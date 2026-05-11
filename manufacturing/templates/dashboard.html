@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manufacturing System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: rgb(0, 85, 255);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        .toolbar {
+            background-color: rgb(0, 60, 180);
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 12px;
+        }
+        .toolbar .spacer { flex: 1; }
+        .toolbar span {
+            color: white;
+            font-size: 13px;
+            padding-right: 12px;
+        }
+        .btn {
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 4px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+        }
+        .btn:hover {
+            background-color: rgb(85, 255, 255);
+            border-color: rgb(85, 255, 255);
+        }
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 52px);
+        }
+        h1 {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <a href="#" class="btn">User Roles</a>
+        <div class="spacer"></div>
+        <span>Logged in as: {{ email }}</span>
+        <a href="{% url 'logout' %}" class="btn">Logout</a>
+    </div>
+    <div class="content">
+        <h1>Welcome to the Manufacturing System</h1>
+    </div>
+</body>
+</html>
