@@ -34,10 +34,13 @@ _MAINT_MENU = {
 _MKT_MENU = {
     'title': 'Marketing Menu',
     'items': [
-        ('campaigns',    'Campaigns',      {'title': 'Campaigns',      'items': []}),
-        ('mkt_research', 'Market Research',{'title': 'Market Research','items': []}),
-        ('advertising',  'Advertising',   {'title': 'Advertising',    'items': []}),
-        ('analytics',    'Analytics',     {'title': 'Analytics',      'items': []}),
+        ('campaigns',    'Campaigns',         {'title': 'Campaigns',         'items': []}),
+        ('mkt_research', 'Market Research',   {'title': 'Market Research',   'items': []}),
+        ('advertising',  'Advertising',       {'title': 'Advertising',       'items': []}),
+        ('analytics',    'Analytics',         {'title': 'Analytics',         'items': []}),
+        ('content_mgmt', 'Content Management',{'title': 'Content Management','items': []}),
+        ('social_media', 'Social Media',      {'title': 'Social Media',      'items': []}),
+        ('email_mkt',    'Email Marketing',   {'title': 'Email Marketing',   'items': []}),
     ],
 }
 _SALES_MENU = {
