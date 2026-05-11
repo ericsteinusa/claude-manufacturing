@@ -26,6 +26,9 @@ _MAINT_MENU = {
         ('maint_schedule', 'Maintenance Schedule',  {'title': 'Maintenance Schedule',  'items': []}),
         ('equip_maint',    'Equipment Maintenance', {'title': 'Equipment Maintenance', 'items': []}),
         ('parts_inv',      'Parts Inventory',       {'title': 'Parts Inventory',       'items': []}),
+        ('maint_reports',  'Maintenance Reports',   {'title': 'Maintenance Reports',   'items': []}),
+        ('safety_insp',    'Safety Inspections',    {'title': 'Safety Inspections',    'items': []}),
+        ('prev_maint',     'Preventive Maintenance',{'title': 'Preventive Maintenance','items': []}),
     ],
 }
 _MKT_MENU = {
