@@ -1,6 +1,5 @@
-import subprocess
+import subprocess, sys, os
 from PyQt6 import QtCore, QtGui, QtWidgets
-import sys
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -56,10 +55,14 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def press_it(self, pressed):
-        if pressed == "IT Support Calls":
-                subprocess.Popen(["python3", "it_calls.py"])
-        if pressed == "IT Tasks":
-                subprocess.Popen(["python3", "IT_Tasks.py"])
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "IT Support Calls": "it_calls.py",
+            "IT Tasks":         "IT_Tasks.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

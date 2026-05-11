@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
+import subprocess, sys, os
 
 class Ui_Purchasing_menu(object):
     def setupUi(self, Purchasing_menu):
@@ -192,10 +192,14 @@ class Ui_Purchasing_menu(object):
         QtCore.QMetaObject.connectSlotsByName(Purchasing_menu)
 
     def press_it(self, pressed):
-        if pressed == "Product Entry":
-                subprocess.run(["python", "product_entry_screen.py"])
-        if pressed == "Supplier Entry":
-                subprocess.run(["python", "Supplier_entry.py"])
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "Product Entry":  "product_entry_screen.py",
+            "Supplier Entry": "Supplier_entry.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, Purchasing_menu):
         _translate = QtCore.QCoreApplication.translate

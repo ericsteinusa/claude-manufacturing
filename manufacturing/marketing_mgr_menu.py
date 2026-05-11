@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
+import subprocess, sys, os
 
 class Ui_Marketing_mgr_menu(object):
     def setupUi(self, Marketing_mgr_menu):
@@ -42,8 +42,13 @@ class Ui_Marketing_mgr_menu(object):
         QtCore.QMetaObject.connectSlotsByName(Marketing_mgr_menu)
 
     def press_it(self, pressed):
-        if pressed == "Marketing Menu":
-            subprocess.Popen(["python3", "marketing_menu.py"])
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "Marketing Menu": "marketing_menu.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, Marketing_mgr_menu):
         _translate = QtCore.QCoreApplication.translate

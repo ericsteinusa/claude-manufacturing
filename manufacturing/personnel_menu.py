@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
+import subprocess, sys, os
 
 class Ui_Personnel_menu(object):
     def setupUi(self, Personnel_menu):
@@ -257,20 +257,19 @@ class Ui_Personnel_menu(object):
         QtCore.QMetaObject.connectSlotsByName(Personnel_menu)
 
     def press_it(self, pressed):
-        if pressed == "Personnel CRM":
-                subprocess.Popen(["python3", "personnel_crm.py"])
-        if pressed == "Registration Form":
-                subprocess.Popen(["python3", "registration_form.py"])
-        if pressed == "Update Password":
-                subprocess.Popen(["python3", "update_users.py"])
-        if pressed == "Display Department":
-                subprocess.Popen(["python3", "display_people_department.py"])
-        if pressed == "Dept Entry":
-                subprocess.Popen(["python3", "dept_entry.py"])
-        if pressed == "Dept Sub Entry":
-                subprocess.Popen(["python3", "dept_sub_entry.py"])
-        if pressed == "Time Clock":
-                subprocess.Popen(["python3", "time_clock_menu.py"])   
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "Personnel CRM":      "personnel_crm.py",
+            "Registration Form":  "registration_form.py",
+            "Update Password":    "update_users.py",
+            "Display Department": "display_people_department.py",
+            "Dept Entry":         "dept_entry.py",
+            "Dept Sub Entry":     "dept_sub_entry.py",
+            "Time Clock":         "time_clock_menu.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, Personnel_menu):
         _translate = QtCore.QCoreApplication.translate
