@@ -46,10 +46,13 @@ _MKT_MENU = {
 _SALES_MENU = {
     'title': 'Sales Menu',
     'items': [
-        ('sales_orders',  'Sales Orders',      {'title': 'Sales Orders',      'items': []}),
-        ('cust_accounts', 'Customer Accounts', {'title': 'Customer Accounts', 'items': []}),
-        ('sales_reports', 'Sales Reports',     {'title': 'Sales Reports',     'items': []}),
-        ('quotes',        'Quotes',            {'title': 'Quotes',            'items': []}),
+        ('sales_orders',  'Sales Orders',          {'title': 'Sales Orders',          'items': []}),
+        ('cust_accounts', 'Customer Accounts',     {'title': 'Customer Accounts',     'items': []}),
+        ('sales_reports', 'Sales Reports',         {'title': 'Sales Reports',         'items': []}),
+        ('quotes',        'Quotes',                {'title': 'Quotes',                'items': []}),
+        ('leads',         'Leads & Opportunities', {'title': 'Leads & Opportunities', 'items': []}),
+        ('contracts',     'Contracts',             {'title': 'Contracts',             'items': []}),
+        ('forecasting',   'Sales Forecasting',     {'title': 'Sales Forecasting',     'items': []}),
     ],
 }
 _PROD_MENU = {
