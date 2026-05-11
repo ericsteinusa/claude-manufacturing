@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manufacturing System</title>
+    <title>{{ title }}</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -74,26 +74,18 @@
 </head>
 <body>
     <div class="toolbar">
-        <a href="{% url 'user_roles' %}" class="btn">User Roles</a>
+        <a href="{% url 'dashboard' %}" class="btn">Back</a>
         <div class="spacer"></div>
         <span>Logged in as: {{ email }}</span>
         <a href="{% url 'change_password' %}" class="btn">Change Password</a>
         <a href="{% url 'logout' %}" class="btn">Logout</a>
     </div>
     <div class="content">
-        <div class="menu-title">Company Main Menu</div>
+        <div class="menu-title">{{ title }}</div>
         <div class="dept-grid">
-            <a href="{% url 'dept_menu' 'accounting' %}" class="dept-btn">Accounting</a>
-            <a href="{% url 'dept_menu' 'customer_service' %}" class="dept-btn">Customer Service</a>
-            <a href="{% url 'dept_menu' 'engineering' %}" class="dept-btn">Engineering</a>
-            <a href="{% url 'dept_menu' 'information_tech' %}" class="dept-btn">Information Tech</a>
-            <a href="{% url 'dept_menu' 'maintenance' %}" class="dept-btn">Maintenance</a>
-            <a href="{% url 'dept_menu' 'marketing' %}" class="dept-btn">Marketing</a>
-            <a href="{% url 'dept_menu' 'personnel' %}" class="dept-btn">Personnel</a>
-            <a href="{% url 'dept_menu' 'production' %}" class="dept-btn">Production</a>
-            <a href="{% url 'dept_menu' 'purchasing' %}" class="dept-btn">Purchasing</a>
-            <a href="{% url 'dept_menu' 'quality_assurance' %}" class="dept-btn">Quality Assurance</a>
-            <a href="{% url 'dept_menu' 'sales' %}" class="dept-btn">Sales</a>
+            {% for key, label in subdepts %}
+            <a href="{% url 'launch_subdept' dept key %}" class="dept-btn">{{ label }}</a>
+            {% endfor %}
         </div>
     </div>
 </body>

@@ -10,5 +10,6 @@ urlpatterns = [
     path('forgot-password/reset/', views.forgot_password_reset, name='forgot_password_reset'),
     path('change-password/', views.change_password, name='change_password'),
     path('user-roles/', views.user_roles, name='user_roles'),
-    path('launch/<str:dept>/', views.launch_department, name='launch_department'),
+    path('dept/<str:dept>/', views.dept_menu, name='dept_menu'),
+    path('launch/<str:dept>/<str:subdept>/', views.launch_subdept, name='launch_subdept'),
 ]

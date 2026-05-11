@@ -5,18 +5,89 @@ import sqlite3
 from django.shortcuts import render, redirect
 
 
-DEPT_SCRIPTS = {
-    'accounting':       'Accounting_Main_menu.py',
-    'customer_service': 'cs_main_menu.py',
-    'engineering':      'engineering_Main_menu.py',
-    'information_tech': 'IT_Main_Menu.py',
-    'maintenance':      'Maint_Main_menu.py',
-    'marketing':        'Marketing_Main_menu.py',
-    'personnel':        'Personnel_Main_menu.py',
-    'production':       'Production_Main_menu.py',
-    'purchasing':       'Purchasing_Main_menu.py',
-    'quality_assurance':'QA_Main_menu.py',
-    'sales':            'Sales_Main_menu.py',
+DEPT_MENUS = {
+    'accounting': {
+        'title': 'Accounting Main Menu',
+        'subdepts': [
+            ('acct_pay',  'Accounts Payable',    'Accounts_payable.py'),
+            ('acct_mgr',  'Accounting Manager',  'Accounting_manager.py'),
+            ('acct_rcv',  'Accounts Receivable', 'Accounts_receivable.py'),
+            ('credit',    'Credit Department',   'Credit_dept.py'),
+            ('payroll',   'Payroll Department',  'Payroll_dept.py'),
+        ],
+    },
+    'customer_service': {
+        'title': 'Customer Service Main Menu',
+        'subdepts': [
+            ('cs_mgr',   'CS Manager Menu',        'cs_mgr_menu.py'),
+            ('cs_menu',  'Customer Service Menu',  'cs_menu.py'),
+            ('cs_calls', 'Customer Service Calls', 'cs_calls.py'),
+        ],
+    },
+    'engineering': {
+        'title': 'Engineering Main Menu',
+        'subdepts': [
+            ('eng_mgr',   'Engineering Manager', 'eng_mgr.py'),
+            ('engineers', 'Engineers',            'engineer.py'),
+        ],
+    },
+    'information_tech': {
+        'title': 'Information Technology Main Menu',
+        'subdepts': [
+            ('it_mgr',  'IT Manager',    'IT_mgr.py'),
+            ('it_tech', 'IT Technician', 'IT_technician.py'),
+        ],
+    },
+    'maintenance': {
+        'title': 'Maintenance Main Menu',
+        'subdepts': [
+            ('maint_mgr', 'Maintenance Manager', 'Maint_mgr_menu.py'),
+            ('maint',     'Maintenance',          'Maint_Maint_menu.py'),
+        ],
+    },
+    'marketing': {
+        'title': 'Marketing Main Menu',
+        'subdepts': [
+            ('mkt_mgr',  'Marketing Manager Menu', 'marketing_mgr_menu.py'),
+            ('mkt_menu', 'Marketing Menu',          'marketing_menu.py'),
+        ],
+    },
+    'personnel': {
+        'title': 'Personnel Main Menu',
+        'subdepts': [
+            ('pers_mgr',  'Personnel Manager Menu', 'personnel_mgr_menu.py'),
+            ('pers_menu', 'Personnel Menu',          'personnel_menu.py'),
+        ],
+    },
+    'production': {
+        'title': 'Production Main Menu',
+        'subdepts': [
+            ('prod_mgr', 'Production Manager', 'prod_mgr_Menu.py'),
+            ('prod',     'Production',          'prod_prod_menu.py'),
+            ('shipping', 'Shipping',            'prod_ship_dept.py'),
+        ],
+    },
+    'purchasing': {
+        'title': 'Purchasing Main Menu',
+        'subdepts': [
+            ('purch_mgr', 'Purchasing Manager Menu', 'Purchasing_Mgr_menu.py'),
+            ('purch',     'Purchasing Menu',          'Purchasing_menu.py'),
+        ],
+    },
+    'quality_assurance': {
+        'title': 'Quality Assurance Main Menu',
+        'subdepts': [
+            ('qa_mgr',  'QA Manager Menu',        'QA_Mgr_menu.py'),
+            ('qa_menu', 'Quality Assurance Menu', 'Quality_Assurance_menu.py'),
+        ],
+    },
+    'sales': {
+        'title': 'Sales Main Menu',
+        'subdepts': [
+            ('sales_mgr', 'Sales Manager Menu', 'Sales_mgr_menu.py'),
+            ('sales',     'Sales Menu',          'Sales_menu.py'),
+        ],
+    },
 }
 
 
@@ -126,15 +197,33 @@ def logout(request):
     return redirect('home')
 
 
-def launch_department(request, dept):
+def dept_menu(request, dept):
     if not request.session.get('user_email'):
         return redirect('home')
-    script = DEPT_SCRIPTS.get(dept)
-    if script:
-        manufacturing_dir = os.path.dirname(__file__)
-        script_path = os.path.join(manufacturing_dir, script)
-        subprocess.Popen([sys.executable, script_path], cwd=manufacturing_dir)
-    return redirect('dashboard')
+    menu = DEPT_MENUS.get(dept)
+    if not menu:
+        return redirect('dashboard')
+    subdepts = [(key, label) for key, label, _script in menu['subdepts']]
+    return render(request, 'dept_menu.html', {
+        'email': request.session['user_email'],
+        'title': menu['title'],
+        'dept': dept,
+        'subdepts': subdepts,
+    })
+
+
+def launch_subdept(request, dept, subdept):
+    if not request.session.get('user_email'):
+        return redirect('home')
+    menu = DEPT_MENUS.get(dept)
+    if menu:
+        for key, _label, script in menu['subdepts']:
+            if key == subdept:
+                manufacturing_dir = os.path.dirname(__file__)
+                subprocess.Popen([sys.executable, os.path.join(manufacturing_dir, script)],
+                                 cwd=manufacturing_dir)
+                break
+    return redirect('dept_menu', dept=dept)
 
 
 # ---------------------------------------------------------------------------
