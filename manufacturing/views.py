@@ -115,11 +115,14 @@ _PERS_MENU = {
 _CS_MENU = {
     'title': 'Customer Service Menu',
     'items': [
-        ('cs_calls',   'Customer Service Calls', 'cs_calls.py'),
-        ('cust_entry', 'Customer Entry Screen',  'customer_entry.py'),
-        ('open_tickets',  'Open Tickets',      {'title': 'Open Tickets',      'items': []}),
-        ('cust_accounts', 'Customer Accounts', {'title': 'Customer Accounts', 'items': []}),
-        ('returns',       'Returns & Refunds', {'title': 'Returns & Refunds', 'items': []}),
+        ('cs_calls',      'Customer Service Calls', 'cs_calls.py'),
+        ('cust_entry',    'Customer Entry Screen',  'customer_entry.py'),
+        ('open_tickets',  'Open Tickets',           {'title': 'Open Tickets',        'items': []}),
+        ('cust_accounts', 'Customer Accounts',      {'title': 'Customer Accounts',   'items': []}),
+        ('returns',       'Returns & Refunds',      {'title': 'Returns & Refunds',   'items': []}),
+        ('knowledge_base','Knowledge Base',         {'title': 'Knowledge Base',      'items': []}),
+        ('svc_reports',   'Service Reports',        {'title': 'Service Reports',     'items': []}),
+        ('surveys',       'Surveys & Feedback',     {'title': 'Surveys & Feedback',  'items': []}),
     ],
 }
 _IT_TECH = {
