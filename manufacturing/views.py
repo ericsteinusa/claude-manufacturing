@@ -101,8 +101,11 @@ _CS_MENU = {
 _IT_TECH = {
     'title': 'IT Technician',
     'items': [
-        ('it_calls', 'IT Support Calls', 'it_calls.py'),
-        ('it_tasks', 'IT Tasks',          'IT_Tasks.py'),
+        ('it_calls',    'IT Support Calls',  'it_calls.py'),
+        ('it_tasks',    'IT Tasks',          'IT_Tasks.py'),
+        ('help_desk',   'Help Desk Tickets', {'title': 'Help Desk Tickets', 'items': []}),
+        ('asset_mgmt',  'Asset Management',  {'title': 'Asset Management',  'items': []}),
+        ('net_status',  'Network Status',    {'title': 'Network Status',    'items': []}),
     ],
 }
 _PURCH_MENU = {
