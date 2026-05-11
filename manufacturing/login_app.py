@@ -1,6 +1,5 @@
 import sys
 import sqlite3
-import bcrypt
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -119,19 +118,7 @@ def verify_login(email: str, password: str) -> bool:
         conn.close()
         return False
 
-    stored = row["password"]
-
-    # Bcrypt hashes start with $2b$ or $2a$
-    if stored.startswith(("$2b$", "$2a$")):
-        ok = bcrypt.checkpw(password.encode(), stored.encode())
-    else:
-        # Plain-text legacy password — compare then upgrade to bcrypt
-        ok = (password == stored)
-        if ok:
-            new_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-            conn.execute("UPDATE passwd SET password = ? WHERE id = ?", (new_hash, row["pw_id"]))
-            conn.commit()
-
+    ok = (password == row["password"])
     conn.close()
     return ok
 
@@ -139,7 +126,6 @@ def verify_login(email: str, password: str) -> bool:
 def create_user(email: str, password: str, first_name: str = "", last_name: str = "",
                 address: str = "", city: str = "", state: str = "", zip_code: str = "",
                 employee_id: int = 0) -> bool:
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     try:
         conn = get_db()
         if conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone():
@@ -152,7 +138,7 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         )
         conn.execute(
             "INSERT INTO passwd (people_id, password) VALUES (?, ?)",
-            (cursor.lastrowid, hashed),
+            (cursor.lastrowid, password),
         )
         conn.commit()
         conn.close()
@@ -183,8 +169,7 @@ def reset_password(email: str, new_password: str) -> bool:
     if row is None:
         conn.close()
         return False
-    new_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-    conn.execute("UPDATE passwd SET password = ? WHERE id = ?", (new_hash, row["pw_id"]))
+    conn.execute("UPDATE passwd SET password = ? WHERE id = ?", (new_password, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
