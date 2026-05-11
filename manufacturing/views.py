@@ -79,13 +79,16 @@ _QA_MENU = {
 _PERS_MENU = {
     'title': 'Personnel Menu',
     'items': [
-        ('pers_crm',   'Personnel CRM',      'personnel_crm.py'),
-        ('reg_form',   'Registration Form',  'registration_form.py'),
-        ('upd_pass',   'Update Password',    'update_users.py'),
-        ('disp_dept',  'Display Department', 'display_people_department.py'),
-        ('dept_entry', 'Dept Entry',         'dept_entry.py'),
-        ('dept_sub',   'Dept Sub Entry',     'dept_sub_entry.py'),
-        ('time_clock', 'Time Clock',         _TIME_CLOCK_MENU),
+        ('pers_crm',    'Personnel CRM',       'personnel_crm.py'),
+        ('reg_form',    'Registration Form',   'registration_form.py'),
+        ('upd_pass',    'Update Password',     'update_users.py'),
+        ('disp_dept',   'Display Department',  'display_people_department.py'),
+        ('dept_entry',  'Dept Entry',          'dept_entry.py'),
+        ('dept_sub',    'Dept Sub Entry',      'dept_sub_entry.py'),
+        ('time_clock',  'Time Clock',          _TIME_CLOCK_MENU),
+        ('emp_records', 'Employee Records',    {'title': 'Employee Records',    'items': []}),
+        ('benefits',    'Benefits',            {'title': 'Benefits',            'items': []}),
+        ('perf_review', 'Performance Reviews', {'title': 'Performance Reviews', 'items': []}),
     ],
 }
 _CS_MENU = {
