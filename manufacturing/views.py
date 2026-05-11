@@ -178,6 +178,9 @@ MENU_TREE = {
             ('gen_ledger',  'General Ledger',      {'title': 'General Ledger',      'items': []}),
             ('budget_mgmt', 'Budget Management',   {'title': 'Budget Management',   'items': []}),
             ('fin_reports', 'Financial Reports',   {'title': 'Financial Reports',   'items': []}),
+            ('tax_mgmt',    'Tax Management',      {'title': 'Tax Management',      'items': []}),
+            ('exp_reports', 'Expense Reports',     {'title': 'Expense Reports',     'items': []}),
+            ('bank_recon',  'Bank Reconciliation', {'title': 'Bank Reconciliation', 'items': []}),
         ],
     },
     'customer_service': {
