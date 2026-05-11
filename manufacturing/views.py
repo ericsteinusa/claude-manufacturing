@@ -7,6 +7,75 @@ from django.shortcuts import render, redirect
 
 # Each item: (key, label, target)
 # target is a script filename (str = leaf) or a dict (sub-menu node).
+_TIME_CLOCK_MENU = {
+    'title': 'Time Clock Menu',
+    'items': [
+        ('clock_in_out',   'Clock In/Out',       {'title': 'Clock In/Out',       'items': []}),
+        ('view_hours',     'View Hours',          {'title': 'View Hours',         'items': []}),
+        ('time_off',       'Time Off Requests',   {'title': 'Time Off Requests',  'items': []}),
+        ('schedules',      'Schedules',           {'title': 'Schedules',          'items': []}),
+    ],
+}
+_MAINT_MENU = {
+    'title': 'Maintenance Menu',
+    'items': [
+        ('work_orders',    'Work Orders',           {'title': 'Work Orders',           'items': []}),
+        ('maint_schedule', 'Maintenance Schedule',  {'title': 'Maintenance Schedule',  'items': []}),
+        ('equip_maint',    'Equipment Maintenance', {'title': 'Equipment Maintenance', 'items': []}),
+        ('parts_inv',      'Parts Inventory',       {'title': 'Parts Inventory',       'items': []}),
+    ],
+}
+_MKT_MENU = {
+    'title': 'Marketing Menu',
+    'items': [
+        ('campaigns',    'Campaigns',      {'title': 'Campaigns',      'items': []}),
+        ('mkt_research', 'Market Research',{'title': 'Market Research','items': []}),
+        ('advertising',  'Advertising',   {'title': 'Advertising',    'items': []}),
+        ('analytics',    'Analytics',     {'title': 'Analytics',      'items': []}),
+    ],
+}
+_SALES_MENU = {
+    'title': 'Sales Menu',
+    'items': [
+        ('sales_orders',  'Sales Orders',      {'title': 'Sales Orders',      'items': []}),
+        ('cust_accounts', 'Customer Accounts', {'title': 'Customer Accounts', 'items': []}),
+        ('sales_reports', 'Sales Reports',     {'title': 'Sales Reports',     'items': []}),
+        ('quotes',        'Quotes',            {'title': 'Quotes',            'items': []}),
+    ],
+}
+_PROD_MENU = {
+    'title': 'Production Menu',
+    'items': [
+        ('work_orders',   'Work Orders',          {'title': 'Work Orders',          'items': []}),
+        ('prod_schedule', 'Production Schedule',  {'title': 'Production Schedule',  'items': []}),
+        ('inventory',     'Inventory',            {'title': 'Inventory',            'items': []}),
+        ('equip_status',  'Equipment Status',     {'title': 'Equipment Status',     'items': []}),
+    ],
+}
+_SHIP_MENU = {
+    'title': 'Shipping Department',
+    'items': [
+        ('ship_orders',   'Shipment Orders',    {'title': 'Shipment Orders',    'items': []}),
+        ('ship_schedule', 'Shipping Schedule',  {'title': 'Shipping Schedule',  'items': []}),
+        ('receiving',     'Receiving',          {'title': 'Receiving',          'items': []}),
+        ('carrier_mgmt',  'Carrier Management', {'title': 'Carrier Management', 'items': []}),
+    ],
+}
+_QA_LAB_MENU = {
+    'title': 'QA Laboratory Menu',
+    'items': [
+        ('test_requests',  'Test Requests',      {'title': 'Test Requests',      'items': []}),
+        ('lab_results',    'Lab Results',        {'title': 'Lab Results',        'items': []}),
+        ('insp_reports',   'Inspection Reports', {'title': 'Inspection Reports', 'items': []}),
+        ('non_conformance','Non-Conformance',    {'title': 'Non-Conformance',    'items': []}),
+    ],
+}
+_QA_MENU = {
+    'title': 'Quality Assurance Menu',
+    'items': [
+        ('qa_lab', 'QA Laboratory Menu', _QA_LAB_MENU),
+    ],
+}
 _PERS_MENU = {
     'title': 'Personnel Menu',
     'items': [
@@ -16,7 +85,7 @@ _PERS_MENU = {
         ('disp_dept',  'Display Department', 'display_people_department.py'),
         ('dept_entry', 'Dept Entry',         'dept_entry.py'),
         ('dept_sub',   'Dept Sub Entry',     'dept_sub_entry.py'),
-        ('time_clock', 'Time Clock',         'time_clock_menu.py'),
+        ('time_clock', 'Time Clock',         _TIME_CLOCK_MENU),
     ],
 }
 _CS_MENU = {
@@ -38,12 +107,6 @@ _PURCH_MENU = {
     'items': [
         ('prod_entry', 'Product Entry',  'product_entry_screen.py'),
         ('sup_entry',  'Supplier Entry', 'Supplier_entry.py'),
-    ],
-}
-_QA_MENU = {
-    'title': 'Quality Assurance Menu',
-    'items': [
-        ('qa_lab', 'QA Laboratory Menu', 'QA_Lab_menu.py'),
     ],
 }
 
@@ -109,10 +172,10 @@ MENU_TREE = {
             ('maint_mgr', 'Maintenance Manager', {
                 'title': 'Maintenance Manager',
                 'items': [
-                    ('maint', 'Maintenance', 'Maint_Maint_menu.py'),
+                    ('maint', 'Maintenance', _MAINT_MENU),
                 ],
             }),
-            ('maint', 'Maintenance', 'Maint_Maint_menu.py'),
+            ('maint', 'Maintenance', _MAINT_MENU),
         ],
     },
     'marketing': {
@@ -121,10 +184,10 @@ MENU_TREE = {
             ('mkt_mgr', 'Marketing Manager Menu', {
                 'title': 'Marketing Manager Menu',
                 'items': [
-                    ('mkt_menu', 'Marketing Menu', 'marketing_menu.py'),
+                    ('mkt_menu', 'Marketing Menu', _MKT_MENU),
                 ],
             }),
-            ('mkt_menu', 'Marketing Menu', 'marketing_menu.py'),
+            ('mkt_menu', 'Marketing Menu', _MKT_MENU),
         ],
     },
     'personnel': {
@@ -145,12 +208,12 @@ MENU_TREE = {
             ('prod_mgr', 'Production Manager', {
                 'title': 'Production Manager',
                 'items': [
-                    ('prod',     'Production', 'prod_prod_menu.py'),
-                    ('shipping', 'Shipping',   'prod_ship_dept.py'),
+                    ('prod',     'Production', _PROD_MENU),
+                    ('shipping', 'Shipping',   _SHIP_MENU),
                 ],
             }),
-            ('prod',     'Production', 'prod_prod_menu.py'),
-            ('shipping', 'Shipping',   'prod_ship_dept.py'),
+            ('prod',     'Production', _PROD_MENU),
+            ('shipping', 'Shipping',   _SHIP_MENU),
         ],
     },
     'purchasing': {
@@ -183,10 +246,10 @@ MENU_TREE = {
             ('sales_mgr', 'Sales Manager Menu', {
                 'title': 'Sales Manager Menu',
                 'items': [
-                    ('sales', 'Sales Menu', 'Sales_menu.py'),
+                    ('sales', 'Sales Menu', _SALES_MENU),
                 ],
             }),
-            ('sales', 'Sales Menu', 'Sales_menu.py'),
+            ('sales', 'Sales Menu', _SALES_MENU),
         ],
     },
 }
