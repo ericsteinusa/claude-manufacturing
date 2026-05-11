@@ -130,10 +130,13 @@ MENU_TREE = {
             ('acct_mgr',    'Accounting Manager', {
                 'title': 'Accounting Manager',
                 'items': [
-                    ('ap',     'Accounts Payable',    'Accounts_payable.py'),
-                    ('rcv',    'Accounts Receivable', 'Accounts_receivable.py'),
-                    ('credit', 'Credit Department',   'Credit_dept.py'),
-                    ('pay',    'Payroll Department',  'Payroll_dept.py'),
+                    ('ap',          'Accounts Payable',    'Accounts_payable.py'),
+                    ('rcv',         'Accounts Receivable', 'Accounts_receivable.py'),
+                    ('credit',      'Credit Department',   'Credit_dept.py'),
+                    ('pay',         'Payroll Department',  'Payroll_dept.py'),
+                    ('fin_reports', 'Financial Reports',   {'title': 'Financial Reports',   'items': []}),
+                    ('budget_mgmt', 'Budget Management',   {'title': 'Budget Management',   'items': []}),
+                    ('audit_mgmt',  'Audit Management',    {'title': 'Audit Management',    'items': []}),
                 ],
             }),
             ('acct_rcv',    'Accounts Receivable', 'Accounts_receivable.py'),
