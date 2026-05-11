@@ -207,7 +207,10 @@ MENU_TREE = {
             ('mkt_mgr', 'Marketing Manager Menu', {
                 'title': 'Marketing Manager Menu',
                 'items': [
-                    ('mkt_menu', 'Marketing Menu', _MKT_MENU),
+                    ('mkt_menu',   'Marketing Menu',     _MKT_MENU),
+                    ('mkt_budget', 'Marketing Budget',   {'title': 'Marketing Budget',   'items': []}),
+                    ('camp_appr',  'Campaign Approvals', {'title': 'Campaign Approvals', 'items': []}),
+                    ('mkt_reports','Marketing Reports',  {'title': 'Marketing Reports',  'items': []}),
                 ],
             }),
             ('mkt_menu', 'Marketing Menu', _MKT_MENU),
