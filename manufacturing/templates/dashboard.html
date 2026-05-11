@@ -55,6 +55,7 @@
         <a href="#" class="btn">User Roles</a>
         <div class="spacer"></div>
         <span>Logged in as: {{ email }}</span>
+        <a href="{% url 'change_password' %}" class="btn">Change Password</a>
         <a href="{% url 'logout' %}" class="btn">Logout</a>
     </div>
     <div class="content">
