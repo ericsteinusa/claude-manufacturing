@@ -273,7 +273,11 @@ MENU_TREE = {
             ('sales_mgr', 'Sales Manager Menu', {
                 'title': 'Sales Manager Menu',
                 'items': [
-                    ('sales', 'Sales Menu', _SALES_MENU),
+                    ('sales',        'Sales Menu',            _SALES_MENU),
+                    ('sales_targets','Sales Targets',         {'title': 'Sales Targets',         'items': []}),
+                    ('territory',    'Territory Management',  {'title': 'Territory Management',  'items': []}),
+                    ('commission',   'Commission Tracking',   {'title': 'Commission Tracking',   'items': []}),
+                    ('staff_perf',   'Staff Performance',     {'title': 'Staff Performance',     'items': []}),
                 ],
             }),
             ('sales', 'Sales Menu', _SALES_MENU),
