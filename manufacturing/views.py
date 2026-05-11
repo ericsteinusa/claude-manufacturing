@@ -93,6 +93,9 @@ _CS_MENU = {
     'items': [
         ('cs_calls',   'Customer Service Calls', 'cs_calls.py'),
         ('cust_entry', 'Customer Entry Screen',  'customer_entry.py'),
+        ('open_tickets',  'Open Tickets',      {'title': 'Open Tickets',      'items': []}),
+        ('cust_accounts', 'Customer Accounts', {'title': 'Customer Accounts', 'items': []}),
+        ('returns',       'Returns & Refunds', {'title': 'Returns & Refunds', 'items': []}),
     ],
 }
 _IT_TECH = {
@@ -105,8 +108,11 @@ _IT_TECH = {
 _PURCH_MENU = {
     'title': 'Purchasing Menu',
     'items': [
-        ('prod_entry', 'Product Entry',  'product_entry_screen.py'),
-        ('sup_entry',  'Supplier Entry', 'Supplier_entry.py'),
+        ('prod_entry',    'Product Entry',    'product_entry_screen.py'),
+        ('sup_entry',     'Supplier Entry',   'Supplier_entry.py'),
+        ('purch_orders',  'Purchase Orders',  {'title': 'Purchase Orders',  'items': []}),
+        ('vendor_mgmt',   'Vendor Management',{'title': 'Vendor Management','items': []}),
+        ('purch_reports', 'Purchase Reports', {'title': 'Purchase Reports', 'items': []}),
     ],
 }
 
