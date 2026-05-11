@@ -179,7 +179,11 @@ MENU_TREE = {
             ('it_mgr', 'IT Manager', {
                 'title': 'IT Manager',
                 'items': [
-                    ('it_tech', 'IT Technician', _IT_TECH),
+                    ('it_tech',    'IT Technician',       _IT_TECH),
+                    ('budget',     'Budget & Procurement', {'title': 'Budget & Procurement', 'items': []}),
+                    ('vendor_con', 'Vendor Contracts',     {'title': 'Vendor Contracts',     'items': []}),
+                    ('it_projects','IT Projects',          {'title': 'IT Projects',          'items': []}),
+                    ('security',   'Security Management',  {'title': 'Security Management',  'items': []}),
                 ],
             }),
             ('it_tech', 'IT Technician', _IT_TECH),
