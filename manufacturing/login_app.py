@@ -97,6 +97,13 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         return False
 
 
+def change_password(email: str, current_password: str, new_password: str) -> bool:
+    """Verify current password then update to new one. Returns False if auth fails."""
+    if not verify_login(email, current_password):
+        return False
+    return reset_password(email, new_password)
+
+
 def reset_password(email: str, new_password: str) -> bool:
     """Update the password for an existing account. Returns False if email not found."""
     conn = get_db()
@@ -300,6 +307,114 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
             self.accept()
         else:
             QtWidgets.QMessageBox.warning(self, "Error", "Password reset failed. Please try again.")
+
+
+# ---------------------------------------------------------------------------
+# Change password window
+# ---------------------------------------------------------------------------
+class ChangePasswordWindow(QtWidgets.QDialog):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Change Password")
+        self.setFixedSize(420, 290)
+        _apply_blue_palette(self)
+        self._build_ui()
+
+    def _build_ui(self):
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(50, 35, 50, 35)
+        layout.setSpacing(14)
+
+        title = QtWidgets.QLabel("Change Password")
+        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        layout.addWidget(title)
+        layout.addSpacing(4)
+
+        self.email_input = QtWidgets.QLineEdit()
+        self.email_input.setPlaceholderText("Your registered email")
+        self.email_input.setStyleSheet(INPUT_STYLE)
+        layout.addLayout(_make_row("Email:", self.email_input))
+
+        self.current_input = QtWidgets.QLineEdit()
+        self.current_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+        self.current_input.setPlaceholderText("Current password")
+        self.current_input.setStyleSheet(INPUT_STYLE)
+        layout.addLayout(_make_row("Current:", self.current_input, label_width=115))
+
+        self.new_input = QtWidgets.QLineEdit()
+        self.new_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+        self.new_input.setPlaceholderText("Minimum 8 characters")
+        self.new_input.setStyleSheet(INPUT_STYLE)
+        layout.addLayout(_make_row("New:", self.new_input, label_width=115))
+
+        self.confirm_input = QtWidgets.QLineEdit()
+        self.confirm_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+        self.confirm_input.setPlaceholderText("Re-enter new password")
+        self.confirm_input.setStyleSheet(INPUT_STYLE)
+        layout.addLayout(_make_row("Confirm:", self.confirm_input, label_width=115))
+
+        layout.addSpacing(6)
+
+        btn_row = QtWidgets.QHBoxLayout()
+        self.submit_btn = QtWidgets.QPushButton("Change Password")
+        self.submit_btn.setFixedHeight(36)
+        self.submit_btn.setStyleSheet(BUTTON_STYLE)
+        self.submit_btn.clicked.connect(self._on_submit)
+        self.confirm_input.returnPressed.connect(self._on_submit)
+
+        cancel_btn = QtWidgets.QPushButton("Cancel")
+        cancel_btn.setFixedHeight(36)
+        cancel_btn.setStyleSheet(BUTTON_STYLE)
+        cancel_btn.clicked.connect(self.reject)
+
+        btn_row.addWidget(self.submit_btn)
+        btn_row.addSpacing(20)
+        btn_row.addWidget(cancel_btn)
+        layout.addLayout(btn_row)
+
+    def _on_submit(self):
+        email = self.email_input.text().strip()
+        current = self.current_input.text()
+        new_pw = self.new_input.text()
+        confirm = self.confirm_input.text()
+
+        if not email or "@" not in email:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter a valid email address.")
+            return
+        if not current:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter your current password.")
+            return
+        if len(new_pw) < 8:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "New password must be at least 8 characters.")
+            return
+        if new_pw != confirm:
+            self.confirm_input.clear()
+            QtWidgets.QMessageBox.warning(self, "Input Error", "New passwords do not match.")
+            return
+        if new_pw == current:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "New password must differ from your current password.")
+            return
+
+        self.submit_btn.setEnabled(False)
+        self.submit_btn.setText("Saving...")
+
+        ok = change_password(email, current, new_pw)
+
+        self.submit_btn.setEnabled(True)
+        self.submit_btn.setText("Change Password")
+
+        if ok:
+            QtWidgets.QMessageBox.information(
+                self, "Success", "Your password has been changed successfully."
+            )
+            self.accept()
+        else:
+            self.current_input.clear()
+            QtWidgets.QMessageBox.warning(
+                self, "Failed", "Incorrect email or current password."
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -541,6 +656,12 @@ class LoginWindow(QtWidgets.QMainWindow):
         forgot_btn.clicked.connect(self._open_forgot_password)
         layout.addWidget(forgot_btn, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
+        change_btn = QtWidgets.QPushButton("Change Password")
+        change_btn.setFixedHeight(28)
+        change_btn.setStyleSheet(LINK_STYLE)
+        change_btn.clicked.connect(self._open_change_password)
+        layout.addWidget(change_btn, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+
         register_btn = QtWidgets.QPushButton("Register New User")
         register_btn.setFixedHeight(28)
         register_btn.setStyleSheet(LINK_STYLE)
@@ -549,6 +670,10 @@ class LoginWindow(QtWidgets.QMainWindow):
 
     def _open_forgot_password(self):
         dlg = ForgotPasswordWindow(self)
+        dlg.exec()
+
+    def _open_change_password(self):
+        dlg = ChangePasswordWindow(self)
         dlg.exec()
 
     def _open_register(self):
