@@ -10,10 +10,13 @@ from django.shortcuts import render, redirect
 _TIME_CLOCK_MENU = {
     'title': 'Time Clock Menu',
     'items': [
-        ('clock_in_out',   'Clock In/Out',       {'title': 'Clock In/Out',       'items': []}),
-        ('view_hours',     'View Hours',          {'title': 'View Hours',         'items': []}),
-        ('time_off',       'Time Off Requests',   {'title': 'Time Off Requests',  'items': []}),
-        ('schedules',      'Schedules',           {'title': 'Schedules',          'items': []}),
+        ('clock_in_out',  'Clock In/Out',       {'title': 'Clock In/Out',       'items': []}),
+        ('view_hours',    'View Hours',          {'title': 'View Hours',         'items': []}),
+        ('time_off',      'Time Off Requests',   {'title': 'Time Off Requests',  'items': []}),
+        ('schedules',     'Schedules',           {'title': 'Schedules',          'items': []}),
+        ('ot_reports',    'Overtime Reports',    {'title': 'Overtime Reports',   'items': []}),
+        ('attend_reports','Attendance Reports',  {'title': 'Attendance Reports', 'items': []}),
+        ('shift_mgmt',    'Shift Management',    {'title': 'Shift Management',   'items': []}),
     ],
 }
 _MAINT_MENU = {
