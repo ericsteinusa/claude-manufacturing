@@ -74,6 +74,9 @@ _SHIP_MENU = {
         ('ship_schedule', 'Shipping Schedule',  {'title': 'Shipping Schedule',  'items': []}),
         ('receiving',     'Receiving',          {'title': 'Receiving',          'items': []}),
         ('carrier_mgmt',  'Carrier Management', {'title': 'Carrier Management', 'items': []}),
+        ('tracking',      'Tracking',           {'title': 'Tracking',           'items': []}),
+        ('ship_reports',  'Shipping Reports',   {'title': 'Shipping Reports',   'items': []}),
+        ('returns_proc',  'Returns Processing', {'title': 'Returns Processing', 'items': []}),
     ],
 }
 _QA_LAB_MENU = {
