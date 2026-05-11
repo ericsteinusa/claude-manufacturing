@@ -166,7 +166,11 @@ MENU_TREE = {
             ('eng_mgr', 'Engineering Manager', {
                 'title': 'Engineering Manager',
                 'items': [
-                    ('engineers', 'Engineers', 'engineer.py'),
+                    ('engineers',  'Engineers',           'engineer.py'),
+                    ('proj_appr',  'Project Approvals',   {'title': 'Project Approvals',   'items': []}),
+                    ('resource',   'Resource Management', {'title': 'Resource Management', 'items': []}),
+                    ('budget',     'Budget Management',   {'title': 'Budget Management',   'items': []}),
+                    ('eng_reports','Engineering Reports', {'title': 'Engineering Reports', 'items': []}),
                 ],
             }),
             ('engineers',   'Engineers',          'engineer.py'),
