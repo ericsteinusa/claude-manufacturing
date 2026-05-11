@@ -257,3 +257,66 @@ def change_password(request):
         })
 
     return render(request, 'change_password.html', {})
+
+
+# ---------------------------------------------------------------------------
+# User roles
+# ---------------------------------------------------------------------------
+
+def _get_all_users_with_roles():
+    conn = _get_db()
+    rows = conn.execute("""
+        SELECT p.id, p.first_name, p.last_name, p.email,
+               r.id as role_id, r.role_name
+        FROM people p
+        LEFT JOIN user_roles ur ON ur.people_id = p.id
+        LEFT JOIN roles r ON r.id = ur.role_id
+        ORDER BY p.last_name, p.first_name
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def _get_all_roles():
+    conn = _get_db()
+    rows = conn.execute("SELECT id, role_name FROM roles ORDER BY id").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def _set_user_role(people_id: int, role_id: int):
+    conn = _get_db()
+    conn.execute("""
+        INSERT INTO user_roles (people_id, role_id) VALUES (?, ?)
+        ON CONFLICT(people_id) DO UPDATE SET role_id = excluded.role_id
+    """, (people_id, role_id))
+    conn.commit()
+    conn.close()
+
+
+def _remove_user_role(people_id: int):
+    conn = _get_db()
+    conn.execute("DELETE FROM user_roles WHERE people_id = ?", (people_id,))
+    conn.commit()
+    conn.close()
+
+
+def user_roles(request):
+    if not request.session.get('user_email'):
+        return redirect('home')
+
+    roles = _get_all_roles()
+
+    if request.method == 'POST':
+        users = _get_all_users_with_roles()
+        for user in users:
+            key = f"role_{user['id']}"
+            value = request.POST.get(key, '').strip()
+            if value:
+                _set_user_role(user['id'], int(value))
+            else:
+                _remove_user_role(user['id'])
+        return redirect('user_roles')
+
+    users = _get_all_users_with_roles()
+    return render(request, 'user_roles.html', {'users': users, 'roles': roles})

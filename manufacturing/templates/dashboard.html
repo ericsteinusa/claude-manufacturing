@@ -52,7 +52,7 @@
 </head>
 <body>
     <div class="toolbar">
-        <a href="#" class="btn">User Roles</a>
+        <a href="{% url 'user_roles' %}" class="btn">User Roles</a>
         <div class="spacer"></div>
         <span>Logged in as: {{ email }}</span>
         <a href="{% url 'change_password' %}" class="btn">Change Password</a>
