@@ -222,7 +222,11 @@ MENU_TREE = {
             ('pers_mgr', 'Personnel Manager Menu', {
                 'title': 'Personnel Manager Menu',
                 'items': [
-                    ('pers_menu', 'Personnel Menu', _PERS_MENU),
+                    ('pers_menu', 'Personnel Menu',      _PERS_MENU),
+                    ('hiring',    'Hiring & Recruitment',{'title': 'Hiring & Recruitment','items': []}),
+                    ('term',      'Terminations',        {'title': 'Terminations',        'items': []}),
+                    ('salary',    'Salary Management',   {'title': 'Salary Management',   'items': []}),
+                    ('hr_reports','HR Reports',          {'title': 'HR Reports',          'items': []}),
                 ],
             }),
             ('pers_menu', 'Personnel Menu', _PERS_MENU),
