@@ -36,6 +36,70 @@ def init_db():
             FOREIGN KEY (people_id) REFERENCES people(id)
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS roles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role_name TEXT NOT NULL UNIQUE,
+            description TEXT
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS user_roles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            people_id INTEGER NOT NULL UNIQUE,
+            role_id INTEGER NOT NULL,
+            FOREIGN KEY (people_id) REFERENCES people(id),
+            FOREIGN KEY (role_id) REFERENCES roles(id)
+        )
+    """)
+    default_roles = [
+        ("Admin",    "Full access to all screens and settings"),
+        ("Manager",  "Access to department management screens"),
+        ("Employee", "Standard employee access"),
+        ("Viewer",   "Read-only access"),
+    ]
+    conn.executemany(
+        "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)",
+        default_roles,
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_all_users_with_roles():
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT p.id, p.first_name, p.last_name, p.email,
+               r.id as role_id, r.role_name
+        FROM people p
+        LEFT JOIN user_roles ur ON ur.people_id = p.id
+        LEFT JOIN roles r ON r.id = ur.role_id
+        ORDER BY p.last_name, p.first_name
+    """).fetchall()
+    conn.close()
+    return rows
+
+
+def get_all_roles():
+    conn = get_db()
+    rows = conn.execute("SELECT id, role_name, description FROM roles ORDER BY id").fetchall()
+    conn.close()
+    return rows
+
+
+def set_user_role(people_id: int, role_id: int):
+    conn = get_db()
+    conn.execute("""
+        INSERT INTO user_roles (people_id, role_id) VALUES (?, ?)
+        ON CONFLICT(people_id) DO UPDATE SET role_id = excluded.role_id
+    """, (people_id, role_id))
+    conn.commit()
+    conn.close()
+
+
+def remove_user_role(people_id: int):
+    conn = get_db()
+    conn.execute("DELETE FROM user_roles WHERE people_id = ?", (people_id,))
     conn.commit()
     conn.close()
 
@@ -603,6 +667,119 @@ class RegisterWindow(QtWidgets.QDialog):
 
 
 # ---------------------------------------------------------------------------
+# User roles window
+# ---------------------------------------------------------------------------
+class RolesWindow(QtWidgets.QDialog):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("User Roles")
+        self.resize(700, 480)
+        _apply_blue_palette(self)
+        self._pending = {}   # people_id -> role_id, tracks unsaved changes
+        self._build_ui()
+        self._load_data()
+
+    def _build_ui(self):
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(12)
+
+        title = QtWidgets.QLabel("User Role Management")
+        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        layout.addWidget(title)
+
+        # Table
+        self.table = QtWidgets.QTableWidget()
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(["Name", "Email", "Current Role", "Assign Role"])
+        self.table.horizontalHeader().setStyleSheet("color: black; font-weight: bold;")
+        self.table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setAlternatingRowColors(True)
+        self.table.verticalHeader().setVisible(False)
+        layout.addWidget(self.table)
+
+        # Buttons
+        btn_row = QtWidgets.QHBoxLayout()
+        self.save_btn = QtWidgets.QPushButton("Save Changes")
+        self.save_btn.setFixedHeight(34)
+        self.save_btn.setStyleSheet(BUTTON_STYLE)
+        self.save_btn.setEnabled(False)
+        self.save_btn.clicked.connect(self._save_changes)
+
+        close_btn = QtWidgets.QPushButton("Close")
+        close_btn.setFixedHeight(34)
+        close_btn.setStyleSheet(BUTTON_STYLE)
+        close_btn.clicked.connect(self.accept)
+
+        btn_row.addWidget(self.save_btn)
+        btn_row.addSpacing(20)
+        btn_row.addWidget(close_btn)
+        layout.addLayout(btn_row)
+
+    def _load_data(self):
+        roles = get_all_roles()
+        role_names = ["(none)"] + [r["role_name"] for r in roles]
+        self._role_id_map = {r["role_name"]: r["id"] for r in roles}
+
+        users = get_all_users_with_roles()
+        self.table.setRowCount(len(users))
+
+        for row_idx, user in enumerate(users):
+            people_id = user["id"]
+            name = f"{user['first_name']} {user['last_name']}"
+            email = user["email"]
+            current_role = user["role_name"] or "(none)"
+
+            self.table.setItem(row_idx, 0, QtWidgets.QTableWidgetItem(name))
+            self.table.setItem(row_idx, 1, QtWidgets.QTableWidgetItem(email))
+            self.table.setItem(row_idx, 2, QtWidgets.QTableWidgetItem(current_role))
+
+            combo = QtWidgets.QComboBox()
+            combo.addItems(role_names)
+            combo.setCurrentText(current_role)
+            combo.setProperty("people_id", people_id)
+            combo.currentTextChanged.connect(self._on_role_changed)
+            self.table.setCellWidget(row_idx, 3, combo)
+
+    def _on_role_changed(self, role_name: str):
+        combo = self.sender()
+        people_id = combo.property("people_id")
+        if role_name == "(none)":
+            self._pending[people_id] = None
+        else:
+            self._pending[people_id] = self._role_id_map.get(role_name)
+        self.save_btn.setEnabled(bool(self._pending))
+
+    def _save_changes(self):
+        for people_id, role_id in self._pending.items():
+            if role_id is None:
+                remove_user_role(people_id)
+            else:
+                set_user_role(people_id, role_id)
+
+        saved = len(self._pending)
+        self._pending.clear()
+        self.save_btn.setEnabled(False)
+
+        # Refresh the "Current Role" column
+        users = get_all_users_with_roles()
+        for row_idx, user in enumerate(users):
+            current_role = user["role_name"] or "(none)"
+            self.table.setItem(row_idx, 2, QtWidgets.QTableWidgetItem(current_role))
+
+        QtWidgets.QMessageBox.information(
+            self, "Saved", f"{saved} role assignment(s) updated."
+        )
+
+
+# ---------------------------------------------------------------------------
 # Session window  (shown after login, hosts the main app + logout button)
 # ---------------------------------------------------------------------------
 class SessionWindow(QtWidgets.QMainWindow):
@@ -623,6 +800,12 @@ class SessionWindow(QtWidgets.QMainWindow):
         toolbar.setStyleSheet(
             "QToolBar { background-color: rgb(0, 60, 180); border: none; spacing: 8px; padding: 4px; }"
         )
+
+        roles_btn = QtWidgets.QPushButton("User Roles")
+        roles_btn.setFixedHeight(28)
+        roles_btn.setStyleSheet(BUTTON_STYLE)
+        roles_btn.clicked.connect(self._open_roles)
+        toolbar.addWidget(roles_btn)
 
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(
@@ -653,6 +836,10 @@ class SessionWindow(QtWidgets.QMainWindow):
         layout.addWidget(welcome)
 
         self.setCentralWidget(central)
+
+    def _open_roles(self):
+        dlg = RolesWindow(self)
+        dlg.exec()
 
     def _on_logout(self):
         reply = QtWidgets.QMessageBox.question(
