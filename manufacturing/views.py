@@ -68,6 +68,9 @@ _QA_LAB_MENU = {
         ('lab_results',    'Lab Results',        {'title': 'Lab Results',        'items': []}),
         ('insp_reports',   'Inspection Reports', {'title': 'Inspection Reports', 'items': []}),
         ('non_conformance','Non-Conformance',    {'title': 'Non-Conformance',    'items': []}),
+        ('calibration',    'Calibration',        {'title': 'Calibration',        'items': []}),
+        ('sample_mgmt',    'Sample Management',  {'title': 'Sample Management',  'items': []}),
+        ('lab_reports',    'Lab Reports',        {'title': 'Lab Reports',        'items': []}),
     ],
 }
 _QA_MENU = {
