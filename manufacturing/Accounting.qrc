@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="Accounting">
+    <file>Accounting2.png</file>
+  </qresource>
+</RCC>

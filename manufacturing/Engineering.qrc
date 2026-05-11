@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="Engineering">
+    <file>engineering.png</file>
+  </qresource>
+</RCC>
