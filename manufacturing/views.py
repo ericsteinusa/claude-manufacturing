@@ -138,11 +138,14 @@ _IT_TECH = {
 _PURCH_MENU = {
     'title': 'Purchasing Menu',
     'items': [
-        ('prod_entry',    'Product Entry',    'product_entry_screen.py'),
-        ('sup_entry',     'Supplier Entry',   'Supplier_entry.py'),
-        ('purch_orders',  'Purchase Orders',  {'title': 'Purchase Orders',  'items': []}),
-        ('vendor_mgmt',   'Vendor Management',{'title': 'Vendor Management','items': []}),
-        ('purch_reports', 'Purchase Reports', {'title': 'Purchase Reports', 'items': []}),
+        ('prod_entry',    'Product Entry',       'product_entry_screen.py'),
+        ('sup_entry',     'Supplier Entry',      'Supplier_entry.py'),
+        ('purch_orders',  'Purchase Orders',     {'title': 'Purchase Orders',     'items': []}),
+        ('vendor_mgmt',   'Vendor Management',   {'title': 'Vendor Management',   'items': []}),
+        ('purch_reports', 'Purchase Reports',    {'title': 'Purchase Reports',    'items': []}),
+        ('receiving',     'Receiving',           {'title': 'Receiving',           'items': []}),
+        ('contracts',     'Contract Management', {'title': 'Contract Management', 'items': []}),
+        ('requisitions',  'Requisitions',        {'title': 'Requisitions',        'items': []}),
     ],
 }
 
