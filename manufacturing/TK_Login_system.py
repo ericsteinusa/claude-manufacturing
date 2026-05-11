@@ -4,86 +4,43 @@ from tkinter import *
 import sqlite3
 import subprocess
 
+root = None
+email_entry = None
+password_entry = None
 
-# Database setup 
-def setup_database():
-    conn = sqlite3.connect('company.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS people (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            first_name TEXT NOT NULL,
-            last_name TEXT NOT NULL,
-            ID interger NOT NULL,
-            address TEXT NOT NULL,
-            city TEXT NOT NULL,
-            state TEXT NOT NULL,
-            zip_code TEXT NOT NULL,
-            email TEXT NOT NULL
-        )
-    ''')
 
-    # Create Password table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS passwd (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        password TEXT NOT NULL,
-        people_id INTEGER,
-        FOREIGN KEY (people_id) REFERENCES people (id)
-        )
-    ''')
-
-    # Create department table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS department (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        dept TEXT NOT NULL,
-        people_id INTEGER,
-        FOREIGN KEY (people_id) REFERENCES people (id)
-        )
-    ''')
-
-# Function to validate credentials
-global email_entry, password_entry
 def validate_credentials():
+    global root
     email = email_entry.get()
     password = password_entry.get()
 
     conn = sqlite3.connect('company.db')
     cursor = conn.cursor()
-    # cursor.execute("SELECT * FROM people WHERE email = ?", (email))
-    cursor.execute("SELECT passwd.password AS passwd_password, people.email AS people_email FROM passwd JOIN people ON passwd.people_id = people.id WHERE passwd_password = ? and people_email = ?", (password, email,))
+    cursor.execute(
+        "SELECT passwd.password FROM passwd "
+        "JOIN people ON passwd.people_id = people.id "
+        "WHERE people.email = ? AND passwd.password = ?",
+        (email, password),
+    )
     result = cursor.fetchone()
-    # conn.close()
+    conn.close()
 
     if result:
-        user_id = result[1]
-        query = "SELECT id from people WHERE email = ?"
-        cursor.execute(query, (user_id,))
-        user_id2 = cursor.fetchone()
-        print(user_id2)
-        # Fetch department
-        cursor.execute("SELECT department.dept AS department_dept, people.id AS people_id FROM department JOIN people ON department.people_id = people.id WHERE people_id = ?", (user_id2))
-        department = cursor.fetchone()
-        if department:
-            dept = department[0]
-            dept = dept + "_Main_menu.py"
-            subprocess.run(["python", "splash.py"])     
-            subprocess.run(["python", dept])
+        root.destroy()
+        subprocess.Popen(["python", "Company_main_menu.py"])
     else:
         messagebox.showerror("Error", "Invalid username or Password.")
         if messagebox.askyesno("Register", "Do you want to register as a new user?"):
-           subprocess.Popen(["python", "TK_Registration_form.py"])
+            subprocess.Popen(["python", "TK_Registration_form.py"])
         else:
-           messagebox.showinfo("Info", "please try again later.")
-           email_entry.delete(0, tk.END)
-           password_entry.delete(0, tk.END)
-    conn.close()
+            messagebox.showinfo("Info", "Please try again later.")
+            email_entry.delete(0, tk.END)
+            password_entry.delete(0, tk.END)
 
 
 # GUI setup
 def create_gui():
-    global email_entry, password_entry
+    global root, email_entry, password_entry
 
     root = tk.Tk()
     root.title("Login System")
@@ -98,8 +55,6 @@ def create_gui():
     y = (screen_height / 2 ) - (app_height / 2)
 
     root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
-    my_label = tk.Label(root, text=f'Width:{screen_width}  Height:{screen_height}')
-    
 
     background_image = PhotoImage(file="manufacturing2.png")
 

@@ -773,13 +773,16 @@ class SessionWindow(QtWidgets.QMainWindow):
     def __init__(self, email: str, parent=None):
         super().__init__(parent)
         self.email = email
-        self.setWindowTitle("Manufacturing System")
-        self.setMinimumSize(729, 761)
         _apply_blue_palette(self)
         self._build_ui()
 
     def _build_ui(self):
-        # Toolbar with user info and logout button
+        # Load Company_main_menu UI into this window
+        from Company_main_menu import Ui_MainWindow as CompanyMenuUi
+        self._company_ui = CompanyMenuUi()
+        self._company_ui.setupUi(self)
+
+        # Toolbar with session controls (added after setupUi so it sits on top)
         toolbar = self.addToolBar("Session")
         toolbar.setMovable(False)
         toolbar.setStyleSheet(
@@ -808,19 +811,6 @@ class SessionWindow(QtWidgets.QMainWindow):
         logout_btn.setStyleSheet(BUTTON_STYLE)
         logout_btn.clicked.connect(self._on_logout)
         toolbar.addWidget(logout_btn)
-
-        # Central placeholder — replace with your actual main menu widget here
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        layout = QtWidgets.QVBoxLayout(central)
-        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-
-        welcome = QtWidgets.QLabel(f"Welcome to the Manufacturing System")
-        welcome.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        welcome.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
-        layout.addWidget(welcome)
-
-        self.setCentralWidget(central)
 
     def _open_roles(self):
         dlg = RolesWindow(self)
