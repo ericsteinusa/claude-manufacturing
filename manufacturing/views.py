@@ -248,8 +248,11 @@ MENU_TREE = {
             ('prod_mgr', 'Production Manager', {
                 'title': 'Production Manager',
                 'items': [
-                    ('prod',     'Production', _PROD_MENU),
-                    ('shipping', 'Shipping',   _SHIP_MENU),
+                    ('prod',        'Production',         _PROD_MENU),
+                    ('shipping',    'Shipping',           _SHIP_MENU),
+                    ('prod_reports','Production Reports', {'title': 'Production Reports', 'items': []}),
+                    ('resource',    'Resource Management',{'title': 'Resource Management','items': []}),
+                    ('budget',      'Budget Management',  {'title': 'Budget Management',  'items': []}),
                 ],
             }),
             ('prod',     'Production', _PROD_MENU),
