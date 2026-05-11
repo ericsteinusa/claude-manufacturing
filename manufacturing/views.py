@@ -265,7 +265,12 @@ MENU_TREE = {
             ('purch_mgr', 'Purchasing Manager Menu', {
                 'title': 'Purchasing Manager Menu',
                 'items': [
-                    ('purch', 'Purchasing Menu', _PURCH_MENU),
+                    ('purch',      'Purchasing Menu',          _PURCH_MENU),
+                    ('po_approvals','PO Approvals',            {'title': 'PO Approvals',            'items': []}),
+                    ('budget',     'Budget Management',        {'title': 'Budget Management',        'items': []}),
+                    ('vendor_mgmt','Vendor Management',        {'title': 'Vendor Management',        'items': []}),
+                    ('purch_rpts', 'Purchasing Reports',       {'title': 'Purchasing Reports',       'items': []}),
+                    ('contracts',  'Contract Management',      {'title': 'Contract Management',      'items': []}),
                 ],
             }),
             ('purch', 'Purchasing Menu', _PURCH_MENU),
