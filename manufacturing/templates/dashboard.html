@@ -39,14 +39,36 @@
         }
         .content {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: calc(100vh - 52px);
+            padding: 40px 20px;
         }
-        h1 {
+        .menu-title {
             color: white;
             font-size: 22px;
             font-weight: bold;
+            margin-bottom: 32px;
+        }
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 200px);
+            gap: 16px;
+        }
+        .dept-btn {
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+            text-align: center;
+            display: block;
+        }
+        .dept-btn:hover {
+            background-color: rgb(85, 255, 255);
+            border-color: rgb(85, 255, 255);
         }
     </style>
 </head>
@@ -59,7 +81,20 @@
         <a href="{% url 'logout' %}" class="btn">Logout</a>
     </div>
     <div class="content">
-        <h1>Welcome to the Manufacturing System</h1>
+        <div class="menu-title">Company Main Menu</div>
+        <div class="dept-grid">
+            <a href="{% url 'launch_department' 'accounting' %}" class="dept-btn">Accounting</a>
+            <a href="{% url 'launch_department' 'customer_service' %}" class="dept-btn">Customer Service</a>
+            <a href="{% url 'launch_department' 'engineering' %}" class="dept-btn">Engineering</a>
+            <a href="{% url 'launch_department' 'information_tech' %}" class="dept-btn">Information Tech</a>
+            <a href="{% url 'launch_department' 'maintenance' %}" class="dept-btn">Maintenance</a>
+            <a href="{% url 'launch_department' 'marketing' %}" class="dept-btn">Marketing</a>
+            <a href="{% url 'launch_department' 'personnel' %}" class="dept-btn">Personnel</a>
+            <a href="{% url 'launch_department' 'production' %}" class="dept-btn">Production</a>
+            <a href="{% url 'launch_department' 'purchasing' %}" class="dept-btn">Purchasing</a>
+            <a href="{% url 'launch_department' 'quality_assurance' %}" class="dept-btn">Quality Assurance</a>
+            <a href="{% url 'launch_department' 'sales' %}" class="dept-btn">Sales</a>
+        </div>
     </div>
 </body>
 </html>

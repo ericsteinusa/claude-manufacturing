@@ -1,6 +1,23 @@
 import os
+import sys
+import subprocess
 import sqlite3
 from django.shortcuts import render, redirect
+
+
+DEPT_SCRIPTS = {
+    'accounting':       'Accounting_Main_menu.py',
+    'customer_service': 'cs_main_menu.py',
+    'engineering':      'engineering_Main_menu.py',
+    'information_tech': 'IT_Main_Menu.py',
+    'maintenance':      'Maint_Main_menu.py',
+    'marketing':        'Marketing_Main_menu.py',
+    'personnel':        'Personnel_Main_menu.py',
+    'production':       'Production_Main_menu.py',
+    'purchasing':       'Purchasing_Main_menu.py',
+    'quality_assurance':'QA_Main_menu.py',
+    'sales':            'Sales_Main_menu.py',
+}
 
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'company.db')
@@ -107,6 +124,17 @@ def dashboard(request):
 def logout(request):
     request.session.flush()
     return redirect('home')
+
+
+def launch_department(request, dept):
+    if not request.session.get('user_email'):
+        return redirect('home')
+    script = DEPT_SCRIPTS.get(dept)
+    if script:
+        manufacturing_dir = os.path.dirname(__file__)
+        script_path = os.path.join(manufacturing_dir, script)
+        subprocess.Popen([sys.executable, script_path], cwd=manufacturing_dir)
+    return redirect('dashboard')
 
 
 # ---------------------------------------------------------------------------
