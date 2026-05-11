@@ -257,7 +257,11 @@ MENU_TREE = {
             ('qa_mgr', 'QA Manager Menu', {
                 'title': 'QA Manager Menu',
                 'items': [
-                    ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
+                    ('qa_menu',    'Quality Assurance Menu', _QA_MENU),
+                    ('audit_mgmt', 'Audit Management',  {'title': 'Audit Management',  'items': []}),
+                    ('compliance', 'Compliance',         {'title': 'Compliance',         'items': []}),
+                    ('corr_action','Corrective Actions', {'title': 'Corrective Actions', 'items': []}),
+                    ('qa_reports', 'QA Reports',         {'title': 'QA Reports',         'items': []}),
                 ],
             }),
             ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
