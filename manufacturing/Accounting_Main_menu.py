@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys
+import subprocess, sys, os
 
 class Ui_Acct_MainWindow(object):
     def setupUi(self, Acct_MainWindow):
@@ -237,16 +237,17 @@ class Ui_Acct_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(Acct_MainWindow)
 
     def press_it(self, pressed):
-        if pressed == "Accounts Payable":
-                subprocess.Popen(["python3", "Accounts_payable.py"])
-        if pressed =="Accounting Manager" :
-                subprocess.Popen(["python3", "Accounting_manager.py"])
-        if pressed == "Accounts Recievable":
-                subprocess.Popen(["python3", "Accounts_receivable.py"])
-        if pressed == "Credit Department":
-                subprocess.Popen(["python3", "Credit_dept.py"])
-        if pressed == "Payroll Department":
-                subprocess.Popen(["python3", "Payroll_dept.py"])    
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "Accounts Payable":    "Accounts_payable.py",
+            "Accounting Manager":  "Accounting_manager.py",
+            "Accounts Recievable": "Accounts_receivable.py",
+            "Credit Department":   "Credit_dept.py",
+            "Payroll Department":  "Payroll_dept.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, Acct_MainWindow):
         _translate = QtCore.QCoreApplication.translate

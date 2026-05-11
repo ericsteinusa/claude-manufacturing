@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
+import subprocess, sys, os
 
 
 class Ui_Eng_MainWindow(object):
@@ -197,10 +197,14 @@ class Ui_Eng_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(Eng_MainWindow)
 
     def press_it(self, pressed):
-        if pressed == "Engineering Manager":
-                subprocess.Popen(["python3", "eng_mgr.py"])
-        if pressed == "Engineers":
-                subprocess.Popen(["python3", "engineer.py"])
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "Engineering Manager": "eng_mgr.py",
+            "Engineers":           "engineer.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, Eng_MainWindow):
         _translate = QtCore.QCoreApplication.translate

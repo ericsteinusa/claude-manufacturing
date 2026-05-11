@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets  # type: ignore
-import sys, subprocess
+import sys, subprocess, os
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -317,28 +317,23 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
     def press_it(self, pressed):
-        if pressed == "Accounting":
-                subprocess.Popen(["python3", "Accounting_Main_menu.py"])
-        if pressed == "Customer Service":
-                subprocess.Popen(["python3", "cs_main_menu.py"])                
-        if pressed == "Engineering":
-                subprocess.Popen(["python3", "engineering_Main_menu.py"])
-        if pressed == "Information Tech":
-                subprocess.Popen(["python3", "IT_Main_Menu.py"])
-        if pressed == "Maintenance":
-                subprocess.Popen(["python3", "Maint_Main_menu.py"])
-        if pressed == "Marketing":
-                subprocess.Popen(["python3", "Marketing_Main_menu.py"])
-        if pressed == "Personnel":
-                subprocess.Popen(["python3", "Personnel_Main_menu.py"])
-        if pressed == "Production":
-                subprocess.Popen(["python3", "Production_Main_menu.py"])
-        if pressed == "Purchasing":
-                subprocess.Popen(["python3", "Purchasing_Main_menu.py"])
-        if pressed == "Quality Assurance":
-                subprocess.Popen(["python3", "QA_Main_menu.py"])
-        if pressed == "Sales":
-                subprocess.Popen(["python3", "Sales_Main_menu.py"])
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "Accounting":        "Accounting_Main_menu.py",
+            "Customer Service":  "cs_main_menu.py",
+            "Engineering":       "engineering_Main_menu.py",
+            "Information Tech":  "IT_Main_Menu.py",
+            "Maintenance":       "Maint_Main_menu.py",
+            "Marketing":         "Marketing_Main_menu.py",
+            "Personnel":         "Personnel_Main_menu.py",
+            "Production":        "Production_Main_menu.py",
+            "Purchasing":        "Purchasing_Main_menu.py",
+            "Quality Assurance": "QA_Main_menu.py",
+            "Sales":             "Sales_Main_menu.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

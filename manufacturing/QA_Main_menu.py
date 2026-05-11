@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
+import subprocess, sys, os
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -191,10 +191,14 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def press_it(self, pressed):
-        if pressed == "QA Manager Menu":
-                subprocess.run(["python", "QA_Mgr_menu.py"])
-        if pressed == "Quality Assurance Menu":
-                subprocess.run(["python", "Quality_Assurance_Menu.py"])
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        scripts = {
+            "QA Manager Menu":        "QA_Mgr_menu.py",
+            "Quality Assurance Menu": "Quality_Assurance_menu.py",
+        }
+        script = scripts.get(pressed)
+        if script:
+            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
