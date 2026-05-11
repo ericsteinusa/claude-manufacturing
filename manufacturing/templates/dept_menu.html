@@ -74,7 +74,7 @@
 </head>
 <body>
     <div class="toolbar">
-        <a href="{% url 'dashboard' %}" class="btn">Back</a>
+        <a href="{{ back_url }}" class="btn">Back</a>
         <div class="spacer"></div>
         <span>Logged in as: {{ email }}</span>
         <a href="{% url 'change_password' %}" class="btn">Change Password</a>
@@ -83,8 +83,8 @@
     <div class="content">
         <div class="menu-title">{{ title }}</div>
         <div class="dept-grid">
-            {% for key, label in subdepts %}
-            <a href="{% url 'launch_subdept' dept key %}" class="dept-btn">{{ label }}</a>
+            {% for url, label in items %}
+            <a href="{{ url }}" class="dept-btn">{{ label }}</a>
             {% endfor %}
         </div>
     </div>

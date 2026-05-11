@@ -5,90 +5,208 @@ import sqlite3
 from django.shortcuts import render, redirect
 
 
-DEPT_MENUS = {
+# Each item: (key, label, target)
+# target is a script filename (str = leaf) or a dict (sub-menu node).
+_PERS_MENU = {
+    'title': 'Personnel Menu',
+    'items': [
+        ('pers_crm',   'Personnel CRM',      'personnel_crm.py'),
+        ('reg_form',   'Registration Form',  'registration_form.py'),
+        ('upd_pass',   'Update Password',    'update_users.py'),
+        ('disp_dept',  'Display Department', 'display_people_department.py'),
+        ('dept_entry', 'Dept Entry',         'dept_entry.py'),
+        ('dept_sub',   'Dept Sub Entry',     'dept_sub_entry.py'),
+        ('time_clock', 'Time Clock',         'time_clock_menu.py'),
+    ],
+}
+_CS_MENU = {
+    'title': 'Customer Service Menu',
+    'items': [
+        ('cs_calls',   'Customer Service Calls', 'cs_calls.py'),
+        ('cust_entry', 'Customer Entry Screen',  'customer_entry.py'),
+    ],
+}
+_IT_TECH = {
+    'title': 'IT Technician',
+    'items': [
+        ('it_calls', 'IT Support Calls', 'it_calls.py'),
+        ('it_tasks', 'IT Tasks',          'IT_Tasks.py'),
+    ],
+}
+_PURCH_MENU = {
+    'title': 'Purchasing Menu',
+    'items': [
+        ('prod_entry', 'Product Entry',  'product_entry_screen.py'),
+        ('sup_entry',  'Supplier Entry', 'Supplier_entry.py'),
+    ],
+}
+_QA_MENU = {
+    'title': 'Quality Assurance Menu',
+    'items': [
+        ('qa_lab', 'QA Laboratory Menu', 'QA_Lab_menu.py'),
+    ],
+}
+
+MENU_TREE = {
     'accounting': {
         'title': 'Accounting Main Menu',
-        'subdepts': [
-            ('acct_pay',  'Accounts Payable',    'Accounts_payable.py'),
-            ('acct_mgr',  'Accounting Manager',  'Accounting_manager.py'),
-            ('acct_rcv',  'Accounts Receivable', 'Accounts_receivable.py'),
-            ('credit',    'Credit Department',   'Credit_dept.py'),
-            ('payroll',   'Payroll Department',  'Payroll_dept.py'),
+        'items': [
+            ('acct_pay', 'Accounts Payable',    'Accounts_payable.py'),
+            ('acct_mgr', 'Accounting Manager', {
+                'title': 'Accounting Manager',
+                'items': [
+                    ('ap',     'Accounts Payable',    'Accounts_payable.py'),
+                    ('rcv',    'Accounts Receivable', 'Accounts_receivable.py'),
+                    ('credit', 'Credit Department',   'Credit_dept.py'),
+                    ('pay',    'Payroll Department',  'Payroll_dept.py'),
+                ],
+            }),
+            ('acct_rcv', 'Accounts Receivable', 'Accounts_receivable.py'),
+            ('credit',   'Credit Department',   'Credit_dept.py'),
+            ('payroll',  'Payroll Department',  'Payroll_dept.py'),
         ],
     },
     'customer_service': {
         'title': 'Customer Service Main Menu',
-        'subdepts': [
-            ('cs_mgr',   'CS Manager Menu',        'cs_mgr_menu.py'),
-            ('cs_menu',  'Customer Service Menu',  'cs_menu.py'),
+        'items': [
+            ('cs_mgr', 'CS Manager Menu', {
+                'title': 'CS Manager Menu',
+                'items': [
+                    ('cs_menu', 'Customer Service Menu', _CS_MENU),
+                ],
+            }),
+            ('cs_menu',  'Customer Service Menu',  _CS_MENU),
             ('cs_calls', 'Customer Service Calls', 'cs_calls.py'),
         ],
     },
     'engineering': {
         'title': 'Engineering Main Menu',
-        'subdepts': [
-            ('eng_mgr',   'Engineering Manager', 'eng_mgr.py'),
-            ('engineers', 'Engineers',            'engineer.py'),
+        'items': [
+            ('eng_mgr', 'Engineering Manager', {
+                'title': 'Engineering Manager',
+                'items': [
+                    ('engineers', 'Engineers', 'engineer.py'),
+                ],
+            }),
+            ('engineers', 'Engineers', 'engineer.py'),
         ],
     },
     'information_tech': {
         'title': 'Information Technology Main Menu',
-        'subdepts': [
-            ('it_mgr',  'IT Manager',    'IT_mgr.py'),
-            ('it_tech', 'IT Technician', 'IT_technician.py'),
+        'items': [
+            ('it_mgr', 'IT Manager', {
+                'title': 'IT Manager',
+                'items': [
+                    ('it_tech', 'IT Technician', _IT_TECH),
+                ],
+            }),
+            ('it_tech', 'IT Technician', _IT_TECH),
         ],
     },
     'maintenance': {
         'title': 'Maintenance Main Menu',
-        'subdepts': [
-            ('maint_mgr', 'Maintenance Manager', 'Maint_mgr_menu.py'),
-            ('maint',     'Maintenance',          'Maint_Maint_menu.py'),
+        'items': [
+            ('maint_mgr', 'Maintenance Manager', {
+                'title': 'Maintenance Manager',
+                'items': [
+                    ('maint', 'Maintenance', 'Maint_Maint_menu.py'),
+                ],
+            }),
+            ('maint', 'Maintenance', 'Maint_Maint_menu.py'),
         ],
     },
     'marketing': {
         'title': 'Marketing Main Menu',
-        'subdepts': [
-            ('mkt_mgr',  'Marketing Manager Menu', 'marketing_mgr_menu.py'),
-            ('mkt_menu', 'Marketing Menu',          'marketing_menu.py'),
+        'items': [
+            ('mkt_mgr', 'Marketing Manager Menu', {
+                'title': 'Marketing Manager Menu',
+                'items': [
+                    ('mkt_menu', 'Marketing Menu', 'marketing_menu.py'),
+                ],
+            }),
+            ('mkt_menu', 'Marketing Menu', 'marketing_menu.py'),
         ],
     },
     'personnel': {
         'title': 'Personnel Main Menu',
-        'subdepts': [
-            ('pers_mgr',  'Personnel Manager Menu', 'personnel_mgr_menu.py'),
-            ('pers_menu', 'Personnel Menu',          'personnel_menu.py'),
+        'items': [
+            ('pers_mgr', 'Personnel Manager Menu', {
+                'title': 'Personnel Manager Menu',
+                'items': [
+                    ('pers_menu', 'Personnel Menu', _PERS_MENU),
+                ],
+            }),
+            ('pers_menu', 'Personnel Menu', _PERS_MENU),
         ],
     },
     'production': {
         'title': 'Production Main Menu',
-        'subdepts': [
-            ('prod_mgr', 'Production Manager', 'prod_mgr_Menu.py'),
-            ('prod',     'Production',          'prod_prod_menu.py'),
-            ('shipping', 'Shipping',            'prod_ship_dept.py'),
+        'items': [
+            ('prod_mgr', 'Production Manager', {
+                'title': 'Production Manager',
+                'items': [
+                    ('prod',     'Production', 'prod_prod_menu.py'),
+                    ('shipping', 'Shipping',   'prod_ship_dept.py'),
+                ],
+            }),
+            ('prod',     'Production', 'prod_prod_menu.py'),
+            ('shipping', 'Shipping',   'prod_ship_dept.py'),
         ],
     },
     'purchasing': {
         'title': 'Purchasing Main Menu',
-        'subdepts': [
-            ('purch_mgr', 'Purchasing Manager Menu', 'Purchasing_Mgr_menu.py'),
-            ('purch',     'Purchasing Menu',          'Purchasing_menu.py'),
+        'items': [
+            ('purch_mgr', 'Purchasing Manager Menu', {
+                'title': 'Purchasing Manager Menu',
+                'items': [
+                    ('purch', 'Purchasing Menu', _PURCH_MENU),
+                ],
+            }),
+            ('purch', 'Purchasing Menu', _PURCH_MENU),
         ],
     },
     'quality_assurance': {
         'title': 'Quality Assurance Main Menu',
-        'subdepts': [
-            ('qa_mgr',  'QA Manager Menu',        'QA_Mgr_menu.py'),
-            ('qa_menu', 'Quality Assurance Menu', 'Quality_Assurance_menu.py'),
+        'items': [
+            ('qa_mgr', 'QA Manager Menu', {
+                'title': 'QA Manager Menu',
+                'items': [
+                    ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
+                ],
+            }),
+            ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
         ],
     },
     'sales': {
         'title': 'Sales Main Menu',
-        'subdepts': [
-            ('sales_mgr', 'Sales Manager Menu', 'Sales_mgr_menu.py'),
-            ('sales',     'Sales Menu',          'Sales_menu.py'),
+        'items': [
+            ('sales_mgr', 'Sales Manager Menu', {
+                'title': 'Sales Manager Menu',
+                'items': [
+                    ('sales', 'Sales Menu', 'Sales_menu.py'),
+                ],
+            }),
+            ('sales', 'Sales Menu', 'Sales_menu.py'),
         ],
     },
 }
+
+
+def _walk_tree(dept, parts):
+    """Walk MENU_TREE by dept + list of key parts. Returns the node dict, or None."""
+    node = MENU_TREE.get(dept)
+    if node is None:
+        return None
+    for part in parts:
+        found = None
+        for key, _label, target in node.get('items', []):
+            if key == part:
+                found = target
+                break
+        if not isinstance(found, dict):
+            return None
+        node = found
+    return node
 
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'company.db')
@@ -197,33 +315,54 @@ def logout(request):
     return redirect('home')
 
 
-def dept_menu(request, dept):
+def generic_menu(request, dept, subpath=''):
     if not request.session.get('user_email'):
         return redirect('home')
-    menu = DEPT_MENUS.get(dept)
-    if not menu:
+    parts = [p for p in subpath.split('/') if p]
+    node = _walk_tree(dept, parts)
+    if node is None:
         return redirect('dashboard')
-    subdepts = [(key, label) for key, label, _script in menu['subdepts']]
+
+    items = []
+    for key, label, target in node['items']:
+        new_parts = parts + [key]
+        if isinstance(target, dict):
+            url = '/dept/{}/{}/'.format(dept, '/'.join(new_parts))
+        else:
+            url = '/run/{}/{}/'.format(dept, '/'.join(new_parts))
+        items.append((url, label))
+
+    if parts:
+        parent = parts[:-1]
+        back_url = '/dept/{}/{}/'.format(dept, '/'.join(parent)) if parent else '/dept/{}/'.format(dept)
+    else:
+        back_url = '/dashboard/'
+
     return render(request, 'dept_menu.html', {
         'email': request.session['user_email'],
-        'title': menu['title'],
-        'dept': dept,
-        'subdepts': subdepts,
+        'title': node['title'],
+        'items': items,
+        'back_url': back_url,
     })
 
 
-def launch_subdept(request, dept, subdept):
+def run_script(request, dept, subpath):
     if not request.session.get('user_email'):
         return redirect('home')
-    menu = DEPT_MENUS.get(dept)
-    if menu:
-        for key, _label, script in menu['subdepts']:
-            if key == subdept:
-                manufacturing_dir = os.path.dirname(__file__)
-                subprocess.Popen([sys.executable, os.path.join(manufacturing_dir, script)],
-                                 cwd=manufacturing_dir)
+    parts = [p for p in subpath.split('/') if p]
+    if not parts:
+        return redirect('dashboard')
+    parent_parts, leaf_key = parts[:-1], parts[-1]
+    node = _walk_tree(dept, parent_parts)
+    if node:
+        for key, _label, target in node['items']:
+            if key == leaf_key and isinstance(target, str):
+                mfg_dir = os.path.dirname(__file__)
+                subprocess.Popen([sys.executable, os.path.join(mfg_dir, target)], cwd=mfg_dir)
                 break
-    return redirect('dept_menu', dept=dept)
+    if parent_parts:
+        return redirect('/dept/{}/{}/'.format(dept, '/'.join(parent_parts)))
+    return redirect('/dept/{}/'.format(dept))
 
 
 # ---------------------------------------------------------------------------
