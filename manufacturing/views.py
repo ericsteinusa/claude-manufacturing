@@ -153,7 +153,11 @@ MENU_TREE = {
             ('cs_mgr', 'CS Manager Menu', {
                 'title': 'CS Manager Menu',
                 'items': [
-                    ('cs_menu', 'Customer Service Menu', _CS_MENU),
+                    ('cs_menu',    'Customer Service Menu',  _CS_MENU),
+                    ('ticket_rpts','Ticket Reports',         {'title': 'Ticket Reports',         'items': []}),
+                    ('staff_mgmt', 'Staff Management',       {'title': 'Staff Management',       'items': []}),
+                    ('cust_sat',   'Customer Satisfaction',  {'title': 'Customer Satisfaction',  'items': []}),
+                    ('escalations','Escalations',            {'title': 'Escalations',            'items': []}),
                 ],
             }),
             ('cs_menu',  'Customer Service Menu',  _CS_MENU),
