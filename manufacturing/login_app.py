@@ -603,10 +603,72 @@ class RegisterWindow(QtWidgets.QDialog):
 
 
 # ---------------------------------------------------------------------------
+# Session window  (shown after login, hosts the main app + logout button)
+# ---------------------------------------------------------------------------
+class SessionWindow(QtWidgets.QMainWindow):
+    logged_out = QtCore.pyqtSignal()
+
+    def __init__(self, email: str, parent=None):
+        super().__init__(parent)
+        self.email = email
+        self.setWindowTitle("Manufacturing System")
+        self.setMinimumSize(729, 761)
+        _apply_blue_palette(self)
+        self._build_ui()
+
+    def _build_ui(self):
+        # Toolbar with user info and logout button
+        toolbar = self.addToolBar("Session")
+        toolbar.setMovable(False)
+        toolbar.setStyleSheet(
+            "QToolBar { background-color: rgb(0, 60, 180); border: none; spacing: 8px; padding: 4px; }"
+        )
+
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Preferred,
+        )
+        toolbar.addWidget(spacer)
+
+        user_lbl = QtWidgets.QLabel(f"Logged in as:  {self.email}")
+        user_lbl.setStyleSheet("color: white; font-size: 12px; padding-right: 12px;")
+        toolbar.addWidget(user_lbl)
+
+        logout_btn = QtWidgets.QPushButton("Logout")
+        logout_btn.setFixedHeight(28)
+        logout_btn.setStyleSheet(BUTTON_STYLE)
+        logout_btn.clicked.connect(self._on_logout)
+        toolbar.addWidget(logout_btn)
+
+        # Central placeholder — replace with your actual main menu widget here
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        layout = QtWidgets.QVBoxLayout(central)
+        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        welcome = QtWidgets.QLabel(f"Welcome to the Manufacturing System")
+        welcome.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        welcome.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
+        layout.addWidget(welcome)
+
+        self.setCentralWidget(central)
+
+    def _on_logout(self):
+        reply = QtWidgets.QMessageBox.question(
+            self, "Logout", "Are you sure you want to logout?",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+        )
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            self.logged_out.emit()
+            self.close()
+
+
+# ---------------------------------------------------------------------------
 # Login window
 # ---------------------------------------------------------------------------
 class LoginWindow(QtWidgets.QMainWindow):
-    login_successful = QtCore.pyqtSignal()
+    login_successful = QtCore.pyqtSignal(str)  # emits the logged-in email
 
     def __init__(self):
         super().__init__()
@@ -698,8 +760,8 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.login_btn.setText("Login")
 
         if ok:
-            self.login_successful.emit()
-            self.close()
+            self.login_successful.emit(email)
+            self.hide()
         else:
             self.passwd_input.clear()
             QtWidgets.QMessageBox.warning(self, "Login Failed", "Invalid email or password.")
@@ -715,18 +777,20 @@ def main():
 
     login = LoginWindow()
 
-    def open_main_menu():
-        try:
-            import subprocess
-            subprocess.Popen([sys.executable, "-c",
-                "import sys; from PySide6.QtWidgets import QApplication, QMainWindow; "
-                "from Company_main_menu_ui import Ui_MainWindow; "
-                "app=QApplication(sys.argv); w=QMainWindow(); ui=Ui_MainWindow(); "
-                "ui.setupUi(w); w.show(); sys.exit(app.exec())"])
-        except Exception:
-            QtWidgets.QMessageBox.information(None, "Login", "Login successful! Main menu not yet wired up.")
+    def on_login(email: str):
+        session = SessionWindow(email)
+        session.logged_out.connect(on_logout)
+        # Keep a reference so it isn't garbage-collected
+        login._session = session
+        session.show()
 
-    login.login_successful.connect(open_main_menu)
+    def on_logout():
+        login._session = None
+        login.email_input.clear()
+        login.passwd_input.clear()
+        login.show()
+
+    login.login_successful.connect(on_login)
     login.show()
 
     sys.exit(app.exec())
