@@ -62,6 +62,9 @@ _PROD_MENU = {
         ('prod_schedule', 'Production Schedule',  {'title': 'Production Schedule',  'items': []}),
         ('inventory',     'Inventory',            {'title': 'Inventory',            'items': []}),
         ('equip_status',  'Equipment Status',     {'title': 'Equipment Status',     'items': []}),
+        ('quality_ctrl',  'Quality Control',      {'title': 'Quality Control',      'items': []}),
+        ('prod_reports',  'Production Reports',   {'title': 'Production Reports',   'items': []}),
+        ('labor_tracking','Labor Tracking',       {'title': 'Labor Tracking',       'items': []}),
     ],
 }
 _SHIP_MENU = {
