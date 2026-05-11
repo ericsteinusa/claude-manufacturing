@@ -166,7 +166,11 @@ MENU_TREE = {
                     ('engineers', 'Engineers', 'engineer.py'),
                 ],
             }),
-            ('engineers', 'Engineers', 'engineer.py'),
+            ('engineers',   'Engineers',          'engineer.py'),
+            ('proj_mgmt',   'Project Management', {'title': 'Project Management', 'items': []}),
+            ('design_docs', 'Design Documents',   {'title': 'Design Documents',   'items': []}),
+            ('bom',         'Bill of Materials',  {'title': 'Bill of Materials',  'items': []}),
+            ('chg_orders',  'Change Orders',      {'title': 'Change Orders',      'items': []}),
         ],
     },
     'information_tech': {
