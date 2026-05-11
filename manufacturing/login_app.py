@@ -795,6 +795,12 @@ class SessionWindow(QtWidgets.QMainWindow):
         roles_btn.clicked.connect(self._open_roles)
         toolbar.addWidget(roles_btn)
 
+        change_pw_btn = QtWidgets.QPushButton("Change Password")
+        change_pw_btn.setFixedHeight(28)
+        change_pw_btn.setStyleSheet(BUTTON_STYLE)
+        change_pw_btn.clicked.connect(self._open_change_password)
+        toolbar.addWidget(change_pw_btn)
+
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(
             QtWidgets.QSizePolicy.Policy.Expanding,
@@ -814,6 +820,10 @@ class SessionWindow(QtWidgets.QMainWindow):
 
     def _open_roles(self):
         dlg = RolesWindow(self)
+        dlg.exec()
+
+    def _open_change_password(self):
+        dlg = ChangePasswordWindow(self)
         dlg.exec()
 
     def _on_logout(self):
