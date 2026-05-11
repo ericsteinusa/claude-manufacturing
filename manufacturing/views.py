@@ -198,7 +198,10 @@ MENU_TREE = {
             ('maint_mgr', 'Maintenance Manager', {
                 'title': 'Maintenance Manager',
                 'items': [
-                    ('maint', 'Maintenance', _MAINT_MENU),
+                    ('maint',       'Maintenance',         _MAINT_MENU),
+                    ('wo_approvals','Work Order Approvals',{'title': 'Work Order Approvals','items': []}),
+                    ('budget_mgmt', 'Budget Management',   {'title': 'Budget Management',   'items': []}),
+                    ('maint_rpts',  'Maintenance Reports', {'title': 'Maintenance Reports', 'items': []}),
                 ],
             }),
             ('maint', 'Maintenance', _MAINT_MENU),
