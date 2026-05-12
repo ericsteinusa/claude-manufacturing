@@ -7,96 +7,496 @@ from django.shortcuts import render, redirect
 
 # Each item: (key, label, target)
 # target is a script filename (str = leaf) or a dict (sub-menu node).
+
 _TIME_CLOCK_MENU = {
     'title': 'Time Clock Menu',
     'items': [
-        ('clock_in_out',  'Clock In/Out',       {'title': 'Clock In/Out',       'items': []}),
-        ('view_hours',    'View Hours',          {'title': 'View Hours',         'items': []}),
-        ('time_off',      'Time Off Requests',   {'title': 'Time Off Requests',  'items': []}),
-        ('schedules',     'Schedules',           {'title': 'Schedules',          'items': []}),
-        ('ot_reports',    'Overtime Reports',    {'title': 'Overtime Reports',   'items': []}),
-        ('attend_reports','Attendance Reports',  {'title': 'Attendance Reports', 'items': []}),
-        ('shift_mgmt',    'Shift Management',    {'title': 'Shift Management',   'items': []}),
+        ('clock_in_out',   'Clock In/Out',        {
+            'title': 'Clock In/Out',
+            'items': [
+                ('punch_in',   'Record Clock In',    {'title': 'Record Clock In',    'items': []}),
+                ('punch_out',  'Record Clock Out',   {'title': 'Record Clock Out',   'items': []}),
+                ('cur_status', 'Current Status',     {'title': 'Current Status',     'items': []}),
+            ],
+        }),
+        ('view_hours',     'View Hours',           {
+            'title': 'View Hours',
+            'items': [
+                ('today_hrs',  "Today's Hours",      {'title': "Today's Hours",      'items': []}),
+                ('week_hrs',   'Weekly Hours',        {'title': 'Weekly Hours',       'items': []}),
+                ('month_hrs',  'Monthly Hours',       {'title': 'Monthly Hours',      'items': []}),
+                ('period_hrs', 'Pay Period Hours',    {'title': 'Pay Period Hours',   'items': []}),
+            ],
+        }),
+        ('time_off',       'Time Off Requests',    {
+            'title': 'Time Off Requests',
+            'items': [
+                ('submit_req', 'Submit Request',      {'title': 'Submit Request',     'items': []}),
+                ('pend_req',   'Pending Requests',    {'title': 'Pending Requests',   'items': []}),
+                ('appr_req',   'Approved Requests',   {'title': 'Approved Requests',  'items': []}),
+                ('req_hist',   'Request History',     {'title': 'Request History',    'items': []}),
+            ],
+        }),
+        ('schedules',      'Schedules',            {
+            'title': 'Schedules',
+            'items': [
+                ('my_sched',   'My Schedule',         {'title': 'My Schedule',        'items': []}),
+                ('upcoming',   'Upcoming Shifts',     {'title': 'Upcoming Shifts',    'items': []}),
+                ('sched_cal',  'Schedule Calendar',   {'title': 'Schedule Calendar',  'items': []}),
+                ('swap_req',   'Swap Requests',       {'title': 'Swap Requests',      'items': []}),
+            ],
+        }),
+        ('ot_reports',     'Overtime Reports',     {
+            'title': 'Overtime Reports',
+            'items': [
+                ('cur_ot',     'Current Period OT',   {'title': 'Current Period OT',  'items': []}),
+                ('hist_ot',    'Historical OT',       {'title': 'Historical OT',      'items': []}),
+                ('ot_by_emp',  'OT by Employee',      {'title': 'OT by Employee',     'items': []}),
+                ('ot_appr',    'OT Approval',         {'title': 'OT Approval',        'items': []}),
+            ],
+        }),
+        ('attend_reports', 'Attendance Reports',   {
+            'title': 'Attendance Reports',
+            'items': [
+                ('daily_att',  'Daily Attendance',    {'title': 'Daily Attendance',   'items': []}),
+                ('month_sum',  'Monthly Summary',     {'title': 'Monthly Summary',    'items': []}),
+                ('tard_rpt',   'Tardiness Report',    {'title': 'Tardiness Report',   'items': []}),
+                ('abs_rpt',    'Absence Report',      {'title': 'Absence Report',     'items': []}),
+            ],
+        }),
+        ('shift_mgmt',     'Shift Management',     {
+            'title': 'Shift Management',
+            'items': [
+                ('view_shfts', 'View Shifts',          {'title': 'View Shifts',        'items': []}),
+                ('assign_emp', 'Assign Employees',     {'title': 'Assign Employees',   'items': []}),
+                ('shft_tmpl',  'Shift Templates',      {'title': 'Shift Templates',    'items': []}),
+                ('swap_mgmt',  'Swap Management',      {'title': 'Swap Management',    'items': []}),
+            ],
+        }),
     ],
 }
+
 _MAINT_MENU = {
     'title': 'Maintenance Menu',
     'items': [
-        ('work_orders',    'Work Orders',           {'title': 'Work Orders',           'items': []}),
-        ('maint_schedule', 'Maintenance Schedule',  {'title': 'Maintenance Schedule',  'items': []}),
-        ('equip_maint',    'Equipment Maintenance', {'title': 'Equipment Maintenance', 'items': []}),
-        ('parts_inv',      'Parts Inventory',       {'title': 'Parts Inventory',       'items': []}),
-        ('maint_reports',  'Maintenance Reports',   {'title': 'Maintenance Reports',   'items': []}),
-        ('safety_insp',    'Safety Inspections',    {'title': 'Safety Inspections',    'items': []}),
-        ('prev_maint',     'Preventive Maintenance',{'title': 'Preventive Maintenance','items': []}),
+        ('work_orders',    'Work Orders',           {
+            'title': 'Work Orders',
+            'items': [
+                ('create_wo',  'Create Work Order',   {'title': 'Create Work Order',  'items': []}),
+                ('open_wo',    'Open Work Orders',    {'title': 'Open Work Orders',   'items': []}),
+                ('inprog_wo',  'In Progress',         {'title': 'In Progress',        'items': []}),
+                ('comp_wo',    'Completed',           {'title': 'Completed',          'items': []}),
+            ],
+        }),
+        ('maint_schedule', 'Maintenance Schedule',  {
+            'title': 'Maintenance Schedule',
+            'items': [
+                ('daily_sched','Daily Schedule',      {'title': 'Daily Schedule',     'items': []}),
+                ('week_sched', 'Weekly Schedule',     {'title': 'Weekly Schedule',    'items': []}),
+                ('month_sched','Monthly Schedule',    {'title': 'Monthly Schedule',   'items': []}),
+                ('annual_plan','Annual Plan',         {'title': 'Annual Plan',        'items': []}),
+            ],
+        }),
+        ('equip_maint',    'Equipment Maintenance', {
+            'title': 'Equipment Maintenance',
+            'items': [
+                ('equip_list', 'Equipment List',      {'title': 'Equipment List',     'items': []}),
+                ('maint_hist', 'Maintenance History', {'title': 'Maintenance History','items': []}),
+                ('svc_records','Service Records',     {'title': 'Service Records',    'items': []}),
+                ('equip_stat', 'Equipment Status',    {'title': 'Equipment Status',   'items': []}),
+            ],
+        }),
+        ('parts_inv',      'Parts Inventory',       {
+            'title': 'Parts Inventory',
+            'items': [
+                ('view_inv',   'View Inventory',      {'title': 'View Inventory',     'items': []}),
+                ('parts_req',  'Parts Request',       {'title': 'Parts Request',      'items': []}),
+                ('reorder',    'Reorder List',        {'title': 'Reorder List',       'items': []}),
+                ('parts_hist', 'Parts History',       {'title': 'Parts History',      'items': []}),
+            ],
+        }),
+        ('maint_reports',  'Maintenance Reports',   {
+            'title': 'Maintenance Reports',
+            'items': [
+                ('daily_rpt',  'Daily Report',        {'title': 'Daily Report',       'items': []}),
+                ('week_rpt',   'Weekly Report',       {'title': 'Weekly Report',      'items': []}),
+                ('cost_analy', 'Cost Analysis',       {'title': 'Cost Analysis',      'items': []}),
+                ('down_rpt',   'Downtime Report',     {'title': 'Downtime Report',    'items': []}),
+            ],
+        }),
+        ('safety_insp',    'Safety Inspections',    {
+            'title': 'Safety Inspections',
+            'items': [
+                ('sched_insp', 'Schedule Inspection', {'title': 'Schedule Inspection','items': []}),
+                ('insp_chk',   'Inspection Checklist',{'title': 'Inspection Checklist','items': []}),
+                ('insp_res',   'Inspection Results',  {'title': 'Inspection Results', 'items': []}),
+                ('corr_act',   'Corrective Actions',  {'title': 'Corrective Actions', 'items': []}),
+            ],
+        }),
+        ('prev_maint',     'Preventive Maintenance', {
+            'title': 'Preventive Maintenance',
+            'items': [
+                ('pm_sched',   'PM Schedule',         {'title': 'PM Schedule',        'items': []}),
+                ('pm_chk',     'PM Checklists',       {'title': 'PM Checklists',      'items': []}),
+                ('pm_hist',    'PM History',          {'title': 'PM History',         'items': []}),
+                ('pm_rpts',    'PM Reports',          {'title': 'PM Reports',         'items': []}),
+            ],
+        }),
     ],
 }
+
 _MKT_MENU = {
     'title': 'Marketing Menu',
     'items': [
-        ('campaigns',    'Campaigns',         {'title': 'Campaigns',         'items': []}),
-        ('mkt_research', 'Market Research',   {'title': 'Market Research',   'items': []}),
-        ('advertising',  'Advertising',       {'title': 'Advertising',       'items': []}),
-        ('analytics',    'Analytics',         {'title': 'Analytics',         'items': []}),
-        ('content_mgmt', 'Content Management',{'title': 'Content Management','items': []}),
-        ('social_media', 'Social Media',      {'title': 'Social Media',      'items': []}),
-        ('email_mkt',    'Email Marketing',   {'title': 'Email Marketing',   'items': []}),
+        ('campaigns',    'Campaigns',         {
+            'title': 'Campaigns',
+            'items': [
+                ('act_camp',   'Active Campaigns',    {'title': 'Active Campaigns',   'items': []}),
+                ('new_camp',   'Create Campaign',     {'title': 'Create Campaign',    'items': []}),
+                ('camp_cal',   'Campaign Calendar',   {'title': 'Campaign Calendar',  'items': []}),
+                ('camp_res',   'Campaign Results',    {'title': 'Campaign Results',   'items': []}),
+            ],
+        }),
+        ('mkt_research', 'Market Research',   {
+            'title': 'Market Research',
+            'items': [
+                ('res_proj',   'Research Projects',   {'title': 'Research Projects',  'items': []}),
+                ('comp_analy', 'Competitor Analysis', {'title': 'Competitor Analysis','items': []}),
+                ('surv_mgmt',  'Survey Management',   {'title': 'Survey Management',  'items': []}),
+                ('mkt_trends', 'Market Trends',       {'title': 'Market Trends',      'items': []}),
+            ],
+        }),
+        ('advertising',  'Advertising',       {
+            'title': 'Advertising',
+            'items': [
+                ('ad_mgmt',    'Ad Management',       {'title': 'Ad Management',      'items': []}),
+                ('ad_budget',  'Ad Budget',           {'title': 'Ad Budget',          'items': []}),
+                ('ad_perf',    'Ad Performance',      {'title': 'Ad Performance',     'items': []}),
+                ('ad_cal',     'Ad Calendar',         {'title': 'Ad Calendar',        'items': []}),
+            ],
+        }),
+        ('analytics',    'Analytics',         {
+            'title': 'Analytics',
+            'items': [
+                ('web_analy',  'Website Analytics',   {'title': 'Website Analytics',  'items': []}),
+                ('camp_analy', 'Campaign Analytics',  {'title': 'Campaign Analytics', 'items': []}),
+                ('sales_analy','Sales Analytics',     {'title': 'Sales Analytics',    'items': []}),
+                ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+            ],
+        }),
+        ('content_mgmt', 'Content Management', {
+            'title': 'Content Management',
+            'items': [
+                ('cont_cal',   'Content Calendar',    {'title': 'Content Calendar',   'items': []}),
+                ('blog',       'Blog Posts',          {'title': 'Blog Posts',         'items': []}),
+                ('mkt_mat',    'Marketing Materials', {'title': 'Marketing Materials','items': []}),
+                ('cont_arch',  'Content Archive',     {'title': 'Content Archive',    'items': []}),
+            ],
+        }),
+        ('social_media', 'Social Media',      {
+            'title': 'Social Media',
+            'items': [
+                ('post_mgmt',  'Post Management',     {'title': 'Post Management',    'items': []}),
+                ('social_cal', 'Social Calendar',     {'title': 'Social Calendar',    'items': []}),
+                ('eng_rpts',   'Engagement Reports',  {'title': 'Engagement Reports', 'items': []}),
+                ('acct_mgmt',  'Account Management',  {'title': 'Account Management', 'items': []}),
+            ],
+        }),
+        ('email_mkt',    'Email Marketing',   {
+            'title': 'Email Marketing',
+            'items': [
+                ('email_camp', 'Email Campaigns',     {'title': 'Email Campaigns',    'items': []}),
+                ('sub_lists',  'Subscriber Lists',    {'title': 'Subscriber Lists',   'items': []}),
+                ('email_tmpl', 'Email Templates',     {'title': 'Email Templates',    'items': []}),
+                ('email_analy','Email Analytics',     {'title': 'Email Analytics',    'items': []}),
+            ],
+        }),
     ],
 }
+
 _SALES_MENU = {
     'title': 'Sales Menu',
     'items': [
-        ('sales_orders',  'Sales Orders',          {'title': 'Sales Orders',          'items': []}),
-        ('cust_accounts', 'Customer Accounts',     {'title': 'Customer Accounts',     'items': []}),
-        ('sales_reports', 'Sales Reports',         {'title': 'Sales Reports',         'items': []}),
-        ('quotes',        'Quotes',                {'title': 'Quotes',                'items': []}),
-        ('leads',         'Leads & Opportunities', {'title': 'Leads & Opportunities', 'items': []}),
-        ('contracts',     'Contracts',             {'title': 'Contracts',             'items': []}),
-        ('forecasting',   'Sales Forecasting',     {'title': 'Sales Forecasting',     'items': []}),
+        ('sales_orders',  'Sales Orders',          {
+            'title': 'Sales Orders',
+            'items': [
+                ('new_order',  'New Order',           {'title': 'New Order',          'items': []}),
+                ('open_orders','Open Orders',         {'title': 'Open Orders',        'items': []}),
+                ('order_hist', 'Order History',       {'title': 'Order History',      'items': []}),
+                ('order_stat', 'Order Status',        {'title': 'Order Status',       'items': []}),
+            ],
+        }),
+        ('cust_accounts', 'Customer Accounts',     {
+            'title': 'Customer Accounts',
+            'items': [
+                ('acct_list',  'Account List',        {'title': 'Account List',       'items': []}),
+                ('new_acct',   'New Account',         {'title': 'New Account',        'items': []}),
+                ('acct_det',   'Account Details',     {'title': 'Account Details',    'items': []}),
+                ('acct_hist',  'Account History',     {'title': 'Account History',    'items': []}),
+            ],
+        }),
+        ('sales_reports', 'Sales Reports',         {
+            'title': 'Sales Reports',
+            'items': [
+                ('daily_sales','Daily Sales',         {'title': 'Daily Sales',        'items': []}),
+                ('month_sales','Monthly Sales',       {'title': 'Monthly Sales',      'items': []}),
+                ('annual_rpt', 'Annual Report',       {'title': 'Annual Report',      'items': []}),
+                ('by_rep',     'Sales by Rep',        {'title': 'Sales by Rep',       'items': []}),
+            ],
+        }),
+        ('quotes',        'Quotes',                {
+            'title': 'Quotes',
+            'items': [
+                ('new_quote',  'Create Quote',        {'title': 'Create Quote',       'items': []}),
+                ('act_quotes', 'Active Quotes',       {'title': 'Active Quotes',      'items': []}),
+                ('quote_hist', 'Quote History',       {'title': 'Quote History',      'items': []}),
+                ('conv_order', 'Convert to Order',    {'title': 'Convert to Order',   'items': []}),
+            ],
+        }),
+        ('leads',         'Leads & Opportunities', {
+            'title': 'Leads & Opportunities',
+            'items': [
+                ('new_lead',   'New Lead',            {'title': 'New Lead',           'items': []}),
+                ('act_leads',  'Active Leads',        {'title': 'Active Leads',       'items': []}),
+                ('opp_pipe',   'Opportunities Pipeline',{'title': 'Opportunities Pipeline','items': []}),
+                ('lead_rpts',  'Lead Reports',        {'title': 'Lead Reports',       'items': []}),
+            ],
+        }),
+        ('contracts',     'Contracts',             {
+            'title': 'Contracts',
+            'items': [
+                ('act_cont',   'Active Contracts',    {'title': 'Active Contracts',   'items': []}),
+                ('new_cont',   'Create Contract',     {'title': 'Create Contract',    'items': []}),
+                ('cont_renew', 'Contract Renewals',   {'title': 'Contract Renewals',  'items': []}),
+                ('cont_arch',  'Contract Archive',    {'title': 'Contract Archive',   'items': []}),
+            ],
+        }),
+        ('forecasting',   'Sales Forecasting',     {
+            'title': 'Sales Forecasting',
+            'items': [
+                ('cur_fore',   'Current Forecast',    {'title': 'Current Forecast',   'items': []}),
+                ('fore_rep',   'Forecast by Rep',     {'title': 'Forecast by Rep',    'items': []}),
+                ('fore_prod',  'Forecast by Product', {'title': 'Forecast by Product','items': []}),
+                ('fore_rpts',  'Forecast Reports',    {'title': 'Forecast Reports',   'items': []}),
+            ],
+        }),
     ],
 }
+
 _PROD_MENU = {
     'title': 'Production Menu',
     'items': [
-        ('work_orders',   'Work Orders',          {'title': 'Work Orders',          'items': []}),
-        ('prod_schedule', 'Production Schedule',  {'title': 'Production Schedule',  'items': []}),
-        ('inventory',     'Inventory',            {'title': 'Inventory',            'items': []}),
-        ('equip_status',  'Equipment Status',     {'title': 'Equipment Status',     'items': []}),
-        ('quality_ctrl',  'Quality Control',      {'title': 'Quality Control',      'items': []}),
-        ('prod_reports',  'Production Reports',   {'title': 'Production Reports',   'items': []}),
-        ('labor_tracking','Labor Tracking',       {'title': 'Labor Tracking',       'items': []}),
+        ('work_orders',   'Work Orders',          {
+            'title': 'Work Orders',
+            'items': [
+                ('create_wo',  'Create Work Order',   {'title': 'Create Work Order',  'items': []}),
+                ('open_wo',    'Open Work Orders',    {'title': 'Open Work Orders',   'items': []}),
+                ('inprog_wo',  'In Progress',         {'title': 'In Progress',        'items': []}),
+                ('comp_wo',    'Completed',           {'title': 'Completed',          'items': []}),
+            ],
+        }),
+        ('prod_schedule', 'Production Schedule',  {
+            'title': 'Production Schedule',
+            'items': [
+                ('daily_sched','Daily Schedule',      {'title': 'Daily Schedule',     'items': []}),
+                ('week_sched', 'Weekly Schedule',     {'title': 'Weekly Schedule',    'items': []}),
+                ('month_sched','Monthly Schedule',    {'title': 'Monthly Schedule',   'items': []}),
+                ('sched_cal',  'Schedule Calendar',   {'title': 'Schedule Calendar',  'items': []}),
+            ],
+        }),
+        ('inventory',     'Inventory',            {
+            'title': 'Inventory',
+            'items': [
+                ('raw_mat',    'Raw Materials',        {'title': 'Raw Materials',      'items': []}),
+                ('fin_goods',  'Finished Goods',      {'title': 'Finished Goods',     'items': []}),
+                ('wip_inv',    'WIP Inventory',       {'title': 'WIP Inventory',      'items': []}),
+                ('inv_rpts',   'Inventory Reports',   {'title': 'Inventory Reports',  'items': []}),
+            ],
+        }),
+        ('equip_status',  'Equipment Status',     {
+            'title': 'Equipment Status',
+            'items': [
+                ('equip_list', 'Equipment List',      {'title': 'Equipment List',     'items': []}),
+                ('stat_dash',  'Status Dashboard',    {'title': 'Status Dashboard',   'items': []}),
+                ('down_log',   'Downtime Log',        {'title': 'Downtime Log',       'items': []}),
+                ('maint_req',  'Maintenance Requests',{'title': 'Maintenance Requests','items': []}),
+            ],
+        }),
+        ('quality_ctrl',  'Quality Control',      {
+            'title': 'Quality Control',
+            'items': [
+                ('insp_res',   'Inspection Results',  {'title': 'Inspection Results', 'items': []}),
+                ('non_conf',   'Non-Conformances',    {'title': 'Non-Conformances',   'items': []}),
+                ('qc_rpts',    'QC Reports',          {'title': 'QC Reports',         'items': []}),
+                ('rej_analy',  'Reject Analysis',     {'title': 'Reject Analysis',    'items': []}),
+            ],
+        }),
+        ('prod_reports',  'Production Reports',   {
+            'title': 'Production Reports',
+            'items': [
+                ('daily_prod', 'Daily Production',    {'title': 'Daily Production',   'items': []}),
+                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
+                ('eff_rpt',    'Efficiency Report',   {'title': 'Efficiency Report',  'items': []}),
+                ('scrap_rpt',  'Scrap Report',        {'title': 'Scrap Report',       'items': []}),
+            ],
+        }),
+        ('labor_tracking','Labor Tracking',       {
+            'title': 'Labor Tracking',
+            'items': [
+                ('cur_labor',  'Current Labor',       {'title': 'Current Labor',      'items': []}),
+                ('labor_shft', 'Labor by Shift',      {'title': 'Labor by Shift',     'items': []}),
+                ('labor_job',  'Labor by Job',        {'title': 'Labor by Job',       'items': []}),
+                ('labor_rpts', 'Labor Reports',       {'title': 'Labor Reports',      'items': []}),
+            ],
+        }),
     ],
 }
+
 _SHIP_MENU = {
     'title': 'Shipping Department',
     'items': [
-        ('ship_orders',   'Shipment Orders',    {'title': 'Shipment Orders',    'items': []}),
-        ('ship_schedule', 'Shipping Schedule',  {'title': 'Shipping Schedule',  'items': []}),
-        ('receiving',     'Receiving',          {'title': 'Receiving',          'items': []}),
-        ('carrier_mgmt',  'Carrier Management', {'title': 'Carrier Management', 'items': []}),
-        ('tracking',      'Tracking',           {'title': 'Tracking',           'items': []}),
-        ('ship_reports',  'Shipping Reports',   {'title': 'Shipping Reports',   'items': []}),
-        ('returns_proc',  'Returns Processing', {'title': 'Returns Processing', 'items': []}),
+        ('ship_orders',   'Shipment Orders',    {
+            'title': 'Shipment Orders',
+            'items': [
+                ('new_ship',   'New Shipment',        {'title': 'New Shipment',       'items': []}),
+                ('pend_ship',  'Pending Shipments',   {'title': 'Pending Shipments',  'items': []}),
+                ('shipped',    'Shipped Orders',      {'title': 'Shipped Orders',     'items': []}),
+                ('deliv_conf', 'Delivery Confirmation',{'title': 'Delivery Confirmation','items': []}),
+            ],
+        }),
+        ('ship_schedule', 'Shipping Schedule',  {
+            'title': 'Shipping Schedule',
+            'items': [
+                ('today_sched',"Today's Schedule",    {'title': "Today's Schedule",   'items': []}),
+                ('week_sched', 'Weekly Schedule',     {'title': 'Weekly Schedule',    'items': []}),
+                ('sched_cal',  'Schedule Calendar',   {'title': 'Schedule Calendar',  'items': []}),
+                ('rush_orders','Rush Orders',         {'title': 'Rush Orders',        'items': []}),
+            ],
+        }),
+        ('receiving',     'Receiving',          {
+            'title': 'Receiving',
+            'items': [
+                ('inbound',    'Inbound Shipments',   {'title': 'Inbound Shipments',  'items': []}),
+                ('recv_items', 'Receive Items',       {'title': 'Receive Items',      'items': []}),
+                ('recv_rpts',  'Receiving Reports',   {'title': 'Receiving Reports',  'items': []}),
+                ('disc_rpts',  'Discrepancy Reports', {'title': 'Discrepancy Reports','items': []}),
+            ],
+        }),
+        ('carrier_mgmt',  'Carrier Management', {
+            'title': 'Carrier Management',
+            'items': [
+                ('carr_list',  'Carrier List',        {'title': 'Carrier List',       'items': []}),
+                ('carr_rates', 'Carrier Rates',       {'title': 'Carrier Rates',      'items': []}),
+                ('perf_rpts',  'Performance Reports', {'title': 'Performance Reports','items': []}),
+                ('carr_cont',  'Carrier Contracts',   {'title': 'Carrier Contracts',  'items': []}),
+            ],
+        }),
+        ('tracking',      'Tracking',           {
+            'title': 'Tracking',
+            'items': [
+                ('track_ship', 'Track Shipment',      {'title': 'Track Shipment',     'items': []}),
+                ('track_dash', 'Tracking Dashboard',  {'title': 'Tracking Dashboard', 'items': []}),
+                ('deliv_stat', 'Delivery Status',     {'title': 'Delivery Status',    'items': []}),
+                ('exc_rpts',   'Exception Reports',   {'title': 'Exception Reports',  'items': []}),
+            ],
+        }),
+        ('ship_reports',  'Shipping Reports',   {
+            'title': 'Shipping Reports',
+            'items': [
+                ('daily_rpt',  'Daily Report',        {'title': 'Daily Report',       'items': []}),
+                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
+                ('cost_analy', 'Cost Analysis',       {'title': 'Cost Analysis',      'items': []}),
+                ('perf_rpt',   'Performance Report',  {'title': 'Performance Report', 'items': []}),
+            ],
+        }),
+        ('returns_proc',  'Returns Processing', {
+            'title': 'Returns Processing',
+            'items': [
+                ('new_return', 'New Return',          {'title': 'New Return',         'items': []}),
+                ('pend_ret',   'Pending Returns',     {'title': 'Pending Returns',    'items': []}),
+                ('ret_hist',   'Return History',      {'title': 'Return History',     'items': []}),
+                ('ret_rpts',   'Return Reports',      {'title': 'Return Reports',     'items': []}),
+            ],
+        }),
     ],
 }
+
 _QA_LAB_MENU = {
     'title': 'QA Laboratory Menu',
     'items': [
-        ('test_requests',  'Test Requests',      {'title': 'Test Requests',      'items': []}),
-        ('lab_results',    'Lab Results',        {'title': 'Lab Results',        'items': []}),
-        ('insp_reports',   'Inspection Reports', {'title': 'Inspection Reports', 'items': []}),
-        ('non_conformance','Non-Conformance',    {'title': 'Non-Conformance',    'items': []}),
-        ('calibration',    'Calibration',        {'title': 'Calibration',        'items': []}),
-        ('sample_mgmt',    'Sample Management',  {'title': 'Sample Management',  'items': []}),
-        ('lab_reports',    'Lab Reports',        {'title': 'Lab Reports',        'items': []}),
+        ('test_requests',  'Test Requests',      {
+            'title': 'Test Requests',
+            'items': [
+                ('new_req',    'New Request',         {'title': 'New Request',        'items': []}),
+                ('pend_req',   'Pending Requests',    {'title': 'Pending Requests',   'items': []}),
+                ('inprog_req', 'In Progress',         {'title': 'In Progress',        'items': []}),
+                ('comp_tests', 'Completed Tests',     {'title': 'Completed Tests',    'items': []}),
+            ],
+        }),
+        ('lab_results',    'Lab Results',        {
+            'title': 'Lab Results',
+            'items': [
+                ('recent_res', 'Recent Results',      {'title': 'Recent Results',     'items': []}),
+                ('search_res', 'Search Results',      {'title': 'Search Results',     'items': []}),
+                ('failed',     'Failed Tests',        {'title': 'Failed Tests',       'items': []}),
+                ('res_rpts',   'Result Reports',      {'title': 'Result Reports',     'items': []}),
+            ],
+        }),
+        ('insp_reports',   'Inspection Reports', {
+            'title': 'Inspection Reports',
+            'items': [
+                ('create_rpt', 'Create Report',       {'title': 'Create Report',      'items': []}),
+                ('pend_rpts',  'Pending Reports',     {'title': 'Pending Reports',    'items': []}),
+                ('rpt_arch',   'Report Archive',      {'title': 'Report Archive',     'items': []}),
+                ('rpt_sum',    'Report Summary',      {'title': 'Report Summary',     'items': []}),
+            ],
+        }),
+        ('non_conformance','Non-Conformance',    {
+            'title': 'Non-Conformance',
+            'items': [
+                ('new_ncr',    'New NCR',             {'title': 'New NCR',            'items': []}),
+                ('open_ncrs',  'Open NCRs',           {'title': 'Open NCRs',          'items': []}),
+                ('ncr_hist',   'NCR History',         {'title': 'NCR History',        'items': []}),
+                ('ncr_rpts',   'NCR Reports',         {'title': 'NCR Reports',        'items': []}),
+            ],
+        }),
+        ('calibration',    'Calibration',        {
+            'title': 'Calibration',
+            'items': [
+                ('cal_sched',  'Calibration Schedule',{'title': 'Calibration Schedule','items': []}),
+                ('cal_records','Calibration Records', {'title': 'Calibration Records','items': []}),
+                ('overdue',    'Overdue Items',       {'title': 'Overdue Items',      'items': []}),
+                ('cal_rpts',   'Calibration Reports', {'title': 'Calibration Reports','items': []}),
+            ],
+        }),
+        ('sample_mgmt',    'Sample Management',  {
+            'title': 'Sample Management',
+            'items': [
+                ('recv_sample','Receive Sample',      {'title': 'Receive Sample',     'items': []}),
+                ('samp_track', 'Sample Tracking',     {'title': 'Sample Tracking',    'items': []}),
+                ('samp_disp',  'Sample Disposal',     {'title': 'Sample Disposal',    'items': []}),
+                ('samp_rpts',  'Sample Reports',      {'title': 'Sample Reports',     'items': []}),
+            ],
+        }),
+        ('lab_reports',    'Lab Reports',        {
+            'title': 'Lab Reports',
+            'items': [
+                ('daily_rpts', 'Daily Reports',       {'title': 'Daily Reports',      'items': []}),
+                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
+                ('month_rpt',  'Monthly Report',      {'title': 'Monthly Report',     'items': []}),
+                ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+            ],
+        }),
     ],
 }
+
 _QA_MENU = {
     'title': 'Quality Assurance Menu',
     'items': [
         ('qa_lab', 'QA Laboratory Menu', _QA_LAB_MENU),
     ],
 }
+
 _PERS_MENU = {
     'title': 'Personnel Menu',
     'items': [
@@ -107,51 +507,246 @@ _PERS_MENU = {
         ('dept_entry',  'Dept Entry',             'dept_entry.py'),
         ('dept_sub',    'Dept Sub Entry',         'dept_sub_entry.py'),
         ('time_clock',  'Time Clock',             _TIME_CLOCK_MENU),
-        ('emp_records', 'Employee Records',       {'title': 'Employee Records',       'items': []}),
-        ('benefits',    'Benefits',               {'title': 'Benefits',               'items': []}),
-        ('perf_review', 'Performance Reviews',    {'title': 'Performance Reviews',    'items': []}),
-        ('disc_records','Disciplinary Records',   {'title': 'Disciplinary Records',   'items': []}),
-        ('training',    'Training & Development', {'title': 'Training & Development', 'items': []}),
-        ('onboarding',  'Onboarding',             {'title': 'Onboarding',             'items': []}),
+        ('emp_records', 'Employee Records',       {
+            'title': 'Employee Records',
+            'items': [
+                ('view_recs',  'View Records',        {'title': 'View Records',       'items': []}),
+                ('new_emp',    'New Employee',        {'title': 'New Employee',       'items': []}),
+                ('upd_rec',    'Update Record',       {'title': 'Update Record',      'items': []}),
+                ('emp_hist',   'Employment History',  {'title': 'Employment History', 'items': []}),
+            ],
+        }),
+        ('benefits',    'Benefits',               {
+            'title': 'Benefits',
+            'items': [
+                ('ben_enroll', 'Benefits Enrollment', {'title': 'Benefits Enrollment','items': []}),
+                ('ben_sum',    'Benefits Summary',    {'title': 'Benefits Summary',   'items': []}),
+                ('cobra',      'COBRA Management',    {'title': 'COBRA Management',   'items': []}),
+                ('ben_rpts',   'Benefits Reports',    {'title': 'Benefits Reports',   'items': []}),
+            ],
+        }),
+        ('perf_review', 'Performance Reviews',    {
+            'title': 'Performance Reviews',
+            'items': [
+                ('sched_rev',  'Schedule Review',     {'title': 'Schedule Review',    'items': []}),
+                ('pend_revs',  'Pending Reviews',     {'title': 'Pending Reviews',    'items': []}),
+                ('rev_hist',   'Review History',      {'title': 'Review History',     'items': []}),
+                ('perf_rpts',  'Performance Reports', {'title': 'Performance Reports','items': []}),
+            ],
+        }),
+        ('disc_records','Disciplinary Records',   {
+            'title': 'Disciplinary Records',
+            'items': [
+                ('new_rec',    'New Record',          {'title': 'New Record',         'items': []}),
+                ('view_recs',  'View Records',        {'title': 'View Records',       'items': []}),
+                ('rec_hist',   'Record History',      {'title': 'Record History',     'items': []}),
+                ('disc_rpts',  'Disciplinary Reports',{'title': 'Disciplinary Reports','items': []}),
+            ],
+        }),
+        ('training',    'Training & Development', {
+            'title': 'Training & Development',
+            'items': [
+                ('train_cal',  'Training Calendar',   {'title': 'Training Calendar',  'items': []}),
+                ('train_recs', 'Training Records',    {'title': 'Training Records',   'items': []}),
+                ('course_mgmt','Course Management',   {'title': 'Course Management',  'items': []}),
+                ('cert_track', 'Certification Tracking',{'title': 'Certification Tracking','items': []}),
+            ],
+        }),
+        ('onboarding',  'Onboarding',             {
+            'title': 'Onboarding',
+            'items': [
+                ('hire_chk',   'New Hire Checklist',  {'title': 'New Hire Checklist', 'items': []}),
+                ('onb_stat',   'Onboarding Status',   {'title': 'Onboarding Status',  'items': []}),
+                ('doc_coll',   'Document Collection', {'title': 'Document Collection','items': []}),
+                ('onb_rpts',   'Onboarding Reports',  {'title': 'Onboarding Reports', 'items': []}),
+            ],
+        }),
     ],
 }
+
 _CS_MENU = {
     'title': 'Customer Service Menu',
     'items': [
         ('cs_calls',      'Customer Service Calls', 'cs_calls.py'),
         ('cust_entry',    'Customer Entry Screen',  'customer_entry.py'),
-        ('open_tickets',  'Open Tickets',           {'title': 'Open Tickets',        'items': []}),
-        ('cust_accounts', 'Customer Accounts',      {'title': 'Customer Accounts',   'items': []}),
-        ('returns',       'Returns & Refunds',      {'title': 'Returns & Refunds',   'items': []}),
-        ('knowledge_base','Knowledge Base',         {'title': 'Knowledge Base',      'items': []}),
-        ('svc_reports',   'Service Reports',        {'title': 'Service Reports',     'items': []}),
-        ('surveys',       'Surveys & Feedback',     {'title': 'Surveys & Feedback',  'items': []}),
+        ('open_tickets',  'Open Tickets',           {
+            'title': 'Open Tickets',
+            'items': [
+                ('all_tickets','View All Tickets',    {'title': 'View All Tickets',   'items': []}),
+                ('my_tickets', 'My Tickets',          {'title': 'My Tickets',         'items': []}),
+                ('hi_pri',     'High Priority',       {'title': 'High Priority',      'items': []}),
+                ('tick_search','Ticket Search',       {'title': 'Ticket Search',      'items': []}),
+            ],
+        }),
+        ('cust_accounts', 'Customer Accounts',      {
+            'title': 'Customer Accounts',
+            'items': [
+                ('acct_list',  'Account List',        {'title': 'Account List',       'items': []}),
+                ('new_acct',   'New Account',         {'title': 'New Account',        'items': []}),
+                ('acct_det',   'Account Details',     {'title': 'Account Details',    'items': []}),
+                ('acct_hist',  'Account History',     {'title': 'Account History',    'items': []}),
+            ],
+        }),
+        ('returns',       'Returns & Refunds',      {
+            'title': 'Returns & Refunds',
+            'items': [
+                ('new_return', 'New Return',          {'title': 'New Return',         'items': []}),
+                ('pend_ret',   'Pending Returns',     {'title': 'Pending Returns',    'items': []}),
+                ('refund_proc','Refund Processing',   {'title': 'Refund Processing',  'items': []}),
+                ('ret_rpts',   'Returns Reports',     {'title': 'Returns Reports',    'items': []}),
+            ],
+        }),
+        ('knowledge_base','Knowledge Base',         {
+            'title': 'Knowledge Base',
+            'items': [
+                ('browse',     'Browse Articles',     {'title': 'Browse Articles',    'items': []}),
+                ('create_art', 'Create Article',      {'title': 'Create Article',     'items': []}),
+                ('art_mgmt',   'Article Management',  {'title': 'Article Management', 'items': []}),
+                ('kb_search',  'Search Knowledge Base',{'title': 'Search Knowledge Base','items': []}),
+            ],
+        }),
+        ('svc_reports',   'Service Reports',        {
+            'title': 'Service Reports',
+            'items': [
+                ('daily_rpt',  'Daily Report',        {'title': 'Daily Report',       'items': []}),
+                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
+                ('res_rpts',   'Resolution Reports',  {'title': 'Resolution Reports', 'items': []}),
+                ('csat_rpts',  'Customer Satisfaction',{'title': 'Customer Satisfaction','items': []}),
+            ],
+        }),
+        ('surveys',       'Surveys & Feedback',     {
+            'title': 'Surveys & Feedback',
+            'items': [
+                ('act_surv',   'Active Surveys',      {'title': 'Active Surveys',     'items': []}),
+                ('new_surv',   'Create Survey',       {'title': 'Create Survey',      'items': []}),
+                ('surv_res',   'Survey Results',      {'title': 'Survey Results',     'items': []}),
+                ('feed_rpts',  'Feedback Reports',    {'title': 'Feedback Reports',   'items': []}),
+            ],
+        }),
     ],
 }
+
 _IT_TECH = {
     'title': 'IT Technician',
     'items': [
         ('it_calls',    'IT Support Calls',       'it_calls.py'),
         ('it_tasks',    'IT Tasks',               'IT_Tasks.py'),
-        ('help_desk',   'Help Desk Tickets',      {'title': 'Help Desk Tickets',      'items': []}),
-        ('asset_mgmt',  'Asset Management',       {'title': 'Asset Management',       'items': []}),
-        ('net_status',  'Network Status',         {'title': 'Network Status',         'items': []}),
-        ('sw_install',  'Software Installations', {'title': 'Software Installations', 'items': []}),
-        ('hw_repairs',  'Hardware Repairs',       {'title': 'Hardware Repairs',       'items': []}),
-        ('user_accts',  'User Account Management',{'title': 'User Account Management','items': []}),
+        ('help_desk',   'Help Desk Tickets',      {
+            'title': 'Help Desk Tickets',
+            'items': [
+                ('new_ticket', 'New Ticket',          {'title': 'New Ticket',         'items': []}),
+                ('open_tick',  'Open Tickets',        {'title': 'Open Tickets',       'items': []}),
+                ('my_tickets', 'My Assigned Tickets', {'title': 'My Assigned Tickets','items': []}),
+                ('tick_hist',  'Ticket History',      {'title': 'Ticket History',     'items': []}),
+            ],
+        }),
+        ('asset_mgmt',  'Asset Management',       {
+            'title': 'Asset Management',
+            'items': [
+                ('asset_inv',  'Asset Inventory',     {'title': 'Asset Inventory',    'items': []}),
+                ('new_asset',  'New Asset',           {'title': 'New Asset',          'items': []}),
+                ('asset_hist', 'Asset History',       {'title': 'Asset History',      'items': []}),
+                ('disposition','Disposition',         {'title': 'Disposition',        'items': []}),
+            ],
+        }),
+        ('net_status',  'Network Status',         {
+            'title': 'Network Status',
+            'items': [
+                ('net_dash',   'Network Dashboard',   {'title': 'Network Dashboard',  'items': []}),
+                ('bw_monitor', 'Bandwidth Monitor',   {'title': 'Bandwidth Monitor',  'items': []}),
+                ('net_map',    'Network Map',         {'title': 'Network Map',        'items': []}),
+                ('inc_log',    'Incident Log',        {'title': 'Incident Log',       'items': []}),
+            ],
+        }),
+        ('sw_install',  'Software Installations', {
+            'title': 'Software Installations',
+            'items': [
+                ('pend_inst',  'Pending Installs',    {'title': 'Pending Installs',   'items': []}),
+                ('sw_inv',     'Software Inventory',  {'title': 'Software Inventory', 'items': []}),
+                ('lic_mgmt',   'License Management',  {'title': 'License Management', 'items': []}),
+                ('inst_hist',  'Installation History',{'title': 'Installation History','items': []}),
+            ],
+        }),
+        ('hw_repairs',  'Hardware Repairs',       {
+            'title': 'Hardware Repairs',
+            'items': [
+                ('new_repair', 'New Repair Request',  {'title': 'New Repair Request', 'items': []}),
+                ('inprog',     'In Progress',         {'title': 'In Progress',        'items': []}),
+                ('comp_rep',   'Completed Repairs',   {'title': 'Completed Repairs',  'items': []}),
+                ('rep_hist',   'Repair History',      {'title': 'Repair History',     'items': []}),
+            ],
+        }),
+        ('user_accts',  'User Account Management', {
+            'title': 'User Account Management',
+            'items': [
+                ('create_acct','Create Account',      {'title': 'Create Account',     'items': []}),
+                ('reset_pw',   'Reset Password',      {'title': 'Reset Password',     'items': []}),
+                ('acct_stat',  'Account Status',      {'title': 'Account Status',     'items': []}),
+                ('acct_audit', 'Account Audit',       {'title': 'Account Audit',      'items': []}),
+            ],
+        }),
     ],
 }
+
 _PURCH_MENU = {
     'title': 'Purchasing Menu',
     'items': [
         ('prod_entry',    'Product Entry',       'product_entry_screen.py'),
         ('sup_entry',     'Supplier Entry',      'Supplier_entry.py'),
-        ('purch_orders',  'Purchase Orders',     {'title': 'Purchase Orders',     'items': []}),
-        ('vendor_mgmt',   'Vendor Management',   {'title': 'Vendor Management',   'items': []}),
-        ('purch_reports', 'Purchase Reports',    {'title': 'Purchase Reports',    'items': []}),
-        ('receiving',     'Receiving',           {'title': 'Receiving',           'items': []}),
-        ('contracts',     'Contract Management', {'title': 'Contract Management', 'items': []}),
-        ('requisitions',  'Requisitions',        {'title': 'Requisitions',        'items': []}),
+        ('purch_orders',  'Purchase Orders',     {
+            'title': 'Purchase Orders',
+            'items': [
+                ('new_po',     'New PO',             {'title': 'New PO',             'items': []}),
+                ('open_pos',   'Open POs',           {'title': 'Open POs',           'items': []}),
+                ('po_status',  'PO Status',          {'title': 'PO Status',          'items': []}),
+                ('po_hist',    'PO History',         {'title': 'PO History',         'items': []}),
+            ],
+        }),
+        ('vendor_mgmt',   'Vendor Management',   {
+            'title': 'Vendor Management',
+            'items': [
+                ('vend_list',  'Vendor List',        {'title': 'Vendor List',        'items': []}),
+                ('new_vend',   'New Vendor',         {'title': 'New Vendor',         'items': []}),
+                ('vend_perf',  'Vendor Performance', {'title': 'Vendor Performance', 'items': []}),
+                ('vend_cont',  'Vendor Contracts',   {'title': 'Vendor Contracts',   'items': []}),
+            ],
+        }),
+        ('purch_reports', 'Purchase Reports',    {
+            'title': 'Purchase Reports',
+            'items': [
+                ('spend_sum',  'Spending Summary',   {'title': 'Spending Summary',   'items': []}),
+                ('po_rpts',    'PO Reports',         {'title': 'PO Reports',         'items': []}),
+                ('budg_act',   'Budget vs. Actual',  {'title': 'Budget vs. Actual',  'items': []}),
+                ('cat_rpts',   'Category Reports',   {'title': 'Category Reports',   'items': []}),
+            ],
+        }),
+        ('receiving',     'Receiving',           {
+            'title': 'Receiving',
+            'items': [
+                ('pend_recv',  'Pending Receipts',   {'title': 'Pending Receipts',   'items': []}),
+                ('recv_items', 'Receive Items',      {'title': 'Receive Items',      'items': []}),
+                ('disc_rpts',  'Discrepancy Reports',{'title': 'Discrepancy Reports','items': []}),
+                ('recv_hist',  'Receiving History',  {'title': 'Receiving History',  'items': []}),
+            ],
+        }),
+        ('contracts',     'Contract Management', {
+            'title': 'Contract Management',
+            'items': [
+                ('act_cont',   'Active Contracts',   {'title': 'Active Contracts',   'items': []}),
+                ('new_cont',   'New Contract',       {'title': 'New Contract',       'items': []}),
+                ('cont_renew', 'Contract Renewals',  {'title': 'Contract Renewals',  'items': []}),
+                ('cont_arch',  'Contract Archive',   {'title': 'Contract Archive',   'items': []}),
+            ],
+        }),
+        ('requisitions',  'Requisitions',        {
+            'title': 'Requisitions',
+            'items': [
+                ('new_req',    'New Requisition',    {'title': 'New Requisition',    'items': []}),
+                ('pend_appr',  'Pending Approval',   {'title': 'Pending Approval',   'items': []}),
+                ('appr_reqs',  'Approved Requisitions',{'title': 'Approved Requisitions','items': []}),
+                ('req_hist',   'Requisition History',{'title': 'Requisition History','items': []}),
+            ],
+        }),
     ],
 }
 
@@ -167,20 +762,92 @@ MENU_TREE = {
                     ('rcv',         'Accounts Receivable', 'Accounts_receivable.py'),
                     ('credit',      'Credit Department',   'Credit_dept.py'),
                     ('pay',         'Payroll Department',  'Payroll_dept.py'),
-                    ('fin_reports', 'Financial Reports',   {'title': 'Financial Reports',   'items': []}),
-                    ('budget_mgmt', 'Budget Management',   {'title': 'Budget Management',   'items': []}),
-                    ('audit_mgmt',  'Audit Management',    {'title': 'Audit Management',    'items': []}),
+                    ('fin_reports', 'Financial Reports',   {
+                        'title': 'Financial Reports',
+                        'items': [
+                            ('inc_stmt',   'Income Statement',    {'title': 'Income Statement',   'items': []}),
+                            ('bal_sheet',  'Balance Sheet',       {'title': 'Balance Sheet',      'items': []}),
+                            ('cash_flow',  'Cash Flow',           {'title': 'Cash Flow',          'items': []}),
+                            ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                        ],
+                    }),
+                    ('budget_mgmt', 'Budget Management',   {
+                        'title': 'Budget Management',
+                        'items': [
+                            ('budg_plan',  'Budget Planning',     {'title': 'Budget Planning',    'items': []}),
+                            ('budg_act',   'Budget vs. Actual',   {'title': 'Budget vs. Actual',  'items': []}),
+                            ('budg_amend', 'Budget Amendments',   {'title': 'Budget Amendments',  'items': []}),
+                            ('budg_rpts',  'Budget Reports',      {'title': 'Budget Reports',     'items': []}),
+                        ],
+                    }),
+                    ('audit_mgmt',  'Audit Management',    {
+                        'title': 'Audit Management',
+                        'items': [
+                            ('audit_sched','Audit Schedule',      {'title': 'Audit Schedule',     'items': []}),
+                            ('findings',   'Audit Findings',      {'title': 'Audit Findings',     'items': []}),
+                            ('corr_act',   'Corrective Actions',  {'title': 'Corrective Actions', 'items': []}),
+                            ('audit_rpts', 'Audit Reports',       {'title': 'Audit Reports',      'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('acct_rcv',    'Accounts Receivable', 'Accounts_receivable.py'),
             ('credit',      'Credit Department',   'Credit_dept.py'),
             ('payroll',     'Payroll Department',  'Payroll_dept.py'),
-            ('gen_ledger',  'General Ledger',      {'title': 'General Ledger',      'items': []}),
-            ('budget_mgmt', 'Budget Management',   {'title': 'Budget Management',   'items': []}),
-            ('fin_reports', 'Financial Reports',   {'title': 'Financial Reports',   'items': []}),
-            ('tax_mgmt',    'Tax Management',      {'title': 'Tax Management',      'items': []}),
-            ('exp_reports', 'Expense Reports',     {'title': 'Expense Reports',     'items': []}),
-            ('bank_recon',  'Bank Reconciliation', {'title': 'Bank Reconciliation', 'items': []}),
+            ('gen_ledger',  'General Ledger',      {
+                'title': 'General Ledger',
+                'items': [
+                    ('chart_accts','Chart of Accounts',   {'title': 'Chart of Accounts',  'items': []}),
+                    ('jrnl_ent',   'Journal Entries',     {'title': 'Journal Entries',    'items': []}),
+                    ('gl_rpts',    'GL Reports',          {'title': 'GL Reports',         'items': []}),
+                    ('per_close',  'Period Close',        {'title': 'Period Close',       'items': []}),
+                ],
+            }),
+            ('budget_mgmt', 'Budget Management',   {
+                'title': 'Budget Management',
+                'items': [
+                    ('budg_plan',  'Budget Planning',     {'title': 'Budget Planning',    'items': []}),
+                    ('budg_act',   'Budget vs. Actual',   {'title': 'Budget vs. Actual',  'items': []}),
+                    ('budg_amend', 'Budget Amendments',   {'title': 'Budget Amendments',  'items': []}),
+                    ('budg_rpts',  'Budget Reports',      {'title': 'Budget Reports',     'items': []}),
+                ],
+            }),
+            ('fin_reports', 'Financial Reports',   {
+                'title': 'Financial Reports',
+                'items': [
+                    ('inc_stmt',   'Income Statement',    {'title': 'Income Statement',   'items': []}),
+                    ('bal_sheet',  'Balance Sheet',       {'title': 'Balance Sheet',      'items': []}),
+                    ('cash_flow',  'Cash Flow',           {'title': 'Cash Flow',          'items': []}),
+                    ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                ],
+            }),
+            ('tax_mgmt',    'Tax Management',      {
+                'title': 'Tax Management',
+                'items': [
+                    ('tax_cal',    'Tax Calendar',        {'title': 'Tax Calendar',       'items': []}),
+                    ('tax_filing', 'Tax Filing',          {'title': 'Tax Filing',         'items': []}),
+                    ('tax_pay',    'Tax Payments',        {'title': 'Tax Payments',       'items': []}),
+                    ('tax_rpts',   'Tax Reports',         {'title': 'Tax Reports',        'items': []}),
+                ],
+            }),
+            ('exp_reports', 'Expense Reports',     {
+                'title': 'Expense Reports',
+                'items': [
+                    ('sub_exp',    'Submit Expense',      {'title': 'Submit Expense',     'items': []}),
+                    ('pend_appr',  'Pending Approval',    {'title': 'Pending Approval',   'items': []}),
+                    ('appr_exp',   'Approved Expenses',   {'title': 'Approved Expenses',  'items': []}),
+                    ('exp_sum',    'Expense Summary',     {'title': 'Expense Summary',    'items': []}),
+                ],
+            }),
+            ('bank_recon',  'Bank Reconciliation', {
+                'title': 'Bank Reconciliation',
+                'items': [
+                    ('recon_acct', 'Reconcile Account',   {'title': 'Reconcile Account',  'items': []}),
+                    ('pend_items', 'Pending Items',        {'title': 'Pending Items',      'items': []}),
+                    ('recon_hist', 'Reconciliation History',{'title': 'Reconciliation History','items': []}),
+                    ('bank_rpts',  'Bank Reports',         {'title': 'Bank Reports',       'items': []}),
+                ],
+            }),
         ],
     },
     'customer_service': {
@@ -190,10 +857,42 @@ MENU_TREE = {
                 'title': 'CS Manager Menu',
                 'items': [
                     ('cs_menu',    'Customer Service Menu',  _CS_MENU),
-                    ('ticket_rpts','Ticket Reports',         {'title': 'Ticket Reports',         'items': []}),
-                    ('staff_mgmt', 'Staff Management',       {'title': 'Staff Management',       'items': []}),
-                    ('cust_sat',   'Customer Satisfaction',  {'title': 'Customer Satisfaction',  'items': []}),
-                    ('escalations','Escalations',            {'title': 'Escalations',            'items': []}),
+                    ('ticket_rpts','Ticket Reports',         {
+                        'title': 'Ticket Reports',
+                        'items': [
+                            ('daily_tick', 'Daily Ticket Report',   {'title': 'Daily Ticket Report', 'items': []}),
+                            ('week_sum',   'Weekly Summary',        {'title': 'Weekly Summary',      'items': []}),
+                            ('res_analy',  'Resolution Analysis',   {'title': 'Resolution Analysis', 'items': []}),
+                            ('sla_rpts',   'SLA Reports',           {'title': 'SLA Reports',         'items': []}),
+                        ],
+                    }),
+                    ('staff_mgmt', 'Staff Management',       {
+                        'title': 'Staff Management',
+                        'items': [
+                            ('staff_sched','Staff Schedule',        {'title': 'Staff Schedule',      'items': []}),
+                            ('perf_met',   'Performance Metrics',   {'title': 'Performance Metrics', 'items': []}),
+                            ('staff_train','Staff Training',        {'title': 'Staff Training',      'items': []}),
+                            ('staff_rpts', 'Staff Reports',         {'title': 'Staff Reports',       'items': []}),
+                        ],
+                    }),
+                    ('cust_sat',   'Customer Satisfaction',  {
+                        'title': 'Customer Satisfaction',
+                        'items': [
+                            ('csat_res',   'CSAT Survey Results',   {'title': 'CSAT Survey Results', 'items': []}),
+                            ('nps_rpts',   'NPS Reports',           {'title': 'NPS Reports',         'items': []}),
+                            ('sat_trends', 'Satisfaction Trends',   {'title': 'Satisfaction Trends', 'items': []}),
+                            ('impr_plans', 'Improvement Plans',     {'title': 'Improvement Plans',   'items': []}),
+                        ],
+                    }),
+                    ('escalations','Escalations',            {
+                        'title': 'Escalations',
+                        'items': [
+                            ('act_esc',    'Active Escalations',    {'title': 'Active Escalations',  'items': []}),
+                            ('esc_hist',   'Escalation History',    {'title': 'Escalation History',  'items': []}),
+                            ('esc_rpts',   'Escalation Reports',    {'title': 'Escalation Reports',  'items': []}),
+                            ('res_track',  'Resolution Tracking',   {'title': 'Resolution Tracking', 'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('cs_menu',  'Customer Service Menu',  _CS_MENU),
@@ -207,20 +906,108 @@ MENU_TREE = {
                 'title': 'Engineering Manager',
                 'items': [
                     ('engineers',  'Engineers',           'engineer.py'),
-                    ('proj_appr',  'Project Approvals',   {'title': 'Project Approvals',   'items': []}),
-                    ('resource',   'Resource Management', {'title': 'Resource Management', 'items': []}),
-                    ('budget',     'Budget Management',   {'title': 'Budget Management',   'items': []}),
-                    ('eng_reports','Engineering Reports', {'title': 'Engineering Reports', 'items': []}),
+                    ('proj_appr',  'Project Approvals',   {
+                        'title': 'Project Approvals',
+                        'items': [
+                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
+                            ('appr_proj',  'Approved Projects',    {'title': 'Approved Projects',  'items': []}),
+                            ('rej_proj',   'Rejected Projects',    {'title': 'Rejected Projects',  'items': []}),
+                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                        ],
+                    }),
+                    ('resource',   'Resource Management', {
+                        'title': 'Resource Management',
+                        'items': [
+                            ('res_alloc',  'Resource Allocation',   {'title': 'Resource Allocation', 'items': []}),
+                            ('cap_plan',   'Capacity Planning',     {'title': 'Capacity Planning',   'items': []}),
+                            ('res_rpts',   'Resource Reports',      {'title': 'Resource Reports',    'items': []}),
+                            ('avail_cal',  'Availability Calendar', {'title': 'Availability Calendar','items': []}),
+                        ],
+                    }),
+                    ('budget',     'Budget Management',   {
+                        'title': 'Budget Management',
+                        'items': [
+                            ('eng_budg',   'Engineering Budget',    {'title': 'Engineering Budget',  'items': []}),
+                            ('budg_act',   'Budget vs. Actual',     {'title': 'Budget vs. Actual',   'items': []}),
+                            ('cost_rpts',  'Cost Reports',          {'title': 'Cost Reports',        'items': []}),
+                            ('budg_req',   'Budget Requests',       {'title': 'Budget Requests',     'items': []}),
+                        ],
+                    }),
+                    ('eng_reports','Engineering Reports', {
+                        'title': 'Engineering Reports',
+                        'items': [
+                            ('proj_stat',  'Project Status',        {'title': 'Project Status',      'items': []}),
+                            ('res_util',   'Resource Utilization',  {'title': 'Resource Utilization','items': []}),
+                            ('kpi_dash',   'KPI Dashboard',         {'title': 'KPI Dashboard',       'items': []}),
+                            ('month_rpts', 'Monthly Reports',       {'title': 'Monthly Reports',     'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('engineers',   'Engineers',              'engineer.py'),
-            ('proj_mgmt',   'Project Management',     {'title': 'Project Management',     'items': []}),
-            ('design_docs', 'Design Documents',       {'title': 'Design Documents',       'items': []}),
-            ('bom',         'Bill of Materials',      {'title': 'Bill of Materials',      'items': []}),
-            ('chg_orders',  'Change Orders',          {'title': 'Change Orders',          'items': []}),
-            ('test_val',    'Test & Validation',      {'title': 'Test & Validation',      'items': []}),
-            ('eng_reports', 'Engineering Reports',    {'title': 'Engineering Reports',    'items': []}),
-            ('standards',   'Standards & Compliance', {'title': 'Standards & Compliance', 'items': []}),
+            ('proj_mgmt',   'Project Management',     {
+                'title': 'Project Management',
+                'items': [
+                    ('act_proj',   'Active Projects',      {'title': 'Active Projects',    'items': []}),
+                    ('new_proj',   'New Project',          {'title': 'New Project',        'items': []}),
+                    ('proj_time',  'Project Timeline',     {'title': 'Project Timeline',   'items': []}),
+                    ('proj_rpts',  'Project Reports',      {'title': 'Project Reports',    'items': []}),
+                ],
+            }),
+            ('design_docs', 'Design Documents',       {
+                'title': 'Design Documents',
+                'items': [
+                    ('doc_lib',    'Document Library',     {'title': 'Document Library',   'items': []}),
+                    ('new_doc',    'New Document',         {'title': 'New Document',       'items': []}),
+                    ('doc_review', 'Document Review',      {'title': 'Document Review',    'items': []}),
+                    ('archive',    'Archive',              {'title': 'Archive',            'items': []}),
+                ],
+            }),
+            ('bom',         'Bill of Materials',      {
+                'title': 'Bill of Materials',
+                'items': [
+                    ('bom_list',   'BOM List',            {'title': 'BOM List',           'items': []}),
+                    ('new_bom',    'Create BOM',          {'title': 'Create BOM',         'items': []}),
+                    ('bom_rev',    'BOM Revision',        {'title': 'BOM Revision',       'items': []}),
+                    ('bom_rpts',   'BOM Reports',         {'title': 'BOM Reports',        'items': []}),
+                ],
+            }),
+            ('chg_orders',  'Change Orders',          {
+                'title': 'Change Orders',
+                'items': [
+                    ('new_co',     'New Change Order',    {'title': 'New Change Order',   'items': []}),
+                    ('pend_appr',  'Pending Approval',    {'title': 'Pending Approval',   'items': []}),
+                    ('appr_chg',   'Approved Changes',    {'title': 'Approved Changes',   'items': []}),
+                    ('chg_hist',   'Change History',      {'title': 'Change History',     'items': []}),
+                ],
+            }),
+            ('test_val',    'Test & Validation',      {
+                'title': 'Test & Validation',
+                'items': [
+                    ('test_plans', 'Test Plans',          {'title': 'Test Plans',         'items': []}),
+                    ('test_res',   'Test Results',        {'title': 'Test Results',       'items': []}),
+                    ('val_rpts',   'Validation Reports',  {'title': 'Validation Reports', 'items': []}),
+                    ('issue_track','Issue Tracking',      {'title': 'Issue Tracking',     'items': []}),
+                ],
+            }),
+            ('eng_reports', 'Engineering Reports',    {
+                'title': 'Engineering Reports',
+                'items': [
+                    ('proj_stat',  'Project Status',      {'title': 'Project Status',     'items': []}),
+                    ('design_rev', 'Design Review',       {'title': 'Design Review',      'items': []}),
+                    ('res_rpt',    'Resource Report',     {'title': 'Resource Report',    'items': []}),
+                    ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                ],
+            }),
+            ('standards',   'Standards & Compliance', {
+                'title': 'Standards & Compliance',
+                'items': [
+                    ('std_lib',    'Standards Library',   {'title': 'Standards Library',  'items': []}),
+                    ('comp_chk',   'Compliance Checklist',{'title': 'Compliance Checklist','items': []}),
+                    ('audit_res',  'Audit Results',       {'title': 'Audit Results',      'items': []}),
+                    ('reg_upd',    'Regulatory Updates',  {'title': 'Regulatory Updates', 'items': []}),
+                ],
+            }),
         ],
     },
     'information_tech': {
@@ -230,10 +1017,42 @@ MENU_TREE = {
                 'title': 'IT Manager',
                 'items': [
                     ('it_tech',    'IT Technician',       _IT_TECH),
-                    ('budget',     'Budget & Procurement', {'title': 'Budget & Procurement', 'items': []}),
-                    ('vendor_con', 'Vendor Contracts',     {'title': 'Vendor Contracts',     'items': []}),
-                    ('it_projects','IT Projects',          {'title': 'IT Projects',          'items': []}),
-                    ('security',   'Security Management',  {'title': 'Security Management',  'items': []}),
+                    ('budget',     'Budget & Procurement', {
+                        'title': 'Budget & Procurement',
+                        'items': [
+                            ('it_budg',    'IT Budget',           {'title': 'IT Budget',          'items': []}),
+                            ('hw_proc',    'Hardware Procurement', {'title': 'Hardware Procurement','items': []}),
+                            ('sw_lic',     'Software Licensing',   {'title': 'Software Licensing', 'items': []}),
+                            ('proc_rpts',  'Procurement Reports',  {'title': 'Procurement Reports','items': []}),
+                        ],
+                    }),
+                    ('vendor_con', 'Vendor Contracts',     {
+                        'title': 'Vendor Contracts',
+                        'items': [
+                            ('act_cont',   'Active Contracts',     {'title': 'Active Contracts',   'items': []}),
+                            ('cont_renew', 'Contract Renewals',    {'title': 'Contract Renewals',  'items': []}),
+                            ('vend_perf',  'Vendor Performance',   {'title': 'Vendor Performance', 'items': []}),
+                            ('cont_arch',  'Contract Archive',     {'title': 'Contract Archive',   'items': []}),
+                        ],
+                    }),
+                    ('it_projects','IT Projects',          {
+                        'title': 'IT Projects',
+                        'items': [
+                            ('act_proj',   'Active Projects',      {'title': 'Active Projects',    'items': []}),
+                            ('proj_pipe',  'Project Pipeline',     {'title': 'Project Pipeline',   'items': []}),
+                            ('proj_rpts',  'Project Reports',      {'title': 'Project Reports',    'items': []}),
+                            ('res_alloc',  'Resource Allocation',  {'title': 'Resource Allocation','items': []}),
+                        ],
+                    }),
+                    ('security',   'Security Management',  {
+                        'title': 'Security Management',
+                        'items': [
+                            ('sec_dash',   'Security Dashboard',   {'title': 'Security Dashboard', 'items': []}),
+                            ('inc_rpts',   'Incident Reports',     {'title': 'Incident Reports',   'items': []}),
+                            ('vuln_mgmt',  'Vulnerability Management',{'title': 'Vulnerability Management','items': []}),
+                            ('comp_rpts',  'Compliance Reports',   {'title': 'Compliance Reports', 'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('it_tech', 'IT Technician', _IT_TECH),
@@ -246,9 +1065,33 @@ MENU_TREE = {
                 'title': 'Maintenance Manager',
                 'items': [
                     ('maint',       'Maintenance',         _MAINT_MENU),
-                    ('wo_approvals','Work Order Approvals',{'title': 'Work Order Approvals','items': []}),
-                    ('budget_mgmt', 'Budget Management',   {'title': 'Budget Management',   'items': []}),
-                    ('maint_rpts',  'Maintenance Reports', {'title': 'Maintenance Reports', 'items': []}),
+                    ('wo_approvals','Work Order Approvals', {
+                        'title': 'Work Order Approvals',
+                        'items': [
+                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
+                            ('appr_wo',    'Approved Work Orders',  {'title': 'Approved Work Orders','items': []}),
+                            ('rej_wo',     'Rejected',             {'title': 'Rejected',           'items': []}),
+                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                        ],
+                    }),
+                    ('budget_mgmt', 'Budget Management',   {
+                        'title': 'Budget Management',
+                        'items': [
+                            ('maint_budg', 'Maintenance Budget',   {'title': 'Maintenance Budget', 'items': []}),
+                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
+                            ('cost_analy', 'Cost Analysis',        {'title': 'Cost Analysis',      'items': []}),
+                            ('budg_req',   'Budget Requests',      {'title': 'Budget Requests',    'items': []}),
+                        ],
+                    }),
+                    ('maint_rpts',  'Maintenance Reports', {
+                        'title': 'Maintenance Reports',
+                        'items': [
+                            ('daily_rpt',  'Daily Report',         {'title': 'Daily Report',       'items': []}),
+                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
+                            ('equip_rpts', 'Equipment Reports',    {'title': 'Equipment Reports',  'items': []}),
+                            ('cost_rpts',  'Cost Reports',         {'title': 'Cost Reports',       'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('maint', 'Maintenance', _MAINT_MENU),
@@ -261,9 +1104,33 @@ MENU_TREE = {
                 'title': 'Marketing Manager Menu',
                 'items': [
                     ('mkt_menu',   'Marketing Menu',     _MKT_MENU),
-                    ('mkt_budget', 'Marketing Budget',   {'title': 'Marketing Budget',   'items': []}),
-                    ('camp_appr',  'Campaign Approvals', {'title': 'Campaign Approvals', 'items': []}),
-                    ('mkt_reports','Marketing Reports',  {'title': 'Marketing Reports',  'items': []}),
+                    ('mkt_budget', 'Marketing Budget',   {
+                        'title': 'Marketing Budget',
+                        'items': [
+                            ('budg_over',  'Budget Overview',      {'title': 'Budget Overview',    'items': []}),
+                            ('budg_camp',  'Budget by Campaign',   {'title': 'Budget by Campaign', 'items': []}),
+                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
+                            ('budg_req',   'Budget Requests',      {'title': 'Budget Requests',    'items': []}),
+                        ],
+                    }),
+                    ('camp_appr',  'Campaign Approvals', {
+                        'title': 'Campaign Approvals',
+                        'items': [
+                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
+                            ('appr_camp',  'Approved Campaigns',   {'title': 'Approved Campaigns', 'items': []}),
+                            ('camp_arch',  'Campaign Archive',     {'title': 'Campaign Archive',   'items': []}),
+                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                        ],
+                    }),
+                    ('mkt_reports','Marketing Reports',  {
+                        'title': 'Marketing Reports',
+                        'items': [
+                            ('camp_perf',  'Campaign Performance', {'title': 'Campaign Performance','items': []}),
+                            ('roi_rpts',   'ROI Reports',          {'title': 'ROI Reports',        'items': []}),
+                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
+                            ('kpi_dash',   'KPI Dashboard',        {'title': 'KPI Dashboard',      'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('mkt_menu', 'Marketing Menu', _MKT_MENU),
@@ -276,10 +1143,42 @@ MENU_TREE = {
                 'title': 'Personnel Manager Menu',
                 'items': [
                     ('pers_menu', 'Personnel Menu',      _PERS_MENU),
-                    ('hiring',    'Hiring & Recruitment',{'title': 'Hiring & Recruitment','items': []}),
-                    ('term',      'Terminations',        {'title': 'Terminations',        'items': []}),
-                    ('salary',    'Salary Management',   {'title': 'Salary Management',   'items': []}),
-                    ('hr_reports','HR Reports',          {'title': 'HR Reports',          'items': []}),
+                    ('hiring',    'Hiring & Recruitment', {
+                        'title': 'Hiring & Recruitment',
+                        'items': [
+                            ('open_pos',   'Open Positions',       {'title': 'Open Positions',     'items': []}),
+                            ('appl_track', 'Applicant Tracking',   {'title': 'Applicant Tracking', 'items': []}),
+                            ('int_sched',  'Interview Schedule',   {'title': 'Interview Schedule', 'items': []}),
+                            ('offer_mgmt', 'Offer Management',     {'title': 'Offer Management',   'items': []}),
+                        ],
+                    }),
+                    ('term',      'Terminations',        {
+                        'title': 'Terminations',
+                        'items': [
+                            ('term_proc',  'Termination Process',  {'title': 'Termination Process','items': []}),
+                            ('exit_int',   'Exit Interviews',      {'title': 'Exit Interviews',    'items': []}),
+                            ('final_pay',  'Final Pay Processing', {'title': 'Final Pay Processing','items': []}),
+                            ('offboard',   'Offboarding Checklist',{'title': 'Offboarding Checklist','items': []}),
+                        ],
+                    }),
+                    ('salary',    'Salary Management',   {
+                        'title': 'Salary Management',
+                        'items': [
+                            ('sal_review', 'Salary Review',        {'title': 'Salary Review',      'items': []}),
+                            ('sal_adj',    'Salary Adjustments',   {'title': 'Salary Adjustments', 'items': []}),
+                            ('comp_rpts',  'Compensation Reports', {'title': 'Compensation Reports','items': []}),
+                            ('pay_grades', 'Pay Grades',           {'title': 'Pay Grades',         'items': []}),
+                        ],
+                    }),
+                    ('hr_reports','HR Reports',          {
+                        'title': 'HR Reports',
+                        'items': [
+                            ('hd_rpt',     'Headcount Report',     {'title': 'Headcount Report',   'items': []}),
+                            ('turn_rpt',   'Turnover Report',      {'title': 'Turnover Report',    'items': []}),
+                            ('comp_rpts',  'Compliance Reports',   {'title': 'Compliance Reports', 'items': []}),
+                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('pers_menu', 'Personnel Menu', _PERS_MENU),
@@ -293,9 +1192,33 @@ MENU_TREE = {
                 'items': [
                     ('prod',        'Production',         _PROD_MENU),
                     ('shipping',    'Shipping',           _SHIP_MENU),
-                    ('prod_reports','Production Reports', {'title': 'Production Reports', 'items': []}),
-                    ('resource',    'Resource Management',{'title': 'Resource Management','items': []}),
-                    ('budget',      'Budget Management',  {'title': 'Budget Management',  'items': []}),
+                    ('prod_reports','Production Reports', {
+                        'title': 'Production Reports',
+                        'items': [
+                            ('daily_prod', 'Daily Production',     {'title': 'Daily Production',   'items': []}),
+                            ('week_sum',   'Weekly Summary',       {'title': 'Weekly Summary',     'items': []}),
+                            ('eff_rpts',   'Efficiency Reports',   {'title': 'Efficiency Reports', 'items': []}),
+                            ('kpi_dash',   'KPI Dashboard',        {'title': 'KPI Dashboard',      'items': []}),
+                        ],
+                    }),
+                    ('resource',    'Resource Management', {
+                        'title': 'Resource Management',
+                        'items': [
+                            ('res_alloc',  'Resource Allocation',   {'title': 'Resource Allocation','items': []}),
+                            ('cap_plan',   'Capacity Planning',     {'title': 'Capacity Planning',  'items': []}),
+                            ('res_rpts',   'Resource Reports',      {'title': 'Resource Reports',   'items': []}),
+                            ('wf_plan',    'Workforce Planning',    {'title': 'Workforce Planning', 'items': []}),
+                        ],
+                    }),
+                    ('budget',      'Budget Management',  {
+                        'title': 'Budget Management',
+                        'items': [
+                            ('prod_budg',  'Production Budget',    {'title': 'Production Budget',  'items': []}),
+                            ('cost_analy', 'Cost Analysis',        {'title': 'Cost Analysis',      'items': []}),
+                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
+                            ('budg_rpts',  'Budget Reports',       {'title': 'Budget Reports',     'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('prod',     'Production', _PROD_MENU),
@@ -308,12 +1231,52 @@ MENU_TREE = {
             ('purch_mgr', 'Purchasing Manager Menu', {
                 'title': 'Purchasing Manager Menu',
                 'items': [
-                    ('purch',      'Purchasing Menu',          _PURCH_MENU),
-                    ('po_approvals','PO Approvals',            {'title': 'PO Approvals',            'items': []}),
-                    ('budget',     'Budget Management',        {'title': 'Budget Management',        'items': []}),
-                    ('vendor_mgmt','Vendor Management',        {'title': 'Vendor Management',        'items': []}),
-                    ('purch_rpts', 'Purchasing Reports',       {'title': 'Purchasing Reports',       'items': []}),
-                    ('contracts',  'Contract Management',      {'title': 'Contract Management',      'items': []}),
+                    ('purch',       'Purchasing Menu',          _PURCH_MENU),
+                    ('po_approvals','PO Approvals',            {
+                        'title': 'PO Approvals',
+                        'items': [
+                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
+                            ('appr_pos',   'Approved POs',         {'title': 'Approved POs',       'items': []}),
+                            ('rej_pos',    'Rejected POs',         {'title': 'Rejected POs',       'items': []}),
+                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                        ],
+                    }),
+                    ('budget',      'Budget Management',        {
+                        'title': 'Budget Management',
+                        'items': [
+                            ('purch_budg', 'Purchasing Budget',    {'title': 'Purchasing Budget',  'items': []}),
+                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
+                            ('spend_analy','Spending Analysis',    {'title': 'Spending Analysis',  'items': []}),
+                            ('budg_rpts',  'Budget Reports',       {'title': 'Budget Reports',     'items': []}),
+                        ],
+                    }),
+                    ('vendor_mgmt', 'Vendor Management',        {
+                        'title': 'Vendor Management',
+                        'items': [
+                            ('vend_list',  'Vendor List',          {'title': 'Vendor List',        'items': []}),
+                            ('vend_eval',  'Vendor Evaluation',    {'title': 'Vendor Evaluation',  'items': []}),
+                            ('vend_perf',  'Vendor Performance',   {'title': 'Vendor Performance', 'items': []}),
+                            ('appr_vend',  'Approved Vendors',     {'title': 'Approved Vendors',   'items': []}),
+                        ],
+                    }),
+                    ('purch_rpts',  'Purchasing Reports',       {
+                        'title': 'Purchasing Reports',
+                        'items': [
+                            ('spend_rpt',  'Spending Report',      {'title': 'Spending Report',    'items': []}),
+                            ('vend_rpt',   'Vendor Report',        {'title': 'Vendor Report',      'items': []}),
+                            ('cat_analy',  'Category Analysis',    {'title': 'Category Analysis',  'items': []}),
+                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
+                        ],
+                    }),
+                    ('contracts',   'Contract Management',      {
+                        'title': 'Contract Management',
+                        'items': [
+                            ('act_cont',   'Active Contracts',     {'title': 'Active Contracts',   'items': []}),
+                            ('pend_renew', 'Pending Renewals',     {'title': 'Pending Renewals',   'items': []}),
+                            ('cont_arch',  'Contract Archive',     {'title': 'Contract Archive',   'items': []}),
+                            ('cont_rpts',  'Contract Reports',     {'title': 'Contract Reports',   'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('purch', 'Purchasing Menu', _PURCH_MENU),
@@ -326,13 +1289,69 @@ MENU_TREE = {
                 'title': 'QA Manager Menu',
                 'items': [
                     ('qa_menu',    'Quality Assurance Menu', _QA_MENU),
-                    ('audit_mgmt', 'Audit Management',   {'title': 'Audit Management',   'items': []}),
-                    ('compliance', 'Compliance',          {'title': 'Compliance',          'items': []}),
-                    ('corr_action','Corrective Actions',  {'title': 'Corrective Actions',  'items': []}),
-                    ('qa_reports', 'QA Reports',          {'title': 'QA Reports',          'items': []}),
-                    ('supp_qual',  'Supplier Quality',    {'title': 'Supplier Quality',    'items': []}),
-                    ('cust_comp',  'Customer Complaints', {'title': 'Customer Complaints', 'items': []}),
-                    ('doc_control','Document Control',    {'title': 'Document Control',    'items': []}),
+                    ('audit_mgmt', 'Audit Management',   {
+                        'title': 'Audit Management',
+                        'items': [
+                            ('audit_sched','Audit Schedule',       {'title': 'Audit Schedule',     'items': []}),
+                            ('act_audits', 'Active Audits',        {'title': 'Active Audits',      'items': []}),
+                            ('findings',   'Audit Findings',       {'title': 'Audit Findings',     'items': []}),
+                            ('corr_act',   'Corrective Actions',   {'title': 'Corrective Actions', 'items': []}),
+                        ],
+                    }),
+                    ('compliance', 'Compliance',          {
+                        'title': 'Compliance',
+                        'items': [
+                            ('comp_dash',  'Compliance Dashboard', {'title': 'Compliance Dashboard','items': []}),
+                            ('reg_req',    'Regulatory Requirements',{'title': 'Regulatory Requirements','items': []}),
+                            ('comp_rpts',  'Compliance Reports',   {'title': 'Compliance Reports', 'items': []}),
+                            ('non_comp',   'Non-Compliance Issues', {'title': 'Non-Compliance Issues','items': []}),
+                        ],
+                    }),
+                    ('corr_action','Corrective Actions',  {
+                        'title': 'Corrective Actions',
+                        'items': [
+                            ('open_cars',  'Open CARs',            {'title': 'Open CARs',          'items': []}),
+                            ('inprog_cars','In Progress',          {'title': 'In Progress',        'items': []}),
+                            ('closed_cars','Closed CARs',          {'title': 'Closed CARs',        'items': []}),
+                            ('car_rpts',   'CAR Reports',          {'title': 'CAR Reports',        'items': []}),
+                        ],
+                    }),
+                    ('qa_reports', 'QA Reports',          {
+                        'title': 'QA Reports',
+                        'items': [
+                            ('daily_qa',   'Daily QA Report',      {'title': 'Daily QA Report',    'items': []}),
+                            ('week_sum',   'Weekly Summary',       {'title': 'Weekly Summary',     'items': []}),
+                            ('month_rpt',  'Monthly Report',       {'title': 'Monthly Report',     'items': []}),
+                            ('kpi_dash',   'KPI Dashboard',        {'title': 'KPI Dashboard',      'items': []}),
+                        ],
+                    }),
+                    ('supp_qual',  'Supplier Quality',    {
+                        'title': 'Supplier Quality',
+                        'items': [
+                            ('supp_score', 'Supplier Scorecards',  {'title': 'Supplier Scorecards','items': []}),
+                            ('inc_insp',   'Incoming Inspection',  {'title': 'Incoming Inspection','items': []}),
+                            ('supp_audit', 'Supplier Audits',      {'title': 'Supplier Audits',    'items': []}),
+                            ('supp_rpts',  'Supplier Reports',     {'title': 'Supplier Reports',   'items': []}),
+                        ],
+                    }),
+                    ('cust_comp',  'Customer Complaints', {
+                        'title': 'Customer Complaints',
+                        'items': [
+                            ('new_comp',   'New Complaint',        {'title': 'New Complaint',      'items': []}),
+                            ('open_comp',  'Open Complaints',      {'title': 'Open Complaints',    'items': []}),
+                            ('res_track',  'Resolution Tracking',  {'title': 'Resolution Tracking','items': []}),
+                            ('comp_rpts',  'Complaint Reports',    {'title': 'Complaint Reports',  'items': []}),
+                        ],
+                    }),
+                    ('doc_control','Document Control',    {
+                        'title': 'Document Control',
+                        'items': [
+                            ('doc_lib',    'Document Library',     {'title': 'Document Library',   'items': []}),
+                            ('new_doc',    'New Document',         {'title': 'New Document',       'items': []}),
+                            ('doc_review', 'Document Review',      {'title': 'Document Review',    'items': []}),
+                            ('rev_hist',   'Revision History',     {'title': 'Revision History',   'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
@@ -345,10 +1364,42 @@ MENU_TREE = {
                 'title': 'Sales Manager Menu',
                 'items': [
                     ('sales',        'Sales Menu',            _SALES_MENU),
-                    ('sales_targets','Sales Targets',         {'title': 'Sales Targets',         'items': []}),
-                    ('territory',    'Territory Management',  {'title': 'Territory Management',  'items': []}),
-                    ('commission',   'Commission Tracking',   {'title': 'Commission Tracking',   'items': []}),
-                    ('staff_perf',   'Staff Performance',     {'title': 'Staff Performance',     'items': []}),
+                    ('sales_targets','Sales Targets',         {
+                        'title': 'Sales Targets',
+                        'items': [
+                            ('set_tgt',    'Set Targets',          {'title': 'Set Targets',        'items': []}),
+                            ('tgt_act',    'Target vs. Actual',    {'title': 'Target vs. Actual',  'items': []}),
+                            ('tgt_rep',    'Target by Rep',        {'title': 'Target by Rep',      'items': []}),
+                            ('tgt_rpts',   'Target Reports',       {'title': 'Target Reports',     'items': []}),
+                        ],
+                    }),
+                    ('territory',    'Territory Management',  {
+                        'title': 'Territory Management',
+                        'items': [
+                            ('terr_map',   'Territory Map',        {'title': 'Territory Map',      'items': []}),
+                            ('terr_assign','Territory Assignments',{'title': 'Territory Assignments','items': []}),
+                            ('terr_perf',  'Territory Performance',{'title': 'Territory Performance','items': []}),
+                            ('terr_rpts',  'Territory Reports',    {'title': 'Territory Reports',  'items': []}),
+                        ],
+                    }),
+                    ('commission',   'Commission Tracking',   {
+                        'title': 'Commission Tracking',
+                        'items': [
+                            ('comm_calc',  'Commission Calculator',{'title': 'Commission Calculator','items': []}),
+                            ('comm_rpts',  'Commission Reports',   {'title': 'Commission Reports', 'items': []}),
+                            ('pay_hist',   'Payment History',      {'title': 'Payment History',    'items': []}),
+                            ('comm_plans', 'Commission Plans',     {'title': 'Commission Plans',   'items': []}),
+                        ],
+                    }),
+                    ('staff_perf',   'Staff Performance',     {
+                        'title': 'Staff Performance',
+                        'items': [
+                            ('perf_dash',  'Performance Dashboard',{'title': 'Performance Dashboard','items': []}),
+                            ('rep_rank',   'Rep Rankings',         {'title': 'Rep Rankings',       'items': []}),
+                            ('perf_revs',  'Performance Reviews',  {'title': 'Performance Reviews','items': []}),
+                            ('coaching',   'Coaching Notes',       {'title': 'Coaching Notes',     'items': []}),
+                        ],
+                    }),
                 ],
             }),
             ('sales', 'Sales Menu', _SALES_MENU),
