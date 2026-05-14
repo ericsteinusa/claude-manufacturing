@@ -1,680 +1,832 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
+import sys
 import sqlite3
-from tkinter import colorchooser
-from configparser import ConfigParser
+import os
+from datetime import date
+from PyQt6 import QtCore, QtGui, QtWidgets
 
-root = Tk()
-root.title('Product')
-root.geometry("1350x600")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
-# Read our config file and get colors
-parser = ConfigParser()
-parser.read("personnel.ini")
-saved_primary_color = parser.get('colors', 'primary_color')
-saved_secondary_color = parser.get('colors', 'secondary_color')
-saved_highlight_color = parser.get('colors', 'highlight_color')
+BLUE = QtGui.QColor(0, 85, 255)
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
+DATE_STYLE  = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE  = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+ISPIN_STYLE = "QSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color:white;font-size:13px;"
+TAB_STYLE   = ("QTabWidget::pane{border:1px solid black;}"
+               "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
+               " border-bottom:none; border-radius:4px 4px 0 0;}"
+               "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
+               "QTabBar::tab:hover{background:rgb(85,255,255);}")
 
+# Stock level row colors
+COLOR_CRITICAL = QtGui.QColor(255, 200, 200)   # red   — at or below reorder point
+COLOR_LOW      = QtGui.QColor(255, 243, 205)   # amber — within 2x reorder point
+COLOR_OK       = QtGui.QColor(212, 237, 218)   # green — well stocked
 
-def query_database():
-	# Clear the Treeview
-	for record in my_tree.get_children():
-		my_tree.delete(record)
-		
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	c.execute("SELECT rowid, * FROM product")
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	for record in records:
-		print(record)
-
-
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2], record[3],  record[4], record[5], record[6], record[7]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2], record[3],  record[4], record[5], record[6], record[7]), tags=('oddrow',))
-		# increment counter
-		count += 1
+# Transaction type colors
+TRANS_COLORS = {
+    "receipt":    QtGui.QColor(212, 237, 218),
+    "issue":      QtGui.QColor(255, 200, 200),
+    "adjustment": QtGui.QColor(220, 235, 255),
+}
 
 
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
-def search_records():
-	lookup_record = search_entry.get()
-	# close the search box
-	search.destroy()
-	
-	# Clear the Treeview
-	for record in my_tree.get_children():
-		my_tree.delete(record)
-	
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	c.execute("SELECT rowid, * FROM product WHERE name like ?", (lookup_record,))
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	#for record in records:
-	#	print(record)
-
-
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[0], record[1], record[2],  record[3], record[4], record[5]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[0], record[1], record[2],  record[3], record[4], record[5]), tags=('oddrow',))
-		# increment counter
-		count += 1
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-
-
-def lookup_records():
-	global search_entry, search
-
-	search = Toplevel(root)
-	search.title("Lookup Records")
-	search.geometry("400x200")
-	search.iconbitmap('/images/red_dragon2.ico')
-
-	# Create label frame
-	search_frame = LabelFrame(search, text="Name")
-	search_frame.pack(padx=10, pady=10)
-
-	# Add entry box
-	search_entry = Entry(search_frame, font=("Helvetica", 18))
-	search_entry.pack(pady=20, padx=20)
-
-	# Add button
-	search_button = Button(search, text="Search Records", command=search_records)
-	search_button.pack(padx=20, pady=20)
-
-
-
-def primary_color():
-	# Pick Color
-	primary_color = colorchooser.askcolor()[1]
-
-	# Update Treeview Color
-	if primary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('evenrow', background=primary_color)
-
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'primary_color', primary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-
-
-def secondary_color():
-	# Pick Color
-	secondary_color = colorchooser.askcolor()[1]
-	
-	# Update Treeview Color
-	if secondary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('oddrow', background=secondary_color)
-		
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'secondary_color', secondary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-
-def highlight_color():
-	# Pick Color
-	highlight_color = colorchooser.askcolor()[1]
-
-	#Update Treeview Color
-	# Change Selected Color
-	if highlight_color:
-		style.map('Treeview',
-			background=[('selected', highlight_color)])
-
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'highlight_color', highlight_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-
-def reset_colors():
-	# Save original colors to config file
-	parser = ConfigParser()
-	parser.read('personnel.ini')
-	parser.set('colors', 'primary_color', 'lightblue')
-	parser.set('colors', 'secondary_color', 'white')
-	parser.set('colors', 'highlight_color', '#347083')
-	with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-	# Reset the colors
-	my_tree.tag_configure('oddrow', background='white')
-	my_tree.tag_configure('evenrow', background='lightblue')
-	style.map('Treeview',
-			background=[('selected', '#347083')])
-
-# Add Menu
-my_menu = Menu(root)
-root.config(menu=my_menu)
-
-
-
-# Configure our menu
-option_menu = Menu(my_menu, tearoff=0)
-my_menu.add_cascade(label="Options", menu=option_menu)
-# Drop down menu
-option_menu.add_command(label="Primary Color", command=primary_color)
-option_menu.add_command(label="Secondary Color", command=secondary_color)
-option_menu.add_command(label="Highlight Color", command=highlight_color)
-option_menu.add_separator()
-option_menu.add_command(label="Reset Colors", command=reset_colors)
-option_menu.add_separator()
-option_menu.add_command(label="Exit", command=root.quit)
-
-#Search Menu
-search_menu = Menu(my_menu, tearoff=0)
-my_menu.add_cascade(label="Search", menu=search_menu)
-# Drop down menu
-search_menu.add_command(label="Search", command=lookup_records)
-search_menu.add_separator()
-search_menu.add_command(label="Reset", command=query_database)
-
-# Add Fake Data
-
-
-# Do some database stuff
-# Create a database or connect to one that exists
-conn = sqlite3.connect('company.db')
-
-# Create a cursor instance
-c = conn.cursor()
-
-# Create Tables
-
-c.execute("""
-    CREATE TABLE IF NOT EXISTS supplier (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        company_name TEXT NOT NULL,
-        phone_number TEXT NOT NULL,
-        address TEXT NOT NULL,
-        city TEXT NOT NULL,
-        state TEXT NOT NULL,
-        zip_code TEXT NOT NULL,
-        email TEXT NOT NULL            
+def init_db():
+    conn = get_db()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS supplier (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name   TEXT NOT NULL,
+            last_name    TEXT NOT NULL,
+            company_name TEXT NOT NULL,
+            phone_number TEXT NOT NULL,
+            address      TEXT NOT NULL,
+            city         TEXT NOT NULL,
+            state        TEXT NOT NULL,
+            zip_code     TEXT NOT NULL,
+            email        TEXT NOT NULL
         )
     """)
-
-c.execute("""
-	CREATE TABLE if not exists product (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		supplier_id INTEGER,
-		name text,
-		purchase_date text,
-		purchase_price integer,
-		bin integer,  
-	    amount integer,
-		FOREIGN KEY (supplier_id) REFERENCES supplier(id)
-		)
-	""")
-# Commit changes
-conn.commit()
-
-# Close our connection
-conn.close()
-
-
-# Add Some Style
-style = ttk.Style()
-
-# Pick A Theme
-style.theme_use('default')
-
-# Configure the Treeview Colors
-style.configure("Treeview",
-	background="#D3D3D3",
-	foreground="black",
-	rowheight=25,
-	fieldbackground="#D3D3D3")
-
-# Change Selected Color #347083
-style.map('Treeview',
-	background=[('selected', saved_highlight_color)])
-
-# Create a Treeview Frame
-tree_frame = Frame(root)
-tree_frame.pack(pady=10)
-
-# Create a Treeview Scrollbar
-tree_scroll = Scrollbar(tree_frame)
-tree_scroll.pack(side=RIGHT, fill=Y)
-
-# Create The Treeview
-my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
-my_tree.pack()
-
-# Configure the Scrollbar
-tree_scroll.config(command=my_tree.yview)
-
-# Define Our Columns
-my_tree['columns'] = ("ID", "Supplier ID", "Name", "Purchase Date", "Purchase Price", "Bin", "Amount")
-
-# Format Our Columns
-my_tree.column("#0", width=0, stretch=NO)
-my_tree.column("ID", anchor=CENTER, width=100)
-my_tree.column("Supplier ID", anchor=CENTER, width=100)
-my_tree.column("Name", anchor=W, width=140)
-my_tree.column("Purchase Date", anchor=W, width=140)
-my_tree.column("Purchase Price", anchor=W, width=140)
-my_tree.column("Bin", anchor=W, width=140)
-my_tree.column("Amount", anchor=W, width=140)
-
-# Create Headings
-my_tree.heading("#0", text="", anchor=W)
-my_tree.heading("ID", text="ID", anchor=CENTER)
-my_tree.heading("Supplier ID", text="Supplier ID", anchor=CENTER)
-my_tree.heading("Name", text="Name", anchor=W)
-my_tree.heading("Purchase Date", text="Purchase Date", anchor=W)
-my_tree.heading("Purchase Price", text="Purchase Price", anchor=W)
-my_tree.heading("Bin", text="Bin", anchor=W)
-my_tree.heading("Amount", text="Amount")
-
-# Create Striped Row Tags
-my_tree.tag_configure('oddrow', background=saved_secondary_color)
-my_tree.tag_configure('evenrow', background=saved_primary_color)
-
-# Step 2: Fetch data for the selection list
-def fetch_supplier():
-	conn = sqlite3.connect("company.db")
-	cursor = conn.cursor()
-	cursor.execute("SELECT id, company_name FROM supplier")
-	supplier = [row[1] for row in cursor.fetchall()]
-	conn.close()
-	return supplier
-
-
-# Add Record Entry Boxes
-data_frame = LabelFrame(root, text="Record")
-data_frame.pack(fill="x", expand="yes", padx=20)
-
-id_label = Label(data_frame, text="ID")
-id_label.grid(row=0, column=0, padx=10, pady=10)
-id_entry = Entry(data_frame)
-id_entry.grid(row=0, column=1, padx=10, pady=10)
-
-si_data = fetch_supplier()
-si_label = Label(data_frame, text="Supplier ID:")
-si_label.grid(row=0, column=2, padx=10, pady=10)
-si_combobox = ttk.Combobox(root, values=si_data)
-si_combobox.place(x=292, y=348)
-si_combobox.bind("<<ComboboxSelected>>")
-
-
-nm_label = Label(data_frame, text="Name")
-nm_label.grid(row=0, column=4, padx=10, pady=10)
-nm_entry = Entry(data_frame)
-nm_entry.grid(row=0, column=5, padx=10, pady=10)
-
-pd_label = Label(data_frame, text="Purchase Date")
-pd_label.grid(row=0, column=6, padx=10, pady=10)
-pd_entry = Entry(data_frame)
-pd_entry.grid(row=0, column=7, padx=10, pady=10)
-
-pp_label = Label(data_frame, text="Purchase Price")
-pp_label.grid(row=0, column=8, padx=10, pady=10)
-pp_entry = Entry(data_frame)
-pp_entry.grid(row=0, column=9, padx=10, pady=10)
-
-bin_label = Label(data_frame, text="Bin")
-bin_label.grid(row=1, column=0, padx=10, pady=10)
-bin_entry = Entry(data_frame)
-bin_entry.grid(row=1, column=1, padx=10, pady=10)
-
-amt_label = Label(data_frame, text="Amount")
-amt_label.grid(row=1, column=2, padx=10, pady=10)
-amt_entry = Entry(data_frame)
-amt_entry.grid(row=1, column=3, padx=10, pady=10)
-
-# Move Row Up
-def up():
-	rows = my_tree.selection()
-	for row in rows:
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)-1)
-
-# Move Rown Down
-def down():
-	rows = my_tree.selection()
-	for row in reversed(rows):
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)+1)
-
-# Remove one record
-def remove_one():
-	x = my_tree.selection()[0]
-	my_tree.delete(x)
-
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# Delete From Database
-	c.execute("DELETE from product WHERE oid=" + id_entry.get())
-	
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-	# Clear The Entry Boxes
-	clear_entries()
-
-	# Add a little message box for fun
-	messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
-
-
-
-# Remove Many records
-def remove_many():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
-
-	#Add logic for message box
-	if response == 1:
-		# Designate selections
-		x = my_tree.selection()
-
-		# Create List of ID's
-		ids_to_delete = []
-		
-		# Add selections to ids_to_delete list
-		for record in x:
-			ids_to_delete.append(my_tree.item(record, 'values')[2])
-
-		# Delete From Treeview
-		for record in x:
-			my_tree.delete(record)
-
-		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
-
-		# Create a cursor instance
-		c = conn.cursor()
-		
-
-		# Delete Everything From The Table
-		c.executemany("DELETE FROM product WHERE id = ?", [(a,) for a in ids_to_delete])
-
-		# Reset List
-		ids_to_delete = []
-
-
-		# Commit changes
-		conn.commit()
-
-		# Close our connection
-		conn.close()
-
-		# Clear entry boxes if filled
-		clear_entries()
-
-
-# Remove all records
-def remove_all():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
-
-	#Add logic for message box
-	if response == 1:
-		# Clear the Treeview
-		for record in my_tree.get_children():
-			my_tree.delete(record)
-
-		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
-
-		# Create a cursor instance
-		c = conn.cursor()
-
-		# Delete Everything From The Table
-		c.execute("DROP TABLE product")		
-
-
-		# Commit changes
-		conn.commit()
-
-		# Close our connection
-		conn.close()
-
-		# Clear entry boxes if filled
-		clear_entries()
-
-		# Recreate The Table
-		create_table_again()
-
-# Clear entry boxes
-def clear_entries():
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	si_combobox.delete(0, END)
-	nm_entry.delete(0, END)
-	pd_entry.delete(0, END)
-	pp_entry.delete(0, END)
-	bin_entry.delete(0, END)
-	amt_entry.delete(0, END)
-	
-
-# Select Record
-def select_record(e):
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	si_combobox.delete(0, END)
-	nm_entry.delete(0, END)
-	pd_entry.delete(0, END)	
-	pp_entry.delete(0, END)
-	bin_entry.delete(0, END)
-	amt_entry.delete(0, END)
-	
-	
-	# Grab record Number
-	selected = my_tree.focus()
-	# Grab record values
-	values = my_tree.item(selected, 'values')
-
-	# output to entry boxes
-	id_entry.insert(0, values[0])
-	si_combobox.insert(0, values[1])
-	nm_entry.insert(0, values[2])
-	pd_entry.insert(0, values[3])
-	pp_entry.insert(0, values[4])
-	bin_entry.insert(0, values[5])
-	amt_entry.insert(0, values[6])
-	
-		
-# Update record
-def update_record():
-	# Grab the record number
-	selected = my_tree.focus()
-	# Update record
-	my_tree.item(selected, text="", values=(id_entry.get(), si_combobox.get(), nm_entry.get(), pd_entry.get(), pp_entry.get(), bin_entry.get(), amt_entry.get()))
-
-	# Update the database
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	c.execute("""UPDATE product SET
-		supplier_id = :supplier_id,
-		name = :name,
-		purchase_date = :purchase_date,
-		purchase_price = :purchase_price,
-		bin = :bin,
-		amount = :amount
-	
-		WHERE oid = :oid""",
-		{
-			'oid': id_entry.get(),
-			'supplier_id': si_combobox.get(),
-			'name': nm_entry.get(),
-			'purchase_date': pd_entry.get(),
-			'purchase_price': pp_entry.get(),
-			'bin': bin_entry.get(),
-			'amount': amt_entry.get()
-		})
-	
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	si_combobox.delete(0, END)
-	nm_entry.delete(0, END)
-	pd_entry.delete(0, END)
-	pp_entry.delete(0, END)
-	bin_entry.delete(0, END)
-	amt_entry.delete(0, END)
-	
-# add new record to database
-def add_record():
-	# Update the database
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# Add New Record
-	c.execute("INSERT INTO product (supplier_id, name, purchase_date, purchase_price, bin, amount) VALUES (?, ?, ?, ?, ?, ?)", (si_combobox.get(), nm_entry.get(), pd_entry.get(), pp_entry.get(), bin_entry.get(), amt_entry.get()))
-	
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	si_combobox.delete(0, END)
-	nm_entry.delete(0, END)
-	pd_entry.delete(0, END)	
-	pp_entry.delete(0, END)
-	bin_entry.delete(0, END)
-	amt_entry.delete(0, END)
-		
-	# Clear The Treeview Table
-	my_tree.delete(*my_tree.get_children())
-
-	# Run to pull data from database on start
-	query_database()
-
-def create_table_again():
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# Create Table
-	c.execute("""CREATE TABLE if not exists product (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		supplier_id INTEGER,
-		name text,
-		purchase_date text,
-		purchase_price integer,
-		bin integer,  
-	    amount integer)
-		""")
-	
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-# Add Buttons
-button_frame = LabelFrame(root, text="Commands")
-button_frame.pack(fill="x", expand="yes", padx=20)
-
-update_button = Button(button_frame, text="Update Record", command=update_record)
-update_button.grid(row=0, column=0, padx=10, pady=10)
-
-add_button = Button(button_frame, text="Add Record", command=add_record)
-add_button.grid(row=0, column=1, padx=10, pady=10)
-
-remove_all_button = Button(button_frame, text="Remove All Records", command=remove_all)
-remove_all_button.grid(row=0, column=2, padx=10, pady=10)
-
-remove_one_button = Button(button_frame, text="Remove One Selected", command=remove_one)
-remove_one_button.grid(row=0, column=3, padx=10, pady=10)
-
-remove_many_button = Button(button_frame, text="Remove Many Selected", command=remove_many)
-remove_many_button.grid(row=0, column=4, padx=10, pady=10)
-
-move_up_button = Button(button_frame, text="Move Up", command=up)
-move_up_button.grid(row=0, column=5, padx=10, pady=10)
-
-move_down_button = Button(button_frame, text="Move Down", command=down)
-move_down_button.grid(row=0, column=6, padx=10, pady=10)
-
-select_record_button = Button(button_frame, text="Clear Entry Boxes", command=clear_entries)
-select_record_button.grid(row=0, column=7, padx=10, pady=10)
-
-# Bind the treeview
-my_tree.bind("<ButtonRelease-1>", select_record)
-
-# Run to pull data from database on start
-query_database()
-
-root.mainloop()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS product (
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            supplier_id    INTEGER REFERENCES supplier(id),
+            name           TEXT,
+            purchase_date  TEXT,
+            purchase_price INTEGER,
+            bin            INTEGER,
+            amount         INTEGER,
+            reorder_point  INTEGER DEFAULT 0
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS inventory_transaction (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            trans_date TEXT NOT NULL,
+            trans_type TEXT NOT NULL,
+            quantity   INTEGER NOT NULL,
+            reference  TEXT,
+            notes      TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+
+def _apply_blue_palette(widget):
+    pal = widget.palette()
+    for g in (QtGui.QPalette.ColorGroup.Active,
+              QtGui.QPalette.ColorGroup.Inactive,
+              QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(g, QtGui.QPalette.ColorRole.Window, BLUE)
+        pal.setColor(g, QtGui.QPalette.ColorRole.Button, BLUE)
+    widget.setPalette(pal)
+
+
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+    item = QtWidgets.QTableWidgetItem(str(text))
+    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+    item.setTextAlignment(align)
+    return item
+
+
+def _supplier_display(row):
+    company = (row["company_name"] or "").strip()
+    contact = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+    return company if company else contact
+
+
+# ── Transaction dialog ─────────────────────────────────────────────────────
+
+class TransactionDialog(QtWidgets.QDialog):
+    """Handles receipt, issue, and adjustment transactions."""
+
+    def __init__(self, trans_type, parent=None, preselect_product_id=None):
+        super().__init__(parent)
+        self._trans_type = trans_type
+        titles = {"receipt": "Receive Stock", "issue": "Issue Stock",
+                  "adjustment": "Inventory Adjustment"}
+        self.setWindowTitle(titles[trans_type])
+        self.setFixedSize(460, 280)
+        _apply_blue_palette(self)
+        self._preselect = preselect_product_id
+        self._build_ui()
+
+    def _build_ui(self):
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(30, 20, 30, 20)
+        layout.setSpacing(10)
+
+        title_text = {
+            "receipt":    "Receive Stock",
+            "issue":      "Issue / Use Stock",
+            "adjustment": "Inventory Adjustment",
+        }[self._trans_type]
+        title = QtWidgets.QLabel(title_text)
+        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        layout.addWidget(title)
+
+        def row(lbl_text, widget, lbl_w=120):
+            r = QtWidgets.QHBoxLayout()
+            l = QtWidgets.QLabel(lbl_text)
+            l.setFixedWidth(lbl_w)
+            l.setStyleSheet(LABEL_STYLE)
+            r.addWidget(l)
+            r.addWidget(widget)
+            return r
+
+        self.prod_combo = QtWidgets.QComboBox()
+        self.prod_combo.setStyleSheet(COMBO_STYLE)
+        conn = get_db()
+        products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
+        conn.close()
+        for p in products:
+            self.prod_combo.addItem(p["name"], p["id"])
+        if self._preselect:
+            idx = self.prod_combo.findData(self._preselect)
+            if idx >= 0:
+                self.prod_combo.setCurrentIndex(idx)
+        self.prod_combo.currentIndexChanged.connect(self._update_max)
+        layout.addLayout(row("Product:", self.prod_combo))
+
+        self.trans_date = QtWidgets.QDateEdit()
+        self.trans_date.setStyleSheet(DATE_STYLE)
+        self.trans_date.setCalendarPopup(True)
+        self.trans_date.setDisplayFormat("MM/dd/yyyy")
+        self.trans_date.setDate(QtCore.QDate.currentDate())
+        layout.addLayout(row("Date:", self.trans_date))
+
+        if self._trans_type == "adjustment":
+            self.qty = QtWidgets.QSpinBox()
+            self.qty.setStyleSheet(ISPIN_STYLE)
+            self.qty.setRange(-999999, 999999)
+            self.qty.setValue(0)
+            layout.addLayout(row("Qty Change (+/-):", self.qty))
+        else:
+            self.qty = QtWidgets.QSpinBox()
+            self.qty.setStyleSheet(ISPIN_STYLE)
+            self.qty.setRange(1, 999999)
+            self.qty.setValue(1)
+            qty_label = "Qty to Receive:" if self._trans_type == "receipt" else "Qty to Issue:"
+            layout.addLayout(row(qty_label, self.qty))
+
+        self.reference = QtWidgets.QLineEdit()
+        self.reference.setStyleSheet(INPUT_STYLE)
+        self.reference.setPlaceholderText("PO #, work order, etc.")
+        layout.addLayout(row("Reference:", self.reference))
+
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        self.notes.setPlaceholderText("Optional notes")
+        layout.addLayout(row("Notes:", self.notes))
+
+        btn_row = QtWidgets.QHBoxLayout()
+        for text, slot in (("Save", self._on_save), ("Cancel", self.reject)):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(32)
+            b.clicked.connect(slot)
+            btn_row.addWidget(b)
+        layout.addLayout(btn_row)
+
+    def _update_max(self):
+        if self._trans_type != "issue":
+            return
+        pid = self.prod_combo.currentData()
+        if pid is None:
+            return
+        conn = get_db()
+        p = conn.execute("SELECT amount FROM product WHERE id=?", (pid,)).fetchone()
+        conn.close()
+        if p:
+            self.qty.setRange(1, max(1, p["amount"]))
+
+    def _on_save(self):
+        pid = self.prod_combo.currentData()
+        if pid is None:
+            QtWidgets.QMessageBox.warning(self, "Error", "Select a product.")
+            return
+        qty_val = self.qty.value()
+        if self._trans_type == "adjustment" and qty_val == 0:
+            QtWidgets.QMessageBox.warning(self, "Error", "Adjustment quantity cannot be zero.")
+            return
+
+        stored_qty = qty_val if self._trans_type != "issue" else -qty_val
+        today = self.trans_date.date().toString("yyyy-MM-dd")
+
+        conn = get_db()
+        conn.execute("""
+            INSERT INTO inventory_transaction
+                (product_id, trans_date, trans_type, quantity, reference, notes)
+            VALUES (?,?,?,?,?,?)
+        """, (pid, today, self._trans_type, stored_qty,
+              self.reference.text().strip() or None,
+              self.notes.text().strip() or None))
+        conn.execute(
+            "UPDATE product SET amount = amount + ? WHERE id=?",
+            (stored_qty, pid))
+        if self._trans_type == "receipt":
+            conn.execute(
+                "UPDATE product SET purchase_date=? WHERE id=?", (today, pid))
+        conn.commit()
+        conn.close()
+        self.accept()
+
+
+# ── Main window ────────────────────────────────────────────────────────────
+
+class Inventory(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Inventory")
+        self.resize(1100, 680)
+        _apply_blue_palette(self)
+        self._prod_row_ids  = []
+        self._trans_row_ids = []
+        self._build_ui()
+        self._load_products()
+        self._refresh_stock_report()
+        self._refresh_transactions()
+
+    def _build_ui(self):
+        central = QtWidgets.QWidget()
+        self.setCentralWidget(central)
+        outer = QtWidgets.QVBoxLayout(central)
+        outer.setContentsMargins(10, 10, 10, 10)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
+        outer.addWidget(tabs)
+        tabs.addTab(self._build_products_tab(),     "Products")
+        tabs.addTab(self._build_stock_report_tab(), "Stock Report")
+        tabs.addTab(self._build_transactions_tab(), "Transactions")
+        tabs.currentChanged.connect(self._on_tab_changed)
+        self._tabs = tabs
+
+    # ── Products tab ───────────────────────────────────────────────────────
+
+    def _build_products_tab(self):
+        w = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(w)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
+
+        self.prod_table = QtWidgets.QTableWidget()
+        self.prod_table.setColumnCount(7)
+        self.prod_table.setHorizontalHeaderLabels(
+            ["Name", "Supplier", "Bin", "Unit Cost", "Qty on Hand",
+             "Reorder Point", "Last Received"])
+        hh = self.prod_table.horizontalHeader()
+        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        for c in (1, 2, 3, 4, 5, 6):
+            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.prod_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.prod_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.prod_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.prod_table.setAlternatingRowColors(True)
+        self.prod_table.verticalHeader().setVisible(False)
+        self.prod_table.clicked.connect(self._on_prod_row_clicked)
+        layout.addWidget(self.prod_table, stretch=1)
+
+        sr = QtWidgets.QHBoxLayout()
+        sl = QtWidgets.QLabel("Search:")
+        sl.setStyleSheet(LABEL_STYLE)
+        sr.addWidget(sl)
+        self.prod_search = QtWidgets.QLineEdit()
+        self.prod_search.setStyleSheet(INPUT_STYLE)
+        self.prod_search.setFixedWidth(220)
+        self.prod_search.setPlaceholderText("Product name")
+        self.prod_search.returnPressed.connect(self._on_prod_search)
+        sr.addWidget(self.prod_search)
+        for t, fn in (("Search", self._on_prod_search), ("Show All", self._load_products)):
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(fn)
+            sr.addWidget(b)
+        sr.addStretch()
+        layout.addLayout(sr)
+
+        fg = QtWidgets.QGroupBox("Product Record")
+        fg.setStyleSheet(
+            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
+            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+        grid = QtWidgets.QGridLayout(fg)
+        grid.setSpacing(6)
+
+        def lbl(t):
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
+
+        def inp(ph=""):
+            e = QtWidgets.QLineEdit()
+            e.setStyleSheet(INPUT_STYLE)
+            e.setPlaceholderText(ph)
+            return e
+
+        self.pf_name = inp("Product / item name")
+
+        self.pf_supplier = QtWidgets.QComboBox()
+        self.pf_supplier.setStyleSheet(COMBO_STYLE)
+        self.pf_supplier.setMinimumWidth(180)
+
+        self.pf_bin = inp("Bin / location")
+        self.pf_bin.setFixedWidth(100)
+
+        self.pf_cost = QtWidgets.QDoubleSpinBox()
+        self.pf_cost.setStyleSheet(SPIN_STYLE)
+        self.pf_cost.setRange(0, 9999999)
+        self.pf_cost.setDecimals(2)
+        self.pf_cost.setPrefix("$ ")
+        self.pf_cost.setFixedWidth(110)
+
+        self.pf_qty = QtWidgets.QSpinBox()
+        self.pf_qty.setStyleSheet(ISPIN_STYLE)
+        self.pf_qty.setRange(0, 999999)
+        self.pf_qty.setFixedWidth(80)
+
+        self.pf_reorder = QtWidgets.QSpinBox()
+        self.pf_reorder.setStyleSheet(ISPIN_STYLE)
+        self.pf_reorder.setRange(0, 999999)
+        self.pf_reorder.setFixedWidth(80)
+
+        grid.addWidget(lbl("Name:"),         0, 0); grid.addWidget(self.pf_name,     0, 1, 1, 5)
+        grid.addWidget(lbl("Supplier:"),     1, 0); grid.addWidget(self.pf_supplier, 1, 1, 1, 2)
+        grid.addWidget(lbl("Bin:"),          1, 3); grid.addWidget(self.pf_bin,      1, 4)
+        grid.addWidget(lbl("Unit Cost:"),    2, 0); grid.addWidget(self.pf_cost,     2, 1)
+        grid.addWidget(lbl("Qty on Hand:"),  2, 2); grid.addWidget(self.pf_qty,      2, 3)
+        grid.addWidget(lbl("Reorder Pt:"),   2, 4); grid.addWidget(self.pf_reorder,  2, 5)
+        layout.addWidget(fg)
+
+        br = QtWidgets.QHBoxLayout()
+        for t, fn in (("Add New", self._on_prod_add), ("Update Selected", self._on_prod_update),
+                      ("Delete Selected", self._on_prod_delete), ("Clear", self._prod_clear)):
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(34)
+            b.clicked.connect(fn)
+            br.addWidget(b)
+        br.addStretch()
+        layout.addLayout(br)
+        self._load_supplier_combo()
+        return w
+
+    # ── Stock Report tab ───────────────────────────────────────────────────
+
+    def _build_stock_report_tab(self):
+        w = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(w)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
+
+        hdr = QtWidgets.QHBoxLayout()
+        title = QtWidgets.QLabel("Stock Levels  —  sorted by quantity on hand")
+        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        hdr.addWidget(title)
+        ref_btn = QtWidgets.QPushButton("Refresh")
+        ref_btn.setStyleSheet(BUTTON_STYLE)
+        ref_btn.setFixedHeight(30)
+        ref_btn.clicked.connect(self._refresh_stock_report)
+        hdr.addWidget(ref_btn)
+        hdr.addStretch()
+        layout.addLayout(hdr)
+
+        legend = QtWidgets.QHBoxLayout()
+        for color, label in (
+            (COLOR_CRITICAL, "At/Below Reorder Point"),
+            (COLOR_LOW,      "Within 2x Reorder Point"),
+            (COLOR_OK,       "Well Stocked"),
+        ):
+            swatch = QtWidgets.QLabel("   ")
+            pal = swatch.palette()
+            pal.setColor(QtGui.QPalette.ColorRole.Window, color)
+            swatch.setAutoFillBackground(True)
+            swatch.setPalette(pal)
+            swatch.setFixedSize(24, 16)
+            legend.addWidget(swatch)
+            lbl = QtWidgets.QLabel(label)
+            lbl.setStyleSheet("color:white;font-size:12px;")
+            legend.addWidget(lbl)
+            legend.addSpacing(16)
+        legend.addStretch()
+        layout.addLayout(legend)
+
+        self.stock_table = QtWidgets.QTableWidget()
+        self.stock_table.setColumnCount(6)
+        self.stock_table.setHorizontalHeaderLabels(
+            ["Name", "Supplier", "Bin", "Qty on Hand", "Reorder Point", "Unit Cost"])
+        sh = self.stock_table.horizontalHeader()
+        sh.setStyleSheet("color:black;font-weight:bold;")
+        sh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        for c in (1, 2, 3, 4, 5):
+            sh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.stock_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.stock_table.setAlternatingRowColors(False)
+        self.stock_table.verticalHeader().setVisible(False)
+        layout.addWidget(self.stock_table, stretch=1)
+        return w
+
+    # ── Transactions tab ───────────────────────────────────────────────────
+
+    def _build_transactions_tab(self):
+        w = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(w)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(6)
+
+        fr = QtWidgets.QHBoxLayout()
+        fr.setSpacing(8)
+
+        def fl(t):
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
+
+        self.tr_prod_filter = QtWidgets.QComboBox()
+        self.tr_prod_filter.setStyleSheet(COMBO_STYLE)
+        self.tr_prod_filter.setMinimumWidth(200)
+        self.tr_type_filter = QtWidgets.QComboBox()
+        self.tr_type_filter.setStyleSheet(COMBO_STYLE)
+        self.tr_type_filter.addItems(["(all types)", "receipt", "issue", "adjustment"])
+        self.tr_from = QtWidgets.QDateEdit()
+        self.tr_from.setStyleSheet(DATE_STYLE)
+        self.tr_from.setCalendarPopup(True)
+        self.tr_from.setDisplayFormat("MM/dd/yyyy")
+        self.tr_from.setDate(QtCore.QDate.currentDate().addDays(-30))
+        self.tr_to = QtWidgets.QDateEdit()
+        self.tr_to.setStyleSheet(DATE_STYLE)
+        self.tr_to.setCalendarPopup(True)
+        self.tr_to.setDisplayFormat("MM/dd/yyyy")
+        self.tr_to.setDate(QtCore.QDate.currentDate())
+
+        fr.addWidget(fl("Product:")); fr.addWidget(self.tr_prod_filter)
+        fr.addWidget(fl("Type:"));    fr.addWidget(self.tr_type_filter)
+        fr.addWidget(fl("From:"));    fr.addWidget(self.tr_from)
+        fr.addWidget(fl("To:"));      fr.addWidget(self.tr_to)
+        for t, fn in (("Apply", self._refresh_transactions), ("Show All", self._tr_show_all)):
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(fn)
+            fr.addWidget(b)
+        fr.addStretch()
+        layout.addLayout(fr)
+
+        self.trans_table = QtWidgets.QTableWidget()
+        self.trans_table.setColumnCount(6)
+        self.trans_table.setHorizontalHeaderLabels(
+            ["Date", "Product", "Type", "Qty", "Reference", "Notes"])
+        th = self.trans_table.horizontalHeader()
+        th.setStyleSheet("color:black;font-weight:bold;")
+        th.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        for c in (0, 2, 3, 4, 5):
+            th.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.trans_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.trans_table.verticalHeader().setVisible(False)
+        layout.addWidget(self.trans_table, stretch=1)
+
+        ar = QtWidgets.QHBoxLayout()
+        for t, fn in (("Receive Stock", self._on_receive),
+                      ("Issue Stock",   self._on_issue),
+                      ("Adjustment",    self._on_adjust)):
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(32)
+            b.clicked.connect(fn)
+            ar.addWidget(b)
+        ar.addStretch()
+        layout.addLayout(ar)
+        return w
+
+    # ── Products data ──────────────────────────────────────────────────────
+
+    def _load_supplier_combo(self):
+        conn = get_db()
+        suppliers = conn.execute(
+            "SELECT id, first_name, last_name, company_name FROM supplier "
+            "ORDER BY company_name, last_name, first_name"
+        ).fetchall()
+        conn.close()
+        self.pf_supplier.blockSignals(True)
+        self.pf_supplier.clear()
+        self.pf_supplier.addItem("(none)", None)
+        for s in suppliers:
+            self.pf_supplier.addItem(_supplier_display(s), s["id"])
+        self.pf_supplier.blockSignals(False)
+
+    def _load_products(self, search=None):
+        self.prod_search.blockSignals(True)
+        if not search:
+            self.prod_search.clear()
+        self.prod_search.blockSignals(False)
+
+        conn = get_db()
+        if search:
+            rows = conn.execute(
+                "SELECT p.*, s.first_name, s.last_name, s.company_name "
+                "FROM product p LEFT JOIN supplier s ON s.id=p.supplier_id "
+                "WHERE p.name LIKE ? ORDER BY p.name",
+                (f"%{search}%",)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT p.*, s.first_name, s.last_name, s.company_name "
+                "FROM product p LEFT JOIN supplier s ON s.id=p.supplier_id "
+                "ORDER BY p.name"
+            ).fetchall()
+        conn.close()
+
+        self.prod_table.setRowCount(0)
+        self._prod_row_ids = []
+        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        for row in rows:
+            r = self.prod_table.rowCount()
+            self.prod_table.insertRow(r)
+            self._prod_row_ids.append(row["id"])
+            supp = _supplier_display(row) if row["company_name"] or row["last_name"] else ""
+            rp   = row["reorder_point"] if "reorder_point" in row.keys() else 0
+            qty  = row["amount"] or 0
+            for c, (val, algn) in enumerate([
+                (row["name"],              QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (supp,                     QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["bin"] or "",         center),
+                (f"${row['purchase_price'] or 0:,.2f}", right),
+                (str(qty),                 center),
+                (str(rp),                  center),
+                (row["purchase_date"] or "", center),
+            ]):
+                self.prod_table.setItem(r, c, _ro(val, algn))
+        self._refresh_product_filter()
+
+    def _refresh_product_filter(self):
+        conn = get_db()
+        products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
+        conn.close()
+        self.tr_prod_filter.blockSignals(True)
+        self.tr_prod_filter.clear()
+        self.tr_prod_filter.addItem("(all products)", None)
+        for p in products:
+            self.tr_prod_filter.addItem(p["name"], p["id"])
+        self.tr_prod_filter.blockSignals(False)
+
+    def _on_prod_search(self):
+        self._load_products(search=self.prod_search.text().strip() or None)
+
+    def _on_prod_row_clicked(self, index):
+        row = index.row()
+        if row < 0 or row >= len(self._prod_row_ids):
+            return
+        conn = get_db()
+        p = conn.execute("SELECT * FROM product WHERE id=?",
+                         (self._prod_row_ids[row],)).fetchone()
+        conn.close()
+        if not p:
+            return
+        self.pf_name.setText(p["name"] or "")
+        idx = self.pf_supplier.findData(p["supplier_id"])
+        self.pf_supplier.setCurrentIndex(max(0, idx))
+        self.pf_bin.setText(p["bin"] or "")
+        self.pf_cost.setValue(float(p["purchase_price"] or 0))
+        self.pf_qty.setValue(int(p["amount"] or 0))
+        rp = p["reorder_point"] if "reorder_point" in p.keys() else 0
+        self.pf_reorder.setValue(int(rp or 0))
+
+    def _prod_clear(self):
+        self.pf_name.clear()
+        self.pf_supplier.setCurrentIndex(0)
+        self.pf_bin.clear()
+        self.pf_cost.setValue(0)
+        self.pf_qty.setValue(0)
+        self.pf_reorder.setValue(0)
+        self.prod_table.clearSelection()
+
+    def _collect_product_form(self):
+        name = self.pf_name.text().strip()
+        if not name:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Product name is required.")
+            return None
+        return {
+            "name":           name,
+            "supplier_id":    self.pf_supplier.currentData(),
+            "bin":            self.pf_bin.text().strip() or None,
+            "purchase_price": self.pf_cost.value(),
+            "amount":         self.pf_qty.value(),
+            "reorder_point":  self.pf_reorder.value(),
+        }
+
+    def _on_prod_add(self):
+        data = self._collect_product_form()
+        if not data:
+            return
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO product (name,supplier_id,bin,purchase_price,amount,reorder_point) "
+            "VALUES (:name,:supplier_id,:bin,:purchase_price,:amount,:reorder_point)",
+            data)
+        conn.commit()
+        conn.close()
+        self._prod_clear()
+        self._load_products()
+
+    def _on_prod_update(self):
+        row = self.prod_table.currentRow()
+        if row < 0 or row >= len(self._prod_row_ids):
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            return
+        data = self._collect_product_form()
+        if not data:
+            return
+        data["id"] = self._prod_row_ids[row]
+        conn = get_db()
+        conn.execute(
+            "UPDATE product SET name=:name,supplier_id=:supplier_id,bin=:bin,"
+            "purchase_price=:purchase_price,amount=:amount,reorder_point=:reorder_point "
+            "WHERE id=:id",
+            data)
+        conn.commit()
+        conn.close()
+        self._load_products()
+
+    def _on_prod_delete(self):
+        row = self.prod_table.currentRow()
+        if row < 0 or row >= len(self._prod_row_ids):
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            return
+        pid = self._prod_row_ids[row]
+        conn = get_db()
+        tr_count = conn.execute(
+            "SELECT COUNT(*) FROM inventory_transaction WHERE product_id=?", (pid,)
+        ).fetchone()[0]
+        conn.close()
+        msg = "Delete this product?"
+        if tr_count:
+            msg += f"\n\nWarning: {tr_count} transaction record(s) will also be deleted."
+        if (QtWidgets.QMessageBox.question(
+                self, "Confirm Delete", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                == QtWidgets.QMessageBox.StandardButton.Yes):
+            conn = get_db()
+            conn.execute(
+                "DELETE FROM inventory_transaction WHERE product_id=?", (pid,))
+            conn.execute("DELETE FROM product WHERE id=?", (pid,))
+            conn.commit()
+            conn.close()
+            self._prod_clear()
+            self._load_products()
+            self._refresh_transactions()
+
+    # ── Stock report data ──────────────────────────────────────────────────
+
+    def _refresh_stock_report(self):
+        conn = get_db()
+        rows = conn.execute(
+            "SELECT p.*, s.first_name, s.last_name, s.company_name "
+            "FROM product p LEFT JOIN supplier s ON s.id=p.supplier_id "
+            "ORDER BY p.amount ASC, p.name"
+        ).fetchall()
+        conn.close()
+
+        self.stock_table.setRowCount(0)
+        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        for row in rows:
+            r = self.stock_table.rowCount()
+            self.stock_table.insertRow(r)
+            qty = int(row["amount"] or 0)
+            rp  = int(row["reorder_point"] if "reorder_point" in row.keys() else 0) or 0
+            supp = _supplier_display(row) if row["company_name"] or row["last_name"] else ""
+            if rp > 0 and qty <= rp:
+                color = COLOR_CRITICAL
+            elif rp > 0 and qty <= rp * 2:
+                color = COLOR_LOW
+            else:
+                color = COLOR_OK
+            for c, (val, algn) in enumerate([
+                (row["name"],   QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (supp,          QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["bin"] or "", center),
+                (str(qty),      center),
+                (str(rp),       center),
+                (f"${row['purchase_price'] or 0:,.2f}", right),
+            ]):
+                item = _ro(val, algn)
+                item.setBackground(color)
+                self.stock_table.setItem(r, c, item)
+
+    # ── Transaction data ───────────────────────────────────────────────────
+
+    def _refresh_transactions(self):
+        pid    = self.tr_prod_filter.currentData()
+        ttype  = self.tr_type_filter.currentText()
+        from_s = self.tr_from.date().toString("yyyy-MM-dd")
+        to_s   = self.tr_to.date().toString("yyyy-MM-dd")
+        conn   = get_db()
+        q = (
+            "SELECT t.*, p.name AS product_name "
+            "FROM inventory_transaction t JOIN product p ON p.id=t.product_id "
+            "WHERE t.trans_date BETWEEN ? AND ?"
+        )
+        params = [from_s, to_s]
+        if pid:
+            q += " AND t.product_id=?"
+            params.append(pid)
+        if ttype != "(all types)":
+            q += " AND t.trans_type=?"
+            params.append(ttype)
+        q += " ORDER BY t.trans_date DESC, t.id DESC"
+        rows = conn.execute(q, params).fetchall()
+        conn.close()
+
+        self.trans_table.setRowCount(0)
+        self._trans_row_ids = []
+        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        for row in rows:
+            r = self.trans_table.rowCount()
+            self.trans_table.insertRow(r)
+            self._trans_row_ids.append(row["id"])
+            qty     = row["quantity"]
+            qty_str = f"+{qty}" if qty > 0 else str(qty)
+            color   = TRANS_COLORS.get(row["trans_type"], QtGui.QColor(255, 255, 255))
+            for c, (val, algn) in enumerate([
+                (row["trans_date"],    center),
+                (row["product_name"],  QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["trans_type"],    center),
+                (qty_str,              right),
+                (row["reference"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["notes"] or "",     QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+            ]):
+                item = _ro(val, algn)
+                item.setBackground(color)
+                self.trans_table.setItem(r, c, item)
+
+    def _tr_show_all(self):
+        self.tr_prod_filter.setCurrentIndex(0)
+        self.tr_type_filter.setCurrentIndex(0)
+        self.tr_from.setDate(QtCore.QDate(2000, 1, 1))
+        self.tr_to.setDate(QtCore.QDate.currentDate())
+        self._refresh_transactions()
+
+    def _on_receive(self):
+        pid = self._selected_product_id()
+        dlg = TransactionDialog("receipt", self, preselect_product_id=pid)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._load_products()
+            self._refresh_stock_report()
+            self._refresh_transactions()
+
+    def _on_issue(self):
+        pid = self._selected_product_id()
+        dlg = TransactionDialog("issue", self, preselect_product_id=pid)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._load_products()
+            self._refresh_stock_report()
+            self._refresh_transactions()
+
+    def _on_adjust(self):
+        pid = self._selected_product_id()
+        dlg = TransactionDialog("adjustment", self, preselect_product_id=pid)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._load_products()
+            self._refresh_stock_report()
+            self._refresh_transactions()
+
+    def _selected_product_id(self):
+        row = self.prod_table.currentRow()
+        if 0 <= row < len(self._prod_row_ids):
+            return self._prod_row_ids[row]
+        return None
+
+    def _on_tab_changed(self, index):
+        if index == 1:
+            self._refresh_stock_report()
+        elif index == 2:
+            self._refresh_product_filter()
+            self._refresh_transactions()
+
+
+def main():
+    init_db()
+    app = QtWidgets.QApplication(sys.argv)
+    window = Inventory()
+    window.show()
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
