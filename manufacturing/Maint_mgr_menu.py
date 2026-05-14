@@ -1,47 +1,60 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import subprocess, sys, os
 
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
+    "QPushButton:hover{background-color:rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+
+
 class Ui_Maint_mgr_menu(object):
     def setupUi(self, Maint_mgr_menu):
         Maint_mgr_menu.setObjectName("Maint_mgr_menu")
         Maint_mgr_menu.resize(800, 600)
-        Maint_mgr_menu.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+
+        palette = QtGui.QPalette()
+        for group in (QtGui.QPalette.ColorGroup.Active,
+                      QtGui.QPalette.ColorGroup.Inactive,
+                      QtGui.QPalette.ColorGroup.Disabled):
+            palette.setColor(group, QtGui.QPalette.ColorRole.Window, QtGui.QColor(0, 85, 255))
+            palette.setColor(group, QtGui.QPalette.ColorRole.Button, QtGui.QColor(0, 85, 255))
+        Maint_mgr_menu.setPalette(palette)
+
         self.centralwidget = QtWidgets.QWidget(parent=Maint_mgr_menu)
-        self.centralwidget.setObjectName("centralwidget")
-        self.maint_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Maintenance"))
-        self.maint_Button.setGeometry(QtCore.QRect(10, 10, 161, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.maint_Button.setFont(font)
-        self.maint_Button.setAutoDefault(False)
-        self.maint_Button.setObjectName("maint_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 581))
-        self.label.setStyleSheet("background-image: url(Maintenance.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+        self.label.setStyleSheet(
+            "background-image: url(Maintenance.png); background-repeat: no-repeat;"
+            " background-position: center; background-color: white;")
         self.label.setText("")
-        self.label.setObjectName("label")
+
+        font = QtGui.QFont(); font.setPointSize(16)
+
+        btn_data = [
+            ("Maintenance",    QtCore.QRect( 10, 10, 161, 41), "Maintenance"),
+            ("Work Orders",    QtCore.QRect(190, 10, 161, 41), "Work Orders"),
+            ("Equip. Reports", QtCore.QRect(370, 10, 171, 41), "Equip Reports"),
+            ("Safety Reports", QtCore.QRect( 10,510, 171, 41), "Safety Reports"),
+        ]
+
+        self._btns = []
+        for text, geom, key in btn_data:
+            b = QtWidgets.QPushButton(parent=self.centralwidget,
+                                      clicked=lambda chk, k=key: self.press_it(k))
+            b.setGeometry(geom); b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            self._btns.append(b)
+
         self.label.raise_()
-        self.maint_Button.raise_()
+        for b in self._btns: b.raise_()
+
         Maint_mgr_menu.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Maint_mgr_menu)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
         Maint_mgr_menu.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(parent=Maint_mgr_menu)
-        self.statusbar.setObjectName("statusbar")
         Maint_mgr_menu.setStatusBar(self.statusbar)
-
         self.retranslateUi(Maint_mgr_menu)
-        QtCore.QMetaObject.connectSlotsByName(Maint_mgr_menu)
 
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
@@ -51,15 +64,15 @@ class Ui_Maint_mgr_menu(object):
         script = scripts.get(pressed)
         if script:
             subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+        else:
+            QtWidgets.QMessageBox.information(None, pressed, f"{pressed} — coming soon.")
 
     def retranslateUi(self, Maint_mgr_menu):
-        _translate = QtCore.QCoreApplication.translate
-        Maint_mgr_menu.setWindowTitle(_translate("Maint_mgr_menu", "Maintenance Manager Menu"))
-        self.maint_Button.setText(_translate("Maint_mgr_menu", "Maintenance"))
+        Maint_mgr_menu.setWindowTitle(
+            QtCore.QCoreApplication.translate("Maint_mgr_menu", "Maintenance Manager Menu"))
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Maint_mgr_menu = QtWidgets.QMainWindow()
     ui = Ui_Maint_mgr_menu()
