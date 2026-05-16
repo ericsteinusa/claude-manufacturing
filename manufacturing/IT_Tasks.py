@@ -224,6 +224,11 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         init_db()
         self._refresh()
 
+    def _launch(self, script):
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        import subprocess
+        subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+
     def _build_ui(self):
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
@@ -231,6 +236,26 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
+
+        # ── program buttons ──────────────────────────────────────────────────
+        prog_row = QtWidgets.QHBoxLayout()
+        prog_row.setSpacing(4)
+        font16 = QtGui.QFont(); font16.setPointSize(16)
+        for label, script in (
+            ("Department Entry",        "dept_entry.py"),
+            ("Department Sub Entry",    "dept_sub_entry.py"),
+            ("Department and Sub List", "dept_sub.py"),
+            ("People and Dept",         "display_people_department.py"),
+        ):
+            b = QtWidgets.QPushButton(label)
+            b.setFont(font16)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(41)
+            b.setAutoDefault(False)
+            b.clicked.connect(lambda chk, s=script: self._launch(s))
+            prog_row.addWidget(b)
+        prog_row.addStretch()
+        v.addLayout(prog_row)
 
         # ── filter bar ──────────────────────────────────────────────────────
         fr = QtWidgets.QHBoxLayout()
