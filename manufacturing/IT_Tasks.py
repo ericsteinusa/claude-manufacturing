@@ -1,6 +1,7 @@
 import sys
 import sqlite3
 import os
+import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
@@ -226,7 +227,6 @@ class ITTasksMenu(QtWidgets.QMainWindow):
 
     def _launch(self, script):
         _dir = os.path.dirname(os.path.abspath(__file__))
-        import subprocess
         subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def _build_ui(self):
