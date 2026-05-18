@@ -209,6 +209,32 @@ class Ui_Acct_MainWindow(object):
 "}")
         self.payroll_button.setAutoDefault(False)
         self.payroll_button.setObjectName("payroll_button")
+        self.budget_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Budget Management"))
+        self.budget_button.setGeometry(QtCore.QRect(460, 110, 211, 41))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.budget_button.setFont(font)
+        self.budget_button.setStyleSheet("QPushButton{background-color: white;\n"
+"border: 2px solid black;\n"
+"border-radius: 10px;}\n"
+"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+"border: 2px solidrgb(85, 255, 255);\n"
+"}")
+        self.budget_button.setAutoDefault(False)
+        self.budget_button.setObjectName("budget_button")
+        self.gl_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("General Ledger"))
+        self.gl_button.setGeometry(QtCore.QRect(460, 60, 211, 41))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.gl_button.setFont(font)
+        self.gl_button.setStyleSheet("QPushButton{background-color: white;\n"
+"border: 2px solid black;\n"
+"border-radius: 10px;}\n"
+"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+"border: 2px solidrgb(85, 255, 255);\n"
+"}")
+        self.gl_button.setAutoDefault(False)
+        self.gl_button.setObjectName("gl_button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 661))
         self.label.setStyleSheet("background-image: url(Accounting2.png);\n"
@@ -224,6 +250,8 @@ class Ui_Acct_MainWindow(object):
         self.acct_rcv_Button.raise_()
         self.credit_dept_button.raise_()
         self.payroll_button.raise_()
+        self.gl_button.raise_()
+        self.budget_button.raise_()
         Acct_MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Acct_MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -244,6 +272,8 @@ class Ui_Acct_MainWindow(object):
             "Accounts Recievable": "Accounts_receivable.py",
             "Credit Department":   "Credit_dept.py",
             "Payroll Department":  "Payroll_dept.py",
+            "General Ledger":      "General_ledger.py",
+            "Budget Management":   "Budget_mgmt.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -257,6 +287,8 @@ class Ui_Acct_MainWindow(object):
         self.acct_rcv_Button.setText(_translate("Acct_MainWindow", "Accounts Receivable"))
         self.credit_dept_button.setText(_translate("Acct_MainWindow", "Credit Department"))
         self.payroll_button.setText(_translate("Acct_MainWindow", "Payroll"))
+        self.gl_button.setText(_translate("Acct_MainWindow", "General Ledger"))
+        self.budget_button.setText(_translate("Acct_MainWindow", "Budget Management"))
 
 
 if __name__ == "__main__":

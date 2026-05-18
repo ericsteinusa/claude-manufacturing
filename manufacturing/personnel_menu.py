@@ -244,6 +244,19 @@ class Ui_Personnel_menu(object):
 "}")
         self.Time_Clock.setAutoDefault(False)
         self.Time_Clock.setObjectName("Time_Clock")
+        self.payroll_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Payroll"))
+        self.payroll_Button.setGeometry(QtCore.QRect(550, 510, 161, 41))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.payroll_Button.setFont(font)
+        self.payroll_Button.setStyleSheet("QPushButton{background-color: white;\n"
+"border: 2px solid black;\n"
+"border-radius: 10px;}\n"
+"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+"border: 2px solidrgb(85, 255, 255);\n"
+"}")
+        self.payroll_Button.setAutoDefault(False)
+        self.payroll_Button.setObjectName("payroll_Button")
         Personnel_menu.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Personnel_menu)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 809, 23))
@@ -266,6 +279,7 @@ class Ui_Personnel_menu(object):
             "Dept Entry":         "dept_entry.py",
             "Dept Sub Entry":     "dept_sub_entry.py",
             "Time Clock":         "time_clock_menu.py",
+            "Payroll":            "Payroll_dept.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -281,6 +295,7 @@ class Ui_Personnel_menu(object):
         self.dept_entry.setText(_translate("Personnel_menu", "Dept Entry"))
         self.dept_sub_entry.setText(_translate("Personnel_menu", "Dept Sub Entry"))
         self.Time_Clock.setText(_translate("Personnel_menu", "Time Clock"))
+        self.payroll_Button.setText(_translate("Personnel_menu", "Payroll"))
 
 
 if __name__ == "__main__":
