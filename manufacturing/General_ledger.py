@@ -435,6 +435,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self._build_ui()
         self._refresh_coa()
         self._refresh_journals()
+        self.statusBar().showMessage("Ready")
 
     def _build_ui(self):
         cw = QtWidgets.QWidget()
@@ -606,9 +607,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         )
 
     def _on_coa_add(self):
+        self.statusBar().showMessage("Add Account clicked")
         num, name, typ, sub, act, notes = self._coa_form_values()
         if not num or not name:
             QtWidgets.QMessageBox.warning(self, "Validation", "Account # and Name are required.")
+            self.statusBar().showMessage("Validation: Account # and Name are required")
             return
         try:
             with _conn() as con:
@@ -618,9 +621,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                 )
         except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"Account # {num} already exists.")
+            self.statusBar().showMessage(f"Duplicate: Account # {num} already exists")
             return
         self._refresh_coa()
         self._on_coa_clear()
+        self.statusBar().showMessage(f"Account {num} added")
 
     def _selected_coa_id(self):
         rows = self.coa_tbl.selectionModel().selectedRows()
@@ -630,6 +635,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         return self.coa_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
 
     def _on_coa_update(self):
+        self.statusBar().showMessage("Update Account clicked")
         aid = self._selected_coa_id()
         if aid is None:
             return
@@ -644,8 +650,10 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                 (num, name, typ, sub, act, notes, aid)
             )
         self._refresh_coa()
+        self.statusBar().showMessage(f"Account {num} updated")
 
     def _on_coa_toggle(self):
+        self.statusBar().showMessage("Toggle Active clicked")
         aid = self._selected_coa_id()
         if aid is None:
             return
@@ -654,6 +662,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             new_val = 0 if cur["is_active"] else 1
             con.execute("UPDATE gl_account SET is_active=? WHERE id=?", (new_val, aid))
         self._refresh_coa()
+        self.statusBar().showMessage("Account active status toggled")
 
     def _on_coa_clear(self):
         self.coa_ef_num.clear(); self.coa_ef_name.clear()
@@ -661,6 +670,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.coa_ef_type.setCurrentIndex(0)
         self.coa_ef_act.setChecked(True)
         self.coa_tbl.clearSelection()
+        self.statusBar().showMessage("Form cleared")
 
     # ── Journal Entries tab ───────────────────────────────────────────────────
     def _build_journals_tab(self):
@@ -879,7 +889,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.tb_to.setDate(QtCore.QDate.currentDate())
         fb.addWidget(self.tb_to)
         self.tb_posted_only = QtWidgets.QCheckBox("Posted Only")
-        self.tb_posted_only.setChecked(True)
+        self.tb_posted_only.setChecked(False)
         self.tb_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.tb_posted_only)
         btn_run = QtWidgets.QPushButton("Run Trial Balance"); btn_run.setStyleSheet(BTN_STYLE)
@@ -987,7 +997,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.lv_to.setDate(QtCore.QDate.currentDate())
         fb.addWidget(self.lv_to)
         self.lv_posted_only = QtWidgets.QCheckBox("Posted Only")
-        self.lv_posted_only.setChecked(True)
+        self.lv_posted_only.setChecked(False)
         self.lv_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.lv_posted_only)
         btn_run = QtWidgets.QPushButton("View Ledger"); btn_run.setStyleSheet(BTN_STYLE)
@@ -1112,7 +1122,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.is_to.setDate(QtCore.QDate.currentDate())
         fb.addWidget(self.is_to)
         self.is_posted_only = QtWidgets.QCheckBox("Posted Only")
-        self.is_posted_only.setChecked(True)
+        self.is_posted_only.setChecked(False)
         self.is_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.is_posted_only)
         btn_run = QtWidgets.QPushButton("Run"); btn_run.setStyleSheet(BTN_STYLE)
@@ -1148,7 +1158,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.bs_fy_start.setDate(QtCore.QDate(QtCore.QDate.currentDate().year(), 1, 1))
         fb.addWidget(self.bs_fy_start)
         self.bs_posted_only = QtWidgets.QCheckBox("Posted Only")
-        self.bs_posted_only.setChecked(True)
+        self.bs_posted_only.setChecked(False)
         self.bs_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.bs_posted_only)
         btn_run = QtWidgets.QPushButton("Run"); btn_run.setStyleSheet(BTN_STYLE)
@@ -1417,6 +1427,9 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
 
     # ── tab change ────────────────────────────────────────────────────────────
     def _on_tab_change(self, idx):
+        tab_names = ["Chart of Accounts", "Journal Entries", "Trial Balance",
+                     "Ledger View", "Financial Statements"]
+        self.statusBar().showMessage(f"Tab: {tab_names[idx]}")
         if idx == 1:   # Journal Entries — always fetch latest from DB
             self._refresh_journals()
         elif idx == 2:  # Trial Balance — auto-run
