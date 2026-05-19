@@ -455,7 +455,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.tabs.addTab(self._build_coa_tab(),     "Chart of Accounts")
         self.tabs.addTab(self._build_journals_tab(),"Journal Entries")
         self.tabs.addTab(self._build_trial_tab(),   "Trial Balance")
-        self.tabs.addTab(self._build_ledger_tab(),  "Ledger View")
+        self.tabs.addTab(self._build_ledger_tab(),   "Ledger View")
+        self.tabs.addTab(self._build_fs_tab(),       "Financial Statements")
 
         self.tabs.currentChanged.connect(self._on_tab_change)
 
@@ -1083,6 +1084,336 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             f"Total Credits: <b>{_money(total_c)}</b>   "
             f"Ending Balance: <b>{_money(running)}</b>"
         )
+
+    # ── Financial Statements tab ──────────────────────────────────────────────
+    def _build_fs_tab(self):
+        w = QtWidgets.QWidget()
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(6, 6, 6, 6)
+        inner = QtWidgets.QTabWidget()
+        inner.setStyleSheet(TAB_STYLE)
+        inner.addTab(self._build_income_stmt_tab(), "Income Statement")
+        inner.addTab(self._build_balance_sheet_tab(), "Balance Sheet")
+        v.addWidget(inner)
+        return w
+
+    def _build_income_stmt_tab(self):
+        w = QtWidgets.QWidget()
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(6, 6, 6, 6)
+
+        fb = QtWidgets.QHBoxLayout()
+        fb.addWidget(QtWidgets.QLabel("From:"))
+        self.is_from = QtWidgets.QDateEdit(calendarPopup=True)
+        self.is_from.setDate(QtCore.QDate(QtCore.QDate.currentDate().year(), 1, 1))
+        fb.addWidget(self.is_from)
+        fb.addWidget(QtWidgets.QLabel("To:"))
+        self.is_to = QtWidgets.QDateEdit(calendarPopup=True)
+        self.is_to.setDate(QtCore.QDate.currentDate())
+        fb.addWidget(self.is_to)
+        self.is_posted_only = QtWidgets.QCheckBox("Posted Only")
+        self.is_posted_only.setChecked(True)
+        self.is_posted_only.setStyleSheet("color:white;font-weight:bold;")
+        fb.addWidget(self.is_posted_only)
+        btn_run = QtWidgets.QPushButton("Run"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run.clicked.connect(self._refresh_income_stmt)
+        fb.addWidget(btn_run); fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.is_tbl, self))
+        fb.addWidget(btn_exp)
+        v.addLayout(fb)
+
+        self.is_tbl = QtWidgets.QTableWidget(0, 2)
+        self.is_tbl.setHorizontalHeaderLabels(["Description", "Amount"])
+        self.is_tbl.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.is_tbl.setColumnWidth(1, 160)
+        self.is_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.is_tbl.verticalHeader().setVisible(False)
+        self.is_tbl.verticalHeader().setDefaultSectionSize(24)
+        v.addWidget(self.is_tbl)
+        return w
+
+    def _build_balance_sheet_tab(self):
+        w = QtWidgets.QWidget()
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(6, 6, 6, 6)
+
+        fb = QtWidgets.QHBoxLayout()
+        fb.addWidget(QtWidgets.QLabel("As Of:"))
+        self.bs_as_of = QtWidgets.QDateEdit(calendarPopup=True)
+        self.bs_as_of.setDate(QtCore.QDate.currentDate())
+        fb.addWidget(self.bs_as_of)
+        fb.addWidget(QtWidgets.QLabel("Fiscal Year Start:"))
+        self.bs_fy_start = QtWidgets.QDateEdit(calendarPopup=True)
+        self.bs_fy_start.setDate(QtCore.QDate(QtCore.QDate.currentDate().year(), 1, 1))
+        fb.addWidget(self.bs_fy_start)
+        self.bs_posted_only = QtWidgets.QCheckBox("Posted Only")
+        self.bs_posted_only.setChecked(True)
+        self.bs_posted_only.setStyleSheet("color:white;font-weight:bold;")
+        fb.addWidget(self.bs_posted_only)
+        btn_run = QtWidgets.QPushButton("Run"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run.clicked.connect(self._refresh_balance_sheet)
+        fb.addWidget(btn_run); fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.bs_tbl, self))
+        fb.addWidget(btn_exp)
+        v.addLayout(fb)
+
+        self.bs_tbl = QtWidgets.QTableWidget(0, 2)
+        self.bs_tbl.setHorizontalHeaderLabels(["Description", "Amount"])
+        self.bs_tbl.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.bs_tbl.setColumnWidth(1, 160)
+        self.bs_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.bs_tbl.verticalHeader().setVisible(False)
+        self.bs_tbl.verticalHeader().setDefaultSectionSize(24)
+        v.addWidget(self.bs_tbl)
+
+        self.bs_balance_lbl = QtWidgets.QLabel("")
+        self.bs_balance_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        self.bs_balance_lbl.setStyleSheet("font-weight:bold;font-size:13px;padding:4px 8px;")
+        v.addWidget(self.bs_balance_lbl)
+        return w
+
+    # ── FS row helpers ────────────────────────────────────────────────────────
+    def _fs_section_header(self, tbl, label):
+        r = tbl.rowCount(); tbl.insertRow(r)
+        item = _ro(label.upper())
+        item.setBackground(QtGui.QColor(0, 85, 255))
+        item.setForeground(QtGui.QColor(255, 255, 255))
+        f = item.font(); f.setBold(True); item.setFont(f)
+        tbl.setItem(r, 0, item)
+        amt = _ro(""); amt.setBackground(QtGui.QColor(0, 85, 255))
+        tbl.setItem(r, 1, amt)
+        tbl.setRowHeight(r, 28)
+
+    def _fs_detail_row(self, tbl, label, amount, color=None):
+        r = tbl.rowCount(); tbl.insertRow(r)
+        lbl_item = _ro(f"    {label}")
+        amt_item = _ro_r(_money(amount) if amount != 0 else "")
+        if color:
+            lbl_item.setBackground(color); amt_item.setBackground(color)
+        tbl.setItem(r, 0, lbl_item); tbl.setItem(r, 1, amt_item)
+
+    def _fs_subtotal_row(self, tbl, label, amount, bg=None):
+        r = tbl.rowCount(); tbl.insertRow(r)
+        lbl_item = _ro(label); amt_item = _ro_r(_money(amount))
+        for it in (lbl_item, amt_item):
+            f = it.font(); f.setBold(True); it.setFont(f)
+            it.setBackground(bg or QtGui.QColor(210, 230, 255))
+        tbl.setItem(r, 0, lbl_item); tbl.setItem(r, 1, amt_item)
+        tbl.setRowHeight(r, 26)
+
+    def _fs_total_row(self, tbl, label, amount, positive_good=True):
+        r = tbl.rowCount(); tbl.insertRow(r)
+        lbl_item = _ro(label); amt_item = _ro_r(_money(amount))
+        fg = QtGui.QColor("green") if (amount >= 0 if positive_good else True) else QtGui.QColor("red")
+        bg = QtGui.QColor(0, 85, 255)
+        for it in (lbl_item, amt_item):
+            f = it.font(); f.setBold(True); it.setFont(f)
+            it.setBackground(bg); it.setForeground(QtGui.QColor(255, 255, 255))
+        amt_item.setForeground(fg)
+        tbl.setItem(r, 0, lbl_item); tbl.setItem(r, 1, amt_item)
+        tbl.setRowHeight(r, 28)
+
+    def _fs_spacer(self, tbl):
+        r = tbl.rowCount(); tbl.insertRow(r)
+        tbl.setItem(r, 0, _ro("")); tbl.setItem(r, 1, _ro(""))
+        tbl.setRowHeight(r, 10)
+
+    # ── Income Statement ──────────────────────────────────────────────────────
+    def _refresh_income_stmt(self):
+        d0 = self.is_from.date().toString("yyyy-MM-dd")
+        d1 = self.is_to.date().toString("yyyy-MM-dd")
+        pc = "AND j.posted=1" if self.is_posted_only.isChecked() else ""
+        sql = f"""
+            SELECT a.account_name, a.account_type,
+                   COALESCE(SUM(l.debit),0)  AS td,
+                   COALESCE(SUM(l.credit),0) AS tc
+            FROM gl_account a
+            LEFT JOIN gl_journal_line l ON l.account_id=a.id
+            LEFT JOIN gl_journal j ON j.id=l.journal_id
+                AND j.journal_date>=? AND j.journal_date<=? {pc}
+            WHERE a.is_active=1
+              AND a.account_type IN ('Revenue','COGS','Expense')
+            GROUP BY a.id ORDER BY a.account_number
+        """
+        with _conn() as con:
+            rows = con.execute(sql, (d0, d1)).fetchall()
+
+        rev_rows  = [(r["account_name"], r["tc"] - r["td"]) for r in rows if r["account_type"] == "Revenue"]
+        cogs_rows = [(r["account_name"], r["td"] - r["tc"]) for r in rows if r["account_type"] == "COGS"]
+        exp_rows  = [(r["account_name"], r["td"] - r["tc"]) for r in rows if r["account_type"] == "Expense"]
+
+        total_rev  = sum(v for _, v in rev_rows)
+        total_cogs = sum(v for _, v in cogs_rows)
+        gross      = total_rev - total_cogs
+        total_exp  = sum(v for _, v in exp_rows)
+        net_income = gross - total_exp
+
+        tbl = self.is_tbl; tbl.setRowCount(0)
+        c_rev  = ACCT_TYPE_COLORS["Revenue"]
+        c_cogs = ACCT_TYPE_COLORS["COGS"]
+        c_exp  = ACCT_TYPE_COLORS["Expense"]
+
+        self._fs_section_header(tbl, "Revenue")
+        for name, amt in rev_rows:
+            if amt != 0:
+                self._fs_detail_row(tbl, name, amt, c_rev)
+        self._fs_subtotal_row(tbl, "Total Revenue", total_rev, QtGui.QColor(190, 230, 200))
+        self._fs_spacer(tbl)
+
+        self._fs_section_header(tbl, "Cost of Goods Sold")
+        for name, amt in cogs_rows:
+            if amt != 0:
+                self._fs_detail_row(tbl, name, amt, c_cogs)
+        self._fs_subtotal_row(tbl, "Total Cost of Goods Sold", total_cogs, QtGui.QColor(240, 240, 180))
+        self._fs_spacer(tbl)
+
+        self._fs_total_row(tbl, "Gross Profit", gross)
+        self._fs_spacer(tbl)
+
+        self._fs_section_header(tbl, "Operating Expenses")
+        for name, amt in exp_rows:
+            if amt != 0:
+                self._fs_detail_row(tbl, name, amt, c_exp)
+        self._fs_subtotal_row(tbl, "Total Operating Expenses", total_exp, QtGui.QColor(255, 200, 200))
+        self._fs_spacer(tbl)
+
+        self._fs_total_row(tbl, "Net Income", net_income, positive_good=True)
+
+    # ── Balance Sheet ─────────────────────────────────────────────────────────
+    def _refresh_balance_sheet(self):
+        d1  = self.bs_as_of.date().toString("yyyy-MM-dd")
+        fy0 = self.bs_fy_start.date().toString("yyyy-MM-dd")
+        pc  = "AND j.posted=1" if self.bs_posted_only.isChecked() else ""
+
+        sql_bal = f"""
+            SELECT a.account_number, a.account_name, a.account_type, a.account_sub,
+                   COALESCE(SUM(l.debit),0)  AS td,
+                   COALESCE(SUM(l.credit),0) AS tc
+            FROM gl_account a
+            LEFT JOIN gl_journal_line l ON l.account_id=a.id
+            LEFT JOIN gl_journal j ON j.id=l.journal_id
+                AND j.journal_date<=? {pc}
+            WHERE a.is_active=1
+              AND a.account_type IN ('Asset','Liability','Equity')
+            GROUP BY a.id ORDER BY a.account_number
+        """
+        sql_nie = f"""
+            SELECT a.account_type,
+                   COALESCE(SUM(l.debit),0)  AS td,
+                   COALESCE(SUM(l.credit),0) AS tc
+            FROM gl_account a
+            LEFT JOIN gl_journal_line l ON l.account_id=a.id
+            LEFT JOIN gl_journal j ON j.id=l.journal_id
+                AND j.journal_date>=? AND j.journal_date<=? {pc}
+            WHERE a.is_active=1
+              AND a.account_type IN ('Revenue','COGS','Expense')
+            GROUP BY a.account_type
+        """
+        with _conn() as con:
+            bal_rows = con.execute(sql_bal, (d1,)).fetchall()
+            nie_rows = con.execute(sql_nie, (fy0, d1)).fetchall()
+
+        nie = {r["account_type"]: (r["td"], r["tc"]) for r in nie_rows}
+        rev_d,  rev_c  = nie.get("Revenue", (0, 0))
+        cogs_d, cogs_c = nie.get("COGS",    (0, 0))
+        exp_d,  exp_c  = nie.get("Expense", (0, 0))
+        cy_earnings = (rev_c - rev_d) - (cogs_d - cogs_c) - (exp_d - exp_c)
+
+        def net(row):
+            return row["td"] - row["tc"] if row["account_type"] == "Asset" else row["tc"] - row["td"]
+
+        asset_rows = [r for r in bal_rows if r["account_type"] == "Asset"]
+        liab_rows  = [r for r in bal_rows if r["account_type"] == "Liability"]
+        eq_rows    = [r for r in bal_rows if r["account_type"] == "Equity"]
+
+        tbl = self.bs_tbl; tbl.setRowCount(0)
+        c_asset = ACCT_TYPE_COLORS["Asset"]
+        c_liab  = ACCT_TYPE_COLORS["Liability"]
+        c_eq    = ACCT_TYPE_COLORS["Equity"]
+
+        # ── Assets ──
+        self._fs_section_header(tbl, "Assets")
+        total_assets = 0.0
+        for sub, sub_label, hdr_bg, sub_bg in [
+            ("Current",  "Current Assets",      QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
+            ("Fixed",    "Fixed Assets",         QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
+            ("Other",    "Other Assets",         QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
+        ]:
+            sub_rows = [r for r in asset_rows if (r["account_sub"] or "Other") == sub]
+            if not sub_rows:
+                continue
+            r = tbl.rowCount(); tbl.insertRow(r)
+            lbl = _ro(f"  {sub_label}"); f = lbl.font(); f.setItalic(True); f.setBold(True); lbl.setFont(f)
+            lbl.setBackground(hdr_bg)
+            tbl.setItem(r, 0, lbl); a = _ro(""); a.setBackground(hdr_bg); tbl.setItem(r, 1, a)
+            sub_total = 0.0
+            for row in sub_rows:
+                bal = net(row); sub_total += bal
+                self._fs_detail_row(tbl, row["account_name"], bal, c_asset)
+            total_assets += sub_total
+            self._fs_subtotal_row(tbl, f"    Total {sub_label}", sub_total, sub_bg)
+        self._fs_spacer(tbl)
+        self._fs_total_row(tbl, "Total Assets", total_assets)
+        self._fs_spacer(tbl)
+
+        # ── Liabilities ──
+        self._fs_section_header(tbl, "Liabilities")
+        total_liab = 0.0
+        for sub, sub_label, hdr_bg, sub_bg in [
+            ("Current",   "Current Liabilities",    QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
+            ("Long-term", "Long-term Liabilities",  QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
+            ("Other",     "Other Liabilities",      QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
+        ]:
+            sub_rows = [r for r in liab_rows if (r["account_sub"] or "Other") == sub]
+            if not sub_rows:
+                continue
+            r = tbl.rowCount(); tbl.insertRow(r)
+            lbl = _ro(f"  {sub_label}"); f = lbl.font(); f.setItalic(True); f.setBold(True); lbl.setFont(f)
+            lbl.setBackground(hdr_bg)
+            tbl.setItem(r, 0, lbl); a = _ro(""); a.setBackground(hdr_bg); tbl.setItem(r, 1, a)
+            sub_total = 0.0
+            for row in sub_rows:
+                bal = net(row); sub_total += bal
+                self._fs_detail_row(tbl, row["account_name"], bal, c_liab)
+            total_liab += sub_total
+            self._fs_subtotal_row(tbl, f"    Total {sub_label}", sub_total, sub_bg)
+        self._fs_spacer(tbl)
+        self._fs_total_row(tbl, "Total Liabilities", total_liab)
+        self._fs_spacer(tbl)
+
+        # ── Equity ──
+        self._fs_section_header(tbl, "Equity")
+        total_eq = 0.0
+        for row in eq_rows:
+            if row["account_number"] == "3900":
+                continue  # replaced by computed current year earnings below
+            bal = net(row); total_eq += bal
+            self._fs_detail_row(tbl, row["account_name"], bal, c_eq)
+        self._fs_detail_row(tbl, "Current Year Earnings (computed)", cy_earnings, c_eq)
+        total_eq += cy_earnings
+        self._fs_spacer(tbl)
+        self._fs_total_row(tbl, "Total Equity", total_eq)
+        self._fs_spacer(tbl)
+
+        # ── Total Liabilities + Equity ──
+        total_l_e = total_liab + total_eq
+        self._fs_total_row(tbl, "Total Liabilities + Equity", total_l_e)
+
+        diff = abs(total_assets - total_l_e)
+        if diff < 0.005:
+            self.bs_balance_lbl.setText(
+                "<span style='color:green;'>✓ Balance Sheet is balanced</span>   "
+                f"Total Assets: <b>{_money(total_assets)}</b>   "
+                f"Total Liabilities + Equity: <b>{_money(total_l_e)}</b>"
+            )
+        else:
+            self.bs_balance_lbl.setText(
+                f"<span style='color:red;'>⚠ Out of balance by {_money(diff)}</span>   "
+                f"Total Assets: <b>{_money(total_assets)}</b>   "
+                f"Total Liabilities + Equity: <b>{_money(total_l_e)}</b>"
+            )
 
     # ── tab change ────────────────────────────────────────────────────────────
     def _on_tab_change(self, idx):
