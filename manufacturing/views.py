@@ -1449,6 +1449,15 @@ DEPT_MENU_KEY = {
 FULL_ACCESS_ROLES = {'Admin', 'President', 'Vice President', 'Auditor'}
 READ_ONLY_ROLES   = {'Auditor'}   # can browse all depts but cannot launch scripts
 
+# dept_sub_ids whose holders are department managers
+MANAGER_DEPT_SUB_IDS = {5, 7, 10, 11, 13, 15, 17, 19, 22, 24, 25, 26, 28, 31}
+
+# MENU_TREE item keys that are hidden from non-managers
+MANAGER_MENU_KEYS = {
+    'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr',
+    'mkt_mgr', 'pers_mgr', 'prod_mgr', 'purch_mgr', 'qa_mgr', 'sales_mgr',
+}
+
 
 def _get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -1478,7 +1487,7 @@ def _ensure_roles():
 def _get_user_profile(email: str) -> dict:
     conn = _get_db()
     row = conn.execute("""
-        SELECT p.id, p.dept_id, d.dept_name,
+        SELECT p.id, p.dept_id, p.dept_Sub_id, d.dept_name,
                r.role_name,
                pos.position
         FROM people p
@@ -1491,14 +1500,22 @@ def _get_user_profile(email: str) -> dict:
     conn.close()
     if not row:
         return {}
-    dept_name = row['dept_name'] or ''
-    dept_key  = DEPT_MENU_KEY.get(dept_name)  # None means full access (e.g. Company)
+    dept_name   = row['dept_name'] or ''
+    dept_key    = DEPT_MENU_KEY.get(dept_name)
+    role_name   = row['role_name'] or ''
+    dept_sub_id = row['dept_Sub_id']
+    is_manager  = (
+        dept_sub_id in MANAGER_DEPT_SUB_IDS
+        or role_name in {'Department Manager'} | FULL_ACCESS_ROLES
+    )
     return {
-        'people_id': row['id'],
-        'dept_name': dept_name,
-        'dept_key':  dept_key,
-        'role_name': row['role_name'] or '',
-        'position':  row['position'] or '',
+        'people_id':   row['id'],
+        'dept_name':   dept_name,
+        'dept_key':    dept_key,
+        'role_name':   role_name,
+        'position':    row['position'] or '',
+        'dept_sub_id': dept_sub_id,
+        'is_manager':  is_manager,
     }
 
 
@@ -1588,6 +1605,7 @@ def home(request):
             request.session['user_dept_key']    = profile.get('dept_key') or ''
             request.session['user_dept_name']   = profile.get('dept_name', '')
             request.session['user_full_access'] = _is_full_access(profile)
+            request.session['user_is_manager']  = profile.get('is_manager', False)
             if request.session['user_full_access']:
                 return redirect('dashboard')
             dept_key = profile.get('dept_key')
@@ -1639,8 +1657,11 @@ def generic_menu(request, dept, subpath=''):
     if node is None:
         return redirect('dashboard')
 
+    is_manager = request.session.get('user_is_manager', False)
     items = []
     for key, label, target in node['items']:
+        if key in MANAGER_MENU_KEYS and not is_manager:
+            continue
         new_parts = parts + [key]
         if isinstance(target, dict):
             url = '/dept/{}/{}/'.format(dept, '/'.join(new_parts))
