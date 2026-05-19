@@ -1428,11 +1428,81 @@ def _walk_tree(dept, parts):
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'company.db')
 
+# Maps dept.dept_name → MENU_TREE key (None = full access, e.g. Company)
+DEPT_MENU_KEY = {
+    'Accounting':               'accounting',
+    'Customer Service':         'customer_service',
+    'Engineering':              'engineering',
+    'Information Technologies': 'information_tech',
+    'Maintenance':              'maintenance',
+    'Marketing':                'marketing',
+    'Personnel':                'personnel',
+    'Production':               'production',
+    'Purchasing':               'purchasing',
+    'Quality Assurance':        'quality_assurance',
+    'Sales':                    'sales',
+    'Budget Management':        'budget_management',
+    'Company':                  None,   # full access
+    'Labs':                     'quality_assurance',
+}
+
+FULL_ACCESS_ROLES = {'Admin', 'President', 'Vice President'}
+
 
 def _get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def _ensure_roles():
+    """Insert President and Vice President roles if not already present."""
+    conn = _get_db()
+    for name, desc in [
+        ('President',      'Full access — company president'),
+        ('Vice President', 'Full access — company vice president'),
+    ]:
+        conn.execute(
+            "INSERT INTO roles(role_name, description) SELECT ?,? WHERE NOT EXISTS "
+            "(SELECT 1 FROM roles WHERE role_name=?)", (name, desc, name)
+        )
+    conn.commit()
+    conn.close()
+
+
+def _get_user_profile(email: str) -> dict:
+    conn = _get_db()
+    row = conn.execute("""
+        SELECT p.id, p.dept_id, d.dept_name,
+               r.role_name,
+               pos.position
+        FROM people p
+        LEFT JOIN dept d ON d.dept_id = p.dept_id
+        LEFT JOIN user_roles ur ON ur.people_id = p.id
+        LEFT JOIN roles r ON r.id = ur.role_id
+        LEFT JOIN position pos ON pos.people_id = p.id
+        WHERE p.email = ?
+    """, (email,)).fetchone()
+    conn.close()
+    if not row:
+        return {}
+    dept_name = row['dept_name'] or ''
+    dept_key  = DEPT_MENU_KEY.get(dept_name)  # None means full access (e.g. Company)
+    return {
+        'people_id': row['id'],
+        'dept_name': dept_name,
+        'dept_key':  dept_key,
+        'role_name': row['role_name'] or '',
+        'position':  row['position'] or '',
+    }
+
+
+def _is_full_access(profile: dict) -> bool:
+    """Admin, President, Vice President, or Company dept users see all departments."""
+    return (
+        profile.get('role_name') in FULL_ACCESS_ROLES
+        or profile.get('dept_key') is None
+    )
 
 
 def _verify_login(email: str, password: str) -> bool:
@@ -1495,6 +1565,7 @@ def _reset_password(email: str, new_password: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def home(request):
+    _ensure_roles()
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -1507,6 +1578,16 @@ def home(request):
 
         if _verify_login(email, password):
             request.session['user_email'] = email
+            profile = _get_user_profile(email)
+            request.session['user_role']        = profile.get('role_name', '')
+            request.session['user_dept_key']    = profile.get('dept_key') or ''
+            request.session['user_dept_name']   = profile.get('dept_name', '')
+            request.session['user_full_access'] = _is_full_access(profile)
+            if request.session['user_full_access']:
+                return redirect('dashboard')
+            dept_key = profile.get('dept_key')
+            if dept_key:
+                return redirect('dept_menu', dept=dept_key)
             return redirect('dashboard')
 
         return render(request, 'home.html', {
@@ -1524,7 +1605,16 @@ def dashboard(request):
     email = request.session.get('user_email')
     if not email:
         return redirect('home')
-    return render(request, 'dashboard.html', {'email': email})
+    if not request.session.get('user_full_access'):
+        dept_key = request.session.get('user_dept_key')
+        if dept_key:
+            return redirect('dept_menu', dept=dept_key)
+    return render(request, 'dashboard.html', {
+        'email':       email,
+        'user_role':   request.session.get('user_role', ''),
+        'dept_name':   request.session.get('user_dept_name', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })
 
 
 def logout(request):
@@ -1535,6 +1625,10 @@ def logout(request):
 def generic_menu(request, dept, subpath=''):
     if not request.session.get('user_email'):
         return redirect('home')
+    if not request.session.get('user_full_access'):
+        user_dept = request.session.get('user_dept_key', '')
+        if user_dept and dept != user_dept:
+            return redirect('dept_menu', dept=user_dept)
     parts = [p for p in subpath.split('/') if p]
     node = _walk_tree(dept, parts)
     if node is None:
@@ -1556,16 +1650,22 @@ def generic_menu(request, dept, subpath=''):
         back_url = '/dashboard/'
 
     return render(request, 'dept_menu.html', {
-        'email': request.session['user_email'],
-        'title': node['title'],
-        'items': items,
-        'back_url': back_url,
+        'email':       request.session['user_email'],
+        'user_role':   request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'title':       node['title'],
+        'items':       items,
+        'back_url':    back_url,
     })
 
 
 def run_script(request, dept, subpath):
     if not request.session.get('user_email'):
         return redirect('home')
+    if not request.session.get('user_full_access'):
+        user_dept = request.session.get('user_dept_key', '')
+        if user_dept and dept != user_dept:
+            return redirect('dept_menu', dept=user_dept)
     parts = [p for p in subpath.split('/') if p]
     if not parts:
         return redirect('dashboard')

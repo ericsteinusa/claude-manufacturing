@@ -75,9 +75,9 @@
 <body>
     <div class="toolbar">
         <a href="{{ back_url }}" class="btn">Back</a>
-        <a href="/dashboard/" class="btn">Home</a>
+        {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
         <div class="spacer"></div>
-        <span>Logged in as: {{ email }}</span>
+        <span>Logged in as: {{ email }}{% if user_role %} ({{ user_role }}){% endif %}</span>
         <a href="{% url 'change_password' %}" class="btn">Change Password</a>
         <a href="{% url 'logout' %}" class="btn">Logout</a>
     </div>
