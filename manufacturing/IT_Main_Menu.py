@@ -213,7 +213,6 @@ class Ui_IT_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     IT_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_IT_MainWindow()

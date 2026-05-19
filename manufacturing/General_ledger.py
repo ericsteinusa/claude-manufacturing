@@ -3,7 +3,6 @@ General_ledger.py — General Ledger module
 Tabs: Chart of Accounts | Journal Entries | Trial Balance | Ledger View
 """
 import sys, os, sqlite3, csv
-from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 # ── database ─────────────────────────────────────────────────────────────────

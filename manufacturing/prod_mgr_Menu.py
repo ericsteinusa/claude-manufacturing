@@ -210,7 +210,6 @@ class Ui_prod_mgr_menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     prod_mgr_menu = QtWidgets.QMainWindow()
     ui = Ui_prod_mgr_menu()

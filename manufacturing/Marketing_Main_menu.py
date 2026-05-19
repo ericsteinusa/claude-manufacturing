@@ -211,7 +211,6 @@ class Ui_Marketing_Main_Menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Marketing_Main_Menu = QtWidgets.QMainWindow()
     ui = Ui_Marketing_Main_Menu()
