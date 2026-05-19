@@ -794,15 +794,7 @@ MENU_TREE = {
             ('acct_rcv',    'Accounts Receivable', 'Accounts_receivable.py'),
             ('credit',      'Credit Department',   'Credit_dept.py'),
             ('payroll',     'Payroll Department',  'Payroll_dept.py'),
-            ('gen_ledger',  'General Ledger',      {
-                'title': 'General Ledger',
-                'items': [
-                    ('chart_accts','Chart of Accounts',   {'title': 'Chart of Accounts',  'items': []}),
-                    ('jrnl_ent',   'Journal Entries',     {'title': 'Journal Entries',    'items': []}),
-                    ('gl_rpts',    'GL Reports',          {'title': 'GL Reports',         'items': []}),
-                    ('per_close',  'Period Close',        {'title': 'Period Close',       'items': []}),
-                ],
-            }),
+            ('gen_ledger',  'General Ledger',      'General_ledger.py'),
             ('budget_mgmt', 'Budget Management',   {
                 'title': 'Budget Management',
                 'items': [
