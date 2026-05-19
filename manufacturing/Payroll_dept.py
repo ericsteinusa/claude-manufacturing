@@ -3,6 +3,7 @@ import sqlite3
 import os
 from datetime import datetime, date, timedelta
 from PyQt6 import QtCore, QtGui, QtWidgets
+from gl_utils import post_gl_entry
 
 DB_PATH      = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 SS_RATE      = 0.062
@@ -712,6 +713,28 @@ class PayrollDept(QtWidgets.QMainWindow):
 
         conn.commit()
         conn.close()
+
+        # Post draft GL entry for the full payroll run
+        # DR: Salaries & Wages (6000) — total gross
+        # CR: Cash (1000)            — total net pay
+        # CR: Payroll Liabilities (2200) — total withholding
+        total_gross = total_net = 0.0
+        for r in range(self.run_table.rowCount()):
+            def _v(col): return float(self.run_table.item(r, col).text().replace("$","").replace(",",""))
+            total_gross += _v(self._C_GROSS)
+            total_net   += _v(self._C_NET)
+        total_withholding = round(total_gross - total_net, 2)
+        ref = f"PAYROLL-{start_str}"
+        post_gl_entry(
+            journal_date=end_str,
+            reference=ref,
+            description=f"Payroll run {start_str} – {end_str} ({freq})",
+            lines=[
+                ("6000", round(total_gross, 2), 0.0,                    "Gross wages"),
+                ("1000", 0.0, round(total_net, 2),                      "Net pay disbursed"),
+                ("2200", 0.0, total_withholding,                        "Taxes & withholding"),
+            ],
+        )
 
         self.run_table.setRowCount(0)
         self._run_people_ids = []

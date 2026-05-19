@@ -3,6 +3,7 @@ import sqlite3
 import os
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
+from gl_utils import post_gl_entry, gl_accounts_by_type
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
@@ -123,7 +124,7 @@ class NewInvoiceDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, preselect_vendor_id=None):
         super().__init__(parent)
         self.setWindowTitle("New Bill / Invoice")
-        self.setFixedSize(480, 320)
+        self.setFixedSize(480, 360)
         _apply_blue_palette(self)
         self._preselect = preselect_vendor_id
         self._build_ui()
@@ -176,6 +177,15 @@ class NewInvoiceDialog(QtWidgets.QDialog):
         self.desc.setPlaceholderText("Description / PO reference")
         layout.addLayout(row("Description:", self.desc))
 
+        self.gl_acct_combo = QtWidgets.QComboBox(); self.gl_acct_combo.setStyleSheet(COMBO_STYLE)
+        for num, name in gl_accounts_by_type("Expense", "COGS", "Asset"):
+            self.gl_acct_combo.addItem(f"{num}  {name}", num)
+        # Default to "Other Expense" 7900 if present
+        idx = self.gl_acct_combo.findData("7900")
+        if idx >= 0:
+            self.gl_acct_combo.setCurrentIndex(idx)
+        layout.addLayout(row("GL Expense Acct:", self.gl_acct_combo))
+
         btn_row = QtWidgets.QHBoxLayout()
         for text, slot in (("Save", self._on_save), ("Cancel", self.reject)):
             b = QtWidgets.QPushButton(text); b.setStyleSheet(BUTTON_STYLE)
@@ -187,21 +197,38 @@ class NewInvoiceDialog(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, "Error", "Select a vendor."); return
         if self.amount.value() <= 0:
             QtWidgets.QMessageBox.warning(self, "Error", "Amount must be greater than zero."); return
+        inv_num  = self.inv_num.text().strip()
+        inv_date = self.inv_date.date().toString("yyyy-MM-dd")
+        amount   = self.amount.value()
+        desc     = self.desc.text().strip() or None
+        vendor   = self.vendor_combo.currentText()
+        gl_acct  = self.gl_acct_combo.currentData()
         conn = get_db()
         try:
             conn.execute("""
                 INSERT INTO ap_invoice (vendor_id, invoice_number, invoice_date, due_date, amount, description)
                 VALUES (?,?,?,?,?,?)
-            """, (self.vendor_combo.currentData(),
-                  self.inv_num.text().strip(),
-                  self.inv_date.date().toString("yyyy-MM-dd"),
-                  self.due_date.date().toString("yyyy-MM-dd"),
-                  self.amount.value(),
-                  self.desc.text().strip() or None))
+            """, (self.vendor_combo.currentData(), inv_num, inv_date,
+                  self.due_date.date().toString("yyyy-MM-dd"), amount, desc))
             conn.commit()
         except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists."); conn.close(); return
         conn.close()
+        # Post draft GL entry: DR expense account, CR Accounts Payable (2000)
+        jid = post_gl_entry(
+            journal_date=inv_date,
+            reference=inv_num,
+            description=f"AP Invoice – {vendor}",
+            lines=[
+                (gl_acct, amount, 0.0,   f"AP Invoice {inv_num}"),
+                ("2000",  0.0,  amount,  f"AP Invoice {inv_num}"),
+            ],
+        )
+        if jid is None:
+            QtWidgets.QMessageBox.warning(
+                self, "GL Warning",
+                "Invoice saved, but the GL journal entry could not be created.\n"
+                "Check that accounts 2000 and the selected expense account exist in the Chart of Accounts.")
         self.accept()
 
 
@@ -269,17 +296,32 @@ class RecordPaymentDialog(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, "Error", "Payment amount must be greater than zero."); return
         if amount > self._balance + 0.001:
             QtWidgets.QMessageBox.warning(self, "Error", f"Payment exceeds balance of {_money(self._balance)}."); return
+        pay_date = self.pay_date.date().toString("yyyy-MM-dd")
+        ref_text = self.ref.text().strip() or None
         conn = get_db()
         conn.execute("INSERT INTO ap_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (?,?,?,?,?)",
-                     (self._invoice_id, self.pay_date.date().toString("yyyy-MM-dd"),
-                      amount, self.method.currentText(), self.ref.text().strip() or None))
+                     (self._invoice_id, pay_date, amount, self.method.currentText(), ref_text))
         new_paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=?",
                                 (self._invoice_id,)).fetchone()[0]
-        inv_amt  = conn.execute("SELECT amount FROM ap_invoice WHERE id=?",
-                                (self._invoice_id,)).fetchone()["amount"]
-        new_status = "paid" if abs(new_paid - inv_amt) < 0.01 else "partial"
+        inv      = conn.execute(
+            "SELECT ai.amount, ai.invoice_number, v.vendor_name "
+            "FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=?",
+            (self._invoice_id,)
+        ).fetchone()
+        new_status = "paid" if abs(new_paid - inv["amount"]) < 0.01 else "partial"
         conn.execute("UPDATE ap_invoice SET status=? WHERE id=?", (new_status, self._invoice_id))
         conn.commit(); conn.close()
+        # Post draft GL entry: DR Accounts Payable (2000), CR Cash (1000)
+        ref = ref_text or inv["invoice_number"]
+        post_gl_entry(
+            journal_date=pay_date,
+            reference=ref,
+            description=f"AP Payment – {inv['vendor_name']} ({inv['invoice_number']})",
+            lines=[
+                ("2000", amount, 0.0,   f"Payment on {inv['invoice_number']}"),
+                ("1000", 0.0,  amount,  f"Payment on {inv['invoice_number']}"),
+            ],
+        )
         self.accept()
 
 

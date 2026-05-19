@@ -3,6 +3,7 @@ import sqlite3
 import os
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
+from gl_utils import post_gl_entry
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
@@ -207,23 +208,34 @@ class NewInvoiceDialog(QtWidgets.QDialog):
         if self.amount.value() <= 0:
             QtWidgets.QMessageBox.warning(self, "Error", "Amount must be greater than zero.")
             return
+        inv_num  = self.inv_num.text().strip()
+        inv_date = self.inv_date.date().toString("yyyy-MM-dd")
+        amount   = self.amount.value()
+        desc     = self.desc.text().strip() or None
+        cust     = self.cust_combo.currentText()
         conn = get_db()
         try:
             conn.execute("""
                 INSERT INTO ar_invoice (customer_id, invoice_number, invoice_date, due_date, amount, description)
                 VALUES (?,?,?,?,?,?)
-            """, (self.cust_combo.currentData(),
-                  self.inv_num.text().strip(),
-                  self.inv_date.date().toString("yyyy-MM-dd"),
-                  self.due_date.date().toString("yyyy-MM-dd"),
-                  self.amount.value(),
-                  self.desc.text().strip() or None))
+            """, (self.cust_combo.currentData(), inv_num, inv_date,
+                  self.due_date.date().toString("yyyy-MM-dd"), amount, desc))
             conn.commit()
         except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists.")
             conn.close()
             return
         conn.close()
+        # Post draft GL entry: DR Accounts Receivable (1100), CR Sales Revenue (4000)
+        post_gl_entry(
+            journal_date=inv_date,
+            reference=inv_num,
+            description=f"AR Invoice – {cust}",
+            lines=[
+                ("1100", amount, 0.0,   f"AR Invoice {inv_num}"),
+                ("4000", 0.0,  amount,  f"AR Invoice {inv_num}"),
+            ],
+        )
         self.accept()
 
 
@@ -314,22 +326,37 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         if amount > self._balance + 0.001:
             QtWidgets.QMessageBox.warning(self, "Error", f"Payment exceeds balance of {_money(self._balance)}.")
             return
+        pay_date = self.pay_date.date().toString("yyyy-MM-dd")
+        ref_text = self.ref.text().strip() or None
         conn = get_db()
         conn.execute(
             "INSERT INTO ar_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (?,?,?,?,?)",
-            (self._invoice_id, self.pay_date.date().toString("yyyy-MM-dd"),
-             amount, self.method.currentText(), self.ref.text().strip() or None))
+            (self._invoice_id, pay_date, amount, self.method.currentText(), ref_text))
         new_paid = conn.execute(
             "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=?",
             (self._invoice_id,)
         ).fetchone()[0]
-        inv_amt = conn.execute(
-            "SELECT amount FROM ar_invoice WHERE id=?", (self._invoice_id,)
-        ).fetchone()["amount"]
-        new_status = "paid" if abs(new_paid - inv_amt) < 0.01 else "partial"
+        inv = conn.execute(
+            "SELECT ai.amount, ai.invoice_number, c.first_name, c.last_name, c.company_name "
+            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=?",
+            (self._invoice_id,)
+        ).fetchone()
+        new_status = "paid" if abs(new_paid - inv["amount"]) < 0.01 else "partial"
         conn.execute("UPDATE ar_invoice SET status=? WHERE id=?", (new_status, self._invoice_id))
         conn.commit()
         conn.close()
+        # Post draft GL entry: DR Cash (1000), CR Accounts Receivable (1100)
+        ref = ref_text or inv["invoice_number"]
+        cust = _customer_display(inv)
+        post_gl_entry(
+            journal_date=pay_date,
+            reference=ref,
+            description=f"AR Payment – {cust} ({inv['invoice_number']})",
+            lines=[
+                ("1000", amount, 0.0,   f"Payment on {inv['invoice_number']}"),
+                ("1100", 0.0,  amount,  f"Payment on {inv['invoice_number']}"),
+            ],
+        )
         self.accept()
 
 
