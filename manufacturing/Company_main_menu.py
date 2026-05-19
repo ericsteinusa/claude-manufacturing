@@ -295,6 +295,19 @@ class Ui_MainWindow(object):
 "")
         self.Sales_button.setAutoDefault(False)
         self.Sales_button.setObjectName("Sales_button")
+        self.budget_mgmt_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Budget Management"))
+        self.budget_mgmt_button.setGeometry(QtCore.QRect(180, 400, 181, 41))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.budget_mgmt_button.setFont(font)
+        self.budget_mgmt_button.setStyleSheet("QPushButton{background-color: white;\n"
+"border: 2px solid black;\n"
+"border-radius: 10px;\n}"
+"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+"border: 2px solidrgb(85, 255, 255);\n}"
+"")
+        self.budget_mgmt_button.setAutoDefault(False)
+        self.budget_mgmt_button.setObjectName("budget_mgmt_button")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 729, 21))
@@ -330,6 +343,7 @@ class Ui_MainWindow(object):
             "Purchasing":        "Purchasing_Main_menu.py",
             "Quality Assurance": "QA_Main_menu.py",
             "Sales":             "Sales_Main_menu.py",
+            "Budget Management": "Budget_mgmt.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -349,6 +363,7 @@ class Ui_MainWindow(object):
         self.Marketing_button.setText(_translate("MainWindow", "Marketing"))
         self.Engineering_button.setText(_translate("MainWindow", "Engineering"))
         self.Sales_button.setText(_translate("MainWindow", "Sales"))
+        self.budget_mgmt_button.setText(_translate("MainWindow", "Budget Management"))
 
 
 if __name__ == "__main__":

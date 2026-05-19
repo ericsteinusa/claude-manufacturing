@@ -1397,6 +1397,15 @@ MENU_TREE = {
             ('sales', 'Sales Menu', _SALES_MENU),
         ],
     },
+    'budget_management': {
+        'title': 'Budget Management',
+        'items': [
+            ('budgets',    'Budgets',             'Budget_mgmt.py'),
+            ('bud_detail', 'Budget Detail',       'Budget_mgmt.py'),
+            ('bva',        'Budget vs. Actual',   'Budget_mgmt.py'),
+            ('variance',   'Variance Report',     'Budget_mgmt.py'),
+        ],
+    },
 }
 
 
