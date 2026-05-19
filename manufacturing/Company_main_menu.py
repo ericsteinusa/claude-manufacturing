@@ -308,6 +308,26 @@ class Ui_MainWindow(object):
 "")
         self.budget_mgmt_button.setAutoDefault(False)
         self.budget_mgmt_button.setObjectName("budget_mgmt_button")
+        BTN_STYLE = ("QPushButton{background-color: white;\nborder: 2px solid black;\nborder-radius: 10px;\n}"
+                     "QPushButton:hover{background-color:rgb(85, 255, 255);\nborder: 2px solidrgb(85, 255, 255);\n}")
+        self.finance_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked=lambda: self.press_it("Finance"))
+        self.finance_button.setGeometry(QtCore.QRect(20, 470, 131, 41))
+        self.finance_button.setFont(QtGui.QFont("", 16))
+        self.finance_button.setStyleSheet(BTN_STYLE)
+        self.finance_button.setAutoDefault(False)
+        self.finance_button.setObjectName("finance_button")
+        self.legal_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked=lambda: self.press_it("Legal"))
+        self.legal_button.setGeometry(QtCore.QRect(180, 470, 131, 41))
+        self.legal_button.setFont(QtGui.QFont("", 16))
+        self.legal_button.setStyleSheet(BTN_STYLE)
+        self.legal_button.setAutoDefault(False)
+        self.legal_button.setObjectName("legal_button")
+        self.risk_mgmt_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked=lambda: self.press_it("Risk Management"))
+        self.risk_mgmt_button.setGeometry(QtCore.QRect(20, 540, 181, 41))
+        self.risk_mgmt_button.setFont(QtGui.QFont("", 16))
+        self.risk_mgmt_button.setStyleSheet(BTN_STYLE)
+        self.risk_mgmt_button.setAutoDefault(False)
+        self.risk_mgmt_button.setObjectName("risk_mgmt_button")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 729, 21))
@@ -344,6 +364,9 @@ class Ui_MainWindow(object):
             "Quality Assurance": "QA_Main_menu.py",
             "Sales":             "Sales_Main_menu.py",
             "Budget Management": "Budget_mgmt.py",
+            "Finance":           "Finance_Main_menu.py",
+            "Legal":             "Legal_Main_menu.py",
+            "Risk Management":   "Risk_mgmt_Main_menu.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -364,6 +387,9 @@ class Ui_MainWindow(object):
         self.Engineering_button.setText(_translate("MainWindow", "Engineering"))
         self.Sales_button.setText(_translate("MainWindow", "Sales"))
         self.budget_mgmt_button.setText(_translate("MainWindow", "Budget Management"))
+        self.finance_button.setText(_translate("MainWindow", "Finance"))
+        self.legal_button.setText(_translate("MainWindow", "Legal"))
+        self.risk_mgmt_button.setText(_translate("MainWindow", "Risk Management"))
 
 
 if __name__ == "__main__":

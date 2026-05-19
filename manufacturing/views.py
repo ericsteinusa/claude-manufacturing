@@ -1406,6 +1406,63 @@ MENU_TREE = {
             ('variance',   'Variance Report',     'Budget_mgmt.py'),
         ],
     },
+    'finance': {
+        'title': 'Finance Main Menu',
+        'items': [
+            ('fin_mgr',      'Finance Manager', {
+                'title': 'Finance Manager',
+                'items': [
+                    ('fin_plan',     'Financial Planning',    {'title': 'Financial Planning',    'items': []}),
+                    ('fin_forecast', 'Budget & Forecasting',  {'title': 'Budget & Forecasting',  'items': []}),
+                    ('treasury_mgmt','Treasury Management',   {'title': 'Treasury Management',   'items': []}),
+                    ('invest_mgmt',  'Investment Management', {'title': 'Investment Management', 'items': []}),
+                    ('fin_rpts_mgr', 'Financial Reports',     {'title': 'Financial Reports',     'items': []}),
+                ],
+            }),
+            ('fin_analysis',  'Financial Analysis',   {'title': 'Financial Analysis',   'items': []}),
+            ('fin_reporting', 'Financial Reporting',   {'title': 'Financial Reporting',   'items': []}),
+            ('treasury_ops',  'Treasury Operations',   {'title': 'Treasury Operations',   'items': []}),
+            ('capital_mgmt',  'Capital Management',    {'title': 'Capital Management',    'items': []}),
+            ('tax_planning',  'Tax Planning',           {'title': 'Tax Planning',           'items': []}),
+        ],
+    },
+    'legal': {
+        'title': 'Legal Main Menu',
+        'items': [
+            ('legal_mgr',    'Legal Manager', {
+                'title': 'Legal Manager',
+                'items': [
+                    ('contracts_mgmt',  'Contract Management',   {'title': 'Contract Management',   'items': []}),
+                    ('litigation_mgmt', 'Litigation Management', {'title': 'Litigation Management', 'items': []}),
+                    ('compliance_mgmt', 'Compliance Management', {'title': 'Compliance Management', 'items': []}),
+                    ('corp_gov',        'Corporate Governance',  {'title': 'Corporate Governance',  'items': []}),
+                ],
+            }),
+            ('contracts',  'Contracts',            {'title': 'Contracts',            'items': []}),
+            ('compliance', 'Compliance',           {'title': 'Compliance',           'items': []}),
+            ('litigation', 'Litigation',           {'title': 'Litigation',           'items': []}),
+            ('ip_mgmt',    'Intellectual Property',{'title': 'Intellectual Property','items': []}),
+            ('emp_law',    'Employment Law',        {'title': 'Employment Law',        'items': []}),
+        ],
+    },
+    'risk_management': {
+        'title': 'Risk Management Main Menu',
+        'items': [
+            ('risk_mgr',     'Risk Manager', {
+                'title': 'Risk Manager',
+                'items': [
+                    ('risk_framework', 'Risk Framework',      {'title': 'Risk Framework',      'items': []}),
+                    ('risk_reporting', 'Risk Reporting',      {'title': 'Risk Reporting',      'items': []}),
+                    ('biz_continuity', 'Business Continuity', {'title': 'Business Continuity', 'items': []}),
+                ],
+            }),
+            ('risk_assess',   'Risk Assessment',     {'title': 'Risk Assessment',     'items': []}),
+            ('risk_register', 'Risk Register',        {'title': 'Risk Register',        'items': []}),
+            ('insurance',     'Insurance Management', {'title': 'Insurance Management', 'items': []}),
+            ('biz_cont',      'Business Continuity',  {'title': 'Business Continuity',  'items': []}),
+            ('comp_audit',    'Compliance & Audit',   {'title': 'Compliance & Audit',   'items': []}),
+        ],
+    },
 }
 
 
@@ -1444,18 +1501,22 @@ DEPT_MENU_KEY = {
     'Budget Management':        'budget_management',
     'Company':                  None,   # full access
     'Labs':                     'quality_assurance',
+    'Finance':                  'finance',
+    'Legal':                    'legal',
+    'Risk Management':          'risk_management',
 }
 
 FULL_ACCESS_ROLES = {'Admin', 'President', 'Vice President', 'Auditor'}
 READ_ONLY_ROLES   = {'Auditor'}   # can browse all depts but cannot launch scripts
 
 # dept_sub_ids whose holders are department managers
-MANAGER_DEPT_SUB_IDS = {5, 7, 10, 11, 13, 15, 17, 19, 22, 24, 25, 26, 28, 31}
+MANAGER_DEPT_SUB_IDS = {5, 7, 10, 11, 13, 15, 17, 19, 22, 24, 25, 26, 28, 31, 33, 36, 40}
 
 # MENU_TREE item keys that are hidden from non-managers
 MANAGER_MENU_KEYS = {
     'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr',
     'mkt_mgr', 'pers_mgr', 'prod_mgr', 'purch_mgr', 'qa_mgr', 'sales_mgr',
+    'fin_mgr', 'legal_mgr', 'risk_mgr',
 }
 
 
