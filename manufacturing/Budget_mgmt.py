@@ -1,6 +1,6 @@
 """
 Budget_mgmt.py — Budget Management module
-Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report
+Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report | Department Summary
 """
 import sys, os, sqlite3, csv
 from datetime import date
@@ -42,6 +42,21 @@ def init_db():
 MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 STATUSES = ["Draft", "Approved", "Active", "Closed"]
 ACCT_TYPES = ["Asset","Liability","Equity","Revenue","COGS","Expense"]
+DEPARTMENTS = [
+    "All",
+    "Accounting",
+    "Customer Service",
+    "Engineering",
+    "Information Technology",
+    "Maintenance",
+    "Marketing",
+    "Personnel",
+    "Production",
+    "Purchasing",
+    "Quality Assurance",
+    "Sales",
+    "Budget Management",
+]
 
 BTN_STYLE = (
     "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
@@ -174,10 +189,11 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self.tabs.setStyleSheet(TAB_STYLE)
         root.addWidget(self.tabs)
 
-        self.tabs.addTab(self._build_budgets_tab(),   "Budgets")
+        self.tabs.addTab(self._build_budgets_tab(),    "Budgets")
         self.tabs.addTab(self._build_detail_tab(),    "Budget Detail")
         self.tabs.addTab(self._build_bva_tab(),       "Budget vs. Actual")
         self.tabs.addTab(self._build_variance_tab(),  "Variance Report")
+        self.tabs.addTab(self._build_dept_summary_tab(), "Department Summary")
 
         self.tabs.currentChanged.connect(self._on_tab_change)
 
@@ -203,6 +219,13 @@ class BudgetWindow(QtWidgets.QMainWindow):
             self.bud_status_filter.addItem(s)
         self.bud_status_filter.currentIndexChanged.connect(self._refresh_budgets)
         fb.addWidget(self.bud_status_filter)
+        fb.addWidget(QtWidgets.QLabel("Department:"))
+        self.bud_dept_filter = QtWidgets.QComboBox()
+        self.bud_dept_filter.addItem("All Departments")
+        for d in DEPARTMENTS[1:]:
+            self.bud_dept_filter.addItem(d)
+        self.bud_dept_filter.currentIndexChanged.connect(self._refresh_budgets)
+        fb.addWidget(self.bud_dept_filter)
         fb.addStretch()
         v.addLayout(fb)
 
@@ -236,8 +259,9 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self.bud_ef_year = QtWidgets.QSpinBox()
         self.bud_ef_year.setRange(2000, 2100)
         self.bud_ef_year.setValue(date.today().year)
-        self.bud_ef_dept = QtWidgets.QLineEdit()
-        self.bud_ef_dept.setPlaceholderText("e.g. All, Manufacturing, Sales…")
+        self.bud_ef_dept = QtWidgets.QComboBox()
+        for d in DEPARTMENTS:
+            self.bud_ef_dept.addItem(d)
         self.bud_ef_status = QtWidgets.QComboBox()
         for s in STATUSES:
             self.bud_ef_status.addItem(s)
@@ -277,9 +301,12 @@ class BudgetWindow(QtWidgets.QMainWindow):
         st = self.bud_status_filter.currentText()
         if st != "All Statuses":
             where.append("status=?"); params.append(st)
+        dept = self.bud_dept_filter.currentText()
+        if dept != "All Departments":
+            where.append("department=?"); params.append(dept)
         if where:
             q += " WHERE " + " AND ".join(where)
-        q += " ORDER BY fiscal_year DESC, budget_name"
+        q += " ORDER BY fiscal_year DESC, department, budget_name"
         with _conn() as con:
             rows = con.execute(q, params).fetchall()
         self.bud_tbl.setRowCount(0)
@@ -310,7 +337,9 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self._current_budget_id = bid
         self.bud_ef_name.setText(self.bud_tbl.item(r, 1).text())
         self.bud_ef_year.setValue(int(self.bud_tbl.item(r, 2).text()))
-        self.bud_ef_dept.setText(self.bud_tbl.item(r, 3).text())
+        didx = self.bud_ef_dept.findText(self.bud_tbl.item(r, 3).text())
+        if didx >= 0:
+            self.bud_ef_dept.setCurrentIndex(didx)
         idx = self.bud_ef_status.findText(self.bud_tbl.item(r, 4).text())
         if idx >= 0:
             self.bud_ef_status.setCurrentIndex(idx)
@@ -324,7 +353,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
         return (
             self.bud_ef_name.text().strip(),
             self.bud_ef_year.value(),
-            self.bud_ef_dept.text().strip() or "All",
+            self.bud_ef_dept.currentText(),
             self.bud_ef_status.currentText(),
             self.bud_ef_desc.text().strip(),
             self.bud_ef_by.text().strip(),
@@ -419,7 +448,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self.tabs.setCurrentIndex(1)
 
     def _on_bud_clear(self):
-        self.bud_ef_name.clear(); self.bud_ef_dept.clear()
+        self.bud_ef_name.clear()
+        self.bud_ef_dept.setCurrentIndex(0)
         self.bud_ef_desc.clear(); self.bud_ef_by.clear()
         self.bud_ef_year.setValue(date.today().year)
         self.bud_ef_status.setCurrentIndex(0)
@@ -1015,6 +1045,145 @@ class BudgetWindow(QtWidgets.QMainWindow):
             self._populate_bva_combo()
         elif idx == 3:
             self._populate_var_combo()
+        elif idx == 4:
+            self._refresh_dept_summary()
+
+
+    # ── Department Summary tab ────────────────────────────────────────────────
+    def _build_dept_summary_tab(self):
+        w = QtWidgets.QWidget()
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(6, 6, 6, 6)
+
+        fb = QtWidgets.QHBoxLayout()
+        fb.addWidget(QtWidgets.QLabel("Fiscal Year:"))
+        self.ds_year = QtWidgets.QComboBox()
+        self.ds_year.addItem("All Years")
+        for yr in range(date.today().year + 1, date.today().year - 6, -1):
+            self.ds_year.addItem(str(yr))
+        self.ds_year.setCurrentText(str(date.today().year))
+        fb.addWidget(self.ds_year)
+        fb.addWidget(QtWidgets.QLabel("Status:"))
+        self.ds_status = QtWidgets.QComboBox()
+        self.ds_status.addItem("All Statuses")
+        for s in STATUSES:
+            self.ds_status.addItem(s)
+        fb.addWidget(self.ds_status)
+        btn_run = QtWidgets.QPushButton("Refresh"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run.clicked.connect(self._refresh_dept_summary)
+        fb.addWidget(btn_run); fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.ds_tbl, self))
+        fb.addWidget(btn_exp)
+        v.addLayout(fb)
+
+        self.ds_tbl = QtWidgets.QTableWidget(0, 5)
+        self.ds_tbl.setHorizontalHeaderLabels(
+            ["Department", "Budgets", "Active", "Total Budgeted", "Avg per Budget"]
+        )
+        self.ds_tbl.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ds_tbl.setColumnWidth(1, 80)
+        self.ds_tbl.setColumnWidth(2, 80)
+        self.ds_tbl.setColumnWidth(3, 130)
+        self.ds_tbl.setColumnWidth(4, 130)
+        self.ds_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ds_tbl.setAlternatingRowColors(True)
+        self.ds_tbl.verticalHeader().setDefaultSectionSize(28)
+        self.ds_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ds_tbl.itemSelectionChanged.connect(self._on_ds_select)
+        v.addWidget(self.ds_tbl)
+
+        self.ds_totals = QtWidgets.QLabel("")
+        self.ds_totals.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        self.ds_totals.setStyleSheet("font-weight:bold;font-size:13px;padding:4px 8px;color:white;")
+        v.addWidget(self.ds_totals)
+
+        lbl = QtWidgets.QLabel("Select a department row to filter the Budgets tab to that department.")
+        lbl.setStyleSheet("color:white;font-size:11px;padding:2px 4px;")
+        v.addWidget(lbl)
+        return w
+
+    def _refresh_dept_summary(self):
+        yr = self.ds_year.currentText()
+        st = self.ds_status.currentText()
+
+        q = "SELECT department, status, COUNT(*) as cnt, SUM(total) as total FROM (" \
+            "SELECT b.department, b.status, COALESCE(SUM(bl.amount),0) as total " \
+            "FROM budget b LEFT JOIN budget_line bl ON bl.budget_id=b.id"
+        params = []
+        where = []
+        if yr != "All Years":
+            where.append("b.fiscal_year=?"); params.append(int(yr))
+        if st != "All Statuses":
+            where.append("b.status=?"); params.append(st)
+        if where:
+            q += " WHERE " + " AND ".join(where)
+        q += " GROUP BY b.id, b.department, b.status) GROUP BY department, status ORDER BY department, status"
+
+        with _conn() as con:
+            rows = con.execute(q, params).fetchall()
+
+        # aggregate by department
+        dept_map: dict = {}
+        for row in rows:
+            d = row["department"] or "All"
+            if d not in dept_map:
+                dept_map[d] = {"budgets": 0, "active": 0, "total": 0.0}
+            dept_map[d]["budgets"] += row["cnt"]
+            if row["status"] == "Active":
+                dept_map[d]["active"] += row["cnt"]
+            dept_map[d]["total"] += row["total"] or 0.0
+
+        DEPT_COLORS = {
+            "Accounting":           QtGui.QColor(220, 240, 255),
+            "Customer Service":     QtGui.QColor(220, 255, 235),
+            "Engineering":          QtGui.QColor(255, 245, 220),
+            "Information Technology": QtGui.QColor(240, 220, 255),
+            "Maintenance":          QtGui.QColor(255, 235, 220),
+            "Marketing":            QtGui.QColor(220, 255, 255),
+            "Personnel":            QtGui.QColor(255, 220, 240),
+            "Production":           QtGui.QColor(230, 255, 220),
+            "Purchasing":           QtGui.QColor(255, 255, 220),
+            "Quality Assurance":    QtGui.QColor(220, 230, 255),
+            "Sales":                QtGui.QColor(255, 240, 220),
+            "Budget Management":    QtGui.QColor(200, 230, 255),
+        }
+
+        self.ds_tbl.setRowCount(0)
+        grand_total = 0.0
+        for dept in sorted(dept_map.keys()):
+            info = dept_map[dept]
+            r = self.ds_tbl.rowCount()
+            self.ds_tbl.insertRow(r)
+            self.ds_tbl.setItem(r, 0, _ro(dept))
+            self.ds_tbl.setItem(r, 1, _ro(str(info["budgets"]), QtCore.Qt.AlignmentFlag.AlignCenter))
+            self.ds_tbl.setItem(r, 2, _ro(str(info["active"]), QtCore.Qt.AlignmentFlag.AlignCenter))
+            self.ds_tbl.setItem(r, 3, _ro_r(_money(info["total"])))
+            avg = info["total"] / info["budgets"] if info["budgets"] else 0.0
+            self.ds_tbl.setItem(r, 4, _ro_r(_money(avg)))
+            color = DEPT_COLORS.get(dept, QtGui.QColor(245, 245, 245))
+            for c in range(5):
+                it = self.ds_tbl.item(r, c)
+                if it:
+                    it.setBackground(color)
+            grand_total += info["total"]
+
+        total_budgets = sum(v["budgets"] for v in dept_map.values())
+        self.ds_totals.setText(
+            f"Departments: <b>{len(dept_map)}</b>   "
+            f"Total Budgets: <b>{total_budgets}</b>   "
+            f"Grand Total Budgeted: <b>{_money(grand_total)}</b>"
+        )
+
+    def _on_ds_select(self):
+        rows = self.ds_tbl.selectionModel().selectedRows()
+        if not rows:
+            return
+        dept = self.ds_tbl.item(rows[0].row(), 0).text()
+        idx = self.bud_dept_filter.findText(dept)
+        if idx >= 0:
+            self.bud_dept_filter.setCurrentIndex(idx)
+        self.tabs.setCurrentIndex(0)
 
 
 # ── entry point ───────────────────────────────────────────────────────────────
