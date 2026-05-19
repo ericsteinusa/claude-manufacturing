@@ -209,7 +209,6 @@ class Ui_Purchasing_menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Purchasing_menu = QtWidgets.QMainWindow()
     ui = Ui_Purchasing_menu()

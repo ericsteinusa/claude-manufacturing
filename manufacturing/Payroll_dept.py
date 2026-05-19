@@ -1,7 +1,7 @@
 import sys
 import sqlite3
 import os
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from gl_utils import post_gl_entry
 

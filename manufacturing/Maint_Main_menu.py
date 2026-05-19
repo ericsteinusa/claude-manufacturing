@@ -212,7 +212,6 @@ class Ui_Maint_main_menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Maint_main_menu = QtWidgets.QMainWindow()
     ui = Ui_Maint_main_menu()

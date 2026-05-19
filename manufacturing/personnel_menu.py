@@ -299,7 +299,6 @@ class Ui_Personnel_menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Personnel_menu = QtWidgets.QMainWindow()
     ui = Ui_Personnel_menu()

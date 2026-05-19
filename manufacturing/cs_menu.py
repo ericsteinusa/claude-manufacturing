@@ -72,7 +72,6 @@ class Ui_Customer_service_menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Customer_service_menu = QtWidgets.QMainWindow()
     ui = Ui_Customer_service_menu()

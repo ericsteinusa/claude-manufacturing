@@ -292,7 +292,6 @@ class Ui_Acct_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Acct_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_Acct_MainWindow()

@@ -195,7 +195,6 @@ class Ui_Quality_Assurance_menu(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Quality_Assurance_menu = QtWidgets.QMainWindow()
     ui = Ui_Quality_Assurance_menu()

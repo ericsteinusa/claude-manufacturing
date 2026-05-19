@@ -1,7 +1,6 @@
 import sys
 import sqlite3
 import os
-from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
