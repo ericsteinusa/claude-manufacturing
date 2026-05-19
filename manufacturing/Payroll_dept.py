@@ -463,7 +463,7 @@ class PayrollDept(QtWidgets.QMainWindow):
     def _load_pay_rates(self):
         conn = get_db()
         employees = conn.execute(
-            "SELECT id, first_name, last_name, ID as emp_id FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name, emp_id FROM people ORDER BY last_name, first_name"
         ).fetchall()
         pay_map = {r["people_id"]: r for r in conn.execute("SELECT * FROM employee_pay").fetchall()}
         conn.close()
