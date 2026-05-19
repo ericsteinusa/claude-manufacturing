@@ -1446,7 +1446,8 @@ DEPT_MENU_KEY = {
     'Labs':                     'quality_assurance',
 }
 
-FULL_ACCESS_ROLES = {'Admin', 'President', 'Vice President'}
+FULL_ACCESS_ROLES = {'Admin', 'President', 'Vice President', 'Auditor'}
+READ_ONLY_ROLES   = {'Auditor'}   # can browse all depts but cannot launch scripts
 
 
 def _get_db():
@@ -1456,11 +1457,15 @@ def _get_db():
 
 
 def _ensure_roles():
-    """Insert President and Vice President roles if not already present."""
+    """Insert any missing roles into the roles table."""
     conn = _get_db()
     for name, desc in [
-        ('President',      'Full access — company president'),
-        ('Vice President', 'Full access — company vice president'),
+        ('President',           'Full access — company president'),
+        ('Vice President',      'Full access — company vice president'),
+        ('Department Manager',  'Full access to own department including management screens'),
+        ('Supervisor',          'Access to own department operational screens'),
+        ('Auditor',             'Read-only browse access across all departments — cannot launch apps'),
+        ('HR / Personnel',      'Full access to Personnel department'),
     ]:
         conn.execute(
             "INSERT INTO roles(role_name, description) SELECT ?,? WHERE NOT EXISTS "
@@ -1662,6 +1667,8 @@ def generic_menu(request, dept, subpath=''):
 def run_script(request, dept, subpath):
     if not request.session.get('user_email'):
         return redirect('home')
+    if request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('dept_menu', dept=dept)
     if not request.session.get('user_full_access'):
         user_dept = request.session.get('user_dept_key', '')
         if user_dept and dept != user_dept:
@@ -1840,11 +1847,13 @@ def _get_all_users_with_roles():
     conn = _get_db()
     rows = conn.execute("""
         SELECT p.id, p.first_name, p.last_name, p.email,
+               d.dept_name,
                r.id as role_id, r.role_name
         FROM people p
+        LEFT JOIN dept d ON d.dept_id = p.dept_id
         LEFT JOIN user_roles ur ON ur.people_id = p.id
         LEFT JOIN roles r ON r.id = ur.role_id
-        ORDER BY p.last_name, p.first_name
+        ORDER BY d.dept_name, p.last_name, p.first_name
     """).fetchall()
     conn.close()
     return [dict(r) for r in rows]

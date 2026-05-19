@@ -133,6 +133,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Department</th>
                         <th>Current Role</th>
                         <th>Assign Role</th>
                     </tr>
@@ -142,6 +143,7 @@
                     <tr>
                         <td>{{ user.first_name }} {{ user.last_name }}</td>
                         <td>{{ user.email }}</td>
+                        <td>{{ user.dept_name|default:"—" }}</td>
                         <td>{{ user.role_name|default:"(none)" }}</td>
                         <td>
                             <select name="role_{{ user.id }}">
