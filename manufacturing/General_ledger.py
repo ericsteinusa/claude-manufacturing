@@ -1417,7 +1417,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
 
     # ── tab change ────────────────────────────────────────────────────────────
     def _on_tab_change(self, idx):
-        if idx == 3:   # Ledger View — repopulate account combo
+        if idx == 1:   # Journal Entries — always fetch latest from DB
+            self._refresh_journals()
+        elif idx == 2:  # Trial Balance — auto-run
+            self._refresh_trial()
+        elif idx == 3:  # Ledger View — repopulate account combo
             self._populate_lv_acct_combo()
 
 
