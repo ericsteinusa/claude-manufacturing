@@ -1,285 +1,174 @@
+"""
+Accounting_manager.py — Accounting Manager dashboard
+"""
+import sys, os, sqlite3, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 695)
-        palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Button, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Light, brush)
-        brush = QtGui.QBrush(QtGui.QColor(63, 127, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Midlight, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Dark, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 56, 170))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Mid, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.BrightText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.ButtonText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Shadow, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.AlternateBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 220))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.ToolTipBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.ToolTipText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Button, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Light, brush)
-        brush = QtGui.QBrush(QtGui.QColor(63, 127, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Midlight, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Dark, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 56, 170))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Mid, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Text, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.BrightText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.ButtonText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Shadow, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.AlternateBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 220))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.ToolTipBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.ToolTipText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Button, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Light, brush)
-        brush = QtGui.QBrush(QtGui.QColor(63, 127, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Midlight, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Dark, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 56, 170))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Mid, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.BrightText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.ButtonText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Shadow, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.AlternateBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 220))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.ToolTipBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.ToolTipText, brush)
-        MainWindow.setPalette(palette)
-        self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.acct_rcv_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Accounts Recievable"))
-        self.acct_rcv_Button.setGeometry(QtCore.QRect(20, 10, 211, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.acct_rcv_Button.setFont(font)
-        self.acct_rcv_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
-        self.acct_rcv_Button.setAutoDefault(False)
-        self.acct_rcv_Button.setObjectName("acct_rcv_Button")
-        self.credit_dept_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Credit Department"))
-        self.credit_dept_button.setGeometry(QtCore.QRect(450, 10, 211, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.credit_dept_button.setFont(font)
-        self.credit_dept_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
-        self.credit_dept_button.setAutoDefault(False)
-        self.credit_dept_button.setObjectName("credit_dept_button")
-        self.acct_pay_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Accounts Payable"))
-        self.acct_pay_Button.setGeometry(QtCore.QRect(250, 10, 181, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.acct_pay_Button.setFont(font)
-        self.acct_pay_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
-        self.acct_pay_Button.setAutoDefault(False)
-        self.acct_pay_Button.setObjectName("acct_pay_Button")
-        self.payroll_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Payroll Department"))
-        self.payroll_button.setGeometry(QtCore.QRect(20, 60, 181, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.payroll_button.setFont(font)
-        self.payroll_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
-        self.payroll_button.setAutoDefault(False)
-        self.payroll_button.setObjectName("payroll_button")
-        self.budget_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Budget Management"))
-        self.budget_button.setGeometry(QtCore.QRect(450, 60, 181, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.budget_button.setFont(font)
-        self.budget_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
-        self.budget_button.setAutoDefault(False)
-        self.budget_button.setObjectName("budget_button")
-        self.gl_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("General Ledger"))
-        self.gl_button.setGeometry(QtCore.QRect(250, 60, 181, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.gl_button.setFont(font)
-        self.gl_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
-        self.gl_button.setAutoDefault(False)
-        self.gl_button.setObjectName("gl_button")
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 0, 801, 661))
-        self.label.setStyleSheet("background-image: url(Accounting2.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
-        self.label.setText("")
-        self.label.setObjectName("label")
-        self.label.raise_()
-        self.acct_rcv_Button.raise_()
-        self.credit_dept_button.raise_()
-        self.acct_pay_Button.raise_()
-        self.payroll_button.raise_()
-        self.gl_button.raise_()
-        self.budget_button.raise_()
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+BLUE = QtGui.QColor(0, 85, 255)
 
-    def press_it(self, pressed):
+BUTTON_STYLE = (
+    "QPushButton{"
+    "  background-color: white;"
+    "  border: 2px solid black;"
+    "  border-radius: 10px;"
+    "  font-size: 15px;"
+    "  font-weight: bold;"
+    "  padding: 10px;"
+    "}"
+    "QPushButton:hover{"
+    "  background-color: rgb(85, 255, 255);"
+    "  border: 2px solid rgb(85, 255, 255);"
+    "}"
+)
+
+
+def _conn():
+    c = sqlite3.connect(DB_PATH)
+    c.row_factory = sqlite3.Row
+    return c
+
+
+def _apply_palette(widget):
+    pal = QtGui.QPalette()
+    pal.setColor(QtGui.QPalette.ColorRole.Window,      BLUE)
+    pal.setColor(QtGui.QPalette.ColorRole.Button,      BLUE)
+    pal.setColor(QtGui.QPalette.ColorRole.Base,        QtGui.QColor(255, 255, 255))
+    pal.setColor(QtGui.QPalette.ColorRole.WindowText,  QtGui.QColor(255, 255, 255))
+    pal.setColor(QtGui.QPalette.ColorRole.ButtonText,  QtGui.QColor(0,   0,   0))
+    pal.setColor(QtGui.QPalette.ColorRole.Text,        QtGui.QColor(0,   0,   0))
+    widget.setPalette(pal)
+
+
+class AccountingManagerWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Accounting Manager")
+        self.resize(820, 580)
+        _apply_palette(self)
+        self._build_ui()
+        self._load_summary()
+
+    def _build_ui(self):
+        cw = QtWidgets.QWidget()
+        self.setCentralWidget(cw)
+        root = QtWidgets.QVBoxLayout(cw)
+        root.setContentsMargins(24, 20, 24, 20)
+        root.setSpacing(18)
+
+        # ── Title ─────────────────────────────────────────────────────────────
+        title = QtWidgets.QLabel("Accounting Manager")
+        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet(
+            "font-size: 26px; font-weight: bold; color: white; padding: 8px;"
+        )
+        root.addWidget(title)
+
+        # ── Department buttons (2 × 3 grid) ───────────────────────────────────
+        grid = QtWidgets.QGridLayout()
+        grid.setSpacing(14)
+        grid.setContentsMargins(0, 0, 0, 0)
+
+        departments = [
+            ("Accounts Payable",    "Accounts_payable.py"),
+            ("Accounts Receivable", "Accounts_receivable.py"),
+            ("Credit Department",   "Credit_dept.py"),
+            ("Payroll Department",  "Payroll_dept.py"),
+            ("General Ledger",      "General_ledger.py"),
+            ("Budget Management",   "Budget_mgmt.py"),
+        ]
+
+        for i, (label, script) in enumerate(departments):
+            btn = QtWidgets.QPushButton(label)
+            btn.setStyleSheet(BUTTON_STYLE)
+            btn.setMinimumHeight(72)
+            btn.clicked.connect(lambda _=False, s=script: self._launch(s))
+            grid.addWidget(btn, i // 2, i % 2)
+
+        root.addLayout(grid)
+
+        # ── Summary stats panel ────────────────────────────────────────────────
+        stats_box = QtWidgets.QGroupBox()
+        stats_box.setStyleSheet(
+            "QGroupBox{"
+            "  background-color: rgba(255,255,255,20);"
+            "  border: 1px solid rgba(255,255,255,80);"
+            "  border-radius: 8px;"
+            "  margin-top: 0px;"
+            "}"
+        )
+        stats_row = QtWidgets.QHBoxLayout(stats_box)
+        stats_row.setContentsMargins(20, 14, 20, 14)
+        stats_row.setSpacing(0)
+
+        self._stat_vals = {}
+        stats = [
+            ("journals",  "Journal Entries"),
+            ("posted",    "Posted"),
+            ("draft",     "Draft"),
+            ("accounts",  "GL Accounts"),
+            ("vendors",   "Vendors"),
+            ("customers", "Customers"),
+        ]
+
+        for idx, (key, label) in enumerate(stats):
+            col = QtWidgets.QVBoxLayout()
+            col.setSpacing(2)
+
+            val = QtWidgets.QLabel("—")
+            val.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            val.setStyleSheet("font-size: 22px; font-weight: bold; color: white;")
+
+            lbl = QtWidgets.QLabel(label)
+            lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            lbl.setStyleSheet("font-size: 10px; color: rgba(255,255,255,180);")
+
+            col.addWidget(val)
+            col.addWidget(lbl)
+            self._stat_vals[key] = val
+            stats_row.addLayout(col)
+
+            if idx < len(stats) - 1:
+                sep = QtWidgets.QFrame()
+                sep.setFrameShape(QtWidgets.QFrame.Shape.VLine)
+                sep.setFixedWidth(1)
+                sep.setStyleSheet("background-color: rgba(255,255,255,60);")
+                stats_row.addWidget(sep)
+
+        root.addWidget(stats_box)
+
+    def _load_summary(self):
+        try:
+            with _conn() as con:
+                total    = con.execute("SELECT COUNT(*) FROM gl_journal").fetchone()[0]
+                posted   = con.execute("SELECT COUNT(*) FROM gl_journal WHERE posted=1").fetchone()[0]
+                draft    = total - posted
+                accounts = con.execute("SELECT COUNT(*) FROM gl_account WHERE is_active=1").fetchone()[0]
+                try:
+                    vendors = con.execute("SELECT COUNT(*) FROM vendors").fetchone()[0]
+                except Exception:
+                    vendors = 0
+                try:
+                    customers = con.execute("SELECT COUNT(*) FROM customers").fetchone()[0]
+                except Exception:
+                    customers = 0
+            self._stat_vals["journals"].setText(str(total))
+            self._stat_vals["posted"].setText(str(posted))
+            self._stat_vals["draft"].setText(str(draft))
+            self._stat_vals["accounts"].setText(str(accounts))
+            self._stat_vals["vendors"].setText(str(vendors))
+            self._stat_vals["customers"].setText(str(customers))
+        except Exception:
+            pass
+
+    def _launch(self, script):
         _dir = os.path.dirname(os.path.abspath(__file__))
-        scripts = {
-            "Accounts Payable":    "Accounts_payable.py",
-            "Accounts Recievable": "Accounts_receivable.py",
-            "Credit Department":   "Credit_dept.py",
-            "Payroll Department":  "Payroll_dept.py",
-            "General Ledger":      "General_ledger.py",
-            "Budget Management":   "Budget_mgmt.py",
-        }
-        script = scripts.get(pressed)
-        if script:
-            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.acct_rcv_Button.setText(_translate("MainWindow", "Accounts Receivable"))
-        self.credit_dept_button.setText(_translate("MainWindow", "Credit Department"))
-        self.acct_pay_Button.setText(_translate("MainWindow", "Accounts Payable"))
-        self.payroll_button.setText(_translate("MainWindow", "Payroll"))
-        self.gl_button.setText(_translate("MainWindow", "General Ledger"))
-        self.budget_button.setText(_translate("MainWindow", "Budget Management"))
+        subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    win = AccountingManagerWindow()
+    win.show()
     sys.exit(app.exec())
