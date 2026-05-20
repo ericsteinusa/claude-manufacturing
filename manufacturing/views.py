@@ -765,10 +765,10 @@ MENU_TREE = {
                     ('fin_reports', 'Financial Reports',   {
                         'title': 'Financial Reports',
                         'items': [
-                            ('inc_stmt',   'Income Statement',    {'title': 'Income Statement',   'items': []}),
-                            ('bal_sheet',  'Balance Sheet',       {'title': 'Balance Sheet',      'items': []}),
-                            ('cash_flow',  'Cash Flow',           {'title': 'Cash Flow',          'items': []}),
-                            ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                            ('inc_stmt',   'Income Statement',    'General_ledger.py'),
+                            ('bal_sheet',  'Balance Sheet',       'General_ledger.py'),
+                            ('cash_flow',  'Cash Flow',           'General_ledger.py'),
+                            ('cust_rpts',  'Custom Reports',      'General_ledger.py'),
                         ],
                     }),
                     ('budget_mgmt', 'Budget Management',   {
@@ -783,10 +783,10 @@ MENU_TREE = {
                     ('audit_mgmt',  'Audit Management',    {
                         'title': 'Audit Management',
                         'items': [
-                            ('audit_sched','Audit Schedule',      {'title': 'Audit Schedule',     'items': []}),
-                            ('findings',   'Audit Findings',      {'title': 'Audit Findings',     'items': []}),
-                            ('corr_act',   'Corrective Actions',  {'title': 'Corrective Actions', 'items': []}),
-                            ('audit_rpts', 'Audit Reports',       {'title': 'Audit Reports',      'items': []}),
+                            ('audit_sched','Audit Schedule',      'Accounting_manager.py'),
+                            ('findings',   'Audit Findings',      'Accounting_manager.py'),
+                            ('corr_act',   'Corrective Actions',  'Accounting_manager.py'),
+                            ('audit_rpts', 'Audit Reports',       'Accounting_manager.py'),
                         ],
                     }),
                 ],
@@ -807,37 +807,37 @@ MENU_TREE = {
             ('fin_reports', 'Financial Reports',   {
                 'title': 'Financial Reports',
                 'items': [
-                    ('inc_stmt',   'Income Statement',    {'title': 'Income Statement',   'items': []}),
-                    ('bal_sheet',  'Balance Sheet',       {'title': 'Balance Sheet',      'items': []}),
-                    ('cash_flow',  'Cash Flow',           {'title': 'Cash Flow',          'items': []}),
-                    ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                    ('inc_stmt',   'Income Statement',    'General_ledger.py'),
+                    ('bal_sheet',  'Balance Sheet',       'General_ledger.py'),
+                    ('cash_flow',  'Cash Flow',           'General_ledger.py'),
+                    ('cust_rpts',  'Custom Reports',      'General_ledger.py'),
                 ],
             }),
             ('tax_mgmt',    'Tax Management',      {
                 'title': 'Tax Management',
                 'items': [
-                    ('tax_cal',    'Tax Calendar',        {'title': 'Tax Calendar',       'items': []}),
-                    ('tax_filing', 'Tax Filing',          {'title': 'Tax Filing',         'items': []}),
-                    ('tax_pay',    'Tax Payments',        {'title': 'Tax Payments',       'items': []}),
-                    ('tax_rpts',   'Tax Reports',         {'title': 'Tax Reports',        'items': []}),
+                    ('tax_cal',    'Tax Calendar',        'taxes.py'),
+                    ('tax_filing', 'Tax Filing',          'taxes.py'),
+                    ('tax_pay',    'Tax Payments',        'taxes.py'),
+                    ('tax_rpts',   'Tax Reports',         'taxes.py'),
                 ],
             }),
             ('exp_reports', 'Expense Reports',     {
                 'title': 'Expense Reports',
                 'items': [
-                    ('sub_exp',    'Submit Expense',      {'title': 'Submit Expense',     'items': []}),
-                    ('pend_appr',  'Pending Approval',    {'title': 'Pending Approval',   'items': []}),
-                    ('appr_exp',   'Approved Expenses',   {'title': 'Approved Expenses',  'items': []}),
-                    ('exp_sum',    'Expense Summary',     {'title': 'Expense Summary',    'items': []}),
+                    ('sub_exp',    'Submit Expense',      'Accounts_payable.py'),
+                    ('pend_appr',  'Pending Approval',    'Accounts_payable.py'),
+                    ('appr_exp',   'Approved Expenses',   'Accounts_payable.py'),
+                    ('exp_sum',    'Expense Summary',     'Accounts_payable.py'),
                 ],
             }),
             ('bank_recon',  'Bank Reconciliation', {
                 'title': 'Bank Reconciliation',
                 'items': [
-                    ('recon_acct', 'Reconcile Account',   {'title': 'Reconcile Account',  'items': []}),
-                    ('pend_items', 'Pending Items',        {'title': 'Pending Items',      'items': []}),
-                    ('recon_hist', 'Reconciliation History',{'title': 'Reconciliation History','items': []}),
-                    ('bank_rpts',  'Bank Reports',         {'title': 'Bank Reports',       'items': []}),
+                    ('recon_acct', 'Reconcile Account',   'General_ledger.py'),
+                    ('pend_items', 'Pending Items',        'General_ledger.py'),
+                    ('recon_hist', 'Reconciliation History','General_ledger.py'),
+                    ('bank_rpts',  'Bank Reports',         'General_ledger.py'),
                 ],
             }),
         ],
