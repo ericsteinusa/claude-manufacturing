@@ -774,10 +774,10 @@ MENU_TREE = {
                     ('budget_mgmt', 'Budget Management',   {
                         'title': 'Budget Management',
                         'items': [
-                            ('budg_plan',  'Budget Planning',     {'title': 'Budget Planning',    'items': []}),
-                            ('budg_act',   'Budget vs. Actual',   {'title': 'Budget vs. Actual',  'items': []}),
-                            ('budg_amend', 'Budget Amendments',   {'title': 'Budget Amendments',  'items': []}),
-                            ('budg_rpts',  'Budget Reports',      {'title': 'Budget Reports',     'items': []}),
+                            ('budg_plan',  'Budget Planning',     'Budget_mgmt.py'),
+                            ('budg_act',   'Budget vs. Actual',   'Budget_mgmt.py'),
+                            ('budg_amend', 'Budget Amendments',   'Budget_mgmt.py'),
+                            ('budg_rpts',  'Budget Reports',      'Budget_mgmt.py'),
                         ],
                     }),
                     ('audit_mgmt',  'Audit Management',    {
@@ -798,10 +798,10 @@ MENU_TREE = {
             ('budget_mgmt', 'Budget Management',   {
                 'title': 'Budget Management',
                 'items': [
-                    ('budg_plan',  'Budget Planning',     {'title': 'Budget Planning',    'items': []}),
-                    ('budg_act',   'Budget vs. Actual',   {'title': 'Budget vs. Actual',  'items': []}),
-                    ('budg_amend', 'Budget Amendments',   {'title': 'Budget Amendments',  'items': []}),
-                    ('budg_rpts',  'Budget Reports',      {'title': 'Budget Reports',     'items': []}),
+                    ('budg_plan',  'Budget Planning',     'Budget_mgmt.py'),
+                    ('budg_act',   'Budget vs. Actual',   'Budget_mgmt.py'),
+                    ('budg_amend', 'Budget Amendments',   'Budget_mgmt.py'),
+                    ('budg_rpts',  'Budget Reports',      'Budget_mgmt.py'),
                 ],
             }),
             ('fin_reports', 'Financial Reports',   {
