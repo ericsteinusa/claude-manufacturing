@@ -77,15 +77,19 @@
     <div class="toolbar">
         {% block toolbar_left %}{% endblock %}
         <div class="spacer"></div>
+        {% block toolbar_right %}
         <span>Logged in as: {{ email }}{% if user_role %} ({{ user_role }}){% endif %}</span>
         <a href="{% url 'change_password' %}" class="btn">Change Password</a>
         <a href="{% url 'logout' %}" class="btn">Logout</a>
+        {% endblock %}
     </div>
+    {% block body %}
     <div class="content">
         <div class="menu-title">{% block menu_title %}{% endblock %}</div>
         <div class="dept-grid">
             {% block grid_items %}{% endblock %}
         </div>
     </div>
+    {% endblock %}
 </body>
 </html>
