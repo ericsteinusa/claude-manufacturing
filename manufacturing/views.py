@@ -1647,6 +1647,24 @@ def _reset_password(email: str, new_password: str) -> bool:
 # Login / dashboard / logout
 # ---------------------------------------------------------------------------
 
+DASHBOARD_DEPARTMENTS = [
+    ('accounting',        'Accounting'),
+    ('customer_service',  'Customer Service'),
+    ('engineering',       'Engineering'),
+    ('information_tech',  'Information Tech'),
+    ('maintenance',       'Maintenance'),
+    ('marketing',         'Marketing'),
+    ('personnel',         'Personnel'),
+    ('production',        'Production'),
+    ('purchasing',        'Purchasing'),
+    ('quality_assurance', 'Quality Assurance'),
+    ('sales',             'Sales'),
+    ('budget_management', 'Budget Management'),
+    ('finance',           'Finance'),
+    ('legal',             'Legal'),
+    ('risk_management',   'Risk Management'),
+]
+
 def home(request):
     _ensure_roles()
     if request.method == 'POST':
@@ -1693,11 +1711,16 @@ def dashboard(request):
         dept_key = request.session.get('user_dept_key')
         if dept_key:
             return redirect('dept_menu', dept=dept_key)
+    departments = [
+        ('/dept/{}/'.format(key), label)
+        for key, label in DASHBOARD_DEPARTMENTS
+    ]
     return render(request, 'dashboard.html', {
-        'email':       email,
-        'user_role':   request.session.get('user_role', ''),
-        'dept_name':   request.session.get('user_dept_name', ''),
-        'full_access': request.session.get('user_full_access', False),
+        'email':        email,
+        'user_role':    request.session.get('user_role', ''),
+        'dept_name':    request.session.get('user_dept_name', ''),
+        'full_access':  request.session.get('user_full_access', False),
+        'departments':  departments,
     })
 
 
