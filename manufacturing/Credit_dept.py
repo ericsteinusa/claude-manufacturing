@@ -397,8 +397,10 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {'credit': 0}
+
 class CreditDept(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Credit Department")
         self.resize(1150, 700)
@@ -418,6 +420,8 @@ class CreditDept(QtWidgets.QMainWindow):
         if held:
             self._load_accounts()
             self._refresh_summary()
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         central = QtWidgets.QWidget()
@@ -1200,7 +1204,7 @@ class CreditDept(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = CreditDept()
+    window = CreditDept(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

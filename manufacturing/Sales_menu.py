@@ -275,8 +275,18 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {
+    'new_order': 0, 'open_orders': 0, 'order_hist': 0, 'order_stat': 0,
+    'daily_sales': 0, 'month_sales': 0, 'annual_rpt': 0, 'by_rep': 0,
+    'new_quote': 0, 'act_quotes': 0, 'quote_hist': 0, 'conv_order': 0,
+    'new_lead': 0, 'act_leads': 0, 'opp_pipe': 0, 'lead_rpts': 0,
+    'act_cont': 0, 'new_cont': 0, 'cont_renew': 0, 'cont_arch': 0,
+    'cur_fore': 0, 'fore_rep': 0, 'fore_prod': 0, 'fore_rpts': 0,
+    'acct_list': 1, 'new_acct': 1, 'acct_det': 1, 'acct_hist': 1,
+}
+
 class SalesOrders(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Sales")
         self.resize(920, 640)
@@ -291,6 +301,8 @@ class SalesOrders(QtWidgets.QMainWindow):
         self._load_ord_customer_filter()
         self._refresh_orders()
         self._refresh_customers()
+        if initial_tab in _TAB_KEYS:
+            self._tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
@@ -736,7 +748,7 @@ class SalesOrders(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = SalesOrders()
+    window = SalesOrders(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

@@ -351,8 +351,18 @@ class AddSpecDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {
+    'new_req': 0, 'pend_req': 0, 'inprog_req': 0, 'comp_tests': 0,
+    'recent_res': 0, 'search_res': 0, 'failed': 0, 'res_rpts': 0,
+    'create_rpt': 0, 'pend_rpts': 0, 'rpt_arch': 0, 'rpt_sum': 0,
+    'recv_sample': 0, 'samp_track': 0, 'samp_disp': 0, 'samp_rpts': 0,
+    'daily_rpts': 0, 'week_sum': 0, 'month_rpt': 0, 'cust_rpts': 0,
+    'new_ncr': 1, 'open_ncrs': 1, 'ncr_hist': 1, 'ncr_rpts': 1,
+    'cal_sched': 2, 'cal_records': 2, 'overdue': 2, 'cal_rpts': 2,
+}
+
 class QALab(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("QA Laboratory")
         self.resize(960, 660)
@@ -367,6 +377,8 @@ class QALab(QtWidgets.QMainWindow):
         self._refresh_inspections()
         self._refresh_defects()
         self._refresh_specs()
+        if initial_tab in _TAB_KEYS:
+            self._tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
@@ -920,7 +932,7 @@ class QALab(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = QALab()
+    window = QALab(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

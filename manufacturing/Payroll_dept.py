@@ -165,13 +165,15 @@ def _rw(text):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {'pay': 0, 'payroll': 0}
+
 class PayrollDept(QtWidgets.QMainWindow):
 
     # column indices for the run-payroll table
     _C_EMP  = 0; _C_TYPE = 1; _C_RATE = 2; _C_REG  = 3; _C_OT   = 4
     _C_GROSS= 5; _C_FED  = 6; _C_ST   = 7; _C_SS   = 8; _C_MED  = 9; _C_NET  = 10
 
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Payroll Department")
         self.resize(1200, 700)
@@ -182,6 +184,8 @@ class PayrollDept(QtWidgets.QMainWindow):
         self._build_ui()
         self._load_pay_rates()
         self._load_history()
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     # ── UI construction ────────────────────────────────────────────────────
 
@@ -190,12 +194,12 @@ class PayrollDept(QtWidgets.QMainWindow):
         self.setCentralWidget(central)
         outer = QtWidgets.QVBoxLayout(central)
         outer.setContentsMargins(10, 10, 10, 10)
-        tabs = QtWidgets.QTabWidget()
-        tabs.setStyleSheet(TAB_STYLE)
-        outer.addWidget(tabs)
-        tabs.addTab(self._build_pay_rates_tab(),   "Pay Rates")
-        tabs.addTab(self._build_run_payroll_tab(), "Run Payroll")
-        tabs.addTab(self._build_history_tab(),     "Payroll History")
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setStyleSheet(TAB_STYLE)
+        outer.addWidget(self.tabs)
+        self.tabs.addTab(self._build_pay_rates_tab(),   "Pay Rates")
+        self.tabs.addTab(self._build_run_payroll_tab(), "Run Payroll")
+        self.tabs.addTab(self._build_history_tab(),     "Payroll History")
 
     # ── Pay Rates tab ──────────────────────────────────────────────────────
 
@@ -849,7 +853,7 @@ class PayrollDept(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = PayrollDept()
+    window = PayrollDept(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

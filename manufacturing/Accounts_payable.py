@@ -327,8 +327,13 @@ class RecordPaymentDialog(QtWidgets.QDialog):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {
+    'acct_pay': 0, 'ap': 0,
+    'sub_exp': 1, 'pend_appr': 1, 'appr_exp': 1, 'exp_sum': 1,
+}
+
 class AccountsPayable(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Accounts Payable")
         self.resize(1150, 700)
@@ -339,6 +344,8 @@ class AccountsPayable(QtWidgets.QMainWindow):
         self._load_vendors()
         self._refresh_invoices()
         self._refresh_aging()
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         central = QtWidgets.QWidget(); self.setCentralWidget(central)
@@ -727,7 +734,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = AccountsPayable()
+    window = AccountsPayable(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

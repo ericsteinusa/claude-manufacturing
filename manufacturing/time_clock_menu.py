@@ -192,8 +192,18 @@ class EditRecordDialog(QtWidgets.QDialog):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {
+    'punch_in': 0, 'punch_out': 0, 'cur_status': 0,
+    'week_hrs': 1, 'month_hrs': 1, 'period_hrs': 1,
+    'submit_req': 1, 'pend_req': 1, 'appr_req': 1, 'req_hist': 1,
+    'my_sched': 1, 'upcoming': 1, 'sched_cal': 1, 'swap_req': 1,
+    'cur_ot': 1, 'hist_ot': 1, 'ot_by_emp': 1, 'ot_appr': 1,
+    'daily_att': 1, 'month_sum': 1, 'tard_rpt': 1, 'abs_rpt': 1,
+    'view_shfts': 1, 'assign_emp': 1, 'shft_tmpl': 1, 'swap_mgmt': 1,
+}
+
 class TimeClock(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Time Clock")
         self.resize(1000, 640)
@@ -207,6 +217,9 @@ class TimeClock(QtWidgets.QMainWindow):
         self._timer.timeout.connect(self._tick)
         self._timer.start(1000)
 
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
+
     # ── UI construction ────────────────────────────────────────────────────
 
     def _build_ui(self):
@@ -215,18 +228,18 @@ class TimeClock(QtWidgets.QMainWindow):
         outer = QtWidgets.QVBoxLayout(central)
         outer.setContentsMargins(10, 10, 10, 10)
 
-        tabs = QtWidgets.QTabWidget()
-        tabs.setStyleSheet(
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"
             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
             " border-bottom:none; border-radius:4px 4px 0 0;}"
             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
             "QTabBar::tab:hover{background:rgb(85,255,255);}"
         )
-        outer.addWidget(tabs)
+        outer.addWidget(self.tabs)
 
-        tabs.addTab(self._build_clock_tab(), "Clock In / Out")
-        tabs.addTab(self._build_records_tab(), "Time Records")
+        self.tabs.addTab(self._build_clock_tab(), "Clock In / Out")
+        self.tabs.addTab(self._build_records_tab(), "Time Records")
 
     def _build_clock_tab(self):
         w = QtWidgets.QWidget()
@@ -645,7 +658,7 @@ class TimeClock(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = TimeClock()
+    window = TimeClock(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

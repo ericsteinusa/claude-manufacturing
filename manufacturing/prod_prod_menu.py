@@ -439,8 +439,18 @@ class AddBOMItemDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {
+    'create_wo': 0, 'open_wo': 0, 'inprog_wo': 0, 'comp_wo': 0,
+    'daily_sched': 0, 'week_sched': 0, 'month_sched': 0, 'sched_cal': 0,
+    'raw_mat': 0, 'fin_goods': 0, 'wip_inv': 0, 'inv_rpts': 0,
+    'equip_list': 0, 'stat_dash': 0, 'down_log': 0, 'maint_req': 0,
+    'insp_res': 0, 'non_conf': 0, 'qc_rpts': 0, 'rej_analy': 0,
+    'daily_prod': 0, 'week_sum': 0, 'eff_rpt': 0, 'scrap_rpt': 0,
+    'cur_labor': 0, 'labor_shft': 0, 'labor_job': 0, 'labor_rpts': 0,
+}
+
 class WorkOrders(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Production / Work Orders")
         self.resize(920, 640)
@@ -454,6 +464,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         init_db()
         self._refresh_wo()
         self._refresh_bom()
+        if initial_tab in _TAB_KEYS:
+            self._tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
@@ -838,7 +850,7 @@ class WorkOrders(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = WorkOrders()
+    window = WorkOrders(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

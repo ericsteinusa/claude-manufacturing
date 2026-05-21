@@ -362,8 +362,10 @@ class RecordPaymentDialog(QtWidgets.QDialog):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
+_TAB_KEYS = {'rcv': 0, 'acct_rcv': 0}
+
 class AccountsReceivable(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         self.setWindowTitle("Accounts Receivable")
         self.resize(1150, 700)
@@ -372,6 +374,8 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self._invoice_row_ids = []
         self._build_ui()
         self._load_customers()
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
         self._refresh_invoices()
         self._refresh_aging()
 
@@ -976,7 +980,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = AccountsReceivable()
+    window = AccountsReceivable(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

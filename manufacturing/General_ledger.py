@@ -424,8 +424,14 @@ class JournalDialog(QtWidgets.QDialog):
 # ══════════════════════════════════════════════════════════════════════════════
 # Main GL Window
 # ══════════════════════════════════════════════════════════════════════════════
+_TAB_KEYS = {
+    'gen_ledger': 3,
+    'inc_stmt': 5, 'bal_sheet': 6, 'cash_flow': 4, 'cust_rpts': 4,
+    'recon_acct': 1, 'pend_items': 1, 'recon_hist': 1, 'bank_rpts': 1,
+}
+
 class GeneralLedgerWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         init_db()
         self.setWindowTitle("General Ledger")
@@ -435,6 +441,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self._refresh_coa()
         self._refresh_journals()
         self.statusBar().showMessage("Ready")
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         cw = QtWidgets.QWidget()
@@ -1440,6 +1448,6 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
 # ── entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    win = GeneralLedgerWindow()
+    win = GeneralLedgerWindow(sys.argv[1] if len(sys.argv) > 1 else None)
     win.show()
     sys.exit(app.exec())
