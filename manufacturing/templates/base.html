@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block page_title %}Manufacturing System{% endblock %}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: rgb(0, 85, 255);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        .toolbar {
+            background-color: rgb(0, 60, 180);
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 12px;
+        }
+        .toolbar .spacer { flex: 1; }
+        .toolbar span {
+            color: white;
+            font-size: 13px;
+            padding-right: 12px;
+        }
+        .btn {
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 4px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+        }
+        .btn:hover {
+            background-color: rgb(85, 255, 255);
+            border-color: rgb(85, 255, 255);
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .menu-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 32px;
+        }
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 200px);
+            gap: 16px;
+        }
+        .dept-btn {
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+            text-align: center;
+            display: block;
+        }
+        .dept-btn:hover {
+            background-color: rgb(85, 255, 255);
+            border-color: rgb(85, 255, 255);
+        }
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        {% block toolbar_left %}{% endblock %}
+        <div class="spacer"></div>
+        <span>Logged in as: {{ email }}{% if user_role %} ({{ user_role }}){% endif %}</span>
+        <a href="{% url 'change_password' %}" class="btn">Change Password</a>
+        <a href="{% url 'logout' %}" class="btn">Logout</a>
+    </div>
+    {% block content %}{% endblock %}
+</body>
+</html>
