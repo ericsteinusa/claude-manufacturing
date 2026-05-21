@@ -163,8 +163,10 @@ class CopyBudgetDialog(QtWidgets.QDialog):
 # ══════════════════════════════════════════════════════════════════════════════
 # Main Budget Window
 # ══════════════════════════════════════════════════════════════════════════════
+_TAB_KEYS = {'budgets': 0, 'bud_detail': 1, 'bva': 2, 'variance': 3}
+
 class BudgetWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, initial_tab=None):
         super().__init__()
         init_db()
         self.setWindowTitle("Budget Management")
@@ -173,6 +175,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self._current_budget_id = None
         self._build_ui()
         self._refresh_budgets()
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         cw = QtWidgets.QWidget()
@@ -1189,6 +1193,6 @@ class BudgetWindow(QtWidgets.QMainWindow):
 # ── entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    win = BudgetWindow()
+    win = BudgetWindow(sys.argv[1] if len(sys.argv) > 1 else None)
     win.show()
     sys.exit(app.exec())
