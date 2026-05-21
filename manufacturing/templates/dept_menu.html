@@ -7,13 +7,10 @@
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}
 
-{% block content %}
-<div class="content">
-    <div class="menu-title">{{ title }}</div>
-    <div class="dept-grid">
-        {% for url, label in items %}
-        <a href="{{ url }}" class="dept-btn">{{ label }}</a>
-        {% endfor %}
-    </div>
-</div>
+{% block menu_title %}{{ title }}{% endblock %}
+
+{% block grid_items %}
+{% for url, label in items %}
+<a href="{{ url }}" class="dept-btn">{{ label }}</a>
+{% endfor %}
 {% endblock %}

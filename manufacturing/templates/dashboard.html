@@ -4,13 +4,10 @@
 <a href="{% url 'user_roles' %}" class="btn">User Roles</a>
 {% endblock %}
 
-{% block content %}
-<div class="content">
-    <div class="menu-title">Company Main Menu</div>
-    <div class="dept-grid">
-        {% for url, label in departments %}
-        <a href="{{ url }}" class="dept-btn">{{ label }}</a>
-        {% endfor %}
-    </div>
-</div>
+{% block menu_title %}Company Main Menu{% endblock %}
+
+{% block grid_items %}
+{% for url, label in departments %}
+<a href="{{ url }}" class="dept-btn">{{ label }}</a>
+{% endfor %}
 {% endblock %}
