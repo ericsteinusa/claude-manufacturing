@@ -75,6 +75,18 @@ def init_db():
             notes          TEXT
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS expense_report (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            submitted_by TEXT NOT NULL,
+            description  TEXT DEFAULT '',
+            amount       REAL NOT NULL DEFAULT 0.0,
+            submitted_date TEXT NOT NULL,
+            category     TEXT DEFAULT 'Other',
+            status       TEXT NOT NULL DEFAULT 'Pending Approval',
+            notes        TEXT DEFAULT ''
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -329,8 +341,12 @@ class RecordPaymentDialog(QtWidgets.QDialog):
 
 _TAB_KEYS = {
     'acct_pay': 0, 'ap': 0,
-    'sub_exp': 1, 'pend_appr': 1, 'appr_exp': 1, 'exp_sum': 1,
+    'sub_exp': 3, 'pend_appr': 3, 'appr_exp': 3, 'exp_sum': 3,
 }
+
+EXP_STATUSES   = ["Pending Approval", "Approved", "Rejected", "Paid"]
+EXP_CATEGORIES = ["Travel", "Meals", "Office Supplies", "Equipment", "Software",
+                   "Training", "Marketing", "Utilities", "Other"]
 
 class AccountsPayable(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
@@ -344,6 +360,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         self._load_vendors()
         self._refresh_invoices()
         self._refresh_aging()
+        self._refresh_expenses()
         if initial_tab in _TAB_KEYS:
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
@@ -354,6 +371,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         self.tabs.addTab(self._build_vendors_tab(),  "Vendors")
         self.tabs.addTab(self._build_invoices_tab(), "Bills / Invoices")
         self.tabs.addTab(self._build_aging_tab(),    "Aging Report")
+        self.tabs.addTab(self._build_expense_tab(),  "Expense Reports")
 
     # ── Vendors tab ────────────────────────────────────────────────────────
 
@@ -729,6 +747,195 @@ class AccountsPayable(QtWidgets.QMainWindow):
             f"Totals —  0–30: {_money(totals[0])}   31–60: {_money(totals[1])}   "
             f"61–90: {_money(totals[2])}   91+: {_money(totals[3])}   "
             f"Total Outstanding: {_money(sum(totals))}")
+
+
+    # ── Expense Reports tab ───────────────────────────────────────────────────
+    def _build_expense_tab(self):
+        w = QtWidgets.QWidget(); layout = QtWidgets.QVBoxLayout(w)
+        layout.setContentsMargins(12, 12, 12, 12); layout.setSpacing(8)
+
+        fb = QtWidgets.QHBoxLayout()
+        fb.addWidget(QtWidgets.QLabel("Status:", styleSheet=LABEL_STYLE))
+        self.exp_status_filter = QtWidgets.QComboBox(); self.exp_status_filter.setStyleSheet(COMBO_STYLE)
+        self.exp_status_filter.addItems(["All Statuses"] + EXP_STATUSES)
+        self.exp_status_filter.currentIndexChanged.connect(self._refresh_expenses)
+        fb.addWidget(self.exp_status_filter)
+        fb.addWidget(QtWidgets.QLabel("Category:", styleSheet=LABEL_STYLE))
+        self.exp_cat_filter = QtWidgets.QComboBox(); self.exp_cat_filter.setStyleSheet(COMBO_STYLE)
+        self.exp_cat_filter.addItems(["All Categories"] + EXP_CATEGORIES)
+        self.exp_cat_filter.currentIndexChanged.connect(self._refresh_expenses)
+        fb.addWidget(self.exp_cat_filter)
+        fb.addStretch()
+        layout.addLayout(fb)
+
+        self.exp_table = QtWidgets.QTableWidget()
+        self.exp_table.setColumnCount(7)
+        self.exp_table.setHorizontalHeaderLabels(["ID", "Submitted By", "Description", "Category", "Amount", "Date", "Status"])
+        hh = self.exp_table.horizontalHeader(); hh.setStyleSheet("color:black;font-weight:bold;")
+        self.exp_table.setColumnWidth(0, 45)
+        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.exp_table.setColumnWidth(1, 130); self.exp_table.setColumnWidth(3, 110)
+        self.exp_table.setColumnWidth(4, 90);  self.exp_table.setColumnWidth(5, 95)
+        self.exp_table.setColumnWidth(6, 120)
+        self.exp_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.exp_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.exp_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.exp_table.setAlternatingRowColors(True); self.exp_table.verticalHeader().setVisible(False)
+        layout.addWidget(self.exp_table, stretch=1)
+
+        self.exp_total_lbl = QtWidgets.QLabel("Total: $0.00", styleSheet="color:white;font-weight:bold;")
+        layout.addWidget(self.exp_total_lbl)
+
+        # Form
+        fg = QtWidgets.QGroupBox("Expense Entry")
+        fg.setStyleSheet("QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+        grid = QtWidgets.QGridLayout(fg); grid.setSpacing(6)
+
+        def lbl(t): l = QtWidgets.QLabel(t); l.setStyleSheet(LABEL_STYLE); return l
+        def inp(ph=""): e = QtWidgets.QLineEdit(); e.setStyleSheet(INPUT_STYLE); e.setPlaceholderText(ph); return e
+
+        self.ef_by   = inp("Your name")
+        self.ef_desc = inp("Description")
+        self.ef_cat  = QtWidgets.QComboBox(); self.ef_cat.setStyleSheet(COMBO_STYLE); self.ef_cat.addItems(EXP_CATEGORIES)
+        self.ef_amt  = QtWidgets.QDoubleSpinBox(); self.ef_amt.setStyleSheet(SPIN_STYLE)
+        self.ef_amt.setRange(0, 999_999); self.ef_amt.setDecimals(2); self.ef_amt.setGroupSeparatorShown(True)
+        self.ef_date = QtWidgets.QDateEdit(calendarPopup=True); self.ef_date.setStyleSheet(DATE_STYLE)
+        self.ef_date.setDisplayFormat("yyyy-MM-dd"); self.ef_date.setDate(QtCore.QDate.currentDate())
+        self.ef_status = QtWidgets.QComboBox(); self.ef_status.setStyleSheet(COMBO_STYLE); self.ef_status.addItems(EXP_STATUSES)
+        self.ef_notes = inp("Notes")
+
+        grid.addWidget(lbl("Submitted By:"), 0, 0); grid.addWidget(self.ef_by,     0, 1)
+        grid.addWidget(lbl("Description:"),  0, 2); grid.addWidget(self.ef_desc,   0, 3)
+        grid.addWidget(lbl("Category:"),     0, 4); grid.addWidget(self.ef_cat,    0, 5)
+        grid.addWidget(lbl("Amount:"),       1, 0); grid.addWidget(self.ef_amt,    1, 1)
+        grid.addWidget(lbl("Date:"),         1, 2); grid.addWidget(self.ef_date,   1, 3)
+        grid.addWidget(lbl("Status:"),       1, 4); grid.addWidget(self.ef_status, 1, 5)
+        grid.addWidget(lbl("Notes:"),        2, 0); grid.addWidget(self.ef_notes,  2, 1, 1, 5)
+        layout.addWidget(fg)
+
+        bb = QtWidgets.QHBoxLayout()
+        for t, fn in [("Submit Expense", self._add_expense), ("Update Expense", self._update_expense),
+                      ("Approve", self._approve_expense), ("Reject", self._reject_expense),
+                      ("Clear", self._clear_expense_form)]:
+            b = QtWidgets.QPushButton(t); b.setStyleSheet(BUTTON_STYLE); b.setFixedHeight(30)
+            b.clicked.connect(fn); bb.addWidget(b)
+        bb.addStretch()
+        layout.addLayout(bb)
+
+        self.exp_table.clicked.connect(self._on_exp_row_clicked)
+        return w
+
+    def _refresh_expenses(self):
+        sf = self.exp_status_filter.currentText() if hasattr(self, 'exp_status_filter') else "All Statuses"
+        cf = self.exp_cat_filter.currentText()    if hasattr(self, 'exp_cat_filter')    else "All Categories"
+        conn = get_db()
+        q = "SELECT * FROM expense_report WHERE 1=1"
+        p = []
+        if sf != "All Statuses":   q += " AND status=?";   p.append(sf)
+        if cf != "All Categories": q += " AND category=?"; p.append(cf)
+        q += " ORDER BY submitted_date DESC"
+        rows = conn.execute(q, p).fetchall(); conn.close()
+
+        EXP_STATUS_COLORS = {
+            "Pending Approval": QtGui.QColor(255, 255, 200),
+            "Approved":         QtGui.QColor(212, 237, 218),
+            "Rejected":         QtGui.QColor(255, 200, 200),
+            "Paid":             QtGui.QColor(200, 230, 255),
+        }
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
+        self.exp_table.setRowCount(0)
+        self._exp_row_ids = []
+        total = 0.0
+        for row in rows:
+            r = self.exp_table.rowCount(); self.exp_table.insertRow(r)
+            self.exp_table.setItem(r, 0, _ro(str(row["id"]), right))
+            self.exp_table.setItem(r, 1, _ro(row["submitted_by"]))
+            self.exp_table.setItem(r, 2, _ro(row["description"]))
+            self.exp_table.setItem(r, 3, _ro(row["category"]))
+            self.exp_table.setItem(r, 4, _ro(_money(row["amount"]), right))
+            self.exp_table.setItem(r, 5, _ro(row["submitted_date"]))
+            self.exp_table.setItem(r, 6, _ro(row["status"]))
+            color = EXP_STATUS_COLORS.get(row["status"])
+            if color:
+                for c in range(7):
+                    it = self.exp_table.item(r, c)
+                    if it: it.setBackground(color)
+            self._exp_row_ids.append(row["id"])
+            total += row["amount"]
+        self.exp_total_lbl.setText(f"Total: {_money(total)}")
+
+    def _on_exp_row_clicked(self, idx):
+        row = idx.row()
+        rid = self._exp_row_ids[row]
+        conn = get_db()
+        rec = conn.execute("SELECT * FROM expense_report WHERE id=?", (rid,)).fetchone(); conn.close()
+        if not rec: return
+        self.exp_table.setProperty("_selected_id", rid)
+        self.ef_by.setText(rec["submitted_by"])
+        self.ef_desc.setText(rec["description"])
+        self.ef_cat.setCurrentText(rec["category"])
+        self.ef_amt.setValue(rec["amount"])
+        self.ef_date.setDate(QtCore.QDate.fromString(rec["submitted_date"], "yyyy-MM-dd"))
+        self.ef_status.setCurrentText(rec["status"])
+        self.ef_notes.setText(rec["notes"] or "")
+
+    def _add_expense(self):
+        if not self.ef_by.text().strip():
+            QtWidgets.QMessageBox.warning(self, "Validation", "Submitted By is required.")
+            return
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO expense_report (submitted_by, description, amount, submitted_date, category, status, notes) VALUES (?,?,?,?,?,?,?)",
+            (self.ef_by.text().strip(), self.ef_desc.text().strip(), self.ef_amt.value(),
+             self.ef_date.date().toString("yyyy-MM-dd"), self.ef_cat.currentText(),
+             self.ef_status.currentText(), self.ef_notes.text().strip())
+        )
+        conn.commit(); conn.close()
+        self._clear_expense_form()
+        self._refresh_expenses()
+
+    def _update_expense(self):
+        rid = self.exp_table.property("_selected_id")
+        if not rid:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an expense to update.")
+            return
+        conn = get_db()
+        conn.execute(
+            "UPDATE expense_report SET submitted_by=?, description=?, amount=?, submitted_date=?, category=?, status=?, notes=? WHERE id=?",
+            (self.ef_by.text().strip(), self.ef_desc.text().strip(), self.ef_amt.value(),
+             self.ef_date.date().toString("yyyy-MM-dd"), self.ef_cat.currentText(),
+             self.ef_status.currentText(), self.ef_notes.text().strip(), rid)
+        )
+        conn.commit(); conn.close()
+        self._clear_expense_form()
+        self._refresh_expenses()
+
+    def _approve_expense(self):
+        rid = self.exp_table.property("_selected_id")
+        if not rid: return
+        conn = get_db()
+        conn.execute("UPDATE expense_report SET status='Approved' WHERE id=?", (rid,))
+        conn.commit(); conn.close()
+        self._clear_expense_form()
+        self._refresh_expenses()
+
+    def _reject_expense(self):
+        rid = self.exp_table.property("_selected_id")
+        if not rid: return
+        conn = get_db()
+        conn.execute("UPDATE expense_report SET status='Rejected' WHERE id=?", (rid,))
+        conn.commit(); conn.close()
+        self._clear_expense_form()
+        self._refresh_expenses()
+
+    def _clear_expense_form(self):
+        self.ef_by.clear(); self.ef_desc.clear(); self.ef_notes.clear()
+        self.ef_amt.setValue(0.0)
+        self.ef_date.setDate(QtCore.QDate.currentDate())
+        self.ef_cat.setCurrentIndex(0)
+        self.ef_status.setCurrentIndex(0)
+        self.exp_table.setProperty("_selected_id", None)
+        self.exp_table.clearSelection()
 
 
 def main():
