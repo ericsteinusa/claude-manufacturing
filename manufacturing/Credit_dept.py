@@ -428,14 +428,14 @@ class CreditDept(QtWidgets.QMainWindow):
         self.setCentralWidget(central)
         outer = QtWidgets.QVBoxLayout(central)
         outer.setContentsMargins(10, 10, 10, 10)
-        self._tabs = QtWidgets.QTabWidget()
-        self._tabs.setStyleSheet(TAB_STYLE)
-        outer.addWidget(self._tabs)
-        self._tabs.addTab(self._build_accounts_tab(),     "Credit Accounts")
-        self._tabs.addTab(self._build_applications_tab(), "Applications")
-        self._tabs.addTab(self._build_overdue_tab(),      "Overdue Report")
-        self._tabs.addTab(self._build_limit_history_tab(),"Limit History")
-        self._tabs.addTab(self._build_summary_tab(),      "Summary")
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setStyleSheet(TAB_STYLE)
+        outer.addWidget(self.tabs)
+        self.tabs.addTab(self._build_accounts_tab(),     "Credit Accounts")
+        self.tabs.addTab(self._build_applications_tab(), "Applications")
+        self.tabs.addTab(self._build_overdue_tab(),      "Overdue Report")
+        self.tabs.addTab(self._build_limit_history_tab(),"Limit History")
+        self.tabs.addTab(self._build_summary_tab(),      "Summary")
 
     # ── Credit Accounts tab ────────────────────────────────────────────────
 
