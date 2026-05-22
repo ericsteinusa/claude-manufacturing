@@ -384,12 +384,12 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self.setCentralWidget(central)
         outer = QtWidgets.QVBoxLayout(central)
         outer.setContentsMargins(10, 10, 10, 10)
-        tabs = QtWidgets.QTabWidget()
-        tabs.setStyleSheet(TAB_STYLE)
-        outer.addWidget(tabs)
-        tabs.addTab(self._build_customers_tab(), "Customers")
-        tabs.addTab(self._build_invoices_tab(),  "Invoices")
-        tabs.addTab(self._build_aging_tab(),     "Aging Report")
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setStyleSheet(TAB_STYLE)
+        outer.addWidget(self.tabs)
+        self.tabs.addTab(self._build_customers_tab(), "Customers")
+        self.tabs.addTab(self._build_invoices_tab(),  "Invoices")
+        self.tabs.addTab(self._build_aging_tab(),     "Aging Report")
 
     # ── Customers tab ──────────────────────────────────────────────────────
 
