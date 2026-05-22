@@ -783,10 +783,10 @@ MENU_TREE = {
                     ('audit_mgmt',  'Audit Management',    {
                         'title': 'Audit Management',
                         'items': [
-                            ('audit_sched','Audit Schedule',      'Accounting_manager.py'),
-                            ('findings',   'Audit Findings',      'Accounting_manager.py'),
-                            ('corr_act',   'Corrective Actions',  'Accounting_manager.py'),
-                            ('audit_rpts', 'Audit Reports',       'Accounting_manager.py'),
+                            ('audit_sched','Audit Schedule',      'Audit_mgmt.py'),
+                            ('findings',   'Audit Findings',      'Audit_mgmt.py'),
+                            ('corr_act',   'Corrective Actions',  'Audit_mgmt.py'),
+                            ('audit_rpts', 'Audit Reports',       'Audit_mgmt.py'),
                         ],
                     }),
                 ],

@@ -426,8 +426,14 @@ class JournalDialog(QtWidgets.QDialog):
 # ══════════════════════════════════════════════════════════════════════════════
 _TAB_KEYS = {
     'gen_ledger': 3,
-    'inc_stmt': 5, 'bal_sheet': 6, 'cash_flow': 4, 'cust_rpts': 4,
-    'recon_acct': 1, 'pend_items': 1, 'recon_hist': 1, 'bank_rpts': 1,
+    'inc_stmt': 4, 'bal_sheet': 4, 'cash_flow': 4, 'cust_rpts': 4,
+    'recon_acct': 5, 'pend_items': 5, 'recon_hist': 5, 'bank_rpts': 5,
+}
+
+# Inner tab index within the Financial Statements tab (tab 4)
+_FS_INNER_KEYS = {
+    'inc_stmt': 0,
+    'bal_sheet': 1,
 }
 
 class GeneralLedgerWindow(QtWidgets.QMainWindow):
@@ -443,6 +449,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage("Ready")
         if initial_tab in _TAB_KEYS:
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
+            if initial_tab in _FS_INNER_KEYS:
+                self.fs_inner.setCurrentIndex(_FS_INNER_KEYS[initial_tab])
 
     def _build_ui(self):
         cw = QtWidgets.QWidget()
@@ -465,6 +473,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.tabs.addTab(self._build_trial_tab(),   "Trial Balance")
         self.tabs.addTab(self._build_ledger_tab(),   "Ledger View")
         self.tabs.addTab(self._build_fs_tab(),       "Financial Statements")
+        self.tabs.addTab(self._build_recon_tab(),    "Bank Reconciliation")
 
         self.tabs.currentChanged.connect(self._on_tab_change)
 
@@ -1107,11 +1116,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
         v.setContentsMargins(6, 6, 6, 6)
-        inner = QtWidgets.QTabWidget()
-        inner.setStyleSheet(TAB_STYLE)
-        inner.addTab(self._build_income_stmt_tab(), "Income Statement")
-        inner.addTab(self._build_balance_sheet_tab(), "Balance Sheet")
-        v.addWidget(inner)
+        self.fs_inner = QtWidgets.QTabWidget()
+        self.fs_inner.setStyleSheet(TAB_STYLE)
+        self.fs_inner.addTab(self._build_income_stmt_tab(), "Income Statement")
+        self.fs_inner.addTab(self._build_balance_sheet_tab(), "Balance Sheet")
+        v.addWidget(self.fs_inner)
         return w
 
     def _build_income_stmt_tab(self):
@@ -1443,6 +1452,132 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             self._refresh_trial()
         elif idx == 3:  # Ledger View — repopulate account combo
             self._populate_lv_acct_combo()
+
+
+    # ── Bank Reconciliation tab ───────────────────────────────────────────────
+    def _build_recon_tab(self):
+        w = QtWidgets.QWidget()
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(6, 6, 6, 6)
+
+        hdr = QtWidgets.QLabel("Bank Reconciliation")
+        hdr.setStyleSheet("font-size:15px;font-weight:bold;color:white;padding:2px;")
+        v.addWidget(hdr)
+
+        top = QtWidgets.QHBoxLayout()
+        top.addWidget(QtWidgets.QLabel("Account:"))
+        self.recon_acct_cb = QtWidgets.QComboBox()
+        self.recon_acct_cb.setMinimumWidth(220)
+        top.addWidget(self.recon_acct_cb)
+        top.addWidget(QtWidgets.QLabel("Statement Date:"))
+        self.recon_stmt_date = QtWidgets.QDateEdit(calendarPopup=True)
+        self.recon_stmt_date.setDisplayFormat("yyyy-MM-dd")
+        self.recon_stmt_date.setDate(QtCore.QDate.currentDate())
+        top.addWidget(self.recon_stmt_date)
+        top.addWidget(QtWidgets.QLabel("Statement Balance:"))
+        self.recon_stmt_bal = QtWidgets.QDoubleSpinBox()
+        self.recon_stmt_bal.setRange(-999_999_999, 999_999_999)
+        self.recon_stmt_bal.setDecimals(2)
+        self.recon_stmt_bal.setGroupSeparatorShown(True)
+        top.addWidget(self.recon_stmt_bal)
+        btn_load = QtWidgets.QPushButton("Load Transactions"); btn_load.setStyleSheet(BTN_STYLE)
+        btn_load.clicked.connect(self._recon_load)
+        top.addWidget(btn_load)
+        top.addStretch()
+        v.addLayout(top)
+
+        self.recon_tbl = QtWidgets.QTableWidget(0, 5)
+        self.recon_tbl.setHorizontalHeaderLabels(["Date", "Reference", "Description", "Amount", "Cleared"])
+        self.recon_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.recon_tbl.setColumnWidth(0, 95); self.recon_tbl.setColumnWidth(1, 110)
+        self.recon_tbl.setColumnWidth(3, 100); self.recon_tbl.setColumnWidth(4, 65)
+        self.recon_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.recon_tbl.setAlternatingRowColors(True)
+        self.recon_tbl.verticalHeader().setDefaultSectionSize(24)
+        v.addWidget(self.recon_tbl)
+
+        self.recon_summary_lbl = QtWidgets.QLabel("Statement Balance: $0.00  |  Cleared Balance: $0.00  |  Difference: $0.00")
+        self.recon_summary_lbl.setStyleSheet("font-weight:bold;color:white;padding:4px;")
+        v.addWidget(self.recon_summary_lbl)
+
+        bb = QtWidgets.QHBoxLayout()
+        btn_clear = QtWidgets.QPushButton("Toggle Cleared"); btn_clear.setStyleSheet(BTN_STYLE)
+        btn_clear.clicked.connect(self._recon_toggle_cleared)
+        bb.addWidget(btn_clear)
+        bb.addStretch()
+        v.addLayout(bb)
+
+        self._recon_populate_accts()
+        return w
+
+    def _recon_populate_accts(self):
+        with _conn() as con:
+            rows = con.execute(
+                "SELECT id, account_number, account_name FROM gl_account WHERE account_type='Asset' AND is_active=1 ORDER BY account_number"
+            ).fetchall()
+        self.recon_acct_cb.clear()
+        for row in rows:
+            self.recon_acct_cb.addItem(f"{row['account_number']} – {row['account_name']}", userData=row["id"])
+
+    def _recon_load(self):
+        acct_id = self.recon_acct_cb.currentData()
+        if acct_id is None:
+            return
+        stmt_date = self.recon_stmt_date.date().toString("yyyy-MM-dd")
+        with _conn() as con:
+            rows = con.execute("""
+                SELECT j.journal_date, j.reference, j.description,
+                       l.debit, l.credit, l.id as line_id
+                FROM gl_journal_line l
+                JOIN gl_journal j ON j.id = l.journal_id
+                WHERE l.account_id = ? AND j.journal_date <= ?
+                ORDER BY j.journal_date, j.id
+            """, (acct_id, stmt_date)).fetchall()
+        self.recon_tbl.setRowCount(0)
+        self._recon_line_ids = []
+        for row in rows:
+            r = self.recon_tbl.rowCount(); self.recon_tbl.insertRow(r)
+            amount = row["debit"] - row["credit"]
+            self.recon_tbl.setItem(r, 0, _ro(row["journal_date"]))
+            self.recon_tbl.setItem(r, 1, _ro(row["reference"] or ""))
+            self.recon_tbl.setItem(r, 2, _ro(row["description"] or ""))
+            self.recon_tbl.setItem(r, 3, _ro(f"{amount:,.2f}", QtCore.Qt.AlignmentFlag.AlignRight))
+            chk = QtWidgets.QTableWidgetItem()
+            chk.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            chk.setCheckState(QtCore.Qt.CheckState.Unchecked)
+            self.recon_tbl.setItem(r, 4, chk)
+            self._recon_line_ids.append(row["line_id"])
+        self._recon_update_summary()
+
+    def _recon_toggle_cleared(self):
+        rows = self.recon_tbl.selectedItems()
+        if not rows:
+            return
+        r = self.recon_tbl.currentRow()
+        chk = self.recon_tbl.item(r, 4)
+        if chk:
+            chk.setCheckState(
+                QtCore.Qt.CheckState.Unchecked if chk.checkState() == QtCore.Qt.CheckState.Checked
+                else QtCore.Qt.CheckState.Checked
+            )
+        self._recon_update_summary()
+
+    def _recon_update_summary(self):
+        stmt_bal = self.recon_stmt_bal.value()
+        cleared = 0.0
+        for r in range(self.recon_tbl.rowCount()):
+            chk = self.recon_tbl.item(r, 4)
+            if chk and chk.checkState() == QtCore.Qt.CheckState.Checked:
+                try:
+                    cleared += float(self.recon_tbl.item(r, 3).text().replace(",", ""))
+                except Exception:
+                    pass
+        diff = stmt_bal - cleared
+        color = "lime" if abs(diff) < 0.01 else "red"
+        self.recon_summary_lbl.setText(
+            f"Statement Balance: ${stmt_bal:,.2f}  |  Cleared Balance: ${cleared:,.2f}  |  "
+            f"<span style='color:{color};font-weight:bold;'>Difference: ${diff:,.2f}</span>"
+        )
 
 
 # ── entry point ───────────────────────────────────────────────────────────────
