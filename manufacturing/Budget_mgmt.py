@@ -163,7 +163,18 @@ class CopyBudgetDialog(QtWidgets.QDialog):
 # ══════════════════════════════════════════════════════════════════════════════
 # Main Budget Window
 # ══════════════════════════════════════════════════════════════════════════════
-_TAB_KEYS = {'budgets': 0, 'bud_detail': 1, 'bva': 2, 'variance': 3}
+_TAB_KEYS = {
+    # Tab 0 – Budgets
+    'budgets': 0, 'budg_plan': 0, 'budg_over': 0, 'budg_camp': 0,
+    'eng_budg': 0, 'it_budg': 0, 'maint_budg': 0, 'prod_budg': 0,
+    'purch_budg': 0, 'hw_proc': 0, 'sw_lic': 0, 'budg_req': 0,
+    # Tab 1 – Budget Detail
+    'bud_detail': 1, 'budg_amend': 1,
+    # Tab 2 – Budget vs. Actual
+    'bva': 2, 'budg_act': 2, 'cost_analy': 2, 'spend_analy': 2,
+    # Tab 3 – Variance Report
+    'variance': 3, 'budg_rpts': 3, 'cost_rpts': 3, 'proc_rpts': 3,
+}
 
 class BudgetWindow(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
