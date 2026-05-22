@@ -350,10 +350,10 @@ class AccountsPayable(QtWidgets.QMainWindow):
     def _build_ui(self):
         central = QtWidgets.QWidget(); self.setCentralWidget(central)
         outer = QtWidgets.QVBoxLayout(central); outer.setContentsMargins(10,10,10,10)
-        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE); outer.addWidget(tabs)
-        tabs.addTab(self._build_vendors_tab(),  "Vendors")
-        tabs.addTab(self._build_invoices_tab(), "Bills / Invoices")
-        tabs.addTab(self._build_aging_tab(),    "Aging Report")
+        self.tabs = QtWidgets.QTabWidget(); self.tabs.setStyleSheet(TAB_STYLE); outer.addWidget(self.tabs)
+        self.tabs.addTab(self._build_vendors_tab(),  "Vendors")
+        self.tabs.addTab(self._build_invoices_tab(), "Bills / Invoices")
+        self.tabs.addTab(self._build_aging_tab(),    "Aging Report")
 
     # ── Vendors tab ────────────────────────────────────────────────────────
 
