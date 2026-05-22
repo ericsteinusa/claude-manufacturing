@@ -816,10 +816,10 @@ MENU_TREE = {
             ('tax_mgmt',    'Tax Management',      {
                 'title': 'Tax Management',
                 'items': [
-                    ('tax_cal',    'Tax Calendar',        'taxes.py'),
-                    ('tax_filing', 'Tax Filing',          'taxes.py'),
-                    ('tax_pay',    'Tax Payments',        'taxes.py'),
-                    ('tax_rpts',   'Tax Reports',         'taxes.py'),
+                    ('tax_cal',    'Tax Calendar',        'Tax_mgmt.py'),
+                    ('tax_filing', 'Tax Filing',          'Tax_mgmt.py'),
+                    ('tax_pay',    'Tax Payments',        'Tax_mgmt.py'),
+                    ('tax_rpts',   'Tax Reports',         'Tax_mgmt.py'),
                 ],
             }),
             ('exp_reports', 'Expense Reports',     {
