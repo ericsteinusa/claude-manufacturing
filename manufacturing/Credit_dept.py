@@ -12,13 +12,13 @@ BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
     "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE  = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE  = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE   = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE   = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE   = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-LABEL_STYLE  = "color:white;font-size:13px;"
-TAB_STYLE    = (
+INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
+DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TEXT_STYLE = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+LABEL_STYLE = "color:white;font-size:13px;"
+TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
     " border-bottom:none; border-radius:4px 4px 0 0;}"
@@ -27,23 +27,23 @@ TAB_STYLE    = (
 )
 
 CREDIT_STATUS_COLORS = {
-    "good":      QtGui.QColor(212, 237, 218),
-    "hold":      QtGui.QColor(255, 243, 205),
+    "good": QtGui.QColor(212, 237, 218),
+    "hold": QtGui.QColor(255, 243, 205),
     "suspended": QtGui.QColor(248, 215, 218),
-    "closed":    QtGui.QColor(220, 220, 220),
+    "closed": QtGui.QColor(220, 220, 220),
 }
 
 APP_STATUS_COLORS = {
-    "pending":  QtGui.QColor(255, 243, 205),
+    "pending": QtGui.QColor(255, 243, 205),
     "approved": QtGui.QColor(212, 237, 218),
-    "denied":   QtGui.QColor(248, 215, 218),
+    "denied": QtGui.QColor(248, 215, 218),
 }
 
 OVERDUE_COLORS = [
-    (30,  QtGui.QColor(255, 243, 205)),   # 1–30 days — yellow
-    (60,  QtGui.QColor(255, 224, 178)),   # 31–60 days — orange-ish
-    (90,  QtGui.QColor(248, 215, 218)),   # 61–90 days — light red
-    (999, QtGui.QColor(220, 53,  69,  80)),  # 90+ days  — red
+    (30, QtGui.QColor(255, 243, 205)),   # 1–30 days — yellow
+    (60, QtGui.QColor(255, 224, 178)),   # 31–60 days — orange-ish
+    (90, QtGui.QColor(248, 215, 218)),   # 61–90 days — light red
+    (999, QtGui.QColor(220, 53, 69, 80)),  # 90+ days  — red
 ]
 
 
@@ -206,10 +206,10 @@ class NewApplicationDialog(QtWidgets.QDialog):
 
         def row(lbl_text, widget, lbl_w=130):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -310,10 +310,10 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
 
         def row(lbl_text, widget, lbl_w=130):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -365,11 +365,11 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
         layout.addLayout(btn_row)
 
     def _on_save(self):
-        decision      = self.decision.currentText()
+        decision = self.decision.currentText()
         approved_limit = self.approved_limit.value() if decision == "approved" else None
-        reviewer      = self.reviewer.text().strip() or None
-        review_date   = self.review_date.date().toString("yyyy-MM-dd")
-        notes         = self.notes.toPlainText().strip() or None
+        reviewer = self.reviewer.text().strip() or None
+        review_date = self.review_date.date().toString("yyyy-MM-dd")
+        notes = self.notes.toPlainText().strip() or None
 
         conn = get_db()
         conn.execute("""
@@ -387,7 +387,7 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
                 "SELECT id, credit_limit, status FROM credit_account WHERE customer_id=?", (cid,)
             ).fetchone()
             if existing:
-                old_limit  = existing["credit_limit"]
+                old_limit = existing["credit_limit"]
                 old_status = existing["status"]
                 conn.execute("""
                     UPDATE credit_account SET credit_limit=?, status='good' WHERE customer_id=?
@@ -412,17 +412,18 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
-ACTIVITY_TYPES   = ["Call", "Email", "Letter", "Visit", "Payment Arrangement", "Other"]
+ACTIVITY_TYPES = ["Call", "Email", "Letter", "Visit", "Payment Arrangement", "Other"]
 ACTIVITY_STATUSES = ["Open", "Pending", "Resolved", "Escalated"]
 
 RISK_COLORS = {
-    "Low":      QtGui.QColor(212, 237, 218),
-    "Medium":   QtGui.QColor(255, 243, 205),
-    "High":     QtGui.QColor(255, 200, 150),
+    "Low": QtGui.QColor(212, 237, 218),
+    "Medium": QtGui.QColor(255, 243, 205),
+    "High": QtGui.QColor(255, 200, 150),
     "Critical": QtGui.QColor(248, 215, 218),
 }
 
 _TAB_KEYS = {'credit': 0, 'aging': 5, 'collections': 6, 'risk': 7}
+
 
 class CreditDept(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
@@ -430,9 +431,9 @@ class CreditDept(QtWidgets.QMainWindow):
         self.setWindowTitle("Credit Department")
         self.resize(1150, 700)
         _apply_blue_palette(self)
-        self._acct_row_ids   = []
-        self._app_row_ids    = []
-        self._hist_row_ids   = []
+        self._acct_row_ids = []
+        self._app_row_ids = []
+        self._hist_row_ids = []
         self._overdue_cust_ids = []
         self._build_ui()
         self._load_accounts()
@@ -456,14 +457,14 @@ class CreditDept(QtWidgets.QMainWindow):
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(self.tabs)
-        self.tabs.addTab(self._build_accounts_tab(),     "Credit Accounts")
+        self.tabs.addTab(self._build_accounts_tab(), "Credit Accounts")
         self.tabs.addTab(self._build_applications_tab(), "Applications")
-        self.tabs.addTab(self._build_overdue_tab(),      "Overdue Report")
-        self.tabs.addTab(self._build_limit_history_tab(),"Limit History")
-        self.tabs.addTab(self._build_summary_tab(),      "Summary")
-        self.tabs.addTab(self._build_aging_tab(),        "A/R Aging")
-        self.tabs.addTab(self._build_collections_tab(),  "Collections")
-        self.tabs.addTab(self._build_risk_tab(),         "Risk Scoring")
+        self.tabs.addTab(self._build_overdue_tab(), "Overdue Report")
+        self.tabs.addTab(self._build_limit_history_tab(), "Limit History")
+        self.tabs.addTab(self._build_summary_tab(), "Summary")
+        self.tabs.addTab(self._build_aging_tab(), "A/R Aging")
+        self.tabs.addTab(self._build_collections_tab(), "Collections")
+        self.tabs.addTab(self._build_risk_tab(), "Risk Scoring")
         self.tabs.currentChanged.connect(self._on_tab_change)
 
     # ── Credit Accounts tab ────────────────────────────────────────────────
@@ -509,11 +510,14 @@ class CreditDept(QtWidgets.QMainWindow):
 
         for t, fn in (("Search", self._on_acct_search), ("Show All", self._load_accounts)):
             b = QtWidgets.QPushButton(t)
-            b.setStyleSheet(BUTTON_STYLE); b.setFixedHeight(30)
-            b.clicked.connect(fn); sr.addWidget(b)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(fn)
+            sr.addWidget(b)
 
         auto_hold_btn = QtWidgets.QPushButton("Run Auto-Hold Check")
-        auto_hold_btn.setStyleSheet(BUTTON_STYLE); auto_hold_btn.setFixedHeight(30)
+        auto_hold_btn.setStyleSheet(BUTTON_STYLE)
+        auto_hold_btn.setFixedHeight(30)
         auto_hold_btn.clicked.connect(self._on_auto_hold_clicked)
         sr.addWidget(auto_hold_btn)
         sr.addStretch()
@@ -524,48 +528,71 @@ class CreditDept(QtWidgets.QMainWindow):
         fg.setStyleSheet(
             "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
             "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
-        grid = QtWidgets.QGridLayout(fg); grid.setSpacing(6)
+        grid = QtWidgets.QGridLayout(fg)
+        grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t); l.setStyleSheet(LABEL_STYLE); return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
+
         def inp(ph=""):
-            e = QtWidgets.QLineEdit(); e.setStyleSheet(INPUT_STYLE); e.setPlaceholderText(ph); return e
+            e = QtWidgets.QLineEdit()
+            e.setStyleSheet(INPUT_STYLE)
+            e.setPlaceholderText(ph)
+            return e
 
         self.af_cust_combo = QtWidgets.QComboBox()
-        self.af_cust_combo.setStyleSheet(COMBO_STYLE); self.af_cust_combo.setMinimumWidth(220)
+        self.af_cust_combo.setStyleSheet(COMBO_STYLE)
+        self.af_cust_combo.setMinimumWidth(220)
         self._refresh_customer_combo(self.af_cust_combo)
 
         self.af_limit = QtWidgets.QDoubleSpinBox()
-        self.af_limit.setStyleSheet(SPIN_STYLE); self.af_limit.setRange(0, 9999999)
-        self.af_limit.setDecimals(2); self.af_limit.setPrefix("$ ")
+        self.af_limit.setStyleSheet(SPIN_STYLE)
+        self.af_limit.setRange(0, 9999999)
+        self.af_limit.setDecimals(2)
+        self.af_limit.setPrefix("$ ")
 
         self.af_status = QtWidgets.QComboBox()
         self.af_status.setStyleSheet(COMBO_STYLE)
         self.af_status.addItems(["good", "hold", "suspended", "closed"])
 
-        self.af_terms   = inp("Net 30, Net 60, etc.")
-        self.af_opened  = QtWidgets.QDateEdit()
-        self.af_opened.setStyleSheet(DATE_STYLE); self.af_opened.setCalendarPopup(True)
-        self.af_opened.setDisplayFormat("MM/dd/yyyy"); self.af_opened.setDate(QtCore.QDate.currentDate())
-        self.af_notes   = inp("Notes")
+        self.af_terms = inp("Net 30, Net 60, etc.")
+        self.af_opened = QtWidgets.QDateEdit()
+        self.af_opened.setStyleSheet(DATE_STYLE)
+        self.af_opened.setCalendarPopup(True)
+        self.af_opened.setDisplayFormat("MM/dd/yyyy")
+        self.af_opened.setDate(QtCore.QDate.currentDate())
+        self.af_notes = inp("Notes")
         self.af_changed_by = inp("Your name (for history log)")
-        self.af_reason  = inp("Reason for change (for history log)")
+        self.af_reason = inp("Reason for change (for history log)")
 
-        grid.addWidget(lbl("Customer:"),     0, 0); grid.addWidget(self.af_cust_combo,  0, 1)
-        grid.addWidget(lbl("Credit Limit:"), 0, 2); grid.addWidget(self.af_limit,       0, 3)
-        grid.addWidget(lbl("Status:"),       0, 4); grid.addWidget(self.af_status,      0, 5)
-        grid.addWidget(lbl("Terms:"),        1, 0); grid.addWidget(self.af_terms,       1, 1)
-        grid.addWidget(lbl("Opened Date:"),  1, 2); grid.addWidget(self.af_opened,      1, 3)
-        grid.addWidget(lbl("Notes:"),        1, 4); grid.addWidget(self.af_notes,       1, 5)
-        grid.addWidget(lbl("Changed By:"),   2, 0); grid.addWidget(self.af_changed_by,  2, 1)
-        grid.addWidget(lbl("Reason:"),       2, 2); grid.addWidget(self.af_reason,      2, 3, 1, 3)
+        grid.addWidget(lbl("Customer:"), 0, 0)
+        grid.addWidget(self.af_cust_combo, 0, 1)
+        grid.addWidget(lbl("Credit Limit:"), 0, 2)
+        grid.addWidget(self.af_limit, 0, 3)
+        grid.addWidget(lbl("Status:"), 0, 4)
+        grid.addWidget(self.af_status, 0, 5)
+        grid.addWidget(lbl("Terms:"), 1, 0)
+        grid.addWidget(self.af_terms, 1, 1)
+        grid.addWidget(lbl("Opened Date:"), 1, 2)
+        grid.addWidget(self.af_opened, 1, 3)
+        grid.addWidget(lbl("Notes:"), 1, 4)
+        grid.addWidget(self.af_notes, 1, 5)
+        grid.addWidget(lbl("Changed By:"), 2, 0)
+        grid.addWidget(self.af_changed_by, 2, 1)
+        grid.addWidget(lbl("Reason:"), 2, 2)
+        grid.addWidget(self.af_reason, 2, 3, 1, 3)
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
         for t, fn in (("Add New", self._on_acct_add), ("Update Selected", self._on_acct_update),
                       ("Delete Selected", self._on_acct_delete), ("Clear", self._acct_clear)):
-            b = QtWidgets.QPushButton(t); b.setStyleSheet(BUTTON_STYLE)
-            b.setFixedHeight(34); b.clicked.connect(fn); br.addWidget(b)
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(34)
+            b.clicked.connect(fn)
+            br.addWidget(b)
         br.addStretch()
         layout.addLayout(br)
         return w
@@ -575,31 +602,47 @@ class CreditDept(QtWidgets.QMainWindow):
     def _build_applications_tab(self):
         w = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(12, 12, 12, 12); layout.setSpacing(6)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(6)
 
-        fr = QtWidgets.QHBoxLayout(); fr.setSpacing(8)
+        fr = QtWidgets.QHBoxLayout()
+        fr.setSpacing(8)
+
         def fl(t):
-            l = QtWidgets.QLabel(t); l.setStyleSheet(LABEL_STYLE); return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.app_status_filter = QtWidgets.QComboBox()
         self.app_status_filter.setStyleSheet(COMBO_STYLE)
         self.app_status_filter.addItems(["(all status)", "pending", "approved", "denied"])
 
-        self.app_from = QtWidgets.QDateEdit(); self.app_from.setStyleSheet(DATE_STYLE)
-        self.app_from.setCalendarPopup(True); self.app_from.setDisplayFormat("MM/dd/yyyy")
+        self.app_from = QtWidgets.QDateEdit()
+        self.app_from.setStyleSheet(DATE_STYLE)
+        self.app_from.setCalendarPopup(True)
+        self.app_from.setDisplayFormat("MM/dd/yyyy")
         self.app_from.setDate(QtCore.QDate.currentDate().addDays(-180))
 
-        self.app_to = QtWidgets.QDateEdit(); self.app_to.setStyleSheet(DATE_STYLE)
-        self.app_to.setCalendarPopup(True); self.app_to.setDisplayFormat("MM/dd/yyyy")
+        self.app_to = QtWidgets.QDateEdit()
+        self.app_to.setStyleSheet(DATE_STYLE)
+        self.app_to.setCalendarPopup(True)
+        self.app_to.setDisplayFormat("MM/dd/yyyy")
         self.app_to.setDate(QtCore.QDate.currentDate())
 
-        fr.addWidget(fl("Status:")); fr.addWidget(self.app_status_filter)
-        fr.addWidget(fl("From:"));   fr.addWidget(self.app_from)
-        fr.addWidget(fl("To:"));     fr.addWidget(self.app_to)
+        fr.addWidget(fl("Status:"))
+        fr.addWidget(self.app_status_filter)
+        fr.addWidget(fl("From:"))
+        fr.addWidget(self.app_from)
+        fr.addWidget(fl("To:"))
+        fr.addWidget(self.app_to)
         for t, fn in (("Apply", self._load_applications), ("Show All", self._app_show_all)):
-            b = QtWidgets.QPushButton(t); b.setStyleSheet(BUTTON_STYLE)
-            b.setFixedHeight(30); b.clicked.connect(fn); fr.addWidget(b)
-        fr.addStretch(); layout.addLayout(fr)
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(fn)
+            fr.addWidget(b)
+        fr.addStretch()
+        layout.addLayout(fr)
 
         self.app_table = QtWidgets.QTableWidget()
         self.app_table.setColumnCount(8)
@@ -607,7 +650,8 @@ class CreditDept(QtWidgets.QMainWindow):
             "Customer", "Applied Date", "Requested", "Approved",
             "Status", "Reviewed By", "Review Date", "Notes"
         ])
-        hh = self.app_table.horizontalHeader(); hh.setStyleSheet("color:black;font-weight:bold;")
+        hh = self.app_table.horizontalHeader()
+        hh.setStyleSheet("color:black;font-weight:bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
@@ -615,16 +659,21 @@ class CreditDept(QtWidgets.QMainWindow):
         self.app_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.app_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.app_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
-        self.app_table.setAlternatingRowColors(True); self.app_table.verticalHeader().setVisible(False)
+        self.app_table.setAlternatingRowColors(True)
+        self.app_table.verticalHeader().setVisible(False)
         layout.addWidget(self.app_table, stretch=1)
 
         ar = QtWidgets.QHBoxLayout()
         for t, fn in (("New Application", self._on_new_application),
                       ("Review Selected", self._on_review_application),
                       ("Delete Selected", self._on_delete_application)):
-            b = QtWidgets.QPushButton(t); b.setStyleSheet(BUTTON_STYLE)
-            b.setFixedHeight(32); b.clicked.connect(fn); ar.addWidget(b)
-        ar.addStretch(); layout.addLayout(ar)
+            b = QtWidgets.QPushButton(t)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(32)
+            b.clicked.connect(fn)
+            ar.addWidget(b)
+        ar.addStretch()
+        layout.addLayout(ar)
         return w
 
     # ── Overdue Report tab ─────────────────────────────────────────────────
@@ -632,19 +681,25 @@ class CreditDept(QtWidgets.QMainWindow):
     def _build_overdue_tab(self):
         w = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(12, 12, 12, 12); layout.setSpacing(8)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Overdue Invoices Report")
         title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
-        ref_btn.setStyleSheet(BUTTON_STYLE); ref_btn.setFixedHeight(30)
-        ref_btn.clicked.connect(self._refresh_overdue); hdr.addWidget(ref_btn)
+        ref_btn.setStyleSheet(BUTTON_STYLE)
+        ref_btn.setFixedHeight(30)
+        ref_btn.clicked.connect(self._refresh_overdue)
+        hdr.addWidget(ref_btn)
         exp_btn = QtWidgets.QPushButton("Export CSV")
-        exp_btn.setStyleSheet(BUTTON_STYLE); exp_btn.setFixedHeight(30)
+        exp_btn.setStyleSheet(BUTTON_STYLE)
+        exp_btn.setFixedHeight(30)
         exp_btn.clicked.connect(lambda: _export_table_to_csv(self.overdue_table, self))
-        hdr.addWidget(exp_btn); hdr.addStretch(); layout.addLayout(hdr)
+        hdr.addWidget(exp_btn)
+        hdr.addStretch()
+        layout.addLayout(hdr)
 
         legend = QtWidgets.QLabel(
             "  Legend:  1–30 days ■   31–60 days ■   61–90 days ■   91+ days ■")
@@ -657,7 +712,8 @@ class CreditDept(QtWidgets.QMainWindow):
             "Customer", "Invoice #", "Invoice Date", "Due Date",
             "Days Overdue", "Balance Due", "Credit Status"
         ])
-        oh = self.overdue_table.horizontalHeader(); oh.setStyleSheet("color:black;font-weight:bold;")
+        oh = self.overdue_table.horizontalHeader()
+        oh.setStyleSheet("color:black;font-weight:bold;")
         oh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         oh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for c in (2, 3, 4, 5, 6):
@@ -678,7 +734,8 @@ class CreditDept(QtWidgets.QMainWindow):
     def _build_limit_history_tab(self):
         w = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(12, 12, 12, 12); layout.setSpacing(8)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Credit Limit Change History")
@@ -686,26 +743,39 @@ class CreditDept(QtWidgets.QMainWindow):
         hdr.addWidget(title)
 
         self.hist_cust_filter = QtWidgets.QComboBox()
-        self.hist_cust_filter.setStyleSheet(COMBO_STYLE); self.hist_cust_filter.setMinimumWidth(200)
+        self.hist_cust_filter.setStyleSheet(COMBO_STYLE)
+        self.hist_cust_filter.setMinimumWidth(200)
         self._refresh_customer_combo(self.hist_cust_filter, all_label="(all customers)")
 
-        self.hist_from = QtWidgets.QDateEdit(); self.hist_from.setStyleSheet(DATE_STYLE)
-        self.hist_from.setCalendarPopup(True); self.hist_from.setDisplayFormat("MM/dd/yyyy")
+        self.hist_from = QtWidgets.QDateEdit()
+        self.hist_from.setStyleSheet(DATE_STYLE)
+        self.hist_from.setCalendarPopup(True)
+        self.hist_from.setDisplayFormat("MM/dd/yyyy")
         self.hist_from.setDate(QtCore.QDate.currentDate().addDays(-365))
-        self.hist_to = QtWidgets.QDateEdit(); self.hist_to.setStyleSheet(DATE_STYLE)
-        self.hist_to.setCalendarPopup(True); self.hist_to.setDisplayFormat("MM/dd/yyyy")
+        self.hist_to = QtWidgets.QDateEdit()
+        self.hist_to.setStyleSheet(DATE_STYLE)
+        self.hist_to.setCalendarPopup(True)
+        self.hist_to.setDisplayFormat("MM/dd/yyyy")
         self.hist_to.setDate(QtCore.QDate.currentDate())
 
         def fl(t):
-            l = QtWidgets.QLabel(t); l.setStyleSheet(LABEL_STYLE); return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
-        hdr.addWidget(fl("Customer:")); hdr.addWidget(self.hist_cust_filter)
-        hdr.addWidget(fl("From:"));     hdr.addWidget(self.hist_from)
-        hdr.addWidget(fl("To:"));       hdr.addWidget(self.hist_to)
+        hdr.addWidget(fl("Customer:"))
+        hdr.addWidget(self.hist_cust_filter)
+        hdr.addWidget(fl("From:"))
+        hdr.addWidget(self.hist_from)
+        hdr.addWidget(fl("To:"))
+        hdr.addWidget(self.hist_to)
         ref_btn = QtWidgets.QPushButton("Apply")
-        ref_btn.setStyleSheet(BUTTON_STYLE); ref_btn.setFixedHeight(30)
-        ref_btn.clicked.connect(self._refresh_limit_history); hdr.addWidget(ref_btn)
-        hdr.addStretch(); layout.addLayout(hdr)
+        ref_btn.setStyleSheet(BUTTON_STYLE)
+        ref_btn.setFixedHeight(30)
+        ref_btn.clicked.connect(self._refresh_limit_history)
+        hdr.addWidget(ref_btn)
+        hdr.addStretch()
+        layout.addLayout(hdr)
 
         self.hist_table = QtWidgets.QTableWidget()
         self.hist_table.setColumnCount(7)
@@ -713,13 +783,15 @@ class CreditDept(QtWidgets.QMainWindow):
             "Customer", "Changed Date", "Old Limit", "New Limit",
             "Old Status", "New Status", "Changed By / Reason"
         ])
-        lh = self.hist_table.horizontalHeader(); lh.setStyleSheet("color:black;font-weight:bold;")
+        lh = self.hist_table.horizontalHeader()
+        lh.setStyleSheet("color:black;font-weight:bold;")
         lh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         lh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             lh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.hist_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.hist_table.setAlternatingRowColors(True); self.hist_table.verticalHeader().setVisible(False)
+        self.hist_table.setAlternatingRowColors(True)
+        self.hist_table.verticalHeader().setVisible(False)
         layout.addWidget(self.hist_table, stretch=1)
         return w
 
@@ -728,19 +800,25 @@ class CreditDept(QtWidgets.QMainWindow):
     def _build_summary_tab(self):
         w = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(12, 12, 12, 12); layout.setSpacing(8)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Credit Exposure Summary")
         title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
-        ref_btn.setStyleSheet(BUTTON_STYLE); ref_btn.setFixedHeight(30)
-        ref_btn.clicked.connect(self._refresh_summary); hdr.addWidget(ref_btn)
+        ref_btn.setStyleSheet(BUTTON_STYLE)
+        ref_btn.setFixedHeight(30)
+        ref_btn.clicked.connect(self._refresh_summary)
+        hdr.addWidget(ref_btn)
         exp_btn = QtWidgets.QPushButton("Export CSV")
-        exp_btn.setStyleSheet(BUTTON_STYLE); exp_btn.setFixedHeight(30)
+        exp_btn.setStyleSheet(BUTTON_STYLE)
+        exp_btn.setFixedHeight(30)
         exp_btn.clicked.connect(lambda: _export_table_to_csv(self.summary_table, self))
-        hdr.addWidget(exp_btn); hdr.addStretch(); layout.addLayout(hdr)
+        hdr.addWidget(exp_btn)
+        hdr.addStretch()
+        layout.addLayout(hdr)
 
         self.summary_stats_lbl = QtWidgets.QLabel("")
         self.summary_stats_lbl.setStyleSheet("color:white;font-size:13px;")
@@ -751,12 +829,14 @@ class CreditDept(QtWidgets.QMainWindow):
         self.summary_table.setHorizontalHeaderLabels([
             "Customer", "Status", "Credit Limit", "AR Balance", "Available Credit", "Utilization %"
         ])
-        sh = self.summary_table.horizontalHeader(); sh.setStyleSheet("color:black;font-weight:bold;")
+        sh = self.summary_table.horizontalHeader()
+        sh.setStyleSheet("color:black;font-weight:bold;")
         sh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             sh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.summary_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.summary_table.setAlternatingRowColors(True); self.summary_table.verticalHeader().setVisible(False)
+        self.summary_table.setAlternatingRowColors(True)
+        self.summary_table.verticalHeader().setVisible(False)
         layout.addWidget(self.summary_table, stretch=1)
         return w
 
@@ -798,14 +878,16 @@ class CreditDept(QtWidgets.QMainWindow):
         rows = conn.execute(q, params).fetchall()
         conn.close()
 
-        self.acct_table.setRowCount(0); self._acct_row_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        self.acct_table.setRowCount(0)
+        self._acct_row_ids = []
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         for row in rows:
-            r = self.acct_table.rowCount(); self.acct_table.insertRow(r)
+            r = self.acct_table.rowCount()
+            self.acct_table.insertRow(r)
             self._acct_row_ids.append(row["id"])
-            ar_bal    = _ar_balance(row["customer_id"])
+            ar_bal = _ar_balance(row["customer_id"])
             available = max(0.0, row["credit_limit"] - ar_bal)
             over_limit = ar_bal > row["credit_limit"] and row["credit_limit"] > 0
             alert = "⚠ OVER LIMIT" if over_limit else ""
@@ -813,18 +895,20 @@ class CreditDept(QtWidgets.QMainWindow):
             for c, (val, algn) in enumerate([
                 (_customer_display(row), QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (_money(row["credit_limit"]), right),
-                (_money(ar_bal),             right),
-                (_money(available),          right),
-                (row["status"].upper(),      center),
-                (row["terms"] or "",         QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["opened_date"],         center),
-                (alert,                      center),
+                (_money(ar_bal), right),
+                (_money(available), right),
+                (row["status"].upper(), center),
+                (row["terms"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["opened_date"], center),
+                (alert, center),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)
                 if c == 7 and over_limit:
                     item.setForeground(QtGui.QColor(180, 0, 0))
-                    font = item.font(); font.setBold(True); item.setFont(font)
+                    font = item.font()
+                    font.setBold(True)
+                    item.setFont(font)
                 self.acct_table.setItem(r, c, item)
 
     def _on_acct_search(self):
@@ -856,9 +940,12 @@ class CreditDept(QtWidgets.QMainWindow):
 
     def _acct_clear(self):
         self.af_cust_combo.setCurrentIndex(0)
-        self.af_limit.setValue(0.0); self.af_status.setCurrentIndex(0)
-        self.af_terms.clear(); self.af_notes.clear()
-        self.af_changed_by.clear(); self.af_reason.clear()
+        self.af_limit.setValue(0.0)
+        self.af_status.setCurrentIndex(0)
+        self.af_terms.clear()
+        self.af_notes.clear()
+        self.af_changed_by.clear()
+        self.af_reason.clear()
         self.af_opened.setDate(QtCore.QDate.currentDate())
         self.acct_table.clearSelection()
 
@@ -868,14 +955,14 @@ class CreditDept(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Input Error", "Select a customer.")
             return None
         return {
-            "customer_id":  cid,
+            "customer_id": cid,
             "credit_limit": self.af_limit.value(),
-            "status":       self.af_status.currentText(),
-            "terms":        self.af_terms.text().strip() or None,
-            "opened_date":  self.af_opened.date().toString("yyyy-MM-dd"),
-            "notes":        self.af_notes.text().strip() or None,
-            "changed_by":   self.af_changed_by.text().strip() or None,
-            "reason":       self.af_reason.text().strip() or None,
+            "status": self.af_status.currentText(),
+            "terms": self.af_terms.text().strip() or None,
+            "opened_date": self.af_opened.date().toString("yyyy-MM-dd"),
+            "notes": self.af_notes.text().strip() or None,
+            "changed_by": self.af_changed_by.text().strip() or None,
+            "reason": self.af_reason.text().strip() or None,
         }
 
     def _on_acct_add(self):
@@ -902,7 +989,9 @@ class CreditDept(QtWidgets.QMainWindow):
             conn.close()
             return
         conn.close()
-        self._acct_clear(); self._load_accounts(); self._refresh_summary()
+        self._acct_clear()
+        self._load_accounts()
+        self._refresh_summary()
         self._refresh_limit_history()
 
     def _on_acct_update(self):
@@ -935,8 +1024,11 @@ class CreditDept(QtWidgets.QMainWindow):
                   old["credit_limit"], data["credit_limit"],
                   old["status"], data["status"],
                   data["changed_by"], data["reason"]))
-        conn.commit(); conn.close()
-        self._load_accounts(); self._refresh_summary(); self._refresh_limit_history()
+        conn.commit()
+        conn.close()
+        self._load_accounts()
+        self._refresh_summary()
+        self._refresh_limit_history()
 
     def _on_acct_delete(self):
         row = self.acct_table.currentRow()
@@ -949,8 +1041,11 @@ class CreditDept(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             conn.execute("DELETE FROM credit_account WHERE id=?", (self._acct_row_ids[row],))
-            conn.commit(); conn.close()
-            self._acct_clear(); self._load_accounts(); self._refresh_summary()
+            conn.commit()
+            conn.close()
+            self._acct_clear()
+            self._load_accounts()
+            self._refresh_summary()
 
     # ── Auto-Hold logic ────────────────────────────────────────────────────
 
@@ -978,7 +1073,8 @@ class CreditDept(QtWidgets.QMainWindow):
                     VALUES (?, ?, ?, ?, 'good', 'hold', 'System', 'Auto-hold: AR balance exceeded credit limit')
                 """, (acct["customer_id"], date.today().isoformat(),
                       acct["credit_limit"], acct["credit_limit"]))
-                conn.commit(); conn.close()
+                conn.commit()
+                conn.close()
                 held.append(_customer_display(acct))
 
         if not silent and held:
@@ -993,15 +1089,17 @@ class CreditDept(QtWidgets.QMainWindow):
     def _on_auto_hold_clicked(self):
         held = self._run_auto_hold(silent=False)
         if held:
-            self._load_accounts(); self._refresh_summary(); self._refresh_limit_history()
+            self._load_accounts()
+            self._refresh_summary()
+            self._refresh_limit_history()
 
     # ── Applications data ──────────────────────────────────────────────────
 
     def _load_applications(self):
         status = self.app_status_filter.currentText()
         from_s = self.app_from.date().toString("yyyy-MM-dd")
-        to_s   = self.app_to.date().toString("yyyy-MM-dd")
-        conn   = get_db()
+        to_s = self.app_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
         q = (
             "SELECT ca.id, ca.customer_id, c.first_name, c.last_name, c.company_name, "
             "ca.applied_date, ca.requested_limit, ca.approved_limit, ca.status, "
@@ -1014,28 +1112,32 @@ class CreditDept(QtWidgets.QMainWindow):
             q += " AND ca.status = ?"
             params.append(status)
         q += " ORDER BY ca.applied_date DESC"
-        rows = conn.execute(q, params).fetchall(); conn.close()
+        rows = conn.execute(q, params).fetchall()
+        conn.close()
 
-        self.app_table.setRowCount(0); self._app_row_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        self.app_table.setRowCount(0)
+        self._app_row_ids = []
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         for row in rows:
-            r = self.app_table.rowCount(); self.app_table.insertRow(r)
+            r = self.app_table.rowCount()
+            self.app_table.insertRow(r)
             self._app_row_ids.append(row["id"])
             color = APP_STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
             approved_str = _money(row["approved_limit"]) if row["approved_limit"] is not None else ""
             for c, (val, algn) in enumerate([
                 (_customer_display(row), QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["applied_date"],    center),
+                (row["applied_date"], center),
                 (_money(row["requested_limit"]), right),
-                (approved_str,                  right),
-                (row["status"].upper(),         center),
-                (row["reviewed_by"] or "",      QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["review_date"] or "",      center),
-                (row["notes"] or "",            QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (approved_str, right),
+                (row["status"].upper(), center),
+                (row["reviewed_by"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["review_date"] or "", center),
+                (row["notes"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
             ]):
-                item = _ro(val, algn); item.setBackground(color)
+                item = _ro(val, algn)
+                item.setBackground(color)
                 self.app_table.setItem(r, c, item)
 
     def _app_show_all(self):
@@ -1066,8 +1168,10 @@ class CreditDept(QtWidgets.QMainWindow):
             return
         dlg = ReviewApplicationDialog(app_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            self._load_applications(); self._load_accounts()
-            self._refresh_summary(); self._refresh_limit_history()
+            self._load_applications()
+            self._load_accounts()
+            self._refresh_summary()
+            self._refresh_limit_history()
 
     def _on_delete_application(self):
         row = self.app_table.currentRow()
@@ -1080,15 +1184,16 @@ class CreditDept(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             conn.execute("DELETE FROM credit_application WHERE id=?", (self._app_row_ids[row],))
-            conn.commit(); conn.close()
+            conn.commit()
+            conn.close()
             self._load_applications()
 
     # ── Overdue Report data ────────────────────────────────────────────────
 
     def _refresh_overdue(self):
         today = date.today().isoformat()
-        conn  = get_db()
-        rows  = conn.execute("""
+        conn = get_db()
+        rows = conn.execute("""
             SELECT ai.id, ai.invoice_number, ai.due_date, ai.invoice_date,
                    ai.amount - COALESCE(p.paid, 0) AS balance,
                    c.id AS customer_id, c.first_name, c.last_name, c.company_name,
@@ -1104,7 +1209,7 @@ class CreditDept(QtWidgets.QMainWindow):
         conn.close()
 
         self.overdue_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         total_overdue = 0.0
@@ -1122,17 +1227,19 @@ class CreditDept(QtWidgets.QMainWindow):
             color = _overdue_color(days_over)
             credit_status = (row["credit_status"] or "").upper()
 
-            r = self.overdue_table.rowCount(); self.overdue_table.insertRow(r)
+            r = self.overdue_table.rowCount()
+            self.overdue_table.insertRow(r)
             for c, (val, algn) in enumerate([
-                (_customer_display(row),    QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["invoice_number"],     QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (_customer_display(row), QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["invoice_number"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (row["invoice_date"] or "", center),
-                (row["due_date"] or "",     center),
-                (str(days_over),            right),
-                (_money(balance),           right),
-                (credit_status,             center),
+                (row["due_date"] or "", center),
+                (str(days_over), right),
+                (_money(balance), right),
+                (credit_status, center),
             ]):
-                item = _ro(val, algn); item.setBackground(color)
+                item = _ro(val, algn)
+                item.setBackground(color)
                 self.overdue_table.setItem(r, c, item)
 
         count = self.overdue_table.rowCount()
@@ -1142,10 +1249,10 @@ class CreditDept(QtWidgets.QMainWindow):
     # ── Limit History data ─────────────────────────────────────────────────
 
     def _refresh_limit_history(self):
-        cid    = self.hist_cust_filter.currentData()
+        cid = self.hist_cust_filter.currentData()
         from_s = self.hist_from.date().toString("yyyy-MM-dd")
-        to_s   = self.hist_to.date().toString("yyyy-MM-dd")
-        conn   = get_db()
+        to_s = self.hist_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
         q = (
             "SELECT h.id, h.customer_id, c.first_name, c.last_name, c.company_name, "
             "h.changed_date, h.old_limit, h.new_limit, h.old_status, h.new_status, "
@@ -1158,24 +1265,26 @@ class CreditDept(QtWidgets.QMainWindow):
             q += " AND h.customer_id = ?"
             params.append(cid)
         q += " ORDER BY h.changed_date DESC, h.id DESC"
-        rows = conn.execute(q, params).fetchall(); conn.close()
+        rows = conn.execute(q, params).fetchall()
+        conn.close()
 
         self.hist_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         for row in rows:
-            r = self.hist_table.rowCount(); self.hist_table.insertRow(r)
-            old_lim  = _money(row["old_limit"]) if row["old_limit"] is not None else "(new)"
+            r = self.hist_table.rowCount()
+            self.hist_table.insertRow(r)
+            old_lim = _money(row["old_limit"]) if row["old_limit"] is not None else "(new)"
             by_reason = " / ".join(filter(None, [row["changed_by"], row["reason"]])) or ""
             for c, (val, algn) in enumerate([
-                (_customer_display(row),      QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["changed_date"],         center),
-                (old_lim,                     right),
-                (_money(row["new_limit"]),    right),
-                (row["old_status"] or "",     center),
-                (row["new_status"] or "",     center),
-                (by_reason,                   QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (_customer_display(row), QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["changed_date"], center),
+                (old_lim, right),
+                (_money(row["new_limit"]), right),
+                (row["old_status"] or "", center),
+                (row["new_status"] or "", center),
+                (by_reason, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
             ]):
                 self.hist_table.setItem(r, c, _ro(val, algn))
 
@@ -1188,38 +1297,42 @@ class CreditDept(QtWidgets.QMainWindow):
                    ca.credit_limit, ca.status
             FROM credit_account ca JOIN customer c ON c.id = ca.customer_id
             ORDER BY c.company_name, c.last_name, c.first_name
-        """).fetchall(); conn.close()
+        """).fetchall()
+        conn.close()
 
         self.summary_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         total_limit = total_balance = 0.0
         for row in rows:
-            ar_bal    = _ar_balance(row["customer_id"])
+            ar_bal = _ar_balance(row["customer_id"])
             available = max(0.0, row["credit_limit"] - ar_bal)
-            util_pct  = (ar_bal / row["credit_limit"] * 100) if row["credit_limit"] > 0 else 0.0
+            util_pct = (ar_bal / row["credit_limit"] * 100) if row["credit_limit"] > 0 else 0.0
             color = CREDIT_STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
-            r = self.summary_table.rowCount(); self.summary_table.insertRow(r)
+            r = self.summary_table.rowCount()
+            self.summary_table.insertRow(r)
             for c, (val, algn) in enumerate([
-                (_customer_display(row),      QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["status"].upper(),       center),
+                (_customer_display(row), QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["status"].upper(), center),
                 (_money(row["credit_limit"]), right),
-                (_money(ar_bal),             right),
-                (_money(available),          right),
-                (f"{util_pct:.1f}%",         right),
+                (_money(ar_bal), right),
+                (_money(available), right),
+                (f"{util_pct:.1f}%", right),
             ]):
-                item = _ro(val, algn); item.setBackground(color)
+                item = _ro(val, algn)
+                item.setBackground(color)
                 self.summary_table.setItem(r, c, item)
-            total_limit   += row["credit_limit"]
+            total_limit += row["credit_limit"]
             total_balance += ar_bal
 
         conn = get_db()
         pending_count = conn.execute(
             "SELECT COUNT(*) FROM credit_application WHERE status='pending'"
-        ).fetchone()[0]; conn.close()
+        ).fetchone()[0]
+        conn.close()
 
-        total_avail  = max(0.0, total_limit - total_balance)
+        total_avail = max(0.0, total_limit - total_balance)
         overall_util = (total_balance / total_limit * 100) if total_limit > 0 else 0.0
         self.summary_stats_lbl.setText(
             f"Total Credit Extended: {_money(total_limit)}     "
@@ -1229,13 +1342,13 @@ class CreditDept(QtWidgets.QMainWindow):
             f"Pending Applications: {pending_count}"
         )
 
-
     # ── A/R Aging tab ──────────────────────────────────────────────────────
 
     def _build_aging_tab(self):
         w = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(12, 12, 12, 12); layout.setSpacing(8)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Accounts Receivable Aging Report")
@@ -1251,12 +1364,17 @@ class CreditDept(QtWidgets.QMainWindow):
         hdr.addWidget(self.aging_as_of)
 
         ref_btn = QtWidgets.QPushButton("Refresh")
-        ref_btn.setStyleSheet(BUTTON_STYLE); ref_btn.setFixedHeight(30)
-        ref_btn.clicked.connect(self._refresh_aging); hdr.addWidget(ref_btn)
+        ref_btn.setStyleSheet(BUTTON_STYLE)
+        ref_btn.setFixedHeight(30)
+        ref_btn.clicked.connect(self._refresh_aging)
+        hdr.addWidget(ref_btn)
         exp_btn = QtWidgets.QPushButton("Export CSV")
-        exp_btn.setStyleSheet(BUTTON_STYLE); exp_btn.setFixedHeight(30)
+        exp_btn.setStyleSheet(BUTTON_STYLE)
+        exp_btn.setFixedHeight(30)
         exp_btn.clicked.connect(lambda: _export_table_to_csv(self.aging_table, self))
-        hdr.addWidget(exp_btn); hdr.addStretch(); layout.addLayout(hdr)
+        hdr.addWidget(exp_btn)
+        hdr.addStretch()
+        layout.addLayout(hdr)
 
         self.aging_table = QtWidgets.QTableWidget()
         self.aging_table.setColumnCount(8)
@@ -1281,7 +1399,9 @@ class CreditDept(QtWidgets.QMainWindow):
         return w
 
     def _make_lbl(self, text):
-        l = QtWidgets.QLabel(text); l.setStyleSheet(LABEL_STYLE); return l
+        lbl = QtWidgets.QLabel(text)
+        lbl.setStyleSheet(LABEL_STYLE)
+        return lbl
 
     def _refresh_aging(self):
         as_of = self.aging_as_of.date().toString("yyyy-MM-dd")
@@ -1333,13 +1453,14 @@ class CreditDept(QtWidgets.QMainWindow):
                 b["d90p"] += bal
 
         self.aging_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left   = QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         totals = {"current": 0.0, "d30": 0.0, "d60": 0.0, "d90": 0.0, "d90p": 0.0, "total": 0.0}
 
         for cid, b in sorted(buckets.items(), key=lambda x: x[1]["name"]):
             total = b["current"] + b["d30"] + b["d60"] + b["d90"] + b["d90p"]
-            r = self.aging_table.rowCount(); self.aging_table.insertRow(r)
+            r = self.aging_table.rowCount()
+            self.aging_table.insertRow(r)
             # row color driven by worst bucket
             if b["d90p"] > 0:
                 row_color = QtGui.QColor(248, 215, 218)
@@ -1353,30 +1474,35 @@ class CreditDept(QtWidgets.QMainWindow):
                 row_color = QtGui.QColor(212, 237, 218)
 
             for c, (val, algn) in enumerate([
-                (b["name"],         left),
-                (_money(b["current"]), right), (_money(b["d30"]),  right),
-                (_money(b["d60"]),  right),    (_money(b["d90"]),  right),
-                (_money(b["d90p"]), right),    (_money(total),     right),
+                (b["name"], left),
+                (_money(b["current"]), right), (_money(b["d30"]), right),
+                (_money(b["d60"]), right), (_money(b["d90"]), right),
+                (_money(b["d90p"]), right), (_money(total), right),
                 (_money(b["limit"]), right),
             ]):
-                it = _ro(val, algn); it.setBackground(row_color)
+                it = _ro(val, algn)
+                it.setBackground(row_color)
                 self.aging_table.setItem(r, c, it)
             for k, v in [("current", b["current"]), ("d30", b["d30"]), ("d60", b["d60"]),
-                          ("d90", b["d90"]), ("d90p", b["d90p"]), ("total", total)]:
+                         ("d90", b["d90"]), ("d90p", b["d90p"]), ("total", total)]:
                 totals[k] += v
 
         # Totals row
         if buckets:
-            r = self.aging_table.rowCount(); self.aging_table.insertRow(r)
-            bold = QtGui.QFont(); bold.setBold(True)
-            bg   = QtGui.QColor(200, 220, 255)
+            r = self.aging_table.rowCount()
+            self.aging_table.insertRow(r)
+            bold = QtGui.QFont()
+            bold.setBold(True)
+            bg = QtGui.QColor(200, 220, 255)
             for c, val in enumerate([
                 "TOTALS", _money(totals["current"]), _money(totals["d30"]),
                 _money(totals["d60"]), _money(totals["d90"]), _money(totals["d90p"]),
                 _money(totals["total"]), "",
             ]):
                 algn = left if c == 0 else right
-                it = _ro(val, algn); it.setFont(bold); it.setBackground(bg)
+                it = _ro(val, algn)
+                it.setFont(bold)
+                it.setBackground(bg)
                 self.aging_table.setItem(r, c, it)
 
         self.aging_totals_lbl.setText(
@@ -1394,19 +1520,22 @@ class CreditDept(QtWidgets.QMainWindow):
     def _build_collections_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
 
         # Left: customer list with overdue balances
         left = QtWidgets.QWidget()
-        lv = QtWidgets.QVBoxLayout(left); lv.setContentsMargins(0, 0, 6, 0)
+        lv = QtWidgets.QVBoxLayout(left)
+        lv.setContentsMargins(0, 0, 6, 0)
 
         lv.addWidget(self._make_lbl("Customers with Open Balances"))
 
         self.col_cust_tbl = QtWidgets.QTableWidget(0, 3)
         self.col_cust_tbl.setHorizontalHeaderLabels(["Customer", "Balance", "Activities"])
-        ch = self.col_cust_tbl.horizontalHeader(); ch.setStyleSheet("color:black;font-weight:bold;")
+        ch = self.col_cust_tbl.horizontalHeader()
+        ch.setStyleSheet("color:black;font-weight:bold;")
         ch.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         ch.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         ch.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -1418,14 +1547,16 @@ class CreditDept(QtWidgets.QMainWindow):
         lv.addWidget(self.col_cust_tbl, stretch=1)
 
         ref_cust_btn = QtWidgets.QPushButton("Refresh List")
-        ref_cust_btn.setStyleSheet(BUTTON_STYLE); ref_cust_btn.setFixedHeight(28)
+        ref_cust_btn.setStyleSheet(BUTTON_STYLE)
+        ref_cust_btn.setFixedHeight(28)
         ref_cust_btn.clicked.connect(self._refresh_col_customers)
         lv.addWidget(ref_cust_btn)
         splitter.addWidget(left)
 
         # Right: activity log + form
         right = QtWidgets.QWidget()
-        rv = QtWidgets.QVBoxLayout(right); rv.setContentsMargins(6, 0, 0, 0)
+        rv = QtWidgets.QVBoxLayout(right)
+        rv.setContentsMargins(6, 0, 0, 0)
 
         self.col_cust_lbl = QtWidgets.QLabel("Select a customer to view activities")
         self.col_cust_lbl.setStyleSheet("color:white;font-weight:bold;font-size:13px;")
@@ -1434,17 +1565,22 @@ class CreditDept(QtWidgets.QMainWindow):
         # Filter bar
         fb = QtWidgets.QHBoxLayout()
         fb.addWidget(self._make_lbl("Status:"))
-        self.col_status_filter = QtWidgets.QComboBox(); self.col_status_filter.setStyleSheet(COMBO_STYLE)
-        self.col_status_filter.addItem("All"); [self.col_status_filter.addItem(s) for s in ACTIVITY_STATUSES]
+        self.col_status_filter = QtWidgets.QComboBox()
+        self.col_status_filter.setStyleSheet(COMBO_STYLE)
+        self.col_status_filter.addItem("All")
+        [self.col_status_filter.addItem(s) for s in ACTIVITY_STATUSES]
         self.col_status_filter.currentIndexChanged.connect(self._refresh_col_activities)
         fb.addWidget(self.col_status_filter)
         fb.addWidget(self._make_lbl("Follow-up Due:"))
-        self.col_due_filter = QtWidgets.QComboBox(); self.col_due_filter.setStyleSheet(COMBO_STYLE)
+        self.col_due_filter = QtWidgets.QComboBox()
+        self.col_due_filter.setStyleSheet(COMBO_STYLE)
         self.col_due_filter.addItems(["All Dates", "Today", "This Week", "Overdue"])
         self.col_due_filter.currentIndexChanged.connect(self._refresh_col_activities)
-        fb.addWidget(self.col_due_filter); fb.addStretch()
+        fb.addWidget(self.col_due_filter)
+        fb.addStretch()
         exp_btn = QtWidgets.QPushButton("Export CSV")
-        exp_btn.setStyleSheet(BUTTON_STYLE); exp_btn.setFixedHeight(28)
+        exp_btn.setStyleSheet(BUTTON_STYLE)
+        exp_btn.setFixedHeight(28)
         exp_btn.clicked.connect(lambda: _export_table_to_csv(self.col_act_tbl, self))
         fb.addWidget(exp_btn)
         rv.addLayout(fb)
@@ -1453,11 +1589,15 @@ class CreditDept(QtWidgets.QMainWindow):
         self.col_act_tbl.setHorizontalHeaderLabels([
             "ID", "Date", "Type", "Contact", "Notes", "Promised", "Follow-up", "Status"
         ])
-        ah = self.col_act_tbl.horizontalHeader(); ah.setStyleSheet("color:black;font-weight:bold;")
+        ah = self.col_act_tbl.horizontalHeader()
+        ah.setStyleSheet("color:black;font-weight:bold;")
         ah.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.col_act_tbl.setColumnWidth(0, 40); self.col_act_tbl.setColumnWidth(1, 90)
-        self.col_act_tbl.setColumnWidth(2, 110); self.col_act_tbl.setColumnWidth(3, 100)
-        self.col_act_tbl.setColumnWidth(5, 90); self.col_act_tbl.setColumnWidth(6, 90)
+        self.col_act_tbl.setColumnWidth(0, 40)
+        self.col_act_tbl.setColumnWidth(1, 90)
+        self.col_act_tbl.setColumnWidth(2, 110)
+        self.col_act_tbl.setColumnWidth(3, 100)
+        self.col_act_tbl.setColumnWidth(5, 90)
+        self.col_act_tbl.setColumnWidth(6, 90)
         self.col_act_tbl.setColumnWidth(7, 90)
         self.col_act_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.col_act_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
@@ -1470,55 +1610,73 @@ class CreditDept(QtWidgets.QMainWindow):
         fg = QtWidgets.QGroupBox("Log Activity")
         fg.setStyleSheet("QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
                          "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
-        fl = QtWidgets.QFormLayout(fg); fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
+        fl = QtWidgets.QFormLayout(fg)
+        fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self.col_ef_date = QtWidgets.QDateEdit(); self.col_ef_date.setStyleSheet(DATE_STYLE)
-        self.col_ef_date.setCalendarPopup(True); self.col_ef_date.setDisplayFormat("MM/dd/yyyy")
+        self.col_ef_date = QtWidgets.QDateEdit()
+        self.col_ef_date.setStyleSheet(DATE_STYLE)
+        self.col_ef_date.setCalendarPopup(True)
+        self.col_ef_date.setDisplayFormat("MM/dd/yyyy")
         self.col_ef_date.setDate(QtCore.QDate.currentDate())
 
-        self.col_ef_type = QtWidgets.QComboBox(); self.col_ef_type.setStyleSheet(COMBO_STYLE)
+        self.col_ef_type = QtWidgets.QComboBox()
+        self.col_ef_type.setStyleSheet(COMBO_STYLE)
         [self.col_ef_type.addItem(t) for t in ACTIVITY_TYPES]
 
-        self.col_ef_contact = QtWidgets.QLineEdit(); self.col_ef_contact.setStyleSheet(INPUT_STYLE)
-        self.col_ef_notes   = QtWidgets.QLineEdit(); self.col_ef_notes.setStyleSheet(INPUT_STYLE)
+        self.col_ef_contact = QtWidgets.QLineEdit()
+        self.col_ef_contact.setStyleSheet(INPUT_STYLE)
+        self.col_ef_notes = QtWidgets.QLineEdit()
+        self.col_ef_notes.setStyleSheet(INPUT_STYLE)
 
-        self.col_ef_promised = QtWidgets.QDoubleSpinBox(); self.col_ef_promised.setStyleSheet(SPIN_STYLE)
-        self.col_ef_promised.setRange(0, 9_999_999); self.col_ef_promised.setDecimals(2)
-        self.col_ef_promised.setPrefix("$ "); self.col_ef_promised.setSpecialValueText("(none)")
+        self.col_ef_promised = QtWidgets.QDoubleSpinBox()
+        self.col_ef_promised.setStyleSheet(SPIN_STYLE)
+        self.col_ef_promised.setRange(0, 9_999_999)
+        self.col_ef_promised.setDecimals(2)
+        self.col_ef_promised.setPrefix("$ ")
+        self.col_ef_promised.setSpecialValueText("(none)")
 
-        self.col_ef_promise_date = QtWidgets.QDateEdit(); self.col_ef_promise_date.setStyleSheet(DATE_STYLE)
-        self.col_ef_promise_date.setCalendarPopup(True); self.col_ef_promise_date.setDisplayFormat("MM/dd/yyyy")
+        self.col_ef_promise_date = QtWidgets.QDateEdit()
+        self.col_ef_promise_date.setStyleSheet(DATE_STYLE)
+        self.col_ef_promise_date.setCalendarPopup(True)
+        self.col_ef_promise_date.setDisplayFormat("MM/dd/yyyy")
         self.col_ef_promise_date.setSpecialValueText("(none)")
         self.col_ef_promise_date.setDate(QtCore.QDate.currentDate())
 
-        self.col_ef_followup = QtWidgets.QDateEdit(); self.col_ef_followup.setStyleSheet(DATE_STYLE)
-        self.col_ef_followup.setCalendarPopup(True); self.col_ef_followup.setDisplayFormat("MM/dd/yyyy")
+        self.col_ef_followup = QtWidgets.QDateEdit()
+        self.col_ef_followup.setStyleSheet(DATE_STYLE)
+        self.col_ef_followup.setCalendarPopup(True)
+        self.col_ef_followup.setDisplayFormat("MM/dd/yyyy")
         self.col_ef_followup.setSpecialValueText("(none)")
         self.col_ef_followup.setDate(QtCore.QDate.currentDate().addDays(7))
 
-        self.col_ef_status = QtWidgets.QComboBox(); self.col_ef_status.setStyleSheet(COMBO_STYLE)
+        self.col_ef_status = QtWidgets.QComboBox()
+        self.col_ef_status.setStyleSheet(COMBO_STYLE)
         [self.col_ef_status.addItem(s) for s in ACTIVITY_STATUSES]
 
-        self.col_ef_by = QtWidgets.QLineEdit(); self.col_ef_by.setStyleSheet(INPUT_STYLE)
+        self.col_ef_by = QtWidgets.QLineEdit()
+        self.col_ef_by.setStyleSheet(INPUT_STYLE)
 
-        fl.addRow(self._make_lbl("Date:"),          self.col_ef_date)
-        fl.addRow(self._make_lbl("Type:"),          self.col_ef_type)
-        fl.addRow(self._make_lbl("Contact:"),       self.col_ef_contact)
-        fl.addRow(self._make_lbl("Notes:"),         self.col_ef_notes)
+        fl.addRow(self._make_lbl("Date:"), self.col_ef_date)
+        fl.addRow(self._make_lbl("Type:"), self.col_ef_type)
+        fl.addRow(self._make_lbl("Contact:"), self.col_ef_contact)
+        fl.addRow(self._make_lbl("Notes:"), self.col_ef_notes)
         fl.addRow(self._make_lbl("Amount Promised:"), self.col_ef_promised)
-        fl.addRow(self._make_lbl("Promise Date:"),  self.col_ef_promise_date)
+        fl.addRow(self._make_lbl("Promise Date:"), self.col_ef_promise_date)
         fl.addRow(self._make_lbl("Follow-up Date:"), self.col_ef_followup)
-        fl.addRow(self._make_lbl("Status:"),        self.col_ef_status)
-        fl.addRow(self._make_lbl("Created By:"),    self.col_ef_by)
+        fl.addRow(self._make_lbl("Status:"), self.col_ef_status)
+        fl.addRow(self._make_lbl("Created By:"), self.col_ef_by)
         rv.addWidget(fg)
 
         btn_row = QtWidgets.QHBoxLayout()
-        for txt, slot in [("Log Activity",   self._on_col_add),
-                           ("Update",         self._on_col_update),
-                           ("Delete",         self._on_col_delete),
-                           ("Clear",          self._on_col_clear)]:
-            b = QtWidgets.QPushButton(txt); b.setStyleSheet(BUTTON_STYLE); b.setFixedHeight(30)
-            b.clicked.connect(slot); btn_row.addWidget(b)
+        for txt, slot in [("Log Activity", self._on_col_add),
+                          ("Update", self._on_col_update),
+                          ("Delete", self._on_col_delete),
+                          ("Clear", self._on_col_clear)]:
+            b = QtWidgets.QPushButton(txt)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(slot)
+            btn_row.addWidget(b)
         btn_row.addStretch()
         rv.addLayout(btn_row)
         splitter.addWidget(right)
@@ -1533,19 +1691,24 @@ class CreditDept(QtWidgets.QMainWindow):
     def _build_risk_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Credit Risk Scoring")
         title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Run Scoring")
-        ref_btn.setStyleSheet(BUTTON_STYLE); ref_btn.setFixedHeight(30)
-        ref_btn.clicked.connect(self._refresh_risk); hdr.addWidget(ref_btn)
+        ref_btn.setStyleSheet(BUTTON_STYLE)
+        ref_btn.setFixedHeight(30)
+        ref_btn.clicked.connect(self._refresh_risk)
+        hdr.addWidget(ref_btn)
         exp_btn = QtWidgets.QPushButton("Export CSV")
-        exp_btn.setStyleSheet(BUTTON_STYLE); exp_btn.setFixedHeight(30)
+        exp_btn.setStyleSheet(BUTTON_STYLE)
+        exp_btn.setFixedHeight(30)
         exp_btn.clicked.connect(lambda: _export_table_to_csv(self.risk_tbl, self))
-        hdr.addWidget(exp_btn); hdr.addStretch()
+        hdr.addWidget(exp_btn)
+        hdr.addStretch()
         layout_lbl = QtWidgets.QLabel(
             "Score: 0–30 Low  |  31–60 Medium  |  61–80 High  |  81–100 Critical")
         layout_lbl.setStyleSheet("color:rgba(255,255,255,200);font-size:11px;")
@@ -1557,7 +1720,8 @@ class CreditDept(QtWidgets.QMainWindow):
             "Customer", "Status", "Utilization %", "Max Days Over",
             "Avg Days Over", "Open Invoices", "Risk Score", "Risk Level", "Recommendation"
         ])
-        rh = self.risk_tbl.horizontalHeader(); rh.setStyleSheet("color:black;font-weight:bold;")
+        rh = self.risk_tbl.horizontalHeader()
+        rh.setStyleSheet("color:black;font-weight:bold;")
         rh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         rh.setSectionResizeMode(8, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in range(1, 8):
@@ -1611,23 +1775,23 @@ class CreditDept(QtWidgets.QMainWindow):
                 inv_map[cid]["days"].append(0)
 
         self.risk_tbl.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left   = QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         risk_counts = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0}
 
         for acct in accounts:
-            cid    = acct["customer_id"]
-            limit  = acct["credit_limit"] or 0.0
+            cid = acct["customer_id"]
+            limit = acct["credit_limit"] or 0.0
             status = acct["status"]
-            info   = inv_map.get(cid, {"balances": [], "days": [], "count": 0})
+            info = inv_map.get(cid, {"balances": [], "days": [], "count": 0})
 
-            ar_bal    = sum(info["balances"])
-            max_days  = max(info["days"]) if info["days"] else 0
-            avg_days  = (sum(info["days"]) / len(info["days"])) if info["days"] else 0.0
-            util_pct  = (ar_bal / limit * 100) if limit > 0 else 0.0
-            open_inv  = info["count"]
+            ar_bal = sum(info["balances"])
+            max_days = max(info["days"]) if info["days"] else 0
+            avg_days = (sum(info["days"]) / len(info["days"])) if info["days"] else 0.0
+            util_pct = (ar_bal / limit * 100) if limit > 0 else 0.0
+            open_inv = info["count"]
 
             # Scoring components (0–100)
             # Status: good=0, hold=20, suspended=35, closed=10
@@ -1668,21 +1832,25 @@ class CreditDept(QtWidgets.QMainWindow):
 
             risk_counts[level] += 1
             color = RISK_COLORS.get(level, QtGui.QColor(255, 255, 255))
-            r = self.risk_tbl.rowCount(); self.risk_tbl.insertRow(r)
+            r = self.risk_tbl.rowCount()
+            self.risk_tbl.insertRow(r)
             for c, (val, algn) in enumerate([
                 (_customer_display(acct), left),
-                (status.upper(),          center),
-                (f"{util_pct:.1f}%",      right),
-                (str(max_days),           right),
-                (f"{avg_days:.1f}",       right),
-                (str(open_inv),           right),
-                (str(score),              right),
-                (level,                   center),
-                (rec,                     left),
+                (status.upper(), center),
+                (f"{util_pct:.1f}%", right),
+                (str(max_days), right),
+                (f"{avg_days:.1f}", right),
+                (str(open_inv), right),
+                (str(score), right),
+                (level, center),
+                (rec, left),
             ]):
-                it = _ro(val, algn); it.setBackground(color)
+                it = _ro(val, algn)
+                it.setBackground(color)
                 if c == 6:
-                    font = it.font(); font.setBold(True); it.setFont(font)
+                    font = it.font()
+                    font.setBold(True)
+                    it.setFont(font)
                 self.risk_tbl.setItem(r, c, it)
 
         self.risk_summary_lbl.setText(
@@ -1712,14 +1880,15 @@ class CreditDept(QtWidgets.QMainWindow):
         conn.close()
 
         self.col_cust_tbl.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left   = QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         for cust in custs:
             bal = _ar_balance(cust["id"])
             if bal <= 0:
                 continue
-            r = self.col_cust_tbl.rowCount(); self.col_cust_tbl.insertRow(r)
+            r = self.col_cust_tbl.rowCount()
+            self.col_cust_tbl.insertRow(r)
             self.col_cust_tbl.setItem(r, 0, _ro(_customer_display(cust), left))
             self.col_cust_tbl.setItem(r, 1, _ro(_money(bal), right))
             self.col_cust_tbl.setItem(r, 2, _ro(str(act_counts.get(cust["id"], 0)), center))
@@ -1731,7 +1900,7 @@ class CreditDept(QtWidgets.QMainWindow):
             return
         cid = self.col_cust_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         name = self.col_cust_tbl.item(rows[0].row(), 0).text()
-        bal  = self.col_cust_tbl.item(rows[0].row(), 1).text()
+        bal = self.col_cust_tbl.item(rows[0].row(), 1).text()
         self._col_selected_cid = cid
         self.col_cust_lbl.setText(f"Activities — {name}  (Balance: {bal})")
         self._refresh_col_activities()
@@ -1739,31 +1908,33 @@ class CreditDept(QtWidgets.QMainWindow):
     def _refresh_col_activities(self):
         cid = getattr(self, "_col_selected_cid", None)
         if not cid:
-            self.col_act_tbl.setRowCount(0); return
-        status_f  = self.col_status_filter.currentText()
-        due_f     = self.col_due_filter.currentText()
-        today     = date.today()
+            self.col_act_tbl.setRowCount(0)
+            return
+        status_f = self.col_status_filter.currentText()
+        due_f = self.col_due_filter.currentText()
+        today = date.today()
 
         conn = get_db()
         q = "SELECT * FROM collection_activity WHERE customer_id=?"
         params = [cid]
         if status_f != "All":
-            q += " AND status=?"; params.append(status_f)
+            q += " AND status=?"
+            params.append(status_f)
         q += " ORDER BY activity_date DESC, id DESC"
         rows = conn.execute(q, params).fetchall()
         conn.close()
 
         STATUS_COLORS_COL = {
-            "Open":      QtGui.QColor(255, 243, 205),
-            "Pending":   QtGui.QColor(200, 230, 255),
-            "Resolved":  QtGui.QColor(212, 237, 218),
+            "Open": QtGui.QColor(255, 243, 205),
+            "Pending": QtGui.QColor(200, 230, 255),
+            "Resolved": QtGui.QColor(212, 237, 218),
             "Escalated": QtGui.QColor(248, 215, 218),
         }
         self.col_act_tbl.setRowCount(0)
         self._col_act_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left   = QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
 
         for row in rows:
             # Apply due-date filter
@@ -1783,19 +1954,21 @@ class CreditDept(QtWidgets.QMainWindow):
 
             color = STATUS_COLORS_COL.get(row["status"], QtGui.QColor(255, 255, 255))
             promised_str = _money(row["amount_promised"]) if row["amount_promised"] else ""
-            r = self.col_act_tbl.rowCount(); self.col_act_tbl.insertRow(r)
+            r = self.col_act_tbl.rowCount()
+            self.col_act_tbl.insertRow(r)
             self._col_act_ids.append(row["id"])
             for c, (val, algn) in enumerate([
-                (str(row["id"]),              center),
-                (row["activity_date"],        center),
-                (row["activity_type"],        left),
-                (row["contact_name"] or "",   left),
-                (row["notes"] or "",          left),
-                (promised_str,                right),
+                (str(row["id"]), center),
+                (row["activity_date"], center),
+                (row["activity_type"], left),
+                (row["contact_name"] or "", left),
+                (row["notes"] or "", left),
+                (promised_str, right),
                 (row["follow_up_date"] or "", center),
-                (row["status"],               center),
+                (row["status"], center),
             ]):
-                it = _ro(val, algn); it.setBackground(color)
+                it = _ro(val, algn)
+                it.setBackground(color)
                 self.col_act_tbl.setItem(r, c, it)
             self.col_act_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
 
@@ -1812,7 +1985,8 @@ class CreditDept(QtWidgets.QMainWindow):
             return
         self.col_ef_date.setDate(QtCore.QDate.fromString(row["activity_date"], "yyyy-MM-dd"))
         idx = self.col_ef_type.findText(row["activity_type"])
-        if idx >= 0: self.col_ef_type.setCurrentIndex(idx)
+        if idx >= 0:
+            self.col_ef_type.setCurrentIndex(idx)
         self.col_ef_contact.setText(row["contact_name"] or "")
         self.col_ef_notes.setText(row["notes"] or "")
         self.col_ef_promised.setValue(row["amount_promised"] or 0.0)
@@ -1821,27 +1995,29 @@ class CreditDept(QtWidgets.QMainWindow):
         if row["follow_up_date"]:
             self.col_ef_followup.setDate(QtCore.QDate.fromString(row["follow_up_date"], "yyyy-MM-dd"))
         idx = self.col_ef_status.findText(row["status"])
-        if idx >= 0: self.col_ef_status.setCurrentIndex(idx)
+        if idx >= 0:
+            self.col_ef_status.setCurrentIndex(idx)
         self.col_ef_by.setText(row["created_by"] or "")
 
     def _col_form_values(self):
         promised = self.col_ef_promised.value() if self.col_ef_promised.value() > 0 else None
         return {
-            "activity_date":   self.col_ef_date.date().toString("yyyy-MM-dd"),
-            "activity_type":   self.col_ef_type.currentText(),
-            "contact_name":    self.col_ef_contact.text().strip() or None,
-            "notes":           self.col_ef_notes.text().strip() or None,
+            "activity_date": self.col_ef_date.date().toString("yyyy-MM-dd"),
+            "activity_type": self.col_ef_type.currentText(),
+            "contact_name": self.col_ef_contact.text().strip() or None,
+            "notes": self.col_ef_notes.text().strip() or None,
             "amount_promised": promised,
-            "promise_date":    self.col_ef_promise_date.date().toString("yyyy-MM-dd") if promised else None,
-            "follow_up_date":  self.col_ef_followup.date().toString("yyyy-MM-dd"),
-            "status":          self.col_ef_status.currentText(),
-            "created_by":      self.col_ef_by.text().strip() or None,
+            "promise_date": self.col_ef_promise_date.date().toString("yyyy-MM-dd") if promised else None,
+            "follow_up_date": self.col_ef_followup.date().toString("yyyy-MM-dd"),
+            "status": self.col_ef_status.currentText(),
+            "created_by": self.col_ef_by.text().strip() or None,
         }
 
     def _on_col_add(self):
         cid = getattr(self, "_col_selected_cid", None)
         if not cid:
-            QtWidgets.QMessageBox.warning(self, "No Customer", "Select a customer first."); return
+            QtWidgets.QMessageBox.warning(self, "No Customer", "Select a customer first.")
+            return
         vals = self._col_form_values()
         conn = get_db()
         conn.execute("""
@@ -1851,13 +2027,17 @@ class CreditDept(QtWidgets.QMainWindow):
             VALUES (:customer_id, :activity_date, :activity_type, :contact_name, :notes,
                     :amount_promised, :promise_date, :follow_up_date, :status, :created_by)
         """, {**vals, "customer_id": cid})
-        conn.commit(); conn.close()
-        self._refresh_col_activities(); self._refresh_col_customers(); self._on_col_clear()
+        conn.commit()
+        conn.close()
+        self._refresh_col_activities()
+        self._refresh_col_customers()
+        self._on_col_clear()
 
     def _on_col_update(self):
         aid = getattr(self, "_col_selected_act_id", None)
         if not aid:
-            QtWidgets.QMessageBox.warning(self, "No Activity", "Select an activity first."); return
+            QtWidgets.QMessageBox.warning(self, "No Activity", "Select an activity first.")
+            return
         vals = self._col_form_values()
         conn = get_db()
         conn.execute("""
@@ -1868,31 +2048,39 @@ class CreditDept(QtWidgets.QMainWindow):
                 follow_up_date=:follow_up_date, status=:status, created_by=:created_by
             WHERE id=:id
         """, {**vals, "id": aid})
-        conn.commit(); conn.close()
+        conn.commit()
+        conn.close()
         self._refresh_col_activities()
 
     def _on_col_delete(self):
         aid = getattr(self, "_col_selected_act_id", None)
         if not aid:
-            QtWidgets.QMessageBox.warning(self, "No Activity", "Select an activity first."); return
+            QtWidgets.QMessageBox.warning(self, "No Activity", "Select an activity first.")
+            return
         if QtWidgets.QMessageBox.question(
             self, "Delete", "Delete this activity log entry?",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
             conn.execute("DELETE FROM collection_activity WHERE id=?", (aid,))
-            conn.commit(); conn.close()
+            conn.commit()
+            conn.close()
             self._col_selected_act_id = None
-            self._refresh_col_activities(); self._refresh_col_customers()
+            self._refresh_col_activities()
+            self._refresh_col_customers()
 
     def _on_col_clear(self):
         self.col_ef_date.setDate(QtCore.QDate.currentDate())
-        self.col_ef_type.setCurrentIndex(0); self.col_ef_contact.clear()
-        self.col_ef_notes.clear(); self.col_ef_promised.setValue(0.0)
+        self.col_ef_type.setCurrentIndex(0)
+        self.col_ef_contact.clear()
+        self.col_ef_notes.clear()
+        self.col_ef_promised.setValue(0.0)
         self.col_ef_promise_date.setDate(QtCore.QDate.currentDate())
         self.col_ef_followup.setDate(QtCore.QDate.currentDate().addDays(7))
-        self.col_ef_status.setCurrentIndex(0); self.col_ef_by.clear()
-        self.col_act_tbl.clearSelection(); self._col_selected_act_id = None
+        self.col_ef_status.setCurrentIndex(0)
+        self.col_ef_by.clear()
+        self.col_act_tbl.clearSelection()
+        self._col_selected_act_id = None
 
     # ── Tab change ────────────────────────────────────────────────────────────
 

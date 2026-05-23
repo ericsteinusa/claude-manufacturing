@@ -18,12 +18,12 @@ COMBO_STYLE = (
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 SO_COLORS = {
-    "quote":      "#ffffff",
-    "order":      "#e8f4fd",
+    "quote": "#ffffff",
+    "order": "#e8f4fd",
     "processing": "#fff3cd",
-    "shipped":    "#d4edda",
-    "invoiced":   "#d1ecf1",
-    "cancelled":  "#dcdcdc",
+    "shipped": "#d4edda",
+    "invoiced": "#d1ecf1",
+    "cancelled": "#dcdcdc",
 }
 
 
@@ -116,9 +116,9 @@ class NewOrderDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.so_num = QtWidgets.QLineEdit(_next_so_num())
         self.so_num.setStyleSheet(INPUT_STYLE)
@@ -203,9 +203,9 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -284,6 +284,7 @@ _TAB_KEYS = {
     'cur_fore': 0, 'fore_rep': 0, 'fore_prod': 0, 'fore_rpts': 0,
     'acct_list': 1, 'new_acct': 1, 'acct_det': 1, 'acct_hist': 1,
 }
+
 
 class SalesOrders(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
@@ -398,12 +399,12 @@ class SalesOrders(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Order",       self._on_new_order),
-            ("Add Line Item",   self._on_add_line_item),
-            ("Mark as Order",   lambda: self._set_status("order",      "Mark this as a confirmed order?")),
+            ("New Order", self._on_new_order),
+            ("Add Line Item", self._on_add_line_item),
+            ("Mark as Order", lambda: self._set_status("order", "Mark this as a confirmed order?")),
             ("Mark Processing", lambda: self._set_status("processing", "Mark as in processing?")),
-            ("Mark Shipped",    lambda: self._set_status("shipped",    "Mark as shipped?")),
-            ("Cancel Order",    lambda: self._set_status("cancelled",  "Cancel this order?")),
+            ("Mark Shipped", lambda: self._set_status("shipped", "Mark as shipped?")),
+            ("Cancel Order", lambda: self._set_status("cancelled", "Cancel this order?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -434,7 +435,7 @@ class SalesOrders(QtWidgets.QMainWindow):
 
     def _refresh_orders(self):
         cust_id = self.ord_cust_filter.currentData()
-        status  = self.ord_status_filter.currentData()
+        status = self.ord_status_filter.currentData()
         base = """
             SELECT so.id, so.so_number, so.order_date, so.ship_date, so.status,
                    c.first_name, c.last_name, c.company_name,
@@ -445,9 +446,11 @@ class SalesOrders(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if cust_id:
-            conds.append("so.customer_id = ?"); params.append(cust_id)
+            conds.append("so.customer_id = ?")
+            params.append(cust_id)
         if status:
-            conds.append("so.status = ?"); params.append(status)
+            conds.append("so.status = ?")
+            params.append(status)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
         rows = conn.execute(base + where + " GROUP BY so.id ORDER BY so.order_date DESC", params).fetchall()
@@ -565,7 +568,8 @@ class SalesOrders(QtWidgets.QMainWindow):
 
         self.cust_table = QtWidgets.QTableWidget()
         self.cust_table.setColumnCount(6)
-        self.cust_table.setHorizontalHeaderLabels(["Company", "First Name", "Last Name", "Phone", "Email", "City/State"])
+        self.cust_table.setHorizontalHeaderLabels(
+            ["Company", "First Name", "Last Name", "Phone", "Email", "City/State"])
         hh = self.cust_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -587,14 +591,14 @@ class SalesOrders(QtWidgets.QMainWindow):
         fl = QtWidgets.QGridLayout(fg)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         fields = [
             ("Company:", "cust_company"), ("First Name:", "cust_first"), ("Last Name:", "cust_last"),
-            ("Phone:", "cust_phone"),     ("Email:", "cust_email"),       ("Address:", "cust_address"),
-            ("City:", "cust_city"),       ("State:", "cust_state"),       ("Zip:", "cust_zip"),
+            ("Phone:", "cust_phone"), ("Email:", "cust_email"), ("Address:", "cust_address"),
+            ("City:", "cust_city"), ("State:", "cust_state"), ("Zip:", "cust_zip"),
         ]
         for i, (label, attr) in enumerate(fields):
             row, col = divmod(i, 3)
@@ -607,10 +611,10 @@ class SalesOrders(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add New",         self._on_cust_add),
+            ("Add New", self._on_cust_add),
             ("Update Selected", self._on_cust_update),
             ("Delete Selected", self._on_cust_delete),
-            ("Clear",           self._clear_cust_form),
+            ("Clear", self._clear_cust_form),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)

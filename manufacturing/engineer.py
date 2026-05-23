@@ -10,10 +10,10 @@ class Ui_engineer(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 711))
         self.label.setStyleSheet("background-image: url(engineering.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         engineer.setCentralWidget(self.centralwidget)

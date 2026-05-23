@@ -21,12 +21,14 @@ def check_name():
 
     if result:
         messagebox.showinfo("Result", f"Email '{name_to_check}' exists in the database!")
-        messagebox.showinfo("User Details", f"id: {result[0]}\nFirst Name: {result[1]}\nLast Name {result[2]}\nEmail: {result[7]}")
+        messagebox.showinfo(
+            "User Details", f"id: {result[0]}\nFirst Name: {result[1]}\nLast Name {result[2]}\nEmail: {result[7]}")
     else:
         messagebox.showinfo("Result", f"Email '{name_to_check}' does not exist in the database.")
 
     # Close the connection
     conn.close()
+
 
 # Tkinter GUI setup
 root = Tk()

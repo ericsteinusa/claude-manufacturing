@@ -150,8 +150,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.F_name_label.setFont(font)
         self.F_name_label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                        "border: 2px solid black;\n"
+                                        "")
         self.F_name_label.setObjectName("F_name_label")
         self.fname_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.fname_lineEdit.setGeometry(QtCore.QRect(240, 99, 113, 31))
@@ -162,8 +162,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.L_name_label.setFont(font)
         self.L_name_label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                        "border: 2px solid black;\n"
+                                        "")
         self.L_name_label.setObjectName("L_name_label")
         self.Lname_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.Lname_lineEdit.setGeometry(QtCore.QRect(490, 99, 131, 31))
@@ -174,8 +174,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.label.setFont(font)
         self.label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                 "border: 2px solid black;\n"
+                                 "")
         self.label.setObjectName("label")
         self.address_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.address_lineEdit.setGeometry(QtCore.QRect(240, 180, 191, 31))
@@ -186,8 +186,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.city_label.setFont(font)
         self.city_label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                      "border: 2px solid black;\n"
+                                      "")
         self.city_label.setObjectName("city_label")
         self.city_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.city_lineEdit.setGeometry(QtCore.QRect(530, 179, 141, 31))
@@ -198,8 +198,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.state_label.setFont(font)
         self.state_label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                       "border: 2px solid black;\n"
+                                       "")
         self.state_label.setObjectName("state_label")
         self.state_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.state_lineEdit.setGeometry(QtCore.QRect(240, 259, 101, 31))
@@ -210,8 +210,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.zip_code_label.setFont(font)
         self.zip_code_label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                          "border: 2px solid black;\n"
+                                          "")
         self.zip_code_label.setObjectName("zip_code_label")
         self.zip_code_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.zip_code_lineEdit.setGeometry(QtCore.QRect(480, 259, 141, 31))
@@ -222,8 +222,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.email_label.setFont(font)
         self.email_label.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                       "border: 2px solid black;\n"
+                                       "")
         self.email_label.setObjectName("email_label")
         self.email_lineEdit = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.email_lineEdit.setGeometry(QtCore.QRect(240, 340, 331, 31))
@@ -234,8 +234,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.submit_pushButton.setFont(font)
         self.submit_pushButton.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                             "border: 2px solid black;\n"
+                                             "")
         self.submit_pushButton.setObjectName("submit_pushButton")
         self.exit_pushButton = QtWidgets.QPushButton(parent=self.centralwidget)
         self.exit_pushButton.setGeometry(QtCore.QRect(340, 460, 91, 31))
@@ -243,8 +243,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.exit_pushButton.setFont(font)
         self.exit_pushButton.setStyleSheet("background-color: white;\n"
-"border: 2px solid black;\n"
-"")
+                                           "border: 2px solid black;\n"
+                                           "")
         self.exit_pushButton.setObjectName("exit_pushButton")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)

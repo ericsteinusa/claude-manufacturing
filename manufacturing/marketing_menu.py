@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white;\n"
@@ -45,11 +47,11 @@ class Ui_Marketing_menu(object):
         font.setPointSize(16)
 
         btn_data = [
-            ("Sales Orders",      QtCore.QRect(10,  10, 191, 41), "Sales Orders"),
+            ("Sales Orders", QtCore.QRect(10, 10, 191, 41), "Sales Orders"),
             ("Customer Contacts", QtCore.QRect(220, 10, 211, 41), "Customer Contacts"),
-            ("Campaign Tracker",  QtCore.QRect(10, 510, 191, 41), "Campaign Tracker"),
-            ("Market Research",   QtCore.QRect(220,510, 191, 41), "Market Research"),
-            ("Marketing Reports", QtCore.QRect(430,510, 211, 41), "Marketing Reports"),
+            ("Campaign Tracker", QtCore.QRect(10, 510, 191, 41), "Campaign Tracker"),
+            ("Market Research", QtCore.QRect(220, 510, 191, 41), "Market Research"),
+            ("Marketing Reports", QtCore.QRect(430, 510, 211, 41), "Marketing Reports"),
         ]
 
         self._buttons = {}
@@ -82,7 +84,7 @@ class Ui_Marketing_menu(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "Sales Orders":      "Sales_menu.py",
+            "Sales Orders": "Sales_menu.py",
             "Customer Contacts": "customer_entry.py",
         }
         script = scripts.get(pressed)

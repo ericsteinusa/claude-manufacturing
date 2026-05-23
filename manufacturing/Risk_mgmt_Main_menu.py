@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import sys, subprocess, os
+import sys
+import subprocess
+import os
+
 
 class Ui_Risk_mgmt_main_menu(object):
     def setupUi(self, MainWindow):
@@ -26,11 +29,11 @@ class Ui_Risk_mgmt_main_menu(object):
                      "QPushButton:hover{background-color:rgb(85,255,255);}")
 
         buttons = [
-            ("Risk Assessment",     self._risk_assess),
-            ("Risk Register",       self._risk_register),
-            ("Insurance Management",self._insurance),
+            ("Risk Assessment", self._risk_assess),
+            ("Risk Register", self._risk_register),
+            ("Insurance Management", self._insurance),
             ("Business Continuity", self._biz_cont),
-            ("Compliance & Audit",  self._comp_audit),
+            ("Compliance & Audit", self._comp_audit),
         ]
         for label, slot in buttons:
             btn = QtWidgets.QPushButton(label)
@@ -46,11 +49,11 @@ class Ui_Risk_mgmt_main_menu(object):
         d = os.path.dirname(os.path.abspath(__file__))
         subprocess.Popen([sys.executable, os.path.join(d, script)], cwd=d)
 
-    def _risk_assess(self):   pass
+    def _risk_assess(self): pass
     def _risk_register(self): pass
-    def _insurance(self):     pass
-    def _biz_cont(self):      pass
-    def _comp_audit(self):    pass
+    def _insurance(self): pass
+    def _biz_cont(self): pass
+    def _comp_audit(self): pass
 
 
 if __name__ == "__main__":

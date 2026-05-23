@@ -13,20 +13,20 @@ BUTTON_STYLE = (
 )
 INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
 COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE  = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE  = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
 ISPIN_STYLE = "QSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
 LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE   = ("QTabWidget::pane{border:1px solid black;}"
-               "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-               " border-bottom:none; border-radius:4px 4px 0 0;}"
-               "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-               "QTabBar::tab:hover{background:rgb(85,255,255);}")
+TAB_STYLE = ("QTabWidget::pane{border:1px solid black;}"
+             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
+             " border-bottom:none; border-radius:4px 4px 0 0;}"
+             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
+             "QTabBar::tab:hover{background:rgb(85,255,255);}")
 
 PO_COLORS = {
-    "open":      QtGui.QColor(255, 255, 255),
-    "partial":   QtGui.QColor(255, 243, 205),
-    "received":  QtGui.QColor(212, 237, 218),
+    "open": QtGui.QColor(255, 255, 255),
+    "partial": QtGui.QColor(255, 243, 205),
+    "received": QtGui.QColor(212, 237, 218),
     "cancelled": QtGui.QColor(220, 220, 220),
 }
 
@@ -112,7 +112,7 @@ def _next_po_num():
     n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE ?",
                      (f"PO-{yr}-%",)).fetchone()[0]
     conn.close()
-    return f"PO-{yr}-{n+1:04d}"
+    return f"PO-{yr}-{n + 1:04d}"
 
 
 # ── Dialogs ────────────────────────────────────────────────────────────────
@@ -138,10 +138,10 @@ class NewPODialog(QtWidgets.QDialog):
 
         def row(lbl_text, widget, lbl_w=120):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -239,10 +239,10 @@ class AddLineItemDialog(QtWidgets.QDialog):
 
         def row(lbl_text, widget, lbl_w=120):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -447,7 +447,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.resize(1150, 700)
         _apply_blue_palette(self)
         self._supp_row_ids = []
-        self._po_row_ids   = []
+        self._po_row_ids = []
         self._build_ui()
         self._load_suppliers()
         self._refresh_pos()
@@ -461,7 +461,7 @@ class Purchasing(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(tabs)
         tabs.addTab(self._build_suppliers_tab(), "Suppliers")
-        tabs.addTab(self._build_po_tab(),        "Purchase Orders")
+        tabs.addTab(self._build_po_tab(), "Purchase Orders")
 
     # ── Suppliers tab ──────────────────────────────────────────────────────
 
@@ -515,9 +515,9 @@ class Purchasing(QtWidgets.QMainWindow):
         grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         def inp(ph=""):
             e = QtWidgets.QLineEdit()
@@ -526,28 +526,37 @@ class Purchasing(QtWidgets.QMainWindow):
             return e
 
         self.sf_company = inp("Company name")
-        self.sf_first   = inp("First name")
-        self.sf_last    = inp("Last name")
-        self.sf_phone   = inp("Phone")
+        self.sf_first = inp("First name")
+        self.sf_last = inp("Last name")
+        self.sf_phone = inp("Phone")
         self.sf_phone.setFixedWidth(140)
-        self.sf_email   = inp("Email")
-        self.sf_addr    = inp("Street address")
-        self.sf_city    = inp("City")
-        self.sf_state   = inp("ST")
+        self.sf_email = inp("Email")
+        self.sf_addr = inp("Street address")
+        self.sf_city = inp("City")
+        self.sf_state = inp("ST")
         self.sf_state.setMaxLength(2)
         self.sf_state.setFixedWidth(44)
-        self.sf_zip     = inp("Zip")
+        self.sf_zip = inp("Zip")
         self.sf_zip.setFixedWidth(90)
 
-        grid.addWidget(lbl("Company:"),    0, 0); grid.addWidget(self.sf_company, 0, 1, 1, 3)
-        grid.addWidget(lbl("First Name:"), 0, 4); grid.addWidget(self.sf_first,   0, 5)
-        grid.addWidget(lbl("Last Name:"),  1, 0); grid.addWidget(self.sf_last,    1, 1, 1, 3)
-        grid.addWidget(lbl("Phone:"),      1, 4); grid.addWidget(self.sf_phone,   1, 5)
-        grid.addWidget(lbl("Email:"),      2, 0); grid.addWidget(self.sf_email,   2, 1, 1, 5)
-        grid.addWidget(lbl("Address:"),    3, 0); grid.addWidget(self.sf_addr,    3, 1, 1, 3)
-        grid.addWidget(lbl("City:"),       3, 4); grid.addWidget(self.sf_city,    3, 5)
-        grid.addWidget(lbl("State:"),      4, 0); grid.addWidget(self.sf_state,   4, 1)
-        grid.addWidget(lbl("Zip:"),        4, 2); grid.addWidget(self.sf_zip,     4, 3)
+        grid.addWidget(lbl("Company:"), 0, 0)
+        grid.addWidget(self.sf_company, 0, 1, 1, 3)
+        grid.addWidget(lbl("First Name:"), 0, 4)
+        grid.addWidget(self.sf_first, 0, 5)
+        grid.addWidget(lbl("Last Name:"), 1, 0)
+        grid.addWidget(self.sf_last, 1, 1, 1, 3)
+        grid.addWidget(lbl("Phone:"), 1, 4)
+        grid.addWidget(self.sf_phone, 1, 5)
+        grid.addWidget(lbl("Email:"), 2, 0)
+        grid.addWidget(self.sf_email, 2, 1, 1, 5)
+        grid.addWidget(lbl("Address:"), 3, 0)
+        grid.addWidget(self.sf_addr, 3, 1, 1, 3)
+        grid.addWidget(lbl("City:"), 3, 4)
+        grid.addWidget(self.sf_city, 3, 5)
+        grid.addWidget(lbl("State:"), 4, 0)
+        grid.addWidget(self.sf_state, 4, 1)
+        grid.addWidget(lbl("Zip:"), 4, 2)
+        grid.addWidget(self.sf_zip, 4, 3)
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
@@ -574,9 +583,9 @@ class Purchasing(QtWidgets.QMainWindow):
         fr.setSpacing(8)
 
         def fl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.po_supp_filter = QtWidgets.QComboBox()
         self.po_supp_filter.setStyleSheet(COMBO_STYLE)
@@ -595,10 +604,14 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_to.setDisplayFormat("MM/dd/yyyy")
         self.po_to.setDate(QtCore.QDate.currentDate())
 
-        fr.addWidget(fl("Supplier:")); fr.addWidget(self.po_supp_filter)
-        fr.addWidget(fl("Status:"));   fr.addWidget(self.po_status_filter)
-        fr.addWidget(fl("From:"));     fr.addWidget(self.po_from)
-        fr.addWidget(fl("To:"));       fr.addWidget(self.po_to)
+        fr.addWidget(fl("Supplier:"))
+        fr.addWidget(self.po_supp_filter)
+        fr.addWidget(fl("Status:"))
+        fr.addWidget(self.po_status_filter)
+        fr.addWidget(fl("From:"))
+        fr.addWidget(self.po_from)
+        fr.addWidget(fl("To:"))
+        fr.addWidget(self.po_to)
         for t, fn in (("Apply", self._refresh_pos), ("Show All", self._po_show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
@@ -745,21 +758,21 @@ class Purchasing(QtWidgets.QMainWindow):
 
     def _collect_supplier_form(self):
         company = self.sf_company.text().strip()
-        last    = self.sf_last.text().strip()
+        last = self.sf_last.text().strip()
         if not company and not last:
             QtWidgets.QMessageBox.warning(
                 self, "Input Error", "Company name or last name is required.")
             return None
         return {
             "company_name": company or "",
-            "first_name":   self.sf_first.text().strip() or "",
-            "last_name":    last or "",
+            "first_name": self.sf_first.text().strip() or "",
+            "last_name": last or "",
             "phone_number": self.sf_phone.text().strip() or "",
-            "email":        self.sf_email.text().strip() or "",
-            "address":      self.sf_addr.text().strip() or "",
-            "city":         self.sf_city.text().strip() or "",
-            "state":        self.sf_state.text().strip().upper() or "",
-            "zip_code":     self.sf_zip.text().strip() or "",
+            "email": self.sf_email.text().strip() or "",
+            "address": self.sf_addr.text().strip() or "",
+            "city": self.sf_city.text().strip() or "",
+            "state": self.sf_state.text().strip().upper() or "",
+            "zip_code": self.sf_zip.text().strip() or "",
         }
 
     def _on_supp_add(self):
@@ -832,11 +845,11 @@ class Purchasing(QtWidgets.QMainWindow):
     # ── PO data ────────────────────────────────────────────────────────────
 
     def _refresh_pos(self):
-        sid    = self.po_supp_filter.currentData()
+        sid = self.po_supp_filter.currentData()
         status = self.po_status_filter.currentText()
         from_s = self.po_from.date().toString("yyyy-MM-dd")
-        to_s   = self.po_to.date().toString("yyyy-MM-dd")
-        conn   = get_db()
+        to_s = self.po_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
         q = (
             "SELECT po.id, po.po_number, po.order_date, po.expected_date, po.status, "
             "s.first_name, s.last_name, s.company_name, "
@@ -860,22 +873,22 @@ class Purchasing(QtWidgets.QMainWindow):
 
         self.po_table.setRowCount(0)
         self._po_row_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left   = QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         for row in rows:
             r = self.po_table.rowCount()
             self.po_table.insertRow(r)
             self._po_row_ids.append(row["id"])
             color = PO_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
             for c, (val, algn) in enumerate([
-                (row["po_number"],          left),
-                (_supplier_display(row),    left),
-                (row["order_date"],         center),
+                (row["po_number"], left),
+                (_supplier_display(row), left),
+                (row["order_date"], center),
                 (row["expected_date"] or "", center),
-                (str(row["item_count"]),    center),
-                (_money(row["total"]),      right),
-                (row["status"].upper(),     center),
+                (str(row["item_count"]), center),
+                (_money(row["total"]), right),
+                (row["status"].upper(), center),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)
@@ -904,7 +917,7 @@ class Purchasing(QtWidgets.QMainWindow):
         conn.close()
 
         self.po_items_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
         for item in items:
             r = self.po_items_table.rowCount()

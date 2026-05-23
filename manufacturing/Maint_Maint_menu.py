@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white;\n"
@@ -45,11 +47,11 @@ class Ui_Maint_maint_menu(object):
         font.setPointSize(16)
 
         btn_data = [
-            ("Work Orders",          QtCore.QRect(10,  10, 181, 41), "Work Orders"),
-            ("Equipment List",       QtCore.QRect(210, 10, 181, 41), "Equipment List"),
-            ("Parts Request",        QtCore.QRect(410, 10, 171, 41), "Parts Request"),
-            ("Maint. Schedule",      QtCore.QRect(10, 510, 181, 41), "Maintenance Schedule"),
-            ("Safety Inspection",    QtCore.QRect(210,510, 201, 41), "Safety Inspection"),
+            ("Work Orders", QtCore.QRect(10, 10, 181, 41), "Work Orders"),
+            ("Equipment List", QtCore.QRect(210, 10, 181, 41), "Equipment List"),
+            ("Parts Request", QtCore.QRect(410, 10, 171, 41), "Parts Request"),
+            ("Maint. Schedule", QtCore.QRect(10, 510, 181, 41), "Maintenance Schedule"),
+            ("Safety Inspection", QtCore.QRect(210, 510, 201, 41), "Safety Inspection"),
         ]
 
         self._buttons = {}

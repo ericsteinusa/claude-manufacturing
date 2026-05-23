@@ -7,12 +7,13 @@ splash_root.title("Splash Screen!!")
 app_width = 1000
 app_height = 560
 splash_root.overrideredirect(True)
-image = tk.PhotoImage(file="c:/source/pythonQSG/pyqt6 apps/images/manufacturing2.png")  # Supports .png, .gif, .pgm, .ppm
+# Supports .png, .gif, .pgm, .ppm
+image = tk.PhotoImage(file="c:/source/pythonQSG/pyqt6 apps/images/manufacturing2.png")
 screen_width = splash_root.winfo_screenwidth()
 screen_height = splash_root.winfo_screenheight()
 
 x = (screen_width / 2) - (app_width / 2)
-y = (screen_height / 2 ) - (app_height / 2)
+y = (screen_height / 2) - (app_height / 2)
 
 splash_root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
@@ -22,12 +23,8 @@ splash_label.pack(pady=20)
 
 
 def main_window():
-	# Kill the splash screen
-	splash_root.destroy()
-
-
-
-	
+    # Kill the splash screen
+    splash_root.destroy()
 
 
 # Splash Screen Timer

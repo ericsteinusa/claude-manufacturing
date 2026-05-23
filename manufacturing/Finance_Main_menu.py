@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import sys, subprocess, os
+import sys
+import subprocess
+import os
+
 
 class Ui_Finance_main_menu(object):
     def setupUi(self, MainWindow):
@@ -26,11 +29,11 @@ class Ui_Finance_main_menu(object):
                      "QPushButton:hover{background-color:rgb(85,255,255);}")
 
         buttons = [
-            ("Financial Analysis",   self._financial_analysis),
-            ("Financial Reporting",  self._financial_reporting),
-            ("Treasury Operations",  self._treasury_ops),
-            ("Capital Management",   self._capital_mgmt),
-            ("Tax Planning",         self._tax_planning),
+            ("Financial Analysis", self._financial_analysis),
+            ("Financial Reporting", self._financial_reporting),
+            ("Treasury Operations", self._treasury_ops),
+            ("Capital Management", self._capital_mgmt),
+            ("Tax Planning", self._tax_planning),
         ]
         for label, slot in buttons:
             btn = QtWidgets.QPushButton(label)
@@ -46,11 +49,11 @@ class Ui_Finance_main_menu(object):
         d = os.path.dirname(os.path.abspath(__file__))
         subprocess.Popen([sys.executable, os.path.join(d, script)], cwd=d)
 
-    def _financial_analysis(self):  pass
+    def _financial_analysis(self): pass
     def _financial_reporting(self): pass
-    def _treasury_ops(self):        pass
-    def _capital_mgmt(self):        pass
-    def _tax_planning(self):        pass
+    def _treasury_ops(self): pass
+    def _capital_mgmt(self): pass
+    def _tax_planning(self): pass
 
 
 if __name__ == "__main__":

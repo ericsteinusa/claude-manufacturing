@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_Purchasing_Main_menu(object):
     def setupUi(self, Purchasing_Main_menu):
@@ -147,36 +150,38 @@ class Ui_Purchasing_Main_menu(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 60, 801, 511))
         self.label.setStyleSheet("background-image: url(purchasing_dept.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
-        self.Purchasing_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Purchasing Manager Menu"))
+        self.Purchasing_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Purchasing Manager Menu"))
         self.Purchasing_mgr_Button.setGeometry(QtCore.QRect(20, 10, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Purchasing_mgr_Button.setFont(font)
         self.Purchasing_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                                 "border: 2px solid black;\n"
+                                                 "border-radius: 10px;}\n"
+                                                 "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                                 "border: 2px solidrgb(85, 255, 255);\n"
+                                                 "}")
         self.Purchasing_mgr_Button.setAutoDefault(False)
         self.Purchasing_mgr_Button.setObjectName("Purchasing_mgr_Button")
-        self.Purchasing_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Purchasing Menu"))
+        self.Purchasing_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Purchasing Menu"))
         self.Purchasing_Button.setGeometry(QtCore.QRect(260, 10, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Purchasing_Button.setFont(font)
         self.Purchasing_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.Purchasing_Button.setAutoDefault(False)
         self.Purchasing_Button.setObjectName("Purchasing_Button")
         Purchasing_Main_menu.setCentralWidget(self.centralwidget)
@@ -195,7 +200,7 @@ class Ui_Purchasing_Main_menu(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Purchasing Manager Menu": "Purchasing_Mgr_menu.py",
-            "Purchasing Menu":         "Purchasing_menu.py",
+            "Purchasing Menu": "Purchasing_menu.py",
         }
         script = scripts.get(pressed)
         if script:

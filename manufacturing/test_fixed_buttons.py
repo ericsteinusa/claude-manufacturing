@@ -1,10 +1,13 @@
-import sys, os, time, subprocess
+import sys
+import os
+import time
+import subprocess
 
 mfg = '/home/eric/tester/manufacture/manufacturing'
 tests = [
-    ('Accounts_payable.py',   'acct_pay',  '/tmp/test_ap.png'),
-    ('Accounts_receivable.py','acct_rcv',  '/tmp/test_ar.png'),
-    ('Credit_dept.py',        'credit',    '/tmp/test_cr.png'),
+    ('Accounts_payable.py', 'acct_pay', '/tmp/test_ap.png'),
+    ('Accounts_receivable.py', 'acct_rcv', '/tmp/test_ar.png'),
+    ('Credit_dept.py', 'credit', '/tmp/test_cr.png'),
 ]
 
 for script, key, shot in tests:

@@ -18,10 +18,10 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 831, 651))
         self.label.setStyleSheet("background-image: url(:/IT/IT_picture2.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.Dept_Entry_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -30,13 +30,13 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.Dept_Entry_Button.setFont(font)
         self.Dept_Entry_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black; border-radius: 10px;\n"
-"}\n"
-"\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"} \n"
-"")
+                                             "border: 2px solid black; border-radius: 10px;\n"
+                                             "}\n"
+                                             "\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "} \n"
+                                             "")
         self.Dept_Entry_Button.setAutoDefault(False)
         self.Dept_Entry_Button.setObjectName("Dept_Entry_Button")
         self.Dept_Sub_entry_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -45,13 +45,13 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.Dept_Sub_entry_Button.setFont(font)
         self.Dept_Sub_entry_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black; border-radius: 10px;\n"
-"}\n"
-"\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"} \n"
-"")
+                                                 "border: 2px solid black; border-radius: 10px;\n"
+                                                 "}\n"
+                                                 "\n"
+                                                 "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                                 "border: 2px solidrgb(85, 255, 255);\n"
+                                                 "} \n"
+                                                 "")
         self.Dept_Sub_entry_Button.setAutoDefault(False)
         self.Dept_Sub_entry_Button.setObjectName("Dept_Sub_entry_Button")
         self.Dept_sub_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -60,13 +60,13 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.Dept_sub_Button.setFont(font)
         self.Dept_sub_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black; border-radius: 10px;\n"
-"}\n"
-"\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"} \n"
-"")
+                                           "border: 2px solid black; border-radius: 10px;\n"
+                                           "}\n"
+                                           "\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "} \n"
+                                           "")
         self.Dept_sub_Button.setAutoDefault(False)
         self.Dept_sub_Button.setObjectName("Dept_sub_Button")
         self.People_Dept_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -75,13 +75,13 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.People_Dept_Button.setFont(font)
         self.People_Dept_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black; border-radius: 10px;\n"
-"}\n"
-"\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"} \n"
-"")
+                                              "border: 2px solid black; border-radius: 10px;\n"
+                                              "}\n"
+                                              "\n"
+                                              "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                              "border: 2px solidrgb(85, 255, 255);\n"
+                                              "} \n"
+                                              "")
         self.People_Dept_Button.setAutoDefault(False)
         self.People_Dept_Button.setObjectName("People_Dept_Button")
         MainWindow.setCentralWidget(self.centralwidget)

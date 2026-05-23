@@ -122,10 +122,10 @@ class DeptEntry(QtWidgets.QMainWindow):
         # ── Buttons ────────────────────────────────────────────────────────
         btn_row = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add New",         self._on_add),
+            ("Add New", self._on_add),
             ("Update Selected", self._on_update),
             ("Delete Selected", self._on_delete),
-            ("Clear",           self._clear_form),
+            ("Clear", self._clear_form),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)

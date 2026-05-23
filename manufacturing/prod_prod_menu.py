@@ -18,11 +18,11 @@ COMBO_STYLE = (
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 WO_COLORS = {
-    "planned":     "#ffffff",
+    "planned": "#ffffff",
     "in_progress": "#fff3cd",
-    "completed":   "#d4edda",
-    "on_hold":     "#ffe0b2",
-    "cancelled":   "#dcdcdc",
+    "completed": "#d4edda",
+    "on_hold": "#ffe0b2",
+    "cancelled": "#dcdcdc",
 }
 
 
@@ -129,9 +129,9 @@ class NewWODialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.wo_num = QtWidgets.QLineEdit(_next_wo_num())
         self.wo_num.setStyleSheet(INPUT_STYLE)
@@ -222,9 +222,9 @@ class AddMaterialDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -380,9 +380,9 @@ class AddBOMItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.finished_combo = QtWidgets.QComboBox()
         self.finished_combo.setStyleSheet(COMBO_STYLE)
@@ -448,6 +448,7 @@ _TAB_KEYS = {
     'daily_prod': 0, 'week_sum': 0, 'eff_rpt': 0, 'scrap_rpt': 0,
     'cur_labor': 0, 'labor_shft': 0, 'labor_job': 0, 'labor_rpts': 0,
 }
+
 
 class WorkOrders(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
@@ -573,13 +574,13 @@ class WorkOrders(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Work Order",   self._on_new_wo),
-            ("Add Material",     self._on_add_material),
-            ("Issue Materials",  self._on_issue_materials),
+            ("New Work Order", self._on_new_wo),
+            ("Add Material", self._on_add_material),
+            ("Issue Materials", self._on_issue_materials),
             ("Start (In Progress)", lambda: self._set_wo_status("in_progress", "Mark as In Progress?")),
-            ("Complete",         lambda: self._set_wo_status("completed",   "Mark as Completed?")),
-            ("On Hold",          lambda: self._set_wo_status("on_hold",     "Put On Hold?")),
-            ("Cancel",           lambda: self._set_wo_status("cancelled",   "Cancel this work order?")),
+            ("Complete", lambda: self._set_wo_status("completed", "Mark as Completed?")),
+            ("On Hold", lambda: self._set_wo_status("on_hold", "Put On Hold?")),
+            ("Cancel", lambda: self._set_wo_status("cancelled", "Cancel this work order?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -592,7 +593,7 @@ class WorkOrders(QtWidgets.QMainWindow):
 
     def _refresh_wo(self):
         status = self.wo_status_filter.currentData()
-        term   = self.wo_search.text().strip()
+        term = self.wo_search.text().strip()
         base = """
             SELECT wo.id, wo.wo_number, wo.description, p.product_name,
                    wo.quantity, wo.start_date, wo.due_date, wo.status
@@ -601,7 +602,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("wo.status = ?"); params.append(status)
+            conds.append("wo.status = ?")
+            params.append(status)
         if term:
             conds.append("(wo.wo_number LIKE ? OR wo.description LIKE ?)")
             params += [f"%{term}%", f"%{term}%"]
@@ -754,8 +756,8 @@ class WorkOrders(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add BOM Item",     self._on_add_bom),
-            ("Delete Selected",  self._on_delete_bom),
+            ("Add BOM Item", self._on_add_bom),
+            ("Delete Selected", self._on_delete_bom),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)

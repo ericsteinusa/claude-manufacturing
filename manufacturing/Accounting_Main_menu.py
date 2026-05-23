@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_Acct_MainWindow(object):
     def setupUi(self, Acct_MainWindow):
@@ -144,117 +147,125 @@ class Ui_Acct_MainWindow(object):
         Acct_MainWindow.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(parent=Acct_MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.acct_pay_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Accounts Payable"))
+        self.acct_pay_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Accounts Payable"))
         self.acct_pay_Button.setGeometry(QtCore.QRect(260, 10, 181, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.acct_pay_Button.setFont(font)
         self.acct_pay_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.acct_pay_Button.setAutoDefault(False)
         self.acct_pay_Button.setObjectName("acct_pay_Button")
-        self.Acct_mgr_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Accounting Manager"))
+        self.Acct_mgr_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Accounting Manager"))
         self.Acct_mgr_button.setGeometry(QtCore.QRect(220, 60, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Acct_mgr_button.setFont(font)
         self.Acct_mgr_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.Acct_mgr_button.setAutoDefault(False)
         self.Acct_mgr_button.setObjectName("Acct_mgr_button")
-        self.acct_rcv_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Accounts Recievable"))
+        self.acct_rcv_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Accounts Recievable"))
         self.acct_rcv_Button.setGeometry(QtCore.QRect(20, 10, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.acct_rcv_Button.setFont(font)
         self.acct_rcv_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.acct_rcv_Button.setAutoDefault(False)
         self.acct_rcv_Button.setObjectName("acct_rcv_Button")
-        self.credit_dept_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Credit Department"))
+        self.credit_dept_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Credit Department"))
         self.credit_dept_button.setGeometry(QtCore.QRect(460, 10, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.credit_dept_button.setFont(font)
         self.credit_dept_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                              "border: 2px solid black;\n"
+                                              "border-radius: 10px;}\n"
+                                              "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                              "border: 2px solidrgb(85, 255, 255);\n"
+                                              "}")
         self.credit_dept_button.setAutoDefault(False)
         self.credit_dept_button.setObjectName("credit_dept_button")
-        self.payroll_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Payroll Department"))
+        self.payroll_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Payroll Department"))
         self.payroll_button.setGeometry(QtCore.QRect(20, 60, 181, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.payroll_button.setFont(font)
         self.payroll_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                          "border: 2px solid black;\n"
+                                          "border-radius: 10px;}\n"
+                                          "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                          "border: 2px solidrgb(85, 255, 255);\n"
+                                          "}")
         self.payroll_button.setAutoDefault(False)
         self.payroll_button.setObjectName("payroll_button")
-        self.budget_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Budget Management"))
+        self.budget_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Budget Management"))
         self.budget_button.setGeometry(QtCore.QRect(460, 110, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.budget_button.setFont(font)
         self.budget_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                         "border: 2px solid black;\n"
+                                         "border-radius: 10px;}\n"
+                                         "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                         "border: 2px solidrgb(85, 255, 255);\n"
+                                         "}")
         self.budget_button.setAutoDefault(False)
         self.budget_button.setObjectName("budget_button")
-        self.bank_recon_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Bank Reconciliation"))
+        self.bank_recon_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Bank Reconciliation"))
         self.bank_recon_button.setGeometry(QtCore.QRect(20, 110, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.bank_recon_button.setFont(font)
         self.bank_recon_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.bank_recon_button.setAutoDefault(False)
         self.bank_recon_button.setObjectName("bank_recon_button")
-        self.gl_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("General Ledger"))
+        self.gl_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("General Ledger"))
         self.gl_button.setGeometry(QtCore.QRect(460, 60, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.gl_button.setFont(font)
         self.gl_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                     "border: 2px solid black;\n"
+                                     "border-radius: 10px;}\n"
+                                     "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                     "border: 2px solidrgb(85, 255, 255);\n"
+                                     "}")
         self.gl_button.setAutoDefault(False)
         self.gl_button.setObjectName("gl_button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 661))
         self.label.setStyleSheet("background-image: url(Accounting2.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.label.raise_()
@@ -281,13 +292,13 @@ class Ui_Acct_MainWindow(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "Accounts Payable":    "Accounts_payable.py",
-            "Accounting Manager":  "Accounting_manager.py",
+            "Accounts Payable": "Accounts_payable.py",
+            "Accounting Manager": "Accounting_manager.py",
             "Accounts Recievable": "Accounts_receivable.py",
-            "Credit Department":   "Credit_dept.py",
-            "Payroll Department":  "Payroll_dept.py",
-            "General Ledger":      "General_ledger.py",
-            "Budget Management":   "Budget_mgmt.py",
+            "Credit Department": "Credit_dept.py",
+            "Payroll Department": "Payroll_dept.py",
+            "General Ledger": "General_ledger.py",
+            "Budget Management": "Budget_mgmt.py",
             "Bank Reconciliation": "Bank_reconciliation.py",
         }
         script = scripts.get(pressed)

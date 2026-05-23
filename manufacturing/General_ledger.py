@@ -2,16 +2,21 @@
 General_ledger.py — General Ledger module
 Tabs: Chart of Accounts | Journal Entries | Trial Balance | Ledger View
 """
-import sys, os, sqlite3, csv
+import sys
+import os
+import sqlite3
+import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 # ── database ─────────────────────────────────────────────────────────────────
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
+
 def _conn():
     c = sqlite3.connect(DB_PATH)
     c.row_factory = sqlite3.Row
     return c
+
 
 def init_db():
     with _conn() as con:
@@ -49,63 +54,65 @@ def init_db():
         if con.execute("SELECT COUNT(*) FROM gl_account").fetchone()[0] == 0:
             _seed_coa(con)
 
+
 def _seed_coa(con):
     accounts = [
         # Assets
-        ("1000", "Cash",                          "Asset",     "Current"),
-        ("1010", "Petty Cash",                    "Asset",     "Current"),
-        ("1100", "Accounts Receivable",           "Asset",     "Current"),
-        ("1150", "Allowance for Doubtful Accts",  "Asset",     "Current"),
-        ("1200", "Raw Materials Inventory",        "Asset",     "Current"),
-        ("1210", "Work in Process Inventory",      "Asset",     "Current"),
-        ("1220", "Finished Goods Inventory",       "Asset",     "Current"),
-        ("1300", "Prepaid Expenses",               "Asset",     "Current"),
-        ("1500", "Property, Plant & Equipment",    "Asset",     "Fixed"),
-        ("1510", "Accumulated Depreciation",       "Asset",     "Fixed"),
-        ("1600", "Other Assets",                   "Asset",     "Other"),
+        ("1000", "Cash", "Asset", "Current"),
+        ("1010", "Petty Cash", "Asset", "Current"),
+        ("1100", "Accounts Receivable", "Asset", "Current"),
+        ("1150", "Allowance for Doubtful Accts", "Asset", "Current"),
+        ("1200", "Raw Materials Inventory", "Asset", "Current"),
+        ("1210", "Work in Process Inventory", "Asset", "Current"),
+        ("1220", "Finished Goods Inventory", "Asset", "Current"),
+        ("1300", "Prepaid Expenses", "Asset", "Current"),
+        ("1500", "Property, Plant & Equipment", "Asset", "Fixed"),
+        ("1510", "Accumulated Depreciation", "Asset", "Fixed"),
+        ("1600", "Other Assets", "Asset", "Other"),
         # Liabilities
-        ("2000", "Accounts Payable",               "Liability", "Current"),
-        ("2100", "Accrued Liabilities",            "Liability", "Current"),
-        ("2200", "Payroll Liabilities",            "Liability", "Current"),
-        ("2300", "Sales Tax Payable",              "Liability", "Current"),
-        ("2400", "Notes Payable - Short Term",     "Liability", "Current"),
-        ("2500", "Notes Payable - Long Term",      "Liability", "Long-term"),
-        ("2600", "Other Long-Term Liabilities",    "Liability", "Long-term"),
+        ("2000", "Accounts Payable", "Liability", "Current"),
+        ("2100", "Accrued Liabilities", "Liability", "Current"),
+        ("2200", "Payroll Liabilities", "Liability", "Current"),
+        ("2300", "Sales Tax Payable", "Liability", "Current"),
+        ("2400", "Notes Payable - Short Term", "Liability", "Current"),
+        ("2500", "Notes Payable - Long Term", "Liability", "Long-term"),
+        ("2600", "Other Long-Term Liabilities", "Liability", "Long-term"),
         # Equity
-        ("3000", "Common Stock",                   "Equity",    ""),
-        ("3100", "Retained Earnings",              "Equity",    ""),
-        ("3200", "Dividends Paid",                 "Equity",    ""),
-        ("3900", "Current Year Earnings",          "Equity",    ""),
+        ("3000", "Common Stock", "Equity", ""),
+        ("3100", "Retained Earnings", "Equity", ""),
+        ("3200", "Dividends Paid", "Equity", ""),
+        ("3900", "Current Year Earnings", "Equity", ""),
         # Revenue
-        ("4000", "Sales Revenue",                  "Revenue",   "Operating"),
-        ("4100", "Service Revenue",                "Revenue",   "Operating"),
-        ("4200", "Shipping & Handling Income",     "Revenue",   "Operating"),
-        ("4900", "Other Income",                   "Revenue",   "Other"),
+        ("4000", "Sales Revenue", "Revenue", "Operating"),
+        ("4100", "Service Revenue", "Revenue", "Operating"),
+        ("4200", "Shipping & Handling Income", "Revenue", "Operating"),
+        ("4900", "Other Income", "Revenue", "Other"),
         # Cost of Goods Sold
-        ("5000", "Cost of Goods Sold",             "COGS",      ""),
-        ("5100", "Raw Materials Used",             "COGS",      ""),
-        ("5200", "Direct Labor",                   "COGS",      ""),
-        ("5300", "Manufacturing Overhead",         "COGS",      ""),
-        ("5400", "Freight & Shipping",             "COGS",      ""),
+        ("5000", "Cost of Goods Sold", "COGS", ""),
+        ("5100", "Raw Materials Used", "COGS", ""),
+        ("5200", "Direct Labor", "COGS", ""),
+        ("5300", "Manufacturing Overhead", "COGS", ""),
+        ("5400", "Freight & Shipping", "COGS", ""),
         # Expenses
-        ("6000", "Salaries & Wages",               "Expense",   "Operating"),
-        ("6100", "Payroll Taxes",                  "Expense",   "Operating"),
-        ("6200", "Rent Expense",                   "Expense",   "Operating"),
-        ("6300", "Utilities",                      "Expense",   "Operating"),
-        ("6400", "Insurance",                      "Expense",   "Operating"),
-        ("6500", "Depreciation Expense",           "Expense",   "Operating"),
-        ("6600", "Office Supplies",                "Expense",   "Operating"),
-        ("6700", "Marketing & Advertising",        "Expense",   "Operating"),
-        ("6800", "Professional Services",          "Expense",   "Operating"),
-        ("6900", "Travel & Entertainment",         "Expense",   "Operating"),
-        ("7000", "Interest Expense",               "Expense",   "Non-operating"),
-        ("7100", "Bank Charges",                   "Expense",   "Non-operating"),
-        ("7900", "Other Expense",                  "Expense",   "Other"),
+        ("6000", "Salaries & Wages", "Expense", "Operating"),
+        ("6100", "Payroll Taxes", "Expense", "Operating"),
+        ("6200", "Rent Expense", "Expense", "Operating"),
+        ("6300", "Utilities", "Expense", "Operating"),
+        ("6400", "Insurance", "Expense", "Operating"),
+        ("6500", "Depreciation Expense", "Expense", "Operating"),
+        ("6600", "Office Supplies", "Expense", "Operating"),
+        ("6700", "Marketing & Advertising", "Expense", "Operating"),
+        ("6800", "Professional Services", "Expense", "Operating"),
+        ("6900", "Travel & Entertainment", "Expense", "Operating"),
+        ("7000", "Interest Expense", "Expense", "Non-operating"),
+        ("7100", "Bank Charges", "Expense", "Non-operating"),
+        ("7900", "Other Expense", "Expense", "Other"),
     ]
     con.executemany(
         "INSERT INTO gl_account(account_number,account_name,account_type,account_sub) VALUES(?,?,?,?)",
         accounts
     )
+
 
 # ── style constants ───────────────────────────────────────────────────────────
 BTN_STYLE = (
@@ -121,14 +128,15 @@ TAB_STYLE = (
 )
 HDR_STYLE = "background-color:rgb(0,85,255);color:white;font-weight:bold;"
 ACCT_TYPE_COLORS = {
-    "Asset":     QtGui.QColor(220, 240, 255),
+    "Asset": QtGui.QColor(220, 240, 255),
     "Liability": QtGui.QColor(255, 235, 220),
-    "Equity":    QtGui.QColor(220, 255, 220),
-    "Revenue":   QtGui.QColor(220, 255, 235),
-    "COGS":      QtGui.QColor(255, 255, 210),
-    "Expense":   QtGui.QColor(255, 220, 220),
+    "Equity": QtGui.QColor(220, 255, 220),
+    "Revenue": QtGui.QColor(220, 255, 235),
+    "COGS": QtGui.QColor(255, 255, 210),
+    "Expense": QtGui.QColor(255, 220, 220),
 }
 ACCT_TYPES = ["Asset", "Liability", "Equity", "Revenue", "COGS", "Expense"]
+
 
 def _apply_blue_palette(widget):
     pal = QtGui.QPalette()
@@ -140,20 +148,24 @@ def _apply_blue_palette(widget):
     pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
     widget.setPalette(pal)
 
+
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
     item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
+
 def _ro_r(text):
     return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight)
+
 
 def _money(v):
     try:
         return f"{float(v):,.2f}"
     except Exception:
         return "0.00"
+
 
 def _export_table_to_csv(table: QtWidgets.QTableWidget, parent):
     path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -176,6 +188,8 @@ def _export_table_to_csv(table: QtWidgets.QTableWidget, parent):
 # ══════════════════════════════════════════════════════════════════════════════
 # Journal Entry Dialog
 # ══════════════════════════════════════════════════════════════════════════════
+
+
 class JournalDialog(QtWidgets.QDialog):
     """New / Edit Journal Entry dialog with line-item grid."""
 
@@ -199,9 +213,12 @@ class JournalDialog(QtWidgets.QDialog):
 
         self.ef_date = QtWidgets.QDateEdit(calendarPopup=True)
         self.ef_date.setDate(QtCore.QDate.currentDate())
-        self.ef_ref  = QtWidgets.QLineEdit(); self.ef_ref.setPlaceholderText("e.g. JE-0001")
-        self.ef_desc = QtWidgets.QLineEdit(); self.ef_desc.setPlaceholderText("Journal description")
-        self.ef_by   = QtWidgets.QLineEdit(); self.ef_by.setPlaceholderText("Your name")
+        self.ef_ref = QtWidgets.QLineEdit()
+        self.ef_ref.setPlaceholderText("e.g. JE-0001")
+        self.ef_desc = QtWidgets.QLineEdit()
+        self.ef_desc.setPlaceholderText("Journal description")
+        self.ef_by = QtWidgets.QLineEdit()
+        self.ef_by.setPlaceholderText("Your name")
 
         for lbl, w in [("Date*", self.ef_date), ("Reference", self.ef_ref),
                        ("Description", self.ef_desc), ("Created By", self.ef_by)]:
@@ -227,19 +244,23 @@ class JournalDialog(QtWidgets.QDialog):
 
         # add/remove line buttons
         lr = QtWidgets.QHBoxLayout()
-        b_add = QtWidgets.QPushButton("＋ Add Line"); b_add.setStyleSheet(BTN_STYLE)
-        b_del = QtWidgets.QPushButton("－ Remove Line"); b_del.setStyleSheet(BTN_STYLE)
+        b_add = QtWidgets.QPushButton("＋ Add Line")
+        b_add.setStyleSheet(BTN_STYLE)
+        b_del = QtWidgets.QPushButton("－ Remove Line")
+        b_del.setStyleSheet(BTN_STYLE)
         b_add.clicked.connect(self._add_line)
         b_del.clicked.connect(self._remove_line)
-        lr.addWidget(b_add); lr.addWidget(b_del); lr.addStretch()
+        lr.addWidget(b_add)
+        lr.addWidget(b_del)
+        lr.addStretch()
         lv.addLayout(lr)
 
         # totals bar
         tot = QtWidgets.QHBoxLayout()
         tot.addStretch()
-        self.lbl_debit  = QtWidgets.QLabel("Debits: 0.00")
+        self.lbl_debit = QtWidgets.QLabel("Debits: 0.00")
         self.lbl_credit = QtWidgets.QLabel("Credits: 0.00")
-        self.lbl_diff   = QtWidgets.QLabel("Difference: 0.00")
+        self.lbl_diff = QtWidgets.QLabel("Difference: 0.00")
         for lbl in [self.lbl_debit, self.lbl_credit, self.lbl_diff]:
             lbl.setStyleSheet("font-weight:bold; font-size:13px; padding:0 12px;")
         tot.addWidget(self.lbl_debit)
@@ -251,9 +272,9 @@ class JournalDialog(QtWidgets.QDialog):
 
         # ── buttons ──
         bb = QtWidgets.QDialogButtonBox()
-        self.btn_save  = bb.addButton("Save Draft",  QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
-        self.btn_post  = bb.addButton("Save & Post", QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
-        btn_cancel     = bb.addButton("Cancel",      QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
+        self.btn_save = bb.addButton("Save Draft", QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
+        self.btn_post = bb.addButton("Save & Post", QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
+        btn_cancel = bb.addButton("Cancel", QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
         for b in [self.btn_save, self.btn_post]:
             b.setStyleSheet(BTN_STYLE)
         btn_cancel.setStyleSheet(BTN_STYLE)
@@ -288,7 +309,8 @@ class JournalDialog(QtWidgets.QDialog):
         self.tbl.insertRow(r)
         cb = self._acct_combo()
         self.tbl.setCellWidget(r, 0, cb)
-        type_item = _ro(""); type_item.setForeground(QtGui.QColor(80, 80, 80))
+        type_item = _ro("")
+        type_item.setForeground(QtGui.QColor(80, 80, 80))
         self.tbl.setItem(r, 1, type_item)
         for c in [2, 3]:
             spin = QtWidgets.QDoubleSpinBox()
@@ -324,8 +346,10 @@ class JournalDialog(QtWidgets.QDialog):
         for r in range(self.tbl.rowCount()):
             d = self.tbl.cellWidget(r, 2)
             c = self.tbl.cellWidget(r, 3)
-            if d: dr += d.value()
-            if c: cr += c.value()
+            if d:
+                dr += d.value()
+            if c:
+                cr += c.value()
         diff = dr - cr
         self.lbl_debit.setText(f"Debits: {_money(dr)}")
         self.lbl_credit.setText(f"Credits: {_money(cr)}")
@@ -357,8 +381,10 @@ class JournalDialog(QtWidgets.QDialog):
                 cb.setCurrentIndex(idx)
             dw = self.tbl.cellWidget(r, 2)
             cw = self.tbl.cellWidget(r, 3)
-            if dw: dw.setValue(ln["debit"] or 0)
-            if cw: cw.setValue(ln["credit"] or 0)
+            if dw:
+                dw.setValue(ln["debit"] or 0)
+            if cw:
+                cw.setValue(ln["credit"] or 0)
             memo_item = self.tbl.item(r, 4)
             if memo_item:
                 memo_item.setText(ln["memo"] or "")
@@ -375,8 +401,8 @@ class JournalDialog(QtWidgets.QDialog):
             if not cb or not dw or not cw:
                 continue
             aid = cb.currentData()
-            d   = round(dw.value(), 2)
-            c   = round(cw.value(), 2)
+            d = round(dw.value(), 2)
+            c = round(cw.value(), 2)
             if aid == 0 and d == 0 and c == 0:
                 continue   # blank row
             if aid == 0:
@@ -388,8 +414,8 @@ class JournalDialog(QtWidgets.QDialog):
         if not lines:
             QtWidgets.QMessageBox.warning(self, "Validation", "Add at least one journal line.")
             return
-        total_d = sum(l[1] for l in lines)
-        total_c = sum(l[2] for l in lines)
+        total_d = sum(ln[1] for ln in lines)
+        total_c = sum(ln[2] for ln in lines)
         if post and abs(total_d - total_c) >= 0.005:
             QtWidgets.QMessageBox.warning(
                 self, "Unbalanced Entry",
@@ -436,6 +462,7 @@ _FS_INNER_KEYS = {
     'bal_sheet': 1,
 }
 
+
 class GeneralLedgerWindow(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
@@ -468,12 +495,12 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.tabs.setStyleSheet(TAB_STYLE)
         root.addWidget(self.tabs)
 
-        self.tabs.addTab(self._build_coa_tab(),     "Chart of Accounts")
-        self.tabs.addTab(self._build_journals_tab(),"Journal Entries")
-        self.tabs.addTab(self._build_trial_tab(),   "Trial Balance")
-        self.tabs.addTab(self._build_ledger_tab(),   "Ledger View")
-        self.tabs.addTab(self._build_fs_tab(),       "Financial Statements")
-        self.tabs.addTab(self._build_recon_tab(),    "Bank Reconciliation")
+        self.tabs.addTab(self._build_coa_tab(), "Chart of Accounts")
+        self.tabs.addTab(self._build_journals_tab(), "Journal Entries")
+        self.tabs.addTab(self._build_trial_tab(), "Trial Balance")
+        self.tabs.addTab(self._build_ledger_tab(), "Ledger View")
+        self.tabs.addTab(self._build_fs_tab(), "Financial Statements")
+        self.tabs.addTab(self._build_recon_tab(), "Bank Reconciliation")
 
         self.tabs.currentChanged.connect(self._on_tab_change)
 
@@ -486,7 +513,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         # filter bar
         fb = QtWidgets.QHBoxLayout()
         fb.addWidget(QtWidgets.QLabel("Filter:"))
-        self.coa_search = QtWidgets.QLineEdit(); self.coa_search.setPlaceholderText("account # or name…")
+        self.coa_search = QtWidgets.QLineEdit()
+        self.coa_search.setPlaceholderText("account # or name…")
         self.coa_search.textChanged.connect(self._refresh_coa)
         self.coa_type_filter = QtWidgets.QComboBox()
         self.coa_type_filter.addItem("All Types")
@@ -501,7 +529,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         fb.addWidget(self.coa_type_filter)
         fb.addWidget(self.coa_active_filter)
         fb.addStretch()
-        btn_export = QtWidgets.QPushButton("Export CSV"); btn_export.setStyleSheet(BTN_STYLE)
+        btn_export = QtWidgets.QPushButton("Export CSV")
+        btn_export.setStyleSheet(BTN_STYLE)
         btn_export.clicked.connect(lambda: _export_table_to_csv(self.coa_tbl, self))
         fb.addWidget(btn_export)
         v.addLayout(fb)
@@ -529,30 +558,34 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         fl = QtWidgets.QFormLayout(fg)
         fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self.coa_ef_num   = QtWidgets.QLineEdit(); self.coa_ef_num.setMaxLength(20)
-        self.coa_ef_name  = QtWidgets.QLineEdit()
-        self.coa_ef_type  = QtWidgets.QComboBox()
+        self.coa_ef_num = QtWidgets.QLineEdit()
+        self.coa_ef_num.setMaxLength(20)
+        self.coa_ef_name = QtWidgets.QLineEdit()
+        self.coa_ef_type = QtWidgets.QComboBox()
         for t in ACCT_TYPES:
             self.coa_ef_type.addItem(t)
-        self.coa_ef_sub   = QtWidgets.QLineEdit(); self.coa_ef_sub.setPlaceholderText("e.g. Current, Fixed…")
-        self.coa_ef_act   = QtWidgets.QCheckBox("Active"); self.coa_ef_act.setChecked(True)
+        self.coa_ef_sub = QtWidgets.QLineEdit()
+        self.coa_ef_sub.setPlaceholderText("e.g. Current, Fixed…")
+        self.coa_ef_act = QtWidgets.QCheckBox("Active")
+        self.coa_ef_act.setChecked(True)
         self.coa_ef_notes = QtWidgets.QLineEdit()
 
-        fl.addRow("Acct # *",  self.coa_ef_num)
-        fl.addRow("Name *",    self.coa_ef_name)
-        fl.addRow("Type *",    self.coa_ef_type)
-        fl.addRow("Sub-type",  self.coa_ef_sub)
-        fl.addRow("",          self.coa_ef_act)
-        fl.addRow("Notes",     self.coa_ef_notes)
+        fl.addRow("Acct # *", self.coa_ef_num)
+        fl.addRow("Name *", self.coa_ef_name)
+        fl.addRow("Type *", self.coa_ef_type)
+        fl.addRow("Sub-type", self.coa_ef_sub)
+        fl.addRow("", self.coa_ef_act)
+        fl.addRow("Notes", self.coa_ef_notes)
         v.addWidget(fg)
 
         # buttons
         bb = QtWidgets.QHBoxLayout()
         for lbl, slot in [("Add Account", self._on_coa_add),
-                           ("Update Account", self._on_coa_update),
-                           ("Toggle Active", self._on_coa_toggle),
-                           ("Clear", self._on_coa_clear)]:
-            b = QtWidgets.QPushButton(lbl); b.setStyleSheet(BTN_STYLE)
+                          ("Update Account", self._on_coa_update),
+                          ("Toggle Active", self._on_coa_toggle),
+                          ("Clear", self._on_coa_clear)]:
+            b = QtWidgets.QPushButton(lbl)
+            b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
             bb.addWidget(b)
         bb.addStretch()
@@ -569,7 +602,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             params += [f"%{txt}%", f"%{txt}%"]
         t = self.coa_type_filter.currentText()
         if t != "All Types":
-            where.append("account_type=?"); params.append(t)
+            where.append("account_type=?")
+            params.append(t)
         if self.coa_active_filter.isChecked():
             where.append("is_active=1")
         if where:
@@ -681,8 +715,10 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage("Account active status toggled")
 
     def _on_coa_clear(self):
-        self.coa_ef_num.clear(); self.coa_ef_name.clear()
-        self.coa_ef_sub.clear(); self.coa_ef_notes.clear()
+        self.coa_ef_num.clear()
+        self.coa_ef_name.clear()
+        self.coa_ef_sub.clear()
+        self.coa_ef_notes.clear()
         self.coa_ef_type.setCurrentIndex(0)
         self.coa_ef_act.setChecked(True)
         self.coa_tbl.clearSelection()
@@ -707,9 +743,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.je_status_filter = QtWidgets.QComboBox()
         self.je_status_filter.addItems(["All", "Draft", "Posted"])
         fb.addWidget(self.je_status_filter)
-        btn_search = QtWidgets.QPushButton("Search"); btn_search.setStyleSheet(BTN_STYLE)
+        btn_search = QtWidgets.QPushButton("Search")
+        btn_search.setStyleSheet(BTN_STYLE)
         btn_search.clicked.connect(self._refresh_journals)
-        fb.addWidget(btn_search); fb.addStretch()
+        fb.addWidget(btn_search)
+        fb.addStretch()
         v.addLayout(fb)
 
         # journal header table
@@ -750,10 +788,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         # action buttons
         bb = QtWidgets.QHBoxLayout()
         for lbl, slot in [("New Journal", self._on_je_new),
-                           ("Edit Journal", self._on_je_edit),
-                           ("Post Entry", self._on_je_post),
-                           ("Delete Draft", self._on_je_delete)]:
-            b = QtWidgets.QPushButton(lbl); b.setStyleSheet(BTN_STYLE)
+                          ("Edit Journal", self._on_je_edit),
+                          ("Post Entry", self._on_je_post),
+                          ("Delete Draft", self._on_je_delete)]:
+            b = QtWidgets.QPushButton(lbl)
+            b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
             bb.addWidget(b)
         bb.addStretch()
@@ -815,10 +854,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             self.je_lines_tbl.setItem(r, 2, _ro(ln["account_type"]))
             self.je_lines_tbl.setItem(r, 3, _ro_r(_money(ln["debit"])))
             self.je_lines_tbl.setItem(r, 4, _ro_r(_money(ln["credit"])))
-            td += ln["debit"] or 0; tc += ln["credit"] or 0
+            td += ln["debit"] or 0
+            tc += ln["credit"] or 0
         diff = abs(td - tc)
         bal_str = "✓ Balanced" if diff < 0.005 else f"⚠ Difference: {_money(diff)}"
-        color   = "green" if diff < 0.005 else "red"
+        color = "green" if diff < 0.005 else "red"
         self.je_totals_lbl.setText(
             f"<span style='color:{color};'>  {bal_str}</span>   "
             f"Debits: <b>{_money(td)}</b>   Credits: <b>{_money(tc)}</b>"
@@ -863,7 +903,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                 "SELECT SUM(debit) AS td, SUM(credit) AS tc FROM gl_journal_line WHERE journal_id=?",
                 (jid,)
             ).fetchone()
-        td = agg["td"] or 0; tc = agg["tc"] or 0
+        td = agg["td"] or 0
+        tc = agg["tc"] or 0
         if abs(td - tc) >= 0.005:
             QtWidgets.QMessageBox.warning(
                 self, "Unbalanced",
@@ -908,10 +949,13 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.tb_posted_only.setChecked(False)
         self.tb_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.tb_posted_only)
-        btn_run = QtWidgets.QPushButton("Run Trial Balance"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("Run Trial Balance")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_trial)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.tb_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
@@ -959,7 +1003,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.tb_tbl.setRowCount(0)
         grand_dr = grand_cr = 0.0
         for row in rows:
-            td = row["total_debit"]; tc = row["total_credit"]
+            td = row["total_debit"]
+            tc = row["total_credit"]
             # natural balance: Asset/Expense/COGS = debit-normal; Liability/Equity/Revenue = credit-normal
             if row["account_type"] in ("Asset", "Expense", "COGS"):
                 bal = td - tc
@@ -983,11 +1028,12 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                 it = self.tb_tbl.item(r, c)
                 if it:
                     it.setBackground(color)
-            grand_dr += td; grand_cr += tc
+            grand_dr += td
+            grand_cr += tc
 
         diff = abs(grand_dr - grand_cr)
         bal_str = "✓ Trial Balance is balanced" if diff < 0.005 else f"⚠ Out of balance by {_money(diff)}"
-        color   = "green" if diff < 0.005 else "red"
+        color = "green" if diff < 0.005 else "red"
         self.tb_totals_lbl.setText(
             f"<span style='color:{color};'>{bal_str}</span>   "
             f"Total Debits: <b>{_money(grand_dr)}</b>   "
@@ -1002,7 +1048,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
 
         fb = QtWidgets.QHBoxLayout()
         fb.addWidget(QtWidgets.QLabel("Account:"))
-        self.lv_acct = QtWidgets.QComboBox(); self.lv_acct.setMinimumWidth(300)
+        self.lv_acct = QtWidgets.QComboBox()
+        self.lv_acct.setMinimumWidth(300)
         fb.addWidget(self.lv_acct)
         fb.addWidget(QtWidgets.QLabel("From:"))
         self.lv_from = QtWidgets.QDateEdit(calendarPopup=True)
@@ -1016,10 +1063,13 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.lv_posted_only.setChecked(False)
         self.lv_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.lv_posted_only)
-        btn_run = QtWidgets.QPushButton("View Ledger"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("View Ledger")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_ledger)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.lv_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
@@ -1085,12 +1135,14 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         running = 0.0
         total_d = total_c = 0.0
         for row in rows:
-            d = row["debit"] or 0; c = row["credit"] or 0
+            d = row["debit"] or 0
+            c = row["credit"] or 0
             if debit_normal:
                 running += d - c
             else:
                 running += c - d
-            total_d += d; total_c += c
+            total_d += d
+            total_c += c
             r = self.lv_tbl.rowCount()
             self.lv_tbl.insertRow(r)
             self.lv_tbl.setItem(r, 0, _ro(row["journal_date"]))
@@ -1141,10 +1193,13 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.is_posted_only.setChecked(False)
         self.is_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.is_posted_only)
-        btn_run = QtWidgets.QPushButton("Run"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("Run")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_income_stmt)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.is_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
@@ -1177,10 +1232,13 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.bs_posted_only.setChecked(False)
         self.bs_posted_only.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.bs_posted_only)
-        btn_run = QtWidgets.QPushButton("Run"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("Run")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_balance_sheet)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.bs_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
@@ -1202,48 +1260,68 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
 
     # ── FS row helpers ────────────────────────────────────────────────────────
     def _fs_section_header(self, tbl, label):
-        r = tbl.rowCount(); tbl.insertRow(r)
+        r = tbl.rowCount()
+        tbl.insertRow(r)
         item = _ro(label.upper())
         item.setBackground(QtGui.QColor(0, 85, 255))
         item.setForeground(QtGui.QColor(255, 255, 255))
-        f = item.font(); f.setBold(True); item.setFont(f)
+        f = item.font()
+        f.setBold(True)
+        item.setFont(f)
         tbl.setItem(r, 0, item)
-        amt = _ro(""); amt.setBackground(QtGui.QColor(0, 85, 255))
+        amt = _ro("")
+        amt.setBackground(QtGui.QColor(0, 85, 255))
         tbl.setItem(r, 1, amt)
         tbl.setRowHeight(r, 28)
 
     def _fs_detail_row(self, tbl, label, amount, color=None):
-        r = tbl.rowCount(); tbl.insertRow(r)
+        r = tbl.rowCount()
+        tbl.insertRow(r)
         lbl_item = _ro(f"    {label}")
         amt_item = _ro_r(_money(amount) if amount != 0 else "")
         if color:
-            lbl_item.setBackground(color); amt_item.setBackground(color)
-        tbl.setItem(r, 0, lbl_item); tbl.setItem(r, 1, amt_item)
+            lbl_item.setBackground(color)
+            amt_item.setBackground(color)
+        tbl.setItem(r, 0, lbl_item)
+        tbl.setItem(r, 1, amt_item)
 
     def _fs_subtotal_row(self, tbl, label, amount, bg=None):
-        r = tbl.rowCount(); tbl.insertRow(r)
-        lbl_item = _ro(label); amt_item = _ro_r(_money(amount))
+        r = tbl.rowCount()
+        tbl.insertRow(r)
+        lbl_item = _ro(label)
+        amt_item = _ro_r(_money(amount))
         for it in (lbl_item, amt_item):
-            f = it.font(); f.setBold(True); it.setFont(f)
+            f = it.font()
+            f.setBold(True)
+            it.setFont(f)
             it.setBackground(bg or QtGui.QColor(210, 230, 255))
-        tbl.setItem(r, 0, lbl_item); tbl.setItem(r, 1, amt_item)
+        tbl.setItem(r, 0, lbl_item)
+        tbl.setItem(r, 1, amt_item)
         tbl.setRowHeight(r, 26)
 
     def _fs_total_row(self, tbl, label, amount, positive_good=True):
-        r = tbl.rowCount(); tbl.insertRow(r)
-        lbl_item = _ro(label); amt_item = _ro_r(_money(amount))
+        r = tbl.rowCount()
+        tbl.insertRow(r)
+        lbl_item = _ro(label)
+        amt_item = _ro_r(_money(amount))
         fg = QtGui.QColor("green") if (amount >= 0 if positive_good else True) else QtGui.QColor("red")
         bg = QtGui.QColor(0, 85, 255)
         for it in (lbl_item, amt_item):
-            f = it.font(); f.setBold(True); it.setFont(f)
-            it.setBackground(bg); it.setForeground(QtGui.QColor(255, 255, 255))
+            f = it.font()
+            f.setBold(True)
+            it.setFont(f)
+            it.setBackground(bg)
+            it.setForeground(QtGui.QColor(255, 255, 255))
         amt_item.setForeground(fg)
-        tbl.setItem(r, 0, lbl_item); tbl.setItem(r, 1, amt_item)
+        tbl.setItem(r, 0, lbl_item)
+        tbl.setItem(r, 1, amt_item)
         tbl.setRowHeight(r, 28)
 
     def _fs_spacer(self, tbl):
-        r = tbl.rowCount(); tbl.insertRow(r)
-        tbl.setItem(r, 0, _ro("")); tbl.setItem(r, 1, _ro(""))
+        r = tbl.rowCount()
+        tbl.insertRow(r)
+        tbl.setItem(r, 0, _ro(""))
+        tbl.setItem(r, 1, _ro(""))
         tbl.setRowHeight(r, 10)
 
     # ── Income Statement ──────────────────────────────────────────────────────
@@ -1266,20 +1344,21 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             rows = con.execute(sql, (d0, d1)).fetchall()
 
-        rev_rows  = [(r["account_name"], r["tc"] - r["td"]) for r in rows if r["account_type"] == "Revenue"]
+        rev_rows = [(r["account_name"], r["tc"] - r["td"]) for r in rows if r["account_type"] == "Revenue"]
         cogs_rows = [(r["account_name"], r["td"] - r["tc"]) for r in rows if r["account_type"] == "COGS"]
-        exp_rows  = [(r["account_name"], r["td"] - r["tc"]) for r in rows if r["account_type"] == "Expense"]
+        exp_rows = [(r["account_name"], r["td"] - r["tc"]) for r in rows if r["account_type"] == "Expense"]
 
-        total_rev  = sum(v for _, v in rev_rows)
+        total_rev = sum(v for _, v in rev_rows)
         total_cogs = sum(v for _, v in cogs_rows)
-        gross      = total_rev - total_cogs
-        total_exp  = sum(v for _, v in exp_rows)
+        gross = total_rev - total_cogs
+        total_exp = sum(v for _, v in exp_rows)
         net_income = gross - total_exp
 
-        tbl = self.is_tbl; tbl.setRowCount(0)
-        c_rev  = ACCT_TYPE_COLORS["Revenue"]
+        tbl = self.is_tbl
+        tbl.setRowCount(0)
+        c_rev = ACCT_TYPE_COLORS["Revenue"]
         c_cogs = ACCT_TYPE_COLORS["COGS"]
-        c_exp  = ACCT_TYPE_COLORS["Expense"]
+        c_exp = ACCT_TYPE_COLORS["Expense"]
 
         self._fs_section_header(tbl, "Revenue")
         for name, amt in rev_rows:
@@ -1309,9 +1388,9 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
 
     # ── Balance Sheet ─────────────────────────────────────────────────────────
     def _refresh_balance_sheet(self):
-        d1  = self.bs_as_of.date().toString("yyyy-MM-dd")
+        d1 = self.bs_as_of.date().toString("yyyy-MM-dd")
         fy0 = self.bs_fy_start.date().toString("yyyy-MM-dd")
-        pc  = "AND j.posted=1" if self.bs_posted_only.isChecked() else ""
+        pc = "AND j.posted=1" if self.bs_posted_only.isChecked() else ""
 
         sql_bal = f"""
             SELECT a.account_number, a.account_name, a.account_type, a.account_sub,
@@ -1342,41 +1421,51 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             nie_rows = con.execute(sql_nie, (fy0, d1)).fetchall()
 
         nie = {r["account_type"]: (r["td"], r["tc"]) for r in nie_rows}
-        rev_d,  rev_c  = nie.get("Revenue", (0, 0))
-        cogs_d, cogs_c = nie.get("COGS",    (0, 0))
-        exp_d,  exp_c  = nie.get("Expense", (0, 0))
+        rev_d, rev_c = nie.get("Revenue", (0, 0))
+        cogs_d, cogs_c = nie.get("COGS", (0, 0))
+        exp_d, exp_c = nie.get("Expense", (0, 0))
         cy_earnings = (rev_c - rev_d) - (cogs_d - cogs_c) - (exp_d - exp_c)
 
         def net(row):
             return row["td"] - row["tc"] if row["account_type"] == "Asset" else row["tc"] - row["td"]
 
         asset_rows = [r for r in bal_rows if r["account_type"] == "Asset"]
-        liab_rows  = [r for r in bal_rows if r["account_type"] == "Liability"]
-        eq_rows    = [r for r in bal_rows if r["account_type"] == "Equity"]
+        liab_rows = [r for r in bal_rows if r["account_type"] == "Liability"]
+        eq_rows = [r for r in bal_rows if r["account_type"] == "Equity"]
 
-        tbl = self.bs_tbl; tbl.setRowCount(0)
+        tbl = self.bs_tbl
+        tbl.setRowCount(0)
         c_asset = ACCT_TYPE_COLORS["Asset"]
-        c_liab  = ACCT_TYPE_COLORS["Liability"]
-        c_eq    = ACCT_TYPE_COLORS["Equity"]
+        c_liab = ACCT_TYPE_COLORS["Liability"]
+        c_eq = ACCT_TYPE_COLORS["Equity"]
 
         # ── Assets ──
         self._fs_section_header(tbl, "Assets")
         total_assets = 0.0
         for sub, sub_label, hdr_bg, sub_bg in [
-            ("Current",  "Current Assets",      QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
-            ("Fixed",    "Fixed Assets",         QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
-            ("Other",    "Other Assets",         QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
+            ("Current", "Current Assets", QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
+            ("Fixed", "Fixed Assets", QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
+            ("Other", "Other Assets", QtGui.QColor(190, 215, 245), QtGui.QColor(210, 230, 255)),
         ]:
             sub_rows = [r for r in asset_rows if (r["account_sub"] or "Other") == sub]
             if not sub_rows:
                 continue
-            r = tbl.rowCount(); tbl.insertRow(r)
-            lbl = _ro(f"  {sub_label}"); f = lbl.font(); f.setItalic(True); f.setBold(True); lbl.setFont(f)
+            r = tbl.rowCount()
+            tbl.insertRow(r)
+            lbl = _ro(f"  {sub_label}")
+            f = lbl.font()
+            f.setItalic(True)
+            f.setBold(True)
+            lbl.setFont(f)
             lbl.setBackground(hdr_bg)
-            tbl.setItem(r, 0, lbl); a = _ro(""); a.setBackground(hdr_bg); tbl.setItem(r, 1, a)
+            tbl.setItem(r, 0, lbl)
+            a = _ro("")
+            a.setBackground(hdr_bg)
+            tbl.setItem(r, 1, a)
             sub_total = 0.0
             for row in sub_rows:
-                bal = net(row); sub_total += bal
+                bal = net(row)
+                sub_total += bal
                 self._fs_detail_row(tbl, row["account_name"], bal, c_asset)
             total_assets += sub_total
             self._fs_subtotal_row(tbl, f"    Total {sub_label}", sub_total, sub_bg)
@@ -1388,20 +1477,29 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self._fs_section_header(tbl, "Liabilities")
         total_liab = 0.0
         for sub, sub_label, hdr_bg, sub_bg in [
-            ("Current",   "Current Liabilities",    QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
-            ("Long-term", "Long-term Liabilities",  QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
-            ("Other",     "Other Liabilities",      QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
+            ("Current", "Current Liabilities", QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
+            ("Long-term", "Long-term Liabilities", QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
+            ("Other", "Other Liabilities", QtGui.QColor(245, 215, 190), QtGui.QColor(255, 225, 200)),
         ]:
             sub_rows = [r for r in liab_rows if (r["account_sub"] or "Other") == sub]
             if not sub_rows:
                 continue
-            r = tbl.rowCount(); tbl.insertRow(r)
-            lbl = _ro(f"  {sub_label}"); f = lbl.font(); f.setItalic(True); f.setBold(True); lbl.setFont(f)
+            r = tbl.rowCount()
+            tbl.insertRow(r)
+            lbl = _ro(f"  {sub_label}")
+            f = lbl.font()
+            f.setItalic(True)
+            f.setBold(True)
+            lbl.setFont(f)
             lbl.setBackground(hdr_bg)
-            tbl.setItem(r, 0, lbl); a = _ro(""); a.setBackground(hdr_bg); tbl.setItem(r, 1, a)
+            tbl.setItem(r, 0, lbl)
+            a = _ro("")
+            a.setBackground(hdr_bg)
+            tbl.setItem(r, 1, a)
             sub_total = 0.0
             for row in sub_rows:
-                bal = net(row); sub_total += bal
+                bal = net(row)
+                sub_total += bal
                 self._fs_detail_row(tbl, row["account_name"], bal, c_liab)
             total_liab += sub_total
             self._fs_subtotal_row(tbl, f"    Total {sub_label}", sub_total, sub_bg)
@@ -1415,7 +1513,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         for row in eq_rows:
             if row["account_number"] == "3900":
                 continue  # replaced by computed current year earnings below
-            bal = net(row); total_eq += bal
+            bal = net(row)
+            total_eq += bal
             self._fs_detail_row(tbl, row["account_name"], bal, c_eq)
         self._fs_detail_row(tbl, "Current Year Earnings (computed)", cy_earnings, c_eq)
         total_eq += cy_earnings
@@ -1453,8 +1552,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         elif idx == 3:  # Ledger View — repopulate account combo
             self._populate_lv_acct_combo()
 
-
     # ── Bank Reconciliation tab ───────────────────────────────────────────────
+
     def _build_recon_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
@@ -1480,7 +1579,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.recon_stmt_bal.setDecimals(2)
         self.recon_stmt_bal.setGroupSeparatorShown(True)
         top.addWidget(self.recon_stmt_bal)
-        btn_load = QtWidgets.QPushButton("Load Transactions"); btn_load.setStyleSheet(BTN_STYLE)
+        btn_load = QtWidgets.QPushButton("Load Transactions")
+        btn_load.setStyleSheet(BTN_STYLE)
         btn_load.clicked.connect(self._recon_load)
         top.addWidget(btn_load)
         top.addStretch()
@@ -1489,19 +1589,23 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.recon_tbl = QtWidgets.QTableWidget(0, 5)
         self.recon_tbl.setHorizontalHeaderLabels(["Date", "Reference", "Description", "Amount", "Cleared"])
         self.recon_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.recon_tbl.setColumnWidth(0, 95); self.recon_tbl.setColumnWidth(1, 110)
-        self.recon_tbl.setColumnWidth(3, 100); self.recon_tbl.setColumnWidth(4, 65)
+        self.recon_tbl.setColumnWidth(0, 95)
+        self.recon_tbl.setColumnWidth(1, 110)
+        self.recon_tbl.setColumnWidth(3, 100)
+        self.recon_tbl.setColumnWidth(4, 65)
         self.recon_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.recon_tbl.setAlternatingRowColors(True)
         self.recon_tbl.verticalHeader().setDefaultSectionSize(24)
         v.addWidget(self.recon_tbl)
 
-        self.recon_summary_lbl = QtWidgets.QLabel("Statement Balance: $0.00  |  Cleared Balance: $0.00  |  Difference: $0.00")
+        self.recon_summary_lbl = QtWidgets.QLabel(
+            "Statement Balance: $0.00  |  Cleared Balance: $0.00  |  Difference: $0.00")
         self.recon_summary_lbl.setStyleSheet("font-weight:bold;color:white;padding:4px;")
         v.addWidget(self.recon_summary_lbl)
 
         bb = QtWidgets.QHBoxLayout()
-        btn_clear = QtWidgets.QPushButton("Toggle Cleared"); btn_clear.setStyleSheet(BTN_STYLE)
+        btn_clear = QtWidgets.QPushButton("Toggle Cleared")
+        btn_clear.setStyleSheet(BTN_STYLE)
         btn_clear.clicked.connect(self._recon_toggle_cleared)
         bb.addWidget(btn_clear)
         bb.addStretch()
@@ -1536,7 +1640,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         self.recon_tbl.setRowCount(0)
         self._recon_line_ids = []
         for row in rows:
-            r = self.recon_tbl.rowCount(); self.recon_tbl.insertRow(r)
+            r = self.recon_tbl.rowCount()
+            self.recon_tbl.insertRow(r)
             amount = row["debit"] - row["credit"]
             self.recon_tbl.setItem(r, 0, _ro(row["journal_date"]))
             self.recon_tbl.setItem(r, 1, _ro(row["reference"] or ""))

@@ -18,10 +18,10 @@ COMBO_STYLE = (
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 SHIP_COLORS = {
-    "pending":   "#ffffff",
-    "shipped":   "#fff3cd",
+    "pending": "#ffffff",
+    "shipped": "#fff3cd",
     "delivered": "#d4edda",
-    "returned":  "#dcdcdc",
+    "returned": "#dcdcdc",
 }
 
 
@@ -100,9 +100,9 @@ class NewShipmentDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.ship_num = QtWidgets.QLineEdit(_next_ship_num())
         self.ship_num.setStyleSheet(INPUT_STYLE)
@@ -197,9 +197,9 @@ class AddShipItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -258,6 +258,7 @@ class AddShipItemDialog(QtWidgets.QDialog):
 
 class UpdateShipmentDialog(QtWidgets.QDialog):
     """Edit carrier/tracking on an existing shipment."""
+
     def __init__(self, shipment_id, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Update Shipment")
@@ -272,9 +273,9 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.ship_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         self.ship_date.setCalendarPopup(True)
@@ -439,12 +440,12 @@ class ShippingDept(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Shipment",    self._on_new_shipment),
-            ("Add Item",        self._on_add_item),
-            ("Update Details",  self._on_update_shipment),
-            ("Mark Shipped",    lambda: self._set_status("shipped",   "Mark as Shipped?")),
-            ("Mark Delivered",  lambda: self._set_status("delivered", "Mark as Delivered?")),
-            ("Mark Returned",   lambda: self._set_status("returned",  "Mark as Returned?")),
+            ("New Shipment", self._on_new_shipment),
+            ("Add Item", self._on_add_item),
+            ("Update Details", self._on_update_shipment),
+            ("Mark Shipped", lambda: self._set_status("shipped", "Mark as Shipped?")),
+            ("Mark Delivered", lambda: self._set_status("delivered", "Mark as Delivered?")),
+            ("Mark Returned", lambda: self._set_status("returned", "Mark as Returned?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -457,7 +458,7 @@ class ShippingDept(QtWidgets.QMainWindow):
     def _refresh_shipments(self):
         status = self.status_filter.currentData()
         d_from = self.date_from.date().toString("yyyy-MM-dd")
-        d_to   = self.date_to.date().toString("yyyy-MM-dd")
+        d_to = self.date_to.date().toString("yyyy-MM-dd")
 
         base = """
             SELECT s.id, s.ship_number, s.ship_date, s.carrier, s.tracking_number, s.status,
@@ -468,7 +469,8 @@ class ShippingDept(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("s.status = ?"); params.append(status)
+            conds.append("s.status = ?")
+            params.append(status)
         conds.append("(s.ship_date IS NULL OR s.ship_date BETWEEN ? AND ?)")
         params += [d_from, d_to]
         where = " WHERE " + " AND ".join(conds)

@@ -20,17 +20,17 @@ TEXT_STYLE = "QPlainTextEdit{background-color: white; border: 2px solid black; b
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 TASK_COLORS = {
-    "pending":     "#ffffff",
+    "pending": "#ffffff",
     "in_progress": "#fff3cd",
-    "completed":   "#d4edda",
-    "on_hold":     "#f8d7da",
-    "cancelled":   "#dcdcdc",
+    "completed": "#d4edda",
+    "on_hold": "#f8d7da",
+    "cancelled": "#dcdcdc",
 }
 
 PRIORITY_COLORS = {
     "critical": QtGui.QColor(248, 215, 218),
-    "high":     QtGui.QColor(255, 243, 205),
-    "medium":   QtGui.QColor(220, 235, 255),
+    "high": QtGui.QColor(255, 243, 205),
+    "medium": QtGui.QColor(220, 235, 255),
 }
 
 TASK_TYPES = (
@@ -114,9 +114,9 @@ class NewTaskDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.task_num = QtWidgets.QLineEdit(_next_task_num())
         self.task_num.setStyleSheet(INPUT_STYLE)
@@ -240,12 +240,13 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         # ── program buttons ──────────────────────────────────────────────────
         prog_row = QtWidgets.QHBoxLayout()
         prog_row.setSpacing(4)
-        font16 = QtGui.QFont(); font16.setPointSize(16)
+        font16 = QtGui.QFont()
+        font16.setPointSize(16)
         for label, script in (
-            ("Department Entry",        "dept_entry.py"),
-            ("Department Sub Entry",    "dept_sub_entry.py"),
+            ("Department Entry", "dept_entry.py"),
+            ("Department Sub Entry", "dept_sub_entry.py"),
             ("Department and Sub List", "dept_sub.py"),
-            ("People and Dept",         "display_people_department.py"),
+            ("People and Dept", "display_people_department.py"),
         ):
             b = QtWidgets.QPushButton(label)
             b.setFont(font16)
@@ -359,11 +360,11 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         # ── action buttons ──────────────────────────────────────────────────
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Task",       self._on_new_task),
-            ("Start Task",     lambda: self._set_status("in_progress", "Mark as In Progress?")),
-            ("Mark On Hold",   lambda: self._set_status("on_hold",     "Put On Hold?")),
-            ("Mark Complete",  lambda: self._set_status("completed",   "Mark as Completed?")),
-            ("Cancel Task",    lambda: self._set_status("cancelled",   "Cancel this task?")),
+            ("New Task", self._on_new_task),
+            ("Start Task", lambda: self._set_status("in_progress", "Mark as In Progress?")),
+            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold?")),
+            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed?")),
+            ("Cancel Task", lambda: self._set_status("cancelled", "Cancel this task?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -375,20 +376,23 @@ class ITTasksMenu(QtWidgets.QMainWindow):
 
     def _refresh(self):
         status_val = self.status_filter.currentData()
-        priority   = self.pri_filter.currentData()
-        task_type  = self.type_filter.currentData()
-        term       = self.search.text().strip()
+        priority = self.pri_filter.currentData()
+        task_type = self.type_filter.currentData()
+        term = self.search.text().strip()
 
         base = "SELECT * FROM it_task"
         conds, params = [], []
         if status_val == "active":
             conds.append("status IN ('pending','in_progress')")
         elif status_val:
-            conds.append("status = ?"); params.append(status_val)
+            conds.append("status = ?")
+            params.append(status_val)
         if priority:
-            conds.append("priority = ?"); params.append(priority)
+            conds.append("priority = ?")
+            params.append(priority)
         if task_type:
-            conds.append("task_type = ?"); params.append(task_type)
+            conds.append("task_type = ?")
+            params.append(task_type)
         if term:
             conds.append("(task_number LIKE ? OR task_name LIKE ? OR assigned_to LIKE ?"
                          " OR description LIKE ?)")

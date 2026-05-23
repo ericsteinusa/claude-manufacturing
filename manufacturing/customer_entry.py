@@ -13,7 +13,7 @@ BUTTON_STYLE = (
 INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
 COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
 LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE   = (
+TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
     " border-bottom:none; border-radius:4px 4px 0 0;}"
@@ -92,7 +92,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(tabs)
         tabs.addTab(self._build_customers_tab(), "Customers")
-        tabs.addTab(self._build_history_tab(),   "Service History")
+        tabs.addTab(self._build_history_tab(), "Service History")
         self._tabs = tabs
 
     # ── Customers tab ──────────────────────────────────────────────────────
@@ -152,9 +152,9 @@ class CustomerEntry(QtWidgets.QMainWindow):
         grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         def inp(ph=""):
             e = QtWidgets.QLineEdit()
@@ -163,24 +163,37 @@ class CustomerEntry(QtWidgets.QMainWindow):
             return e
 
         self.ef_company = inp("Company name")
-        self.ef_first   = inp("First name")
-        self.ef_last    = inp("Last name")
-        self.ef_phone   = inp("Phone"); self.ef_phone.setFixedWidth(140)
-        self.ef_email   = inp("Email")
-        self.ef_addr    = inp("Street address")
-        self.ef_city    = inp("City")
-        self.ef_state   = inp("ST"); self.ef_state.setMaxLength(2); self.ef_state.setFixedWidth(44)
-        self.ef_zip     = inp("Zip"); self.ef_zip.setFixedWidth(90)
+        self.ef_first = inp("First name")
+        self.ef_last = inp("Last name")
+        self.ef_phone = inp("Phone")
+        self.ef_phone.setFixedWidth(140)
+        self.ef_email = inp("Email")
+        self.ef_addr = inp("Street address")
+        self.ef_city = inp("City")
+        self.ef_state = inp("ST")
+        self.ef_state.setMaxLength(2)
+        self.ef_state.setFixedWidth(44)
+        self.ef_zip = inp("Zip")
+        self.ef_zip.setFixedWidth(90)
 
-        grid.addWidget(lbl("Company:"),    0, 0); grid.addWidget(self.ef_company, 0, 1, 1, 3)
-        grid.addWidget(lbl("First Name:"), 0, 4); grid.addWidget(self.ef_first,   0, 5)
-        grid.addWidget(lbl("Last Name:"),  1, 0); grid.addWidget(self.ef_last,    1, 1, 1, 3)
-        grid.addWidget(lbl("Phone:"),      1, 4); grid.addWidget(self.ef_phone,   1, 5)
-        grid.addWidget(lbl("Email:"),      2, 0); grid.addWidget(self.ef_email,   2, 1, 1, 5)
-        grid.addWidget(lbl("Address:"),    3, 0); grid.addWidget(self.ef_addr,    3, 1, 1, 3)
-        grid.addWidget(lbl("City:"),       3, 4); grid.addWidget(self.ef_city,    3, 5)
-        grid.addWidget(lbl("State:"),      4, 0); grid.addWidget(self.ef_state,   4, 1)
-        grid.addWidget(lbl("Zip:"),        4, 2); grid.addWidget(self.ef_zip,     4, 3)
+        grid.addWidget(lbl("Company:"), 0, 0)
+        grid.addWidget(self.ef_company, 0, 1, 1, 3)
+        grid.addWidget(lbl("First Name:"), 0, 4)
+        grid.addWidget(self.ef_first, 0, 5)
+        grid.addWidget(lbl("Last Name:"), 1, 0)
+        grid.addWidget(self.ef_last, 1, 1, 1, 3)
+        grid.addWidget(lbl("Phone:"), 1, 4)
+        grid.addWidget(self.ef_phone, 1, 5)
+        grid.addWidget(lbl("Email:"), 2, 0)
+        grid.addWidget(self.ef_email, 2, 1, 1, 5)
+        grid.addWidget(lbl("Address:"), 3, 0)
+        grid.addWidget(self.ef_addr, 3, 1, 1, 3)
+        grid.addWidget(lbl("City:"), 3, 4)
+        grid.addWidget(self.ef_city, 3, 5)
+        grid.addWidget(lbl("State:"), 4, 0)
+        grid.addWidget(self.ef_state, 4, 1)
+        grid.addWidget(lbl("Zip:"), 4, 2)
+        grid.addWidget(self.ef_zip, 4, 3)
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
@@ -301,20 +314,20 @@ class CustomerEntry(QtWidgets.QMainWindow):
 
     def _collect_form(self):
         company = self.ef_company.text().strip()
-        last    = self.ef_last.text().strip()
+        last = self.ef_last.text().strip()
         if not company and not last:
             QtWidgets.QMessageBox.warning(self, "Input Error", "Company name or last name is required.")
             return None
         return {
             "company_name": company or None,
-            "first_name":   self.ef_first.text().strip() or None,
-            "last_name":    last or None,
+            "first_name": self.ef_first.text().strip() or None,
+            "last_name": last or None,
             "phone_number": self.ef_phone.text().strip() or None,
-            "email":        self.ef_email.text().strip() or None,
-            "address":      self.ef_addr.text().strip() or None,
-            "city":         self.ef_city.text().strip() or None,
-            "state":        self.ef_state.text().strip().upper() or None,
-            "zip_code":     self.ef_zip.text().strip() or None,
+            "email": self.ef_email.text().strip() or None,
+            "address": self.ef_addr.text().strip() or None,
+            "city": self.ef_city.text().strip() or None,
+            "state": self.ef_state.text().strip().upper() or None,
+            "zip_code": self.ef_zip.text().strip() or None,
         }
 
     def _on_add(self):
@@ -406,20 +419,20 @@ class CustomerEntry(QtWidgets.QMainWindow):
             color = QtGui.QColor(212, 237, 218) if completed else QtGui.QColor(255, 243, 205)
             status_str = "Completed" if completed else "Open"
             for c, (val, algn) in enumerate([
-                (call["call_date"] or "",       center),
-                (call["call_time"] or "",       center),
-                (call["call"] or "",            QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (call["call_date"] or "", center),
+                (call["call_time"] or "", center),
+                (call["call"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (call["completion_date"] or "", center),
                 (call["completion_time"] or "", center),
-                (call["comments_box"] or "",    QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (status_str,                    center),
+                (call["comments_box"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (status_str, center),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)
                 self.hist_table.setItem(r, c, item)
 
         total = len(calls)
-        done  = total - open_count
+        done = total - open_count
         self.hist_summary_lbl.setText(
             f"Total calls: {total}    Completed: {done}    Open: {open_count}")
         self._tabs.setCurrentIndex(1)

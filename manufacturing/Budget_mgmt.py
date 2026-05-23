@@ -2,17 +2,22 @@
 Budget_mgmt.py — Budget Management module
 Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report | Department Summary
 """
-import sys, os, sqlite3, csv
+import sys
+import os
+import sqlite3
+import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 # ── database ─────────────────────────────────────────────────────────────────
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
+
 def _conn():
     c = sqlite3.connect(DB_PATH)
     c.row_factory = sqlite3.Row
     return c
+
 
 def init_db():
     with _conn() as con:
@@ -38,10 +43,11 @@ def init_db():
         );
         """)
 
+
 # ── constants ─────────────────────────────────────────────────────────────────
-MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 STATUSES = ["Draft", "Approved", "Active", "Closed"]
-ACCT_TYPES = ["Asset","Liability","Equity","Revenue","COGS","Expense"]
+ACCT_TYPES = ["Asset", "Liability", "Equity", "Revenue", "COGS", "Expense"]
 DEPARTMENTS = [
     "All",
     "Accounting",
@@ -71,19 +77,20 @@ TAB_STYLE = (
 )
 
 STATUS_COLORS = {
-    "Draft":    QtGui.QColor(230, 230, 230),
+    "Draft": QtGui.QColor(230, 230, 230),
     "Approved": QtGui.QColor(200, 230, 255),
-    "Active":   QtGui.QColor(200, 255, 210),
-    "Closed":   QtGui.QColor(255, 220, 200),
+    "Active": QtGui.QColor(200, 255, 210),
+    "Closed": QtGui.QColor(255, 220, 200),
 }
 ACCT_TYPE_COLORS = {
-    "Asset":     QtGui.QColor(220, 240, 255),
+    "Asset": QtGui.QColor(220, 240, 255),
     "Liability": QtGui.QColor(255, 235, 220),
-    "Equity":    QtGui.QColor(220, 255, 220),
-    "Revenue":   QtGui.QColor(220, 255, 235),
-    "COGS":      QtGui.QColor(255, 255, 210),
-    "Expense":   QtGui.QColor(255, 220, 220),
+    "Equity": QtGui.QColor(220, 255, 220),
+    "Revenue": QtGui.QColor(220, 255, 235),
+    "COGS": QtGui.QColor(255, 255, 210),
+    "Expense": QtGui.QColor(255, 220, 220),
 }
+
 
 def _apply_blue_palette(widget):
     pal = QtGui.QPalette()
@@ -95,20 +102,24 @@ def _apply_blue_palette(widget):
     pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
     widget.setPalette(pal)
 
+
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
     item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
+
 def _ro_r(text):
     return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight)
+
 
 def _money(v):
     try:
         return f"{float(v):,.2f}" if v else "0.00"
     except Exception:
         return "0.00"
+
 
 def _export_table_to_csv(table: QtWidgets.QTableWidget, parent):
     path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -146,7 +157,7 @@ class CopyBudgetDialog(QtWidgets.QDialog):
         self.ef_year.setRange(2000, 2100)
         self.ef_year.setValue(date.today().year)
         fl.addRow("New Budget Name:", self.ef_name)
-        fl.addRow("Fiscal Year:",     self.ef_year)
+        fl.addRow("Fiscal Year:", self.ef_year)
         v.addLayout(fl)
         bb = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
@@ -176,6 +187,7 @@ _TAB_KEYS = {
     'variance': 3, 'budg_rpts': 3, 'cost_rpts': 3, 'proc_rpts': 3,
 }
 
+
 class BudgetWindow(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
@@ -204,10 +216,10 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self.tabs.setStyleSheet(TAB_STYLE)
         root.addWidget(self.tabs)
 
-        self.tabs.addTab(self._build_budgets_tab(),    "Budgets")
-        self.tabs.addTab(self._build_detail_tab(),    "Budget Detail")
-        self.tabs.addTab(self._build_bva_tab(),       "Budget vs. Actual")
-        self.tabs.addTab(self._build_variance_tab(),  "Variance Report")
+        self.tabs.addTab(self._build_budgets_tab(), "Budgets")
+        self.tabs.addTab(self._build_detail_tab(), "Budget Detail")
+        self.tabs.addTab(self._build_bva_tab(), "Budget vs. Actual")
+        self.tabs.addTab(self._build_variance_tab(), "Variance Report")
         self.tabs.addTab(self._build_dept_summary_tab(), "Department Summary")
 
         self.tabs.currentChanged.connect(self._on_tab_change)
@@ -285,21 +297,22 @@ class BudgetWindow(QtWidgets.QMainWindow):
 
         fl.addRow("Budget Name *", self.bud_ef_name)
         fl.addRow("Fiscal Year *", self.bud_ef_year)
-        fl.addRow("Department",    self.bud_ef_dept)
-        fl.addRow("Status",        self.bud_ef_status)
-        fl.addRow("Description",   self.bud_ef_desc)
-        fl.addRow("Created By",    self.bud_ef_by)
+        fl.addRow("Department", self.bud_ef_dept)
+        fl.addRow("Status", self.bud_ef_status)
+        fl.addRow("Description", self.bud_ef_desc)
+        fl.addRow("Created By", self.bud_ef_by)
         v.addWidget(fg)
 
         # buttons
         bb = QtWidgets.QHBoxLayout()
-        for lbl, slot in [("Add Budget",     self._on_bud_add),
-                           ("Update Budget",  self._on_bud_update),
-                           ("Copy Budget",    self._on_bud_copy),
-                           ("Delete Budget",  self._on_bud_delete),
-                           ("Open Detail →",  self._on_open_detail),
-                           ("Clear",          self._on_bud_clear)]:
-            b = QtWidgets.QPushButton(lbl); b.setStyleSheet(BTN_STYLE)
+        for lbl, slot in [("Add Budget", self._on_bud_add),
+                          ("Update Budget", self._on_bud_update),
+                          ("Copy Budget", self._on_bud_copy),
+                          ("Delete Budget", self._on_bud_delete),
+                          ("Open Detail →", self._on_open_detail),
+                          ("Clear", self._on_bud_clear)]:
+            b = QtWidgets.QPushButton(lbl)
+            b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
             bb.addWidget(b)
         bb.addStretch()
@@ -312,13 +325,16 @@ class BudgetWindow(QtWidgets.QMainWindow):
         where = []
         yr = self.bud_year_filter.currentText()
         if yr != "All Years":
-            where.append("fiscal_year=?"); params.append(int(yr))
+            where.append("fiscal_year=?")
+            params.append(int(yr))
         st = self.bud_status_filter.currentText()
         if st != "All Statuses":
-            where.append("status=?"); params.append(st)
+            where.append("status=?")
+            params.append(st)
         dept = self.bud_dept_filter.currentText()
         if dept != "All Departments":
-            where.append("department=?"); params.append(dept)
+            where.append("department=?")
+            params.append(dept)
         if where:
             q += " WHERE " + " AND ".join(where)
         q += " ORDER BY fiscal_year DESC, department, budget_name"
@@ -465,7 +481,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
     def _on_bud_clear(self):
         self.bud_ef_name.clear()
         self.bud_ef_dept.setCurrentIndex(0)
-        self.bud_ef_desc.clear(); self.bud_ef_by.clear()
+        self.bud_ef_desc.clear()
+        self.bud_ef_by.clear()
         self.bud_ef_year.setValue(date.today().year)
         self.bud_ef_status.setCurrentIndex(0)
         self.bud_tbl.clearSelection()
@@ -491,14 +508,17 @@ class BudgetWindow(QtWidgets.QMainWindow):
             self.det_type_filter.addItem(t)
         self.det_type_filter.currentIndexChanged.connect(self._refresh_detail)
         sb.addWidget(self.det_type_filter)
-        btn_load = QtWidgets.QPushButton("Load"); btn_load.setStyleSheet(BTN_STYLE)
+        btn_load = QtWidgets.QPushButton("Load")
+        btn_load.setStyleSheet(BTN_STYLE)
         btn_load.clicked.connect(self._refresh_detail)
         sb.addWidget(btn_load)
         sb.addStretch()
-        btn_save_all = QtWidgets.QPushButton("💾 Save All Changes"); btn_save_all.setStyleSheet(BTN_STYLE)
+        btn_save_all = QtWidgets.QPushButton("💾 Save All Changes")
+        btn_save_all.setStyleSheet(BTN_STYLE)
         btn_save_all.clicked.connect(self._save_detail)
         sb.addWidget(btn_save_all)
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.det_tbl, self))
         sb.addWidget(btn_exp)
         v.addLayout(sb)
@@ -531,13 +551,18 @@ class BudgetWindow(QtWidgets.QMainWindow):
         qf = QtWidgets.QHBoxLayout()
         qf.addWidget(QtWidgets.QLabel("Quick Fill — set monthly amount for selected row:"))
         self.qf_amount = QtWidgets.QDoubleSpinBox()
-        self.qf_amount.setRange(0, 99_999_999); self.qf_amount.setDecimals(2)
+        self.qf_amount.setRange(0, 99_999_999)
+        self.qf_amount.setDecimals(2)
         qf.addWidget(self.qf_amount)
-        btn_fill_monthly = QtWidgets.QPushButton("Fill All 12 Months"); btn_fill_monthly.setStyleSheet(BTN_STYLE)
+        btn_fill_monthly = QtWidgets.QPushButton("Fill All 12 Months")
+        btn_fill_monthly.setStyleSheet(BTN_STYLE)
         btn_fill_monthly.clicked.connect(self._quick_fill_monthly)
-        btn_fill_equal = QtWidgets.QPushButton("Spread Annual Total"); btn_fill_equal.setStyleSheet(BTN_STYLE)
+        btn_fill_equal = QtWidgets.QPushButton("Spread Annual Total")
+        btn_fill_equal.setStyleSheet(BTN_STYLE)
         btn_fill_equal.clicked.connect(self._quick_fill_spread)
-        qf.addWidget(btn_fill_monthly); qf.addWidget(btn_fill_equal); qf.addStretch()
+        qf.addWidget(btn_fill_monthly)
+        qf.addWidget(btn_fill_equal)
+        qf.addStretch()
         v.addLayout(qf)
 
         return w
@@ -721,7 +746,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
 
         fb = QtWidgets.QHBoxLayout()
         fb.addWidget(QtWidgets.QLabel("Budget:"))
-        self.bva_combo = QtWidgets.QComboBox(); self.bva_combo.setMinimumWidth(280)
+        self.bva_combo = QtWidgets.QComboBox()
+        self.bva_combo.setMinimumWidth(280)
         fb.addWidget(self.bva_combo)
         fb.addWidget(QtWidgets.QLabel("From:"))
         self.bva_from = QtWidgets.QDateEdit(calendarPopup=True)
@@ -735,10 +761,13 @@ class BudgetWindow(QtWidgets.QMainWindow):
         self.bva_posted.setChecked(True)
         self.bva_posted.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.bva_posted)
-        btn_run = QtWidgets.QPushButton("Run Report"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("Run Report")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_bva)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.bva_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
@@ -824,18 +853,18 @@ class BudgetWindow(QtWidgets.QMainWindow):
             ).fetchall()
 
         bud_map = {r["account_id"]: r["budgeted"] for r in bud_lines}
-        act_map = {r["account_id"]: r["actual"]   for r in actuals}
+        act_map = {r["account_id"]: r["actual"] for r in actuals}
 
         self.bva_tbl.setRowCount(0)
         tot_bud = tot_act = 0.0
         for acct in accounts:
             aid = acct["id"]
             budgeted = bud_map.get(aid, 0.0) or 0.0
-            actual   = act_map.get(aid, 0.0) or 0.0
+            actual = act_map.get(aid, 0.0) or 0.0
             if budgeted == 0 and actual == 0:
                 continue
             variance = actual - budgeted
-            pct      = (variance / budgeted * 100) if budgeted else 0.0
+            pct = (variance / budgeted * 100) if budgeted else 0.0
             # favorable = under budget for expense/COGS, over for revenue
             if acct["account_type"] in ("Revenue",):
                 favorable = actual >= budgeted
@@ -852,7 +881,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
             self.bva_tbl.setItem(r, 4, _ro_r(_money(actual)))
             var_item = _ro_r(_money(abs(variance)))
             pct_item = _ro_r(f"{pct:+.1f}%" if budgeted else "N/A")
-            st_item  = _ro(status, QtCore.Qt.AlignmentFlag.AlignCenter)
+            st_item = _ro(status, QtCore.Qt.AlignmentFlag.AlignCenter)
 
             var_color = QtGui.QColor("green") if favorable else QtGui.QColor("red")
             for it in [var_item, pct_item, st_item]:
@@ -866,7 +895,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
                 it = self.bva_tbl.item(r, c)
                 if it:
                     it.setBackground(bg)
-            tot_bud += budgeted; tot_act += actual
+            tot_bud += budgeted
+            tot_act += actual
 
         grand_var = tot_act - tot_bud
         self.bva_totals.setText(
@@ -884,7 +914,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
 
         fb = QtWidgets.QHBoxLayout()
         fb.addWidget(QtWidgets.QLabel("Budget:"))
-        self.var_combo = QtWidgets.QComboBox(); self.var_combo.setMinimumWidth(280)
+        self.var_combo = QtWidgets.QComboBox()
+        self.var_combo.setMinimumWidth(280)
         fb.addWidget(self.var_combo)
         fb.addWidget(QtWidgets.QLabel("Period:"))
         self.var_from = QtWidgets.QDateEdit(calendarPopup=True)
@@ -896,27 +927,31 @@ class BudgetWindow(QtWidgets.QMainWindow):
         fb.addWidget(self.var_to)
         fb.addWidget(QtWidgets.QLabel("Threshold %:"))
         self.var_threshold = QtWidgets.QSpinBox()
-        self.var_threshold.setRange(0, 100); self.var_threshold.setValue(10)
+        self.var_threshold.setRange(0, 100)
+        self.var_threshold.setValue(10)
         self.var_threshold.setSuffix("%")
         fb.addWidget(self.var_threshold)
         self.var_posted = QtWidgets.QCheckBox("Posted GL Only")
         self.var_posted.setChecked(True)
         self.var_posted.setStyleSheet("color:white;font-weight:bold;")
         fb.addWidget(self.var_posted)
-        btn_run = QtWidgets.QPushButton("Run Variance"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("Run Variance")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_variance)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.var_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
 
         # summary cards row
         self.var_cards = QtWidgets.QHBoxLayout()
-        self.card_over   = self._make_card("Over Budget",  "#ffcccc")
-        self.card_under  = self._make_card("Under Budget", "#ccffcc")
-        self.card_ok     = self._make_card("On Target",    "#cce0ff")
-        self.card_noact  = self._make_card("No Activity",  "#eeeeee")
+        self.card_over = self._make_card("Over Budget", "#ffcccc")
+        self.card_under = self._make_card("Under Budget", "#ccffcc")
+        self.card_ok = self._make_card("On Target", "#cce0ff")
+        self.card_noact = self._make_card("No Activity", "#eeeeee")
         for card in [self.card_over, self.card_under, self.card_ok, self.card_noact]:
             self.var_cards.addWidget(card)
         v.addLayout(self.var_cards)
@@ -949,7 +984,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
         val = QtWidgets.QLabel("—")
         val.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         val.setStyleSheet("font-size:20px;font-weight:bold;")
-        cl.addWidget(lbl); cl.addWidget(val)
+        cl.addWidget(lbl)
+        cl.addWidget(val)
         card._value_label = val
         return card
 
@@ -1004,7 +1040,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
             ).fetchall()
 
         bud_map = {r["account_id"]: r["budgeted"] for r in bud_lines}
-        act_map = {r["account_id"]: r["actual"]   for r in actuals}
+        act_map = {r["account_id"]: r["actual"] for r in actuals}
 
         self.var_tbl.setRowCount(0)
         cnt_over = cnt_under = cnt_ok = cnt_noact = 0
@@ -1012,11 +1048,11 @@ class BudgetWindow(QtWidgets.QMainWindow):
         for acct in accounts:
             aid = acct["id"]
             budgeted = bud_map.get(aid, 0.0) or 0.0
-            actual   = act_map.get(aid, 0.0) or 0.0
+            actual = act_map.get(aid, 0.0) or 0.0
             if budgeted == 0 and actual == 0:
                 continue
             variance = actual - budgeted
-            pct      = (variance / budgeted * 100) if budgeted else 0.0
+            pct = (variance / budgeted * 100) if budgeted else 0.0
             is_revenue = acct["account_type"] in ("Revenue",)
 
             if actual == 0 and budgeted > 0:
@@ -1063,8 +1099,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
         elif idx == 4:
             self._refresh_dept_summary()
 
-
     # ── Department Summary tab ────────────────────────────────────────────────
+
     def _build_dept_summary_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
@@ -1084,10 +1120,13 @@ class BudgetWindow(QtWidgets.QMainWindow):
         for s in STATUSES:
             self.ds_status.addItem(s)
         fb.addWidget(self.ds_status)
-        btn_run = QtWidgets.QPushButton("Refresh"); btn_run.setStyleSheet(BTN_STYLE)
+        btn_run = QtWidgets.QPushButton("Refresh")
+        btn_run.setStyleSheet(BTN_STYLE)
         btn_run.clicked.connect(self._refresh_dept_summary)
-        fb.addWidget(btn_run); fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV"); btn_exp.setStyleSheet(BTN_STYLE)
+        fb.addWidget(btn_run)
+        fb.addStretch()
+        btn_exp = QtWidgets.QPushButton("Export CSV")
+        btn_exp.setStyleSheet(BTN_STYLE)
         btn_exp.clicked.connect(lambda: _export_table_to_csv(self.ds_tbl, self))
         fb.addWidget(btn_exp)
         v.addLayout(fb)
@@ -1128,9 +1167,11 @@ class BudgetWindow(QtWidgets.QMainWindow):
         params = []
         where = []
         if yr != "All Years":
-            where.append("b.fiscal_year=?"); params.append(int(yr))
+            where.append("b.fiscal_year=?")
+            params.append(int(yr))
         if st != "All Statuses":
-            where.append("b.status=?"); params.append(st)
+            where.append("b.status=?")
+            params.append(st)
         if where:
             q += " WHERE " + " AND ".join(where)
         q += " GROUP BY b.id, b.department, b.status) GROUP BY department, status ORDER BY department, status"
@@ -1150,18 +1191,18 @@ class BudgetWindow(QtWidgets.QMainWindow):
             dept_map[d]["total"] += row["total"] or 0.0
 
         DEPT_COLORS = {
-            "Accounting":           QtGui.QColor(220, 240, 255),
-            "Customer Service":     QtGui.QColor(220, 255, 235),
-            "Engineering":          QtGui.QColor(255, 245, 220),
+            "Accounting": QtGui.QColor(220, 240, 255),
+            "Customer Service": QtGui.QColor(220, 255, 235),
+            "Engineering": QtGui.QColor(255, 245, 220),
             "Information Technology": QtGui.QColor(240, 220, 255),
-            "Maintenance":          QtGui.QColor(255, 235, 220),
-            "Marketing":            QtGui.QColor(220, 255, 255),
-            "Personnel":            QtGui.QColor(255, 220, 240),
-            "Production":           QtGui.QColor(230, 255, 220),
-            "Purchasing":           QtGui.QColor(255, 255, 220),
-            "Quality Assurance":    QtGui.QColor(220, 230, 255),
-            "Sales":                QtGui.QColor(255, 240, 220),
-            "Budget Management":    QtGui.QColor(200, 230, 255),
+            "Maintenance": QtGui.QColor(255, 235, 220),
+            "Marketing": QtGui.QColor(220, 255, 255),
+            "Personnel": QtGui.QColor(255, 220, 240),
+            "Production": QtGui.QColor(230, 255, 220),
+            "Purchasing": QtGui.QColor(255, 255, 220),
+            "Quality Assurance": QtGui.QColor(220, 230, 255),
+            "Sales": QtGui.QColor(255, 240, 220),
+            "Budget Management": QtGui.QColor(200, 230, 255),
         }
 
         self.ds_tbl.setRowCount(0)

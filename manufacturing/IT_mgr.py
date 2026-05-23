@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
@@ -28,25 +30,30 @@ class Ui_MainWindow(object):
             " background-position: center; background-color: white;")
         self.label.setText("")
 
-        font = QtGui.QFont(); font.setPointSize(16)
+        font = QtGui.QFont()
+        font.setPointSize(16)
 
         btn_data = [
-            ("IT Technician", QtCore.QRect( 10, 10, 191, 41), "IT Technician"),
-            ("IT Tasks",      QtCore.QRect(220, 10, 141, 41), "IT Tasks"),
-            ("System Admin",  QtCore.QRect( 10,645, 161, 41), "System Admin"),
-            ("IT Reports",    QtCore.QRect(190,645, 151, 41), "IT Reports"),
+            ("IT Technician", QtCore.QRect(10, 10, 191, 41), "IT Technician"),
+            ("IT Tasks", QtCore.QRect(220, 10, 141, 41), "IT Tasks"),
+            ("System Admin", QtCore.QRect(10, 645, 161, 41), "System Admin"),
+            ("IT Reports", QtCore.QRect(190, 645, 151, 41), "IT Reports"),
         ]
 
         self._btns = []
         for text, geom, key in btn_data:
             b = QtWidgets.QPushButton(parent=self.centralwidget,
                                       clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom); b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            b.setGeometry(geom)
+            b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setAutoDefault(False)
+            b.setText(text)
             self._btns.append(b)
 
         self.label.raise_()
-        for b in self._btns: b.raise_()
+        for b in self._btns:
+            b.raise_()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
@@ -60,7 +67,7 @@ class Ui_MainWindow(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "IT Technician": "IT_technician.py",
-            "IT Tasks":      "IT_Tasks.py",
+            "IT Tasks": "IT_Tasks.py",
         }
         script = scripts.get(pressed)
         if script:

@@ -3,6 +3,8 @@ from tkinter import *
 from tkinter import ttk
 
 # Database setup
+
+
 def setup_database():
     conn = sqlite3.connect("company.db")
     cursor = conn.cursor()
@@ -20,7 +22,7 @@ def setup_database():
         zip_code TEXT NOT NULL,
         email TEXT NOT NULL,
         FOREIGN KEY (dept_id) REFERENCES dept (id)
-        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)                                       
+        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)
     )
     """)
 
@@ -31,7 +33,7 @@ def setup_database():
         dept_name TEXT
         )
     """)
-    
+
     # Create Child table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS dept_sub (
@@ -41,6 +43,8 @@ def setup_database():
     """)
 
     # Fetch data with JOIN
+
+
 def fetch_data():
     conn = sqlite3.connect("company.db")
     cursor = conn.cursor()
@@ -57,8 +61,10 @@ def fetch_data():
     data = cursor.fetchall()
     conn.close()
     return data
-    
+
 # Tkinter GUI
+
+
 def create_gui():
     root = Tk()
     root.title("Employee Department Viewer")
@@ -66,7 +72,7 @@ def create_gui():
     # Treeview widget
     tree = ttk.Treeview(root, columns=("First Name", "Last Name", "Dept Name", "Dept Sub Name"), show="headings")
     tree.heading("First Name", text="First Name")
-    tree.heading("Last Name",  text="Last Name")
+    tree.heading("Last Name", text="Last Name")
     tree.heading("Dept Name", text="Dept Name")
     tree.heading("Dept Sub Name", text="Dept Sub Name")
     tree.pack(fill="both", expand=True)
@@ -76,6 +82,7 @@ def create_gui():
     for people_first_Name, people_last_name, dept_name, dept_sub_name in data:
         tree.insert("", "end", values=(people_first_Name, people_last_name, dept_name, dept_sub_name))
     root.mainloop()
+
 
 # Main execution
 setup_database()

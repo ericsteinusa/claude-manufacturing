@@ -2,16 +2,20 @@
 Tax_mgmt.py — Tax Management module
 Tabs: Tax Calendar | Tax Filing | Tax Payments | Tax Reports
 """
-import sys, os, sqlite3
-from datetime import date, datetime
+import sys
+import os
+import sqlite3
+from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
+
 
 def _conn():
     c = sqlite3.connect(DB_PATH)
     c.row_factory = sqlite3.Row
     return c
+
 
 def init_db():
     with _conn() as con:
@@ -56,22 +60,25 @@ def init_db():
         if con.execute("SELECT COUNT(*) FROM tax_calendar").fetchone()[0] == 0:
             _seed_calendar(con)
 
+
 def _seed_calendar(con):
     today = date.today()
     yr = today.year
     entries = [
-        ("Federal Income Tax",    "Quarterly estimated payment Q1", f"{yr}-04-15", f"Q1 {yr}", "Pending", ""),
-        ("Federal Income Tax",    "Quarterly estimated payment Q2", f"{yr}-06-15", f"Q2 {yr}", "Pending", ""),
-        ("Federal Income Tax",    "Quarterly estimated payment Q3", f"{yr}-09-15", f"Q3 {yr}", "Pending", ""),
-        ("Federal Income Tax",    "Quarterly estimated payment Q4", f"{yr+1}-01-15", f"Q4 {yr}", "Pending", ""),
-        ("Payroll Tax (941)",     "Monthly deposit",                f"{yr}-{today.month:02d}-15", f"{today.strftime('%b %Y')}", "Pending", ""),
-        ("State Income Tax",      "Annual filing",                  f"{yr}-04-15", f"FY {yr-1}", "Pending", ""),
-        ("Sales Tax",             "Monthly filing",                  f"{yr}-{today.month:02d}-20", f"{today.strftime('%b %Y')}", "Pending", ""),
+        ("Federal Income Tax", "Quarterly estimated payment Q1", f"{yr}-04-15", f"Q1 {yr}", "Pending", ""),
+        ("Federal Income Tax", "Quarterly estimated payment Q2", f"{yr}-06-15", f"Q2 {yr}", "Pending", ""),
+        ("Federal Income Tax", "Quarterly estimated payment Q3", f"{yr}-09-15", f"Q3 {yr}", "Pending", ""),
+        ("Federal Income Tax", "Quarterly estimated payment Q4", f"{yr + 1}-01-15", f"Q4 {yr}", "Pending", ""),
+        ("Payroll Tax (941)", "Monthly deposit", f"{yr}-{today.month:02d}-15",
+         f"{today.strftime('%b %Y')}", "Pending", ""),
+        ("State Income Tax", "Annual filing", f"{yr}-04-15", f"FY {yr - 1}", "Pending", ""),
+        ("Sales Tax", "Monthly filing", f"{yr}-{today.month:02d}-20", f"{today.strftime('%b %Y')}", "Pending", ""),
     ]
     con.executemany(
         "INSERT INTO tax_calendar (tax_type, description, due_date, period, status, notes) VALUES (?,?,?,?,?,?)",
         entries,
     )
+
 
 BTN_STYLE = (
     "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
@@ -93,13 +100,13 @@ PAYMENT_METHODS = ["ACH", "Check", "Wire Transfer", "Credit Card", "Online Porta
 CAL_STATUSES = ["Pending", "Completed", "Late", "Waived"]
 
 STATUS_COLORS = {
-    "Pending":   QtGui.QColor(255, 255, 210),
-    "Filed":     QtGui.QColor(200, 255, 210),
+    "Pending": QtGui.QColor(255, 255, 210),
+    "Filed": QtGui.QColor(200, 255, 210),
     "Completed": QtGui.QColor(200, 255, 210),
-    "Late":      QtGui.QColor(255, 200, 200),
-    "Amended":   QtGui.QColor(200, 230, 255),
-    "Closed":    QtGui.QColor(220, 220, 220),
-    "Waived":    QtGui.QColor(220, 220, 220),
+    "Late": QtGui.QColor(255, 200, 200),
+    "Amended": QtGui.QColor(200, 230, 255),
+    "Closed": QtGui.QColor(220, 220, 220),
+    "Waived": QtGui.QColor(220, 220, 220),
 }
 
 _TAB_KEYS = {
@@ -113,6 +120,7 @@ _TAB_KEYS = {
     'tax_rpts': 3,
 }
 
+
 def _apply_blue_palette(widget):
     pal = QtGui.QPalette()
     blue = QtGui.QColor(0, 85, 255)
@@ -123,20 +131,24 @@ def _apply_blue_palette(widget):
     pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
     widget.setPalette(pal)
 
+
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
     item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
+
 def _ro_r(text):
     return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight)
+
 
 def _money(v):
     try:
         return f"{float(v):,.2f}" if v else "0.00"
     except Exception:
         return "0.00"
+
 
 def _color_row(table, row, status):
     color = STATUS_COLORS.get(status)
@@ -197,12 +209,12 @@ class CalendarDialog(QtWidgets.QDialog):
 
     def values(self):
         return {
-            "tax_type":    self.ef_type.currentText().strip(),
+            "tax_type": self.ef_type.currentText().strip(),
             "description": self.ef_desc.text().strip(),
-            "due_date":    self.ef_due.date().toString("yyyy-MM-dd"),
-            "period":      self.ef_period.text().strip(),
-            "status":      self.ef_status.currentText(),
-            "notes":       self.ef_notes.text().strip(),
+            "due_date": self.ef_due.date().toString("yyyy-MM-dd"),
+            "period": self.ef_period.text().strip(),
+            "status": self.ef_status.currentText(),
+            "notes": self.ef_notes.text().strip(),
         }
 
 
@@ -279,16 +291,16 @@ class FilingDialog(QtWidgets.QDialog):
 
     def values(self):
         return {
-            "tax_type":     self.ef_type.currentText().strip(),
+            "tax_type": self.ef_type.currentText().strip(),
             "jurisdiction": self.ef_jur.currentText().strip(),
-            "period":       self.ef_period.text().strip(),
-            "amount_due":   self.ef_amount_due.value(),
-            "amount_paid":  self.ef_amount_paid.value(),
-            "due_date":     self.ef_due_date.date().toString("yyyy-MM-dd"),
-            "filed_date":   self.ef_filed_date.date().toString("yyyy-MM-dd"),
-            "status":       self.ef_status.currentText(),
-            "reference":    self.ef_ref.text().strip(),
-            "notes":        self.ef_notes.text().strip(),
+            "period": self.ef_period.text().strip(),
+            "amount_due": self.ef_amount_due.value(),
+            "amount_paid": self.ef_amount_paid.value(),
+            "due_date": self.ef_due_date.date().toString("yyyy-MM-dd"),
+            "filed_date": self.ef_filed_date.date().toString("yyyy-MM-dd"),
+            "status": self.ef_status.currentText(),
+            "reference": self.ef_ref.text().strip(),
+            "notes": self.ef_notes.text().strip(),
         }
 
 
@@ -353,14 +365,14 @@ class PaymentDialog(QtWidgets.QDialog):
 
     def values(self):
         return {
-            "tax_type":     self.ef_type.currentText().strip(),
+            "tax_type": self.ef_type.currentText().strip(),
             "jurisdiction": self.ef_jur.currentText().strip(),
-            "period":       self.ef_period.text().strip(),
-            "amount":       self.ef_amount.value(),
+            "period": self.ef_period.text().strip(),
+            "amount": self.ef_amount.value(),
             "payment_date": self.ef_date.date().toString("yyyy-MM-dd"),
-            "method":       self.ef_method.currentText(),
-            "reference":    self.ef_ref.text().strip(),
-            "notes":        self.ef_notes.text().strip(),
+            "method": self.ef_method.currentText(),
+            "reference": self.ef_ref.text().strip(),
+            "notes": self.ef_notes.text().strip(),
         }
 
 
@@ -398,9 +410,9 @@ class TaxWindow(QtWidgets.QMainWindow):
         root.addWidget(self.tabs)
 
         self.tabs.addTab(self._build_calendar_tab(), "Tax Calendar")
-        self.tabs.addTab(self._build_filing_tab(),   "Tax Filing")
-        self.tabs.addTab(self._build_payment_tab(),  "Tax Payments")
-        self.tabs.addTab(self._build_reports_tab(),  "Tax Reports")
+        self.tabs.addTab(self._build_filing_tab(), "Tax Filing")
+        self.tabs.addTab(self._build_payment_tab(), "Tax Payments")
+        self.tabs.addTab(self._build_reports_tab(), "Tax Reports")
 
     # ── Tax Calendar tab ──────────────────────────────────────────────────────
     def _build_calendar_tab(self):
@@ -441,9 +453,9 @@ class TaxWindow(QtWidgets.QMainWindow):
 
         bb = QtWidgets.QHBoxLayout()
         for label, slot in [("Add Entry", self._add_calendar_entry),
-                             ("Edit Entry", self._edit_calendar_entry),
-                             ("Delete Entry", self._delete_calendar_entry),
-                             ("Mark Completed", self._mark_cal_completed)]:
+                            ("Edit Entry", self._edit_calendar_entry),
+                            ("Delete Entry", self._delete_calendar_entry),
+                            ("Mark Completed", self._mark_cal_completed)]:
             btn = QtWidgets.QPushButton(label)
             btn.setStyleSheet(BTN_STYLE)
             btn.clicked.connect(slot)
@@ -454,21 +466,23 @@ class TaxWindow(QtWidgets.QMainWindow):
 
     def _refresh_calendar(self):
         status_f = self.cal_status_filter.currentText() if hasattr(self, 'cal_status_filter') else "All Statuses"
-        type_f   = self.cal_type_filter.currentText()   if hasattr(self, 'cal_type_filter')   else "All Types"
+        type_f = self.cal_type_filter.currentText() if hasattr(self, 'cal_type_filter') else "All Types"
         with _conn() as con:
             q = "SELECT id, tax_type, description, due_date, period, status FROM tax_calendar WHERE 1=1"
             params = []
             if status_f != "All Statuses":
-                q += " AND status=?"; params.append(status_f)
+                q += " AND status=?"
+                params.append(status_f)
             if type_f != "All Types":
-                q += " AND tax_type=?"; params.append(type_f)
+                q += " AND tax_type=?"
+                params.append(type_f)
             q += " ORDER BY due_date"
             rows = con.execute(q, params).fetchall()
         self.cal_tbl.setRowCount(0)
         for row in rows:
             r = self.cal_tbl.rowCount()
             self.cal_tbl.insertRow(r)
-            self.cal_tbl.setItem(r, 0, _ro(row["id"],          QtCore.Qt.AlignmentFlag.AlignRight))
+            self.cal_tbl.setItem(r, 0, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
             self.cal_tbl.setItem(r, 1, _ro(row["tax_type"]))
             self.cal_tbl.setItem(r, 2, _ro(row["description"]))
             self.cal_tbl.setItem(r, 3, _ro(row["due_date"]))
@@ -571,9 +585,9 @@ class TaxWindow(QtWidgets.QMainWindow):
 
         bb = QtWidgets.QHBoxLayout()
         for label, slot in [("Add Filing", self._add_filing),
-                             ("Edit Filing", self._edit_filing),
-                             ("Delete Filing", self._delete_filing),
-                             ("Mark Filed", self._mark_filed)]:
+                            ("Edit Filing", self._edit_filing),
+                            ("Delete Filing", self._delete_filing),
+                            ("Mark Filed", self._mark_filed)]:
             btn = QtWidgets.QPushButton(label)
             btn.setStyleSheet(BTN_STYLE)
             btn.clicked.connect(slot)
@@ -584,14 +598,16 @@ class TaxWindow(QtWidgets.QMainWindow):
 
     def _refresh_filings(self):
         status_f = self.fil_status_filter.currentText() if hasattr(self, 'fil_status_filter') else "All Statuses"
-        type_f   = self.fil_type_filter.currentText()   if hasattr(self, 'fil_type_filter')   else "All Types"
+        type_f = self.fil_type_filter.currentText() if hasattr(self, 'fil_type_filter') else "All Types"
         with _conn() as con:
             q = "SELECT * FROM tax_filing WHERE 1=1"
             params = []
             if status_f != "All Statuses":
-                q += " AND status=?"; params.append(status_f)
+                q += " AND status=?"
+                params.append(status_f)
             if type_f != "All Types":
-                q += " AND tax_type=?"; params.append(type_f)
+                q += " AND tax_type=?"
+                params.append(type_f)
             q += " ORDER BY due_date DESC"
             rows = con.execute(q, params).fetchall()
         self.fil_tbl.setRowCount(0)
@@ -599,7 +615,7 @@ class TaxWindow(QtWidgets.QMainWindow):
         for row in rows:
             r = self.fil_tbl.rowCount()
             self.fil_tbl.insertRow(r)
-            self.fil_tbl.setItem(r, 0, _ro(row["id"],          QtCore.Qt.AlignmentFlag.AlignRight))
+            self.fil_tbl.setItem(r, 0, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
             self.fil_tbl.setItem(r, 1, _ro(row["tax_type"]))
             self.fil_tbl.setItem(r, 2, _ro(row["jurisdiction"]))
             self.fil_tbl.setItem(r, 3, _ro(row["period"]))
@@ -609,7 +625,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             self.fil_tbl.setItem(r, 7, _ro(row["filed_date"]))
             self.fil_tbl.setItem(r, 8, _ro(row["status"]))
             _color_row(self.fil_tbl, r, row["status"])
-            total_due  += float(row["amount_due"]  or 0)
+            total_due += float(row["amount_due"] or 0)
             total_paid += float(row["amount_paid"] or 0)
         bal = total_due - total_paid
         self.fil_total_lbl.setText(
@@ -714,8 +730,8 @@ class TaxWindow(QtWidgets.QMainWindow):
 
         bb = QtWidgets.QHBoxLayout()
         for label, slot in [("Add Payment", self._add_payment),
-                             ("Edit Payment", self._edit_payment),
-                             ("Delete Payment", self._delete_payment)]:
+                            ("Edit Payment", self._edit_payment),
+                            ("Delete Payment", self._delete_payment)]:
             btn = QtWidgets.QPushButton(label)
             btn.setStyleSheet(BTN_STYLE)
             btn.clicked.connect(slot)
@@ -725,15 +741,17 @@ class TaxWindow(QtWidgets.QMainWindow):
         return w
 
     def _refresh_payments(self):
-        type_f   = self.pay_type_filter.currentText()   if hasattr(self, 'pay_type_filter')   else "All Types"
+        type_f = self.pay_type_filter.currentText() if hasattr(self, 'pay_type_filter') else "All Types"
         method_f = self.pay_method_filter.currentText() if hasattr(self, 'pay_method_filter') else "All Methods"
         with _conn() as con:
             q = "SELECT * FROM tax_payment WHERE 1=1"
             params = []
             if type_f != "All Types":
-                q += " AND tax_type=?"; params.append(type_f)
+                q += " AND tax_type=?"
+                params.append(type_f)
             if method_f != "All Methods":
-                q += " AND method=?"; params.append(method_f)
+                q += " AND method=?"
+                params.append(method_f)
             q += " ORDER BY payment_date DESC"
             rows = con.execute(q, params).fetchall()
         self.pay_tbl.setRowCount(0)
@@ -741,7 +759,7 @@ class TaxWindow(QtWidgets.QMainWindow):
         for row in rows:
             r = self.pay_tbl.rowCount()
             self.pay_tbl.insertRow(r)
-            self.pay_tbl.setItem(r, 0, _ro(row["id"],          QtCore.Qt.AlignmentFlag.AlignRight))
+            self.pay_tbl.setItem(r, 0, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
             self.pay_tbl.setItem(r, 1, _ro(row["tax_type"]))
             self.pay_tbl.setItem(r, 2, _ro(row["jurisdiction"]))
             self.pay_tbl.setItem(r, 3, _ro(row["period"]))

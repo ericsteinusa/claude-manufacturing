@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -144,39 +147,41 @@ class Ui_MainWindow(object):
         MainWindow.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.pers_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Personnel Manager Menu"))
+        self.pers_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Personnel Manager Menu"))
         self.pers_mgr_Button.setGeometry(QtCore.QRect(10, 10, 261, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.pers_mgr_Button.setFont(font)
         self.pers_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.pers_mgr_Button.setAutoDefault(False)
         self.pers_mgr_Button.setObjectName("pers_mgr_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 60, 811, 501))
         self.label.setStyleSheet("background-image: url(Personnel2.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
-        self.pers_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Personnel Menu"))
+        self.pers_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Personnel Menu"))
         self.pers_Button.setGeometry(QtCore.QRect(310, 10, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.pers_Button.setFont(font)
         self.pers_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                       "border: 2px solid black;\n"
+                                       "border-radius: 10px;}\n"
+                                       "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                       "border: 2px solidrgb(85, 255, 255);\n"
+                                       "}")
         self.pers_Button.setAutoDefault(False)
         self.pers_Button.setObjectName("pers_Button")
         self.label.raise_()
@@ -198,7 +203,7 @@ class Ui_MainWindow(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Personnel Manager Menu": "personnel_mgr_menu.py",
-            "Personnel Menu":         "personnel_menu.py",
+            "Personnel Menu": "personnel_menu.py",
         }
         script = scripts.get(pressed)
         if script:

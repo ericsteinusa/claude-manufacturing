@@ -12,11 +12,11 @@ BUTTON_STYLE = (
 )
 INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
 COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE  = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TIME_STYLE  = "QTimeEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE  = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TIME_STYLE = "QTimeEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TEXT_STYLE = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
 LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE   = (
+TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
     " border-bottom:none; border-radius:4px 4px 0 0;}"
@@ -116,9 +116,9 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         fr.setSpacing(8)
 
         def fl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.filter_cust = QtWidgets.QComboBox()
         self.filter_cust.setStyleSheet(COMBO_STYLE)
@@ -140,10 +140,14 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self.filter_to.setDisplayFormat("MM/dd/yyyy")
         self.filter_to.setDate(QtCore.QDate.currentDate())
 
-        fr.addWidget(fl("Customer:")); fr.addWidget(self.filter_cust)
-        fr.addWidget(fl("Status:"));   fr.addWidget(self.filter_status)
-        fr.addWidget(fl("From:"));     fr.addWidget(self.filter_from)
-        fr.addWidget(fl("To:"));       fr.addWidget(self.filter_to)
+        fr.addWidget(fl("Customer:"))
+        fr.addWidget(self.filter_cust)
+        fr.addWidget(fl("Status:"))
+        fr.addWidget(self.filter_status)
+        fr.addWidget(fl("From:"))
+        fr.addWidget(self.filter_from)
+        fr.addWidget(fl("To:"))
+        fr.addWidget(self.filter_to)
         for t, fn in (("Apply", self._load_calls), ("Show All", self._show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
@@ -184,9 +188,9 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.ef_cust = QtWidgets.QComboBox()
         self.ef_cust.setStyleSheet(COMBO_STYLE)
@@ -227,14 +231,21 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self.ef_comments.setFixedHeight(55)
         self.ef_comments.setPlaceholderText("Comments / resolution notes...")
 
-        grid.addWidget(lbl("Customer:"),         0, 0); grid.addWidget(self.ef_cust,      0, 1)
-        grid.addWidget(lbl("Call Date:"),         0, 2); grid.addWidget(self.ef_call_date, 0, 3)
-        grid.addWidget(lbl("Call Time:"),         0, 4); grid.addWidget(self.ef_call_time, 0, 5)
-        grid.addWidget(self.ef_completed,         0, 6)
-        grid.addWidget(lbl("Completion Date:"),   1, 2); grid.addWidget(self.ef_comp_date, 1, 3)
-        grid.addWidget(lbl("Completion Time:"),   1, 4); grid.addWidget(self.ef_comp_time, 1, 5)
-        grid.addWidget(lbl("Problem / Call:"),    2, 0); grid.addWidget(self.ef_call,      2, 1, 1, 3)
-        grid.addWidget(lbl("Comments:"),          2, 4); grid.addWidget(self.ef_comments,  2, 5, 1, 2)
+        grid.addWidget(lbl("Customer:"), 0, 0)
+        grid.addWidget(self.ef_cust, 0, 1)
+        grid.addWidget(lbl("Call Date:"), 0, 2)
+        grid.addWidget(self.ef_call_date, 0, 3)
+        grid.addWidget(lbl("Call Time:"), 0, 4)
+        grid.addWidget(self.ef_call_time, 0, 5)
+        grid.addWidget(self.ef_completed, 0, 6)
+        grid.addWidget(lbl("Completion Date:"), 1, 2)
+        grid.addWidget(self.ef_comp_date, 1, 3)
+        grid.addWidget(lbl("Completion Time:"), 1, 4)
+        grid.addWidget(self.ef_comp_time, 1, 5)
+        grid.addWidget(lbl("Problem / Call:"), 2, 0)
+        grid.addWidget(self.ef_call, 2, 1, 1, 3)
+        grid.addWidget(lbl("Comments:"), 2, 4)
+        grid.addWidget(self.ef_comments, 2, 5, 1, 2)
         outer.addWidget(form_grp)
 
         # ── Buttons ────────────────────────────────────────────────────────
@@ -269,10 +280,10 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             combo.blockSignals(False)
 
     def _load_calls(self):
-        cid    = self.filter_cust.currentData()
+        cid = self.filter_cust.currentData()
         status = self.filter_status.currentText()
         from_s = self.filter_from.date().toString("yyyy-MM-dd")
-        to_s   = self.filter_to.date().toString("yyyy-MM-dd")
+        to_s = self.filter_to.date().toString("yyyy-MM-dd")
 
         conn = get_db()
         q = (
@@ -307,14 +318,14 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             cust_name = _customer_display(row) if row["first_name"] or row["company_name"] else "(no customer)"
             status_str = "Completed" if completed else "Open"
             for c, (val, algn) in enumerate([
-                (cust_name,                   QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["call"] or "",           QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["call_date"] or "",      center),
-                (row["call_time"] or "",      center),
+                (cust_name, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["call"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["call_date"] or "", center),
+                (row["call_time"] or "", center),
                 (row["completion_date"] or "", center),
                 (row["completion_time"] or "", center),
-                (row["comments_box"] or "",   QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (status_str,                  center),
+                (row["comments_box"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (status_str, center),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)
@@ -367,14 +378,14 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Input Error", "Problem / Call description is required.")
             return None
         return {
-            "customer_id":     self.ef_cust.currentData(),
-            "call":            call_text,
-            "call_date":       self.ef_call_date.date().toString("yyyy-MM-dd"),
-            "call_time":       self.ef_call_time.time().toString("hh:mm"),
+            "customer_id": self.ef_cust.currentData(),
+            "call": call_text,
+            "call_date": self.ef_call_date.date().toString("yyyy-MM-dd"),
+            "call_time": self.ef_call_time.time().toString("hh:mm"),
             "completion_date": self.ef_comp_date.date().toString("yyyy-MM-dd"),
             "completion_time": self.ef_comp_time.time().toString("hh:mm"),
-            "comments_box":    self.ef_comments.toPlainText().strip() or None,
-            "completion_box":  1 if self.ef_completed.isChecked() else 0,
+            "comments_box": self.ef_comments.toPlainText().strip() or None,
+            "completion_box": 1 if self.ef_completed.isChecked() else 0,
         }
 
     def _on_add(self):
