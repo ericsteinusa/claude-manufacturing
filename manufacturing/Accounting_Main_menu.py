@@ -222,6 +222,19 @@ class Ui_Acct_MainWindow(object):
 "}")
         self.budget_button.setAutoDefault(False)
         self.budget_button.setObjectName("budget_button")
+        self.bank_recon_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Bank Reconciliation"))
+        self.bank_recon_button.setGeometry(QtCore.QRect(20, 110, 211, 41))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.bank_recon_button.setFont(font)
+        self.bank_recon_button.setStyleSheet("QPushButton{background-color: white;\n"
+"border: 2px solid black;\n"
+"border-radius: 10px;}\n"
+"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+"border: 2px solidrgb(85, 255, 255);\n"
+"}")
+        self.bank_recon_button.setAutoDefault(False)
+        self.bank_recon_button.setObjectName("bank_recon_button")
         self.gl_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("General Ledger"))
         self.gl_button.setGeometry(QtCore.QRect(460, 60, 211, 41))
         font = QtGui.QFont()
@@ -252,6 +265,7 @@ class Ui_Acct_MainWindow(object):
         self.payroll_button.raise_()
         self.gl_button.raise_()
         self.budget_button.raise_()
+        self.bank_recon_button.raise_()
         Acct_MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Acct_MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -274,6 +288,7 @@ class Ui_Acct_MainWindow(object):
             "Payroll Department":  "Payroll_dept.py",
             "General Ledger":      "General_ledger.py",
             "Budget Management":   "Budget_mgmt.py",
+            "Bank Reconciliation": "Bank_reconciliation.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -289,6 +304,7 @@ class Ui_Acct_MainWindow(object):
         self.payroll_button.setText(_translate("Acct_MainWindow", "Payroll"))
         self.gl_button.setText(_translate("Acct_MainWindow", "General Ledger"))
         self.budget_button.setText(_translate("Acct_MainWindow", "Budget Management"))
+        self.bank_recon_button.setText(_translate("Acct_MainWindow", "Bank Reconciliation"))
 
 
 if __name__ == "__main__":

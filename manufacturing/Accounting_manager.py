@@ -77,6 +77,7 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
             ("Payroll Department",  "Payroll_dept.py"),
             ("General Ledger",      "General_ledger.py"),
             ("Budget Management",   "Budget_mgmt.py"),
+            ("Bank Reconciliation", "Bank_reconciliation.py"),
         ]
 
         for i, (label, script) in enumerate(departments):
