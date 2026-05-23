@@ -69,6 +69,7 @@ class Ui_CS_Mgr_menu(object):
             "Customer Service Menu": "cs_menu.py",
             "CS Calls": "cs_calls.py",
             "Customer Entry": "customer_entry.py",
+            "CS Reports": "cs_reports.py",
         }
         script = scripts.get(pressed)
         if script:
