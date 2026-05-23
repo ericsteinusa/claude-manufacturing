@@ -343,6 +343,13 @@ class Ui_MainWindow(object):
         self.risk_mgmt_button.setStyleSheet(BTN_STYLE)
         self.risk_mgmt_button.setAutoDefault(False)
         self.risk_mgmt_button.setObjectName("risk_mgmt_button")
+        self.warehouse_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Warehouse"))
+        self.warehouse_button.setGeometry(QtCore.QRect(20, 610, 181, 41))
+        self.warehouse_button.setFont(QtGui.QFont("", 16))
+        self.warehouse_button.setStyleSheet(BTN_STYLE)
+        self.warehouse_button.setAutoDefault(False)
+        self.warehouse_button.setObjectName("warehouse_button")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 729, 21))
@@ -382,6 +389,7 @@ class Ui_MainWindow(object):
             "Finance": "Finance_Main_menu.py",
             "Legal": "Legal_Main_menu.py",
             "Risk Management": "Risk_mgmt_Main_menu.py",
+            "Warehouse": "Warehouse_Main_menu.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -405,6 +413,7 @@ class Ui_MainWindow(object):
         self.finance_button.setText(_translate("MainWindow", "Finance"))
         self.legal_button.setText(_translate("MainWindow", "Legal"))
         self.risk_mgmt_button.setText(_translate("MainWindow", "Risk Management"))
+        self.warehouse_button.setText(_translate("MainWindow", "Warehouse"))
 
 
 if __name__ == "__main__":
