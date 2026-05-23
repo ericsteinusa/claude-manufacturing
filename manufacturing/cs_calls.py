@@ -1,6 +1,8 @@
 import sys
 import sqlite3
 import os
+import csv
+from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
@@ -23,10 +25,14 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
+NOTE_BROWSER_STYLE = (
+    "QTextBrowser{background-color:white;border:2px solid black;"
+    "border-radius:4px;padding:4px 6px;font-family:monospace;font-size:12px;}"
+)
 
 STATUS_COLORS = {
-    0: QtGui.QColor(255, 243, 205),  # open — yellow tint
-    1: QtGui.QColor(212, 237, 218),  # completed — green tint
+    0: QtGui.QColor(255, 243, 205),   # open — yellow tint
+    1: QtGui.QColor(212, 237, 218),   # completed — green tint
 }
 
 
@@ -65,6 +71,14 @@ def init_db():
             completion_box  INTEGER NOT NULL DEFAULT 0
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS call_notes (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            call_id    INTEGER NOT NULL REFERENCES calls2(id) ON DELETE CASCADE,
+            note_text  TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -96,7 +110,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Customer Service Calls")
-        self.resize(1200, 750)
+        self.resize(1200, 820)
         _apply_blue_palette(self)
         self._row_ids = []
         self._current_id = None
@@ -122,7 +136,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
 
         self.filter_cust = QtWidgets.QComboBox()
         self.filter_cust.setStyleSheet(COMBO_STYLE)
-        self.filter_cust.setMinimumWidth(200)
+        self.filter_cust.setMinimumWidth(180)
 
         self.filter_status = QtWidgets.QComboBox()
         self.filter_status.setStyleSheet(COMBO_STYLE)
@@ -140,6 +154,12 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self.filter_to.setDisplayFormat("MM/dd/yyyy")
         self.filter_to.setDate(QtCore.QDate.currentDate())
 
+        self.filter_search = QtWidgets.QLineEdit()
+        self.filter_search.setStyleSheet(INPUT_STYLE)
+        self.filter_search.setPlaceholderText("Search call / comments...")
+        self.filter_search.setMinimumWidth(180)
+        self.filter_search.returnPressed.connect(self._load_calls)
+
         fr.addWidget(fl("Customer:"))
         fr.addWidget(self.filter_cust)
         fr.addWidget(fl("Status:"))
@@ -148,6 +168,8 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         fr.addWidget(self.filter_from)
         fr.addWidget(fl("To:"))
         fr.addWidget(self.filter_to)
+        fr.addWidget(fl("Search:"))
+        fr.addWidget(self.filter_search)
         for t, fn in (("Apply", self._load_calls), ("Show All", self._show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
@@ -188,9 +210,9 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         grid.setSpacing(6)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.ef_cust = QtWidgets.QComboBox()
         self.ef_cust.setStyleSheet(COMBO_STYLE)
@@ -248,11 +270,43 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         grid.addWidget(self.ef_comments, 2, 5, 1, 2)
         outer.addWidget(form_grp)
 
-        # ── Buttons ────────────────────────────────────────────────────────
+        # ── Notes / History panel ──────────────────────────────────────────
+        notes_grp = QtWidgets.QGroupBox("Notes & History")
+        notes_grp.setStyleSheet(
+            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
+            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+        notes_layout = QtWidgets.QVBoxLayout(notes_grp)
+        notes_layout.setSpacing(4)
+
+        self.notes_browser = QtWidgets.QTextBrowser()
+        self.notes_browser.setStyleSheet(NOTE_BROWSER_STYLE)
+        self.notes_browser.setFixedHeight(90)
+        self.notes_browser.setPlaceholderText("Select a call to view its note history.")
+        notes_layout.addWidget(self.notes_browser)
+
+        note_input_row = QtWidgets.QHBoxLayout()
+        self.note_input = QtWidgets.QLineEdit()
+        self.note_input.setStyleSheet(INPUT_STYLE)
+        self.note_input.setPlaceholderText("Type a note and click Add Note (requires a saved call selected above)...")
+        self.note_input.returnPressed.connect(self._on_add_note)
+        note_input_row.addWidget(self.note_input)
+
+        btn_add_note = QtWidgets.QPushButton("Add Note")
+        btn_add_note.setStyleSheet(BUTTON_STYLE)
+        btn_add_note.setFixedHeight(30)
+        btn_add_note.setFixedWidth(100)
+        btn_add_note.clicked.connect(self._on_add_note)
+        note_input_row.addWidget(btn_add_note)
+        notes_layout.addLayout(note_input_row)
+        outer.addWidget(notes_grp)
+
+        # ── Action buttons ─────────────────────────────────────────────────
         br = QtWidgets.QHBoxLayout()
         for t, fn in (("Add New", self._on_add), ("Update Selected", self._on_update),
                       ("Mark Complete", self._on_mark_complete),
-                      ("Delete Selected", self._on_delete), ("Clear", self._clear_form)):
+                      ("Delete Selected", self._on_delete),
+                      ("Export CSV", self._on_export),
+                      ("Clear", self._clear_form)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(34)
@@ -284,6 +338,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         status = self.filter_status.currentText()
         from_s = self.filter_from.date().toString("yyyy-MM-dd")
         to_s = self.filter_to.date().toString("yyyy-MM-dd")
+        keyword = self.filter_search.text().strip()
 
         conn = get_db()
         q = (
@@ -301,6 +356,9 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             q += " AND c2.completion_box = 0"
         elif status == "Completed":
             q += " AND c2.completion_box = 1"
+        if keyword:
+            q += " AND (c2.call LIKE ? OR c2.comments_box LIKE ?)"
+            params += [f"%{keyword}%", f"%{keyword}%"]
         q += " ORDER BY c2.call_date DESC, c2.call_time DESC"
         rows = conn.execute(q, params).fetchall()
         conn.close()
@@ -331,11 +389,14 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
                 item.setBackground(color)
                 self.table.setItem(r, c, item)
 
+        self.statusBar().showMessage(f"{len(rows)} record(s) shown")
+
     def _show_all(self):
         self.filter_cust.setCurrentIndex(0)
         self.filter_status.setCurrentIndex(0)
         self.filter_from.setDate(QtCore.QDate(2000, 1, 1))
         self.filter_to.setDate(QtCore.QDate.currentDate())
+        self.filter_search.clear()
         self._load_calls()
 
     def _on_row_clicked(self, index):
@@ -371,6 +432,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self.ef_call.setPlainText(rec["call"] or "")
         self.ef_comments.setPlainText(rec["comments_box"] or "")
         self.ef_completed.setChecked(bool(rec["completion_box"]))
+        self._load_notes()
 
     def _collect_form(self):
         call_text = self.ef_call.toPlainText().strip()
@@ -428,14 +490,17 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         if self._current_id is None:
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a call first.")
             return
+        now_date = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
+        now_time = QtCore.QTime.currentTime().toString("hh:mm")
         conn = get_db()
         conn.execute("""
-            UPDATE calls2 SET completion_box=1,
-                completion_date=?, completion_time=?
+            UPDATE calls2 SET completion_box=1, completion_date=?, completion_time=?
             WHERE id=?
-        """, (QtCore.QDate.currentDate().toString("yyyy-MM-dd"),
-              QtCore.QTime.currentTime().toString("hh:mm"),
-              self._current_id))
+        """, (now_date, now_time, self._current_id))
+        conn.execute("""
+            INSERT INTO call_notes (call_id, note_text, created_at)
+            VALUES (?, ?, ?)
+        """, (self._current_id, "Call marked as completed.", f"{now_date} {now_time}"))
         conn.commit()
         conn.close()
         self._clear_form()
@@ -446,15 +511,91 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a call first.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Confirm Delete", "Delete this call record?",
+                self, "Confirm Delete", "Delete this call record and all its notes?",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
+            conn.execute("DELETE FROM call_notes WHERE call_id=?", (self._current_id,))
             conn.execute("DELETE FROM calls2 WHERE id=?", (self._current_id,))
             conn.commit()
             conn.close()
             self._clear_form()
             self._load_calls()
+
+    # ── Notes threading ────────────────────────────────────────────────────
+
+    def _load_notes(self):
+        if self._current_id is None:
+            self.notes_browser.clear()
+            return
+        conn = get_db()
+        notes = conn.execute(
+            "SELECT note_text, created_at FROM call_notes WHERE call_id=? ORDER BY created_at ASC",
+            (self._current_id,)
+        ).fetchall()
+        conn.close()
+
+        if not notes:
+            self.notes_browser.setPlainText("No notes yet for this call.")
+            return
+
+        lines = []
+        for n in notes:
+            ts = n["created_at"]
+            try:
+                dt = datetime.strptime(ts, "%Y-%m-%d %H:%M")
+                ts = dt.strftime("%m/%d/%Y %I:%M %p")
+            except ValueError:
+                pass
+            lines.append(f"[{ts}]  {n['note_text']}")
+        self.notes_browser.setPlainText("\n".join(lines))
+        # Scroll to bottom so newest note is visible
+        sb = self.notes_browser.verticalScrollBar()
+        sb.setValue(sb.maximum())
+
+    def _on_add_note(self):
+        if self._current_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection",
+                                          "Select a saved call record before adding a note.")
+            return
+        text = self.note_input.text().strip()
+        if not text:
+            return
+        now = datetime.now().strftime("%Y-%m-%d %H:%M")
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO call_notes (call_id, note_text, created_at) VALUES (?, ?, ?)",
+            (self._current_id, text, now)
+        )
+        conn.commit()
+        conn.close()
+        self.note_input.clear()
+        self._load_notes()
+
+    # ── Export CSV ─────────────────────────────────────────────────────────
+
+    def _on_export(self):
+        if self.table.rowCount() == 0:
+            QtWidgets.QMessageBox.information(self, "Export", "No records to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export to CSV", "cs_calls_export.csv", "CSV Files (*.csv)"
+        )
+        if not path:
+            return
+        headers = [self.table.horizontalHeaderItem(c).text()
+                   for c in range(self.table.columnCount())]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(headers)
+            for r in range(self.table.rowCount()):
+                writer.writerow([
+                    self.table.item(r, c).text() if self.table.item(r, c) else ""
+                    for c in range(self.table.columnCount())
+                ])
+        QtWidgets.QMessageBox.information(self, "Export Complete", f"Saved to:\n{path}")
+
+    # ── Clear form ─────────────────────────────────────────────────────────
 
     def _clear_form(self):
         self._current_id = None
@@ -466,6 +607,8 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self.ef_call.clear()
         self.ef_comments.clear()
         self.ef_completed.setChecked(False)
+        self.note_input.clear()
+        self.notes_browser.clear()
         self.table.clearSelection()
 
 
