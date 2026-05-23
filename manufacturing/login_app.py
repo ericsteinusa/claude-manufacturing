@@ -52,10 +52,10 @@ def init_db():
         )
     """)
     default_roles = [
-        ("Admin",    "Full access to all screens and settings"),
-        ("Manager",  "Access to department management screens"),
+        ("Admin", "Full access to all screens and settings"),
+        ("Manager", "Access to department management screens"),
         ("Employee", "Standard employee access"),
-        ("Viewer",   "Read-only access"),
+        ("Viewer", "Read-only access"),
     ]
     conn.executemany(
         "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)",

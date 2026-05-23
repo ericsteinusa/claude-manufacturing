@@ -2,6 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtSql import QSqlDatabase
 
+
 def connect_to_database():
     db = QSqlDatabase.addDatabase('QSQLITE')
     db.setDatabaseName('company.db')
@@ -12,6 +13,7 @@ def connect_to_database():
     else:
         QMessageBox.information(None, 'Database Connection', 'Successfully connected to the database.')
         return True
+
 
 # Create an instance of QApplication
 app = QApplication(sys.argv)

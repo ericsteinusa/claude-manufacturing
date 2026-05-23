@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
@@ -28,25 +30,30 @@ class Ui_CS_Mgr_menu(object):
             " background-position: center; background-color: white;")
         self.label.setText("")
 
-        font = QtGui.QFont(); font.setPointSize(16)
+        font = QtGui.QFont()
+        font.setPointSize(16)
 
         btn_data = [
-            ("Customer Service", QtCore.QRect( 10, 10, 231, 41), "Customer Service Menu"),
-            ("CS Calls",         QtCore.QRect(260, 10, 141, 41), "CS Calls"),
-            ("Customer Entry",   QtCore.QRect(420, 10, 201, 41), "Customer Entry"),
-            ("CS Reports",       QtCore.QRect( 10,645, 151, 41), "CS Reports"),
+            ("Customer Service", QtCore.QRect(10, 10, 231, 41), "Customer Service Menu"),
+            ("CS Calls", QtCore.QRect(260, 10, 141, 41), "CS Calls"),
+            ("Customer Entry", QtCore.QRect(420, 10, 201, 41), "Customer Entry"),
+            ("CS Reports", QtCore.QRect(10, 645, 151, 41), "CS Reports"),
         ]
 
         self._btns = []
         for text, geom, key in btn_data:
             b = QtWidgets.QPushButton(parent=self.centralwidget,
                                       clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom); b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            b.setGeometry(geom)
+            b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setAutoDefault(False)
+            b.setText(text)
             self._btns.append(b)
 
         self.label.raise_()
-        for b in self._btns: b.raise_()
+        for b in self._btns:
+            b.raise_()
 
         CS_Mgr_menu.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=CS_Mgr_menu)
@@ -60,8 +67,8 @@ class Ui_CS_Mgr_menu(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Customer Service Menu": "cs_menu.py",
-            "CS Calls":              "cs_calls.py",
-            "Customer Entry":        "customer_entry.py",
+            "CS Calls": "cs_calls.py",
+            "Customer Entry": "customer_entry.py",
         }
         script = scripts.get(pressed)
         if script:

@@ -3,6 +3,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from registration import Ui_MainWindow  # Import the generated Python file
 
+
 class MainApp(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -27,7 +28,7 @@ class MainApp(QMainWindow):
             address text not null,
             city text not null,
             state text not null,
-            zip_code text not null,            
+            zip_code text not null,
             email text NOT NULL
         )
         """)
@@ -52,7 +53,8 @@ class MainApp(QMainWindow):
         try:
             conn = sqlite3.connect("company.db")
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO people (first_name, last_name, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, address, city, state, zip_code, email))
+            cursor.execute("INSERT INTO people (first_name, last_name, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                           (first_name, last_name, address, city, state, zip_code, email))
             conn.commit()
             conn.close()
 
@@ -66,6 +68,7 @@ class MainApp(QMainWindow):
             self.ui.email_lineEdit.clear()
         except Exception as e:
             QMessageBox.critical(self, "Database Error", f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

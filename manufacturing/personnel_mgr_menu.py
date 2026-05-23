@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
@@ -28,26 +30,31 @@ class Ui_Personnel_mgr_menu(object):
             " background-position: center; background-color: white;")
         self.label.setText("")
 
-        font = QtGui.QFont(); font.setPointSize(16)
+        font = QtGui.QFont()
+        font.setPointSize(16)
 
         btn_data = [
-            ("Personnel",      QtCore.QRect( 10, 10, 161, 41), "Personnel Menu"),
-            ("Personnel CRM",  QtCore.QRect(190, 10, 181, 41), "Personnel CRM"),
-            ("Dept Entry",     QtCore.QRect(390, 10, 151, 41), "Dept Entry"),
+            ("Personnel", QtCore.QRect(10, 10, 161, 41), "Personnel Menu"),
+            ("Personnel CRM", QtCore.QRect(190, 10, 181, 41), "Personnel CRM"),
+            ("Dept Entry", QtCore.QRect(390, 10, 151, 41), "Dept Entry"),
             ("Dept Sub Entry", QtCore.QRect(560, 10, 171, 41), "Dept Sub Entry"),
-            ("Payroll",        QtCore.QRect( 10,510, 151, 41), "Payroll"),
+            ("Payroll", QtCore.QRect(10, 510, 151, 41), "Payroll"),
         ]
 
         self._btns = []
         for text, geom, key in btn_data:
             b = QtWidgets.QPushButton(parent=self.centralwidget,
                                       clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom); b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            b.setGeometry(geom)
+            b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setAutoDefault(False)
+            b.setText(text)
             self._btns.append(b)
 
         self.label.raise_()
-        for b in self._btns: b.raise_()
+        for b in self._btns:
+            b.raise_()
 
         Personnel_mgr_menu.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Personnel_mgr_menu)
@@ -61,10 +68,10 @@ class Ui_Personnel_mgr_menu(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Personnel Menu": "personnel_menu.py",
-            "Personnel CRM":  "personnel_crm.py",
-            "Dept Entry":     "dept_entry.py",
+            "Personnel CRM": "personnel_crm.py",
+            "Dept Entry": "dept_entry.py",
             "Dept Sub Entry": "dept_sub_entry.py",
-            "Payroll":        "Payroll_dept.py",
+            "Payroll": "Payroll_dept.py",
         }
         script = scripts.get(pressed)
         if script:

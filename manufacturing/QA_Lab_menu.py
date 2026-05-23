@@ -19,15 +19,15 @@ LABEL_STYLE = "color: white; font-size: 13px;"
 
 INSP_COLORS = {
     "pending": "#ffffff",
-    "passed":  "#d4edda",
-    "failed":  "#f8d7da",
+    "passed": "#d4edda",
+    "failed": "#f8d7da",
     "on_hold": "#fff3cd",
 }
 
 SEVERITY_COLORS = {
     "critical": QtGui.QColor(248, 215, 218),
-    "major":    QtGui.QColor(255, 243, 205),
-    "minor":    QtGui.QColor(220, 235, 255),
+    "major": QtGui.QColor(255, 243, 205),
+    "minor": QtGui.QColor(220, 235, 255),
 }
 
 
@@ -132,9 +132,9 @@ class NewInspectionDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.insp_num = QtWidgets.QLineEdit(_next_insp_num())
         self.insp_num.setStyleSheet(INPUT_STYLE)
@@ -228,9 +228,9 @@ class LogDefectDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.defect_type = QtWidgets.QLineEdit()
         self.defect_type.setStyleSheet(INPUT_STYLE)
@@ -285,9 +285,9 @@ class AddSpecDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -360,6 +360,7 @@ _TAB_KEYS = {
     'new_ncr': 1, 'open_ncrs': 1, 'ncr_hist': 1, 'ncr_rpts': 1,
     'cal_sched': 2, 'cal_records': 2, 'overdue': 2, 'cal_rpts': 2,
 }
+
 
 class QALab(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
@@ -496,12 +497,12 @@ class QALab(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Inspection",  self._on_new_insp),
-            ("Log Defect",      self._on_log_defect),
-            ("Mark Passed",     lambda: self._set_result("passed",  "Mark as Passed?")),
-            ("Mark Failed",     lambda: self._set_result("failed",  "Mark as Failed?")),
-            ("Mark On Hold",    lambda: self._set_result("on_hold", "Put On Hold?")),
-            ("Resolve Defect",  self._on_resolve_defect),
+            ("New Inspection", self._on_new_insp),
+            ("Log Defect", self._on_log_defect),
+            ("Mark Passed", lambda: self._set_result("passed", "Mark as Passed?")),
+            ("Mark Failed", lambda: self._set_result("failed", "Mark as Failed?")),
+            ("Mark On Hold", lambda: self._set_result("on_hold", "Put On Hold?")),
+            ("Resolve Defect", self._on_resolve_defect),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -551,9 +552,11 @@ class QALab(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if result:
-            conds.append("qi.result = ?"); params.append(result)
+            conds.append("qi.result = ?")
+            params.append(result)
         if prod_id:
-            conds.append("qi.product_id = ?"); params.append(prod_id)
+            conds.append("qi.product_id = ?")
+            params.append(prod_id)
         if term:
             conds.append("(qi.insp_number LIKE ? OR qi.inspector LIKE ?)")
             params += [f"%{term}%", f"%{term}%"]
@@ -755,9 +758,11 @@ class QALab(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if sev:
-            conds.append("d.severity = ?"); params.append(sev)
+            conds.append("d.severity = ?")
+            params.append(sev)
         if resolved is not None:
-            conds.append("d.resolved = ?"); params.append(resolved)
+            conds.append("d.resolved = ?")
+            params.append(resolved)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()
@@ -840,7 +845,7 @@ class QALab(QtWidgets.QMainWindow):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("Add Specification", self._on_add_spec),
-            ("Delete Selected",   self._on_delete_spec),
+            ("Delete Selected", self._on_delete_spec),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)

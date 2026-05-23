@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import sys, subprocess, os
+import sys
+import subprocess
+import os
+
 
 class Ui_Legal_main_menu(object):
     def setupUi(self, MainWindow):
@@ -26,11 +29,11 @@ class Ui_Legal_main_menu(object):
                      "QPushButton:hover{background-color:rgb(85,255,255);}")
 
         buttons = [
-            ("Contracts",            self._contracts),
-            ("Compliance",           self._compliance),
-            ("Litigation",           self._litigation),
-            ("Intellectual Property",self._ip_mgmt),
-            ("Employment Law",       self._emp_law),
+            ("Contracts", self._contracts),
+            ("Compliance", self._compliance),
+            ("Litigation", self._litigation),
+            ("Intellectual Property", self._ip_mgmt),
+            ("Employment Law", self._emp_law),
         ]
         for label, slot in buttons:
             btn = QtWidgets.QPushButton(label)
@@ -46,11 +49,11 @@ class Ui_Legal_main_menu(object):
         d = os.path.dirname(os.path.abspath(__file__))
         subprocess.Popen([sys.executable, os.path.join(d, script)], cwd=d)
 
-    def _contracts(self):   pass
-    def _compliance(self):  pass
-    def _litigation(self):  pass
-    def _ip_mgmt(self):     pass
-    def _emp_law(self):     pass
+    def _contracts(self): pass
+    def _compliance(self): pass
+    def _litigation(self): pass
+    def _ip_mgmt(self): pass
+    def _emp_law(self): pass
 
 
 if __name__ == "__main__":

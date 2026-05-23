@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Sales_mgr_menu.ui'
+# Form generated from reading UI file 'Sales_mgr_menu.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QWidget)
+                               QPushButton, QSizePolicy, QStatusBar, QWidget)
+
 
 class Ui_Sales_mgr_menu(object):
     def setupUi(self, Sales_mgr_menu):
@@ -92,10 +93,10 @@ class Ui_Sales_mgr_menu(object):
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 60, 801, 501))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/sales.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.Sales_Button = QPushButton(self.centralwidget)
         self.Sales_Button.setObjectName(u"Sales_Button")
         self.Sales_Button.setGeometry(QRect(20, 10, 151, 41))
@@ -103,11 +104,11 @@ class Ui_Sales_mgr_menu(object):
         font.setPointSize(16)
         self.Sales_Button.setFont(font)
         self.Sales_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                        "border: 2px solid black;\n"
+                                        "border-radius: 10px;}\n"
+                                        "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                        "border: 2px solidrgb(85, 255, 255);\n"
+                                        "}")
         self.Sales_Button.setAutoDefault(False)
         Sales_mgr_menu.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Sales_mgr_menu)
@@ -128,4 +129,3 @@ class Ui_Sales_mgr_menu(object):
         self.label.setText("")
         self.Sales_Button.setText(QCoreApplication.translate("Sales_mgr_menu", u"Sales", None))
     # retranslateUi
-

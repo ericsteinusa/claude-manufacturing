@@ -1,7 +1,10 @@
 """
 Accounting_manager.py — Accounting Manager dashboard
 """
-import sys, os, sqlite3, subprocess
+import sys
+import os
+import sqlite3
+import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
@@ -32,12 +35,12 @@ def _conn():
 
 def _apply_palette(widget):
     pal = QtGui.QPalette()
-    pal.setColor(QtGui.QPalette.ColorRole.Window,      BLUE)
-    pal.setColor(QtGui.QPalette.ColorRole.Button,      BLUE)
-    pal.setColor(QtGui.QPalette.ColorRole.Base,        QtGui.QColor(255, 255, 255))
-    pal.setColor(QtGui.QPalette.ColorRole.WindowText,  QtGui.QColor(255, 255, 255))
-    pal.setColor(QtGui.QPalette.ColorRole.ButtonText,  QtGui.QColor(0,   0,   0))
-    pal.setColor(QtGui.QPalette.ColorRole.Text,        QtGui.QColor(0,   0,   0))
+    pal.setColor(QtGui.QPalette.ColorRole.Window, BLUE)
+    pal.setColor(QtGui.QPalette.ColorRole.Button, BLUE)
+    pal.setColor(QtGui.QPalette.ColorRole.Base, QtGui.QColor(255, 255, 255))
+    pal.setColor(QtGui.QPalette.ColorRole.WindowText, QtGui.QColor(255, 255, 255))
+    pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
+    pal.setColor(QtGui.QPalette.ColorRole.Text, QtGui.QColor(0, 0, 0))
     widget.setPalette(pal)
 
 
@@ -71,12 +74,12 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
         grid.setContentsMargins(0, 0, 0, 0)
 
         departments = [
-            ("Accounts Payable",    "Accounts_payable.py"),
+            ("Accounts Payable", "Accounts_payable.py"),
             ("Accounts Receivable", "Accounts_receivable.py"),
-            ("Credit Department",   "Credit_dept.py"),
-            ("Payroll Department",  "Payroll_dept.py"),
-            ("General Ledger",      "General_ledger.py"),
-            ("Budget Management",   "Budget_mgmt.py"),
+            ("Credit Department", "Credit_dept.py"),
+            ("Payroll Department", "Payroll_dept.py"),
+            ("General Ledger", "General_ledger.py"),
+            ("Budget Management", "Budget_mgmt.py"),
             ("Bank Reconciliation", "Bank_reconciliation.py"),
         ]
 
@@ -105,11 +108,11 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
 
         self._stat_vals = {}
         stats = [
-            ("journals",  "Journal Entries"),
-            ("posted",    "Posted"),
-            ("draft",     "Draft"),
-            ("accounts",  "GL Accounts"),
-            ("vendors",   "Vendors"),
+            ("journals", "Journal Entries"),
+            ("posted", "Posted"),
+            ("draft", "Draft"),
+            ("accounts", "GL Accounts"),
+            ("vendors", "Vendors"),
             ("customers", "Customers"),
         ]
 
@@ -142,9 +145,9 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
     def _load_summary(self):
         try:
             with _conn() as con:
-                total    = con.execute("SELECT COUNT(*) FROM gl_journal").fetchone()[0]
-                posted   = con.execute("SELECT COUNT(*) FROM gl_journal WHERE posted=1").fetchone()[0]
-                draft    = total - posted
+                total = con.execute("SELECT COUNT(*) FROM gl_journal").fetchone()[0]
+                posted = con.execute("SELECT COUNT(*) FROM gl_journal WHERE posted=1").fetchone()[0]
+                draft = total - posted
                 accounts = con.execute("SELECT COUNT(*) FROM gl_account WHERE is_active=1").fetchone()[0]
                 try:
                     vendors = con.execute("SELECT COUNT(*) FROM vendors").fetchone()[0]

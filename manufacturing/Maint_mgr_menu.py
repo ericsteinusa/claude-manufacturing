@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
@@ -28,25 +30,30 @@ class Ui_Maint_mgr_menu(object):
             " background-position: center; background-color: white;")
         self.label.setText("")
 
-        font = QtGui.QFont(); font.setPointSize(16)
+        font = QtGui.QFont()
+        font.setPointSize(16)
 
         btn_data = [
-            ("Maintenance",    QtCore.QRect( 10, 10, 161, 41), "Maintenance"),
-            ("Work Orders",    QtCore.QRect(190, 10, 161, 41), "Work Orders"),
+            ("Maintenance", QtCore.QRect(10, 10, 161, 41), "Maintenance"),
+            ("Work Orders", QtCore.QRect(190, 10, 161, 41), "Work Orders"),
             ("Equip. Reports", QtCore.QRect(370, 10, 171, 41), "Equip Reports"),
-            ("Safety Reports", QtCore.QRect( 10,510, 171, 41), "Safety Reports"),
+            ("Safety Reports", QtCore.QRect(10, 510, 171, 41), "Safety Reports"),
         ]
 
         self._btns = []
         for text, geom, key in btn_data:
             b = QtWidgets.QPushButton(parent=self.centralwidget,
                                       clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom); b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            b.setGeometry(geom)
+            b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setAutoDefault(False)
+            b.setText(text)
             self._btns.append(b)
 
         self.label.raise_()
-        for b in self._btns: b.raise_()
+        for b in self._btns:
+            b.raise_()
 
         Maint_mgr_menu.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Maint_mgr_menu)

@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'prod_ship_dept.ui'
+# Form generated from reading UI file 'prod_ship_dept.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QWidget)
+                               QSizePolicy, QStatusBar, QWidget)
+
 
 class Ui_prod_ship_dept(object):
     def setupUi(self, prod_ship_dept):
@@ -92,10 +93,10 @@ class Ui_prod_ship_dept(object):
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 60, 801, 521))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/pharmamfg.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         prod_ship_dept.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(prod_ship_dept)
         self.menubar.setObjectName(u"menubar")
@@ -114,4 +115,3 @@ class Ui_prod_ship_dept(object):
         prod_ship_dept.setWindowTitle(QCoreApplication.translate("prod_ship_dept", u"MainWindow", None))
         self.label.setText("")
     # retranslateUi
-

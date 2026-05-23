@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
@@ -28,26 +30,31 @@ class Ui_eng_mgr(object):
             " background-position: center; background-color: white;")
         self.label.setText("")
 
-        font = QtGui.QFont(); font.setPointSize(16)
+        font = QtGui.QFont()
+        font.setPointSize(16)
 
         btn_data = [
-            ("Engineers",       QtCore.QRect( 10, 10, 151, 41), "Engineers"),
-            ("Product Entry",   QtCore.QRect(180, 10, 171, 41), "Product Entry"),
-            ("Supplier Entry",  QtCore.QRect(370, 10, 171, 41), "Supplier Entry"),
-            ("Design Review",   QtCore.QRect( 10,710, 171, 41), "Design Review"),
-            ("Eng. Reports",    QtCore.QRect(200,710, 161, 41), "Eng Reports"),
+            ("Engineers", QtCore.QRect(10, 10, 151, 41), "Engineers"),
+            ("Product Entry", QtCore.QRect(180, 10, 171, 41), "Product Entry"),
+            ("Supplier Entry", QtCore.QRect(370, 10, 171, 41), "Supplier Entry"),
+            ("Design Review", QtCore.QRect(10, 710, 171, 41), "Design Review"),
+            ("Eng. Reports", QtCore.QRect(200, 710, 161, 41), "Eng Reports"),
         ]
 
         self._btns = []
         for text, geom, key in btn_data:
             b = QtWidgets.QPushButton(parent=self.centralwidget,
                                       clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom); b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            b.setGeometry(geom)
+            b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setAutoDefault(False)
+            b.setText(text)
             self._btns.append(b)
 
         self.label.raise_()
-        for b in self._btns: b.raise_()
+        for b in self._btns:
+            b.raise_()
 
         eng_mgr.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=eng_mgr)
@@ -60,8 +67,8 @@ class Ui_eng_mgr(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "Engineers":      "engineer.py",
-            "Product Entry":  "product_entry_screen.py",
+            "Engineers": "engineer.py",
+            "Product Entry": "product_entry_screen.py",
             "Supplier Entry": "Supplier_entry.py",
         }
         script = scripts.get(pressed)

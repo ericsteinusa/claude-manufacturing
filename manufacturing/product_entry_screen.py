@@ -12,25 +12,25 @@ BUTTON_STYLE = (
 )
 INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
 COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE  = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE  = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
 ISPIN_STYLE = "QSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
 LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE   = ("QTabWidget::pane{border:1px solid black;}"
-               "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-               " border-bottom:none; border-radius:4px 4px 0 0;}"
-               "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-               "QTabBar::tab:hover{background:rgb(85,255,255);}")
+TAB_STYLE = ("QTabWidget::pane{border:1px solid black;}"
+             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
+             " border-bottom:none; border-radius:4px 4px 0 0;}"
+             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
+             "QTabBar::tab:hover{background:rgb(85,255,255);}")
 
 # Stock level row colors
 COLOR_CRITICAL = QtGui.QColor(255, 200, 200)   # red   — at or below reorder point
-COLOR_LOW      = QtGui.QColor(255, 243, 205)   # amber — within 2x reorder point
-COLOR_OK       = QtGui.QColor(212, 237, 218)   # green — well stocked
+COLOR_LOW = QtGui.QColor(255, 243, 205)   # amber — within 2x reorder point
+COLOR_OK = QtGui.QColor(212, 237, 218)   # green — well stocked
 
 # Transaction type colors
 TRANS_COLORS = {
-    "receipt":    QtGui.QColor(212, 237, 218),
-    "issue":      QtGui.QColor(255, 200, 200),
+    "receipt": QtGui.QColor(212, 237, 218),
+    "issue": QtGui.QColor(255, 200, 200),
     "adjustment": QtGui.QColor(220, 235, 255),
 }
 
@@ -129,8 +129,8 @@ class TransactionDialog(QtWidgets.QDialog):
         layout.setSpacing(10)
 
         title_text = {
-            "receipt":    "Receive Stock",
-            "issue":      "Issue / Use Stock",
+            "receipt": "Receive Stock",
+            "issue": "Issue / Use Stock",
             "adjustment": "Inventory Adjustment",
         }[self._trans_type]
         title = QtWidgets.QLabel(title_text)
@@ -140,10 +140,10 @@ class TransactionDialog(QtWidgets.QDialog):
 
         def row(lbl_text, widget, lbl_w=120):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -253,7 +253,7 @@ class Inventory(QtWidgets.QMainWindow):
         self.setWindowTitle("Inventory")
         self.resize(1100, 680)
         _apply_blue_palette(self)
-        self._prod_row_ids  = []
+        self._prod_row_ids = []
         self._trans_row_ids = []
         self._build_ui()
         self._load_products()
@@ -268,7 +268,7 @@ class Inventory(QtWidgets.QMainWindow):
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(tabs)
-        tabs.addTab(self._build_products_tab(),     "Products")
+        tabs.addTab(self._build_products_tab(), "Products")
         tabs.addTab(self._build_stock_report_tab(), "Stock Report")
         tabs.addTab(self._build_transactions_tab(), "Transactions")
         tabs.currentChanged.connect(self._on_tab_changed)
@@ -327,9 +327,9 @@ class Inventory(QtWidgets.QMainWindow):
         grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         def inp(ph=""):
             e = QtWidgets.QLineEdit()
@@ -363,12 +363,18 @@ class Inventory(QtWidgets.QMainWindow):
         self.pf_reorder.setRange(0, 999999)
         self.pf_reorder.setFixedWidth(80)
 
-        grid.addWidget(lbl("Name:"),         0, 0); grid.addWidget(self.pf_name,     0, 1, 1, 5)
-        grid.addWidget(lbl("Supplier:"),     1, 0); grid.addWidget(self.pf_supplier, 1, 1, 1, 2)
-        grid.addWidget(lbl("Bin:"),          1, 3); grid.addWidget(self.pf_bin,      1, 4)
-        grid.addWidget(lbl("Unit Cost:"),    2, 0); grid.addWidget(self.pf_cost,     2, 1)
-        grid.addWidget(lbl("Qty on Hand:"),  2, 2); grid.addWidget(self.pf_qty,      2, 3)
-        grid.addWidget(lbl("Reorder Pt:"),   2, 4); grid.addWidget(self.pf_reorder,  2, 5)
+        grid.addWidget(lbl("Name:"), 0, 0)
+        grid.addWidget(self.pf_name, 0, 1, 1, 5)
+        grid.addWidget(lbl("Supplier:"), 1, 0)
+        grid.addWidget(self.pf_supplier, 1, 1, 1, 2)
+        grid.addWidget(lbl("Bin:"), 1, 3)
+        grid.addWidget(self.pf_bin, 1, 4)
+        grid.addWidget(lbl("Unit Cost:"), 2, 0)
+        grid.addWidget(self.pf_cost, 2, 1)
+        grid.addWidget(lbl("Qty on Hand:"), 2, 2)
+        grid.addWidget(self.pf_qty, 2, 3)
+        grid.addWidget(lbl("Reorder Pt:"), 2, 4)
+        grid.addWidget(self.pf_reorder, 2, 5)
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
@@ -407,8 +413,8 @@ class Inventory(QtWidgets.QMainWindow):
         legend = QtWidgets.QHBoxLayout()
         for color, label in (
             (COLOR_CRITICAL, "At/Below Reorder Point"),
-            (COLOR_LOW,      "Within 2x Reorder Point"),
-            (COLOR_OK,       "Well Stocked"),
+            (COLOR_LOW, "Within 2x Reorder Point"),
+            (COLOR_OK, "Well Stocked"),
         ):
             swatch = QtWidgets.QLabel("   ")
             pal = swatch.palette()
@@ -451,9 +457,9 @@ class Inventory(QtWidgets.QMainWindow):
         fr.setSpacing(8)
 
         def fl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.tr_prod_filter = QtWidgets.QComboBox()
         self.tr_prod_filter.setStyleSheet(COMBO_STYLE)
@@ -472,10 +478,14 @@ class Inventory(QtWidgets.QMainWindow):
         self.tr_to.setDisplayFormat("MM/dd/yyyy")
         self.tr_to.setDate(QtCore.QDate.currentDate())
 
-        fr.addWidget(fl("Product:")); fr.addWidget(self.tr_prod_filter)
-        fr.addWidget(fl("Type:"));    fr.addWidget(self.tr_type_filter)
-        fr.addWidget(fl("From:"));    fr.addWidget(self.tr_from)
-        fr.addWidget(fl("To:"));      fr.addWidget(self.tr_to)
+        fr.addWidget(fl("Product:"))
+        fr.addWidget(self.tr_prod_filter)
+        fr.addWidget(fl("Type:"))
+        fr.addWidget(self.tr_type_filter)
+        fr.addWidget(fl("From:"))
+        fr.addWidget(self.tr_from)
+        fr.addWidget(fl("To:"))
+        fr.addWidget(self.tr_to)
         for t, fn in (("Apply", self._refresh_transactions), ("Show All", self._tr_show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
@@ -500,8 +510,8 @@ class Inventory(QtWidgets.QMainWindow):
 
         ar = QtWidgets.QHBoxLayout()
         for t, fn in (("Receive Stock", self._on_receive),
-                      ("Issue Stock",   self._on_issue),
-                      ("Adjustment",    self._on_adjust)):
+                      ("Issue Stock", self._on_issue),
+                      ("Adjustment", self._on_adjust)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(32)
@@ -551,22 +561,22 @@ class Inventory(QtWidgets.QMainWindow):
 
         self.prod_table.setRowCount(0)
         self._prod_row_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
         for row in rows:
             r = self.prod_table.rowCount()
             self.prod_table.insertRow(r)
             self._prod_row_ids.append(row["id"])
             supp = _supplier_display(row) if row["company_name"] or row["last_name"] else ""
-            rp   = row["reorder_point"] if "reorder_point" in row.keys() else 0
-            qty  = row["amount"] or 0
+            rp = row["reorder_point"] if "reorder_point" in row.keys() else 0
+            qty = row["amount"] or 0
             for c, (val, algn) in enumerate([
-                (row["name"],              QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (supp,                     QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["bin"] or "",         center),
+                (row["name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (supp, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["bin"] or "", center),
                 (f"${row['purchase_price'] or 0:,.2f}", right),
-                (str(qty),                 center),
-                (str(rp),                  center),
+                (str(qty), center),
+                (str(rp), center),
                 (row["purchase_date"] or "", center),
             ]):
                 self.prod_table.setItem(r, c, _ro(val, algn))
@@ -620,12 +630,12 @@ class Inventory(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Input Error", "Product name is required.")
             return None
         return {
-            "name":           name,
-            "supplier_id":    self.pf_supplier.currentData(),
-            "bin":            self.pf_bin.text().strip() or None,
+            "name": name,
+            "supplier_id": self.pf_supplier.currentData(),
+            "bin": self.pf_bin.text().strip() or None,
             "purchase_price": self.pf_cost.value(),
-            "amount":         self.pf_qty.value(),
-            "reorder_point":  self.pf_reorder.value(),
+            "amount": self.pf_qty.value(),
+            "reorder_point": self.pf_reorder.value(),
         }
 
     def _on_prod_add(self):
@@ -701,13 +711,13 @@ class Inventory(QtWidgets.QMainWindow):
         conn.close()
 
         self.stock_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
         for row in rows:
             r = self.stock_table.rowCount()
             self.stock_table.insertRow(r)
             qty = int(row["amount"] or 0)
-            rp  = int(row["reorder_point"] if "reorder_point" in row.keys() else 0) or 0
+            rp = int(row["reorder_point"] if "reorder_point" in row.keys() else 0) or 0
             supp = _supplier_display(row) if row["company_name"] or row["last_name"] else ""
             if rp > 0 and qty <= rp:
                 color = COLOR_CRITICAL
@@ -716,11 +726,11 @@ class Inventory(QtWidgets.QMainWindow):
             else:
                 color = COLOR_OK
             for c, (val, algn) in enumerate([
-                (row["name"],   QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (supp,          QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (supp, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (row["bin"] or "", center),
-                (str(qty),      center),
-                (str(rp),       center),
+                (str(qty), center),
+                (str(rp), center),
                 (f"${row['purchase_price'] or 0:,.2f}", right),
             ]):
                 item = _ro(val, algn)
@@ -730,11 +740,11 @@ class Inventory(QtWidgets.QMainWindow):
     # ── Transaction data ───────────────────────────────────────────────────
 
     def _refresh_transactions(self):
-        pid    = self.tr_prod_filter.currentData()
-        ttype  = self.tr_type_filter.currentText()
+        pid = self.tr_prod_filter.currentData()
+        ttype = self.tr_type_filter.currentText()
         from_s = self.tr_from.date().toString("yyyy-MM-dd")
-        to_s   = self.tr_to.date().toString("yyyy-MM-dd")
-        conn   = get_db()
+        to_s = self.tr_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
         q = (
             "SELECT t.*, p.name AS product_name "
             "FROM inventory_transaction t JOIN product p ON p.id=t.product_id "
@@ -753,22 +763,22 @@ class Inventory(QtWidgets.QMainWindow):
 
         self.trans_table.setRowCount(0)
         self._trans_row_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
         for row in rows:
             r = self.trans_table.rowCount()
             self.trans_table.insertRow(r)
             self._trans_row_ids.append(row["id"])
-            qty     = row["quantity"]
+            qty = row["quantity"]
             qty_str = f"+{qty}" if qty > 0 else str(qty)
-            color   = TRANS_COLORS.get(row["trans_type"], QtGui.QColor(255, 255, 255))
+            color = TRANS_COLORS.get(row["trans_type"], QtGui.QColor(255, 255, 255))
             for c, (val, algn) in enumerate([
-                (row["trans_date"],    center),
-                (row["product_name"],  QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["trans_type"],    center),
-                (qty_str,              right),
+                (row["trans_date"], center),
+                (row["product_name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["trans_type"], center),
+                (qty_str, right),
                 (row["reference"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["notes"] or "",     QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["notes"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)

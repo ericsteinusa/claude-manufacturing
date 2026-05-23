@@ -131,14 +131,16 @@ class EditRecordDialog(QtWidgets.QDialog):
         self.in_edit = QtWidgets.QDateTimeEdit()
         self.in_edit.setDisplayFormat("MM/dd/yyyy hh:mm AP")
         self.in_edit.setCalendarPopup(True)
-        self.in_edit.setStyleSheet("QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.in_edit.setStyleSheet(
+            "QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         self.in_edit.setDateTime(_to_qdatetime(self._record["clock_in"]))
         layout.addLayout(row("Clock In:", self.in_edit))
 
         self.out_edit = QtWidgets.QDateTimeEdit()
         self.out_edit.setDisplayFormat("MM/dd/yyyy hh:mm AP")
         self.out_edit.setCalendarPopup(True)
-        self.out_edit.setStyleSheet("QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.out_edit.setStyleSheet(
+            "QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         if self._record["clock_out"]:
             self.out_edit.setDateTime(_to_qdatetime(self._record["clock_out"]))
         else:
@@ -173,7 +175,7 @@ class EditRecordDialog(QtWidgets.QDialog):
         layout.addLayout(btn_row)
 
     def _on_save(self):
-        clock_in  = self.in_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        clock_in = self.in_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss")
         clock_out = (None if self.clear_out_chk.isChecked()
                      else self.out_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss"))
         if clock_out and clock_out <= clock_in:
@@ -201,6 +203,7 @@ _TAB_KEYS = {
     'daily_att': 1, 'month_sum': 1, 'tard_rpt': 1, 'abs_rpt': 1,
     'view_shfts': 1, 'assign_emp': 1, 'shft_tmpl': 1, 'swap_mgmt': 1,
 }
+
 
 class TimeClock(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
@@ -332,9 +335,9 @@ class TimeClock(QtWidgets.QMainWindow):
         filter_row.setSpacing(8)
 
         def fl(text):
-            l = QtWidgets.QLabel(text)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(text)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         filter_row.addWidget(fl("Employee:"))
         self.rec_emp_combo = QtWidgets.QComboBox()
@@ -344,7 +347,8 @@ class TimeClock(QtWidgets.QMainWindow):
 
         filter_row.addWidget(fl("From:"))
         self.from_date = QtWidgets.QDateEdit()
-        self.from_date.setStyleSheet("QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.from_date.setStyleSheet(
+            "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         self.from_date.setCalendarPopup(True)
         self.from_date.setDate(QtCore.QDate.currentDate().addDays(-30))
         self.from_date.setDisplayFormat("MM/dd/yyyy")
@@ -352,7 +356,8 @@ class TimeClock(QtWidgets.QMainWindow):
 
         filter_row.addWidget(fl("To:"))
         self.to_date = QtWidgets.QDateEdit()
-        self.to_date.setStyleSheet("QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.to_date.setStyleSheet(
+            "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         self.to_date.setCalendarPopup(True)
         self.to_date.setDate(QtCore.QDate.currentDate())
         self.to_date.setDisplayFormat("MM/dd/yyyy")
@@ -553,7 +558,7 @@ class TimeClock(QtWidgets.QMainWindow):
     def _refresh_records(self):
         pid = self.rec_emp_combo.currentData()
         from_dt = self.from_date.date().toString("yyyy-MM-dd") + " 00:00:00"
-        to_dt   = self.to_date.date().toString("yyyy-MM-dd")   + " 23:59:59"
+        to_dt = self.to_date.date().toString("yyyy-MM-dd") + " 23:59:59"
 
         conn = get_db()
         q = """
@@ -589,7 +594,7 @@ class TimeClock(QtWidgets.QMainWindow):
             # accumulate completed entries only
             if row["clock_out"]:
                 try:
-                    t_in  = datetime.strptime(row["clock_in"],  DT_FMT)
+                    t_in = datetime.strptime(row["clock_in"], DT_FMT)
                     t_out = datetime.strptime(row["clock_out"], DT_FMT)
                     total_mins += max(0, int((t_out - t_in).total_seconds() / 60))
                 except ValueError:

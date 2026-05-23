@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
@@ -28,25 +30,30 @@ class Ui_Sales_mgr_menu(object):
             " background-position: center; background-color: white;")
         self.label.setText("")
 
-        font = QtGui.QFont(); font.setPointSize(16)
+        font = QtGui.QFont()
+        font.setPointSize(16)
 
         btn_data = [
-            ("Sales",             QtCore.QRect( 10, 10, 151, 41), "Sales Menu"),
-            ("Customer Entry",    QtCore.QRect(180, 10, 191, 41), "Customer Entry"),
-            ("Accts Receivable",  QtCore.QRect(390, 10, 201, 41), "Accts Receivable"),
-            ("Sales Reports",     QtCore.QRect( 10,510, 181, 41), "Sales Reports"),
+            ("Sales", QtCore.QRect(10, 10, 151, 41), "Sales Menu"),
+            ("Customer Entry", QtCore.QRect(180, 10, 191, 41), "Customer Entry"),
+            ("Accts Receivable", QtCore.QRect(390, 10, 201, 41), "Accts Receivable"),
+            ("Sales Reports", QtCore.QRect(10, 510, 181, 41), "Sales Reports"),
         ]
 
         self._btns = []
         for text, geom, key in btn_data:
             b = QtWidgets.QPushButton(parent=self.centralwidget,
                                       clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom); b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE); b.setAutoDefault(False); b.setText(text)
+            b.setGeometry(geom)
+            b.setFont(font)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setAutoDefault(False)
+            b.setText(text)
             self._btns.append(b)
 
         self.label.raise_()
-        for b in self._btns: b.raise_()
+        for b in self._btns:
+            b.raise_()
 
         Sales_mgr_menu.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=Sales_mgr_menu)
@@ -59,8 +66,8 @@ class Ui_Sales_mgr_menu(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "Sales Menu":      "Sales_menu.py",
-            "Customer Entry":  "customer_entry.py",
+            "Sales Menu": "Sales_menu.py",
+            "Customer Entry": "customer_entry.py",
             "Accts Receivable": "Accounts_receivable.py",
         }
         script = scripts.get(pressed)

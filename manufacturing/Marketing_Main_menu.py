@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_Marketing_Main_Menu(object):
     def setupUi(self, Marketing_Main_Menu):
@@ -144,39 +147,41 @@ class Ui_Marketing_Main_Menu(object):
         Marketing_Main_Menu.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(parent=Marketing_Main_Menu)
         self.centralwidget.setObjectName("centralwidget")
-        self.market_Mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Marketing Manager Menu"))
+        self.market_Mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Marketing Manager Menu"))
         self.market_Mgr_Button.setGeometry(QtCore.QRect(20, 20, 191, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.market_Mgr_Button.setFont(font)
         self.market_Mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.market_Mgr_Button.setAutoDefault(False)
         self.market_Mgr_Button.setObjectName("market_Mgr_Button")
-        self.Marketing_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Marketing Menu"))
+        self.Marketing_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Marketing Menu"))
         self.Marketing_Button.setGeometry(QtCore.QRect(20, 80, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Marketing_Button.setFont(font)
         self.Marketing_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.Marketing_Button.setAutoDefault(False)
         self.Marketing_Button.setObjectName("Marketing_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 561))
         self.label.setStyleSheet("background-image: url(Marketing.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.label.raise_()
@@ -193,11 +198,12 @@ class Ui_Marketing_Main_Menu(object):
 
         self.retranslateUi(Marketing_Main_Menu)
         QtCore.QMetaObject.connectSlotsByName(Marketing_Main_Menu)
+
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Marketing Manager Menu": "marketing_mgr_menu.py",
-            "Marketing Menu":         "marketing_menu.py",
+            "Marketing Menu": "marketing_menu.py",
         }
         script = scripts.get(pressed)
         if script:

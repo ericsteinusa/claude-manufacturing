@@ -142,15 +142,15 @@ class PersonnelCRM(QtWidgets.QMainWindow):
                 w.setPlaceholderText(ph)
             return w
 
-        self.fn_input    = inp("First name")
-        self.ln_input    = inp("Last name")
+        self.fn_input = inp("First name")
+        self.ln_input = inp("Last name")
         self.empid_input = inp("Numbers only")
-        self.addr_input  = inp("Street address")
-        self.city_input  = inp("City")
+        self.addr_input = inp("Street address")
+        self.city_input = inp("City")
         self.state_input = inp("ST")
         self.state_input.setMaxLength(2)
         self.state_input.setFixedWidth(44)
-        self.zip_input   = inp("Zip")
+        self.zip_input = inp("Zip")
         self.zip_input.setFixedWidth(90)
         self.email_input = inp("Email address")
 
@@ -164,40 +164,40 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         self.dept_sub_combo.setMinimumWidth(160)
 
         # Row 0: name / emp id / email
-        fg.addWidget(lbl2("First Name:"),  0, 0)
-        fg.addWidget(self.fn_input,         0, 1)
-        fg.addWidget(lbl2("Last Name:"),   0, 2)
-        fg.addWidget(self.ln_input,         0, 3)
-        fg.addWidget(lbl2("Emp ID:"),      0, 4)
-        fg.addWidget(self.empid_input,      0, 5)
-        fg.addWidget(lbl2("Email:"),        0, 6)
-        fg.addWidget(self.email_input,      0, 7)
+        fg.addWidget(lbl2("First Name:"), 0, 0)
+        fg.addWidget(self.fn_input, 0, 1)
+        fg.addWidget(lbl2("Last Name:"), 0, 2)
+        fg.addWidget(self.ln_input, 0, 3)
+        fg.addWidget(lbl2("Emp ID:"), 0, 4)
+        fg.addWidget(self.empid_input, 0, 5)
+        fg.addWidget(lbl2("Email:"), 0, 6)
+        fg.addWidget(self.email_input, 0, 7)
 
         # Row 1: address / city / state
-        fg.addWidget(lbl2("Address:"),      1, 0)
-        fg.addWidget(self.addr_input,       1, 1, 1, 3)
-        fg.addWidget(lbl2("City:"),         1, 4)
-        fg.addWidget(self.city_input,       1, 5)
-        fg.addWidget(lbl2("State:"),        1, 6)
-        fg.addWidget(self.state_input,      1, 7)
+        fg.addWidget(lbl2("Address:"), 1, 0)
+        fg.addWidget(self.addr_input, 1, 1, 1, 3)
+        fg.addWidget(lbl2("City:"), 1, 4)
+        fg.addWidget(self.city_input, 1, 5)
+        fg.addWidget(lbl2("State:"), 1, 6)
+        fg.addWidget(self.state_input, 1, 7)
 
         # Row 2: zip / dept / dept sub
-        fg.addWidget(lbl2("Zip:"),          2, 0)
-        fg.addWidget(self.zip_input,        2, 1)
-        fg.addWidget(lbl2("Department:"),   2, 2)
-        fg.addWidget(self.dept_combo,       2, 3)
-        fg.addWidget(lbl2("Dept Sub:"),     2, 4)
-        fg.addWidget(self.dept_sub_combo,   2, 5)
+        fg.addWidget(lbl2("Zip:"), 2, 0)
+        fg.addWidget(self.zip_input, 2, 1)
+        fg.addWidget(lbl2("Department:"), 2, 2)
+        fg.addWidget(self.dept_combo, 2, 3)
+        fg.addWidget(lbl2("Dept Sub:"), 2, 4)
+        fg.addWidget(self.dept_sub_combo, 2, 5)
 
         layout.addWidget(form_group)
 
         # ── Action buttons ─────────────────────────────────────────────────
         btn_row = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add New",        self._on_add),
+            ("Add New", self._on_add),
             ("Update Selected", self._on_update),
             ("Delete Selected", self._on_delete),
-            ("Clear Form",     self._clear_form),
+            ("Clear Form", self._clear_form),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -311,7 +311,7 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         self.zip_input.setText(p["zip_code"] or "")
         self.email_input.setText(p["email"] or "")
 
-        dept_id     = p["dept_id"]     if "dept_id"     in keys else None
+        dept_id = p["dept_id"] if "dept_id" in keys else None
         dept_sub_id = p["dept_Sub_id"] if "dept_Sub_id" in keys else None
 
         idx = self.dept_combo.findData(dept_id)
@@ -327,15 +327,15 @@ class PersonnelCRM(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Input Error", "Employee ID must be a number.")
             return None
         return {
-            "first_name":  self.fn_input.text().strip(),
-            "last_name":   self.ln_input.text().strip(),
-            "emp_id":      int(emp_id_text) if emp_id_text else 0,
-            "address":     self.addr_input.text().strip(),
-            "city":        self.city_input.text().strip(),
-            "state":       self.state_input.text().strip().upper(),
-            "zip_code":    self.zip_input.text().strip(),
-            "email":       self.email_input.text().strip(),
-            "dept_id":     self.dept_combo.currentData(),
+            "first_name": self.fn_input.text().strip(),
+            "last_name": self.ln_input.text().strip(),
+            "emp_id": int(emp_id_text) if emp_id_text else 0,
+            "address": self.addr_input.text().strip(),
+            "city": self.city_input.text().strip(),
+            "state": self.state_input.text().strip().upper(),
+            "zip_code": self.zip_input.text().strip(),
+            "email": self.email_input.text().strip(),
+            "dept_id": self.dept_combo.currentData(),
             "dept_Sub_id": self.dept_sub_combo.currentData(),
         }
 

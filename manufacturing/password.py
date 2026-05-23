@@ -150,11 +150,11 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.submit_Button.setFont(font)
         self.submit_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                         "border: 2px solid black;\n"
+                                         "border-radius: 10px;}\n"
+                                         "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                         "border: 2px solidrgb(85, 255, 255);\n"
+                                         "}")
         self.submit_Button.setAutoDefault(False)
         self.submit_Button.setObjectName("submit_Button")
         self.email_label = QtWidgets.QLabel(parent=self.centralwidget)
@@ -197,8 +197,10 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.submit_Button.setText(_translate("MainWindow", "Submit"))
-        self.email_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" color:#ffffff;\">Enter Email:</span></p></body></html>"))
-        self.passwd_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" color:#ffffff;\">Enter New Password:</span></p></body></html>"))
+        self.email_label.setText(_translate(
+            "MainWindow", "<html><head/><body><p><span style=\" color:#ffffff;\">Enter Email:</span></p></body></html>"))
+        self.passwd_label.setText(_translate(
+            "MainWindow", "<html><head/><body><p><span style=\" color:#ffffff;\">Enter New Password:</span></p></body></html>"))
 
 
 if __name__ == "__main__":

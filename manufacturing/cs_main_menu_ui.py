@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'cs_main_menu.ui'
+# Form generated from reading UI file 'cs_main_menu.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QWidget)
+                               QPushButton, QSizePolicy, QStatusBar, QWidget)
+
 
 class Ui_Cust_Serv_Main_Menu(object):
     def setupUi(self, Cust_Serv_Main_Menu):
@@ -96,41 +97,41 @@ class Ui_Cust_Serv_Main_Menu(object):
         font.setPointSize(16)
         self.cs_mgr_Button.setFont(font)
         self.cs_mgr_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                         "border: 2px solid black;\n"
+                                         "border-radius: 10px;}\n"
+                                         "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                         "border: 2px solidrgb(85, 255, 255);\n"
+                                         "}")
         self.cs_mgr_Button.setAutoDefault(False)
         self.cust_calls_Button = QPushButton(self.centralwidget)
         self.cust_calls_Button.setObjectName(u"cust_calls_Button")
         self.cust_calls_Button.setGeometry(QRect(20, 160, 161, 41))
         self.cust_calls_Button.setFont(font)
         self.cust_calls_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.cust_calls_Button.setAutoDefault(False)
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 0, 801, 551))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/Customer_service.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.cust_calls_Button_2 = QPushButton(self.centralwidget)
         self.cust_calls_Button_2.setObjectName(u"cust_calls_Button_2")
         self.cust_calls_Button_2.setGeometry(QRect(20, 90, 241, 41))
         self.cust_calls_Button_2.setFont(font)
         self.cust_calls_Button_2.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                               "border: 2px solid black;\n"
+                                               "border-radius: 10px;}\n"
+                                               "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                               "border: 2px solidrgb(85, 255, 255);\n"
+                                               "}")
         self.cust_calls_Button_2.setAutoDefault(False)
         Cust_Serv_Main_Menu.setCentralWidget(self.centralwidget)
         self.label.raise_()
@@ -155,6 +156,6 @@ class Ui_Cust_Serv_Main_Menu(object):
         self.cs_mgr_Button.setText(QCoreApplication.translate("Cust_Serv_Main_Menu", u"CS Manager Menu", None))
         self.cust_calls_Button.setText(QCoreApplication.translate("Cust_Serv_Main_Menu", u"Customer Calls", None))
         self.label.setText("")
-        self.cust_calls_Button_2.setText(QCoreApplication.translate("Cust_Serv_Main_Menu", u"Customer Service Menu", None))
+        self.cust_calls_Button_2.setText(QCoreApplication.translate(
+            "Cust_Serv_Main_Menu", u"Customer Service Menu", None))
     # retranslateUi
-

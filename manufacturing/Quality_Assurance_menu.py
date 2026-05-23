@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_Quality_Assurance_menu(object):
     def setupUi(self, Quality_Assurance_menu):
@@ -148,23 +151,24 @@ class Ui_Quality_Assurance_menu(object):
         self.label.setGeometry(QtCore.QRect(0, 60, 801, 521))
         self.label.setPalette(palette)
         self.label.setStyleSheet("background-image: url(Quality-Assurance.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
-        self.lab_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("QA Labratory Menu"))
+        self.lab_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("QA Labratory Menu"))
         self.lab_Button.setGeometry(QtCore.QRect(20, 10, 211, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.lab_Button.setFont(font)
         self.lab_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                      "border: 2px solid black;\n"
+                                      "border-radius: 10px;}\n"
+                                      "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                      "border: 2px solidrgb(85, 255, 255);\n"
+                                      "}")
         self.lab_Button.setAutoDefault(False)
         self.lab_Button.setObjectName("lab_Button")
         Quality_Assurance_menu.setCentralWidget(self.centralwidget)

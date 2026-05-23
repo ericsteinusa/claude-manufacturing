@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -144,52 +147,55 @@ class Ui_MainWindow(object):
         MainWindow.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.Product_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Production Menu"))
+        self.Product_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Production Menu"))
         self.Product_Button.setGeometry(QtCore.QRect(270, 10, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Product_Button.setFont(font)
         self.Product_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                          "border: 2px solid black;\n"
+                                          "border-radius: 10px;}\n"
+                                          "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                          "border: 2px solidrgb(85, 255, 255);\n"
+                                          "}")
         self.Product_Button.setAutoDefault(False)
         self.Product_Button.setObjectName("Product_Button")
-        self.Prod_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Production Manager Menu"))
+        self.Prod_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Production Manager Menu"))
         self.Prod_mgr_Button.setGeometry(QtCore.QRect(10, 10, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Prod_mgr_Button.setFont(font)
         self.Prod_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.Prod_mgr_Button.setAutoDefault(False)
         self.Prod_mgr_Button.setObjectName("Prod_mgr_Button")
-        self.Shipping_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Shipping Menu"))
+        self.Shipping_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Shipping Menu"))
         self.Shipping_Button.setGeometry(QtCore.QRect(470, 10, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Shipping_Button.setFont(font)
         self.Shipping_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.Shipping_Button.setAutoDefault(False)
         self.Shipping_Button.setObjectName("Shipping_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 60, 801, 501))
         self.label.setStyleSheet("background-image: url(pharmamfg.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.label.raise_()
@@ -211,9 +217,9 @@ class Ui_MainWindow(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "Production Menu":         "prod_prod_menu.py",
+            "Production Menu": "prod_prod_menu.py",
             "Production Manager Menu": "prod_mgr_Menu.py",
-            "Shipping Menu":           "prod_ship_dept.py",
+            "Shipping Menu": "prod_ship_dept.py",
         }
         script = scripts.get(pressed)
         if script:

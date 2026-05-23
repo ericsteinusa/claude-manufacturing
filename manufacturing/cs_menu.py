@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_Customer_service_menu(object):
     def setupUi(self, Customer_service_menu):
@@ -10,36 +13,38 @@ class Ui_Customer_service_menu(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 661))
         self.label.setStyleSheet("background-image: url(customer_service.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
-        self.CS_calls_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Customer Service Calls"))
+        self.CS_calls_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Customer Service Calls"))
         self.CS_calls_Button.setGeometry(QtCore.QRect(10, 20, 231, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.CS_calls_Button.setFont(font)
         self.CS_calls_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;\n}"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n}"
+                                           "")
         self.CS_calls_Button.setAutoDefault(False)
         self.CS_calls_Button.setObjectName("CS_calls_Button")
-        self.Cust_entry_button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Customer Entry Screen"))
+        self.Cust_entry_button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Customer Entry Screen"))
         self.Cust_entry_button.setGeometry(QtCore.QRect(10, 80, 241, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Cust_entry_button.setFont(font)
         self.Cust_entry_button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;\n}"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n}"
+                                             "")
         self.Cust_entry_button.setAutoDefault(False)
         self.Cust_entry_button.setObjectName("Cust_entry_button")
         Customer_service_menu.setCentralWidget(self.centralwidget)
@@ -53,12 +58,12 @@ class Ui_Customer_service_menu(object):
 
         self.retranslateUi(Customer_service_menu)
         QtCore.QMetaObject.connectSlotsByName(Customer_service_menu)
-   
+
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Customer Service Calls": "cs_calls.py",
-            "Customer Entry Screen":  "customer_entry.py",
+            "Customer Entry Screen": "customer_entry.py",
         }
         script = scripts.get(pressed)
         if script:

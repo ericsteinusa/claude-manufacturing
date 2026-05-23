@@ -11,21 +11,23 @@ root = Tk()
 people = ''
 
 # Database setup
+
+
 def setup_database():
     conn = sqlite3.connect('company.db')
     cursor = conn.cursor()
     cursor.execute("""
     CREATE TABLE if not exists people (
-	    first_name text,
-	    last_name text,
-	    id integer,
-	    address text,
-	    city text,
-	    state text,
-	    zip_code text,
- 	    email text
+        first_name text,
+        last_name text,
+        id integer,
+        address text,
+        city text,
+        state text,
+        zip_code text,
+        email text
         )
-	""")
+    """)
 
     cursor.execute("""
     CREATE TABLE if not exists calls (
@@ -43,7 +45,9 @@ def setup_database():
     """)
     conn.commit()
     conn.close()
-'''	
+
+
+'''
 # Read our config file and get colors
 parser = ConfigParser()
 parser.read("personnel.ini")
@@ -51,171 +55,175 @@ saved_primary_color = parser.get('colors', 'primary_color')
 saved_secondary_color = parser.get('colors', 'secondary_color')
 saved_highlight_color = parser.get('colors', 'highlight_color')
 '''
+
+
 def query_database():
-	# Clear the Treeview
-	for record in my_tree.get_children():
-		my_tree.delete(record)
-		
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+    # Clear the Treeview
+    for record in my_tree.get_children():
+        my_tree.delete(record)
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a database or connect to one that exists
+    conn = sqlite3.connect('company.db')
 
-	c.execute("SELECT rowid, * FROM calls")
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow',))
-		# increment counter
-		count += 1
+    # Create a cursor instance
+    c = conn.cursor()
 
+    c.execute("SELECT rowid, * FROM calls")
+    records = c.fetchall()
 
-	# Commit changes
-	conn.commit()
+    # Add our data to the screen
+    global count
+    count = 0
 
-	# Close our connection
-	conn.close()
+    for record in records:
+        if count % 2 == 0:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
+        else:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow',))
+        # increment counter
+        count += 1
+
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
 
 
 def search_records():
-	lookup_record = search_entry.get()
-	# close the search box
-	search.destroy()
-	
-	# Clear the Treeview
-	for record in my_tree.get_children():
-		my_tree.delete(record)
-	
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+    lookup_record = search_entry.get()
+    # close the search box
+    search.destroy()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Clear the Treeview
+    for record in my_tree.get_children():
+        my_tree.delete(record)
 
-	c.execute("SELECT rowid, * FROM calls WHERE rowid like ?", (lookup_record,))
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow',))
-		# increment counter
-		count += 1
+    # Create a database or connect to one that exists
+    conn = sqlite3.connect('company.db')
 
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Commit changes
-	conn.commit()
+    c.execute("SELECT rowid, * FROM calls WHERE rowid like ?", (lookup_record,))
+    records = c.fetchall()
 
-	# Close our connection
-	conn.close()
+    # Add our data to the screen
+    global count
+    count = 0
+
+    for record in records:
+        if count % 2 == 0:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
+        else:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow',))
+        # increment counter
+        count += 1
+
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
+
 
 def lookup_records():
-	global search_entry, search
+    global search_entry, search
 
-	search = Toplevel(root)
-	search.title("Lookup Records")
-	search.geometry("400x200")
-	
+    search = Toplevel(root)
+    search.title("Lookup Records")
+    search.geometry("400x200")
 
-	# Create label frame
-	search_frame = LabelFrame(search, text="Record Number")
-	search_frame.pack(padx=10, pady=10)
+    # Create label frame
+    search_frame = LabelFrame(search, text="Record Number")
+    search_frame.pack(padx=10, pady=10)
 
-	# Add entry box
-	search_entry = Entry(search_frame, font=("Helvetica", 18))
-	search_entry.pack(pady=20, padx=20)
+    # Add entry box
+    search_entry = Entry(search_frame, font=("Helvetica", 18))
+    search_entry.pack(pady=20, padx=20)
 
-	# Add button
-	search_button = Button(search, text="Search Records", command=search_records)
-	search_button.pack(padx=20, pady=20)
-
+    # Add button
+    search_button = Button(search, text="Search Records", command=search_records)
+    search_button.pack(padx=20, pady=20)
 
 
 def primary_color():
-	# Pick Color
-	primary_color = colorchooser.askcolor()[1]
+    # Pick Color
+    primary_color = colorchooser.askcolor()[1]
 
-	# Update Treeview Color
-	if primary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('evenrow', background=primary_color)
+    # Update Treeview Color
+    if primary_color:
+        # Create Striped Row Tags
+        my_tree.tag_configure('evenrow', background=primary_color)
 
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'primary_color', primary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
+        # Config file
+        parser = ConfigParser()
+        parser.read("personnel.ini")
+        # Set the color change
+        parser.set('colors', 'primary_color', primary_color)
+        # Save the config file
+        with open('personnel.ini', 'w') as configfile:
+            parser.write(configfile)
 
 
 def secondary_color():
-	# Pick Color
-	secondary_color = colorchooser.askcolor()[1]
-	
-	# Update Treeview Color
-	if secondary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('oddrow', background=secondary_color)
-		
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'secondary_color', secondary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
+    # Pick Color
+    secondary_color = colorchooser.askcolor()[1]
+
+    # Update Treeview Color
+    if secondary_color:
+        # Create Striped Row Tags
+        my_tree.tag_configure('oddrow', background=secondary_color)
+
+        # Config file
+        parser = ConfigParser()
+        parser.read("personnel.ini")
+        # Set the color change
+        parser.set('colors', 'secondary_color', secondary_color)
+        # Save the config file
+        with open('personnel.ini', 'w') as configfile:
+            parser.write(configfile)
+
 
 def highlight_color():
-	# Pick Color
-	highlight_color = colorchooser.askcolor()[1]
+    # Pick Color
+    highlight_color = colorchooser.askcolor()[1]
 
-	#Update Treeview Color
-	# Change Selected Color
-	if highlight_color:
-		style.map('Treeview',
-			background=[('selected', highlight_color)])
+    # Update Treeview Color
+    # Change Selected Color
+    if highlight_color:
+        style.map('Treeview',
+                  background=[('selected', highlight_color)])
 
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'highlight_color', highlight_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
+        # Config file
+        parser = ConfigParser()
+        parser.read("personnel.ini")
+        # Set the color change
+        parser.set('colors', 'highlight_color', highlight_color)
+        # Save the config file
+        with open('personnel.ini', 'w') as configfile:
+            parser.write(configfile)
+
 
 def reset_colors():
-	# Save original colors to config file
-	parser = ConfigParser()
-	parser.read('personnel.ini')
-	parser.set('colors', 'primary_color', 'lightblue')
-	parser.set('colors', 'secondary_color', 'white')
-	parser.set('colors', 'highlight_color', '#347083')
-	with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-	# Reset the colors
-	my_tree.tag_configure('oddrow', background='white')
-	my_tree.tag_configure('evenrow', background='lightblue')
-	style.map('Treeview',
-			background=[('selected', '#347083')])
+    # Save original colors to config file
+    parser = ConfigParser()
+    parser.read('personnel.ini')
+    parser.set('colors', 'primary_color', 'lightblue')
+    parser.set('colors', 'secondary_color', 'white')
+    parser.set('colors', 'highlight_color', '#347083')
+    with open('personnel.ini', 'w') as configfile:
+        parser.write(configfile)
+    # Reset the colors
+    my_tree.tag_configure('oddrow', background='white')
+    my_tree.tag_configure('evenrow', background='lightblue')
+    style.map('Treeview',
+              background=[('selected', '#347083')])
+
 
 # Add Menu
 my_menu = Menu(root)
@@ -233,7 +241,7 @@ option_menu.add_command(label="Reset Colors", command=reset_colors)
 option_menu.add_separator()
 option_menu.add_command(label="Exit", command=root.quit)
 
-#Search Menu
+# Search Menu
 search_menu = Menu(my_menu, tearoff=0)
 my_menu.add_cascade(label="Search", menu=search_menu)
 # Drop down menu
@@ -242,38 +250,40 @@ search_menu.add_separator()
 search_menu.add_command(label="Reset", command=query_database)
 
 
-
 # Step 2: Fetch data for the selection list
 def fetch_people():
-	conn = sqlite3.connect("company.db")
-	cursor = conn.cursor()
-	cursor.execute("SELECT id || ' ' || first_name || ' ' || last_name as full_name FROM people")
-	people = [row[0] for row in cursor.fetchall()]
-	conn.close()
-	return people
-    
+    conn = sqlite3.connect("company.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id || ' ' || first_name || ' ' || last_name as full_name FROM people")
+    people = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return people
+
 # Insert data into the database
+
+
 def insert_data():
     people_id = people_combobox.get().split(' ')[0].strip('{')
-    call = call_widget.get("1.0", "end-1c") # Get text from Text Widget
+    call = call_widget.get("1.0", "end-1c")  # Get text from Text Widget
     call_date = call_date_entry.get()
     call_time = call_time_entry.get()
     completion_date = completion_date_entry.get()
-    completion_time= completion_time_entry.get()
-    comments_box= comment_widget.get("1.0", "end-1c") # Get text from Text Widget
-    completion_box = checkbox_var.get() # Get value from checkbox (0 or 1)
-    
+    completion_time = completion_time_entry.get()
+    comments_box = comment_widget.get("1.0", "end-1c")  # Get text from Text Widget
+    completion_box = checkbox_var.get()  # Get value from checkbox (0 or 1)
+
     if not people_id or not call or not call_date or not call_time or not completion_date or not completion_time or not comments_box or not completion_box:
-    
+
         messagebox.showerror("Input Error", "Please fill in all fields.")
-        
+
     #    return
 
     else:
 
         conn = sqlite3.connect("company.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box))
+        cursor.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                       (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box))
         conn.commit()
         messagebox.showinfo("Message", "Call Saved Successfully.")
         conn.close()
@@ -287,15 +297,16 @@ def insert_data():
         completion_box.delete(0, END)
         # display_data()
 
+
 # Display data from the database
 '''
 def display_data():
-  	user_list.delete(0, END)
+    user_list.delete(0, END)
     conn = sqlite3.connect("company.db")
     cursor = conn.cursor()
     cursor.execute("SELECT id, people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box FROM calls")
     for row in cursor.fetchall():
-    user_list.insert(END, f"ID: {row[0]}, people_id: {row[1]}, call: {row[2]}, call_date: {row[3]}, call_time: {row[4]}, completion_date: {row[5]}, completion_time: {row[6]}, comments_box: {row[7]}, completion_box: {row[8]}") 
+    user_list.insert(END, f"ID: {row[0]}, people_id: {row[1]}, call: {row[2]}, call_date: {row[3]}, call_time: {row[4]}, completion_date: {row[5]}, completion_time: {row[6]}, comments_box: {row[7]}, completion_box: {row[8]}")
   conn.close()
 '''
 root.configure(bg="lightblue")
@@ -325,14 +336,14 @@ style.theme_use('default')
 
 # Configure the Treeview Colors
 style.configure("Treeview",
-	background="#D3D3D3",
-	foreground="black",
-	rowheight=25,
-	fieldbackground="#D3D3D3")
+                background="#D3D3D3",
+                foreground="black",
+                rowheight=25,
+                fieldbackground="#D3D3D3")
 
 # Change Selected Color #347083
 style.map('Treeview',
-	background=[('selected', saved_highlight_color)])
+          background=[('selected', saved_highlight_color)])
 
 
 # Create a Treeview Frame
@@ -351,7 +362,8 @@ my_tree.pack()
 tree_scroll.config(command=my_tree.yview)
 
 # Define Our Columns
-my_tree['columns'] = ("ID", "People ID", "Problem", "Call Date", "Call Time", "Completion Date", "Completion Time", "Comments", "Completion Box")
+my_tree['columns'] = ("ID", "People ID", "Problem", "Call Date", "Call Time",
+                      "Completion Date", "Completion Time", "Comments", "Completion Box")
 
 # Format Our Columns
 my_tree.column("#0", width=0, stretch=NO)
@@ -403,7 +415,7 @@ people_combobox.bind("<<ComboboxSelected>>")
 Label(root, text="Call:").place(x=425, y=327)
 call_widget = Text(root, wrap="word", width=30, height=5)
 call_widget.place(x=460, y=327)
-call = call_widget.get("1.0", "end-1c") # Get text from Text widget
+call = call_widget.get("1.0", "end-1c")  # Get text from Text widget
 
 Label(root, text="Call Date:").place(x=715, y=327)
 call_date_entry = Entry(root)
@@ -413,7 +425,7 @@ Label(root, text="Call Time:").place(x=910, y=327)
 call_time_entry = Entry(root)
 call_time_entry.place(x=975, y=327)
 
-Label(root, text="Completion Date:").place(x=25, y= 440)
+Label(root, text="Completion Date:").place(x=25, y=440)
 completion_date_entry = Entry(root)
 completion_date_entry.place(x=130, y=440)
 
@@ -432,287 +444,289 @@ checkbox = tk.Checkbutton(root, text="Completed", variable=checkbox_var)
 checkbox.place(x=850, y=440)
 
 # Move Row Up
+
+
 def up():
-	rows = my_tree.selection()
-	for row in rows:
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)-1)
+    rows = my_tree.selection()
+    for row in rows:
+        my_tree.move(row, my_tree.parent(row), my_tree.index(row) - 1)
 
 # Move Rown Down
+
+
 def down():
-	rows = my_tree.selection()
-	for row in reversed(rows):
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)+1)
+    rows = my_tree.selection()
+    for row in reversed(rows):
+        my_tree.move(row, my_tree.parent(row), my_tree.index(row) + 1)
 
 # Remove one record
+
+
 def remove_one():
-	x = my_tree.selection()[0]
-	my_tree.delete(x)
+    x = my_tree.selection()[0]
+    my_tree.delete(x)
 
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+    # Create a database or connect to one that exists
+    conn = sqlite3.connect('company.db')
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Delete From Database
-	c.execute("DELETE from calls WHERE oid=" + id_entry.get())
-	
+    # Delete From Database
+    c.execute("DELETE from calls WHERE oid=" + id_entry.get())
 
+    # Commit changes
+    conn.commit()
 
-	# Commit changes
-	conn.commit()
+    # Close our connection
+    conn.close()
 
-	# Close our connection
-	conn.close()
+    # Clear The Entry Boxes
+    clear_entries()
 
-	# Clear The Entry Boxes
-	clear_entries()
-
-	# Add a little message box for fun
-	messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
-
+    # Add a little message box for fun
+    messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
 
 
 # Remove Many records
 def remove_many():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
+    # Add a little message box for fun
+    response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
 
-	#Add logic for message box
-	if response == 1:
-		# Designate selections
-		x = my_tree.selection()
+    # Add logic for message box
+    if response == 1:
+        # Designate selections
+        x = my_tree.selection()
 
-		# Create List of ID's
-		ids_to_delete = []
-		
-		# Add selections to ids_to_delete list
-		for record in x:
-			ids_to_delete.append(my_tree.item(record, 'values')[2])
+        # Create List of ID's
+        ids_to_delete = []
 
-		# Delete From Treeview
-		for record in x:
-			my_tree.delete(record)
+        # Add selections to ids_to_delete list
+        for record in x:
+            ids_to_delete.append(my_tree.item(record, 'values')[2])
 
-		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+        # Delete From Treeview
+        for record in x:
+            my_tree.delete(record)
 
-		# Create a cursor instance
-		c = conn.cursor()
-		
+        # Create a database or connect to one that exists
+        conn = sqlite3.connect('company.db')
 
-		# Delete Everything From The Table
-		c.executemany("DELETE FROM calls WHERE id = ?", [(a,) for a in ids_to_delete])
+        # Create a cursor instance
+        c = conn.cursor()
 
-		# Reset List
-		ids_to_delete = []
+        # Delete Everything From The Table
+        c.executemany("DELETE FROM calls WHERE id = ?", [(a,) for a in ids_to_delete])
 
+        # Reset List
+        ids_to_delete = []
 
-		# Commit changes
-		conn.commit()
+        # Commit changes
+        conn.commit()
 
-		# Close our connection
-		conn.close()
+        # Close our connection
+        conn.close()
 
-		# Clear entry boxes if filled
-		clear_entries()
+        # Clear entry boxes if filled
+        clear_entries()
 
 
 # Remove all records
 def remove_all():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
+    # Add a little message box for fun
+    response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
 
-	#Add logic for message box
-	if response == 1:
-		# Clear the Treeview
-		for record in my_tree.get_children():
-			my_tree.delete(record)
+    # Add logic for message box
+    if response == 1:
+        # Clear the Treeview
+        for record in my_tree.get_children():
+            my_tree.delete(record)
 
-		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+        # Create a database or connect to one that exists
+        conn = sqlite3.connect('company.db')
 
-		# Create a cursor instance
-		c = conn.cursor()
+        # Create a cursor instance
+        c = conn.cursor()
 
-		# Delete Everything From The Table
-		c.execute("DROP TABLE calls")		
+        # Delete Everything From The Table
+        c.execute("DROP TABLE calls")
 
+        # Commit changes
+        conn.commit()
 
-		# Commit changes
-		conn.commit()
+        # Close our connection
+        conn.close()
 
-		# Close our connection
-		conn.close()
+        # Clear entry boxes if filled
+        clear_entries()
 
-		# Clear entry boxes if filled
-		clear_entries()
-
-		# Recreate The Table
-		create_table_again()
+        # Recreate The Table
+        create_table_again()
 
 # Clear entry boxes
+
+
 def clear_entries():
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	people_combobox.delete(0, END)
-	call_widget.delete("1.0", END)
-	call_date_entry.delete(0, END)
-	call_time_entry.delete(0, END)
-	completion_date_entry.delete(0, END)
-	completion_time_entry.delete(0, END)
-	comment_widget.delete("1.0", END)
-	checkbox_var.set(0)
-	
+    # Clear entry boxes
+    id_entry.delete(0, END)
+    people_combobox.delete(0, END)
+    call_widget.delete("1.0", END)
+    call_date_entry.delete(0, END)
+    call_time_entry.delete(0, END)
+    completion_date_entry.delete(0, END)
+    completion_time_entry.delete(0, END)
+    comment_widget.delete("1.0", END)
+    checkbox_var.set(0)
+
 
 # Select Record
 def select_record(e):
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	people_combobox.delete(0, END)
-	call_widget.delete("1.0", END)
-	call_date_entry.delete(0, END)
-	call_time_entry.delete(0, END)
-	completion_date_entry.delete(0, END)
-	completion_time_entry.delete(0, END)
-	comment_widget.delete("1.0", END)
-	checkbox_var.set(0)
-	
-	
-	# Grab record Number
-	selected = my_tree.focus()
-	# Grab record values
-	values = my_tree.item(selected, 'values')
-		
-	# output to entry boxes
-	id_entry.insert(0, values[0])
-	people_combobox.insert(0, values[1])
-	call_widget.insert("1.0", values[2])
-	call_date_entry.insert(0, values[3])
-	call_time_entry.insert(0, values[4])
-	completion_date_entry.insert(0, values[5])
-	completion_time_entry.insert(0, values[6])
-	comment_widget.insert("1.0", values[7])
-	checkbox_var.set(values[8])
-	
-		
+    # Clear entry boxes
+    id_entry.delete(0, END)
+    people_combobox.delete(0, END)
+    call_widget.delete("1.0", END)
+    call_date_entry.delete(0, END)
+    call_time_entry.delete(0, END)
+    completion_date_entry.delete(0, END)
+    completion_time_entry.delete(0, END)
+    comment_widget.delete("1.0", END)
+    checkbox_var.set(0)
+
+    # Grab record Number
+    selected = my_tree.focus()
+    # Grab record values
+    values = my_tree.item(selected, 'values')
+
+    # output to entry boxes
+    id_entry.insert(0, values[0])
+    people_combobox.insert(0, values[1])
+    call_widget.insert("1.0", values[2])
+    call_date_entry.insert(0, values[3])
+    call_time_entry.insert(0, values[4])
+    completion_date_entry.insert(0, values[5])
+    completion_time_entry.insert(0, values[6])
+    comment_widget.insert("1.0", values[7])
+    checkbox_var.set(values[8])
+
+
 # Update record
 def update_record():
-	# Grab the record number
-	selected = my_tree.focus()
-	# Update record
-	my_tree.item(selected, text="", values=(id_entry.get(), people_combobox.get().split(' ')[0].strip('{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
-	# Update the database
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+    # Grab the record number
+    selected = my_tree.focus()
+    # Update record
+    my_tree.item(selected, text="", values=(id_entry.get(), people_combobox.get().split(' ')[0].strip('{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(
+    ), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
+    # Update the database
+    # Create a database or connect to one that exists
+    conn = sqlite3.connect('company.db')
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	c.execute("""UPDATE calls SET
-		people_id = :people,
-		call = :call,
-		call_date = :call_date,
-		call_time = :call_time,
-		completion_date = :completion_date,
-		completion_time = :completion_time,
-		comments_box = :comments_box,
-		completion_box = :completion_box
-			
-		WHERE oid = :oid""",
-		{	
-			'people': people_combobox.get().split(' ')[0].strip('{'),
-			'call': call_widget.get("1.0", "end-1c"),
-			'call_date': call_date_entry.get(),
-			'call_time': call_time_entry.get(),
-			'completion_date': completion_date_entry.get(),
-			'completion_time': completion_time_entry.get(),
-			'comments_box': comment_widget.get("1.0", "end-1c"),
-			'completion_box': checkbox_var.get(),
-			'oid': id_entry.get(),
-		})
-	
-	# Commit changes
-	conn.commit()
+    c.execute("""UPDATE calls SET
+        people_id = :people,
+        call = :call,
+        call_date = :call_date,
+        call_time = :call_time,
+        completion_date = :completion_date,
+        completion_time = :completion_time,
+        comments_box = :comments_box,
+        completion_box = :completion_box
 
-	# Close our connection
-	conn.close()
+        WHERE oid = :oid""",
+              {
+                  'people': people_combobox.get().split(' ')[0].strip('{'),
+                  'call': call_widget.get("1.0", "end-1c"),
+                  'call_date': call_date_entry.get(),
+                  'call_time': call_time_entry.get(),
+                  'completion_date': completion_date_entry.get(),
+                  'completion_time': completion_time_entry.get(),
+                  'comments_box': comment_widget.get("1.0", "end-1c"),
+                  'completion_box': checkbox_var.get(),
+                  'oid': id_entry.get(),
+              })
+
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
+
+    # Clear entry boxes
+    id_entry.delete(0, END)
+    people_combobox.delete(0, END)
+    call_widget.delete("1.0", END)
+    call_date_entry.delete(0, END)
+    call_time_entry.delete(0, END)
+    completion_date_entry.delete(0, END)
+    completion_time_entry.delete(0, END)
+    comment_widget.delete("1.0", END)
+    checkbox_var.set(0)
 
 
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	people_combobox.delete(0, END)
-	call_widget.delete("1.0", END)
-	call_date_entry.delete(0, END)
-	call_time_entry.delete(0, END)
-	completion_date_entry.delete(0, END)
-	completion_time_entry.delete(0, END)
-	comment_widget.delete("1.0", END)
-	checkbox_var.set(0)
-	
-	
 # add new record to database
 def add_record():
-	# Update the database
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+    # Update the database
+    # Create a database or connect to one that exists
+    conn = sqlite3.connect('company.db')
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Add New Record
-	c.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (people_combobox.get().split(' ')[0].strip('{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
-	
+    # Add New Record
+    c.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (people_combobox.get().split(' ')[0].strip(
+        '{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
 
-	# Commit changes
-	conn.commit()
+    # Commit changes
+    conn.commit()
 
-	# Close our connection
-	conn.close()
+    # Close our connection
+    conn.close()
 
-	# Clear entry boxes
-	id_entry.delete(0, END)
-	people_combobox.delete(0, END)
-	call_widget.delete("1.0", END)
-	call_date_entry.delete(0, END)
-	call_time_entry.delete(0, END)
-	completion_date_entry.delete(0, END)
-	completion_time_entry.delete(0, END)
-	comment_widget.delete("1.0", END)
-	checkbox_var.set(0)
-		
-	# Clear The Treeview Table
-	my_tree.delete(*my_tree.get_children())
+    # Clear entry boxes
+    id_entry.delete(0, END)
+    people_combobox.delete(0, END)
+    call_widget.delete("1.0", END)
+    call_date_entry.delete(0, END)
+    call_time_entry.delete(0, END)
+    completion_date_entry.delete(0, END)
+    completion_time_entry.delete(0, END)
+    comment_widget.delete("1.0", END)
+    checkbox_var.set(0)
 
-	# Run to pull data from database on start
-	query_database()
+    # Clear The Treeview Table
+    my_tree.delete(*my_tree.get_children())
+
+    # Run to pull data from database on start
+    query_database()
+
 
 def create_table_again():
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+    # Create a database or connect to one that exists
+    conn = sqlite3.connect('company.db')
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Create Table
-	c.execute("""CREATE TABLE if not exists calls (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		people_id integer,
-		call text,
-		call_date text,
-		call_time text,
-		completion_date,
-		completion_time,  
-	    comments_box text,
-		completion_box integer,
-		FOREIGN KEY (people_id) REFERENCES people(id))
-		""")
-	
-	# Commit changes
-	conn.commit()
+    # Create Table
+    c.execute("""CREATE TABLE if not exists calls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        people_id integer,
+        call text,
+        call_date text,
+        call_time text,
+        completion_date,
+        completion_time,
+        comments_box text,
+        completion_box integer,
+        FOREIGN KEY (people_id) REFERENCES people(id))
+        """)
 
-	# Close our connection
-	conn.close()
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
 
 
 # Add Buttons

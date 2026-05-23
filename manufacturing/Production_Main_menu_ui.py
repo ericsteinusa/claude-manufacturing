@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Production_Main_menu.ui'
+# Form generated from reading UI file 'Production_Main_menu.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QWidget)
+                               QPushButton, QSizePolicy, QStatusBar, QWidget)
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -95,42 +96,42 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.Product_Button.setFont(font)
         self.Product_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                          "border: 2px solid black;\n"
+                                          "border-radius: 10px;}\n"
+                                          "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                          "border: 2px solidrgb(85, 255, 255);\n"
+                                          "}")
         self.Product_Button.setAutoDefault(False)
         self.Prod_mgr_Button = QPushButton(self.centralwidget)
         self.Prod_mgr_Button.setObjectName(u"Prod_mgr_Button")
         self.Prod_mgr_Button.setGeometry(QRect(10, 10, 221, 41))
         self.Prod_mgr_Button.setFont(font)
         self.Prod_mgr_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.Prod_mgr_Button.setAutoDefault(False)
         self.Shipping_Button = QPushButton(self.centralwidget)
         self.Shipping_Button.setObjectName(u"Shipping_Button")
         self.Shipping_Button.setGeometry(QRect(470, 10, 161, 41))
         self.Shipping_Button.setFont(font)
         self.Shipping_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.Shipping_Button.setAutoDefault(False)
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 60, 801, 501))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/pharmamfg.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         MainWindow.setCentralWidget(self.centralwidget)
         self.label.raise_()
         self.Product_Button.raise_()
@@ -156,4 +157,3 @@ class Ui_MainWindow(object):
         self.Shipping_Button.setText(QCoreApplication.translate("MainWindow", u"Shipping", None))
         self.label.setText("")
     # retranslateUi
-

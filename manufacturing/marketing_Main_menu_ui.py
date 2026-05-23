@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Marketing_Main_menu.ui'
+# Form generated from reading UI file 'Marketing_Main_menu.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QWidget)
+                               QPushButton, QSizePolicy, QStatusBar, QWidget)
+
 
 class Ui_Marketing_Main_Menu(object):
     def setupUi(self, Marketing_Main_Menu):
@@ -95,31 +96,31 @@ class Ui_Marketing_Main_Menu(object):
         font.setPointSize(16)
         self.market_Mgr_Button.setFont(font)
         self.market_Mgr_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.market_Mgr_Button.setAutoDefault(False)
         self.Marketing_Button = QPushButton(self.centralwidget)
         self.Marketing_Button.setObjectName(u"Marketing_Button")
         self.Marketing_Button.setGeometry(QRect(20, 80, 211, 41))
         self.Marketing_Button.setFont(font)
         self.Marketing_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.Marketing_Button.setAutoDefault(False)
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 0, 801, 561))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/marketing.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         Marketing_Main_Menu.setCentralWidget(self.centralwidget)
         self.label.raise_()
         self.market_Mgr_Button.raise_()
@@ -143,4 +144,3 @@ class Ui_Marketing_Main_Menu(object):
         self.Marketing_Button.setText(QCoreApplication.translate("Marketing_Main_Menu", u"Marketing", None))
         self.label.setText("")
     # retranslateUi
-

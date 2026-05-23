@@ -2,8 +2,10 @@
 Bank_reconciliation.py — Bank Reconciliation module
 Tabs: Bank Accounts | Statement Entry | Reconciliation | History
 """
-import sys, os, sqlite3, csv
-from datetime import date
+import sys
+import os
+import sqlite3
+import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
@@ -64,8 +66,8 @@ def init_db():
         """)
 
 
-STATUSES     = ["Open", "In Progress", "Reconciled"]
-ITEM_TYPES   = ["Credit", "Debit"]
+STATUSES = ["Open", "In Progress", "Reconciled"]
+ITEM_TYPES = ["Credit", "Debit"]
 
 BLUE = QtGui.QColor(0, 85, 255)
 
@@ -85,12 +87,12 @@ HDR_STYLE = "font-size:22px;font-weight:bold;color:white;padding:4px;"
 
 def _apply_palette(widget):
     pal = QtGui.QPalette()
-    pal.setColor(QtGui.QPalette.ColorRole.Window,     BLUE)
-    pal.setColor(QtGui.QPalette.ColorRole.Button,     BLUE)
-    pal.setColor(QtGui.QPalette.ColorRole.Base,       QtGui.QColor(255, 255, 255))
+    pal.setColor(QtGui.QPalette.ColorRole.Window, BLUE)
+    pal.setColor(QtGui.QPalette.ColorRole.Button, BLUE)
+    pal.setColor(QtGui.QPalette.ColorRole.Base, QtGui.QColor(255, 255, 255))
     pal.setColor(QtGui.QPalette.ColorRole.WindowText, QtGui.QColor(255, 255, 255))
     pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
-    pal.setColor(QtGui.QPalette.ColorRole.Text,       QtGui.QColor(0, 0, 0))
+    pal.setColor(QtGui.QPalette.ColorRole.Text, QtGui.QColor(0, 0, 0))
     widget.setPalette(pal)
 
 
@@ -160,10 +162,10 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         self.tabs.setStyleSheet(TAB_STYLE)
         root.addWidget(self.tabs)
 
-        self.tabs.addTab(self._build_accounts_tab(),     "Bank Accounts")
-        self.tabs.addTab(self._build_statements_tab(),   "Statement Entry")
-        self.tabs.addTab(self._build_reconcile_tab(),    "Reconciliation")
-        self.tabs.addTab(self._build_history_tab(),      "History")
+        self.tabs.addTab(self._build_accounts_tab(), "Bank Accounts")
+        self.tabs.addTab(self._build_statements_tab(), "Statement Entry")
+        self.tabs.addTab(self._build_reconcile_tab(), "Reconciliation")
+        self.tabs.addTab(self._build_history_tab(), "History")
 
         self.tabs.currentChanged.connect(self._on_tab_change)
 
@@ -197,30 +199,30 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         fl = QtWidgets.QFormLayout(fg)
         fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self.ba_ef_name    = QtWidgets.QLineEdit()
-        self.ba_ef_bank    = QtWidgets.QLineEdit()
-        self.ba_ef_acctno  = QtWidgets.QLineEdit()
+        self.ba_ef_name = QtWidgets.QLineEdit()
+        self.ba_ef_bank = QtWidgets.QLineEdit()
+        self.ba_ef_acctno = QtWidgets.QLineEdit()
         self.ba_ef_routing = QtWidgets.QLineEdit()
-        self.ba_ef_gl      = QtWidgets.QComboBox()
+        self.ba_ef_gl = QtWidgets.QComboBox()
         self.ba_ef_gl.setMinimumWidth(200)
-        self.ba_ef_active  = QtWidgets.QCheckBox("Active")
+        self.ba_ef_active = QtWidgets.QCheckBox("Active")
         self.ba_ef_active.setChecked(True)
-        self.ba_ef_notes   = QtWidgets.QLineEdit()
+        self.ba_ef_notes = QtWidgets.QLineEdit()
 
-        fl.addRow("Account Name *",  self.ba_ef_name)
-        fl.addRow("Bank Name",       self.ba_ef_bank)
-        fl.addRow("Account Number",  self.ba_ef_acctno)
-        fl.addRow("Routing Number",  self.ba_ef_routing)
-        fl.addRow("GL Account",      self.ba_ef_gl)
-        fl.addRow("",                self.ba_ef_active)
-        fl.addRow("Notes",           self.ba_ef_notes)
+        fl.addRow("Account Name *", self.ba_ef_name)
+        fl.addRow("Bank Name", self.ba_ef_bank)
+        fl.addRow("Account Number", self.ba_ef_acctno)
+        fl.addRow("Routing Number", self.ba_ef_routing)
+        fl.addRow("GL Account", self.ba_ef_gl)
+        fl.addRow("", self.ba_ef_active)
+        fl.addRow("Notes", self.ba_ef_notes)
         v.addWidget(fg)
 
         bb = QtWidgets.QHBoxLayout()
-        for lbl, slot in [("Add Account",    self._on_ba_add),
-                           ("Update Account", self._on_ba_update),
-                           ("Delete Account", self._on_ba_delete),
-                           ("Clear",          self._on_ba_clear)]:
+        for lbl, slot in [("Add Account", self._on_ba_add),
+                          ("Update Account", self._on_ba_update),
+                          ("Delete Account", self._on_ba_delete),
+                          ("Clear", self._on_ba_clear)]:
             b = QtWidgets.QPushButton(lbl)
             b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
@@ -414,9 +416,9 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         fl = QtWidgets.QFormLayout(fg)
         fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self.st_ef_ba      = QtWidgets.QComboBox()
+        self.st_ef_ba = QtWidgets.QComboBox()
         self.st_ef_ba.setMinimumWidth(200)
-        self.st_ef_date    = QtWidgets.QDateEdit(calendarPopup=True)
+        self.st_ef_date = QtWidgets.QDateEdit(calendarPopup=True)
         self.st_ef_date.setDate(QtCore.QDate.currentDate())
         self.st_ef_beg_bal = QtWidgets.QDoubleSpinBox()
         self.st_ef_beg_bal.setRange(-99_999_999, 99_999_999)
@@ -424,27 +426,27 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         self.st_ef_end_bal = QtWidgets.QDoubleSpinBox()
         self.st_ef_end_bal.setRange(-99_999_999, 99_999_999)
         self.st_ef_end_bal.setDecimals(2)
-        self.st_ef_status  = QtWidgets.QComboBox()
+        self.st_ef_status = QtWidgets.QComboBox()
         for s in STATUSES:
             self.st_ef_status.addItem(s)
-        self.st_ef_by      = QtWidgets.QLineEdit()
-        self.st_ef_notes   = QtWidgets.QLineEdit()
+        self.st_ef_by = QtWidgets.QLineEdit()
+        self.st_ef_notes = QtWidgets.QLineEdit()
 
-        fl.addRow("Bank Account *",    self.st_ef_ba)
-        fl.addRow("Statement Date *",  self.st_ef_date)
+        fl.addRow("Bank Account *", self.st_ef_ba)
+        fl.addRow("Statement Date *", self.st_ef_date)
         fl.addRow("Beginning Balance", self.st_ef_beg_bal)
-        fl.addRow("Ending Balance",    self.st_ef_end_bal)
-        fl.addRow("Status",            self.st_ef_status)
-        fl.addRow("Reconciled By",     self.st_ef_by)
-        fl.addRow("Notes",             self.st_ef_notes)
+        fl.addRow("Ending Balance", self.st_ef_end_bal)
+        fl.addRow("Status", self.st_ef_status)
+        fl.addRow("Reconciled By", self.st_ef_by)
+        fl.addRow("Notes", self.st_ef_notes)
         v.addWidget(fg)
 
         sb = QtWidgets.QHBoxLayout()
-        for lbl, slot in [("Add Statement",    self._on_st_add),
-                           ("Update Statement", self._on_st_update),
-                           ("Delete Statement", self._on_st_delete),
-                           ("Clear",            self._on_st_clear),
-                           ("Open Items →",     self._on_st_open_items)]:
+        for lbl, slot in [("Add Statement", self._on_st_add),
+                          ("Update Statement", self._on_st_update),
+                          ("Delete Statement", self._on_st_delete),
+                          ("Clear", self._on_st_clear),
+                          ("Open Items →", self._on_st_open_items)]:
             b = QtWidgets.QPushButton(lbl)
             b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
@@ -480,27 +482,27 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         item_fl = QtWidgets.QFormLayout(item_fg)
         item_fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self.si_ef_date  = QtWidgets.QDateEdit(calendarPopup=True)
+        self.si_ef_date = QtWidgets.QDateEdit(calendarPopup=True)
         self.si_ef_date.setDate(QtCore.QDate.currentDate())
-        self.si_ef_desc  = QtWidgets.QLineEdit()
-        self.si_ef_type  = QtWidgets.QComboBox()
+        self.si_ef_desc = QtWidgets.QLineEdit()
+        self.si_ef_type = QtWidgets.QComboBox()
         for t in ITEM_TYPES:
             self.si_ef_type.addItem(t)
-        self.si_ef_amt   = QtWidgets.QDoubleSpinBox()
+        self.si_ef_amt = QtWidgets.QDoubleSpinBox()
         self.si_ef_amt.setRange(0, 99_999_999)
         self.si_ef_amt.setDecimals(2)
 
-        item_fl.addRow("Date *",        self.si_ef_date)
-        item_fl.addRow("Description",   self.si_ef_desc)
-        item_fl.addRow("Type",          self.si_ef_type)
-        item_fl.addRow("Amount *",      self.si_ef_amt)
+        item_fl.addRow("Date *", self.si_ef_date)
+        item_fl.addRow("Description", self.si_ef_desc)
+        item_fl.addRow("Type", self.si_ef_type)
+        item_fl.addRow("Amount *", self.si_ef_amt)
         v.addWidget(item_fg)
 
         ib = QtWidgets.QHBoxLayout()
-        for lbl, slot in [("Add Item",    self._on_si_add),
-                           ("Delete Item", self._on_si_delete),
-                           ("Clear Item",  self._on_si_clear),
-                           ("Export CSV",  lambda: _export_csv(self.si_tbl, self))]:
+        for lbl, slot in [("Add Item", self._on_si_add),
+                          ("Delete Item", self._on_si_delete),
+                          ("Clear Item", self._on_si_clear),
+                          ("Export CSV", lambda: _export_csv(self.si_tbl, self))]:
             b = QtWidgets.QPushButton(lbl)
             b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
@@ -528,7 +530,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             combo.blockSignals(False)
 
     def _refresh_statements(self):
-        ba_id  = self.st_ba_filter.currentData()
+        ba_id = self.st_ba_filter.currentData()
         status = self.st_status_filter.currentText()
         q = """
             SELECT bs.*, ba.account_name
@@ -537,9 +539,11 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         """
         params, where = [], []
         if ba_id:
-            where.append("bs.bank_account_id=?"); params.append(ba_id)
+            where.append("bs.bank_account_id=?")
+            params.append(ba_id)
         if status != "All Statuses":
-            where.append("bs.status=?"); params.append(status)
+            where.append("bs.status=?")
+            params.append(status)
         if where:
             q += " WHERE " + " AND ".join(where)
         q += " ORDER BY bs.statement_date DESC"
@@ -547,9 +551,9 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             rows = con.execute(q, params).fetchall()
         self.st_tbl.setRowCount(0)
         STATUS_COLORS = {
-            "Open":         QtGui.QColor(240, 240, 240),
-            "In Progress":  QtGui.QColor(200, 230, 255),
-            "Reconciled":   QtGui.QColor(200, 255, 210),
+            "Open": QtGui.QColor(240, 240, 240),
+            "In Progress": QtGui.QColor(200, 230, 255),
+            "Reconciled": QtGui.QColor(200, 255, 210),
         }
         for row in rows:
             r = self.st_tbl.rowCount()
@@ -725,10 +729,10 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         if not self._current_stmt_id:
             QtWidgets.QMessageBox.warning(self, "No Statement", "Select a statement first.")
             return
-        dt   = self.si_ef_date.date().toString("yyyy-MM-dd")
+        dt = self.si_ef_date.date().toString("yyyy-MM-dd")
         desc = self.si_ef_desc.text().strip()
-        typ  = self.si_ef_type.currentText()
-        amt  = self.si_ef_amt.value()
+        typ = self.si_ef_type.currentText()
+        amt = self.si_ef_amt.value()
         if amt <= 0:
             QtWidgets.QMessageBox.warning(self, "Validation", "Amount must be greater than zero.")
             return
@@ -986,7 +990,6 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         for row in gl_rows:
             r = self.rec_gl_tbl.rowCount()
             self.rec_gl_tbl.insertRow(r)
-            net = row["debit"] - row["credit"]
             self.rec_gl_tbl.setItem(r, 0, _ro_c(str(row["id"])))
             self.rec_gl_tbl.setItem(r, 1, _ro_c(row["journal_date"] or ""))
             self.rec_gl_tbl.setItem(r, 2, _ro(row["description"] or ""))
@@ -1226,15 +1229,16 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         """
         params = []
         if ba_id:
-            q += " WHERE bs.bank_account_id=?"; params.append(ba_id)
+            q += " WHERE bs.bank_account_id=?"
+            params.append(ba_id)
         q += " ORDER BY bs.statement_date DESC"
         with _conn() as con:
             rows = con.execute(q, params).fetchall()
         self.hist_tbl.setRowCount(0)
         STATUS_COLORS = {
-            "Open":         QtGui.QColor(240, 240, 240),
-            "In Progress":  QtGui.QColor(200, 230, 255),
-            "Reconciled":   QtGui.QColor(200, 255, 210),
+            "Open": QtGui.QColor(240, 240, 240),
+            "In Progress": QtGui.QColor(200, 230, 255),
+            "Reconciled": QtGui.QColor(200, 255, 210),
         }
         for row in rows:
             r = self.hist_tbl.rowCount()

@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_Maint_main_menu(object):
     def setupUi(self, Maint_main_menu):
@@ -144,39 +147,41 @@ class Ui_Maint_main_menu(object):
         Maint_main_menu.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(parent=Maint_main_menu)
         self.centralwidget.setObjectName("centralwidget")
-        self.maint_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Maintenance Manager"))
+        self.maint_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Maintenance Manager"))
         self.maint_mgr_Button.setGeometry(QtCore.QRect(20, 0, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.maint_mgr_Button.setFont(font)
         self.maint_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.maint_mgr_Button.setAutoDefault(False)
         self.maint_mgr_Button.setObjectName("maint_mgr_Button")
-        self.maint_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Maintenance"))
+        self.maint_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Maintenance"))
         self.maint_Button.setGeometry(QtCore.QRect(270, 0, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.maint_Button.setFont(font)
         self.maint_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                        "border: 2px solid black;\n"
+                                        "border-radius: 10px;}\n"
+                                        "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                        "border: 2px solidrgb(85, 255, 255);\n"
+                                        "}")
         self.maint_Button.setAutoDefault(False)
         self.maint_Button.setObjectName("maint_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 561))
         self.label.setStyleSheet("background-image: url(Maintenance.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.label.raise_()
@@ -198,7 +203,7 @@ class Ui_Maint_main_menu(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Maintenance Manager": "Maint_mgr_menu.py",
-            "Maintenance":         "Maint_Maint_menu.py",
+            "Maintenance": "Maint_Maint_menu.py",
         }
         script = scripts.get(pressed)
         if script:
