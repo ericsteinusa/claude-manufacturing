@@ -1543,8 +1543,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
     # ── tab change ────────────────────────────────────────────────────────────
     def _on_tab_change(self, idx):
         tab_names = ["Chart of Accounts", "Journal Entries", "Trial Balance",
-                     "Ledger View", "Financial Statements"]
-        self.statusBar().showMessage(f"Tab: {tab_names[idx]}")
+                     "Ledger View", "Financial Statements", "Bank Reconciliation"]
+        self.statusBar().showMessage(f"Tab: {tab_names[idx] if idx < len(tab_names) else ''}")
         if idx == 1:   # Journal Entries — always fetch latest from DB
             self._refresh_journals()
         elif idx == 2:  # Trial Balance — auto-run
