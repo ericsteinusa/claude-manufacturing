@@ -6,6 +6,22 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import colorchooser
 from configparser import ConfigParser
+from datetime import datetime
+
+
+def _to_iso_date(val):
+    """Normalize M/D/YYYY or MM/DD/YYYY input to ISO YYYY-MM-DD; pass through if already ISO or empty."""
+    if not val or val.strip() == '':
+        return val
+    val = val.strip()
+    if len(val) == 10 and val[4] == '-':
+        return val
+    for fmt in ('%m/%d/%Y', '%m/%d/%y'):
+        try:
+            return datetime.strptime(val, fmt).strftime('%Y-%m-%d')
+        except ValueError:
+            pass
+    return val
 
 root = Tk()
 people = ''
@@ -265,9 +281,9 @@ def fetch_people():
 def insert_data():
     people_id = people_combobox.get().split(' ')[0].strip('{')
     call = call_widget.get("1.0", "end-1c")  # Get text from Text Widget
-    call_date = call_date_entry.get()
+    call_date = _to_iso_date(call_date_entry.get())
     call_time = call_time_entry.get()
-    completion_date = completion_date_entry.get()
+    completion_date = _to_iso_date(completion_date_entry.get())
     completion_time = completion_time_entry.get()
     comments_box = comment_widget.get("1.0", "end-1c")  # Get text from Text Widget
     completion_box = checkbox_var.get()  # Get value from checkbox (0 or 1)
@@ -637,9 +653,9 @@ def update_record():
               {
                   'people': people_combobox.get().split(' ')[0].strip('{'),
                   'call': call_widget.get("1.0", "end-1c"),
-                  'call_date': call_date_entry.get(),
+                  'call_date': _to_iso_date(call_date_entry.get()),
                   'call_time': call_time_entry.get(),
-                  'completion_date': completion_date_entry.get(),
+                  'completion_date': _to_iso_date(completion_date_entry.get()),
                   'completion_time': completion_time_entry.get(),
                   'comments_box': comment_widget.get("1.0", "end-1c"),
                   'completion_box': checkbox_var.get(),
@@ -675,7 +691,7 @@ def add_record():
 
     # Add New Record
     c.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (people_combobox.get().split(' ')[0].strip(
-        '{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
+        '{'), call_widget.get("1.0", "end-1c"), _to_iso_date(call_date_entry.get()), call_time_entry.get(), _to_iso_date(completion_date_entry.get()), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
 
     # Commit changes
     conn.commit()
