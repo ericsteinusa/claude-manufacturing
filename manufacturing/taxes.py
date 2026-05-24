@@ -361,7 +361,7 @@ def remove_one():
     c = conn.cursor()
 
     # Delete From Database
-    c.execute("DELETE from tax WHERE oid=" + id_entry.get())
+    c.execute("DELETE from tax WHERE oid=?", (id_entry.get(),))
 
     # Commit changes
     conn.commit()
@@ -501,7 +501,7 @@ def update_record():
         WHERE oid = :oid""",
               {
                   'state': st_entry.get(),
-                  'percent': pcnt_entry.get(),
+                  'percent': int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0,
                   'oid': id_entry.get(),
               })
 
@@ -527,7 +527,7 @@ def add_record():
     c = conn.cursor()
 
     # Add New Record
-    c.execute("INSERT INTO tax (state, percent) VALUES (?, ?)", (st_entry.get(), pcnt_entry.get()))
+    c.execute("INSERT INTO tax (state, percent) VALUES (?, ?)", (st_entry.get(), int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0))
 
     # Commit changes
     conn.commit()
