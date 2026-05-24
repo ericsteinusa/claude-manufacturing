@@ -596,11 +596,17 @@ class BudgetWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             bud = con.execute("SELECT * FROM budget WHERE id=?", (bid,)).fetchone()
             acct_filter = self.det_type_filter.currentText()
-            acct_q = "SELECT id,account_number,account_name,account_type FROM gl_account WHERE is_active=1"
             if acct_filter != "All Types":
-                acct_q += f" AND account_type='{acct_filter}'"
-            acct_q += " ORDER BY account_number"
-            accounts = con.execute(acct_q).fetchall()
+                accounts = con.execute(
+                    "SELECT id,account_number,account_name,account_type FROM gl_account"
+                    " WHERE is_active=1 AND account_type=? ORDER BY account_number",
+                    (acct_filter,)
+                ).fetchall()
+            else:
+                accounts = con.execute(
+                    "SELECT id,account_number,account_name,account_type FROM gl_account"
+                    " WHERE is_active=1 ORDER BY account_number"
+                ).fetchall()
             # load existing budget lines into dict
             lines = con.execute(
                 "SELECT account_id, month, amount FROM budget_line WHERE budget_id=?", (bid,)
