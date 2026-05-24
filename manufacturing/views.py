@@ -852,10 +852,10 @@ MENU_TREE = {
                     ('ticket_rpts', 'Ticket Reports', {
                         'title': 'Ticket Reports',
                         'items': [
-                            ('daily_tick', 'Daily Ticket Report', 'cs_mgr_menu.py'),
-                            ('week_sum', 'Weekly Summary', 'cs_mgr_menu.py'),
-                            ('res_analy', 'Resolution Analysis', 'cs_mgr_menu.py'),
-                            ('sla_rpts', 'SLA Reports', 'cs_mgr_menu.py'),
+                            ('daily_tick', 'Daily Ticket Report', 'cs_reports.py'),
+                            ('week_sum', 'Weekly Summary', 'cs_reports.py'),
+                            ('res_analy', 'Resolution Analysis', 'cs_reports.py'),
+                            ('sla_rpts', 'SLA Reports', 'cs_reports.py'),
                         ],
                     }),
                     ('staff_mgmt', 'Staff Management', {
