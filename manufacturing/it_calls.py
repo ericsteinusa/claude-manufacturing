@@ -489,7 +489,7 @@ def remove_one():
     c = conn.cursor()
 
     # Delete From Database
-    c.execute("DELETE from calls WHERE oid=" + id_entry.get())
+    c.execute("DELETE from calls WHERE oid=?", (id_entry.get(),))
 
     # Commit changes
     conn.commit()
