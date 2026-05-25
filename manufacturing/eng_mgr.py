@@ -70,6 +70,8 @@ class Ui_eng_mgr(object):
             "Engineers": "engineer.py",
             "Product Entry": "product_entry_screen.py",
             "Supplier Entry": "Supplier_entry.py",
+            "Design Review": "eng_design_review.py",
+            "Eng Reports": "eng_reports.py",
         }
         script = scripts.get(pressed)
         if script:
