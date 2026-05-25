@@ -1,7 +1,6 @@
 import sys
 import sqlite3
 import os
-import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
@@ -687,10 +686,6 @@ class EngineerMenu(QtWidgets.QMainWindow):
         _apply_blue_palette(self)
         self._build_ui()
 
-    def _launch(self, script):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-
     def _build_ui(self):
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
@@ -698,24 +693,6 @@ class EngineerMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
-
-        nav = QtWidgets.QHBoxLayout()
-        nav.setSpacing(4)
-        font16 = QtGui.QFont()
-        font16.setPointSize(16)
-        for label, script in (
-            ("Product Entry", "product_entry_screen.py"),
-            ("Supplier Entry", "Supplier_entry.py"),
-        ):
-            b = QtWidgets.QPushButton(label)
-            b.setFont(font16)
-            b.setStyleSheet(BUTTON_STYLE)
-            b.setFixedHeight(41)
-            b.setAutoDefault(False)
-            b.clicked.connect(lambda chk, s=script: self._launch(s))
-            nav.addWidget(b)
-        nav.addStretch()
-        v.addLayout(nav)
 
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)

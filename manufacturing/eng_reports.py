@@ -71,9 +71,7 @@ def _ro(text):
 
 def _stat_card(title, value):
     w = QtWidgets.QWidget()
-    w.setStyleSheet(
-        "background-color:white;border-radius:6px;border:1px solid black;"
-    )
+    w.setStyleSheet("background-color:white;border-radius:6px;border:1px solid black;")
     v = QtWidgets.QVBoxLayout(w)
     v.setContentsMargins(10, 4, 10, 4)
     val_lbl = QtWidgets.QLabel(str(value))
@@ -88,7 +86,7 @@ def _stat_card(title, value):
     return w
 
 
-# ── Projects tab ───────────────────────────────────────────────────────────────
+# ── Projects report tab ────────────────────────────────────────────────────────
 
 class ProjectsReportTab(QtWidgets.QWidget):
     def __init__(self):
@@ -196,7 +194,7 @@ class ProjectsReportTab(QtWidgets.QWidget):
                 self.table.item(r, col).setBackground(bg)
 
 
-# ── Tasks tab ──────────────────────────────────────────────────────────────────
+# ── Tasks report tab ───────────────────────────────────────────────────────────
 
 class TasksReportTab(QtWidgets.QWidget):
     def __init__(self):
@@ -312,7 +310,7 @@ class TasksReportTab(QtWidgets.QWidget):
                     self.table.item(r, 3).setBackground(pc)
 
 
-# ── Design Reviews tab ─────────────────────────────────────────────────────────
+# ── Design Reviews report tab ──────────────────────────────────────────────────
 
 class DesignReviewReportTab(QtWidgets.QWidget):
     def __init__(self):
@@ -410,33 +408,18 @@ class DesignReviewReportTab(QtWidgets.QWidget):
                 self.table.item(r, col).setBackground(bg)
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Embeddable widget (used standalone and embedded in eng_mgr) ────────────────
 
-class EngReportsMenu(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Engineering Reports")
-        self.resize(1100, 720)
+class EngReportsWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._build_ui()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8)
-        v.setSpacing(6)
-
-        top = QtWidgets.QHBoxLayout()
-        refresh_btn = QtWidgets.QPushButton("Refresh All")
-        refresh_btn.setStyleSheet(BUTTON_STYLE)
-        refresh_btn.setFixedHeight(30)
-        refresh_btn.clicked.connect(self._refresh_all)
-        top.addWidget(refresh_btn)
-        top.addStretch()
-        v.addLayout(top)
-
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(4, 4, 4, 4)
+        v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
         self.proj_tab = ProjectsReportTab()
@@ -445,12 +428,18 @@ class EngReportsMenu(QtWidgets.QMainWindow):
         tabs.addTab(self.proj_tab, "Projects")
         tabs.addTab(self.task_tab, "Tasks")
         tabs.addTab(self.ecr_tab, "Design Reviews")
-        v.addWidget(tabs, stretch=1)
+        v.addWidget(tabs)
 
-    def _refresh_all(self):
-        self.proj_tab._refresh()
-        self.task_tab._refresh()
-        self.ecr_tab._refresh()
+
+# ── Standalone window wrapper ──────────────────────────────────────────────────
+
+class EngReportsMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Engineering Reports")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self.setCentralWidget(EngReportsWidget())
 
 
 def main():

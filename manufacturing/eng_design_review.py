@@ -162,11 +162,11 @@ class NewECRDialog(QtWidgets.QDialog):
         self.accept()
 
 
-class DesignReviewMenu(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Engineering Design Reviews")
-        self.resize(1060, 700)
+# ── Embeddable widget (used standalone and embedded in eng_mgr) ────────────────
+
+class DesignReviewWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._row_ids = []
         self._selected_id = None
@@ -174,10 +174,7 @@ class DesignReviewMenu(QtWidgets.QMainWindow):
         self._refresh()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
+        v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
 
@@ -359,6 +356,17 @@ class DesignReviewMenu(QtWidgets.QMainWindow):
             conn.commit()
             conn.close()
             self._refresh()
+
+
+# ── Standalone window wrapper ──────────────────────────────────────────────────
+
+class DesignReviewMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Engineering Design Reviews")
+        self.resize(1060, 700)
+        _apply_blue_palette(self)
+        self.setCentralWidget(DesignReviewWidget())
 
 
 def main():
