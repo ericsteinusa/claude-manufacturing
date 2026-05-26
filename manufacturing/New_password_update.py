@@ -24,7 +24,7 @@ class MainApp(QMainWindow):
             id SERIAL PRIMARY KEY,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
-            ID interger NOT NULL,
+            employee_id INTEGER NOT NULL DEFAULT 0,
             address TEXT NOT NULL,
             city TEXT NOT NULL,
             state TEXT NOT NULL,

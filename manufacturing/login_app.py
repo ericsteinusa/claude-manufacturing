@@ -20,7 +20,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
-            ID INTEGER NOT NULL,
+            employee_id INTEGER NOT NULL DEFAULT 0,
             address TEXT NOT NULL,
             city TEXT NOT NULL,
             state TEXT NOT NULL,
@@ -59,7 +59,7 @@ def init_db():
         ("Viewer", "Read-only access"),
     ]
     conn.executemany(
-        "INSERT OR IGNORE INTO roles (role_name, description) VALUES (%s, %s)",
+        "INSERT INTO roles (role_name, description) VALUES (%s, %s) ON CONFLICT (role_name) DO NOTHING",
         default_roles,
     )
     conn.commit()
@@ -133,7 +133,7 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
             conn.close()
             return False
         cursor = conn.execute(
-            "INSERT INTO people (first_name, last_name, ID, address, city, state, zip_code, email) "
+            "INSERT INTO people (first_name, last_name, employee_id, address, city, state, zip_code, email) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )

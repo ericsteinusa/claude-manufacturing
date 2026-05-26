@@ -10,19 +10,19 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-ISPIN_STYLE = "QSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE = ("QTabWidget::pane{border:1px solid black;}"
-             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-             " border-bottom:none; border-radius:4px 4px 0 0;}"
-             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-             "QTabBar::tab:hover{background:rgb(85,255,255);}")
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+ISPIN_STYLE = "QSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
+TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 PO_COLORS = {
     "open": QtGui.QColor(255, 255, 255),
@@ -133,7 +133,7 @@ class NewPODialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Purchase Order")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
@@ -234,7 +234,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("Add Line Item")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
@@ -347,11 +347,11 @@ class ReceivePODialog(QtWidgets.QDialog):
 
         info = QtWidgets.QLabel(
             f"PO: {po['po_number']}  |  Supplier: {_supplier_display(po)}")
-        info.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
+        info.setStyleSheet("color%(white)s;font-size:13px;font-weight%(bold)s;")
         layout.addWidget(info)
 
         lbl = QtWidgets.QLabel("Enter quantity to receive for each open item:")
-        lbl.setStyleSheet("color:white;font-size:12px;")
+        lbl.setStyleSheet("color%(white)s;font-size:12px;")
         layout.addWidget(lbl)
 
         tbl = QtWidgets.QTableWidget()
@@ -359,7 +359,7 @@ class ReceivePODialog(QtWidgets.QDialog):
         tbl.setHorizontalHeaderLabels(
             ["Description", "Ordered", "Already Received", "Remaining", "Receive Now"])
         hh = tbl.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -476,7 +476,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.supp_table.setHorizontalHeaderLabels(
             ["Company / Name", "Contact", "Phone", "Email", "City", "State", "Zip"])
         hh = self.supp_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -509,8 +509,8 @@ class Purchasing(QtWidgets.QMainWindow):
 
         fg = QtWidgets.QGroupBox("Supplier Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
@@ -626,7 +626,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_table.setHorizontalHeaderLabels(
             ["PO Number", "Supplier", "Order Date", "Expected Date", "Items", "Total", "Status"])
         hh = self.po_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -652,8 +652,8 @@ class Purchasing(QtWidgets.QMainWindow):
 
         self.po_detail_grp = QtWidgets.QGroupBox("PO Line Items")
         self.po_detail_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:6px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:6px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         self.po_detail_grp.setVisible(False)
         dv = QtWidgets.QVBoxLayout(self.po_detail_grp)
         self.po_items_table = QtWidgets.QTableWidget()
@@ -661,7 +661,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_items_table.setHorizontalHeaderLabels(
             ["Description", "Product", "Qty Ordered", "Qty Received", "Remaining", "Line Total"])
         ph = self.po_items_table.horizontalHeader()
-        ph.setStyleSheet("color:black;font-weight:bold;")
+        ph.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ph.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             ph.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -783,8 +783,8 @@ class Purchasing(QtWidgets.QMainWindow):
         conn.execute(
             "INSERT INTO supplier "
             "(company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "
-            "VALUES (:company_name,:first_name,:last_name,:phone_number,"
-            ":email,:address,:city,:state,:zip_code)",
+            "VALUES (%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,"
+            "%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)",
             data)
         conn.commit()
         conn.close()
@@ -802,9 +802,9 @@ class Purchasing(QtWidgets.QMainWindow):
         data["id"] = self._supp_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE supplier SET company_name=:company_name,first_name=:first_name,"
-            "last_name=:last_name,phone_number=:phone_number,email=:email,"
-            "address=:address,city=:city,state=:state,zip_code=:zip_code WHERE id=:id",
+            "UPDATE supplier SET company_name=%(company_name)s,first_name=%(first_name)s,"
+            "last_name=%(last_name)s,phone_number=%(phone_number)s,email=%(email)s,"
+            "address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s WHERE id=%(id)s",
             data)
         conn.commit()
         conn.close()

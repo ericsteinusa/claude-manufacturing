@@ -14,22 +14,22 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
-    "padding:4px 12px;font-weight:bold;}"
-    "QPushButton:hover{background-color:rgb(85,255,255);}"
+    "QPushButton{background-color%(white)s;border:2px solid black;border-radius:8px;"
+    "padding:4px 12px;font-weight%(bold)s;}"
+    "QPushButton%(hover)s{background-color%(rgb)s(85,255,255);}"
 )
 TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid #aaa;background:white;}"
-    "QTabBar::tab{background:#cce0ff;padding:6px 18px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabWidget:%(pane)s{border:1px solid #aaa;background%(white)s;}"
+    "QTabBar:%(tab)s{background:#cce0ff;padding:6px 18px;font-weight%(bold)s;}"
+    "QTabBar:%(tab)s%(selected)s{background%(white)s;border-bottom:2px solid rgb(0,85,255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-HDR_STYLE = "font-size:20px;font-weight:bold;color:white;padding:4px;"
-SECTION_STYLE = "font-size:13px;font-weight:bold;color:white;"
-LABEL_STYLE = "color:white;font-size:13px;"
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TEXT_STYLE = "QTextEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+HDR_STYLE = "font-size:20px;font-weight%(bold)s;color%(white)s;padding:4px;"
+SECTION_STYLE = "font-size:13px;font-weight%(bold)s;color%(white)s;"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
 
 
 def _conn():
@@ -174,7 +174,7 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
 
         info = QtWidgets.QLabel(
             "CSAT score derived from call completion rate and average resolution time per customer.")
-        info.setStyleSheet("color:white;font-size:12px;font-style:italic;")
+        info.setStyleSheet("color%(white)s;font-size:12px;font-style%(italic)s;")
         info.setWordWrap(True)
         v.addWidget(info)
 
@@ -291,7 +291,7 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
             "NPS proxy: customers with ≥80% completion rate = Promoters, "
             "50–79% = Passives, <50% = Detractors. "
             "Net Promoter Score = %Promoters − %Detractors.")
-        info.setStyleSheet("color:white;font-size:12px;font-style:italic;")
+        info.setStyleSheet("color%(white)s;font-size:12px;font-style%(italic)s;")
         info.setWordWrap(True)
         v.addWidget(info)
 
@@ -311,16 +311,16 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
         ):
             card = QtWidgets.QFrame()
             card.setFrameShape(QtWidgets.QFrame.Shape.Box)
-            card.setStyleSheet("QFrame{background:white;border:2px solid #0055ff;border-radius:8px;}")
+            card.setStyleSheet("QFrame{background%(white)s;border:2px solid #0055ff;border-radius:8px;}")
             card.setFixedSize(180, 90)
             cl = QtWidgets.QVBoxLayout(card)
             cl.setContentsMargins(8, 6, 8, 6)
             tl = QtWidgets.QLabel(label)
             tl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            tl.setStyleSheet("color:#333;font-size:12px;font-weight:bold;")
+            tl.setStyleSheet("color:#333;font-size:12px;font-weight%(bold)s;")
             vl = QtWidgets.QLabel("—")
             vl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            vl.setStyleSheet("color:#0055ff;font-size:22px;font-weight:bold;")
+            vl.setStyleSheet("color:#0055ff;font-size:22px;font-weight%(bold)s;")
             cl.addWidget(tl)
             cl.addWidget(vl)
             self._nps_cards[key] = vl
@@ -539,8 +539,8 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
         # Entry form
         form = QtWidgets.QGroupBox("Improvement Plan")
         form.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(form)
         grid.setSpacing(6)
 
@@ -680,7 +680,7 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
             con.execute("""
                 INSERT INTO cs_improvement_plan
                     (title, description, owner, target_date, status, created_date)
-                VALUES (:title, :description, :owner, :target_date, :status, :created_date)
+                VALUES (%(title)s, %(description)s, %(owner)s, %(target_date)s, %(status)s, %(created_date)s)
             """, data)
         self._plan_clear()
         self._run_plans()
@@ -696,9 +696,9 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute("""
                 UPDATE cs_improvement_plan
-                SET title=:title, description=:description, owner=:owner,
-                    target_date=:target_date, status=:status
-                WHERE id=:id
+                SET title=%(title)s, description=%(description)s, owner=%(owner)s,
+                    target_date=%(target_date)s, status=%(status)s
+                WHERE id=%(id)s
             """, data)
         self._run_plans()
 
@@ -736,7 +736,7 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
 
 def _mk_lbl(text):
     w = QtWidgets.QLabel(text)
-    w.setStyleSheet("color:white;font-size:12px;")
+    w.setStyleSheet("color%(white)s;font-size:12px;")
     return w
 
 

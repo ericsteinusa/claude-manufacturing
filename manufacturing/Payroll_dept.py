@@ -794,7 +794,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _load_pay_rates(self):
         conn = get_db()
         employees = conn.execute(
-            "SELECT id, first_name, last_name, emp_id FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name, employee_id FROM people ORDER BY last_name, first_name"
         ).fetchall()
         pay_map = {r["people_id"]: r for r in conn.execute("SELECT * FROM employee_pay").fetchall()}
         conn.close()
@@ -804,7 +804,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.pr_emp_combo.addItem("-- select --", None)
         for e in employees:
             label = f"{e['last_name']}, {e['first_name']}"
-            if e["emp_id"]:
+            if e["employee_id"]:
                 label += f"  (ID {e['emp_id']})"
             self.pr_emp_combo.addItem(label, e["id"])
         self.pr_emp_combo.blockSignals(False)
@@ -817,7 +817,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             self.pr_table.insertRow(r)
             self._pay_rate_row_ids.append(e["id"])
             name = f"{e['last_name']}, {e['first_name']}"
-            emp_id_str = str(e["emp_id"]) if e["emp_id"] else ""
+            emp_id_str = str(e["employee_id"]) if e["employee_id"] else ""
             if pay:
                 rate_str = (f"${pay['pay_rate']:.2f}/hr" if pay["pay_type"] == "hourly"
                             else f"${pay['pay_rate']:,.0f}/yr")
@@ -1468,7 +1468,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             "PAY STUB".center(W),
             divider("="),
             line("Employee:", f"{e['last_name']}, {e['first_name']}"),
-            line("Employee ID:", e["emp_id"] or "—"),
+            line("Employee ID:", e["employee_id"] or "—"),
             line("Pay Period:", f"{e['period_start']}  to  {e['period_end']}"),
             line("Payment Date:", rd),
             line("Pay Frequency:", e["pay_frequency"]),

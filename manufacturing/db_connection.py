@@ -4,13 +4,16 @@ import psycopg2.extras
 
 
 def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.environ.get('DB_HOST', 'localhost'),
-        database=os.environ.get('DB_NAME', 'company_db'),
-        user=os.environ.get('DB_USER', 'postgres'),
-        password=os.environ.get('DB_PASSWORD', ''),
-        port=int(os.environ.get('DB_PORT', '5432')),
-    )
+    kwargs = {
+        'database': os.environ.get('DB_NAME', 'company_db'),
+        'user': os.environ.get('DB_USER', '') or None,
+        'password': os.environ.get('DB_PASSWORD', '') or None,
+        'port': int(os.environ.get('DB_PORT', '5432')),
+    }
+    host = os.environ.get('DB_HOST', '')
+    if host:
+        kwargs['host'] = host
+    conn = psycopg2.connect(**kwargs)
     return PgConnection(conn)
 
 

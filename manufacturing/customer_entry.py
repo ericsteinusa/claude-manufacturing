@@ -9,17 +9,17 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-LABEL_STYLE = "color:white;font-size:13px;"
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
 TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid black;}"
-    "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-    " border-bottom:none; border-radius:4px 4px 0 0;}"
-    "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+    "QTabWidget:%(pane)s{border:1px solid black;}"
+    "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+    " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+    "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+    "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}"
 )
 
 
@@ -129,7 +129,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
         self.cust_table.setHorizontalHeaderLabels(
             ["Company / Name", "Contact", "Phone", "Email", "Address", "City", "State", "Zip"])
         hh = self.cust_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -146,8 +146,8 @@ class CustomerEntry(QtWidgets.QMainWindow):
         # Form
         fg = QtWidgets.QGroupBox("Customer Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
@@ -218,7 +218,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
         layout.setSpacing(8)
 
         self.hist_cust_lbl = QtWidgets.QLabel("Select a customer on the Customers tab, then click View History.")
-        self.hist_cust_lbl.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
+        self.hist_cust_lbl.setStyleSheet("color%(white)s;font-size:13px;font-weight%(bold)s;")
         layout.addWidget(self.hist_cust_lbl)
 
         self.hist_table = QtWidgets.QTableWidget()
@@ -228,7 +228,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
             "Completion Date", "Completion Time", "Comments", "Status"
         ])
         hh = self.hist_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 1, 3, 4, 6):
@@ -239,7 +239,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
         layout.addWidget(self.hist_table, stretch=1)
 
         self.hist_summary_lbl = QtWidgets.QLabel("")
-        self.hist_summary_lbl.setStyleSheet("color:white;font-size:12px;")
+        self.hist_summary_lbl.setStyleSheet("color%(white)s;font-size:12px;")
         layout.addWidget(self.hist_summary_lbl)
         return w
 
@@ -338,8 +338,8 @@ class CustomerEntry(QtWidgets.QMainWindow):
         conn.execute("""
             INSERT INTO customer (company_name, first_name, last_name, phone_number,
                                   email, address, city, state, zip_code)
-            VALUES (:company_name, :first_name, :last_name, :phone_number,
-                    :email, :address, :city, :state, :zip_code)
+            VALUES (%(company_name)s, %(first_name)s, %(last_name)s, %(phone_number)s,
+                    %(email)s, %(address)s, %(city)s, %(state)s, %(zip_code)s)
         """, data)
         conn.commit()
         conn.close()
@@ -357,10 +357,10 @@ class CustomerEntry(QtWidgets.QMainWindow):
         data["id"] = self._row_ids[row]
         conn = get_db()
         conn.execute("""
-            UPDATE customer SET company_name=:company_name, first_name=:first_name,
-                last_name=:last_name, phone_number=:phone_number, email=:email,
-                address=:address, city=:city, state=:state, zip_code=:zip_code
-            WHERE id=:id
+            UPDATE customer SET company_name=%(company_name)s, first_name=%(first_name)s,
+                last_name=%(last_name)s, phone_number=%(phone_number)s, email=%(email)s,
+                address=%(address)s, city=%(city)s, state=%(state)s, zip_code=%(zip_code)s
+            WHERE id=%(id)s
         """, data)
         conn.commit()
         conn.close()

@@ -11,18 +11,18 @@ from gl_utils import post_gl_entry
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE = ("QTabWidget::pane{border:1px solid black;}"
-             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-             " border-bottom:none; border-radius:4px 4px 0 0;}"
-             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-             "QTabBar::tab:hover{background:rgb(85,255,255);}")
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
+TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 STATUS_COLORS = {
     "open": QtGui.QColor(255, 255, 255),
@@ -135,7 +135,7 @@ class NewInvoiceDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Accounts Receivable Invoice")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=110):
@@ -271,7 +271,7 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         info = QtWidgets.QLabel(
             f"{inv['invoice_number']}  |  {cust_name}\n"
             f"Invoice: {_money(inv['amount'])}   Paid: {_money(paid)}   Balance: {_money(self._balance)}")
-        info.setStyleSheet("color:white;font-size:12px;")
+        info.setStyleSheet("color%(white)s;font-size:12px;")
         info.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(info)
 
@@ -401,7 +401,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         self.cust_table.setHorizontalHeaderLabels(
             ["Company / Name", "Contact", "Phone", "Email", "City", "State", "Zip"])
         hh = self.cust_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -436,8 +436,8 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         # Form
         fg = QtWidgets.QGroupBox("Customer Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
@@ -555,7 +555,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         self.inv_table.setHorizontalHeaderLabels(
             ["Invoice #", "Customer", "Date", "Due Date", "Amount", "Paid", "Balance", "Status"])
         hh = self.inv_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -582,18 +582,18 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         # Detail panel
         self.inv_detail_grp = QtWidgets.QGroupBox("Invoice Detail")
         self.inv_detail_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:6px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:6px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         self.inv_detail_grp.setVisible(False)
         dv = QtWidgets.QVBoxLayout(self.inv_detail_grp)
         self.inv_detail_lbl = QtWidgets.QLabel("")
-        self.inv_detail_lbl.setStyleSheet("color:white;font-size:12px;")
+        self.inv_detail_lbl.setStyleSheet("color%(white)s;font-size:12px;")
         dv.addWidget(self.inv_detail_lbl)
         self.pay_hist_table = QtWidgets.QTableWidget()
         self.pay_hist_table.setColumnCount(5)
         self.pay_hist_table.setHorizontalHeaderLabels(["Date", "Amount", "Method", "Reference", "Notes"])
         ph = self.pay_hist_table.horizontalHeader()
-        ph.setStyleSheet("color:black;font-weight:bold;")
+        ph.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ph.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 1, 2, 3):
             ph.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -615,7 +615,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Accounts Receivable Aging Report  (open & partial invoices only)")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -630,7 +630,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         self.aging_table.setHorizontalHeaderLabels(
             ["Customer", "0-30 Days", "31-60 Days", "61-90 Days", "91+ Days", "Total Outstanding"])
         ah = self.aging_table.horizontalHeader()
-        ah.setStyleSheet("color:black;font-weight:bold;")
+        ah.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ah.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             ah.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -640,7 +640,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         layout.addWidget(self.aging_table, stretch=1)
 
         self.aging_totals_lbl = QtWidgets.QLabel("")
-        self.aging_totals_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.aging_totals_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         layout.addWidget(self.aging_totals_lbl)
         return w
 
@@ -752,7 +752,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute(
             "INSERT INTO customer (company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "
-            "VALUES (:company_name,:first_name,:last_name,:phone_number,:email,:address,:city,:state,:zip_code)",
+            "VALUES (%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)",
             data)
         conn.commit()
         conn.close()
@@ -770,9 +770,9 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         data["id"] = self._cust_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE customer SET company_name=:company_name,first_name=:first_name,last_name=:last_name,"
-            "phone_number=:phone_number,email=:email,address=:address,city=:city,state=:state,zip_code=:zip_code "
-            "WHERE id=:id",
+            "UPDATE customer SET company_name=%(company_name)s,first_name=%(first_name)s,last_name=%(last_name)s,"
+            "phone_number=%(phone_number)s,email=%(email)s,address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s "
+            "WHERE id=%(id)s",
             data)
         conn.commit()
         conn.close()

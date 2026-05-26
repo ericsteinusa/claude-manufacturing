@@ -9,7 +9,7 @@ from PyQt6 import QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
 INPUT_STYLE = (
     "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
@@ -40,7 +40,7 @@ def init_db():
             dept_sub_name TEXT NOT NULL
         )
     """)
-    for col in ("emp_id INTEGER",
+    for col in ("employee_id INTEGER",
                 "dept_id INTEGER REFERENCES dept(dept_id)",
                 "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
         try:
@@ -121,7 +121,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         form_group.setStyleSheet(
             "QGroupBox{color: white; font-weight: bold;"
             " border: 1px solid white; margin-top: 8px;}"
-            "QGroupBox::title{subcontrol-origin: margin; left: 10px;}"
+            "QGroupBox:%(title)s{subcontrol-origin: margin; left: 10px;}"
         )
         fg = QtWidgets.QGridLayout(form_group)
         fg.setSpacing(6)
@@ -266,7 +266,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
             self._row_ids.append(row["id"])
             for col, val in enumerate([
                 row["first_name"], row["last_name"],
-                str(row["emp_id"] or ""),
+                str(row["employee_id"] or ""),
                 row["address"] or "", row["city"] or "",
                 row["state"] or "", row["zip_code"] or "",
                 row["email"] or "",
@@ -300,7 +300,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         keys = p.keys()
         self.fn_input.setText(p["first_name"] or "")
         self.ln_input.setText(p["last_name"] or "")
-        self.empid_input.setText(str(p["emp_id"] or ""))
+        self.empid_input.setText(str(p["employee_id"] or ""))
         self.addr_input.setText(p["address"] or "")
         self.city_input.setText(p["city"] or "")
         self.state_input.setText(p["state"] or "")
@@ -325,7 +325,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         return {
             "first_name": self.fn_input.text().strip(),
             "last_name": self.ln_input.text().strip(),
-            "emp_id": int(emp_id_text) if emp_id_text else 0,
+            "employee_id": int(emp_id_text) if emp_id_text else 0,
             "address": self.addr_input.text().strip(),
             "city": self.city_input.text().strip(),
             "state": self.state_input.text().strip().upper(),
@@ -357,10 +357,10 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             INSERT INTO people
-                (first_name, last_name, emp_id, address, city, state, zip_code, email, dept_id, dept_Sub_id)
+                (first_name, last_name, employee_id, address, city, state, zip_code, email, dept_id, dept_Sub_id)
             VALUES
-                (:first_name, :last_name, :emp_id, :address, :city, :state, :zip_code, :email,
-                 :dept_id, :dept_Sub_id)
+                (%(first_name)s, %(last_name)s, %(employee_id)s, %(address)s, %(city)s, %(state)s, %(zip_code)s, %(email)s,
+                 %(dept_id)s, :dept_Sub_id)
         """, data)
         conn.commit()
         conn.close()
@@ -378,17 +378,17 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             UPDATE people SET
-                first_name  = :first_name,
-                last_name   = :last_name,
-                emp_id      = :emp_id,
-                address     = :address,
-                city        = :city,
-                state       = :state,
-                zip_code    = :zip_code,
-                email       = :email,
-                dept_id     = :dept_id,
+                first_name  = %(first_name)s,
+                last_name   = %(last_name)s,
+                emp_id      = %(employee_id)s,
+                address     = %(address)s,
+                city        = %(city)s,
+                state       = %(state)s,
+                zip_code    = %(zip_code)s,
+                email       = %(email)s,
+                dept_id     = %(dept_id)s,
                 dept_Sub_id = :dept_Sub_id
-            WHERE id = :row_id
+            WHERE id = %(row_id)s
         """, data)
         conn.commit()
         conn.close()
