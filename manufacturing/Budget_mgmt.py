@@ -4,18 +4,18 @@ Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report | Department
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 # ── database ─────────────────────────────────────────────────────────────────
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -23,7 +23,7 @@ def init_db():
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS budget (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             budget_name  TEXT    NOT NULL,
             fiscal_year  INTEGER NOT NULL,
             department   TEXT    DEFAULT 'All',
@@ -34,7 +34,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS budget_line (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            id         SERIAL PRIMARY KEY,
             budget_id  INTEGER NOT NULL REFERENCES budget(id) ON DELETE CASCADE,
             account_id INTEGER NOT NULL REFERENCES gl_account(id),
             month      INTEGER NOT NULL CHECK(month BETWEEN 1 AND 12),
@@ -188,12 +188,10 @@ _TAB_KEYS = {
 }
 
 
-class BudgetWindow(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
+class BudgetMgmtWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         init_db()
-        self.setWindowTitle("Budget Management")
-        self.resize(1200, 740)
         _apply_blue_palette(self)
         self._current_budget_id = None
         self._build_ui()
@@ -202,9 +200,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
 
         title = QtWidgets.QLabel("Budget Management")
@@ -325,15 +321,15 @@ class BudgetWindow(QtWidgets.QMainWindow):
         where = []
         yr = self.bud_year_filter.currentText()
         if yr != "All Years":
-            where.append("fiscal_year=?")
+            where.append("fiscal_year=%s")
             params.append(int(yr))
         st = self.bud_status_filter.currentText()
         if st != "All Statuses":
-            where.append("status=?")
+            where.append("status=%s")
             params.append(st)
         dept = self.bud_dept_filter.currentText()
         if dept != "All Departments":
-            where.append("department=?")
+            where.append("department=%s")
             params.append(dept)
         if where:
             q += " WHERE " + " AND ".join(where)
@@ -375,7 +371,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
         if idx >= 0:
             self.bud_ef_status.setCurrentIndex(idx)
         with _conn() as con:
-            full = con.execute("SELECT * FROM budget WHERE id=?", (bid,)).fetchone()
+            full = con.execute("SELECT * FROM budget WHERE id=%s", (bid,)).fetchone()
         if full:
             self.bud_ef_desc.setText(full["description"] or "")
             self.bud_ef_by.setText(full["created_by"] or "")
@@ -398,7 +394,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             con.execute(
                 "INSERT INTO budget(budget_name,fiscal_year,department,status,description,created_by) "
-                "VALUES(?,?,?,?,?,?)", (name, yr, dept, status, desc, by)
+                "VALUES(%s,%s,%s,%s,%s,%s)", (name, yr, dept, status, desc, by)
             )
         self._refresh_budgets()
         self._on_bud_clear()
@@ -420,8 +416,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
             return
         with _conn() as con:
             con.execute(
-                "UPDATE budget SET budget_name=?,fiscal_year=?,department=?,status=?,"
-                "description=?,created_by=? WHERE id=?",
+                "UPDATE budget SET budget_name=%s,fiscal_year=%s,department=%s,status=%s,"
+                "description=%s,created_by=%s WHERE id=%s",
                 (name, yr, dept, status, desc, by, bid)
             )
         self._refresh_budgets()
@@ -431,7 +427,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
         if bid is None:
             return
         with _conn() as con:
-            src = con.execute("SELECT * FROM budget WHERE id=?", (bid,)).fetchone()
+            src = con.execute("SELECT * FROM budget WHERE id=%s", (bid,)).fetchone()
         dlg = CopyBudgetDialog(bid, src["budget_name"], self)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
@@ -442,16 +438,16 @@ class BudgetWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             cur = con.execute(
                 "INSERT INTO budget(budget_name,fiscal_year,department,status,description,created_by) "
-                "VALUES(?,?,?,?,?,?)",
+                "VALUES(%s,%s,%s,%s,%s,%s) RETURNING id",
                 (new_name, new_year, src["department"], "Draft", src["description"], src["created_by"])
             )
-            new_id = cur.lastrowid
+            new_id = cur.fetchone()['id']
             # copy lines
             lines = con.execute(
-                "SELECT account_id, month, amount FROM budget_line WHERE budget_id=?", (bid,)
+                "SELECT account_id, month, amount FROM budget_line WHERE budget_id=%s", (bid,)
             ).fetchall()
             con.executemany(
-                "INSERT INTO budget_line(budget_id,account_id,month,amount) VALUES(?,?,?,?)",
+                "INSERT INTO budget_line(budget_id,account_id,month,amount) VALUES(%s,%s,%s,%s)",
                 [(new_id, ln["account_id"], ln["month"], ln["amount"]) for ln in lines]
             )
         QtWidgets.QMessageBox.information(self, "Copied", f"Budget copied as '{new_name}'.")
@@ -462,11 +458,11 @@ class BudgetWindow(QtWidgets.QMainWindow):
         if bid is None:
             return
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this budget and all its line items?",
+            self, "Delete", "Delete this budget and all its line items%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM budget WHERE id=?", (bid,))
+                con.execute("DELETE FROM budget WHERE id=%s", (bid,))
             if self._current_budget_id == bid:
                 self._current_budget_id = None
             self._refresh_budgets()
@@ -594,12 +590,12 @@ class BudgetWindow(QtWidgets.QMainWindow):
             return
         self._current_budget_id = bid
         with _conn() as con:
-            bud = con.execute("SELECT * FROM budget WHERE id=?", (bid,)).fetchone()
+            bud = con.execute("SELECT * FROM budget WHERE id=%s", (bid,)).fetchone()
             acct_filter = self.det_type_filter.currentText()
             if acct_filter != "All Types":
                 accounts = con.execute(
                     "SELECT id,account_number,account_name,account_type FROM gl_account"
-                    " WHERE is_active=1 AND account_type=? ORDER BY account_number",
+                    " WHERE is_active=1 AND account_type=%s ORDER BY account_number",
                     (acct_filter,)
                 ).fetchall()
             else:
@@ -609,7 +605,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
                 ).fetchall()
             # load existing budget lines into dict
             lines = con.execute(
-                "SELECT account_id, month, amount FROM budget_line WHERE budget_id=?", (bid,)
+                "SELECT account_id, month, amount FROM budget_line WHERE budget_id=%s", (bid,)
             ).fetchall()
         line_map = {}   # (account_id, month) -> amount
         for ln in lines:
@@ -703,8 +699,8 @@ class BudgetWindow(QtWidgets.QMainWindow):
                 to_upsert.append((bid, aid, m, amt, amt))
         with _conn() as con:
             con.executemany(
-                "INSERT INTO budget_line(budget_id,account_id,month,amount) VALUES(?,?,?,?) "
-                "ON CONFLICT(budget_id,account_id,month) DO UPDATE SET amount=?",
+                "INSERT INTO budget_line(budget_id,account_id,month,amount) VALUES(%s,%s,%s,%s) "
+                "ON CONFLICT(budget_id,account_id,month) DO UPDATE SET amount=%s",
                 to_upsert
             )
         QtWidgets.QMessageBox.information(self, "Saved", "Budget lines saved.")
@@ -833,7 +829,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
             bud_lines = con.execute(
                 "SELECT bl.account_id, SUM(bl.amount) AS budgeted "
                 "FROM budget_line bl "
-                "WHERE bl.budget_id=? AND bl.month>=? AND bl.month<=? "
+                "WHERE bl.budget_id=%s AND bl.month>=%s AND bl.month<=%s "
                 "GROUP BY bl.account_id",
                 (bid, m0, m1)
             ).fetchall()
@@ -847,7 +843,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
                 FROM gl_journal_line l
                 JOIN gl_journal j ON j.id=l.journal_id
                 JOIN gl_account  a ON a.id=l.account_id
-                WHERE j.journal_date>=? AND j.journal_date<=?
+                WHERE j.journal_date>=%s AND j.journal_date<=%s
                   {posted_clause}
                 GROUP BY l.account_id
             """
@@ -1024,7 +1020,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             bud_lines = con.execute(
                 "SELECT bl.account_id, SUM(bl.amount) AS budgeted "
-                "FROM budget_line bl WHERE bl.budget_id=? AND bl.month>=? AND bl.month<=? "
+                "FROM budget_line bl WHERE bl.budget_id=%s AND bl.month>=%s AND bl.month<=%s "
                 "GROUP BY bl.account_id", (bid, m0, m1)
             ).fetchall()
             act_sql = f"""
@@ -1035,7 +1031,7 @@ class BudgetWindow(QtWidgets.QMainWindow):
                 FROM gl_journal_line l
                 JOIN gl_journal j ON j.id=l.journal_id
                 JOIN gl_account  a ON a.id=l.account_id
-                WHERE j.journal_date>=? AND j.journal_date<=?
+                WHERE j.journal_date>=%s AND j.journal_date<=%s
                   {posted_clause}
                 GROUP BY l.account_id
             """
@@ -1173,10 +1169,10 @@ class BudgetWindow(QtWidgets.QMainWindow):
         params = []
         where = []
         if yr != "All Years":
-            where.append("b.fiscal_year=?")
+            where.append("b.fiscal_year=%s")
             params.append(int(yr))
         if st != "All Statuses":
-            where.append("b.status=?")
+            where.append("b.status=%s")
             params.append(st)
         if where:
             q += " WHERE " + " AND ".join(where)
@@ -1246,6 +1242,15 @@ class BudgetWindow(QtWidgets.QMainWindow):
         if idx >= 0:
             self.bud_dept_filter.setCurrentIndex(idx)
         self.tabs.setCurrentIndex(0)
+
+
+class BudgetWindow(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Budget Management")
+        self.resize(1200, 740)
+        _apply_blue_palette(self)
+        self.setCentralWidget(BudgetMgmtWidget(initial_tab=initial_tab))
 
 
 # ── entry point ───────────────────────────────────────────────────────────────

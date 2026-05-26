@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -17,8 +18,7 @@ LABEL_STYLE = "color: white; font-size: 13px;"
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -26,7 +26,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS dept (
-            dept_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dept_id SERIAL PRIMARY KEY,
             dept_name TEXT NOT NULL
         )
     """)
@@ -141,7 +141,7 @@ class DeptEntry(QtWidgets.QMainWindow):
         conn = get_db()
         if search_term:
             rows = conn.execute(
-                "SELECT dept_id, dept_name FROM dept WHERE dept_name LIKE ? ORDER BY dept_name",
+                "SELECT dept_id, dept_name FROM dept WHERE dept_name LIKE %s ORDER BY dept_name",
                 (f"%{search_term}%",)
             ).fetchall()
         else:
@@ -190,13 +190,13 @@ class DeptEntry(QtWidgets.QMainWindow):
             return
         conn = get_db()
         existing = conn.execute(
-            "SELECT dept_id FROM dept WHERE dept_name = ?", (name,)
+            "SELECT dept_id FROM dept WHERE dept_name = %s", (name,)
         ).fetchone()
         if existing:
             conn.close()
             QtWidgets.QMessageBox.warning(self, "Duplicate", f'"{name}" already exists.')
             return
-        conn.execute("INSERT INTO dept (dept_name) VALUES (?)", (name,))
+        conn.execute("INSERT INTO dept (dept_name) VALUES (%s)", (name,))
         conn.commit()
         conn.close()
         self._clear_form()
@@ -212,13 +212,13 @@ class DeptEntry(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conflict = conn.execute(
-            "SELECT dept_id FROM dept WHERE dept_name = ? AND dept_id != ?", (name, self._selected_id)
+            "SELECT dept_id FROM dept WHERE dept_name = %s AND dept_id != %s", (name, self._selected_id)
         ).fetchone()
         if conflict:
             conn.close()
             QtWidgets.QMessageBox.warning(self, "Duplicate", f'"{name}" already exists.')
             return
-        conn.execute("UPDATE dept SET dept_name = ? WHERE dept_id = ?", (name, self._selected_id))
+        conn.execute("UPDATE dept SET dept_name = %s WHERE dept_id = %s", (name, self._selected_id))
         conn.commit()
         conn.close()
         self._refresh_table()
@@ -229,11 +229,11 @@ class DeptEntry(QtWidgets.QMainWindow):
             return
         conn = get_db()
         emp_count = conn.execute(
-            "SELECT COUNT(*) FROM people WHERE dept_id = ?", (self._selected_id,)
+            "SELECT COUNT(*) FROM people WHERE dept_id = %s", (self._selected_id,)
         ).fetchone()[0]
         conn.close()
 
-        msg = "Delete this department?"
+        msg = "Delete this department%s"
         if emp_count:
             msg += f"\n\nWarning: {emp_count} employee(s) are assigned to it.\nThose links will be cleared."
 
@@ -243,8 +243,8 @@ class DeptEntry(QtWidgets.QMainWindow):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE people SET dept_id = NULL WHERE dept_id = ?", (self._selected_id,))
-            conn.execute("DELETE FROM dept WHERE dept_id = ?", (self._selected_id,))
+            conn.execute("UPDATE people SET dept_id = NULL WHERE dept_id = %s", (self._selected_id,))
+            conn.execute("DELETE FROM dept WHERE dept_id = %s", (self._selected_id,))
             conn.commit()
             conn.close()
             self._clear_form()

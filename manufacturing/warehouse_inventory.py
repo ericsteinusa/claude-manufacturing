@@ -4,12 +4,13 @@ Tabs: Stock Overview | Receive Stock | Adjustments | Reports
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 
@@ -44,8 +45,7 @@ ADJUST_TYPES = ["Cycle Count", "Damage / Shrinkage", "Return to Vendor", "Transf
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -53,7 +53,7 @@ def init_db():
     with _conn() as con:
         con.execute("""
             CREATE TABLE IF NOT EXISTS product (
-                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                id             SERIAL PRIMARY KEY,
                 supplier_id    INTEGER REFERENCES supplier(id),
                 name           TEXT NOT NULL,
                 purchase_date  TEXT,
@@ -65,7 +65,7 @@ def init_db():
         """)
         con.execute("""
             CREATE TABLE IF NOT EXISTS inventory_transaction (
-                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                id         SERIAL PRIMARY KEY,
                 product_id INTEGER NOT NULL REFERENCES product(id),
                 trans_date TEXT NOT NULL,
                 trans_type TEXT NOT NULL,
@@ -133,20 +133,16 @@ def _export_table(table, parent, default_name="inventory_export.csv"):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
-class WarehouseWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Warehouse & Inventory")
-        self.resize(1200, 780)
+class WarehouseWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_palette(self)
         self._current_product_id = None
         self._build_ui()
         self._refresh_all()
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(10, 8, 10, 8)
         root.setSpacing(6)
 
@@ -472,9 +468,9 @@ class WarehouseWindow(QtWidgets.QMainWindow):
             con.execute("""
                 INSERT INTO inventory_transaction
                     (product_id, trans_date, trans_type, quantity, reference, notes)
-                VALUES (?, ?, 'Receive', ?, ?, ?)
+                VALUES (%s, %s, 'Receive', %s, %s, %s)
             """, (pid, trans_date, qty, ref, notes))
-            con.execute("UPDATE product SET amount = amount + ? WHERE id=?", (qty, pid))
+            con.execute("UPDATE product SET amount = amount + %s WHERE id=%s", (qty, pid))
 
         self._clear_receive()
         self._load_stock()
@@ -630,7 +626,7 @@ class WarehouseWindow(QtWidgets.QMainWindow):
             self.adj_on_hand_lbl.setText("On Hand: —")
             return
         with _conn() as con:
-            row = con.execute("SELECT amount FROM product WHERE id=?", (pid,)).fetchone()
+            row = con.execute("SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
         if row:
             self.adj_on_hand_lbl.setText(f"On Hand: {float(row['amount']):,.2f}")
 
@@ -649,7 +645,7 @@ class WarehouseWindow(QtWidgets.QMainWindow):
 
         # Check stock won't go negative
         with _conn() as con:
-            row = con.execute("SELECT amount FROM product WHERE id=?", (pid,)).fetchone()
+            row = con.execute("SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
             current = float(row["amount"] or 0) if row else 0
         if current + signed_qty < 0:
             QtWidgets.QMessageBox.warning(
@@ -661,9 +657,9 @@ class WarehouseWindow(QtWidgets.QMainWindow):
             con.execute("""
                 INSERT INTO inventory_transaction
                     (product_id, trans_date, trans_type, quantity, reference, notes)
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """, (pid, trans_date, adj_type, signed_qty, ref, notes))
-            con.execute("UPDATE product SET amount = amount + ? WHERE id=?", (signed_qty, pid))
+            con.execute("UPDATE product SET amount = amount + %s WHERE id=%s", (signed_qty, pid))
 
         self._clear_adjust()
         self._load_stock()
@@ -882,14 +878,14 @@ class WarehouseWindow(QtWidgets.QMainWindow):
             SELECT t.trans_date, p.name, t.trans_type, t.quantity, t.reference, t.notes
             FROM inventory_transaction t
             JOIN product p ON p.id = t.product_id
-            WHERE t.trans_date BETWEEN ? AND ?
+            WHERE t.trans_date BETWEEN %s AND %s
         """
         params = [from_s, to_s]
         if pid:
-            q += " AND t.product_id = ?"
+            q += " AND t.product_id = %s"
             params.append(pid)
         if txn_type != "All Types":
-            q += " AND t.trans_type = ?"
+            q += " AND t.trans_type = %s"
             params.append(txn_type)
         q += " ORDER BY t.trans_date DESC, t.id DESC"
 
@@ -1018,6 +1014,15 @@ class WarehouseWindow(QtWidgets.QMainWindow):
         self._load_low_stock()
         self._load_valuation()
         self._stock_ids = getattr(self, "_stock_ids", [])
+
+
+class WarehouseWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Warehouse & Inventory")
+        self.resize(1200, 780)
+        _apply_palette(self)
+        self.setCentralWidget(WarehouseWidget())
 
 
 if __name__ == "__main__":

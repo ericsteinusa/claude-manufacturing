@@ -4,16 +4,16 @@ Tabs: Audit Schedule | Audit Findings | Corrective Actions | Audit Reports
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -21,7 +21,7 @@ def init_db():
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS audit_schedule (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            id          SERIAL PRIMARY KEY,
             audit_name  TEXT    NOT NULL,
             audit_type  TEXT    DEFAULT '',
             department  TEXT    DEFAULT '',
@@ -33,7 +33,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS audit_finding (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            id          SERIAL PRIMARY KEY,
             audit_id    INTEGER DEFAULT NULL,
             finding_ref TEXT    DEFAULT '',
             description TEXT    NOT NULL,
@@ -45,7 +45,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS corrective_action (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            id          SERIAL PRIMARY KEY,
             finding_id  INTEGER DEFAULT NULL,
             description TEXT    NOT NULL,
             assigned_to TEXT    DEFAULT '',
@@ -62,7 +62,7 @@ def init_db():
 def _seed(con):
     today = date.today().isoformat()
     con.execute(
-        "INSERT INTO audit_schedule (audit_name, audit_type, department, auditor, scheduled, status) VALUES (?,?,?,?,?,?)",
+        "INSERT INTO audit_schedule (audit_name, audit_type, department, auditor, scheduled, status) VALUES (%s,%s,%s,%s,%s,%s)",
         ("Annual Financial Audit", "Financial", "Accounting", "External Auditor", today, "Scheduled")
     )
 
@@ -332,12 +332,10 @@ class CorrectiveActionDialog(QtWidgets.QDialog):
 # ══════════════════════════════════════════════════════════════════════════════
 # Main Audit Management Window
 # ══════════════════════════════════════════════════════════════════════════════
-class AuditWindow(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
+class AuditMgmtWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         init_db()
-        self.setWindowTitle("Audit Management")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
         self._refresh_schedule()
@@ -348,9 +346,7 @@ class AuditWindow(QtWidgets.QMainWindow):
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
 
         title = QtWidgets.QLabel("Audit Management")
@@ -422,10 +418,10 @@ class AuditWindow(QtWidgets.QMainWindow):
             q = "SELECT * FROM audit_schedule WHERE 1=1"
             p = []
             if sf != "All Statuses":
-                q += " AND status=?"
+                q += " AND status=%s"
                 p.append(sf)
             if tf != "All Types":
-                q += " AND audit_type=?"
+                q += " AND audit_type=%s"
                 p.append(tf)
             q += " ORDER BY scheduled"
             rows = con.execute(q, p).fetchall()
@@ -447,7 +443,7 @@ class AuditWindow(QtWidgets.QMainWindow):
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("INSERT INTO audit_schedule (audit_name,audit_type,department,auditor,scheduled,completed,status,notes) VALUES (?,?,?,?,?,?,?,?)",
+                con.execute("INSERT INTO audit_schedule (audit_name,audit_type,department,auditor,scheduled,completed,status,notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                             (v["audit_name"], v["audit_type"], v["department"], v["auditor"], v["scheduled"], v["completed"], v["status"], v["notes"]))
             self._refresh_schedule()
 
@@ -456,14 +452,14 @@ class AuditWindow(QtWidgets.QMainWindow):
             return
         rid = int(self.sched_tbl.item(self.sched_tbl.currentRow(), 0).text())
         with _conn() as con:
-            rd = con.execute("SELECT * FROM audit_schedule WHERE id=?", (rid,)).fetchone()
+            rd = con.execute("SELECT * FROM audit_schedule WHERE id=%s", (rid,)).fetchone()
         if not rd:
             return
         dlg = AuditDialog(self, row_data=rd)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("UPDATE audit_schedule SET audit_name=?,audit_type=?,department=?,auditor=?,scheduled=?,completed=?,status=?,notes=? WHERE id=?",
+                con.execute("UPDATE audit_schedule SET audit_name=%s,audit_type=%s,department=%s,auditor=%s,scheduled=%s,completed=%s,status=%s,notes=%s WHERE id=%s",
                             (v["audit_name"], v["audit_type"], v["department"], v["auditor"], v["scheduled"], v["completed"], v["status"], v["notes"], rid))
             self._refresh_schedule()
 
@@ -471,9 +467,9 @@ class AuditWindow(QtWidgets.QMainWindow):
         if not self.sched_tbl.selectedItems():
             return
         rid = int(self.sched_tbl.item(self.sched_tbl.currentRow(), 0).text())
-        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this audit?") == QtWidgets.QMessageBox.StandardButton.Yes:
+        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this audit%s") == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM audit_schedule WHERE id=?", (rid,))
+                con.execute("DELETE FROM audit_schedule WHERE id=%s", (rid,))
             self._refresh_schedule()
 
     def _mark_audit_complete(self, *_):
@@ -482,7 +478,7 @@ class AuditWindow(QtWidgets.QMainWindow):
         rid = int(self.sched_tbl.item(self.sched_tbl.currentRow(), 0).text())
         today = date.today().isoformat()
         with _conn() as con:
-            con.execute("UPDATE audit_schedule SET status='Completed', completed=? WHERE id=?", (today, rid))
+            con.execute("UPDATE audit_schedule SET status='Completed', completed=%s WHERE id=%s", (today, rid))
         self._refresh_schedule()
 
     # ── Audit Findings tab ────────────────────────────────────────────────────
@@ -540,10 +536,10 @@ class AuditWindow(QtWidgets.QMainWindow):
             q = "SELECT * FROM audit_finding WHERE 1=1"
             p = []
             if sf != "All Severities":
-                q += " AND severity=?"
+                q += " AND severity=%s"
                 p.append(sf)
             if stf != "All Statuses":
-                q += " AND status=?"
+                q += " AND status=%s"
                 p.append(stf)
             q += " ORDER BY found_date DESC"
             rows = con.execute(q, p).fetchall()
@@ -565,7 +561,7 @@ class AuditWindow(QtWidgets.QMainWindow):
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("INSERT INTO audit_finding (finding_ref,description,severity,department,found_date,status,notes) VALUES (?,?,?,?,?,?,?)",
+                con.execute("INSERT INTO audit_finding (finding_ref,description,severity,department,found_date,status,notes) VALUES (%s,%s,%s,%s,%s,%s,%s)",
                             (v["finding_ref"], v["description"], v["severity"], v["department"], v["found_date"], v["status"], v["notes"]))
             self._refresh_findings()
             self._refresh_reports()
@@ -575,14 +571,14 @@ class AuditWindow(QtWidgets.QMainWindow):
             return
         rid = int(self.find_tbl.item(self.find_tbl.currentRow(), 0).text())
         with _conn() as con:
-            rd = con.execute("SELECT * FROM audit_finding WHERE id=?", (rid,)).fetchone()
+            rd = con.execute("SELECT * FROM audit_finding WHERE id=%s", (rid,)).fetchone()
         if not rd:
             return
         dlg = FindingDialog(self, row_data=rd)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("UPDATE audit_finding SET finding_ref=?,description=?,severity=?,department=?,found_date=?,status=?,notes=? WHERE id=?",
+                con.execute("UPDATE audit_finding SET finding_ref=%s,description=%s,severity=%s,department=%s,found_date=%s,status=%s,notes=%s WHERE id=%s",
                             (v["finding_ref"], v["description"], v["severity"], v["department"], v["found_date"], v["status"], v["notes"], rid))
             self._refresh_findings()
             self._refresh_reports()
@@ -591,9 +587,9 @@ class AuditWindow(QtWidgets.QMainWindow):
         if not self.find_tbl.selectedItems():
             return
         rid = int(self.find_tbl.item(self.find_tbl.currentRow(), 0).text())
-        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this finding?") == QtWidgets.QMessageBox.StandardButton.Yes:
+        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this finding%s") == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM audit_finding WHERE id=?", (rid,))
+                con.execute("DELETE FROM audit_finding WHERE id=%s", (rid,))
             self._refresh_findings()
             self._refresh_reports()
 
@@ -602,7 +598,7 @@ class AuditWindow(QtWidgets.QMainWindow):
             return
         rid = int(self.find_tbl.item(self.find_tbl.currentRow(), 0).text())
         with _conn() as con:
-            con.execute("UPDATE audit_finding SET status='Resolved' WHERE id=?", (rid,))
+            con.execute("UPDATE audit_finding SET status='Resolved' WHERE id=%s", (rid,))
         self._refresh_findings()
 
     # ── Corrective Actions tab ────────────────────────────────────────────────
@@ -652,7 +648,7 @@ class AuditWindow(QtWidgets.QMainWindow):
             q = "SELECT * FROM corrective_action WHERE 1=1"
             p = []
             if sf != "All Statuses":
-                q += " AND status=?"
+                q += " AND status=%s"
                 p.append(sf)
             q += " ORDER BY due_date"
             rows = con.execute(q, p).fetchall()
@@ -673,7 +669,7 @@ class AuditWindow(QtWidgets.QMainWindow):
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("INSERT INTO corrective_action (description,assigned_to,due_date,completed,status,notes) VALUES (?,?,?,?,?,?)",
+                con.execute("INSERT INTO corrective_action (description,assigned_to,due_date,completed,status,notes) VALUES (%s,%s,%s,%s,%s,%s)",
                             (v["description"], v["assigned_to"], v["due_date"], v["completed"], v["status"], v["notes"]))
             self._refresh_corrective()
             self._refresh_reports()
@@ -683,14 +679,14 @@ class AuditWindow(QtWidgets.QMainWindow):
             return
         rid = int(self.ca_tbl.item(self.ca_tbl.currentRow(), 0).text())
         with _conn() as con:
-            rd = con.execute("SELECT * FROM corrective_action WHERE id=?", (rid,)).fetchone()
+            rd = con.execute("SELECT * FROM corrective_action WHERE id=%s", (rid,)).fetchone()
         if not rd:
             return
         dlg = CorrectiveActionDialog(self, row_data=rd)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("UPDATE corrective_action SET description=?,assigned_to=?,due_date=?,completed=?,status=?,notes=? WHERE id=?",
+                con.execute("UPDATE corrective_action SET description=%s,assigned_to=%s,due_date=%s,completed=%s,status=%s,notes=%s WHERE id=%s",
                             (v["description"], v["assigned_to"], v["due_date"], v["completed"], v["status"], v["notes"], rid))
             self._refresh_corrective()
             self._refresh_reports()
@@ -699,9 +695,9 @@ class AuditWindow(QtWidgets.QMainWindow):
         if not self.ca_tbl.selectedItems():
             return
         rid = int(self.ca_tbl.item(self.ca_tbl.currentRow(), 0).text())
-        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this corrective action?") == QtWidgets.QMessageBox.StandardButton.Yes:
+        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this corrective action%s") == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM corrective_action WHERE id=?", (rid,))
+                con.execute("DELETE FROM corrective_action WHERE id=%s", (rid,))
             self._refresh_corrective()
             self._refresh_reports()
 
@@ -711,7 +707,7 @@ class AuditWindow(QtWidgets.QMainWindow):
         rid = int(self.ca_tbl.item(self.ca_tbl.currentRow(), 0).text())
         today = date.today().isoformat()
         with _conn() as con:
-            con.execute("UPDATE corrective_action SET status='Completed', completed=? WHERE id=?", (today, rid))
+            con.execute("UPDATE corrective_action SET status='Completed', completed=%s WHERE id=%s", (today, rid))
         self._refresh_corrective()
 
     # ── Audit Reports tab ─────────────────────────────────────────────────────
@@ -809,6 +805,15 @@ class AuditWindow(QtWidgets.QMainWindow):
             self.rpt_ca_tbl.setItem(r, 0, _ro(row["status"]))
             self.rpt_ca_tbl.setItem(r, 1, _ro(str(row["cnt"]), QtCore.Qt.AlignmentFlag.AlignRight))
             _color_row(self.rpt_ca_tbl, r, STATUS_COLORS.get(row["status"]))
+
+
+class AuditWindow(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Audit Management")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self.setCentralWidget(AuditMgmtWidget(initial_tab=initial_tab))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 from tkinter import *
 from tkinter import Label, Entry, Button, END
 from tkinter import messagebox
@@ -30,7 +32,7 @@ people = ''
 
 
 def setup_database():
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
     CREATE TABLE if not exists people (
@@ -47,7 +49,7 @@ def setup_database():
 
     cursor.execute("""
     CREATE TABLE if not exists calls (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         People_id INTEGER,
         call TEXT NOT NULL,
         call_date TEXT NOT NULL,
@@ -79,12 +81,12 @@ def query_database():
         my_tree.delete(record)
 
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
-    c.execute("SELECT rowid, * FROM calls")
+    c.execute("SELECT id, * FROM calls")
     records = c.fetchall()
 
     # Add our data to the screen
@@ -118,12 +120,12 @@ def search_records():
         my_tree.delete(record)
 
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
-    c.execute("SELECT rowid, * FROM calls WHERE rowid like ?", (lookup_record,))
+    c.execute("SELECT id, * FROM calls WHERE id like %s", (lookup_record,))
     records = c.fetchall()
 
     # Add our data to the screen
@@ -268,7 +270,7 @@ search_menu.add_command(label="Reset", command=query_database)
 
 # Step 2: Fetch data for the selection list
 def fetch_people():
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id || ' ' || first_name || ' ' || last_name as full_name FROM people")
     people = [row[0] for row in cursor.fetchall()]
@@ -296,9 +298,9 @@ def insert_data():
 
     else:
 
-        conn = sqlite3.connect("company.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        cursor.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                        (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box))
         conn.commit()
         messagebox.showinfo("Message", "Call Saved Successfully.")
@@ -318,7 +320,7 @@ def insert_data():
 '''
 def display_data():
     user_list.delete(0, END)
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box FROM calls")
     for row in cursor.fetchall():
@@ -483,13 +485,13 @@ def remove_one():
     my_tree.delete(x)
 
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
     # Delete From Database
-    c.execute("DELETE from calls WHERE oid=?", (id_entry.get(),))
+    c.execute("DELETE FROM calls WHERE id = %s", (id_entry.get(),))
 
     # Commit changes
     conn.commit()
@@ -526,13 +528,13 @@ def remove_many():
             my_tree.delete(record)
 
         # Create a database or connect to one that exists
-        conn = sqlite3.connect('company.db')
+        conn = get_db_connection()
 
         # Create a cursor instance
         c = conn.cursor()
 
         # Delete Everything From The Table
-        c.executemany("DELETE FROM calls WHERE id = ?", [(a,) for a in ids_to_delete])
+        c.executemany("DELETE FROM calls WHERE id = %s", [(a,) for a in ids_to_delete])
 
         # Reset List
         ids_to_delete = []
@@ -559,7 +561,7 @@ def remove_all():
             my_tree.delete(record)
 
         # Create a database or connect to one that exists
-        conn = sqlite3.connect('company.db')
+        conn = get_db_connection()
 
         # Create a cursor instance
         c = conn.cursor()
@@ -634,7 +636,7 @@ def update_record():
     ), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
     # Update the database
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -649,7 +651,7 @@ def update_record():
         comments_box = :comments_box,
         completion_box = :completion_box
 
-        WHERE oid = :oid""",
+        WHERE id = %(oid)s""",
               {
                   'people': people_combobox.get().split(' ')[0].strip('{'),
                   'call': call_widget.get("1.0", "end-1c"),
@@ -684,13 +686,13 @@ def update_record():
 def add_record():
     # Update the database
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
     # Add New Record
-    c.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (people_combobox.get().split(' ')[0].strip(
+    c.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (people_combobox.get().split(' ')[0].strip(
         '{'), call_widget.get("1.0", "end-1c"), _to_iso_date(call_date_entry.get()), call_time_entry.get(), _to_iso_date(completion_date_entry.get()), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
 
     # Commit changes
@@ -719,14 +721,14 @@ def add_record():
 
 def create_table_again():
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
     # Create Table
     c.execute("""CREATE TABLE if not exists calls (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         people_id integer,
         call text,
         call_date text,

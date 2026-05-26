@@ -1,90 +1,72 @@
+import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
-import sys
-import os
+from Sales_menu import SalesOrdersWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
-    "QPushButton:hover{background-color:rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
 
 
-class Ui_Marketing_mgr_menu(object):
-    def setupUi(self, Marketing_mgr_menu):
-        Marketing_mgr_menu.setObjectName("Marketing_mgr_menu")
-        Marketing_mgr_menu.resize(800, 600)
+def _launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
-        palette = QtGui.QPalette()
-        for group in (QtGui.QPalette.ColorGroup.Active,
-                      QtGui.QPalette.ColorGroup.Inactive,
-                      QtGui.QPalette.ColorGroup.Disabled):
-            palette.setColor(group, QtGui.QPalette.ColorRole.Window, QtGui.QColor(0, 85, 255))
-            palette.setColor(group, QtGui.QPalette.ColorRole.Button, QtGui.QColor(0, 85, 255))
-        Marketing_mgr_menu.setPalette(palette)
 
-        self.centralwidget = QtWidgets.QWidget(parent=Marketing_mgr_menu)
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 0, 801, 561))
-        self.label.setStyleSheet(
-            "background-image: url(Marketing.png); background-repeat: no-repeat;"
-            " background-position: center; background-color: white;")
-        self.label.setText("")
+def _launch_tab(script, label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch(); row.addWidget(btn); row.addStretch()
+    v.addLayout(row); v.addStretch()
+    return w
 
-        font = QtGui.QFont()
-        font.setPointSize(16)
 
-        btn_data = [
-            ("Marketing", QtCore.QRect(10, 10, 211, 41), "Marketing Menu"),
-            ("Sales Orders", QtCore.QRect(240, 10, 171, 41), "Sales Orders"),
-            ("Customer Contacts", QtCore.QRect(10, 510, 211, 41), "Customer Contacts"),
-            ("Campaign Reports", QtCore.QRect(240, 510, 211, 41), "Campaign Reports"),
-        ]
+def _placeholder_tab(label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addStretch()
+    return w
 
-        self._btns = []
-        for text, geom, key in btn_data:
-            b = QtWidgets.QPushButton(parent=self.centralwidget,
-                                      clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom)
-            b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE)
-            b.setAutoDefault(False)
-            b.setText(text)
-            self._btns.append(b)
 
-        self.label.raise_()
-        for b in self._btns:
-            b.raise_()
+class MarketingMgrMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Marketing Manager Menu")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self._build_ui()
 
-        Marketing_mgr_menu.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=Marketing_mgr_menu)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        Marketing_mgr_menu.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=Marketing_mgr_menu)
-        Marketing_mgr_menu.setStatusBar(self.statusbar)
-        self.retranslateUi(Marketing_mgr_menu)
-
-    def press_it(self, pressed):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        scripts = {
-            "Marketing Menu": "marketing_menu.py",
-            "Sales Orders": "Sales_menu.py",
-            "Customer Contacts": "customer_entry.py",
-        }
-        script = scripts.get(pressed)
-        if script:
-            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-        else:
-            QtWidgets.QMessageBox.information(None, pressed, f"{pressed} — coming soon.")
-
-    def retranslateUi(self, Marketing_mgr_menu):
-        Marketing_mgr_menu.setWindowTitle(
-            QtCore.QCoreApplication.translate("Marketing_mgr_menu", "Marketing Manager Menu"))
+    def _build_ui(self):
+        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(SalesOrdersWidget(), "Sales Orders")
+        tabs.addTab(_launch_tab("customer_entry.py", "Customer Contacts"), "Customer Contacts")
+        tabs.addTab(_placeholder_tab("Campaign Reports"), "Campaign Reports")
+        v.addWidget(tabs)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    Marketing_mgr_menu = QtWidgets.QMainWindow()
-    ui = Ui_Marketing_mgr_menu()
-    ui.setupUi(Marketing_mgr_menu)
-    Marketing_mgr_menu.show()
+    w = MarketingMgrMenu(); w.show()
     sys.exit(app.exec())

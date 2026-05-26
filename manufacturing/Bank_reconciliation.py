@@ -4,16 +4,16 @@ Tabs: Bank Accounts | Statement Entry | Reconciliation | History
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -21,7 +21,7 @@ def init_db():
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS bank_account (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             account_name   TEXT    NOT NULL,
             bank_name      TEXT    DEFAULT '',
             account_number TEXT    DEFAULT '',
@@ -32,7 +32,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS bank_statement (
-            id                INTEGER PRIMARY KEY AUTOINCREMENT,
+            id                SERIAL PRIMARY KEY,
             bank_account_id   INTEGER NOT NULL REFERENCES bank_account(id) ON DELETE CASCADE,
             statement_date    TEXT    NOT NULL,
             beginning_balance REAL    DEFAULT 0.0,
@@ -45,7 +45,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS bank_statement_item (
-            id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+            id                     SERIAL PRIMARY KEY,
             statement_id           INTEGER NOT NULL REFERENCES bank_statement(id) ON DELETE CASCADE,
             item_date              TEXT    NOT NULL,
             description            TEXT    DEFAULT '',
@@ -56,7 +56,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS bank_reconciliation (
-            id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+            id                    SERIAL PRIMARY KEY,
             statement_id          INTEGER NOT NULL REFERENCES bank_statement(id) ON DELETE CASCADE,
             journal_line_id       INTEGER REFERENCES gl_journal_line(id),
             statement_item_id     INTEGER REFERENCES bank_statement_item(id),
@@ -137,20 +137,16 @@ def _export_csv(table: QtWidgets.QTableWidget, parent):
 # ══════════════════════════════════════════════════════════════════════════════
 # Main Window
 # ══════════════════════════════════════════════════════════════════════════════
-class BankReconciliationWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
+class BankReconciliationWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         init_db()
-        self.setWindowTitle("Bank Reconciliation")
-        self.resize(1200, 780)
         _apply_palette(self)
         self._current_stmt_id = None
         self._build_ui()
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
 
         title = QtWidgets.QLabel("Bank Reconciliation")
@@ -279,7 +275,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         r = rows[0].row()
         bid = self.ba_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
-            row = con.execute("SELECT * FROM bank_account WHERE id=?", (bid,)).fetchone()
+            row = con.execute("SELECT * FROM bank_account WHERE id=%s", (bid,)).fetchone()
         if not row:
             return
         self.ba_ef_name.setText(row["account_name"])
@@ -314,7 +310,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             con.execute(
                 "INSERT INTO bank_account(account_name,bank_name,account_number,routing_number,"
-                "gl_account_id,is_active,notes) VALUES(?,?,?,?,?,?,?)",
+                "gl_account_id,is_active,notes) VALUES(%s,%s,%s,%s,%s,%s,%s)",
                 (name, bank, acctno, routing, gl_id, active, notes)
             )
         self._refresh_accounts()
@@ -337,8 +333,8 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             return
         with _conn() as con:
             con.execute(
-                "UPDATE bank_account SET account_name=?,bank_name=?,account_number=?,"
-                "routing_number=?,gl_account_id=?,is_active=?,notes=? WHERE id=?",
+                "UPDATE bank_account SET account_name=%s,bank_name=%s,account_number=%s,"
+                "routing_number=%s,gl_account_id=%s,is_active=%s,notes=%s WHERE id=%s",
                 (name, bank, acctno, routing, gl_id, active, notes, bid)
             )
         self._refresh_accounts()
@@ -348,11 +344,11 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         if bid is None:
             return
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this bank account and all its statements?",
+            self, "Delete", "Delete this bank account and all its statements%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM bank_account WHERE id=?", (bid,))
+                con.execute("DELETE FROM bank_account WHERE id=%s", (bid,))
             self._refresh_accounts()
             self._on_ba_clear()
 
@@ -539,10 +535,10 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         """
         params, where = [], []
         if ba_id:
-            where.append("bs.bank_account_id=?")
+            where.append("bs.bank_account_id=%s")
             params.append(ba_id)
         if status != "All Statuses":
-            where.append("bs.status=?")
+            where.append("bs.status=%s")
             params.append(status)
         if where:
             q += " WHERE " + " AND ".join(where)
@@ -580,7 +576,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         sid = self.st_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         self._current_stmt_id = sid
         with _conn() as con:
-            row = con.execute("SELECT * FROM bank_statement WHERE id=?", (sid,)).fetchone()
+            row = con.execute("SELECT * FROM bank_statement WHERE id=%s", (sid,)).fetchone()
         if not row:
             return
         idx = self.st_ef_ba.findData(row["bank_account_id"])
@@ -602,7 +598,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             return
         with _conn() as con:
             rows = con.execute(
-                "SELECT * FROM bank_statement_item WHERE statement_id=? ORDER BY item_date, id",
+                "SELECT * FROM bank_statement_item WHERE statement_id=%s ORDER BY item_date, id",
                 (self._current_stmt_id,)
             ).fetchall()
         self.si_tbl.setRowCount(0)
@@ -642,7 +638,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             con.execute(
                 "INSERT INTO bank_statement(bank_account_id,statement_date,beginning_balance,"
-                "ending_balance,status,reconciled_by,notes) VALUES(?,?,?,?,?,?,?)",
+                "ending_balance,status,reconciled_by,notes) VALUES(%s,%s,%s,%s,%s,%s,%s)",
                 (ba_id, dt, beg, end, status, by, notes)
             )
         self._refresh_statements()
@@ -665,8 +661,8 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             return
         with _conn() as con:
             con.execute(
-                "UPDATE bank_statement SET bank_account_id=?,statement_date=?,beginning_balance=?,"
-                "ending_balance=?,status=?,reconciled_by=?,notes=? WHERE id=?",
+                "UPDATE bank_statement SET bank_account_id=%s,statement_date=%s,beginning_balance=%s,"
+                "ending_balance=%s,status=%s,reconciled_by=%s,notes=%s WHERE id=%s",
                 (ba_id, dt, beg, end, status, by, notes, sid)
             )
         self._refresh_statements()
@@ -676,11 +672,11 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         if sid is None:
             return
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this statement and all its line items?",
+            self, "Delete", "Delete this statement and all its line items%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM bank_statement WHERE id=?", (sid,))
+                con.execute("DELETE FROM bank_statement WHERE id=%s", (sid,))
             if self._current_stmt_id == sid:
                 self._current_stmt_id = None
             self._refresh_statements()
@@ -715,7 +711,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         r = rows[0].row()
         iid = self.si_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
-            row = con.execute("SELECT * FROM bank_statement_item WHERE id=?", (iid,)).fetchone()
+            row = con.execute("SELECT * FROM bank_statement_item WHERE id=%s", (iid,)).fetchone()
         if not row:
             return
         self.si_ef_date.setDate(QtCore.QDate.fromString(row["item_date"], "yyyy-MM-dd"))
@@ -739,7 +735,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             con.execute(
                 "INSERT INTO bank_statement_item(statement_id,item_date,description,amount,item_type) "
-                "VALUES(?,?,?,?,?)",
+                "VALUES(%s,%s,%s,%s,%s)",
                 (self._current_stmt_id, dt, desc, amt, typ)
             )
         self._refresh_stmt_items()
@@ -753,13 +749,13 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         iid = self.si_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
             matched = con.execute(
-                "SELECT is_matched FROM bank_statement_item WHERE id=?", (iid,)
+                "SELECT is_matched FROM bank_statement_item WHERE id=%s", (iid,)
             ).fetchone()
         if matched and matched["is_matched"]:
             QtWidgets.QMessageBox.warning(self, "Matched", "Unmatch this item in Reconciliation before deleting.")
             return
         with _conn() as con:
-            con.execute("DELETE FROM bank_statement_item WHERE id=?", (iid,))
+            con.execute("DELETE FROM bank_statement_item WHERE id=%s", (iid,))
         self._refresh_stmt_items()
 
     def _on_si_clear(self):
@@ -930,7 +926,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
                 "SELECT bs.*, ba.gl_account_id, ba.account_name "
                 "FROM bank_statement bs "
                 "JOIN bank_account ba ON ba.id=bs.bank_account_id "
-                "WHERE bs.id=?", (sid,)
+                "WHERE bs.id=%s", (sid,)
             ).fetchone()
             if not stmt:
                 return
@@ -943,10 +939,10 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
                     SELECT l.id, j.journal_date, j.description, l.debit, l.credit
                     FROM gl_journal_line l
                     JOIN gl_journal j ON j.id=l.journal_id
-                    WHERE l.account_id=?
+                    WHERE l.account_id=%s
                       AND l.id NOT IN (
                           SELECT journal_line_id FROM bank_reconciliation
-                          WHERE statement_id=? AND journal_line_id IS NOT NULL
+                          WHERE statement_id=%s AND journal_line_id IS NOT NULL
                       )
                     ORDER BY j.journal_date
                 """, (gl_acct_id, sid)).fetchall()
@@ -954,7 +950,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             # Unmatched statement items
             st_rows = con.execute(
                 "SELECT * FROM bank_statement_item "
-                "WHERE statement_id=? AND is_matched=0 ORDER BY item_date",
+                "WHERE statement_id=%s AND is_matched=0 ORDER BY item_date",
                 (sid,)
             ).fetchall()
 
@@ -969,7 +965,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
                 LEFT JOIN gl_journal_line l  ON l.id=br.journal_line_id
                 LEFT JOIN gl_journal j        ON j.id=l.journal_id
                 LEFT JOIN bank_statement_item si ON si.id=br.statement_item_id
-                WHERE br.statement_id=?
+                WHERE br.statement_id=%s
                 ORDER BY j.journal_date
             """, (sid,)).fetchall()
 
@@ -980,7 +976,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
                     "SELECT COALESCE(SUM(l.debit - l.credit),0) AS net "
                     "FROM gl_journal_line l "
                     "JOIN gl_journal j ON j.id=l.journal_id "
-                    "WHERE l.account_id=?",
+                    "WHERE l.account_id=%s",
                     (gl_acct_id,)
                 ).fetchone()
                 book_bal = res["net"] if res else 0.0
@@ -1060,10 +1056,10 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             con.execute(
                 "INSERT INTO bank_reconciliation(statement_id,journal_line_id,statement_item_id) "
-                "VALUES(?,?,?)",
+                "VALUES(%s,%s,%s)",
                 (sid, gl_id, si_id)
             )
-            con.execute("UPDATE bank_statement_item SET is_matched=1 WHERE id=?", (si_id,))
+            con.execute("UPDATE bank_statement_item SET is_matched=1 WHERE id=%s", (si_id,))
         self._refresh_reconcile_tab()
 
     def _on_auto_match(self):
@@ -1074,7 +1070,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         with _conn() as con:
             stmt = con.execute(
                 "SELECT ba.gl_account_id FROM bank_statement bs "
-                "JOIN bank_account ba ON ba.id=bs.bank_account_id WHERE bs.id=?", (sid,)
+                "JOIN bank_account ba ON ba.id=bs.bank_account_id WHERE bs.id=%s", (sid,)
             ).fetchone()
             if not stmt or not stmt["gl_account_id"]:
                 QtWidgets.QMessageBox.warning(self, "No GL Account", "No GL account linked to this bank account.")
@@ -1084,15 +1080,15 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
                 SELECT l.id, j.journal_date, (l.debit - l.credit) AS net
                 FROM gl_journal_line l
                 JOIN gl_journal j ON j.id=l.journal_id
-                WHERE l.account_id=?
+                WHERE l.account_id=%s
                   AND l.id NOT IN (
                       SELECT journal_line_id FROM bank_reconciliation
-                      WHERE statement_id=? AND journal_line_id IS NOT NULL
+                      WHERE statement_id=%s AND journal_line_id IS NOT NULL
                   )
             """, (gl_acct_id, sid)).fetchall()
             st_rows = con.execute(
                 "SELECT id, item_date, amount, item_type FROM bank_statement_item "
-                "WHERE statement_id=? AND is_matched=0", (sid,)
+                "WHERE statement_id=%s AND is_matched=0", (sid,)
             ).fetchall()
 
         matched_count = 0
@@ -1108,9 +1104,9 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
                     with _conn() as con:
                         con.execute(
                             "INSERT INTO bank_reconciliation(statement_id,journal_line_id,statement_item_id) "
-                            "VALUES(?,?,?)", (sid, gl["id"], si["id"])
+                            "VALUES(%s,%s,%s)", (sid, gl["id"], si["id"])
                         )
-                        con.execute("UPDATE bank_statement_item SET is_matched=1 WHERE id=?", (si["id"],))
+                        con.execute("UPDATE bank_statement_item SET is_matched=1 WHERE id=%s", (si["id"],))
                     used_si.add(si["id"])
                     matched_count += 1
                     break
@@ -1126,12 +1122,12 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         match_id = self.rec_match_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
             match = con.execute(
-                "SELECT statement_item_id FROM bank_reconciliation WHERE id=?", (match_id,)
+                "SELECT statement_item_id FROM bank_reconciliation WHERE id=%s", (match_id,)
             ).fetchone()
-            con.execute("DELETE FROM bank_reconciliation WHERE id=?", (match_id,))
+            con.execute("DELETE FROM bank_reconciliation WHERE id=%s", (match_id,))
             if match and match["statement_item_id"]:
                 con.execute(
-                    "UPDATE bank_statement_item SET is_matched=0 WHERE id=?",
+                    "UPDATE bank_statement_item SET is_matched=0 WHERE id=%s",
                     (match["statement_item_id"],)
                 )
         self._refresh_reconcile_tab()
@@ -1143,13 +1139,13 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
             return
         with _conn() as con:
             unmatched = con.execute(
-                "SELECT COUNT(*) FROM bank_statement_item WHERE statement_id=? AND is_matched=0", (sid,)
+                "SELECT COUNT(*) FROM bank_statement_item WHERE statement_id=%s AND is_matched=0", (sid,)
             ).fetchone()[0]
         msg = (
             f"There are {unmatched} unmatched statement item(s).\n\n"
-            "Mark this statement as Reconciled anyway?"
+            "Mark this statement as Reconciled anyway%s"
             if unmatched else
-            "Mark this statement as Reconciled?"
+            "Mark this statement as Reconciled%s"
         )
         if QtWidgets.QMessageBox.question(
             self, "Mark Reconciled", msg,
@@ -1157,7 +1153,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
                 con.execute(
-                    "UPDATE bank_statement SET status='Reconciled', reconciled_at=datetime('now') WHERE id=?",
+                    "UPDATE bank_statement SET status='Reconciled', reconciled_at=datetime('now') WHERE id=%s",
                     (sid,)
                 )
             QtWidgets.QMessageBox.information(self, "Done", "Statement marked as Reconciled.")
@@ -1229,7 +1225,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         """
         params = []
         if ba_id:
-            q += " WHERE bs.bank_account_id=?"
+            q += " WHERE bs.bank_account_id=%s"
             params.append(ba_id)
         q += " ORDER BY bs.statement_date DESC"
         with _conn() as con:
@@ -1269,6 +1265,15 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         elif idx == 3:
             self._populate_hist_ba_filter()
             self._refresh_history()
+
+
+class BankReconciliationWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Bank Reconciliation")
+        self.resize(1200, 780)
+        _apply_palette(self)
+        self.setCentralWidget(BankReconciliationWidget())
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -51,8 +52,7 @@ PRIORITY_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -76,7 +76,7 @@ def _next_proj_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM eng_project WHERE project_number LIKE ?",
+        "SELECT COUNT(*) FROM eng_project WHERE project_number LIKE %s",
         (f"PROJ-{yr}-%",)
     ).fetchone()[0]
     conn.close()
@@ -159,7 +159,7 @@ class NewProjectDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO eng_project"
                 " (project_number, title, engineer, start_date, due_date, status, notes)"
-                " VALUES (?,?,?,?,?,?,?)",
+                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, title,
                  self.engineer.text().strip(),
                  self.start_date.date().toString("yyyy-MM-dd"),
@@ -167,9 +167,9 @@ class NewProjectDialog(QtWidgets.QDialog):
                  self.status_combo.currentData(),
                  self.notes.toPlainText().strip())
             )
-            self.project_id = cur.lastrowid
+            self.project_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Project number '{num}' already exists.")
             conn.close()
@@ -259,7 +259,7 @@ class NewTaskDialog(QtWidgets.QDialog):
         cur = conn.execute(
             "INSERT INTO eng_task"
             " (task_name, project_id, assigned_to, priority, status, due_date, notes)"
-            " VALUES (?,?,?,?,?,?,?)",
+            " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
             (name,
              self.project_combo.currentData(),
              self.assigned_to.text().strip(),
@@ -268,7 +268,7 @@ class NewTaskDialog(QtWidgets.QDialog):
              self.due_date.date().toString("yyyy-MM-dd"),
              self.notes.toPlainText().strip())
         )
-        self.task_id = cur.lastrowid
+        self.task_id = cur.fetchone()['id']
         conn.commit()
         conn.close()
         self.accept()
@@ -361,10 +361,10 @@ class ProjectsTab(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Project", self._on_new),
-            ("Start Project", lambda: self._set_status("in_progress", "Mark as In Progress?")),
-            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold?")),
-            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed?")),
-            ("Cancel Project", lambda: self._set_status("cancelled", "Cancel this project?")),
+            ("Start Project", lambda: self._set_status("in_progress", "Mark as In Progress%s")),
+            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold%s")),
+            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed%s")),
+            ("Cancel Project", lambda: self._set_status("cancelled", "Cancel this project%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -381,10 +381,10 @@ class ProjectsTab(QtWidgets.QWidget):
         if status_val == "active":
             conds.append("status IN ('planning','in_progress')")
         elif status_val:
-            conds.append("status = ?")
+            conds.append("status = %s")
             params.append(status_val)
         if term:
-            conds.append("(project_number LIKE ? OR title LIKE ? OR engineer LIKE ?)")
+            conds.append("(project_number LIKE %s OR title LIKE %s OR engineer LIKE %s)")
             params += [f"%{term}%"] * 3
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
@@ -424,7 +424,7 @@ class ProjectsTab(QtWidgets.QWidget):
         self._selected_id = self._row_ids[row]
         conn = get_db()
         rec = conn.execute(
-            "SELECT * FROM eng_project WHERE id = ?", (self._selected_id,)
+            "SELECT * FROM eng_project WHERE id = %s", (self._selected_id,)
         ).fetchone()
         conn.close()
         if not rec:
@@ -454,7 +454,7 @@ class ProjectsTab(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE eng_project SET status = ? WHERE id = ?",
+            conn.execute("UPDATE eng_project SET status = %s WHERE id = %s",
                          (new_status, self._selected_id))
             conn.commit()
             conn.close()
@@ -557,10 +557,10 @@ class TasksTab(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Task", self._on_new),
-            ("Start Task", lambda: self._set_status("in_progress", "Mark as In Progress?")),
-            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold?")),
-            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed?")),
-            ("Cancel Task", lambda: self._set_status("cancelled", "Cancel this task?")),
+            ("Start Task", lambda: self._set_status("in_progress", "Mark as In Progress%s")),
+            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold%s")),
+            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed%s")),
+            ("Cancel Task", lambda: self._set_status("cancelled", "Cancel this task%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -578,13 +578,13 @@ class TasksTab(QtWidgets.QWidget):
         if status_val == "active":
             conds.append("t.status IN ('open','in_progress')")
         elif status_val:
-            conds.append("t.status = ?")
+            conds.append("t.status = %s")
             params.append(status_val)
         if priority:
-            conds.append("t.priority = ?")
+            conds.append("t.priority = %s")
             params.append(priority)
         if term:
-            conds.append("(t.task_name LIKE ? OR t.assigned_to LIKE ? OR p.title LIKE ?)")
+            conds.append("(t.task_name LIKE %s OR t.assigned_to LIKE %s OR p.title LIKE %s)")
             params += [f"%{term}%"] * 3
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
@@ -637,7 +637,7 @@ class TasksTab(QtWidgets.QWidget):
         rec = conn.execute(
             "SELECT t.*, p.project_number, p.title as proj_title"
             " FROM eng_task t LEFT JOIN eng_project p ON t.project_id = p.id"
-            " WHERE t.id = ?", (self._selected_id,)
+            " WHERE t.id = %s", (self._selected_id,)
         ).fetchone()
         conn.close()
         if not rec:
@@ -669,7 +669,7 @@ class TasksTab(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE eng_task SET status = ? WHERE id = ?",
+            conn.execute("UPDATE eng_task SET status = %s WHERE id = %s",
                          (new_status, self._selected_id))
             conn.commit()
             conn.close()

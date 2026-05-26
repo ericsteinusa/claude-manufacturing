@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -21,8 +22,7 @@ LABEL_STYLE = "color: white; font-size: 13px;"
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -30,13 +30,13 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS dept (
-            dept_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dept_id SERIAL PRIMARY KEY,
             dept_name TEXT NOT NULL
         )
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS dept_sub (
-            dept_sub_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dept_sub_id SERIAL PRIMARY KEY,
             dept_sub_name TEXT NOT NULL
         )
     """)
@@ -45,7 +45,7 @@ def init_db():
                 "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
         try:
             conn.execute(f"ALTER TABLE people ADD COLUMN {col}")
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
     conn.commit()
     conn.close()
@@ -61,11 +61,9 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-class PersonnelCRM(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Personnel CRM")
-        self.resize(1300, 720)
+class PersonnelCRMWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._selected_row_id = None
         self._row_ids = []
@@ -74,9 +72,7 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         self._refresh_table()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        layout = QtWidgets.QVBoxLayout(central)
+        layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
@@ -253,7 +249,7 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         """
         if search_term:
             rows = conn.execute(
-                q + " WHERE p.last_name LIKE ? ORDER BY p.last_name, p.first_name",
+                q + " WHERE p.last_name LIKE %s ORDER BY p.last_name, p.first_name",
                 (f"%{search_term}%",)
             ).fetchall()
         else:
@@ -296,7 +292,7 @@ class PersonnelCRM(QtWidgets.QMainWindow):
             return
         self._selected_row_id = self._row_ids[row]
         conn = get_db()
-        p = conn.execute("SELECT * FROM people WHERE id = ?", (self._selected_row_id,)).fetchone()
+        p = conn.execute("SELECT * FROM people WHERE id = %s", (self._selected_row_id,)).fetchone()
         conn.close()
         if not p:
             return
@@ -403,16 +399,25 @@ class PersonnelCRM(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
             return
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this employee record?",
+            self, "Confirm Delete", "Delete this employee record%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM people WHERE id = ?", (self._selected_row_id,))
+            conn.execute("DELETE FROM people WHERE id = %s", (self._selected_row_id,))
             conn.commit()
             conn.close()
             self._clear_form()
             self._refresh_table()
+
+
+class PersonnelCRM(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Personnel CRM")
+        self.resize(1300, 720)
+        _apply_blue_palette(self)
+        self.setCentralWidget(PersonnelCRMWidget())
 
 
 def main():

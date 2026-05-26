@@ -4,12 +4,13 @@ Tabs: Summary | Call Volume | By Customer | Open Calls
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 
@@ -32,8 +33,7 @@ OVERDUE_DAYS = 7   # open calls older than this are highlighted red
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -142,19 +142,15 @@ class DateRangeBar(QtWidgets.QWidget):
 
 # ── Main window ────────────────────────────────────────────────────────────────
 
-class CSReportsWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Customer Service Reports")
-        self.resize(1100, 720)
+class CSReportsWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_palette(self)
         self._build_ui()
         self._run_all()
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(10, 8, 10, 8)
         root.setSpacing(6)
 
@@ -253,7 +249,7 @@ class CSReportsWindow(QtWidgets.QMainWindow):
                 SELECT c2.*, cu.first_name, cu.last_name, cu.company_name
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
-                WHERE c2.call_date BETWEEN ? AND ?
+                WHERE c2.call_date BETWEEN %s AND %s
                 ORDER BY c2.call_date DESC
             """, (f, t)).fetchall()
 
@@ -336,7 +332,7 @@ class CSReportsWindow(QtWidgets.QMainWindow):
                        SUM(CASE WHEN completion_box=0 THEN 1 ELSE 0 END) AS open_ct,
                        SUM(completion_box)          AS comp_ct
                 FROM calls2
-                WHERE call_date BETWEEN ? AND ?
+                WHERE call_date BETWEEN %s AND %s
                 GROUP BY month
                 ORDER BY month DESC
             """, (f, t)).fetchall()
@@ -416,7 +412,7 @@ class CSReportsWindow(QtWidgets.QMainWindow):
                        c2.call_date, c2.completion_date, c2.completion_box
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
-                WHERE c2.call_date BETWEEN ? AND ?
+                WHERE c2.call_date BETWEEN %s AND %s
                 GROUP BY cu.id
                 ORDER BY total DESC
             """, (f, t)).fetchall()
@@ -427,7 +423,7 @@ class CSReportsWindow(QtWidgets.QMainWindow):
                        AVG(julianday(c2.completion_date) - julianday(c2.call_date)) AS avg_res
                 FROM calls2 c2
                 WHERE c2.completion_box = 1
-                  AND c2.call_date BETWEEN ? AND ?
+                  AND c2.call_date BETWEEN %s AND %s
                   AND c2.completion_date IS NOT NULL
                 GROUP BY c2.customer_id
             """, (f, t)).fetchall()
@@ -575,6 +571,15 @@ class CSReportsWindow(QtWidgets.QMainWindow):
         self._run_volume()
         self._run_customer()
         self._run_open()
+
+
+class CSReportsWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Customer Service Reports")
+        self.resize(1100, 720)
+        _apply_palette(self)
+        self.setCentralWidget(CSReportsWidget())
 
 
 if __name__ == "__main__":

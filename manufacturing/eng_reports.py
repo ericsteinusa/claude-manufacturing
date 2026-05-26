@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -48,8 +49,7 @@ PRIORITY_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -156,10 +156,10 @@ class ProjectsReportTab(QtWidgets.QWidget):
         eng = self.eng_search.text().strip()
         conds, params = [], []
         if status_val:
-            conds.append("status = ?")
+            conds.append("status = %s")
             params.append(status_val)
         if eng:
-            conds.append("engineer LIKE ?")
+            conds.append("engineer LIKE %s")
             params.append(f"%{eng}%")
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
@@ -265,10 +265,10 @@ class TasksReportTab(QtWidgets.QWidget):
         priority = self.pri_filter.currentData()
         conds, params = [], []
         if status_val:
-            conds.append("t.status = ?")
+            conds.append("t.status = %s")
             params.append(status_val)
         if priority:
-            conds.append("t.priority = ?")
+            conds.append("t.priority = %s")
             params.append(priority)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
@@ -369,7 +369,7 @@ class DesignReviewReportTab(QtWidgets.QWidget):
         status_val = self.status_filter.currentData()
         conds, params = [], []
         if status_val:
-            conds.append("d.status = ?")
+            conds.append("d.status = %s")
             params.append(status_val)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()

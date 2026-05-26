@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -23,8 +24,7 @@ TAB_STYLE = (
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -32,7 +32,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS customer (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT,
             last_name    TEXT,
             company_name TEXT,
@@ -254,7 +254,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
         conn = get_db()
         if search:
             rows = conn.execute(
-                "SELECT * FROM customer WHERE company_name LIKE ? OR last_name LIKE ? "
+                "SELECT * FROM customer WHERE company_name LIKE %s OR last_name LIKE %s "
                 "ORDER BY company_name, last_name, first_name",
                 (f"%{search}%", f"%{search}%")
             ).fetchall()
@@ -292,7 +292,7 @@ class CustomerEntry(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._row_ids):
             return
         conn = get_db()
-        c = conn.execute("SELECT * FROM customer WHERE id=?", (self._row_ids[row],)).fetchone()
+        c = conn.execute("SELECT * FROM customer WHERE id=%s", (self._row_ids[row],)).fetchone()
         conn.close()
         if not c:
             return
@@ -374,10 +374,10 @@ class CustomerEntry(QtWidgets.QMainWindow):
         cid = self._row_ids[row]
         conn = get_db()
         call_count = conn.execute(
-            "SELECT COUNT(*) FROM calls2 WHERE customer_id=?", (cid,)
+            "SELECT COUNT(*) FROM calls2 WHERE customer_id=%s", (cid,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this customer?"
+        msg = "Delete this customer%s"
         if call_count:
             msg += f"\n\nWarning: {call_count} service call(s) reference this customer. They will also be deleted."
         if (QtWidgets.QMessageBox.question(
@@ -385,8 +385,8 @@ class CustomerEntry(QtWidgets.QMainWindow):
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("DELETE FROM calls2 WHERE customer_id=?", (cid,))
-            conn.execute("DELETE FROM customer WHERE id=?", (cid,))
+            conn.execute("DELETE FROM calls2 WHERE customer_id=%s", (cid,))
+            conn.execute("DELETE FROM customer WHERE id=%s", (cid,))
             conn.commit()
             conn.close()
             self._clear_form()
@@ -399,9 +399,9 @@ class CustomerEntry(QtWidgets.QMainWindow):
             return
         cid = self._row_ids[row]
         conn = get_db()
-        cust = conn.execute("SELECT * FROM customer WHERE id=?", (cid,)).fetchone()
+        cust = conn.execute("SELECT * FROM customer WHERE id=%s", (cid,)).fetchone()
         calls = conn.execute(
-            "SELECT * FROM calls2 WHERE customer_id=? ORDER BY call_date DESC, call_time DESC",
+            "SELECT * FROM calls2 WHERE customer_id=%s ORDER BY call_date DESC, call_time DESC",
             (cid,)
         ).fetchall()
         conn.close()

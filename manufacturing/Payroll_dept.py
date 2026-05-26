@@ -3,14 +3,15 @@ Payroll_dept.py — Payroll Department
 Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report | Payroll History
 """
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from gl_utils import post_gl_entry
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 SS_RATE = 0.062
 MEDICARE_RATE = 0.0145
 DT_FMT = "%Y-%m-%d %H:%M:%S"
@@ -53,8 +54,7 @@ DED_CATEGORIES = ["Benefits", "Retirement", "Garnishment", "Other"]
 # ── DB ─────────────────────────────────────────────────────────────────────────
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -62,7 +62,7 @@ def init_db():
     conn = get_db()
     conn.executescript("""
         CREATE TABLE IF NOT EXISTS employee_pay (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             people_id      INTEGER NOT NULL UNIQUE REFERENCES people(id),
             pay_type       TEXT    NOT NULL DEFAULT 'hourly',
             pay_rate       REAL    NOT NULL DEFAULT 0.0,
@@ -70,7 +70,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS payroll_run (
-            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            id               SERIAL PRIMARY KEY,
             period_start     TEXT NOT NULL,
             period_end       TEXT NOT NULL,
             run_date         TEXT NOT NULL,
@@ -81,7 +81,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS payroll_entry (
-            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            id                  SERIAL PRIMARY KEY,
             run_id              INTEGER NOT NULL REFERENCES payroll_run(id),
             people_id           INTEGER NOT NULL REFERENCES people(id),
             regular_hours       REAL NOT NULL DEFAULT 0.0,
@@ -97,7 +97,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS payroll_deduction_type (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            id         SERIAL PRIMARY KEY,
             name       TEXT    NOT NULL,
             category   TEXT    DEFAULT 'Other',
             is_pre_tax INTEGER DEFAULT 1,
@@ -105,7 +105,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS employee_deduction (
-            id                INTEGER PRIMARY KEY AUTOINCREMENT,
+            id                SERIAL PRIMARY KEY,
             people_id         INTEGER NOT NULL REFERENCES people(id),
             deduction_type_id INTEGER NOT NULL REFERENCES payroll_deduction_type(id),
             calc_method       TEXT    DEFAULT 'flat',
@@ -117,7 +117,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS payroll_entry_deduction (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             entry_id       INTEGER NOT NULL REFERENCES payroll_entry(id) ON DELETE CASCADE,
             deduction_name TEXT    NOT NULL,
             is_pre_tax     INTEGER DEFAULT 1,
@@ -153,7 +153,7 @@ def _hours_from_timeclock(people_id, start_str, end_str):
     conn = get_db()
     rows = conn.execute("""
         SELECT clock_in, clock_out FROM time_clock
-        WHERE people_id=? AND clock_in>=? AND clock_in<=?
+        WHERE people_id=%s AND clock_in>=%s AND clock_in<=%s
           AND clock_out IS NOT NULL
     """, (people_id, start_str + " 00:00:00", end_str + " 23:59:59")).fetchall()
     conn.close()
@@ -233,7 +233,7 @@ def _export_csv(table: QtWidgets.QTableWidget, parent):
 _TAB_KEYS = {'pay': 0, 'payroll': 2, 'deductions': 1, 'paystub': 3, 'ytd': 4, 'history': 5}
 
 
-class PayrollDept(QtWidgets.QMainWindow):
+class PayrollDeptWidget(QtWidgets.QWidget):
 
     # Column indices for the run-payroll table
     _C_EMP = 0
@@ -249,14 +249,12 @@ class PayrollDept(QtWidgets.QMainWindow):
     _C_MED = 10
     _C_NET = 11
 
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Payroll Department")
-        self.resize(1280, 740)
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._pay_rate_row_ids = []
         self._run_people_ids = []
-        self._run_deductions = {}   # people_id → {'pre': float, 'post': float, 'items': list}
+        self._run_deductions = {}
         self._history_run_ids = []
         self._build_ui()
         self._load_pay_rates()
@@ -267,9 +265,7 @@ class PayrollDept(QtWidgets.QMainWindow):
     # ── UI construction ──────────────────────────────────────────────────────
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.setStyleSheet(TAB_STYLE)
@@ -845,7 +841,7 @@ class PayrollDept(QtWidgets.QMainWindow):
         if idx >= 0:
             self.pr_emp_combo.setCurrentIndex(idx)
         conn = get_db()
-        pay = conn.execute("SELECT * FROM employee_pay WHERE people_id=?", (pid,)).fetchone()
+        pay = conn.execute("SELECT * FROM employee_pay WHERE people_id=%s", (pid,)).fetchone()
         conn.close()
         if pay:
             self.pr_type_combo.setCurrentText(pay["pay_type"])
@@ -876,7 +872,7 @@ class PayrollDept(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute("""
             INSERT INTO employee_pay (people_id, pay_type, pay_rate, effective_date)
-            VALUES (?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s)
             ON CONFLICT(people_id) DO UPDATE SET
                 pay_type=excluded.pay_type,
                 pay_rate=excluded.pay_rate,
@@ -892,11 +888,11 @@ class PayrollDept(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Employee", "Select an employee first.")
             return
         if QtWidgets.QMessageBox.question(
-            self, "Confirm", "Remove pay rate for this employee?",
+            self, "Confirm", "Remove pay rate for this employee%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM employee_pay WHERE people_id=?", (pid,))
+            conn.execute("DELETE FROM employee_pay WHERE people_id=%s", (pid,))
             conn.commit()
             conn.close()
             self._pr_clear_form()
@@ -963,7 +959,7 @@ class PayrollDept(QtWidgets.QMainWindow):
         """
         params = []
         if pid:
-            q += " WHERE ed.people_id=?"
+            q += " WHERE ed.people_id=%s"
             params.append(pid)
         q += " ORDER BY p.last_name, p.first_name, dt.name"
         rows = conn.execute(q, params).fetchall()
@@ -1001,7 +997,7 @@ class PayrollDept(QtWidgets.QMainWindow):
         r = rows[0].row()
         tid = self.ded_type_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         conn = get_db()
-        row = conn.execute("SELECT * FROM payroll_deduction_type WHERE id=?", (tid,)).fetchone()
+        row = conn.execute("SELECT * FROM payroll_deduction_type WHERE id=%s", (tid,)).fetchone()
         conn.close()
         if row:
             self.dt_ef_name.setText(row["name"])
@@ -1017,7 +1013,7 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO payroll_deduction_type(name,category,is_pre_tax) VALUES(?,?,?)",
+            "INSERT INTO payroll_deduction_type(name,category,is_pre_tax) VALUES(%s,%s,%s)",
             (name, self.dt_ef_cat.currentText(), 1 if self.dt_ef_pretax.isChecked() else 0)
         )
         conn.commit()
@@ -1037,7 +1033,7 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE payroll_deduction_type SET name=?,category=?,is_pre_tax=? WHERE id=?",
+            "UPDATE payroll_deduction_type SET name=%s,category=%s,is_pre_tax=%s WHERE id=%s",
             (name, self.dt_ef_cat.currentText(), 1 if self.dt_ef_pretax.isChecked() else 0, tid)
         )
         conn.commit()
@@ -1051,11 +1047,11 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         tid = self.ded_type_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this deduction type? This will remove all employee assignments.",
+            self, "Delete", "Delete this deduction type%s This will remove all employee assignments.",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM payroll_deduction_type WHERE id=?", (tid,))
+            conn.execute("DELETE FROM payroll_deduction_type WHERE id=%s", (tid,))
             conn.commit()
             conn.close()
             self._refresh_ded_types()
@@ -1073,7 +1069,7 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         eid = self.ed_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         conn = get_db()
-        row = conn.execute("SELECT * FROM employee_deduction WHERE id=?", (eid,)).fetchone()
+        row = conn.execute("SELECT * FROM employee_deduction WHERE id=%s", (eid,)).fetchone()
         conn.close()
         if not row:
             return
@@ -1097,7 +1093,7 @@ class PayrollDept(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute(
             "INSERT INTO employee_deduction(people_id,deduction_type_id,calc_method,amount,is_active,notes) "
-            "VALUES(?,?,?,?,?,?)",
+            "VALUES(%s,%s,%s,%s,%s,%s)",
             (pid, tid, self.ed_ef_method.currentText(), self.ed_ef_amount.value(),
              1 if self.ed_ef_active.isChecked() else 0, self.ed_ef_notes.text().strip())
         )
@@ -1114,8 +1110,8 @@ class PayrollDept(QtWidgets.QMainWindow):
         eid = self.ed_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         conn = get_db()
         conn.execute(
-            "UPDATE employee_deduction SET people_id=?,deduction_type_id=?,calc_method=?,"
-            "amount=?,is_active=?,notes=? WHERE id=?",
+            "UPDATE employee_deduction SET people_id=%s,deduction_type_id=%s,calc_method=%s,"
+            "amount=%s,is_active=%s,notes=%s WHERE id=%s",
             (self.ed_ef_emp.currentData(), self.ed_ef_type.currentData(),
              self.ed_ef_method.currentText(), self.ed_ef_amount.value(),
              1 if self.ed_ef_active.isChecked() else 0,
@@ -1132,11 +1128,11 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         eid = self.ed_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         if QtWidgets.QMessageBox.question(
-            self, "Remove", "Remove this deduction assignment?",
+            self, "Remove", "Remove this deduction assignment%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM employee_deduction WHERE id=?", (eid,))
+            conn.execute("DELETE FROM employee_deduction WHERE id=%s", (eid,))
             conn.commit()
             conn.close()
             self._refresh_emp_deductions()
@@ -1158,7 +1154,7 @@ class PayrollDept(QtWidgets.QMainWindow):
             SELECT ed.calc_method, ed.amount, dt.name, dt.is_pre_tax
             FROM employee_deduction ed
             JOIN payroll_deduction_type dt ON dt.id=ed.deduction_type_id
-            WHERE ed.people_id=? AND ed.is_active=1
+            WHERE ed.people_id=%s AND ed.is_active=1
         """, (people_id,)).fetchall()
         conn.close()
         pre_total = post_total = 0.0
@@ -1327,9 +1323,9 @@ class PayrollDept(QtWidgets.QMainWindow):
         cur = conn.execute("""
             INSERT INTO payroll_run (period_start, period_end, run_date, pay_frequency,
                                      federal_tax_rate, state_tax_rate, status)
-            VALUES (?, ?, ?, ?, ?, ?, 'processed')
+            VALUES (%s, %s, %s, %s, %s, %s, 'processed') RETURNING id
         """, (start_str, end_str, datetime.now().strftime(DT_FMT), freq, fed_rate, state_rate))
-        run_id = cur.lastrowid
+        run_id = cur.fetchone()['id']
 
         def _v(r, col):
             it = self.run_table.item(r, col)
@@ -1343,19 +1339,19 @@ class PayrollDept(QtWidgets.QMainWindow):
                     (run_id, people_id, regular_hours, overtime_hours,
                      gross_pay, federal_tax, state_tax, social_security, medicare, net_pay,
                      pre_tax_deductions, post_tax_deductions)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
             """, (run_id, pid,
                   float(self.run_table.item(r, self._C_REG).text()),
                   float(self.run_table.item(r, self._C_OT).text()),
                   _v(r, self._C_GROSS), _v(r, self._C_FED), _v(r, self._C_ST),
                   _v(r, self._C_SS), _v(r, self._C_MED), _v(r, self._C_NET),
                   deds['pre'], deds['post']))
-            entry_id = entry_cur.lastrowid
+            entry_id = entry_cur.fetchone()['id']
 
             for item in deds['items']:
                 conn.execute(
                     "INSERT INTO payroll_entry_deduction(entry_id,deduction_name,is_pre_tax,amount) "
-                    "VALUES(?,?,?,?)",
+                    "VALUES(%s,%s,%s,%s)",
                     (entry_id, item["name"], item["is_pre_tax"], item["amount"])
                 )
             total_gross += _v(r, self._C_GROSS)
@@ -1415,7 +1411,7 @@ class PayrollDept(QtWidgets.QMainWindow):
         emps = conn.execute("""
             SELECT pe.id AS entry_id, p.first_name, p.last_name
             FROM payroll_entry pe JOIN people p ON p.id=pe.people_id
-            WHERE pe.run_id=? ORDER BY p.last_name, p.first_name
+            WHERE pe.run_id=%s ORDER BY p.last_name, p.first_name
         """, (run_id,)).fetchall()
         conn.close()
         for e in emps:
@@ -1436,10 +1432,10 @@ class PayrollDept(QtWidgets.QMainWindow):
             JOIN people p      ON p.id=pe.people_id
             JOIN payroll_run pr ON pr.id=pe.run_id
             LEFT JOIN employee_pay ep ON ep.people_id=pe.people_id
-            WHERE pe.id=?
+            WHERE pe.id=%s
         """, (entry_id,)).fetchone()
         ded_rows = conn.execute(
-            "SELECT * FROM payroll_entry_deduction WHERE entry_id=? ORDER BY is_pre_tax DESC, deduction_name",
+            "SELECT * FROM payroll_entry_deduction WHERE entry_id=%s ORDER BY is_pre_tax DESC, deduction_name",
             (entry_id,)
         ).fetchall()
         conn.close()
@@ -1551,11 +1547,11 @@ class PayrollDept(QtWidgets.QMainWindow):
             FROM payroll_entry pe
             JOIN people p      ON p.id=pe.people_id
             JOIN payroll_run pr ON pr.id=pe.run_id
-            WHERE strftime('%Y', pr.period_start)=?
+            WHERE strftime('%Y', pr.period_start)=%s
         """
         params = [str(year)]
         if pid:
-            q += " AND pe.people_id=?"
+            q += " AND pe.people_id=%s"
             params.append(pid)
         q += " GROUP BY pe.people_id ORDER BY p.last_name, p.first_name"
 
@@ -1661,11 +1657,11 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         run_id = self._history_run_ids[row]
         conn = get_db()
-        run = conn.execute("SELECT * FROM payroll_run WHERE id=?", (run_id,)).fetchone()
+        run = conn.execute("SELECT * FROM payroll_run WHERE id=%s", (run_id,)).fetchone()
         entries = conn.execute("""
             SELECT p.first_name, p.last_name, pe.*
             FROM payroll_entry pe JOIN people p ON p.id=pe.people_id
-            WHERE pe.run_id=?
+            WHERE pe.run_id=%s
             ORDER BY p.last_name, p.first_name
         """, (run_id,)).fetchall()
         conn.close()
@@ -1714,12 +1710,12 @@ class PayrollDept(QtWidgets.QMainWindow):
             return
         run_id = self._history_run_ids[row]
         if QtWidgets.QMessageBox.question(
-            self, "Void Run", "Permanently delete this payroll run and all its entries?",
+            self, "Void Run", "Permanently delete this payroll run and all its entries%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM payroll_entry WHERE run_id=?", (run_id,))
-            conn.execute("DELETE FROM payroll_run   WHERE id=?", (run_id,))
+            conn.execute("DELETE FROM payroll_entry WHERE run_id=%s", (run_id,))
+            conn.execute("DELETE FROM payroll_run   WHERE id=%s", (run_id,))
             conn.commit()
             conn.close()
             self._load_history()
@@ -1736,6 +1732,15 @@ class PayrollDept(QtWidgets.QMainWindow):
         elif idx == 4:  # YTD
             self._refresh_ytd_emp_combo()
             self._refresh_ytd()
+
+
+class PayrollDept(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Payroll Department")
+        self.resize(1280, 740)
+        _apply_blue_palette(self)
+        self.setCentralWidget(PayrollDeptWidget(initial_tab=initial_tab))
 
 
 def main():

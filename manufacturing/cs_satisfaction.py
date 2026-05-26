@@ -4,12 +4,13 @@ Tabs: CSAT Results | NPS Reports | Satisfaction Trends | Improvement Plans
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -32,8 +33,7 @@ LABEL_STYLE = "color:white;font-size:13px;"
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -41,7 +41,7 @@ def _init_db():
     with _conn() as con:
         con.execute("""
             CREATE TABLE IF NOT EXISTS cs_improvement_plan (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                id          SERIAL PRIMARY KEY,
                 title       TEXT NOT NULL,
                 description TEXT,
                 owner       TEXT,
@@ -136,20 +136,16 @@ class DateRangeBar(QtWidgets.QWidget):
         return self.dt_to.date().toString("yyyy-MM-dd")
 
 
-class CSSatisfactionWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Customer Satisfaction")
-        self.resize(1100, 720)
+class CSSatisfactionWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_palette(self)
         self._plan_current_id = None
         self._build_ui()
         self._run_all()
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(10, 8, 10, 8)
         root.setSpacing(6)
 
@@ -236,7 +232,7 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
                                 END) AS avg_res
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
-                WHERE c2.call_date BETWEEN ? AND ?
+                WHERE c2.call_date BETWEEN %s AND %s
                 GROUP BY c2.customer_id
                 ORDER BY comp_ct * 1.0 / COUNT(c2.id) DESC
             """, (f, t)).fetchall()
@@ -366,7 +362,7 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
                        SUM(c2.completion_box) AS comp_ct
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
-                WHERE c2.call_date BETWEEN ? AND ?
+                WHERE c2.call_date BETWEEN %s AND %s
                 GROUP BY c2.customer_id
                 HAVING COUNT(c2.id) > 0
             """, (f, t)).fetchall()
@@ -458,7 +454,7 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
                                 THEN julianday(completion_date) - julianday(call_date)
                                 END) AS avg_res
                 FROM calls2
-                WHERE call_date BETWEEN ? AND ?
+                WHERE call_date BETWEEN %s AND %s
                 GROUP BY month
                 ORDER BY month ASC
             """, (f, t)).fetchall()
@@ -605,7 +601,7 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
                 ).fetchall()
             else:
                 rows = con.execute(
-                    "SELECT * FROM cs_improvement_plan WHERE status=? ORDER BY target_date ASC",
+                    "SELECT * FROM cs_improvement_plan WHERE status=%s ORDER BY target_date ASC",
                     (status_filter,)
                 ).fetchall()
 
@@ -646,7 +642,7 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
             return
         self._plan_current_id = self._plan_ids[row]
         with _conn() as con:
-            rec = con.execute("SELECT * FROM cs_improvement_plan WHERE id=?",
+            rec = con.execute("SELECT * FROM cs_improvement_plan WHERE id=%s",
                               (self._plan_current_id,)).fetchone()
         if not rec:
             return
@@ -711,11 +707,11 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a plan first.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Confirm Delete", "Delete this improvement plan?",
+                self, "Confirm Delete", "Delete this improvement plan%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             with _conn() as con:
-                con.execute("DELETE FROM cs_improvement_plan WHERE id=?", (self._plan_current_id,))
+                con.execute("DELETE FROM cs_improvement_plan WHERE id=%s", (self._plan_current_id,))
             self._plan_clear()
             self._run_plans()
 
@@ -742,6 +738,15 @@ def _mk_lbl(text):
     w = QtWidgets.QLabel(text)
     w.setStyleSheet("color:white;font-size:12px;")
     return w
+
+
+class CSSatisfactionWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Customer Satisfaction")
+        self.resize(1100, 720)
+        _apply_palette(self)
+        self.setCentralWidget(CSSatisfactionWidget())
 
 
 if __name__ == "__main__":

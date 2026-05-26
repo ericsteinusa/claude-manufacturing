@@ -4,12 +4,13 @@ Tabs: Staff Directory | Performance Metrics | Staff Training | Staff Reports
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 CS_DEPT_ID = 3
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -33,8 +34,7 @@ LABEL_STYLE = "color:white;font-size:13px;"
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -42,7 +42,7 @@ def _init_db():
     with _conn() as con:
         con.execute("""
             CREATE TABLE IF NOT EXISTS cs_training (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                id          SERIAL PRIMARY KEY,
                 people_id   INTEGER,
                 topic       TEXT NOT NULL,
                 trainer     TEXT,
@@ -133,20 +133,16 @@ class DateRangeBar(QtWidgets.QWidget):
         return self.dt_to.date().toString("yyyy-MM-dd")
 
 
-class CSStaffMgmtWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("CS Staff Management")
-        self.resize(1100, 720)
+class CSStaffMgmtWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_palette(self)
         self._training_current_id = None
         self._build_ui()
         self._run_all()
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(10, 8, 10, 8)
         root.setSpacing(6)
 
@@ -210,7 +206,7 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
             rows = con.execute("""
                 SELECT p.first_name, p.last_name, p.email, p.city, p.state, p.zip_code, p.emp_id
                 FROM people p
-                WHERE p.dept_id = ?
+                WHERE p.dept_id = %s
                 ORDER BY p.last_name, p.first_name
             """, (CS_DEPT_ID,)).fetchall()
 
@@ -299,7 +295,7 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
         today = date.today().isoformat()
         with _conn() as con:
             rows = con.execute(
-                "SELECT * FROM calls2 WHERE call_date BETWEEN ? AND ?", (f, t)
+                "SELECT * FROM calls2 WHERE call_date BETWEEN %s AND %s", (f, t)
             ).fetchall()
             monthly = con.execute("""
                 SELECT strftime('%Y-%m', call_date) AS month,
@@ -307,7 +303,7 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
                        SUM(CASE WHEN completion_box=0 THEN 1 ELSE 0 END) AS open_ct,
                        SUM(completion_box) AS comp_ct
                 FROM calls2
-                WHERE call_date BETWEEN ? AND ?
+                WHERE call_date BETWEEN %s AND %s
                 GROUP BY month ORDER BY month DESC
             """, (f, t)).fetchall()
 
@@ -441,7 +437,7 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
     def _load_staff_combo(self):
         with _conn() as con:
             staff = con.execute(
-                "SELECT id, first_name, last_name FROM people WHERE dept_id=? ORDER BY last_name, first_name",
+                "SELECT id, first_name, last_name FROM people WHERE dept_id=%s ORDER BY last_name, first_name",
                 (CS_DEPT_ID,)
             ).fetchall()
         self.tr_staff.blockSignals(True)
@@ -483,7 +479,7 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
             return
         self._training_current_id = self._training_ids[row]
         with _conn() as con:
-            rec = con.execute("SELECT * FROM cs_training WHERE id=?",
+            rec = con.execute("SELECT * FROM cs_training WHERE id=%s",
                               (self._training_current_id,)).fetchone()
         if not rec:
             return
@@ -547,11 +543,11 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a record first.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Confirm Delete", "Delete this training record?",
+                self, "Confirm Delete", "Delete this training record%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             with _conn() as con:
-                con.execute("DELETE FROM cs_training WHERE id=?", (self._training_current_id,))
+                con.execute("DELETE FROM cs_training WHERE id=%s", (self._training_current_id,))
             self._tr_clear()
             self._run_training()
 
@@ -612,7 +608,7 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
                        SUM(c2.completion_box) AS comp_ct
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
-                WHERE c2.call_date BETWEEN ? AND ?
+                WHERE c2.call_date BETWEEN %s AND %s
                 GROUP BY c2.customer_id
                 ORDER BY total DESC
             """, (f, t)).fetchall()
@@ -648,6 +644,15 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
         self._run_metrics()
         self._run_training()
         self._run_reports()
+
+
+class CSStaffMgmtWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("CS Staff Management")
+        self.resize(1100, 720)
+        _apply_palette(self)
+        self.setCentralWidget(CSStaffMgmtWidget())
 
 
 if __name__ == "__main__":

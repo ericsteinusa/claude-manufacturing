@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -30,8 +31,7 @@ ECR_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -55,7 +55,7 @@ def _next_ecr_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM eng_design_review WHERE ecr_number LIKE ?",
+        "SELECT COUNT(*) FROM eng_design_review WHERE ecr_number LIKE %s",
         (f"ECR-{yr}-%",)
     ).fetchone()[0]
     conn.close()
@@ -143,7 +143,7 @@ class NewECRDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO eng_design_review"
                 " (ecr_number, title, project_id, requested_by, review_date, status, notes)"
-                " VALUES (?,?,?,?,?,?,?)",
+                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, title,
                  self.project_combo.currentData(),
                  self.requested_by.text().strip(),
@@ -151,9 +151,9 @@ class NewECRDialog(QtWidgets.QDialog):
                  self.status_combo.currentData(),
                  self.notes.toPlainText().strip())
             )
-            self.ecr_id = cur.lastrowid
+            self.ecr_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"ECR number '{num}' already exists.")
             conn.close()
@@ -249,10 +249,10 @@ class DesignReviewWidget(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New ECR", self._on_new),
-            ("Submit for Review", lambda: self._set_status("pending", "Submit for review?")),
-            ("Approve", lambda: self._set_status("approved", "Approve this design review?")),
-            ("Request Revision", lambda: self._set_status("revision_needed", "Request revision?")),
-            ("Reject", lambda: self._set_status("rejected", "Reject this design review?")),
+            ("Submit for Review", lambda: self._set_status("pending", "Submit for review%s")),
+            ("Approve", lambda: self._set_status("approved", "Approve this design review%s")),
+            ("Request Revision", lambda: self._set_status("revision_needed", "Request revision%s")),
+            ("Reject", lambda: self._set_status("rejected", "Reject this design review%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -269,10 +269,10 @@ class DesignReviewWidget(QtWidgets.QWidget):
         if status_val == "open":
             conds.append("d.status IN ('draft','pending')")
         elif status_val:
-            conds.append("d.status = ?")
+            conds.append("d.status = %s")
             params.append(status_val)
         if term:
-            conds.append("(d.ecr_number LIKE ? OR d.title LIKE ? OR d.requested_by LIKE ?)")
+            conds.append("(d.ecr_number LIKE %s OR d.title LIKE %s OR d.requested_by LIKE %s)")
             params += [f"%{term}%"] * 3
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
@@ -317,7 +317,7 @@ class DesignReviewWidget(QtWidgets.QWidget):
         rec = conn.execute(
             "SELECT d.*, p.project_number, p.title as proj_title"
             " FROM eng_design_review d LEFT JOIN eng_project p ON d.project_id = p.id"
-            " WHERE d.id = ?", (self._selected_id,)
+            " WHERE d.id = %s", (self._selected_id,)
         ).fetchone()
         conn.close()
         if not rec:
@@ -351,7 +351,7 @@ class DesignReviewWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE eng_design_review SET status = ? WHERE id = ?",
+            conn.execute("UPDATE eng_design_review SET status = %s WHERE id = %s",
                          (new_status, self._selected_id))
             conn.commit()
             conn.close()

@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox, PhotoImage
 from tkinter import *
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import subprocess
 
 root = None
@@ -13,12 +15,12 @@ def validate_credentials():
     email = email_entry.get()
     password = password_entry.get()
 
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         "SELECT passwd.password FROM passwd "
         "JOIN people ON passwd.people_id = people.id "
-        "WHERE people.email = ? AND passwd.password = ?",
+        "WHERE people.email = %s AND passwd.password = %s",
         (email, password),
     )
     result = cursor.fetchone()
@@ -29,7 +31,7 @@ def validate_credentials():
         subprocess.Popen(["python", "Company_main_menu.py"])
     else:
         messagebox.showerror("Error", "Invalid username or Password.")
-        if messagebox.askyesno("Register", "Do you want to register as a new user?"):
+        if messagebox.askyesno("Register", "Do you want to register as a new user%s"):
             subprocess.Popen(["python", "TK_Registration_form.py"])
         else:
             messagebox.showinfo("Info", "Please try again later.")

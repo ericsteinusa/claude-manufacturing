@@ -4,17 +4,17 @@ Tabs: Chart of Accounts | Journal Entries | Trial Balance | Ledger View
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 # ── database ─────────────────────────────────────────────────────────────────
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -22,7 +22,7 @@ def init_db():
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS gl_account (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             account_number TEXT    NOT NULL UNIQUE,
             account_name   TEXT    NOT NULL,
             account_type   TEXT    NOT NULL,   -- Asset/Liability/Equity/Revenue/Expense/COGS
@@ -32,7 +32,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS gl_journal (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             journal_date TEXT    NOT NULL,
             reference    TEXT    DEFAULT '',
             description  TEXT    DEFAULT '',
@@ -42,7 +42,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS gl_journal_line (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            id          SERIAL PRIMARY KEY,
             journal_id  INTEGER NOT NULL REFERENCES gl_journal(id) ON DELETE CASCADE,
             account_id  INTEGER NOT NULL REFERENCES gl_account(id),
             debit       REAL    DEFAULT 0.0,
@@ -109,7 +109,7 @@ def _seed_coa(con):
         ("7900", "Other Expense", "Expense", "Other"),
     ]
     con.executemany(
-        "INSERT INTO gl_account(account_number,account_name,account_type,account_sub) VALUES(?,?,?,?)",
+        "INSERT INTO gl_account(account_number,account_name,account_type,account_sub) VALUES(%s,%s,%s,%s)",
         accounts
     )
 
@@ -359,7 +359,7 @@ class JournalDialog(QtWidgets.QDialog):
 
     def _load_journal(self, jid):
         with _conn() as con:
-            j = con.execute("SELECT * FROM gl_journal WHERE id=?", (jid,)).fetchone()
+            j = con.execute("SELECT * FROM gl_journal WHERE id=%s", (jid,)).fetchone()
             if not j:
                 return
             self.ef_date.setDate(QtCore.QDate.fromString(j["journal_date"], "yyyy-MM-dd"))
@@ -367,7 +367,7 @@ class JournalDialog(QtWidgets.QDialog):
             self.ef_desc.setText(j["description"] or "")
             self.ef_by.setText(j["created_by"] or "")
             lines = con.execute(
-                "SELECT * FROM gl_journal_line WHERE journal_id=? ORDER BY id", (jid,)
+                "SELECT * FROM gl_journal_line WHERE journal_id=%s ORDER BY id", (jid,)
             ).fetchall()
         # clear default lines and reload
         while self.tbl.rowCount():
@@ -427,21 +427,21 @@ class JournalDialog(QtWidgets.QDialog):
             if self._journal_id:
                 # update
                 con.execute(
-                    "UPDATE gl_journal SET journal_date=?,reference=?,description=?,posted=?,created_by=? WHERE id=?",
+                    "UPDATE gl_journal SET journal_date=%s,reference=%s,description=%s,posted=%s,created_by=%s WHERE id=%s",
                     (jdate, self.ef_ref.text().strip(), self.ef_desc.text().strip(),
                      1 if post else 0, self.ef_by.text().strip(), self._journal_id)
                 )
-                con.execute("DELETE FROM gl_journal_line WHERE journal_id=?", (self._journal_id,))
+                con.execute("DELETE FROM gl_journal_line WHERE journal_id=%s", (self._journal_id,))
                 jid = self._journal_id
             else:
                 cur = con.execute(
-                    "INSERT INTO gl_journal(journal_date,reference,description,posted,created_by) VALUES(?,?,?,?,?)",
+                    "INSERT INTO gl_journal(journal_date,reference,description,posted,created_by) VALUES(%s,%s,%s,%s,%s) RETURNING id",
                     (jdate, self.ef_ref.text().strip(), self.ef_desc.text().strip(),
                      1 if post else 0, self.ef_by.text().strip())
                 )
-                jid = cur.lastrowid
+                jid = cur.fetchone()['id']
             con.executemany(
-                "INSERT INTO gl_journal_line(journal_id,account_id,debit,credit,memo) VALUES(?,?,?,?,?)",
+                "INSERT INTO gl_journal_line(journal_id,account_id,debit,credit,memo) VALUES(%s,%s,%s,%s,%s)",
                 [(jid, aid, d, c, memo) for aid, d, c, memo in lines]
             )
         self.accept()
@@ -463,26 +463,26 @@ _FS_INNER_KEYS = {
 }
 
 
-class GeneralLedgerWindow(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
+class GeneralLedgerWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         init_db()
-        self.setWindowTitle("General Ledger")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
         self._refresh_coa()
         self._refresh_journals()
-        self.statusBar().showMessage("Ready")
         if initial_tab in _TAB_KEYS:
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
             if initial_tab in _FS_INNER_KEYS:
                 self.fs_inner.setCurrentIndex(_FS_INNER_KEYS[initial_tab])
 
+    def statusBar(self):
+        class _Sb:
+            def showMessage(self, *a): pass
+        return _Sb()
+
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
 
         # title
@@ -598,11 +598,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         where = []
         txt = self.coa_search.text().strip()
         if txt:
-            where.append("(account_number LIKE ? OR account_name LIKE ?)")
+            where.append("(account_number LIKE %s OR account_name LIKE %s)")
             params += [f"%{txt}%", f"%{txt}%"]
         t = self.coa_type_filter.currentText()
         if t != "All Types":
-            where.append("account_type=?")
+            where.append("account_type=%s")
             params.append(t)
         if self.coa_active_filter.isChecked():
             where.append("is_active=1")
@@ -667,9 +667,9 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             with _conn() as con:
                 con.execute(
                     "INSERT INTO gl_account(account_number,account_name,account_type,account_sub,is_active,notes) "
-                    "VALUES(?,?,?,?,?,?)", (num, name, typ, sub, act, notes)
+                    "VALUES(%s,%s,%s,%s,%s,%s)", (num, name, typ, sub, act, notes)
                 )
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"Account # {num} already exists.")
             self.statusBar().showMessage(f"Duplicate: Account # {num} already exists")
             return
@@ -695,8 +695,8 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             return
         with _conn() as con:
             con.execute(
-                "UPDATE gl_account SET account_number=?,account_name=?,account_type=?,"
-                "account_sub=?,is_active=?,notes=? WHERE id=?",
+                "UPDATE gl_account SET account_number=%s,account_name=%s,account_type=%s,"
+                "account_sub=%s,is_active=%s,notes=%s WHERE id=%s",
                 (num, name, typ, sub, act, notes, aid)
             )
         self._refresh_coa()
@@ -708,9 +708,9 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         if aid is None:
             return
         with _conn() as con:
-            cur = con.execute("SELECT is_active FROM gl_account WHERE id=?", (aid,)).fetchone()
+            cur = con.execute("SELECT is_active FROM gl_account WHERE id=%s", (aid,)).fetchone()
             new_val = 0 if cur["is_active"] else 1
-            con.execute("UPDATE gl_account SET is_active=? WHERE id=?", (new_val, aid))
+            con.execute("UPDATE gl_account SET is_active=%s WHERE id=%s", (new_val, aid))
         self._refresh_coa()
         self.statusBar().showMessage("Account active status toggled")
 
@@ -802,7 +802,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
     def _refresh_journals(self):
         q = ("SELECT j.*, "
              "(SELECT COUNT(*) FROM gl_journal_line WHERE journal_id=j.id) AS line_count "
-             "FROM gl_journal j WHERE j.journal_date>=? AND j.journal_date<=?")
+             "FROM gl_journal j WHERE j.journal_date>=%s AND j.journal_date<=%s")
         params = [self.je_from.date().toString("yyyy-MM-dd"),
                   self.je_to.date().toString("yyyy-MM-dd")]
         s = self.je_status_filter.currentText()
@@ -842,7 +842,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                 "SELECT l.*, a.account_number, a.account_name, a.account_type "
                 "FROM gl_journal_line l "
                 "JOIN gl_account a ON a.id=l.account_id "
-                "WHERE l.journal_id=? ORDER BY l.id", (jid,)
+                "WHERE l.journal_id=%s ORDER BY l.id", (jid,)
             ).fetchall()
         self.je_lines_tbl.setRowCount(0)
         td = tc = 0.0
@@ -900,7 +900,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
         # check balance
         with _conn() as con:
             agg = con.execute(
-                "SELECT SUM(debit) AS td, SUM(credit) AS tc FROM gl_journal_line WHERE journal_id=?",
+                "SELECT SUM(debit) AS td, SUM(credit) AS tc FROM gl_journal_line WHERE journal_id=%s",
                 (jid,)
             ).fetchone()
         td = agg["td"] or 0
@@ -912,7 +912,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             )
             return
         with _conn() as con:
-            con.execute("UPDATE gl_journal SET posted=1 WHERE id=?", (jid,))
+            con.execute("UPDATE gl_journal SET posted=1 WHERE id=%s", (jid,))
         self._refresh_journals()
 
     def _on_je_delete(self):
@@ -923,11 +923,11 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Posted", "Posted entries cannot be deleted.")
             return
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this draft journal entry?",
+            self, "Delete", "Delete this draft journal entry%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM gl_journal WHERE id=?", (jid,))
+                con.execute("DELETE FROM gl_journal WHERE id=%s", (jid,))
             self._refresh_journals()
 
     # ── Trial Balance tab ─────────────────────────────────────────────────────
@@ -992,7 +992,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             FROM gl_account a
             LEFT JOIN gl_journal_line l ON l.account_id=a.id
             LEFT JOIN gl_journal j ON j.id=l.journal_id
-                AND j.journal_date>=? AND j.journal_date<=?
+                AND j.journal_date>=%s AND j.journal_date<=%s
                 {posted_clause}
             WHERE a.is_active=1
             GROUP BY a.id
@@ -1118,14 +1118,14 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                    l.debit, l.credit
             FROM gl_journal_line l
             JOIN gl_journal j ON j.id=l.journal_id
-            WHERE l.account_id=?
-              AND j.journal_date>=? AND j.journal_date<=?
+            WHERE l.account_id=%s
+              AND j.journal_date>=%s AND j.journal_date<=%s
               {posted_clause}
             ORDER BY j.journal_date, j.id
         """
         with _conn() as con:
             # get account type for natural balance direction
-            acct = con.execute("SELECT account_type FROM gl_account WHERE id=?", (aid,)).fetchone()
+            acct = con.execute("SELECT account_type FROM gl_account WHERE id=%s", (aid,)).fetchone()
             rows = con.execute(sql, (aid, d0, d1)).fetchall()
 
         acct_type = acct["account_type"] if acct else "Asset"
@@ -1336,7 +1336,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             FROM gl_account a
             LEFT JOIN gl_journal_line l ON l.account_id=a.id
             LEFT JOIN gl_journal j ON j.id=l.journal_id
-                AND j.journal_date>=? AND j.journal_date<=? {pc}
+                AND j.journal_date>=%s AND j.journal_date<=%s {pc}
             WHERE a.is_active=1
               AND a.account_type IN ('Revenue','COGS','Expense')
             GROUP BY a.id ORDER BY a.account_number
@@ -1399,7 +1399,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             FROM gl_account a
             LEFT JOIN gl_journal_line l ON l.account_id=a.id
             LEFT JOIN gl_journal j ON j.id=l.journal_id
-                AND j.journal_date<=? {pc}
+                AND j.journal_date<=%s {pc}
             WHERE a.is_active=1
               AND a.account_type IN ('Asset','Liability','Equity')
             GROUP BY a.id ORDER BY a.account_number
@@ -1411,7 +1411,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             FROM gl_account a
             LEFT JOIN gl_journal_line l ON l.account_id=a.id
             LEFT JOIN gl_journal j ON j.id=l.journal_id
-                AND j.journal_date>=? AND j.journal_date<=? {pc}
+                AND j.journal_date>=%s AND j.journal_date<=%s {pc}
             WHERE a.is_active=1
               AND a.account_type IN ('Revenue','COGS','Expense')
             GROUP BY a.account_type
@@ -1634,7 +1634,7 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
                        l.debit, l.credit, l.id as line_id
                 FROM gl_journal_line l
                 JOIN gl_journal j ON j.id = l.journal_id
-                WHERE l.account_id = ? AND j.journal_date <= ?
+                WHERE l.account_id = %s AND j.journal_date <= %s
                 ORDER BY j.journal_date, j.id
             """, (acct_id, stmt_date)).fetchall()
         self.recon_tbl.setRowCount(0)
@@ -1683,6 +1683,15 @@ class GeneralLedgerWindow(QtWidgets.QMainWindow):
             f"Statement Balance: ${stmt_bal:,.2f}  |  Cleared Balance: ${cleared:,.2f}  |  "
             f"<span style='color:{color};font-weight:bold;'>Difference: ${diff:,.2f}</span>"
         )
+
+
+class GeneralLedgerWindow(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("General Ledger")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self.setCentralWidget(GeneralLedgerWidget(initial_tab=initial_tab))
 
 
 # ── entry point ───────────────────────────────────────────────────────────────

@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 
 
 # Function to check if the name exists in the database
@@ -12,11 +14,11 @@ def check_name():
         return
 
     # Connect to SQLite3 database
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # Query to check if the name exists
-    cursor.execute("SELECT * FROM people WHERE email = ?", (name_to_check,))
+    cursor.execute("SELECT * FROM people WHERE email = %s", (name_to_check,))
     result = cursor.fetchone()
 
     if result:

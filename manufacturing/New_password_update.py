@@ -1,4 +1,6 @@
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from password import Ui_MainWindow  # Import the generated Python file
@@ -15,11 +17,11 @@ class MainApp(QMainWindow):
 
     def initialize_database(self):
         # Connect to SQLite3 database and create table if it doesn't exist
-        conn = sqlite3.connect("company.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS people (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
             ID interger NOT NULL,
@@ -40,14 +42,14 @@ class MainApp(QMainWindow):
 
 
 def check_name(self):
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     email = self.ui.email_lineEdit.text()
 
     if not email.strip():
         QMessageBox.showwarning("Input Error", "Please enter your email.")
     else:
-        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = ?", (email,))
+        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = %s", (email,))
         result = cursor.fetchone()
         if result:
             # id = result[0]
@@ -61,7 +63,7 @@ def check_name(self):
 '''
 def save_data(self):
     # Get input data from the form
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     email = self.ui.email_lineEdit.text()
     password = self.ui.passwd_lineEdit.text()
@@ -72,7 +74,7 @@ def save_data(self):
         return
 
     # Save data to SQLite3 database
-    cursor.execute("UPDATE passwd SET password = ? WHERE id = ?", (password, id))
+    cursor.execute("UPDATE passwd SET password = %s WHERE id = %s", (password, id))
     QMessageBox.showinfo("Update Status", "Password updated successfully!")
 
     self.ui.email_lineEdit.clear()

@@ -1,10 +1,11 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -32,8 +33,7 @@ PO_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -41,7 +41,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS supplier (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT NOT NULL,
             last_name    TEXT NOT NULL,
             company_name TEXT NOT NULL,
@@ -55,7 +55,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS purchase_order (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            id            SERIAL PRIMARY KEY,
             po_number     TEXT NOT NULL UNIQUE,
             supplier_id   INTEGER NOT NULL REFERENCES supplier(id),
             order_date    TEXT NOT NULL,
@@ -66,7 +66,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS po_item (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             po_id        INTEGER NOT NULL REFERENCES purchase_order(id),
             description  TEXT NOT NULL,
             product_id   INTEGER,
@@ -109,7 +109,7 @@ def _supplier_display(row):
 def _next_po_num():
     yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE ?",
+    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s",
                      (f"PO-{yr}-%",)).fetchone()[0]
     conn.close()
     return f"PO-{yr}-{n + 1:04d}"
@@ -202,7 +202,7 @@ class NewPODialog(QtWidgets.QDialog):
             conn.execute("""
                 INSERT INTO purchase_order
                     (po_number, supplier_id, order_date, expected_date, status, notes)
-                VALUES (?,?,?,?,?,?)
+                VALUES (%s,%s,%s,%s,%s,%s)
             """, (self.po_num.text().strip(),
                   self.supp_combo.currentData(),
                   self.order_date.date().toString("yyyy-MM-dd"),
@@ -210,7 +210,7 @@ class NewPODialog(QtWidgets.QDialog):
                   "open",
                   self.notes.text().strip() or None))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "PO number already exists.")
             conn.close()
             return
@@ -259,7 +259,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
             products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
             for p in products:
                 self.prod_combo.addItem(p["name"], p["id"])
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
         conn.close()
         self.prod_combo.currentIndexChanged.connect(self._on_product_changed)
@@ -293,13 +293,13 @@ class AddLineItemDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         try:
-            p = conn.execute("SELECT name, purchase_price FROM product WHERE id=?", (pid,)).fetchone()
+            p = conn.execute("SELECT name, purchase_price FROM product WHERE id=%s", (pid,)).fetchone()
             if p:
                 if not self.desc.text().strip():
                     self.desc.setText(p["name"])
                 if p["purchase_price"]:
                     self.price.setValue(float(p["purchase_price"]))
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
         conn.close()
 
@@ -311,7 +311,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             INSERT INTO po_item (po_id, description, product_id, qty_ordered, unit_price)
-            VALUES (?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s)
         """, (self._po_id, desc, self.prod_combo.currentData(),
               self.qty.value(), self.price.value()))
         conn.commit()
@@ -333,11 +333,11 @@ class ReceivePODialog(QtWidgets.QDialog):
         conn = get_db()
         po = conn.execute(
             "SELECT po.*, s.first_name, s.last_name, s.company_name "
-            "FROM purchase_order po JOIN supplier s ON s.id=po.supplier_id WHERE po.id=?",
+            "FROM purchase_order po JOIN supplier s ON s.id=po.supplier_id WHERE po.id=%s",
             (self._po_id,)
         ).fetchone()
         items = conn.execute(
-            "SELECT * FROM po_item WHERE po_id=? ORDER BY id", (self._po_id,)
+            "SELECT * FROM po_item WHERE po_id=%s ORDER BY id", (self._po_id,)
         ).fetchall()
         conn.close()
 
@@ -399,7 +399,7 @@ class ReceivePODialog(QtWidgets.QDialog):
         today = date.today().isoformat()
         conn = get_db()
         po_num = conn.execute(
-            "SELECT po_number FROM purchase_order WHERE id=?", (self._po_id,)
+            "SELECT po_number FROM purchase_order WHERE id=%s", (self._po_id,)
         ).fetchone()["po_number"]
 
         for item_id, product_id, spin in self._spins:
@@ -407,31 +407,31 @@ class ReceivePODialog(QtWidgets.QDialog):
             if qty <= 0:
                 continue
             conn.execute(
-                "UPDATE po_item SET qty_received = qty_received + ? WHERE id=?",
+                "UPDATE po_item SET qty_received = qty_received + %s WHERE id=%s",
                 (qty, item_id))
             if product_id:
                 conn.execute(
-                    "UPDATE product SET amount = amount + ? WHERE id=?",
+                    "UPDATE product SET amount = amount + %s WHERE id=%s",
                     (qty, product_id))
                 try:
                     conn.execute("""
                         INSERT INTO inventory_transaction
                             (product_id, trans_date, trans_type, quantity, reference, notes)
-                        VALUES (?,?,?,?,?,?)
+                        VALUES (%s,%s,%s,%s,%s,%s)
                     """, (product_id, today, "receipt", qty, po_num,
                           f"Received from PO {po_num}"))
-                except sqlite3.OperationalError:
+                except psycopg2.OperationalError:
                     pass
 
         all_items = conn.execute(
-            "SELECT qty_ordered, qty_received FROM po_item WHERE po_id=?",
+            "SELECT qty_ordered, qty_received FROM po_item WHERE po_id=%s",
             (self._po_id,)
         ).fetchall()
         if all_items:
             all_recv = all(i["qty_received"] >= i["qty_ordered"] for i in all_items)
             any_recv = any(i["qty_received"] > 0 for i in all_items)
             new_status = "received" if all_recv else ("partial" if any_recv else "open")
-            conn.execute("UPDATE purchase_order SET status=? WHERE id=?",
+            conn.execute("UPDATE purchase_order SET status=%s WHERE id=%s",
                          (new_status, self._po_id))
         conn.commit()
         conn.close()
@@ -683,7 +683,7 @@ class Purchasing(QtWidgets.QMainWindow):
         conn = get_db()
         if search:
             rows = conn.execute(
-                "SELECT * FROM supplier WHERE company_name LIKE ? OR last_name LIKE ? "
+                "SELECT * FROM supplier WHERE company_name LIKE %s OR last_name LIKE %s "
                 "ORDER BY company_name, last_name, first_name",
                 (f"%{search}%", f"%{search}%")
             ).fetchall()
@@ -735,7 +735,7 @@ class Purchasing(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._supp_row_ids):
             return
         conn = get_db()
-        s = conn.execute("SELECT * FROM supplier WHERE id=?",
+        s = conn.execute("SELECT * FROM supplier WHERE id=%s",
                          (self._supp_row_ids[row],)).fetchone()
         conn.close()
         if not s:
@@ -818,10 +818,10 @@ class Purchasing(QtWidgets.QMainWindow):
         sid = self._supp_row_ids[row]
         conn = get_db()
         po_count = conn.execute(
-            "SELECT COUNT(*) FROM purchase_order WHERE supplier_id=?", (sid,)
+            "SELECT COUNT(*) FROM purchase_order WHERE supplier_id=%s", (sid,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this supplier?"
+        msg = "Delete this supplier%s"
         if po_count:
             msg += (f"\n\nWarning: {po_count} purchase order(s) reference this supplier."
                     " They will also be deleted.")
@@ -831,11 +831,11 @@ class Purchasing(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             po_ids = [r[0] for r in conn.execute(
-                "SELECT id FROM purchase_order WHERE supplier_id=?", (sid,)).fetchall()]
+                "SELECT id FROM purchase_order WHERE supplier_id=%s", (sid,)).fetchall()]
             for pid in po_ids:
-                conn.execute("DELETE FROM po_item WHERE po_id=?", (pid,))
-            conn.execute("DELETE FROM purchase_order WHERE supplier_id=?", (sid,))
-            conn.execute("DELETE FROM supplier WHERE id=?", (sid,))
+                conn.execute("DELETE FROM po_item WHERE po_id=%s", (pid,))
+            conn.execute("DELETE FROM purchase_order WHERE supplier_id=%s", (sid,))
+            conn.execute("DELETE FROM supplier WHERE id=%s", (sid,))
             conn.commit()
             conn.close()
             self._supp_clear()
@@ -858,14 +858,14 @@ class Purchasing(QtWidgets.QMainWindow):
             "FROM purchase_order po "
             "JOIN supplier s ON s.id=po.supplier_id "
             "LEFT JOIN po_item pi ON pi.po_id=po.id "
-            "WHERE po.order_date BETWEEN ? AND ?"
+            "WHERE po.order_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if sid:
-            q += " AND po.supplier_id=?"
+            q += " AND po.supplier_id=%s"
             params.append(sid)
         if status != "(all status)":
-            q += " AND po.status=?"
+            q += " AND po.status=%s"
             params.append(status)
         q += " GROUP BY po.id ORDER BY po.order_date DESC"
         rows = conn.execute(q, params).fetchall()
@@ -912,7 +912,7 @@ class Purchasing(QtWidgets.QMainWindow):
             SELECT pi.*, p.name AS product_name
             FROM po_item pi
             LEFT JOIN product p ON p.id = pi.product_id
-            WHERE pi.po_id=? ORDER BY pi.id
+            WHERE pi.po_id=%s ORDER BY pi.id
         """, (po_id,)).fetchall()
         conn.close()
 
@@ -946,7 +946,7 @@ class Purchasing(QtWidgets.QMainWindow):
         po_id = self._po_row_ids[row]
         conn = get_db()
         status = conn.execute(
-            "SELECT status FROM purchase_order WHERE id=?", (po_id,)
+            "SELECT status FROM purchase_order WHERE id=%s", (po_id,)
         ).fetchone()["status"]
         conn.close()
         if status in ("received", "cancelled"):
@@ -969,10 +969,10 @@ class Purchasing(QtWidgets.QMainWindow):
         po_id = self._po_row_ids[row]
         conn = get_db()
         po = conn.execute(
-            "SELECT status FROM purchase_order WHERE id=?", (po_id,)
+            "SELECT status FROM purchase_order WHERE id=%s", (po_id,)
         ).fetchone()
         item_count = conn.execute(
-            "SELECT COUNT(*) FROM po_item WHERE po_id=?", (po_id,)
+            "SELECT COUNT(*) FROM po_item WHERE po_id=%s", (po_id,)
         ).fetchone()[0]
         conn.close()
         if po["status"] in ("received", "cancelled"):
@@ -999,18 +999,18 @@ class Purchasing(QtWidgets.QMainWindow):
         po_id = self._po_row_ids[row]
         conn = get_db()
         status = conn.execute(
-            "SELECT status FROM purchase_order WHERE id=?", (po_id,)
+            "SELECT status FROM purchase_order WHERE id=%s", (po_id,)
         ).fetchone()["status"]
         conn.close()
         if status == "cancelled":
             QtWidgets.QMessageBox.information(self, "Already Cancelled", "PO is already cancelled.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Cancel PO", "Mark this PO as cancelled?",
+                self, "Cancel PO", "Mark this PO as cancelled%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("UPDATE purchase_order SET status='cancelled' WHERE id=?", (po_id,))
+            conn.execute("UPDATE purchase_order SET status='cancelled' WHERE id=%s", (po_id,))
             conn.commit()
             conn.close()
             self._refresh_pos()

@@ -1,11 +1,12 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from gl_utils import post_gl_entry, gl_accounts_by_type
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -32,8 +33,7 @@ STATUS_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -41,7 +41,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS vendors (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             vendor_name  TEXT NOT NULL,
             contact_name TEXT,
             phone        TEXT,
@@ -54,7 +54,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ap_invoice (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             vendor_id      INTEGER NOT NULL REFERENCES vendors(id),
             invoice_number TEXT NOT NULL UNIQUE,
             invoice_date   TEXT NOT NULL,
@@ -66,7 +66,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ap_payment (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             invoice_id     INTEGER NOT NULL REFERENCES ap_invoice(id),
             payment_date   TEXT NOT NULL,
             amount         REAL NOT NULL,
@@ -77,7 +77,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS expense_report (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             submitted_by TEXT NOT NULL,
             description  TEXT DEFAULT '',
             amount       REAL NOT NULL DEFAULT 0.0,
@@ -114,8 +114,8 @@ def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.
 
 def _invoice_balance(invoice_id):
     conn = get_db()
-    inv = conn.execute("SELECT amount FROM ap_invoice WHERE id=?", (invoice_id,)).fetchone()
-    paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=?",
+    inv = conn.execute("SELECT amount FROM ap_invoice WHERE id=%s", (invoice_id,)).fetchone()
+    paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=%s",
                         (invoice_id,)).fetchone()[0]
     conn.close()
     return (inv["amount"] - paid) if inv else 0.0
@@ -124,7 +124,7 @@ def _invoice_balance(invoice_id):
 def _next_inv_num():
     yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM ap_invoice WHERE invoice_number LIKE ?",
+    n = conn.execute("SELECT COUNT(*) FROM ap_invoice WHERE invoice_number LIKE %s",
                      (f"AP-{yr}-%",)).fetchone()[0]
     conn.close()
     return f"AP-{yr}-{n + 1:04d}"
@@ -239,11 +239,11 @@ class NewInvoiceDialog(QtWidgets.QDialog):
         try:
             conn.execute("""
                 INSERT INTO ap_invoice (vendor_id, invoice_number, invoice_date, due_date, amount, description)
-                VALUES (?,?,?,?,?,?)
+                VALUES (%s,%s,%s,%s,%s,%s)
             """, (self.vendor_combo.currentData(), inv_num, inv_date,
                   self.due_date.date().toString("yyyy-MM-dd"), amount, desc))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists.")
             conn.close()
             return
@@ -278,9 +278,9 @@ class RecordPaymentDialog(QtWidgets.QDialog):
     def _build_ui(self):
         conn = get_db()
         inv = conn.execute(
-            "SELECT ai.*, v.vendor_name FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=?",
+            "SELECT ai.*, v.vendor_name FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=%s",
             (self._invoice_id,)).fetchone()
-        paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=?",
+        paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=%s",
                             (self._invoice_id,)).fetchone()[0]
         conn.close()
         self._balance = inv["amount"] - paid
@@ -350,17 +350,17 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         pay_date = self.pay_date.date().toString("yyyy-MM-dd")
         ref_text = self.ref.text().strip() or None
         conn = get_db()
-        conn.execute("INSERT INTO ap_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (?,?,?,?,?)",
+        conn.execute("INSERT INTO ap_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (%s,%s,%s,%s,%s)",
                      (self._invoice_id, pay_date, amount, self.method.currentText(), ref_text))
-        new_paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=?",
+        new_paid = conn.execute("SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=%s",
                                 (self._invoice_id,)).fetchone()[0]
         inv = conn.execute(
             "SELECT ai.amount, ai.invoice_number, v.vendor_name "
-            "FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=?",
+            "FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=%s",
             (self._invoice_id,)
         ).fetchone()
         new_status = "paid" if abs(new_paid - inv["amount"]) < 0.01 else "partial"
-        conn.execute("UPDATE ap_invoice SET status=? WHERE id=?", (new_status, self._invoice_id))
+        conn.execute("UPDATE ap_invoice SET status=%s WHERE id=%s", (new_status, self._invoice_id))
         conn.commit()
         conn.close()
         # Post draft GL entry: DR Accounts Payable (2000), CR Cash (1000)
@@ -389,11 +389,9 @@ EXP_CATEGORIES = ["Travel", "Meals", "Office Supplies", "Equipment", "Software",
                   "Training", "Marketing", "Utilities", "Other"]
 
 
-class AccountsPayable(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Accounts Payable")
-        self.resize(1150, 700)
+class AccountsPayableWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._vendor_row_ids = []
         self._invoice_row_ids = []
@@ -406,9 +404,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.setStyleSheet(TAB_STYLE)
@@ -672,7 +668,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         self.vend_search.blockSignals(False)
         conn = get_db()
         if search:
-            rows = conn.execute("SELECT * FROM vendors WHERE vendor_name LIKE ? ORDER BY vendor_name",
+            rows = conn.execute("SELECT * FROM vendors WHERE vendor_name LIKE %s ORDER BY vendor_name",
                                 (f"%{search}%",)).fetchall()
         else:
             rows = conn.execute("SELECT * FROM vendors ORDER BY vendor_name").fetchall()
@@ -708,7 +704,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._vendor_row_ids):
             return
         conn = get_db()
-        v = conn.execute("SELECT * FROM vendors WHERE id=?", (self._vendor_row_ids[row],)).fetchone()
+        v = conn.execute("SELECT * FROM vendors WHERE id=%s", (self._vendor_row_ids[row],)).fetchone()
         conn.close()
         if not v:
             return
@@ -769,18 +765,18 @@ class AccountsPayable(QtWidgets.QMainWindow):
             return
         vid = self._vendor_row_ids[row]
         conn = get_db()
-        inv_count = conn.execute("SELECT COUNT(*) FROM ap_invoice WHERE vendor_id=?", (vid,)).fetchone()[0]
+        inv_count = conn.execute("SELECT COUNT(*) FROM ap_invoice WHERE vendor_id=%s", (vid,)).fetchone()[0]
         conn.close()
-        msg = "Delete this vendor?"
+        msg = "Delete this vendor%s"
         if inv_count:
             msg += f"\n\nWarning: {inv_count} invoice(s) reference this vendor. They will also be deleted."
         if QtWidgets.QMessageBox.question(self, "Confirm Delete", msg, QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            inv_ids = [r[0] for r in conn.execute("SELECT id FROM ap_invoice WHERE vendor_id=?", (vid,)).fetchall()]
+            inv_ids = [r[0] for r in conn.execute("SELECT id FROM ap_invoice WHERE vendor_id=%s", (vid,)).fetchall()]
             for iid in inv_ids:
-                conn.execute("DELETE FROM ap_payment WHERE invoice_id=?", (iid,))
-            conn.execute("DELETE FROM ap_invoice WHERE vendor_id=?", (vid,))
-            conn.execute("DELETE FROM vendors WHERE id=?", (vid,))
+                conn.execute("DELETE FROM ap_payment WHERE invoice_id=%s", (iid,))
+            conn.execute("DELETE FROM ap_invoice WHERE vendor_id=%s", (vid,))
+            conn.execute("DELETE FROM vendors WHERE id=%s", (vid,))
             conn.commit()
             conn.close()
             self._vend_clear()
@@ -799,13 +795,13 @@ class AccountsPayable(QtWidgets.QMainWindow):
              "ai.amount, COALESCE(p.paid,0) as paid, ai.status "
              "FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id "
              "LEFT JOIN (SELECT invoice_id, SUM(amount) as paid FROM ap_payment GROUP BY invoice_id) p ON p.invoice_id=ai.id "
-             "WHERE ai.invoice_date BETWEEN ? AND ?")
+             "WHERE ai.invoice_date BETWEEN %s AND %s")
         params = [from_s, to_s]
         if vid:
-            q += " AND ai.vendor_id=?"
+            q += " AND ai.vendor_id=%s"
             params.append(vid)
         if status != "(all status)":
-            q += " AND ai.status=?"
+            q += " AND ai.status=%s"
             params.append(status)
         q += " ORDER BY ai.invoice_date DESC"
         rows = conn.execute(q, params).fetchall()
@@ -848,9 +844,9 @@ class AccountsPayable(QtWidgets.QMainWindow):
         inv_id = self._invoice_row_ids[row]
         conn = get_db()
         inv = conn.execute(
-            "SELECT ai.*, v.vendor_name FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=?", (inv_id,)).fetchone()
+            "SELECT ai.*, v.vendor_name FROM ap_invoice ai JOIN vendors v ON v.id=ai.vendor_id WHERE ai.id=%s", (inv_id,)).fetchone()
         payments = conn.execute(
-            "SELECT * FROM ap_payment WHERE invoice_id=? ORDER BY payment_date", (inv_id,)).fetchall()
+            "SELECT * FROM ap_payment WHERE invoice_id=%s ORDER BY payment_date", (inv_id,)).fetchall()
         conn.close()
         paid_total = sum(p["amount"] for p in payments)
         self.inv_detail_lbl.setText(
@@ -881,7 +877,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
             return
         inv_id = self._invoice_row_ids[row]
         conn = get_db()
-        status = conn.execute("SELECT status FROM ap_invoice WHERE id=?", (inv_id,)).fetchone()["status"]
+        status = conn.execute("SELECT status FROM ap_invoice WHERE id=%s", (inv_id,)).fetchone()["status"]
         conn.close()
         if status in ("paid", "void"):
             QtWidgets.QMessageBox.information(self, "Cannot Pay", f"Invoice is already {status}.")
@@ -898,10 +894,10 @@ class AccountsPayable(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select an invoice first.")
             return
         inv_id = self._invoice_row_ids[row]
-        if QtWidgets.QMessageBox.question(self, "Void Invoice", "Mark this invoice as void?",
+        if QtWidgets.QMessageBox.question(self, "Void Invoice", "Mark this invoice as void%s",
                                           QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE ap_invoice SET status='void' WHERE id=?", (inv_id,))
+            conn.execute("UPDATE ap_invoice SET status='void' WHERE id=%s", (inv_id,))
             conn.commit()
             conn.close()
             self._refresh_invoices()
@@ -1071,10 +1067,10 @@ class AccountsPayable(QtWidgets.QMainWindow):
         q = "SELECT * FROM expense_report WHERE 1=1"
         p = []
         if sf != "All Statuses":
-            q += " AND status=?"
+            q += " AND status=%s"
             p.append(sf)
         if cf != "All Categories":
-            q += " AND category=?"
+            q += " AND category=%s"
             p.append(cf)
         q += " ORDER BY submitted_date DESC"
         rows = conn.execute(q, p).fetchall()
@@ -1114,7 +1110,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         row = idx.row()
         rid = self._exp_row_ids[row]
         conn = get_db()
-        rec = conn.execute("SELECT * FROM expense_report WHERE id=?", (rid,)).fetchone()
+        rec = conn.execute("SELECT * FROM expense_report WHERE id=%s", (rid,)).fetchone()
         conn.close()
         if not rec:
             return
@@ -1133,7 +1129,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO expense_report (submitted_by, description, amount, submitted_date, category, status, notes) VALUES (?,?,?,?,?,?,?)",
+            "INSERT INTO expense_report (submitted_by, description, amount, submitted_date, category, status, notes) VALUES (%s,%s,%s,%s,%s,%s,%s)",
             (self.ef_by.text().strip(), self.ef_desc.text().strip(), self.ef_amt.value(),
              self.ef_date.date().toString("yyyy-MM-dd"), self.ef_cat.currentText(),
              self.ef_status.currentText(), self.ef_notes.text().strip())
@@ -1150,7 +1146,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE expense_report SET submitted_by=?, description=?, amount=?, submitted_date=?, category=?, status=?, notes=? WHERE id=?",
+            "UPDATE expense_report SET submitted_by=%s, description=%s, amount=%s, submitted_date=%s, category=%s, status=%s, notes=%s WHERE id=%s",
             (self.ef_by.text().strip(), self.ef_desc.text().strip(), self.ef_amt.value(),
              self.ef_date.date().toString("yyyy-MM-dd"), self.ef_cat.currentText(),
              self.ef_status.currentText(), self.ef_notes.text().strip(), rid)
@@ -1165,7 +1161,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         if not rid:
             return
         conn = get_db()
-        conn.execute("UPDATE expense_report SET status='Approved' WHERE id=?", (rid,))
+        conn.execute("UPDATE expense_report SET status='Approved' WHERE id=%s", (rid,))
         conn.commit()
         conn.close()
         self._clear_expense_form()
@@ -1176,7 +1172,7 @@ class AccountsPayable(QtWidgets.QMainWindow):
         if not rid:
             return
         conn = get_db()
-        conn.execute("UPDATE expense_report SET status='Rejected' WHERE id=?", (rid,))
+        conn.execute("UPDATE expense_report SET status='Rejected' WHERE id=%s", (rid,))
         conn.commit()
         conn.close()
         self._clear_expense_form()
@@ -1192,6 +1188,15 @@ class AccountsPayable(QtWidgets.QMainWindow):
         self.ef_status.setCurrentIndex(0)
         self.exp_table.setProperty("_selected_id", None)
         self.exp_table.clearSelection()
+
+
+class AccountsPayable(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Accounts Payable")
+        self.resize(1150, 700)
+        _apply_blue_palette(self)
+        self.setCentralWidget(AccountsPayableWidget(initial_tab=initial_tab))
 
 
 def main():
