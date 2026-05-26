@@ -83,11 +83,10 @@ class SqliteAdapterCursor:
     def fetchone(self):
         if self._returning_id:
             return {'id': self._cur.lastrowid}
-        row = self._cur.fetchone()
-        return dict(row) if row is not None else None
+        return self._cur.fetchone()  # sqlite3.Row: supports row["name"] and row[0]
 
     def fetchall(self):
-        return [dict(row) for row in self._cur.fetchall()]
+        return self._cur.fetchall()  # list of sqlite3.Row
 
     @property
     def lastrowid(self):
@@ -100,7 +99,7 @@ class SqliteAdapterCursor:
         row = self._cur.fetchone()
         if row is None:
             raise StopIteration
-        return dict(row)
+        return row
 
     def __getitem__(self, key):
         return self._cur[key]

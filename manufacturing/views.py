@@ -697,10 +697,10 @@ _PURCH_MENU = {
         ('purch_orders', 'Purchase Orders', {
             'title': 'Purchase Orders',
             'items': [
-                ('new_po', 'New PO', 'Purchasing_menu.py'),
-                ('open_pos', 'Open POs', 'Purchasing_menu.py'),
-                ('po_status', 'PO Status', 'Purchasing_menu.py'),
-                ('po_hist', 'PO History', 'Purchasing_menu.py'),
+                ('new_po', 'New PO', 'purchase_orders.py'),
+                ('open_pos', 'Open POs', 'purchase_orders.py'),
+                ('po_status', 'PO Status', 'purchase_orders.py'),
+                ('po_hist', 'PO History', 'purchase_orders.py'),
             ],
         }),
         ('vendor_mgmt', 'Vendor Management', {
