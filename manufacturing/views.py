@@ -725,10 +725,10 @@ _PURCH_MENU = {
         ('receiving', 'Receiving', {
             'title': 'Receiving',
             'items': [
-                ('pend_recv', 'Pending Receipts', 'Purchasing_menu.py'),
-                ('recv_items', 'Receive Items', 'Purchasing_menu.py'),
-                ('disc_rpts', 'Discrepancy Reports', 'Purchasing_menu.py'),
-                ('recv_hist', 'Receiving History', 'Purchasing_menu.py'),
+                ('pend_recv', 'Pending Receipts', 'receiving_dept.py'),
+                ('recv_items', 'Receive Items', 'receiving_dept.py'),
+                ('disc_rpts', 'Discrepancy Reports', 'receiving_dept.py'),
+                ('recv_hist', 'Receiving History', 'receiving_dept.py'),
             ],
         }),
         ('contracts', 'Contract Management', {
