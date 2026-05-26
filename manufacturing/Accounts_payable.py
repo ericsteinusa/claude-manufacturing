@@ -11,18 +11,18 @@ from gl_utils import post_gl_entry, gl_accounts_by_type
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE = ("QTabWidget::pane{border:1px solid black;}"
-             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-             " border-bottom:none; border-radius:4px 4px 0 0;}"
-             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-             "QTabBar::tab:hover{background:rgb(85,255,255);}")
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
+TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 STATUS_COLORS = {
     "open": QtGui.QColor(255, 255, 255),
@@ -148,7 +148,7 @@ class NewInvoiceDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Accounts Payable Invoice")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=110):
@@ -292,7 +292,7 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         info = QtWidgets.QLabel(
             f"{inv['invoice_number']}  |  {inv['vendor_name']}\n"
             f"Invoice: {_money(inv['amount'])}   Paid: {_money(paid)}   Balance: {_money(self._balance)}")
-        info.setStyleSheet("color:white;font-size:12px;")
+        info.setStyleSheet("color%(white)s;font-size:12px;")
         info.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(info)
 
@@ -426,7 +426,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.vend_table.setColumnCount(6)
         self.vend_table.setHorizontalHeaderLabels(["Vendor Name", "Contact", "Phone", "Email", "City", "State"])
         hh = self.vend_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -460,7 +460,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         # Form
         fg = QtWidgets.QGroupBox("Vendor Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
@@ -575,7 +575,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.inv_table.setHorizontalHeaderLabels(
             ["Invoice #", "Vendor", "Date", "Due Date", "Amount", "Paid", "Balance", "Status"])
         hh = self.inv_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -601,17 +601,17 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         # Detail panel
         self.inv_detail_grp = QtWidgets.QGroupBox("Invoice Detail")
         self.inv_detail_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:6px;}QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:6px;}QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         self.inv_detail_grp.setVisible(False)
         dv = QtWidgets.QVBoxLayout(self.inv_detail_grp)
         self.inv_detail_lbl = QtWidgets.QLabel("")
-        self.inv_detail_lbl.setStyleSheet("color:white;font-size:12px;")
+        self.inv_detail_lbl.setStyleSheet("color%(white)s;font-size:12px;")
         dv.addWidget(self.inv_detail_lbl)
         self.pay_hist_table = QtWidgets.QTableWidget()
         self.pay_hist_table.setColumnCount(5)
         self.pay_hist_table.setHorizontalHeaderLabels(["Date", "Amount", "Method", "Reference", "Notes"])
         ph = self.pay_hist_table.horizontalHeader()
-        ph.setStyleSheet("color:black;font-weight:bold;")
+        ph.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ph.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 1, 2, 3):
             ph.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -632,7 +632,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         layout.setSpacing(8)
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Accounts Payable Aging Report  (open & partial invoices only)")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -646,7 +646,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.aging_table.setHorizontalHeaderLabels(
             ["Vendor", "0–30 Days", "31–60 Days", "61–90 Days", "91+ Days", "Total Outstanding"])
         ah = self.aging_table.horizontalHeader()
-        ah.setStyleSheet("color:black;font-weight:bold;")
+        ah.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ah.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             ah.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -655,7 +655,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.aging_table.verticalHeader().setVisible(False)
         layout.addWidget(self.aging_table, stretch=1)
         self.aging_totals_lbl = QtWidgets.QLabel("")
-        self.aging_totals_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.aging_totals_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         layout.addWidget(self.aging_totals_lbl)
         return w
 
@@ -734,7 +734,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         if not data:
             return
         conn = get_db()
-        conn.execute("INSERT INTO vendors (vendor_name,contact_name,phone,email,address,city,state,zip_code) VALUES (:vendor_name,:contact_name,:phone,:email,:address,:city,:state,:zip_code)", data)
+        conn.execute("INSERT INTO vendors (vendor_name,contact_name,phone,email,address,city,state,zip_code) VALUES (%(vendor_name)s,%(contact_name)s,%(phone)s,%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)", data)
         conn.commit()
         conn.close()
         self._vend_clear()
@@ -753,7 +753,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
             return
         data["id"] = self._vendor_row_ids[row]
         conn = get_db()
-        conn.execute("UPDATE vendors SET vendor_name=:vendor_name,contact_name=:contact_name,phone=:phone,email=:email,address=:address,city=:city,state=:state,zip_code=:zip_code WHERE id=:id", data)
+        conn.execute("UPDATE vendors SET vendor_name=%(vendor_name)s,contact_name=%(contact_name)s,phone=%(phone)s,email=%(email)s,address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s WHERE id=%(id)s", data)
         conn.commit()
         conn.close()
         self._load_vendors()
@@ -974,7 +974,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.exp_table.setHorizontalHeaderLabels(
             ["ID", "Submitted By", "Description", "Category", "Amount", "Date", "Status"])
         hh = self.exp_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         self.exp_table.setColumnWidth(0, 45)
         hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.exp_table.setColumnWidth(1, 130)
@@ -989,13 +989,13 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.exp_table.verticalHeader().setVisible(False)
         layout.addWidget(self.exp_table, stretch=1)
 
-        self.exp_total_lbl = QtWidgets.QLabel("Total: $0.00", styleSheet="color:white;font-weight:bold;")
+        self.exp_total_lbl = QtWidgets.QLabel("Total: $0.00", styleSheet="color%(white)s;font-weight%(bold)s;")
         layout.addWidget(self.exp_total_lbl)
 
         # Form
         fg = QtWidgets.QGroupBox("Expense Entry")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 

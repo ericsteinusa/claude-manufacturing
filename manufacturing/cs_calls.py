@@ -11,24 +11,24 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TIME_STYLE = "QTimeEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TIME_STYLE = "QTimeEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TEXT_STYLE = "QTextEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
 TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid black;}"
-    "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-    " border-bottom:none; border-radius:4px 4px 0 0;}"
-    "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+    "QTabWidget:%(pane)s{border:1px solid black;}"
+    "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+    " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+    "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+    "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}"
 )
 NOTE_BROWSER_STYLE = (
-    "QTextBrowser{background-color:white;border:2px solid black;"
-    "border-radius:4px;padding:4px 6px;font-family:monospace;font-size:12px;}"
+    "QTextBrowser{background-color%(white)s;border:2px solid black;"
+    "border-radius:4px;padding:4px 6px;font-family%(monospace)s;font-size:12px;}"
 )
 
 STATUS_COLORS = {
@@ -183,7 +183,7 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             "Completion Date", "Completion Time", "Comments", "Status"
         ])
         hh = self.table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -200,8 +200,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         # ── Entry form ─────────────────────────────────────────────────────
         form_grp = QtWidgets.QGroupBox("Call Record")
         form_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(form_grp)
         grid.setSpacing(6)
 
@@ -222,7 +222,7 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
 
         self.ef_call_time = QtWidgets.QTimeEdit()
         self.ef_call_time.setStyleSheet(TIME_STYLE)
-        self.ef_call_time.setDisplayFormat("hh:mm AP")
+        self.ef_call_time.setDisplayFormat("hh%(mm)s AP")
         self.ef_call_time.setTime(QtCore.QTime.currentTime())
 
         self.ef_comp_date = QtWidgets.QDateEdit()
@@ -233,11 +233,11 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
 
         self.ef_comp_time = QtWidgets.QTimeEdit()
         self.ef_comp_time.setStyleSheet(TIME_STYLE)
-        self.ef_comp_time.setDisplayFormat("hh:mm AP")
+        self.ef_comp_time.setDisplayFormat("hh%(mm)s AP")
         self.ef_comp_time.setTime(QtCore.QTime.currentTime())
 
         self.ef_completed = QtWidgets.QCheckBox("Completed")
-        self.ef_completed.setStyleSheet("color:white;font-size:13px;")
+        self.ef_completed.setStyleSheet("color%(white)s;font-size:13px;")
 
         self.ef_call = QtWidgets.QTextEdit()
         self.ef_call.setStyleSheet(TEXT_STYLE)
@@ -269,8 +269,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         # ── Notes / History panel ──────────────────────────────────────────
         notes_grp = QtWidgets.QGroupBox("Notes & History")
         notes_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         notes_layout = QtWidgets.QVBoxLayout(notes_grp)
         notes_layout.setSpacing(4)
 
@@ -420,7 +420,7 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         for time_edit, val in ((self.ef_call_time, rec["call_time"]),
                                (self.ef_comp_time, rec["completion_time"])):
             if val:
-                t = QtCore.QTime.fromString(val, "hh:mm")
+                t = QtCore.QTime.fromString(val, "hh%(mm)s")
                 if t.isValid():
                     time_edit.setTime(t)
 
@@ -438,9 +438,9 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             "customer_id": self.ef_cust.currentData(),
             "call": call_text,
             "call_date": self.ef_call_date.date().toString("yyyy-MM-dd"),
-            "call_time": self.ef_call_time.time().toString("hh:mm"),
+            "call_time": self.ef_call_time.time().toString("hh%(mm)s"),
             "completion_date": self.ef_comp_date.date().toString("yyyy-MM-dd"),
-            "completion_time": self.ef_comp_time.time().toString("hh:mm"),
+            "completion_time": self.ef_comp_time.time().toString("hh%(mm)s"),
             "comments_box": self.ef_comments.toPlainText().strip() or None,
             "completion_box": 1 if self.ef_completed.isChecked() else 0,
         }
@@ -453,8 +453,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         conn.execute("""
             INSERT INTO calls2 (customer_id, call, call_date, call_time,
                                 completion_date, completion_time, comments_box, completion_box)
-            VALUES (:customer_id, :call, :call_date, :call_time,
-                    :completion_date, :completion_time, :comments_box, :completion_box)
+            VALUES (%(customer_id)s, %(call)s, %(call_date)s, %(call_time)s,
+                    %(completion_date)s, %(completion_time)s, %(comments_box)s, %(completion_box)s)
         """, data)
         conn.commit()
         conn.close()
@@ -471,11 +471,11 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         data["id"] = self._current_id
         conn = get_db()
         conn.execute("""
-            UPDATE calls2 SET customer_id=:customer_id, call=:call, call_date=:call_date,
-                call_time=:call_time, completion_date=:completion_date,
-                completion_time=:completion_time, comments_box=:comments_box,
-                completion_box=:completion_box
-            WHERE id=:id
+            UPDATE calls2 SET customer_id=%(customer_id)s, call=%(call)s, call_date=%(call_date)s,
+                call_time=%(call_time)s, completion_date=%(completion_date)s,
+                completion_time=%(completion_time)s, comments_box=%(comments_box)s,
+                completion_box=%(completion_box)s
+            WHERE id=%(id)s
         """, data)
         conn.commit()
         conn.close()
@@ -486,7 +486,7 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a call first.")
             return
         now_date = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
-        now_time = QtCore.QTime.currentTime().toString("hh:mm")
+        now_time = QtCore.QTime.currentTime().toString("hh%(mm)s")
         conn = get_db()
         conn.execute("""
             UPDATE calls2 SET completion_box=1, completion_date=%s, completion_time=%s

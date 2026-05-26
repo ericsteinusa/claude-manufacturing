@@ -11,20 +11,20 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+TEXT_STYLE = "QTextEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
 TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid black;}"
-    "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-    " border-bottom:none; border-radius:4px 4px 0 0;}"
-    "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+    "QTabWidget:%(pane)s{border:1px solid black;}"
+    "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+    " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+    "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+    "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}"
 )
 
 CREDIT_STATUS_COLORS = {
@@ -201,7 +201,7 @@ class NewApplicationDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Credit Application")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=130):
@@ -304,7 +304,7 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
             f"Customer: {_customer_display(app)}\n"
             f"Applied: {app['applied_date']}   Requested: {_money(app['requested_limit'])}"
         )
-        info.setStyleSheet("color:white;font-size:13px;")
+        info.setStyleSheet("color%(white)s;font-size:13px;")
         info.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(info)
 
@@ -351,7 +351,7 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
         layout.addLayout(row("Notes:", self.notes))
 
         self.auto_update_chk = QtWidgets.QCheckBox("Update / create credit account automatically")
-        self.auto_update_chk.setStyleSheet("color:white;font-size:12px;")
+        self.auto_update_chk.setStyleSheet("color%(white)s;font-size:12px;")
         self.auto_update_chk.setChecked(True)
         layout.addWidget(self.auto_update_chk)
 
@@ -476,7 +476,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         self.acct_table.setHorizontalHeaderLabels(
             ["Customer", "Credit Limit", "AR Balance", "Available", "Status", "Terms", "Opened", "Alert"])
         hh = self.acct_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -522,8 +522,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
         # Edit form
         fg = QtWidgets.QGroupBox("Credit Account Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
@@ -647,7 +647,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "Status", "Reviewed By", "Review Date", "Notes"
         ])
         hh = self.app_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
@@ -682,7 +682,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Overdue Invoices Report")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -699,7 +699,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         legend = QtWidgets.QLabel(
             "  Legend:  1–30 days ■   31–60 days ■   61–90 days ■   91+ days ■")
-        legend.setStyleSheet("color:white;font-size:11px;")
+        legend.setStyleSheet("color%(white)s;font-size:11px;")
         layout.addWidget(legend)
 
         self.overdue_table = QtWidgets.QTableWidget()
@@ -709,7 +709,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "Days Overdue", "Balance Due", "Credit Status"
         ])
         oh = self.overdue_table.horizontalHeader()
-        oh.setStyleSheet("color:black;font-weight:bold;")
+        oh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         oh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         oh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for c in (2, 3, 4, 5, 6):
@@ -721,7 +721,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         layout.addWidget(self.overdue_table, stretch=1)
 
         self.overdue_totals_lbl = QtWidgets.QLabel("")
-        self.overdue_totals_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.overdue_totals_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         layout.addWidget(self.overdue_totals_lbl)
         return w
 
@@ -735,7 +735,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Credit Limit Change History")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
 
         self.hist_cust_filter = QtWidgets.QComboBox()
@@ -780,7 +780,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "Old Status", "New Status", "Changed By / Reason"
         ])
         lh = self.hist_table.horizontalHeader()
-        lh.setStyleSheet("color:black;font-weight:bold;")
+        lh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         lh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         lh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
@@ -801,7 +801,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Credit Exposure Summary")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -817,7 +817,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         layout.addLayout(hdr)
 
         self.summary_stats_lbl = QtWidgets.QLabel("")
-        self.summary_stats_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.summary_stats_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         layout.addWidget(self.summary_stats_lbl)
 
         self.summary_table = QtWidgets.QTableWidget()
@@ -826,7 +826,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "Customer", "Status", "Credit Limit", "AR Balance", "Available Credit", "Utilization %"
         ])
         sh = self.summary_table.horizontalHeader()
-        sh.setStyleSheet("color:black;font-weight:bold;")
+        sh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         sh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             sh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -969,7 +969,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         try:
             conn.execute("""
                 INSERT INTO credit_account (customer_id, credit_limit, status, terms, opened_date, notes)
-                VALUES (:customer_id, :credit_limit, :status, :terms, :opened_date, :notes)
+                VALUES (%(customer_id)s, %(credit_limit)s, %(status)s, %(terms)s, %(opened_date)s, %(notes)s)
             """, data)
             # log the initial entry
             conn.execute("""
@@ -1006,9 +1006,9 @@ class CreditDeptWidget(QtWidgets.QWidget):
         data["id"] = acct_id
         conn.execute("""
             UPDATE credit_account
-            SET customer_id=:customer_id, credit_limit=:credit_limit, status=:status,
-                terms=:terms, opened_date=:opened_date, notes=:notes
-            WHERE id=:id
+            SET customer_id=%(customer_id)s, credit_limit=%(credit_limit)s, status=%(status)s,
+                terms=%(terms)s, opened_date=%(opened_date)s, notes=%(notes)s
+            WHERE id=%(id)s
         """, data)
         # log if limit or status changed
         if old and (old["credit_limit"] != data["credit_limit"] or old["status"] != data["status"]):
@@ -1348,7 +1348,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Accounts Receivable Aging Report")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
 
         hdr.addWidget(QtWidgets.QLabel("  As of:") if False else self._make_lbl("  As of:"))
@@ -1379,7 +1379,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "61–90 Days", "91+ Days", "Total Balance", "Credit Limit"
         ])
         ah = self.aging_table.horizontalHeader()
-        ah.setStyleSheet("color:black;font-weight:bold;")
+        ah.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ah.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in range(1, 8):
             ah.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -1389,7 +1389,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         layout.addWidget(self.aging_table, stretch=1)
 
         self.aging_totals_lbl = QtWidgets.QLabel("")
-        self.aging_totals_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.aging_totals_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         self.aging_totals_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
         layout.addWidget(self.aging_totals_lbl)
         return w
@@ -1531,7 +1531,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         self.col_cust_tbl = QtWidgets.QTableWidget(0, 3)
         self.col_cust_tbl.setHorizontalHeaderLabels(["Customer", "Balance", "Activities"])
         ch = self.col_cust_tbl.horizontalHeader()
-        ch.setStyleSheet("color:black;font-weight:bold;")
+        ch.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ch.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         ch.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         ch.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -1555,7 +1555,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         rv.setContentsMargins(6, 0, 0, 0)
 
         self.col_cust_lbl = QtWidgets.QLabel("Select a customer to view activities")
-        self.col_cust_lbl.setStyleSheet("color:white;font-weight:bold;font-size:13px;")
+        self.col_cust_lbl.setStyleSheet("color%(white)s;font-weight%(bold)s;font-size:13px;")
         rv.addWidget(self.col_cust_lbl)
 
         # Filter bar
@@ -1586,7 +1586,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "ID", "Date", "Type", "Contact", "Notes", "Promised", "Follow-up", "Status"
         ])
         ah = self.col_act_tbl.horizontalHeader()
-        ah.setStyleSheet("color:black;font-weight:bold;")
+        ah.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ah.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.col_act_tbl.setColumnWidth(0, 40)
         self.col_act_tbl.setColumnWidth(1, 90)
@@ -1604,8 +1604,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         # Activity form
         fg = QtWidgets.QGroupBox("Log Activity")
-        fg.setStyleSheet("QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-                         "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+        fg.setStyleSheet("QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+                         "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         fl = QtWidgets.QFormLayout(fg)
         fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
@@ -1692,7 +1692,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Credit Risk Scoring")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Run Scoring")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -1707,7 +1707,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         hdr.addStretch()
         layout_lbl = QtWidgets.QLabel(
             "Score: 0–30 Low  |  31–60 Medium  |  61–80 High  |  81–100 Critical")
-        layout_lbl.setStyleSheet("color:rgba(255,255,255,200);font-size:11px;")
+        layout_lbl.setStyleSheet("color%(rgba)s(255,255,255,200);font-size:11px;")
         hdr.addWidget(layout_lbl)
         v.addLayout(hdr)
 
@@ -1717,7 +1717,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
             "Avg Days Over", "Open Invoices", "Risk Score", "Risk Level", "Recommendation"
         ])
         rh = self.risk_tbl.horizontalHeader()
-        rh.setStyleSheet("color:black;font-weight:bold;")
+        rh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         rh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         rh.setSectionResizeMode(8, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in range(1, 8):
@@ -1728,7 +1728,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         v.addWidget(self.risk_tbl, stretch=1)
 
         self.risk_summary_lbl = QtWidgets.QLabel("")
-        self.risk_summary_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.risk_summary_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         v.addWidget(self.risk_summary_lbl)
         return w
 
@@ -2020,8 +2020,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
             INSERT INTO collection_activity
                 (customer_id, activity_date, activity_type, contact_name, notes,
                  amount_promised, promise_date, follow_up_date, status, created_by)
-            VALUES (:customer_id, :activity_date, :activity_type, :contact_name, :notes,
-                    :amount_promised, :promise_date, :follow_up_date, :status, :created_by)
+            VALUES (%(customer_id)s, %(activity_date)s, %(activity_type)s, %(contact_name)s, %(notes)s,
+                    %(amount_promised)s, %(promise_date)s, %(follow_up_date)s, %(status)s, %(created_by)s)
         """, {**vals, "customer_id": cid})
         conn.commit()
         conn.close()
@@ -2038,11 +2038,11 @@ class CreditDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             UPDATE collection_activity SET
-                activity_date=:activity_date, activity_type=:activity_type,
-                contact_name=:contact_name, notes=:notes,
-                amount_promised=:amount_promised, promise_date=:promise_date,
-                follow_up_date=:follow_up_date, status=:status, created_by=:created_by
-            WHERE id=:id
+                activity_date=%(activity_date)s, activity_type=%(activity_type)s,
+                contact_name=%(contact_name)s, notes=%(notes)s,
+                amount_promised=%(amount_promised)s, promise_date=%(promise_date)s,
+                follow_up_date=%(follow_up_date)s, status=%(status)s, created_by=%(created_by)s
+            WHERE id=%(id)s
         """, {**vals, "id": aid})
         conn.commit()
         conn.close()

@@ -1526,6 +1526,64 @@ def _get_db():
     return conn
 
 
+def _init_schema():
+    """Create application tables if they don't exist."""
+    conn = _get_db()
+    tables = [
+        """CREATE TABLE IF NOT EXISTS people (
+            id SERIAL PRIMARY KEY,
+            first_name TEXT NOT NULL DEFAULT '',
+            last_name TEXT NOT NULL DEFAULT '',
+            employee_id INTEGER NOT NULL DEFAULT 0,
+            address TEXT NOT NULL DEFAULT '',
+            city TEXT NOT NULL DEFAULT '',
+            state TEXT NOT NULL DEFAULT '',
+            zip_code TEXT NOT NULL DEFAULT '',
+            email TEXT NOT NULL DEFAULT '',
+            dept_id INTEGER,
+            dept_sub_id INTEGER
+        )""",
+        """CREATE TABLE IF NOT EXISTS passwd (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            FOREIGN KEY (people_id) REFERENCES people(id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS roles (
+            id SERIAL PRIMARY KEY,
+            role_name TEXT NOT NULL UNIQUE,
+            description TEXT
+        )""",
+        """CREATE TABLE IF NOT EXISTS user_roles (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL UNIQUE,
+            role_id INTEGER NOT NULL,
+            FOREIGN KEY (people_id) REFERENCES people(id),
+            FOREIGN KEY (role_id) REFERENCES roles(id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS dept (
+            dept_id SERIAL PRIMARY KEY,
+            dept_name TEXT NOT NULL UNIQUE
+        )""",
+        """CREATE TABLE IF NOT EXISTS dept_sub (
+            dept_sub_id SERIAL PRIMARY KEY,
+            dept_id INTEGER,
+            dept_sub_name TEXT NOT NULL,
+            FOREIGN KEY (dept_id) REFERENCES dept(dept_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS position (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL UNIQUE,
+            job_title TEXT NOT NULL DEFAULT '',
+            FOREIGN KEY (people_id) REFERENCES people(id)
+        )""",
+    ]
+    for ddl in tables:
+        conn.execute(ddl)
+    conn.commit()
+    conn.close()
+
+
 def _ensure_roles():
     """Insert any missing roles into the roles table."""
     conn = _get_db()
@@ -1613,7 +1671,7 @@ def _create_user(email, password, first_name='', last_name='',
             conn.close()
             return False
         cursor = conn.execute(
-            "INSERT INTO people (first_name, last_name, ID, address, city, state, zip_code, email) "
+            "INSERT INTO people (first_name, last_name, employee_id, address, city, state, zip_code, email) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )

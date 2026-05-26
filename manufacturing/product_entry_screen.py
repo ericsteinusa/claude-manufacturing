@@ -9,19 +9,19 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-ISPIN_STYLE = "QSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE = ("QTabWidget::pane{border:1px solid black;}"
-             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-             " border-bottom:none; border-radius:4px 4px 0 0;}"
-             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-             "QTabBar::tab:hover{background:rgb(85,255,255);}")
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+ISPIN_STYLE = "QSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
+TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 # Stock level row colors
 COLOR_CRITICAL = QtGui.QColor(255, 200, 200)   # red   — at or below reorder point
@@ -135,7 +135,7 @@ class TransactionDialog(QtWidgets.QDialog):
         }[self._trans_type]
         title = QtWidgets.QLabel(title_text)
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
@@ -288,7 +288,7 @@ class Inventory(QtWidgets.QMainWindow):
             ["Name", "Supplier", "Bin", "Unit Cost", "Qty on Hand",
              "Reorder Point", "Last Received"])
         hh = self.prod_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -321,8 +321,8 @@ class Inventory(QtWidgets.QMainWindow):
 
         fg = QtWidgets.QGroupBox("Product Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
@@ -400,7 +400,7 @@ class Inventory(QtWidgets.QMainWindow):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Stock Levels  —  sorted by quantity on hand")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -424,7 +424,7 @@ class Inventory(QtWidgets.QMainWindow):
             swatch.setFixedSize(24, 16)
             legend.addWidget(swatch)
             lbl = QtWidgets.QLabel(label)
-            lbl.setStyleSheet("color:white;font-size:12px;")
+            lbl.setStyleSheet("color%(white)s;font-size:12px;")
             legend.addWidget(lbl)
             legend.addSpacing(16)
         legend.addStretch()
@@ -435,7 +435,7 @@ class Inventory(QtWidgets.QMainWindow):
         self.stock_table.setHorizontalHeaderLabels(
             ["Name", "Supplier", "Bin", "Qty on Hand", "Reorder Point", "Unit Cost"])
         sh = self.stock_table.horizontalHeader()
-        sh.setStyleSheet("color:black;font-weight:bold;")
+        sh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         sh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             sh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -500,7 +500,7 @@ class Inventory(QtWidgets.QMainWindow):
         self.trans_table.setHorizontalHeaderLabels(
             ["Date", "Product", "Type", "Qty", "Reference", "Notes"])
         th = self.trans_table.horizontalHeader()
-        th.setStyleSheet("color:black;font-weight:bold;")
+        th.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         th.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5):
             th.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -645,7 +645,7 @@ class Inventory(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute(
             "INSERT INTO product (name,supplier_id,bin,purchase_price,amount,reorder_point) "
-            "VALUES (:name,:supplier_id,:bin,:purchase_price,:amount,:reorder_point)",
+            "VALUES (%(name)s,%(supplier_id)s,%(bin)s,%(purchase_price)s,%(amount)s,%(reorder_point)s)",
             data)
         conn.commit()
         conn.close()
@@ -663,9 +663,9 @@ class Inventory(QtWidgets.QMainWindow):
         data["id"] = self._prod_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE product SET name=:name,supplier_id=:supplier_id,bin=:bin,"
-            "purchase_price=:purchase_price,amount=:amount,reorder_point=:reorder_point "
-            "WHERE id=:id",
+            "UPDATE product SET name=%(name)s,supplier_id=%(supplier_id)s,bin=%(bin)s,"
+            "purchase_price=%(purchase_price)s,amount=%(amount)s,reorder_point=%(reorder_point)s "
+            "WHERE id=%(id)s",
             data)
         conn.commit()
         conn.close()

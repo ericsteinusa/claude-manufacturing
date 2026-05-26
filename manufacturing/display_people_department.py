@@ -17,7 +17,7 @@ def setup_database():
         id SERIAL PRIMARY KEY,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
-        ID INTEGER,
+        employee_id INTEGER,
         address TEXT NOT NULL,
         city TEXT NOT NULL,
         state TEXT NOT NULL,
