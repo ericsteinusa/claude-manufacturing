@@ -1,8 +1,7 @@
 import os
 import sys
+import sqlite3
 import subprocess
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 from django.shortcuts import render, redirect
 
@@ -1683,7 +1682,7 @@ def _create_user(email, password, first_name='', last_name='',
         conn.commit()
         conn.close()
         return True
-    except psycopg2.IntegrityError:
+    except sqlite3.IntegrityError:
         return False
 
 

@@ -18,8 +18,6 @@ Usage:
 """
 
 import os
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 
 

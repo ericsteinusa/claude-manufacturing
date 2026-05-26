@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -116,7 +115,7 @@ class NewShipmentDialog(QtWidgets.QDialog):
                 "SELECT id, so_number FROM sales_order"
                 " WHERE status NOT IN ('cancelled','invoiced') ORDER BY so_number"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             sos = []
         conn.close()
         self.so_combo.addItem("(none)", None)
@@ -174,7 +173,7 @@ class NewShipmentDialog(QtWidgets.QDialog):
             )
             self.shipment_id = cur.fetchone()['id']
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Shipment number '{ship_num}' already exists.")
             conn.close()
@@ -209,7 +208,7 @@ class AddShipItemDialog(QtWidgets.QDialog):
             prods = conn.execute(
                 "SELECT id, product_name FROM product ORDER BY product_name"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             prods = []
         conn.close()
         self.product_combo.addItem("(none)", None)
@@ -473,7 +472,7 @@ class ShippingDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY s.ship_date DESC", params).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = []
         conn.close()
 
@@ -529,7 +528,7 @@ class ShippingDeptWidget(QtWidgets.QWidget):
                 FROM shipment_item si LEFT JOIN product p ON p.id = si.product_id
                 WHERE si.shipment_id = %s
             """, (self._selected_ship_id,)).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             items = conn.execute(
                 "SELECT description, NULL AS product_name, qty FROM shipment_item WHERE shipment_id = %s",
                 (self._selected_ship_id,)

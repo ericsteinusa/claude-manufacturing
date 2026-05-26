@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from PyQt6 import QtGui, QtWidgets
@@ -45,7 +44,7 @@ def init_db():
                 "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
         try:
             conn.execute(f"ALTER TABLE people ADD COLUMN {col}")
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             pass
     conn.commit()
     conn.close()

@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, PhotoImage
 from tkinter import *
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 import subprocess
 

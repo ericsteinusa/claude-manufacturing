@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -181,7 +180,7 @@ class NewOrderDialog(QtWidgets.QDialog):
             )
             self.so_id = cur.fetchone()['id']
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"SO number '{so_num}' already exists.")
             conn.close()
             return
@@ -215,7 +214,7 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
             prods = conn.execute(
                 "SELECT id, product_name, purchase_price FROM product ORDER BY product_name"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             prods = []
         conn.close()
         self.product_combo.addItem("(none)", None)
@@ -495,7 +494,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
                 FROM so_item i LEFT JOIN product p ON p.id = i.product_id
                 WHERE i.so_id = %s
             """, (self._selected_so_id,)).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             items = conn.execute(
                 "SELECT description, NULL AS product_name, qty, unit_price FROM so_item WHERE so_id = %s",
                 (self._selected_so_id,)

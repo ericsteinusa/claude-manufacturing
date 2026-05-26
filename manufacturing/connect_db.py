@@ -5,12 +5,9 @@ from PyQt6.QtSql import QSqlDatabase
 
 
 def connect_to_database():
-    db = QSqlDatabase.addDatabase('QPSQL')
-    db.setHostName(os.environ.get('DB_HOST', 'localhost'))
-    db.setDatabaseName(os.environ.get('DB_NAME', 'company_db'))
-    db.setUserName(os.environ.get('DB_USER', 'postgres'))
-    db.setPassword(os.environ.get('DB_PASSWORD', ''))
-    db.setPort(int(os.environ.get('DB_PORT', '5432')))
+    db = QSqlDatabase.addDatabase('QSQLITE')
+    db_path = os.path.join(os.path.dirname(__file__), 'company.db')
+    db.setDatabaseName(db_path)
 
     if not db.open():
         QMessageBox.critical(None, 'Database Connection', 'Failed to connect to the database.')

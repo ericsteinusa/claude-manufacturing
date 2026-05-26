@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from datetime import date
@@ -210,7 +209,7 @@ class NewPODialog(QtWidgets.QDialog):
                   "open",
                   self.notes.text().strip() or None))
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "PO number already exists.")
             conn.close()
             return
@@ -259,7 +258,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
             products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
             for p in products:
                 self.prod_combo.addItem(p["name"], p["id"])
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             pass
         conn.close()
         self.prod_combo.currentIndexChanged.connect(self._on_product_changed)
@@ -299,7 +298,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
                     self.desc.setText(p["name"])
                 if p["purchase_price"]:
                     self.price.setValue(float(p["purchase_price"]))
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             pass
         conn.close()
 
@@ -420,7 +419,7 @@ class ReceivePODialog(QtWidgets.QDialog):
                         VALUES (%s,%s,%s,%s,%s,%s)
                     """, (product_id, today, "receipt", qty, po_num,
                           f"Received from PO {po_num}"))
-                except psycopg2.OperationalError:
+                except sqlite3.OperationalError:
                     pass
 
         all_items = conn.execute(

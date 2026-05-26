@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -106,7 +105,7 @@ def _load_products(combo, include_none=True):
     conn = get_db()
     try:
         prods = conn.execute("SELECT id, product_name FROM product ORDER BY product_name").fetchall()
-    except psycopg2.OperationalError:
+    except sqlite3.OperationalError:
         prods = []
     conn.close()
     combo.clear()
@@ -152,7 +151,7 @@ class NewInspectionDialog(QtWidgets.QDialog):
             wos = conn.execute(
                 "SELECT id, wo_number FROM work_order ORDER BY wo_number DESC LIMIT 100"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             wos = []
         conn.close()
         self.wo_combo.addItem("(none)", None)
@@ -205,7 +204,7 @@ class NewInspectionDialog(QtWidgets.QDialog):
             )
             self.insp_id = cur.fetchone()['id']
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Inspection number '{num}' already exists.")
             conn.close()
@@ -521,7 +520,7 @@ class QALabWidget(QtWidgets.QWidget):
                 FROM qa_inspection qi JOIN product p ON p.id = qi.product_id
                 ORDER BY p.product_name
             """).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             prods = []
         conn.close()
         saved = self.insp_prod_filter.currentData()
@@ -566,7 +565,7 @@ class QALabWidget(QtWidgets.QWidget):
         try:
             rows = conn.execute(base + where + " ORDER BY qi.insp_date DESC, qi.insp_number DESC",
                                 params).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = conn.execute(
                 "SELECT id, insp_number, insp_date, inspector, result,"
                 " NULL AS product_name, NULL AS wo_number, 0 AS defect_count"
@@ -771,7 +770,7 @@ class QALabWidget(QtWidgets.QWidget):
                 base + where + " ORDER BY d.resolved ASC, d.severity DESC, qi.insp_number",
                 params
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = []
         conn.close()
 
@@ -863,7 +862,7 @@ class QALabWidget(QtWidgets.QWidget):
                 SELECT DISTINCT s.product_id, p.product_name FROM qa_spec s
                 JOIN product p ON p.id = s.product_id ORDER BY p.product_name
             """).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             prods = []
         conn.close()
         saved = self.spec_prod_filter.currentData()
@@ -895,7 +894,7 @@ class QALabWidget(QtWidgets.QWidget):
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
                     ORDER BY p.product_name, s.spec_name
                 """).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = []
         conn.close()
 

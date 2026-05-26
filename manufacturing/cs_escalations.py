@@ -4,8 +4,6 @@ Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution 
 """
 import sys
 import os
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 import csv
 from datetime import date, datetime
