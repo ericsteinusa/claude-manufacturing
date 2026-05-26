@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -117,7 +116,7 @@ class NewReceiptDialog(QtWidgets.QDialog):
                 "SELECT id, po_number FROM purchase_order"
                 " WHERE status NOT IN ('cancelled','closed') ORDER BY po_number"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             pos = []
         conn.close()
         self.po_combo.addItem("(none)", None)
@@ -181,7 +180,7 @@ class NewReceiptDialog(QtWidgets.QDialog):
             )
             self.receiving_id = cur.fetchone()['id']
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Receipt number '{rcv_num}' already exists.")
             conn.close()
@@ -216,7 +215,7 @@ class AddReceiptItemDialog(QtWidgets.QDialog):
             prods = conn.execute(
                 "SELECT id, product_name FROM product ORDER BY product_name"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             prods = []
         conn.close()
         self.product_combo.addItem("(none)", None)
@@ -498,7 +497,7 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY r.rcv_date DESC", params).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = []
         conn.close()
 
@@ -555,7 +554,7 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
                 FROM receiving_item ri LEFT JOIN product p ON p.id = ri.product_id
                 WHERE ri.receiving_id = %s
             """, (self._selected_rcv_id,)).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             items = conn.execute(
                 "SELECT description, NULL AS product_name, qty_ordered, qty_received"
                 " FROM receiving_item WHERE receiving_id = %s",

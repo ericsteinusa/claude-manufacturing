@@ -1,6 +1,4 @@
 import sys
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 import os
 from datetime import datetime, date

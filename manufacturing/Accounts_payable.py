@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from datetime import date
@@ -243,7 +242,7 @@ class NewInvoiceDialog(QtWidgets.QDialog):
             """, (self.vendor_combo.currentData(), inv_num, inv_date,
                   self.due_date.date().toString("yyyy-MM-dd"), amount, desc))
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists.")
             conn.close()
             return

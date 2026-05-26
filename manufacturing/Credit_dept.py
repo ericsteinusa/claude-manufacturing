@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 import csv
@@ -980,7 +979,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
                   data["credit_limit"], data["status"],
                   data["changed_by"], data["reason"] or "Account opened"))
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "A credit account already exists for this customer.")
             conn.close()
             return

@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -103,7 +102,7 @@ def _load_products(combo, include_none=True):
         prods = conn.execute(
             "SELECT id, product_name FROM product ORDER BY product_name"
         ).fetchall()
-    except psycopg2.OperationalError:
+    except sqlite3.OperationalError:
         prods = []
     conn.close()
     combo.clear()
@@ -200,7 +199,7 @@ class NewWODialog(QtWidgets.QDialog):
             )
             self.wo_id = cur.fetchone()['id']
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"WO number '{wo_num}' already exists.")
             conn.close()
             return
@@ -312,7 +311,7 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
                 FROM wo_material m JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = %s
             """, (self._wo_id,)).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             mats = []
         conn.close()
 
@@ -360,7 +359,7 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
                      conn.execute("SELECT wo_number FROM work_order WHERE id=%s",
                                   (self._wo_id,)).fetchone()["wo_number"])
                 )
-            except psycopg2.OperationalError:
+            except sqlite3.OperationalError:
                 pass
         conn.commit()
         conn.close()
@@ -611,7 +610,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY wo.due_date, wo.wo_number", params).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = conn.execute(
                 "SELECT id, wo_number, description, NULL AS product_name,"
                 " quantity, start_date, due_date, status FROM work_order"
@@ -666,7 +665,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
                 FROM wo_material m JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = %s
             """, (self._selected_wo_id,)).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             mats = []
         conn.close()
         for mat in mats:
@@ -775,7 +774,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
                 "SELECT DISTINCT b.product_id, p.product_name FROM bom b"
                 " JOIN product p ON p.id = b.product_id ORDER BY p.product_name"
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             prods = []
         conn.close()
         saved = self.bom_filter_combo.currentData()
@@ -807,7 +806,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
                                     (prod_id,)).fetchall()
             else:
                 rows = conn.execute(base + " ORDER BY fg.product_name, c.product_name").fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = []
         conn.close()
 

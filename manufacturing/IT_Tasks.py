@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 import os
 import subprocess
@@ -92,7 +91,7 @@ def _next_task_num():
         count = conn.execute(
             "SELECT COUNT(*) FROM it_task WHERE task_number LIKE %s", (f"TASK-{yr}-%",)
         ).fetchone()[0]
-    except psycopg2.OperationalError:
+    except sqlite3.OperationalError:
         count = 0
     conn.close()
     return f"TASK-{yr}-{count + 1:04d}"
@@ -202,7 +201,7 @@ class NewTaskDialog(QtWidgets.QDialog):
             )
             self.task_id = cur.fetchone()['id']
             conn.commit()
-        except psycopg2.IntegrityError:
+        except sqlite3.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Task number '{num}' already exists.")
             conn.close()
@@ -399,7 +398,7 @@ class ITTasksWidget(QtWidgets.QWidget):
             rows = conn.execute(
                 base + where + " ORDER BY due_date, task_number", params
             ).fetchall()
-        except psycopg2.OperationalError:
+        except sqlite3.OperationalError:
             rows = []
         conn.close()
 

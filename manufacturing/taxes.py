@@ -1,8 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 from tkinter import colorchooser
 from configparser import ConfigParser

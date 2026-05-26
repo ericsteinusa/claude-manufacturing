@@ -1,6 +1,5 @@
 import sys
-import psycopg2
-import psycopg2.extras
+import sqlite3
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -145,7 +144,7 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         conn.commit()
         conn.close()
         return True
-    except psycopg2.IntegrityError:
+    except sqlite3.IntegrityError:
         return False
 
 

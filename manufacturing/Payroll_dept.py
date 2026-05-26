@@ -3,8 +3,6 @@ Payroll_dept.py — Payroll Department
 Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report | Payroll History
 """
 import sys
-import psycopg2
-import psycopg2.extras
 from .db_connection import get_db_connection
 import os
 import csv
