@@ -1,11 +1,12 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -48,8 +49,7 @@ OVERDUE_COLORS = [
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -57,7 +57,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS credit_account (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            id              SERIAL PRIMARY KEY,
             customer_id     INTEGER NOT NULL UNIQUE REFERENCES customer(id),
             credit_limit    REAL    NOT NULL DEFAULT 0.0,
             status          TEXT    NOT NULL DEFAULT 'good',
@@ -68,7 +68,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS credit_application (
-            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            id               SERIAL PRIMARY KEY,
             customer_id      INTEGER NOT NULL REFERENCES customer(id),
             applied_date     TEXT    NOT NULL,
             requested_limit  REAL    NOT NULL DEFAULT 0.0,
@@ -81,7 +81,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS credit_limit_history (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             customer_id  INTEGER NOT NULL REFERENCES customer(id),
             changed_date TEXT    NOT NULL,
             old_limit    REAL,
@@ -94,7 +94,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS collection_activity (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            id              SERIAL PRIMARY KEY,
             customer_id     INTEGER NOT NULL REFERENCES customer(id),
             activity_date   TEXT    NOT NULL DEFAULT (date('now')),
             activity_type   TEXT    NOT NULL DEFAULT 'Call',
@@ -146,7 +146,7 @@ def _ar_balance(customer_id):
         FROM ar_invoice ai
         LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
             ON p.invoice_id = ai.id
-        WHERE ai.customer_id = ? AND ai.status IN ('open', 'partial')
+        WHERE ai.customer_id = %s AND ai.status IN ('open', 'partial')
     """, (customer_id,)).fetchone()[0]
     conn.close()
     return result
@@ -268,7 +268,7 @@ class NewApplicationDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             INSERT INTO credit_application (customer_id, applied_date, requested_limit, notes)
-            VALUES (?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s)
         """, (self.cust_combo.currentData(),
               self.app_date.date().toString("yyyy-MM-dd"),
               self.req_limit.value(),
@@ -292,7 +292,7 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
         app = conn.execute("""
             SELECT ca.*, c.first_name, c.last_name, c.company_name
             FROM credit_application ca JOIN customer c ON c.id = ca.customer_id
-            WHERE ca.id = ?
+            WHERE ca.id = %s
         """, (self._app_id,)).fetchone()
         conn.close()
 
@@ -374,35 +374,35 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             UPDATE credit_application
-            SET status=?, approved_limit=?, reviewed_by=?, review_date=?, notes=?
-            WHERE id=?
+            SET status=%s, approved_limit=%s, reviewed_by=%s, review_date=%s, notes=%s
+            WHERE id=%s
         """, (decision, approved_limit, reviewer, review_date, notes, self._app_id))
 
         if decision == "approved" and self.auto_update_chk.isChecked() and approved_limit:
             app = conn.execute(
-                "SELECT customer_id FROM credit_application WHERE id=?", (self._app_id,)
+                "SELECT customer_id FROM credit_application WHERE id=%s", (self._app_id,)
             ).fetchone()
             cid = app["customer_id"]
             existing = conn.execute(
-                "SELECT id, credit_limit, status FROM credit_account WHERE customer_id=?", (cid,)
+                "SELECT id, credit_limit, status FROM credit_account WHERE customer_id=%s", (cid,)
             ).fetchone()
             if existing:
                 old_limit = existing["credit_limit"]
                 old_status = existing["status"]
                 conn.execute("""
-                    UPDATE credit_account SET credit_limit=?, status='good' WHERE customer_id=?
+                    UPDATE credit_account SET credit_limit=%s, status='good' WHERE customer_id=%s
                 """, (approved_limit, cid))
             else:
                 old_limit = old_status = None
                 conn.execute("""
                     INSERT INTO credit_account (customer_id, credit_limit, status, opened_date)
-                    VALUES (?, ?, 'good', ?)
+                    VALUES (%s, %s, 'good', %s)
                 """, (cid, approved_limit, review_date))
             # log the limit change
             conn.execute("""
                 INSERT INTO credit_limit_history
                     (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
-                VALUES (?, ?, ?, ?, ?, 'good', ?, 'Application approved')
+                VALUES (%s, %s, %s, %s, %s, 'good', %s, 'Application approved')
             """, (cid, review_date, old_limit, approved_limit, old_status, reviewer))
 
         conn.commit()
@@ -425,11 +425,9 @@ RISK_COLORS = {
 _TAB_KEYS = {'credit': 0, 'aging': 5, 'collections': 6, 'risk': 7}
 
 
-class CreditDept(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Credit Department")
-        self.resize(1150, 700)
+class CreditDeptWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._acct_row_ids = []
         self._app_row_ids = []
@@ -450,9 +448,7 @@ class CreditDept(QtWidgets.QMainWindow):
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.setStyleSheet(TAB_STYLE)
@@ -869,10 +865,10 @@ class CreditDept(QtWidgets.QMainWindow):
         )
         params = []
         if search:
-            q += " AND (c.company_name LIKE ? OR c.last_name LIKE ?)"
+            q += " AND (c.company_name LIKE %s OR c.last_name LIKE %s)"
             params += [f"%{search}%", f"%{search}%"]
         if status_filter != "(all status)":
-            q += " AND ca.status = ?"
+            q += " AND ca.status = %s"
             params.append(status_filter)
         q += " ORDER BY c.company_name, c.last_name, c.first_name"
         rows = conn.execute(q, params).fetchall()
@@ -919,7 +915,7 @@ class CreditDept(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._acct_row_ids):
             return
         conn = get_db()
-        acct = conn.execute("SELECT * FROM credit_account WHERE id=?", (self._acct_row_ids[row],)).fetchone()
+        acct = conn.execute("SELECT * FROM credit_account WHERE id=%s", (self._acct_row_ids[row],)).fetchone()
         conn.close()
         if not acct:
             return
@@ -979,12 +975,12 @@ class CreditDept(QtWidgets.QMainWindow):
             conn.execute("""
                 INSERT INTO credit_limit_history
                     (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
-                VALUES (?, ?, NULL, ?, NULL, ?, ?, ?)
+                VALUES (%s, %s, NULL, %s, NULL, %s, %s, %s)
             """, (data["customer_id"], date.today().isoformat(),
                   data["credit_limit"], data["status"],
                   data["changed_by"], data["reason"] or "Account opened"))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "A credit account already exists for this customer.")
             conn.close()
             return
@@ -1005,7 +1001,7 @@ class CreditDept(QtWidgets.QMainWindow):
         acct_id = self._acct_row_ids[row]
         conn = get_db()
         old = conn.execute(
-            "SELECT credit_limit, status FROM credit_account WHERE id=?", (acct_id,)
+            "SELECT credit_limit, status FROM credit_account WHERE id=%s", (acct_id,)
         ).fetchone()
         data["id"] = acct_id
         conn.execute("""
@@ -1019,7 +1015,7 @@ class CreditDept(QtWidgets.QMainWindow):
             conn.execute("""
                 INSERT INTO credit_limit_history
                     (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (data["customer_id"], date.today().isoformat(),
                   old["credit_limit"], data["credit_limit"],
                   old["status"], data["status"],
@@ -1036,11 +1032,11 @@ class CreditDept(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select an account first.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Confirm Delete", "Delete this credit account?",
+                self, "Confirm Delete", "Delete this credit account%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("DELETE FROM credit_account WHERE id=?", (self._acct_row_ids[row],))
+            conn.execute("DELETE FROM credit_account WHERE id=%s", (self._acct_row_ids[row],))
             conn.commit()
             conn.close()
             self._acct_clear()
@@ -1066,11 +1062,11 @@ class CreditDept(QtWidgets.QMainWindow):
             if bal > acct["credit_limit"] and acct["credit_limit"] > 0:
                 conn = get_db()
                 conn.execute(
-                    "UPDATE credit_account SET status='hold' WHERE id=?", (acct["id"],))
+                    "UPDATE credit_account SET status='hold' WHERE id=%s", (acct["id"],))
                 conn.execute("""
                     INSERT INTO credit_limit_history
                         (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
-                    VALUES (?, ?, ?, ?, 'good', 'hold', 'System', 'Auto-hold: AR balance exceeded credit limit')
+                    VALUES (%s, %s, %s, %s, 'good', 'hold', 'System', 'Auto-hold: AR balance exceeded credit limit')
                 """, (acct["customer_id"], date.today().isoformat(),
                       acct["credit_limit"], acct["credit_limit"]))
                 conn.commit()
@@ -1105,11 +1101,11 @@ class CreditDept(QtWidgets.QMainWindow):
             "ca.applied_date, ca.requested_limit, ca.approved_limit, ca.status, "
             "ca.reviewed_by, ca.review_date, ca.notes "
             "FROM credit_application ca JOIN customer c ON c.id = ca.customer_id "
-            "WHERE ca.applied_date BETWEEN ? AND ?"
+            "WHERE ca.applied_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if status != "(all status)":
-            q += " AND ca.status = ?"
+            q += " AND ca.status = %s"
             params.append(status)
         q += " ORDER BY ca.applied_date DESC"
         rows = conn.execute(q, params).fetchall()
@@ -1159,7 +1155,7 @@ class CreditDept(QtWidgets.QMainWindow):
         app_id = self._app_row_ids[row]
         conn = get_db()
         status = conn.execute(
-            "SELECT status FROM credit_application WHERE id=?", (app_id,)
+            "SELECT status FROM credit_application WHERE id=%s", (app_id,)
         ).fetchone()["status"]
         conn.close()
         if status != "pending":
@@ -1179,11 +1175,11 @@ class CreditDept(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select an application first.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Confirm Delete", "Delete this application?",
+                self, "Confirm Delete", "Delete this application%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("DELETE FROM credit_application WHERE id=?", (self._app_row_ids[row],))
+            conn.execute("DELETE FROM credit_application WHERE id=%s", (self._app_row_ids[row],))
             conn.commit()
             conn.close()
             self._load_applications()
@@ -1203,7 +1199,7 @@ class CreditDept(QtWidgets.QMainWindow):
             LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
                 ON p.invoice_id = ai.id
             LEFT JOIN credit_account ca ON ca.customer_id = c.id
-            WHERE ai.status IN ('open','partial') AND ai.due_date < ?
+            WHERE ai.status IN ('open','partial') AND ai.due_date < %s
             ORDER BY ai.due_date ASC
         """, (today,)).fetchall()
         conn.close()
@@ -1258,11 +1254,11 @@ class CreditDept(QtWidgets.QMainWindow):
             "h.changed_date, h.old_limit, h.new_limit, h.old_status, h.new_status, "
             "h.changed_by, h.reason "
             "FROM credit_limit_history h JOIN customer c ON c.id = h.customer_id "
-            "WHERE h.changed_date BETWEEN ? AND ?"
+            "WHERE h.changed_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if cid:
-            q += " AND h.customer_id = ?"
+            q += " AND h.customer_id = %s"
             params.append(cid)
         q += " ORDER BY h.changed_date DESC, h.id DESC"
         rows = conn.execute(q, params).fetchall()
@@ -1416,7 +1412,7 @@ class CreditDept(QtWidgets.QMainWindow):
             LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
                 ON p.invoice_id = ai.id
             LEFT JOIN credit_account ca ON ca.customer_id = c.id
-            WHERE ai.status IN ('open','partial') AND ai.invoice_date <= ?
+            WHERE ai.status IN ('open','partial') AND ai.invoice_date <= %s
             ORDER BY c.company_name, c.last_name, c.first_name
         """, (as_of,)).fetchall()
         conn.close()
@@ -1915,10 +1911,10 @@ class CreditDept(QtWidgets.QMainWindow):
         today = date.today()
 
         conn = get_db()
-        q = "SELECT * FROM collection_activity WHERE customer_id=?"
+        q = "SELECT * FROM collection_activity WHERE customer_id=%s"
         params = [cid]
         if status_f != "All":
-            q += " AND status=?"
+            q += " AND status=%s"
             params.append(status_f)
         q += " ORDER BY activity_date DESC, id DESC"
         rows = conn.execute(q, params).fetchall()
@@ -1979,7 +1975,7 @@ class CreditDept(QtWidgets.QMainWindow):
         aid = self.col_act_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
         self._col_selected_act_id = aid
         conn = get_db()
-        row = conn.execute("SELECT * FROM collection_activity WHERE id=?", (aid,)).fetchone()
+        row = conn.execute("SELECT * FROM collection_activity WHERE id=%s", (aid,)).fetchone()
         conn.close()
         if not row:
             return
@@ -2058,11 +2054,11 @@ class CreditDept(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Activity", "Select an activity first.")
             return
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this activity log entry?",
+            self, "Delete", "Delete this activity log entry%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM collection_activity WHERE id=?", (aid,))
+            conn.execute("DELETE FROM collection_activity WHERE id=%s", (aid,))
             conn.commit()
             conn.close()
             self._col_selected_act_id = None
@@ -2091,6 +2087,15 @@ class CreditDept(QtWidgets.QMainWindow):
             self._refresh_col_customers()
         elif idx == 7:  # Risk Scoring
             self._refresh_risk()
+
+
+class CreditDept(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Credit Department")
+        self.resize(1150, 700)
+        _apply_blue_palette(self)
+        self.setCentralWidget(CreditDeptWidget(initial_tab=initial_tab))
 
 
 def main():

@@ -1,7 +1,9 @@
 import os
 import sys
 import subprocess
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 from django.shortcuts import render, redirect
 
 
@@ -1483,7 +1485,6 @@ def _walk_tree(dept, parts):
     return node
 
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'company.db')
 
 # Maps dept.dept_name → MENU_TREE key (None = full access, e.g. Company)
 DEPT_MENU_KEY = {
@@ -1521,8 +1522,7 @@ MANAGER_MENU_KEYS = {
 
 
 def _get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -1538,8 +1538,8 @@ def _ensure_roles():
         ('HR / Personnel', 'Full access to Personnel department'),
     ]:
         conn.execute(
-            "INSERT INTO roles(role_name, description) SELECT ?,? WHERE NOT EXISTS "
-            "(SELECT 1 FROM roles WHERE role_name=?)", (name, desc, name)
+            "INSERT INTO roles(role_name, description) SELECT %s,%s WHERE NOT EXISTS "
+            "(SELECT 1 FROM roles WHERE role_name=%s)", (name, desc, name)
         )
     conn.commit()
     conn.close()
@@ -1556,7 +1556,7 @@ def _get_user_profile(email: str) -> dict:
         LEFT JOIN user_roles ur ON ur.people_id = p.id
         LEFT JOIN roles r ON r.id = ur.role_id
         LEFT JOIN position pos ON pos.people_id = p.id
-        WHERE p.email = ?
+        WHERE p.email = %s
     """, (email,)).fetchone()
     conn.close()
     if not row:
@@ -1591,7 +1591,7 @@ def _is_full_access(profile: dict) -> bool:
 def _verify_login(email: str, password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = ?",
+        "SELECT pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
         (email,),
     ).fetchone()
     conn.close()
@@ -1600,7 +1600,7 @@ def _verify_login(email: str, password: str) -> bool:
 
 def _email_exists(email: str) -> bool:
     conn = _get_db()
-    found = conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone()
+    found = conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone()
     conn.close()
     return found is not None
 
@@ -1609,35 +1609,36 @@ def _create_user(email, password, first_name='', last_name='',
                  address='', city='', state='', zip_code='', employee_id=0) -> bool:
     try:
         conn = _get_db()
-        if conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone():
+        if conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone():
             conn.close()
             return False
         cursor = conn.execute(
             "INSERT INTO people (first_name, last_name, ID, address, city, state, zip_code, email) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )
+        people_id = cursor.fetchone()['id']
         conn.execute(
-            "INSERT INTO passwd (people_id, password) VALUES (?, ?)",
-            (cursor.lastrowid, password),
+            "INSERT INTO passwd (people_id, password) VALUES (%s, %s)",
+            (people_id, password),
         )
         conn.commit()
         conn.close()
         return True
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         return False
 
 
 def _reset_password(email: str, new_password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = ?",
+        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
         (email,),
     ).fetchone()
     if row is None:
         conn.close()
         return False
-    conn.execute("UPDATE passwd SET password = ? WHERE id = ?", (new_password, row["pw_id"]))
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (new_password, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
@@ -1975,7 +1976,7 @@ def _get_all_roles():
 def _set_user_role(people_id: int, role_id: int):
     conn = _get_db()
     conn.execute("""
-        INSERT INTO user_roles (people_id, role_id) VALUES (?, ?)
+        INSERT INTO user_roles (people_id, role_id) VALUES (%s, %s)
         ON CONFLICT(people_id) DO UPDATE SET role_id = excluded.role_id
     """, (people_id, role_id))
     conn.commit()
@@ -1984,7 +1985,7 @@ def _set_user_role(people_id: int, role_id: int):
 
 def _remove_user_role(people_id: int):
     conn = _get_db()
-    conn.execute("DELETE FROM user_roles WHERE people_id = ?", (people_id,))
+    conn.execute("DELETE FROM user_roles WHERE people_id = %s", (people_id,))
     conn.commit()
     conn.close()
 

@@ -1,16 +1,18 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 
 
 # Database setup
 def setup_database():
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS people (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 address TEXT NOT NULL,
@@ -27,7 +29,7 @@ global email_entry, password_entry
 
 def check_name():
 
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     email = email_entry.get()
     password = password_entry.get()
@@ -35,7 +37,7 @@ def check_name():
     if not email.strip():
         messagebox.showwarning("Input Error", "Please enter a name.")
     else:
-        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = ?", (email,))
+        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = %s", (email,))
         result = cursor.fetchone()
         if result:
             id = result[0]
@@ -44,7 +46,7 @@ def check_name():
             messagebox.showinfo("Result", f"Email '{email}' exists in the database!")
             messagebox.showinfo(
                 "User Details", f"id: {result[0]}\nPeople ID: {result[1]}\nEmail: {result[2]}\nPassword: {result[3]}")
-            cursor.execute("UPDATE passwd SET password = ? WHERE id = ?", (password, id))
+            cursor.execute("UPDATE passwd SET password = %s WHERE id = %s", (password, id))
             messagebox.showinfo("Update Status", "Password updated successfully!")
         else:
             messagebox.showinfo("Result", f"Email '{email}' does not exist in the database.")

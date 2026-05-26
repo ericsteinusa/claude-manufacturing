@@ -1,85 +1,61 @@
+import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
-import sys
-import os
+from cs_calls import CustomerServiceCallsWidget, _apply_blue_palette
+
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+)
 
 
-class Ui_Customer_service_menu(object):
-    def setupUi(self, Customer_service_menu):
-        Customer_service_menu.setObjectName("Customer_service_menu")
-        Customer_service_menu.resize(800, 694)
-        self.centralwidget = QtWidgets.QWidget(parent=Customer_service_menu)
-        self.centralwidget.setObjectName("centralwidget")
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 0, 801, 661))
-        self.label.setStyleSheet("background-image: url(customer_service.png);\n"
-                                 "background-repeat: no-repeat;\n"
-                                 "background-position: center;\n"
-                                 "background-attachment: fixed;\n"
-                                 "background-color: white; /* Fallback color */")
-        self.label.setText("")
-        self.label.setObjectName("label")
-        self.CS_calls_Button = QtWidgets.QPushButton(
-            parent=self.centralwidget, clicked=lambda: self.press_it("Customer Service Calls"))
-        self.CS_calls_Button.setGeometry(QtCore.QRect(10, 20, 231, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.CS_calls_Button.setFont(font)
-        self.CS_calls_Button.setStyleSheet("QPushButton{background-color: white;\n"
-                                           "border: 2px solid black;\n"
-                                           "border-radius: 10px;\n}"
-                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-                                           "border: 2px solidrgb(85, 255, 255);\n}"
-                                           "")
-        self.CS_calls_Button.setAutoDefault(False)
-        self.CS_calls_Button.setObjectName("CS_calls_Button")
-        self.Cust_entry_button = QtWidgets.QPushButton(
-            parent=self.centralwidget, clicked=lambda: self.press_it("Customer Entry Screen"))
-        self.Cust_entry_button.setGeometry(QtCore.QRect(10, 80, 241, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.Cust_entry_button.setFont(font)
-        self.Cust_entry_button.setStyleSheet("QPushButton{background-color: white;\n"
-                                             "border: 2px solid black;\n"
-                                             "border-radius: 10px;\n}"
-                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-                                             "border: 2px solidrgb(85, 255, 255);\n}"
-                                             "")
-        self.Cust_entry_button.setAutoDefault(False)
-        self.Cust_entry_button.setObjectName("Cust_entry_button")
-        Customer_service_menu.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=Customer_service_menu)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
-        Customer_service_menu.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=Customer_service_menu)
-        self.statusbar.setObjectName("statusbar")
-        Customer_service_menu.setStatusBar(self.statusbar)
+def _launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
-        self.retranslateUi(Customer_service_menu)
-        QtCore.QMetaObject.connectSlotsByName(Customer_service_menu)
 
-    def press_it(self, pressed):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        scripts = {
-            "Customer Service Calls": "cs_calls.py",
-            "Customer Entry Screen": "customer_entry.py",
-        }
-        script = scripts.get(pressed)
-        if script:
-            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+def _launch_tab(script, label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch(); row.addWidget(btn); row.addStretch()
+    v.addLayout(row); v.addStretch()
+    return w
 
-    def retranslateUi(self, Customer_service_menu):
-        _translate = QtCore.QCoreApplication.translate
-        Customer_service_menu.setWindowTitle(_translate("Customer_service_menu", "Customer Service Menu"))
-        self.CS_calls_Button.setText(_translate("Customer_service_menu", "Customer Service Calls"))
-        self.Cust_entry_button.setText(_translate("customer_service_menu", "Customer Entry Screen"))
+
+class CSMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Customer Service Menu")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self._build_ui()
+
+    def _build_ui(self):
+        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(CustomerServiceCallsWidget(), "CS Calls")
+        tabs.addTab(_launch_tab("customer_entry.py", "Customer Entry"), "Customer Entry")
+        v.addWidget(tabs)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    Customer_service_menu = QtWidgets.QMainWindow()
-    ui = Ui_Customer_service_menu()
-    ui.setupUi(Customer_service_menu)
-    Customer_service_menu.show()
+    w = CSMenu(); w.show()
     sys.exit(app.exec())

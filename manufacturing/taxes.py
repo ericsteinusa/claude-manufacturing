@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 from tkinter import colorchooser
 from configparser import ConfigParser
 
@@ -33,12 +35,12 @@ def query_database():
         my_tree.delete(record)
 
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
-    c.execute("SELECT rowid, * FROM tax")
+    c.execute("SELECT id, * FROM tax")
     records = c.fetchall()
 
     # Add our data to the screen
@@ -75,12 +77,12 @@ def search_records():
         my_tree.delete(record)
 
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
-    c.execute("SELECT rowid, * FROM tax WHERE state like ?", (lookup_record,))
+    c.execute("SELECT id, * FROM tax WHERE state like %s", (lookup_record,))
     records = c.fetchall()
 
     # Add our data to the screen
@@ -231,7 +233,7 @@ search_menu.add_command(label="Reset", command=query_database)
 
 # Do some database stuff
 # Create a database or connect to one that exists
-conn = sqlite3.connect('company.db')
+conn = get_db_connection()
 
 # Create a cursor instance
 c = conn.cursor()
@@ -355,13 +357,13 @@ def remove_one():
     my_tree.delete(x)
 
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
     # Delete From Database
-    c.execute("DELETE from tax WHERE oid=?", (id_entry.get(),))
+    c.execute("DELETE FROM tax WHERE id = %s", (id_entry.get(),))
 
     # Commit changes
     conn.commit()
@@ -398,13 +400,13 @@ def remove_many():
             my_tree.delete(record)
 
         # Create a database or connect to one that exists
-        conn = sqlite3.connect('company.db')
+        conn = get_db_connection()
 
         # Create a cursor instance
         c = conn.cursor()
 
         # Delete Everything From The Table
-        c.executemany("DELETE FROM tax WHERE id = ?", [(a,) for a in ids_to_delete])
+        c.executemany("DELETE FROM tax WHERE id = %s", [(a,) for a in ids_to_delete])
 
         # Reset List
         ids_to_delete = []
@@ -431,7 +433,7 @@ def remove_all():
             my_tree.delete(record)
 
         # Create a database or connect to one that exists
-        conn = sqlite3.connect('company.db')
+        conn = get_db_connection()
 
         # Create a cursor instance
         c = conn.cursor()
@@ -489,7 +491,7 @@ def update_record():
 
     # Update the database
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -498,7 +500,7 @@ def update_record():
         state = :state,
         percent = :percent
 
-        WHERE oid = :oid""",
+        WHERE id = %(oid)s""",
               {
                   'state': st_entry.get(),
                   'percent': int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0,
@@ -521,13 +523,13 @@ def update_record():
 def add_record():
     # Update the database
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()
 
     # Add New Record
-    c.execute("INSERT INTO tax (state, percent) VALUES (?, ?)", (st_entry.get(), int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0))
+    c.execute("INSERT INTO tax (state, percent) VALUES (%s, %s)", (st_entry.get(), int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0))
 
     # Commit changes
     conn.commit()
@@ -549,7 +551,7 @@ def add_record():
 
 def create_table_again():
     # Create a database or connect to one that exists
-    conn = sqlite3.connect('company.db')
+    conn = get_db_connection()
 
     # Create a cursor instance
     c = conn.cursor()

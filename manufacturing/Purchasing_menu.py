@@ -1,222 +1,71 @@
+import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
-import sys
-import os
 
 
-class Ui_Purchasing_menu(object):
-    def setupUi(self, Purchasing_menu):
-        Purchasing_menu.setObjectName("Purchasing_menu")
-        Purchasing_menu.resize(800, 600)
-        palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Button, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Light, brush)
-        brush = QtGui.QBrush(QtGui.QColor(63, 127, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Midlight, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Dark, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 56, 170))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Mid, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Text, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.BrightText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.ButtonText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.Shadow, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.AlternateBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 220))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.ToolTipBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.ColorRole.ToolTipText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Button, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Light, brush)
-        brush = QtGui.QBrush(QtGui.QColor(63, 127, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Midlight, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Dark, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 56, 170))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Mid, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Text, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.BrightText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.ButtonText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Shadow, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.AlternateBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 220))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.ToolTipBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.ToolTipText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Button, brush)
-        brush = QtGui.QBrush(QtGui.QColor(127, 170, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Light, brush)
-        brush = QtGui.QBrush(QtGui.QColor(63, 127, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Midlight, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Dark, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 56, 170))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Mid, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.BrightText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 42, 127))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.ButtonText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Shadow, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 85, 255))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.AlternateBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 220))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.ToolTipBase, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.BrushStyle.SolidPattern)
-        palette.setBrush(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.ToolTipText, brush)
-        Purchasing_menu.setPalette(palette)
-        self.centralwidget = QtWidgets.QWidget(parent=Purchasing_menu)
-        self.centralwidget.setObjectName("centralwidget")
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 60, 799, 521))
-        self.label.setStyleSheet("background-image: url(purchasing_dept.png);\n"
-                                 "background-repeat: no-repeat;\n"
-                                 "background-position: center;\n"
-                                 "background-attachment: fixed;\n"
-                                 "background-color: white; /* Fallback color */")
-        self.label.setText("")
-        self.label.setObjectName("label")
-        self.Supplier_entry_Button = QtWidgets.QPushButton(
-            parent=self.centralwidget, clicked=lambda: self.press_it("Supplier Entry"))
-        self.Supplier_entry_Button.setGeometry(QtCore.QRect(250, 10, 191, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.Supplier_entry_Button.setFont(font)
-        self.Supplier_entry_Button.setStyleSheet("QPushButton{background-color: white;\n"
-                                                 "border: 2px solid black;\n"
-                                                 "border-radius: 10px;}\n"
-                                                 "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-                                                 "border: 2px solidrgb(85, 255, 255);\n"
-                                                 "}")
-        self.Supplier_entry_Button.setAutoDefault(False)
-        self.Supplier_entry_Button.setObjectName("Supplier_entry_Button")
-        self.Product_entry_Button = QtWidgets.QPushButton(
-            parent=self.centralwidget, clicked=lambda: self.press_it("Product Entry"))
-        self.Product_entry_Button.setGeometry(QtCore.QRect(10, 10, 221, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.Product_entry_Button.setFont(font)
-        self.Product_entry_Button.setStyleSheet("QPushButton{background-color: white;\n"
-                                                "border: 2px solid black;\n"
-                                                "border-radius: 10px;}\n"
-                                                "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-                                                "border: 2px solidrgb(85, 255, 255);\n"
-                                                "}")
-        self.Product_entry_Button.setAutoDefault(False)
-        self.Product_entry_Button.setObjectName("Product_entry_Button")
-        Purchasing_menu.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=Purchasing_menu)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
-        Purchasing_menu.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=Purchasing_menu)
-        self.statusbar.setObjectName("statusbar")
-        Purchasing_menu.setStatusBar(self.statusbar)
+def _apply_blue_palette(widget):
+    pal = QtGui.QPalette()
+    for g in (QtGui.QPalette.ColorGroup.Active,
+              QtGui.QPalette.ColorGroup.Inactive,
+              QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(g, QtGui.QPalette.ColorRole.Window, QtGui.QColor(0, 85, 255))
+        pal.setColor(g, QtGui.QPalette.ColorRole.Button, QtGui.QColor(0, 85, 255))
+    widget.setPalette(pal)
 
-        self.retranslateUi(Purchasing_menu)
-        QtCore.QMetaObject.connectSlotsByName(Purchasing_menu)
 
-    def press_it(self, pressed):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        scripts = {
-            "Product Entry": "product_entry_screen.py",
-            "Supplier Entry": "Supplier_entry.py",
-        }
-        script = scripts.get(pressed)
-        if script:
-            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+)
 
-    def retranslateUi(self, Purchasing_menu):
-        _translate = QtCore.QCoreApplication.translate
-        Purchasing_menu.setWindowTitle(_translate("Purchasing_menu", "Purchasing Menu"))
-        self.Supplier_entry_Button.setText(_translate("Purchasing_menu", "Supplier Entry"))
-        self.Product_entry_Button.setText(_translate("Purchasing_menu", "Product Entry"))
+
+def _launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+
+
+def _launch_tab(script, label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch(); row.addWidget(btn); row.addStretch()
+    v.addLayout(row); v.addStretch()
+    return w
+
+
+class PurchasingMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Purchasing Menu")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self._build_ui()
+
+    def _build_ui(self):
+        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(_launch_tab("product_entry_screen.py", "Product Entry"), "Product Entry")
+        tabs.addTab(_launch_tab("Supplier_entry.py", "Supplier Entry"), "Supplier Entry")
+        v.addWidget(tabs)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    Purchasing_menu = QtWidgets.QMainWindow()
-    ui = Ui_Purchasing_menu()
-    ui.setupUi(Purchasing_menu)
-    Purchasing_menu.show()
+    w = PurchasingMenu(); w.show()
     sys.exit(app.exec())

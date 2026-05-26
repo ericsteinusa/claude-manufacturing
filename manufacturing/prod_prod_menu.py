@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -27,8 +28,7 @@ WO_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -36,7 +36,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS work_order (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             wo_number TEXT NOT NULL UNIQUE,
             product_id INTEGER,
             description TEXT,
@@ -49,7 +49,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wo_material (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             wo_id INTEGER NOT NULL REFERENCES work_order(id),
             product_id INTEGER NOT NULL,
             qty_required REAL DEFAULT 1.0,
@@ -59,7 +59,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS bom (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             product_id INTEGER NOT NULL,
             component_id INTEGER NOT NULL,
             qty_required REAL DEFAULT 1.0,
@@ -91,7 +91,7 @@ def _next_wo_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM work_order WHERE wo_number LIKE ?", (f"WO-{yr}-%",)
+        "SELECT COUNT(*) FROM work_order WHERE wo_number LIKE %s", (f"WO-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"WO-{yr}-{count + 1:04d}"
@@ -103,7 +103,7 @@ def _load_products(combo, include_none=True):
         prods = conn.execute(
             "SELECT id, product_name FROM product ORDER BY product_name"
         ).fetchall()
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         prods = []
     conn.close()
     combo.clear()
@@ -191,16 +191,16 @@ class NewWODialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO work_order (wo_number, product_id, description, quantity,"
-                " start_date, due_date, status, notes) VALUES (?,?,?,?,?,?,?,?)",
+                " start_date, due_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (wo_num, self.product_combo.currentData(),
                  self.desc.text().strip(), self.qty.value(),
                  self.start_date.date().toString("yyyy-MM-dd"),
                  self.due_date.date().toString("yyyy-MM-dd"),
                  "planned", self.notes.text().strip())
             )
-            self.wo_id = cur.lastrowid
+            self.wo_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"WO number '{wo_num}' already exists.")
             conn.close()
             return
@@ -257,7 +257,7 @@ class AddMaterialDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO wo_material (wo_id, product_id, qty_required, notes) VALUES (?,?,?,?)",
+            "INSERT INTO wo_material (wo_id, product_id, qty_required, notes) VALUES (%s,%s,%s,%s)",
             (self._wo_id, prod_id, self.qty_req.value(), self.notes.text().strip())
         )
         conn.commit()
@@ -310,9 +310,9 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
                 SELECT m.id, p.product_name, p.id AS prod_id, p.amount,
                        m.qty_required, m.qty_issued
                 FROM wo_material m JOIN product p ON p.id = m.product_id
-                WHERE m.wo_id = ?
+                WHERE m.wo_id = %s
             """, (self._wo_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             mats = []
         conn.close()
 
@@ -346,21 +346,21 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
             if qty <= 0:
                 continue
             conn.execute(
-                "UPDATE wo_material SET qty_issued = qty_issued + ? WHERE id = ?", (qty, mat_id)
+                "UPDATE wo_material SET qty_issued = qty_issued + %s WHERE id = %s", (qty, mat_id)
             )
             conn.execute(
-                "UPDATE product SET amount = amount - ? WHERE id = ?", (qty, prod_id)
+                "UPDATE product SET amount = amount - %s WHERE id = %s", (qty, prod_id)
             )
             try:
                 conn.execute(
                     "INSERT INTO inventory_transaction (product_id, trans_date, trans_type, quantity, reference)"
-                    " VALUES (?,?,?,?,?)",
+                    " VALUES (%s,%s,%s,%s,%s)",
                     (prod_id, QtCore.QDate.currentDate().toString("yyyy-MM-dd"),
                      "issue", -qty,
-                     conn.execute("SELECT wo_number FROM work_order WHERE id=?",
+                     conn.execute("SELECT wo_number FROM work_order WHERE id=%s",
                                   (self._wo_id,)).fetchone()["wo_number"])
                 )
-            except sqlite3.OperationalError:
+            except psycopg2.OperationalError:
                 pass
         conn.commit()
         conn.close()
@@ -429,7 +429,7 @@ class AddBOMItemDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO bom (product_id, component_id, qty_required, unit, notes) VALUES (?,?,?,?,?)",
+            "INSERT INTO bom (product_id, component_id, qty_required, unit, notes) VALUES (%s,%s,%s,%s,%s)",
             (prod_id, comp_id, self.qty_req.value(), self.unit.text().strip(), self.notes.text().strip())
         )
         conn.commit()
@@ -450,11 +450,9 @@ _TAB_KEYS = {
 }
 
 
-class WorkOrders(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Production / Work Orders")
-        self.resize(920, 640)
+class WorkOrdersWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._wo_row_ids = []
         self._selected_wo_id = None
@@ -475,7 +473,9 @@ class WorkOrders(QtWidgets.QMainWindow):
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
-        self.setCentralWidget(self._tabs)
+        _v = QtWidgets.QVBoxLayout(self)
+        _v.setContentsMargins(0, 0, 0, 0)
+        _v.addWidget(self._tabs)
         self._build_wo_tab()
         self._build_bom_tab()
 
@@ -577,10 +577,10 @@ class WorkOrders(QtWidgets.QMainWindow):
             ("New Work Order", self._on_new_wo),
             ("Add Material", self._on_add_material),
             ("Issue Materials", self._on_issue_materials),
-            ("Start (In Progress)", lambda: self._set_wo_status("in_progress", "Mark as In Progress?")),
-            ("Complete", lambda: self._set_wo_status("completed", "Mark as Completed?")),
-            ("On Hold", lambda: self._set_wo_status("on_hold", "Put On Hold?")),
-            ("Cancel", lambda: self._set_wo_status("cancelled", "Cancel this work order?")),
+            ("Start (In Progress)", lambda: self._set_wo_status("in_progress", "Mark as In Progress%s")),
+            ("Complete", lambda: self._set_wo_status("completed", "Mark as Completed%s")),
+            ("On Hold", lambda: self._set_wo_status("on_hold", "Put On Hold%s")),
+            ("Cancel", lambda: self._set_wo_status("cancelled", "Cancel this work order%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -602,16 +602,16 @@ class WorkOrders(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("wo.status = ?")
+            conds.append("wo.status = %s")
             params.append(status)
         if term:
-            conds.append("(wo.wo_number LIKE ? OR wo.description LIKE ?)")
+            conds.append("(wo.wo_number LIKE %s OR wo.description LIKE %s)")
             params += [f"%{term}%", f"%{term}%"]
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY wo.due_date, wo.wo_number", params).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = conn.execute(
                 "SELECT id, wo_number, description, NULL AS product_name,"
                 " quantity, start_date, due_date, status FROM work_order"
@@ -664,9 +664,9 @@ class WorkOrders(QtWidgets.QMainWindow):
             mats = conn.execute("""
                 SELECT m.qty_required, m.qty_issued, p.product_name
                 FROM wo_material m JOIN product p ON p.id = m.product_id
-                WHERE m.wo_id = ?
+                WHERE m.wo_id = %s
             """, (self._selected_wo_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             mats = []
         conn.close()
         for mat in mats:
@@ -710,7 +710,7 @@ class WorkOrders(QtWidgets.QMainWindow):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE work_order SET status = ? WHERE id = ?", (new_status, self._selected_wo_id))
+            conn.execute("UPDATE work_order SET status = %s WHERE id = %s", (new_status, self._selected_wo_id))
             conn.commit()
             conn.close()
             self._refresh_wo()
@@ -775,7 +775,7 @@ class WorkOrders(QtWidgets.QMainWindow):
                 "SELECT DISTINCT b.product_id, p.product_name FROM bom b"
                 " JOIN product p ON p.id = b.product_id ORDER BY p.product_name"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             prods = []
         conn.close()
         saved = self.bom_filter_combo.currentData()
@@ -803,11 +803,11 @@ class WorkOrders(QtWidgets.QMainWindow):
                 JOIN product c  ON c.id  = b.component_id
             """
             if prod_id:
-                rows = conn.execute(base + " WHERE b.product_id = ? ORDER BY fg.product_name, c.product_name",
+                rows = conn.execute(base + " WHERE b.product_id = %s ORDER BY fg.product_name, c.product_name",
                                     (prod_id,)).fetchall()
             else:
                 rows = conn.execute(base + " ORDER BY fg.product_name, c.product_name").fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -838,15 +838,24 @@ class WorkOrders(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._bom_row_ids):
             return
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this BOM item?",
+            self, "Confirm Delete", "Delete this BOM item%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM bom WHERE id = ?", (self._bom_row_ids[row],))
+            conn.execute("DELETE FROM bom WHERE id = %s", (self._bom_row_ids[row],))
             conn.commit()
             conn.close()
             self._refresh_bom()
+
+
+class WorkOrders(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Production / Work Orders")
+        self.resize(920, 640)
+        _apply_blue_palette(self)
+        self.setCentralWidget(WorkOrdersWidget(initial_tab=initial_tab))
 
 
 def main():

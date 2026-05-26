@@ -1,9 +1,10 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -36,8 +37,7 @@ TRANS_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -45,7 +45,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS supplier (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT NOT NULL,
             last_name    TEXT NOT NULL,
             company_name TEXT NOT NULL,
@@ -59,7 +59,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS product (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             supplier_id    INTEGER REFERENCES supplier(id),
             name           TEXT,
             purchase_date  TEXT,
@@ -71,7 +71,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS inventory_transaction (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            id         SERIAL PRIMARY KEY,
             product_id INTEGER NOT NULL REFERENCES product(id),
             trans_date TEXT NOT NULL,
             trans_type TEXT NOT NULL,
@@ -208,7 +208,7 @@ class TransactionDialog(QtWidgets.QDialog):
         if pid is None:
             return
         conn = get_db()
-        p = conn.execute("SELECT amount FROM product WHERE id=?", (pid,)).fetchone()
+        p = conn.execute("SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
         conn.close()
         if p:
             self.qty.setRange(1, max(1, p["amount"]))
@@ -230,16 +230,16 @@ class TransactionDialog(QtWidgets.QDialog):
         conn.execute("""
             INSERT INTO inventory_transaction
                 (product_id, trans_date, trans_type, quantity, reference, notes)
-            VALUES (?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s)
         """, (pid, today, self._trans_type, stored_qty,
               self.reference.text().strip() or None,
               self.notes.text().strip() or None))
         conn.execute(
-            "UPDATE product SET amount = amount + ? WHERE id=?",
+            "UPDATE product SET amount = amount + %s WHERE id=%s",
             (stored_qty, pid))
         if self._trans_type == "receipt":
             conn.execute(
-                "UPDATE product SET purchase_date=? WHERE id=?", (today, pid))
+                "UPDATE product SET purchase_date=%s WHERE id=%s", (today, pid))
         conn.commit()
         conn.close()
         self.accept()
@@ -548,7 +548,7 @@ class Inventory(QtWidgets.QMainWindow):
             rows = conn.execute(
                 "SELECT p.*, s.first_name, s.last_name, s.company_name "
                 "FROM product p LEFT JOIN supplier s ON s.id=p.supplier_id "
-                "WHERE p.name LIKE ? ORDER BY p.name",
+                "WHERE p.name LIKE %s ORDER BY p.name",
                 (f"%{search}%",)
             ).fetchall()
         else:
@@ -601,7 +601,7 @@ class Inventory(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._prod_row_ids):
             return
         conn = get_db()
-        p = conn.execute("SELECT * FROM product WHERE id=?",
+        p = conn.execute("SELECT * FROM product WHERE id=%s",
                          (self._prod_row_ids[row],)).fetchone()
         conn.close()
         if not p:
@@ -679,10 +679,10 @@ class Inventory(QtWidgets.QMainWindow):
         pid = self._prod_row_ids[row]
         conn = get_db()
         tr_count = conn.execute(
-            "SELECT COUNT(*) FROM inventory_transaction WHERE product_id=?", (pid,)
+            "SELECT COUNT(*) FROM inventory_transaction WHERE product_id=%s", (pid,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this product?"
+        msg = "Delete this product%s"
         if tr_count:
             msg += f"\n\nWarning: {tr_count} transaction record(s) will also be deleted."
         if (QtWidgets.QMessageBox.question(
@@ -691,8 +691,8 @@ class Inventory(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             conn.execute(
-                "DELETE FROM inventory_transaction WHERE product_id=?", (pid,))
-            conn.execute("DELETE FROM product WHERE id=?", (pid,))
+                "DELETE FROM inventory_transaction WHERE product_id=%s", (pid,))
+            conn.execute("DELETE FROM product WHERE id=%s", (pid,))
             conn.commit()
             conn.close()
             self._prod_clear()
@@ -748,14 +748,14 @@ class Inventory(QtWidgets.QMainWindow):
         q = (
             "SELECT t.*, p.name AS product_name "
             "FROM inventory_transaction t JOIN product p ON p.id=t.product_id "
-            "WHERE t.trans_date BETWEEN ? AND ?"
+            "WHERE t.trans_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if pid:
-            q += " AND t.product_id=?"
+            q += " AND t.product_id=%s"
             params.append(pid)
         if ttype != "(all types)":
-            q += " AND t.trans_type=?"
+            q += " AND t.trans_type=%s"
             params.append(ttype)
         q += " ORDER BY t.trans_date DESC, t.id DESC"
         rows = conn.execute(q, params).fetchall()

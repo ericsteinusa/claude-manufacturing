@@ -4,12 +4,13 @@ Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution 
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 OVERDUE_DAYS = 7   # calls open this long or more are considered escalated
 
@@ -35,8 +36,7 @@ COLOR_RESOLVED = QtGui.QColor(212, 237, 218)   # completed after being overdue
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -137,19 +137,15 @@ class DateRangeBar(QtWidgets.QWidget):
         return self.dt_to.date().toString("yyyy-MM-dd")
 
 
-class CSEscalationsWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("CS Escalations")
-        self.resize(1100, 720)
+class CSEscalationsWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_palette(self)
         self._build_ui()
         self._run_all()
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(10, 8, 10, 8)
         root.setSpacing(6)
 
@@ -329,7 +325,7 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.completion_box = 1
                   AND c2.completion_date IS NOT NULL
-                  AND c2.call_date BETWEEN ? AND ?
+                  AND c2.call_date BETWEEN %s AND %s
                 ORDER BY c2.completion_date DESC
             """, (f, t)).fetchall()
 
@@ -427,7 +423,7 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
             all_calls = con.execute("""
                 SELECT c2.call_date, c2.completion_date, c2.completion_box
                 FROM calls2 c2
-                WHERE c2.call_date BETWEEN ? AND ?
+                WHERE c2.call_date BETWEEN %s AND %s
             """, (f, t)).fetchall()
 
         def _resolve_date(row):
@@ -457,7 +453,7 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
                        COUNT(*) AS total,
                        call_date, completion_date, completion_box
                 FROM calls2
-                WHERE call_date BETWEEN ? AND ?
+                WHERE call_date BETWEEN %s AND %s
                 GROUP BY month, id
                 ORDER BY month DESC
             """, (f, t)).fetchall()
@@ -541,7 +537,7 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
                 FROM calls2
                 WHERE completion_box = 1
                   AND completion_date IS NOT NULL
-                  AND call_date BETWEEN ? AND ?
+                  AND call_date BETWEEN %s AND %s
                 ORDER BY month ASC
             """, (f, t)).fetchall()
 
@@ -600,6 +596,15 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
         self._run_history()
         self._run_reports()
         self._run_tracking()
+
+
+class CSEscalationsWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("CS Escalations")
+        self.resize(1100, 720)
+        _apply_palette(self)
+        self.setCentralWidget(CSEscalationsWidget())
 
 
 if __name__ == "__main__":

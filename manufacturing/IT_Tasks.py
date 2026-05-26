@@ -1,10 +1,11 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -41,8 +42,7 @@ TASK_TYPES = (
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -50,7 +50,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS it_task (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             task_number    TEXT NOT NULL UNIQUE,
             task_name      TEXT NOT NULL,
             task_type      TEXT,
@@ -90,9 +90,9 @@ def _next_task_num():
     conn = get_db()
     try:
         count = conn.execute(
-            "SELECT COUNT(*) FROM it_task WHERE task_number LIKE ?", (f"TASK-{yr}-%",)
+            "SELECT COUNT(*) FROM it_task WHERE task_number LIKE %s", (f"TASK-{yr}-%",)
         ).fetchone()[0]
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         count = 0
     conn.close()
     return f"TASK-{yr}-{count + 1:04d}"
@@ -190,7 +190,7 @@ class NewTaskDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO it_task (task_number, task_name, task_type, description,"
                 " priority, assigned_to, department, scheduled_date, due_date, notes)"
-                " VALUES (?,?,?,?,?,?,?,?,?,?)",
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, name, self.task_type.currentData(),
                  self.description.toPlainText().strip(),
                  self.priority_combo.currentData(),
@@ -200,9 +200,9 @@ class NewTaskDialog(QtWidgets.QDialog):
                  self.due_date.date().toString("yyyy-MM-dd"),
                  self.notes.text().strip())
             )
-            self.task_id = cur.lastrowid
+            self.task_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Task number '{num}' already exists.")
             conn.close()
@@ -213,11 +213,9 @@ class NewTaskDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
-class ITTasksMenu(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("IT Tasks")
-        self.resize(1060, 700)
+class ITTasksWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._row_ids = []
         self._selected_id = None
@@ -230,10 +228,7 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
+        v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
 
@@ -361,10 +356,10 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Task", self._on_new_task),
-            ("Start Task", lambda: self._set_status("in_progress", "Mark as In Progress?")),
-            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold?")),
-            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed?")),
-            ("Cancel Task", lambda: self._set_status("cancelled", "Cancel this task?")),
+            ("Start Task", lambda: self._set_status("in_progress", "Mark as In Progress%s")),
+            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold%s")),
+            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed%s")),
+            ("Cancel Task", lambda: self._set_status("cancelled", "Cancel this task%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -385,17 +380,17 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         if status_val == "active":
             conds.append("status IN ('pending','in_progress')")
         elif status_val:
-            conds.append("status = ?")
+            conds.append("status = %s")
             params.append(status_val)
         if priority:
-            conds.append("priority = ?")
+            conds.append("priority = %s")
             params.append(priority)
         if task_type:
-            conds.append("task_type = ?")
+            conds.append("task_type = %s")
             params.append(task_type)
         if term:
-            conds.append("(task_number LIKE ? OR task_name LIKE ? OR assigned_to LIKE ?"
-                         " OR description LIKE ?)")
+            conds.append("(task_number LIKE %s OR task_name LIKE %s OR assigned_to LIKE %s"
+                         " OR description LIKE %s)")
             params += [f"%{term}%"] * 4
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
@@ -404,7 +399,7 @@ class ITTasksMenu(QtWidgets.QMainWindow):
             rows = conn.execute(
                 base + where + " ORDER BY due_date, task_number", params
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -451,7 +446,7 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         self._selected_id = self._row_ids[row]
         conn = get_db()
         rec = conn.execute(
-            "SELECT * FROM it_task WHERE id = ?", (self._selected_id,)
+            "SELECT * FROM it_task WHERE id = %s", (self._selected_id,)
         ).fetchone()
         conn.close()
         if not rec:
@@ -488,13 +483,22 @@ class ITTasksMenu(QtWidgets.QMainWindow):
             extra = ""
             params = [new_status]
             if new_status == "completed":
-                extra = ", completed_date = ?"
+                extra = ", completed_date = %s"
                 params.append(QtCore.QDate.currentDate().toString("yyyy-MM-dd"))
             params.append(self._selected_id)
-            conn.execute(f"UPDATE it_task SET status = ?{extra} WHERE id = ?", params)
+            conn.execute(f"UPDATE it_task SET status = %s{extra} WHERE id = %s", params)
             conn.commit()
             conn.close()
             self._refresh()
+
+
+class ITTasksMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("IT Tasks")
+        self.resize(1060, 700)
+        _apply_blue_palette(self)
+        self.setCentralWidget(ITTasksWidget())
 
 
 def main():

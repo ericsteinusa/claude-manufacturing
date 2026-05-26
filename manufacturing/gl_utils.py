@@ -18,14 +18,14 @@ Usage:
 """
 
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -47,7 +47,7 @@ def post_gl_entry(journal_date, reference, description, lines, created_by="Syste
             resolved = []
             for acct_num, debit, credit, memo in lines:
                 row = con.execute(
-                    "SELECT id FROM gl_account WHERE account_number=?", (acct_num,)
+                    "SELECT id FROM gl_account WHERE account_number=%s", (acct_num,)
                 ).fetchone()
                 if not row:
                     return None
@@ -55,13 +55,13 @@ def post_gl_entry(journal_date, reference, description, lines, created_by="Syste
 
             cur = con.execute(
                 "INSERT INTO gl_journal(journal_date, reference, description, posted, created_by) "
-                "VALUES(?,?,?,0,?)",
+                "VALUES(%s,%s,%s,0,%s) RETURNING id",
                 (journal_date, reference, description, created_by),
             )
-            jid = cur.lastrowid
+            jid = cur.fetchone()['id']
             con.executemany(
                 "INSERT INTO gl_journal_line(journal_id, account_id, debit, credit, memo) "
-                "VALUES(?,?,?,?,?)",
+                "VALUES(%s,%s,%s,%s,%s)",
                 [(jid, aid, dr, cr, m) for aid, dr, cr, m in resolved],
             )
         return jid
@@ -71,7 +71,7 @@ def post_gl_entry(journal_date, reference, description, lines, created_by="Syste
 
 def gl_accounts_by_type(*types):
     """Return list of (account_number, account_name) for the given account types."""
-    placeholders = ",".join("?" for _ in types)
+    placeholders = ",".join("%s" for _ in types)
     with _conn() as con:
         rows = con.execute(
             f"SELECT account_number, account_name FROM gl_account "

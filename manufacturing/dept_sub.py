@@ -1,4 +1,6 @@
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 from tkinter import *
 from tkinter import ttk
 
@@ -6,13 +8,13 @@ from tkinter import ttk
 
 
 def setup_database():
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # Create Parent table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS department (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         FOREIGN KEY (people_id) REFERENCES people (id)
         FOREIGN KEY (dept_id) REFERENCES dept (id)
         FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)
@@ -22,7 +24,7 @@ def setup_database():
     # Create Child table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS people (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
         ID INTEGER,
@@ -39,7 +41,7 @@ def setup_database():
     # Create Child table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS dept (
-        dept_id INTEGER PRIMARY KEY AUTOINCREMENT ,
+        dept_id SERIAL PRIMARY KEY ,
         dept_name TEXT
         )
     """)
@@ -47,7 +49,7 @@ def setup_database():
     # Create Child table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS dept_sub (
-        dept_sub_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dept_sub_id SERIAL PRIMARY KEY,
         dept_sub_name TEXT
         )
     """)
@@ -56,7 +58,7 @@ def setup_database():
 
 
 def fetch_data():
-    conn = sqlite3.connect("company.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     query = """

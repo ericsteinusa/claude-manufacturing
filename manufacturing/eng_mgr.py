@@ -1,91 +1,101 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
 import sys
 import os
+import subprocess
+from PyQt6 import QtCore, QtGui, QtWidgets
 
+from engineer import ProjectsTab, TasksTab, _apply_blue_palette
+from eng_design_review import DesignReviewWidget
+from eng_reports import EngReportsWidget
+
+BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}\n"
-    "QPushButton:hover{background-color:rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
 
 
-class Ui_eng_mgr(object):
-    def setupUi(self, eng_mgr):
-        eng_mgr.setObjectName("eng_mgr")
-        eng_mgr.resize(800, 760)
+def _launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
-        palette = QtGui.QPalette()
-        for group in (QtGui.QPalette.ColorGroup.Active,
-                      QtGui.QPalette.ColorGroup.Inactive,
-                      QtGui.QPalette.ColorGroup.Disabled):
-            palette.setColor(group, QtGui.QPalette.ColorRole.Window, QtGui.QColor(0, 85, 255))
-            palette.setColor(group, QtGui.QPalette.ColorRole.Button, QtGui.QColor(0, 85, 255))
-        eng_mgr.setPalette(palette)
 
-        self.centralwidget = QtWidgets.QWidget(parent=eng_mgr)
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 0, 801, 721))
-        self.label.setStyleSheet(
-            "background-image: url(engineering.png); background-repeat: no-repeat;"
-            " background-position: center; background-color: white;")
-        self.label.setText("")
+def _launch_tab(script, label):
+    """A tab widget with a centered launch button for external tools."""
+    w = QtWidgets.QWidget()
+    _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w)
+    v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl)
+    v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE)
+    btn.setFixedHeight(44)
+    btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch()
+    row.addWidget(btn)
+    row.addStretch()
+    v.addLayout(row)
+    v.addStretch()
+    return w
 
-        font = QtGui.QFont()
-        font.setPointSize(16)
 
-        btn_data = [
-            ("Engineers", QtCore.QRect(10, 10, 151, 41), "Engineers"),
-            ("Product Entry", QtCore.QRect(180, 10, 171, 41), "Product Entry"),
-            ("Supplier Entry", QtCore.QRect(370, 10, 171, 41), "Supplier Entry"),
-            ("Design Review", QtCore.QRect(10, 710, 171, 41), "Design Review"),
-            ("Eng. Reports", QtCore.QRect(200, 710, 161, 41), "Eng Reports"),
-        ]
+class EngMgrMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Engineering Manager Menu")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self._build_ui()
 
-        self._btns = []
-        for text, geom, key in btn_data:
-            b = QtWidgets.QPushButton(parent=self.centralwidget,
-                                      clicked=lambda chk, k=key: self.press_it(k))
-            b.setGeometry(geom)
-            b.setFont(font)
-            b.setStyleSheet(BUTTON_STYLE)
-            b.setAutoDefault(False)
-            b.setText(text)
-            self._btns.append(b)
+    def _build_ui(self):
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
 
-        self.label.raise_()
-        for b in self._btns:
-            b.raise_()
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
 
-        eng_mgr.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=eng_mgr)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        eng_mgr.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=eng_mgr)
-        eng_mgr.setStatusBar(self.statusbar)
-        self.retranslateUi(eng_mgr)
+        # Engineers tab: nested Projects + Tasks tabs
+        eng_w = QtWidgets.QWidget()
+        _apply_blue_palette(eng_w)
+        eng_v = QtWidgets.QVBoxLayout(eng_w)
+        eng_v.setContentsMargins(0, 4, 0, 0)
+        eng_tabs = QtWidgets.QTabWidget()
+        eng_tabs.setStyleSheet(TAB_STYLE)
+        eng_tabs.addTab(ProjectsTab(), "Engineering Projects")
+        eng_tabs.addTab(TasksTab(), "Engineering Tasks")
+        eng_v.addWidget(eng_tabs)
+        tabs.addTab(eng_w, "Engineers")
 
-    def press_it(self, pressed):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        scripts = {
-            "Engineers": "engineer.py",
-            "Product Entry": "product_entry_screen.py",
-            "Supplier Entry": "Supplier_entry.py",
-        }
-        script = scripts.get(pressed)
-        if script:
-            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-        else:
-            QtWidgets.QMessageBox.information(None, pressed, f"{pressed} — coming soon.")
+        tabs.addTab(DesignReviewWidget(), "Design Reviews")
+        tabs.addTab(EngReportsWidget(), "Eng Reports")
+        tabs.addTab(_launch_tab("product_entry_screen.py", "Product Entry"), "Product Entry")
+        tabs.addTab(_launch_tab("Supplier_entry.py", "Supplier Entry"), "Supplier Entry")
 
-    def retranslateUi(self, eng_mgr):
-        eng_mgr.setWindowTitle(
-            QtCore.QCoreApplication.translate("eng_mgr", "Engineering Manager Menu"))
+        v.addWidget(tabs)
+
+
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    window = EngMgrMenu()
+    window.show()
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    eng_mgr = QtWidgets.QMainWindow()
-    ui = Ui_eng_mgr()
-    ui.setupUi(eng_mgr)
-    eng_mgr.show()
-    sys.exit(app.exec())
+    main()

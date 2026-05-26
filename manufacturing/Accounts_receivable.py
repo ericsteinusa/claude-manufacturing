@@ -1,11 +1,12 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from gl_utils import post_gl_entry
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -32,8 +33,7 @@ STATUS_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -41,7 +41,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS customer (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT,
             last_name    TEXT,
             company_name TEXT,
@@ -55,7 +55,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ar_invoice (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             customer_id    INTEGER NOT NULL REFERENCES customer(id),
             invoice_number TEXT NOT NULL UNIQUE,
             invoice_date   TEXT NOT NULL,
@@ -67,7 +67,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ar_payment (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             invoice_id     INTEGER NOT NULL REFERENCES ar_invoice(id),
             payment_date   TEXT NOT NULL,
             amount         REAL NOT NULL,
@@ -111,7 +111,7 @@ def _customer_display(row):
 def _next_inv_num():
     yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM ar_invoice WHERE invoice_number LIKE ?",
+    n = conn.execute("SELECT COUNT(*) FROM ar_invoice WHERE invoice_number LIKE %s",
                      (f"AR-{yr}-%",)).fetchone()[0]
     conn.close()
     return f"AR-{yr}-{n + 1:04d}"
@@ -217,11 +217,11 @@ class NewInvoiceDialog(QtWidgets.QDialog):
         try:
             conn.execute("""
                 INSERT INTO ar_invoice (customer_id, invoice_number, invoice_date, due_date, amount, description)
-                VALUES (?,?,?,?,?,?)
+                VALUES (%s,%s,%s,%s,%s,%s)
             """, (self.cust_combo.currentData(), inv_num, inv_date,
                   self.due_date.date().toString("yyyy-MM-dd"), amount, desc))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists.")
             conn.close()
             return
@@ -253,11 +253,11 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         inv = conn.execute(
             """SELECT ai.*, c.first_name, c.last_name, c.company_name
                FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id
-               WHERE ai.id=?""",
+               WHERE ai.id=%s""",
             (self._invoice_id,)
         ).fetchone()
         paid = conn.execute(
-            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=?",
+            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=%s",
             (self._invoice_id,)
         ).fetchone()[0]
         conn.close()
@@ -330,19 +330,19 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         ref_text = self.ref.text().strip() or None
         conn = get_db()
         conn.execute(
-            "INSERT INTO ar_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (?,?,?,?,?)",
+            "INSERT INTO ar_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (%s,%s,%s,%s,%s)",
             (self._invoice_id, pay_date, amount, self.method.currentText(), ref_text))
         new_paid = conn.execute(
-            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=?",
+            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=%s",
             (self._invoice_id,)
         ).fetchone()[0]
         inv = conn.execute(
             "SELECT ai.amount, ai.invoice_number, c.first_name, c.last_name, c.company_name "
-            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=?",
+            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=%s",
             (self._invoice_id,)
         ).fetchone()
         new_status = "paid" if abs(new_paid - inv["amount"]) < 0.01 else "partial"
-        conn.execute("UPDATE ar_invoice SET status=? WHERE id=?", (new_status, self._invoice_id))
+        conn.execute("UPDATE ar_invoice SET status=%s WHERE id=%s", (new_status, self._invoice_id))
         conn.commit()
         conn.close()
         # Post draft GL entry: DR Cash (1000), CR Accounts Receivable (1100)
@@ -365,11 +365,9 @@ class RecordPaymentDialog(QtWidgets.QDialog):
 _TAB_KEYS = {'rcv': 0, 'acct_rcv': 0}
 
 
-class AccountsReceivable(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Accounts Receivable")
-        self.resize(1150, 700)
+class AccountsReceivableWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._cust_row_ids = []
         self._invoice_row_ids = []
@@ -381,9 +379,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self._refresh_aging()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.setStyleSheet(TAB_STYLE)
@@ -658,7 +654,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         conn = get_db()
         if search:
             rows = conn.execute(
-                "SELECT * FROM customer WHERE company_name LIKE ? OR last_name LIKE ? "
+                "SELECT * FROM customer WHERE company_name LIKE %s OR last_name LIKE %s "
                 "ORDER BY company_name, last_name, first_name",
                 (f"%{search}%", f"%{search}%")
             ).fetchall()
@@ -710,7 +706,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._cust_row_ids):
             return
         conn = get_db()
-        c = conn.execute("SELECT * FROM customer WHERE id=?", (self._cust_row_ids[row],)).fetchone()
+        c = conn.execute("SELECT * FROM customer WHERE id=%s", (self._cust_row_ids[row],)).fetchone()
         conn.close()
         if not c:
             return
@@ -790,10 +786,10 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         cid = self._cust_row_ids[row]
         conn = get_db()
         inv_count = conn.execute(
-            "SELECT COUNT(*) FROM ar_invoice WHERE customer_id=?", (cid,)
+            "SELECT COUNT(*) FROM ar_invoice WHERE customer_id=%s", (cid,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this customer?"
+        msg = "Delete this customer%s"
         if inv_count:
             msg += f"\n\nWarning: {inv_count} invoice(s) reference this customer. They will also be deleted."
         if (QtWidgets.QMessageBox.question(
@@ -802,11 +798,11 @@ class AccountsReceivable(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             inv_ids = [r[0] for r in conn.execute(
-                "SELECT id FROM ar_invoice WHERE customer_id=?", (cid,)).fetchall()]
+                "SELECT id FROM ar_invoice WHERE customer_id=%s", (cid,)).fetchall()]
             for iid in inv_ids:
-                conn.execute("DELETE FROM ar_payment WHERE invoice_id=?", (iid,))
-            conn.execute("DELETE FROM ar_invoice WHERE customer_id=?", (cid,))
-            conn.execute("DELETE FROM customer WHERE id=?", (cid,))
+                conn.execute("DELETE FROM ar_payment WHERE invoice_id=%s", (iid,))
+            conn.execute("DELETE FROM ar_invoice WHERE customer_id=%s", (cid,))
+            conn.execute("DELETE FROM customer WHERE id=%s", (cid,))
             conn.commit()
             conn.close()
             self._cust_clear()
@@ -827,14 +823,14 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id "
             "LEFT JOIN (SELECT invoice_id, SUM(amount) as paid FROM ar_payment GROUP BY invoice_id) p "
             "ON p.invoice_id=ai.id "
-            "WHERE ai.invoice_date BETWEEN ? AND ?"
+            "WHERE ai.invoice_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if cid:
-            q += " AND ai.customer_id=?"
+            q += " AND ai.customer_id=%s"
             params.append(cid)
         if status != "(all status)":
-            q += " AND ai.status=?"
+            q += " AND ai.status=%s"
             params.append(status)
         q += " ORDER BY ai.invoice_date DESC"
         rows = conn.execute(q, params).fetchall()
@@ -880,11 +876,11 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         conn = get_db()
         inv = conn.execute(
             "SELECT ai.*, c.first_name, c.last_name, c.company_name "
-            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=?",
+            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=%s",
             (inv_id,)
         ).fetchone()
         payments = conn.execute(
-            "SELECT * FROM ar_payment WHERE invoice_id=? ORDER BY payment_date", (inv_id,)
+            "SELECT * FROM ar_payment WHERE invoice_id=%s ORDER BY payment_date", (inv_id,)
         ).fetchall()
         conn.close()
         paid_total = sum(p["amount"] for p in payments)
@@ -918,7 +914,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             return
         inv_id = self._invoice_row_ids[row]
         conn = get_db()
-        status = conn.execute("SELECT status FROM ar_invoice WHERE id=?", (inv_id,)).fetchone()["status"]
+        status = conn.execute("SELECT status FROM ar_invoice WHERE id=%s", (inv_id,)).fetchone()["status"]
         conn.close()
         if status in ("paid", "void"):
             QtWidgets.QMessageBox.information(self, "Cannot Pay", f"Invoice is already {status}.")
@@ -936,11 +932,11 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             return
         inv_id = self._invoice_row_ids[row]
         if (QtWidgets.QMessageBox.question(
-                self, "Void Invoice", "Mark this invoice as void?",
+                self, "Void Invoice", "Mark this invoice as void%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("UPDATE ar_invoice SET status='void' WHERE id=?", (inv_id,))
+            conn.execute("UPDATE ar_invoice SET status='void' WHERE id=%s", (inv_id,))
             conn.commit()
             conn.close()
             self._refresh_invoices()
@@ -989,6 +985,15 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             f"Totals --  0-30: {_money(totals[0])}   31-60: {_money(totals[1])}   "
             f"61-90: {_money(totals[2])}   91+: {_money(totals[3])}   "
             f"Total Outstanding: {_money(sum(totals))}")
+
+
+class AccountsReceivable(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Accounts Receivable")
+        self.resize(1150, 700)
+        _apply_blue_palette(self)
+        self.setCentralWidget(AccountsReceivableWidget(initial_tab=initial_tab))
 
 
 def main():

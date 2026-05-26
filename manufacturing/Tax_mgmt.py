@@ -4,16 +4,16 @@ Tabs: Tax Calendar | Tax Filing | Tax Payments | Tax Reports
 """
 import sys
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
-    c.row_factory = sqlite3.Row
+    c = get_db_connection()
     return c
 
 
@@ -21,7 +21,7 @@ def init_db():
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS tax_calendar (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            id          SERIAL PRIMARY KEY,
             tax_type    TEXT    NOT NULL,
             description TEXT    DEFAULT '',
             due_date    TEXT    NOT NULL,
@@ -31,7 +31,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS tax_filing (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             tax_type     TEXT    NOT NULL,
             jurisdiction TEXT    DEFAULT '',
             period       TEXT    DEFAULT '',
@@ -45,7 +45,7 @@ def init_db():
         );
 
         CREATE TABLE IF NOT EXISTS tax_payment (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             filing_id    INTEGER DEFAULT NULL,
             tax_type     TEXT    NOT NULL,
             jurisdiction TEXT    DEFAULT '',
@@ -75,7 +75,7 @@ def _seed_calendar(con):
         ("Sales Tax", "Monthly filing", f"{yr}-{today.month:02d}-20", f"{today.strftime('%b %Y')}", "Pending", ""),
     ]
     con.executemany(
-        "INSERT INTO tax_calendar (tax_type, description, due_date, period, status, notes) VALUES (?,?,?,?,?,?)",
+        "INSERT INTO tax_calendar (tax_type, description, due_date, period, status, notes) VALUES (%s,%s,%s,%s,%s,%s)",
         entries,
     )
 
@@ -379,12 +379,10 @@ class PaymentDialog(QtWidgets.QDialog):
 # ══════════════════════════════════════════════════════════════════════════════
 # Main Tax Management Window
 # ══════════════════════════════════════════════════════════════════════════════
-class TaxWindow(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
+class TaxMgmtWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         init_db()
-        self.setWindowTitle("Tax Management")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
         self._refresh_calendar()
@@ -395,9 +393,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
-        cw = QtWidgets.QWidget()
-        self.setCentralWidget(cw)
-        root = QtWidgets.QVBoxLayout(cw)
+        root = QtWidgets.QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
 
         title = QtWidgets.QLabel("Tax Management")
@@ -471,10 +467,10 @@ class TaxWindow(QtWidgets.QMainWindow):
             q = "SELECT id, tax_type, description, due_date, period, status FROM tax_calendar WHERE 1=1"
             params = []
             if status_f != "All Statuses":
-                q += " AND status=?"
+                q += " AND status=%s"
                 params.append(status_f)
             if type_f != "All Types":
-                q += " AND tax_type=?"
+                q += " AND tax_type=%s"
                 params.append(type_f)
             q += " ORDER BY due_date"
             rows = con.execute(q, params).fetchall()
@@ -496,7 +492,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "INSERT INTO tax_calendar (tax_type, description, due_date, period, status, notes) VALUES (?,?,?,?,?,?)",
+                    "INSERT INTO tax_calendar (tax_type, description, due_date, period, status, notes) VALUES (%s,%s,%s,%s,%s,%s)",
                     (v["tax_type"], v["description"], v["due_date"], v["period"], v["status"], v["notes"])
                 )
             self._refresh_calendar()
@@ -507,7 +503,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             return
         row_id = int(self.cal_tbl.item(self.cal_tbl.currentRow(), 0).text())
         with _conn() as con:
-            rd = con.execute("SELECT * FROM tax_calendar WHERE id=?", (row_id,)).fetchone()
+            rd = con.execute("SELECT * FROM tax_calendar WHERE id=%s", (row_id,)).fetchone()
         if not rd:
             return
         dlg = CalendarDialog(self, row_data=rd)
@@ -515,7 +511,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "UPDATE tax_calendar SET tax_type=?, description=?, due_date=?, period=?, status=?, notes=? WHERE id=?",
+                    "UPDATE tax_calendar SET tax_type=%s, description=%s, due_date=%s, period=%s, status=%s, notes=%s WHERE id=%s",
                     (v["tax_type"], v["description"], v["due_date"], v["period"], v["status"], v["notes"], row_id)
                 )
             self._refresh_calendar()
@@ -525,9 +521,9 @@ class TaxWindow(QtWidgets.QMainWindow):
         if not rows:
             return
         row_id = int(self.cal_tbl.item(self.cal_tbl.currentRow(), 0).text())
-        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this calendar entry?") == QtWidgets.QMessageBox.StandardButton.Yes:
+        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this calendar entry%s") == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM tax_calendar WHERE id=?", (row_id,))
+                con.execute("DELETE FROM tax_calendar WHERE id=%s", (row_id,))
             self._refresh_calendar()
 
     def _mark_cal_completed(self, *_):
@@ -536,7 +532,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             return
         row_id = int(self.cal_tbl.item(self.cal_tbl.currentRow(), 0).text())
         with _conn() as con:
-            con.execute("UPDATE tax_calendar SET status='Completed' WHERE id=?", (row_id,))
+            con.execute("UPDATE tax_calendar SET status='Completed' WHERE id=%s", (row_id,))
         self._refresh_calendar()
 
     # ── Tax Filing tab ────────────────────────────────────────────────────────
@@ -603,10 +599,10 @@ class TaxWindow(QtWidgets.QMainWindow):
             q = "SELECT * FROM tax_filing WHERE 1=1"
             params = []
             if status_f != "All Statuses":
-                q += " AND status=?"
+                q += " AND status=%s"
                 params.append(status_f)
             if type_f != "All Types":
-                q += " AND tax_type=?"
+                q += " AND tax_type=%s"
                 params.append(type_f)
             q += " ORDER BY due_date DESC"
             rows = con.execute(q, params).fetchall()
@@ -638,7 +634,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "INSERT INTO tax_filing (tax_type,jurisdiction,period,amount_due,amount_paid,due_date,filed_date,status,reference,notes) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO tax_filing (tax_type,jurisdiction,period,amount_due,amount_paid,due_date,filed_date,status,reference,notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (v["tax_type"], v["jurisdiction"], v["period"], v["amount_due"], v["amount_paid"],
                      v["due_date"], v["filed_date"], v["status"], v["reference"], v["notes"])
                 )
@@ -650,7 +646,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             return
         row_id = int(self.fil_tbl.item(self.fil_tbl.currentRow(), 0).text())
         with _conn() as con:
-            rd = con.execute("SELECT * FROM tax_filing WHERE id=?", (row_id,)).fetchone()
+            rd = con.execute("SELECT * FROM tax_filing WHERE id=%s", (row_id,)).fetchone()
         if not rd:
             return
         dlg = FilingDialog(self, row_data=rd)
@@ -658,7 +654,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "UPDATE tax_filing SET tax_type=?,jurisdiction=?,period=?,amount_due=?,amount_paid=?,due_date=?,filed_date=?,status=?,reference=?,notes=? WHERE id=?",
+                    "UPDATE tax_filing SET tax_type=%s,jurisdiction=%s,period=%s,amount_due=%s,amount_paid=%s,due_date=%s,filed_date=%s,status=%s,reference=%s,notes=%s WHERE id=%s",
                     (v["tax_type"], v["jurisdiction"], v["period"], v["amount_due"], v["amount_paid"],
                      v["due_date"], v["filed_date"], v["status"], v["reference"], v["notes"], row_id)
                 )
@@ -669,9 +665,9 @@ class TaxWindow(QtWidgets.QMainWindow):
         if not self.fil_tbl.selectedItems():
             return
         row_id = int(self.fil_tbl.item(self.fil_tbl.currentRow(), 0).text())
-        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this filing?") == QtWidgets.QMessageBox.StandardButton.Yes:
+        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this filing%s") == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM tax_filing WHERE id=?", (row_id,))
+                con.execute("DELETE FROM tax_filing WHERE id=%s", (row_id,))
             self._refresh_filings()
             self._refresh_reports()
 
@@ -681,7 +677,7 @@ class TaxWindow(QtWidgets.QMainWindow):
         row_id = int(self.fil_tbl.item(self.fil_tbl.currentRow(), 0).text())
         today = date.today().isoformat()
         with _conn() as con:
-            con.execute("UPDATE tax_filing SET status='Filed', filed_date=? WHERE id=?", (today, row_id))
+            con.execute("UPDATE tax_filing SET status='Filed', filed_date=%s WHERE id=%s", (today, row_id))
         self._refresh_filings()
         self._refresh_reports()
 
@@ -747,10 +743,10 @@ class TaxWindow(QtWidgets.QMainWindow):
             q = "SELECT * FROM tax_payment WHERE 1=1"
             params = []
             if type_f != "All Types":
-                q += " AND tax_type=?"
+                q += " AND tax_type=%s"
                 params.append(type_f)
             if method_f != "All Methods":
-                q += " AND method=?"
+                q += " AND method=%s"
                 params.append(method_f)
             q += " ORDER BY payment_date DESC"
             rows = con.execute(q, params).fetchall()
@@ -776,7 +772,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "INSERT INTO tax_payment (tax_type,jurisdiction,period,amount,payment_date,method,reference,notes) VALUES (?,?,?,?,?,?,?,?)",
+                    "INSERT INTO tax_payment (tax_type,jurisdiction,period,amount,payment_date,method,reference,notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                     (v["tax_type"], v["jurisdiction"], v["period"], v["amount"],
                      v["payment_date"], v["method"], v["reference"], v["notes"])
                 )
@@ -788,7 +784,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             return
         row_id = int(self.pay_tbl.item(self.pay_tbl.currentRow(), 0).text())
         with _conn() as con:
-            rd = con.execute("SELECT * FROM tax_payment WHERE id=?", (row_id,)).fetchone()
+            rd = con.execute("SELECT * FROM tax_payment WHERE id=%s", (row_id,)).fetchone()
         if not rd:
             return
         dlg = PaymentDialog(self, row_data=rd)
@@ -796,7 +792,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "UPDATE tax_payment SET tax_type=?,jurisdiction=?,period=?,amount=?,payment_date=?,method=?,reference=?,notes=? WHERE id=?",
+                    "UPDATE tax_payment SET tax_type=%s,jurisdiction=%s,period=%s,amount=%s,payment_date=%s,method=%s,reference=%s,notes=%s WHERE id=%s",
                     (v["tax_type"], v["jurisdiction"], v["period"], v["amount"],
                      v["payment_date"], v["method"], v["reference"], v["notes"], row_id)
                 )
@@ -807,9 +803,9 @@ class TaxWindow(QtWidgets.QMainWindow):
         if not self.pay_tbl.selectedItems():
             return
         row_id = int(self.pay_tbl.item(self.pay_tbl.currentRow(), 0).text())
-        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this payment?") == QtWidgets.QMessageBox.StandardButton.Yes:
+        if QtWidgets.QMessageBox.question(self, "Delete", "Delete this payment%s") == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
-                con.execute("DELETE FROM tax_payment WHERE id=?", (row_id,))
+                con.execute("DELETE FROM tax_payment WHERE id=%s", (row_id,))
             self._refresh_payments()
             self._refresh_reports()
 
@@ -891,7 +887,7 @@ class TaxWindow(QtWidgets.QMainWindow):
             from datetime import timedelta
             cutoff = (date.today() + timedelta(days=60)).isoformat()
             upcoming = con.execute(
-                "SELECT tax_type, description, due_date, status FROM tax_calendar WHERE due_date BETWEEN ? AND ? ORDER BY due_date",
+                "SELECT tax_type, description, due_date, status FROM tax_calendar WHERE due_date BETWEEN %s AND %s ORDER BY due_date",
                 (today, cutoff)
             ).fetchall()
 
@@ -921,6 +917,15 @@ class TaxWindow(QtWidgets.QMainWindow):
             self.rpt_upcoming_tbl.setItem(r, 2, _ro(row["due_date"]))
             self.rpt_upcoming_tbl.setItem(r, 3, _ro(row["status"]))
             _color_row(self.rpt_upcoming_tbl, r, row["status"])
+
+
+class TaxWindow(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Tax Management")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self.setCentralWidget(TaxMgmtWidget(initial_tab=initial_tab))
 
 
 if __name__ == "__main__":

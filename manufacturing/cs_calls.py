@@ -1,11 +1,12 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -37,8 +38,7 @@ STATUS_COLORS = {
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -46,7 +46,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS customer (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT,
             last_name    TEXT,
             company_name TEXT,
@@ -60,7 +60,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS calls2 (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            id              SERIAL PRIMARY KEY,
             customer_id     INTEGER REFERENCES customer(id),
             call            TEXT NOT NULL,
             call_date       TEXT NOT NULL,
@@ -73,7 +73,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS call_notes (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            id         SERIAL PRIMARY KEY,
             call_id    INTEGER NOT NULL REFERENCES calls2(id) ON DELETE CASCADE,
             note_text  TEXT NOT NULL,
             created_at TEXT NOT NULL
@@ -106,11 +106,9 @@ def _customer_display(row):
     return company if company else contact
 
 
-class CustomerServiceCalls(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Customer Service Calls")
-        self.resize(1200, 820)
+class CustomerServiceCallsWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._row_ids = []
         self._current_id = None
@@ -119,9 +117,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self._load_calls()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
         outer.setSpacing(8)
 
@@ -346,18 +342,18 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             "c2.call, c2.call_date, c2.call_time, c2.completion_date, c2.completion_time, "
             "c2.comments_box, c2.completion_box "
             "FROM calls2 c2 LEFT JOIN customer cu ON cu.id = c2.customer_id "
-            "WHERE c2.call_date BETWEEN ? AND ?"
+            "WHERE c2.call_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if cid:
-            q += " AND c2.customer_id = ?"
+            q += " AND c2.customer_id = %s"
             params.append(cid)
         if status == "Open":
             q += " AND c2.completion_box = 0"
         elif status == "Completed":
             q += " AND c2.completion_box = 1"
         if keyword:
-            q += " AND (c2.call LIKE ? OR c2.comments_box LIKE ?)"
+            q += " AND (c2.call LIKE %s OR c2.comments_box LIKE %s)"
             params += [f"%{keyword}%", f"%{keyword}%"]
         q += " ORDER BY c2.call_date DESC, c2.call_time DESC"
         rows = conn.execute(q, params).fetchall()
@@ -389,7 +385,6 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
                 item.setBackground(color)
                 self.table.setItem(r, c, item)
 
-        self.statusBar().showMessage(f"{len(rows)} record(s) shown")
 
     def _show_all(self):
         self.filter_cust.setCurrentIndex(0)
@@ -405,7 +400,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             return
         self._current_id = self._row_ids[row]
         conn = get_db()
-        rec = conn.execute("SELECT * FROM calls2 WHERE id=?", (self._current_id,)).fetchone()
+        rec = conn.execute("SELECT * FROM calls2 WHERE id=%s", (self._current_id,)).fetchone()
         conn.close()
         if not rec:
             return
@@ -494,12 +489,12 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         now_time = QtCore.QTime.currentTime().toString("hh:mm")
         conn = get_db()
         conn.execute("""
-            UPDATE calls2 SET completion_box=1, completion_date=?, completion_time=?
-            WHERE id=?
+            UPDATE calls2 SET completion_box=1, completion_date=%s, completion_time=%s
+            WHERE id=%s
         """, (now_date, now_time, self._current_id))
         conn.execute("""
             INSERT INTO call_notes (call_id, note_text, created_at)
-            VALUES (?, ?, ?)
+            VALUES (%s, %s, %s)
         """, (self._current_id, "Call marked as completed.", f"{now_date} {now_time}"))
         conn.commit()
         conn.close()
@@ -511,12 +506,12 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a call first.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Confirm Delete", "Delete this call record and all its notes?",
+                self, "Confirm Delete", "Delete this call record and all its notes%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("DELETE FROM call_notes WHERE call_id=?", (self._current_id,))
-            conn.execute("DELETE FROM calls2 WHERE id=?", (self._current_id,))
+            conn.execute("DELETE FROM call_notes WHERE call_id=%s", (self._current_id,))
+            conn.execute("DELETE FROM calls2 WHERE id=%s", (self._current_id,))
             conn.commit()
             conn.close()
             self._clear_form()
@@ -530,7 +525,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
             return
         conn = get_db()
         notes = conn.execute(
-            "SELECT note_text, created_at FROM call_notes WHERE call_id=? ORDER BY created_at ASC",
+            "SELECT note_text, created_at FROM call_notes WHERE call_id=%s ORDER BY created_at ASC",
             (self._current_id,)
         ).fetchall()
         conn.close()
@@ -564,7 +559,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         now = datetime.now().strftime("%Y-%m-%d %H:%M")
         conn = get_db()
         conn.execute(
-            "INSERT INTO call_notes (call_id, note_text, created_at) VALUES (?, ?, ?)",
+            "INSERT INTO call_notes (call_id, note_text, created_at) VALUES (%s, %s, %s)",
             (self._current_id, text, now)
         )
         conn.commit()
@@ -610,6 +605,15 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         self.note_input.clear()
         self.notes_browser.clear()
         self.table.clearSelection()
+
+
+class CustomerServiceCalls(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Customer Service Calls")
+        self.resize(1200, 820)
+        _apply_blue_palette(self)
+        self.setCentralWidget(CustomerServiceCallsWidget())
 
 
 def main():

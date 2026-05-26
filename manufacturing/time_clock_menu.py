@@ -1,10 +1,11 @@
 import sys
-import sqlite3
+import psycopg2
+import psycopg2.extras
+from .db_connection import get_db_connection
 import os
 from datetime import datetime, date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -35,8 +36,7 @@ DT_FMT = "%Y-%m-%d %H:%M:%S"
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     return conn
 
 
@@ -44,7 +44,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS time_clock (
-            id        INTEGER PRIMARY KEY AUTOINCREMENT,
+            id        SERIAL PRIMARY KEY,
             people_id INTEGER NOT NULL REFERENCES people(id),
             clock_in  TEXT NOT NULL,
             clock_out TEXT,
@@ -183,7 +183,7 @@ class EditRecordDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE time_clock SET clock_in=?, clock_out=?, notes=? WHERE id=?",
+            "UPDATE time_clock SET clock_in=%s, clock_out=%s, notes=%s WHERE id=%s",
             (clock_in, clock_out, self.notes_input.text().strip() or None,
              self._record["id"])
         )
@@ -205,13 +205,11 @@ _TAB_KEYS = {
 }
 
 
-class TimeClock(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Time Clock")
-        self.resize(1000, 640)
+class TimeClockWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
-        self._clock_people_id = None  # currently selected employee on tab 1
+        self._clock_people_id = None
         self._records_row_ids = []
         self._build_ui()
         self._load_employees()
@@ -226,9 +224,7 @@ class TimeClock(QtWidgets.QMainWindow):
     # ── UI construction ────────────────────────────────────────────────────
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
 
         self.tabs = QtWidgets.QTabWidget()
@@ -440,7 +436,7 @@ class TimeClock(QtWidgets.QMainWindow):
     def _get_open_record(self, people_id):
         conn = get_db()
         rec = conn.execute(
-            "SELECT * FROM time_clock WHERE people_id=? AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1",
+            "SELECT * FROM time_clock WHERE people_id=%s AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1",
             (people_id,)
         ).fetchone()
         conn.close()
@@ -497,7 +493,7 @@ class TimeClock(QtWidgets.QMainWindow):
         today = date.today().strftime("%Y-%m-%d")
         conn = get_db()
         rows = conn.execute(
-            "SELECT * FROM time_clock WHERE people_id=? AND clock_in LIKE ? ORDER BY clock_in",
+            "SELECT * FROM time_clock WHERE people_id=%s AND clock_in LIKE %s ORDER BY clock_in",
             (self._clock_people_id, f"{today}%")
         ).fetchall()
         conn.close()
@@ -524,7 +520,7 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO time_clock (people_id, clock_in) VALUES (?, ?)",
+            "INSERT INTO time_clock (people_id, clock_in) VALUES (%s, %s)",
             (pid, datetime.now().strftime(DT_FMT))
         )
         conn.commit()
@@ -544,7 +540,7 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE time_clock SET clock_out=? WHERE id=?",
+            "UPDATE time_clock SET clock_out=%s WHERE id=%s",
             (datetime.now().strftime(DT_FMT), open_rec["id"])
         )
         conn.commit()
@@ -566,11 +562,11 @@ class TimeClock(QtWidgets.QMainWindow):
                    tc.clock_in, tc.clock_out, tc.notes
             FROM time_clock tc
             JOIN people p ON p.id = tc.people_id
-            WHERE tc.clock_in BETWEEN ? AND ?
+            WHERE tc.clock_in BETWEEN %s AND %s
         """
         params = [from_dt, to_dt]
         if pid is not None:
-            q += " AND tc.people_id = ?"
+            q += " AND tc.people_id = %s"
             params.append(pid)
         q += " ORDER BY tc.clock_in DESC"
         rows = conn.execute(q, params).fetchall()
@@ -628,7 +624,7 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         rid = self._records_row_ids[row]
         conn = get_db()
-        rec = conn.execute("SELECT * FROM time_clock WHERE id=?", (rid,)).fetchone()
+        rec = conn.execute("SELECT * FROM time_clock WHERE id=%s", (rid,)).fetchone()
         conn.close()
         if not rec:
             return
@@ -646,18 +642,27 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         rid = self._records_row_ids[row]
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this time record?",
+            self, "Confirm Delete", "Delete this time record%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM time_clock WHERE id=?", (rid,))
+            conn.execute("DELETE FROM time_clock WHERE id=%s", (rid,))
             conn.commit()
             conn.close()
             self._refresh_records()
             if self._clock_people_id:
                 self._update_status()
                 self._refresh_today()
+
+
+class TimeClock(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Time Clock")
+        self.resize(1000, 640)
+        _apply_blue_palette(self)
+        self.setCentralWidget(TimeClockWidget(initial_tab=initial_tab))
 
 
 def main():
