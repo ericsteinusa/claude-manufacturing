@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
-import sqlite3
+import psycopg2
+from db_pg import get_db
 
 
 # Function to check if the name exists in the database
@@ -11,8 +12,7 @@ def check_name():
         messagebox.showwarning("Input Error", "Please enter a Email.")
         return
 
-    # Connect to SQLite3 database
-    conn = sqlite3.connect("company.db")
+    conn = get_db()
     cursor = conn.cursor()
 
     # Query to check if the name exists
@@ -30,7 +30,7 @@ def check_name():
 
 # Tkinter GUI setup
 root = Tk()
-root.title("Check Name in SQLite3")
+root.title("Check Name in PostgreSQL")
 
 Label(root, text="Enter Email:").grid(row=0, column=0, padx=10, pady=10)
 

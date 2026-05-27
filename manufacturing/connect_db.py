@@ -3,8 +3,12 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtSql import QSqlDatabase
 
 def connect_to_database():
-    db = QSqlDatabase.addDatabase('QSQLITE')
-    db.setDatabaseName('company.db')
+    db = QSqlDatabase.addDatabase('QPSQL')
+    db.setHostName('localhost')
+    db.setDatabaseName('company')
+    db.setUserName('postgres')
+    db.setPassword('')
+    db.setPort(5432)
 
     if not db.open():
         QMessageBox.critical(None, 'Database Connection', 'Failed to connect to the database.')

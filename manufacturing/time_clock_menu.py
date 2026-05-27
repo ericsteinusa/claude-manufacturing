@@ -1,10 +1,8 @@
 import sys
-import sqlite3
-import os
+import psycopg2
+from db_pg import get_db
 from datetime import datetime, date, timedelta
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -32,12 +30,6 @@ INPUT_STYLE = (
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 DT_FMT = "%Y-%m-%d %H:%M:%S"
-
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def init_db():

@@ -1,4 +1,5 @@
-import sqlite3
+import psycopg2
+from db_pg import get_db
 from tkinter import *
 from tkinter import Label, Entry, Button, Listbox, END
 from tkinter import messagebox
@@ -8,7 +9,7 @@ import tkinter as tk
 
 # Database setup
 def setup_database():
-    conn = sqlite3.connect('company.db')
+    conn = get_db()
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS supplier (
@@ -47,7 +48,7 @@ def insert_data():
 
     else:
 
-        conn = sqlite3.connect("company.db")
+        conn = get_db()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO supplier (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email))
         conn.commit()
@@ -68,7 +69,7 @@ def insert_data():
 
 def display_data():
     user_list.delete(0, END)
-    conn = sqlite3.connect("company.db")
+    conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT id, first_name, last_name, company_name, phone_number, address, city, state, zip_code, email FROM supplier")
     for row in cursor.fetchall():

@@ -1,4 +1,5 @@
-import sqlite3
+import psycopg2
+from db_pg import get_db
 from tkinter import *
 from tkinter import Label, Entry, Button, END
 from tkinter import messagebox
@@ -12,7 +13,7 @@ customer = ''
 
 # Database setup
 def setup_database():
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 	cursor = conn.cursor()
 	cursor.execute("""
 	CREATE TABLE IF NOT EXISTS customer (
@@ -39,7 +40,7 @@ def query_database():
 		my_tree.delete(record)
 		
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -78,12 +79,12 @@ def search_records():
 		my_tree.delete(record)
 	
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
 
-	c.execute("SELECT rowid, * FROM customer WHERE rowid like ?", (lookup_record,))
+	c.execute("SELECT rowid, * FROM customer WHERE CAST(rowid AS TEXT) LIKE ?", (lookup_record,))
 	records = c.fetchall()
 	
 	# Add our data to the screen
@@ -248,7 +249,7 @@ def insert_data():
 
 	else:
 
-		conn = sqlite3.connect("company.db")
+		conn = get_db()
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO customer (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (customer_id, first_name, last_name, company_name, phone_number, address, city, state, zip_code, email))
 		conn.commit()
@@ -426,7 +427,7 @@ def remove_one():
 	my_tree.delete(x)
 
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -470,7 +471,7 @@ def remove_many():
 			my_tree.delete(record)
 
 		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+		conn = get_db()
 
 		# Create a cursor instance
 		c = conn.cursor()
@@ -505,7 +506,7 @@ def remove_all():
 			my_tree.delete(record)
 
 		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+		conn = get_db()
 
 		# Create a cursor instance
 		c = conn.cursor()
@@ -583,7 +584,7 @@ def update_record():
 	my_tree.item(selected, text="", values=(customer_id_entry.get(), first_name_entry.get(), last_name_entry.get(), company_name_entry.get(), phone_number_entry.get(), address_entry.get(), city_entry.get(), state_entry.get(), zip_code_entry.get(), email_entry.get()))
 	# Update the database
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -637,7 +638,7 @@ def update_record():
 def add_record():
 	# Update the database
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -672,7 +673,7 @@ def add_record():
 
 def create_table_again():
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()

@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import sqlite3
+import psycopg2
+from db_pg import get_db
 from tkinter import colorchooser
 from configparser import ConfigParser
 
@@ -33,7 +34,7 @@ def query_database():
 		my_tree.delete(record)
 		
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -76,7 +77,7 @@ def search_records():
 		my_tree.delete(record)
 	
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -233,7 +234,7 @@ search_menu.add_command(label="Reset", command=query_database)
 
 # Do some database stuff
 # Create a database or connect to one that exists
-conn = sqlite3.connect('company.db')
+conn = get_db()
 
 # Create a cursor instance
 c = conn.cursor()
@@ -354,7 +355,7 @@ def remove_one():
 	my_tree.delete(x)
 
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -400,7 +401,7 @@ def remove_many():
 			my_tree.delete(record)
 
 		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+		conn = get_db()
 
 		# Create a cursor instance
 		c = conn.cursor()
@@ -435,7 +436,7 @@ def remove_all():
 			my_tree.delete(record)
 
 		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+		conn = get_db()
 
 		# Create a cursor instance
 		c = conn.cursor()
@@ -493,7 +494,7 @@ def update_record():
 
 	# Update the database
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -528,7 +529,7 @@ def update_record():
 def add_record():
 	# Update the database
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -556,7 +557,7 @@ def add_record():
 
 def create_table_again():
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()

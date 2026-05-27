@@ -1,10 +1,9 @@
 import sys
-import sqlite3
+import psycopg2
+from db_pg import get_db
 import os
 from datetime import datetime, date, timedelta
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-DB_PATH      = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 SS_RATE      = 0.062
 MEDICARE_RATE = 0.0145
 DT_FMT       = "%Y-%m-%d %H:%M:%S"
@@ -39,11 +38,6 @@ TAB_STYLE = (
 FREQ_DIVISORS = {"Weekly": 52, "Bi-Weekly": 26, "Semi-Monthly": 24, "Monthly": 12}
 
 # ── DB ─────────────────────────────────────────────────────────────────────
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def init_db():

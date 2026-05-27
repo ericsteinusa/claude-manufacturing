@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox, PhotoImage
 from tkinter import *
-import sqlite3
+import psycopg2
+from db_pg import get_db
 import subprocess
 
 root = None
@@ -14,7 +15,7 @@ def validate_credentials():
     email = email_entry.get()
     password = password_entry.get()
 
-    conn = sqlite3.connect('company.db')
+    conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
         "SELECT passwd.password FROM passwd "

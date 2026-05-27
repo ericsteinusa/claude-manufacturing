@@ -1,11 +1,11 @@
-import sqlite3
+import psycopg2
+from db_pg import get_db
 from tkinter import *
 from tkinter import ttk
-import sqlite3
 
 # Database setup
 def setup_database():
-    conn = sqlite3.connect("company.db")
+    conn = get_db()
     cursor = conn.cursor()
 
     # Create Parent table
@@ -53,7 +53,7 @@ def setup_database():
 
     # Fetch data with JOIN
 def fetch_data():
-    conn = sqlite3.connect("company.db")
+    conn = get_db()
     cursor = conn.cursor()
 
     query = """

@@ -1,7 +1,7 @@
 import os
 import sys
 import subprocess
-import sqlite3
+import psycopg2
 from django.shortcuts import render, redirect
 
 
@@ -1425,13 +1425,7 @@ def _walk_tree(dept, parts):
     return node
 
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'company.db')
-
-
-def _get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+from .db_pg import get_db as _get_db
 
 
 def _verify_login(email: str, password: str) -> bool:
@@ -1470,7 +1464,7 @@ def _create_user(email, password, first_name='', last_name='',
         conn.commit()
         conn.close()
         return True
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         return False
 
 

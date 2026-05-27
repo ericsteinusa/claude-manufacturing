@@ -1,4 +1,5 @@
-import sqlite3
+import psycopg2
+from db_pg import get_db
 from tkinter import messagebox
 import tkinter as tk
 from tkinter import ttk
@@ -10,7 +11,7 @@ customer = ''
 
 # Database setup
 def setup_database():
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 	cursor = conn.cursor()
 	cursor.execute("""
 	CREATE TABLE IF NOT EXISTS customer (
@@ -50,7 +51,7 @@ def query_database():
 		my_tree.delete(record)
 		
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -89,7 +90,7 @@ def search_records():
 		my_tree.delete(record)
 	
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -238,7 +239,7 @@ search_menu.add_command(label="Reset", command=query_database)
 
 # Step 2: Fetch data for the selection list
 def fetch_customer():
-	conn = sqlite3.connect("company.db")
+	conn = get_db()
 	cursor = conn.cursor()
 	cursor.execute("SELECT id || ' ' || first_name || ' ' || last_name as full_name FROM customer")
 	customer_list = cursor.fetchall()
@@ -264,7 +265,7 @@ def insert_data():
 
 	else:
 
-		conn = sqlite3.connect("company.db")
+		conn = get_db()
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO calls2 (customer_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (customer_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box))
 		conn.commit()
@@ -436,7 +437,7 @@ def remove_one():
 	my_tree.delete(x)
 
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -482,7 +483,7 @@ def remove_many():
 			my_tree.delete(record)
 
 		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+		conn = get_db()
 
 		# Create a cursor instance
 		c = conn.cursor()
@@ -517,7 +518,7 @@ def remove_all():
 			my_tree.delete(record)
 
 		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
+		conn = get_db()
 
 		# Create a cursor instance
 		c = conn.cursor()
@@ -591,7 +592,7 @@ def update_record():
 	my_tree.item(selected, text="", values=(id_entry.get(), customer_combobox.get().split(' ')[0].strip('{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
 	# Update the database
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -642,7 +643,7 @@ def update_record():
 def add_record():
 	# Update the database
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()
@@ -676,7 +677,7 @@ def add_record():
 
 def create_table_again():
 	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
+	conn = get_db()
 
 	# Create a cursor instance
 	c = conn.cursor()

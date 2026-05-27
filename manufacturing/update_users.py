@@ -1,14 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox, font
 from tkinter import *
-import sqlite3
+import psycopg2
+from db_pg import get_db
 
 
 
 
 # Database setup
 def setup_database():
-    conn = sqlite3.connect('company.db')
+    conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS people (
@@ -27,7 +28,7 @@ global email_entry, password_entry
 def check_name():
    
    
-    conn = sqlite3.connect("company.db")
+    conn = get_db()
     cursor = conn.cursor()
     email = email_entry.get()
     password = password_entry.get()

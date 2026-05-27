@@ -1,10 +1,9 @@
 import sys
-import sqlite3
+import psycopg2
+from db_pg import get_db
 import os
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -30,10 +29,6 @@ STATUS_COLORS = {
 }
 
 
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def init_db():
@@ -219,7 +214,7 @@ class NewInvoiceDialog(QtWidgets.QDialog):
                   self.amount.value(),
                   self.desc.text().strip() or None))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists.")
             conn.close()
             return

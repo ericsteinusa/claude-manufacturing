@@ -1,10 +1,8 @@
 import sys
-import sqlite3
-import os
+import psycopg2
+from db_pg import get_db
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -34,12 +32,6 @@ TRANS_COLORS = {
     "issue":      QtGui.QColor(255, 200, 200),
     "adjustment": QtGui.QColor(220, 235, 255),
 }
-
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def init_db():

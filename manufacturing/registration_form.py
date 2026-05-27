@@ -1,4 +1,5 @@
-import sqlite3
+import psycopg2
+from db_pg import get_db
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from registration import Ui_MainWindow  # Import the generated Python file
@@ -17,7 +18,7 @@ class MainApp(QMainWindow):
 
     def initialize_database(self):
         # Connect to SQLite3 database and create table if it doesn't exist
-        conn = sqlite3.connect("company.db")
+        conn = get_db()
         cursor = conn.cursor()
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS people (
@@ -50,7 +51,7 @@ class MainApp(QMainWindow):
 
         # Save data to SQLite3 database
         try:
-            conn = sqlite3.connect("company.db")
+            conn = get_db()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO people (first_name, last_name, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, address, city, state, zip_code, email))
             conn.commit()

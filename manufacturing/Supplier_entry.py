@@ -1,10 +1,8 @@
 import sys
-import sqlite3
-import os
+import psycopg2
+from db_pg import get_db
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company.db")
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -29,12 +27,6 @@ PO_COLORS = {
     "received":  QtGui.QColor(212, 237, 218),
     "cancelled": QtGui.QColor(220, 220, 220),
 }
-
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def init_db():
@@ -210,7 +202,7 @@ class NewPODialog(QtWidgets.QDialog):
                   "open",
                   self.notes.text().strip() or None))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "PO number already exists.")
             conn.close()
             return
@@ -259,7 +251,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
             products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
             for p in products:
                 self.prod_combo.addItem(p["name"], p["id"])
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
         conn.close()
         self.prod_combo.currentIndexChanged.connect(self._on_product_changed)
@@ -299,7 +291,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
                     self.desc.setText(p["name"])
                 if p["purchase_price"]:
                     self.price.setValue(float(p["purchase_price"]))
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
         conn.close()
 
@@ -420,7 +412,7 @@ class ReceivePODialog(QtWidgets.QDialog):
                         VALUES (?,?,?,?,?,?)
                     """, (product_id, today, "receipt", qty, po_num,
                           f"Received from PO {po_num}"))
-                except sqlite3.OperationalError:
+                except psycopg2.OperationalError:
                     pass
 
         all_items = conn.execute(

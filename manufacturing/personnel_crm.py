@@ -1,750 +1,419 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
-import sqlite3
-from tkinter import colorchooser
-from configparser import ConfigParser
+import sys
+import psycopg2
+from db_pg import get_db
+from PyQt6 import QtCore, QtGui, QtWidgets
 
-root = Tk()
-root.title('Personnel CRM')
-root.geometry("1400x550")
+BLUE = QtGui.QColor(0, 85, 255)
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+)
+COMBO_STYLE = (
+    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox QAbstractItemView{background-color: white;}"
+)
+LABEL_STYLE = "color: white; font-size: 13px;"
 
-# Database setup
-def setup_database():
-    conn = sqlite3.connect('company.db')
-    cursor = conn.cursor()
-    cursor.execute("""
-    CREATE TABLE if not exists people (
-	    first_name text,
-	    last_name text,
-	    id integer,
-	    address text,
-	    city text,
-	    state text,
-	    zip_code text,
- 	    email text,
-        dept_id INTEGER,
-        dept_sub_id INTEGER,
-        FOREIGN KEY(dept_id) REFERENCES dept(id),
-        FOREIGN KEY(dept_sub_id) REFERENCES dept_sub(id)
-        )
-	""")
 
-    cursor.execute("""
-    CREATE TABLE if not exists dept (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        dept_id integer,
-        dept_name text
+def init_db():
+    conn = get_db()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS dept (
+            dept_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dept_name TEXT NOT NULL
         )
     """)
-    
-    cursor.execute("""
-    CREATE TABLE if not exists dept_sub (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        dept_sub_id integer,
-        dept_sub_name text
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS dept_sub (
+            dept_sub_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dept_sub_name TEXT NOT NULL
         )
     """)
+    for col in ("emp_id INTEGER",
+                "dept_id INTEGER REFERENCES dept(dept_id)",
+                "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
+        try:
+            conn.execute(f"ALTER TABLE people ADD COLUMN {col}")
+        except psycopg2.OperationalError:
+            pass
     conn.commit()
     conn.close()
-# Read our config file and get colors
-parser = ConfigParser()
-parser.read("personnel.ini")
-saved_primary_color = parser.get('colors', 'primary_color')
-saved_secondary_color = parser.get('colors', 'secondary_color')
-saved_highlight_color = parser.get('colors', 'highlight_color')
-
-def query_database():
-	# Clear the Treeview
-	for record in my_tree.get_children():
-		my_tree.delete(record)
-		
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	c.execute("SELECT rowid, * FROM people")
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	#for record in records:
-	#	print(record)
-
-
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0], record[4], record[5], record[6], record[7], record[8],  record[9],  record[10]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0], record[4], record[5], record[6], record[7], record[8],  record[9],  record[10]), tags=('oddrow',))
-		# increment counter
-		count += 1
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-
-
-def search_records():
-	lookup_record = search_entry.get()
-	# close the search box
-	search.destroy()
-	
-	# Clear the Treeview
-	for record in my_tree.get_children():
-		my_tree.delete(record)
-	
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	c.execute("SELECT rowid, * FROM people WHERE last_name like ?", (lookup_record,))
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	#for record in records:
-	#	print(record)
-
-
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0], record[4], record[5], record[6], record[7], record[8],  record[9],  record[10]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0], record[4], record[5], record[6], record[7], record[8],  record[9],  record[10]), tags=('oddrow',))
-		# increment counter
-		count += 1
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-
-
-def lookup_records():
-	global search_entry, search
-
-	search = Toplevel(root)
-	search.title("Lookup Records")
-	search.geometry("400x200")
-	
-
-	# Create label frame
-	search_frame = LabelFrame(search, text="Last Name")
-	search_frame.pack(padx=10, pady=10)
-
-	# Add entry box
-	search_entry = Entry(search_frame, font=("Helvetica", 18))
-	search_entry.pack(pady=20, padx=20)
-
-	# Add button
-	search_button = Button(search, text="Search Records", command=search_records)
-	search_button.pack(padx=20, pady=20)
-
-
-
-def primary_color():
-	# Pick Color
-	primary_color = colorchooser.askcolor()[1]
-
-	# Update Treeview Color
-	if primary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('evenrow', background=primary_color)
-
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'primary_color', primary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-
-
-def secondary_color():
-	# Pick Color
-	secondary_color = colorchooser.askcolor()[1]
-	
-	# Update Treeview Color
-	if secondary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('oddrow', background=secondary_color)
-		
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'secondary_color', secondary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-
-def highlight_color():
-	# Pick Color
-	highlight_color = colorchooser.askcolor()[1]
-
-	#Update Treeview Color
-	# Change Selected Color
-	if highlight_color:
-		style.map('Treeview',
-			background=[('selected', highlight_color)])
-
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'highlight_color', highlight_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-
-def reset_colors():
-	# Save original colors to config file
-	parser = ConfigParser()
-	parser.read('personnel.ini')
-	parser.set('colors', 'primary_color', 'lightblue')
-	parser.set('colors', 'secondary_color', 'white')
-	parser.set('colors', 'highlight_color', '#347083')
-	with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-	# Reset the colors
-	my_tree.tag_configure('oddrow', background='white')
-	my_tree.tag_configure('evenrow', background='lightblue')
-	style.map('Treeview',
-			background=[('selected', '#347083')])
-
-# Add Menu
-my_menu = Menu(root)
-root.config(menu=my_menu)
-
-
-
-# Configure our menu
-option_menu = Menu(my_menu, tearoff=0)
-my_menu.add_cascade(label="Options", menu=option_menu)
-# Drop down menu
-option_menu.add_command(label="Primary Color", command=primary_color)
-option_menu.add_command(label="Secondary Color", command=secondary_color)
-option_menu.add_command(label="Highlight Color", command=highlight_color)
-option_menu.add_separator()
-option_menu.add_command(label="Reset Colors", command=reset_colors)
-option_menu.add_separator()
-option_menu.add_command(label="Exit", command=root.quit)
-
-#Search Menu
-search_menu = Menu(my_menu, tearoff=0)
-my_menu.add_cascade(label="Search", menu=search_menu)
-# Drop down menu
-search_menu.add_command(label="Search", command=lookup_records)
-search_menu.add_separator()
-search_menu.add_command(label="Reset", command=query_database)
-
-# Do some database stuff
-# Create a database or connect to one that exists
-conn = sqlite3.connect('company.db')
-
-# Create a cursor instance
-c = conn.cursor()
-
-# Create Table
-c.execute("""CREATE TABLE if not exists people (
-	first_name text,
-	last_name text,
-	id integer,
-	address text,
-	city text,
-	state text,
-	zip_code text,
- 	email text,
-    dept_id INTEGER,
-    dept_sub_id INTEGER,
-    FOREIGN KEY(dept_id) REFERENCES dept(id),
-    FOREIGN KEY(dept_sub_id) REFERENCES dept_sub(id))
-	""")
-
-# Commit changes
-conn.commit()
-
-# Close our connection
-conn.close()
-
-
-
-# Add Some Style
-style = ttk.Style()
-
-# Pick A Theme
-style.theme_use('default')
-
-# Configure the Treeview Colors
-style.configure("Treeview",
-	background="#D3D3D3",
-	foreground="black",
-	rowheight=25,
-	fieldbackground="#D3D3D3")
-
-# Change Selected Color #347083
-style.map('Treeview',
-	background=[('selected', saved_highlight_color)])
-
-# Create a Treeview Frame
-tree_frame = Frame(root)
-tree_frame.pack(pady=10)
-
-# Create a Treeview Scrollbar
-tree_scroll = Scrollbar(tree_frame)
-tree_scroll.pack(side=RIGHT, fill=Y)
-
-# Create The Treeview
-my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
-my_tree.pack()
-
-# Configure the Scrollbar
-tree_scroll.config(command=my_tree.yview)
-
-# Define Our Columns
-my_tree['columns'] = ("First Name", "Last Name", "ID", "Address", "City", "State", "Zipcode", "Email",  "Dept",  "Dept Sub")
-
-# Format Our Columns
-my_tree.column("#0", width=0, stretch=NO)
-my_tree.column("First Name", anchor=W, width=140)
-my_tree.column("Last Name", anchor=W, width=140)
-my_tree.column("ID", anchor=CENTER, width=100)
-my_tree.column("Address", anchor=CENTER, width=140)
-my_tree.column("City", anchor=CENTER, width=140)
-my_tree.column("State", anchor=CENTER, width=140)
-my_tree.column("Zipcode", anchor=CENTER, width=140)
-my_tree.column("Email", anchor=CENTER, width=140)
-my_tree.column("Dept",  anchor=CENTER,  width=140)
-my_tree.column("Dept Sub",  anchor=CENTER,  width=140)
-
-# Create Headings
-my_tree.heading("#0", text="", anchor=W)
-my_tree.heading("First Name", text="First Name", anchor=W)
-my_tree.heading("Last Name", text="Last Name", anchor=W)
-my_tree.heading("ID", text="ID", anchor=CENTER)
-my_tree.heading("Address", text="Address", anchor=CENTER)
-my_tree.heading("City", text="City", anchor=CENTER)
-my_tree.heading("State", text="State", anchor=CENTER)
-my_tree.heading("Zipcode", text="Zip_code", anchor=CENTER)
-my_tree.heading("Email", text="Email", anchor=CENTER)
-my_tree.heading("Dept",  text="Dept",  anchor=CENTER)
-my_tree.heading("Dept Sub",  text="Dept Sub",  anchor=CENTER)
-
-# Create Striped Row Tags
-my_tree.tag_configure('oddrow', background=saved_secondary_color)
-my_tree.tag_configure('evenrow', background=saved_primary_color)
-
-
-
-# Add Record Entry Boxes
-data_frame = LabelFrame(root, text="Record")
-data_frame.pack(fill="x", expand="yes", padx=20)
-
-fn_label = Label(data_frame, text="First Name")
-fn_label.grid(row=0, column=0, padx=10, pady=10)
-fn_entry = Entry(data_frame)
-fn_entry.grid(row=0, column=1, padx=10, pady=10)
-
-ln_label = Label(data_frame, text="Last Name")
-ln_label.grid(row=0, column=2, padx=10, pady=10)
-ln_entry = Entry(data_frame)
-ln_entry.grid(row=0, column=3, padx=10, pady=10)
-
-id_label = Label(data_frame, text="ID")
-id_label.grid(row=0, column=4, padx=10, pady=10)
-id_entry = Entry(data_frame)
-id_entry.grid(row=0, column=5, padx=10, pady=10)
-
-address_label = Label(data_frame, text="Address")
-address_label.grid(row=0, column=6, padx=10, pady=10)
-address_entry = Entry(data_frame)
-address_entry.grid(row=0, column=7, padx=10, pady=10)
-
-city_label = Label(data_frame, text="City")
-city_label.grid(row=0, column=8, padx=10, pady=10)
-city_entry = Entry(data_frame)
-city_entry.grid(row=0, column=9, padx=10, pady=10)
-
-state_label = Label(data_frame, text="State")
-state_label.grid(row=0, column=10, padx=10, pady=10)
-state_entry = Entry(data_frame)
-state_entry.grid(row=0, column=11, padx=10, pady=10)
-
-zip_code_label = Label(data_frame, text="Zipcode")
-zip_code_label.grid(row=1, column=0, padx=10, pady=10)
-zip_code_entry = Entry(data_frame)
-zip_code_entry.grid(row=1, column=1, padx=10, pady=10)
-
-email_label = Label(data_frame, text="Email")
-email_label.grid(row=1, column=2, padx=10, pady=10)
-email_entry = Entry(data_frame)
-email_entry.grid(row=1, column=3, padx=10, pady=10)
-
-dept_label = Label(data_frame, text="Dept")
-dept_label.grid(row=1, column=4, padx=10, pady=10)
-dept_entry = Entry(data_frame)
-dept_entry.grid(row=1, column=5, padx=10, pady=10)
-
-ds_label = Label(data_frame, text="Dept Sub")
-ds_label.grid(row=1, column=6, padx=10, pady=10)
-ds_entry = Entry(data_frame)
-ds_entry.grid(row=1, column=7, padx=10, pady=10)
-
-
-# Move Row Up
-def up():
-	rows = my_tree.selection()
-	for row in rows:
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)-1)
-
-# Move Rown Down
-def down():
-	rows = my_tree.selection()
-	for row in reversed(rows):
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)+1)
-
-# Remove one record
-def remove_one():
-	x = my_tree.selection()[0]
-	my_tree.delete(x)
-
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# Delete From Database
-	c.execute("DELETE from people WHERE oid=" + id_entry.get())
-	
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-	# Clear The Entry Boxes
-	clear_entries()
-
-	# Add a little message box for fun
-	messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
-
-
-
-# Remove Many records
-def remove_many():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
-
-	#Add logic for message box
-	if response == 1:
-		# Designate selections
-		x = my_tree.selection()
-
-		# Create List of ID's
-		ids_to_delete = []
-		
-		# Add selections to ids_to_delete list
-		for record in x:
-			ids_to_delete.append(my_tree.item(record, 'values')[2])
-
-		# Delete From Treeview
-		for record in x:
-			my_tree.delete(record)
-
-		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
-
-		# Create a cursor instance
-		c = conn.cursor()
-		
-
-		# Delete Everything From The Table
-		c.executemany("DELETE FROM people WHERE id = ?", [(a,) for a in ids_to_delete])
-
-		# Reset List
-		ids_to_delete = []
-
-
-		# Commit changes
-		conn.commit()
-
-		# Close our connection
-		conn.close()
-
-		# Clear entry boxes if filled
-		clear_entries()
-
-
-# Remove all records
-def remove_all():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
-
-	#Add logic for message box
-	if response == 1:
-		# Clear the Treeview
-		for record in my_tree.get_children():
-			my_tree.delete(record)
-
-		# Create a database or connect to one that exists
-		conn = sqlite3.connect('company.db')
-
-		# Create a cursor instance
-		c = conn.cursor()
-
-		# Delete Everything From The Table
-		c.execute("DROP TABLE people")
-			
-
-
-		# Commit changes
-		conn.commit()
-
-		# Close our connection
-		conn.close()
-
-		# Clear entry boxes if filled
-		clear_entries()
-
-		# Recreate The Table
-		create_table_again()
-
-# Clear entry boxes
-def clear_entries():
-	# Clear entry boxes
-	fn_entry.delete(0, END)
-	ln_entry.delete(0, END)
-	id_entry.delete(0, END)
-	address_entry.delete(0, END)
-	city_entry.delete(0, END)
-	state_entry.delete(0, END)
-	zip_code_entry.delete(0, END)
-	email_entry.delete(0, END)
-	dept_entry.delete(0, END)
-	ds_entry.delete(0, END)
-	
-
-# Select Record
-def select_record(e):
-	# Clear entry boxes
-	fn_entry.delete(0, END)
-	ln_entry.delete(0, END)
-	id_entry.delete(0, END)
-	address_entry.delete(0, END)
-	city_entry.delete(0, END)
-	state_entry.delete(0, END)
-	zip_code_entry.delete(0, END)
-	email_entry.delete(0, END)
-	dept_entry.delete(0, END)
-	ds_entry.delete(0, END)
-	
-	# Grab record Number
-	selected = my_tree.focus()
-	# Grab record values
-	values = my_tree.item(selected, 'values')
-
-	# output to entry boxes
-	fn_entry.insert(0, values[0])
-	ln_entry.insert(0, values[1])
-	id_entry.insert(0, values[2])
-	address_entry.insert(0, values[3])
-	city_entry.insert(0, values[4])
-	state_entry.insert(0, values[5])
-	zip_code_entry.insert(0, values[6])
-	email_entry.insert(0, values[7])
-	dept_entry.insert(0, values[8])
-	ds_entry.insert(0,  values[9])
-	
-# Update record
-def update_record():
-	# Grab the record number
-	selected = my_tree.focus()
-	# Update record
-	my_tree.item(selected, text="", values=(fn_entry.get(), ln_entry.get(), id_entry.get(), address_entry.get(), city_entry.get(), state_entry.get(), zip_code_entry.get(), email_entry.get(), dept_entry.get(), ds_entry.get()))
-
-	# Update the database
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# c.execute("SELECT * FROM people WHERE id=?", (selected_id))
-
-	c.execute("""UPDATE people SET
-		first_name = :first,
-		last_name = :last,
-		address = :address,
-		city = :city,
-		state = :state,
-		zip_code = :zip_code,
-		email = :email,
-        dept = :dept
-        dept_sub = :dept_sub
-	
-		WHERE oid = :oid""",
-		{
-			'first': fn_entry.get(),
-			'last': ln_entry.get(),
-			'address': address_entry.get(),
-			'city': city_entry.get(),
-			'state': state_entry.get(),
-			'zip_code': zip_code_entry.get(),
-			'email': email_entry.get(),
-            'dept': dept_entry.get(), 
-            'dept_sub': ds_entry.get(), 
-			'oid': id_entry.get(),			
-		})
-	
-
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-
-	# Clear entry boxes
-	fn_entry.delete(0, END)
-	ln_entry.delete(0, END)
-	id_entry.delete(0, END)
-	address_entry.delete(0, END)
-	city_entry.delete(0, END)
-	state_entry.delete(0, END)
-	zip_code_entry.delete(0, END)
-	email_entry.delete(0, END)
-	dept_entry.delete(0,  END)
-	ds_entry.delete(0, END)
-	
-# add new record to database
-def add_record():
-	# Update the database
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# Add New Record
-	c.execute("INSERT INTO people VALUES (:first, :last, :id, :address, :city, :state, :email, :dept_id, :ds_id)",
-		{
-			'first': fn_entry.get(),
-			'last': ln_entry.get(),
-			'id': id_entry.get(),
-			'address': address_entry.get(),
-			'city': city_entry.get(),
-			'state': state_entry.get(),
-			'zip_code': zip_code_entry.get(),
-			'email': email_entry.get(),
-            'dept': dept_entry.get(), 
-			'dept_sub': ds_entry.get(), 
-		})
-	
-
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-	# Clear entry boxes
-	fn_entry.delete(0, END)
-	ln_entry.delete(0, END)
-	id_entry.delete(0, END)
-	address_entry.delete(0, END)
-	city_entry.delete(0, END)
-	state_entry.delete(0, END)
-	zip_code_entry.delete(0, END)
-	email_entry.delete(0, END)
-	dept_entry.delete(0,  END)
-	ds_entry.delete(0,  END)
-    
-    # Clear The Treeview Table
-	my_tree.delete(*my_tree.get_children())
-
-	# Run to pull data from database on start
-	query_database()
-
-def create_table_again():
-	# Create a database or connect to one that exists
-	conn = sqlite3.connect('company.db')
-
-	# Create a cursor instance
-	c = conn.cursor()
-
-	# Create Table
-	c.execute("""CREATE TABLE if not exists people (
-		first_name text,
-		last_name text,
-		id integer,
-		address text,
-		city text,
-		state text,
-		zip_code text,
-		email text),
-        dept text),
-        dept_sub text)
-		""")
-	
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-# Add Buttons
-button_frame = LabelFrame(root, text="Commands")
-button_frame.pack(fill="x", expand="yes", padx=20)
-
-update_button = Button(button_frame, text="Update Record", command=update_record)
-update_button.grid(row=0, column=0, padx=10, pady=10)
-
-add_button = Button(button_frame, text="Add Record", command=add_record)
-add_button.grid(row=0, column=1, padx=10, pady=10)
-
-remove_all_button = Button(button_frame, text="Remove All Records", command=remove_all)
-remove_all_button.grid(row=0, column=2, padx=10, pady=10)
-
-remove_one_button = Button(button_frame, text="Remove One Selected", command=remove_one)
-remove_one_button.grid(row=0, column=3, padx=10, pady=10)
-
-remove_many_button = Button(button_frame, text="Remove Many Selected", command=remove_many)
-remove_many_button.grid(row=0, column=4, padx=10, pady=10)
-
-move_up_button = Button(button_frame, text="Move Up", command=up)
-move_up_button.grid(row=0, column=5, padx=10, pady=10)
-
-move_down_button = Button(button_frame, text="Move Down", command=down)
-move_down_button.grid(row=0, column=6, padx=10, pady=10)
-
-select_record_button = Button(button_frame, text="Clear Entry Boxes", command=clear_entries)
-select_record_button.grid(row=0, column=7, padx=10, pady=10)
-
-# Bind the treeview
-my_tree.bind("<ButtonRelease-1>", select_record)
-
-# Run to pull data from database on start
-query_database()
-
-root.mainloop()
+
+
+def _apply_blue_palette(widget):
+    pal = widget.palette()
+    for group in (QtGui.QPalette.ColorGroup.Active,
+                  QtGui.QPalette.ColorGroup.Inactive,
+                  QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
+        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
+    widget.setPalette(pal)
+
+
+class PersonnelCRM(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Personnel CRM")
+        self.resize(1300, 720)
+        _apply_blue_palette(self)
+        self._selected_row_id = None
+        self._row_ids = []
+        self._build_ui()
+        self._load_depts()
+        self._refresh_table()
+
+    def _build_ui(self):
+        central = QtWidgets.QWidget()
+        self.setCentralWidget(central)
+        layout = QtWidgets.QVBoxLayout(central)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
+
+        # ── Table ──────────────────────────────────────────────────────────
+        self.table = QtWidgets.QTableWidget()
+        self.table.setColumnCount(10)
+        self.table.setHorizontalHeaderLabels([
+            "First Name", "Last Name", "Emp ID",
+            "Address", "City", "State", "Zip", "Email",
+            "Department", "Dept Sub",
+        ])
+        hh = self.table.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.table.setAlternatingRowColors(True)
+        self.table.verticalHeader().setVisible(False)
+        self.table.clicked.connect(self._on_row_clicked)
+        layout.addWidget(self.table, stretch=1)
+
+        # ── Search bar ─────────────────────────────────────────────────────
+        search_row = QtWidgets.QHBoxLayout()
+        lbl = QtWidgets.QLabel("Search by last name:")
+        lbl.setStyleSheet(LABEL_STYLE)
+        search_row.addWidget(lbl)
+        self.search_input = QtWidgets.QLineEdit()
+        self.search_input.setStyleSheet(INPUT_STYLE)
+        self.search_input.setFixedWidth(220)
+        self.search_input.returnPressed.connect(self._on_search)
+        search_row.addWidget(self.search_input)
+
+        for text, slot in (("Search", self._on_search), ("Show All", self._on_show_all)):
+            btn = QtWidgets.QPushButton(text)
+            btn.setStyleSheet(BUTTON_STYLE)
+            btn.setFixedHeight(30)
+            btn.clicked.connect(slot)
+            search_row.addWidget(btn)
+        search_row.addStretch()
+        layout.addLayout(search_row)
+
+        # ── Entry form ─────────────────────────────────────────────────────
+        form_group = QtWidgets.QGroupBox("Employee Record")
+        form_group.setStyleSheet(
+            "QGroupBox{color: white; font-weight: bold;"
+            " border: 1px solid white; margin-top: 8px;}"
+            "QGroupBox::title{subcontrol-origin: margin; left: 10px;}"
+        )
+        fg = QtWidgets.QGridLayout(form_group)
+        fg.setSpacing(6)
+
+        def lbl2(text):
+            w = QtWidgets.QLabel(text)
+            w.setStyleSheet(LABEL_STYLE)
+            return w
+
+        def inp(ph=""):
+            w = QtWidgets.QLineEdit()
+            w.setStyleSheet(INPUT_STYLE)
+            if ph:
+                w.setPlaceholderText(ph)
+            return w
+
+        self.fn_input    = inp("First name")
+        self.ln_input    = inp("Last name")
+        self.empid_input = inp("Numbers only")
+        self.addr_input  = inp("Street address")
+        self.city_input  = inp("City")
+        self.state_input = inp("ST")
+        self.state_input.setMaxLength(2)
+        self.state_input.setFixedWidth(44)
+        self.zip_input   = inp("Zip")
+        self.zip_input.setFixedWidth(90)
+        self.email_input = inp("Email address")
+
+        self.dept_combo = QtWidgets.QComboBox()
+        self.dept_combo.setStyleSheet(COMBO_STYLE)
+        self.dept_combo.setMinimumWidth(160)
+        self.dept_combo.currentIndexChanged.connect(self._on_dept_changed)
+
+        self.dept_sub_combo = QtWidgets.QComboBox()
+        self.dept_sub_combo.setStyleSheet(COMBO_STYLE)
+        self.dept_sub_combo.setMinimumWidth(160)
+
+        # Row 0: name / emp id / email
+        fg.addWidget(lbl2("First Name:"),  0, 0)
+        fg.addWidget(self.fn_input,         0, 1)
+        fg.addWidget(lbl2("Last Name:"),   0, 2)
+        fg.addWidget(self.ln_input,         0, 3)
+        fg.addWidget(lbl2("Emp ID:"),      0, 4)
+        fg.addWidget(self.empid_input,      0, 5)
+        fg.addWidget(lbl2("Email:"),        0, 6)
+        fg.addWidget(self.email_input,      0, 7)
+
+        # Row 1: address / city / state
+        fg.addWidget(lbl2("Address:"),      1, 0)
+        fg.addWidget(self.addr_input,       1, 1, 1, 3)
+        fg.addWidget(lbl2("City:"),         1, 4)
+        fg.addWidget(self.city_input,       1, 5)
+        fg.addWidget(lbl2("State:"),        1, 6)
+        fg.addWidget(self.state_input,      1, 7)
+
+        # Row 2: zip / dept / dept sub
+        fg.addWidget(lbl2("Zip:"),          2, 0)
+        fg.addWidget(self.zip_input,        2, 1)
+        fg.addWidget(lbl2("Department:"),   2, 2)
+        fg.addWidget(self.dept_combo,       2, 3)
+        fg.addWidget(lbl2("Dept Sub:"),     2, 4)
+        fg.addWidget(self.dept_sub_combo,   2, 5)
+
+        layout.addWidget(form_group)
+
+        # ── Action buttons ─────────────────────────────────────────────────
+        btn_row = QtWidgets.QHBoxLayout()
+        for text, slot in (
+            ("Add New",        self._on_add),
+            ("Update Selected", self._on_update),
+            ("Delete Selected", self._on_delete),
+            ("Clear Form",     self._clear_form),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(34)
+            b.clicked.connect(slot)
+            btn_row.addWidget(b)
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
+
+    # ── Department helpers ─────────────────────────────────────────────────
+
+    def _load_depts(self):
+        conn = get_db()
+        depts = conn.execute(
+            "SELECT dept_id, dept_name FROM dept ORDER BY dept_name"
+        ).fetchall()
+        conn.close()
+        self.dept_combo.blockSignals(True)
+        self.dept_combo.clear()
+        self.dept_combo.addItem("(none)", None)
+        for row in depts:
+            self.dept_combo.addItem(row["dept_name"], row["dept_id"])
+        self.dept_combo.blockSignals(False)
+        self._populate_dept_sub(None)
+
+    def _on_dept_changed(self):
+        self._populate_dept_sub(self.dept_combo.currentData())
+
+    def _populate_dept_sub(self, dept_id):
+        conn = get_db()
+        subs = conn.execute(
+            "SELECT dept_sub_id, dept_sub_name FROM dept_sub ORDER BY dept_sub_name"
+        ).fetchall()
+        conn.close()
+        self.dept_sub_combo.blockSignals(True)
+        self.dept_sub_combo.clear()
+        self.dept_sub_combo.addItem("(none)", None)
+        for row in subs:
+            self.dept_sub_combo.addItem(row["dept_sub_name"], row["dept_sub_id"])
+        self.dept_sub_combo.blockSignals(False)
+
+    # ── Table data ─────────────────────────────────────────────────────────
+
+    def _refresh_table(self, search_term=None):
+        conn = get_db()
+        q = """
+            SELECT p.id, p.first_name, p.last_name, p.emp_id,
+                   p.address, p.city, p.state, p.zip_code, p.email,
+                   d.dept_name, ds.dept_sub_name
+            FROM people p
+            LEFT JOIN dept d    ON d.dept_id     = p.dept_id
+            LEFT JOIN dept_sub ds ON ds.dept_sub_id = p.dept_Sub_id
+        """
+        if search_term:
+            rows = conn.execute(
+                q + " WHERE p.last_name LIKE ? ORDER BY p.last_name, p.first_name",
+                (f"%{search_term}%",)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                q + " ORDER BY p.last_name, p.first_name"
+            ).fetchall()
+        conn.close()
+
+        self.table.setRowCount(0)
+        self._row_ids = []
+        for row in rows:
+            r = self.table.rowCount()
+            self.table.insertRow(r)
+            self._row_ids.append(row["id"])
+            for col, val in enumerate([
+                row["first_name"], row["last_name"],
+                str(row["emp_id"] or ""),
+                row["address"] or "", row["city"] or "",
+                row["state"] or "", row["zip_code"] or "",
+                row["email"] or "",
+                row["dept_name"] or "", row["dept_sub_name"] or "",
+            ]):
+                self.table.setItem(r, col, QtWidgets.QTableWidgetItem(val))
+
+        self._selected_row_id = None
+
+    def _on_search(self):
+        term = self.search_input.text().strip()
+        self._refresh_table(search_term=term if term else None)
+
+    def _on_show_all(self):
+        self.search_input.clear()
+        self._refresh_table()
+
+    # ── Row selection → populate form ──────────────────────────────────────
+
+    def _on_row_clicked(self, index):
+        row = index.row()
+        if row < 0 or row >= len(self._row_ids):
+            return
+        self._selected_row_id = self._row_ids[row]
+        conn = get_db()
+        p = conn.execute("SELECT * FROM people WHERE id = ?", (self._selected_row_id,)).fetchone()
+        conn.close()
+        if not p:
+            return
+
+        keys = p.keys()
+        self.fn_input.setText(p["first_name"] or "")
+        self.ln_input.setText(p["last_name"] or "")
+        self.empid_input.setText(str(p["emp_id"] or ""))
+        self.addr_input.setText(p["address"] or "")
+        self.city_input.setText(p["city"] or "")
+        self.state_input.setText(p["state"] or "")
+        self.zip_input.setText(p["zip_code"] or "")
+        self.email_input.setText(p["email"] or "")
+
+        dept_id     = p["dept_id"]     if "dept_id"     in keys else None
+        dept_sub_id = p["dept_Sub_id"] if "dept_Sub_id" in keys else None
+
+        idx = self.dept_combo.findData(dept_id)
+        self.dept_combo.setCurrentIndex(max(0, idx))
+        idx2 = self.dept_sub_combo.findData(dept_sub_id)
+        self.dept_sub_combo.setCurrentIndex(max(0, idx2))
+
+    # ── Form helpers ───────────────────────────────────────────────────────
+
+    def _collect_form(self):
+        emp_id_text = self.empid_input.text().strip()
+        if emp_id_text and not emp_id_text.isdigit():
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Employee ID must be a number.")
+            return None
+        return {
+            "first_name":  self.fn_input.text().strip(),
+            "last_name":   self.ln_input.text().strip(),
+            "emp_id":      int(emp_id_text) if emp_id_text else 0,
+            "address":     self.addr_input.text().strip(),
+            "city":        self.city_input.text().strip(),
+            "state":       self.state_input.text().strip().upper(),
+            "zip_code":    self.zip_input.text().strip(),
+            "email":       self.email_input.text().strip(),
+            "dept_id":     self.dept_combo.currentData(),
+            "dept_Sub_id": self.dept_sub_combo.currentData(),
+        }
+
+    def _clear_form(self):
+        self._selected_row_id = None
+        for w in (self.fn_input, self.ln_input, self.empid_input,
+                  self.addr_input, self.city_input, self.state_input,
+                  self.zip_input, self.email_input):
+            w.clear()
+        self.dept_combo.setCurrentIndex(0)
+        self.dept_sub_combo.setCurrentIndex(0)
+        self.table.clearSelection()
+
+    # ── CRUD ───────────────────────────────────────────────────────────────
+
+    def _on_add(self):
+        data = self._collect_form()
+        if data is None:
+            return
+        if not data["first_name"] or not data["last_name"]:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "First and last name are required.")
+            return
+        conn = get_db()
+        conn.execute("""
+            INSERT INTO people
+                (first_name, last_name, emp_id, address, city, state, zip_code, email, dept_id, dept_Sub_id)
+            VALUES
+                (:first_name, :last_name, :emp_id, :address, :city, :state, :zip_code, :email,
+                 :dept_id, :dept_Sub_id)
+        """, data)
+        conn.commit()
+        conn.close()
+        self._clear_form()
+        self._refresh_table()
+
+    def _on_update(self):
+        if self._selected_row_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
+            return
+        data = self._collect_form()
+        if data is None:
+            return
+        data["row_id"] = self._selected_row_id
+        conn = get_db()
+        conn.execute("""
+            UPDATE people SET
+                first_name  = :first_name,
+                last_name   = :last_name,
+                emp_id      = :emp_id,
+                address     = :address,
+                city        = :city,
+                state       = :state,
+                zip_code    = :zip_code,
+                email       = :email,
+                dept_id     = :dept_id,
+                dept_Sub_id = :dept_Sub_id
+            WHERE id = :row_id
+        """, data)
+        conn.commit()
+        conn.close()
+        self._refresh_table()
+
+    def _on_delete(self):
+        if self._selected_row_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
+            return
+        reply = QtWidgets.QMessageBox.question(
+            self, "Confirm Delete", "Delete this employee record?",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+        )
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            conn = get_db()
+            conn.execute("DELETE FROM people WHERE id = ?", (self._selected_row_id,))
+            conn.commit()
+            conn.close()
+            self._clear_form()
+            self._refresh_table()
+
+
+def main():
+    init_db()
+    app = QtWidgets.QApplication(sys.argv)
+    window = PersonnelCRM()
+    window.show()
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()

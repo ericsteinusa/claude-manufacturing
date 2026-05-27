@@ -1,15 +1,7 @@
 import sys
-import sqlite3
+import psycopg2
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-
-# ---------------------------------------------------------------------------
-# Database helpers
-# ---------------------------------------------------------------------------
-def get_db():
-    conn = sqlite3.connect("company.db")
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def init_db():
@@ -143,7 +135,7 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         conn.commit()
         conn.close()
         return True
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         return False
 
 
