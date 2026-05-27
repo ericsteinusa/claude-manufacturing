@@ -4,7 +4,7 @@ import psycopg2.extras
 
 DB_CONFIG = {
     'host': 'localhost',
-    'dbname': 'company',
+    'dbname': 'company_db',
     'user': 'postgres',
     'password': '***REMOVED***',
     'port': 5432,
