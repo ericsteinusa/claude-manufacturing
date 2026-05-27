@@ -15,6 +15,19 @@ _RE_INSERT_IGNORE = re.compile(r'INSERT\s+OR\s+IGNORE\s+INTO', re.IGNORECASE)
 _RE_ROWID_STAR = re.compile(r'SELECT\s+rowid\s*,\s*\*', re.IGNORECASE)
 _RE_NAMED_PARAM = re.compile(r':([A-Za-z_]\w*)')
 _RE_DATETIME_NOW = re.compile(r"datetime\s*\(\s*'now'\s*\)", re.IGNORECASE)
+_RE_DATE_NOW = re.compile(r"\bdate\s*\(\s*'now'\s*\)", re.IGNORECASE)
+# CAST(julianday('now')-julianday(X) AS INT) -> (CURRENT_DATE - X::date)
+_RE_JULIANDAY_DIFF_NOW = re.compile(
+    r"CAST\s*\(\s*julianday\s*\(\s*'now'\s*\)\s*-\s*julianday\s*\(([^)]+)\)\s*AS\s+INT\s*\)",
+    re.IGNORECASE)
+# julianday(X) - julianday(Y) -> (X::date - Y::date)
+_RE_JULIANDAY_DIFF = re.compile(
+    r"julianday\s*\(([^)]+)\)\s*-\s*julianday\s*\(([^)]+)\)",
+    re.IGNORECASE)
+# strftime('%Y-%m', col) -> TO_CHAR(col::timestamp, 'YYYY-MM')
+_RE_STRFTIME_YM = re.compile(r"strftime\s*\(\s*'%Y-%m'\s*,\s*([^,)]+)\)", re.IGNORECASE)
+# strftime('%Y', col) -> TO_CHAR(col::timestamp, 'YYYY')
+_RE_STRFTIME_Y = re.compile(r"strftime\s*\(\s*'%Y'\s*,\s*([^,)]+)\)", re.IGNORECASE)
 
 
 def _adapt(sql):
@@ -28,6 +41,15 @@ def _adapt(sql):
         sql = sql.rstrip().rstrip(';') + ' ON CONFLICT DO NOTHING'
     sql = _RE_AUTOINCREMENT.sub('SERIAL PRIMARY KEY', sql)
     sql = _RE_DATETIME_NOW.sub('CURRENT_TIMESTAMP', sql)
+    sql = _RE_DATE_NOW.sub("CURRENT_DATE::text", sql)
+    sql = _RE_JULIANDAY_DIFF_NOW.sub(
+        lambda m: f"(CURRENT_DATE - ({m.group(1).strip()})::date)", sql)
+    sql = _RE_JULIANDAY_DIFF.sub(
+        lambda m: f"({m.group(1).strip()}::date - {m.group(2).strip()}::date)", sql)
+    sql = _RE_STRFTIME_YM.sub(
+        lambda m: f"TO_CHAR(({m.group(1).strip()})::timestamp, 'YYYY-MM')", sql)
+    sql = _RE_STRFTIME_Y.sub(
+        lambda m: f"TO_CHAR(({m.group(1).strip()})::timestamp, 'YYYY')", sql)
     return sql
 
 
