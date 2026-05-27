@@ -1,7 +1,11 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from QA_Lab_menu import QALabWidget, _apply_blue_palette
+from QA_Lab_menu import _apply_blue_palette
 
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
@@ -9,6 +13,27 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
+
+
+def _launch_tab(script, label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _do_launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch(); row.addWidget(btn); row.addStretch()
+    v.addLayout(row); v.addStretch()
+    return w
+
+
+def _do_launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
 
 class QualityAssuranceMenu(QtWidgets.QMainWindow):
@@ -25,7 +50,7 @@ class QualityAssuranceMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(QALabWidget(), "QA Lab")
+        tabs.addTab(_launch_tab("QA_Lab_menu.py", "QA Lab"), "QA Lab")
         v.addWidget(tabs)
 
 

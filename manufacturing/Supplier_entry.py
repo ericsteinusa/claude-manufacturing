@@ -859,7 +859,7 @@ class Purchasing(QtWidgets.QMainWindow):
         if status != "(all status)":
             q += " AND po.status=%s"
             params.append(status)
-        q += " GROUP BY po.id ORDER BY po.order_date DESC"
+        q += " GROUP BY po.id, po.po_number, po.order_date, po.expected_date, po.status, s.first_name, s.last_name, s.company_name ORDER BY po.order_date DESC"
         rows = conn.execute(q, params).fetchall()
         conn.close()
 

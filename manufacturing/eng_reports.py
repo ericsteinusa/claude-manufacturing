@@ -46,11 +46,6 @@ PRIORITY_COLORS = {
 }
 
 
-def get_db():
-    conn = get_db()
-    return conn
-
-
 def _apply_blue_palette(widget):
     pal = widget.palette()
     for group in (QtGui.QPalette.ColorGroup.Active,

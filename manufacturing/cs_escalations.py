@@ -267,7 +267,6 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         self.active_summary_lbl.setText(
             f"{total} active escalation(s) — {critical_count} critical"
         )
-        self.statusBar().showMessage(f"{total} escalations | {critical_count} critical")
 
     # ── Escalation History ────────────────────────────────────────────────
 
@@ -345,7 +344,6 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             for c in range(6):
                 self.hist_tbl.item(r, c).setBackground(color)
         self.hist_tbl.setSortingEnabled(True)
-        self.statusBar().showMessage(f"{self.hist_tbl.rowCount()} escalation(s) resolved in period")
 
     # ── Escalation Reports ────────────────────────────────────────────────
 

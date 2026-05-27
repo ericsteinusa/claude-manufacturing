@@ -406,12 +406,11 @@ class CSReportsWidget(QtWidgets.QWidget):
                 SELECT cu.id, cu.first_name, cu.last_name, cu.company_name,
                        COUNT(c2.id)                                           AS total,
                        SUM(CASE WHEN c2.completion_box=0 THEN 1 ELSE 0 END)  AS open_ct,
-                       SUM(c2.completion_box)                                 AS comp_ct,
-                       c2.call_date, c2.completion_date, c2.completion_box
+                       SUM(c2.completion_box)                                 AS comp_ct
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.call_date BETWEEN %s AND %s
-                GROUP BY cu.id
+                GROUP BY cu.id, cu.first_name, cu.last_name, cu.company_name
                 ORDER BY total DESC
             """, (f, t)).fetchall()
 
@@ -560,7 +559,6 @@ class CSReportsWidget(QtWidgets.QWidget):
         self.open_overdue_lbl.setText(
             f"{total_open} open call(s) — {overdue_count} overdue (≥{OVERDUE_DAYS} days)"
         )
-        self.statusBar().showMessage(f"{total_open} open calls | {overdue_count} overdue")
 
     # ── Run all tabs ──────────────────────────────────────────────────────
 

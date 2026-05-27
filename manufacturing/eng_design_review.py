@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 from db_pg import get_db
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -27,11 +26,6 @@ ECR_COLORS = {
     "rejected": "#f8d7da",
     "revision_needed": "#ffe8c0",
 }
-
-
-def get_db():
-    conn = get_db()
-    return conn
 
 
 def _apply_blue_palette(widget):
