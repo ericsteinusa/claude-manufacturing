@@ -18,6 +18,8 @@ def _conn():
 
 
 def init_db():
+    import General_ledger
+    General_ledger.init_db()
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS budget (

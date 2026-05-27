@@ -14,6 +14,7 @@ _RE_AUTOINCREMENT = re.compile(r'INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT', re.IG
 _RE_INSERT_IGNORE = re.compile(r'INSERT\s+OR\s+IGNORE\s+INTO', re.IGNORECASE)
 _RE_ROWID_STAR = re.compile(r'SELECT\s+rowid\s*,\s*\*', re.IGNORECASE)
 _RE_NAMED_PARAM = re.compile(r':([A-Za-z_]\w*)')
+_RE_DATETIME_NOW = re.compile(r"datetime\s*\(\s*'now'\s*\)", re.IGNORECASE)
 
 
 def _adapt(sql):
@@ -26,6 +27,7 @@ def _adapt(sql):
         sql = _RE_INSERT_IGNORE.sub('INSERT INTO', sql)
         sql = sql.rstrip().rstrip(';') + ' ON CONFLICT DO NOTHING'
     sql = _RE_AUTOINCREMENT.sub('SERIAL PRIMARY KEY', sql)
+    sql = _RE_DATETIME_NOW.sub('CURRENT_TIMESTAMP', sql)
     return sql
 
 
@@ -85,6 +87,14 @@ class PgConnection:
         cur = self.cursor()
         return cur.executemany(sql, params_seq)
 
+    def executescript(self, script):
+        cur = self.cursor()
+        for stmt in script.split(';'):
+            stmt = stmt.strip()
+            if stmt:
+                cur.execute(stmt)
+        return cur
+
     def commit(self):
         self._conn.commit()
 
@@ -94,7 +104,11 @@ class PgConnection:
     def __enter__(self):
         return self
 
-    def __exit__(self, *_):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self._conn.commit()
+        else:
+            self._conn.rollback()
         self._conn.close()
 
 
