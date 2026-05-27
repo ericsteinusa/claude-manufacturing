@@ -1,6 +1,7 @@
 import sys
-from .db_connection import get_db_connection
 import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
