@@ -5,7 +5,7 @@ Tabs: Chart of Accounts | Journal Entries | Trial Balance | Ledger View
 import sys
 import sqlite3
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -13,7 +13,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 

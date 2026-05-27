@@ -4,7 +4,7 @@ Tabs: Staff Directory | Performance Metrics | Staff Training | Staff Reports
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -32,7 +32,7 @@ LABEL_STYLE = "color%(white)s;font-size:13px;"
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 

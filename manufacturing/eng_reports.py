@@ -1,5 +1,5 @@
 import sys
-from .db_connection import get_db_connection
+from db_pg import get_db
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -47,7 +47,7 @@ PRIORITY_COLORS = {
 
 
 def get_db():
-    conn = get_db_connection()
+    conn = get_db()
     return conn
 
 

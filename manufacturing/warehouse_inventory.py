@@ -4,7 +4,7 @@ Tabs: Stock Overview | Receive Stock | Adjustments | Reports
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -43,7 +43,7 @@ ADJUST_TYPES = ["Cycle Count", "Damage / Shrinkage", "Return to Vendor", "Transf
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 

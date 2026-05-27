@@ -4,7 +4,7 @@ Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution 
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -34,7 +34,7 @@ COLOR_RESOLVED = QtGui.QColor(212, 237, 218)   # completed after being overdue
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 

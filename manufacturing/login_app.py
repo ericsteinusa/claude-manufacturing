@@ -821,7 +821,7 @@ class SessionWindow(QtWidgets.QMainWindow):
 
     def _on_logout(self):
         reply = QtWidgets.QMessageBox.question(
-            self, "Logout", "Are you sure you want to logout%s",
+            self, "Logout", "Are you sure you want to logout?",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
@@ -877,7 +877,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.passwd_input.returnPressed.connect(self._on_login)
         layout.addWidget(self.login_btn)
 
-        forgot_btn = QtWidgets.QPushButton("Forgot Password%s")
+        forgot_btn = QtWidgets.QPushButton("Forgot Password?")
         forgot_btn.setFixedHeight(28)
         forgot_btn.setStyleSheet(LINK_STYLE)
         forgot_btn.clicked.connect(self._open_forgot_password)

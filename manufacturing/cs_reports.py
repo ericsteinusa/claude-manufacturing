@@ -4,7 +4,7 @@ Tabs: Summary | Call Volume | By Customer | Open Calls
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -31,7 +31,7 @@ OVERDUE_DAYS = 7   # open calls older than this are highlighted red
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 

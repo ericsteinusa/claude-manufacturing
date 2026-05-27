@@ -1,6 +1,6 @@
 import sys
 import sqlite3
-from .db_connection import get_db_connection
+from db_pg import get_db
 import os
 import csv
 from datetime import date
@@ -48,7 +48,7 @@ OVERDUE_COLORS = [
 
 
 def get_db():
-    conn = get_db_connection()
+    conn = get_db()
     return conn
 
 

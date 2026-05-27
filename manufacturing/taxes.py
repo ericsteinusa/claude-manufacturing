@@ -37,7 +37,7 @@ def query_database():
 	conn = get_db()
 
     # Create a database or connect to one that exists
-    conn = get_db_connection()
+    conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -86,7 +86,7 @@ def search_records():
         my_tree.delete(record)
 
     # Create a database or connect to one that exists
-    conn = get_db_connection()
+    conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -408,7 +408,7 @@ def remove_many():
 		conn = get_db()
 
         # Create a database or connect to one that exists
-        conn = get_db_connection()
+        conn = get_db()
 
         # Create a cursor instance
         c = conn.cursor()

@@ -18,12 +18,12 @@ Usage:
 """
 
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 
