@@ -67,8 +67,15 @@ class _Cursor:
         if sql.strip().upper().startswith('INSERT'):
             try:
                 tmp = self._conn.cursor()
-                tmp.execute('SELECT lastval()')
-                self.lastrowid = tmp.fetchone()[0]
+                tmp.execute('SAVEPOINT _lastval')
+                try:
+                    tmp.execute('SELECT lastval()')
+                    self.lastrowid = tmp.fetchone()[0]
+                    tmp.execute('RELEASE SAVEPOINT _lastval')
+                except Exception:
+                    tmp.execute('ROLLBACK TO SAVEPOINT _lastval')
+                    tmp.execute('RELEASE SAVEPOINT _lastval')
+                    self.lastrowid = None
                 tmp.close()
             except Exception:
                 self.lastrowid = None

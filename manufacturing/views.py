@@ -1563,12 +1563,42 @@ def _ensure_roles():
     conn.close()
 
 
+DEPT_MENU_KEY = {
+    'Accounting': 'accounting',
+    'Customer Service': 'customer_service',
+    'Engineering': 'engineering',
+    'Information Tech': 'information_tech',
+    'Maintenance': 'maintenance',
+    'Marketing': 'marketing',
+    'Personnel': 'personnel',
+    'Production': 'production',
+    'Purchasing': 'purchasing',
+    'Quality Assurance': 'quality_assurance',
+    'Sales': 'sales',
+    'Budget Management': 'budget_management',
+    'Finance': 'finance',
+    'Legal': 'legal',
+    'Risk Management': 'risk_management',
+}
+
+FULL_ACCESS_ROLES = {'President', 'Vice President'}
+
+MANAGER_DEPT_SUB_IDS = set()
+
+MANAGER_MENU_KEYS = {
+    'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr', 'mkt_mgr',
+    'pers_mgr', 'prod_mgr', 'purch_mgr', 'qa_mgr', 'sales_mgr',
+}
+
+READ_ONLY_ROLES = {'Auditor'}
+
+
 def _get_user_profile(email: str) -> dict:
     conn = _get_db()
     row = conn.execute("""
-        SELECT p.id, p.dept_id, p.dept_Sub_id, d.dept_name,
+        SELECT p.id, p.dept_id, p.dept_sub_id, d.dept_name,
                r.role_name,
-               pos.position
+               pos.job_title AS position
         FROM people p
         LEFT JOIN dept d ON d.dept_id = p.dept_id
         LEFT JOIN user_roles ur ON ur.people_id = p.id
@@ -1582,7 +1612,7 @@ def _get_user_profile(email: str) -> dict:
     dept_name = row['dept_name'] or ''
     dept_key = DEPT_MENU_KEY.get(dept_name)
     role_name = row['role_name'] or ''
-    dept_sub_id = row['dept_Sub_id']
+    dept_sub_id = row['dept_sub_id']
     is_manager = (
         dept_sub_id in MANAGER_DEPT_SUB_IDS
         or role_name in {'Department Manager'} | FULL_ACCESS_ROLES
