@@ -8,10 +8,10 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS people (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
-            ID INTEGER NOT NULL,
+            employee_id INTEGER NOT NULL DEFAULT 0,
             address TEXT NOT NULL,
             city TEXT NOT NULL,
             state TEXT NOT NULL,
@@ -21,7 +21,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS passwd (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             people_id INTEGER NOT NULL UNIQUE,
             password TEXT NOT NULL,
             FOREIGN KEY (people_id) REFERENCES people(id)
@@ -29,14 +29,14 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS roles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             role_name TEXT NOT NULL UNIQUE,
             description TEXT
         )
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS user_roles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             people_id INTEGER NOT NULL UNIQUE,
             role_id INTEGER NOT NULL,
             FOREIGN KEY (people_id) REFERENCES people(id),
@@ -44,13 +44,13 @@ def init_db():
         )
     """)
     default_roles = [
-        ("Admin",    "Full access to all screens and settings"),
-        ("Manager",  "Access to department management screens"),
+        ("Admin", "Full access to all screens and settings"),
+        ("Manager", "Access to department management screens"),
         ("Employee", "Standard employee access"),
-        ("Viewer",   "Read-only access"),
+        ("Viewer", "Read-only access"),
     ]
     conn.executemany(
-        "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)",
+        "INSERT INTO roles (role_name, description) VALUES (%s, %s) ON CONFLICT (role_name) DO NOTHING",
         default_roles,
     )
     conn.commit()
@@ -81,7 +81,7 @@ def get_all_roles():
 def set_user_role(people_id: int, role_id: int):
     conn = get_db()
     conn.execute("""
-        INSERT INTO user_roles (people_id, role_id) VALUES (?, ?)
+        INSERT INTO user_roles (people_id, role_id) VALUES (%s, %s)
         ON CONFLICT(people_id) DO UPDATE SET role_id = excluded.role_id
     """, (people_id, role_id))
     conn.commit()
@@ -90,7 +90,7 @@ def set_user_role(people_id: int, role_id: int):
 
 def remove_user_role(people_id: int):
     conn = get_db()
-    conn.execute("DELETE FROM user_roles WHERE people_id = ?", (people_id,))
+    conn.execute("DELETE FROM user_roles WHERE people_id = %s", (people_id,))
     conn.commit()
     conn.close()
 
@@ -102,7 +102,7 @@ def verify_login(email: str, password: str) -> bool:
         SELECT pw.id as pw_id, pw.password
         FROM passwd pw
         JOIN people p ON pw.people_id = p.id
-        WHERE p.email = ?
+        WHERE p.email = %s
         """,
         (email,),
     ).fetchone()
@@ -120,17 +120,18 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
                 employee_id: int = 0) -> bool:
     try:
         conn = get_db()
-        if conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone():
+        if conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone():
             conn.close()
             return False
         cursor = conn.execute(
-            "INSERT INTO people (first_name, last_name, ID, address, city, state, zip_code, email) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO people (first_name, last_name, employee_id, address, city, state, zip_code, email) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )
+        people_id = cursor.fetchone()['id']
         conn.execute(
-            "INSERT INTO passwd (people_id, password) VALUES (?, ?)",
-            (cursor.lastrowid, password),
+            "INSERT INTO passwd (people_id, password) VALUES (%s, %s)",
+            (people_id, password),
         )
         conn.commit()
         conn.close()
@@ -154,14 +155,14 @@ def reset_password(email: str, new_password: str) -> bool:
         SELECT pw.id as pw_id
         FROM passwd pw
         JOIN people p ON pw.people_id = p.id
-        WHERE p.email = ?
+        WHERE p.email = %s
         """,
         (email,),
     ).fetchone()
     if row is None:
         conn.close()
         return False
-    conn.execute("UPDATE passwd SET password = ? WHERE id = ?", (new_password, row["pw_id"]))
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (new_password, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
@@ -301,7 +302,7 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
             return
 
         conn = get_db()
-        found = conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone()
+        found = conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone()
         conn.close()
 
         # Give the same message whether found or not to avoid account enumeration
@@ -820,7 +821,7 @@ class SessionWindow(QtWidgets.QMainWindow):
 
     def _on_logout(self):
         reply = QtWidgets.QMessageBox.question(
-            self, "Logout", "Are you sure you want to logout?",
+            self, "Logout", "Are you sure you want to logout%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
@@ -876,7 +877,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.passwd_input.returnPressed.connect(self._on_login)
         layout.addWidget(self.login_btn)
 
-        forgot_btn = QtWidgets.QPushButton("Forgot Password?")
+        forgot_btn = QtWidgets.QPushButton("Forgot Password%s")
         forgot_btn.setFixedHeight(28)
         forgot_btn.setStyleSheet(LINK_STYLE)
         forgot_btn.clicked.connect(self._open_forgot_password)

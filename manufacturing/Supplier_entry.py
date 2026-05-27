@@ -7,24 +7,24 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE  = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE  = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-ISPIN_STYLE = "QSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE   = ("QTabWidget::pane{border:1px solid black;}"
-               "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-               " border-bottom:none; border-radius:4px 4px 0 0;}"
-               "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-               "QTabBar::tab:hover{background:rgb(85,255,255);}")
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+ISPIN_STYLE = "QSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
+TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 PO_COLORS = {
-    "open":      QtGui.QColor(255, 255, 255),
-    "partial":   QtGui.QColor(255, 243, 205),
-    "received":  QtGui.QColor(212, 237, 218),
+    "open": QtGui.QColor(255, 255, 255),
+    "partial": QtGui.QColor(255, 243, 205),
+    "received": QtGui.QColor(212, 237, 218),
     "cancelled": QtGui.QColor(220, 220, 220),
 }
 
@@ -33,7 +33,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS supplier (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT NOT NULL,
             last_name    TEXT NOT NULL,
             company_name TEXT NOT NULL,
@@ -47,7 +47,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS purchase_order (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            id            SERIAL PRIMARY KEY,
             po_number     TEXT NOT NULL UNIQUE,
             supplier_id   INTEGER NOT NULL REFERENCES supplier(id),
             order_date    TEXT NOT NULL,
@@ -58,7 +58,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS po_item (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             po_id        INTEGER NOT NULL REFERENCES purchase_order(id),
             description  TEXT NOT NULL,
             product_id   INTEGER,
@@ -101,10 +101,10 @@ def _supplier_display(row):
 def _next_po_num():
     yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE ?",
+    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s",
                      (f"PO-{yr}-%",)).fetchone()[0]
     conn.close()
-    return f"PO-{yr}-{n+1:04d}"
+    return f"PO-{yr}-{n + 1:04d}"
 
 
 # ── Dialogs ────────────────────────────────────────────────────────────────
@@ -125,15 +125,15 @@ class NewPODialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Purchase Order")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -194,7 +194,7 @@ class NewPODialog(QtWidgets.QDialog):
             conn.execute("""
                 INSERT INTO purchase_order
                     (po_number, supplier_id, order_date, expected_date, status, notes)
-                VALUES (?,?,?,?,?,?)
+                VALUES (%s,%s,%s,%s,%s,%s)
             """, (self.po_num.text().strip(),
                   self.supp_combo.currentData(),
                   self.order_date.date().toString("yyyy-MM-dd"),
@@ -226,15 +226,15 @@ class AddLineItemDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("Add Line Item")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -285,7 +285,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         try:
-            p = conn.execute("SELECT name, purchase_price FROM product WHERE id=?", (pid,)).fetchone()
+            p = conn.execute("SELECT name, purchase_price FROM product WHERE id=%s", (pid,)).fetchone()
             if p:
                 if not self.desc.text().strip():
                     self.desc.setText(p["name"])
@@ -303,7 +303,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             INSERT INTO po_item (po_id, description, product_id, qty_ordered, unit_price)
-            VALUES (?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s)
         """, (self._po_id, desc, self.prod_combo.currentData(),
               self.qty.value(), self.price.value()))
         conn.commit()
@@ -325,11 +325,11 @@ class ReceivePODialog(QtWidgets.QDialog):
         conn = get_db()
         po = conn.execute(
             "SELECT po.*, s.first_name, s.last_name, s.company_name "
-            "FROM purchase_order po JOIN supplier s ON s.id=po.supplier_id WHERE po.id=?",
+            "FROM purchase_order po JOIN supplier s ON s.id=po.supplier_id WHERE po.id=%s",
             (self._po_id,)
         ).fetchone()
         items = conn.execute(
-            "SELECT * FROM po_item WHERE po_id=? ORDER BY id", (self._po_id,)
+            "SELECT * FROM po_item WHERE po_id=%s ORDER BY id", (self._po_id,)
         ).fetchall()
         conn.close()
 
@@ -339,11 +339,11 @@ class ReceivePODialog(QtWidgets.QDialog):
 
         info = QtWidgets.QLabel(
             f"PO: {po['po_number']}  |  Supplier: {_supplier_display(po)}")
-        info.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
+        info.setStyleSheet("color%(white)s;font-size:13px;font-weight%(bold)s;")
         layout.addWidget(info)
 
         lbl = QtWidgets.QLabel("Enter quantity to receive for each open item:")
-        lbl.setStyleSheet("color:white;font-size:12px;")
+        lbl.setStyleSheet("color%(white)s;font-size:12px;")
         layout.addWidget(lbl)
 
         tbl = QtWidgets.QTableWidget()
@@ -351,7 +351,7 @@ class ReceivePODialog(QtWidgets.QDialog):
         tbl.setHorizontalHeaderLabels(
             ["Description", "Ordered", "Already Received", "Remaining", "Receive Now"])
         hh = tbl.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -391,7 +391,7 @@ class ReceivePODialog(QtWidgets.QDialog):
         today = date.today().isoformat()
         conn = get_db()
         po_num = conn.execute(
-            "SELECT po_number FROM purchase_order WHERE id=?", (self._po_id,)
+            "SELECT po_number FROM purchase_order WHERE id=%s", (self._po_id,)
         ).fetchone()["po_number"]
 
         for item_id, product_id, spin in self._spins:
@@ -399,31 +399,31 @@ class ReceivePODialog(QtWidgets.QDialog):
             if qty <= 0:
                 continue
             conn.execute(
-                "UPDATE po_item SET qty_received = qty_received + ? WHERE id=?",
+                "UPDATE po_item SET qty_received = qty_received + %s WHERE id=%s",
                 (qty, item_id))
             if product_id:
                 conn.execute(
-                    "UPDATE product SET amount = amount + ? WHERE id=?",
+                    "UPDATE product SET amount = amount + %s WHERE id=%s",
                     (qty, product_id))
                 try:
                     conn.execute("""
                         INSERT INTO inventory_transaction
                             (product_id, trans_date, trans_type, quantity, reference, notes)
-                        VALUES (?,?,?,?,?,?)
+                        VALUES (%s,%s,%s,%s,%s,%s)
                     """, (product_id, today, "receipt", qty, po_num,
                           f"Received from PO {po_num}"))
                 except psycopg2.OperationalError:
                     pass
 
         all_items = conn.execute(
-            "SELECT qty_ordered, qty_received FROM po_item WHERE po_id=?",
+            "SELECT qty_ordered, qty_received FROM po_item WHERE po_id=%s",
             (self._po_id,)
         ).fetchall()
         if all_items:
             all_recv = all(i["qty_received"] >= i["qty_ordered"] for i in all_items)
             any_recv = any(i["qty_received"] > 0 for i in all_items)
             new_status = "received" if all_recv else ("partial" if any_recv else "open")
-            conn.execute("UPDATE purchase_order SET status=? WHERE id=?",
+            conn.execute("UPDATE purchase_order SET status=%s WHERE id=%s",
                          (new_status, self._po_id))
         conn.commit()
         conn.close()
@@ -439,7 +439,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.resize(1150, 700)
         _apply_blue_palette(self)
         self._supp_row_ids = []
-        self._po_row_ids   = []
+        self._po_row_ids = []
         self._build_ui()
         self._load_suppliers()
         self._refresh_pos()
@@ -453,7 +453,7 @@ class Purchasing(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(tabs)
         tabs.addTab(self._build_suppliers_tab(), "Suppliers")
-        tabs.addTab(self._build_po_tab(),        "Purchase Orders")
+        tabs.addTab(self._build_po_tab(), "Purchase Orders")
 
     # ── Suppliers tab ──────────────────────────────────────────────────────
 
@@ -468,7 +468,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.supp_table.setHorizontalHeaderLabels(
             ["Company / Name", "Contact", "Phone", "Email", "City", "State", "Zip"])
         hh = self.supp_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -501,15 +501,15 @@ class Purchasing(QtWidgets.QMainWindow):
 
         fg = QtWidgets.QGroupBox("Supplier Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         def inp(ph=""):
             e = QtWidgets.QLineEdit()
@@ -518,28 +518,37 @@ class Purchasing(QtWidgets.QMainWindow):
             return e
 
         self.sf_company = inp("Company name")
-        self.sf_first   = inp("First name")
-        self.sf_last    = inp("Last name")
-        self.sf_phone   = inp("Phone")
+        self.sf_first = inp("First name")
+        self.sf_last = inp("Last name")
+        self.sf_phone = inp("Phone")
         self.sf_phone.setFixedWidth(140)
-        self.sf_email   = inp("Email")
-        self.sf_addr    = inp("Street address")
-        self.sf_city    = inp("City")
-        self.sf_state   = inp("ST")
+        self.sf_email = inp("Email")
+        self.sf_addr = inp("Street address")
+        self.sf_city = inp("City")
+        self.sf_state = inp("ST")
         self.sf_state.setMaxLength(2)
         self.sf_state.setFixedWidth(44)
-        self.sf_zip     = inp("Zip")
+        self.sf_zip = inp("Zip")
         self.sf_zip.setFixedWidth(90)
 
-        grid.addWidget(lbl("Company:"),    0, 0); grid.addWidget(self.sf_company, 0, 1, 1, 3)
-        grid.addWidget(lbl("First Name:"), 0, 4); grid.addWidget(self.sf_first,   0, 5)
-        grid.addWidget(lbl("Last Name:"),  1, 0); grid.addWidget(self.sf_last,    1, 1, 1, 3)
-        grid.addWidget(lbl("Phone:"),      1, 4); grid.addWidget(self.sf_phone,   1, 5)
-        grid.addWidget(lbl("Email:"),      2, 0); grid.addWidget(self.sf_email,   2, 1, 1, 5)
-        grid.addWidget(lbl("Address:"),    3, 0); grid.addWidget(self.sf_addr,    3, 1, 1, 3)
-        grid.addWidget(lbl("City:"),       3, 4); grid.addWidget(self.sf_city,    3, 5)
-        grid.addWidget(lbl("State:"),      4, 0); grid.addWidget(self.sf_state,   4, 1)
-        grid.addWidget(lbl("Zip:"),        4, 2); grid.addWidget(self.sf_zip,     4, 3)
+        grid.addWidget(lbl("Company:"), 0, 0)
+        grid.addWidget(self.sf_company, 0, 1, 1, 3)
+        grid.addWidget(lbl("First Name:"), 0, 4)
+        grid.addWidget(self.sf_first, 0, 5)
+        grid.addWidget(lbl("Last Name:"), 1, 0)
+        grid.addWidget(self.sf_last, 1, 1, 1, 3)
+        grid.addWidget(lbl("Phone:"), 1, 4)
+        grid.addWidget(self.sf_phone, 1, 5)
+        grid.addWidget(lbl("Email:"), 2, 0)
+        grid.addWidget(self.sf_email, 2, 1, 1, 5)
+        grid.addWidget(lbl("Address:"), 3, 0)
+        grid.addWidget(self.sf_addr, 3, 1, 1, 3)
+        grid.addWidget(lbl("City:"), 3, 4)
+        grid.addWidget(self.sf_city, 3, 5)
+        grid.addWidget(lbl("State:"), 4, 0)
+        grid.addWidget(self.sf_state, 4, 1)
+        grid.addWidget(lbl("Zip:"), 4, 2)
+        grid.addWidget(self.sf_zip, 4, 3)
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
@@ -566,9 +575,9 @@ class Purchasing(QtWidgets.QMainWindow):
         fr.setSpacing(8)
 
         def fl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.po_supp_filter = QtWidgets.QComboBox()
         self.po_supp_filter.setStyleSheet(COMBO_STYLE)
@@ -587,10 +596,14 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_to.setDisplayFormat("MM/dd/yyyy")
         self.po_to.setDate(QtCore.QDate.currentDate())
 
-        fr.addWidget(fl("Supplier:")); fr.addWidget(self.po_supp_filter)
-        fr.addWidget(fl("Status:"));   fr.addWidget(self.po_status_filter)
-        fr.addWidget(fl("From:"));     fr.addWidget(self.po_from)
-        fr.addWidget(fl("To:"));       fr.addWidget(self.po_to)
+        fr.addWidget(fl("Supplier:"))
+        fr.addWidget(self.po_supp_filter)
+        fr.addWidget(fl("Status:"))
+        fr.addWidget(self.po_status_filter)
+        fr.addWidget(fl("From:"))
+        fr.addWidget(self.po_from)
+        fr.addWidget(fl("To:"))
+        fr.addWidget(self.po_to)
         for t, fn in (("Apply", self._refresh_pos), ("Show All", self._po_show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
@@ -605,7 +618,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_table.setHorizontalHeaderLabels(
             ["PO Number", "Supplier", "Order Date", "Expected Date", "Items", "Total", "Status"])
         hh = self.po_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -631,8 +644,8 @@ class Purchasing(QtWidgets.QMainWindow):
 
         self.po_detail_grp = QtWidgets.QGroupBox("PO Line Items")
         self.po_detail_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:6px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:6px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         self.po_detail_grp.setVisible(False)
         dv = QtWidgets.QVBoxLayout(self.po_detail_grp)
         self.po_items_table = QtWidgets.QTableWidget()
@@ -640,7 +653,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_items_table.setHorizontalHeaderLabels(
             ["Description", "Product", "Qty Ordered", "Qty Received", "Remaining", "Line Total"])
         ph = self.po_items_table.horizontalHeader()
-        ph.setStyleSheet("color:black;font-weight:bold;")
+        ph.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ph.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             ph.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -662,7 +675,7 @@ class Purchasing(QtWidgets.QMainWindow):
         conn = get_db()
         if search:
             rows = conn.execute(
-                "SELECT * FROM supplier WHERE company_name LIKE ? OR last_name LIKE ? "
+                "SELECT * FROM supplier WHERE company_name LIKE %s OR last_name LIKE %s "
                 "ORDER BY company_name, last_name, first_name",
                 (f"%{search}%", f"%{search}%")
             ).fetchall()
@@ -714,7 +727,7 @@ class Purchasing(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._supp_row_ids):
             return
         conn = get_db()
-        s = conn.execute("SELECT * FROM supplier WHERE id=?",
+        s = conn.execute("SELECT * FROM supplier WHERE id=%s",
                          (self._supp_row_ids[row],)).fetchone()
         conn.close()
         if not s:
@@ -737,21 +750,21 @@ class Purchasing(QtWidgets.QMainWindow):
 
     def _collect_supplier_form(self):
         company = self.sf_company.text().strip()
-        last    = self.sf_last.text().strip()
+        last = self.sf_last.text().strip()
         if not company and not last:
             QtWidgets.QMessageBox.warning(
                 self, "Input Error", "Company name or last name is required.")
             return None
         return {
             "company_name": company or "",
-            "first_name":   self.sf_first.text().strip() or "",
-            "last_name":    last or "",
+            "first_name": self.sf_first.text().strip() or "",
+            "last_name": last or "",
             "phone_number": self.sf_phone.text().strip() or "",
-            "email":        self.sf_email.text().strip() or "",
-            "address":      self.sf_addr.text().strip() or "",
-            "city":         self.sf_city.text().strip() or "",
-            "state":        self.sf_state.text().strip().upper() or "",
-            "zip_code":     self.sf_zip.text().strip() or "",
+            "email": self.sf_email.text().strip() or "",
+            "address": self.sf_addr.text().strip() or "",
+            "city": self.sf_city.text().strip() or "",
+            "state": self.sf_state.text().strip().upper() or "",
+            "zip_code": self.sf_zip.text().strip() or "",
         }
 
     def _on_supp_add(self):
@@ -762,8 +775,8 @@ class Purchasing(QtWidgets.QMainWindow):
         conn.execute(
             "INSERT INTO supplier "
             "(company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "
-            "VALUES (:company_name,:first_name,:last_name,:phone_number,"
-            ":email,:address,:city,:state,:zip_code)",
+            "VALUES (%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,"
+            "%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)",
             data)
         conn.commit()
         conn.close()
@@ -781,9 +794,9 @@ class Purchasing(QtWidgets.QMainWindow):
         data["id"] = self._supp_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE supplier SET company_name=:company_name,first_name=:first_name,"
-            "last_name=:last_name,phone_number=:phone_number,email=:email,"
-            "address=:address,city=:city,state=:state,zip_code=:zip_code WHERE id=:id",
+            "UPDATE supplier SET company_name=%(company_name)s,first_name=%(first_name)s,"
+            "last_name=%(last_name)s,phone_number=%(phone_number)s,email=%(email)s,"
+            "address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s WHERE id=%(id)s",
             data)
         conn.commit()
         conn.close()
@@ -797,10 +810,10 @@ class Purchasing(QtWidgets.QMainWindow):
         sid = self._supp_row_ids[row]
         conn = get_db()
         po_count = conn.execute(
-            "SELECT COUNT(*) FROM purchase_order WHERE supplier_id=?", (sid,)
+            "SELECT COUNT(*) FROM purchase_order WHERE supplier_id=%s", (sid,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this supplier?"
+        msg = "Delete this supplier%s"
         if po_count:
             msg += (f"\n\nWarning: {po_count} purchase order(s) reference this supplier."
                     " They will also be deleted.")
@@ -810,11 +823,11 @@ class Purchasing(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             po_ids = [r[0] for r in conn.execute(
-                "SELECT id FROM purchase_order WHERE supplier_id=?", (sid,)).fetchall()]
+                "SELECT id FROM purchase_order WHERE supplier_id=%s", (sid,)).fetchall()]
             for pid in po_ids:
-                conn.execute("DELETE FROM po_item WHERE po_id=?", (pid,))
-            conn.execute("DELETE FROM purchase_order WHERE supplier_id=?", (sid,))
-            conn.execute("DELETE FROM supplier WHERE id=?", (sid,))
+                conn.execute("DELETE FROM po_item WHERE po_id=%s", (pid,))
+            conn.execute("DELETE FROM purchase_order WHERE supplier_id=%s", (sid,))
+            conn.execute("DELETE FROM supplier WHERE id=%s", (sid,))
             conn.commit()
             conn.close()
             self._supp_clear()
@@ -824,11 +837,11 @@ class Purchasing(QtWidgets.QMainWindow):
     # ── PO data ────────────────────────────────────────────────────────────
 
     def _refresh_pos(self):
-        sid    = self.po_supp_filter.currentData()
+        sid = self.po_supp_filter.currentData()
         status = self.po_status_filter.currentText()
         from_s = self.po_from.date().toString("yyyy-MM-dd")
-        to_s   = self.po_to.date().toString("yyyy-MM-dd")
-        conn   = get_db()
+        to_s = self.po_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
         q = (
             "SELECT po.id, po.po_number, po.order_date, po.expected_date, po.status, "
             "s.first_name, s.last_name, s.company_name, "
@@ -837,14 +850,14 @@ class Purchasing(QtWidgets.QMainWindow):
             "FROM purchase_order po "
             "JOIN supplier s ON s.id=po.supplier_id "
             "LEFT JOIN po_item pi ON pi.po_id=po.id "
-            "WHERE po.order_date BETWEEN ? AND ?"
+            "WHERE po.order_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if sid:
-            q += " AND po.supplier_id=?"
+            q += " AND po.supplier_id=%s"
             params.append(sid)
         if status != "(all status)":
-            q += " AND po.status=?"
+            q += " AND po.status=%s"
             params.append(status)
         q += " GROUP BY po.id ORDER BY po.order_date DESC"
         rows = conn.execute(q, params).fetchall()
@@ -852,22 +865,22 @@ class Purchasing(QtWidgets.QMainWindow):
 
         self.po_table.setRowCount(0)
         self._po_row_ids = []
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left   = QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         for row in rows:
             r = self.po_table.rowCount()
             self.po_table.insertRow(r)
             self._po_row_ids.append(row["id"])
             color = PO_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
             for c, (val, algn) in enumerate([
-                (row["po_number"],          left),
-                (_supplier_display(row),    left),
-                (row["order_date"],         center),
+                (row["po_number"], left),
+                (_supplier_display(row), left),
+                (row["order_date"], center),
                 (row["expected_date"] or "", center),
-                (str(row["item_count"]),    center),
-                (_money(row["total"]),      right),
-                (row["status"].upper(),     center),
+                (str(row["item_count"]), center),
+                (_money(row["total"]), right),
+                (row["status"].upper(), center),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)
@@ -891,12 +904,12 @@ class Purchasing(QtWidgets.QMainWindow):
             SELECT pi.*, p.name AS product_name
             FROM po_item pi
             LEFT JOIN product p ON p.id = pi.product_id
-            WHERE pi.po_id=? ORDER BY pi.id
+            WHERE pi.po_id=%s ORDER BY pi.id
         """, (po_id,)).fetchall()
         conn.close()
 
         self.po_items_table.setRowCount(0)
-        right  = QtCore.Qt.AlignmentFlag.AlignRight  | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
         center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
         for item in items:
             r = self.po_items_table.rowCount()
@@ -925,7 +938,7 @@ class Purchasing(QtWidgets.QMainWindow):
         po_id = self._po_row_ids[row]
         conn = get_db()
         status = conn.execute(
-            "SELECT status FROM purchase_order WHERE id=?", (po_id,)
+            "SELECT status FROM purchase_order WHERE id=%s", (po_id,)
         ).fetchone()["status"]
         conn.close()
         if status in ("received", "cancelled"):
@@ -948,10 +961,10 @@ class Purchasing(QtWidgets.QMainWindow):
         po_id = self._po_row_ids[row]
         conn = get_db()
         po = conn.execute(
-            "SELECT status FROM purchase_order WHERE id=?", (po_id,)
+            "SELECT status FROM purchase_order WHERE id=%s", (po_id,)
         ).fetchone()
         item_count = conn.execute(
-            "SELECT COUNT(*) FROM po_item WHERE po_id=?", (po_id,)
+            "SELECT COUNT(*) FROM po_item WHERE po_id=%s", (po_id,)
         ).fetchone()[0]
         conn.close()
         if po["status"] in ("received", "cancelled"):
@@ -978,18 +991,18 @@ class Purchasing(QtWidgets.QMainWindow):
         po_id = self._po_row_ids[row]
         conn = get_db()
         status = conn.execute(
-            "SELECT status FROM purchase_order WHERE id=?", (po_id,)
+            "SELECT status FROM purchase_order WHERE id=%s", (po_id,)
         ).fetchone()["status"]
         conn.close()
         if status == "cancelled":
             QtWidgets.QMessageBox.information(self, "Already Cancelled", "PO is already cancelled.")
             return
         if (QtWidgets.QMessageBox.question(
-                self, "Cancel PO", "Mark this PO as cancelled?",
+                self, "Cancel PO", "Mark this PO as cancelled%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("UPDATE purchase_order SET status='cancelled' WHERE id=?", (po_id,))
+            conn.execute("UPDATE purchase_order SET status='cancelled' WHERE id=%s", (po_id,))
             conn.commit()
             conn.close()
             self._refresh_pos()

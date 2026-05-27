@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'marketing_menu.ui'
+# Form generated from reading UI file 'marketing_menu.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QWidget)
+                               QSizePolicy, QStatusBar, QWidget)
+
 
 class Ui_Marketing_menu(object):
     def setupUi(self, Marketing_menu):
@@ -29,10 +30,10 @@ class Ui_Marketing_menu(object):
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 0, 801, 571))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/marketing.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         Marketing_menu.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Marketing_menu)
         self.menubar.setObjectName(u"menubar")
@@ -51,4 +52,3 @@ class Ui_Marketing_menu(object):
         Marketing_menu.setWindowTitle(QCoreApplication.translate("Marketing_menu", u"MainWindow", None))
         self.label.setText("")
     # retranslateUi
-

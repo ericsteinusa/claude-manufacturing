@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -147,36 +150,38 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 60, 801, 501))
         self.label.setStyleSheet("background-image: url(sales.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
-        self.Sales_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Sales Manager Menu"))
+        self.Sales_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Sales Manager Menu"))
         self.Sales_mgr_Button.setGeometry(QtCore.QRect(20, 10, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Sales_mgr_Button.setFont(font)
         self.Sales_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.Sales_mgr_Button.setAutoDefault(False)
         self.Sales_mgr_Button.setObjectName("Sales_mgr_Button")
-        self.Sales_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Sales Menu"))
+        self.Sales_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Sales Menu"))
         self.Sales_Button.setGeometry(QtCore.QRect(270, 10, 151, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.Sales_Button.setFont(font)
         self.Sales_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                        "border: 2px solid black;\n"
+                                        "border-radius: 10px;}\n"
+                                        "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                        "border: 2px solidrgb(85, 255, 255);\n"
+                                        "}")
         self.Sales_Button.setAutoDefault(False)
         self.Sales_Button.setObjectName("Sales_Button")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -195,7 +200,7 @@ class Ui_MainWindow(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Sales Manager Menu": "Sales_mgr_menu.py",
-            "Sales Menu":         "Sales_menu.py",
+            "Sales Menu": "Sales_menu.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -209,7 +214,6 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

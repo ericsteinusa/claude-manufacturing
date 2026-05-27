@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -10,10 +10,10 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 831, 651))
         self.label.setStyleSheet("background-image: url(\'C:/source/pythonQSG/PyQt6 Apps/images/IT_picture.png\');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: blue; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: blue; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.Dept_list_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -22,11 +22,11 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.Dept_list_Button.setFont(font)
         self.Dept_list_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);}\n"
-"")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);}\n"
+                                            "")
         self.Dept_list_Button.setAutoDefault(False)
         self.Dept_list_Button.setObjectName("Dept_list_Button")
         self.acct_rcv_Button_2 = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -35,11 +35,11 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.acct_rcv_Button_2.setFont(font)
         self.acct_rcv_Button_2.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;\n}"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n}"
+                                             "")
         self.acct_rcv_Button_2.setAutoDefault(False)
         self.acct_rcv_Button_2.setObjectName("acct_rcv_Button_2")
         self.acct_rcv_Button_3 = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -48,11 +48,11 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.acct_rcv_Button_3.setFont(font)
         self.acct_rcv_Button_3.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;\n}"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n}"
+                                             "")
         self.acct_rcv_Button_3.setAutoDefault(False)
         self.acct_rcv_Button_3.setObjectName("acct_rcv_Button_3")
         self.acct_rcv_Button_4 = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -61,11 +61,11 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.acct_rcv_Button_4.setFont(font)
         self.acct_rcv_Button_4.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;\n}"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n}"
+                                             "")
         self.acct_rcv_Button_4.setAutoDefault(False)
         self.acct_rcv_Button_4.setObjectName("acct_rcv_Button_4")
         self.acct_rcv_Button_5 = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -74,11 +74,11 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.acct_rcv_Button_5.setFont(font)
         self.acct_rcv_Button_5.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;\n}"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n}"
+                                             "")
         self.acct_rcv_Button_5.setAutoDefault(False)
         self.acct_rcv_Button_5.setObjectName("acct_rcv_Button_5")
         MainWindow.setCentralWidget(self.centralwidget)

@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Company_main_menu.ui'
+# Form generated from reading UI file 'Company_main_menu.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.2
+# Created by: Qt User Interface Compiler version 6.9.2
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
+                           QCursor, QFont, QFontDatabase, QGradient,
+                           QIcon, QImage, QKeySequence, QLinearGradient,
+                           QPainter, QPalette, QPixmap, QRadialGradient,
+                           QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenu,
-    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
-    QWidget)
+                               QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+                               QWidget)
 # import bg_rc
 # import 1_rc
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -96,10 +97,10 @@ class Ui_MainWindow(object):
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 160, 731, 561))
         self.label.setStyleSheet(u"background-image: url('C:/source/pythonQSG/PyQt6 Apps/images/manufacturing2.png');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.cust_serv_Button = QPushButton(self.centralwidget)
         self.cust_serv_Button.setObjectName(u"cust_serv_Button")
         self.cust_serv_Button.setGeometry(QRect(160, 10, 181, 41))
@@ -107,121 +108,121 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.cust_serv_Button.setFont(font)
         self.cust_serv_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.cust_serv_Button.setAutoDefault(False)
         self.production_button = QPushButton(self.centralwidget)
         self.production_button.setObjectName(u"production_button")
         self.production_button.setGeometry(QRect(460, 60, 131, 41))
         self.production_button.setFont(font)
         self.production_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.production_button.setAutoDefault(False)
         self.purchasing_button = QPushButton(self.centralwidget)
         self.purchasing_button.setObjectName(u"purchasing_button")
         self.purchasing_button.setGeometry(QRect(10, 110, 131, 41))
         self.purchasing_button.setFont(font)
         self.purchasing_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.purchasing_button.setAutoDefault(False)
         self.personnel_button = QPushButton(self.centralwidget)
         self.personnel_button.setObjectName(u"personnel_button")
         self.personnel_button.setGeometry(QRect(310, 60, 131, 41))
         self.personnel_button.setFont(font)
         self.personnel_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.personnel_button.setAutoDefault(False)
         self.qa_button = QPushButton(self.centralwidget)
         self.qa_button.setObjectName(u"qa_button")
         self.qa_button.setGeometry(QRect(160, 110, 181, 41))
         self.qa_button.setFont(font)
         self.qa_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                     "border: 2px solid black;\n"
+                                     "border-radius: 10px;}\n"
+                                     "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                     "border: 2px solidrgb(85, 255, 255);\n"
+                                     "}")
         self.qa_button.setAutoDefault(False)
         self.Accounting_Button = QPushButton(self.centralwidget)
         self.Accounting_Button.setObjectName(u"Accounting_Button")
         self.Accounting_Button.setGeometry(QRect(10, 10, 131, 41))
         self.Accounting_Button.setFont(font)
         self.Accounting_Button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.Accounting_Button.setAutoDefault(False)
         self.maintenance_button = QPushButton(self.centralwidget)
         self.maintenance_button.setObjectName(u"maintenance_button")
         self.maintenance_button.setGeometry(QRect(10, 60, 131, 41))
         self.maintenance_button.setFont(font)
         self.maintenance_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                              "border: 2px solid black;\n"
+                                              "border-radius: 10px;}\n"
+                                              "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                              "border: 2px solidrgb(85, 255, 255);\n"
+                                              "}")
         self.maintenance_button.setAutoDefault(False)
         self.Infor_tech_button = QPushButton(self.centralwidget)
         self.Infor_tech_button.setObjectName(u"Infor_tech_button")
         self.Infor_tech_button.setGeometry(QRect(500, 10, 181, 41))
         self.Infor_tech_button.setFont(font)
         self.Infor_tech_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                             "border: 2px solid black;\n"
+                                             "border-radius: 10px;}\n"
+                                             "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                             "border: 2px solidrgb(85, 255, 255);\n"
+                                             "}")
         self.Infor_tech_button.setAutoDefault(False)
         self.Marketing_button = QPushButton(self.centralwidget)
         self.Marketing_button.setObjectName(u"Marketing_button")
         self.Marketing_button.setGeometry(QRect(160, 60, 131, 41))
         self.Marketing_button.setFont(font)
         self.Marketing_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.Marketing_button.setAutoDefault(False)
         self.Engineering_button = QPushButton(self.centralwidget)
         self.Engineering_button.setObjectName(u"Engineering_button")
         self.Engineering_button.setGeometry(QRect(350, 10, 131, 41))
         self.Engineering_button.setFont(font)
         self.Engineering_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                              "border: 2px solid black;\n"
+                                              "border-radius: 10px;}\n"
+                                              "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                              "border: 2px solidrgb(85, 255, 255);\n"
+                                              "}")
         self.Engineering_button.setAutoDefault(False)
         self.Sales_button = QPushButton(self.centralwidget)
         self.Sales_button.setObjectName(u"Sales_button")
         self.Sales_button.setGeometry(QRect(360, 110, 131, 41))
         self.Sales_button.setFont(font)
         self.Sales_button.setStyleSheet(u"QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                        "border: 2px solid black;\n"
+                                        "border-radius: 10px;}\n"
+                                        "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                        "border: 2px solidrgb(85, 255, 255);\n"
+                                        "}")
         self.Sales_button.setAutoDefault(False)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -262,4 +263,3 @@ class Ui_MainWindow(object):
         self.Sales_button.setText(QCoreApplication.translate("MainWindow", u"Sales", None))
         self.menuCompany_Main_Menu.setTitle("")
     # retranslateUi
-

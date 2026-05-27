@@ -11,66 +11,66 @@ from django.shortcuts import render, redirect
 _TIME_CLOCK_MENU = {
     'title': 'Time Clock Menu',
     'items': [
-        ('clock_in_out',   'Clock In/Out',        {
+        ('clock_in_out', 'Clock In/Out', {
             'title': 'Clock In/Out',
             'items': [
-                ('punch_in',   'Record Clock In',    {'title': 'Record Clock In',    'items': []}),
-                ('punch_out',  'Record Clock Out',   {'title': 'Record Clock Out',   'items': []}),
-                ('cur_status', 'Current Status',     {'title': 'Current Status',     'items': []}),
+                ('punch_in', 'Record Clock In', 'time_clock_menu.py'),
+                ('punch_out', 'Record Clock Out', 'time_clock_menu.py'),
+                ('cur_status', 'Current Status', 'time_clock_menu.py'),
             ],
         }),
-        ('view_hours',     'View Hours',           {
+        ('view_hours', 'View Hours', {
             'title': 'View Hours',
             'items': [
-                ('today_hrs',  "Today's Hours",      {'title': "Today's Hours",      'items': []}),
-                ('week_hrs',   'Weekly Hours',        {'title': 'Weekly Hours',       'items': []}),
-                ('month_hrs',  'Monthly Hours',       {'title': 'Monthly Hours',      'items': []}),
-                ('period_hrs', 'Pay Period Hours',    {'title': 'Pay Period Hours',   'items': []}),
+                ('today_hrs', "Today's Hours", 'time_clock_menu.py'),
+                ('week_hrs', 'Weekly Hours', 'time_clock_menu.py'),
+                ('month_hrs', 'Monthly Hours', 'time_clock_menu.py'),
+                ('period_hrs', 'Pay Period Hours', 'time_clock_menu.py'),
             ],
         }),
-        ('time_off',       'Time Off Requests',    {
+        ('time_off', 'Time Off Requests', {
             'title': 'Time Off Requests',
             'items': [
-                ('submit_req', 'Submit Request',      {'title': 'Submit Request',     'items': []}),
-                ('pend_req',   'Pending Requests',    {'title': 'Pending Requests',   'items': []}),
-                ('appr_req',   'Approved Requests',   {'title': 'Approved Requests',  'items': []}),
-                ('req_hist',   'Request History',     {'title': 'Request History',    'items': []}),
+                ('submit_req', 'Submit Request', 'time_clock_menu.py'),
+                ('pend_req', 'Pending Requests', 'time_clock_menu.py'),
+                ('appr_req', 'Approved Requests', 'time_clock_menu.py'),
+                ('req_hist', 'Request History', 'time_clock_menu.py'),
             ],
         }),
-        ('schedules',      'Schedules',            {
+        ('schedules', 'Schedules', {
             'title': 'Schedules',
             'items': [
-                ('my_sched',   'My Schedule',         {'title': 'My Schedule',        'items': []}),
-                ('upcoming',   'Upcoming Shifts',     {'title': 'Upcoming Shifts',    'items': []}),
-                ('sched_cal',  'Schedule Calendar',   {'title': 'Schedule Calendar',  'items': []}),
-                ('swap_req',   'Swap Requests',       {'title': 'Swap Requests',      'items': []}),
+                ('my_sched', 'My Schedule', 'time_clock_menu.py'),
+                ('upcoming', 'Upcoming Shifts', 'time_clock_menu.py'),
+                ('sched_cal', 'Schedule Calendar', 'time_clock_menu.py'),
+                ('swap_req', 'Swap Requests', 'time_clock_menu.py'),
             ],
         }),
-        ('ot_reports',     'Overtime Reports',     {
+        ('ot_reports', 'Overtime Reports', {
             'title': 'Overtime Reports',
             'items': [
-                ('cur_ot',     'Current Period OT',   {'title': 'Current Period OT',  'items': []}),
-                ('hist_ot',    'Historical OT',       {'title': 'Historical OT',      'items': []}),
-                ('ot_by_emp',  'OT by Employee',      {'title': 'OT by Employee',     'items': []}),
-                ('ot_appr',    'OT Approval',         {'title': 'OT Approval',        'items': []}),
+                ('cur_ot', 'Current Period OT', 'time_clock_menu.py'),
+                ('hist_ot', 'Historical OT', 'time_clock_menu.py'),
+                ('ot_by_emp', 'OT by Employee', 'time_clock_menu.py'),
+                ('ot_appr', 'OT Approval', 'time_clock_menu.py'),
             ],
         }),
-        ('attend_reports', 'Attendance Reports',   {
+        ('attend_reports', 'Attendance Reports', {
             'title': 'Attendance Reports',
             'items': [
-                ('daily_att',  'Daily Attendance',    {'title': 'Daily Attendance',   'items': []}),
-                ('month_sum',  'Monthly Summary',     {'title': 'Monthly Summary',    'items': []}),
-                ('tard_rpt',   'Tardiness Report',    {'title': 'Tardiness Report',   'items': []}),
-                ('abs_rpt',    'Absence Report',      {'title': 'Absence Report',     'items': []}),
+                ('daily_att', 'Daily Attendance', 'time_clock_menu.py'),
+                ('month_sum', 'Monthly Summary', 'time_clock_menu.py'),
+                ('tard_rpt', 'Tardiness Report', 'time_clock_menu.py'),
+                ('abs_rpt', 'Absence Report', 'time_clock_menu.py'),
             ],
         }),
-        ('shift_mgmt',     'Shift Management',     {
+        ('shift_mgmt', 'Shift Management', {
             'title': 'Shift Management',
             'items': [
-                ('view_shfts', 'View Shifts',          {'title': 'View Shifts',        'items': []}),
-                ('assign_emp', 'Assign Employees',     {'title': 'Assign Employees',   'items': []}),
-                ('shft_tmpl',  'Shift Templates',      {'title': 'Shift Templates',    'items': []}),
-                ('swap_mgmt',  'Swap Management',      {'title': 'Swap Management',    'items': []}),
+                ('view_shfts', 'View Shifts', 'time_clock_menu.py'),
+                ('assign_emp', 'Assign Employees', 'time_clock_menu.py'),
+                ('shft_tmpl', 'Shift Templates', 'time_clock_menu.py'),
+                ('swap_mgmt', 'Swap Management', 'time_clock_menu.py'),
             ],
         }),
     ],
@@ -79,67 +79,67 @@ _TIME_CLOCK_MENU = {
 _MAINT_MENU = {
     'title': 'Maintenance Menu',
     'items': [
-        ('work_orders',    'Work Orders',           {
+        ('work_orders', 'Work Orders', {
             'title': 'Work Orders',
             'items': [
-                ('create_wo',  'Create Work Order',   {'title': 'Create Work Order',  'items': []}),
-                ('open_wo',    'Open Work Orders',    {'title': 'Open Work Orders',   'items': []}),
-                ('inprog_wo',  'In Progress',         {'title': 'In Progress',        'items': []}),
-                ('comp_wo',    'Completed',           {'title': 'Completed',          'items': []}),
+                ('create_wo', 'Create Work Order', 'Maint_Maint_menu.py'),
+                ('open_wo', 'Open Work Orders', 'Maint_Maint_menu.py'),
+                ('inprog_wo', 'In Progress', 'Maint_Maint_menu.py'),
+                ('comp_wo', 'Completed', 'Maint_Maint_menu.py'),
             ],
         }),
-        ('maint_schedule', 'Maintenance Schedule',  {
+        ('maint_schedule', 'Maintenance Schedule', {
             'title': 'Maintenance Schedule',
             'items': [
-                ('daily_sched','Daily Schedule',      {'title': 'Daily Schedule',     'items': []}),
-                ('week_sched', 'Weekly Schedule',     {'title': 'Weekly Schedule',    'items': []}),
-                ('month_sched','Monthly Schedule',    {'title': 'Monthly Schedule',   'items': []}),
-                ('annual_plan','Annual Plan',         {'title': 'Annual Plan',        'items': []}),
+                ('daily_sched', 'Daily Schedule', 'Maint_Maint_menu.py'),
+                ('week_sched', 'Weekly Schedule', 'Maint_Maint_menu.py'),
+                ('month_sched', 'Monthly Schedule', 'Maint_Maint_menu.py'),
+                ('annual_plan', 'Annual Plan', 'Maint_Maint_menu.py'),
             ],
         }),
-        ('equip_maint',    'Equipment Maintenance', {
+        ('equip_maint', 'Equipment Maintenance', {
             'title': 'Equipment Maintenance',
             'items': [
-                ('equip_list', 'Equipment List',      {'title': 'Equipment List',     'items': []}),
-                ('maint_hist', 'Maintenance History', {'title': 'Maintenance History','items': []}),
-                ('svc_records','Service Records',     {'title': 'Service Records',    'items': []}),
-                ('equip_stat', 'Equipment Status',    {'title': 'Equipment Status',   'items': []}),
+                ('equip_list', 'Equipment List', 'Maint_Maint_menu.py'),
+                ('maint_hist', 'Maintenance History', 'Maint_Maint_menu.py'),
+                ('svc_records', 'Service Records', 'Maint_Maint_menu.py'),
+                ('equip_stat', 'Equipment Status', 'Maint_Maint_menu.py'),
             ],
         }),
-        ('parts_inv',      'Parts Inventory',       {
+        ('parts_inv', 'Parts Inventory', {
             'title': 'Parts Inventory',
             'items': [
-                ('view_inv',   'View Inventory',      {'title': 'View Inventory',     'items': []}),
-                ('parts_req',  'Parts Request',       {'title': 'Parts Request',      'items': []}),
-                ('reorder',    'Reorder List',        {'title': 'Reorder List',       'items': []}),
-                ('parts_hist', 'Parts History',       {'title': 'Parts History',      'items': []}),
+                ('view_inv', 'View Inventory', 'Maint_Maint_menu.py'),
+                ('parts_req', 'Parts Request', 'Maint_Maint_menu.py'),
+                ('reorder', 'Reorder List', 'Maint_Maint_menu.py'),
+                ('parts_hist', 'Parts History', 'Maint_Maint_menu.py'),
             ],
         }),
-        ('maint_reports',  'Maintenance Reports',   {
+        ('maint_reports', 'Maintenance Reports', {
             'title': 'Maintenance Reports',
             'items': [
-                ('daily_rpt',  'Daily Report',        {'title': 'Daily Report',       'items': []}),
-                ('week_rpt',   'Weekly Report',       {'title': 'Weekly Report',      'items': []}),
-                ('cost_analy', 'Cost Analysis',       {'title': 'Cost Analysis',      'items': []}),
-                ('down_rpt',   'Downtime Report',     {'title': 'Downtime Report',    'items': []}),
+                ('daily_rpt', 'Daily Report', 'Maint_Maint_menu.py'),
+                ('week_rpt', 'Weekly Report', 'Maint_Maint_menu.py'),
+                ('cost_analy', 'Cost Analysis', 'Maint_Maint_menu.py'),
+                ('down_rpt', 'Downtime Report', 'Maint_Maint_menu.py'),
             ],
         }),
-        ('safety_insp',    'Safety Inspections',    {
+        ('safety_insp', 'Safety Inspections', {
             'title': 'Safety Inspections',
             'items': [
-                ('sched_insp', 'Schedule Inspection', {'title': 'Schedule Inspection','items': []}),
-                ('insp_chk',   'Inspection Checklist',{'title': 'Inspection Checklist','items': []}),
-                ('insp_res',   'Inspection Results',  {'title': 'Inspection Results', 'items': []}),
-                ('corr_act',   'Corrective Actions',  {'title': 'Corrective Actions', 'items': []}),
+                ('sched_insp', 'Schedule Inspection', 'Maint_Maint_menu.py'),
+                ('insp_chk', 'Inspection Checklist', 'Maint_Maint_menu.py'),
+                ('insp_res', 'Inspection Results', 'Maint_Maint_menu.py'),
+                ('corr_act', 'Corrective Actions', 'Maint_Maint_menu.py'),
             ],
         }),
-        ('prev_maint',     'Preventive Maintenance', {
+        ('prev_maint', 'Preventive Maintenance', {
             'title': 'Preventive Maintenance',
             'items': [
-                ('pm_sched',   'PM Schedule',         {'title': 'PM Schedule',        'items': []}),
-                ('pm_chk',     'PM Checklists',       {'title': 'PM Checklists',      'items': []}),
-                ('pm_hist',    'PM History',          {'title': 'PM History',         'items': []}),
-                ('pm_rpts',    'PM Reports',          {'title': 'PM Reports',         'items': []}),
+                ('pm_sched', 'PM Schedule', 'Maint_Maint_menu.py'),
+                ('pm_chk', 'PM Checklists', 'Maint_Maint_menu.py'),
+                ('pm_hist', 'PM History', 'Maint_Maint_menu.py'),
+                ('pm_rpts', 'PM Reports', 'Maint_Maint_menu.py'),
             ],
         }),
     ],
@@ -148,67 +148,67 @@ _MAINT_MENU = {
 _MKT_MENU = {
     'title': 'Marketing Menu',
     'items': [
-        ('campaigns',    'Campaigns',         {
+        ('campaigns', 'Campaigns', {
             'title': 'Campaigns',
             'items': [
-                ('act_camp',   'Active Campaigns',    {'title': 'Active Campaigns',   'items': []}),
-                ('new_camp',   'Create Campaign',     {'title': 'Create Campaign',    'items': []}),
-                ('camp_cal',   'Campaign Calendar',   {'title': 'Campaign Calendar',  'items': []}),
-                ('camp_res',   'Campaign Results',    {'title': 'Campaign Results',   'items': []}),
+                ('act_camp', 'Active Campaigns', 'marketing_menu.py'),
+                ('new_camp', 'Create Campaign', 'marketing_menu.py'),
+                ('camp_cal', 'Campaign Calendar', 'marketing_menu.py'),
+                ('camp_res', 'Campaign Results', 'marketing_menu.py'),
             ],
         }),
-        ('mkt_research', 'Market Research',   {
+        ('mkt_research', 'Market Research', {
             'title': 'Market Research',
             'items': [
-                ('res_proj',   'Research Projects',   {'title': 'Research Projects',  'items': []}),
-                ('comp_analy', 'Competitor Analysis', {'title': 'Competitor Analysis','items': []}),
-                ('surv_mgmt',  'Survey Management',   {'title': 'Survey Management',  'items': []}),
-                ('mkt_trends', 'Market Trends',       {'title': 'Market Trends',      'items': []}),
+                ('res_proj', 'Research Projects', 'marketing_menu.py'),
+                ('comp_analy', 'Competitor Analysis', 'marketing_menu.py'),
+                ('surv_mgmt', 'Survey Management', 'marketing_menu.py'),
+                ('mkt_trends', 'Market Trends', 'marketing_menu.py'),
             ],
         }),
-        ('advertising',  'Advertising',       {
+        ('advertising', 'Advertising', {
             'title': 'Advertising',
             'items': [
-                ('ad_mgmt',    'Ad Management',       {'title': 'Ad Management',      'items': []}),
-                ('ad_budget',  'Ad Budget',           {'title': 'Ad Budget',          'items': []}),
-                ('ad_perf',    'Ad Performance',      {'title': 'Ad Performance',     'items': []}),
-                ('ad_cal',     'Ad Calendar',         {'title': 'Ad Calendar',        'items': []}),
+                ('ad_mgmt', 'Ad Management', 'marketing_menu.py'),
+                ('ad_budget', 'Ad Budget', 'marketing_menu.py'),
+                ('ad_perf', 'Ad Performance', 'marketing_menu.py'),
+                ('ad_cal', 'Ad Calendar', 'marketing_menu.py'),
             ],
         }),
-        ('analytics',    'Analytics',         {
+        ('analytics', 'Analytics', {
             'title': 'Analytics',
             'items': [
-                ('web_analy',  'Website Analytics',   {'title': 'Website Analytics',  'items': []}),
-                ('camp_analy', 'Campaign Analytics',  {'title': 'Campaign Analytics', 'items': []}),
-                ('sales_analy','Sales Analytics',     {'title': 'Sales Analytics',    'items': []}),
-                ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                ('web_analy', 'Website Analytics', 'marketing_menu.py'),
+                ('camp_analy', 'Campaign Analytics', 'marketing_menu.py'),
+                ('sales_analy', 'Sales Analytics', 'marketing_menu.py'),
+                ('cust_rpts', 'Custom Reports', 'marketing_menu.py'),
             ],
         }),
         ('content_mgmt', 'Content Management', {
             'title': 'Content Management',
             'items': [
-                ('cont_cal',   'Content Calendar',    {'title': 'Content Calendar',   'items': []}),
-                ('blog',       'Blog Posts',          {'title': 'Blog Posts',         'items': []}),
-                ('mkt_mat',    'Marketing Materials', {'title': 'Marketing Materials','items': []}),
-                ('cont_arch',  'Content Archive',     {'title': 'Content Archive',    'items': []}),
+                ('cont_cal', 'Content Calendar', 'marketing_menu.py'),
+                ('blog', 'Blog Posts', 'marketing_menu.py'),
+                ('mkt_mat', 'Marketing Materials', 'marketing_menu.py'),
+                ('cont_arch', 'Content Archive', 'marketing_menu.py'),
             ],
         }),
-        ('social_media', 'Social Media',      {
+        ('social_media', 'Social Media', {
             'title': 'Social Media',
             'items': [
-                ('post_mgmt',  'Post Management',     {'title': 'Post Management',    'items': []}),
-                ('social_cal', 'Social Calendar',     {'title': 'Social Calendar',    'items': []}),
-                ('eng_rpts',   'Engagement Reports',  {'title': 'Engagement Reports', 'items': []}),
-                ('acct_mgmt',  'Account Management',  {'title': 'Account Management', 'items': []}),
+                ('post_mgmt', 'Post Management', 'marketing_menu.py'),
+                ('social_cal', 'Social Calendar', 'marketing_menu.py'),
+                ('eng_rpts', 'Engagement Reports', 'marketing_menu.py'),
+                ('acct_mgmt', 'Account Management', 'marketing_menu.py'),
             ],
         }),
-        ('email_mkt',    'Email Marketing',   {
+        ('email_mkt', 'Email Marketing', {
             'title': 'Email Marketing',
             'items': [
-                ('email_camp', 'Email Campaigns',     {'title': 'Email Campaigns',    'items': []}),
-                ('sub_lists',  'Subscriber Lists',    {'title': 'Subscriber Lists',   'items': []}),
-                ('email_tmpl', 'Email Templates',     {'title': 'Email Templates',    'items': []}),
-                ('email_analy','Email Analytics',     {'title': 'Email Analytics',    'items': []}),
+                ('email_camp', 'Email Campaigns', 'marketing_menu.py'),
+                ('sub_lists', 'Subscriber Lists', 'marketing_menu.py'),
+                ('email_tmpl', 'Email Templates', 'marketing_menu.py'),
+                ('email_analy', 'Email Analytics', 'marketing_menu.py'),
             ],
         }),
     ],
@@ -217,67 +217,67 @@ _MKT_MENU = {
 _SALES_MENU = {
     'title': 'Sales Menu',
     'items': [
-        ('sales_orders',  'Sales Orders',          {
+        ('sales_orders', 'Sales Orders', {
             'title': 'Sales Orders',
             'items': [
-                ('new_order',  'New Order',           {'title': 'New Order',          'items': []}),
-                ('open_orders','Open Orders',         {'title': 'Open Orders',        'items': []}),
-                ('order_hist', 'Order History',       {'title': 'Order History',      'items': []}),
-                ('order_stat', 'Order Status',        {'title': 'Order Status',       'items': []}),
+                ('new_order', 'New Order', 'Sales_menu.py'),
+                ('open_orders', 'Open Orders', 'Sales_menu.py'),
+                ('order_hist', 'Order History', 'Sales_menu.py'),
+                ('order_stat', 'Order Status', 'Sales_menu.py'),
             ],
         }),
-        ('cust_accounts', 'Customer Accounts',     {
+        ('cust_accounts', 'Customer Accounts', {
             'title': 'Customer Accounts',
             'items': [
-                ('acct_list',  'Account List',        {'title': 'Account List',       'items': []}),
-                ('new_acct',   'New Account',         {'title': 'New Account',        'items': []}),
-                ('acct_det',   'Account Details',     {'title': 'Account Details',    'items': []}),
-                ('acct_hist',  'Account History',     {'title': 'Account History',    'items': []}),
+                ('acct_list', 'Account List', 'Sales_menu.py'),
+                ('new_acct', 'New Account', 'Sales_menu.py'),
+                ('acct_det', 'Account Details', 'Sales_menu.py'),
+                ('acct_hist', 'Account History', 'Sales_menu.py'),
             ],
         }),
-        ('sales_reports', 'Sales Reports',         {
+        ('sales_reports', 'Sales Reports', {
             'title': 'Sales Reports',
             'items': [
-                ('daily_sales','Daily Sales',         {'title': 'Daily Sales',        'items': []}),
-                ('month_sales','Monthly Sales',       {'title': 'Monthly Sales',      'items': []}),
-                ('annual_rpt', 'Annual Report',       {'title': 'Annual Report',      'items': []}),
-                ('by_rep',     'Sales by Rep',        {'title': 'Sales by Rep',       'items': []}),
+                ('daily_sales', 'Daily Sales', 'Sales_menu.py'),
+                ('month_sales', 'Monthly Sales', 'Sales_menu.py'),
+                ('annual_rpt', 'Annual Report', 'Sales_menu.py'),
+                ('by_rep', 'Sales by Rep', 'Sales_menu.py'),
             ],
         }),
-        ('quotes',        'Quotes',                {
+        ('quotes', 'Quotes', {
             'title': 'Quotes',
             'items': [
-                ('new_quote',  'Create Quote',        {'title': 'Create Quote',       'items': []}),
-                ('act_quotes', 'Active Quotes',       {'title': 'Active Quotes',      'items': []}),
-                ('quote_hist', 'Quote History',       {'title': 'Quote History',      'items': []}),
-                ('conv_order', 'Convert to Order',    {'title': 'Convert to Order',   'items': []}),
+                ('new_quote', 'Create Quote', 'Sales_menu.py'),
+                ('act_quotes', 'Active Quotes', 'Sales_menu.py'),
+                ('quote_hist', 'Quote History', 'Sales_menu.py'),
+                ('conv_order', 'Convert to Order', 'Sales_menu.py'),
             ],
         }),
-        ('leads',         'Leads & Opportunities', {
+        ('leads', 'Leads & Opportunities', {
             'title': 'Leads & Opportunities',
             'items': [
-                ('new_lead',   'New Lead',            {'title': 'New Lead',           'items': []}),
-                ('act_leads',  'Active Leads',        {'title': 'Active Leads',       'items': []}),
-                ('opp_pipe',   'Opportunities Pipeline',{'title': 'Opportunities Pipeline','items': []}),
-                ('lead_rpts',  'Lead Reports',        {'title': 'Lead Reports',       'items': []}),
+                ('new_lead', 'New Lead', 'Sales_menu.py'),
+                ('act_leads', 'Active Leads', 'Sales_menu.py'),
+                ('opp_pipe', 'Opportunities Pipeline', 'Sales_menu.py'),
+                ('lead_rpts', 'Lead Reports', 'Sales_menu.py'),
             ],
         }),
-        ('contracts',     'Contracts',             {
+        ('contracts', 'Contracts', {
             'title': 'Contracts',
             'items': [
-                ('act_cont',   'Active Contracts',    {'title': 'Active Contracts',   'items': []}),
-                ('new_cont',   'Create Contract',     {'title': 'Create Contract',    'items': []}),
-                ('cont_renew', 'Contract Renewals',   {'title': 'Contract Renewals',  'items': []}),
-                ('cont_arch',  'Contract Archive',    {'title': 'Contract Archive',   'items': []}),
+                ('act_cont', 'Active Contracts', 'Sales_menu.py'),
+                ('new_cont', 'Create Contract', 'Sales_menu.py'),
+                ('cont_renew', 'Contract Renewals', 'Sales_menu.py'),
+                ('cont_arch', 'Contract Archive', 'Sales_menu.py'),
             ],
         }),
-        ('forecasting',   'Sales Forecasting',     {
+        ('forecasting', 'Sales Forecasting', {
             'title': 'Sales Forecasting',
             'items': [
-                ('cur_fore',   'Current Forecast',    {'title': 'Current Forecast',   'items': []}),
-                ('fore_rep',   'Forecast by Rep',     {'title': 'Forecast by Rep',    'items': []}),
-                ('fore_prod',  'Forecast by Product', {'title': 'Forecast by Product','items': []}),
-                ('fore_rpts',  'Forecast Reports',    {'title': 'Forecast Reports',   'items': []}),
+                ('cur_fore', 'Current Forecast', 'Sales_menu.py'),
+                ('fore_rep', 'Forecast by Rep', 'Sales_menu.py'),
+                ('fore_prod', 'Forecast by Product', 'Sales_menu.py'),
+                ('fore_rpts', 'Forecast Reports', 'Sales_menu.py'),
             ],
         }),
     ],
@@ -286,67 +286,67 @@ _SALES_MENU = {
 _PROD_MENU = {
     'title': 'Production Menu',
     'items': [
-        ('work_orders',   'Work Orders',          {
+        ('work_orders', 'Work Orders', {
             'title': 'Work Orders',
             'items': [
-                ('create_wo',  'Create Work Order',   {'title': 'Create Work Order',  'items': []}),
-                ('open_wo',    'Open Work Orders',    {'title': 'Open Work Orders',   'items': []}),
-                ('inprog_wo',  'In Progress',         {'title': 'In Progress',        'items': []}),
-                ('comp_wo',    'Completed',           {'title': 'Completed',          'items': []}),
+                ('create_wo', 'Create Work Order', 'prod_prod_menu.py'),
+                ('open_wo', 'Open Work Orders', 'prod_prod_menu.py'),
+                ('inprog_wo', 'In Progress', 'prod_prod_menu.py'),
+                ('comp_wo', 'Completed', 'prod_prod_menu.py'),
             ],
         }),
-        ('prod_schedule', 'Production Schedule',  {
+        ('prod_schedule', 'Production Schedule', {
             'title': 'Production Schedule',
             'items': [
-                ('daily_sched','Daily Schedule',      {'title': 'Daily Schedule',     'items': []}),
-                ('week_sched', 'Weekly Schedule',     {'title': 'Weekly Schedule',    'items': []}),
-                ('month_sched','Monthly Schedule',    {'title': 'Monthly Schedule',   'items': []}),
-                ('sched_cal',  'Schedule Calendar',   {'title': 'Schedule Calendar',  'items': []}),
+                ('daily_sched', 'Daily Schedule', 'prod_prod_menu.py'),
+                ('week_sched', 'Weekly Schedule', 'prod_prod_menu.py'),
+                ('month_sched', 'Monthly Schedule', 'prod_prod_menu.py'),
+                ('sched_cal', 'Schedule Calendar', 'prod_prod_menu.py'),
             ],
         }),
-        ('inventory',     'Inventory',            {
+        ('inventory', 'Inventory', {
             'title': 'Inventory',
             'items': [
-                ('raw_mat',    'Raw Materials',        {'title': 'Raw Materials',      'items': []}),
-                ('fin_goods',  'Finished Goods',      {'title': 'Finished Goods',     'items': []}),
-                ('wip_inv',    'WIP Inventory',       {'title': 'WIP Inventory',      'items': []}),
-                ('inv_rpts',   'Inventory Reports',   {'title': 'Inventory Reports',  'items': []}),
+                ('raw_mat', 'Raw Materials', 'prod_prod_menu.py'),
+                ('fin_goods', 'Finished Goods', 'prod_prod_menu.py'),
+                ('wip_inv', 'WIP Inventory', 'prod_prod_menu.py'),
+                ('inv_rpts', 'Inventory Reports', 'prod_prod_menu.py'),
             ],
         }),
-        ('equip_status',  'Equipment Status',     {
+        ('equip_status', 'Equipment Status', {
             'title': 'Equipment Status',
             'items': [
-                ('equip_list', 'Equipment List',      {'title': 'Equipment List',     'items': []}),
-                ('stat_dash',  'Status Dashboard',    {'title': 'Status Dashboard',   'items': []}),
-                ('down_log',   'Downtime Log',        {'title': 'Downtime Log',       'items': []}),
-                ('maint_req',  'Maintenance Requests',{'title': 'Maintenance Requests','items': []}),
+                ('equip_list', 'Equipment List', 'prod_prod_menu.py'),
+                ('stat_dash', 'Status Dashboard', 'prod_prod_menu.py'),
+                ('down_log', 'Downtime Log', 'prod_prod_menu.py'),
+                ('maint_req', 'Maintenance Requests', 'prod_prod_menu.py'),
             ],
         }),
-        ('quality_ctrl',  'Quality Control',      {
+        ('quality_ctrl', 'Quality Control', {
             'title': 'Quality Control',
             'items': [
-                ('insp_res',   'Inspection Results',  {'title': 'Inspection Results', 'items': []}),
-                ('non_conf',   'Non-Conformances',    {'title': 'Non-Conformances',   'items': []}),
-                ('qc_rpts',    'QC Reports',          {'title': 'QC Reports',         'items': []}),
-                ('rej_analy',  'Reject Analysis',     {'title': 'Reject Analysis',    'items': []}),
+                ('insp_res', 'Inspection Results', 'prod_prod_menu.py'),
+                ('non_conf', 'Non-Conformances', 'prod_prod_menu.py'),
+                ('qc_rpts', 'QC Reports', 'prod_prod_menu.py'),
+                ('rej_analy', 'Reject Analysis', 'prod_prod_menu.py'),
             ],
         }),
-        ('prod_reports',  'Production Reports',   {
+        ('prod_reports', 'Production Reports', {
             'title': 'Production Reports',
             'items': [
-                ('daily_prod', 'Daily Production',    {'title': 'Daily Production',   'items': []}),
-                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
-                ('eff_rpt',    'Efficiency Report',   {'title': 'Efficiency Report',  'items': []}),
-                ('scrap_rpt',  'Scrap Report',        {'title': 'Scrap Report',       'items': []}),
+                ('daily_prod', 'Daily Production', 'prod_prod_menu.py'),
+                ('week_sum', 'Weekly Summary', 'prod_prod_menu.py'),
+                ('eff_rpt', 'Efficiency Report', 'prod_prod_menu.py'),
+                ('scrap_rpt', 'Scrap Report', 'prod_prod_menu.py'),
             ],
         }),
-        ('labor_tracking','Labor Tracking',       {
+        ('labor_tracking', 'Labor Tracking', {
             'title': 'Labor Tracking',
             'items': [
-                ('cur_labor',  'Current Labor',       {'title': 'Current Labor',      'items': []}),
-                ('labor_shft', 'Labor by Shift',      {'title': 'Labor by Shift',     'items': []}),
-                ('labor_job',  'Labor by Job',        {'title': 'Labor by Job',       'items': []}),
-                ('labor_rpts', 'Labor Reports',       {'title': 'Labor Reports',      'items': []}),
+                ('cur_labor', 'Current Labor', 'prod_prod_menu.py'),
+                ('labor_shft', 'Labor by Shift', 'prod_prod_menu.py'),
+                ('labor_job', 'Labor by Job', 'prod_prod_menu.py'),
+                ('labor_rpts', 'Labor Reports', 'prod_prod_menu.py'),
             ],
         }),
     ],
@@ -355,67 +355,67 @@ _PROD_MENU = {
 _SHIP_MENU = {
     'title': 'Shipping Department',
     'items': [
-        ('ship_orders',   'Shipment Orders',    {
+        ('ship_orders', 'Shipment Orders', {
             'title': 'Shipment Orders',
             'items': [
-                ('new_ship',   'New Shipment',        {'title': 'New Shipment',       'items': []}),
-                ('pend_ship',  'Pending Shipments',   {'title': 'Pending Shipments',  'items': []}),
-                ('shipped',    'Shipped Orders',      {'title': 'Shipped Orders',     'items': []}),
-                ('deliv_conf', 'Delivery Confirmation',{'title': 'Delivery Confirmation','items': []}),
+                ('new_ship', 'New Shipment', 'prod_ship_dept.py'),
+                ('pend_ship', 'Pending Shipments', 'prod_ship_dept.py'),
+                ('shipped', 'Shipped Orders', 'prod_ship_dept.py'),
+                ('deliv_conf', 'Delivery Confirmation', 'prod_ship_dept.py'),
             ],
         }),
-        ('ship_schedule', 'Shipping Schedule',  {
+        ('ship_schedule', 'Shipping Schedule', {
             'title': 'Shipping Schedule',
             'items': [
-                ('today_sched',"Today's Schedule",    {'title': "Today's Schedule",   'items': []}),
-                ('week_sched', 'Weekly Schedule',     {'title': 'Weekly Schedule',    'items': []}),
-                ('sched_cal',  'Schedule Calendar',   {'title': 'Schedule Calendar',  'items': []}),
-                ('rush_orders','Rush Orders',         {'title': 'Rush Orders',        'items': []}),
+                ('today_sched', "Today's Schedule", 'prod_ship_dept.py'),
+                ('week_sched', 'Weekly Schedule', 'prod_ship_dept.py'),
+                ('sched_cal', 'Schedule Calendar', 'prod_ship_dept.py'),
+                ('rush_orders', 'Rush Orders', 'prod_ship_dept.py'),
             ],
         }),
-        ('receiving',     'Receiving',          {
+        ('receiving', 'Receiving', {
             'title': 'Receiving',
             'items': [
-                ('inbound',    'Inbound Shipments',   {'title': 'Inbound Shipments',  'items': []}),
-                ('recv_items', 'Receive Items',       {'title': 'Receive Items',      'items': []}),
-                ('recv_rpts',  'Receiving Reports',   {'title': 'Receiving Reports',  'items': []}),
-                ('disc_rpts',  'Discrepancy Reports', {'title': 'Discrepancy Reports','items': []}),
+                ('inbound', 'Inbound Shipments', 'prod_ship_dept.py'),
+                ('recv_items', 'Receive Items', 'prod_ship_dept.py'),
+                ('recv_rpts', 'Receiving Reports', 'prod_ship_dept.py'),
+                ('disc_rpts', 'Discrepancy Reports', 'prod_ship_dept.py'),
             ],
         }),
-        ('carrier_mgmt',  'Carrier Management', {
+        ('carrier_mgmt', 'Carrier Management', {
             'title': 'Carrier Management',
             'items': [
-                ('carr_list',  'Carrier List',        {'title': 'Carrier List',       'items': []}),
-                ('carr_rates', 'Carrier Rates',       {'title': 'Carrier Rates',      'items': []}),
-                ('perf_rpts',  'Performance Reports', {'title': 'Performance Reports','items': []}),
-                ('carr_cont',  'Carrier Contracts',   {'title': 'Carrier Contracts',  'items': []}),
+                ('carr_list', 'Carrier List', 'prod_ship_dept.py'),
+                ('carr_rates', 'Carrier Rates', 'prod_ship_dept.py'),
+                ('perf_rpts', 'Performance Reports', 'prod_ship_dept.py'),
+                ('carr_cont', 'Carrier Contracts', 'prod_ship_dept.py'),
             ],
         }),
-        ('tracking',      'Tracking',           {
+        ('tracking', 'Tracking', {
             'title': 'Tracking',
             'items': [
-                ('track_ship', 'Track Shipment',      {'title': 'Track Shipment',     'items': []}),
-                ('track_dash', 'Tracking Dashboard',  {'title': 'Tracking Dashboard', 'items': []}),
-                ('deliv_stat', 'Delivery Status',     {'title': 'Delivery Status',    'items': []}),
-                ('exc_rpts',   'Exception Reports',   {'title': 'Exception Reports',  'items': []}),
+                ('track_ship', 'Track Shipment', 'prod_ship_dept.py'),
+                ('track_dash', 'Tracking Dashboard', 'prod_ship_dept.py'),
+                ('deliv_stat', 'Delivery Status', 'prod_ship_dept.py'),
+                ('exc_rpts', 'Exception Reports', 'prod_ship_dept.py'),
             ],
         }),
-        ('ship_reports',  'Shipping Reports',   {
+        ('ship_reports', 'Shipping Reports', {
             'title': 'Shipping Reports',
             'items': [
-                ('daily_rpt',  'Daily Report',        {'title': 'Daily Report',       'items': []}),
-                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
-                ('cost_analy', 'Cost Analysis',       {'title': 'Cost Analysis',      'items': []}),
-                ('perf_rpt',   'Performance Report',  {'title': 'Performance Report', 'items': []}),
+                ('daily_rpt', 'Daily Report', 'prod_ship_dept.py'),
+                ('week_sum', 'Weekly Summary', 'prod_ship_dept.py'),
+                ('cost_analy', 'Cost Analysis', 'prod_ship_dept.py'),
+                ('perf_rpt', 'Performance Report', 'prod_ship_dept.py'),
             ],
         }),
-        ('returns_proc',  'Returns Processing', {
+        ('returns_proc', 'Returns Processing', {
             'title': 'Returns Processing',
             'items': [
-                ('new_return', 'New Return',          {'title': 'New Return',         'items': []}),
-                ('pend_ret',   'Pending Returns',     {'title': 'Pending Returns',    'items': []}),
-                ('ret_hist',   'Return History',      {'title': 'Return History',     'items': []}),
-                ('ret_rpts',   'Return Reports',      {'title': 'Return Reports',     'items': []}),
+                ('new_return', 'New Return', 'prod_ship_dept.py'),
+                ('pend_ret', 'Pending Returns', 'prod_ship_dept.py'),
+                ('ret_hist', 'Return History', 'prod_ship_dept.py'),
+                ('ret_rpts', 'Return Reports', 'prod_ship_dept.py'),
             ],
         }),
     ],
@@ -424,67 +424,67 @@ _SHIP_MENU = {
 _QA_LAB_MENU = {
     'title': 'QA Laboratory Menu',
     'items': [
-        ('test_requests',  'Test Requests',      {
+        ('test_requests', 'Test Requests', {
             'title': 'Test Requests',
             'items': [
-                ('new_req',    'New Request',         {'title': 'New Request',        'items': []}),
-                ('pend_req',   'Pending Requests',    {'title': 'Pending Requests',   'items': []}),
-                ('inprog_req', 'In Progress',         {'title': 'In Progress',        'items': []}),
-                ('comp_tests', 'Completed Tests',     {'title': 'Completed Tests',    'items': []}),
+                ('new_req', 'New Request', 'QA_Lab_menu.py'),
+                ('pend_req', 'Pending Requests', 'QA_Lab_menu.py'),
+                ('inprog_req', 'In Progress', 'QA_Lab_menu.py'),
+                ('comp_tests', 'Completed Tests', 'QA_Lab_menu.py'),
             ],
         }),
-        ('lab_results',    'Lab Results',        {
+        ('lab_results', 'Lab Results', {
             'title': 'Lab Results',
             'items': [
-                ('recent_res', 'Recent Results',      {'title': 'Recent Results',     'items': []}),
-                ('search_res', 'Search Results',      {'title': 'Search Results',     'items': []}),
-                ('failed',     'Failed Tests',        {'title': 'Failed Tests',       'items': []}),
-                ('res_rpts',   'Result Reports',      {'title': 'Result Reports',     'items': []}),
+                ('recent_res', 'Recent Results', 'QA_Lab_menu.py'),
+                ('search_res', 'Search Results', 'QA_Lab_menu.py'),
+                ('failed', 'Failed Tests', 'QA_Lab_menu.py'),
+                ('res_rpts', 'Result Reports', 'QA_Lab_menu.py'),
             ],
         }),
-        ('insp_reports',   'Inspection Reports', {
+        ('insp_reports', 'Inspection Reports', {
             'title': 'Inspection Reports',
             'items': [
-                ('create_rpt', 'Create Report',       {'title': 'Create Report',      'items': []}),
-                ('pend_rpts',  'Pending Reports',     {'title': 'Pending Reports',    'items': []}),
-                ('rpt_arch',   'Report Archive',      {'title': 'Report Archive',     'items': []}),
-                ('rpt_sum',    'Report Summary',      {'title': 'Report Summary',     'items': []}),
+                ('create_rpt', 'Create Report', 'QA_Lab_menu.py'),
+                ('pend_rpts', 'Pending Reports', 'QA_Lab_menu.py'),
+                ('rpt_arch', 'Report Archive', 'QA_Lab_menu.py'),
+                ('rpt_sum', 'Report Summary', 'QA_Lab_menu.py'),
             ],
         }),
-        ('non_conformance','Non-Conformance',    {
+        ('non_conformance', 'Non-Conformance', {
             'title': 'Non-Conformance',
             'items': [
-                ('new_ncr',    'New NCR',             {'title': 'New NCR',            'items': []}),
-                ('open_ncrs',  'Open NCRs',           {'title': 'Open NCRs',          'items': []}),
-                ('ncr_hist',   'NCR History',         {'title': 'NCR History',        'items': []}),
-                ('ncr_rpts',   'NCR Reports',         {'title': 'NCR Reports',        'items': []}),
+                ('new_ncr', 'New NCR', 'QA_Lab_menu.py'),
+                ('open_ncrs', 'Open NCRs', 'QA_Lab_menu.py'),
+                ('ncr_hist', 'NCR History', 'QA_Lab_menu.py'),
+                ('ncr_rpts', 'NCR Reports', 'QA_Lab_menu.py'),
             ],
         }),
-        ('calibration',    'Calibration',        {
+        ('calibration', 'Calibration', {
             'title': 'Calibration',
             'items': [
-                ('cal_sched',  'Calibration Schedule',{'title': 'Calibration Schedule','items': []}),
-                ('cal_records','Calibration Records', {'title': 'Calibration Records','items': []}),
-                ('overdue',    'Overdue Items',       {'title': 'Overdue Items',      'items': []}),
-                ('cal_rpts',   'Calibration Reports', {'title': 'Calibration Reports','items': []}),
+                ('cal_sched', 'Calibration Schedule', 'QA_Lab_menu.py'),
+                ('cal_records', 'Calibration Records', 'QA_Lab_menu.py'),
+                ('overdue', 'Overdue Items', 'QA_Lab_menu.py'),
+                ('cal_rpts', 'Calibration Reports', 'QA_Lab_menu.py'),
             ],
         }),
-        ('sample_mgmt',    'Sample Management',  {
+        ('sample_mgmt', 'Sample Management', {
             'title': 'Sample Management',
             'items': [
-                ('recv_sample','Receive Sample',      {'title': 'Receive Sample',     'items': []}),
-                ('samp_track', 'Sample Tracking',     {'title': 'Sample Tracking',    'items': []}),
-                ('samp_disp',  'Sample Disposal',     {'title': 'Sample Disposal',    'items': []}),
-                ('samp_rpts',  'Sample Reports',      {'title': 'Sample Reports',     'items': []}),
+                ('recv_sample', 'Receive Sample', 'QA_Lab_menu.py'),
+                ('samp_track', 'Sample Tracking', 'QA_Lab_menu.py'),
+                ('samp_disp', 'Sample Disposal', 'QA_Lab_menu.py'),
+                ('samp_rpts', 'Sample Reports', 'QA_Lab_menu.py'),
             ],
         }),
-        ('lab_reports',    'Lab Reports',        {
+        ('lab_reports', 'Lab Reports', {
             'title': 'Lab Reports',
             'items': [
-                ('daily_rpts', 'Daily Reports',       {'title': 'Daily Reports',      'items': []}),
-                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
-                ('month_rpt',  'Monthly Report',      {'title': 'Monthly Report',     'items': []}),
-                ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                ('daily_rpts', 'Daily Reports', 'QA_Lab_menu.py'),
+                ('week_sum', 'Weekly Summary', 'QA_Lab_menu.py'),
+                ('month_rpt', 'Monthly Report', 'QA_Lab_menu.py'),
+                ('cust_rpts', 'Custom Reports', 'QA_Lab_menu.py'),
             ],
         }),
     ],
@@ -500,65 +500,65 @@ _QA_MENU = {
 _PERS_MENU = {
     'title': 'Personnel Menu',
     'items': [
-        ('pers_crm',    'Personnel CRM',          'personnel_crm.py'),
-        ('reg_form',    'Registration Form',      'registration_form.py'),
-        ('upd_pass',    'Update Password',        'update_users.py'),
-        ('disp_dept',   'Display Department',     'display_people_department.py'),
-        ('dept_entry',  'Dept Entry',             'dept_entry.py'),
-        ('dept_sub',    'Dept Sub Entry',         'dept_sub_entry.py'),
-        ('time_clock',  'Time Clock',             _TIME_CLOCK_MENU),
-        ('emp_records', 'Employee Records',       {
+        ('pers_crm', 'Personnel CRM', 'personnel_crm.py'),
+        ('reg_form', 'Registration Form', 'registration_form.py'),
+        ('upd_pass', 'Update Password', 'update_users.py'),
+        ('disp_dept', 'Display Department', 'display_people_department.py'),
+        ('dept_entry', 'Dept Entry', 'dept_entry.py'),
+        ('dept_sub', 'Dept Sub Entry', 'dept_sub_entry.py'),
+        ('time_clock', 'Time Clock', _TIME_CLOCK_MENU),
+        ('emp_records', 'Employee Records', {
             'title': 'Employee Records',
             'items': [
-                ('view_recs',  'View Records',        {'title': 'View Records',       'items': []}),
-                ('new_emp',    'New Employee',        {'title': 'New Employee',       'items': []}),
-                ('upd_rec',    'Update Record',       {'title': 'Update Record',      'items': []}),
-                ('emp_hist',   'Employment History',  {'title': 'Employment History', 'items': []}),
+                ('view_recs', 'View Records', 'personnel_crm.py'),
+                ('new_emp', 'New Employee', 'personnel_crm.py'),
+                ('upd_rec', 'Update Record', 'personnel_crm.py'),
+                ('emp_hist', 'Employment History', 'personnel_crm.py'),
             ],
         }),
-        ('benefits',    'Benefits',               {
+        ('benefits', 'Benefits', {
             'title': 'Benefits',
             'items': [
-                ('ben_enroll', 'Benefits Enrollment', {'title': 'Benefits Enrollment','items': []}),
-                ('ben_sum',    'Benefits Summary',    {'title': 'Benefits Summary',   'items': []}),
-                ('cobra',      'COBRA Management',    {'title': 'COBRA Management',   'items': []}),
-                ('ben_rpts',   'Benefits Reports',    {'title': 'Benefits Reports',   'items': []}),
+                ('ben_enroll', 'Benefits Enrollment', 'personnel_crm.py'),
+                ('ben_sum', 'Benefits Summary', 'personnel_crm.py'),
+                ('cobra', 'COBRA Management', 'personnel_crm.py'),
+                ('ben_rpts', 'Benefits Reports', 'personnel_crm.py'),
             ],
         }),
-        ('perf_review', 'Performance Reviews',    {
+        ('perf_review', 'Performance Reviews', {
             'title': 'Performance Reviews',
             'items': [
-                ('sched_rev',  'Schedule Review',     {'title': 'Schedule Review',    'items': []}),
-                ('pend_revs',  'Pending Reviews',     {'title': 'Pending Reviews',    'items': []}),
-                ('rev_hist',   'Review History',      {'title': 'Review History',     'items': []}),
-                ('perf_rpts',  'Performance Reports', {'title': 'Performance Reports','items': []}),
+                ('sched_rev', 'Schedule Review', 'personnel_crm.py'),
+                ('pend_revs', 'Pending Reviews', 'personnel_crm.py'),
+                ('rev_hist', 'Review History', 'personnel_crm.py'),
+                ('perf_rpts', 'Performance Reports', 'personnel_crm.py'),
             ],
         }),
-        ('disc_records','Disciplinary Records',   {
+        ('disc_records', 'Disciplinary Records', {
             'title': 'Disciplinary Records',
             'items': [
-                ('new_rec',    'New Record',          {'title': 'New Record',         'items': []}),
-                ('view_recs',  'View Records',        {'title': 'View Records',       'items': []}),
-                ('rec_hist',   'Record History',      {'title': 'Record History',     'items': []}),
-                ('disc_rpts',  'Disciplinary Reports',{'title': 'Disciplinary Reports','items': []}),
+                ('new_rec', 'New Record', 'personnel_crm.py'),
+                ('view_recs', 'View Records', 'personnel_crm.py'),
+                ('rec_hist', 'Record History', 'personnel_crm.py'),
+                ('disc_rpts', 'Disciplinary Reports', 'personnel_crm.py'),
             ],
         }),
-        ('training',    'Training & Development', {
+        ('training', 'Training & Development', {
             'title': 'Training & Development',
             'items': [
-                ('train_cal',  'Training Calendar',   {'title': 'Training Calendar',  'items': []}),
-                ('train_recs', 'Training Records',    {'title': 'Training Records',   'items': []}),
-                ('course_mgmt','Course Management',   {'title': 'Course Management',  'items': []}),
-                ('cert_track', 'Certification Tracking',{'title': 'Certification Tracking','items': []}),
+                ('train_cal', 'Training Calendar', 'personnel_crm.py'),
+                ('train_recs', 'Training Records', 'personnel_crm.py'),
+                ('course_mgmt', 'Course Management', 'personnel_crm.py'),
+                ('cert_track', 'Certification Tracking', 'personnel_crm.py'),
             ],
         }),
-        ('onboarding',  'Onboarding',             {
+        ('onboarding', 'Onboarding', {
             'title': 'Onboarding',
             'items': [
-                ('hire_chk',   'New Hire Checklist',  {'title': 'New Hire Checklist', 'items': []}),
-                ('onb_stat',   'Onboarding Status',   {'title': 'Onboarding Status',  'items': []}),
-                ('doc_coll',   'Document Collection', {'title': 'Document Collection','items': []}),
-                ('onb_rpts',   'Onboarding Reports',  {'title': 'Onboarding Reports', 'items': []}),
+                ('hire_chk', 'New Hire Checklist', 'personnel_crm.py'),
+                ('onb_stat', 'Onboarding Status', 'personnel_crm.py'),
+                ('doc_coll', 'Document Collection', 'personnel_crm.py'),
+                ('onb_rpts', 'Onboarding Reports', 'personnel_crm.py'),
             ],
         }),
     ],
@@ -567,60 +567,60 @@ _PERS_MENU = {
 _CS_MENU = {
     'title': 'Customer Service Menu',
     'items': [
-        ('cs_calls',      'Customer Service Calls', 'cs_calls.py'),
-        ('cust_entry',    'Customer Entry Screen',  'customer_entry.py'),
-        ('open_tickets',  'Open Tickets',           {
+        ('cs_calls', 'Customer Service Calls', 'cs_calls.py'),
+        ('cust_entry', 'Customer Entry Screen', 'customer_entry.py'),
+        ('open_tickets', 'Open Tickets', {
             'title': 'Open Tickets',
             'items': [
-                ('all_tickets','View All Tickets',    {'title': 'View All Tickets',   'items': []}),
-                ('my_tickets', 'My Tickets',          {'title': 'My Tickets',         'items': []}),
-                ('hi_pri',     'High Priority',       {'title': 'High Priority',      'items': []}),
-                ('tick_search','Ticket Search',       {'title': 'Ticket Search',      'items': []}),
+                ('all_tickets', 'View All Tickets', 'cs_calls.py'),
+                ('my_tickets', 'My Tickets', 'cs_calls.py'),
+                ('hi_pri', 'High Priority', 'cs_calls.py'),
+                ('tick_search', 'Ticket Search', 'cs_calls.py'),
             ],
         }),
-        ('cust_accounts', 'Customer Accounts',      {
+        ('cust_accounts', 'Customer Accounts', {
             'title': 'Customer Accounts',
             'items': [
-                ('acct_list',  'Account List',        {'title': 'Account List',       'items': []}),
-                ('new_acct',   'New Account',         {'title': 'New Account',        'items': []}),
-                ('acct_det',   'Account Details',     {'title': 'Account Details',    'items': []}),
-                ('acct_hist',  'Account History',     {'title': 'Account History',    'items': []}),
+                ('acct_list', 'Account List', 'cs_calls.py'),
+                ('new_acct', 'New Account', 'cs_calls.py'),
+                ('acct_det', 'Account Details', 'cs_calls.py'),
+                ('acct_hist', 'Account History', 'cs_calls.py'),
             ],
         }),
-        ('returns',       'Returns & Refunds',      {
+        ('returns', 'Returns & Refunds', {
             'title': 'Returns & Refunds',
             'items': [
-                ('new_return', 'New Return',          {'title': 'New Return',         'items': []}),
-                ('pend_ret',   'Pending Returns',     {'title': 'Pending Returns',    'items': []}),
-                ('refund_proc','Refund Processing',   {'title': 'Refund Processing',  'items': []}),
-                ('ret_rpts',   'Returns Reports',     {'title': 'Returns Reports',    'items': []}),
+                ('new_return', 'New Return', 'cs_calls.py'),
+                ('pend_ret', 'Pending Returns', 'cs_calls.py'),
+                ('refund_proc', 'Refund Processing', 'cs_calls.py'),
+                ('ret_rpts', 'Returns Reports', 'cs_calls.py'),
             ],
         }),
-        ('knowledge_base','Knowledge Base',         {
+        ('knowledge_base', 'Knowledge Base', {
             'title': 'Knowledge Base',
             'items': [
-                ('browse',     'Browse Articles',     {'title': 'Browse Articles',    'items': []}),
-                ('create_art', 'Create Article',      {'title': 'Create Article',     'items': []}),
-                ('art_mgmt',   'Article Management',  {'title': 'Article Management', 'items': []}),
-                ('kb_search',  'Search Knowledge Base',{'title': 'Search Knowledge Base','items': []}),
+                ('browse', 'Browse Articles', 'cs_calls.py'),
+                ('create_art', 'Create Article', 'cs_calls.py'),
+                ('art_mgmt', 'Article Management', 'cs_calls.py'),
+                ('kb_search', 'Search Knowledge Base', 'cs_calls.py'),
             ],
         }),
-        ('svc_reports',   'Service Reports',        {
+        ('svc_reports', 'Service Reports', {
             'title': 'Service Reports',
             'items': [
-                ('daily_rpt',  'Daily Report',        {'title': 'Daily Report',       'items': []}),
-                ('week_sum',   'Weekly Summary',      {'title': 'Weekly Summary',     'items': []}),
-                ('res_rpts',   'Resolution Reports',  {'title': 'Resolution Reports', 'items': []}),
-                ('csat_rpts',  'Customer Satisfaction',{'title': 'Customer Satisfaction','items': []}),
+                ('daily_rpt', 'Daily Report', 'cs_calls.py'),
+                ('week_sum', 'Weekly Summary', 'cs_calls.py'),
+                ('res_rpts', 'Resolution Reports', 'cs_calls.py'),
+                ('csat_rpts', 'Customer Satisfaction', 'cs_calls.py'),
             ],
         }),
-        ('surveys',       'Surveys & Feedback',     {
+        ('surveys', 'Surveys & Feedback', {
             'title': 'Surveys & Feedback',
             'items': [
-                ('act_surv',   'Active Surveys',      {'title': 'Active Surveys',     'items': []}),
-                ('new_surv',   'Create Survey',       {'title': 'Create Survey',      'items': []}),
-                ('surv_res',   'Survey Results',      {'title': 'Survey Results',     'items': []}),
-                ('feed_rpts',  'Feedback Reports',    {'title': 'Feedback Reports',   'items': []}),
+                ('act_surv', 'Active Surveys', 'cs_calls.py'),
+                ('new_surv', 'Create Survey', 'cs_calls.py'),
+                ('surv_res', 'Survey Results', 'cs_calls.py'),
+                ('feed_rpts', 'Feedback Reports', 'cs_calls.py'),
             ],
         }),
     ],
@@ -629,60 +629,60 @@ _CS_MENU = {
 _IT_TECH = {
     'title': 'IT Technician',
     'items': [
-        ('it_calls',    'IT Support Calls',       'it_calls.py'),
-        ('it_tasks',    'IT Tasks',               'IT_Tasks.py'),
-        ('help_desk',   'Help Desk Tickets',      {
+        ('it_calls', 'IT Support Calls', 'it_calls.py'),
+        ('it_tasks', 'IT Tasks', 'IT_Tasks.py'),
+        ('help_desk', 'Help Desk Tickets', {
             'title': 'Help Desk Tickets',
             'items': [
-                ('new_ticket', 'New Ticket',          {'title': 'New Ticket',         'items': []}),
-                ('open_tick',  'Open Tickets',        {'title': 'Open Tickets',       'items': []}),
-                ('my_tickets', 'My Assigned Tickets', {'title': 'My Assigned Tickets','items': []}),
-                ('tick_hist',  'Ticket History',      {'title': 'Ticket History',     'items': []}),
+                ('new_ticket', 'New Ticket', 'IT_Tasks.py'),
+                ('open_tick', 'Open Tickets', 'IT_Tasks.py'),
+                ('my_tickets', 'My Assigned Tickets', 'IT_Tasks.py'),
+                ('tick_hist', 'Ticket History', 'IT_Tasks.py'),
             ],
         }),
-        ('asset_mgmt',  'Asset Management',       {
+        ('asset_mgmt', 'Asset Management', {
             'title': 'Asset Management',
             'items': [
-                ('asset_inv',  'Asset Inventory',     {'title': 'Asset Inventory',    'items': []}),
-                ('new_asset',  'New Asset',           {'title': 'New Asset',          'items': []}),
-                ('asset_hist', 'Asset History',       {'title': 'Asset History',      'items': []}),
-                ('disposition','Disposition',         {'title': 'Disposition',        'items': []}),
+                ('asset_inv', 'Asset Inventory', 'IT_Tasks.py'),
+                ('new_asset', 'New Asset', 'IT_Tasks.py'),
+                ('asset_hist', 'Asset History', 'IT_Tasks.py'),
+                ('disposition', 'Disposition', 'IT_Tasks.py'),
             ],
         }),
-        ('net_status',  'Network Status',         {
+        ('net_status', 'Network Status', {
             'title': 'Network Status',
             'items': [
-                ('net_dash',   'Network Dashboard',   {'title': 'Network Dashboard',  'items': []}),
-                ('bw_monitor', 'Bandwidth Monitor',   {'title': 'Bandwidth Monitor',  'items': []}),
-                ('net_map',    'Network Map',         {'title': 'Network Map',        'items': []}),
-                ('inc_log',    'Incident Log',        {'title': 'Incident Log',       'items': []}),
+                ('net_dash', 'Network Dashboard', 'IT_Tasks.py'),
+                ('bw_monitor', 'Bandwidth Monitor', 'IT_Tasks.py'),
+                ('net_map', 'Network Map', 'IT_Tasks.py'),
+                ('inc_log', 'Incident Log', 'IT_Tasks.py'),
             ],
         }),
-        ('sw_install',  'Software Installations', {
+        ('sw_install', 'Software Installations', {
             'title': 'Software Installations',
             'items': [
-                ('pend_inst',  'Pending Installs',    {'title': 'Pending Installs',   'items': []}),
-                ('sw_inv',     'Software Inventory',  {'title': 'Software Inventory', 'items': []}),
-                ('lic_mgmt',   'License Management',  {'title': 'License Management', 'items': []}),
-                ('inst_hist',  'Installation History',{'title': 'Installation History','items': []}),
+                ('pend_inst', 'Pending Installs', 'IT_Tasks.py'),
+                ('sw_inv', 'Software Inventory', 'IT_Tasks.py'),
+                ('lic_mgmt', 'License Management', 'IT_Tasks.py'),
+                ('inst_hist', 'Installation History', 'IT_Tasks.py'),
             ],
         }),
-        ('hw_repairs',  'Hardware Repairs',       {
+        ('hw_repairs', 'Hardware Repairs', {
             'title': 'Hardware Repairs',
             'items': [
-                ('new_repair', 'New Repair Request',  {'title': 'New Repair Request', 'items': []}),
-                ('inprog',     'In Progress',         {'title': 'In Progress',        'items': []}),
-                ('comp_rep',   'Completed Repairs',   {'title': 'Completed Repairs',  'items': []}),
-                ('rep_hist',   'Repair History',      {'title': 'Repair History',     'items': []}),
+                ('new_repair', 'New Repair Request', 'IT_Tasks.py'),
+                ('inprog', 'In Progress', 'IT_Tasks.py'),
+                ('comp_rep', 'Completed Repairs', 'IT_Tasks.py'),
+                ('rep_hist', 'Repair History', 'IT_Tasks.py'),
             ],
         }),
-        ('user_accts',  'User Account Management', {
+        ('user_accts', 'User Account Management', {
             'title': 'User Account Management',
             'items': [
-                ('create_acct','Create Account',      {'title': 'Create Account',     'items': []}),
-                ('reset_pw',   'Reset Password',      {'title': 'Reset Password',     'items': []}),
-                ('acct_stat',  'Account Status',      {'title': 'Account Status',     'items': []}),
-                ('acct_audit', 'Account Audit',       {'title': 'Account Audit',      'items': []}),
+                ('create_acct', 'Create Account', 'IT_Tasks.py'),
+                ('reset_pw', 'Reset Password', 'IT_Tasks.py'),
+                ('acct_stat', 'Account Status', 'IT_Tasks.py'),
+                ('acct_audit', 'Account Audit', 'IT_Tasks.py'),
             ],
         }),
     ],
@@ -691,60 +691,60 @@ _IT_TECH = {
 _PURCH_MENU = {
     'title': 'Purchasing Menu',
     'items': [
-        ('prod_entry',    'Product Entry',       'product_entry_screen.py'),
-        ('sup_entry',     'Supplier Entry',      'Supplier_entry.py'),
-        ('purch_orders',  'Purchase Orders',     {
+        ('prod_entry', 'Product Entry', 'product_entry_screen.py'),
+        ('sup_entry', 'Supplier Entry', 'Supplier_entry.py'),
+        ('purch_orders', 'Purchase Orders', {
             'title': 'Purchase Orders',
             'items': [
-                ('new_po',     'New PO',             {'title': 'New PO',             'items': []}),
-                ('open_pos',   'Open POs',           {'title': 'Open POs',           'items': []}),
-                ('po_status',  'PO Status',          {'title': 'PO Status',          'items': []}),
-                ('po_hist',    'PO History',         {'title': 'PO History',         'items': []}),
+                ('new_po', 'New PO', 'purchase_orders.py'),
+                ('open_pos', 'Open POs', 'purchase_orders.py'),
+                ('po_status', 'PO Status', 'purchase_orders.py'),
+                ('po_hist', 'PO History', 'purchase_orders.py'),
             ],
         }),
-        ('vendor_mgmt',   'Vendor Management',   {
+        ('vendor_mgmt', 'Vendor Management', {
             'title': 'Vendor Management',
             'items': [
-                ('vend_list',  'Vendor List',        {'title': 'Vendor List',        'items': []}),
-                ('new_vend',   'New Vendor',         {'title': 'New Vendor',         'items': []}),
-                ('vend_perf',  'Vendor Performance', {'title': 'Vendor Performance', 'items': []}),
-                ('vend_cont',  'Vendor Contracts',   {'title': 'Vendor Contracts',   'items': []}),
+                ('vend_list', 'Vendor List', 'Purchasing_menu.py'),
+                ('new_vend', 'New Vendor', 'Purchasing_menu.py'),
+                ('vend_perf', 'Vendor Performance', 'Purchasing_menu.py'),
+                ('vend_cont', 'Vendor Contracts', 'Purchasing_menu.py'),
             ],
         }),
-        ('purch_reports', 'Purchase Reports',    {
+        ('purch_reports', 'Purchase Reports', {
             'title': 'Purchase Reports',
             'items': [
-                ('spend_sum',  'Spending Summary',   {'title': 'Spending Summary',   'items': []}),
-                ('po_rpts',    'PO Reports',         {'title': 'PO Reports',         'items': []}),
-                ('budg_act',   'Budget vs. Actual',  {'title': 'Budget vs. Actual',  'items': []}),
-                ('cat_rpts',   'Category Reports',   {'title': 'Category Reports',   'items': []}),
+                ('spend_sum', 'Spending Summary', 'Purchasing_menu.py'),
+                ('po_rpts', 'PO Reports', 'Purchasing_menu.py'),
+                ('budg_act', 'Budget vs. Actual', 'Purchasing_menu.py'),
+                ('cat_rpts', 'Category Reports', 'Purchasing_menu.py'),
             ],
         }),
-        ('receiving',     'Receiving',           {
+        ('receiving', 'Receiving', {
             'title': 'Receiving',
             'items': [
-                ('pend_recv',  'Pending Receipts',   {'title': 'Pending Receipts',   'items': []}),
-                ('recv_items', 'Receive Items',      {'title': 'Receive Items',      'items': []}),
-                ('disc_rpts',  'Discrepancy Reports',{'title': 'Discrepancy Reports','items': []}),
-                ('recv_hist',  'Receiving History',  {'title': 'Receiving History',  'items': []}),
+                ('pend_recv', 'Pending Receipts', 'receiving_dept.py'),
+                ('recv_items', 'Receive Items', 'receiving_dept.py'),
+                ('disc_rpts', 'Discrepancy Reports', 'receiving_dept.py'),
+                ('recv_hist', 'Receiving History', 'receiving_dept.py'),
             ],
         }),
-        ('contracts',     'Contract Management', {
+        ('contracts', 'Contract Management', {
             'title': 'Contract Management',
             'items': [
-                ('act_cont',   'Active Contracts',   {'title': 'Active Contracts',   'items': []}),
-                ('new_cont',   'New Contract',       {'title': 'New Contract',       'items': []}),
-                ('cont_renew', 'Contract Renewals',  {'title': 'Contract Renewals',  'items': []}),
-                ('cont_arch',  'Contract Archive',   {'title': 'Contract Archive',   'items': []}),
+                ('act_cont', 'Active Contracts', 'Purchasing_menu.py'),
+                ('new_cont', 'New Contract', 'Purchasing_menu.py'),
+                ('cont_renew', 'Contract Renewals', 'Purchasing_menu.py'),
+                ('cont_arch', 'Contract Archive', 'Purchasing_menu.py'),
             ],
         }),
-        ('requisitions',  'Requisitions',        {
+        ('requisitions', 'Requisitions', {
             'title': 'Requisitions',
             'items': [
-                ('new_req',    'New Requisition',    {'title': 'New Requisition',    'items': []}),
-                ('pend_appr',  'Pending Approval',   {'title': 'Pending Approval',   'items': []}),
-                ('appr_reqs',  'Approved Requisitions',{'title': 'Approved Requisitions','items': []}),
-                ('req_hist',   'Requisition History',{'title': 'Requisition History','items': []}),
+                ('new_req', 'New Requisition', 'Purchasing_menu.py'),
+                ('pend_appr', 'Pending Approval', 'Purchasing_menu.py'),
+                ('appr_reqs', 'Approved Requisitions', 'Purchasing_menu.py'),
+                ('req_hist', 'Requisition History', 'Purchasing_menu.py'),
             ],
         }),
     ],
@@ -754,98 +754,90 @@ MENU_TREE = {
     'accounting': {
         'title': 'Accounting Main Menu',
         'items': [
-            ('acct_pay',    'Accounts Payable',    'Accounts_payable.py'),
-            ('acct_mgr',    'Accounting Manager', {
+            ('acct_pay', 'Accounts Payable', 'Accounts_payable.py'),
+            ('acct_mgr', 'Accounting Manager', {
                 'title': 'Accounting Manager',
                 'items': [
-                    ('ap',          'Accounts Payable',    'Accounts_payable.py'),
-                    ('rcv',         'Accounts Receivable', 'Accounts_receivable.py'),
-                    ('credit',      'Credit Department',   'Credit_dept.py'),
-                    ('pay',         'Payroll Department',  'Payroll_dept.py'),
-                    ('fin_reports', 'Financial Reports',   {
+                    ('ap', 'Accounts Payable', 'Accounts_payable.py'),
+                    ('rcv', 'Accounts Receivable', 'Accounts_receivable.py'),
+                    ('credit', 'Credit Department', 'Credit_dept.py'),
+                    ('pay', 'Payroll Department', 'Payroll_dept.py'),
+                    ('fin_reports', 'Financial Reports', {
                         'title': 'Financial Reports',
                         'items': [
-                            ('inc_stmt',   'Income Statement',    {'title': 'Income Statement',   'items': []}),
-                            ('bal_sheet',  'Balance Sheet',       {'title': 'Balance Sheet',      'items': []}),
-                            ('cash_flow',  'Cash Flow',           {'title': 'Cash Flow',          'items': []}),
-                            ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                            ('inc_stmt', 'Income Statement', 'General_ledger.py'),
+                            ('bal_sheet', 'Balance Sheet', 'General_ledger.py'),
+                            ('cash_flow', 'Cash Flow', 'General_ledger.py'),
+                            ('cust_rpts', 'Custom Reports', 'General_ledger.py'),
                         ],
                     }),
-                    ('budget_mgmt', 'Budget Management',   {
+                    ('budget_mgmt', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('budg_plan',  'Budget Planning',     {'title': 'Budget Planning',    'items': []}),
-                            ('budg_act',   'Budget vs. Actual',   {'title': 'Budget vs. Actual',  'items': []}),
-                            ('budg_amend', 'Budget Amendments',   {'title': 'Budget Amendments',  'items': []}),
-                            ('budg_rpts',  'Budget Reports',      {'title': 'Budget Reports',     'items': []}),
+                            ('budg_plan', 'Budget Planning', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('budg_amend', 'Budget Amendments', 'Budget_mgmt.py'),
+                            ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                         ],
                     }),
-                    ('audit_mgmt',  'Audit Management',    {
+                    ('audit_mgmt', 'Audit Management', {
                         'title': 'Audit Management',
                         'items': [
-                            ('audit_sched','Audit Schedule',      {'title': 'Audit Schedule',     'items': []}),
-                            ('findings',   'Audit Findings',      {'title': 'Audit Findings',     'items': []}),
-                            ('corr_act',   'Corrective Actions',  {'title': 'Corrective Actions', 'items': []}),
-                            ('audit_rpts', 'Audit Reports',       {'title': 'Audit Reports',      'items': []}),
+                            ('audit_sched', 'Audit Schedule', 'Audit_mgmt.py'),
+                            ('findings', 'Audit Findings', 'Audit_mgmt.py'),
+                            ('corr_act', 'Corrective Actions', 'Audit_mgmt.py'),
+                            ('audit_rpts', 'Audit Reports', 'Audit_mgmt.py'),
                         ],
                     }),
                 ],
             }),
-            ('acct_rcv',    'Accounts Receivable', 'Accounts_receivable.py'),
-            ('credit',      'Credit Department',   'Credit_dept.py'),
-            ('payroll',     'Payroll Department',  'Payroll_dept.py'),
-            ('gen_ledger',  'General Ledger',      {
-                'title': 'General Ledger',
-                'items': [
-                    ('chart_accts','Chart of Accounts',   {'title': 'Chart of Accounts',  'items': []}),
-                    ('jrnl_ent',   'Journal Entries',     {'title': 'Journal Entries',    'items': []}),
-                    ('gl_rpts',    'GL Reports',          {'title': 'GL Reports',         'items': []}),
-                    ('per_close',  'Period Close',        {'title': 'Period Close',       'items': []}),
-                ],
-            }),
-            ('budget_mgmt', 'Budget Management',   {
+            ('acct_rcv', 'Accounts Receivable', 'Accounts_receivable.py'),
+            ('credit', 'Credit Department', 'Credit_dept.py'),
+            ('payroll', 'Payroll Department', 'Payroll_dept.py'),
+            ('gen_ledger', 'General Ledger', 'General_ledger.py'),
+            ('budget_mgmt', 'Budget Management', {
                 'title': 'Budget Management',
                 'items': [
-                    ('budg_plan',  'Budget Planning',     {'title': 'Budget Planning',    'items': []}),
-                    ('budg_act',   'Budget vs. Actual',   {'title': 'Budget vs. Actual',  'items': []}),
-                    ('budg_amend', 'Budget Amendments',   {'title': 'Budget Amendments',  'items': []}),
-                    ('budg_rpts',  'Budget Reports',      {'title': 'Budget Reports',     'items': []}),
+                    ('budg_plan', 'Budget Planning', 'Budget_mgmt.py'),
+                    ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                    ('budg_amend', 'Budget Amendments', 'Budget_mgmt.py'),
+                    ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                 ],
             }),
-            ('fin_reports', 'Financial Reports',   {
+            ('fin_reports', 'Financial Reports', {
                 'title': 'Financial Reports',
                 'items': [
-                    ('inc_stmt',   'Income Statement',    {'title': 'Income Statement',   'items': []}),
-                    ('bal_sheet',  'Balance Sheet',       {'title': 'Balance Sheet',      'items': []}),
-                    ('cash_flow',  'Cash Flow',           {'title': 'Cash Flow',          'items': []}),
-                    ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                    ('inc_stmt', 'Income Statement', 'General_ledger.py'),
+                    ('bal_sheet', 'Balance Sheet', 'General_ledger.py'),
+                    ('cash_flow', 'Cash Flow', 'General_ledger.py'),
+                    ('cust_rpts', 'Custom Reports', 'General_ledger.py'),
                 ],
             }),
-            ('tax_mgmt',    'Tax Management',      {
+            ('tax_mgmt', 'Tax Management', {
                 'title': 'Tax Management',
                 'items': [
-                    ('tax_cal',    'Tax Calendar',        {'title': 'Tax Calendar',       'items': []}),
-                    ('tax_filing', 'Tax Filing',          {'title': 'Tax Filing',         'items': []}),
-                    ('tax_pay',    'Tax Payments',        {'title': 'Tax Payments',       'items': []}),
-                    ('tax_rpts',   'Tax Reports',         {'title': 'Tax Reports',        'items': []}),
+                    ('tax_cal', 'Tax Calendar', 'Tax_mgmt.py'),
+                    ('tax_filing', 'Tax Filing', 'Tax_mgmt.py'),
+                    ('tax_pay', 'Tax Payments', 'Tax_mgmt.py'),
+                    ('tax_rpts', 'Tax Reports', 'Tax_mgmt.py'),
                 ],
             }),
-            ('exp_reports', 'Expense Reports',     {
+            ('exp_reports', 'Expense Reports', {
                 'title': 'Expense Reports',
                 'items': [
-                    ('sub_exp',    'Submit Expense',      {'title': 'Submit Expense',     'items': []}),
-                    ('pend_appr',  'Pending Approval',    {'title': 'Pending Approval',   'items': []}),
-                    ('appr_exp',   'Approved Expenses',   {'title': 'Approved Expenses',  'items': []}),
-                    ('exp_sum',    'Expense Summary',     {'title': 'Expense Summary',    'items': []}),
+                    ('sub_exp', 'Submit Expense', 'Accounts_payable.py'),
+                    ('pend_appr', 'Pending Approval', 'Accounts_payable.py'),
+                    ('appr_exp', 'Approved Expenses', 'Accounts_payable.py'),
+                    ('exp_sum', 'Expense Summary', 'Accounts_payable.py'),
                 ],
             }),
-            ('bank_recon',  'Bank Reconciliation', {
+            ('bank_recon', 'Bank Reconciliation', {
                 'title': 'Bank Reconciliation',
                 'items': [
-                    ('recon_acct', 'Reconcile Account',   {'title': 'Reconcile Account',  'items': []}),
-                    ('pend_items', 'Pending Items',        {'title': 'Pending Items',      'items': []}),
-                    ('recon_hist', 'Reconciliation History',{'title': 'Reconciliation History','items': []}),
-                    ('bank_rpts',  'Bank Reports',         {'title': 'Bank Reports',       'items': []}),
+                    ('recon_acct', 'Reconcile Account', 'General_ledger.py'),
+                    ('pend_items', 'Pending Items', 'General_ledger.py'),
+                    ('recon_hist', 'Reconciliation History', 'General_ledger.py'),
+                    ('bank_rpts', 'Bank Reports', 'General_ledger.py'),
                 ],
             }),
         ],
@@ -856,46 +848,46 @@ MENU_TREE = {
             ('cs_mgr', 'CS Manager Menu', {
                 'title': 'CS Manager Menu',
                 'items': [
-                    ('cs_menu',    'Customer Service Menu',  _CS_MENU),
-                    ('ticket_rpts','Ticket Reports',         {
+                    ('cs_menu', 'Customer Service Menu', _CS_MENU),
+                    ('ticket_rpts', 'Ticket Reports', {
                         'title': 'Ticket Reports',
                         'items': [
-                            ('daily_tick', 'Daily Ticket Report',   {'title': 'Daily Ticket Report', 'items': []}),
-                            ('week_sum',   'Weekly Summary',        {'title': 'Weekly Summary',      'items': []}),
-                            ('res_analy',  'Resolution Analysis',   {'title': 'Resolution Analysis', 'items': []}),
-                            ('sla_rpts',   'SLA Reports',           {'title': 'SLA Reports',         'items': []}),
+                            ('daily_tick', 'Daily Ticket Report', 'cs_reports.py'),
+                            ('week_sum', 'Weekly Summary', 'cs_reports.py'),
+                            ('res_analy', 'Resolution Analysis', 'cs_reports.py'),
+                            ('sla_rpts', 'SLA Reports', 'cs_reports.py'),
                         ],
                     }),
-                    ('staff_mgmt', 'Staff Management',       {
+                    ('staff_mgmt', 'Staff Management', {
                         'title': 'Staff Management',
                         'items': [
-                            ('staff_sched','Staff Schedule',        {'title': 'Staff Schedule',      'items': []}),
-                            ('perf_met',   'Performance Metrics',   {'title': 'Performance Metrics', 'items': []}),
-                            ('staff_train','Staff Training',        {'title': 'Staff Training',      'items': []}),
-                            ('staff_rpts', 'Staff Reports',         {'title': 'Staff Reports',       'items': []}),
+                            ('staff_sched', 'Staff Schedule', 'cs_staff_mgmt.py'),
+                            ('perf_met', 'Performance Metrics', 'cs_staff_mgmt.py'),
+                            ('staff_train', 'Staff Training', 'cs_staff_mgmt.py'),
+                            ('staff_rpts', 'Staff Reports', 'cs_staff_mgmt.py'),
                         ],
                     }),
-                    ('cust_sat',   'Customer Satisfaction',  {
+                    ('cust_sat', 'Customer Satisfaction', {
                         'title': 'Customer Satisfaction',
                         'items': [
-                            ('csat_res',   'CSAT Survey Results',   {'title': 'CSAT Survey Results', 'items': []}),
-                            ('nps_rpts',   'NPS Reports',           {'title': 'NPS Reports',         'items': []}),
-                            ('sat_trends', 'Satisfaction Trends',   {'title': 'Satisfaction Trends', 'items': []}),
-                            ('impr_plans', 'Improvement Plans',     {'title': 'Improvement Plans',   'items': []}),
+                            ('csat_res', 'CSAT Survey Results', 'cs_satisfaction.py'),
+                            ('nps_rpts', 'NPS Reports', 'cs_satisfaction.py'),
+                            ('sat_trends', 'Satisfaction Trends', 'cs_satisfaction.py'),
+                            ('impr_plans', 'Improvement Plans', 'cs_satisfaction.py'),
                         ],
                     }),
-                    ('escalations','Escalations',            {
+                    ('escalations', 'Escalations', {
                         'title': 'Escalations',
                         'items': [
-                            ('act_esc',    'Active Escalations',    {'title': 'Active Escalations',  'items': []}),
-                            ('esc_hist',   'Escalation History',    {'title': 'Escalation History',  'items': []}),
-                            ('esc_rpts',   'Escalation Reports',    {'title': 'Escalation Reports',  'items': []}),
-                            ('res_track',  'Resolution Tracking',   {'title': 'Resolution Tracking', 'items': []}),
+                            ('act_esc', 'Active Escalations', 'cs_escalations.py'),
+                            ('esc_hist', 'Escalation History', 'cs_escalations.py'),
+                            ('esc_rpts', 'Escalation Reports', 'cs_escalations.py'),
+                            ('res_track', 'Resolution Tracking', 'cs_escalations.py'),
                         ],
                     }),
                 ],
             }),
-            ('cs_menu',  'Customer Service Menu',  _CS_MENU),
+            ('cs_menu', 'Customer Service Menu', _CS_MENU),
             ('cs_calls', 'Customer Service Calls', 'cs_calls.py'),
         ],
     },
@@ -905,107 +897,107 @@ MENU_TREE = {
             ('eng_mgr', 'Engineering Manager', {
                 'title': 'Engineering Manager',
                 'items': [
-                    ('engineers',  'Engineers',           'engineer.py'),
-                    ('proj_appr',  'Project Approvals',   {
+                    ('engineers', 'Engineers', 'engineer.py'),
+                    ('proj_appr', 'Project Approvals', {
                         'title': 'Project Approvals',
                         'items': [
-                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
-                            ('appr_proj',  'Approved Projects',    {'title': 'Approved Projects',  'items': []}),
-                            ('rej_proj',   'Rejected Projects',    {'title': 'Rejected Projects',  'items': []}),
-                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                            ('pend_appr', 'Pending Approvals', 'eng_mgr.py'),
+                            ('appr_proj', 'Approved Projects', 'eng_mgr.py'),
+                            ('rej_proj', 'Rejected Projects', 'eng_mgr.py'),
+                            ('appr_hist', 'Approval History', 'eng_mgr.py'),
                         ],
                     }),
-                    ('resource',   'Resource Management', {
+                    ('resource', 'Resource Management', {
                         'title': 'Resource Management',
                         'items': [
-                            ('res_alloc',  'Resource Allocation',   {'title': 'Resource Allocation', 'items': []}),
-                            ('cap_plan',   'Capacity Planning',     {'title': 'Capacity Planning',   'items': []}),
-                            ('res_rpts',   'Resource Reports',      {'title': 'Resource Reports',    'items': []}),
-                            ('avail_cal',  'Availability Calendar', {'title': 'Availability Calendar','items': []}),
+                            ('res_alloc', 'Resource Allocation', 'eng_mgr.py'),
+                            ('cap_plan', 'Capacity Planning', 'eng_mgr.py'),
+                            ('res_rpts', 'Resource Reports', 'eng_mgr.py'),
+                            ('avail_cal', 'Availability Calendar', 'eng_mgr.py'),
                         ],
                     }),
-                    ('budget',     'Budget Management',   {
+                    ('budget', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('eng_budg',   'Engineering Budget',    {'title': 'Engineering Budget',  'items': []}),
-                            ('budg_act',   'Budget vs. Actual',     {'title': 'Budget vs. Actual',   'items': []}),
-                            ('cost_rpts',  'Cost Reports',          {'title': 'Cost Reports',        'items': []}),
-                            ('budg_req',   'Budget Requests',       {'title': 'Budget Requests',     'items': []}),
+                            ('eng_budg', 'Engineering Budget', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('cost_rpts', 'Cost Reports', 'Budget_mgmt.py'),
+                            ('budg_req', 'Budget Requests', 'Budget_mgmt.py'),
                         ],
                     }),
-                    ('eng_reports','Engineering Reports', {
+                    ('eng_reports', 'Engineering Reports', {
                         'title': 'Engineering Reports',
                         'items': [
-                            ('proj_stat',  'Project Status',        {'title': 'Project Status',      'items': []}),
-                            ('res_util',   'Resource Utilization',  {'title': 'Resource Utilization','items': []}),
-                            ('kpi_dash',   'KPI Dashboard',         {'title': 'KPI Dashboard',       'items': []}),
-                            ('month_rpts', 'Monthly Reports',       {'title': 'Monthly Reports',     'items': []}),
+                            ('proj_stat', 'Project Status', 'eng_mgr.py'),
+                            ('res_util', 'Resource Utilization', 'eng_mgr.py'),
+                            ('kpi_dash', 'KPI Dashboard', 'eng_mgr.py'),
+                            ('month_rpts', 'Monthly Reports', 'eng_mgr.py'),
                         ],
                     }),
                 ],
             }),
-            ('engineers',   'Engineers',              'engineer.py'),
-            ('proj_mgmt',   'Project Management',     {
+            ('engineers', 'Engineers', 'engineer.py'),
+            ('proj_mgmt', 'Project Management', {
                 'title': 'Project Management',
                 'items': [
-                    ('act_proj',   'Active Projects',      {'title': 'Active Projects',    'items': []}),
-                    ('new_proj',   'New Project',          {'title': 'New Project',        'items': []}),
-                    ('proj_time',  'Project Timeline',     {'title': 'Project Timeline',   'items': []}),
-                    ('proj_rpts',  'Project Reports',      {'title': 'Project Reports',    'items': []}),
+                    ('act_proj', 'Active Projects', 'engineer.py'),
+                    ('new_proj', 'New Project', 'engineer.py'),
+                    ('proj_time', 'Project Timeline', 'engineer.py'),
+                    ('proj_rpts', 'Project Reports', 'engineer.py'),
                 ],
             }),
-            ('design_docs', 'Design Documents',       {
+            ('design_docs', 'Design Documents', {
                 'title': 'Design Documents',
                 'items': [
-                    ('doc_lib',    'Document Library',     {'title': 'Document Library',   'items': []}),
-                    ('new_doc',    'New Document',         {'title': 'New Document',       'items': []}),
-                    ('doc_review', 'Document Review',      {'title': 'Document Review',    'items': []}),
-                    ('archive',    'Archive',              {'title': 'Archive',            'items': []}),
+                    ('doc_lib', 'Document Library', 'engineer.py'),
+                    ('new_doc', 'New Document', 'engineer.py'),
+                    ('doc_review', 'Document Review', 'engineer.py'),
+                    ('archive', 'Archive', 'engineer.py'),
                 ],
             }),
-            ('bom',         'Bill of Materials',      {
+            ('bom', 'Bill of Materials', {
                 'title': 'Bill of Materials',
                 'items': [
-                    ('bom_list',   'BOM List',            {'title': 'BOM List',           'items': []}),
-                    ('new_bom',    'Create BOM',          {'title': 'Create BOM',         'items': []}),
-                    ('bom_rev',    'BOM Revision',        {'title': 'BOM Revision',       'items': []}),
-                    ('bom_rpts',   'BOM Reports',         {'title': 'BOM Reports',        'items': []}),
+                    ('bom_list', 'BOM List', 'engineer.py'),
+                    ('new_bom', 'Create BOM', 'engineer.py'),
+                    ('bom_rev', 'BOM Revision', 'engineer.py'),
+                    ('bom_rpts', 'BOM Reports', 'engineer.py'),
                 ],
             }),
-            ('chg_orders',  'Change Orders',          {
+            ('chg_orders', 'Change Orders', {
                 'title': 'Change Orders',
                 'items': [
-                    ('new_co',     'New Change Order',    {'title': 'New Change Order',   'items': []}),
-                    ('pend_appr',  'Pending Approval',    {'title': 'Pending Approval',   'items': []}),
-                    ('appr_chg',   'Approved Changes',    {'title': 'Approved Changes',   'items': []}),
-                    ('chg_hist',   'Change History',      {'title': 'Change History',     'items': []}),
+                    ('new_co', 'New Change Order', 'engineer.py'),
+                    ('pend_appr', 'Pending Approval', 'engineer.py'),
+                    ('appr_chg', 'Approved Changes', 'engineer.py'),
+                    ('chg_hist', 'Change History', 'engineer.py'),
                 ],
             }),
-            ('test_val',    'Test & Validation',      {
+            ('test_val', 'Test & Validation', {
                 'title': 'Test & Validation',
                 'items': [
-                    ('test_plans', 'Test Plans',          {'title': 'Test Plans',         'items': []}),
-                    ('test_res',   'Test Results',        {'title': 'Test Results',       'items': []}),
-                    ('val_rpts',   'Validation Reports',  {'title': 'Validation Reports', 'items': []}),
-                    ('issue_track','Issue Tracking',      {'title': 'Issue Tracking',     'items': []}),
+                    ('test_plans', 'Test Plans', 'engineer.py'),
+                    ('test_res', 'Test Results', 'engineer.py'),
+                    ('val_rpts', 'Validation Reports', 'engineer.py'),
+                    ('issue_track', 'Issue Tracking', 'engineer.py'),
                 ],
             }),
-            ('eng_reports', 'Engineering Reports',    {
+            ('eng_reports', 'Engineering Reports', {
                 'title': 'Engineering Reports',
                 'items': [
-                    ('proj_stat',  'Project Status',      {'title': 'Project Status',     'items': []}),
-                    ('design_rev', 'Design Review',       {'title': 'Design Review',      'items': []}),
-                    ('res_rpt',    'Resource Report',     {'title': 'Resource Report',    'items': []}),
-                    ('cust_rpts',  'Custom Reports',      {'title': 'Custom Reports',     'items': []}),
+                    ('proj_stat', 'Project Status', 'engineer.py'),
+                    ('design_rev', 'Design Review', 'engineer.py'),
+                    ('res_rpt', 'Resource Report', 'engineer.py'),
+                    ('cust_rpts', 'Custom Reports', 'engineer.py'),
                 ],
             }),
-            ('standards',   'Standards & Compliance', {
+            ('standards', 'Standards & Compliance', {
                 'title': 'Standards & Compliance',
                 'items': [
-                    ('std_lib',    'Standards Library',   {'title': 'Standards Library',  'items': []}),
-                    ('comp_chk',   'Compliance Checklist',{'title': 'Compliance Checklist','items': []}),
-                    ('audit_res',  'Audit Results',       {'title': 'Audit Results',      'items': []}),
-                    ('reg_upd',    'Regulatory Updates',  {'title': 'Regulatory Updates', 'items': []}),
+                    ('std_lib', 'Standards Library', 'engineer.py'),
+                    ('comp_chk', 'Compliance Checklist', 'engineer.py'),
+                    ('audit_res', 'Audit Results', 'engineer.py'),
+                    ('reg_upd', 'Regulatory Updates', 'engineer.py'),
                 ],
             }),
         ],
@@ -1016,41 +1008,41 @@ MENU_TREE = {
             ('it_mgr', 'IT Manager', {
                 'title': 'IT Manager',
                 'items': [
-                    ('it_tech',    'IT Technician',       _IT_TECH),
-                    ('budget',     'Budget & Procurement', {
+                    ('it_tech', 'IT Technician', _IT_TECH),
+                    ('budget', 'Budget & Procurement', {
                         'title': 'Budget & Procurement',
                         'items': [
-                            ('it_budg',    'IT Budget',           {'title': 'IT Budget',          'items': []}),
-                            ('hw_proc',    'Hardware Procurement', {'title': 'Hardware Procurement','items': []}),
-                            ('sw_lic',     'Software Licensing',   {'title': 'Software Licensing', 'items': []}),
-                            ('proc_rpts',  'Procurement Reports',  {'title': 'Procurement Reports','items': []}),
+                            ('it_budg', 'IT Budget', 'Budget_mgmt.py'),
+                            ('hw_proc', 'Hardware Procurement', 'Budget_mgmt.py'),
+                            ('sw_lic', 'Software Licensing', 'Budget_mgmt.py'),
+                            ('proc_rpts', 'Procurement Reports', 'Budget_mgmt.py'),
                         ],
                     }),
-                    ('vendor_con', 'Vendor Contracts',     {
+                    ('vendor_con', 'Vendor Contracts', {
                         'title': 'Vendor Contracts',
                         'items': [
-                            ('act_cont',   'Active Contracts',     {'title': 'Active Contracts',   'items': []}),
-                            ('cont_renew', 'Contract Renewals',    {'title': 'Contract Renewals',  'items': []}),
-                            ('vend_perf',  'Vendor Performance',   {'title': 'Vendor Performance', 'items': []}),
-                            ('cont_arch',  'Contract Archive',     {'title': 'Contract Archive',   'items': []}),
+                            ('act_cont', 'Active Contracts', 'IT_mgr.py'),
+                            ('cont_renew', 'Contract Renewals', 'IT_mgr.py'),
+                            ('vend_perf', 'Vendor Performance', 'IT_mgr.py'),
+                            ('cont_arch', 'Contract Archive', 'IT_mgr.py'),
                         ],
                     }),
-                    ('it_projects','IT Projects',          {
+                    ('it_projects', 'IT Projects', {
                         'title': 'IT Projects',
                         'items': [
-                            ('act_proj',   'Active Projects',      {'title': 'Active Projects',    'items': []}),
-                            ('proj_pipe',  'Project Pipeline',     {'title': 'Project Pipeline',   'items': []}),
-                            ('proj_rpts',  'Project Reports',      {'title': 'Project Reports',    'items': []}),
-                            ('res_alloc',  'Resource Allocation',  {'title': 'Resource Allocation','items': []}),
+                            ('act_proj', 'Active Projects', 'IT_mgr.py'),
+                            ('proj_pipe', 'Project Pipeline', 'IT_mgr.py'),
+                            ('proj_rpts', 'Project Reports', 'IT_mgr.py'),
+                            ('res_alloc', 'Resource Allocation', 'IT_mgr.py'),
                         ],
                     }),
-                    ('security',   'Security Management',  {
+                    ('security', 'Security Management', {
                         'title': 'Security Management',
                         'items': [
-                            ('sec_dash',   'Security Dashboard',   {'title': 'Security Dashboard', 'items': []}),
-                            ('inc_rpts',   'Incident Reports',     {'title': 'Incident Reports',   'items': []}),
-                            ('vuln_mgmt',  'Vulnerability Management',{'title': 'Vulnerability Management','items': []}),
-                            ('comp_rpts',  'Compliance Reports',   {'title': 'Compliance Reports', 'items': []}),
+                            ('sec_dash', 'Security Dashboard', 'IT_mgr.py'),
+                            ('inc_rpts', 'Incident Reports', 'IT_mgr.py'),
+                            ('vuln_mgmt', 'Vulnerability Management', 'IT_mgr.py'),
+                            ('comp_rpts', 'Compliance Reports', 'IT_mgr.py'),
                         ],
                     }),
                 ],
@@ -1064,32 +1056,32 @@ MENU_TREE = {
             ('maint_mgr', 'Maintenance Manager', {
                 'title': 'Maintenance Manager',
                 'items': [
-                    ('maint',       'Maintenance',         _MAINT_MENU),
-                    ('wo_approvals','Work Order Approvals', {
+                    ('maint', 'Maintenance', _MAINT_MENU),
+                    ('wo_approvals', 'Work Order Approvals', {
                         'title': 'Work Order Approvals',
                         'items': [
-                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
-                            ('appr_wo',    'Approved Work Orders',  {'title': 'Approved Work Orders','items': []}),
-                            ('rej_wo',     'Rejected',             {'title': 'Rejected',           'items': []}),
-                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                            ('pend_appr', 'Pending Approvals', 'Maint_mgr_menu.py'),
+                            ('appr_wo', 'Approved Work Orders', 'Maint_mgr_menu.py'),
+                            ('rej_wo', 'Rejected', 'Maint_mgr_menu.py'),
+                            ('appr_hist', 'Approval History', 'Maint_mgr_menu.py'),
                         ],
                     }),
-                    ('budget_mgmt', 'Budget Management',   {
+                    ('budget_mgmt', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('maint_budg', 'Maintenance Budget',   {'title': 'Maintenance Budget', 'items': []}),
-                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
-                            ('cost_analy', 'Cost Analysis',        {'title': 'Cost Analysis',      'items': []}),
-                            ('budg_req',   'Budget Requests',      {'title': 'Budget Requests',    'items': []}),
+                            ('maint_budg', 'Maintenance Budget', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('cost_analy', 'Cost Analysis', 'Budget_mgmt.py'),
+                            ('budg_req', 'Budget Requests', 'Budget_mgmt.py'),
                         ],
                     }),
-                    ('maint_rpts',  'Maintenance Reports', {
+                    ('maint_rpts', 'Maintenance Reports', {
                         'title': 'Maintenance Reports',
                         'items': [
-                            ('daily_rpt',  'Daily Report',         {'title': 'Daily Report',       'items': []}),
-                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
-                            ('equip_rpts', 'Equipment Reports',    {'title': 'Equipment Reports',  'items': []}),
-                            ('cost_rpts',  'Cost Reports',         {'title': 'Cost Reports',       'items': []}),
+                            ('daily_rpt', 'Daily Report', 'Maint_mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary', 'Maint_mgr_menu.py'),
+                            ('equip_rpts', 'Equipment Reports', 'Maint_mgr_menu.py'),
+                            ('cost_rpts', 'Cost Reports', 'Maint_mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1103,32 +1095,32 @@ MENU_TREE = {
             ('mkt_mgr', 'Marketing Manager Menu', {
                 'title': 'Marketing Manager Menu',
                 'items': [
-                    ('mkt_menu',   'Marketing Menu',     _MKT_MENU),
-                    ('mkt_budget', 'Marketing Budget',   {
+                    ('mkt_menu', 'Marketing Menu', _MKT_MENU),
+                    ('mkt_budget', 'Marketing Budget', {
                         'title': 'Marketing Budget',
                         'items': [
-                            ('budg_over',  'Budget Overview',      {'title': 'Budget Overview',    'items': []}),
-                            ('budg_camp',  'Budget by Campaign',   {'title': 'Budget by Campaign', 'items': []}),
-                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
-                            ('budg_req',   'Budget Requests',      {'title': 'Budget Requests',    'items': []}),
+                            ('budg_over', 'Budget Overview', 'Budget_mgmt.py'),
+                            ('budg_camp', 'Budget by Campaign', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('budg_req', 'Budget Requests', 'Budget_mgmt.py'),
                         ],
                     }),
-                    ('camp_appr',  'Campaign Approvals', {
+                    ('camp_appr', 'Campaign Approvals', {
                         'title': 'Campaign Approvals',
                         'items': [
-                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
-                            ('appr_camp',  'Approved Campaigns',   {'title': 'Approved Campaigns', 'items': []}),
-                            ('camp_arch',  'Campaign Archive',     {'title': 'Campaign Archive',   'items': []}),
-                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                            ('pend_appr', 'Pending Approvals', 'marketing_mgr_menu.py'),
+                            ('appr_camp', 'Approved Campaigns', 'marketing_mgr_menu.py'),
+                            ('camp_arch', 'Campaign Archive', 'marketing_mgr_menu.py'),
+                            ('appr_hist', 'Approval History', 'marketing_mgr_menu.py'),
                         ],
                     }),
-                    ('mkt_reports','Marketing Reports',  {
+                    ('mkt_reports', 'Marketing Reports', {
                         'title': 'Marketing Reports',
                         'items': [
-                            ('camp_perf',  'Campaign Performance', {'title': 'Campaign Performance','items': []}),
-                            ('roi_rpts',   'ROI Reports',          {'title': 'ROI Reports',        'items': []}),
-                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
-                            ('kpi_dash',   'KPI Dashboard',        {'title': 'KPI Dashboard',      'items': []}),
+                            ('camp_perf', 'Campaign Performance', 'marketing_mgr_menu.py'),
+                            ('roi_rpts', 'ROI Reports', 'marketing_mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary', 'marketing_mgr_menu.py'),
+                            ('kpi_dash', 'KPI Dashboard', 'marketing_mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1142,41 +1134,41 @@ MENU_TREE = {
             ('pers_mgr', 'Personnel Manager Menu', {
                 'title': 'Personnel Manager Menu',
                 'items': [
-                    ('pers_menu', 'Personnel Menu',      _PERS_MENU),
-                    ('hiring',    'Hiring & Recruitment', {
+                    ('pers_menu', 'Personnel Menu', _PERS_MENU),
+                    ('hiring', 'Hiring & Recruitment', {
                         'title': 'Hiring & Recruitment',
                         'items': [
-                            ('open_pos',   'Open Positions',       {'title': 'Open Positions',     'items': []}),
-                            ('appl_track', 'Applicant Tracking',   {'title': 'Applicant Tracking', 'items': []}),
-                            ('int_sched',  'Interview Schedule',   {'title': 'Interview Schedule', 'items': []}),
-                            ('offer_mgmt', 'Offer Management',     {'title': 'Offer Management',   'items': []}),
+                            ('open_pos', 'Open Positions', 'personnel_mgr_menu.py'),
+                            ('appl_track', 'Applicant Tracking', 'personnel_mgr_menu.py'),
+                            ('int_sched', 'Interview Schedule', 'personnel_mgr_menu.py'),
+                            ('offer_mgmt', 'Offer Management', 'personnel_mgr_menu.py'),
                         ],
                     }),
-                    ('term',      'Terminations',        {
+                    ('term', 'Terminations', {
                         'title': 'Terminations',
                         'items': [
-                            ('term_proc',  'Termination Process',  {'title': 'Termination Process','items': []}),
-                            ('exit_int',   'Exit Interviews',      {'title': 'Exit Interviews',    'items': []}),
-                            ('final_pay',  'Final Pay Processing', {'title': 'Final Pay Processing','items': []}),
-                            ('offboard',   'Offboarding Checklist',{'title': 'Offboarding Checklist','items': []}),
+                            ('term_proc', 'Termination Process', 'personnel_mgr_menu.py'),
+                            ('exit_int', 'Exit Interviews', 'personnel_mgr_menu.py'),
+                            ('final_pay', 'Final Pay Processing', 'personnel_mgr_menu.py'),
+                            ('offboard', 'Offboarding Checklist', 'personnel_mgr_menu.py'),
                         ],
                     }),
-                    ('salary',    'Salary Management',   {
+                    ('salary', 'Salary Management', {
                         'title': 'Salary Management',
                         'items': [
-                            ('sal_review', 'Salary Review',        {'title': 'Salary Review',      'items': []}),
-                            ('sal_adj',    'Salary Adjustments',   {'title': 'Salary Adjustments', 'items': []}),
-                            ('comp_rpts',  'Compensation Reports', {'title': 'Compensation Reports','items': []}),
-                            ('pay_grades', 'Pay Grades',           {'title': 'Pay Grades',         'items': []}),
+                            ('sal_review', 'Salary Review', 'personnel_mgr_menu.py'),
+                            ('sal_adj', 'Salary Adjustments', 'personnel_mgr_menu.py'),
+                            ('comp_rpts', 'Compensation Reports', 'personnel_mgr_menu.py'),
+                            ('pay_grades', 'Pay Grades', 'personnel_mgr_menu.py'),
                         ],
                     }),
-                    ('hr_reports','HR Reports',          {
+                    ('hr_reports', 'HR Reports', {
                         'title': 'HR Reports',
                         'items': [
-                            ('hd_rpt',     'Headcount Report',     {'title': 'Headcount Report',   'items': []}),
-                            ('turn_rpt',   'Turnover Report',      {'title': 'Turnover Report',    'items': []}),
-                            ('comp_rpts',  'Compliance Reports',   {'title': 'Compliance Reports', 'items': []}),
-                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
+                            ('hd_rpt', 'Headcount Report', 'personnel_mgr_menu.py'),
+                            ('turn_rpt', 'Turnover Report', 'personnel_mgr_menu.py'),
+                            ('comp_rpts', 'Compliance Reports', 'personnel_mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary', 'personnel_mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1190,39 +1182,39 @@ MENU_TREE = {
             ('prod_mgr', 'Production Manager', {
                 'title': 'Production Manager',
                 'items': [
-                    ('prod',        'Production',         _PROD_MENU),
-                    ('shipping',    'Shipping',           _SHIP_MENU),
-                    ('prod_reports','Production Reports', {
+                    ('prod', 'Production', _PROD_MENU),
+                    ('shipping', 'Shipping', _SHIP_MENU),
+                    ('prod_reports', 'Production Reports', {
                         'title': 'Production Reports',
                         'items': [
-                            ('daily_prod', 'Daily Production',     {'title': 'Daily Production',   'items': []}),
-                            ('week_sum',   'Weekly Summary',       {'title': 'Weekly Summary',     'items': []}),
-                            ('eff_rpts',   'Efficiency Reports',   {'title': 'Efficiency Reports', 'items': []}),
-                            ('kpi_dash',   'KPI Dashboard',        {'title': 'KPI Dashboard',      'items': []}),
+                            ('daily_prod', 'Daily Production', 'prod_mgr_Menu.py'),
+                            ('week_sum', 'Weekly Summary', 'prod_mgr_Menu.py'),
+                            ('eff_rpts', 'Efficiency Reports', 'prod_mgr_Menu.py'),
+                            ('kpi_dash', 'KPI Dashboard', 'prod_mgr_Menu.py'),
                         ],
                     }),
-                    ('resource',    'Resource Management', {
+                    ('resource', 'Resource Management', {
                         'title': 'Resource Management',
                         'items': [
-                            ('res_alloc',  'Resource Allocation',   {'title': 'Resource Allocation','items': []}),
-                            ('cap_plan',   'Capacity Planning',     {'title': 'Capacity Planning',  'items': []}),
-                            ('res_rpts',   'Resource Reports',      {'title': 'Resource Reports',   'items': []}),
-                            ('wf_plan',    'Workforce Planning',    {'title': 'Workforce Planning', 'items': []}),
+                            ('res_alloc', 'Resource Allocation', 'prod_mgr_Menu.py'),
+                            ('cap_plan', 'Capacity Planning', 'prod_mgr_Menu.py'),
+                            ('res_rpts', 'Resource Reports', 'prod_mgr_Menu.py'),
+                            ('wf_plan', 'Workforce Planning', 'prod_mgr_Menu.py'),
                         ],
                     }),
-                    ('budget',      'Budget Management',  {
+                    ('budget', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('prod_budg',  'Production Budget',    {'title': 'Production Budget',  'items': []}),
-                            ('cost_analy', 'Cost Analysis',        {'title': 'Cost Analysis',      'items': []}),
-                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
-                            ('budg_rpts',  'Budget Reports',       {'title': 'Budget Reports',     'items': []}),
+                            ('prod_budg', 'Production Budget', 'Budget_mgmt.py'),
+                            ('cost_analy', 'Cost Analysis', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                         ],
                     }),
                 ],
             }),
-            ('prod',     'Production', _PROD_MENU),
-            ('shipping', 'Shipping',   _SHIP_MENU),
+            ('prod', 'Production', _PROD_MENU),
+            ('shipping', 'Shipping', _SHIP_MENU),
         ],
     },
     'purchasing': {
@@ -1231,50 +1223,50 @@ MENU_TREE = {
             ('purch_mgr', 'Purchasing Manager Menu', {
                 'title': 'Purchasing Manager Menu',
                 'items': [
-                    ('purch',       'Purchasing Menu',          _PURCH_MENU),
-                    ('po_approvals','PO Approvals',            {
+                    ('purch', 'Purchasing Menu', _PURCH_MENU),
+                    ('po_approvals', 'PO Approvals', {
                         'title': 'PO Approvals',
                         'items': [
-                            ('pend_appr',  'Pending Approvals',    {'title': 'Pending Approvals',  'items': []}),
-                            ('appr_pos',   'Approved POs',         {'title': 'Approved POs',       'items': []}),
-                            ('rej_pos',    'Rejected POs',         {'title': 'Rejected POs',       'items': []}),
-                            ('appr_hist',  'Approval History',     {'title': 'Approval History',   'items': []}),
+                            ('pend_appr', 'Pending Approvals', 'Purchasing_Mgr_menu.py'),
+                            ('appr_pos', 'Approved POs', 'Purchasing_Mgr_menu.py'),
+                            ('rej_pos', 'Rejected POs', 'Purchasing_Mgr_menu.py'),
+                            ('appr_hist', 'Approval History', 'Purchasing_Mgr_menu.py'),
                         ],
                     }),
-                    ('budget',      'Budget Management',        {
+                    ('budget', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('purch_budg', 'Purchasing Budget',    {'title': 'Purchasing Budget',  'items': []}),
-                            ('budg_act',   'Budget vs. Actual',    {'title': 'Budget vs. Actual',  'items': []}),
-                            ('spend_analy','Spending Analysis',    {'title': 'Spending Analysis',  'items': []}),
-                            ('budg_rpts',  'Budget Reports',       {'title': 'Budget Reports',     'items': []}),
+                            ('purch_budg', 'Purchasing Budget', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('spend_analy', 'Spending Analysis', 'Budget_mgmt.py'),
+                            ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                         ],
                     }),
-                    ('vendor_mgmt', 'Vendor Management',        {
+                    ('vendor_mgmt', 'Vendor Management', {
                         'title': 'Vendor Management',
                         'items': [
-                            ('vend_list',  'Vendor List',          {'title': 'Vendor List',        'items': []}),
-                            ('vend_eval',  'Vendor Evaluation',    {'title': 'Vendor Evaluation',  'items': []}),
-                            ('vend_perf',  'Vendor Performance',   {'title': 'Vendor Performance', 'items': []}),
-                            ('appr_vend',  'Approved Vendors',     {'title': 'Approved Vendors',   'items': []}),
+                            ('vend_list', 'Vendor List', 'Purchasing_Mgr_menu.py'),
+                            ('vend_eval', 'Vendor Evaluation', 'Purchasing_Mgr_menu.py'),
+                            ('vend_perf', 'Vendor Performance', 'Purchasing_Mgr_menu.py'),
+                            ('appr_vend', 'Approved Vendors', 'Purchasing_Mgr_menu.py'),
                         ],
                     }),
-                    ('purch_rpts',  'Purchasing Reports',       {
+                    ('purch_rpts', 'Purchasing Reports', {
                         'title': 'Purchasing Reports',
                         'items': [
-                            ('spend_rpt',  'Spending Report',      {'title': 'Spending Report',    'items': []}),
-                            ('vend_rpt',   'Vendor Report',        {'title': 'Vendor Report',      'items': []}),
-                            ('cat_analy',  'Category Analysis',    {'title': 'Category Analysis',  'items': []}),
-                            ('month_sum',  'Monthly Summary',      {'title': 'Monthly Summary',    'items': []}),
+                            ('spend_rpt', 'Spending Report', 'Purchasing_Mgr_menu.py'),
+                            ('vend_rpt', 'Vendor Report', 'Purchasing_Mgr_menu.py'),
+                            ('cat_analy', 'Category Analysis', 'Purchasing_Mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary', 'Purchasing_Mgr_menu.py'),
                         ],
                     }),
-                    ('contracts',   'Contract Management',      {
+                    ('contracts', 'Contract Management', {
                         'title': 'Contract Management',
                         'items': [
-                            ('act_cont',   'Active Contracts',     {'title': 'Active Contracts',   'items': []}),
-                            ('pend_renew', 'Pending Renewals',     {'title': 'Pending Renewals',   'items': []}),
-                            ('cont_arch',  'Contract Archive',     {'title': 'Contract Archive',   'items': []}),
-                            ('cont_rpts',  'Contract Reports',     {'title': 'Contract Reports',   'items': []}),
+                            ('act_cont', 'Active Contracts', 'Purchasing_Mgr_menu.py'),
+                            ('pend_renew', 'Pending Renewals', 'Purchasing_Mgr_menu.py'),
+                            ('cont_arch', 'Contract Archive', 'Purchasing_Mgr_menu.py'),
+                            ('cont_rpts', 'Contract Reports', 'Purchasing_Mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1288,68 +1280,68 @@ MENU_TREE = {
             ('qa_mgr', 'QA Manager Menu', {
                 'title': 'QA Manager Menu',
                 'items': [
-                    ('qa_menu',    'Quality Assurance Menu', _QA_MENU),
-                    ('audit_mgmt', 'Audit Management',   {
+                    ('qa_menu', 'Quality Assurance Menu', _QA_MENU),
+                    ('audit_mgmt', 'Audit Management', {
                         'title': 'Audit Management',
                         'items': [
-                            ('audit_sched','Audit Schedule',       {'title': 'Audit Schedule',     'items': []}),
-                            ('act_audits', 'Active Audits',        {'title': 'Active Audits',      'items': []}),
-                            ('findings',   'Audit Findings',       {'title': 'Audit Findings',     'items': []}),
-                            ('corr_act',   'Corrective Actions',   {'title': 'Corrective Actions', 'items': []}),
+                            ('audit_sched', 'Audit Schedule', 'QA_Mgr_menu.py'),
+                            ('act_audits', 'Active Audits', 'QA_Mgr_menu.py'),
+                            ('findings', 'Audit Findings', 'QA_Mgr_menu.py'),
+                            ('corr_act', 'Corrective Actions', 'QA_Mgr_menu.py'),
                         ],
                     }),
-                    ('compliance', 'Compliance',          {
+                    ('compliance', 'Compliance', {
                         'title': 'Compliance',
                         'items': [
-                            ('comp_dash',  'Compliance Dashboard', {'title': 'Compliance Dashboard','items': []}),
-                            ('reg_req',    'Regulatory Requirements',{'title': 'Regulatory Requirements','items': []}),
-                            ('comp_rpts',  'Compliance Reports',   {'title': 'Compliance Reports', 'items': []}),
-                            ('non_comp',   'Non-Compliance Issues', {'title': 'Non-Compliance Issues','items': []}),
+                            ('comp_dash', 'Compliance Dashboard', 'QA_Mgr_menu.py'),
+                            ('reg_req', 'Regulatory Requirements', 'QA_Mgr_menu.py'),
+                            ('comp_rpts', 'Compliance Reports', 'QA_Mgr_menu.py'),
+                            ('non_comp', 'Non-Compliance Issues', 'QA_Mgr_menu.py'),
                         ],
                     }),
-                    ('corr_action','Corrective Actions',  {
+                    ('corr_action', 'Corrective Actions', {
                         'title': 'Corrective Actions',
                         'items': [
-                            ('open_cars',  'Open CARs',            {'title': 'Open CARs',          'items': []}),
-                            ('inprog_cars','In Progress',          {'title': 'In Progress',        'items': []}),
-                            ('closed_cars','Closed CARs',          {'title': 'Closed CARs',        'items': []}),
-                            ('car_rpts',   'CAR Reports',          {'title': 'CAR Reports',        'items': []}),
+                            ('open_cars', 'Open CARs', 'QA_Mgr_menu.py'),
+                            ('inprog_cars', 'In Progress', 'QA_Mgr_menu.py'),
+                            ('closed_cars', 'Closed CARs', 'QA_Mgr_menu.py'),
+                            ('car_rpts', 'CAR Reports', 'QA_Mgr_menu.py'),
                         ],
                     }),
-                    ('qa_reports', 'QA Reports',          {
+                    ('qa_reports', 'QA Reports', {
                         'title': 'QA Reports',
                         'items': [
-                            ('daily_qa',   'Daily QA Report',      {'title': 'Daily QA Report',    'items': []}),
-                            ('week_sum',   'Weekly Summary',       {'title': 'Weekly Summary',     'items': []}),
-                            ('month_rpt',  'Monthly Report',       {'title': 'Monthly Report',     'items': []}),
-                            ('kpi_dash',   'KPI Dashboard',        {'title': 'KPI Dashboard',      'items': []}),
+                            ('daily_qa', 'Daily QA Report', 'QA_Mgr_menu.py'),
+                            ('week_sum', 'Weekly Summary', 'QA_Mgr_menu.py'),
+                            ('month_rpt', 'Monthly Report', 'QA_Mgr_menu.py'),
+                            ('kpi_dash', 'KPI Dashboard', 'QA_Mgr_menu.py'),
                         ],
                     }),
-                    ('supp_qual',  'Supplier Quality',    {
+                    ('supp_qual', 'Supplier Quality', {
                         'title': 'Supplier Quality',
                         'items': [
-                            ('supp_score', 'Supplier Scorecards',  {'title': 'Supplier Scorecards','items': []}),
-                            ('inc_insp',   'Incoming Inspection',  {'title': 'Incoming Inspection','items': []}),
-                            ('supp_audit', 'Supplier Audits',      {'title': 'Supplier Audits',    'items': []}),
-                            ('supp_rpts',  'Supplier Reports',     {'title': 'Supplier Reports',   'items': []}),
+                            ('supp_score', 'Supplier Scorecards', 'QA_Mgr_menu.py'),
+                            ('inc_insp', 'Incoming Inspection', 'QA_Mgr_menu.py'),
+                            ('supp_audit', 'Supplier Audits', 'QA_Mgr_menu.py'),
+                            ('supp_rpts', 'Supplier Reports', 'QA_Mgr_menu.py'),
                         ],
                     }),
-                    ('cust_comp',  'Customer Complaints', {
+                    ('cust_comp', 'Customer Complaints', {
                         'title': 'Customer Complaints',
                         'items': [
-                            ('new_comp',   'New Complaint',        {'title': 'New Complaint',      'items': []}),
-                            ('open_comp',  'Open Complaints',      {'title': 'Open Complaints',    'items': []}),
-                            ('res_track',  'Resolution Tracking',  {'title': 'Resolution Tracking','items': []}),
-                            ('comp_rpts',  'Complaint Reports',    {'title': 'Complaint Reports',  'items': []}),
+                            ('new_comp', 'New Complaint', 'QA_Mgr_menu.py'),
+                            ('open_comp', 'Open Complaints', 'QA_Mgr_menu.py'),
+                            ('res_track', 'Resolution Tracking', 'QA_Mgr_menu.py'),
+                            ('comp_rpts', 'Complaint Reports', 'QA_Mgr_menu.py'),
                         ],
                     }),
-                    ('doc_control','Document Control',    {
+                    ('doc_control', 'Document Control', {
                         'title': 'Document Control',
                         'items': [
-                            ('doc_lib',    'Document Library',     {'title': 'Document Library',   'items': []}),
-                            ('new_doc',    'New Document',         {'title': 'New Document',       'items': []}),
-                            ('doc_review', 'Document Review',      {'title': 'Document Review',    'items': []}),
-                            ('rev_hist',   'Revision History',     {'title': 'Revision History',   'items': []}),
+                            ('doc_lib', 'Document Library', 'QA_Mgr_menu.py'),
+                            ('new_doc', 'New Document', 'QA_Mgr_menu.py'),
+                            ('doc_review', 'Document Review', 'QA_Mgr_menu.py'),
+                            ('rev_hist', 'Revision History', 'QA_Mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1363,46 +1355,112 @@ MENU_TREE = {
             ('sales_mgr', 'Sales Manager Menu', {
                 'title': 'Sales Manager Menu',
                 'items': [
-                    ('sales',        'Sales Menu',            _SALES_MENU),
-                    ('sales_targets','Sales Targets',         {
+                    ('sales', 'Sales Menu', _SALES_MENU),
+                    ('sales_targets', 'Sales Targets', {
                         'title': 'Sales Targets',
                         'items': [
-                            ('set_tgt',    'Set Targets',          {'title': 'Set Targets',        'items': []}),
-                            ('tgt_act',    'Target vs. Actual',    {'title': 'Target vs. Actual',  'items': []}),
-                            ('tgt_rep',    'Target by Rep',        {'title': 'Target by Rep',      'items': []}),
-                            ('tgt_rpts',   'Target Reports',       {'title': 'Target Reports',     'items': []}),
+                            ('set_tgt', 'Set Targets', 'Sales_mgr_menu.py'),
+                            ('tgt_act', 'Target vs. Actual', 'Sales_mgr_menu.py'),
+                            ('tgt_rep', 'Target by Rep', 'Sales_mgr_menu.py'),
+                            ('tgt_rpts', 'Target Reports', 'Sales_mgr_menu.py'),
                         ],
                     }),
-                    ('territory',    'Territory Management',  {
+                    ('territory', 'Territory Management', {
                         'title': 'Territory Management',
                         'items': [
-                            ('terr_map',   'Territory Map',        {'title': 'Territory Map',      'items': []}),
-                            ('terr_assign','Territory Assignments',{'title': 'Territory Assignments','items': []}),
-                            ('terr_perf',  'Territory Performance',{'title': 'Territory Performance','items': []}),
-                            ('terr_rpts',  'Territory Reports',    {'title': 'Territory Reports',  'items': []}),
+                            ('terr_map', 'Territory Map', 'Sales_mgr_menu.py'),
+                            ('terr_assign', 'Territory Assignments', 'Sales_mgr_menu.py'),
+                            ('terr_perf', 'Territory Performance', 'Sales_mgr_menu.py'),
+                            ('terr_rpts', 'Territory Reports', 'Sales_mgr_menu.py'),
                         ],
                     }),
-                    ('commission',   'Commission Tracking',   {
+                    ('commission', 'Commission Tracking', {
                         'title': 'Commission Tracking',
                         'items': [
-                            ('comm_calc',  'Commission Calculator',{'title': 'Commission Calculator','items': []}),
-                            ('comm_rpts',  'Commission Reports',   {'title': 'Commission Reports', 'items': []}),
-                            ('pay_hist',   'Payment History',      {'title': 'Payment History',    'items': []}),
-                            ('comm_plans', 'Commission Plans',     {'title': 'Commission Plans',   'items': []}),
+                            ('comm_calc', 'Commission Calculator', 'Sales_mgr_menu.py'),
+                            ('comm_rpts', 'Commission Reports', 'Sales_mgr_menu.py'),
+                            ('pay_hist', 'Payment History', 'Sales_mgr_menu.py'),
+                            ('comm_plans', 'Commission Plans', 'Sales_mgr_menu.py'),
                         ],
                     }),
-                    ('staff_perf',   'Staff Performance',     {
+                    ('staff_perf', 'Staff Performance', {
                         'title': 'Staff Performance',
                         'items': [
-                            ('perf_dash',  'Performance Dashboard',{'title': 'Performance Dashboard','items': []}),
-                            ('rep_rank',   'Rep Rankings',         {'title': 'Rep Rankings',       'items': []}),
-                            ('perf_revs',  'Performance Reviews',  {'title': 'Performance Reviews','items': []}),
-                            ('coaching',   'Coaching Notes',       {'title': 'Coaching Notes',     'items': []}),
+                            ('perf_dash', 'Performance Dashboard', 'Sales_mgr_menu.py'),
+                            ('rep_rank', 'Rep Rankings', 'Sales_mgr_menu.py'),
+                            ('perf_revs', 'Performance Reviews', 'Sales_mgr_menu.py'),
+                            ('coaching', 'Coaching Notes', 'Sales_mgr_menu.py'),
                         ],
                     }),
                 ],
             }),
             ('sales', 'Sales Menu', _SALES_MENU),
+        ],
+    },
+    'budget_management': {
+        'title': 'Budget Management',
+        'items': [
+            ('budgets', 'Budgets', 'Budget_mgmt.py'),
+            ('bud_detail', 'Budget Detail', 'Budget_mgmt.py'),
+            ('bva', 'Budget vs. Actual', 'Budget_mgmt.py'),
+            ('variance', 'Variance Report', 'Budget_mgmt.py'),
+        ],
+    },
+    'finance': {
+        'title': 'Finance Main Menu',
+        'items': [
+            ('fin_mgr', 'Finance Manager', {
+                'title': 'Finance Manager',
+                'items': [
+                    ('fin_plan', 'Financial Planning', 'Finance_Main_menu.py'),
+                    ('fin_forecast', 'Budget & Forecasting', 'Finance_Main_menu.py'),
+                    ('treasury_mgmt', 'Treasury Management', 'Finance_Main_menu.py'),
+                    ('invest_mgmt', 'Investment Management', 'Finance_Main_menu.py'),
+                    ('fin_rpts_mgr', 'Financial Reports', 'Finance_Main_menu.py'),
+                ],
+            }),
+            ('fin_analysis', 'Financial Analysis', 'Finance_Main_menu.py'),
+            ('fin_reporting', 'Financial Reporting', 'Finance_Main_menu.py'),
+            ('treasury_ops', 'Treasury Operations', 'Finance_Main_menu.py'),
+            ('capital_mgmt', 'Capital Management', 'Finance_Main_menu.py'),
+            ('tax_planning', 'Tax Planning', 'Finance_Main_menu.py'),
+        ],
+    },
+    'legal': {
+        'title': 'Legal Main Menu',
+        'items': [
+            ('legal_mgr', 'Legal Manager', {
+                'title': 'Legal Manager',
+                'items': [
+                    ('contracts_mgmt', 'Contract Management', 'Legal_Main_menu.py'),
+                    ('litigation_mgmt', 'Litigation Management', 'Legal_Main_menu.py'),
+                    ('compliance_mgmt', 'Compliance Management', 'Legal_Main_menu.py'),
+                    ('corp_gov', 'Corporate Governance', 'Legal_Main_menu.py'),
+                ],
+            }),
+            ('contracts', 'Contracts', 'Legal_Main_menu.py'),
+            ('compliance', 'Compliance', 'Legal_Main_menu.py'),
+            ('litigation', 'Litigation', 'Legal_Main_menu.py'),
+            ('ip_mgmt', 'Intellectual Property', 'Legal_Main_menu.py'),
+            ('emp_law', 'Employment Law', 'Legal_Main_menu.py'),
+        ],
+    },
+    'risk_management': {
+        'title': 'Risk Management Main Menu',
+        'items': [
+            ('risk_mgr', 'Risk Manager', {
+                'title': 'Risk Manager',
+                'items': [
+                    ('risk_framework', 'Risk Framework', 'Risk_mgmt_Main_menu.py'),
+                    ('risk_reporting', 'Risk Reporting', 'Risk_mgmt_Main_menu.py'),
+                    ('biz_continuity', 'Business Continuity', 'Risk_mgmt_Main_menu.py'),
+                ],
+            }),
+            ('risk_assess', 'Risk Assessment', 'Risk_mgmt_Main_menu.py'),
+            ('risk_register', 'Risk Register', 'Risk_mgmt_Main_menu.py'),
+            ('insurance', 'Insurance Management', 'Risk_mgmt_Main_menu.py'),
+            ('biz_cont', 'Business Continuity', 'Risk_mgmt_Main_menu.py'),
+            ('comp_audit', 'Compliance & Audit', 'Risk_mgmt_Main_menu.py'),
         ],
     },
 }
@@ -1428,10 +1486,130 @@ def _walk_tree(dept, parts):
 from .db_pg import get_db as _get_db
 
 
+def _init_schema():
+    """Create application tables if they don't exist."""
+    conn = _get_db()
+    tables = [
+        """CREATE TABLE IF NOT EXISTS people (
+            id SERIAL PRIMARY KEY,
+            first_name TEXT NOT NULL DEFAULT '',
+            last_name TEXT NOT NULL DEFAULT '',
+            employee_id INTEGER NOT NULL DEFAULT 0,
+            address TEXT NOT NULL DEFAULT '',
+            city TEXT NOT NULL DEFAULT '',
+            state TEXT NOT NULL DEFAULT '',
+            zip_code TEXT NOT NULL DEFAULT '',
+            email TEXT NOT NULL DEFAULT '',
+            dept_id INTEGER,
+            dept_sub_id INTEGER
+        )""",
+        """CREATE TABLE IF NOT EXISTS passwd (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            FOREIGN KEY (people_id) REFERENCES people(id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS roles (
+            id SERIAL PRIMARY KEY,
+            role_name TEXT NOT NULL UNIQUE,
+            description TEXT
+        )""",
+        """CREATE TABLE IF NOT EXISTS user_roles (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL UNIQUE,
+            role_id INTEGER NOT NULL,
+            FOREIGN KEY (people_id) REFERENCES people(id),
+            FOREIGN KEY (role_id) REFERENCES roles(id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS dept (
+            dept_id SERIAL PRIMARY KEY,
+            dept_name TEXT NOT NULL UNIQUE
+        )""",
+        """CREATE TABLE IF NOT EXISTS dept_sub (
+            dept_sub_id SERIAL PRIMARY KEY,
+            dept_id INTEGER,
+            dept_sub_name TEXT NOT NULL,
+            FOREIGN KEY (dept_id) REFERENCES dept(dept_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS position (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL UNIQUE,
+            job_title TEXT NOT NULL DEFAULT '',
+            FOREIGN KEY (people_id) REFERENCES people(id)
+        )""",
+    ]
+    for ddl in tables:
+        conn.execute(ddl)
+    conn.commit()
+    conn.close()
+
+
+def _ensure_roles():
+    """Insert any missing roles into the roles table."""
+    conn = _get_db()
+    for name, desc in [
+        ('President', 'Full access — company president'),
+        ('Vice President', 'Full access — company vice president'),
+        ('Department Manager', 'Full access to own department including management screens'),
+        ('Supervisor', 'Access to own department operational screens'),
+        ('Auditor', 'Read-only browse access across all departments — cannot launch apps'),
+        ('HR / Personnel', 'Full access to Personnel department'),
+    ]:
+        conn.execute(
+            "INSERT INTO roles(role_name, description) SELECT %s,%s WHERE NOT EXISTS "
+            "(SELECT 1 FROM roles WHERE role_name=%s)", (name, desc, name)
+        )
+    conn.commit()
+    conn.close()
+
+
+def _get_user_profile(email: str) -> dict:
+    conn = _get_db()
+    row = conn.execute("""
+        SELECT p.id, p.dept_id, p.dept_Sub_id, d.dept_name,
+               r.role_name,
+               pos.position
+        FROM people p
+        LEFT JOIN dept d ON d.dept_id = p.dept_id
+        LEFT JOIN user_roles ur ON ur.people_id = p.id
+        LEFT JOIN roles r ON r.id = ur.role_id
+        LEFT JOIN position pos ON pos.people_id = p.id
+        WHERE p.email = %s
+    """, (email,)).fetchone()
+    conn.close()
+    if not row:
+        return {}
+    dept_name = row['dept_name'] or ''
+    dept_key = DEPT_MENU_KEY.get(dept_name)
+    role_name = row['role_name'] or ''
+    dept_sub_id = row['dept_Sub_id']
+    is_manager = (
+        dept_sub_id in MANAGER_DEPT_SUB_IDS
+        or role_name in {'Department Manager'} | FULL_ACCESS_ROLES
+    )
+    return {
+        'people_id': row['id'],
+        'dept_name': dept_name,
+        'dept_key': dept_key,
+        'role_name': role_name,
+        'position': row['position'] or '',
+        'dept_sub_id': dept_sub_id,
+        'is_manager': is_manager,
+    }
+
+
+def _is_full_access(profile: dict) -> bool:
+    """Admin, President, Vice President, or Company dept users see all departments."""
+    return (
+        profile.get('role_name') in FULL_ACCESS_ROLES
+        or profile.get('dept_key') is None
+    )
+
+
 def _verify_login(email: str, password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = ?",
+        "SELECT pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
         (email,),
     ).fetchone()
     conn.close()
@@ -1440,7 +1618,7 @@ def _verify_login(email: str, password: str) -> bool:
 
 def _email_exists(email: str) -> bool:
     conn = _get_db()
-    found = conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone()
+    found = conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone()
     conn.close()
     return found is not None
 
@@ -1449,17 +1627,18 @@ def _create_user(email, password, first_name='', last_name='',
                  address='', city='', state='', zip_code='', employee_id=0) -> bool:
     try:
         conn = _get_db()
-        if conn.execute("SELECT id FROM people WHERE email = ?", (email,)).fetchone():
+        if conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone():
             conn.close()
             return False
         cursor = conn.execute(
-            "INSERT INTO people (first_name, last_name, ID, address, city, state, zip_code, email) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO people (first_name, last_name, employee_id, address, city, state, zip_code, email) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )
+        people_id = cursor.fetchone()['id']
         conn.execute(
-            "INSERT INTO passwd (people_id, password) VALUES (?, ?)",
-            (cursor.lastrowid, password),
+            "INSERT INTO passwd (people_id, password) VALUES (%s, %s)",
+            (people_id, password),
         )
         conn.commit()
         conn.close()
@@ -1471,13 +1650,13 @@ def _create_user(email, password, first_name='', last_name='',
 def _reset_password(email: str, new_password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = ?",
+        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
         (email,),
     ).fetchone()
     if row is None:
         conn.close()
         return False
-    conn.execute("UPDATE passwd SET password = ? WHERE id = ?", (new_password, row["pw_id"]))
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (new_password, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
@@ -1487,7 +1666,27 @@ def _reset_password(email: str, new_password: str) -> bool:
 # Login / dashboard / logout
 # ---------------------------------------------------------------------------
 
+DASHBOARD_DEPARTMENTS = [
+    ('accounting', 'Accounting'),
+    ('customer_service', 'Customer Service'),
+    ('engineering', 'Engineering'),
+    ('information_tech', 'Information Tech'),
+    ('maintenance', 'Maintenance'),
+    ('marketing', 'Marketing'),
+    ('personnel', 'Personnel'),
+    ('production', 'Production'),
+    ('purchasing', 'Purchasing'),
+    ('quality_assurance', 'Quality Assurance'),
+    ('sales', 'Sales'),
+    ('budget_management', 'Budget Management'),
+    ('finance', 'Finance'),
+    ('legal', 'Legal'),
+    ('risk_management', 'Risk Management'),
+]
+
+
 def home(request):
+    _ensure_roles()
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -1500,6 +1699,17 @@ def home(request):
 
         if _verify_login(email, password):
             request.session['user_email'] = email
+            profile = _get_user_profile(email)
+            request.session['user_role'] = profile.get('role_name', '')
+            request.session['user_dept_key'] = profile.get('dept_key') or ''
+            request.session['user_dept_name'] = profile.get('dept_name', '')
+            request.session['user_full_access'] = _is_full_access(profile)
+            request.session['user_is_manager'] = profile.get('is_manager', False)
+            if request.session['user_full_access']:
+                return redirect('dashboard')
+            dept_key = profile.get('dept_key')
+            if dept_key:
+                return redirect('dept_menu', dept=dept_key)
             return redirect('dashboard')
 
         return render(request, 'home.html', {
@@ -1517,7 +1727,21 @@ def dashboard(request):
     email = request.session.get('user_email')
     if not email:
         return redirect('home')
-    return render(request, 'dashboard.html', {'email': email})
+    if not request.session.get('user_full_access'):
+        dept_key = request.session.get('user_dept_key')
+        if dept_key:
+            return redirect('dept_menu', dept=dept_key)
+    departments = [
+        ('/dept/{}/'.format(key), label)
+        for key, label in DASHBOARD_DEPARTMENTS
+    ]
+    return render(request, 'dashboard.html', {
+        'email': email,
+        'user_role': request.session.get('user_role', ''),
+        'dept_name': request.session.get('user_dept_name', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'departments': departments,
+    })
 
 
 def logout(request):
@@ -1528,13 +1752,20 @@ def logout(request):
 def generic_menu(request, dept, subpath=''):
     if not request.session.get('user_email'):
         return redirect('home')
+    if not request.session.get('user_full_access'):
+        user_dept = request.session.get('user_dept_key', '')
+        if user_dept and dept != user_dept:
+            return redirect('dept_menu', dept=user_dept)
     parts = [p for p in subpath.split('/') if p]
     node = _walk_tree(dept, parts)
     if node is None:
         return redirect('dashboard')
 
+    is_manager = request.session.get('user_is_manager', False)
     items = []
     for key, label, target in node['items']:
+        if key in MANAGER_MENU_KEYS and not is_manager:
+            continue
         new_parts = parts + [key]
         if isinstance(target, dict):
             url = '/dept/{}/{}/'.format(dept, '/'.join(new_parts))
@@ -1550,6 +1781,8 @@ def generic_menu(request, dept, subpath=''):
 
     return render(request, 'dept_menu.html', {
         'email': request.session['user_email'],
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
         'title': node['title'],
         'items': items,
         'back_url': back_url,
@@ -1559,6 +1792,12 @@ def generic_menu(request, dept, subpath=''):
 def run_script(request, dept, subpath):
     if not request.session.get('user_email'):
         return redirect('home')
+    if request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('dept_menu', dept=dept)
+    if not request.session.get('user_full_access'):
+        user_dept = request.session.get('user_dept_key', '')
+        if user_dept and dept != user_dept:
+            return redirect('dept_menu', dept=user_dept)
     parts = [p for p in subpath.split('/') if p]
     if not parts:
         return redirect('dashboard')
@@ -1568,7 +1807,7 @@ def run_script(request, dept, subpath):
         for key, _label, target in node['items']:
             if key == leaf_key and isinstance(target, str):
                 mfg_dir = os.path.dirname(__file__)
-                subprocess.Popen([sys.executable, os.path.join(mfg_dir, target)], cwd=mfg_dir)
+                subprocess.Popen([sys.executable, os.path.join(mfg_dir, target), leaf_key], cwd=mfg_dir)
                 break
     if parent_parts:
         return redirect('/dept/{}/{}/'.format(dept, '/'.join(parent_parts)))
@@ -1733,11 +1972,13 @@ def _get_all_users_with_roles():
     conn = _get_db()
     rows = conn.execute("""
         SELECT p.id, p.first_name, p.last_name, p.email,
+               d.dept_name,
                r.id as role_id, r.role_name
         FROM people p
+        LEFT JOIN dept d ON d.dept_id = p.dept_id
         LEFT JOIN user_roles ur ON ur.people_id = p.id
         LEFT JOIN roles r ON r.id = ur.role_id
-        ORDER BY p.last_name, p.first_name
+        ORDER BY d.dept_name, p.last_name, p.first_name
     """).fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -1753,7 +1994,7 @@ def _get_all_roles():
 def _set_user_role(people_id: int, role_id: int):
     conn = _get_db()
     conn.execute("""
-        INSERT INTO user_roles (people_id, role_id) VALUES (?, ?)
+        INSERT INTO user_roles (people_id, role_id) VALUES (%s, %s)
         ON CONFLICT(people_id) DO UPDATE SET role_id = excluded.role_id
     """, (people_id, role_id))
     conn.commit()
@@ -1762,7 +2003,7 @@ def _set_user_role(people_id: int, role_id: int):
 
 def _remove_user_role(people_id: int):
     conn = _get_db()
-    conn.execute("DELETE FROM user_roles WHERE people_id = ?", (people_id,))
+    conn.execute("DELETE FROM user_roles WHERE people_id = %s", (people_id,))
     conn.commit()
     conn.close()
 

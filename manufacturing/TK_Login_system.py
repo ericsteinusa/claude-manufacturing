@@ -11,7 +11,6 @@ password_entry = None
 
 
 def validate_credentials():
-    global root
     email = email_entry.get()
     password = password_entry.get()
 
@@ -20,7 +19,7 @@ def validate_credentials():
     cursor.execute(
         "SELECT passwd.password FROM passwd "
         "JOIN people ON passwd.people_id = people.id "
-        "WHERE people.email = ? AND passwd.password = ?",
+        "WHERE people.email = %s AND passwd.password = %s",
         (email, password),
     )
     result = cursor.fetchone()
@@ -31,7 +30,7 @@ def validate_credentials():
         subprocess.Popen(["python", "Company_main_menu.py"])
     else:
         messagebox.showerror("Error", "Invalid username or Password.")
-        if messagebox.askyesno("Register", "Do you want to register as a new user?"):
+        if messagebox.askyesno("Register", "Do you want to register as a new user%s"):
             subprocess.Popen(["python", "TK_Registration_form.py"])
         else:
             messagebox.showinfo("Info", "Please try again later.")
@@ -47,13 +46,12 @@ def create_gui():
     root.title("Login System")
     app_width = 450
     app_height = 400
-    
 
     # root.configure(bg="lightblue")
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     x = (screen_width / 2) - (app_width / 2)
-    y = (screen_height / 2 ) - (app_height / 2)
+    y = (screen_height / 2) - (app_height / 2)
 
     root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
@@ -73,11 +71,10 @@ def create_gui():
 
     login_button = tk.Button(root, text="Login", command=validate_credentials, borderwidth=5)
     login_button.place(x=180, y=155)
-    
+
     Button(root, text="Exit", command=root.quit, borderwidth=5).place(x=180, y=210)
 
     root.mainloop()
-
 
 
 # Main execution

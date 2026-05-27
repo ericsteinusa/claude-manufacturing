@@ -77,6 +77,8 @@ def init_db():
     conn.commit()
     conn.close()
 
+    c.execute("SELECT id, * FROM calls")
+    records = c.fetchall()
 
 def _apply_blue_palette(widget):
     pal = widget.palette()
@@ -93,6 +95,8 @@ def _ro(text):
     item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
     return item
 
+    # Create a cursor instance
+    c = conn.cursor()
 
 def _next_ticket_num():
     yr = QtCore.QDate.currentDate().year()
@@ -106,6 +110,9 @@ def _next_ticket_num():
     conn.close()
     return f"TKT-{yr}-{count + 1:04d}"
 
+    # Add button
+    search_button = Button(search, text="Search Records", command=search_records)
+    search_button.pack(padx=20, pady=20)
 
 # ── Dialogs ────────────────────────────────────────────────────────────────────
 

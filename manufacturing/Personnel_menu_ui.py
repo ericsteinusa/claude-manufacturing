@@ -155,10 +155,10 @@ class Ui_Personnel_menu(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 60, 811, 441))
         self.label.setStyleSheet("background-image: url(\'C:/source/pythonQSG/PyQt6 Apps/images/personnel2.png\');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.pers_crm_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -167,11 +167,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.pers_crm_Button.setFont(font)
         self.pers_crm_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.pers_crm_Button.setAutoDefault(False)
         self.pers_crm_Button.setObjectName("pers_crm_Button")
         self.reg_form_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -180,11 +180,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.reg_form_Button.setFont(font)
         self.reg_form_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.reg_form_Button.setAutoDefault(False)
         self.reg_form_Button.setObjectName("reg_form_Button")
         self.Update_passwd_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -193,11 +193,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.Update_passwd_Button.setFont(font)
         self.Update_passwd_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                                "border: 2px solid black;\n"
+                                                "border-radius: 10px;}\n"
+                                                "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                                "border: 2px solidrgb(85, 255, 255);\n"
+                                                "}")
         self.Update_passwd_Button.setAutoDefault(False)
         self.Update_passwd_Button.setObjectName("Update_passwd_Button")
         self.Disp_dpt_Button = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -206,11 +206,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.Disp_dpt_Button.setFont(font)
         self.Disp_dpt_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.Disp_dpt_Button.setAutoDefault(False)
         self.Disp_dpt_Button.setObjectName("Disp_dpt_Button")
         self.dept_entry = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -219,11 +219,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.dept_entry.setFont(font)
         self.dept_entry.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                      "border: 2px solid black;\n"
+                                      "border-radius: 10px;}\n"
+                                      "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                      "border: 2px solidrgb(85, 255, 255);\n"
+                                      "}")
         self.dept_entry.setAutoDefault(False)
         self.dept_entry.setObjectName("dept_entry")
         self.dept_sub_entry = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -232,11 +232,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.dept_sub_entry.setFont(font)
         self.dept_sub_entry.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                          "border: 2px solid black;\n"
+                                          "border-radius: 10px;}\n"
+                                          "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                          "border: 2px solidrgb(85, 255, 255);\n"
+                                          "}")
         self.dept_sub_entry.setAutoDefault(False)
         self.dept_sub_entry.setObjectName("dept_sub_entry")
         self.Time_Clock = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -245,11 +245,11 @@ class Ui_Personnel_menu(object):
         font.setPointSize(16)
         self.Time_Clock.setFont(font)
         self.Time_Clock.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                      "border: 2px solid black;\n"
+                                      "border-radius: 10px;}\n"
+                                      "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                      "border: 2px solidrgb(85, 255, 255);\n"
+                                      "}")
         self.Time_Clock.setAutoDefault(False)
         self.Time_Clock.setObjectName("Time_Clock")
         Personnel_menu.setCentralWidget(self.centralwidget)

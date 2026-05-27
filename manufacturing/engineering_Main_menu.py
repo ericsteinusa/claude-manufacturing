@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 
 class Ui_Eng_MainWindow(object):
@@ -146,39 +148,41 @@ class Ui_Eng_MainWindow(object):
         Eng_MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(parent=Eng_MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.eng_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Engineering Manager"))
+        self.eng_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Engineering Manager"))
         self.eng_mgr_Button.setGeometry(QtCore.QRect(10, 10, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.eng_mgr_Button.setFont(font)
         self.eng_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                          "border: 2px solid black;\n"
+                                          "border-radius: 10px;}\n"
+                                          "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                          "border: 2px solidrgb(85, 255, 255);\n"
+                                          "}")
         self.eng_mgr_Button.setAutoDefault(False)
         self.eng_mgr_Button.setObjectName("eng_mgr_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 721))
         self.label.setStyleSheet("background-image: url(engineering.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
-        self.engineers_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Engineers"))
+        self.engineers_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Engineers"))
         self.engineers_Button.setGeometry(QtCore.QRect(260, 10, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.engineers_Button.setFont(font)
         self.engineers_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                            "border: 2px solid black;\n"
+                                            "border-radius: 10px;}\n"
+                                            "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                            "border: 2px solidrgb(85, 255, 255);\n"
+                                            "}")
         self.engineers_Button.setAutoDefault(False)
         self.engineers_Button.setObjectName("engineers_Button")
         self.label.raise_()
@@ -200,7 +204,7 @@ class Ui_Eng_MainWindow(object):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
             "Engineering Manager": "eng_mgr.py",
-            "Engineers":           "engineer.py",
+            "Engineers": "engineer.py",
         }
         script = scripts.get(pressed)
         if script:
@@ -214,7 +218,6 @@ class Ui_Eng_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     Eng_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_Eng_MainWindow()

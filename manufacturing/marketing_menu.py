@@ -1,105 +1,74 @@
+import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+from Sales_menu import SalesOrdersWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white;\n"
-    "border: 2px solid black;\n"
-    "border-radius: 10px;}\n"
-    "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-    "border: 2px solid rgb(85, 255, 255);\n"
-    "}"
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
 
 
-class Ui_Marketing_menu(object):
-    def setupUi(self, Marketing_menu):
-        Marketing_menu.setObjectName("Marketing_menu")
-        Marketing_menu.resize(800, 600)
+def _launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
-        palette = QtGui.QPalette()
-        for group in (QtGui.QPalette.ColorGroup.Active,
-                      QtGui.QPalette.ColorGroup.Inactive,
-                      QtGui.QPalette.ColorGroup.Disabled):
-            palette.setColor(group, QtGui.QPalette.ColorRole.Window,
-                             QtGui.QColor(0, 85, 255))
-            palette.setColor(group, QtGui.QPalette.ColorRole.Button,
-                             QtGui.QColor(0, 85, 255))
-        Marketing_menu.setPalette(palette)
 
-        self.centralwidget = QtWidgets.QWidget(parent=Marketing_menu)
-        self.centralwidget.setObjectName("centralwidget")
+def _launch_tab(script, label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch(); row.addWidget(btn); row.addStretch()
+    v.addLayout(row); v.addStretch()
+    return w
 
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 60, 801, 511))
-        self.label.setStyleSheet(
-            "background-image: url(Marketing.png);\n"
-            "background-repeat: no-repeat;\n"
-            "background-position: center;\n"
-            "background-attachment: fixed;\n"
-            "background-color: white;"
-        )
-        self.label.setText("")
-        self.label.setObjectName("label")
 
-        font = QtGui.QFont()
-        font.setPointSize(16)
+def _placeholder_tab(label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addStretch()
+    return w
 
-        btn_data = [
-            ("Sales Orders",      QtCore.QRect(10,  10, 191, 41), "Sales Orders"),
-            ("Customer Contacts", QtCore.QRect(220, 10, 211, 41), "Customer Contacts"),
-            ("Campaign Tracker",  QtCore.QRect(10, 510, 191, 41), "Campaign Tracker"),
-            ("Market Research",   QtCore.QRect(220,510, 191, 41), "Market Research"),
-            ("Marketing Reports", QtCore.QRect(430,510, 211, 41), "Marketing Reports"),
-        ]
 
-        self._buttons = {}
-        for text, geom, key in btn_data:
-            btn = QtWidgets.QPushButton(
-                parent=self.centralwidget,
-                clicked=lambda checked, k=key: self.press_it(k)
-            )
-            btn.setGeometry(geom)
-            btn.setFont(font)
-            btn.setStyleSheet(BUTTON_STYLE)
-            btn.setAutoDefault(False)
-            btn.setText(text)
-            self._buttons[key] = btn
+class MarketingMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Marketing Menu")
+        self.resize(1100, 720)
+        _apply_blue_palette(self)
+        self._build_ui()
 
-        self.label.raise_()
-        for btn in self._buttons.values():
-            btn.raise_()
-
-        Marketing_menu.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=Marketing_menu)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        Marketing_menu.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=Marketing_menu)
-        Marketing_menu.setStatusBar(self.statusbar)
-
-        self.retranslateUi(Marketing_menu)
-        QtCore.QMetaObject.connectSlotsByName(Marketing_menu)
-
-    def press_it(self, pressed):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        scripts = {
-            "Sales Orders":      "Sales_menu.py",
-            "Customer Contacts": "customer_entry.py",
-        }
-        script = scripts.get(pressed)
-        if script:
-            subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-        else:
-            QtWidgets.QMessageBox.information(None, pressed, f"{pressed} — coming soon.")
-
-    def retranslateUi(self, Marketing_menu):
-        _translate = QtCore.QCoreApplication.translate
-        Marketing_menu.setWindowTitle(_translate("Marketing_menu", "Marketing Menu"))
+    def _build_ui(self):
+        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(SalesOrdersWidget(), "Sales Orders")
+        tabs.addTab(_launch_tab("customer_entry.py", "Customer Contacts"), "Customer Contacts")
+        tabs.addTab(_placeholder_tab("Campaign Tracker"), "Campaign Tracker")
+        tabs.addTab(_placeholder_tab("Market Research"), "Market Research")
+        tabs.addTab(_placeholder_tab("Marketing Reports"), "Marketing Reports")
+        v.addWidget(tabs)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    Marketing_menu = QtWidgets.QMainWindow()
-    ui = Ui_Marketing_menu()
-    ui.setupUi(Marketing_menu)
-    Marketing_menu.show()
+    w = MarketingMenu(); w.show()
     sys.exit(app.exec())

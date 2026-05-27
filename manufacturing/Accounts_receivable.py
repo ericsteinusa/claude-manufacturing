@@ -4,28 +4,29 @@ from db_pg import get_db
 import os
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
+from gl_utils import post_gl_entry
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
-DATE_STYLE  = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE  = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-LABEL_STYLE = "color:white;font-size:13px;"
-TAB_STYLE   = ("QTabWidget::pane{border:1px solid black;}"
-               "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-               " border-bottom:none; border-radius:4px 4px 0 0;}"
-               "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-               "QTabBar::tab:hover{background:rgb(85,255,255);}")
+INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
+DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+LABEL_STYLE = "color%(white)s;font-size:13px;"
+TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 STATUS_COLORS = {
-    "open":    QtGui.QColor(255, 255, 255),
+    "open": QtGui.QColor(255, 255, 255),
     "partial": QtGui.QColor(255, 243, 205),
-    "paid":    QtGui.QColor(212, 237, 218),
-    "void":    QtGui.QColor(220, 220, 220),
+    "paid": QtGui.QColor(212, 237, 218),
+    "void": QtGui.QColor(220, 220, 220),
 }
 
 
@@ -35,7 +36,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS customer (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            id           SERIAL PRIMARY KEY,
             first_name   TEXT,
             last_name    TEXT,
             company_name TEXT,
@@ -49,7 +50,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ar_invoice (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             customer_id    INTEGER NOT NULL REFERENCES customer(id),
             invoice_number TEXT NOT NULL UNIQUE,
             invoice_date   TEXT NOT NULL,
@@ -61,7 +62,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ar_payment (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id             SERIAL PRIMARY KEY,
             invoice_id     INTEGER NOT NULL REFERENCES ar_invoice(id),
             payment_date   TEXT NOT NULL,
             amount         REAL NOT NULL,
@@ -105,10 +106,10 @@ def _customer_display(row):
 def _next_inv_num():
     yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM ar_invoice WHERE invoice_number LIKE ?",
+    n = conn.execute("SELECT COUNT(*) FROM ar_invoice WHERE invoice_number LIKE %s",
                      (f"AR-{yr}-%",)).fetchone()[0]
     conn.close()
-    return f"AR-{yr}-{n+1:04d}"
+    return f"AR-{yr}-{n + 1:04d}"
 
 
 # ── Dialogs ────────────────────────────────────────────────────────────────
@@ -129,15 +130,15 @@ class NewInvoiceDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Accounts Receivable Invoice")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color:white;font-size:15px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=110):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -202,23 +203,34 @@ class NewInvoiceDialog(QtWidgets.QDialog):
         if self.amount.value() <= 0:
             QtWidgets.QMessageBox.warning(self, "Error", "Amount must be greater than zero.")
             return
+        inv_num = self.inv_num.text().strip()
+        inv_date = self.inv_date.date().toString("yyyy-MM-dd")
+        amount = self.amount.value()
+        desc = self.desc.text().strip() or None
+        cust = self.cust_combo.currentText()
         conn = get_db()
         try:
             conn.execute("""
                 INSERT INTO ar_invoice (customer_id, invoice_number, invoice_date, due_date, amount, description)
-                VALUES (?,?,?,?,?,?)
-            """, (self.cust_combo.currentData(),
-                  self.inv_num.text().strip(),
-                  self.inv_date.date().toString("yyyy-MM-dd"),
-                  self.due_date.date().toString("yyyy-MM-dd"),
-                  self.amount.value(),
-                  self.desc.text().strip() or None))
+                VALUES (%s,%s,%s,%s,%s,%s)
+            """, (self.cust_combo.currentData(), inv_num, inv_date,
+                  self.due_date.date().toString("yyyy-MM-dd"), amount, desc))
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "Invoice number already exists.")
             conn.close()
             return
         conn.close()
+        # Post draft GL entry: DR Accounts Receivable (1100), CR Sales Revenue (4000)
+        post_gl_entry(
+            journal_date=inv_date,
+            reference=inv_num,
+            description=f"AR Invoice – {cust}",
+            lines=[
+                ("1100", amount, 0.0, f"AR Invoice {inv_num}"),
+                ("4000", 0.0, amount, f"AR Invoice {inv_num}"),
+            ],
+        )
         self.accept()
 
 
@@ -236,11 +248,11 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         inv = conn.execute(
             """SELECT ai.*, c.first_name, c.last_name, c.company_name
                FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id
-               WHERE ai.id=?""",
+               WHERE ai.id=%s""",
             (self._invoice_id,)
         ).fetchone()
         paid = conn.execute(
-            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=?",
+            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=%s",
             (self._invoice_id,)
         ).fetchone()[0]
         conn.close()
@@ -254,16 +266,16 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         info = QtWidgets.QLabel(
             f"{inv['invoice_number']}  |  {cust_name}\n"
             f"Invoice: {_money(inv['amount'])}   Paid: {_money(paid)}   Balance: {_money(self._balance)}")
-        info.setStyleSheet("color:white;font-size:12px;")
+        info.setStyleSheet("color%(white)s;font-size:12px;")
         info.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(info)
 
         def row(lbl_text, widget, lbl_w=120):
             r = QtWidgets.QHBoxLayout()
-            l = QtWidgets.QLabel(lbl_text)
-            l.setFixedWidth(lbl_w)
-            l.setStyleSheet(LABEL_STYLE)
-            r.addWidget(l)
+            lbl = QtWidgets.QLabel(lbl_text)
+            lbl.setFixedWidth(lbl_w)
+            lbl.setStyleSheet(LABEL_STYLE)
+            r.addWidget(lbl)
             r.addWidget(widget)
             return r
 
@@ -309,51 +321,67 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         if amount > self._balance + 0.001:
             QtWidgets.QMessageBox.warning(self, "Error", f"Payment exceeds balance of {_money(self._balance)}.")
             return
+        pay_date = self.pay_date.date().toString("yyyy-MM-dd")
+        ref_text = self.ref.text().strip() or None
         conn = get_db()
         conn.execute(
-            "INSERT INTO ar_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (?,?,?,?,?)",
-            (self._invoice_id, self.pay_date.date().toString("yyyy-MM-dd"),
-             amount, self.method.currentText(), self.ref.text().strip() or None))
+            "INSERT INTO ar_payment (invoice_id, payment_date, amount, payment_method, reference) VALUES (%s,%s,%s,%s,%s)",
+            (self._invoice_id, pay_date, amount, self.method.currentText(), ref_text))
         new_paid = conn.execute(
-            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=?",
+            "SELECT COALESCE(SUM(amount),0) FROM ar_payment WHERE invoice_id=%s",
             (self._invoice_id,)
         ).fetchone()[0]
-        inv_amt = conn.execute(
-            "SELECT amount FROM ar_invoice WHERE id=?", (self._invoice_id,)
-        ).fetchone()["amount"]
-        new_status = "paid" if abs(new_paid - inv_amt) < 0.01 else "partial"
-        conn.execute("UPDATE ar_invoice SET status=? WHERE id=?", (new_status, self._invoice_id))
+        inv = conn.execute(
+            "SELECT ai.amount, ai.invoice_number, c.first_name, c.last_name, c.company_name "
+            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=%s",
+            (self._invoice_id,)
+        ).fetchone()
+        new_status = "paid" if abs(new_paid - inv["amount"]) < 0.01 else "partial"
+        conn.execute("UPDATE ar_invoice SET status=%s WHERE id=%s", (new_status, self._invoice_id))
         conn.commit()
         conn.close()
+        # Post draft GL entry: DR Cash (1000), CR Accounts Receivable (1100)
+        ref = ref_text or inv["invoice_number"]
+        cust = _customer_display(inv)
+        post_gl_entry(
+            journal_date=pay_date,
+            reference=ref,
+            description=f"AR Payment – {cust} ({inv['invoice_number']})",
+            lines=[
+                ("1000", amount, 0.0, f"Payment on {inv['invoice_number']}"),
+                ("1100", 0.0, amount, f"Payment on {inv['invoice_number']}"),
+            ],
+        )
         self.accept()
 
 
 # ── Main window ────────────────────────────────────────────────────────────
 
-class AccountsReceivable(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Accounts Receivable")
-        self.resize(1150, 700)
+_TAB_KEYS = {'rcv': 0, 'acct_rcv': 0}
+
+
+class AccountsReceivableWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
-        self._cust_row_ids    = []
+        self._cust_row_ids = []
         self._invoice_row_ids = []
         self._build_ui()
         self._load_customers()
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
         self._refresh_invoices()
         self._refresh_aging()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
-        tabs = QtWidgets.QTabWidget()
-        tabs.setStyleSheet(TAB_STYLE)
-        outer.addWidget(tabs)
-        tabs.addTab(self._build_customers_tab(), "Customers")
-        tabs.addTab(self._build_invoices_tab(),  "Invoices")
-        tabs.addTab(self._build_aging_tab(),     "Aging Report")
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setStyleSheet(TAB_STYLE)
+        outer.addWidget(self.tabs)
+        self.tabs.addTab(self._build_customers_tab(), "Customers")
+        self.tabs.addTab(self._build_invoices_tab(), "Invoices")
+        self.tabs.addTab(self._build_aging_tab(), "Aging Report")
 
     # ── Customers tab ──────────────────────────────────────────────────────
 
@@ -368,7 +396,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self.cust_table.setHorizontalHeaderLabels(
             ["Company / Name", "Contact", "Phone", "Email", "City", "State", "Zip"])
         hh = self.cust_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -403,15 +431,15 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         # Form
         fg = QtWidgets.QGroupBox("Customer Record")
         fg.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         def inp(ph=""):
             e = QtWidgets.QLineEdit()
@@ -420,28 +448,37 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             return e
 
         self.cf_company = inp("Company name")
-        self.cf_first   = inp("First name")
-        self.cf_last    = inp("Last name")
-        self.cf_phone   = inp("Phone")
+        self.cf_first = inp("First name")
+        self.cf_last = inp("Last name")
+        self.cf_phone = inp("Phone")
         self.cf_phone.setFixedWidth(140)
-        self.cf_email   = inp("Email")
-        self.cf_addr    = inp("Street address")
-        self.cf_city    = inp("City")
-        self.cf_state   = inp("ST")
+        self.cf_email = inp("Email")
+        self.cf_addr = inp("Street address")
+        self.cf_city = inp("City")
+        self.cf_state = inp("ST")
         self.cf_state.setMaxLength(2)
         self.cf_state.setFixedWidth(44)
-        self.cf_zip     = inp("Zip")
+        self.cf_zip = inp("Zip")
         self.cf_zip.setFixedWidth(90)
 
-        grid.addWidget(lbl("Company:"),    0, 0); grid.addWidget(self.cf_company, 0, 1, 1, 3)
-        grid.addWidget(lbl("First Name:"), 0, 4); grid.addWidget(self.cf_first,   0, 5)
-        grid.addWidget(lbl("Last Name:"),  1, 0); grid.addWidget(self.cf_last,    1, 1, 1, 3)
-        grid.addWidget(lbl("Phone:"),      1, 4); grid.addWidget(self.cf_phone,   1, 5)
-        grid.addWidget(lbl("Email:"),      2, 0); grid.addWidget(self.cf_email,   2, 1, 1, 5)
-        grid.addWidget(lbl("Address:"),    3, 0); grid.addWidget(self.cf_addr,    3, 1, 1, 3)
-        grid.addWidget(lbl("City:"),       3, 4); grid.addWidget(self.cf_city,    3, 5)
-        grid.addWidget(lbl("State:"),      4, 0); grid.addWidget(self.cf_state,   4, 1)
-        grid.addWidget(lbl("Zip:"),        4, 2); grid.addWidget(self.cf_zip,     4, 3)
+        grid.addWidget(lbl("Company:"), 0, 0)
+        grid.addWidget(self.cf_company, 0, 1, 1, 3)
+        grid.addWidget(lbl("First Name:"), 0, 4)
+        grid.addWidget(self.cf_first, 0, 5)
+        grid.addWidget(lbl("Last Name:"), 1, 0)
+        grid.addWidget(self.cf_last, 1, 1, 1, 3)
+        grid.addWidget(lbl("Phone:"), 1, 4)
+        grid.addWidget(self.cf_phone, 1, 5)
+        grid.addWidget(lbl("Email:"), 2, 0)
+        grid.addWidget(self.cf_email, 2, 1, 1, 5)
+        grid.addWidget(lbl("Address:"), 3, 0)
+        grid.addWidget(self.cf_addr, 3, 1, 1, 3)
+        grid.addWidget(lbl("City:"), 3, 4)
+        grid.addWidget(self.cf_city, 3, 5)
+        grid.addWidget(lbl("State:"), 4, 0)
+        grid.addWidget(self.cf_state, 4, 1)
+        grid.addWidget(lbl("Zip:"), 4, 2)
+        grid.addWidget(self.cf_zip, 4, 3)
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
@@ -469,9 +506,9 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         fr.setSpacing(8)
 
         def fl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(t)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         self.inv_cust_filter = QtWidgets.QComboBox()
         self.inv_cust_filter.setStyleSheet(COMBO_STYLE)
@@ -490,10 +527,14 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self.inv_to.setDisplayFormat("MM/dd/yyyy")
         self.inv_to.setDate(QtCore.QDate.currentDate())
 
-        fr.addWidget(fl("Customer:")); fr.addWidget(self.inv_cust_filter)
-        fr.addWidget(fl("Status:"));   fr.addWidget(self.inv_status_filter)
-        fr.addWidget(fl("From:"));     fr.addWidget(self.inv_from)
-        fr.addWidget(fl("To:"));       fr.addWidget(self.inv_to)
+        fr.addWidget(fl("Customer:"))
+        fr.addWidget(self.inv_cust_filter)
+        fr.addWidget(fl("Status:"))
+        fr.addWidget(self.inv_status_filter)
+        fr.addWidget(fl("From:"))
+        fr.addWidget(self.inv_from)
+        fr.addWidget(fl("To:"))
+        fr.addWidget(self.inv_to)
         for t, fn in (("Apply", self._refresh_invoices), ("Show All", self._inv_show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
@@ -509,7 +550,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self.inv_table.setHorizontalHeaderLabels(
             ["Invoice #", "Customer", "Date", "Due Date", "Amount", "Paid", "Balance", "Status"])
         hh = self.inv_table.horizontalHeader()
-        hh.setStyleSheet("color:black;font-weight:bold;")
+        hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -536,18 +577,18 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         # Detail panel
         self.inv_detail_grp = QtWidgets.QGroupBox("Invoice Detail")
         self.inv_detail_grp.setStyleSheet(
-            "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:6px;}"
-            "QGroupBox::title{subcontrol-origin:margin;left:10px;}")
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:6px;}"
+            "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         self.inv_detail_grp.setVisible(False)
         dv = QtWidgets.QVBoxLayout(self.inv_detail_grp)
         self.inv_detail_lbl = QtWidgets.QLabel("")
-        self.inv_detail_lbl.setStyleSheet("color:white;font-size:12px;")
+        self.inv_detail_lbl.setStyleSheet("color%(white)s;font-size:12px;")
         dv.addWidget(self.inv_detail_lbl)
         self.pay_hist_table = QtWidgets.QTableWidget()
         self.pay_hist_table.setColumnCount(5)
         self.pay_hist_table.setHorizontalHeaderLabels(["Date", "Amount", "Method", "Reference", "Notes"])
         ph = self.pay_hist_table.horizontalHeader()
-        ph.setStyleSheet("color:black;font-weight:bold;")
+        ph.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ph.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 1, 2, 3):
             ph.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -569,7 +610,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Accounts Receivable Aging Report  (open & partial invoices only)")
-        title.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -584,7 +625,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         self.aging_table.setHorizontalHeaderLabels(
             ["Customer", "0-30 Days", "31-60 Days", "61-90 Days", "91+ Days", "Total Outstanding"])
         ah = self.aging_table.horizontalHeader()
-        ah.setStyleSheet("color:black;font-weight:bold;")
+        ah.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ah.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
             ah.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -594,7 +635,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         layout.addWidget(self.aging_table, stretch=1)
 
         self.aging_totals_lbl = QtWidgets.QLabel("")
-        self.aging_totals_lbl.setStyleSheet("color:white;font-size:13px;")
+        self.aging_totals_lbl.setStyleSheet("color%(white)s;font-size:13px;")
         layout.addWidget(self.aging_totals_lbl)
         return w
 
@@ -608,7 +649,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         conn = get_db()
         if search:
             rows = conn.execute(
-                "SELECT * FROM customer WHERE company_name LIKE ? OR last_name LIKE ? "
+                "SELECT * FROM customer WHERE company_name LIKE %s OR last_name LIKE %s "
                 "ORDER BY company_name, last_name, first_name",
                 (f"%{search}%", f"%{search}%")
             ).fetchall()
@@ -660,7 +701,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         if row < 0 or row >= len(self._cust_row_ids):
             return
         conn = get_db()
-        c = conn.execute("SELECT * FROM customer WHERE id=?", (self._cust_row_ids[row],)).fetchone()
+        c = conn.execute("SELECT * FROM customer WHERE id=%s", (self._cust_row_ids[row],)).fetchone()
         conn.close()
         if not c:
             return
@@ -682,21 +723,21 @@ class AccountsReceivable(QtWidgets.QMainWindow):
 
     def _collect_customer_form(self):
         company = self.cf_company.text().strip()
-        first   = self.cf_first.text().strip()
-        last    = self.cf_last.text().strip()
+        first = self.cf_first.text().strip()
+        last = self.cf_last.text().strip()
         if not company and not last:
             QtWidgets.QMessageBox.warning(self, "Input Error", "Company name or last name is required.")
             return None
         return {
             "company_name": company or None,
-            "first_name":   first or None,
-            "last_name":    last or None,
+            "first_name": first or None,
+            "last_name": last or None,
             "phone_number": self.cf_phone.text().strip() or None,
-            "email":        self.cf_email.text().strip() or None,
-            "address":      self.cf_addr.text().strip() or None,
-            "city":         self.cf_city.text().strip() or None,
-            "state":        self.cf_state.text().strip().upper() or None,
-            "zip_code":     self.cf_zip.text().strip() or None,
+            "email": self.cf_email.text().strip() or None,
+            "address": self.cf_addr.text().strip() or None,
+            "city": self.cf_city.text().strip() or None,
+            "state": self.cf_state.text().strip().upper() or None,
+            "zip_code": self.cf_zip.text().strip() or None,
         }
 
     def _on_cust_add(self):
@@ -706,7 +747,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute(
             "INSERT INTO customer (company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "
-            "VALUES (:company_name,:first_name,:last_name,:phone_number,:email,:address,:city,:state,:zip_code)",
+            "VALUES (%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)",
             data)
         conn.commit()
         conn.close()
@@ -724,9 +765,9 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         data["id"] = self._cust_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE customer SET company_name=:company_name,first_name=:first_name,last_name=:last_name,"
-            "phone_number=:phone_number,email=:email,address=:address,city=:city,state=:state,zip_code=:zip_code "
-            "WHERE id=:id",
+            "UPDATE customer SET company_name=%(company_name)s,first_name=%(first_name)s,last_name=%(last_name)s,"
+            "phone_number=%(phone_number)s,email=%(email)s,address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s "
+            "WHERE id=%(id)s",
             data)
         conn.commit()
         conn.close()
@@ -740,10 +781,10 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         cid = self._cust_row_ids[row]
         conn = get_db()
         inv_count = conn.execute(
-            "SELECT COUNT(*) FROM ar_invoice WHERE customer_id=?", (cid,)
+            "SELECT COUNT(*) FROM ar_invoice WHERE customer_id=%s", (cid,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this customer?"
+        msg = "Delete this customer%s"
         if inv_count:
             msg += f"\n\nWarning: {inv_count} invoice(s) reference this customer. They will also be deleted."
         if (QtWidgets.QMessageBox.question(
@@ -752,11 +793,11 @@ class AccountsReceivable(QtWidgets.QMainWindow):
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             inv_ids = [r[0] for r in conn.execute(
-                "SELECT id FROM ar_invoice WHERE customer_id=?", (cid,)).fetchall()]
+                "SELECT id FROM ar_invoice WHERE customer_id=%s", (cid,)).fetchall()]
             for iid in inv_ids:
-                conn.execute("DELETE FROM ar_payment WHERE invoice_id=?", (iid,))
-            conn.execute("DELETE FROM ar_invoice WHERE customer_id=?", (cid,))
-            conn.execute("DELETE FROM customer WHERE id=?", (cid,))
+                conn.execute("DELETE FROM ar_payment WHERE invoice_id=%s", (iid,))
+            conn.execute("DELETE FROM ar_invoice WHERE customer_id=%s", (cid,))
+            conn.execute("DELETE FROM customer WHERE id=%s", (cid,))
             conn.commit()
             conn.close()
             self._cust_clear()
@@ -766,25 +807,25 @@ class AccountsReceivable(QtWidgets.QMainWindow):
     # ── Invoice data ───────────────────────────────────────────────────────
 
     def _refresh_invoices(self):
-        cid    = self.inv_cust_filter.currentData()
+        cid = self.inv_cust_filter.currentData()
         status = self.inv_status_filter.currentText()
         from_s = self.inv_from.date().toString("yyyy-MM-dd")
-        to_s   = self.inv_to.date().toString("yyyy-MM-dd")
-        conn   = get_db()
+        to_s = self.inv_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
         q = (
             "SELECT ai.id, ai.invoice_number, c.first_name, c.last_name, c.company_name, "
             "ai.invoice_date, ai.due_date, ai.amount, COALESCE(p.paid,0) as paid, ai.status "
             "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id "
             "LEFT JOIN (SELECT invoice_id, SUM(amount) as paid FROM ar_payment GROUP BY invoice_id) p "
             "ON p.invoice_id=ai.id "
-            "WHERE ai.invoice_date BETWEEN ? AND ?"
+            "WHERE ai.invoice_date BETWEEN %s AND %s"
         )
         params = [from_s, to_s]
         if cid:
-            q += " AND ai.customer_id=?"
+            q += " AND ai.customer_id=%s"
             params.append(cid)
         if status != "(all status)":
-            q += " AND ai.status=?"
+            q += " AND ai.status=%s"
             params.append(status)
         q += " ORDER BY ai.invoice_date DESC"
         rows = conn.execute(q, params).fetchall()
@@ -797,17 +838,17 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             r = self.inv_table.rowCount()
             self.inv_table.insertRow(r)
             self._invoice_row_ids.append(row["id"])
-            balance   = row["amount"] - row["paid"]
-            color     = STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
+            balance = row["amount"] - row["paid"]
+            color = STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
             cust_name = _customer_display(row)
             for c, (val, algn) in enumerate([
-                (row["invoice_number"], QtCore.Qt.AlignmentFlag.AlignLeft  | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (cust_name,            QtCore.Qt.AlignmentFlag.AlignLeft   | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["invoice_date"],  QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["due_date"],      QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["invoice_number"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (cust_name, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["invoice_date"], QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["due_date"], QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (_money(row["amount"]), right),
-                (_money(row["paid"]),   right),
-                (_money(balance),       right),
+                (_money(row["paid"]), right),
+                (_money(balance), right),
                 (row["status"].upper(), QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter),
             ]):
                 item = _ro(val, algn)
@@ -830,27 +871,27 @@ class AccountsReceivable(QtWidgets.QMainWindow):
         conn = get_db()
         inv = conn.execute(
             "SELECT ai.*, c.first_name, c.last_name, c.company_name "
-            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=?",
+            "FROM ar_invoice ai JOIN customer c ON c.id=ai.customer_id WHERE ai.id=%s",
             (inv_id,)
         ).fetchone()
         payments = conn.execute(
-            "SELECT * FROM ar_payment WHERE invoice_id=? ORDER BY payment_date", (inv_id,)
+            "SELECT * FROM ar_payment WHERE invoice_id=%s ORDER BY payment_date", (inv_id,)
         ).fetchall()
         conn.close()
         paid_total = sum(p["amount"] for p in payments)
-        cust_name  = _customer_display(inv)
+        cust_name = _customer_display(inv)
         self.inv_detail_lbl.setText(
             f"{inv['invoice_number']}  |  {cust_name}  |  "
             f"Date: {inv['invoice_date']}  |  Due: {inv['due_date']}  |  "
             f"Amount: {_money(inv['amount'])}  |  Paid: {_money(paid_total)}  |  "
-            f"Balance: {_money(inv['amount']-paid_total)}  |  Status: {inv['status'].upper()}"
+            f"Balance: {_money(inv['amount'] - paid_total)}  |  Status: {inv['status'].upper()}"
             + (f"\nDescription: {inv['description']}" if inv["description"] else ""))
         self.pay_hist_table.setRowCount(0)
         for p in payments:
             r = self.pay_hist_table.rowCount()
             self.pay_hist_table.insertRow(r)
             for c, v in enumerate([p["payment_date"], _money(p["amount"]),
-                                    p["payment_method"], p["reference"] or "", p["notes"] or ""]):
+                                   p["payment_method"], p["reference"] or "", p["notes"] or ""]):
                 self.pay_hist_table.setItem(r, c, _ro(v))
         self.inv_detail_grp.setVisible(True)
 
@@ -868,7 +909,7 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             return
         inv_id = self._invoice_row_ids[row]
         conn = get_db()
-        status = conn.execute("SELECT status FROM ar_invoice WHERE id=?", (inv_id,)).fetchone()["status"]
+        status = conn.execute("SELECT status FROM ar_invoice WHERE id=%s", (inv_id,)).fetchone()["status"]
         conn.close()
         if status in ("paid", "void"):
             QtWidgets.QMessageBox.information(self, "Cannot Pay", f"Invoice is already {status}.")
@@ -886,11 +927,11 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             return
         inv_id = self._invoice_row_ids[row]
         if (QtWidgets.QMessageBox.question(
-                self, "Void Invoice", "Mark this invoice as void?",
+                self, "Void Invoice", "Mark this invoice as void%s",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("UPDATE ar_invoice SET status='void' WHERE id=?", (inv_id,))
+            conn.execute("UPDATE ar_invoice SET status='void' WHERE id=%s", (inv_id,))
             conn.commit()
             conn.close()
             self._refresh_invoices()
@@ -941,10 +982,19 @@ class AccountsReceivable(QtWidgets.QMainWindow):
             f"Total Outstanding: {_money(sum(totals))}")
 
 
+class AccountsReceivable(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Accounts Receivable")
+        self.resize(1150, 700)
+        _apply_blue_palette(self)
+        self.setCentralWidget(AccountsReceivableWidget(initial_tab=initial_tab))
+
+
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = AccountsReceivable()
+    window = AccountsReceivable(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

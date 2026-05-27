@@ -1,32 +1,34 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import subprocess
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 695)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.IT_Technician_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("IT Technician"))
+        self.IT_Technician_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("IT Technician"))
         self.IT_Technician_Button.setGeometry(QtCore.QRect(20, 20, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.IT_Technician_Button.setFont(font)
         self.IT_Technician_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;\n}"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n}"
-"")
+                                                "border: 2px solid black;\n"
+                                                "border-radius: 10px;\n}"
+                                                "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                                "border: 2px solidrgb(85, 255, 255);\n}"
+                                                "")
         self.IT_Technician_Button.setAutoDefault(False)
         self.IT_Technician_Button.setObjectName("IT_Technician_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 651))
         self.label.setStyleSheet("background-image: url(\'C:/source/pythonQSG/PyQt6 Apps/images/IT_picture.png\');\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: blue; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: blue; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.label.raise_()
@@ -45,7 +47,7 @@ class Ui_MainWindow(object):
 
     def press_it(self, pressed):
         if pressed == "IT Technician":
-                subprocess.run(["python", "IT_technician.py"])
+            subprocess.run(["python", "IT_technician.py"])
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

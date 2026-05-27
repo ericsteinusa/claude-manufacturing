@@ -1,100 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Manufacturing System</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: rgb(0, 85, 255);
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-        }
-        .toolbar {
-            background-color: rgb(0, 60, 180);
-            display: flex;
-            align-items: center;
-            padding: 8px 16px;
-            gap: 12px;
-        }
-        .toolbar .spacer { flex: 1; }
-        .toolbar span {
-            color: white;
-            font-size: 13px;
-            padding-right: 12px;
-        }
-        .btn {
-            background-color: white;
-            border: 2px solid black;
-            border-radius: 10px;
-            padding: 4px 14px;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: none;
-            color: black;
-        }
-        .btn:hover {
-            background-color: rgb(85, 255, 255);
-            border-color: rgb(85, 255, 255);
-        }
-        .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
-        .menu-title {
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 32px;
-        }
-        .dept-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 200px);
-            gap: 16px;
-        }
-        .dept-btn {
-            background-color: white;
-            border: 2px solid black;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            color: black;
-            text-align: center;
-            display: block;
-        }
-        .dept-btn:hover {
-            background-color: rgb(85, 255, 255);
-            border-color: rgb(85, 255, 255);
-        }
-    </style>
-</head>
-<body>
-    <div class="toolbar">
-        <a href="{% url 'user_roles' %}" class="btn">User Roles</a>
-        <div class="spacer"></div>
-        <span>Logged in as: {{ email }}</span>
-        <a href="{% url 'change_password' %}" class="btn">Change Password</a>
-        <a href="{% url 'logout' %}" class="btn">Logout</a>
-    </div>
-    <div class="content">
-        <div class="menu-title">Company Main Menu</div>
-        <div class="dept-grid">
-            <a href="{% url 'dept_menu' 'accounting' %}" class="dept-btn">Accounting</a>
-            <a href="{% url 'dept_menu' 'customer_service' %}" class="dept-btn">Customer Service</a>
-            <a href="{% url 'dept_menu' 'engineering' %}" class="dept-btn">Engineering</a>
-            <a href="{% url 'dept_menu' 'information_tech' %}" class="dept-btn">Information Tech</a>
-            <a href="{% url 'dept_menu' 'maintenance' %}" class="dept-btn">Maintenance</a>
-            <a href="{% url 'dept_menu' 'marketing' %}" class="dept-btn">Marketing</a>
-            <a href="{% url 'dept_menu' 'personnel' %}" class="dept-btn">Personnel</a>
-            <a href="{% url 'dept_menu' 'production' %}" class="dept-btn">Production</a>
-            <a href="{% url 'dept_menu' 'purchasing' %}" class="dept-btn">Purchasing</a>
-            <a href="{% url 'dept_menu' 'quality_assurance' %}" class="dept-btn">Quality Assurance</a>
-            <a href="{% url 'dept_menu' 'sales' %}" class="dept-btn">Sales</a>
-        </div>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block toolbar_left %}
+<a href="{% url 'user_roles' %}" class="btn">User Roles</a>
+{% endblock %}
+
+{% block menu_title %}Company Main Menu{% endblock %}
+
+{% block grid_items %}
+{% for url, label in departments %}
+<a href="{{ url }}" class="dept-btn">{{ label }}</a>
+{% endfor %}
+{% endblock %}

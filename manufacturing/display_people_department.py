@@ -4,6 +4,8 @@ from tkinter import *
 from tkinter import ttk
 
 # Database setup
+
+
 def setup_database():
     conn = get_db()
     cursor = conn.cursor()
@@ -11,37 +13,39 @@ def setup_database():
     # Create Parent table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS people (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
-        ID INTEGER,
+        employee_id INTEGER,
         address TEXT NOT NULL,
         city TEXT NOT NULL,
         state TEXT NOT NULL,
         zip_code TEXT NOT NULL,
         email TEXT NOT NULL,
         FOREIGN KEY (dept_id) REFERENCES dept (id)
-        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)                                       
+        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)
     )
     """)
 
     # Create Child table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS dept (
-        dept_id INTEGER PRIMARY KEY AUTOINCREMENT ,
+        dept_id SERIAL PRIMARY KEY ,
         dept_name TEXT
         )
     """)
-    
+
     # Create Child table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS dept_sub (
-        dept_sub_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dept_sub_id SERIAL PRIMARY KEY,
         dept_sub_name TEXT
         )
     """)
 
     # Fetch data with JOIN
+
+
 def fetch_data():
     conn = get_db()
     cursor = conn.cursor()
@@ -58,8 +62,10 @@ def fetch_data():
     data = cursor.fetchall()
     conn.close()
     return data
-    
+
 # Tkinter GUI
+
+
 def create_gui():
     root = Tk()
     root.title("Employee Department Viewer")
@@ -67,7 +73,7 @@ def create_gui():
     # Treeview widget
     tree = ttk.Treeview(root, columns=("First Name", "Last Name", "Dept Name", "Dept Sub Name"), show="headings")
     tree.heading("First Name", text="First Name")
-    tree.heading("Last Name",  text="Last Name")
+    tree.heading("Last Name", text="Last Name")
     tree.heading("Dept Name", text="Dept Name")
     tree.heading("Dept Sub Name", text="Dept Sub Name")
     tree.pack(fill="both", expand=True)
@@ -77,6 +83,7 @@ def create_gui():
     for people_first_Name, people_last_name, dept_name, dept_sub_name in data:
         tree.insert("", "end", values=(people_first_Name, people_last_name, dept_name, dept_sub_name))
     root.mainloop()
+
 
 # Main execution
 setup_database()

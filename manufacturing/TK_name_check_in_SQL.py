@@ -16,17 +16,19 @@ def check_name():
     cursor = conn.cursor()
 
     # Query to check if the name exists
-    cursor.execute("SELECT * FROM people WHERE email = ?", (name_to_check,))
+    cursor.execute("SELECT * FROM people WHERE email = %s", (name_to_check,))
     result = cursor.fetchone()
 
     if result:
         messagebox.showinfo("Result", f"Email '{name_to_check}' exists in the database!")
-        messagebox.showinfo("User Details", f"id: {result[0]}\nFirst Name: {result[1]}\nLast Name {result[2]}\nEmail: {result[7]}")
+        messagebox.showinfo(
+            "User Details", f"id: {result[0]}\nFirst Name: {result[1]}\nLast Name {result[2]}\nEmail: {result[7]}")
     else:
         messagebox.showinfo("Result", f"Email '{name_to_check}' does not exist in the database.")
 
     # Close the connection
     conn.close()
+
 
 # Tkinter GUI setup
 root = Tk()

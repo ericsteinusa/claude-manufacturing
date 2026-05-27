@@ -18,7 +18,7 @@ x = (screen_width / 2) - (app_width / 2)
 y = (screen_height / 2) - (app_height / 2)
 root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
-my_label = Label(root, text=f'Width:{screen_width} Height{screen_height}' )
+my_label = Label(root, text=f'Width:{screen_width} Height{screen_height}')
 
 # Read our config file and get colors
 parser = ConfigParser()
@@ -36,35 +36,37 @@ def query_database():
 	# Create a database or connect to one that exists
 	conn = get_db()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a database or connect to one that exists
+    conn = get_db_connection()
 
-	c.execute("SELECT rowid, * FROM tax")
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	#for record in records:
-	#	print(record)
+    # Create a cursor instance
+    c = conn.cursor()
 
+    c.execute("SELECT id, * FROM tax")
+    records = c.fetchall()
 
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0]), tags=('oddrow',))
-		# increment counter
-		count += 1
+    # Add our data to the screen
+    global count
+    count = 0
 
+    # for record in records:
+    # print(record)
 
-	# Commit changes
-	conn.commit()
+    for record in records:
+        if count % 2 == 0:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[2], record[3], record[0]), tags=('evenrow',))
+        else:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[2], record[3], record[0]), tags=('oddrow',))
+        # increment counter
+        count += 1
 
-	# Close our connection
-	conn.close()
+    # Commit changes
+    conn.commit()
 
+    # Close our connection
+    conn.close()
 
 
 def search_records():
@@ -79,134 +81,140 @@ def search_records():
 	# Create a database or connect to one that exists
 	conn = get_db()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Clear the Treeview
+    for record in my_tree.get_children():
+        my_tree.delete(record)
 
-	c.execute("SELECT rowid, * FROM tax WHERE state like ?", (lookup_record,))
-	records = c.fetchall()
-	
-	# Add our data to the screen
-	global count
-	count = 0
-	
-	#for record in records:
-	#	print(record)
+    # Create a database or connect to one that exists
+    conn = get_db_connection()
 
+    # Create a cursor instance
+    c = conn.cursor()
 
-	for record in records:
-		if count % 2 == 0:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0]), tags=('evenrow',))
-		else:
-			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[2], record[3], record[0]), tags=('oddrow',))
-		# increment counter
-		count += 1
+    c.execute("SELECT id, * FROM tax WHERE state like %s", (lookup_record,))
+    records = c.fetchall()
 
+    # Add our data to the screen
+    global count
+    count = 0
 
-	# Commit changes
-	conn.commit()
+    # for record in records:
+    # print(record)
 
-	# Close our connection
-	conn.close()
+    for record in records:
+        if count % 2 == 0:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[2], record[3], record[0]), tags=('evenrow',))
+        else:
+            my_tree.insert(parent='', index='end', iid=count, text='', values=(
+                record[2], record[3], record[0]), tags=('oddrow',))
+        # increment counter
+        count += 1
 
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
 
 
 def lookup_records():
-	global search_entry, search
+    global search_entry, search
 
-	search = Toplevel(root)
-	search.title("Lookup Records")
-	search.geometry("400x200")
-	
+    search = Toplevel(root)
+    search.title("Lookup Records")
+    search.geometry("400x200")
 
-	# Create label frame
-	search_frame = LabelFrame(search, text="State")
-	search_frame.pack(padx=10, pady=10)
+    # Create label frame
+    search_frame = LabelFrame(search, text="State")
+    search_frame.pack(padx=10, pady=10)
 
-	# Add entry box
-	search_entry = Entry(search_frame, font=("Helvetica", 18))
-	search_entry.pack(pady=20, padx=20)
+    # Add entry box
+    search_entry = Entry(search_frame, font=("Helvetica", 18))
+    search_entry.pack(pady=20, padx=20)
 
-	# Add button
-	search_button = Button(search, text="Search Records", command=search_records)
-	search_button.pack(padx=20, pady=20)
-
+    # Add button
+    search_button = Button(search, text="Search Records", command=search_records)
+    search_button.pack(padx=20, pady=20)
 
 
 def primary_color():
-	# Pick Color
-	primary_color = colorchooser.askcolor()[1]
+    # Pick Color
+    primary_color = colorchooser.askcolor()[1]
 
-	# Update Treeview Color
-	if primary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('evenrow', background=primary_color)
+    # Update Treeview Color
+    if primary_color:
+        # Create Striped Row Tags
+        my_tree.tag_configure('evenrow', background=primary_color)
 
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'primary_color', primary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
+        # Config file
+        parser = ConfigParser()
+        parser.read("personnel.ini")
+        # Set the color change
+        parser.set('colors', 'primary_color', primary_color)
+        # Save the config file
+        with open('personnel.ini', 'w') as configfile:
+            parser.write(configfile)
 
 
 def secondary_color():
-	# Pick Color
-	secondary_color = colorchooser.askcolor()[1]
-	
-	# Update Treeview Color
-	if secondary_color:
-		# Create Striped Row Tags
-		my_tree.tag_configure('oddrow', background=secondary_color)
-		
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'secondary_color', secondary_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
+    # Pick Color
+    secondary_color = colorchooser.askcolor()[1]
+
+    # Update Treeview Color
+    if secondary_color:
+        # Create Striped Row Tags
+        my_tree.tag_configure('oddrow', background=secondary_color)
+
+        # Config file
+        parser = ConfigParser()
+        parser.read("personnel.ini")
+        # Set the color change
+        parser.set('colors', 'secondary_color', secondary_color)
+        # Save the config file
+        with open('personnel.ini', 'w') as configfile:
+            parser.write(configfile)
+
 
 def highlight_color():
-	# Pick Color
-	highlight_color = colorchooser.askcolor()[1]
+    # Pick Color
+    highlight_color = colorchooser.askcolor()[1]
 
-	#Update Treeview Color
-	# Change Selected Color
-	if highlight_color:
-		style.map('Treeview',
-			background=[('selected', highlight_color)])
+    # Update Treeview Color
+    # Change Selected Color
+    if highlight_color:
+        style.map('Treeview',
+                  background=[('selected', highlight_color)])
 
-		# Config file
-		parser = ConfigParser()
-		parser.read("personnel.ini")
-		# Set the color change
-		parser.set('colors', 'highlight_color', highlight_color)
-		# Save the config file
-		with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
+        # Config file
+        parser = ConfigParser()
+        parser.read("personnel.ini")
+        # Set the color change
+        parser.set('colors', 'highlight_color', highlight_color)
+        # Save the config file
+        with open('personnel.ini', 'w') as configfile:
+            parser.write(configfile)
+
 
 def reset_colors():
-	# Save original colors to config file
-	parser = ConfigParser()
-	parser.read('personnel.ini')
-	parser.set('colors', 'primary_color', 'lightblue')
-	parser.set('colors', 'secondary_color', 'white')
-	parser.set('colors', 'highlight_color', '#347083')
-	with open('personnel.ini', 'w') as configfile:
-			parser.write(configfile)
-	# Reset the colors
-	my_tree.tag_configure('oddrow', background='white')
-	my_tree.tag_configure('evenrow', background='lightblue')
-	style.map('Treeview',
-			background=[('selected', '#347083')])
+    # Save original colors to config file
+    parser = ConfigParser()
+    parser.read('personnel.ini')
+    parser.set('colors', 'primary_color', 'lightblue')
+    parser.set('colors', 'secondary_color', 'white')
+    parser.set('colors', 'highlight_color', '#347083')
+    with open('personnel.ini', 'w') as configfile:
+        parser.write(configfile)
+    # Reset the colors
+    my_tree.tag_configure('oddrow', background='white')
+    my_tree.tag_configure('evenrow', background='lightblue')
+    style.map('Treeview',
+              background=[('selected', '#347083')])
+
 
 # Add Menu
 my_menu = Menu(root)
 root.config(menu=my_menu)
-
 
 
 # Configure our menu
@@ -221,7 +229,7 @@ option_menu.add_command(label="Reset Colors", command=reset_colors)
 option_menu.add_separator()
 option_menu.add_command(label="Exit", command=root.quit)
 
-#Search Menu
+# Search Menu
 search_menu = Menu(my_menu, tearoff=0)
 my_menu.add_cascade(label="Search", menu=search_menu)
 # Drop down menu
@@ -241,10 +249,10 @@ c = conn.cursor()
 
 # Create Table
 c.execute("""CREATE TABLE if not exists tax (
-	state text,
-	percent integer,
-	id integer)
-	""")
+    state text,
+    percent integer,
+    id integer)
+    """)
 # Add dummy data to table
 
 # Commit changes
@@ -262,7 +270,7 @@ x = (screen_width / 2) - (app_width / 2)
 y = (screen_height / 2) - (app_height / 2)
 root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
-my_label = Label(root, text=f'Width:{screen_width} Height{screen_height}' )
+my_label = Label(root, text=f'Width:{screen_width} Height{screen_height}')
 
 # Add Some Style
 style = ttk.Style()
@@ -272,14 +280,14 @@ style.theme_use('default')
 
 # Configure the Treeview Colors
 style.configure("Treeview",
-	background="#D3D3D3",
-	foreground="black",
-	rowheight=25,
-	fieldbackground="#D3D3D3")
+                background="#D3D3D3",
+                foreground="black",
+                rowheight=25,
+                fieldbackground="#D3D3D3")
 
 # Change Selected Color #347083
 style.map('Treeview',
-	background=[('selected', saved_highlight_color)])
+          background=[('selected', saved_highlight_color)])
 
 # Create a Treeview Frame
 tree_frame = Frame(root)
@@ -316,10 +324,9 @@ my_tree.tag_configure('oddrow', background=saved_secondary_color)
 my_tree.tag_configure('evenrow', background=saved_primary_color)
 
 
-
 # Add Record Entry Boxes
 data_frame = LabelFrame(root, text="Record")
-data_frame.pack(fill="x", expand="yes", padx=20)
+data_frame.pack(fill="x", expand=True, padx=20)
 
 st_label = Label(data_frame, text="State")
 st_label.grid(row=0, column=0, padx=10, pady=10)
@@ -339,245 +346,241 @@ id_entry.grid(row=0, column=5, padx=10, pady=10)
 
 # Move Row Up
 def up():
-	rows = my_tree.selection()
-	for row in rows:
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)-1)
+    rows = my_tree.selection()
+    for row in rows:
+        my_tree.move(row, my_tree.parent(row), my_tree.index(row) - 1)
 
 # Move Rown Down
+
+
 def down():
-	rows = my_tree.selection()
-	for row in reversed(rows):
-		my_tree.move(row, my_tree.parent(row), my_tree.index(row)+1)
+    rows = my_tree.selection()
+    for row in reversed(rows):
+        my_tree.move(row, my_tree.parent(row), my_tree.index(row) + 1)
 
 # Remove one record
+
+
 def remove_one():
-	x = my_tree.selection()[0]
-	my_tree.delete(x)
+    x = my_tree.selection()[0]
+    my_tree.delete(x)
 
 	# Create a database or connect to one that exists
 	conn = get_db()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Delete From Database
-	c.execute("DELETE from tax WHERE oid=" + id_entry.get())
-	
+    # Delete From Database
+    c.execute("DELETE FROM tax WHERE id = %s", (id_entry.get(),))
 
+    # Commit changes
+    conn.commit()
 
-	# Commit changes
-	conn.commit()
+    # Close our connection
+    conn.close()
 
-	# Close our connection
-	conn.close()
+    # Clear The Entry Boxes
+    clear_entries()
 
-	# Clear The Entry Boxes
-	clear_entries()
-
-	# Add a little message box for fun
-	messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
-
+    # Add a little message box for fun
+    messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
 
 
 # Remove Many records
 def remove_many():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
+    # Add a little message box for fun
+    response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
 
-	#Add logic for message box
-	if response == 1:
-		# Designate selections
-		x = my_tree.selection()
+    # Add logic for message box
+    if response == 1:
+        # Designate selections
+        x = my_tree.selection()
 
-		# Create List of ID's
-		ids_to_delete = []
-		
-		# Add selections to ids_to_delete list
-		for record in x:
-			ids_to_delete.append(my_tree.item(record, 'values')[2])
+        # Create List of ID's
+        ids_to_delete = []
 
-		# Delete From Treeview
-		for record in x:
-			my_tree.delete(record)
+        # Add selections to ids_to_delete list
+        for record in x:
+            ids_to_delete.append(my_tree.item(record, 'values')[2])
 
 		# Create a database or connect to one that exists
 		conn = get_db()
 
-		# Create a cursor instance
-		c = conn.cursor()
-		
+        # Create a database or connect to one that exists
+        conn = get_db_connection()
 
-		# Delete Everything From The Table
-		c.executemany("DELETE FROM tax WHERE id = ?", [(a,) for a in ids_to_delete])
+        # Create a cursor instance
+        c = conn.cursor()
 
-		# Reset List
-		ids_to_delete = []
+        # Delete Everything From The Table
+        c.executemany("DELETE FROM tax WHERE id = %s", [(a,) for a in ids_to_delete])
 
+        # Reset List
+        ids_to_delete = []
 
-		# Commit changes
-		conn.commit()
+        # Commit changes
+        conn.commit()
 
-		# Close our connection
-		conn.close()
+        # Close our connection
+        conn.close()
 
-		# Clear entry boxes if filled
-		clear_entries()
+        # Clear entry boxes if filled
+        clear_entries()
 
 
 # Remove all records
 def remove_all():
-	# Add a little message box for fun
-	response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
+    # Add a little message box for fun
+    response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
 
-	#Add logic for message box
-	if response == 1:
-		# Clear the Treeview
-		for record in my_tree.get_children():
-			my_tree.delete(record)
+    # Add logic for message box
+    if response == 1:
+        # Clear the Treeview
+        for record in my_tree.get_children():
+            my_tree.delete(record)
 
 		# Create a database or connect to one that exists
 		conn = get_db()
 
-		# Create a cursor instance
-		c = conn.cursor()
+        # Create a cursor instance
+        c = conn.cursor()
 
-		# Delete Everything From The Table
-		c.execute("DROP TABLE tax")
-			
+        # Delete Everything From The Table
+        c.execute("DROP TABLE tax")
 
+        # Commit changes
+        conn.commit()
 
-		# Commit changes
-		conn.commit()
+        # Close our connection
+        conn.close()
 
-		# Close our connection
-		conn.close()
+        # Clear entry boxes if filled
+        clear_entries()
 
-		# Clear entry boxes if filled
-		clear_entries()
-
-		# Recreate The Table
-		create_table_again()
+        # Recreate The Table
+        create_table_again()
 
 # Clear entry boxes
+
+
 def clear_entries():
-	# Clear entry boxes
-	st_entry.delete(0, END)
-	pcnt_entry.delete(0, END)
-	id_entry.delete(0, END)
-	
-	
+    # Clear entry boxes
+    st_entry.delete(0, END)
+    pcnt_entry.delete(0, END)
+    id_entry.delete(0, END)
+
 
 # Select Record
 def select_record(e):
-	# Clear entry boxes
-	st_entry.delete(0, END)
-	pcnt_entry.delete(0, END)
-	id_entry.delete(0, END)
-	
-	
-	# Grab record Number
-	selected = my_tree.focus()
-	# Grab record values
-	values = my_tree.item(selected, 'values')
+    # Clear entry boxes
+    st_entry.delete(0, END)
+    pcnt_entry.delete(0, END)
+    id_entry.delete(0, END)
 
-	# output to entry boxes
-	st_entry.insert(0, values[0])
-	pcnt_entry.insert(0, values[1])
-	id_entry.insert(0, values[2])
-		
+    # Grab record Number
+    selected = my_tree.focus()
+    # Grab record values
+    values = my_tree.item(selected, 'values')
+
+    # output to entry boxes
+    st_entry.insert(0, values[0])
+    pcnt_entry.insert(0, values[1])
+    id_entry.insert(0, values[2])
+
 # Update record
+
+
 def update_record():
-	# Grab the record number
-	selected = my_tree.focus()
-	# Update record
-	my_tree.item(selected, text="", values=(st_entry.get(), pcnt_entry.get(), id_entry.get()))
+    # Grab the record number
+    selected = my_tree.focus()
+    # Update record
+    my_tree.item(selected, text="", values=(st_entry.get(), pcnt_entry.get(), id_entry.get()))
 
 	# Update the database
 	# Create a database or connect to one that exists
 	conn = get_db()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	c.execute("""UPDATE tax SET
-		state = :state,
-		percent = :percent
-	
-		WHERE oid = :oid""",
-		{
-			'state': st_entry.get(),
-			'percent': pcnt_entry.get(),
-			'oid': id_entry.get(),
-		})
-	
+    c.execute("""UPDATE tax SET
+        state = :state,
+        percent = :percent
+
+        WHERE id = %(oid)s""",
+              {
+                  'state': st_entry.get(),
+                  'percent': int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0,
+                  'oid': id_entry.get(),
+              })
+
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
+
+    # Clear entry boxes
+    st_entry.delete(0, END)
+    pcnt_entry.delete(0, END)
+    id_entry.delete(0, END)
 
 
-	# Commit changes
-	conn.commit()
-
-	# Close our connection
-	conn.close()
-
-
-	# Clear entry boxes
-	st_entry.delete(0, END)
-	pcnt_entry.delete(0, END)
-	id_entry.delete(0, END)
-	
-	
 # add new record to database
 def add_record():
 	# Update the database
 	# Create a database or connect to one that exists
 	conn = get_db()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Add New Record
-	c.execute("INSERT INTO tax (state, percent) VALUES (?, ?)", (st_entry.get(), pcnt_entry.get()))
-	
+    # Add New Record
+    c.execute("INSERT INTO tax (state, percent) VALUES (%s, %s)", (st_entry.get(), int(pcnt_entry.get()) if pcnt_entry.get().strip().lstrip('-').isdigit() else 0))
 
-	# Commit changes
-	conn.commit()
+    # Commit changes
+    conn.commit()
 
-	# Close our connection
-	conn.close()
+    # Close our connection
+    conn.close()
 
-	# Clear entry boxes
-	st_entry.delete(0, END)
-	pcnt_entry.delete(0, END)
-	id_entry.delete(0, END)
-		
-	# Clear The Treeview Table
-	my_tree.delete(*my_tree.get_children())
+    # Clear entry boxes
+    st_entry.delete(0, END)
+    pcnt_entry.delete(0, END)
+    id_entry.delete(0, END)
 
-	# Run to pull data from database on start
-	query_database()
+    # Clear The Treeview Table
+    my_tree.delete(*my_tree.get_children())
+
+    # Run to pull data from database on start
+    query_database()
+
 
 def create_table_again():
 	# Create a database or connect to one that exists
 	conn = get_db()
 
-	# Create a cursor instance
-	c = conn.cursor()
+    # Create a cursor instance
+    c = conn.cursor()
 
-	# Create Table
-	c.execute("""CREATE TABLE if not exists tax (
-		state text,
-		percent integer,
-		id integer)
-		""")
-	
-	# Commit changes
-	conn.commit()
+    # Create Table
+    c.execute("""CREATE TABLE if not exists tax (
+        state text,
+        percent integer,
+        id integer)
+        """)
 
-	# Close our connection
-	conn.close()
+    # Commit changes
+    conn.commit()
+
+    # Close our connection
+    conn.close()
+
 
 # Add Buttons
 button_frame = LabelFrame(root, text="Commands")
-button_frame.pack(fill="x", expand="yes", padx=20)
+button_frame.pack(fill="x", expand=True, padx=20)
 
 update_button = Button(button_frame, text="Update Record", command=update_record)
 update_button.grid(row=0, column=0, padx=10, pady=10)

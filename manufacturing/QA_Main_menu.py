@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -147,35 +150,37 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 60, 801, 501))
         self.label.setStyleSheet("background-image: url(Quality-Assurance.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setObjectName("label")
-        self.QA_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("QA Manager Menu"))
+        self.QA_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("QA Manager Menu"))
         self.QA_mgr_Button.setGeometry(QtCore.QRect(20, 10, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.QA_mgr_Button.setFont(font)
         self.QA_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                         "border: 2px solid black;\n"
+                                         "border-radius: 10px;}\n"
+                                         "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                         "border: 2px solidrgb(85, 255, 255);\n"
+                                         "}")
         self.QA_mgr_Button.setAutoDefault(False)
         self.QA_mgr_Button.setObjectName("QA_mgr_Button")
-        self.QA_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("Quality Assurance Menu"))
+        self.QA_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("Quality Assurance Menu"))
         self.QA_Button.setGeometry(QtCore.QRect(270, 10, 191, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.QA_Button.setFont(font)
         self.QA_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                     "border: 2px solid black;\n"
+                                     "border-radius: 10px;}\n"
+                                     "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                     "border: 2px solidrgb(85, 255, 255);\n"
+                                     "}")
         self.QA_Button.setAutoDefault(False)
         self.QA_Button.setObjectName("QA_Button")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -193,7 +198,7 @@ class Ui_MainWindow(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "QA Manager Menu":        "QA_Mgr_menu.py",
+            "QA Manager Menu": "QA_Mgr_menu.py",
             "Quality Assurance Menu": "Quality_Assurance_menu.py",
         }
         script = scripts.get(pressed)
@@ -209,7 +214,6 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

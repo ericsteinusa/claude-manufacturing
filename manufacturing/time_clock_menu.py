@@ -36,7 +36,7 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS time_clock (
-            id        INTEGER PRIMARY KEY AUTOINCREMENT,
+            id        SERIAL PRIMARY KEY,
             people_id INTEGER NOT NULL REFERENCES people(id),
             clock_in  TEXT NOT NULL,
             clock_out TEXT,
@@ -123,14 +123,16 @@ class EditRecordDialog(QtWidgets.QDialog):
         self.in_edit = QtWidgets.QDateTimeEdit()
         self.in_edit.setDisplayFormat("MM/dd/yyyy hh:mm AP")
         self.in_edit.setCalendarPopup(True)
-        self.in_edit.setStyleSheet("QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.in_edit.setStyleSheet(
+            "QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         self.in_edit.setDateTime(_to_qdatetime(self._record["clock_in"]))
         layout.addLayout(row("Clock In:", self.in_edit))
 
         self.out_edit = QtWidgets.QDateTimeEdit()
         self.out_edit.setDisplayFormat("MM/dd/yyyy hh:mm AP")
         self.out_edit.setCalendarPopup(True)
-        self.out_edit.setStyleSheet("QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.out_edit.setStyleSheet(
+            "QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         if self._record["clock_out"]:
             self.out_edit.setDateTime(_to_qdatetime(self._record["clock_out"]))
         else:
@@ -165,7 +167,7 @@ class EditRecordDialog(QtWidgets.QDialog):
         layout.addLayout(btn_row)
 
     def _on_save(self):
-        clock_in  = self.in_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        clock_in = self.in_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss")
         clock_out = (None if self.clear_out_chk.isChecked()
                      else self.out_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss"))
         if clock_out and clock_out <= clock_in:
@@ -173,7 +175,7 @@ class EditRecordDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE time_clock SET clock_in=?, clock_out=?, notes=? WHERE id=?",
+            "UPDATE time_clock SET clock_in=%s, clock_out=%s, notes=%s WHERE id=%s",
             (clock_in, clock_out, self.notes_input.text().strip() or None,
              self._record["id"])
         )
@@ -184,13 +186,22 @@ class EditRecordDialog(QtWidgets.QDialog):
 
 # ── Main window ────────────────────────────────────────────────────────────
 
-class TimeClock(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Time Clock")
-        self.resize(1000, 640)
+_TAB_KEYS = {
+    'punch_in': 0, 'punch_out': 0, 'cur_status': 0,
+    'week_hrs': 1, 'month_hrs': 1, 'period_hrs': 1,
+    'submit_req': 1, 'pend_req': 1, 'appr_req': 1, 'req_hist': 1,
+    'my_sched': 1, 'upcoming': 1, 'sched_cal': 1, 'swap_req': 1,
+    'cur_ot': 1, 'hist_ot': 1, 'ot_by_emp': 1, 'ot_appr': 1,
+    'daily_att': 1, 'month_sum': 1, 'tard_rpt': 1, 'abs_rpt': 1,
+    'view_shfts': 1, 'assign_emp': 1, 'shft_tmpl': 1, 'swap_mgmt': 1,
+}
+
+
+class TimeClockWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, initial_tab=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
-        self._clock_people_id = None  # currently selected employee on tab 1
+        self._clock_people_id = None
         self._records_row_ids = []
         self._build_ui()
         self._load_employees()
@@ -199,26 +210,27 @@ class TimeClock(QtWidgets.QMainWindow):
         self._timer.timeout.connect(self._tick)
         self._timer.start(1000)
 
+        if initial_tab in _TAB_KEYS:
+            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
+
     # ── UI construction ────────────────────────────────────────────────────
 
     def _build_ui(self):
-        central = QtWidgets.QWidget()
-        self.setCentralWidget(central)
-        outer = QtWidgets.QVBoxLayout(central)
+        outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
 
-        tabs = QtWidgets.QTabWidget()
-        tabs.setStyleSheet(
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"
             "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
             " border-bottom:none; border-radius:4px 4px 0 0;}"
             "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
             "QTabBar::tab:hover{background:rgb(85,255,255);}"
         )
-        outer.addWidget(tabs)
+        outer.addWidget(self.tabs)
 
-        tabs.addTab(self._build_clock_tab(), "Clock In / Out")
-        tabs.addTab(self._build_records_tab(), "Time Records")
+        self.tabs.addTab(self._build_clock_tab(), "Clock In / Out")
+        self.tabs.addTab(self._build_records_tab(), "Time Records")
 
     def _build_clock_tab(self):
         w = QtWidgets.QWidget()
@@ -311,9 +323,9 @@ class TimeClock(QtWidgets.QMainWindow):
         filter_row.setSpacing(8)
 
         def fl(text):
-            l = QtWidgets.QLabel(text)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            lbl = QtWidgets.QLabel(text)
+            lbl.setStyleSheet(LABEL_STYLE)
+            return lbl
 
         filter_row.addWidget(fl("Employee:"))
         self.rec_emp_combo = QtWidgets.QComboBox()
@@ -323,7 +335,8 @@ class TimeClock(QtWidgets.QMainWindow):
 
         filter_row.addWidget(fl("From:"))
         self.from_date = QtWidgets.QDateEdit()
-        self.from_date.setStyleSheet("QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.from_date.setStyleSheet(
+            "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         self.from_date.setCalendarPopup(True)
         self.from_date.setDate(QtCore.QDate.currentDate().addDays(-30))
         self.from_date.setDisplayFormat("MM/dd/yyyy")
@@ -331,7 +344,8 @@ class TimeClock(QtWidgets.QMainWindow):
 
         filter_row.addWidget(fl("To:"))
         self.to_date = QtWidgets.QDateEdit()
-        self.to_date.setStyleSheet("QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
+        self.to_date.setStyleSheet(
+            "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
         self.to_date.setCalendarPopup(True)
         self.to_date.setDate(QtCore.QDate.currentDate())
         self.to_date.setDisplayFormat("MM/dd/yyyy")
@@ -414,7 +428,7 @@ class TimeClock(QtWidgets.QMainWindow):
     def _get_open_record(self, people_id):
         conn = get_db()
         rec = conn.execute(
-            "SELECT * FROM time_clock WHERE people_id=? AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1",
+            "SELECT * FROM time_clock WHERE people_id=%s AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1",
             (people_id,)
         ).fetchone()
         conn.close()
@@ -471,7 +485,7 @@ class TimeClock(QtWidgets.QMainWindow):
         today = date.today().strftime("%Y-%m-%d")
         conn = get_db()
         rows = conn.execute(
-            "SELECT * FROM time_clock WHERE people_id=? AND clock_in LIKE ? ORDER BY clock_in",
+            "SELECT * FROM time_clock WHERE people_id=%s AND clock_in LIKE %s ORDER BY clock_in",
             (self._clock_people_id, f"{today}%")
         ).fetchall()
         conn.close()
@@ -498,7 +512,7 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO time_clock (people_id, clock_in) VALUES (?, ?)",
+            "INSERT INTO time_clock (people_id, clock_in) VALUES (%s, %s)",
             (pid, datetime.now().strftime(DT_FMT))
         )
         conn.commit()
@@ -518,7 +532,7 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE time_clock SET clock_out=? WHERE id=?",
+            "UPDATE time_clock SET clock_out=%s WHERE id=%s",
             (datetime.now().strftime(DT_FMT), open_rec["id"])
         )
         conn.commit()
@@ -532,7 +546,7 @@ class TimeClock(QtWidgets.QMainWindow):
     def _refresh_records(self):
         pid = self.rec_emp_combo.currentData()
         from_dt = self.from_date.date().toString("yyyy-MM-dd") + " 00:00:00"
-        to_dt   = self.to_date.date().toString("yyyy-MM-dd")   + " 23:59:59"
+        to_dt = self.to_date.date().toString("yyyy-MM-dd") + " 23:59:59"
 
         conn = get_db()
         q = """
@@ -540,11 +554,11 @@ class TimeClock(QtWidgets.QMainWindow):
                    tc.clock_in, tc.clock_out, tc.notes
             FROM time_clock tc
             JOIN people p ON p.id = tc.people_id
-            WHERE tc.clock_in BETWEEN ? AND ?
+            WHERE tc.clock_in BETWEEN %s AND %s
         """
         params = [from_dt, to_dt]
         if pid is not None:
-            q += " AND tc.people_id = ?"
+            q += " AND tc.people_id = %s"
             params.append(pid)
         q += " ORDER BY tc.clock_in DESC"
         rows = conn.execute(q, params).fetchall()
@@ -568,7 +582,7 @@ class TimeClock(QtWidgets.QMainWindow):
             # accumulate completed entries only
             if row["clock_out"]:
                 try:
-                    t_in  = datetime.strptime(row["clock_in"],  DT_FMT)
+                    t_in = datetime.strptime(row["clock_in"], DT_FMT)
                     t_out = datetime.strptime(row["clock_out"], DT_FMT)
                     total_mins += max(0, int((t_out - t_in).total_seconds() / 60))
                 except ValueError:
@@ -602,7 +616,7 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         rid = self._records_row_ids[row]
         conn = get_db()
-        rec = conn.execute("SELECT * FROM time_clock WHERE id=?", (rid,)).fetchone()
+        rec = conn.execute("SELECT * FROM time_clock WHERE id=%s", (rid,)).fetchone()
         conn.close()
         if not rec:
             return
@@ -620,12 +634,12 @@ class TimeClock(QtWidgets.QMainWindow):
             return
         rid = self._records_row_ids[row]
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this time record?",
+            self, "Confirm Delete", "Delete this time record%s",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM time_clock WHERE id=?", (rid,))
+            conn.execute("DELETE FROM time_clock WHERE id=%s", (rid,))
             conn.commit()
             conn.close()
             self._refresh_records()
@@ -634,10 +648,19 @@ class TimeClock(QtWidgets.QMainWindow):
                 self._refresh_today()
 
 
+class TimeClock(QtWidgets.QMainWindow):
+    def __init__(self, initial_tab=None):
+        super().__init__()
+        self.setWindowTitle("Time Clock")
+        self.resize(1000, 640)
+        _apply_blue_palette(self)
+        self.setCentralWidget(TimeClockWidget(initial_tab=initial_tab))
+
+
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = TimeClock()
+    window = TimeClock(sys.argv[1] if len(sys.argv) > 1 else None)
     window.show()
     sys.exit(app.exec())
 

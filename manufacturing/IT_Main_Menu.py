@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import subprocess, sys, os
+import subprocess
+import sys
+import os
+
 
 class Ui_IT_MainWindow(object):
     def setupUi(self, IT_MainWindow):
@@ -144,40 +147,42 @@ class Ui_IT_MainWindow(object):
         IT_MainWindow.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(parent=IT_MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.IT_mgr_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("IT Manager"))
+        self.IT_mgr_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("IT Manager"))
         self.IT_mgr_Button.setGeometry(QtCore.QRect(20, 20, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.IT_mgr_Button.setFont(font)
         self.IT_mgr_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                         "border: 2px solid black;\n"
+                                         "border-radius: 10px;}\n"
+                                         "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                         "border: 2px solidrgb(85, 255, 255);\n"
+                                         "}")
         self.IT_mgr_Button.setAutoDefault(False)
         self.IT_mgr_Button.setObjectName("IT_mgr_Button")
-        self.IT_Calls_Button = QtWidgets.QPushButton(parent=self.centralwidget, clicked= lambda: self.press_it("IT Technician"))
+        self.IT_Calls_Button = QtWidgets.QPushButton(
+            parent=self.centralwidget, clicked=lambda: self.press_it("IT Technician"))
         self.IT_Calls_Button.setGeometry(QtCore.QRect(260, 20, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.IT_Calls_Button.setFont(font)
         self.IT_Calls_Button.setStyleSheet("QPushButton{background-color: white;\n"
-"border: 2px solid black;\n"
-"border-radius: 10px;}\n"
-"QPushButton:hover{background-color:rgb(85, 255, 255);\n"
-"border: 2px solidrgb(85, 255, 255);\n"
-"}")
+                                           "border: 2px solid black;\n"
+                                           "border-radius: 10px;}\n"
+                                           "QPushButton:hover{background-color:rgb(85, 255, 255);\n"
+                                           "border: 2px solidrgb(85, 255, 255);\n"
+                                           "}")
         self.IT_Calls_Button.setAutoDefault(False)
         self.IT_Calls_Button.setObjectName("IT_Calls_Button")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 801, 661))
         self.label.setPalette(palette)
         self.label.setStyleSheet("background-image: url(IT_picture2.png);\n"
-"background-repeat: no-repeat;\n"
-"background-position: center;\n"
-"background-attachment: fixed;\n"
-"background-color: white; /* Fallback color */")
+                                 "background-repeat: no-repeat;\n"
+                                 "background-position: center;\n"
+                                 "background-attachment: fixed;\n"
+                                 "background-color: white; /* Fallback color */")
         self.label.setText("")
         self.label.setObjectName("label")
         self.label.raise_()
@@ -198,7 +203,7 @@ class Ui_IT_MainWindow(object):
     def press_it(self, pressed):
         _dir = os.path.dirname(os.path.abspath(__file__))
         scripts = {
-            "IT Manager":    "IT_mgr.py",
+            "IT Manager": "IT_mgr.py",
             "IT Technician": "IT_technician.py",
         }
         script = scripts.get(pressed)
@@ -213,7 +218,6 @@ class Ui_IT_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     IT_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_IT_MainWindow()

@@ -6,14 +6,13 @@ from tkinter import messagebox
 import tkinter as tk
 
 
-
 # Database setup
 def setup_database():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS supplier (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
             company_name TEXT NOT NULL,
@@ -22,13 +21,15 @@ def setup_database():
             city TEXT NOT NULL,
             state TEXT NOT NULL,
             zip_code TEXT NOT NULL,
-            email TEXT NOT NULL            
+            email TEXT NOT NULL
         )
     """)
     conn.commit()
     conn.close()
 
 # Insert data into the database
+
+
 def insert_data():
     first_name = first_name_entry.get()
     last_name = last_name_entry.get()
@@ -39,18 +40,19 @@ def insert_data():
     state = state_entry.get()
     zip_code = zip_code_entry.get()
     email = email_entry.get()
-    
+
     if not first_name or not last_name or not company_name or not phone_number or not address or not city or not state or not zip_code or not email:
-    
+
         messagebox.showerror("Input Error", "Please fill in all fields.")
-        
+
     #    return
 
     else:
 
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO supplier (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email))
+        cursor.execute("INSERT INTO supplier (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                       (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email))
         conn.commit()
         messagebox.showinfo("Message", "Person Saved Successfully.")
         conn.close()
@@ -67,22 +69,26 @@ def insert_data():
 
 # Display data from the database
 
+
 def display_data():
     user_list.delete(0, END)
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, first_name, last_name, company_name, phone_number, address, city, state, zip_code, email FROM supplier")
+    cursor.execute(
+        "SELECT id, first_name, last_name, company_name, phone_number, address, city, state, zip_code, email FROM supplier")
     for row in cursor.fetchall():
-        user_list.insert(END, f"ID: {row[0]}, first_name: {row[1]}, last_name: {row[2]}, company_name: {row[3]}, phone_number: {row[4]}, address: {row[5]}, city: {row[6]}, state: {row[7]}, zip_code: {row[8]}, email: {row[9]}")
+        user_list.insert(
+            END, f"ID: {row[0]}, first_name: {row[1]}, last_name: {row[2]}, company_name: {row[3]}, phone_number: {row[4]}, address: {row[5]}, city: {row[6]}, state: {row[7]}, zip_code: {row[8]}, email: {row[9]}")
     conn.close()
+
 
 # GUI setup
 root = tk.Tk()
 
 # Create the banner (Label widget)
-banner = tk.Label(root, text="Supplier Entry Form", bg = "white",
-fg="Black", font=("Arial" , 16, "bold"))
-banner.place(x=510, y=10) # Place the banner at the top and stretch it horizontally
+banner = tk.Label(root, text="Supplier Entry Form", bg="white",
+                  fg="Black", font=("Arial", 16, "bold"))
+banner.place(x=510, y=10)  # Place the banner at the top and stretch it horizontally
 
 root.configure(bg="blue")
 # Designate Height and Width of our app
@@ -142,7 +148,7 @@ Button(root, text="Exit", command=root.quit).place(x=630, y=220)
 user_list = Listbox(root, width=180, height=10)
 user_list.place(x=60, y=270)
 
-    
+
 # Initialize database and display data
 setup_database()
 
