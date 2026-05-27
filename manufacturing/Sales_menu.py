@@ -205,7 +205,7 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             prods = conn.execute(
-                "SELECT id, product_name, purchase_price FROM product ORDER BY product_name"
+                "SELECT id, name AS product_name, purchase_price FROM product ORDER BY name"
             ).fetchall()
         except psycopg2.OperationalError:
             prods = []
@@ -430,7 +430,7 @@ class SalesOrders(QtWidgets.QMainWindow):
             conds.append("so.status = ?"); params.append(status)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
-        rows = conn.execute(base + where + " GROUP BY so.id ORDER BY so.order_date DESC", params).fetchall()
+        rows = conn.execute(base + where + " GROUP BY so.id, so.so_number, so.order_date, so.ship_date, so.status, c.first_name, c.last_name, c.company_name ORDER BY so.order_date DESC", params).fetchall()
         conn.close()
 
         self.ord_table.setRowCount(0)
@@ -468,7 +468,7 @@ class SalesOrders(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT i.description, p.product_name, i.qty, i.unit_price
+                SELECT i.description, p.name AS product_name, i.qty, i.unit_price
                 FROM so_item i LEFT JOIN product p ON p.id = i.product_id
                 WHERE i.so_id = ?
             """, (self._selected_so_id,)).fetchall()

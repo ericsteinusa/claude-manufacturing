@@ -336,7 +336,7 @@ class WarehouseWidget(QtWidgets.QWidget):
         self.stock_summary_lbl.setText(
             f"{count} product(s)   |   Total Value: ${total_value:,.2f}"
         )
-        self.statusBar().showMessage(f"{count} products shown")
+        pass  # self.statusBar().showMessage(f"{count} products shown")
 
     def _stock_show_all(self):
         self.stock_search.clear()
@@ -474,7 +474,7 @@ class WarehouseWidget(QtWidgets.QWidget):
         self._clear_receive()
         self._load_stock()
         self._load_receive_history()
-        self.statusBar().showMessage(f"Receipt posted: +{qty:,.2f} units")
+        pass  # self.statusBar().showMessage(f"Receipt posted: +{qty:,.2f} units")
 
     def _clear_receive(self):
         self.rcv_product.setCurrentIndex(0)
@@ -663,7 +663,7 @@ class WarehouseWidget(QtWidgets.QWidget):
         self._clear_adjust()
         self._load_stock()
         self._load_adjust_history()
-        self.statusBar().showMessage(f"Adjustment posted: {signed_qty:+,.2f} units")
+        pass  # self.statusBar().showMessage(f"Adjustment posted: {signed_qty:+,.2f} units")
 
     def _clear_adjust(self):
         self.adj_product.setCurrentIndex(0)
@@ -906,7 +906,7 @@ class WarehouseWidget(QtWidgets.QWidget):
             for c in range(6):
                 self.txn_tbl.item(r, c).setBackground(color)
 
-        self.statusBar().showMessage(f"{len(rows)} transaction(s) shown")
+        pass  # self.statusBar().showMessage(f"{len(rows)} transaction(s) shown")
 
     # Valuation report
     def _build_valuation_report(self):
@@ -998,8 +998,6 @@ class WarehouseWidget(QtWidgets.QWidget):
 
     def _on_tab_change(self, idx):
         tab_names = ["Stock Overview", "Receive Stock", "Adjustments", "Reports"]
-        self.statusBar().showMessage(
-            f"Tab: {tab_names[idx] if idx < len(tab_names) else ''}")
         if idx == 1:
             self._load_receive_history()
         elif idx == 2:

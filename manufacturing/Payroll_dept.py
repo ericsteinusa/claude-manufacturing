@@ -1548,7 +1548,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         if pid:
             q += " AND pe.people_id=%s"
             params.append(pid)
-        q += " GROUP BY pe.people_id ORDER BY p.last_name, p.first_name"
+        q += " GROUP BY pe.people_id, p.first_name, p.last_name ORDER BY p.last_name, p.first_name"
 
         conn = get_db()
         rows = conn.execute(q, params).fetchall()

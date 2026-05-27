@@ -97,7 +97,7 @@ def _next_insp_num():
 def _load_products(combo, include_none=True):
     conn = get_db()
     try:
-        prods = conn.execute("SELECT id, product_name FROM product ORDER BY product_name").fetchall()
+        prods = conn.execute("SELECT id, name AS product_name FROM product ORDER BY name").fetchall()
     except psycopg2.OperationalError:
         prods = []
     conn.close()
@@ -496,9 +496,9 @@ class QALab(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             prods = conn.execute("""
-                SELECT DISTINCT qi.product_id, p.product_name
+                SELECT DISTINCT qi.product_id, p.name AS product_name
                 FROM qa_inspection qi JOIN product p ON p.id = qi.product_id
-                ORDER BY p.product_name
+                ORDER BY p.name
             """).fetchall()
         except psycopg2.OperationalError:
             prods = []
@@ -523,7 +523,7 @@ class QALab(QtWidgets.QMainWindow):
 
         base = """
             SELECT qi.id, qi.insp_number, qi.insp_date, qi.inspector, qi.result,
-                   p.product_name, wo.wo_number,
+                   p.name AS product_name, wo.wo_number,
                    (SELECT COUNT(*) FROM qa_defect d WHERE d.insp_id = qi.id) AS defect_count
             FROM qa_inspection qi
             LEFT JOIN product p  ON p.id  = qi.product_id
@@ -728,7 +728,7 @@ class QALab(QtWidgets.QMainWindow):
 
         base = """
             SELECT d.id, d.defect_type, d.severity, d.description, d.resolved,
-                   qi.insp_number, p.product_name
+                   qi.insp_number, p.name AS product_name
             FROM qa_defect d
             JOIN qa_inspection qi ON qi.id = d.insp_id
             LEFT JOIN product p ON p.id = qi.product_id
@@ -835,8 +835,8 @@ class QALab(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             prods = conn.execute("""
-                SELECT DISTINCT s.product_id, p.product_name FROM qa_spec s
-                JOIN product p ON p.id = s.product_id ORDER BY p.product_name
+                SELECT DISTINCT s.product_id, p.name AS product_name FROM qa_spec s
+                JOIN product p ON p.id = s.product_id ORDER BY p.name
             """).fetchall()
         except psycopg2.OperationalError:
             prods = []
@@ -860,15 +860,15 @@ class QALab(QtWidgets.QMainWindow):
         try:
             if prod_id:
                 rows = conn.execute("""
-                    SELECT s.id, p.product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
+                    SELECT s.id, p.name AS product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
-                    WHERE s.product_id = ? ORDER BY p.product_name, s.spec_name
+                    WHERE s.product_id = ? ORDER BY p.name, s.spec_name
                 """, (prod_id,)).fetchall()
             else:
                 rows = conn.execute("""
-                    SELECT s.id, p.product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
+                    SELECT s.id, p.name AS product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
-                    ORDER BY p.product_name, s.spec_name
+                    ORDER BY p.name, s.spec_name
                 """).fetchall()
         except psycopg2.OperationalError:
             rows = []

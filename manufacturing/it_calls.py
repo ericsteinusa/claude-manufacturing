@@ -77,9 +77,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-    c.execute("SELECT id, * FROM calls")
-    records = c.fetchall()
-
 def _apply_blue_palette(widget):
     pal = widget.palette()
     for group in (QtGui.QPalette.ColorGroup.Active,

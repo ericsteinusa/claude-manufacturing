@@ -93,7 +93,7 @@ def _load_products(combo, include_none=True):
     conn = get_db()
     try:
         prods = conn.execute(
-            "SELECT id, product_name FROM product ORDER BY product_name"
+            "SELECT id, name AS product_name FROM product ORDER BY name"
         ).fetchall()
     except psycopg2.OperationalError:
         prods = []
@@ -299,7 +299,7 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             mats = conn.execute("""
-                SELECT m.id, p.product_name, p.id AS prod_id, p.amount,
+                SELECT m.id, p.name AS product_name, p.id AS prod_id, p.amount,
                        m.qty_required, m.qty_issued
                 FROM wo_material m JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = ?
@@ -574,7 +574,7 @@ class WorkOrders(QtWidgets.QMainWindow):
         status = self.wo_status_filter.currentData()
         term   = self.wo_search.text().strip()
         base = """
-            SELECT wo.id, wo.wo_number, wo.description, p.product_name,
+            SELECT wo.id, wo.wo_number, wo.description, p.name AS product_name,
                    wo.quantity, wo.start_date, wo.due_date, wo.status
             FROM work_order wo
             LEFT JOIN product p ON p.id = wo.product_id
@@ -640,7 +640,7 @@ class WorkOrders(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             mats = conn.execute("""
-                SELECT m.qty_required, m.qty_issued, p.product_name
+                SELECT m.qty_required, m.qty_issued, p.name AS product_name
                 FROM wo_material m JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = ?
             """, (self._selected_wo_id,)).fetchall()
@@ -750,8 +750,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             prods = conn.execute(
-                "SELECT DISTINCT b.product_id, p.product_name FROM bom b"
-                " JOIN product p ON p.id = b.product_id ORDER BY p.product_name"
+                "SELECT DISTINCT b.product_id, p.name AS product_name FROM bom b"
+                " JOIN product p ON p.id = b.product_id ORDER BY p.name"
             ).fetchall()
         except psycopg2.OperationalError:
             prods = []
@@ -774,17 +774,17 @@ class WorkOrders(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             base = """
-                SELECT b.id, fg.product_name AS fg_name, c.product_name AS comp_name,
+                SELECT b.id, fg.name AS fg_name, c.name AS comp_name,
                        b.qty_required, b.unit, b.notes
                 FROM bom b
                 JOIN product fg ON fg.id = b.product_id
                 JOIN product c  ON c.id  = b.component_id
             """
             if prod_id:
-                rows = conn.execute(base + " WHERE b.product_id = ? ORDER BY fg.product_name, c.product_name",
+                rows = conn.execute(base + " WHERE b.product_id = ? ORDER BY fg.name, c.name",
                                     (prod_id,)).fetchall()
             else:
-                rows = conn.execute(base + " ORDER BY fg.product_name, c.product_name").fetchall()
+                rows = conn.execute(base + " ORDER BY fg.name, c.name").fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()

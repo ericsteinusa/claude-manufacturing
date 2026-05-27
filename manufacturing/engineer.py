@@ -100,7 +100,7 @@ def _ro(text):
 def _load_products(combo, include_none=True):
     conn = get_db()
     try:
-        prods = conn.execute("SELECT id, product_name FROM product ORDER BY product_name").fetchall()
+        prods = conn.execute("SELECT id, name AS product_name FROM product ORDER BY name").fetchall()
     except psycopg2.OperationalError:
         prods = []
     conn.close()
@@ -553,7 +553,7 @@ class EngineerMenu(QtWidgets.QMainWindow):
 
         base = """
             SELECT ep.id, ep.project_number, ep.title, ep.engineer,
-                   ep.start_date, ep.due_date, ep.status, p.product_name
+                   ep.start_date, ep.due_date, ep.status, p.name AS product_name
             FROM eng_project ep
             LEFT JOIN product p ON p.id = ep.product_id
         """
@@ -715,7 +715,7 @@ class EngineerMenu(QtWidgets.QMainWindow):
         status = self.ecr_status_filter.currentData()
         base = """
             SELECT dr.id, dr.ecr_number, dr.title, dr.requested_by, dr.review_date, dr.status,
-                   p.product_name, ep.project_number
+                   p.name AS product_name, ep.project_number
             FROM eng_design_review dr
             LEFT JOIN product p ON p.id = dr.product_id
             LEFT JOIN eng_project ep ON ep.id = dr.project_id
