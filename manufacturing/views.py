@@ -1616,7 +1616,7 @@ def _get_user_profile(email: str) -> dict:
     dept_sub_id = row['dept_sub_id']
     is_manager = (
         dept_sub_id in MANAGER_DEPT_SUB_IDS
-        or role_name in {'Department Manager'} | FULL_ACCESS_ROLES
+        or role_name in {'Department Manager', 'Admin'} | FULL_ACCESS_ROLES
     )
     return {
         'people_id': row['id'],
