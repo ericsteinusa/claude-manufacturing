@@ -64,7 +64,7 @@ WSGI_APPLICATION = 'manufacture.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'company',
+        'NAME': 'company_db',
         'USER': 'postgres',
         'PASSWORD': '***REMOVED***',
         'HOST': 'localhost',
