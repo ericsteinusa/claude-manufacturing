@@ -1,6 +1,7 @@
 import sys
-from db_pg import get_db
 import os
+import sqlite3
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
