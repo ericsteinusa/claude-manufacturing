@@ -35,10 +35,7 @@ def init_db():
     for col in ("emp_id INTEGER",
                 "dept_id INTEGER REFERENCES dept(dept_id)",
                 "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
-        try:
-            conn.execute(f"ALTER TABLE people ADD COLUMN {col}")
-        except psycopg2.OperationalError:
-            pass
+        conn.execute(f"ALTER TABLE people ADD COLUMN IF NOT EXISTS {col}")
     conn.commit()
     conn.close()
 

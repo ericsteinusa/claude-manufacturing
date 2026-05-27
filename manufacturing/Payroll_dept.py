@@ -249,6 +249,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self._run_people_ids = []
         self._run_deductions = {}
         self._history_run_ids = []
+        import personnel_crm as _pcrm; _pcrm.init_db()
+        init_db()
         self._build_ui()
         self._load_pay_rates()
         self._load_history()
@@ -798,7 +800,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         for e in employees:
             label = f"{e['last_name']}, {e['first_name']}"
             if e["employee_id"]:
-                label += f"  (ID {e['emp_id']})"
+                label += f"  (ID {e['employee_id']})"
             self.pr_emp_combo.addItem(label, e["id"])
         self.pr_emp_combo.blockSignals(False)
 

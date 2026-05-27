@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from personnel_crm import PersonnelCRMWidget, _apply_blue_palette
+from personnel_crm import _apply_blue_palette
 from time_clock_menu import TimeClockWidget
 from Payroll_dept import PayrollDeptWidget
 
@@ -41,6 +41,7 @@ def _launch_tab(script, label):
 class PersonnelMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        import personnel_crm as _pcrm; _pcrm.init_db()
         self.setWindowTitle("Personnel Menu")
         self.resize(1100, 720)
         _apply_blue_palette(self)
@@ -52,7 +53,7 @@ class PersonnelMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(PersonnelCRMWidget(), "Personnel CRM")
+        tabs.addTab(_launch_tab("personnel_crm.py", "Personnel CRM"), "Personnel CRM")
         tabs.addTab(TimeClockWidget(), "Time Clock")
         tabs.addTab(PayrollDeptWidget(), "Payroll")
         tabs.addTab(_launch_tab("registration_form.py", "Registration Form"), "Registration Form")

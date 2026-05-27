@@ -115,6 +115,7 @@ class PgConnection:
             stmt = stmt.strip()
             if stmt:
                 cur.execute(stmt)
+        self._conn.commit()
         return cur
 
     def commit(self):

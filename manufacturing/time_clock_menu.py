@@ -200,6 +200,7 @@ _TAB_KEYS = {
 class TimeClockWidget(QtWidgets.QWidget):
     def __init__(self, parent=None, initial_tab=None):
         super().__init__(parent)
+        init_db()
         _apply_blue_palette(self)
         self._clock_people_id = None
         self._records_row_ids = []
@@ -405,7 +406,7 @@ class TimeClockWidget(QtWidgets.QWidget):
     def _load_employees(self):
         conn = get_db()
         rows = conn.execute(
-            "SELECT id, first_name, last_name, ID as emp_id FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name, emp_id FROM people ORDER BY last_name, first_name"
         ).fetchall()
         conn.close()
 

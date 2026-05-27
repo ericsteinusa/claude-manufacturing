@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 from db_pg import get_db
 import os
 import csv
@@ -45,11 +44,6 @@ OVERDUE_COLORS = [
     (90, QtGui.QColor(248, 215, 218)),   # 61–90 days — light red
     (999, QtGui.QColor(220, 53, 69, 80)),  # 90+ days  — red
 ]
-
-
-def get_db():
-    conn = get_db()
-    return conn
 
 
 def init_db():
