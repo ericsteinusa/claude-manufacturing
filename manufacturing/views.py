@@ -1568,6 +1568,7 @@ DEPT_MENU_KEY = {
     'Customer Service': 'customer_service',
     'Engineering': 'engineering',
     'Information Tech': 'information_tech',
+    'Information Technologies': 'information_tech',
     'Maintenance': 'maintenance',
     'Marketing': 'marketing',
     'Personnel': 'personnel',
