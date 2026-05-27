@@ -1,783 +1,771 @@
-from .db_connection import get_db_connection
-from tkinter import *
-from tkinter import Label, Entry, Button, END
-from tkinter import messagebox
-import tkinter as tk
-from tkinter import ttk
-from tkinter import colorchooser
-from configparser import ConfigParser
-from datetime import datetime
+import sys
+import psycopg2
+from db_pg import get_db
+from PyQt6 import QtCore, QtGui, QtWidgets
+
+BLUE = QtGui.QColor(0, 85, 255)
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+COMBO_STYLE = (
+    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox QAbstractItemView{background-color: white;}"
+)
+TEXT_STYLE = "QPlainTextEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+LABEL_STYLE = "color: white; font-size: 13px;"
+
+TICKET_COLORS = {
+    "open":        "#ffffff",
+    "in_progress": "#fff3cd",
+    "resolved":    "#d4edda",
+    "closed":      "#dcdcdc",
+    "on_hold":     "#f8d7da",
+}
+
+PRIORITY_COLORS = {
+    "critical": QtGui.QColor(248, 215, 218),
+    "high":     QtGui.QColor(255, 243, 205),
+    "medium":   QtGui.QColor(220, 235, 255),
+}
+
+ASSET_STATUS_COLORS = {
+    "active":    "#d4edda",
+    "spare":     "#d1ecf1",
+    "repair":    "#fff3cd",
+    "retired":   "#dcdcdc",
+    "lost":      "#f8d7da",
+}
 
 
-def _to_iso_date(val):
-    """Normalize M/D/YYYY or MM/DD/YYYY input to ISO YYYY-MM-DD; pass through if already ISO or empty."""
-    if not val or val.strip() == '':
-        return val
-    val = val.strip()
-    if len(val) == 10 and val[4] == '-':
-        return val
-    for fmt in ('%m/%d/%Y', '%m/%d/%y'):
-        try:
-            return datetime.strptime(val, fmt).strftime('%Y-%m-%d')
-        except ValueError:
-            pass
-    return val
-
-root = Tk()
-people = ''
-
-# Database setup
-
-
-def setup_database():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-    CREATE TABLE if not exists people (
-        first_name text,
-        last_name text,
-        id integer,
-        address text,
-        city text,
-        state text,
-        zip_code text,
-        email text
+def init_db():
+    conn = get_db()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS it_ticket (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_number TEXT NOT NULL UNIQUE,
+            requester     TEXT,
+            department    TEXT,
+            issue_type    TEXT,
+            description   TEXT NOT NULL,
+            priority      TEXT DEFAULT 'medium',
+            assigned_to   TEXT,
+            submitted_date TEXT,
+            due_date      TEXT,
+            resolved_date TEXT,
+            status        TEXT DEFAULT 'open',
+            notes         TEXT
         )
     """)
-
-    cursor.execute("""
-    CREATE TABLE if not exists calls (
-        id SERIAL PRIMARY KEY,
-        People_id INTEGER,
-        call TEXT NOT NULL,
-        call_date TEXT NOT NULL,
-        call_time INTEGER NOT NULL,
-        completion_date TEXT NOT NULL,
-        completion_time INTEGER NOT NULL,
-        comments_box TEXT NOT NULL,
-        completion_box INTEGER NOT NULL,
-        FOREIGN KEY (people_id) REFERENCES people(id)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS it_asset (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_tag    TEXT NOT NULL UNIQUE,
+            asset_type   TEXT,
+            make         TEXT,
+            model        TEXT,
+            serial_number TEXT,
+            assigned_to  TEXT,
+            department   TEXT,
+            purchase_date TEXT,
+            warranty_exp TEXT,
+            status       TEXT DEFAULT 'active',
+            notes        TEXT
         )
     """)
     conn.commit()
     conn.close()
 
+def _apply_blue_palette(widget):
+    pal = widget.palette()
+    for group in (QtGui.QPalette.ColorGroup.Active,
+                  QtGui.QPalette.ColorGroup.Inactive,
+                  QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
+        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
+    widget.setPalette(pal)
 
-'''
-# Read our config file and get colors
-parser = ConfigParser()
-parser.read("personnel.ini")
-saved_primary_color = parser.get('colors', 'primary_color')
-saved_secondary_color = parser.get('colors', 'secondary_color')
-saved_highlight_color = parser.get('colors', 'highlight_color')
-'''
 
-
-def query_database():
-    # Clear the Treeview
-    for record in my_tree.get_children():
-        my_tree.delete(record)
-
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
+def _ro(text):
+    item = QtWidgets.QTableWidgetItem(text)
+    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+    return item
 
     # Create a cursor instance
     c = conn.cursor()
 
-    c.execute("SELECT id, * FROM calls")
-    records = c.fetchall()
-
-    # Add our data to the screen
-    global count
-    count = 0
-
-    for record in records:
-        if count % 2 == 0:
-            my_tree.insert(parent='', index='end', iid=count, text='', values=(
-                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
-        else:
-            my_tree.insert(parent='', index='end', iid=count, text='', values=(
-                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow',))
-        # increment counter
-        count += 1
-
-    # Commit changes
-    conn.commit()
-
-    # Close our connection
+def _next_ticket_num():
+    yr = QtCore.QDate.currentDate().year()
+    conn = get_db()
+    try:
+        count = conn.execute(
+            "SELECT COUNT(*) FROM it_ticket WHERE ticket_number LIKE ?", (f"TKT-{yr}-%",)
+        ).fetchone()[0]
+    except psycopg2.OperationalError:
+        count = 0
     conn.close()
-
-
-def search_records():
-    lookup_record = search_entry.get()
-    # close the search box
-    search.destroy()
-
-    # Clear the Treeview
-    for record in my_tree.get_children():
-        my_tree.delete(record)
-
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
-
-    # Create a cursor instance
-    c = conn.cursor()
-
-    c.execute("SELECT id, * FROM calls WHERE id like %s", (lookup_record,))
-    records = c.fetchall()
-
-    # Add our data to the screen
-    global count
-    count = 0
-
-    for record in records:
-        if count % 2 == 0:
-            my_tree.insert(parent='', index='end', iid=count, text='', values=(
-                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
-        else:
-            my_tree.insert(parent='', index='end', iid=count, text='', values=(
-                record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow',))
-        # increment counter
-        count += 1
-
-    # Commit changes
-    conn.commit()
-
-    # Close our connection
-    conn.close()
-
-
-def lookup_records():
-    global search_entry, search
-
-    search = Toplevel(root)
-    search.title("Lookup Records")
-    search.geometry("400x200")
-
-    # Create label frame
-    search_frame = LabelFrame(search, text="Record Number")
-    search_frame.pack(padx=10, pady=10)
-
-    # Add entry box
-    search_entry = Entry(search_frame, font=("Helvetica", 18))
-    search_entry.pack(pady=20, padx=20)
+    return f"TKT-{yr}-{count + 1:04d}"
 
     # Add button
     search_button = Button(search, text="Search Records", command=search_records)
     search_button.pack(padx=20, pady=20)
 
+# ── Dialogs ────────────────────────────────────────────────────────────────────
 
-def primary_color():
-    # Pick Color
-    primary_color = colorchooser.askcolor()[1]
+class NewTicketDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("New Support Ticket")
+        self.resize(500, 420)
+        _apply_blue_palette(self)
+        self.ticket_id = None
+        self._build_ui()
 
-    # Update Treeview Color
-    if primary_color:
-        # Create Striped Row Tags
-        my_tree.tag_configure('evenrow', background=primary_color)
+    def _build_ui(self):
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-        # Config file
-        parser = ConfigParser()
-        parser.read("personnel.ini")
-        # Set the color change
-        parser.set('colors', 'primary_color', primary_color)
-        # Save the config file
-        with open('personnel.ini', 'w') as configfile:
-            parser.write(configfile)
+        def lbl(t):
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
+        self.ticket_num = QtWidgets.QLineEdit(_next_ticket_num())
+        self.ticket_num.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Ticket #:"), self.ticket_num)
 
-def secondary_color():
-    # Pick Color
-    secondary_color = colorchooser.askcolor()[1]
+        self.requester = QtWidgets.QLineEdit()
+        self.requester.setStyleSheet(INPUT_STYLE)
+        self.requester.setPlaceholderText("Person submitting the request")
+        layout.addRow(lbl("Requester:"), self.requester)
 
-    # Update Treeview Color
-    if secondary_color:
-        # Create Striped Row Tags
-        my_tree.tag_configure('oddrow', background=secondary_color)
+        self.department = QtWidgets.QLineEdit()
+        self.department.setStyleSheet(INPUT_STYLE)
+        self.department.setPlaceholderText("Requester's department")
+        layout.addRow(lbl("Department:"), self.department)
 
-        # Config file
-        parser = ConfigParser()
-        parser.read("personnel.ini")
-        # Set the color change
-        parser.set('colors', 'secondary_color', secondary_color)
-        # Save the config file
-        with open('personnel.ini', 'w') as configfile:
-            parser.write(configfile)
+        self.issue_type = QtWidgets.QComboBox()
+        self.issue_type.setStyleSheet(COMBO_STYLE)
+        for t in ("Hardware", "Software", "Network", "Email", "Phone", "Printer",
+                  "Access / Permissions", "Account", "Other"):
+            self.issue_type.addItem(t, t)
+        layout.addRow(lbl("Issue Type:"), self.issue_type)
 
+        self.description = QtWidgets.QPlainTextEdit()
+        self.description.setStyleSheet(TEXT_STYLE)
+        self.description.setPlaceholderText("Describe the problem (required)")
+        self.description.setFixedHeight(80)
+        layout.addRow(lbl("Description:"), self.description)
 
-def highlight_color():
-    # Pick Color
-    highlight_color = colorchooser.askcolor()[1]
+        self.priority_combo = QtWidgets.QComboBox()
+        self.priority_combo.setStyleSheet(COMBO_STYLE)
+        for s in ("low", "medium", "high", "critical"):
+            self.priority_combo.addItem(s.capitalize(), s)
+        self.priority_combo.setCurrentIndex(1)
+        layout.addRow(lbl("Priority:"), self.priority_combo)
 
-    # Update Treeview Color
-    # Change Selected Color
-    if highlight_color:
-        style.map('Treeview',
-                  background=[('selected', highlight_color)])
+        self.assigned_to = QtWidgets.QLineEdit()
+        self.assigned_to.setStyleSheet(INPUT_STYLE)
+        self.assigned_to.setPlaceholderText("Assigned technician")
+        layout.addRow(lbl("Assigned To:"), self.assigned_to)
 
-        # Config file
-        parser = ConfigParser()
-        parser.read("personnel.ini")
-        # Set the color change
-        parser.set('colors', 'highlight_color', highlight_color)
-        # Save the config file
-        with open('personnel.ini', 'w') as configfile:
-            parser.write(configfile)
+        self.submitted_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.submitted_date.setCalendarPopup(True)
+        self.submitted_date.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Submitted:"), self.submitted_date)
 
+        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(3))
+        self.due_date.setCalendarPopup(True)
+        self.due_date.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Due Date:"), self.due_date)
 
-def reset_colors():
-    # Save original colors to config file
-    parser = ConfigParser()
-    parser.read('personnel.ini')
-    parser.set('colors', 'primary_color', 'lightblue')
-    parser.set('colors', 'secondary_color', 'white')
-    parser.set('colors', 'highlight_color', '#347083')
-    with open('personnel.ini', 'w') as configfile:
-        parser.write(configfile)
-    # Reset the colors
-    my_tree.tag_configure('oddrow', background='white')
-    my_tree.tag_configure('evenrow', background='lightblue')
-    style.map('Treeview',
-              background=[('selected', '#347083')])
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
 
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
 
-# Add Menu
-my_menu = Menu(root)
-root.config(menu=my_menu)
-
-# Configure our menu
-option_menu = Menu(my_menu, tearoff=0)
-my_menu.add_cascade(label="Options", menu=option_menu)
-# Drop down menu
-option_menu.add_command(label="Primary Color", command=primary_color)
-option_menu.add_command(label="Secondary Color", command=secondary_color)
-option_menu.add_command(label="Highlight Color", command=highlight_color)
-option_menu.add_separator()
-option_menu.add_command(label="Reset Colors", command=reset_colors)
-option_menu.add_separator()
-option_menu.add_command(label="Exit", command=root.quit)
-
-# Search Menu
-search_menu = Menu(my_menu, tearoff=0)
-my_menu.add_cascade(label="Search", menu=search_menu)
-# Drop down menu
-search_menu.add_command(label="Search", command=lookup_records)
-search_menu.add_separator()
-search_menu.add_command(label="Reset", command=query_database)
-
-
-# Step 2: Fetch data for the selection list
-def fetch_people():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id || ' ' || first_name || ' ' || last_name as full_name FROM people")
-    people = [row[0] for row in cursor.fetchall()]
-    conn.close()
-    return people
-
-# Insert data into the database
-
-
-def insert_data():
-    people_id = people_combobox.get().split(' ')[0].strip('{')
-    call = call_widget.get("1.0", "end-1c")  # Get text from Text Widget
-    call_date = _to_iso_date(call_date_entry.get())
-    call_time = call_time_entry.get()
-    completion_date = _to_iso_date(completion_date_entry.get())
-    completion_time = completion_time_entry.get()
-    comments_box = comment_widget.get("1.0", "end-1c")  # Get text from Text Widget
-    completion_box = checkbox_var.get()  # Get value from checkbox (0 or 1)
-
-    if not people_id or not call or not call_date or not call_time or not completion_date or not completion_time or not comments_box or not completion_box:
-
-        messagebox.showerror("Input Error", "Please fill in all fields.")
-
-    #    return
-
-    else:
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box))
-        conn.commit()
-        messagebox.showinfo("Message", "Call Saved Successfully.")
+    def _on_ok(self):
+        num = self.ticket_num.text().strip()
+        desc = self.description.toPlainText().strip()
+        if not num or not desc:
+            QtWidgets.QMessageBox.warning(self, "Input Error",
+                                          "Ticket number and description are required.")
+            return
+        conn = get_db()
+        try:
+            cur = conn.execute(
+                "INSERT INTO it_ticket (ticket_number, requester, department, issue_type,"
+                " description, priority, assigned_to, submitted_date, due_date, notes)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (num, self.requester.text().strip(), self.department.text().strip(),
+                 self.issue_type.currentData(), desc,
+                 self.priority_combo.currentData(),
+                 self.assigned_to.text().strip(),
+                 self.submitted_date.date().toString("yyyy-MM-dd"),
+                 self.due_date.date().toString("yyyy-MM-dd"),
+                 self.notes.text().strip())
+            )
+            self.ticket_id = cur.lastrowid
+            conn.commit()
+        except psycopg2.IntegrityError:
+            QtWidgets.QMessageBox.warning(self, "Duplicate",
+                                          f"Ticket number '{num}' already exists.")
+            conn.close()
+            return
         conn.close()
-        people_id.delete(0, END)
-        call_widget.delete("1.0", END)
-        call_date_entry.delete(0, END)
-        call_time_entry.delete(0, END)
-        completion_date_entry.delete(0, END)
-        completion_time_entry.delete(0, END)
-        comments_box.delete("1.0", END)
-        completion_box.delete(0, END)
-        # display_data()
+        self.accept()
 
 
-# Display data from the database
-'''
-def display_data():
-    user_list.delete(0, END)
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box FROM calls")
-    for row in cursor.fetchall():
-    user_list.insert(END, f"ID: {row[0]}, people_id: {row[1]}, call: {row[2]}, call_date: {row[3]}, call_time: {row[4]}, completion_date: {row[5]}, completion_time: {row[6]}, comments_box: {row[7]}, completion_box: {row[8]}")
-  conn.close()
-'''
-root.configure(bg="lightblue")
-# Designate Height and Width of our app
-app_width = 1210
-app_height = 650
+class NewAssetDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("New IT Asset")
+        self.resize(500, 390)
+        _apply_blue_palette(self)
+        self._build_ui()
 
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
+    def _build_ui(self):
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-x = (screen_width / 2) - (app_width / 2)
-y = (screen_height / 2) - (app_height / 2)
-root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+        def lbl(t):
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
-# Read our config file and get colors
-parser = ConfigParser()
-parser.read("personnel.ini")
-saved_primary_color = parser.get('colors', 'primary_color')
-saved_secondary_color = parser.get('colors', 'secondary_color')
-saved_highlight_color = parser.get('colors', 'highlight_color')
+        self.asset_tag = QtWidgets.QLineEdit()
+        self.asset_tag.setStyleSheet(INPUT_STYLE)
+        self.asset_tag.setPlaceholderText("Unique asset tag (required)")
+        layout.addRow(lbl("Asset Tag:"), self.asset_tag)
 
-# Add Some Style
-style = ttk.Style()
+        self.asset_type = QtWidgets.QComboBox()
+        self.asset_type.setStyleSheet(COMBO_STYLE)
+        for t in ("Desktop", "Laptop", "Monitor", "Server", "Printer", "Phone",
+                  "Tablet", "Switch", "Router", "UPS", "Other"):
+            self.asset_type.addItem(t, t)
+        layout.addRow(lbl("Type:"), self.asset_type)
 
-# Pick A Theme
-style.theme_use('default')
+        self.make = QtWidgets.QLineEdit()
+        self.make.setStyleSheet(INPUT_STYLE)
+        self.make.setPlaceholderText("e.g. Dell, HP, Cisco")
+        layout.addRow(lbl("Make:"), self.make)
 
-# Configure the Treeview Colors
-style.configure("Treeview",
-                background="#D3D3D3",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3")
+        self.model = QtWidgets.QLineEdit()
+        self.model.setStyleSheet(INPUT_STYLE)
+        self.model.setPlaceholderText("Model name / number")
+        layout.addRow(lbl("Model:"), self.model)
 
-# Change Selected Color #347083
-style.map('Treeview',
-          background=[('selected', saved_highlight_color)])
+        self.serial = QtWidgets.QLineEdit()
+        self.serial.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Serial #:"), self.serial)
 
+        self.assigned_to = QtWidgets.QLineEdit()
+        self.assigned_to.setStyleSheet(INPUT_STYLE)
+        self.assigned_to.setPlaceholderText("Assigned user (leave blank if spare)")
+        layout.addRow(lbl("Assigned To:"), self.assigned_to)
 
-# Create a Treeview Frame
-tree_frame = Frame(root)
-tree_frame.pack(pady=10)
+        self.department = QtWidgets.QLineEdit()
+        self.department.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Department:"), self.department)
 
-# Create a Treeview Scrollbar
-tree_scroll = Scrollbar(tree_frame)
-tree_scroll.pack(side=RIGHT, fill=Y)
+        self.purchase_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.purchase_date.setCalendarPopup(True)
+        self.purchase_date.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Purchase Date:"), self.purchase_date)
 
-# Create The Treeview
-my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
-my_tree.pack()
+        self.warranty_exp = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addYears(3))
+        self.warranty_exp.setCalendarPopup(True)
+        self.warranty_exp.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Warranty Exp:"), self.warranty_exp)
 
-# Configure the Scrollbar
-tree_scroll.config(command=my_tree.yview)
+        self.status_combo = QtWidgets.QComboBox()
+        self.status_combo.setStyleSheet(COMBO_STYLE)
+        for s in ("active", "spare", "repair", "retired", "lost"):
+            self.status_combo.addItem(s.capitalize(), s)
+        layout.addRow(lbl("Status:"), self.status_combo)
 
-# Define Our Columns
-my_tree['columns'] = ("ID", "People ID", "Problem", "Call Date", "Call Time",
-                      "Completion Date", "Completion Time", "Comments", "Completion Box")
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
 
-# Format Our Columns
-my_tree.column("#0", width=0, stretch=NO)
-my_tree.column("ID", anchor=CENTER, width=100)
-my_tree.column("People ID", anchor=W, width=140)
-my_tree.column("Problem", anchor=W, width=140)
-my_tree.column("Call Date", anchor=W, width=140)
-my_tree.column("Call Time", anchor=W, width=140)
-my_tree.column("Completion Date", anchor=W, width=140)
-my_tree.column("Completion Time", anchor=W, width=140)
-my_tree.column("Comments", anchor=W, width=140)
-my_tree.column("Completion Box", anchor=CENTER, width=100)
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
 
-# Create Headings
-my_tree.heading("#0", text="", anchor=W)
-my_tree.heading("ID", text="ID", anchor=CENTER)
-my_tree.heading("People ID", text="People ID", anchor=W)
-my_tree.heading("Problem", text="Problem", anchor=W)
-my_tree.heading("Call Date", text="Call Date", anchor=W)
-my_tree.heading("Call Time", text="Call Time", anchor=W)
-my_tree.heading("Completion Date", text="Completion Date", anchor=W)
-my_tree.heading("Completion Time", text="Completion Time", anchor=W)
-my_tree.heading("Comments", text="Comments", anchor=W)
-my_tree.heading("Completion Box", text="Completion Box", anchor=CENTER)
-
-# Create Striped Row Tags
-my_tree.tag_configure('oddrow', background=saved_secondary_color)
-my_tree.tag_configure('evenrow', background=saved_primary_color)
-
-root.title("Call Records")
-
-# Add Record Entry Boxes
-data_frame = LabelFrame(root, text="Record")
-data_frame.place(x=5, y=300, width=1200, height=250)
-id_label = Label(data_frame, text="ID")
-id_label.grid(row=0, column=0, padx=10, pady=10)
-id_entry = Entry(data_frame)
-id_entry.grid(row=0, column=1, padx=10, pady=10)
-
-# Parent selection Combobox
-people_data = fetch_people()
-people_id_label = Label(data_frame, text="People ID:")
-people_id_label.grid(row=0, column=2, padx=10, pady=10)
-people_combobox = ttk.Combobox(root, values=people_data)
-people_combobox.place(x=265, y=327)
-people_combobox.bind("<<ComboboxSelected>>")
-
-
-Label(root, text="Call:").place(x=425, y=327)
-call_widget = Text(root, wrap="word", width=30, height=5)
-call_widget.place(x=460, y=327)
-call = call_widget.get("1.0", "end-1c")  # Get text from Text widget
-
-Label(root, text="Call Date:").place(x=715, y=327)
-call_date_entry = Entry(root)
-call_date_entry.place(x=775, y=327)
-
-Label(root, text="Call Time:").place(x=910, y=327)
-call_time_entry = Entry(root)
-call_time_entry.place(x=975, y=327)
-
-Label(root, text="Completion Date:").place(x=25, y=440)
-completion_date_entry = Entry(root)
-completion_date_entry.place(x=130, y=440)
-
-Label(root, text="Completion Time:").place(x=270, y=440)
-completion_time_entry = Entry(root)
-completion_time_entry.place(x=378, y=440)
-
-Label(root, text="Comments:").place(x=518, y=440)
-comment_widget = Text(root, wrap="word", width=30, height=5)
-comment_widget.place(x=590, y=440)
-
-# Variable to store completion status
-checkbox_var = IntVar()
-# Create a checkbox
-checkbox = tk.Checkbutton(root, text="Completed", variable=checkbox_var)
-checkbox.place(x=850, y=440)
-
-# Move Row Up
-
-
-def up():
-    rows = my_tree.selection()
-    for row in rows:
-        my_tree.move(row, my_tree.parent(row), my_tree.index(row) - 1)
-
-# Move Rown Down
-
-
-def down():
-    rows = my_tree.selection()
-    for row in reversed(rows):
-        my_tree.move(row, my_tree.parent(row), my_tree.index(row) + 1)
-
-# Remove one record
-
-
-def remove_one():
-    x = my_tree.selection()[0]
-    my_tree.delete(x)
-
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
-
-    # Create a cursor instance
-    c = conn.cursor()
-
-    # Delete From Database
-    c.execute("DELETE FROM calls WHERE id = %s", (id_entry.get(),))
-
-    # Commit changes
-    conn.commit()
-
-    # Close our connection
-    conn.close()
-
-    # Clear The Entry Boxes
-    clear_entries()
-
-    # Add a little message box for fun
-    messagebox.showinfo("Deleted!", "Your Record Has Been Deleted!")
-
-
-# Remove Many records
-def remove_many():
-    # Add a little message box for fun
-    response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING SELECTED From The Table\nAre You Sure?!")
-
-    # Add logic for message box
-    if response == 1:
-        # Designate selections
-        x = my_tree.selection()
-
-        # Create List of ID's
-        ids_to_delete = []
-
-        # Add selections to ids_to_delete list
-        for record in x:
-            ids_to_delete.append(my_tree.item(record, 'values')[2])
-
-        # Delete From Treeview
-        for record in x:
-            my_tree.delete(record)
-
-        # Create a database or connect to one that exists
-        conn = get_db_connection()
-
-        # Create a cursor instance
-        c = conn.cursor()
-
-        # Delete Everything From The Table
-        c.executemany("DELETE FROM calls WHERE id = %s", [(a,) for a in ids_to_delete])
-
-        # Reset List
-        ids_to_delete = []
-
-        # Commit changes
-        conn.commit()
-
-        # Close our connection
+    def _on_ok(self):
+        tag = self.asset_tag.text().strip()
+        if not tag:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Asset tag is required.")
+            return
+        conn = get_db()
+        try:
+            conn.execute(
+                "INSERT INTO it_asset (asset_tag, asset_type, make, model, serial_number,"
+                " assigned_to, department, purchase_date, warranty_exp, status, notes)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                (tag, self.asset_type.currentData(),
+                 self.make.text().strip(), self.model.text().strip(),
+                 self.serial.text().strip(), self.assigned_to.text().strip(),
+                 self.department.text().strip(),
+                 self.purchase_date.date().toString("yyyy-MM-dd"),
+                 self.warranty_exp.date().toString("yyyy-MM-dd"),
+                 self.status_combo.currentData(),
+                 self.notes.text().strip())
+            )
+            conn.commit()
+        except psycopg2.IntegrityError:
+            QtWidgets.QMessageBox.warning(self, "Duplicate",
+                                          f"Asset tag '{tag}' already exists.")
+            conn.close()
+            return
         conn.close()
-
-        # Clear entry boxes if filled
-        clear_entries()
+        self.accept()
 
 
-# Remove all records
-def remove_all():
-    # Add a little message box for fun
-    response = messagebox.askyesno("WOAH!!!!", "This Will Delete EVERYTHING From The Table\nAre You Sure?!")
+# ── Main Window ────────────────────────────────────────────────────────────────
 
-    # Add logic for message box
-    if response == 1:
-        # Clear the Treeview
-        for record in my_tree.get_children():
-            my_tree.delete(record)
+class ITSupportMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("IT Support")
+        self.resize(1020, 680)
+        _apply_blue_palette(self)
+        self._ticket_row_ids = []
+        self._selected_ticket_id = None
+        self._asset_row_ids = []
+        self._build_ui()
+        init_db()
+        self._refresh_tickets()
+        self._refresh_assets()
 
-        # Create a database or connect to one that exists
-        conn = get_db_connection()
+    def _build_ui(self):
+        self._tabs = QtWidgets.QTabWidget()
+        self._tabs.setStyleSheet(
+            "QTabBar::tab{background:white; border:1px solid black; padding:4px 10px;}"
+            "QTabBar::tab:selected{background:rgb(85,255,255);}"
+        )
+        self._tabs.currentChanged.connect(self._on_tab_changed)
+        self.setCentralWidget(self._tabs)
+        self._build_tickets_tab()
+        self._build_assets_tab()
 
-        # Create a cursor instance
-        c = conn.cursor()
+    def _on_tab_changed(self, index):
+        if index == 0:
+            self._refresh_tickets()
+        elif index == 1:
+            self._refresh_assets()
 
-        # Delete Everything From The Table
-        c.execute("DROP TABLE calls")
+    # ── Tickets tab ─────────────────────────────────────────────────────────
 
-        # Commit changes
-        conn.commit()
+    def _build_tickets_tab(self):
+        w = QtWidgets.QWidget()
+        _apply_blue_palette(w)
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(6)
 
-        # Close our connection
+        fr = QtWidgets.QHBoxLayout()
+
+        lbl_s = QtWidgets.QLabel("Status:")
+        lbl_s.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_s)
+        self.tkt_status_filter = QtWidgets.QComboBox()
+        self.tkt_status_filter.setStyleSheet(COMBO_STYLE)
+        self.tkt_status_filter.addItem("Open & In Progress", "open")
+        self.tkt_status_filter.addItem("In Progress only", "in_progress")
+        self.tkt_status_filter.addItem("On Hold", "on_hold")
+        self.tkt_status_filter.addItem("Resolved", "resolved")
+        self.tkt_status_filter.addItem("Closed", "closed")
+        self.tkt_status_filter.addItem("All", None)
+        self.tkt_status_filter.currentIndexChanged.connect(self._refresh_tickets)
+        fr.addWidget(self.tkt_status_filter)
+
+        fr.addSpacing(10)
+        lbl_p = QtWidgets.QLabel("Priority:")
+        lbl_p.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_p)
+        self.tkt_pri_filter = QtWidgets.QComboBox()
+        self.tkt_pri_filter.setStyleSheet(COMBO_STYLE)
+        self.tkt_pri_filter.addItem("(all)", None)
+        for s in ("low", "medium", "high", "critical"):
+            self.tkt_pri_filter.addItem(s.capitalize(), s)
+        self.tkt_pri_filter.currentIndexChanged.connect(self._refresh_tickets)
+        fr.addWidget(self.tkt_pri_filter)
+
+        fr.addSpacing(10)
+        lbl_q = QtWidgets.QLabel("Search:")
+        lbl_q.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_q)
+        self.tkt_search = QtWidgets.QLineEdit()
+        self.tkt_search.setStyleSheet(INPUT_STYLE)
+        self.tkt_search.setFixedWidth(160)
+        self.tkt_search.returnPressed.connect(self._refresh_tickets)
+        fr.addWidget(self.tkt_search)
+        b_all = QtWidgets.QPushButton("Show All")
+        b_all.setStyleSheet(BUTTON_STYLE)
+        b_all.setFixedHeight(28)
+        b_all.clicked.connect(self._on_tkt_show_all)
+        fr.addWidget(b_all)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
+
+        self.tkt_table = QtWidgets.QTableWidget()
+        self.tkt_table.setColumnCount(8)
+        self.tkt_table.setHorizontalHeaderLabels(
+            ["Ticket #", "Requester", "Department", "Issue Type",
+             "Priority", "Assigned To", "Due Date", "Status"]
+        )
+        hh = self.tkt_table.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        for col in (2, 3, 4, 5, 6, 7):
+            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tkt_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tkt_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tkt_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tkt_table.setAlternatingRowColors(True)
+        self.tkt_table.verticalHeader().setVisible(False)
+        self.tkt_table.clicked.connect(self._on_ticket_clicked)
+        splitter.addWidget(self.tkt_table)
+
+        detail_w = QtWidgets.QWidget()
+        _apply_blue_palette(detail_w)
+        dv = QtWidgets.QVBoxLayout(detail_w)
+        dv.setContentsMargins(0, 4, 0, 0)
+        dlbl = QtWidgets.QLabel("Description / Notes for Selected Ticket")
+        dlbl.setStyleSheet("color: white; font-weight: bold; font-size: 13px;")
+        dv.addWidget(dlbl)
+        self.tkt_detail_text = QtWidgets.QPlainTextEdit()
+        self.tkt_detail_text.setReadOnly(True)
+        self.tkt_detail_text.setStyleSheet(
+            "QPlainTextEdit{background-color: white; border: 1px solid black;}")
+        dv.addWidget(self.tkt_detail_text)
+        splitter.addWidget(detail_w)
+        splitter.setSizes([420, 160])
+        v.addWidget(splitter, stretch=1)
+
+        br = QtWidgets.QHBoxLayout()
+        for text, slot in (
+            ("New Ticket",      self._on_new_ticket),
+            ("Assign / Start",  lambda: self._set_tkt_status("in_progress", "Mark as In Progress?")),
+            ("Mark On Hold",    lambda: self._set_tkt_status("on_hold",     "Put On Hold?")),
+            ("Mark Resolved",   lambda: self._set_tkt_status("resolved",    "Mark as Resolved?")),
+            ("Close Ticket",    lambda: self._set_tkt_status("closed",      "Close this ticket?")),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(32)
+            b.clicked.connect(slot)
+            br.addWidget(b)
+        br.addStretch()
+        v.addLayout(br)
+        self._tabs.addTab(w, "Support Tickets")
+
+    def _refresh_tickets(self):
+        status_val = self.tkt_status_filter.currentData()
+        priority = self.tkt_pri_filter.currentData()
+        term = self.tkt_search.text().strip()
+
+        base = "SELECT * FROM it_ticket"
+        conds, params = [], []
+        if status_val == "open":
+            conds.append("status IN ('open','in_progress')")
+        elif status_val:
+            conds.append("status = ?"); params.append(status_val)
+        if priority:
+            conds.append("priority = ?"); params.append(priority)
+        if term:
+            conds.append("(ticket_number LIKE ? OR requester LIKE ? OR description LIKE ?)")
+            params += [f"%{term}%", f"%{term}%", f"%{term}%"]
+        where = (" WHERE " + " AND ".join(conds)) if conds else ""
+
+        conn = get_db()
+        try:
+            rows = conn.execute(
+                base + where + " ORDER BY submitted_date DESC, ticket_number DESC", params
+            ).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
         conn.close()
 
-        # Clear entry boxes if filled
-        clear_entries()
+        self.tkt_table.setRowCount(0)
+        self._ticket_row_ids = []
+        for row in rows:
+            r = self.tkt_table.rowCount()
+            self.tkt_table.insertRow(r)
+            self._ticket_row_ids.append(row["id"])
+            self.tkt_table.setItem(r, 0, _ro(row["ticket_number"]))
+            self.tkt_table.setItem(r, 1, _ro(row["requester"] or ""))
+            self.tkt_table.setItem(r, 2, _ro(row["department"] or ""))
+            self.tkt_table.setItem(r, 3, _ro(row["issue_type"] or ""))
+            self.tkt_table.setItem(r, 4, _ro(row["priority"].capitalize()))
+            self.tkt_table.setItem(r, 5, _ro(row["assigned_to"] or ""))
+            self.tkt_table.setItem(r, 6, _ro(row["due_date"] or ""))
+            self.tkt_table.setItem(r, 7, _ro(row["status"].replace("_", " ").capitalize()))
+            bg = QtGui.QColor(TICKET_COLORS.get(row["status"], "#ffffff"))
+            for col in range(8):
+                self.tkt_table.item(r, col).setBackground(bg)
+            if row["status"] not in ("resolved", "closed"):
+                pc = PRIORITY_COLORS.get(row["priority"])
+                if pc:
+                    self.tkt_table.item(r, 4).setBackground(pc)
 
-        # Recreate The Table
-        create_table_again()
+        self._selected_ticket_id = None
+        self.tkt_detail_text.clear()
 
-# Clear entry boxes
+    def _on_tkt_show_all(self):
+        self.tkt_search.clear()
+        self.tkt_status_filter.blockSignals(True)
+        self.tkt_status_filter.setCurrentIndex(0)
+        self.tkt_status_filter.blockSignals(False)
+        self.tkt_pri_filter.blockSignals(True)
+        self.tkt_pri_filter.setCurrentIndex(0)
+        self.tkt_pri_filter.blockSignals(False)
+        self._refresh_tickets()
+
+    def _on_ticket_clicked(self, index):
+        row = index.row()
+        if row < 0 or row >= len(self._ticket_row_ids):
+            return
+        self._selected_ticket_id = self._ticket_row_ids[row]
+        conn = get_db()
+        rec = conn.execute(
+            "SELECT * FROM it_ticket WHERE id = ?", (self._selected_ticket_id,)
+        ).fetchone()
+        conn.close()
+        if not rec:
+            return
+        lines = [
+            f"Ticket:      {rec['ticket_number']}",
+            f"Requester:   {rec['requester'] or '—'}  |  Dept: {rec['department'] or '—'}",
+            f"Issue Type:  {rec['issue_type'] or '—'}  |  Priority: {rec['priority'].capitalize()}",
+            f"Assigned To: {rec['assigned_to'] or '—'}",
+            f"Submitted:   {rec['submitted_date'] or '—'}  |  Due: {rec['due_date'] or '—'}",
+            "",
+            "Description:",
+            rec["description"] or "",
+        ]
+        if rec["notes"]:
+            lines += ["", "Notes:", rec["notes"]]
+        self.tkt_detail_text.setPlainText("\n".join(lines))
+
+    def _on_new_ticket(self):
+        dlg = NewTicketDialog(self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh_tickets()
+
+    def _set_tkt_status(self, new_status, msg):
+        if self._selected_ticket_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a ticket first.")
+            return
+        reply = QtWidgets.QMessageBox.question(
+            self, "Confirm", msg,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+        )
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            conn = get_db()
+            extra = ""
+            params = [new_status]
+            if new_status == "resolved":
+                extra = ", resolved_date = ?"
+                params.append(QtCore.QDate.currentDate().toString("yyyy-MM-dd"))
+            params.append(self._selected_ticket_id)
+            conn.execute(f"UPDATE it_ticket SET status = ?{extra} WHERE id = ?", params)
+            conn.commit()
+            conn.close()
+            self._refresh_tickets()
+
+    # ── Assets tab ──────────────────────────────────────────────────────────
+
+    def _build_assets_tab(self):
+        w = QtWidgets.QWidget()
+        _apply_blue_palette(w)
+        v = QtWidgets.QVBoxLayout(w)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(6)
+
+        fr = QtWidgets.QHBoxLayout()
+        lbl_s = QtWidgets.QLabel("Status:")
+        lbl_s.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_s)
+        self.asset_status_filter = QtWidgets.QComboBox()
+        self.asset_status_filter.setStyleSheet(COMBO_STYLE)
+        self.asset_status_filter.addItem("Active", "active")
+        self.asset_status_filter.addItem("Spare", "spare")
+        self.asset_status_filter.addItem("In Repair", "repair")
+        self.asset_status_filter.addItem("Retired", "retired")
+        self.asset_status_filter.addItem("All", None)
+        self.asset_status_filter.currentIndexChanged.connect(self._refresh_assets)
+        fr.addWidget(self.asset_status_filter)
+
+        fr.addSpacing(10)
+        lbl_t = QtWidgets.QLabel("Type:")
+        lbl_t.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_t)
+        self.asset_type_filter = QtWidgets.QComboBox()
+        self.asset_type_filter.setStyleSheet(COMBO_STYLE)
+        self.asset_type_filter.addItem("(all)", None)
+        for t in ("Desktop", "Laptop", "Monitor", "Server", "Printer", "Phone",
+                  "Tablet", "Switch", "Router", "UPS", "Other"):
+            self.asset_type_filter.addItem(t, t)
+        self.asset_type_filter.currentIndexChanged.connect(self._refresh_assets)
+        fr.addWidget(self.asset_type_filter)
+
+        fr.addSpacing(10)
+        lbl_q = QtWidgets.QLabel("Search:")
+        lbl_q.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_q)
+        self.asset_search = QtWidgets.QLineEdit()
+        self.asset_search.setStyleSheet(INPUT_STYLE)
+        self.asset_search.setFixedWidth(160)
+        self.asset_search.returnPressed.connect(self._refresh_assets)
+        fr.addWidget(self.asset_search)
+        b_all = QtWidgets.QPushButton("Show All")
+        b_all.setStyleSheet(BUTTON_STYLE)
+        b_all.setFixedHeight(28)
+        b_all.clicked.connect(self._on_asset_show_all)
+        fr.addWidget(b_all)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        self.asset_table = QtWidgets.QTableWidget()
+        self.asset_table.setColumnCount(9)
+        self.asset_table.setHorizontalHeaderLabels(
+            ["Asset Tag", "Type", "Make", "Model", "Serial #",
+             "Assigned To", "Department", "Warranty Exp", "Status"]
+        )
+        hh = self.asset_table.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        for col in (1, 2, 4, 5, 6, 7, 8):
+            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.asset_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.asset_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.asset_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.asset_table.setAlternatingRowColors(True)
+        self.asset_table.verticalHeader().setVisible(False)
+        v.addWidget(self.asset_table, stretch=1)
+
+        br = QtWidgets.QHBoxLayout()
+        for text, slot in (
+            ("Add Asset",    self._on_new_asset),
+            ("Mark Spare",   lambda: self._set_asset_status("spare",   "Mark as Spare?")),
+            ("Send to Repair", lambda: self._set_asset_status("repair", "Send to Repair?")),
+            ("Mark Retired", lambda: self._set_asset_status("retired", "Retire this asset?")),
+            ("Mark Active",  lambda: self._set_asset_status("active",  "Mark as Active?")),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(32)
+            b.clicked.connect(slot)
+            br.addWidget(b)
+        br.addStretch()
+        v.addLayout(br)
+        self._tabs.addTab(w, "Assets")
+
+    def _refresh_assets(self):
+        status_val = self.asset_status_filter.currentData()
+        asset_type = self.asset_type_filter.currentData()
+        term = self.asset_search.text().strip()
+
+        base = "SELECT * FROM it_asset"
+        conds, params = [], []
+        if status_val:
+            conds.append("status = ?"); params.append(status_val)
+        if asset_type:
+            conds.append("asset_type = ?"); params.append(asset_type)
+        if term:
+            conds.append("(asset_tag LIKE ? OR make LIKE ? OR model LIKE ?"
+                         " OR assigned_to LIKE ? OR serial_number LIKE ?)")
+            params += [f"%{term}%"] * 5
+        where = (" WHERE " + " AND ".join(conds)) if conds else ""
+
+        conn = get_db()
+        try:
+            rows = conn.execute(
+                base + where + " ORDER BY asset_type, asset_tag", params
+            ).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
+        conn.close()
+
+        self.asset_table.setRowCount(0)
+        self._asset_row_ids = []
+        for row in rows:
+            r = self.asset_table.rowCount()
+            self.asset_table.insertRow(r)
+            self._asset_row_ids.append(row["id"])
+            self.asset_table.setItem(r, 0, _ro(row["asset_tag"]))
+            self.asset_table.setItem(r, 1, _ro(row["asset_type"] or ""))
+            self.asset_table.setItem(r, 2, _ro(row["make"] or ""))
+            self.asset_table.setItem(r, 3, _ro(row["model"] or ""))
+            self.asset_table.setItem(r, 4, _ro(row["serial_number"] or ""))
+            self.asset_table.setItem(r, 5, _ro(row["assigned_to"] or ""))
+            self.asset_table.setItem(r, 6, _ro(row["department"] or ""))
+            self.asset_table.setItem(r, 7, _ro(row["warranty_exp"] or ""))
+            self.asset_table.setItem(r, 8, _ro(row["status"].capitalize()))
+            bg = QtGui.QColor(ASSET_STATUS_COLORS.get(row["status"], "#ffffff"))
+            for col in range(9):
+                self.asset_table.item(r, col).setBackground(bg)
+
+    def _on_asset_show_all(self):
+        self.asset_search.clear()
+        self.asset_status_filter.blockSignals(True)
+        self.asset_status_filter.setCurrentIndex(4)
+        self.asset_status_filter.blockSignals(False)
+        self.asset_type_filter.blockSignals(True)
+        self.asset_type_filter.setCurrentIndex(0)
+        self.asset_type_filter.blockSignals(False)
+        self._refresh_assets()
+
+    def _on_new_asset(self):
+        dlg = NewAssetDialog(self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh_assets()
+
+    def _set_asset_status(self, new_status, msg):
+        row = self.asset_table.currentRow()
+        if row < 0 or row >= len(self._asset_row_ids):
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an asset first.")
+            return
+        reply = QtWidgets.QMessageBox.question(
+            self, "Confirm", msg,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+        )
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            conn = get_db()
+            conn.execute("UPDATE it_asset SET status = ? WHERE id = ?",
+                         (new_status, self._asset_row_ids[row]))
+            conn.commit()
+            conn.close()
+            self._refresh_assets()
 
 
-def clear_entries():
-    # Clear entry boxes
-    id_entry.delete(0, END)
-    people_combobox.delete(0, END)
-    call_widget.delete("1.0", END)
-    call_date_entry.delete(0, END)
-    call_time_entry.delete(0, END)
-    completion_date_entry.delete(0, END)
-    completion_time_entry.delete(0, END)
-    comment_widget.delete("1.0", END)
-    checkbox_var.set(0)
+def main():
+    init_db()
+    app = QtWidgets.QApplication(sys.argv)
+    window = ITSupportMenu()
+    if "--assets" in sys.argv:
+        window._tabs.setCurrentIndex(1)
+    window.show()
+    sys.exit(app.exec())
 
 
-# Select Record
-def select_record(e):
-    # Clear entry boxes
-    id_entry.delete(0, END)
-    people_combobox.delete(0, END)
-    call_widget.delete("1.0", END)
-    call_date_entry.delete(0, END)
-    call_time_entry.delete(0, END)
-    completion_date_entry.delete(0, END)
-    completion_time_entry.delete(0, END)
-    comment_widget.delete("1.0", END)
-    checkbox_var.set(0)
-
-    # Grab record Number
-    selected = my_tree.focus()
-    # Grab record values
-    values = my_tree.item(selected, 'values')
-
-    # output to entry boxes
-    id_entry.insert(0, values[0])
-    people_combobox.insert(0, values[1])
-    call_widget.insert("1.0", values[2])
-    call_date_entry.insert(0, values[3])
-    call_time_entry.insert(0, values[4])
-    completion_date_entry.insert(0, values[5])
-    completion_time_entry.insert(0, values[6])
-    comment_widget.insert("1.0", values[7])
-    checkbox_var.set(values[8])
-
-
-# Update record
-def update_record():
-    # Grab the record number
-    selected = my_tree.focus()
-    # Update record
-    my_tree.item(selected, text="", values=(id_entry.get(), people_combobox.get().split(' ')[0].strip('{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(
-    ), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
-    # Update the database
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
-
-    # Create a cursor instance
-    c = conn.cursor()
-
-    c.execute("""UPDATE calls SET
-        people_id = :people,
-        call = :call,
-        call_date = :call_date,
-        call_time = :call_time,
-        completion_date = :completion_date,
-        completion_time = :completion_time,
-        comments_box = :comments_box,
-        completion_box = :completion_box
-
-        WHERE id = %(oid)s""",
-              {
-                  'people': people_combobox.get().split(' ')[0].strip('{'),
-                  'call': call_widget.get("1.0", "end-1c"),
-                  'call_date': _to_iso_date(call_date_entry.get()),
-                  'call_time': call_time_entry.get(),
-                  'completion_date': _to_iso_date(completion_date_entry.get()),
-                  'completion_time': completion_time_entry.get(),
-                  'comments_box': comment_widget.get("1.0", "end-1c"),
-                  'completion_box': checkbox_var.get(),
-                  'oid': id_entry.get(),
-              })
-
-    # Commit changes
-    conn.commit()
-
-    # Close our connection
-    conn.close()
-
-    # Clear entry boxes
-    id_entry.delete(0, END)
-    people_combobox.delete(0, END)
-    call_widget.delete("1.0", END)
-    call_date_entry.delete(0, END)
-    call_time_entry.delete(0, END)
-    completion_date_entry.delete(0, END)
-    completion_time_entry.delete(0, END)
-    comment_widget.delete("1.0", END)
-    checkbox_var.set(0)
-
-
-# add new record to database
-def add_record():
-    # Update the database
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
-
-    # Create a cursor instance
-    c = conn.cursor()
-
-    # Add New Record
-    c.execute("INSERT INTO calls (people_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (people_combobox.get().split(' ')[0].strip(
-        '{'), call_widget.get("1.0", "end-1c"), _to_iso_date(call_date_entry.get()), call_time_entry.get(), _to_iso_date(completion_date_entry.get()), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
-
-    # Commit changes
-    conn.commit()
-
-    # Close our connection
-    conn.close()
-
-    # Clear entry boxes
-    id_entry.delete(0, END)
-    people_combobox.delete(0, END)
-    call_widget.delete("1.0", END)
-    call_date_entry.delete(0, END)
-    call_time_entry.delete(0, END)
-    completion_date_entry.delete(0, END)
-    completion_time_entry.delete(0, END)
-    comment_widget.delete("1.0", END)
-    checkbox_var.set(0)
-
-    # Clear The Treeview Table
-    my_tree.delete(*my_tree.get_children())
-
-    # Run to pull data from database on start
-    query_database()
-
-
-def create_table_again():
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
-
-    # Create a cursor instance
-    c = conn.cursor()
-
-    # Create Table
-    c.execute("""CREATE TABLE if not exists calls (
-        id SERIAL PRIMARY KEY,
-        people_id integer,
-        call text,
-        call_date text,
-        call_time text,
-        completion_date,
-        completion_time,
-        comments_box text,
-        completion_box integer,
-        FOREIGN KEY (people_id) REFERENCES people(id))
-        """)
-
-    # Commit changes
-    conn.commit()
-
-    # Close our connection
-    conn.close()
-
-
-# Add Buttons
-button_frame = LabelFrame(root, text="Commands")
-button_frame.place(x=5, y=565, width=1200, height=75)
-
-update_button = Button(button_frame, text="Update Record", command=update_record)
-update_button.grid(row=0, column=0, padx=10, pady=10)
-
-add_button = Button(button_frame, text="Add Record", command=add_record)
-add_button.grid(row=0, column=1, padx=10, pady=10)
-
-remove_all_button = Button(button_frame, text="Remove All Records", command=remove_all)
-remove_all_button.grid(row=0, column=2, padx=10, pady=10)
-
-remove_one_button = Button(button_frame, text="Remove One Selected", command=remove_one)
-remove_one_button.grid(row=0, column=3, padx=10, pady=10)
-
-remove_many_button = Button(button_frame, text="Remove Many Selected", command=remove_many)
-remove_many_button.grid(row=0, column=4, padx=10, pady=10)
-
-move_up_button = Button(button_frame, text="Move Up", command=up)
-move_up_button.grid(row=0, column=5, padx=10, pady=10)
-
-move_down_button = Button(button_frame, text="Move Down", command=down)
-move_down_button.grid(row=0, column=6, padx=10, pady=10)
-
-select_record_button = Button(button_frame, text="Clear Entry Boxes", command=clear_entries)
-select_record_button.grid(row=0, column=7, padx=10, pady=10)
-
-# Bind the treeview
-my_tree.bind("<ButtonRelease-1>", select_record)
-
-# Initialize database and display data
-setup_database()
-query_database()
-
-root.mainloop()
+if __name__ == "__main__":
+    main()

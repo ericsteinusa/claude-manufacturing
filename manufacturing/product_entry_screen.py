@@ -1,8 +1,8 @@
 import sys
-from .db_connection import get_db_connection
-import os
+import psycopg2
+from db_pg import get_db
+from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -32,11 +32,6 @@ TRANS_COLORS = {
     "issue": QtGui.QColor(255, 200, 200),
     "adjustment": QtGui.QColor(220, 235, 255),
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():

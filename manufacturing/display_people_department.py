@@ -1,4 +1,5 @@
-from .db_connection import get_db_connection
+import psycopg2
+from db_pg import get_db
 from tkinter import *
 from tkinter import ttk
 
@@ -6,7 +7,7 @@ from tkinter import ttk
 
 
 def setup_database():
-    conn = get_db_connection()
+    conn = get_db()
     cursor = conn.cursor()
 
     # Create Parent table
@@ -46,7 +47,7 @@ def setup_database():
 
 
 def fetch_data():
-    conn = get_db_connection()
+    conn = get_db()
     cursor = conn.cursor()
 
     query = """

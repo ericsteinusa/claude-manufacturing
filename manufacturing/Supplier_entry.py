@@ -1,10 +1,8 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
-import os
+import psycopg2
+from db_pg import get_db
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -29,11 +27,6 @@ PO_COLORS = {
     "received": QtGui.QColor(212, 237, 218),
     "cancelled": QtGui.QColor(220, 220, 220),
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
@@ -209,7 +202,7 @@ class NewPODialog(QtWidgets.QDialog):
                   "open",
                   self.notes.text().strip() or None))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "PO number already exists.")
             conn.close()
             return
@@ -258,7 +251,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
             products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
             for p in products:
                 self.prod_combo.addItem(p["name"], p["id"])
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
         conn.close()
         self.prod_combo.currentIndexChanged.connect(self._on_product_changed)
@@ -298,7 +291,7 @@ class AddLineItemDialog(QtWidgets.QDialog):
                     self.desc.setText(p["name"])
                 if p["purchase_price"]:
                     self.price.setValue(float(p["purchase_price"]))
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pass
         conn.close()
 
@@ -419,7 +412,7 @@ class ReceivePODialog(QtWidgets.QDialog):
                         VALUES (%s,%s,%s,%s,%s,%s)
                     """, (product_id, today, "receipt", qty, po_num,
                           f"Received from PO {po_num}"))
-                except sqlite3.OperationalError:
+                except psycopg2.OperationalError:
                     pass
 
         all_items = conn.execute(
@@ -866,7 +859,7 @@ class Purchasing(QtWidgets.QMainWindow):
         if status != "(all status)":
             q += " AND po.status=%s"
             params.append(status)
-        q += " GROUP BY po.id ORDER BY po.order_date DESC"
+        q += " GROUP BY po.id, po.po_number, po.order_date, po.expected_date, po.status, s.first_name, s.last_name, s.company_name ORDER BY po.order_date DESC"
         rows = conn.execute(q, params).fetchall()
         conn.close()
 

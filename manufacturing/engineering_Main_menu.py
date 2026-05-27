@@ -1,16 +1,7 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-
-def _apply_blue_palette(widget):
-    pal = QtGui.QPalette()
-    for g in (QtGui.QPalette.ColorGroup.Active,
-              QtGui.QPalette.ColorGroup.Inactive,
-              QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(g, QtGui.QPalette.ColorRole.Window, QtGui.QColor(0, 85, 255))
-        pal.setColor(g, QtGui.QPalette.ColorRole.Button, QtGui.QColor(0, 85, 255))
-    widget.setPalette(pal)
-
+BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
     "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
@@ -22,6 +13,16 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
+
+
+def _apply_blue_palette(widget):
+    pal = widget.palette()
+    for group in (QtGui.QPalette.ColorGroup.Active,
+                  QtGui.QPalette.ColorGroup.Inactive,
+                  QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
+        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
+    widget.setPalette(pal)
 
 
 def _launch(script):
@@ -48,13 +49,14 @@ def _launch_tab(script, label):
 class EngineeringMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Engineering Menu")
+        self.setWindowTitle("Engineering Main Menu")
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
@@ -66,5 +68,6 @@ class EngineeringMainMenu(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = EngineeringMainMenu(); w.show()
+    w = EngineeringMainMenu()
+    w.show()
     sys.exit(app.exec())

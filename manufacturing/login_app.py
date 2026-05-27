@@ -1,15 +1,7 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
+import psycopg2
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-
-# ---------------------------------------------------------------------------
-# Database helpers
-# ---------------------------------------------------------------------------
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
@@ -144,7 +136,7 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         conn.commit()
         conn.close()
         return True
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         return False
 
 
@@ -829,7 +821,7 @@ class SessionWindow(QtWidgets.QMainWindow):
 
     def _on_logout(self):
         reply = QtWidgets.QMessageBox.question(
-            self, "Logout", "Are you sure you want to logout%s",
+            self, "Logout", "Are you sure you want to logout?",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
@@ -885,7 +877,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.passwd_input.returnPressed.connect(self._on_login)
         layout.addWidget(self.login_btn)
 
-        forgot_btn = QtWidgets.QPushButton("Forgot Password%s")
+        forgot_btn = QtWidgets.QPushButton("Forgot Password?")
         forgot_btn.setFixedHeight(28)
         forgot_btn.setStyleSheet(LINK_STYLE)
         forgot_btn.clicked.connect(self._open_forgot_password)

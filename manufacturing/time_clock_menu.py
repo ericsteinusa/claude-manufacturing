@@ -1,9 +1,8 @@
 import sys
-from .db_connection import get_db_connection
-import os
-from datetime import datetime, date
+import psycopg2
+from db_pg import get_db
+from datetime import datetime, date, timedelta
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -31,11 +30,6 @@ INPUT_STYLE = (
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 DT_FMT = "%Y-%m-%d %H:%M:%S"
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
@@ -206,6 +200,7 @@ _TAB_KEYS = {
 class TimeClockWidget(QtWidgets.QWidget):
     def __init__(self, parent=None, initial_tab=None):
         super().__init__(parent)
+        init_db()
         _apply_blue_palette(self)
         self._clock_people_id = None
         self._records_row_ids = []
@@ -411,7 +406,7 @@ class TimeClockWidget(QtWidgets.QWidget):
     def _load_employees(self):
         conn = get_db()
         rows = conn.execute(
-            "SELECT id, first_name, last_name, ID as emp_id FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name, emp_id FROM people ORDER BY last_name, first_name"
         ).fetchall()
         conn.close()
 

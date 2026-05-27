@@ -1,9 +1,7 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
-import os
+import psycopg2
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -18,23 +16,18 @@ COMBO_STYLE = (
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 SHIP_COLORS = {
-    "pending": "#ffffff",
-    "shipped": "#fff3cd",
+    "pending":   "#ffffff",
+    "shipped":   "#fff3cd",
     "delivered": "#d4edda",
-    "returned": "#dcdcdc",
+    "returned":  "#dcdcdc",
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS shipment (
-            id SERIAL PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             ship_number TEXT NOT NULL UNIQUE,
             so_id INTEGER,
             ship_date TEXT,
@@ -46,7 +39,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS shipment_item (
-            id SERIAL PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             shipment_id INTEGER NOT NULL REFERENCES shipment(id),
             description TEXT NOT NULL,
             product_id INTEGER,
@@ -77,7 +70,7 @@ def _next_ship_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM shipment WHERE ship_number LIKE %s", (f"SH-{yr}-%",)
+        "SELECT COUNT(*) FROM shipment WHERE ship_number LIKE ?", (f"SH-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"SH-{yr}-{count + 1:04d}"
@@ -99,9 +92,9 @@ class NewShipmentDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.ship_num = QtWidgets.QLineEdit(_next_ship_num())
         self.ship_num.setStyleSheet(INPUT_STYLE)
@@ -115,7 +108,7 @@ class NewShipmentDialog(QtWidgets.QDialog):
                 "SELECT id, so_number FROM sales_order"
                 " WHERE status NOT IN ('cancelled','invoiced') ORDER BY so_number"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             sos = []
         conn.close()
         self.so_combo.addItem("(none)", None)
@@ -165,15 +158,15 @@ class NewShipmentDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO shipment (ship_number, so_id, ship_date, carrier,"
-                " tracking_number, status, notes) VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                " tracking_number, status, notes) VALUES (?,?,?,?,?,?,?)",
                 (ship_num, self.so_combo.currentData(),
                  self.ship_date.date().toString("yyyy-MM-dd"),
                  self.carrier.text().strip(), self.tracking.text().strip(),
                  self.status_combo.currentData(), self.notes.text().strip())
             )
-            self.shipment_id = cur.fetchone()['id']
+            self.shipment_id = cur.lastrowid
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Shipment number '{ship_num}' already exists.")
             conn.close()
@@ -196,9 +189,9 @@ class AddShipItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -208,7 +201,7 @@ class AddShipItemDialog(QtWidgets.QDialog):
             prods = conn.execute(
                 "SELECT id, product_name FROM product ORDER BY product_name"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             prods = []
         conn.close()
         self.product_combo.addItem("(none)", None)
@@ -247,7 +240,7 @@ class AddShipItemDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO shipment_item (shipment_id, description, product_id, qty) VALUES (%s,%s,%s,%s)",
+            "INSERT INTO shipment_item (shipment_id, description, product_id, qty) VALUES (?,?,?,?)",
             (self._shipment_id, desc, self.product_combo.currentData(), self.qty.value())
         )
         conn.commit()
@@ -257,7 +250,6 @@ class AddShipItemDialog(QtWidgets.QDialog):
 
 class UpdateShipmentDialog(QtWidgets.QDialog):
     """Edit carrier/tracking on an existing shipment."""
-
     def __init__(self, shipment_id, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Update Shipment")
@@ -272,9 +264,9 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.ship_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         self.ship_date.setCalendarPopup(True)
@@ -303,7 +295,7 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
 
     def _load(self):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM shipment WHERE id = %s", (self._shipment_id,)).fetchone()
+        rec = conn.execute("SELECT * FROM shipment WHERE id = ?", (self._shipment_id,)).fetchone()
         conn.close()
         if not rec:
             return
@@ -316,7 +308,7 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
     def _on_ok(self):
         conn = get_db()
         conn.execute(
-            "UPDATE shipment SET ship_date=%s, carrier=%s, tracking_number=%s, notes=%s WHERE id=%s",
+            "UPDATE shipment SET ship_date=?, carrier=?, tracking_number=?, notes=? WHERE id=?",
             (self.ship_date.date().toString("yyyy-MM-dd"),
              self.carrier.text().strip(), self.tracking.text().strip(),
              self.notes.text().strip(), self._shipment_id)
@@ -328,9 +320,11 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
-class ShippingDeptWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+class ShippingDept(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Shipping Department")
+        self.resize(920, 640)
         _apply_blue_palette(self)
         self._ship_row_ids = []
         self._selected_ship_id = None
@@ -340,7 +334,10 @@ class ShippingDeptWidget(QtWidgets.QWidget):
         self._refresh_shipments()
 
     def _build_ui(self):
-        v = QtWidgets.QVBoxLayout(self)
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
 
@@ -434,12 +431,12 @@ class ShippingDeptWidget(QtWidgets.QWidget):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Shipment", self._on_new_shipment),
-            ("Add Item", self._on_add_item),
-            ("Update Details", self._on_update_shipment),
-            ("Mark Shipped", lambda: self._set_status("shipped", "Mark as Shipped%s")),
-            ("Mark Delivered", lambda: self._set_status("delivered", "Mark as Delivered%s")),
-            ("Mark Returned", lambda: self._set_status("returned", "Mark as Returned%s")),
+            ("New Shipment",    self._on_new_shipment),
+            ("Add Item",        self._on_add_item),
+            ("Update Details",  self._on_update_shipment),
+            ("Mark Shipped",    lambda: self._set_status("shipped",   "Mark as Shipped?")),
+            ("Mark Delivered",  lambda: self._set_status("delivered", "Mark as Delivered?")),
+            ("Mark Returned",   lambda: self._set_status("returned",  "Mark as Returned?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -452,7 +449,7 @@ class ShippingDeptWidget(QtWidgets.QWidget):
     def _refresh_shipments(self):
         status = self.status_filter.currentData()
         d_from = self.date_from.date().toString("yyyy-MM-dd")
-        d_to = self.date_to.date().toString("yyyy-MM-dd")
+        d_to   = self.date_to.date().toString("yyyy-MM-dd")
 
         base = """
             SELECT s.id, s.ship_number, s.ship_date, s.carrier, s.tracking_number, s.status,
@@ -463,16 +460,15 @@ class ShippingDeptWidget(QtWidgets.QWidget):
         """
         conds, params = [], []
         if status:
-            conds.append("s.status = %s")
-            params.append(status)
-        conds.append("(s.ship_date IS NULL OR s.ship_date BETWEEN %s AND %s)")
+            conds.append("s.status = ?"); params.append(status)
+        conds.append("(s.ship_date IS NULL OR s.ship_date BETWEEN ? AND ?)")
         params += [d_from, d_to]
         where = " WHERE " + " AND ".join(conds)
 
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY s.ship_date DESC", params).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -526,11 +522,11 @@ class ShippingDeptWidget(QtWidgets.QWidget):
             items = conn.execute("""
                 SELECT si.description, p.product_name, si.qty
                 FROM shipment_item si LEFT JOIN product p ON p.id = si.product_id
-                WHERE si.shipment_id = %s
+                WHERE si.shipment_id = ?
             """, (self._selected_ship_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             items = conn.execute(
-                "SELECT description, NULL AS product_name, qty FROM shipment_item WHERE shipment_id = %s",
+                "SELECT description, NULL AS product_name, qty FROM shipment_item WHERE shipment_id = ?",
                 (self._selected_ship_id,)
             ).fetchall()
         conn.close()
@@ -573,20 +569,11 @@ class ShippingDeptWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE shipment SET status = %s WHERE id = %s",
+            conn.execute("UPDATE shipment SET status = ? WHERE id = ?",
                          (new_status, self._selected_ship_id))
             conn.commit()
             conn.close()
             self._refresh_shipments()
-
-
-class ShippingDept(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Shipping Department")
-        self.resize(920, 640)
-        _apply_blue_palette(self)
-        self.setCentralWidget(ShippingDeptWidget())
 
 
 def main():

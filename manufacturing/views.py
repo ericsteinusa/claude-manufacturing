@@ -1,8 +1,7 @@
 import os
 import sys
-import sqlite3
 import subprocess
-from .db_connection import get_db_connection
+import psycopg2
 from django.shortcuts import render, redirect
 
 
@@ -1484,45 +1483,7 @@ def _walk_tree(dept, parts):
     return node
 
 
-
-# Maps dept.dept_name → MENU_TREE key (None = full access, e.g. Company)
-DEPT_MENU_KEY = {
-    'Accounting': 'accounting',
-    'Customer Service': 'customer_service',
-    'Engineering': 'engineering',
-    'Information Technologies': 'information_tech',
-    'Maintenance': 'maintenance',
-    'Marketing': 'marketing',
-    'Personnel': 'personnel',
-    'Production': 'production',
-    'Purchasing': 'purchasing',
-    'Quality Assurance': 'quality_assurance',
-    'Sales': 'sales',
-    'Budget Management': 'budget_management',
-    'Company': None,   # full access
-    'Labs': 'quality_assurance',
-    'Finance': 'finance',
-    'Legal': 'legal',
-    'Risk Management': 'risk_management',
-}
-
-FULL_ACCESS_ROLES = {'Admin', 'President', 'Vice President', 'Auditor'}
-READ_ONLY_ROLES = {'Auditor'}   # can browse all depts but cannot launch scripts
-
-# dept_sub_ids whose holders are department managers
-MANAGER_DEPT_SUB_IDS = {5, 7, 10, 11, 13, 15, 17, 19, 22, 24, 25, 26, 28, 31, 33, 36, 40}
-
-# MENU_TREE item keys that are hidden from non-managers
-MANAGER_MENU_KEYS = {
-    'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr',
-    'mkt_mgr', 'pers_mgr', 'prod_mgr', 'purch_mgr', 'qa_mgr', 'sales_mgr',
-    'fin_mgr', 'legal_mgr', 'risk_mgr',
-}
-
-
-def _get_db():
-    conn = get_db_connection()
-    return conn
+from .db_pg import get_db as _get_db
 
 
 def _init_schema():
@@ -1602,12 +1563,43 @@ def _ensure_roles():
     conn.close()
 
 
+DEPT_MENU_KEY = {
+    'Accounting': 'accounting',
+    'Customer Service': 'customer_service',
+    'Engineering': 'engineering',
+    'Information Tech': 'information_tech',
+    'Information Technologies': 'information_tech',
+    'Maintenance': 'maintenance',
+    'Marketing': 'marketing',
+    'Personnel': 'personnel',
+    'Production': 'production',
+    'Purchasing': 'purchasing',
+    'Quality Assurance': 'quality_assurance',
+    'Sales': 'sales',
+    'Budget Management': 'budget_management',
+    'Finance': 'finance',
+    'Legal': 'legal',
+    'Risk Management': 'risk_management',
+}
+
+FULL_ACCESS_ROLES = {'President', 'Vice President'}
+
+MANAGER_DEPT_SUB_IDS = set()
+
+MANAGER_MENU_KEYS = {
+    'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr', 'mkt_mgr',
+    'pers_mgr', 'prod_mgr', 'purch_mgr', 'qa_mgr', 'sales_mgr',
+}
+
+READ_ONLY_ROLES = {'Auditor'}
+
+
 def _get_user_profile(email: str) -> dict:
     conn = _get_db()
     row = conn.execute("""
-        SELECT p.id, p.dept_id, p.dept_Sub_id, d.dept_name,
+        SELECT p.id, p.dept_id, p.dept_sub_id, d.dept_name,
                r.role_name,
-               pos.position
+               pos.job_title AS position
         FROM people p
         LEFT JOIN dept d ON d.dept_id = p.dept_id
         LEFT JOIN user_roles ur ON ur.people_id = p.id
@@ -1621,10 +1613,10 @@ def _get_user_profile(email: str) -> dict:
     dept_name = row['dept_name'] or ''
     dept_key = DEPT_MENU_KEY.get(dept_name)
     role_name = row['role_name'] or ''
-    dept_sub_id = row['dept_Sub_id']
+    dept_sub_id = row['dept_sub_id']
     is_manager = (
         dept_sub_id in MANAGER_DEPT_SUB_IDS
-        or role_name in {'Department Manager'} | FULL_ACCESS_ROLES
+        or role_name in {'Department Manager', 'Admin'} | FULL_ACCESS_ROLES
     )
     return {
         'people_id': row['id'],
@@ -1682,7 +1674,7 @@ def _create_user(email, password, first_name='', last_name='',
         conn.commit()
         conn.close()
         return True
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         return False
 
 

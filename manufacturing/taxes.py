@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from .db_connection import get_db_connection
+import psycopg2
+from db_pg import get_db
 from tkinter import colorchooser
 from configparser import ConfigParser
 
@@ -28,12 +29,15 @@ saved_highlight_color = parser.get('colors', 'highlight_color')
 
 
 def query_database():
-    # Clear the Treeview
-    for record in my_tree.get_children():
-        my_tree.delete(record)
+	# Clear the Treeview
+	for record in my_tree.get_children():
+		my_tree.delete(record)
+		
+	# Create a database or connect to one that exists
+	conn = get_db()
 
     # Create a database or connect to one that exists
-    conn = get_db_connection()
+    conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -66,16 +70,23 @@ def query_database():
 
 
 def search_records():
-    lookup_record = search_entry.get()
-    # close the search box
-    search.destroy()
+	lookup_record = search_entry.get()
+	# close the search box
+	search.destroy()
+	
+	# Clear the Treeview
+	for record in my_tree.get_children():
+		my_tree.delete(record)
+	
+	# Create a database or connect to one that exists
+	conn = get_db()
 
     # Clear the Treeview
     for record in my_tree.get_children():
         my_tree.delete(record)
 
     # Create a database or connect to one that exists
-    conn = get_db_connection()
+    conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -231,7 +242,7 @@ search_menu.add_command(label="Reset", command=query_database)
 
 # Do some database stuff
 # Create a database or connect to one that exists
-conn = get_db_connection()
+conn = get_db()
 
 # Create a cursor instance
 c = conn.cursor()
@@ -354,8 +365,8 @@ def remove_one():
     x = my_tree.selection()[0]
     my_tree.delete(x)
 
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
+	# Create a database or connect to one that exists
+	conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -393,12 +404,11 @@ def remove_many():
         for record in x:
             ids_to_delete.append(my_tree.item(record, 'values')[2])
 
-        # Delete From Treeview
-        for record in x:
-            my_tree.delete(record)
+		# Create a database or connect to one that exists
+		conn = get_db()
 
         # Create a database or connect to one that exists
-        conn = get_db_connection()
+        conn = get_db()
 
         # Create a cursor instance
         c = conn.cursor()
@@ -430,8 +440,8 @@ def remove_all():
         for record in my_tree.get_children():
             my_tree.delete(record)
 
-        # Create a database or connect to one that exists
-        conn = get_db_connection()
+		# Create a database or connect to one that exists
+		conn = get_db()
 
         # Create a cursor instance
         c = conn.cursor()
@@ -487,9 +497,9 @@ def update_record():
     # Update record
     my_tree.item(selected, text="", values=(st_entry.get(), pcnt_entry.get(), id_entry.get()))
 
-    # Update the database
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
+	# Update the database
+	# Create a database or connect to one that exists
+	conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -519,9 +529,9 @@ def update_record():
 
 # add new record to database
 def add_record():
-    # Update the database
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
+	# Update the database
+	# Create a database or connect to one that exists
+	conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()
@@ -548,8 +558,8 @@ def add_record():
 
 
 def create_table_again():
-    # Create a database or connect to one that exists
-    conn = get_db_connection()
+	# Create a database or connect to one that exists
+	conn = get_db()
 
     # Create a cursor instance
     c = conn.cursor()

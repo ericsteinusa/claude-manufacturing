@@ -1,10 +1,8 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
-import os
+import psycopg2
+from db_pg import get_db
 import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -38,11 +36,6 @@ TASK_TYPES = (
     "Backup / Recovery", "Security", "Network", "Hardware Setup",
     "Software Deployment", "User Setup", "Other",
 )
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
@@ -91,7 +84,7 @@ def _next_task_num():
         count = conn.execute(
             "SELECT COUNT(*) FROM it_task WHERE task_number LIKE %s", (f"TASK-{yr}-%",)
         ).fetchone()[0]
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         count = 0
     conn.close()
     return f"TASK-{yr}-{count + 1:04d}"
@@ -201,7 +194,7 @@ class NewTaskDialog(QtWidgets.QDialog):
             )
             self.task_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Task number '{num}' already exists.")
             conn.close()
@@ -398,7 +391,7 @@ class ITTasksWidget(QtWidgets.QWidget):
             rows = conn.execute(
                 base + where + " ORDER BY due_date, task_number", params
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 

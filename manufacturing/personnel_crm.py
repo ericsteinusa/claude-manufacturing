@@ -1,14 +1,12 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
-import os
-from PyQt6 import QtGui, QtWidgets
-
+import psycopg2
+from db_pg import get_db
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
 INPUT_STYLE = (
     "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
@@ -20,32 +18,24 @@ COMBO_STYLE = (
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 
-def get_db():
-    conn = get_db_connection()
-    return conn
-
-
 def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS dept (
-            dept_id SERIAL PRIMARY KEY,
+            dept_id INTEGER PRIMARY KEY AUTOINCREMENT,
             dept_name TEXT NOT NULL
         )
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS dept_sub (
-            dept_sub_id SERIAL PRIMARY KEY,
+            dept_sub_id INTEGER PRIMARY KEY AUTOINCREMENT,
             dept_sub_name TEXT NOT NULL
         )
     """)
-    for col in ("employee_id INTEGER",
+    for col in ("emp_id INTEGER",
                 "dept_id INTEGER REFERENCES dept(dept_id)",
                 "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
-        try:
-            conn.execute(f"ALTER TABLE people ADD COLUMN {col}")
-        except sqlite3.OperationalError:
-            pass
+        conn.execute(f"ALTER TABLE people ADD COLUMN IF NOT EXISTS {col}")
     conn.commit()
     conn.close()
 
@@ -60,9 +50,11 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-class PersonnelCRMWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+class PersonnelCRM(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Personnel CRM")
+        self.resize(1300, 720)
         _apply_blue_palette(self)
         self._selected_row_id = None
         self._row_ids = []
@@ -71,7 +63,9 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         self._refresh_table()
 
     def _build_ui(self):
-        layout = QtWidgets.QVBoxLayout(self)
+        central = QtWidgets.QWidget()
+        self.setCentralWidget(central)
+        layout = QtWidgets.QVBoxLayout(central)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
@@ -120,7 +114,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         form_group.setStyleSheet(
             "QGroupBox{color: white; font-weight: bold;"
             " border: 1px solid white; margin-top: 8px;}"
-            "QGroupBox:%(title)s{subcontrol-origin: margin; left: 10px;}"
+            "QGroupBox::title{subcontrol-origin: margin; left: 10px;}"
         )
         fg = QtWidgets.QGridLayout(form_group)
         fg.setSpacing(6)
@@ -137,15 +131,15 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
                 w.setPlaceholderText(ph)
             return w
 
-        self.fn_input = inp("First name")
-        self.ln_input = inp("Last name")
+        self.fn_input    = inp("First name")
+        self.ln_input    = inp("Last name")
         self.empid_input = inp("Numbers only")
-        self.addr_input = inp("Street address")
-        self.city_input = inp("City")
+        self.addr_input  = inp("Street address")
+        self.city_input  = inp("City")
         self.state_input = inp("ST")
         self.state_input.setMaxLength(2)
         self.state_input.setFixedWidth(44)
-        self.zip_input = inp("Zip")
+        self.zip_input   = inp("Zip")
         self.zip_input.setFixedWidth(90)
         self.email_input = inp("Email address")
 
@@ -159,40 +153,40 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         self.dept_sub_combo.setMinimumWidth(160)
 
         # Row 0: name / emp id / email
-        fg.addWidget(lbl2("First Name:"), 0, 0)
-        fg.addWidget(self.fn_input, 0, 1)
-        fg.addWidget(lbl2("Last Name:"), 0, 2)
-        fg.addWidget(self.ln_input, 0, 3)
-        fg.addWidget(lbl2("Emp ID:"), 0, 4)
-        fg.addWidget(self.empid_input, 0, 5)
-        fg.addWidget(lbl2("Email:"), 0, 6)
-        fg.addWidget(self.email_input, 0, 7)
+        fg.addWidget(lbl2("First Name:"),  0, 0)
+        fg.addWidget(self.fn_input,         0, 1)
+        fg.addWidget(lbl2("Last Name:"),   0, 2)
+        fg.addWidget(self.ln_input,         0, 3)
+        fg.addWidget(lbl2("Emp ID:"),      0, 4)
+        fg.addWidget(self.empid_input,      0, 5)
+        fg.addWidget(lbl2("Email:"),        0, 6)
+        fg.addWidget(self.email_input,      0, 7)
 
         # Row 1: address / city / state
-        fg.addWidget(lbl2("Address:"), 1, 0)
-        fg.addWidget(self.addr_input, 1, 1, 1, 3)
-        fg.addWidget(lbl2("City:"), 1, 4)
-        fg.addWidget(self.city_input, 1, 5)
-        fg.addWidget(lbl2("State:"), 1, 6)
-        fg.addWidget(self.state_input, 1, 7)
+        fg.addWidget(lbl2("Address:"),      1, 0)
+        fg.addWidget(self.addr_input,       1, 1, 1, 3)
+        fg.addWidget(lbl2("City:"),         1, 4)
+        fg.addWidget(self.city_input,       1, 5)
+        fg.addWidget(lbl2("State:"),        1, 6)
+        fg.addWidget(self.state_input,      1, 7)
 
         # Row 2: zip / dept / dept sub
-        fg.addWidget(lbl2("Zip:"), 2, 0)
-        fg.addWidget(self.zip_input, 2, 1)
-        fg.addWidget(lbl2("Department:"), 2, 2)
-        fg.addWidget(self.dept_combo, 2, 3)
-        fg.addWidget(lbl2("Dept Sub:"), 2, 4)
-        fg.addWidget(self.dept_sub_combo, 2, 5)
+        fg.addWidget(lbl2("Zip:"),          2, 0)
+        fg.addWidget(self.zip_input,        2, 1)
+        fg.addWidget(lbl2("Department:"),   2, 2)
+        fg.addWidget(self.dept_combo,       2, 3)
+        fg.addWidget(lbl2("Dept Sub:"),     2, 4)
+        fg.addWidget(self.dept_sub_combo,   2, 5)
 
         layout.addWidget(form_group)
 
         # ── Action buttons ─────────────────────────────────────────────────
         btn_row = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add New", self._on_add),
+            ("Add New",        self._on_add),
             ("Update Selected", self._on_update),
             ("Delete Selected", self._on_delete),
-            ("Clear Form", self._clear_form),
+            ("Clear Form",     self._clear_form),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -248,7 +242,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         """
         if search_term:
             rows = conn.execute(
-                q + " WHERE p.last_name LIKE %s ORDER BY p.last_name, p.first_name",
+                q + " WHERE p.last_name LIKE ? ORDER BY p.last_name, p.first_name",
                 (f"%{search_term}%",)
             ).fetchall()
         else:
@@ -265,7 +259,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
             self._row_ids.append(row["id"])
             for col, val in enumerate([
                 row["first_name"], row["last_name"],
-                str(row["employee_id"] or ""),
+                str(row["emp_id"] or ""),
                 row["address"] or "", row["city"] or "",
                 row["state"] or "", row["zip_code"] or "",
                 row["email"] or "",
@@ -291,7 +285,7 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
             return
         self._selected_row_id = self._row_ids[row]
         conn = get_db()
-        p = conn.execute("SELECT * FROM people WHERE id = %s", (self._selected_row_id,)).fetchone()
+        p = conn.execute("SELECT * FROM people WHERE id = ?", (self._selected_row_id,)).fetchone()
         conn.close()
         if not p:
             return
@@ -299,14 +293,14 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         keys = p.keys()
         self.fn_input.setText(p["first_name"] or "")
         self.ln_input.setText(p["last_name"] or "")
-        self.empid_input.setText(str(p["employee_id"] or ""))
+        self.empid_input.setText(str(p["emp_id"] or ""))
         self.addr_input.setText(p["address"] or "")
         self.city_input.setText(p["city"] or "")
         self.state_input.setText(p["state"] or "")
         self.zip_input.setText(p["zip_code"] or "")
         self.email_input.setText(p["email"] or "")
 
-        dept_id = p["dept_id"] if "dept_id" in keys else None
+        dept_id     = p["dept_id"]     if "dept_id"     in keys else None
         dept_sub_id = p["dept_Sub_id"] if "dept_Sub_id" in keys else None
 
         idx = self.dept_combo.findData(dept_id)
@@ -322,15 +316,15 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "Input Error", "Employee ID must be a number.")
             return None
         return {
-            "first_name": self.fn_input.text().strip(),
-            "last_name": self.ln_input.text().strip(),
-            "employee_id": int(emp_id_text) if emp_id_text else 0,
-            "address": self.addr_input.text().strip(),
-            "city": self.city_input.text().strip(),
-            "state": self.state_input.text().strip().upper(),
-            "zip_code": self.zip_input.text().strip(),
-            "email": self.email_input.text().strip(),
-            "dept_id": self.dept_combo.currentData(),
+            "first_name":  self.fn_input.text().strip(),
+            "last_name":   self.ln_input.text().strip(),
+            "emp_id":      int(emp_id_text) if emp_id_text else 0,
+            "address":     self.addr_input.text().strip(),
+            "city":        self.city_input.text().strip(),
+            "state":       self.state_input.text().strip().upper(),
+            "zip_code":    self.zip_input.text().strip(),
+            "email":       self.email_input.text().strip(),
+            "dept_id":     self.dept_combo.currentData(),
             "dept_Sub_id": self.dept_sub_combo.currentData(),
         }
 
@@ -356,10 +350,10 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             INSERT INTO people
-                (first_name, last_name, employee_id, address, city, state, zip_code, email, dept_id, dept_Sub_id)
+                (first_name, last_name, emp_id, address, city, state, zip_code, email, dept_id, dept_Sub_id)
             VALUES
-                (%(first_name)s, %(last_name)s, %(employee_id)s, %(address)s, %(city)s, %(state)s, %(zip_code)s, %(email)s,
-                 %(dept_id)s, :dept_Sub_id)
+                (:first_name, :last_name, :emp_id, :address, :city, :state, :zip_code, :email,
+                 :dept_id, :dept_Sub_id)
         """, data)
         conn.commit()
         conn.close()
@@ -377,17 +371,17 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             UPDATE people SET
-                first_name  = %(first_name)s,
-                last_name   = %(last_name)s,
-                emp_id      = %(employee_id)s,
-                address     = %(address)s,
-                city        = %(city)s,
-                state       = %(state)s,
-                zip_code    = %(zip_code)s,
-                email       = %(email)s,
-                dept_id     = %(dept_id)s,
+                first_name  = :first_name,
+                last_name   = :last_name,
+                emp_id      = :emp_id,
+                address     = :address,
+                city        = :city,
+                state       = :state,
+                zip_code    = :zip_code,
+                email       = :email,
+                dept_id     = :dept_id,
                 dept_Sub_id = :dept_Sub_id
-            WHERE id = %(row_id)s
+            WHERE id = :row_id
         """, data)
         conn.commit()
         conn.close()
@@ -398,25 +392,16 @@ class PersonnelCRMWidget(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
             return
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this employee record%s",
+            self, "Confirm Delete", "Delete this employee record?",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM people WHERE id = %s", (self._selected_row_id,))
+            conn.execute("DELETE FROM people WHERE id = ?", (self._selected_row_id,))
             conn.commit()
             conn.close()
             self._clear_form()
             self._refresh_table()
-
-
-class PersonnelCRM(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Personnel CRM")
-        self.resize(1300, 720)
-        _apply_blue_palette(self)
-        self.setCentralWidget(PersonnelCRMWidget())
 
 
 def main():

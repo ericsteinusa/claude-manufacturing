@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from Sales_menu import SalesOrdersWidget, _apply_blue_palette
+from Sales_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -60,7 +60,7 @@ class MarketingMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(SalesOrdersWidget(), "Sales Orders")
+        tabs.addTab(_launch_tab("Sales_menu.py", "Sales Orders"), "Sales Orders")
         tabs.addTab(_launch_tab("customer_entry.py", "Customer Contacts"), "Customer Contacts")
         tabs.addTab(_placeholder_tab("Campaign Tracker"), "Campaign Tracker")
         tabs.addTab(_placeholder_tab("Market Research"), "Market Research")

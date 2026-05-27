@@ -4,7 +4,7 @@ Tabs: Staff Directory | Performance Metrics | Staff Training | Staff Reports
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -32,7 +32,7 @@ LABEL_STYLE = "color%(white)s;font-size:13px;"
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 
@@ -220,7 +220,6 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             self.dir_tbl.setItem(r, 4, _ro_c(row["zip_code"] or ""))
             self.dir_tbl.setItem(r, 5, _ro_c(str(row["emp_id"] or "")))
 
-        self.statusBar().showMessage(f"{len(rows)} CS staff member(s)")
 
     # ── Performance Metrics ───────────────────────────────────────────────
 
@@ -607,7 +606,7 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.call_date BETWEEN %s AND %s
-                GROUP BY c2.customer_id
+                GROUP BY c2.customer_id, cu.first_name, cu.last_name, cu.company_name
                 ORDER BY total DESC
             """, (f, t)).fetchall()
 

@@ -1,6 +1,5 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -23,10 +22,6 @@ PO_COLORS = {
     "received":  "#d4edda",
     "cancelled": "#dcdcdc",
 }
-
-
-def get_db():
-    return get_db_connection()
 
 
 def init_db():

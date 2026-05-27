@@ -1,65 +1,72 @@
+import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-import sys
-import subprocess
-import os
+
+BLUE = QtGui.QColor(0, 85, 255)
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
 
 
-class Ui_Risk_mgmt_main_menu(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("Risk_mgmt_main_menu")
-        MainWindow.resize(800, 600)
-        palette = QtGui.QPalette()
-        blue = QtGui.QColor(0, 85, 255)
-        palette.setColor(QtGui.QPalette.ColorRole.Window, blue)
-        palette.setColor(QtGui.QPalette.ColorRole.Button, blue)
-        MainWindow.setPalette(palette)
+def _apply_blue_palette(widget):
+    pal = widget.palette()
+    for group in (QtGui.QPalette.ColorGroup.Active,
+                  QtGui.QPalette.ColorGroup.Inactive,
+                  QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
+        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
+    widget.setPalette(pal)
 
-        self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
-        layout = QtWidgets.QVBoxLayout(self.centralwidget)
-        layout.setContentsMargins(40, 30, 40, 30)
-        layout.setSpacing(16)
+
+def _coming_soon(label):
+    QtWidgets.QMessageBox.information(None, label, f"{label} — coming soon.")
+
+
+BUTTONS = [
+    "Risk Assessment",
+    "Risk Register",
+    "Insurance Management",
+    "Business Continuity",
+    "Compliance & Audit",
+]
+
+
+class RiskMgmtMainMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Risk Management Main Menu")
+        self.resize(700, 440)
+        _apply_blue_palette(self)
+        self._build_ui()
+
+    def _build_ui(self):
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        self.setCentralWidget(central)
+
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(60, 40, 60, 40)
+        v.setSpacing(16)
 
         title = QtWidgets.QLabel("Risk Management Main Menu")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:8px;")
-        layout.addWidget(title)
+        v.addWidget(title)
+        v.addStretch()
 
-        BTN_STYLE = ("QPushButton{background-color:white;border:2px solid black;"
-                     "border-radius:10px;padding:10px;font-size:16px;}"
-                     "QPushButton:hover{background-color:rgb(85,255,255);}")
-
-        buttons = [
-            ("Risk Assessment", self._risk_assess),
-            ("Risk Register", self._risk_register),
-            ("Insurance Management", self._insurance),
-            ("Business Continuity", self._biz_cont),
-            ("Compliance & Audit", self._comp_audit),
-        ]
-        for label, slot in buttons:
+        for label in BUTTONS:
             btn = QtWidgets.QPushButton(label)
-            btn.setStyleSheet(BTN_STYLE)
-            btn.clicked.connect(slot)
-            layout.addWidget(btn)
+            btn.setStyleSheet(BUTTON_STYLE)
+            btn.setFixedHeight(44)
+            btn.setFont(QtGui.QFont("", 16))
+            btn.clicked.connect(lambda chk=False, lbl=label: _coming_soon(lbl))
+            v.addWidget(btn)
 
-        layout.addStretch()
-        MainWindow.setCentralWidget(self.centralwidget)
-        MainWindow.setWindowTitle("Risk Management")
-
-    def _launch(self, script):
-        d = os.path.dirname(os.path.abspath(__file__))
-        subprocess.Popen([sys.executable, os.path.join(d, script)], cwd=d)
-
-    def _risk_assess(self): pass
-    def _risk_register(self): pass
-    def _insurance(self): pass
-    def _biz_cont(self): pass
-    def _comp_audit(self): pass
+        v.addStretch()
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    win = QtWidgets.QMainWindow()
-    ui = Ui_Risk_mgmt_main_menu()
-    ui.setupUi(win)
-    win.show()
+    w = RiskMgmtMainMenu()
+    w.show()
     sys.exit(app.exec())

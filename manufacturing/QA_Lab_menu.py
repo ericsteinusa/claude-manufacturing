@@ -1,9 +1,7 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
-import os
+import psycopg2
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -19,28 +17,23 @@ LABEL_STYLE = "color: white; font-size: 13px;"
 
 INSP_COLORS = {
     "pending": "#ffffff",
-    "passed": "#d4edda",
-    "failed": "#f8d7da",
+    "passed":  "#d4edda",
+    "failed":  "#f8d7da",
     "on_hold": "#fff3cd",
 }
 
 SEVERITY_COLORS = {
     "critical": QtGui.QColor(248, 215, 218),
-    "major": QtGui.QColor(255, 243, 205),
-    "minor": QtGui.QColor(220, 235, 255),
+    "major":    QtGui.QColor(255, 243, 205),
+    "minor":    QtGui.QColor(220, 235, 255),
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS qa_inspection (
-            id            SERIAL PRIMARY KEY,
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
             insp_number   TEXT NOT NULL UNIQUE,
             product_id    INTEGER,
             wo_id         INTEGER,
@@ -52,7 +45,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS qa_defect (
-            id           SERIAL PRIMARY KEY,
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
             insp_id      INTEGER NOT NULL REFERENCES qa_inspection(id),
             defect_type  TEXT,
             severity     TEXT DEFAULT 'minor',
@@ -62,7 +55,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS qa_spec (
-            id         SERIAL PRIMARY KEY,
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
             product_id INTEGER NOT NULL,
             spec_name  TEXT NOT NULL,
             min_value  REAL,
@@ -95,7 +88,7 @@ def _next_insp_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM qa_inspection WHERE insp_number LIKE %s", (f"QA-{yr}-%",)
+        "SELECT COUNT(*) FROM qa_inspection WHERE insp_number LIKE ?", (f"QA-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"QA-{yr}-{count + 1:04d}"
@@ -104,8 +97,8 @@ def _next_insp_num():
 def _load_products(combo, include_none=True):
     conn = get_db()
     try:
-        prods = conn.execute("SELECT id, product_name FROM product ORDER BY product_name").fetchall()
-    except sqlite3.OperationalError:
+        prods = conn.execute("SELECT id, name AS product_name FROM product ORDER BY name").fetchall()
+    except psycopg2.OperationalError:
         prods = []
     conn.close()
     combo.clear()
@@ -131,9 +124,9 @@ class NewInspectionDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.insp_num = QtWidgets.QLineEdit(_next_insp_num())
         self.insp_num.setStyleSheet(INPUT_STYLE)
@@ -151,7 +144,7 @@ class NewInspectionDialog(QtWidgets.QDialog):
             wos = conn.execute(
                 "SELECT id, wo_number FROM work_order ORDER BY wo_number DESC LIMIT 100"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             wos = []
         conn.close()
         self.wo_combo.addItem("(none)", None)
@@ -196,15 +189,15 @@ class NewInspectionDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO qa_inspection (insp_number, product_id, wo_id, insp_date,"
-                " inspector, result, notes) VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                " inspector, result, notes) VALUES (?,?,?,?,?,?,?)",
                 (num, self.product_combo.currentData(), self.wo_combo.currentData(),
                  self.insp_date.date().toString("yyyy-MM-dd"),
                  self.inspector.text().strip(), self.result_combo.currentData(),
                  self.notes.text().strip())
             )
-            self.insp_id = cur.fetchone()['id']
+            self.insp_id = cur.lastrowid
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"Inspection number '{num}' already exists.")
             conn.close()
@@ -227,9 +220,9 @@ class LogDefectDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.defect_type = QtWidgets.QLineEdit()
         self.defect_type.setStyleSheet(INPUT_STYLE)
@@ -262,7 +255,7 @@ class LogDefectDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO qa_defect (insp_id, defect_type, severity, description) VALUES (%s,%s,%s,%s)",
+            "INSERT INTO qa_defect (insp_id, defect_type, severity, description) VALUES (?,?,?,?)",
             (self._insp_id, self.defect_type.text().strip(),
              self.severity_combo.currentData(), desc)
         )
@@ -284,9 +277,9 @@ class AddSpecDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -339,7 +332,7 @@ class AddSpecDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute(
             "INSERT INTO qa_spec (product_id, spec_name, min_value, max_value, unit, notes)"
-            " VALUES (%s,%s,%s,%s,%s,%s)",
+            " VALUES (?,?,?,?,?,?)",
             (prod_id, name, self.min_val.value(), self.max_val.value(),
              self.unit.text().strip(), self.notes.text().strip())
         )
@@ -350,20 +343,11 @@ class AddSpecDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
-_TAB_KEYS = {
-    'new_req': 0, 'pend_req': 0, 'inprog_req': 0, 'comp_tests': 0,
-    'recent_res': 0, 'search_res': 0, 'failed': 0, 'res_rpts': 0,
-    'create_rpt': 0, 'pend_rpts': 0, 'rpt_arch': 0, 'rpt_sum': 0,
-    'recv_sample': 0, 'samp_track': 0, 'samp_disp': 0, 'samp_rpts': 0,
-    'daily_rpts': 0, 'week_sum': 0, 'month_rpt': 0, 'cust_rpts': 0,
-    'new_ncr': 1, 'open_ncrs': 1, 'ncr_hist': 1, 'ncr_rpts': 1,
-    'cal_sched': 2, 'cal_records': 2, 'overdue': 2, 'cal_rpts': 2,
-}
-
-
-class QALabWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None, initial_tab=None):
-        super().__init__(parent)
+class QALab(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("QA Laboratory")
+        self.resize(960, 660)
         _apply_blue_palette(self)
         self._insp_row_ids = []
         self._selected_insp_id = None
@@ -375,8 +359,6 @@ class QALabWidget(QtWidgets.QWidget):
         self._refresh_inspections()
         self._refresh_defects()
         self._refresh_specs()
-        if initial_tab in _TAB_KEYS:
-            self._tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
@@ -385,9 +367,7 @@ class QALabWidget(QtWidgets.QWidget):
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
-        _v = QtWidgets.QVBoxLayout(self)
-        _v.setContentsMargins(0, 0, 0, 0)
-        _v.addWidget(self._tabs)
+        self.setCentralWidget(self._tabs)
         self._build_inspections_tab()
         self._build_defects_tab()
         self._build_specs_tab()
@@ -496,12 +476,12 @@ class QALabWidget(QtWidgets.QWidget):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Inspection", self._on_new_insp),
-            ("Log Defect", self._on_log_defect),
-            ("Mark Passed", lambda: self._set_result("passed", "Mark as Passed%s")),
-            ("Mark Failed", lambda: self._set_result("failed", "Mark as Failed%s")),
-            ("Mark On Hold", lambda: self._set_result("on_hold", "Put On Hold%s")),
-            ("Resolve Defect", self._on_resolve_defect),
+            ("New Inspection",  self._on_new_insp),
+            ("Log Defect",      self._on_log_defect),
+            ("Mark Passed",     lambda: self._set_result("passed",  "Mark as Passed?")),
+            ("Mark Failed",     lambda: self._set_result("failed",  "Mark as Failed?")),
+            ("Mark On Hold",    lambda: self._set_result("on_hold", "Put On Hold?")),
+            ("Resolve Defect",  self._on_resolve_defect),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -516,11 +496,11 @@ class QALabWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             prods = conn.execute("""
-                SELECT DISTINCT qi.product_id, p.product_name
+                SELECT DISTINCT qi.product_id, p.name AS product_name
                 FROM qa_inspection qi JOIN product p ON p.id = qi.product_id
-                ORDER BY p.product_name
+                ORDER BY p.name
             """).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             prods = []
         conn.close()
         saved = self.insp_prod_filter.currentData()
@@ -543,7 +523,7 @@ class QALabWidget(QtWidgets.QWidget):
 
         base = """
             SELECT qi.id, qi.insp_number, qi.insp_date, qi.inspector, qi.result,
-                   p.product_name, wo.wo_number,
+                   p.name AS product_name, wo.wo_number,
                    (SELECT COUNT(*) FROM qa_defect d WHERE d.insp_id = qi.id) AS defect_count
             FROM qa_inspection qi
             LEFT JOIN product p  ON p.id  = qi.product_id
@@ -551,13 +531,11 @@ class QALabWidget(QtWidgets.QWidget):
         """
         conds, params = [], []
         if result:
-            conds.append("qi.result = %s")
-            params.append(result)
+            conds.append("qi.result = ?"); params.append(result)
         if prod_id:
-            conds.append("qi.product_id = %s")
-            params.append(prod_id)
+            conds.append("qi.product_id = ?"); params.append(prod_id)
         if term:
-            conds.append("(qi.insp_number LIKE %s OR qi.inspector LIKE %s)")
+            conds.append("(qi.insp_number LIKE ? OR qi.inspector LIKE ?)")
             params += [f"%{term}%", f"%{term}%"]
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
@@ -565,7 +543,7 @@ class QALabWidget(QtWidgets.QWidget):
         try:
             rows = conn.execute(base + where + " ORDER BY qi.insp_date DESC, qi.insp_number DESC",
                                 params).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = conn.execute(
                 "SELECT id, insp_number, insp_date, inspector, result,"
                 " NULL AS product_name, NULL AS wo_number, 0 AS defect_count"
@@ -620,7 +598,7 @@ class QALabWidget(QtWidgets.QWidget):
             return
         conn = get_db()
         defects = conn.execute(
-            "SELECT id, defect_type, severity, description, resolved FROM qa_defect WHERE insp_id = %s",
+            "SELECT id, defect_type, severity, description, resolved FROM qa_defect WHERE insp_id = ?",
             (self._selected_insp_id,)
         ).fetchall()
         conn.close()
@@ -663,7 +641,7 @@ class QALabWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE qa_inspection SET result = %s WHERE id = %s",
+            conn.execute("UPDATE qa_inspection SET result = ? WHERE id = ?",
                          (new_result, self._selected_insp_id))
             conn.commit()
             conn.close()
@@ -676,7 +654,7 @@ class QALabWidget(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a defect row first.")
             return
         conn = get_db()
-        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = %s", (ids[row],))
+        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = ?", (ids[row],))
         conn.commit()
         conn.close()
         self._refresh_defect_detail()
@@ -750,18 +728,16 @@ class QALabWidget(QtWidgets.QWidget):
 
         base = """
             SELECT d.id, d.defect_type, d.severity, d.description, d.resolved,
-                   qi.insp_number, p.product_name
+                   qi.insp_number, p.name AS product_name
             FROM qa_defect d
             JOIN qa_inspection qi ON qi.id = d.insp_id
             LEFT JOIN product p ON p.id = qi.product_id
         """
         conds, params = [], []
         if sev:
-            conds.append("d.severity = %s")
-            params.append(sev)
+            conds.append("d.severity = ?"); params.append(sev)
         if resolved is not None:
-            conds.append("d.resolved = %s")
-            params.append(resolved)
+            conds.append("d.resolved = ?"); params.append(resolved)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()
@@ -770,7 +746,7 @@ class QALabWidget(QtWidgets.QWidget):
                 base + where + " ORDER BY d.resolved ASC, d.severity DESC, qi.insp_number",
                 params
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -798,7 +774,7 @@ class QALabWidget(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a defect first.")
             return
         conn = get_db()
-        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = %s", (self._defect_row_ids[row],))
+        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = ?", (self._defect_row_ids[row],))
         conn.commit()
         conn.close()
         self._refresh_defects()
@@ -844,7 +820,7 @@ class QALabWidget(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("Add Specification", self._on_add_spec),
-            ("Delete Selected", self._on_delete_spec),
+            ("Delete Selected",   self._on_delete_spec),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -859,10 +835,10 @@ class QALabWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             prods = conn.execute("""
-                SELECT DISTINCT s.product_id, p.product_name FROM qa_spec s
-                JOIN product p ON p.id = s.product_id ORDER BY p.product_name
+                SELECT DISTINCT s.product_id, p.name AS product_name FROM qa_spec s
+                JOIN product p ON p.id = s.product_id ORDER BY p.name
             """).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             prods = []
         conn.close()
         saved = self.spec_prod_filter.currentData()
@@ -884,17 +860,17 @@ class QALabWidget(QtWidgets.QWidget):
         try:
             if prod_id:
                 rows = conn.execute("""
-                    SELECT s.id, p.product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
+                    SELECT s.id, p.name AS product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
-                    WHERE s.product_id = %s ORDER BY p.product_name, s.spec_name
+                    WHERE s.product_id = ? ORDER BY p.name, s.spec_name
                 """, (prod_id,)).fetchall()
             else:
                 rows = conn.execute("""
-                    SELECT s.id, p.product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
+                    SELECT s.id, p.name AS product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
-                    ORDER BY p.product_name, s.spec_name
+                    ORDER BY p.name, s.spec_name
                 """).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -922,30 +898,21 @@ class QALabWidget(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Selection", "Select a spec first.")
             return
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this specification%s",
+            self, "Confirm Delete", "Delete this specification?",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM qa_spec WHERE id = %s", (self._spec_row_ids[row],))
+            conn.execute("DELETE FROM qa_spec WHERE id = ?", (self._spec_row_ids[row],))
             conn.commit()
             conn.close()
             self._refresh_specs()
 
 
-class QALab(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("QA Laboratory")
-        self.resize(960, 660)
-        _apply_blue_palette(self)
-        self.setCentralWidget(QALabWidget(initial_tab=initial_tab))
-
-
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = QALab(sys.argv[1] if len(sys.argv) > 1 else None)
+    window = QALab()
     window.show()
     sys.exit(app.exec())
 

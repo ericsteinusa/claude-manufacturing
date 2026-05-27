@@ -3,14 +3,13 @@ Payroll_dept.py — Payroll Department
 Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report | Payroll History
 """
 import sys
-from .db_connection import get_db_connection
+import psycopg2
+from db_pg import get_db
 import os
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
-from gl_utils import post_gl_entry
-
-SS_RATE = 0.062
+SS_RATE      = 0.062
 MEDICARE_RATE = 0.0145
 DT_FMT = "%Y-%m-%d %H:%M:%S"
 
@@ -50,10 +49,6 @@ DED_CATEGORIES = ["Benefits", "Retirement", "Garnishment", "Other"]
 
 
 # ── DB ─────────────────────────────────────────────────────────────────────────
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
@@ -254,6 +249,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self._run_people_ids = []
         self._run_deductions = {}
         self._history_run_ids = []
+        import personnel_crm as _pcrm; _pcrm.init_db()
+        init_db()
         self._build_ui()
         self._load_pay_rates()
         self._load_history()
@@ -803,7 +800,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         for e in employees:
             label = f"{e['last_name']}, {e['first_name']}"
             if e["employee_id"]:
-                label += f"  (ID {e['emp_id']})"
+                label += f"  (ID {e['employee_id']})"
             self.pr_emp_combo.addItem(label, e["id"])
         self.pr_emp_combo.blockSignals(False)
 
@@ -1551,7 +1548,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         if pid:
             q += " AND pe.people_id=%s"
             params.append(pid)
-        q += " GROUP BY pe.people_id ORDER BY p.last_name, p.first_name"
+        q += " GROUP BY pe.people_id, p.first_name, p.last_name ORDER BY p.last_name, p.first_name"
 
         conn = get_db()
         rows = conn.execute(q, params).fetchall()

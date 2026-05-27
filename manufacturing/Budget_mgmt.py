@@ -4,7 +4,7 @@ Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report | Department
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -13,11 +13,13 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 
 def init_db():
+    import General_ledger
+    General_ledger.init_db()
     with _conn() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS budget (

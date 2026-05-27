@@ -1,9 +1,7 @@
 import sys
-import sqlite3
-from .db_connection import get_db_connection
-import os
+import psycopg2
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -18,25 +16,20 @@ COMBO_STYLE = (
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 SO_COLORS = {
-    "quote": "#ffffff",
-    "order": "#e8f4fd",
+    "quote":      "#ffffff",
+    "order":      "#e8f4fd",
     "processing": "#fff3cd",
-    "shipped": "#d4edda",
-    "invoiced": "#d1ecf1",
-    "cancelled": "#dcdcdc",
+    "shipped":    "#d4edda",
+    "invoiced":   "#d1ecf1",
+    "cancelled":  "#dcdcdc",
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS customer (
-            id SERIAL PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             first_name TEXT, last_name TEXT, company_name TEXT,
             phone_number TEXT, address TEXT, city TEXT, state TEXT,
             zip_code TEXT, email TEXT
@@ -44,7 +37,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS sales_order (
-            id SERIAL PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             so_number TEXT NOT NULL UNIQUE,
             customer_id INTEGER REFERENCES customer(id),
             order_date TEXT,
@@ -55,7 +48,7 @@ def init_db():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS so_item (
-            id SERIAL PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             so_id INTEGER NOT NULL REFERENCES sales_order(id),
             description TEXT NOT NULL,
             product_id INTEGER,
@@ -93,7 +86,7 @@ def _next_so_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM sales_order WHERE so_number LIKE %s", (f"SO-{yr}-%",)
+        "SELECT COUNT(*) FROM sales_order WHERE so_number LIKE ?", (f"SO-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"SO-{yr}-{count + 1:04d}"
@@ -115,9 +108,9 @@ class NewOrderDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.so_num = QtWidgets.QLineEdit(_next_so_num())
         self.so_num.setStyleSheet(INPUT_STYLE)
@@ -171,16 +164,16 @@ class NewOrderDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO sales_order (so_number, customer_id, order_date, ship_date, status, notes)"
-                " VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
+                " VALUES (?,?,?,?,?,?)",
                 (so_num, self.customer_combo.currentData(),
                  self.order_date.date().toString("yyyy-MM-dd"),
                  self.ship_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
                  self.notes.text().strip())
             )
-            self.so_id = cur.fetchone()['id']
+            self.so_id = cur.lastrowid
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"SO number '{so_num}' already exists.")
             conn.close()
             return
@@ -202,9 +195,9 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -212,9 +205,9 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             prods = conn.execute(
-                "SELECT id, product_name, purchase_price FROM product ORDER BY product_name"
+                "SELECT id, name AS product_name, purchase_price FROM product ORDER BY name"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             prods = []
         conn.close()
         self.product_combo.addItem("(none)", None)
@@ -264,7 +257,7 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         product_id = data["id"] if data and isinstance(data, dict) else None
         conn = get_db()
         conn.execute(
-            "INSERT INTO so_item (so_id, description, product_id, qty, unit_price) VALUES (%s,%s,%s,%s,%s)",
+            "INSERT INTO so_item (so_id, description, product_id, qty, unit_price) VALUES (?,?,?,?,?)",
             (self._so_id, desc, product_id, self.qty.value(), self.price.value())
         )
         conn.commit()
@@ -274,20 +267,11 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
 
 # ── Main Window ────────────────────────────────────────────────────────────────
 
-_TAB_KEYS = {
-    'new_order': 0, 'open_orders': 0, 'order_hist': 0, 'order_stat': 0,
-    'daily_sales': 0, 'month_sales': 0, 'annual_rpt': 0, 'by_rep': 0,
-    'new_quote': 0, 'act_quotes': 0, 'quote_hist': 0, 'conv_order': 0,
-    'new_lead': 0, 'act_leads': 0, 'opp_pipe': 0, 'lead_rpts': 0,
-    'act_cont': 0, 'new_cont': 0, 'cont_renew': 0, 'cont_arch': 0,
-    'cur_fore': 0, 'fore_rep': 0, 'fore_prod': 0, 'fore_rpts': 0,
-    'acct_list': 1, 'new_acct': 1, 'acct_det': 1, 'acct_hist': 1,
-}
-
-
-class SalesOrdersWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None, initial_tab=None):
-        super().__init__(parent)
+class SalesOrders(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Sales")
+        self.resize(920, 640)
         _apply_blue_palette(self)
         self._ord_row_ids = []
         self._selected_so_id = None
@@ -299,8 +283,6 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         self._load_ord_customer_filter()
         self._refresh_orders()
         self._refresh_customers()
-        if initial_tab in _TAB_KEYS:
-            self._tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
 
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
@@ -309,9 +291,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
-        _v = QtWidgets.QVBoxLayout(self)
-        _v.setContentsMargins(0, 0, 0, 0)
-        _v.addWidget(self._tabs)
+        self.setCentralWidget(self._tabs)
         self._build_orders_tab()
         self._build_customers_tab()
 
@@ -398,12 +378,12 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("New Order", self._on_new_order),
-            ("Add Line Item", self._on_add_line_item),
-            ("Mark as Order", lambda: self._set_status("order", "Mark this as a confirmed order%s")),
-            ("Mark Processing", lambda: self._set_status("processing", "Mark as in processing%s")),
-            ("Mark Shipped", lambda: self._set_status("shipped", "Mark as shipped%s")),
-            ("Cancel Order", lambda: self._set_status("cancelled", "Cancel this order%s")),
+            ("New Order",       self._on_new_order),
+            ("Add Line Item",   self._on_add_line_item),
+            ("Mark as Order",   lambda: self._set_status("order",      "Mark this as a confirmed order?")),
+            ("Mark Processing", lambda: self._set_status("processing", "Mark as in processing?")),
+            ("Mark Shipped",    lambda: self._set_status("shipped",    "Mark as shipped?")),
+            ("Cancel Order",    lambda: self._set_status("cancelled",  "Cancel this order?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -434,7 +414,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
     def _refresh_orders(self):
         cust_id = self.ord_cust_filter.currentData()
-        status = self.ord_status_filter.currentData()
+        status  = self.ord_status_filter.currentData()
         base = """
             SELECT so.id, so.so_number, so.order_date, so.ship_date, so.status,
                    c.first_name, c.last_name, c.company_name,
@@ -445,14 +425,12 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         """
         conds, params = [], []
         if cust_id:
-            conds.append("so.customer_id = %s")
-            params.append(cust_id)
+            conds.append("so.customer_id = ?"); params.append(cust_id)
         if status:
-            conds.append("so.status = %s")
-            params.append(status)
+            conds.append("so.status = ?"); params.append(status)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
-        rows = conn.execute(base + where + " GROUP BY so.id ORDER BY so.order_date DESC", params).fetchall()
+        rows = conn.execute(base + where + " GROUP BY so.id, so.so_number, so.order_date, so.ship_date, so.status, c.first_name, c.last_name, c.company_name ORDER BY so.order_date DESC", params).fetchall()
         conn.close()
 
         self.ord_table.setRowCount(0)
@@ -490,13 +468,13 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT i.description, p.product_name, i.qty, i.unit_price
+                SELECT i.description, p.name AS product_name, i.qty, i.unit_price
                 FROM so_item i LEFT JOIN product p ON p.id = i.product_id
-                WHERE i.so_id = %s
+                WHERE i.so_id = ?
             """, (self._selected_so_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             items = conn.execute(
-                "SELECT description, NULL AS product_name, qty, unit_price FROM so_item WHERE so_id = %s",
+                "SELECT description, NULL AS product_name, qty, unit_price FROM so_item WHERE so_id = ?",
                 (self._selected_so_id,)
             ).fetchall()
         conn.close()
@@ -533,7 +511,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE sales_order SET status = %s WHERE id = %s", (new_status, self._selected_so_id))
+            conn.execute("UPDATE sales_order SET status = ? WHERE id = ?", (new_status, self._selected_so_id))
             conn.commit()
             conn.close()
             self._refresh_orders()
@@ -567,8 +545,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
         self.cust_table = QtWidgets.QTableWidget()
         self.cust_table.setColumnCount(6)
-        self.cust_table.setHorizontalHeaderLabels(
-            ["Company", "First Name", "Last Name", "Phone", "Email", "City/State"])
+        self.cust_table.setHorizontalHeaderLabels(["Company", "First Name", "Last Name", "Phone", "Email", "City/State"])
         hh = self.cust_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -590,14 +567,14 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         fl = QtWidgets.QGridLayout(fg)
 
         def lbl(t):
-            lbl = QtWidgets.QLabel(t)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+            l = QtWidgets.QLabel(t)
+            l.setStyleSheet(LABEL_STYLE)
+            return l
 
         fields = [
             ("Company:", "cust_company"), ("First Name:", "cust_first"), ("Last Name:", "cust_last"),
-            ("Phone:", "cust_phone"), ("Email:", "cust_email"), ("Address:", "cust_address"),
-            ("City:", "cust_city"), ("State:", "cust_state"), ("Zip:", "cust_zip"),
+            ("Phone:", "cust_phone"),     ("Email:", "cust_email"),       ("Address:", "cust_address"),
+            ("City:", "cust_city"),       ("State:", "cust_state"),       ("Zip:", "cust_zip"),
         ]
         for i, (label, attr) in enumerate(fields):
             row, col = divmod(i, 3)
@@ -610,10 +587,10 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add New", self._on_cust_add),
+            ("Add New",         self._on_cust_add),
             ("Update Selected", self._on_cust_update),
             ("Delete Selected", self._on_cust_delete),
-            ("Clear", self._clear_cust_form),
+            ("Clear",           self._clear_cust_form),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -629,7 +606,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         if search:
             rows = conn.execute("""
                 SELECT * FROM customer
-                WHERE company_name LIKE %s OR first_name LIKE %s OR last_name LIKE %s OR email LIKE %s
+                WHERE company_name LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR email LIKE ?
                 ORDER BY company_name, last_name
             """, (f"%{search}%",) * 4).fetchall()
         else:
@@ -664,7 +641,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             return
         self._selected_cust_id = self._cust_row_ids[row]
         conn = get_db()
-        rec = conn.execute("SELECT * FROM customer WHERE id = %s", (self._selected_cust_id,)).fetchone()
+        rec = conn.execute("SELECT * FROM customer WHERE id = ?", (self._selected_cust_id,)).fetchone()
         conn.close()
         if not rec:
             return
@@ -689,7 +666,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute(
             "INSERT INTO customer (company_name, first_name, last_name, phone_number, email,"
-            " address, city, state, zip_code) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            " address, city, state, zip_code) VALUES (?,?,?,?,?,?,?,?,?)",
             (self.cust_company.text().strip(), self.cust_first.text().strip(),
              self.cust_last.text().strip(), self.cust_phone.text().strip(),
              self.cust_email.text().strip(), self.cust_address.text().strip(),
@@ -708,8 +685,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             return
         conn = get_db()
         conn.execute(
-            "UPDATE customer SET company_name=%s, first_name=%s, last_name=%s, phone_number=%s,"
-            " email=%s, address=%s, city=%s, state=%s, zip_code=%s WHERE id=%s",
+            "UPDATE customer SET company_name=?, first_name=?, last_name=?, phone_number=?,"
+            " email=?, address=?, city=?, state=?, zip_code=? WHERE id=?",
             (self.cust_company.text().strip(), self.cust_first.text().strip(),
              self.cust_last.text().strip(), self.cust_phone.text().strip(),
              self.cust_email.text().strip(), self.cust_address.text().strip(),
@@ -727,10 +704,10 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             return
         conn = get_db()
         so_count = conn.execute(
-            "SELECT COUNT(*) FROM sales_order WHERE customer_id = %s", (self._selected_cust_id,)
+            "SELECT COUNT(*) FROM sales_order WHERE customer_id = ?", (self._selected_cust_id,)
         ).fetchone()[0]
         conn.close()
-        msg = "Delete this customer%s"
+        msg = "Delete this customer?"
         if so_count:
             msg += f"\n\nWarning: {so_count} sales order(s) will be unlinked."
         reply = QtWidgets.QMessageBox.question(
@@ -739,8 +716,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE sales_order SET customer_id = NULL WHERE customer_id = %s", (self._selected_cust_id,))
-            conn.execute("DELETE FROM customer WHERE id = %s", (self._selected_cust_id,))
+            conn.execute("UPDATE sales_order SET customer_id = NULL WHERE customer_id = ?", (self._selected_cust_id,))
+            conn.execute("DELETE FROM customer WHERE id = ?", (self._selected_cust_id,))
             conn.commit()
             conn.close()
             self._clear_cust_form()
@@ -748,19 +725,10 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             self._load_ord_customer_filter()
 
 
-class SalesOrders(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
-        super().__init__()
-        self.setWindowTitle("Sales")
-        self.resize(920, 640)
-        _apply_blue_palette(self)
-        self.setCentralWidget(SalesOrdersWidget(initial_tab=initial_tab))
-
-
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = SalesOrders(sys.argv[1] if len(sys.argv) > 1 else None)
+    window = SalesOrders()
     window.show()
     sys.exit(app.exec())
 

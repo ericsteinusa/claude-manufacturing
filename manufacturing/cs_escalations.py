@@ -4,7 +4,7 @@ Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution 
 """
 import sys
 import os
-from .db_connection import get_db_connection
+from db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -34,7 +34,7 @@ COLOR_RESOLVED = QtGui.QColor(212, 237, 218)   # completed after being overdue
 
 
 def _conn():
-    c = get_db_connection()
+    c = get_db()
     return c
 
 
@@ -267,7 +267,6 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         self.active_summary_lbl.setText(
             f"{total} active escalation(s) — {critical_count} critical"
         )
-        self.statusBar().showMessage(f"{total} escalations | {critical_count} critical")
 
     # ── Escalation History ────────────────────────────────────────────────
 
@@ -345,7 +344,6 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             for c in range(6):
                 self.hist_tbl.item(r, c).setBackground(color)
         self.hist_tbl.setSortingEnabled(True)
-        self.statusBar().showMessage(f"{self.hist_tbl.rowCount()} escalation(s) resolved in period")
 
     # ── Escalation Reports ────────────────────────────────────────────────
 

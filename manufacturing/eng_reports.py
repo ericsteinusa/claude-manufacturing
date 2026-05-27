@@ -1,7 +1,6 @@
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from db_connection import get_db_connection
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -45,11 +44,6 @@ PRIORITY_COLORS = {
     "high": QtGui.QColor(255, 243, 205),
     "medium": QtGui.QColor(220, 235, 255),
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def _apply_blue_palette(widget):

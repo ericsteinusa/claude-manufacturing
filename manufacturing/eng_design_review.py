@@ -1,8 +1,7 @@
 import sys
 import os
 import sqlite3
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from db_connection import get_db_connection
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -28,11 +27,6 @@ ECR_COLORS = {
     "rejected": "#f8d7da",
     "revision_needed": "#ffe8c0",
 }
-
-
-def get_db():
-    conn = get_db_connection()
-    return conn
 
 
 def _apply_blue_palette(widget):
