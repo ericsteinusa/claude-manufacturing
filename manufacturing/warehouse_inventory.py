@@ -48,6 +48,7 @@ def _conn():
 
 
 def init_db():
+    import Supplier_entry as _se; _se.init_db()
     with _conn() as con:
         con.execute("""
             CREATE TABLE IF NOT EXISTS product (

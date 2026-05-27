@@ -3,7 +3,7 @@ import os
 import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-from engineer import ProjectsTab, TasksTab, _apply_blue_palette
+from engineer import _apply_blue_palette
 from eng_design_review import DesignReviewWidget
 from eng_reports import EngReportsWidget
 
@@ -77,8 +77,8 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         eng_v.setContentsMargins(0, 4, 0, 0)
         eng_tabs = QtWidgets.QTabWidget()
         eng_tabs.setStyleSheet(TAB_STYLE)
-        eng_tabs.addTab(ProjectsTab(), "Engineering Projects")
-        eng_tabs.addTab(TasksTab(), "Engineering Tasks")
+        eng_tabs.addTab(_launch_tab("engineer.py", "Engineering Projects"), "Engineering Projects")
+        eng_tabs.addTab(_launch_tab("engineer.py", "Engineering Tasks"), "Engineering Tasks")
         eng_v.addWidget(eng_tabs)
         tabs.addTab(eng_w, "Engineers")
 
