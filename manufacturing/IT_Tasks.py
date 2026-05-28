@@ -1,7 +1,6 @@
 import os
 import sys
 import psycopg2
-import subprocess
 from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -468,41 +467,6 @@ TAB_STYLE = (
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
 
-_LAUNCH_TABS = [
-    ("Department Entry",        "dept_entry.py"),
-    ("Department Sub Entry",    "dept_sub_entry.py"),
-    ("Department and Sub List", "dept_sub.py"),
-    ("People and Dept",         "display_people_department.py"),
-]
-
-
-def _make_launch_tab(label, script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(label)
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addSpacing(12)
-    btn = QtWidgets.QPushButton(f"Open {label}")
-    btn.setStyleSheet(BUTTON_STYLE)
-    btn.setFixedHeight(44)
-    btn.setFixedWidth(260)
-    btn.clicked.connect(
-        lambda: subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-    )
-    row = QtWidgets.QHBoxLayout()
-    row.addStretch()
-    row.addWidget(btn)
-    row.addStretch()
-    v.addLayout(row)
-    v.addStretch()
-    return w
-
-
 class ITTasksMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -517,11 +481,11 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
 
+        from IT_reports import ITReportsWidget
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ITTasksWidget(), "IT Tasks")
-        for label, script in _LAUNCH_TABS:
-            tabs.addTab(_make_launch_tab(label, script), label)
+        tabs.addTab(ITReportsWidget(), "Reports")
         v.addWidget(tabs)
 
 

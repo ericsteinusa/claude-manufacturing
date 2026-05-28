@@ -1,0 +1,50 @@
+import os
+import sys
+import subprocess
+from PyQt6 import QtCore, QtGui, QtWidgets
+from IT_Tasks import _apply_blue_palette
+
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+
+LAUNCH_ITEMS = [
+    ("Department Entry",        "dept_entry.py"),
+    ("Department Sub Entry",    "dept_sub_entry.py"),
+    ("Department and Sub List", "dept_sub.py"),
+    ("People and Dept",         "display_people_department.py"),
+]
+
+
+def _launch(script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+
+
+class ITReportsWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._build_ui()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(60, 40, 60, 40)
+        v.setSpacing(16)
+
+        title = QtWidgets.QLabel("IT Reports")
+        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:8px;")
+        v.addWidget(title)
+        v.addStretch()
+
+        for label, script in LAUNCH_ITEMS:
+            btn = QtWidgets.QPushButton(label)
+            btn.setStyleSheet(BUTTON_STYLE)
+            btn.setFixedHeight(44)
+            btn.setFont(QtGui.QFont("", 14))
+            btn.clicked.connect(lambda chk=False, s=script: _launch(s))
+            v.addWidget(btn)
+
+        v.addStretch()
