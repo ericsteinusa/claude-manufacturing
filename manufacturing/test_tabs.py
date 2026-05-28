@@ -28,6 +28,7 @@ WINDOWS = [
     ("IT_mgr",               "ITMgrMenu",                 "IT Mgr"),
     ("it_calls",             "ITSupportMenu",             "IT Calls"),
     ("IT_Tasks",             "ITTasksMenu",               "IT Tasks"),
+    ("IT_reports",           "ITReportsWidget",           "IT Reports"),
     ("marketing_menu",       "MarketingMenu",             "Marketing"),
     ("marketing_mgr_menu",   "MarketingMgrMenu",          "Marketing Mgr"),
     ("personnel_menu",       "PersonnelMenu",             "Personnel"),
