@@ -482,9 +482,11 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
 
         from IT_reports import ITReportsWidget
+        from IT_tasks_reports import ITTasksReportsWidget
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ITTasksWidget(), "IT Tasks")
+        tabs.addTab(ITTasksReportsWidget(), "Task Reports")
         tabs.addTab(ITReportsWidget(), "Reports")
         v.addWidget(tabs)
 
