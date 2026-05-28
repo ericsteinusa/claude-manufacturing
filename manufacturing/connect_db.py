@@ -17,11 +17,9 @@ def connect_to_database():
         QMessageBox.information(None, 'Database Connection', 'Successfully connected to the database.')
         return True
 
-# Create an instance of QApplication
-app = QApplication(sys.argv)
-
-# Connect to the database
-if connect_to_database():
-    sys.exit(app.exec())
-else:
-    sys.exit(1)
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    if connect_to_database():
+        sys.exit(app.exec())
+    else:
+        sys.exit(1)
