@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from Sales_menu import _apply_blue_palette
+from Sales_menu import _apply_blue_palette, SalesOrdersWidget
 from Accounts_receivable import AccountsReceivableWidget
 
 BUTTON_STYLE = (
@@ -61,7 +61,7 @@ class SalesMgrMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_launch_tab("Sales_menu.py", "Sales Orders"), "Sales")
+        tabs.addTab(SalesOrdersWidget(), "Sales Orders")
         tabs.addTab(AccountsReceivableWidget(), "Accounts Receivable")
         tabs.addTab(_launch_tab("customer_entry.py", "Customer Entry"), "Customer Entry")
         tabs.addTab(_placeholder_tab("Sales Reports"), "Sales Reports")
