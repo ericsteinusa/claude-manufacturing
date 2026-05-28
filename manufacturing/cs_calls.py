@@ -476,7 +476,7 @@ def remove_many():
 		
 		# Add selections to ids_to_delete list
 		for record in x:
-			ids_to_delete.append(my_tree.item(record, 'values')[2])
+			ids_to_delete.append(my_tree.item(record, 'values')[0])
 
 		# Delete From Treeview
 		for record in x:
