@@ -524,8 +524,7 @@ def remove_all():
 		c = conn.cursor()
 
 		# Delete Everything From The Table
-		c.execute("DROP TABLE calls2")		
-
+		c.execute("DELETE FROM calls2")
 
 		# Commit changes
 		conn.commit()
@@ -535,9 +534,6 @@ def remove_all():
 
 		# Clear entry boxes if filled
 		clear_entries()
-
-		# Recreate The Table
-		create_table_again()
 
 # Clear entry boxes
 def clear_entries():
