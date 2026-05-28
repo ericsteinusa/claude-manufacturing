@@ -1631,11 +1631,8 @@ def _get_user_profile(email: str) -> dict:
 
 
 def _is_full_access(profile: dict) -> bool:
-    """Admin, President, Vice President, or Company dept users see all departments."""
-    return (
-        profile.get('role_name') in FULL_ACCESS_ROLES
-        or profile.get('dept_key') is None
-    )
+    """President, Vice President, and Admin roles see all departments."""
+    return profile.get('role_name') in FULL_ACCESS_ROLES | {'Admin'}
 
 
 def _verify_login(email: str, password: str) -> bool:
@@ -1800,7 +1797,9 @@ def generic_menu(request, dept, subpath=''):
         return redirect('home')
     if not request.session.get('user_full_access'):
         user_dept = request.session.get('user_dept_key', '')
-        if user_dept and dept != user_dept:
+        if not user_dept:
+            return redirect('dashboard')
+        if dept != user_dept:
             return redirect('dept_menu', dept=user_dept)
     parts = [p for p in subpath.split('/') if p]
     node = _walk_tree(dept, parts)
@@ -1842,7 +1841,9 @@ def run_script(request, dept, subpath):
         return redirect('dept_menu', dept=dept)
     if not request.session.get('user_full_access'):
         user_dept = request.session.get('user_dept_key', '')
-        if user_dept and dept != user_dept:
+        if not user_dept:
+            return redirect('dashboard')
+        if dept != user_dept:
             return redirect('dept_menu', dept=user_dept)
     parts = [p for p in subpath.split('/') if p]
     if not parts:
