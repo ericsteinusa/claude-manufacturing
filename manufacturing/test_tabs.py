@@ -29,6 +29,7 @@ WINDOWS = [
     ("IT_technician",        "ITTechnicianMenu",          "IT Technician"),
     ("IT_tech_reports",      "ITTechReportsWidget",       "IT Tech Reports"),
     ("it_calls",             "ITSupportMenu",             "IT Calls"),
+    ("it_calls_reports",     "ITSupportReportsWidget",    "IT Support Reports"),
     ("IT_Tasks",             "ITTasksMenu",               "IT Tasks"),
     ("IT_reports",           "ITReportsWidget",           "IT Reports"),
     ("marketing_menu",       "MarketingMenu",             "Marketing"),
