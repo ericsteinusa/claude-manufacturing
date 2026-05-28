@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import bcrypt
 import psycopg2
 from django.shortcuts import render, redirect
 
@@ -1640,11 +1641,23 @@ def _is_full_access(profile: dict) -> bool:
 def _verify_login(email: str, password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
+        "SELECT pw.id as pw_id, pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
         (email,),
     ).fetchone()
+    if row is None:
+        conn.close()
+        return False
+    stored = row["password"]
+    if stored.startswith("$2b$") or stored.startswith("$2a$"):
+        ok = bcrypt.checkpw(password.encode(), stored.encode())
+    else:
+        ok = (password == stored)
+        if ok:
+            hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+            conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
+            conn.commit()
     conn.close()
-    return row is not None and password == row["password"]
+    return ok
 
 
 def _email_exists(email: str) -> bool:
@@ -1667,9 +1680,10 @@ def _create_user(email, password, first_name='', last_name='',
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )
         people_id = cursor.fetchone()['id']
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         conn.execute(
             "INSERT INTO passwd (people_id, password) VALUES (%s, %s)",
-            (people_id, password),
+            (people_id, hashed),
         )
         conn.commit()
         conn.close()
@@ -1687,7 +1701,8 @@ def _reset_password(email: str, new_password: str) -> bool:
     if row is None:
         conn.close()
         return False
-    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (new_password, row["pw_id"]))
+    hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
