@@ -347,8 +347,11 @@ class ITSupportWidget(QtWidgets.QWidget):
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
         self._tabs.setStyleSheet(
-            "QTabBar::tab{background:white; border:1px solid black; padding:4px 10px;}"
-            "QTabBar::tab:selected{background:rgb(85,255,255);}"
+            "QTabWidget::pane{border:1px solid black;}"
+            "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+            "border-bottom:none;border-radius:4px 4px 0 0;}"
+            "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+            "QTabBar::tab:hover{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
         v = QtWidgets.QVBoxLayout(self)
@@ -527,7 +530,7 @@ class ITSupportWidget(QtWidgets.QWidget):
     def _on_tkt_show_all(self):
         self.tkt_search.clear()
         self.tkt_status_filter.blockSignals(True)
-        self.tkt_status_filter.setCurrentIndex(0)
+        self.tkt_status_filter.setCurrentIndex(self.tkt_status_filter.count() - 1)
         self.tkt_status_filter.blockSignals(False)
         self.tkt_pri_filter.blockSignals(True)
         self.tkt_pri_filter.setCurrentIndex(0)
