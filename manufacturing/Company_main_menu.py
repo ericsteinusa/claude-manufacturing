@@ -6,6 +6,13 @@ BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
     "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:5px 10px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+)
 
 
 def _apply_blue_palette(widget):
@@ -21,6 +28,22 @@ def _apply_blue_palette(widget):
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
     subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+
+
+def _launch_tab(script, label):
+    w = QtWidgets.QWidget(); _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl); v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.clicked.connect(lambda: _launch(script))
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch(); row.addWidget(btn); row.addStretch()
+    v.addLayout(row); v.addStretch()
+    return w
 
 
 DEPARTMENTS = [
@@ -47,7 +70,7 @@ class CompanyMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Company Main Menu")
-        self.resize(900, 620)
+        self.resize(1200, 760)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -55,29 +78,14 @@ class CompanyMainMenu(QtWidgets.QMainWindow):
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
         self.setCentralWidget(central)
-
-        outer = QtWidgets.QVBoxLayout(central)
-        outer.setContentsMargins(30, 20, 30, 20)
-        outer.setSpacing(12)
-
-        title = QtWidgets.QLabel("Company Main Menu")
-        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:24px;font-weight:bold;color:white;padding:8px;")
-        outer.addWidget(title)
-
-        grid = QtWidgets.QGridLayout()
-        grid.setSpacing(12)
-        cols = 4
-        for i, (label, script) in enumerate(DEPARTMENTS):
-            btn = QtWidgets.QPushButton(label)
-            btn.setStyleSheet(BUTTON_STYLE)
-            btn.setFixedHeight(44)
-            btn.setFont(QtGui.QFont("", 14))
-            btn.clicked.connect(lambda chk=False, s=script: _launch(s))
-            grid.addWidget(btn, i // cols, i % cols)
-
-        outer.addLayout(grid)
-        outer.addStretch()
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
+        tabs.setTabPosition(QtWidgets.QTabWidget.TabPosition.North)
+        for label, script in DEPARTMENTS:
+            tabs.addTab(_launch_tab(script, label), label)
+        v.addWidget(tabs)
 
 
 if __name__ == "__main__":
