@@ -277,8 +277,8 @@ def insert_data():
 		call_time_entry.delete(0, tk.END)
 		completion_date_entry.delete(0, tk.END)
 		completion_time_entry.delete(0, tk.END)
-		comments_box.delete("1.0", tk.END)
-		completion_box.delete(0, tk.END)
+		comment_widget.delete("1.0", tk.END)
+		checkbox_var.set(0)
 		# display_data()
 
 # Display data from the database
