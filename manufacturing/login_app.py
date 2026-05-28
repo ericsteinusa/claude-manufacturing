@@ -770,12 +770,10 @@ class SessionWindow(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        # Load Company_main_menu UI into this window
-        from Company_main_menu import Ui_MainWindow as CompanyMenuUi
-        self._company_ui = CompanyMenuUi()
-        self._company_ui.setupUi(self)
+        from Company_main_menu import CompanyMainMenuWidget
+        self.setCentralWidget(CompanyMainMenuWidget())
 
-        # Toolbar with session controls (added after setupUi so it sits on top)
+        # Toolbar with session controls
         toolbar = self.addToolBar("Session")
         toolbar.setMovable(False)
         toolbar.setStyleSheet(
