@@ -1,7 +1,8 @@
+import os
 import sys
 import psycopg2
-from db_pg import get_db
 import subprocess
+from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -215,35 +216,10 @@ class ITTasksWidget(QtWidgets.QWidget):
         init_db()
         self._refresh()
 
-    def _launch(self, script):
-        _dir = os.path.dirname(os.path.abspath(__file__))
-        subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
-
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
-
-        # ── program buttons ──────────────────────────────────────────────────
-        prog_row = QtWidgets.QHBoxLayout()
-        prog_row.setSpacing(4)
-        font16 = QtGui.QFont()
-        font16.setPointSize(16)
-        for label, script in (
-            ("Department Entry", "dept_entry.py"),
-            ("Department Sub Entry", "dept_sub_entry.py"),
-            ("Department and Sub List", "dept_sub.py"),
-            ("People and Dept", "display_people_department.py"),
-        ):
-            b = QtWidgets.QPushButton(label)
-            b.setFont(font16)
-            b.setStyleSheet(BUTTON_STYLE)
-            b.setFixedHeight(41)
-            b.setAutoDefault(False)
-            b.clicked.connect(lambda chk, s=script: self._launch(s))
-            prog_row.addWidget(b)
-        prog_row.addStretch()
-        v.addLayout(prog_row)
 
         # ── filter bar ──────────────────────────────────────────────────────
         fr = QtWidgets.QHBoxLayout()
@@ -484,13 +460,69 @@ class ITTasksWidget(QtWidgets.QWidget):
             self._refresh()
 
 
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+)
+
+_LAUNCH_TABS = [
+    ("Department Entry",        "dept_entry.py"),
+    ("Department Sub Entry",    "dept_sub_entry.py"),
+    ("Department and Sub List", "dept_sub.py"),
+    ("People and Dept",         "display_people_department.py"),
+]
+
+
+def _make_launch_tab(label, script):
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    w = QtWidgets.QWidget()
+    _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w)
+    v.addStretch()
+    lbl = QtWidgets.QLabel(label)
+    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
+    v.addWidget(lbl)
+    v.addSpacing(12)
+    btn = QtWidgets.QPushButton(f"Open {label}")
+    btn.setStyleSheet(BUTTON_STYLE)
+    btn.setFixedHeight(44)
+    btn.setFixedWidth(260)
+    btn.clicked.connect(
+        lambda: subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+    )
+    row = QtWidgets.QHBoxLayout()
+    row.addStretch()
+    row.addWidget(btn)
+    row.addStretch()
+    v.addLayout(row)
+    v.addStretch()
+    return w
+
+
 class ITTasksMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("IT Tasks")
         self.resize(1060, 700)
         _apply_blue_palette(self)
-        self.setCentralWidget(ITTasksWidget())
+
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(ITTasksWidget(), "IT Tasks")
+        for label, script in _LAUNCH_TABS:
+            tabs.addTab(_make_launch_tab(label, script), label)
+        v.addWidget(tabs)
 
 
 def main():
