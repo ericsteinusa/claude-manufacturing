@@ -1401,6 +1401,17 @@ MENU_TREE = {
     'budget_management': {
         'title': 'Budget Management',
         'items': [
+            ('budget_mgr', 'Budget Manager', {
+                'title': 'Budget Manager',
+                'items': [
+                    ('bud_overview', 'Budgets', 'Budget_mgr_menu.py'),
+                    ('bud_detail_mgr', 'Budget Detail', 'Budget_mgr_menu.py'),
+                    ('bva_mgr', 'Budget vs. Actual', 'Budget_mgr_menu.py'),
+                    ('variance_mgr', 'Variance Report', 'Budget_mgr_menu.py'),
+                    ('dept_summary', 'Department Summaries', 'Budget_mgr_menu.py'),
+                    ('approval_wf', 'Approval Workflow', 'Budget_mgr_menu.py'),
+                ],
+            }),
             ('budgets', 'Budgets', 'Budget_mgmt.py'),
             ('bud_detail', 'Budget Detail', 'Budget_mgmt.py'),
             ('bva', 'Budget vs. Actual', 'Budget_mgmt.py'),
@@ -1413,11 +1424,11 @@ MENU_TREE = {
             ('fin_mgr', 'Finance Manager', {
                 'title': 'Finance Manager',
                 'items': [
-                    ('fin_plan', 'Financial Planning', 'Finance_Main_menu.py'),
-                    ('fin_forecast', 'Budget & Forecasting', 'Finance_Main_menu.py'),
-                    ('treasury_mgmt', 'Treasury Management', 'Finance_Main_menu.py'),
-                    ('invest_mgmt', 'Investment Management', 'Finance_Main_menu.py'),
-                    ('fin_rpts_mgr', 'Financial Reports', 'Finance_Main_menu.py'),
+                    ('fin_plan', 'Financial Planning', 'Finance_mgr_menu.py'),
+                    ('fin_forecast', 'Budget & Forecasting', 'Finance_mgr_menu.py'),
+                    ('treasury_mgmt', 'Treasury Management', 'Finance_mgr_menu.py'),
+                    ('invest_mgmt', 'Investment Management', 'Finance_mgr_menu.py'),
+                    ('fin_rpts_mgr', 'Financial Reports', 'Finance_mgr_menu.py'),
                 ],
             }),
             ('fin_analysis', 'Financial Analysis', 'Finance_Main_menu.py'),
@@ -1433,10 +1444,10 @@ MENU_TREE = {
             ('legal_mgr', 'Legal Manager', {
                 'title': 'Legal Manager',
                 'items': [
-                    ('contracts_mgmt', 'Contract Management', 'Legal_Main_menu.py'),
-                    ('litigation_mgmt', 'Litigation Management', 'Legal_Main_menu.py'),
-                    ('compliance_mgmt', 'Compliance Management', 'Legal_Main_menu.py'),
-                    ('corp_gov', 'Corporate Governance', 'Legal_Main_menu.py'),
+                    ('contracts_mgmt', 'Contract Management', 'Legal_mgr_menu.py'),
+                    ('litigation_mgmt', 'Litigation Management', 'Legal_mgr_menu.py'),
+                    ('compliance_mgmt', 'Compliance Management', 'Legal_mgr_menu.py'),
+                    ('corp_gov', 'Corporate Governance', 'Legal_mgr_menu.py'),
                 ],
             }),
             ('contracts', 'Contracts', 'Legal_Main_menu.py'),
@@ -1452,9 +1463,9 @@ MENU_TREE = {
             ('risk_mgr', 'Risk Manager', {
                 'title': 'Risk Manager',
                 'items': [
-                    ('risk_framework', 'Risk Framework', 'Risk_mgmt_Main_menu.py'),
-                    ('risk_reporting', 'Risk Reporting', 'Risk_mgmt_Main_menu.py'),
-                    ('biz_continuity', 'Business Continuity', 'Risk_mgmt_Main_menu.py'),
+                    ('risk_framework', 'Risk Framework', 'Risk_mgr_menu.py'),
+                    ('risk_reporting', 'Risk Reporting', 'Risk_mgr_menu.py'),
+                    ('biz_continuity', 'Business Continuity', 'Risk_mgr_menu.py'),
                 ],
             }),
             ('risk_assess', 'Risk Assessment', 'Risk_mgmt_Main_menu.py'),
@@ -1590,6 +1601,7 @@ MANAGER_DEPT_SUB_IDS = set()
 MANAGER_MENU_KEYS = {
     'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr', 'mkt_mgr',
     'pers_mgr', 'prod_mgr', 'purch_mgr', 'qa_mgr', 'sales_mgr',
+    'budget_mgr', 'fin_mgr', 'legal_mgr', 'risk_mgr',
 }
 
 READ_ONLY_ROLES = {'Auditor'}

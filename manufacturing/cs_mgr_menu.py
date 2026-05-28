@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from cs_calls import CustomerServiceCallsWidget, _apply_blue_palette
+from cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 from cs_reports import CSReportsWidget
 from cs_staff_mgmt import CSStaffMgmtWidget
 from cs_satisfaction import CSSatisfactionWidget

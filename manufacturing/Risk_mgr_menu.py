@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
+from Risk_mgmt_Main_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -20,26 +20,20 @@ def _launch(script):
     subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
 
 
-def _launch_tab(script, label):
+def _placeholder_tab(label):
     w = QtWidgets.QWidget(); _apply_blue_palette(w)
     v = QtWidgets.QVBoxLayout(w); v.addStretch()
-    lbl = QtWidgets.QLabel(label)
+    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl); v.addSpacing(12)
-    btn = QtWidgets.QPushButton(f"Open {label}")
-    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
-    btn.clicked.connect(lambda: _launch(script))
-    row = QtWidgets.QHBoxLayout()
-    row.addStretch(); row.addWidget(btn); row.addStretch()
-    v.addLayout(row); v.addStretch()
+    v.addWidget(lbl); v.addStretch()
     return w
 
 
-class CSMenu(QtWidgets.QMainWindow):
+class RiskMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Customer Service Menu")
+        self.setWindowTitle("Risk Manager Menu")
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
@@ -50,12 +44,13 @@ class CSMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(CustomerServiceCallsWidget(), "CS Calls")
-        tabs.addTab(_launch_tab("customer_entry.py", "Customer Entry"), "Customer Entry")
+        tabs.addTab(_placeholder_tab("Risk Framework"), "Risk Framework")
+        tabs.addTab(_placeholder_tab("Risk Reporting"), "Risk Reporting")
+        tabs.addTab(_placeholder_tab("Business Continuity"), "Business Continuity")
         v.addWidget(tabs)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = CSMenu(); w.show()
+    w = RiskMgrMenu(); w.show()
     sys.exit(app.exec())
