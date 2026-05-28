@@ -1,13 +1,17 @@
+import os
 import re
 import psycopg2
 import psycopg2.extras
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'dbname': 'company_db',
-    'user': 'postgres',
-    'password': '***REMOVED***',
-    'port': 5432,
+    'host':     os.environ.get('DB_HOST', 'localhost'),
+    'dbname':   os.environ.get('DB_NAME', 'company_db'),
+    'user':     os.environ.get('DB_USER', 'postgres'),
+    'password': os.environ.get('DB_PASSWORD', ''),
+    'port':     int(os.environ.get('DB_PORT', '5432')),
 }
 
 _RE_AUTOINCREMENT = re.compile(r'INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT', re.IGNORECASE)
