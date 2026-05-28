@@ -443,7 +443,7 @@ def remove_one():
 	c = conn.cursor()
 
 	# Delete From Database
-	c.execute("DELETE from calls2 WHERE oid=" + id_entry.get())
+	c.execute("DELETE FROM calls2 WHERE id = %s", (id_entry.get(),))
 	
 
 
