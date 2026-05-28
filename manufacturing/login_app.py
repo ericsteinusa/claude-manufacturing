@@ -1,4 +1,5 @@
 import sys
+import bcrypt
 import psycopg2
 from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -110,7 +111,16 @@ def verify_login(email: str, password: str) -> bool:
         conn.close()
         return False
 
-    ok = (password == row["password"])
+    stored = row["password"]
+    if stored.startswith("$2b$") or stored.startswith("$2a$"):
+        ok = bcrypt.checkpw(password.encode(), stored.encode())
+    else:
+        # Plain-text legacy password — verify then transparently rehash
+        ok = (password == stored)
+        if ok:
+            hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+            conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
+            conn.commit()
     conn.close()
     return ok
 
@@ -129,9 +139,10 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
             (first_name, last_name, employee_id, address, city, state, zip_code, email),
         )
         people_id = cursor.fetchone()['id']
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         conn.execute(
             "INSERT INTO passwd (people_id, password) VALUES (%s, %s)",
-            (people_id, password),
+            (people_id, hashed),
         )
         conn.commit()
         conn.close()
@@ -162,7 +173,8 @@ def reset_password(email: str, new_password: str) -> bool:
     if row is None:
         conn.close()
         return False
-    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (new_password, row["pw_id"]))
+    hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
