@@ -66,19 +66,11 @@ DEPARTMENTS = [
 ]
 
 
-class CompanyMainMenu(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Company Main Menu")
-        self.resize(1200, 760)
+class CompanyMainMenuWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
-        self._build_ui()
-
-    def _build_ui(self):
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
+        v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
@@ -86,6 +78,15 @@ class CompanyMainMenu(QtWidgets.QMainWindow):
         for label, script in DEPARTMENTS:
             tabs.addTab(_launch_tab(script, label), label)
         v.addWidget(tabs)
+
+
+class CompanyMainMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Company Main Menu")
+        self.resize(1200, 760)
+        _apply_blue_palette(self)
+        self.setCentralWidget(CompanyMainMenuWidget())
 
 
 if __name__ == "__main__":
