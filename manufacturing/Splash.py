@@ -1,33 +1,51 @@
-from tkinter import *
-import tkinter as tk
-from tkinter import Button, Label, PhotoImage
-
-splash_root = Tk()
-splash_root.title("Splash Screen!!")
-app_width = 1000
-app_height = 560
-splash_root.overrideredirect(True)
-# Supports .png, .gif, .pgm, .ppm
-image = tk.PhotoImage(file="c:/source/pythonQSG/pyqt6 apps/images/manufacturing2.png")
-screen_width = splash_root.winfo_screenwidth()
-screen_height = splash_root.winfo_screenheight()
-
-x = (screen_width / 2) - (app_width / 2)
-y = (screen_height / 2) - (app_height / 2)
-
-splash_root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
-
-# Create a Label widget to display the image
-splash_label = tk.Label(splash_root, image=image)
-splash_label.pack(pady=20)
+import sys, os
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-def main_window():
-    # Kill the splash screen
-    splash_root.destroy()
+class SplashScreen(QtWidgets.QSplashScreen):
+    def __init__(self):
+        img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "manufacturing2.png")
+        pixmap = QtGui.QPixmap(img_path)
+        super().__init__(pixmap, QtCore.Qt.WindowType.WindowStaysOnTopHint)
+        self.setMask(pixmap.mask())
 
 
-# Splash Screen Timer
-splash_root.after(3000, main_window)
+def main():
+    app = QtWidgets.QApplication(sys.argv)
 
-mainloop()
+    splash = SplashScreen()
+    splash.show()
+    app.processEvents()
+
+    def launch_login():
+        splash.finish(None)
+        from login_app import init_db, LoginWindow, SessionWindow
+
+        init_db()
+
+        login = LoginWindow()
+
+        def on_login(email: str):
+            session = SessionWindow(email)
+            session.logged_out.connect(on_logout)
+            login._session = session
+            session.show()
+
+        def on_logout():
+            login._session = None
+            login.email_input.clear()
+            login.passwd_input.clear()
+            login.show()
+
+        login.login_successful.connect(on_login)
+        login.show()
+        # Keep references alive for the duration of the app
+        app._login = login
+
+    QtCore.QTimer.singleShot(3000, launch_login)
+
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
