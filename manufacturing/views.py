@@ -2054,9 +2054,14 @@ def _remove_user_role(people_id: int):
     conn.close()
 
 
+_ROLE_ADMIN_ROLES = FULL_ACCESS_ROLES | {'Admin'}
+
+
 def user_roles(request):
     if not request.session.get('user_email'):
         return redirect('home')
+    if request.session.get('user_role') not in _ROLE_ADMIN_ROLES:
+        return redirect('dashboard')
 
     roles = _get_all_roles()
 
