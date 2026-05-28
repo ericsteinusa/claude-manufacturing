@@ -1,6 +1,7 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 from IT_Tasks import ITTasksWidget, _apply_blue_palette
+from it_calls import ITSupportWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -52,7 +53,7 @@ class ITMgrMenu(QtWidgets.QMainWindow):
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ITTasksWidget(), "IT Tasks")
         tabs.addTab(_launch_tab("IT_technician.py", "IT Technician"), "IT Technician")
-        tabs.addTab(_launch_tab("it_calls.py", "IT Support Calls"), "IT Support Calls")
+        tabs.addTab(ITSupportWidget(), "IT Support Calls")
         v.addWidget(tabs)
 
 

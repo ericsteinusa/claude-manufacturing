@@ -77,6 +77,7 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 def _apply_blue_palette(widget):
     pal = widget.palette()
     for group in (QtGui.QPalette.ColorGroup.Active,
@@ -92,8 +93,6 @@ def _ro(text):
     item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
     return item
 
-    # Create a cursor instance
-    c = conn.cursor()
 
 def _next_ticket_num():
     yr = QtCore.QDate.currentDate().year()
@@ -107,9 +106,6 @@ def _next_ticket_num():
     conn.close()
     return f"TKT-{yr}-{count + 1:04d}"
 
-    # Add button
-    search_button = Button(search, text="Search Records", command=search_records)
-    search_button.pack(padx=20, pady=20)
 
 # ── Dialogs ────────────────────────────────────────────────────────────────────
 
@@ -334,13 +330,11 @@ class NewAssetDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Embeddable Widget ──────────────────────────────────────────────────────────
 
-class ITSupportMenu(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("IT Support")
-        self.resize(1020, 680)
+class ITSupportWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._ticket_row_ids = []
         self._selected_ticket_id = None
@@ -357,7 +351,9 @@ class ITSupportMenu(QtWidgets.QMainWindow):
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
-        self.setCentralWidget(self._tabs)
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.addWidget(self._tabs)
         self._build_tickets_tab()
         self._build_assets_tab()
 
@@ -664,11 +660,11 @@ class ITSupportMenu(QtWidgets.QMainWindow):
 
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
-            ("Add Asset",    self._on_new_asset),
-            ("Mark Spare",   lambda: self._set_asset_status("spare",   "Mark as Spare?")),
-            ("Send to Repair", lambda: self._set_asset_status("repair", "Send to Repair?")),
-            ("Mark Retired", lambda: self._set_asset_status("retired", "Retire this asset?")),
-            ("Mark Active",  lambda: self._set_asset_status("active",  "Mark as Active?")),
+            ("Add Asset",      self._on_new_asset),
+            ("Mark Spare",     lambda: self._set_asset_status("spare",   "Mark as Spare?")),
+            ("Send to Repair", lambda: self._set_asset_status("repair",  "Send to Repair?")),
+            ("Mark Retired",   lambda: self._set_asset_status("retired", "Retire this asset?")),
+            ("Mark Active",    lambda: self._set_asset_status("active",  "Mark as Active?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -757,12 +753,21 @@ class ITSupportMenu(QtWidgets.QMainWindow):
             self._refresh_assets()
 
 
+# ── Standalone Window ──────────────────────────────────────────────────────────
+
+class ITSupportMenu(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("IT Support")
+        self.resize(1020, 680)
+        _apply_blue_palette(self)
+        self.setCentralWidget(ITSupportWidget())
+
+
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = ITSupportMenu()
-    if "--assets" in sys.argv:
-        window._tabs.setCurrentIndex(1)
     window.show()
     sys.exit(app.exec())
 
