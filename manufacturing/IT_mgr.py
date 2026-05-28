@@ -46,6 +46,7 @@ class ITMgrMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
+        from IT_mgr_reports import ITMgrReportsWidget
         central = QtWidgets.QWidget(); _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
@@ -54,6 +55,7 @@ class ITMgrMenu(QtWidgets.QMainWindow):
         tabs.addTab(ITTasksWidget(), "IT Tasks")
         tabs.addTab(_launch_tab("IT_technician.py", "IT Technician"), "IT Technician")
         tabs.addTab(ITSupportWidget(), "IT Support Calls")
+        tabs.addTab(ITMgrReportsWidget(), "Reports")
         v.addWidget(tabs)
 
 

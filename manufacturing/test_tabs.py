@@ -26,6 +26,7 @@ WINDOWS = [
     ("engineer",             "EngineerMenu",              "Engineer"),
     ("eng_mgr",              "EngMgrMenu",                "Eng Mgr"),
     ("IT_mgr",               "ITMgrMenu",                 "IT Mgr"),
+    ("IT_mgr_reports",       "ITMgrReportsWidget",        "IT Mgr Reports"),
     ("IT_technician",        "ITTechnicianMenu",          "IT Technician"),
     ("IT_tech_reports",      "ITTechReportsWidget",       "IT Tech Reports"),
     ("it_calls",             "ITSupportMenu",             "IT Calls"),
