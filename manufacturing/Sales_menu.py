@@ -14,6 +14,13 @@ COMBO_STYLE = (
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+)
 
 SO_COLORS = {
     "quote":      "#ffffff",
@@ -265,13 +272,11 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Embeddable Widget ──────────────────────────────────────────────────────────
 
-class SalesOrders(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Sales")
-        self.resize(920, 640)
+class SalesOrdersWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         _apply_blue_palette(self)
         self._ord_row_ids = []
         self._selected_so_id = None
@@ -285,13 +290,12 @@ class SalesOrders(QtWidgets.QMainWindow):
         self._refresh_customers()
 
     def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(0, 0, 0, 0)
         self._tabs = QtWidgets.QTabWidget()
-        self._tabs.setStyleSheet(
-            "QTabBar::tab{background:white; border:1px solid black; padding:4px 10px;}"
-            "QTabBar::tab:selected{background:rgb(85,255,255);}"
-        )
+        self._tabs.setStyleSheet(TAB_STYLE)
         self._tabs.currentChanged.connect(self._on_tab_changed)
-        self.setCentralWidget(self._tabs)
+        v.addWidget(self._tabs)
         self._build_orders_tab()
         self._build_customers_tab()
 
@@ -725,8 +729,16 @@ class SalesOrders(QtWidgets.QMainWindow):
             self._load_ord_customer_filter()
 
 
+class SalesOrders(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Sales")
+        self.resize(920, 640)
+        _apply_blue_palette(self)
+        self.setCentralWidget(SalesOrdersWidget())
+
+
 def main():
-    init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = SalesOrders()
     window.show()
