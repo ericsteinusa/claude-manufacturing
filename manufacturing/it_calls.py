@@ -764,7 +764,23 @@ class ITSupportMenu(QtWidgets.QMainWindow):
         self.setWindowTitle("IT Support")
         self.resize(1020, 680)
         _apply_blue_palette(self)
-        self.setCentralWidget(ITSupportWidget())
+        from it_calls_reports import ITSupportReportsWidget
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(
+            "QTabWidget::pane{border:1px solid black;}"
+            "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+            "border-bottom:none;border-radius:4px 4px 0 0;}"
+            "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+            "QTabBar::tab:hover{background:rgb(85,255,255);}"
+        )
+        tabs.addTab(ITSupportWidget(), "Support Calls")
+        tabs.addTab(ITSupportReportsWidget(), "Reports")
+        v.addWidget(tabs)
 
 
 def main():
