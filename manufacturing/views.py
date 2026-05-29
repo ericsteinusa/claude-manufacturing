@@ -83,10 +83,10 @@ _MAINT_MENU = {
         ('work_orders', 'Work Orders', {
             'title': 'Work Orders',
             'items': [
-                ('create_wo', 'Create Work Order', 'Maint_Maint_menu.py'),
-                ('open_wo', 'Open Work Orders', 'Maint_Maint_menu.py'),
-                ('inprog_wo', 'In Progress', 'Maint_Maint_menu.py'),
-                ('comp_wo', 'Completed', 'Maint_Maint_menu.py'),
+                ('create_wo', 'Create Work Order', 'work_orders.py'),
+                ('open_wo', 'Open Work Orders', 'work_orders.py'),
+                ('inprog_wo', 'In Progress', 'work_orders.py'),
+                ('comp_wo', 'Completed', 'work_orders.py'),
             ],
         }),
         ('maint_schedule', 'Maintenance Schedule', {
@@ -290,10 +290,10 @@ _PROD_MENU = {
         ('work_orders', 'Work Orders', {
             'title': 'Work Orders',
             'items': [
-                ('create_wo', 'Create Work Order', 'prod_prod_menu.py'),
-                ('open_wo', 'Open Work Orders', 'prod_prod_menu.py'),
-                ('inprog_wo', 'In Progress', 'prod_prod_menu.py'),
-                ('comp_wo', 'Completed', 'prod_prod_menu.py'),
+                ('create_wo', 'Create Work Order', 'work_orders.py'),
+                ('open_wo', 'Open Work Orders', 'work_orders.py'),
+                ('inprog_wo', 'In Progress', 'work_orders.py'),
+                ('comp_wo', 'Completed', 'work_orders.py'),
             ],
         }),
         ('prod_schedule', 'Production Schedule', {
