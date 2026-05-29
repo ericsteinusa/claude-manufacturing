@@ -762,7 +762,7 @@ MENU_TREE = {
                     ('ap', 'Accounts Payable', 'Accounts_payable.py'),
                     ('rcv', 'Accounts Receivable', 'Accounts_receivable.py'),
                     ('credit', 'Credit Department', 'Credit_dept.py'),
-                    ('pay', 'Payroll Department', 'Payroll_dept.py'),
+                    ('pay', 'Payroll Department', 'payroll.py'),
                     ('fin_reports', 'Financial Reports', {
                         'title': 'Financial Reports',
                         'items': [
@@ -794,7 +794,7 @@ MENU_TREE = {
             }),
             ('acct_rcv', 'Accounts Receivable', 'Accounts_receivable.py'),
             ('credit', 'Credit Department', 'Credit_dept.py'),
-            ('payroll', 'Payroll Department', 'Payroll_dept.py'),
+            ('payroll', 'Payroll Department', 'payroll.py'),
             ('gen_ledger', 'General Ledger', 'General_ledger.py'),
             ('budget_mgmt', 'Budget Management', {
                 'title': 'Budget Management',
