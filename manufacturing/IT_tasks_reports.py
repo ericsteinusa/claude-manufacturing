@@ -4,7 +4,7 @@ Tabs: Task Summary | By Technician | By Department | Overdue | Recently Complete
 """
 import sys
 from datetime import date, timedelta
-from db_pg import get_db
+from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 from IT_Tasks import _apply_blue_palette
 

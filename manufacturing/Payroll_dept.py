@@ -4,7 +4,7 @@ Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report |
 """
 import sys
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 import os
 import csv
 from datetime import datetime

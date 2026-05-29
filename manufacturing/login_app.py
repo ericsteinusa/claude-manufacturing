@@ -1,7 +1,7 @@
 import sys
 import bcrypt
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 

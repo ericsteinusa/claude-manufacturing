@@ -1,5 +1,5 @@
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 from tkinter import *
 from tkinter import Label, Entry, Button, Listbox, END
 from tkinter import messagebox

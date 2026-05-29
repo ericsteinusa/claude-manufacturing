@@ -4,7 +4,7 @@ Tabs: Ticket Summary | By Department | By Issue Type | Open Tickets | Asset Summ
 """
 import sys
 from datetime import date
-from db_pg import get_db
+from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 from it_calls import _apply_blue_palette
 

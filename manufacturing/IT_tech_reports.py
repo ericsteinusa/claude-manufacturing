@@ -4,7 +4,7 @@ Tabs: Task Summary | Ticket Summary | Overdue Tasks | Overdue Tickets
 """
 import sys
 from datetime import date
-from db_pg import get_db
+from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 from IT_Tasks import _apply_blue_palette
 

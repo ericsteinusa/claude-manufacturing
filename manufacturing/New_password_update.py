@@ -1,5 +1,5 @@
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from password import Ui_MainWindow  # Import the generated Python file

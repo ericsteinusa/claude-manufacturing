@@ -1,6 +1,6 @@
 import sys
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 from datetime import datetime, date, timedelta
 from PyQt6 import QtCore, QtGui, QtWidgets
 

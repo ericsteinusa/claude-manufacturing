@@ -4,7 +4,7 @@ Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report | Department
 """
 import sys
 import os
-from db_pg import get_db
+from .db_pg import get_db
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets

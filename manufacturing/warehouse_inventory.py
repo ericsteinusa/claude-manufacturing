@@ -4,7 +4,7 @@ Tabs: Stock Overview | Receive Stock | Adjustments | Reports
 """
 import sys
 import os
-from db_pg import get_db
+from .db_pg import get_db
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets

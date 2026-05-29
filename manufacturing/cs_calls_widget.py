@@ -4,7 +4,7 @@ Replaces the legacy tkinter cs_calls.py for embedding in tabbed menus.
 """
 import sys
 from datetime import date
-from db_pg import get_db
+from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)

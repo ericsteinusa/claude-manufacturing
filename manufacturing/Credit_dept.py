@@ -1,5 +1,5 @@
 import sys
-from db_pg import get_db
+from .db_pg import get_db
 import os
 import csv
 from datetime import date

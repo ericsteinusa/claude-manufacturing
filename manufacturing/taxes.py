@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 from tkinter import colorchooser
 from configparser import ConfigParser
 

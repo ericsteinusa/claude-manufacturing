@@ -18,7 +18,7 @@ Usage:
 """
 
 import os
-from db_pg import get_db
+from .db_pg import get_db
 
 
 

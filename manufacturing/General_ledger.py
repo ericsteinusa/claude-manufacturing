@@ -5,7 +5,7 @@ Tabs: Chart of Accounts | Journal Entries | Trial Balance | Ledger View
 import sys
 import psycopg2
 import os
-from db_pg import get_db
+from .db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 

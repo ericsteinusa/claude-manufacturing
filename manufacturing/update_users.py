@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
 import psycopg2
-from db_pg import get_db
+from .db_pg import get_db
 
 
 
