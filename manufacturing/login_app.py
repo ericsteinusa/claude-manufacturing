@@ -846,6 +846,7 @@ class LoginWindow(QtWidgets.QMainWindow):
     login_successful = QtCore.pyqtSignal(str)  # emits the logged-in email
 
     def __init__(self):
+        self._session: "SessionWindow | None" = None
         super().__init__()
         self.setWindowTitle("Company Login")
         self.setFixedSize(480, 360)

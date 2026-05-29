@@ -8,6 +8,7 @@ from .gl_utils import post_gl_entry
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
+from gl_utils import post_gl_entry
 SS_RATE      = 0.062
 MEDICARE_RATE = 0.0145
 DT_FMT = "%Y-%m-%d %H:%M:%S"

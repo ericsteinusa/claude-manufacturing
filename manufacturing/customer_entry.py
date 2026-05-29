@@ -355,7 +355,7 @@ root.title("Customer Entry")
 
 # Add Record Entry Boxes
 data_frame = LabelFrame(root, text="Record")
-data_frame.pack(fill="x", expand="yes", padx=20)
+data_frame.pack(fill="x", expand=True, padx=20)
 data_frame.place(x=5, y=300, width=1385, height=100)
 customer_id_label = Label(data_frame, text="ID")
 customer_id_label.grid(row=0, column=0, padx=10, pady=10)
@@ -702,7 +702,7 @@ def create_table_again():
 # Add Buttons
 button_frame = LabelFrame(root, text="Commands")
 button_frame.place(x=5, y=650, width=1400, height=75)
-button_frame.pack(fill="x", expand="yes", padx=20)
+button_frame.pack(fill="x", expand=True, padx=20)
 
 update_button = Button(button_frame, text="Update Record", command=update_record)
 update_button.grid(row=0, column=0, padx=10, pady=10)

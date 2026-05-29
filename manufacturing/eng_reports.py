@@ -61,8 +61,12 @@ def _ro(text):
     return item
 
 
-def _stat_card(title, value):
-    w = QtWidgets.QWidget()
+class _StatCard(QtWidgets.QWidget):
+    _val_lbl: QtWidgets.QLabel
+
+
+def _stat_card(title, value) -> _StatCard:
+    w = _StatCard()
     w.setStyleSheet("background-color:white;border-radius:6px;border:1px solid black;")
     v = QtWidgets.QVBoxLayout(w)
     v.setContentsMargins(10, 4, 10, 4)

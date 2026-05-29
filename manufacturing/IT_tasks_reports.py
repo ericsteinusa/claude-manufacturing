@@ -55,6 +55,9 @@ def _simple_table(headers, stretch_col=0):
 
 class _TaskSummaryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
+        self._status_tbl: QtWidgets.QTableWidget
+        self._pri_tbl: QtWidgets.QTableWidget
+        self._type_tbl: QtWidgets.QTableWidget
         super().__init__(parent)
         _apply_blue_palette(self)
         self._build_ui()

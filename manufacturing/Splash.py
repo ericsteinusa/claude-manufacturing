@@ -41,7 +41,7 @@ def main():
         login.login_successful.connect(on_login)
         login.show()
         # Keep references alive for the duration of the app
-        app._login = login
+        app._login = login  # type: ignore[attr-defined]
 
     QtCore.QTimer.singleShot(3000, launch_login)
 

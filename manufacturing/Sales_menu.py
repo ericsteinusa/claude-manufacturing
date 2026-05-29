@@ -276,6 +276,15 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
 
 class SalesOrdersWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
+        self.cust_company: QtWidgets.QLineEdit
+        self.cust_first: QtWidgets.QLineEdit
+        self.cust_last: QtWidgets.QLineEdit
+        self.cust_phone: QtWidgets.QLineEdit
+        self.cust_email: QtWidgets.QLineEdit
+        self.cust_address: QtWidgets.QLineEdit
+        self.cust_city: QtWidgets.QLineEdit
+        self.cust_state: QtWidgets.QLineEdit
+        self.cust_zip: QtWidgets.QLineEdit
         super().__init__(parent)
         _apply_blue_palette(self)
         self._ord_row_ids = []

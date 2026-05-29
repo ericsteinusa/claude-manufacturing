@@ -1,8 +1,8 @@
 import sys
 import os
 import subprocess
-from PyQt6 import QtCore, QtWidgets
-from cs_calls import CustomerServiceCallsWidget, _apply_blue_palette
+from PyQt6 import QtCore, QtGui, QtWidgets
+from cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"

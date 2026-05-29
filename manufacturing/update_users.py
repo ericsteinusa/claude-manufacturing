@@ -88,7 +88,7 @@ def create_gui():
     # fg="Black", font=("Arial" , 16, "bold"))
     # banner.place(x=140, y=20) # Place the banner at the top and stretch it horizontally
 
-    Label(root, text="Email:", font=("Arial", 10)).place(x=178, y=125),
+    Label(root, text="Email:", font=("Arial", 10)).place(x=178, y=125)
     email_entry = Entry(root)
     email_entry.place(x=265, y=125)
 

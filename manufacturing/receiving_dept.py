@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 import psycopg2
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
