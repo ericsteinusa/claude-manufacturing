@@ -706,10 +706,10 @@ _PURCH_MENU = {
         ('vendor_mgmt', 'Vendor Management', {
             'title': 'Vendor Management',
             'items': [
-                ('vend_list', 'Vendor List', 'Purchasing_menu.py'),
-                ('new_vend', 'New Vendor', 'Purchasing_menu.py'),
-                ('vend_perf', 'Vendor Performance', 'Purchasing_menu.py'),
-                ('vend_cont', 'Vendor Contracts', 'Purchasing_menu.py'),
+                ('vend_list', 'Vendor List', 'suppliers.py'),
+                ('new_vend', 'New Vendor', 'suppliers.py'),
+                ('vend_perf', 'Vendor Performance', 'suppliers.py'),
+                ('vend_cont', 'Vendor Contracts', 'suppliers.py'),
             ],
         }),
         ('purch_reports', 'Purchase Reports', {
