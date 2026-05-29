@@ -1,10 +1,13 @@
 """Tab-switching regression test. Run from the manufacturing/ directory."""
-import sys, os, traceback, importlib
+import sys
+import os
+import traceback
+import importlib
 _DIR = r"C:\tester\manufacture\manufacturing"
 os.chdir(_DIR)
 sys.path.insert(0, _DIR)
 
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtWidgets  # noqa: E402
 
 app = QtWidgets.QApplication(sys.argv)
 
@@ -100,7 +103,7 @@ for mod_name, cls_name, label in WINDOWS:
         else:
             results.append((label, "OK", [], tab_info))
 
-    except Exception as e:
+    except Exception:
         tb = traceback.format_exc().strip().splitlines()
         short = tb[-1]
         results.append((label, "FAIL", [short], []))

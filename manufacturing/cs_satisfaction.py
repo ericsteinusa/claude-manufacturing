@@ -3,7 +3,6 @@ cs_satisfaction.py — Customer Satisfaction
 Tabs: CSAT Results | NPS Reports | Satisfaction Trends | Improvement Plans
 """
 import sys
-import os
 from .db_pg import get_db
 import csv
 from datetime import date, datetime

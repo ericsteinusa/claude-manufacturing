@@ -3,10 +3,8 @@ warehouse_inventory.py — Warehouse & Inventory Management
 Tabs: Stock Overview | Receive Stock | Adjustments | Reports
 """
 import sys
-import os
 from .db_pg import get_db
 import csv
-from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -48,7 +46,8 @@ def _conn():
 
 
 def init_db():
-    import Supplier_entry as _se; _se.init_db()
+    import Supplier_entry as _se
+    _se.init_db()
     with _conn() as con:
         con.execute("""
             CREATE TABLE IF NOT EXISTS product (
@@ -997,7 +996,6 @@ class WarehouseWidget(QtWidgets.QWidget):
             combo.blockSignals(False)
 
     def _on_tab_change(self, idx):
-        tab_names = ["Stock Overview", "Receive Stock", "Adjustments", "Reports"]
         if idx == 1:
             self._load_receive_history()
         elif idx == 2:

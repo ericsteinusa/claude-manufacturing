@@ -61,14 +61,16 @@ class _OverviewWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(10)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(10)
 
         hdr = QtWidgets.QLabel("IT Department Overview")
         hdr.setStyleSheet(HDR_STYLE)
         hdr.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         v.addWidget(hdr)
 
-        row = QtWidgets.QHBoxLayout(); row.setSpacing(16)
+        row = QtWidgets.QHBoxLayout()
+        row.setSpacing(16)
 
         # Tasks by status
         left = QtWidgets.QVBoxLayout()
@@ -104,7 +106,8 @@ class _OverviewWidget(QtWidgets.QWidget):
 
         v.addLayout(row)
 
-        row2 = QtWidgets.QHBoxLayout(); row2.setSpacing(16)
+        row2 = QtWidgets.QHBoxLayout()
+        row2.setSpacing(16)
 
         # Overdue counts
         left2 = QtWidgets.QVBoxLayout()
@@ -141,7 +144,8 @@ class _OverviewWidget(QtWidgets.QWidget):
         v.addLayout(row2)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
         v.addStretch()
@@ -211,7 +215,8 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Workload by Technician")
         hdr.setStyleSheet(HDR_STYLE)
@@ -234,7 +239,8 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         v.addWidget(self._ticket_tbl, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -293,7 +299,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Activity by Department")
         hdr.setStyleSheet(HDR_STYLE)
@@ -316,7 +323,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
         v.addWidget(self._ticket_tbl, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -373,7 +381,8 @@ class _OverdueWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Overdue Items")
         hdr.setStyleSheet(HDR_STYLE)
@@ -398,7 +407,8 @@ class _OverdueWidget(QtWidgets.QWidget):
         v.addWidget(self._ticket_tbl, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -451,14 +461,16 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Asset Inventory")
         hdr.setStyleSheet(HDR_STYLE)
         hdr.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         v.addWidget(hdr)
 
-        row = QtWidgets.QHBoxLayout(); row.setSpacing(16)
+        row = QtWidgets.QHBoxLayout()
+        row.setSpacing(16)
 
         left = QtWidgets.QVBoxLayout()
         lbl = QtWidgets.QLabel("By Status")
@@ -502,7 +514,8 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
         v.addWidget(self._all_tbl, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 

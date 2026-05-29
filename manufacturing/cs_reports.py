@@ -3,7 +3,6 @@ cs_reports.py — Customer Service Reports
 Tabs: Summary | Call Volume | By Customer | Open Calls
 """
 import sys
-import os
 from .db_pg import get_db
 import csv
 from datetime import date, datetime

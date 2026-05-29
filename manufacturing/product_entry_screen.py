@@ -1,7 +1,5 @@
 import sys
-import psycopg2
 from .db_pg import get_db
-from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)

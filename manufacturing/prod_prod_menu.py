@@ -121,9 +121,9 @@ class NewWODialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.wo_num = QtWidgets.QLineEdit(_next_wo_num())
         self.wo_num.setStyleSheet(INPUT_STYLE)
@@ -214,9 +214,9 @@ class AddMaterialDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -372,9 +372,9 @@ class AddBOMItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.finished_combo = QtWidgets.QComboBox()
         self.finished_combo.setStyleSheet(COMBO_STYLE)
@@ -581,7 +581,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("wo.status = ?"); params.append(status)
+            conds.append("wo.status = ?")
+            params.append(status)
         if term:
             conds.append("(wo.wo_number LIKE ? OR wo.description LIKE ?)")
             params += [f"%{term}%", f"%{term}%"]

@@ -1,7 +1,6 @@
-import tkinter as tk
+# ruff: noqa: F403,F405
 from tkinter import messagebox
-from tkinter import *
-import psycopg2
+from tkinter import *  # noqa: F401,F403,F405
 from .db_pg import get_db
 
 

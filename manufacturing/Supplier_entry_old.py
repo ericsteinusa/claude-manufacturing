@@ -1,6 +1,5 @@
-import psycopg2
 from .db_pg import get_db
-from tkinter import *
+from tkinter import *  # noqa: F401,F403,F405
 from tkinter import Label, Entry, Button, Listbox, END
 from tkinter import messagebox
 import tkinter as tk

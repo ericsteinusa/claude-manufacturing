@@ -1,5 +1,5 @@
-import sys, os, subprocess
-from PyQt6 import QtCore, QtGui, QtWidgets
+import sys
+from PyQt6 import QtWidgets
 from Accounts_payable import AccountsPayableWidget, _apply_blue_palette
 from Accounts_receivable import AccountsReceivableWidget
 from Credit_dept import CreditDeptWidget
@@ -32,11 +32,14 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(AccountsPayableWidget(), "Accounts Payable")
         tabs.addTab(AccountsReceivableWidget(), "Accounts Receivable")
         tabs.addTab(CreditDeptWidget(), "Credit Dept")
@@ -51,5 +54,6 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = AccountingManagerWindow(); w.show()
+    w = AccountingManagerWindow()
+    w.show()
     sys.exit(app.exec())

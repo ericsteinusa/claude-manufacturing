@@ -3,9 +3,8 @@ Payroll_dept.py — Payroll Department
 Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report | Payroll History
 """
 import sys
-import psycopg2
 from .db_pg import get_db
-import os
+from .gl_utils import post_gl_entry
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -249,7 +248,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self._run_people_ids = []
         self._run_deductions = {}
         self._history_run_ids = []
-        from . import personnel_crm as _pcrm; _pcrm.init_db()
+        from . import personnel_crm as _pcrm
+        _pcrm.init_db()
         init_db()
         self._build_ui()
         self._load_pay_rates()
@@ -1302,8 +1302,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             return
         start_str = self.run_from.date().toString("yyyy-MM-dd")
         end_str = self.run_to.date().toString("yyyy-MM-dd")
-        fed_rate = self.run_fed_spin.value() / 100
-        state_rate = self.run_state_spin.value() / 100
+        self.run_fed_spin.value() / 100
+        self.run_state_spin.value() / 100
         freq = self.run_freq.currentText()
 
         if QtWidgets.QMessageBox.question(

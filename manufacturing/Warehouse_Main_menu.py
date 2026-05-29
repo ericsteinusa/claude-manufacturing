@@ -1,5 +1,5 @@
-import sys, os, subprocess
-from PyQt6 import QtCore, QtGui, QtWidgets
+import sys
+from PyQt6 import QtWidgets
 from warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette
 from receiving_dept import ReceivingDeptWidget
 
@@ -29,8 +29,10 @@ class WarehouseMainMenu(QtWidgets.QMainWindow):
         _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(WarehouseWidget(), "Inventory")
         tabs.addTab(ReceivingDeptWidget(), "Receiving")
         v.addWidget(tabs)

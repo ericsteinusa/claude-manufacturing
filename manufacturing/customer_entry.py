@@ -1,12 +1,11 @@
-import psycopg2
+# ruff: noqa: F403,F405
 from .db_pg import get_db
-from tkinter import *
+from tkinter import *  # noqa: F401,F403,F405
 from tkinter import Label, Entry, Button, END
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import colorchooser
 from configparser import ConfigParser
-import tkinter as tk
 
 root = Tk()
 customer = ''
@@ -38,7 +37,7 @@ def query_database():
 	# Clear the Treeview
 	for record in my_tree.get_children():
 		my_tree.delete(record)
-		
+
 	# Create a database or connect to one that exists
 	conn = get_db()
 
@@ -47,12 +46,12 @@ def query_database():
 
 	c.execute("SELECT rowid, * FROM customer")
 	records = c.fetchall()
-	
+
 	# Add our data to the screen
 	global count
 	count = 0
-	
-	
+
+
 	for record in records:
 		if count % 2 == 0:
 			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9], record[10]), tags=('evenrow',))
@@ -73,11 +72,11 @@ def search_records():
 	lookup_record = search_entry.get()
 	# close the search box
 	search.destroy()
-	
+
 	# Clear the Treeview
 	for record in my_tree.get_children():
 		my_tree.delete(record)
-	
+
 	# Create a database or connect to one that exists
 	conn = get_db()
 
@@ -86,12 +85,12 @@ def search_records():
 
 	c.execute("SELECT rowid, * FROM customer WHERE CAST(rowid AS TEXT) LIKE ?", (lookup_record,))
 	records = c.fetchall()
-	
+
 	# Add our data to the screen
 	global count
 	count = 0
-	
-	
+
+
 	for record in records:
 		if count % 2 == 0:
 			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9], record[10]), tags=('evenrow',))
@@ -151,12 +150,12 @@ def primary_color():
 def secondary_color():
 	# Pick Color
 	secondary_color = colorchooser.askcolor()[1]
-	
+
 	# Update Treeview Color
 	if secondary_color:
 		# Create Striped Row Tags
 		my_tree.tag_configure('oddrow', background=secondary_color)
-		
+
 		# Config file
 		parser = ConfigParser()
 		parser.read("personnel.ini")
@@ -461,7 +460,7 @@ def remove_many():
 
 		# Create List of ID's
 		ids_to_delete = []
-		
+
 		# Add selections to ids_to_delete list
 		for record in x:
 			ids_to_delete.append(my_tree.item(record, 'values')[2])
@@ -475,7 +474,7 @@ def remove_many():
 
 		# Create a cursor instance
 		c = conn.cursor()
-		
+
 
 		# Delete Everything From The Table
 		c.executemany("DELETE FROM calls2 WHERE id = ?", [(a,) for a in ids_to_delete])
@@ -512,7 +511,7 @@ def remove_all():
 		c = conn.cursor()
 
 		# Delete Everything From The Table
-		c.execute("DROP TABLE customer")		
+		c.execute("DROP TABLE customer")
 
 
 		# Commit changes
@@ -541,7 +540,7 @@ def clear_entries():
 		state_entry.delete(0, END)
 		zip_code_entry.delete(0, END)
 		email_entry.delete(0, END)
-	
+
 
 # Select Record
 def select_record(e):
@@ -556,13 +555,13 @@ def select_record(e):
 	state_entry.delete(0, END)
 	zip_code_entry.delete(0, END)
 	email_entry.delete(0, END)
-	
-	
+
+
 	# Grab record Number
 	selected = my_tree.focus()
 	# Grab record values
 	values = my_tree.item(selected, 'values')
-		
+
 	# output to entry boxes
 	customer_id_entry.insert(0, values[0])
 	first_name_entry.insert(0, values[1])
@@ -574,8 +573,8 @@ def select_record(e):
 	state_entry.insert(0, values[7])
 	zip_code_entry.insert(0, values[8])
 	email_entry.insert(0, values[9])
-	
-		
+
+
 # Update record
 def update_record():
 	# Grab the record number
@@ -599,9 +598,9 @@ def update_record():
 		city = :city,
 		zip_code = :zip_code,
 		email = :email
-			
+
 		WHERE oid = :oid""",
-		{	
+		{
 			'first_name': first_name_entry.get(),
 			'last_name': last_name_entry.get(),
 			'company_name': company_name_entry.get(),
@@ -613,7 +612,7 @@ def update_record():
 			'email': email_entry.get(),
 			'oid': customer_id_entry.get(),
 		})
-	
+
 	# Commit changes
 	conn.commit()
 
@@ -632,8 +631,8 @@ def update_record():
 	state_entry.delete(0, END)
 	zip_code_entry.delete(0, END)
 	email_entry.delete(0, END)
-	
-	
+
+
 # add new record to database
 def add_record():
 	# Update the database
@@ -645,7 +644,7 @@ def add_record():
 
 	# Add New Record
 	c.execute("INSERT INTO customer (first_name, last_name, company_name, phone_number, address, city, state, zip_code, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name_entry.get(), last_name_entry.get(), company_name_entry.get(), phone_number_entry.get(), address_entry.get(), city_entry.get(), state_entry.get(), zip_code_entry.get(), email_entry.get()))
-	
+
 
 	# Commit changes
 	conn.commit()
@@ -664,7 +663,7 @@ def add_record():
 	state_entry.delete(0, END)
 	zip_code_entry.delete(0, END)
 	email_entry.delete(0, END)
-		
+
 	# Clear The Treeview Table
 	my_tree.delete(*my_tree.get_children())
 
@@ -685,14 +684,14 @@ def create_table_again():
 		last_name text,
 		company_name text,
 		phone_number text,
-		address text,  
+		address text,
 		city text,
 		state text,
 		zip_code text,
 		email text
 		)
 		""")
-	
+
 	# Commit changes
 	conn.commit()
 

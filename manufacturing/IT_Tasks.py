@@ -1,4 +1,3 @@
-import os
 import sys
 import psycopg2
 from .db_pg import get_db

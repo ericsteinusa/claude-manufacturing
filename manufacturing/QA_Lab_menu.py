@@ -124,9 +124,9 @@ class NewInspectionDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.insp_num = QtWidgets.QLineEdit(_next_insp_num())
         self.insp_num.setStyleSheet(INPUT_STYLE)
@@ -220,9 +220,9 @@ class LogDefectDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.defect_type = QtWidgets.QLineEdit()
         self.defect_type.setStyleSheet(INPUT_STYLE)
@@ -277,9 +277,9 @@ class AddSpecDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -531,9 +531,11 @@ class QALab(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if result:
-            conds.append("qi.result = ?"); params.append(result)
+            conds.append("qi.result = ?")
+            params.append(result)
         if prod_id:
-            conds.append("qi.product_id = ?"); params.append(prod_id)
+            conds.append("qi.product_id = ?")
+            params.append(prod_id)
         if term:
             conds.append("(qi.insp_number LIKE ? OR qi.inspector LIKE ?)")
             params += [f"%{term}%", f"%{term}%"]
@@ -735,9 +737,11 @@ class QALab(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if sev:
-            conds.append("d.severity = ?"); params.append(sev)
+            conds.append("d.severity = ?")
+            params.append(sev)
         if resolved is not None:
-            conds.append("d.resolved = ?"); params.append(resolved)
+            conds.append("d.resolved = ?")
+            params.append(resolved)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()

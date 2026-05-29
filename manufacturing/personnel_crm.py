@@ -1,7 +1,6 @@
 import sys
-import psycopg2
 from .db_pg import get_db
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (

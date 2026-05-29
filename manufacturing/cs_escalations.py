@@ -3,7 +3,6 @@ cs_escalations.py — CS Escalations
 Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution Tracking
 """
 import sys
-import os
 from .db_pg import get_db
 import csv
 from datetime import date, datetime

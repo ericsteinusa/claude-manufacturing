@@ -1,6 +1,6 @@
-import psycopg2
+# ruff: noqa: F403,F405
 from .db_pg import get_db
-from tkinter import *
+from tkinter import *  # noqa: F401,F403,F405
 from tkinter import ttk
 
 # Database setup

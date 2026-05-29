@@ -1,5 +1,7 @@
-import sys, os, subprocess
-from PyQt6 import QtCore, QtGui, QtWidgets
+import sys
+import os
+import subprocess
+from PyQt6 import QtCore, QtWidgets
 from .Risk_mgmt_Main_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
@@ -21,12 +23,15 @@ def _launch(script):
 
 
 def _placeholder_tab(label):
-    w = QtWidgets.QWidget(); _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    w = QtWidgets.QWidget()
+    _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w)
+    v.addStretch()
     lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl); v.addStretch()
+    v.addWidget(lbl)
+    v.addStretch()
     return w
 
 
@@ -39,11 +44,14 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(_placeholder_tab("Risk Framework"), "Risk Framework")
         tabs.addTab(_placeholder_tab("Risk Reporting"), "Risk Reporting")
         tabs.addTab(_placeholder_tab("Business Continuity"), "Business Continuity")
@@ -52,5 +60,6 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = RiskMgrMenu(); w.show()
+    w = RiskMgrMenu()
+    w.show()
     sys.exit(app.exec())

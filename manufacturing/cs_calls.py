@@ -1,4 +1,3 @@
-import psycopg2
 from .db_pg import get_db
 from tkinter import messagebox
 import tkinter as tk
@@ -49,7 +48,7 @@ def query_database():
 	# Clear the Treeview
 	for record in my_tree.get_children():
 		my_tree.delete(record)
-		
+
 	# Create a database or connect to one that exists
 	conn = get_db()
 
@@ -58,12 +57,12 @@ def query_database():
 
 	c.execute("SELECT rowid, * FROM calls2")
 	records = c.fetchall()
-	
+
 	# Add our data to the screen
 	global count
 	count = 0
-	
-	
+
+
 	for record in records:
 		if count % 2 == 0:
 			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
@@ -84,11 +83,11 @@ def search_records():
 	lookup_record = search_entry.get()
 	# close the search box
 	search.destroy()
-	
+
 	# Clear the Treeview
 	for record in my_tree.get_children():
 		my_tree.delete(record)
-	
+
 	# Create a database or connect to one that exists
 	conn = get_db()
 
@@ -97,12 +96,12 @@ def search_records():
 
 	c.execute("SELECT rowid, * FROM calls2 WHERE rowid like ?", (lookup_record,))
 	records = c.fetchall()
-	
+
 	# Add our data to the screen
 	global count
 	count = 0
-	
-	
+
+
 	for record in records:
 		if count % 2 == 0:
 			my_tree.insert(parent='', index='end', iid=count, text='', values=(record[1], record[2],  record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('evenrow',))
@@ -162,12 +161,12 @@ def primary_color():
 def secondary_color():
 	# Pick Color
 	secondary_color = colorchooser.askcolor()[1]
-	
+
 	# Update Treeview Color
 	if secondary_color:
 		# Create Striped Row Tags
 		my_tree.tag_configure('oddrow', background=secondary_color)
-		
+
 		# Config file
 		parser = ConfigParser()
 		parser.read("personnel.ini")
@@ -444,7 +443,7 @@ def remove_one():
 
 	# Delete From Database
 	c.execute("DELETE FROM calls2 WHERE id = %s", (id_entry.get(),))
-	
+
 
 
 	# Commit changes
@@ -473,7 +472,7 @@ def remove_many():
 
 		# Create List of ID's
 		ids_to_delete = []
-		
+
 		# Add selections to ids_to_delete list
 		for record in x:
 			ids_to_delete.append(my_tree.item(record, 'values')[0])
@@ -487,7 +486,7 @@ def remove_many():
 
 		# Create a cursor instance
 		c = conn.cursor()
-		
+
 
 		# Delete Everything From The Table
 		c.executemany("DELETE FROM calls2 WHERE id = ?", [(a,) for a in ids_to_delete])
@@ -547,7 +546,7 @@ def clear_entries():
 	completion_time_entry.delete(0, tk.END)
 	comment_widget.delete("1.0", tk.END)
 	checkbox_var.set(0)
-	
+
 
 # Select Record
 def select_record(e):
@@ -561,13 +560,13 @@ def select_record(e):
 	completion_time_entry.delete(0, tk.END)
 	comment_widget.delete("1.0", tk.END)
 	checkbox_var.set(0)
-	
-	
+
+
 	# Grab record Number
 	selected = my_tree.focus()
 	# Grab record values
 	values = my_tree.item(selected, 'values')
-		
+
 	# output to entry boxes
 	id_entry.insert(0, values[0])
 	customer_combobox.insert(0, values[1])
@@ -578,8 +577,8 @@ def select_record(e):
 	completion_time_entry.insert(0, values[6])
 	comment_widget.insert("1.0", values[7])
 	checkbox_var.set(values[8])
-	
-		
+
+
 # Update record
 def update_record():
 	# Grab the record number
@@ -602,9 +601,9 @@ def update_record():
 		completion_time = :completion_time,
 		comments_box = :comments_box,
 		completion_box = :completion_box
-			
+
 		WHERE oid = :oid""",
-		{	
+		{
 			'customer': customer_combobox.get().split(' ')[0].strip('{'),
 			'call': call_widget.get("1.0", "end-1c"),
 			'call_date': call_date_entry.get(),
@@ -615,7 +614,7 @@ def update_record():
 			'completion_box': checkbox_var.get(),
 			'oid': id_entry.get(),
 		})
-	
+
 	# Commit changes
 	conn.commit()
 
@@ -633,8 +632,8 @@ def update_record():
 	completion_time_entry.delete(0, tk.END)
 	comment_widget.delete("1.0", tk.END)
 	checkbox_var.set(0)
-	
-	
+
+
 # add new record to database
 def add_record():
 	# Update the database
@@ -646,7 +645,7 @@ def add_record():
 
 	# Add New Record
 	c.execute("INSERT INTO calls2 (customer_id, call, call_date, call_time, completion_date, completion_time, comments_box, completion_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (customer_combobox.get().split(' ')[0].strip('{'), call_widget.get("1.0", "end-1c"), call_date_entry.get(), call_time_entry.get(), completion_date_entry.get(), completion_time_entry.get(), comment_widget.get("1.0", "end-1c"), checkbox_var.get()))
-	
+
 
 	# Commit changes
 	conn.commit()
@@ -664,7 +663,7 @@ def add_record():
 	completion_time_entry.delete(0, tk.END)
 	comment_widget.delete("1.0", tk.END)
 	checkbox_var.set(0)
-		
+
 	# Clear The Treeview Table
 	my_tree.delete(*my_tree.get_children())
 
@@ -686,12 +685,12 @@ def create_table_again():
 		call_date text,
 		call_time text,
 		completion_date,
-		completion_time,  
+		completion_time,
 		comments_box text,
 		completion_box integer,
 		FOREIGN KEY (customer_id) REFERENCES customer(id))
 		""")
-	
+
 	# Commit changes
 	conn.commit()
 

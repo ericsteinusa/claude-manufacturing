@@ -491,9 +491,11 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         conds = ["(inv.due_date IS NULL OR inv.due_date BETWEEN %s AND %s)"]
         params = [d_from, d_to]
         if status:
-            conds.append("inv.status = %s"); params.append(status)
+            conds.append("inv.status = %s")
+            params.append(status)
         if customer_id:
-            conds.append("inv.customer_id = %s"); params.append(customer_id)
+            conds.append("inv.customer_id = %s")
+            params.append(customer_id)
         where = " AND ".join(conds)
 
         conn = get_db()
