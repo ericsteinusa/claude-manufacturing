@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from IT_Tasks import _apply_blue_palette
+from .IT_Tasks import _apply_blue_palette
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"

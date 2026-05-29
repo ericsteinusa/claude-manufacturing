@@ -88,7 +88,7 @@ def _load_products():
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT id, product_name FROM product ORDER BY product_name"
+            "SELECT id, name AS product_name FROM product ORDER BY name"
         ).fetchall()
     except psycopg2.OperationalError:
         rows = []
@@ -498,7 +498,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         base = """
             SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
                    wo.start_date, wo.due_date, wo.status,
-                   p.product_name,
+                   p.name AS product_name,
                    (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id) AS mat_count
             FROM work_order wo
             LEFT JOIN product p ON p.id = wo.product_id
@@ -568,7 +568,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             mats = conn.execute("""
-                SELECT p.product_name, m.qty_required, m.qty_issued, m.notes
+                SELECT p.name AS product_name, m.qty_required, m.qty_issued, m.notes
                 FROM wo_material m LEFT JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = %s
             """, (self._selected_wo_id,)).fetchall()

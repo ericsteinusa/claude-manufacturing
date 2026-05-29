@@ -64,8 +64,8 @@ def init_db():
 
         CREATE TABLE IF NOT EXISTS payroll_run (
             id               SERIAL PRIMARY KEY,
-            period_start     TEXT NOT NULL,
-            period_end       TEXT NOT NULL,
+            pay_period_start     TEXT NOT NULL,
+            pay_period_end       TEXT NOT NULL,
             run_date         TEXT NOT NULL,
             pay_frequency    TEXT NOT NULL,
             federal_tax_rate REAL NOT NULL,
@@ -249,7 +249,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self._run_people_ids = []
         self._run_deductions = {}
         self._history_run_ids = []
-        import personnel_crm as _pcrm; _pcrm.init_db()
+        from . import personnel_crm as _pcrm; _pcrm.init_db()
         init_db()
         self._build_ui()
         self._load_pay_rates()
@@ -1316,10 +1316,9 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 
         conn = get_db()
         cur = conn.execute("""
-            INSERT INTO payroll_run (period_start, period_end, run_date, pay_frequency,
-                                     federal_tax_rate, state_tax_rate, status)
-            VALUES (%s, %s, %s, %s, %s, %s, 'processed') RETURNING id
-        """, (start_str, end_str, datetime.now().strftime(DT_FMT), freq, fed_rate, state_rate))
+            INSERT INTO payroll_run (pay_period_start, pay_period_end, run_date, status)
+            VALUES (%s, %s, %s, 'processed') RETURNING id
+        """, (start_str, end_str, datetime.now().strftime(DT_FMT)))
         run_id = cur.fetchone()['id']
 
         def _v(r, col):
@@ -1383,7 +1382,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.stub_run_combo.addItem("-- select run --", None)
         conn = get_db()
         runs = conn.execute(
-            "SELECT id, period_start, period_end, run_date, pay_frequency "
+            "SELECT id, pay_period_start, pay_period_end, run_date, status "
             "FROM payroll_run ORDER BY run_date DESC"
         ).fetchall()
         conn.close()
@@ -1392,7 +1391,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
                 rd = datetime.strptime(run["run_date"], DT_FMT).strftime("%m/%d/%Y")
             except ValueError:
                 rd = run["run_date"]
-            label = f"{rd}  ({run['period_start']} – {run['period_end']})  [{run['pay_frequency']}]"
+            label = f"{rd}  ({run['pay_period_start']} – {run['pay_period_end']})"
             self.stub_run_combo.addItem(label, run["id"])
         self.stub_run_combo.blockSignals(False)
 
@@ -1420,8 +1419,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         entry = conn.execute("""
             SELECT pe.*, p.first_name, p.last_name, p.emp_id,
-                   pr.period_start, pr.period_end, pr.run_date, pr.pay_frequency,
-                   pr.federal_tax_rate, pr.state_tax_rate,
+                   pr.pay_period_start, pr.pay_period_end, pr.run_date,
                    ep.pay_type, ep.pay_rate
             FROM payroll_entry pe
             JOIN people p      ON p.id=pe.people_id
@@ -1464,9 +1462,9 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             divider("="),
             line("Employee:", f"{e['last_name']}, {e['first_name']}"),
             line("Employee ID:", e["employee_id"] or "—"),
-            line("Pay Period:", f"{e['period_start']}  to  {e['period_end']}"),
+            line("Pay Period:", f"{e['pay_period_start']}  to  {e['pay_period_end']}"),
             line("Payment Date:", rd),
-            line("Pay Frequency:", e["pay_frequency"]),
+            line("Pay Frequency:", e.get("pay_frequency", "—")),
             line("Pay Type / Rate:", rate_str),
             divider(),
             section("EARNINGS"),
@@ -1487,8 +1485,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 
         taxable = e["gross_pay"] - (e["pre_tax_deductions"] or 0.0)
         stub += section("TAXES  (on taxable wages: " + _money(taxable) + ")")
-        stub += "\n" + line(f"  Federal Income Tax ({_pct(e['federal_tax_rate'])}):".replace("  ", " ", 1) if False else
-                            "  Federal Income Tax:", f"-{_money(e['federal_tax'])}")
+        stub += "\n" + line("  Federal Income Tax:", f"-{_money(e['federal_tax'])}")
         stub += "\n" + line("  State Income Tax:", f"-{_money(e['state_tax'])}")
         stub += "\n" + line(f"  Social Security ({_pct(SS_RATE)}):", f"-{_money(e['social_security'])}")
         stub += "\n" + line(f"  Medicare ({_pct(MEDICARE_RATE)}):", f"-{_money(e['medicare'])}")
@@ -1542,7 +1539,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             FROM payroll_entry pe
             JOIN people p      ON p.id=pe.people_id
             JOIN payroll_run pr ON pr.id=pe.run_id
-            WHERE strftime('%Y', pr.period_start)=%s
+            WHERE strftime('%Y', pr.pay_period_start)=%s
         """
         params = [str(year)]
         if pid:
@@ -1615,7 +1612,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _load_history(self):
         conn = get_db()
         runs = conn.execute("""
-            SELECT pr.id, pr.run_date, pr.period_start, pr.period_end,
+            SELECT pr.id, pr.run_date, pr.pay_period_start, pr.pay_period_end,
                    COUNT(pe.id) AS emp_count,
                    COALESCE(SUM(pe.gross_pay), 0) AS total_gross
             FROM payroll_run pr
@@ -1635,7 +1632,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
                 rd = datetime.strptime(run["run_date"], DT_FMT).strftime("%m/%d/%Y")
             except ValueError:
                 rd = run["run_date"]
-            period = f"{run['period_start']}  –  {run['period_end']}"
+            period = f"{run['pay_period_start']}  –  {run['pay_period_end']}"
             al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
             ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
             for col, (val, align) in enumerate([(rd, ac), (period, al),
@@ -1662,9 +1659,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         conn.close()
 
         self.hist_detail_lbl.setText(
-            f"Run: {run['period_start']} – {run['period_end']}   "
-            f"({run['pay_frequency']}, Fed {_pct(run['federal_tax_rate'])}, "
-            f"State {_pct(run['state_tax_rate'])})"
+            f"Run: {run['pay_period_start']} – {run['pay_period_end']}   "
+            f"(Status: {run.get('status', '')})"
         )
         self.hist_detail_table.setRowCount(0)
         total_gross = total_net = 0.0

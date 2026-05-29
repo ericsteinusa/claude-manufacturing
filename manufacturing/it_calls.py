@@ -764,7 +764,7 @@ class ITSupportMenu(QtWidgets.QMainWindow):
         self.setWindowTitle("IT Support")
         self.resize(1020, 680)
         _apply_blue_palette(self)
-        from it_calls_reports import ITSupportReportsWidget
+        from .it_calls_reports import ITSupportReportsWidget
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
         self.setCentralWidget(central)
