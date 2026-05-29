@@ -230,10 +230,10 @@ _SALES_MENU = {
         ('cust_accounts', 'Customer Accounts', {
             'title': 'Customer Accounts',
             'items': [
-                ('acct_list', 'Account List', 'Sales_menu.py'),
-                ('new_acct', 'New Account', 'Sales_menu.py'),
-                ('acct_det', 'Account Details', 'Sales_menu.py'),
-                ('acct_hist', 'Account History', 'Sales_menu.py'),
+                ('acct_list', 'Account List', 'customers.py'),
+                ('new_acct', 'New Account', 'customers.py'),
+                ('acct_det', 'Account Details', 'customers.py'),
+                ('acct_hist', 'Account History', 'customers.py'),
             ],
         }),
         ('sales_reports', 'Sales Reports', {
@@ -582,10 +582,10 @@ _CS_MENU = {
         ('cust_accounts', 'Customer Accounts', {
             'title': 'Customer Accounts',
             'items': [
-                ('acct_list', 'Account List', 'cs_calls.py'),
-                ('new_acct', 'New Account', 'cs_calls.py'),
-                ('acct_det', 'Account Details', 'cs_calls.py'),
-                ('acct_hist', 'Account History', 'cs_calls.py'),
+                ('acct_list', 'Account List', 'customers.py'),
+                ('new_acct', 'New Account', 'customers.py'),
+                ('acct_det', 'Account Details', 'customers.py'),
+                ('acct_hist', 'Account History', 'customers.py'),
             ],
         }),
         ('returns', 'Returns & Refunds', {
