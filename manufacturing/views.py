@@ -221,10 +221,10 @@ _SALES_MENU = {
         ('sales_orders', 'Sales Orders', {
             'title': 'Sales Orders',
             'items': [
-                ('new_order', 'New Order', 'Sales_menu.py'),
-                ('open_orders', 'Open Orders', 'Sales_menu.py'),
-                ('order_hist', 'Order History', 'Sales_menu.py'),
-                ('order_stat', 'Order Status', 'Sales_menu.py'),
+                ('new_order', 'New Order', 'sales_orders.py'),
+                ('open_orders', 'Open Orders', 'sales_orders.py'),
+                ('order_hist', 'Order History', 'sales_orders.py'),
+                ('order_stat', 'Order Status', 'sales_orders.py'),
             ],
         }),
         ('cust_accounts', 'Customer Accounts', {
