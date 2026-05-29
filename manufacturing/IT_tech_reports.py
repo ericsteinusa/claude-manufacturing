@@ -63,7 +63,8 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(10)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(10)
 
         hdr = QtWidgets.QLabel("Task Summary")
         hdr.setStyleSheet(HDR_STYLE)
@@ -138,7 +139,8 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(10)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(10)
 
         hdr = QtWidgets.QLabel("Support Ticket Summary")
         hdr.setStyleSheet(HDR_STYLE)
@@ -213,7 +215,8 @@ class _OverdueTasksWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Overdue Tasks")
         hdr.setStyleSheet(HDR_STYLE)
@@ -273,7 +276,8 @@ class _OverdueTicketsWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Overdue Support Tickets")
         hdr.setStyleSheet(HDR_STYLE)

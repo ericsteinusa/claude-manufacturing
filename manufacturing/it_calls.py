@@ -123,9 +123,9 @@ class NewTicketDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.ticket_num = QtWidgets.QLineEdit(_next_ticket_num())
         self.ticket_num.setStyleSheet(INPUT_STYLE)
@@ -233,9 +233,9 @@ class NewAssetDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.asset_tag = QtWidgets.QLineEdit()
         self.asset_tag.setStyleSheet(INPUT_STYLE)
@@ -485,9 +485,11 @@ class ITSupportWidget(QtWidgets.QWidget):
         if status_val == "open":
             conds.append("status IN ('open','in_progress')")
         elif status_val:
-            conds.append("status = ?"); params.append(status_val)
+            conds.append("status = ?")
+            params.append(status_val)
         if priority:
-            conds.append("priority = ?"); params.append(priority)
+            conds.append("priority = ?")
+            params.append(priority)
         if term:
             conds.append("(ticket_number LIKE ? OR requester LIKE ? OR description LIKE ?)")
             params += [f"%{term}%", f"%{term}%", f"%{term}%"]
@@ -686,9 +688,11 @@ class ITSupportWidget(QtWidgets.QWidget):
         base = "SELECT * FROM it_asset"
         conds, params = [], []
         if status_val:
-            conds.append("status = ?"); params.append(status_val)
+            conds.append("status = ?")
+            params.append(status_val)
         if asset_type:
-            conds.append("asset_type = ?"); params.append(asset_type)
+            conds.append("asset_type = ?")
+            params.append(asset_type)
         if term:
             conds.append("(asset_tag LIKE ? OR make LIKE ? OR model LIKE ?"
                          " OR assigned_to LIKE ? OR serial_number LIKE ?)")
@@ -769,7 +773,8 @@ class ITSupportMenu(QtWidgets.QMainWindow):
         _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"

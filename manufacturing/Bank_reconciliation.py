@@ -3,7 +3,6 @@ Bank_reconciliation.py — Bank Reconciliation module
 Tabs: Bank Accounts | Statement Entry | Reconciliation | History
 """
 import sys
-import os
 from .db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets

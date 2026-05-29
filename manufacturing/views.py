@@ -1495,7 +1495,7 @@ def _walk_tree(dept, parts):
     return node
 
 
-from .db_pg import get_db as _get_db
+from .db_pg import get_db as _get_db  # noqa: E402
 
 
 def _init_schema():

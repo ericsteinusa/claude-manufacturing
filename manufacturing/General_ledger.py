@@ -377,8 +377,8 @@ class NewJournalDialog(QtWidgets.QDialog):
         self._update_totals()
 
     def _update_totals(self):
-        total_dr = sum(l[1] for l in self._lines)
-        total_cr = sum(l[2] for l in self._lines)
+        total_dr = sum(ln[1] for ln in self._lines)
+        total_cr = sum(ln[2] for ln in self._lines)
         diff = total_dr - total_cr
         color = "color: #90ee90;" if abs(diff) < 0.005 else "color: #ff9999;"
         self.lbl_totals.setStyleSheet(f"{color} font-size: 13px;")
@@ -390,8 +390,8 @@ class NewJournalDialog(QtWidgets.QDialog):
         if not self._lines:
             QtWidgets.QMessageBox.warning(self, "No Lines", "Add at least one line.")
             return
-        total_dr = sum(l[1] for l in self._lines)
-        total_cr = sum(l[2] for l in self._lines)
+        total_dr = sum(ln[1] for ln in self._lines)
+        total_cr = sum(ln[2] for ln in self._lines)
         if abs(total_dr - total_cr) > 0.005:
             QtWidgets.QMessageBox.warning(
                 self, "Not Balanced",
@@ -497,7 +497,8 @@ class ChartOfAccountsTab(QtWidgets.QWidget):
         conds = []
         params = []
         if acct_type:
-            conds.append("account_type = %s"); params.append(acct_type)
+            conds.append("account_type = %s")
+            params.append(acct_type)
         if active_only:
             conds.append("is_active = 1")
         where = ("WHERE " + " AND ".join(conds)) if conds else ""
@@ -674,7 +675,8 @@ class JournalEntriesTab(QtWidgets.QWidget):
         conds = ["j.journal_date BETWEEN %s AND %s"]
         params = [d_from, d_to]
         if posted is not None:
-            conds.append("j.posted = %s"); params.append(posted)
+            conds.append("j.posted = %s")
+            params.append(posted)
         where = " AND ".join(conds)
         conn = get_db()
         rows = conn.execute(f"""
@@ -1000,7 +1002,9 @@ class IncomeStatementTab(QtWidgets.QWidget):
                 hdr.setFlags(hdr.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                 hdr.setBackground(QtGui.QColor("#004499"))
                 hdr.setForeground(QtGui.QColor("white"))
-                font = hdr.font(); font.setBold(True); hdr.setFont(font)
+                font = hdr.font()
+                font.setBold(True)
+                hdr.setFont(font)
                 self.tbl.setItem(r, 0, hdr)
                 self.tbl.setItem(r, 1, _ro(""))
                 self.tbl.setItem(r, 2, _ro(""))
@@ -1103,7 +1107,9 @@ class BalanceSheetTab(QtWidgets.QWidget):
                 hdr.setFlags(hdr.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                 hdr.setBackground(QtGui.QColor("#004499"))
                 hdr.setForeground(QtGui.QColor("white"))
-                font = hdr.font(); font.setBold(True); hdr.setFont(font)
+                font = hdr.font()
+                font.setBold(True)
+                hdr.setFont(font)
                 self.tbl.setItem(r, 0, hdr)
                 self.tbl.setItem(r, 1, _ro(""))
                 self.tbl.setItem(r, 2, _ro(""))

@@ -92,9 +92,9 @@ class NewShipmentDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.ship_num = QtWidgets.QLineEdit(_next_ship_num())
         self.ship_num.setStyleSheet(INPUT_STYLE)
@@ -189,9 +189,9 @@ class AddShipItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -264,9 +264,9 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.ship_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         self.ship_date.setCalendarPopup(True)
@@ -460,7 +460,8 @@ class ShippingDept(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("s.status = ?"); params.append(status)
+            conds.append("s.status = ?")
+            params.append(status)
         conds.append("(s.ship_date IS NULL OR s.ship_date BETWEEN ? AND ?)")
         params += [d_from, d_to]
         where = " WHERE " + " AND ".join(conds)

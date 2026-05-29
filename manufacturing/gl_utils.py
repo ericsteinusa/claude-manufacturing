@@ -17,7 +17,6 @@ Usage:
     # jid is None if an account number wasn't found in the chart of accounts.
 """
 
-import os
 from .db_pg import get_db
 
 

@@ -115,9 +115,9 @@ class NewOrderDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.so_num = QtWidgets.QLineEdit(_next_so_num())
         self.so_num.setStyleSheet(INPUT_STYLE)
@@ -202,9 +202,9 @@ class AddSOLineItemDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
@@ -429,9 +429,11 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         """
         conds, params = [], []
         if cust_id:
-            conds.append("so.customer_id = ?"); params.append(cust_id)
+            conds.append("so.customer_id = ?")
+            params.append(cust_id)
         if status:
-            conds.append("so.status = ?"); params.append(status)
+            conds.append("so.status = ?")
+            params.append(status)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
         rows = conn.execute(base + where + " GROUP BY so.id, so.so_number, so.order_date, so.ship_date, so.status, c.first_name, c.last_name, c.company_name ORDER BY so.order_date DESC", params).fetchall()
@@ -571,9 +573,9 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         fl = QtWidgets.QGridLayout(fg)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         fields = [
             ("Company:", "cust_company"), ("First Name:", "cust_first"), ("Last Name:", "cust_last"),

@@ -497,9 +497,11 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         conds = ["(inv.due_date IS NULL OR inv.due_date BETWEEN %s AND %s)"]
         params = [d_from, d_to]
         if status:
-            conds.append("inv.status = %s"); params.append(status)
+            conds.append("inv.status = %s")
+            params.append(status)
         if vendor_id:
-            conds.append("inv.vendor_id = %s"); params.append(vendor_id)
+            conds.append("inv.vendor_id = %s")
+            params.append(vendor_id)
         where = " AND ".join(conds)
 
         conn = get_db()

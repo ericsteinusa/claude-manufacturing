@@ -510,9 +510,11 @@ class BudgetManagementWidget(QtWidgets.QWidget):
         conds = ["b.fiscal_year = %s"]
         params = [year]
         if status:
-            conds.append("b.status = %s"); params.append(status)
+            conds.append("b.status = %s")
+            params.append(status)
         if dept_id:
-            conds.append("b.dept_id = %s"); params.append(dept_id)
+            conds.append("b.dept_id = %s")
+            params.append(dept_id)
         where = " AND ".join(conds)
 
         conn = get_db()
@@ -572,7 +574,7 @@ class BudgetManagementWidget(QtWidgets.QWidget):
             ).fetchall()
             if not lines:
                 return 0.0
-            account_ids = [l["account_id"] for l in lines]
+            account_ids = [line["account_id"] for line in lines]
             placeholders = ",".join(["%s"] * len(account_ids))
             row = conn.execute(f"""
                 SELECT COALESCE(SUM(ABS(jl.debit - jl.credit)), 0) AS total

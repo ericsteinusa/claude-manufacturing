@@ -64,7 +64,8 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(10)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(10)
 
         hdr = QtWidgets.QLabel("Ticket Summary")
         hdr.setStyleSheet(HDR_STYLE)
@@ -96,7 +97,8 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         v.addWidget(self._pri_tbl)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
         v.addStretch()
@@ -138,7 +140,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Tickets by Department")
         hdr.setStyleSheet(HDR_STYLE)
@@ -157,7 +160,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -196,7 +200,8 @@ class _ByIssueTypeWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Tickets by Issue Type")
         hdr.setStyleSheet(HDR_STYLE)
@@ -215,7 +220,8 @@ class _ByIssueTypeWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -254,7 +260,8 @@ class _OpenTicketsWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Open Tickets")
         hdr.setStyleSheet(HDR_STYLE)
@@ -275,7 +282,8 @@ class _OpenTicketsWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -316,7 +324,8 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(10)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(10)
 
         hdr = QtWidgets.QLabel("Asset Summary")
         hdr.setStyleSheet(HDR_STYLE)
@@ -348,7 +357,8 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
         v.addWidget(self._type_tbl)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
         v.addStretch()

@@ -1,7 +1,7 @@
+# ruff: noqa: F403,F405
 import tkinter as tk
 from tkinter import messagebox
-from tkinter import *
-import psycopg2
+from tkinter import *  # noqa: F401,F403,F405
 from .db_pg import get_db
 
 
@@ -29,8 +29,8 @@ global email_entry, password_entry
 
 
 def check_name():
-   
-   
+
+
     conn = get_db()
     cursor = conn.cursor()
     email = email_entry.get()

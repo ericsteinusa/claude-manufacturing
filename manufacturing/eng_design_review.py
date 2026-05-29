@@ -1,5 +1,4 @@
 import sys
-import os
 import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -70,9 +69,9 @@ class NewECRDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.ecr_num = QtWidgets.QLineEdit(_next_ecr_num())
         self.ecr_num.setStyleSheet(INPUT_STYLE)

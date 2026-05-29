@@ -62,7 +62,8 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(10)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(10)
 
         hdr = QtWidgets.QLabel("Task Summary")
         hdr.setStyleSheet(HDR_STYLE)
@@ -88,7 +89,8 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
             setattr(self, attr, tbl)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
         v.addStretch()
@@ -130,7 +132,8 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Tasks by Technician")
         hdr.setStyleSheet(HDR_STYLE)
@@ -144,7 +147,8 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -185,7 +189,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Tasks by Department")
         hdr.setStyleSheet(HDR_STYLE)
@@ -199,7 +204,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -239,7 +245,8 @@ class _OverdueWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Overdue Tasks")
         hdr.setStyleSheet(HDR_STYLE)
@@ -252,7 +259,8 @@ class _OverdueWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 
@@ -291,7 +299,8 @@ class _RecentlyCompletedWidget(QtWidgets.QWidget):
 
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12); v.setSpacing(8)
+        v.setContentsMargins(12, 12, 12, 12)
+        v.setSpacing(8)
 
         hdr = QtWidgets.QLabel("Recently Completed  (last 30 days)")
         hdr.setStyleSheet(HDR_STYLE)
@@ -304,7 +313,8 @@ class _RecentlyCompletedWidget(QtWidgets.QWidget):
         v.addWidget(self._table, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
-        btn.setStyleSheet(BUTTON_STYLE); btn.setFixedWidth(100)
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedWidth(100)
         btn.clicked.connect(self._load)
         v.addWidget(btn)
 

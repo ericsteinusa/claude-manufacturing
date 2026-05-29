@@ -346,15 +346,18 @@ class TimeOffDialog(QtWidgets.QDialog):
             return
         for i in range(self.emp_combo.count()):
             if self.emp_combo.itemData(i) == rec["people_id"]:
-                self.emp_combo.setCurrentIndex(i); break
+                self.emp_combo.setCurrentIndex(i)
+                break
         for i in range(self.type_combo.count()):
             if self.type_combo.itemData(i) == rec["request_type"]:
-                self.type_combo.setCurrentIndex(i); break
+                self.type_combo.setCurrentIndex(i)
+                break
         self.start_date.setDate(QtCore.QDate.fromString(rec["start_date"], "yyyy-MM-dd"))
         self.end_date.setDate(QtCore.QDate.fromString(rec["end_date"], "yyyy-MM-dd"))
         for i in range(self.status_combo.count()):
             if self.status_combo.itemData(i) == rec["status"]:
-                self.status_combo.setCurrentIndex(i); break
+                self.status_combo.setCurrentIndex(i)
+                break
         self.notes.setText(rec["notes"] or "")
 
     def _on_ok(self):
@@ -509,7 +512,8 @@ class TimeEntriesTab(QtWidgets.QWidget):
         conds = ["DATE(tc.clock_in) BETWEEN %s AND %s"]
         params = [d_from, d_to]
         if emp_id:
-            conds.append("tc.people_id = %s"); params.append(emp_id)
+            conds.append("tc.people_id = %s")
+            params.append(emp_id)
         where = " AND ".join(conds)
 
         conn = get_db()
@@ -699,9 +703,11 @@ class TimeOffTab(QtWidgets.QWidget):
         emp_id = self.emp_filter.currentData()
         conds, params = [], []
         if status:
-            conds.append("r.status=%s"); params.append(status)
+            conds.append("r.status=%s")
+            params.append(status)
         if emp_id:
-            conds.append("r.people_id=%s"); params.append(emp_id)
+            conds.append("r.people_id=%s")
+            params.append(emp_id)
         where = ("WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()

@@ -1,5 +1,5 @@
-import sys, os, subprocess
-from PyQt6 import QtCore, QtGui, QtWidgets
+import sys
+from PyQt6 import QtCore, QtWidgets
 from .Budget_mgmt import BudgetManagementWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
@@ -16,12 +16,15 @@ TAB_STYLE = (
 
 
 def _placeholder_tab(label):
-    w = QtWidgets.QWidget(); _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    w = QtWidgets.QWidget()
+    _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w)
+    v.addStretch()
     lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl); v.addStretch()
+    v.addWidget(lbl)
+    v.addStretch()
     return w
 
 
@@ -34,11 +37,14 @@ class BudgetMgrMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(BudgetManagementWidget(), "Budgets")
         tabs.addTab(_placeholder_tab("Budget Detail"), "Budget Detail")
         tabs.addTab(_placeholder_tab("Budget vs. Actual"), "Budget vs. Actual")
@@ -50,5 +56,6 @@ class BudgetMgrMenu(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = BudgetMgrMenu(); w.show()
+    w = BudgetMgrMenu()
+    w.show()
     sys.exit(app.exec())

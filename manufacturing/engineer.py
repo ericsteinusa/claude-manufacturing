@@ -156,9 +156,9 @@ class NewProjectDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.proj_num = QtWidgets.QLineEdit(_next_num("ENG", "eng_project", "project_number"))
         self.proj_num.setStyleSheet(INPUT_STYLE)
@@ -250,9 +250,9 @@ class NewECRDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.ecr_num = QtWidgets.QLineEdit(_next_num("ECR", "eng_design_review", "ecr_number"))
         self.ecr_num.setStyleSheet(INPUT_STYLE)
@@ -343,9 +343,9 @@ class NewTaskDialog(QtWidgets.QDialog):
         layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         def lbl(t):
-            l = QtWidgets.QLabel(t)
-            l.setStyleSheet(LABEL_STYLE)
-            return l
+            widget = QtWidgets.QLabel(t)
+            widget.setStyleSheet(LABEL_STYLE)
+            return widget
 
         self.project_combo = QtWidgets.QComboBox()
         self.project_combo.setStyleSheet(COMBO_STYLE)
@@ -559,9 +559,11 @@ class EngineerMenu(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("ep.status = ?"); params.append(status)
+            conds.append("ep.status = ?")
+            params.append(status)
         if eng:
-            conds.append("ep.engineer LIKE ?"); params.append(f"%{eng}%")
+            conds.append("ep.engineer LIKE ?")
+            params.append(f"%{eng}%")
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()
@@ -722,7 +724,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
         """
         conds, params = [], []
         if status:
-            conds.append("dr.status = ?"); params.append(status)
+            conds.append("dr.status = ?")
+            params.append(status)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()
@@ -855,9 +858,11 @@ class EngineerMenu(QtWidgets.QMainWindow):
         if status_val == "open":
             conds.append("t.status IN ('open','in_progress')")
         elif status_val:
-            conds.append("t.status = ?"); params.append(status_val)
+            conds.append("t.status = ?")
+            params.append(status_val)
         if priority:
-            conds.append("t.priority = ?"); params.append(priority)
+            conds.append("t.priority = ?")
+            params.append(priority)
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()

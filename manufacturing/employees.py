@@ -332,17 +332,27 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
             w.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
             return w
 
-        self.v_name    = val(); self.v_email   = val()
-        self.v_dept    = val(); self.v_title   = val()
-        self.v_role    = val(); self.v_address = val()
+        self.v_name    = val()
+        self.v_email   = val()
+        self.v_dept    = val()
+        self.v_title   = val()
+        self.v_role    = val()
+        self.v_address = val()
 
-        layout.addWidget(lbl("Name:"),    0, 0); layout.addWidget(self.v_name,    0, 1)
-        layout.addWidget(lbl("Email:"),   0, 2); layout.addWidget(self.v_email,   0, 3)
-        layout.addWidget(lbl("Dept:"),    1, 0); layout.addWidget(self.v_dept,    1, 1)
-        layout.addWidget(lbl("Title:"),   1, 2); layout.addWidget(self.v_title,   1, 3)
-        layout.addWidget(lbl("Role:"),    2, 0); layout.addWidget(self.v_role,    2, 1)
-        layout.addWidget(lbl("Address:"), 3, 0); layout.addWidget(self.v_address, 3, 1, 1, 3)
-        layout.setColumnStretch(1, 2); layout.setColumnStretch(3, 2)
+        layout.addWidget(lbl("Name:"),    0, 0)
+        layout.addWidget(self.v_name,    0, 1)
+        layout.addWidget(lbl("Email:"),   0, 2)
+        layout.addWidget(self.v_email,   0, 3)
+        layout.addWidget(lbl("Dept:"),    1, 0)
+        layout.addWidget(self.v_dept,    1, 1)
+        layout.addWidget(lbl("Title:"),   1, 2)
+        layout.addWidget(self.v_title,   1, 3)
+        layout.addWidget(lbl("Role:"),    2, 0)
+        layout.addWidget(self.v_role,    2, 1)
+        layout.addWidget(lbl("Address:"), 3, 0)
+        layout.addWidget(self.v_address, 3, 1, 1, 3)
+        layout.setColumnStretch(1, 2)
+        layout.setColumnStretch(3, 2)
 
     def load(self, people_id):
         conn = get_db()
@@ -361,7 +371,8 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
         ).fetchone()
         conn.close()
         if not rec:
-            self.clear(); return
+            self.clear()
+            return
         self.v_name.setText(f"{rec['first_name'] or ''} {rec['last_name'] or ''}".strip())
         self.v_email.setText(rec["email"] or "")
         dept_str = dept["dept_name"] or "" if dept else ""

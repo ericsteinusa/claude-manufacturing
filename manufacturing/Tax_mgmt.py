@@ -3,7 +3,6 @@ Tax_mgmt.py — Tax Management module
 Tabs: Tax Calendar | Tax Filing | Tax Payments | Tax Reports
 """
 import sys
-import os
 from .db_pg import get_db
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets

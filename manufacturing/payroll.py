@@ -374,7 +374,8 @@ class EntryDeductionsDialog(QtWidgets.QDialog):
         """, (entry_id,)).fetchall()
         conn.close()
         for row in rows:
-            r = tbl.rowCount(); tbl.insertRow(r)
+            r = tbl.rowCount()
+            tbl.insertRow(r)
             tbl.setItem(r, 0, _ro(row["name"]))
             tbl.setItem(r, 1, _ro(f"${row['amount']:,.2f}"))
         vl.addWidget(tbl)

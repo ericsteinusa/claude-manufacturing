@@ -1,5 +1,7 @@
-import sys, os, subprocess
-from PyQt6 import QtCore, QtGui, QtWidgets
+import sys
+import os
+import subprocess
+from PyQt6 import QtCore, QtWidgets
 from .QA_Lab_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
@@ -16,18 +18,26 @@ TAB_STYLE = (
 
 
 def _launch_tab(script, label):
-    w = QtWidgets.QWidget(); _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    w = QtWidgets.QWidget()
+    _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w)
+    v.addStretch()
     lbl = QtWidgets.QLabel(label)
     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl); v.addSpacing(12)
+    v.addWidget(lbl)
+    v.addSpacing(12)
     btn = QtWidgets.QPushButton(f"Open {label}")
-    btn.setStyleSheet(BUTTON_STYLE); btn.setFixedHeight(44); btn.setFixedWidth(260)
+    btn.setStyleSheet(BUTTON_STYLE)
+    btn.setFixedHeight(44)
+    btn.setFixedWidth(260)
     btn.clicked.connect(lambda: _do_launch(script))
     row = QtWidgets.QHBoxLayout()
-    row.addStretch(); row.addWidget(btn); row.addStretch()
-    v.addLayout(row); v.addStretch()
+    row.addStretch()
+    row.addWidget(btn)
+    row.addStretch()
+    v.addLayout(row)
+    v.addStretch()
     return w
 
 
@@ -37,12 +47,15 @@ def _do_launch(script):
 
 
 def _placeholder_tab(label):
-    w = QtWidgets.QWidget(); _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w); v.addStretch()
+    w = QtWidgets.QWidget()
+    _apply_blue_palette(w)
+    v = QtWidgets.QVBoxLayout(w)
+    v.addStretch()
     lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl); v.addStretch()
+    v.addWidget(lbl)
+    v.addStretch()
     return w
 
 
@@ -55,11 +68,14 @@ class QAMgrMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        central = QtWidgets.QWidget(); _apply_blue_palette(central)
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(_launch_tab("QA_Lab_menu.py", "QA Lab"), "QA Lab")
         tabs.addTab(_placeholder_tab("Inspection Reports"), "Inspection Reports")
         v.addWidget(tabs)
@@ -67,5 +83,6 @@ class QAMgrMenu(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = QAMgrMenu(); w.show()
+    w = QAMgrMenu()
+    w.show()
     sys.exit(app.exec())
