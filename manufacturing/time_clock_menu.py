@@ -1,46 +1,55 @@
 import sys
 import psycopg2
-from .db_pg import get_db
-from datetime import datetime, date, timedelta
+from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
+
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
     "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
 )
-CLOCK_IN_STYLE = (
-    "QPushButton{background-color: #00aa33; color: white; border: 2px solid #007722;"
-    " border-radius: 10px; font-size: 18px; font-weight: bold; padding: 12px 36px;}"
-    "QPushButton:hover{background-color: #00cc44;}"
-    "QPushButton:disabled{background-color: #888; color: #bbb; border-color: #666;}"
-)
-CLOCK_OUT_STYLE = (
-    "QPushButton{background-color: #cc2200; color: white; border: 2px solid #991900;"
-    " border-radius: 10px; font-size: 18px; font-weight: bold; padding: 12px 36px;}"
-    "QPushButton:hover{background-color: #ee3311;}"
-    "QPushButton:disabled{background-color: #888; color: #bbb; border-color: #666;}"
-)
+INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
 COMBO_STYLE = (
     "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
-INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
-)
 LABEL_STYLE = "color: white; font-size: 13px;"
-DT_FMT = "%Y-%m-%d %H:%M:%S"
+
+TIME_OFF_TYPES = ["Vacation", "Sick", "Personal", "Bereavement", "Other"]
+TIME_OFF_COLORS = {
+    "pending":  "#fff3cd",
+    "approved": "#d4edda",
+    "denied":   "#f8d7da",
+}
+
+
+def get_db():
+    return get_db_connection()
 
 
 def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS time_clock (
-            id        SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL REFERENCES people(id),
-            clock_in  TEXT NOT NULL,
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL,
+            clock_in TEXT NOT NULL,
             clock_out TEXT,
-            notes     TEXT
+            hours_worked REAL,
+            notes TEXT DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS time_off_request (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL,
+            request_date TEXT NOT NULL,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            request_type TEXT DEFAULT 'Vacation',
+            status TEXT DEFAULT 'pending',
+            notes TEXT DEFAULT ''
         )
     """)
     conn.commit()
@@ -57,317 +66,413 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-def _fmt_dt(dt_str):
-    if not dt_str:
-        return ""
+def _ro(text):
+    item = QtWidgets.QTableWidgetItem(text)
+    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+    return item
+
+
+def _ro_right(text):
+    item = _ro(text)
+    item.setTextAlignment(
+        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return item
+
+
+def _load_employees():
+    conn = get_db()
     try:
-        return datetime.strptime(dt_str, DT_FMT).strftime("%m/%d/%Y %I:%M %p")
-    except ValueError:
-        return dt_str
+        rows = conn.execute(
+            "SELECT id, first_name, last_name FROM people"
+            " WHERE id > 0 ORDER BY last_name, first_name"
+        ).fetchall()
+    except psycopg2.OperationalError:
+        rows = []
+    conn.close()
+    return rows
 
 
-def _hours_str(clock_in_str, clock_out_str):
-    if not clock_in_str:
-        return ""
+def _emp_label(row):
+    return f"{row['last_name']}, {row['first_name']}"
+
+
+def _now_str():
+    return QtCore.QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+
+
+def _hours_between(clock_in_str, clock_out_str):
+    """Return decimal hours between two datetime strings."""
     try:
-        t_in = datetime.strptime(clock_in_str, DT_FMT)
-        t_out = (datetime.strptime(clock_out_str, DT_FMT)
-                 if clock_out_str else datetime.now())
-        mins = max(0, int((t_out - t_in).total_seconds() / 60))
-        suffix = "" if clock_out_str else " *"
-        return f"{mins // 60}h {mins % 60:02d}m{suffix}"
-    except ValueError:
-        return ""
+        fmt = "yyyy-MM-dd hh:mm:ss"
+        t_in = QtCore.QDateTime.fromString(clock_in_str, fmt)
+        t_out = QtCore.QDateTime.fromString(clock_out_str, fmt)
+        if t_in.isValid() and t_out.isValid():
+            return t_in.secsTo(t_out) / 3600.0
+    except Exception:
+        pass
+    return 0.0
 
 
-def _to_qdatetime(dt_str):
-    try:
-        dt = datetime.strptime(dt_str, DT_FMT)
-        return QtCore.QDateTime(
-            QtCore.QDate(dt.year, dt.month, dt.day),
-            QtCore.QTime(dt.hour, dt.minute, dt.second))
-    except (ValueError, TypeError):
-        return QtCore.QDateTime.currentDateTime()
+# ── Dialogs ────────────────────────────────────────────────────────────────────
 
-
-# ── Edit-record dialog ─────────────────────────────────────────────────────
-
-class EditRecordDialog(QtWidgets.QDialog):
-    def __init__(self, record, parent=None):
+class ClockInDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Edit Time Record")
-        self.setFixedSize(420, 260)
+        self.setWindowTitle("Clock In")
+        self.resize(400, 200)
         _apply_blue_palette(self)
-        self._record = record
         self._build_ui()
 
     def _build_ui(self):
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(30, 24, 30, 24)
-        layout.setSpacing(12)
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-        title = QtWidgets.QLabel("Edit Time Record")
-        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color: white; font-size: 15px; font-weight: bold;")
-        layout.addWidget(title)
+        def lbl(t):
+            w = QtWidgets.QLabel(t)
+            w.setStyleSheet(LABEL_STYLE)
+            return w
 
-        def row(label_text, widget):
-            r = QtWidgets.QHBoxLayout()
-            lbl = QtWidgets.QLabel(label_text)
-            lbl.setFixedWidth(90)
-            lbl.setStyleSheet(LABEL_STYLE)
-            r.addWidget(lbl)
-            r.addWidget(widget)
-            return r
+        self.emp_combo = QtWidgets.QComboBox()
+        self.emp_combo.setStyleSheet(COMBO_STYLE)
+        self.emp_combo.setMinimumWidth(220)
+        for e in _load_employees():
+            self.emp_combo.addItem(_emp_label(e), e["id"])
+        layout.addRow(lbl("Employee:"), self.emp_combo)
 
-        self.in_edit = QtWidgets.QDateTimeEdit()
-        self.in_edit.setDisplayFormat("MM/dd/yyyy hh:mm AP")
-        self.in_edit.setCalendarPopup(True)
-        self.in_edit.setStyleSheet(
-            "QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
-        self.in_edit.setDateTime(_to_qdatetime(self._record["clock_in"]))
-        layout.addLayout(row("Clock In:", self.in_edit))
+        self.dt_edit = QtWidgets.QDateTimeEdit(QtCore.QDateTime.currentDateTime())
+        self.dt_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.dt_edit.setCalendarPopup(True)
+        self.dt_edit.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Clock In Time:"), self.dt_edit)
 
-        self.out_edit = QtWidgets.QDateTimeEdit()
-        self.out_edit.setDisplayFormat("MM/dd/yyyy hh:mm AP")
-        self.out_edit.setCalendarPopup(True)
-        self.out_edit.setStyleSheet(
-            "QDateTimeEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
-        if self._record["clock_out"]:
-            self.out_edit.setDateTime(_to_qdatetime(self._record["clock_out"]))
-        else:
-            self.out_edit.setDateTime(QtCore.QDateTime.currentDateTime())
-        layout.addLayout(row("Clock Out:", self.out_edit))
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
 
-        self.clear_out_chk = QtWidgets.QCheckBox("Still clocked in (clear clock-out)")
-        self.clear_out_chk.setStyleSheet("color: white;")
-        self.clear_out_chk.setChecked(not bool(self._record["clock_out"]))
-        self.clear_out_chk.toggled.connect(lambda c: self.out_edit.setEnabled(not c))
-        self.out_edit.setEnabled(bool(self._record["clock_out"]))
-        layout.addWidget(self.clear_out_chk)
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
 
-        self.notes_input = QtWidgets.QLineEdit()
-        self.notes_input.setStyleSheet(INPUT_STYLE)
-        self.notes_input.setPlaceholderText("Optional notes")
-        self.notes_input.setText(self._record["notes"] or "")
-        layout.addLayout(row("Notes:", self.notes_input))
-
-        btn_row = QtWidgets.QHBoxLayout()
-        save_btn = QtWidgets.QPushButton("Save")
-        save_btn.setStyleSheet(BUTTON_STYLE)
-        save_btn.setFixedHeight(34)
-        save_btn.clicked.connect(self._on_save)
-        cancel_btn = QtWidgets.QPushButton("Cancel")
-        cancel_btn.setStyleSheet(BUTTON_STYLE)
-        cancel_btn.setFixedHeight(34)
-        cancel_btn.clicked.connect(self.reject)
-        btn_row.addWidget(save_btn)
-        btn_row.addSpacing(16)
-        btn_row.addWidget(cancel_btn)
-        layout.addLayout(btn_row)
-
-    def _on_save(self):
-        clock_in = self.in_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss")
-        clock_out = (None if self.clear_out_chk.isChecked()
-                     else self.out_edit.dateTime().toString("yyyy-MM-dd HH:mm:ss"))
-        if clock_out and clock_out <= clock_in:
-            QtWidgets.QMessageBox.warning(self, "Invalid", "Clock-out must be after clock-in.")
+    def _on_ok(self):
+        if not self.emp_combo.count():
+            QtWidgets.QMessageBox.warning(self, "No Employees", "No employees found.")
             return
+        people_id = self.emp_combo.currentData()
+        clock_in = self.dt_edit.dateTime().toString("yyyy-MM-dd hh:mm:ss")
+
+        # Warn if already clocked in
         conn = get_db()
+        open_entry = conn.execute(
+            "SELECT id FROM time_clock WHERE people_id=%s AND clock_out IS NULL",
+            (people_id,)
+        ).fetchone()
+        if open_entry:
+            reply = QtWidgets.QMessageBox.question(
+                self, "Already Clocked In",
+                "This employee has an open clock-in. Clock in again anyway?",
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            )
+            if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                conn.close()
+                return
+
         conn.execute(
-            "UPDATE time_clock SET clock_in=%s, clock_out=%s, notes=%s WHERE id=%s",
-            (clock_in, clock_out, self.notes_input.text().strip() or None,
-             self._record["id"])
+            "INSERT INTO time_clock (people_id, clock_in, notes) VALUES (%s,%s,%s)",
+            (people_id, clock_in, self.notes.text().strip())
         )
         conn.commit()
         conn.close()
         self.accept()
 
 
-# ── Main window ────────────────────────────────────────────────────────────
-
-_TAB_KEYS = {
-    'punch_in': 0, 'punch_out': 0, 'cur_status': 0,
-    'week_hrs': 1, 'month_hrs': 1, 'period_hrs': 1,
-    'submit_req': 1, 'pend_req': 1, 'appr_req': 1, 'req_hist': 1,
-    'my_sched': 1, 'upcoming': 1, 'sched_cal': 1, 'swap_req': 1,
-    'cur_ot': 1, 'hist_ot': 1, 'ot_by_emp': 1, 'ot_appr': 1,
-    'daily_att': 1, 'month_sum': 1, 'tard_rpt': 1, 'abs_rpt': 1,
-    'view_shfts': 1, 'assign_emp': 1, 'shft_tmpl': 1, 'swap_mgmt': 1,
-}
-
-
-class TimeClockWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None, initial_tab=None):
+class ClockOutDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        init_db()
+        self.setWindowTitle("Clock Out")
+        self.resize(400, 200)
         _apply_blue_palette(self)
-        self._clock_people_id = None
-        self._records_row_ids = []
         self._build_ui()
-        self._load_employees()
-
-        self._timer = QtCore.QTimer(self)
-        self._timer.timeout.connect(self._tick)
-        self._timer.start(1000)
-
-        if initial_tab in _TAB_KEYS:
-            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
-
-    # ── UI construction ────────────────────────────────────────────────────
 
     def _build_ui(self):
-        outer = QtWidgets.QVBoxLayout(self)
-        outer.setContentsMargins(10, 10, 10, 10)
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-        self.tabs = QtWidgets.QTabWidget()
-        self.tabs.setStyleSheet(
-            "QTabWidget::pane{border:1px solid black;}"
-            "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
-            " border-bottom:none; border-radius:4px 4px 0 0;}"
-            "QTabBar::tab:selected{background:rgb(85,255,255); font-weight:bold;}"
-            "QTabBar::tab:hover{background:rgb(85,255,255);}"
-        )
-        outer.addWidget(self.tabs)
+        def lbl(t):
+            w = QtWidgets.QLabel(t)
+            w.setStyleSheet(LABEL_STYLE)
+            return w
 
-        self.tabs.addTab(self._build_clock_tab(), "Clock In / Out")
-        self.tabs.addTab(self._build_records_tab(), "Time Records")
-
-    def _build_clock_tab(self):
-        w = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(20, 16, 20, 16)
-        layout.setSpacing(14)
-
-        # Live clock
-        self.live_clock_lbl = QtWidgets.QLabel()
-        self.live_clock_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.live_clock_lbl.setStyleSheet(
-            "color: white; font-size: 32px; font-weight: bold; letter-spacing: 2px;"
-        )
-        layout.addWidget(self.live_clock_lbl)
-
-        # Employee selection
-        emp_row = QtWidgets.QHBoxLayout()
-        emp_lbl = QtWidgets.QLabel("Employee:")
-        emp_lbl.setStyleSheet(LABEL_STYLE)
-        emp_lbl.setFixedWidth(80)
-        emp_row.addWidget(emp_lbl)
         self.emp_combo = QtWidgets.QComboBox()
         self.emp_combo.setStyleSheet(COMBO_STYLE)
-        self.emp_combo.setMinimumWidth(280)
-        self.emp_combo.currentIndexChanged.connect(self._on_emp_changed)
-        emp_row.addWidget(self.emp_combo)
-        emp_row.addStretch()
-        layout.addLayout(emp_row)
+        self.emp_combo.setMinimumWidth(220)
+        # Only show employees with open entries
+        conn = get_db()
+        try:
+            rows = conn.execute("""
+                SELECT DISTINCT p.id, p.first_name, p.last_name
+                FROM people p
+                JOIN time_clock tc ON tc.people_id = p.id
+                WHERE tc.clock_out IS NULL
+                ORDER BY p.last_name, p.first_name
+            """).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
+        conn.close()
+        if not rows:
+            rows = _load_employees()
+        for e in rows:
+            self.emp_combo.addItem(_emp_label(e), e["id"])
+        layout.addRow(lbl("Employee:"), self.emp_combo)
 
-        # Status panel
-        status_frame = QtWidgets.QFrame()
-        status_frame.setStyleSheet(
-            "QFrame{background-color: rgb(0,60,180); border: 2px solid white; border-radius: 8px;}"
+        self.dt_edit = QtWidgets.QDateTimeEdit(QtCore.QDateTime.currentDateTime())
+        self.dt_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.dt_edit.setCalendarPopup(True)
+        self.dt_edit.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Clock Out Time:"), self.dt_edit)
+
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
+
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
         )
-        status_frame.setFixedHeight(70)
-        status_inner = QtWidgets.QVBoxLayout(status_frame)
-        self.status_lbl = QtWidgets.QLabel("Select an employee")
-        self.status_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.status_lbl.setStyleSheet("color: white; font-size: 16px; font-weight: bold; border: none;")
-        status_inner.addWidget(self.status_lbl)
-        layout.addWidget(status_frame)
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
 
-        # Clock in/out buttons
-        btn_row = QtWidgets.QHBoxLayout()
-        btn_row.addStretch()
-        self.clock_in_btn = QtWidgets.QPushButton("Clock In")
-        self.clock_in_btn.setStyleSheet(CLOCK_IN_STYLE)
-        self.clock_in_btn.setEnabled(False)
-        self.clock_in_btn.clicked.connect(self._on_clock_in)
-        btn_row.addWidget(self.clock_in_btn)
-        btn_row.addSpacing(30)
-        self.clock_out_btn = QtWidgets.QPushButton("Clock Out")
-        self.clock_out_btn.setStyleSheet(CLOCK_OUT_STYLE)
-        self.clock_out_btn.setEnabled(False)
-        self.clock_out_btn.clicked.connect(self._on_clock_out)
-        btn_row.addWidget(self.clock_out_btn)
-        btn_row.addStretch()
-        layout.addLayout(btn_row)
+    def _on_ok(self):
+        if not self.emp_combo.count():
+            return
+        people_id = self.emp_combo.currentData()
+        clock_out = self.dt_edit.dateTime().toString("yyyy-MM-dd hh:mm:ss")
+        conn = get_db()
+        # Find the most recent open entry
+        entry = conn.execute(
+            "SELECT id, clock_in FROM time_clock"
+            " WHERE people_id=%s AND clock_out IS NULL"
+            " ORDER BY clock_in DESC LIMIT 1",
+            (people_id,)
+        ).fetchone()
+        if not entry:
+            QtWidgets.QMessageBox.warning(self, "Not Clocked In",
+                                          "No open clock-in found for this employee.")
+            conn.close()
+            return
+        hours = _hours_between(entry["clock_in"], clock_out)
+        conn.execute(
+            "UPDATE time_clock SET clock_out=%s, hours_worked=%s, notes=%s"
+            " WHERE id=%s",
+            (clock_out, round(hours, 4),
+             self.notes.text().strip(), entry["id"])
+        )
+        conn.commit()
+        conn.close()
+        self.accept()
 
-        # Today's entries table
-        today_lbl = QtWidgets.QLabel("Today's entries:")
-        today_lbl.setStyleSheet(LABEL_STYLE)
-        layout.addWidget(today_lbl)
 
-        self.today_table = QtWidgets.QTableWidget()
-        self.today_table.setColumnCount(4)
-        self.today_table.setHorizontalHeaderLabels(["Clock In", "Clock Out", "Hours", "Notes"])
-        hh = self.today_table.horizontalHeader()
-        hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.today_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.today_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.today_table.verticalHeader().setVisible(False)
-        self.today_table.setAlternatingRowColors(True)
-        layout.addWidget(self.today_table, stretch=1)
+class TimeOffDialog(QtWidgets.QDialog):
+    def __init__(self, request_id=None, parent=None):
+        super().__init__(parent)
+        self._request_id = request_id
+        self.setWindowTitle("Edit Request" if request_id else "New Time Off Request")
+        self.resize(440, 320)
+        _apply_blue_palette(self)
+        self._build_ui()
+        if request_id:
+            self._load()
 
-        return w
+    def _build_ui(self):
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-    def _build_records_tab(self):
-        w = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(w)
-        layout.setContentsMargins(12, 12, 12, 12)
-        layout.setSpacing(8)
+        def lbl(t):
+            w = QtWidgets.QLabel(t)
+            w.setStyleSheet(LABEL_STYLE)
+            return w
+
+        self.emp_combo = QtWidgets.QComboBox()
+        self.emp_combo.setStyleSheet(COMBO_STYLE)
+        self.emp_combo.setMinimumWidth(220)
+        for e in _load_employees():
+            self.emp_combo.addItem(_emp_label(e), e["id"])
+        layout.addRow(lbl("Employee:"), self.emp_combo)
+
+        self.type_combo = QtWidgets.QComboBox()
+        self.type_combo.setStyleSheet(COMBO_STYLE)
+        for t in TIME_OFF_TYPES:
+            self.type_combo.addItem(t, t)
+        layout.addRow(lbl("Type:"), self.type_combo)
+
+        self.start_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.start_date.setCalendarPopup(True)
+        self.start_date.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Start Date:"), self.start_date)
+
+        self.end_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.end_date.setCalendarPopup(True)
+        self.end_date.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("End Date:"), self.end_date)
+
+        self.status_combo = QtWidgets.QComboBox()
+        self.status_combo.setStyleSheet(COMBO_STYLE)
+        for s in ("pending", "approved", "denied"):
+            self.status_combo.addItem(s.capitalize(), s)
+        layout.addRow(lbl("Status:"), self.status_combo)
+
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
+
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
+
+    def _load(self):
+        conn = get_db()
+        rec = conn.execute("SELECT * FROM time_off_request WHERE id=%s",
+                           (self._request_id,)).fetchone()
+        conn.close()
+        if not rec:
+            return
+        for i in range(self.emp_combo.count()):
+            if self.emp_combo.itemData(i) == rec["people_id"]:
+                self.emp_combo.setCurrentIndex(i); break
+        for i in range(self.type_combo.count()):
+            if self.type_combo.itemData(i) == rec["request_type"]:
+                self.type_combo.setCurrentIndex(i); break
+        self.start_date.setDate(QtCore.QDate.fromString(rec["start_date"], "yyyy-MM-dd"))
+        self.end_date.setDate(QtCore.QDate.fromString(rec["end_date"], "yyyy-MM-dd"))
+        for i in range(self.status_combo.count()):
+            if self.status_combo.itemData(i) == rec["status"]:
+                self.status_combo.setCurrentIndex(i); break
+        self.notes.setText(rec["notes"] or "")
+
+    def _on_ok(self):
+        if not self.emp_combo.count():
+            return
+        conn = get_db()
+        today = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
+        if self._request_id is None:
+            conn.execute(
+                "INSERT INTO time_off_request"
+                " (people_id, request_date, start_date, end_date, request_type, status, notes)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                (self.emp_combo.currentData(), today,
+                 self.start_date.date().toString("yyyy-MM-dd"),
+                 self.end_date.date().toString("yyyy-MM-dd"),
+                 self.type_combo.currentData(),
+                 self.status_combo.currentData(),
+                 self.notes.text().strip())
+            )
+        else:
+            conn.execute(
+                "UPDATE time_off_request SET people_id=%s, start_date=%s, end_date=%s,"
+                " request_type=%s, status=%s, notes=%s WHERE id=%s",
+                (self.emp_combo.currentData(),
+                 self.start_date.date().toString("yyyy-MM-dd"),
+                 self.end_date.date().toString("yyyy-MM-dd"),
+                 self.type_combo.currentData(),
+                 self.status_combo.currentData(),
+                 self.notes.text().strip(), self._request_id)
+            )
+        conn.commit()
+        conn.close()
+        self.accept()
+
+
+# ── Time Entries Tab ───────────────────────────────────────────────────────────
+
+class TimeEntriesTab(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._row_ids = []
+        self._selected_id = None
+        self._build_ui()
+        self._refresh()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(6, 6, 6, 6)
+        v.setSpacing(6)
+
+        # Clock in/out quick buttons + status
+        top = QtWidgets.QHBoxLayout()
+        btn_in = QtWidgets.QPushButton("⏵  Clock In")
+        btn_in.setStyleSheet(BUTTON_STYLE)
+        btn_in.setFixedHeight(36)
+        btn_in.clicked.connect(self._on_clock_in)
+        top.addWidget(btn_in)
+
+        btn_out = QtWidgets.QPushButton("⏹  Clock Out")
+        btn_out.setStyleSheet(BUTTON_STYLE)
+        btn_out.setFixedHeight(36)
+        btn_out.clicked.connect(self._on_clock_out)
+        top.addWidget(btn_out)
+
+        top.addSpacing(20)
+        self.clocked_in_lbl = QtWidgets.QLabel("")
+        self.clocked_in_lbl.setStyleSheet("color: white; font-size: 13px;")
+        top.addWidget(self.clocked_in_lbl)
+        top.addStretch()
+        v.addLayout(top)
 
         # Filters
-        filter_row = QtWidgets.QHBoxLayout()
-        filter_row.setSpacing(8)
+        fr = QtWidgets.QHBoxLayout()
+        lbl_e = QtWidgets.QLabel("Employee:")
+        lbl_e.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_e)
+        self.emp_filter = QtWidgets.QComboBox()
+        self.emp_filter.setStyleSheet(COMBO_STYLE)
+        self.emp_filter.setMinimumWidth(180)
+        self.emp_filter.addItem("(all)", None)
+        for e in _load_employees():
+            self.emp_filter.addItem(_emp_label(e), e["id"])
+        self.emp_filter.currentIndexChanged.connect(self._refresh)
+        fr.addWidget(self.emp_filter)
 
-        def fl(text):
-            lbl = QtWidgets.QLabel(text)
-            lbl.setStyleSheet(LABEL_STYLE)
-            return lbl
+        fr.addSpacing(10)
+        lbl_f = QtWidgets.QLabel("From:")
+        lbl_f.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_f)
+        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(-6))
+        self.date_from.setCalendarPopup(True)
+        self.date_from.setStyleSheet(INPUT_STYLE)
+        self.date_from.dateChanged.connect(self._refresh)
+        fr.addWidget(self.date_from)
 
-        filter_row.addWidget(fl("Employee:"))
-        self.rec_emp_combo = QtWidgets.QComboBox()
-        self.rec_emp_combo.setStyleSheet(COMBO_STYLE)
-        self.rec_emp_combo.setMinimumWidth(200)
-        filter_row.addWidget(self.rec_emp_combo)
+        lbl_t = QtWidgets.QLabel("To:")
+        lbl_t.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_t)
+        self.date_to = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.date_to.setCalendarPopup(True)
+        self.date_to.setStyleSheet(INPUT_STYLE)
+        self.date_to.dateChanged.connect(self._refresh)
+        fr.addWidget(self.date_to)
 
-        filter_row.addWidget(fl("From:"))
-        self.from_date = QtWidgets.QDateEdit()
-        self.from_date.setStyleSheet(
-            "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
-        self.from_date.setCalendarPopup(True)
-        self.from_date.setDate(QtCore.QDate.currentDate().addDays(-30))
-        self.from_date.setDisplayFormat("MM/dd/yyyy")
-        filter_row.addWidget(self.from_date)
+        b_all = QtWidgets.QPushButton("Show All")
+        b_all.setStyleSheet(BUTTON_STYLE)
+        b_all.setFixedHeight(28)
+        b_all.clicked.connect(self._on_show_all)
+        fr.addWidget(b_all)
+        fr.addStretch()
+        v.addLayout(fr)
 
-        filter_row.addWidget(fl("To:"))
-        self.to_date = QtWidgets.QDateEdit()
-        self.to_date.setStyleSheet(
-            "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}")
-        self.to_date.setCalendarPopup(True)
-        self.to_date.setDate(QtCore.QDate.currentDate())
-        self.to_date.setDisplayFormat("MM/dd/yyyy")
-        filter_row.addWidget(self.to_date)
-
-        for text, slot in (("Apply", self._refresh_records), ("Show All", self._records_show_all)):
-            btn = QtWidgets.QPushButton(text)
-            btn.setStyleSheet(BUTTON_STYLE)
-            btn.setFixedHeight(30)
-            btn.clicked.connect(slot)
-            filter_row.addWidget(btn)
-        filter_row.addStretch()
-        layout.addLayout(filter_row)
-
-        # Records table
-        self.records_table = QtWidgets.QTableWidget()
-        self.records_table.setColumnCount(6)
-        self.records_table.setHorizontalHeaderLabels(
-            ["Employee", "Date", "Clock In", "Clock Out", "Hours", "Notes"]
-        )
-        hh = self.records_table.horizontalHeader()
+        self.tbl = QtWidgets.QTableWidget()
+        self.tbl.setColumnCount(6)
+        self.tbl.setHorizontalHeaderLabels(
+            ["Employee", "Clock In", "Clock Out", "Hours", "Status", "Notes"])
+        hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -375,293 +480,345 @@ class TimeClockWidget(QtWidgets.QWidget):
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.records_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.records_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.records_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
-        self.records_table.setAlternatingRowColors(True)
-        self.records_table.verticalHeader().setVisible(False)
-        layout.addWidget(self.records_table, stretch=1)
+        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.verticalHeader().setVisible(False)
+        self.tbl.clicked.connect(self._on_clicked)
+        v.addWidget(self.tbl, stretch=1)
 
-        # Action buttons
-        act_row = QtWidgets.QHBoxLayout()
-        for text, slot in (("Edit Selected", self._on_edit_record),
-                           ("Delete Selected", self._on_delete_record)):
-            btn = QtWidgets.QPushButton(text)
-            btn.setStyleSheet(BUTTON_STYLE)
-            btn.setFixedHeight(34)
-            btn.clicked.connect(slot)
-            act_row.addWidget(btn)
-        act_row.addStretch()
+        self.summary_lbl = QtWidgets.QLabel("")
+        self.summary_lbl.setStyleSheet("color: white; font-size: 13px;")
+        v.addWidget(self.summary_lbl)
 
-        # Total hours label
-        self.total_lbl = QtWidgets.QLabel("")
-        self.total_lbl.setStyleSheet("color: white; font-size: 13px;")
-        act_row.addWidget(self.total_lbl)
+        br = QtWidgets.QHBoxLayout()
+        btn_del = QtWidgets.QPushButton("Delete Entry")
+        btn_del.setStyleSheet(BUTTON_STYLE)
+        btn_del.setFixedHeight(30)
+        btn_del.clicked.connect(self._on_delete)
+        br.addWidget(btn_del)
+        br.addStretch()
+        v.addLayout(br)
 
-        layout.addLayout(act_row)
-        return w
+    def _refresh(self):
+        emp_id = self.emp_filter.currentData()
+        d_from = self.date_from.date().toString("yyyy-MM-dd")
+        d_to = self.date_to.date().toString("yyyy-MM-dd")
 
-    # ── Data helpers ───────────────────────────────────────────────────────
+        conds = ["DATE(tc.clock_in) BETWEEN %s AND %s"]
+        params = [d_from, d_to]
+        if emp_id:
+            conds.append("tc.people_id = %s"); params.append(emp_id)
+        where = " AND ".join(conds)
 
-    def _load_employees(self):
         conn = get_db()
-        rows = conn.execute(
-            "SELECT id, first_name, last_name, emp_id FROM people ORDER BY last_name, first_name"
-        ).fetchall()
+        try:
+            rows = conn.execute(f"""
+                SELECT tc.id, tc.clock_in, tc.clock_out, tc.hours_worked, tc.notes,
+                       p.first_name, p.last_name
+                FROM time_clock tc
+                JOIN people p ON p.id = tc.people_id
+                WHERE {where}
+                ORDER BY tc.clock_in DESC
+            """, params).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
+
+        # Count currently clocked-in employees
+        try:
+            open_count = conn.execute(
+                "SELECT COUNT(*) FROM time_clock WHERE clock_out IS NULL"
+            ).fetchone()[0]
+        except Exception:
+            open_count = 0
         conn.close()
 
-        for combo in (self.emp_combo, self.rec_emp_combo):
-            combo.blockSignals(True)
-            combo.clear()
-            if combo is self.rec_emp_combo:
-                combo.addItem("(all employees)", None)
-            else:
-                combo.addItem("-- select employee --", None)
-            for r in rows:
-                label = f"{r['last_name']}, {r['first_name']}"
-                if r["emp_id"]:
-                    label += f"  (ID {r['emp_id']})"
-                combo.addItem(label, r["id"])
-            combo.blockSignals(False)
-
-        self._refresh_records()
-
-    def _get_open_record(self, people_id):
-        conn = get_db()
-        rec = conn.execute(
-            "SELECT * FROM time_clock WHERE people_id=%s AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1",
-            (people_id,)
-        ).fetchone()
-        conn.close()
-        return rec
-
-    # ── Tab 1 logic ────────────────────────────────────────────────────────
-
-    def _tick(self):
-        self.live_clock_lbl.setText(
-            datetime.now().strftime("%A  %B %d, %Y    %I:%M:%S %p")
-        )
-        if self._clock_people_id:
-            self._update_status()
-
-    def _on_emp_changed(self):
-        pid = self.emp_combo.currentData()
-        self._clock_people_id = pid
-        if pid is None:
-            self.status_lbl.setText("Select an employee")
-            self.clock_in_btn.setEnabled(False)
-            self.clock_out_btn.setEnabled(False)
-            self.today_table.setRowCount(0)
-            return
-        self._update_status()
-        self._refresh_today()
-
-    def _update_status(self):
-        open_rec = self._get_open_record(self._clock_people_id)
-        if open_rec:
-            since = datetime.strptime(open_rec["clock_in"], DT_FMT).strftime("%I:%M %p")
-            mins = max(0, int((datetime.now() -
-                               datetime.strptime(open_rec["clock_in"], DT_FMT)
-                               ).total_seconds() / 60))
-            h, m = mins // 60, mins % 60
-            self.status_lbl.setText(
-                f"CLOCKED IN  since {since}   ({h}h {m:02d}m elapsed)"
-            )
-            self.status_lbl.setStyleSheet(
-                "color: #88ff88; font-size: 16px; font-weight: bold; border: none;"
-            )
-            self.clock_in_btn.setEnabled(False)
-            self.clock_out_btn.setEnabled(True)
-        else:
-            self.status_lbl.setText("NOT CLOCKED IN")
-            self.status_lbl.setStyleSheet(
-                "color: #ffcccc; font-size: 16px; font-weight: bold; border: none;"
-            )
-            self.clock_in_btn.setEnabled(True)
-            self.clock_out_btn.setEnabled(False)
-
-    def _refresh_today(self):
-        if not self._clock_people_id:
-            return
-        today = date.today().strftime("%Y-%m-%d")
-        conn = get_db()
-        rows = conn.execute(
-            "SELECT * FROM time_clock WHERE people_id=%s AND clock_in LIKE %s ORDER BY clock_in",
-            (self._clock_people_id, f"{today}%")
-        ).fetchall()
-        conn.close()
-
-        self.today_table.setRowCount(0)
+        self.tbl.setRowCount(0)
+        self._row_ids = []
+        total_hours = 0.0
         for row in rows:
-            r = self.today_table.rowCount()
-            self.today_table.insertRow(r)
-            for col, val in enumerate([
-                _fmt_dt(row["clock_in"]),
-                _fmt_dt(row["clock_out"]) if row["clock_out"] else "Active",
-                _hours_str(row["clock_in"], row["clock_out"]),
-                row["notes"] or "",
-            ]):
-                self.today_table.setItem(r, col, QtWidgets.QTableWidgetItem(val))
+            r = self.tbl.rowCount()
+            self.tbl.insertRow(r)
+            self._row_ids.append(row["id"])
+            is_open = row["clock_out"] is None
+            hours = row["hours_worked"] or 0
+            total_hours += hours
+            name = f"{row['last_name']}, {row['first_name']}"
+            self.tbl.setItem(r, 0, _ro(name))
+            self.tbl.setItem(r, 1, _ro(row["clock_in"] or ""))
+            self.tbl.setItem(r, 2, _ro(row["clock_out"] or ""))
+            self.tbl.setItem(r, 3, _ro_right(f"{hours:.2f}" if not is_open else "open"))
+            self.tbl.setItem(r, 4, _ro("Clocked In" if is_open else "Complete"))
+            self.tbl.setItem(r, 5, _ro(row["notes"] or ""))
+            if is_open:
+                bg = QtGui.QColor("#cce5ff")
+                for col in range(6):
+                    self.tbl.item(r, col).setBackground(bg)
+
+        self.summary_lbl.setText(
+            f"Showing {len(rows)} entries  |  "
+            f"Total hours: {total_hours:.2f}  |  "
+            f"Currently clocked in: {open_count}"
+        )
+        self.clocked_in_lbl.setText(f"Currently clocked in: {open_count} employee(s)")
+        self._selected_id = None
+
+    def _on_show_all(self):
+        self.emp_filter.blockSignals(True)
+        self.emp_filter.setCurrentIndex(0)
+        self.emp_filter.blockSignals(False)
+        self.date_from.blockSignals(True)
+        self.date_from.setDate(QtCore.QDate(2000, 1, 1))
+        self.date_from.blockSignals(False)
+        self.date_to.blockSignals(True)
+        self.date_to.setDate(QtCore.QDate.currentDate())
+        self.date_to.blockSignals(False)
+        self._refresh()
+
+    def _on_clicked(self, index):
+        row = index.row()
+        if 0 <= row < len(self._row_ids):
+            self._selected_id = self._row_ids[row]
 
     def _on_clock_in(self):
-        pid = self._clock_people_id
-        if pid is None:
-            return
-        if self._get_open_record(pid):
-            QtWidgets.QMessageBox.warning(self, "Already Clocked In",
-                                          "This employee is already clocked in.")
-            return
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO time_clock (people_id, clock_in) VALUES (%s, %s)",
-            (pid, datetime.now().strftime(DT_FMT))
-        )
-        conn.commit()
-        conn.close()
-        self._update_status()
-        self._refresh_today()
-        self._refresh_records()
+        dlg = ClockInDialog(self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh()
 
     def _on_clock_out(self):
-        pid = self._clock_people_id
-        if pid is None:
-            return
-        open_rec = self._get_open_record(pid)
-        if not open_rec:
-            QtWidgets.QMessageBox.warning(self, "Not Clocked In",
-                                          "This employee is not clocked in.")
-            return
-        conn = get_db()
-        conn.execute(
-            "UPDATE time_clock SET clock_out=%s WHERE id=%s",
-            (datetime.now().strftime(DT_FMT), open_rec["id"])
-        )
-        conn.commit()
-        conn.close()
-        self._update_status()
-        self._refresh_today()
-        self._refresh_records()
-
-    # ── Tab 2 logic ────────────────────────────────────────────────────────
-
-    def _refresh_records(self):
-        pid = self.rec_emp_combo.currentData()
-        from_dt = self.from_date.date().toString("yyyy-MM-dd") + " 00:00:00"
-        to_dt = self.to_date.date().toString("yyyy-MM-dd") + " 23:59:59"
-
-        conn = get_db()
-        q = """
-            SELECT tc.id, p.first_name, p.last_name,
-                   tc.clock_in, tc.clock_out, tc.notes
-            FROM time_clock tc
-            JOIN people p ON p.id = tc.people_id
-            WHERE tc.clock_in BETWEEN %s AND %s
-        """
-        params = [from_dt, to_dt]
-        if pid is not None:
-            q += " AND tc.people_id = %s"
-            params.append(pid)
-        q += " ORDER BY tc.clock_in DESC"
-        rows = conn.execute(q, params).fetchall()
-        conn.close()
-
-        self.records_table.setRowCount(0)
-        self._records_row_ids = []
-        total_mins = 0
-
-        for row in rows:
-            r = self.records_table.rowCount()
-            self.records_table.insertRow(r)
-            self._records_row_ids.append(row["id"])
-
-            try:
-                day_str = datetime.strptime(row["clock_in"], DT_FMT).strftime("%m/%d/%Y")
-            except ValueError:
-                day_str = ""
-
-            hrs = _hours_str(row["clock_in"], row["clock_out"])
-            # accumulate completed entries only
-            if row["clock_out"]:
-                try:
-                    t_in = datetime.strptime(row["clock_in"], DT_FMT)
-                    t_out = datetime.strptime(row["clock_out"], DT_FMT)
-                    total_mins += max(0, int((t_out - t_in).total_seconds() / 60))
-                except ValueError:
-                    pass
-
-            for col, val in enumerate([
-                f"{row['last_name']}, {row['first_name']}",
-                day_str,
-                _fmt_dt(row["clock_in"]),
-                _fmt_dt(row["clock_out"]) if row["clock_out"] else "Active",
-                hrs,
-                row["notes"] or "",
-            ]):
-                self.records_table.setItem(r, col, QtWidgets.QTableWidgetItem(val))
-
-        h, m = total_mins // 60, total_mins % 60
-        self.total_lbl.setText(
-            f"Total completed hours: {h}h {m:02d}m  ({len(rows)} records)"
-        )
-
-    def _records_show_all(self):
-        self.rec_emp_combo.setCurrentIndex(0)
-        self.from_date.setDate(QtCore.QDate(2000, 1, 1))
-        self.to_date.setDate(QtCore.QDate.currentDate())
-        self._refresh_records()
-
-    def _on_edit_record(self):
-        row = self.records_table.currentRow()
-        if row < 0 or row >= len(self._records_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a record first.")
-            return
-        rid = self._records_row_ids[row]
-        conn = get_db()
-        rec = conn.execute("SELECT * FROM time_clock WHERE id=%s", (rid,)).fetchone()
-        conn.close()
-        if not rec:
-            return
-        dlg = EditRecordDialog(rec, self)
+        dlg = ClockOutDialog(self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            self._refresh_records()
-            if self._clock_people_id:
-                self._update_status()
-                self._refresh_today()
+            self._refresh()
 
-    def _on_delete_record(self):
-        row = self.records_table.currentRow()
-        if row < 0 or row >= len(self._records_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a record first.")
+    def _on_delete(self):
+        if self._selected_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an entry first.")
             return
-        rid = self._records_row_ids[row]
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Delete", "Delete this time record%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            self, "Confirm Delete", "Delete this time entry?",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM time_clock WHERE id=%s", (rid,))
+            conn.execute("DELETE FROM time_clock WHERE id=%s", (self._selected_id,))
             conn.commit()
             conn.close()
-            self._refresh_records()
-            if self._clock_people_id:
-                self._update_status()
-                self._refresh_today()
+            self._selected_id = None
+            self._refresh()
 
 
-class TimeClock(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
+# ── Time Off Tab ───────────────────────────────────────────────────────────────
+
+class TimeOffTab(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._row_ids = []
+        self._selected_id = None
+        self._build_ui()
+        self._refresh()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(6, 6, 6, 6)
+        v.setSpacing(6)
+
+        fr = QtWidgets.QHBoxLayout()
+        lbl_s = QtWidgets.QLabel("Status:")
+        lbl_s.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_s)
+        self.status_filter = QtWidgets.QComboBox()
+        self.status_filter.setStyleSheet(COMBO_STYLE)
+        self.status_filter.addItem("(all)", None)
+        for s in ("pending", "approved", "denied"):
+            self.status_filter.addItem(s.capitalize(), s)
+        self.status_filter.currentIndexChanged.connect(self._refresh)
+        fr.addWidget(self.status_filter)
+
+        fr.addSpacing(10)
+        lbl_e = QtWidgets.QLabel("Employee:")
+        lbl_e.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_e)
+        self.emp_filter = QtWidgets.QComboBox()
+        self.emp_filter.setStyleSheet(COMBO_STYLE)
+        self.emp_filter.setMinimumWidth(180)
+        self.emp_filter.addItem("(all)", None)
+        for e in _load_employees():
+            self.emp_filter.addItem(_emp_label(e), e["id"])
+        self.emp_filter.currentIndexChanged.connect(self._refresh)
+        fr.addWidget(self.emp_filter)
+
+        b_all = QtWidgets.QPushButton("Show All")
+        b_all.setStyleSheet(BUTTON_STYLE)
+        b_all.setFixedHeight(28)
+        b_all.clicked.connect(self._on_show_all)
+        fr.addWidget(b_all)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        self.tbl = QtWidgets.QTableWidget()
+        self.tbl.setColumnCount(7)
+        self.tbl.setHorizontalHeaderLabels(
+            ["Employee", "Type", "Start", "End", "Days", "Status", "Notes"])
+        hh = self.tbl.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.verticalHeader().setVisible(False)
+        self.tbl.clicked.connect(self._on_clicked)
+        self.tbl.doubleClicked.connect(self._on_edit)
+        v.addWidget(self.tbl, stretch=1)
+
+        br = QtWidgets.QHBoxLayout()
+        for text, slot in (
+            ("New Request", self._on_new),
+            ("Edit Request", self._on_edit),
+            ("Approve",  lambda: self._set_status("approved")),
+            ("Deny",     lambda: self._set_status("denied")),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(slot)
+            br.addWidget(b)
+        br.addStretch()
+        v.addLayout(br)
+
+    def _refresh(self):
+        status = self.status_filter.currentData()
+        emp_id = self.emp_filter.currentData()
+        conds, params = [], []
+        if status:
+            conds.append("r.status=%s"); params.append(status)
+        if emp_id:
+            conds.append("r.people_id=%s"); params.append(emp_id)
+        where = ("WHERE " + " AND ".join(conds)) if conds else ""
+
+        conn = get_db()
+        try:
+            rows = conn.execute(f"""
+                SELECT r.id, r.start_date, r.end_date, r.request_type, r.status, r.notes,
+                       p.first_name, p.last_name
+                FROM time_off_request r
+                JOIN people p ON p.id = r.people_id
+                {where}
+                ORDER BY r.start_date DESC
+            """, params or None).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
+        conn.close()
+
+        self.tbl.setRowCount(0)
+        self._row_ids = []
+        for row in rows:
+            r = self.tbl.rowCount()
+            self.tbl.insertRow(r)
+            self._row_ids.append(row["id"])
+            # Calculate days
+            try:
+                d1 = QtCore.QDate.fromString(row["start_date"], "yyyy-MM-dd")
+                d2 = QtCore.QDate.fromString(row["end_date"], "yyyy-MM-dd")
+                days = str(d1.daysTo(d2) + 1)
+            except Exception:
+                days = ""
+            name = f"{row['last_name']}, {row['first_name']}"
+            self.tbl.setItem(r, 0, _ro(name))
+            self.tbl.setItem(r, 1, _ro(row["request_type"] or ""))
+            self.tbl.setItem(r, 2, _ro(row["start_date"] or ""))
+            self.tbl.setItem(r, 3, _ro(row["end_date"] or ""))
+            self.tbl.setItem(r, 4, _ro_right(days))
+            self.tbl.setItem(r, 5, _ro((row["status"] or "").capitalize()))
+            self.tbl.setItem(r, 6, _ro(row["notes"] or ""))
+            bg = QtGui.QColor(TIME_OFF_COLORS.get(row["status"], "#ffffff"))
+            for col in range(7):
+                self.tbl.item(r, col).setBackground(bg)
+        self._selected_id = None
+
+    def _on_show_all(self):
+        self.status_filter.blockSignals(True)
+        self.status_filter.setCurrentIndex(0)
+        self.status_filter.blockSignals(False)
+        self.emp_filter.blockSignals(True)
+        self.emp_filter.setCurrentIndex(0)
+        self.emp_filter.blockSignals(False)
+        self._refresh()
+
+    def _on_clicked(self, index):
+        row = index.row()
+        if 0 <= row < len(self._row_ids):
+            self._selected_id = self._row_ids[row]
+
+    def _on_new(self):
+        dlg = TimeOffDialog(parent=self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh()
+
+    def _on_edit(self, _index=None):
+        if self._selected_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a request first.")
+            return
+        dlg = TimeOffDialog(request_id=self._selected_id, parent=self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh()
+
+    def _set_status(self, new_status):
+        if self._selected_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a request first.")
+            return
+        conn = get_db()
+        conn.execute("UPDATE time_off_request SET status=%s WHERE id=%s",
+                     (new_status, self._selected_id))
+        conn.commit()
+        conn.close()
+        self._refresh()
+
+
+# ── Main Window ────────────────────────────────────────────────────────────────
+
+class TimeClockWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        init_db()
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        tabs = QtWidgets.QTabWidget()
+        tabs.setStyleSheet(
+            "QTabWidget::pane{border: none;}"
+            "QTabBar::tab{background: white; color: black; padding: 6px 14px;"
+            " border: 1px solid #999; border-bottom: none;"
+            " border-radius: 4px 4px 0 0;}"
+            "QTabBar::tab:selected{background: rgb(85,255,255); font-weight: bold;}"
+        )
+        tabs.addTab(TimeEntriesTab(), "Time Entries")
+        tabs.addTab(TimeOffTab(), "Time Off Requests")
+        layout.addWidget(tabs)
+
+
+class TimeClockWindow(QtWidgets.QMainWindow):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("Time Clock")
-        self.resize(1000, 640)
+        self.resize(1020, 680)
         _apply_blue_palette(self)
-        self.setCentralWidget(TimeClockWidget(initial_tab=initial_tab))
+        self.setCentralWidget(TimeClockWidget())
 
 
 def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
-    window = TimeClock(sys.argv[1] if len(sys.argv) > 1 else None)
+    window = TimeClockWindow()
     window.show()
     sys.exit(app.exec())
 
