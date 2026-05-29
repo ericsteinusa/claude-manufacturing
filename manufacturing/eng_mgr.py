@@ -3,9 +3,9 @@ import os
 import subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-from engineer import _apply_blue_palette
-from eng_design_review import DesignReviewWidget
-from eng_reports import EngReportsWidget
+from .engineer import _apply_blue_palette
+from .eng_design_review import DesignReviewWidget
+from .eng_reports import EngReportsWidget
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (

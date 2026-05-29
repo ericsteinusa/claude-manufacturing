@@ -1,7 +1,7 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from IT_Tasks import ITTasksWidget, _apply_blue_palette
-from it_calls import ITSupportWidget
+from .IT_Tasks import ITTasksWidget, _apply_blue_palette
+from .it_calls import ITSupportWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -46,7 +46,7 @@ class ITMgrMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        from IT_mgr_reports import ITMgrReportsWidget
+        from .IT_mgr_reports import ITMgrReportsWidget
         central = QtWidgets.QWidget(); _apply_blue_palette(central)
         self.setCentralWidget(central)
         v = QtWidgets.QVBoxLayout(central)

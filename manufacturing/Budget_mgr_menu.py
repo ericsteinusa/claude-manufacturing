@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from Budget_mgmt import BudgetMgmtWidget, _apply_blue_palette
+from .Budget_mgmt import BudgetManagementWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -39,7 +39,7 @@ class BudgetMgrMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8); v.setSpacing(0)
         tabs = QtWidgets.QTabWidget(); tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(BudgetMgmtWidget(), "Budgets")
+        tabs.addTab(BudgetManagementWidget(), "Budgets")
         tabs.addTab(_placeholder_tab("Budget Detail"), "Budget Detail")
         tabs.addTab(_placeholder_tab("Budget vs. Actual"), "Budget vs. Actual")
         tabs.addTab(_placeholder_tab("Variance Report"), "Variance Report")

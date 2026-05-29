@@ -283,9 +283,9 @@ root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 # Read our config file and get colors
 parser = ConfigParser()
 parser.read("personnel.ini")
-saved_primary_color = parser.get('colors', 'primary_color')
-saved_secondary_color = parser.get('colors', 'secondary_color')
-saved_highlight_color = parser.get('colors', 'highlight_color')
+saved_primary_color = parser.get('colors', 'primary_color', fallback='lightblue')
+saved_secondary_color = parser.get('colors', 'secondary_color', fallback='white')
+saved_highlight_color = parser.get('colors', 'highlight_color', fallback='#347083')
 
 # Add Some Style
 style = ttk.Style()

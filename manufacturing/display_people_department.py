@@ -22,8 +22,8 @@ def setup_database():
         state TEXT NOT NULL,
         zip_code TEXT NOT NULL,
         email TEXT NOT NULL,
-        FOREIGN KEY (dept_id) REFERENCES dept (id)
-        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)
+        dept_id INTEGER,
+        dept_sub_id INTEGER
     )
     """)
 

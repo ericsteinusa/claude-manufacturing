@@ -1,6 +1,6 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from Finance_Main_menu import _apply_blue_palette
+from .Finance_Main_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"

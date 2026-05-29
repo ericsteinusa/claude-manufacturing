@@ -1,7 +1,7 @@
 import sys, os, subprocess
 from PyQt6 import QtCore, QtGui, QtWidgets
-from personnel_crm import _apply_blue_palette
-from Payroll_dept import PayrollDeptWidget
+from .personnel_crm import _apply_blue_palette
+from .Payroll_dept import PayrollDeptWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
