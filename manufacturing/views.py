@@ -1866,7 +1866,12 @@ def run_script(request, dept, subpath):
         for key, _label, target in node['items']:
             if key == leaf_key and isinstance(target, str):
                 mfg_dir = os.path.dirname(__file__)
-                subprocess.Popen([sys.executable, os.path.join(mfg_dir, target), leaf_key], cwd=mfg_dir)
+                module_name = os.path.splitext(target)[0]
+                project_dir = os.path.dirname(mfg_dir)
+                subprocess.Popen(
+                    [sys.executable, '-m', f'manufacturing.{module_name}', leaf_key],
+                    cwd=project_dir,
+                )
                 break
     if parent_parts:
         return redirect('/dept/{}/{}/'.format(dept, '/'.join(parent_parts)))
