@@ -1,5 +1,6 @@
 import sys
-from db_pg import get_db
+import psycopg2
+from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -84,7 +85,7 @@ def _load_suppliers():
         rows = conn.execute(
             "SELECT id, company_name FROM supplier ORDER BY company_name"
         ).fetchall()
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         rows = []
     conn.close()
     return rows
@@ -96,7 +97,7 @@ def _load_products():
         rows = conn.execute(
             "SELECT id, product_name FROM product ORDER BY product_name"
         ).fetchall()
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         rows = []
     conn.close()
     return rows
@@ -179,7 +180,7 @@ class NewPODialog(QtWidgets.QDialog):
             )
             self.po_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"PO number '{po_num}' already exists.")
             conn.close()
@@ -515,7 +516,7 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY po.order_date DESC", params).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -577,7 +578,7 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
                 FROM po_item pi LEFT JOIN product p ON p.id = pi.product_id
                 WHERE pi.po_id = %s
             """, (self._selected_po_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             items = []
         conn.close()
         for item in items:
