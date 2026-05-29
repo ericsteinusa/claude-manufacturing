@@ -1,5 +1,5 @@
 import sys
-import sqlite3
+import psycopg2
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -238,7 +238,7 @@ class SupplierDetailPanel(QtWidgets.QWidget):
                 " WHERE supplier_id = %s AND status NOT IN ('cancelled','received')",
                 (supplier_id,)
             ).fetchone()[0]
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             po_count = 0
         conn.close()
         if not rec:
@@ -350,7 +350,7 @@ class SuppliersWidget(QtWidgets.QWidget):
                 " email, phone_number, city, state"
                 " FROM supplier ORDER BY company_name, last_name, first_name"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -444,7 +444,7 @@ class SuppliersWidget(QtWidgets.QWidget):
                 " FROM purchase_order WHERE supplier_id = %s ORDER BY order_date DESC",
                 (self._selected_id,)
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             pos = []
         conn.close()
 

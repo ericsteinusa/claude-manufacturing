@@ -1,7 +1,11 @@
 import sys
 import psycopg2
-from .db_pg import get_db
+from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
+
+
+def get_db():
+    return get_db_connection()
 
 
 BLUE = QtGui.QColor(0, 85, 255)
