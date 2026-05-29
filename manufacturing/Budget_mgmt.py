@@ -1,1261 +1,749 @@
-"""
-Budget_mgmt.py — Budget Management module
-Tabs: Budgets | Budget Detail | Budget vs. Actual | Variance Report | Department Summary
-"""
 import sys
-import os
-from .db_pg import get_db
-import csv
-from datetime import date
+import psycopg2
+from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-# ── database ─────────────────────────────────────────────────────────────────
+
+BLUE = QtGui.QColor(0, 85, 255)
+BUTTON_STYLE = (
+    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+)
+INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+COMBO_STYLE = (
+    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox QAbstractItemView{background-color: white;}"
+)
+LABEL_STYLE = "color: white; font-size: 13px;"
+
+BUDGET_COLORS = {
+    "draft":    "#ffffff",
+    "approved": "#cce5ff",
+    "active":   "#d4edda",
+    "closed":   "#dcdcdc",
+}
+
+CURRENT_YEAR = QtCore.QDate.currentDate().year()
 
 
-def _conn():
-    c = get_db()
-    return c
+def get_db():
+    return get_db_connection()
 
 
 def init_db():
-    import General_ledger
-    General_ledger.init_db()
-    with _conn() as con:
-        con.executescript("""
+    conn = get_db()
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS budget (
-            id           SERIAL PRIMARY KEY,
-            budget_name  TEXT    NOT NULL,
-            fiscal_year  INTEGER NOT NULL,
-            department   TEXT    DEFAULT 'All',
-            description  TEXT    DEFAULT '',
-            status       TEXT    DEFAULT 'Draft',   -- Draft / Approved / Active / Closed
-            created_by   TEXT    DEFAULT '',
-            created_at   TEXT    DEFAULT (datetime('now'))
-        );
-
+            id SERIAL PRIMARY KEY,
+            budget_name TEXT NOT NULL,
+            fiscal_year INTEGER NOT NULL,
+            dept_id INTEGER,
+            status TEXT DEFAULT 'draft',
+            notes TEXT DEFAULT ''
+        )
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS budget_line (
-            id         SERIAL PRIMARY KEY,
-            budget_id  INTEGER NOT NULL REFERENCES budget(id) ON DELETE CASCADE,
-            account_id INTEGER NOT NULL REFERENCES gl_account(id),
-            month      INTEGER NOT NULL CHECK(month BETWEEN 1 AND 12),
-            amount     REAL    DEFAULT 0.0,
-            UNIQUE(budget_id, account_id, month)
-        );
-        """)
-
-
-# ── constants ─────────────────────────────────────────────────────────────────
-MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-STATUSES = ["Draft", "Approved", "Active", "Closed"]
-ACCT_TYPES = ["Asset", "Liability", "Equity", "Revenue", "COGS", "Expense"]
-DEPARTMENTS = [
-    "All",
-    "Accounting",
-    "Customer Service",
-    "Engineering",
-    "Information Technology",
-    "Maintenance",
-    "Marketing",
-    "Personnel",
-    "Production",
-    "Purchasing",
-    "Quality Assurance",
-    "Sales",
-    "Budget Management",
-]
-
-BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
-    "padding:4px 10px;}"
-    "QPushButton:hover{background-color:rgb(85,255,255);}"
-    "QPushButton:disabled{background-color:#cccccc;color:#888888;}"
-)
-TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid #aaa;background:white;}"
-    "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
-)
-
-STATUS_COLORS = {
-    "Draft": QtGui.QColor(230, 230, 230),
-    "Approved": QtGui.QColor(200, 230, 255),
-    "Active": QtGui.QColor(200, 255, 210),
-    "Closed": QtGui.QColor(255, 220, 200),
-}
-ACCT_TYPE_COLORS = {
-    "Asset": QtGui.QColor(220, 240, 255),
-    "Liability": QtGui.QColor(255, 235, 220),
-    "Equity": QtGui.QColor(220, 255, 220),
-    "Revenue": QtGui.QColor(220, 255, 235),
-    "COGS": QtGui.QColor(255, 255, 210),
-    "Expense": QtGui.QColor(255, 220, 220),
-}
+            id SERIAL PRIMARY KEY,
+            budget_id INTEGER NOT NULL REFERENCES budget(id),
+            account_id INTEGER,
+            category TEXT DEFAULT '',
+            description TEXT NOT NULL,
+            budgeted_amount REAL DEFAULT 0,
+            notes TEXT DEFAULT ''
+        )
+    """)
+    conn.commit()
+    conn.close()
 
 
 def _apply_blue_palette(widget):
-    pal = QtGui.QPalette()
-    blue = QtGui.QColor(0, 85, 255)
-    pal.setColor(QtGui.QPalette.ColorRole.Window, blue)
-    pal.setColor(QtGui.QPalette.ColorRole.Button, blue)
-    pal.setColor(QtGui.QPalette.ColorRole.Base, QtGui.QColor(255, 255, 255))
-    pal.setColor(QtGui.QPalette.ColorRole.WindowText, QtGui.QColor(0, 0, 0))
-    pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
+    pal = widget.palette()
+    for group in (QtGui.QPalette.ColorGroup.Active,
+                  QtGui.QPalette.ColorGroup.Inactive,
+                  QtGui.QPalette.ColorGroup.Disabled):
+        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
+        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
     widget.setPalette(pal)
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
-    item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-    item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
+def _ro(text):
+    item = QtWidgets.QTableWidgetItem(text)
+    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
     return item
 
 
-def _ro_r(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight)
+def _ro_right(text):
+    item = _ro(text)
+    item.setTextAlignment(
+        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return item
 
 
-def _money(v):
+def _load_depts():
+    conn = get_db()
     try:
-        return f"{float(v):,.2f}" if v else "0.00"
+        rows = conn.execute(
+            "SELECT dept_id, dept_name FROM dept ORDER BY dept_name"
+        ).fetchall()
+    except psycopg2.OperationalError:
+        rows = []
+    conn.close()
+    return rows
+
+
+def _load_accounts():
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT id, account_number, account_name, account_type"
+            " FROM gl_account WHERE is_active = 1 ORDER BY account_number"
+        ).fetchall()
+    except psycopg2.OperationalError:
+        rows = []
+    conn.close()
+    return rows
+
+
+def _actual_for_account(account_id, fiscal_year):
+    """Sum posted GL journal lines for an account in the given fiscal year."""
+    conn = get_db()
+    try:
+        row = conn.execute("""
+            SELECT COALESCE(SUM(jl.debit - jl.credit), 0) AS net
+            FROM gl_journal_line jl
+            JOIN gl_journal j ON j.id = jl.journal_id
+            WHERE jl.account_id = %s
+              AND j.posted = 1
+              AND EXTRACT(YEAR FROM j.journal_date::date) = %s
+        """, (account_id, fiscal_year)).fetchone()
+        return abs(row["net"]) if row else 0.0
     except Exception:
-        return "0.00"
+        return 0.0
+    finally:
+        conn.close()
 
 
-def _export_table_to_csv(table: QtWidgets.QTableWidget, parent):
-    path, _ = QtWidgets.QFileDialog.getSaveFileName(
-        parent, "Export to CSV", "", "CSV Files (*.csv)"
-    )
-    if not path:
-        return
-    with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
-        headers = [table.horizontalHeaderItem(c).text() for c in range(table.columnCount())]
-        w.writerow(headers)
-        for r in range(table.rowCount()):
-            row = []
-            for c in range(table.columnCount()):
-                it = table.item(r, c)
-                row.append(it.text() if it else "")
-            w.writerow(row)
-    QtWidgets.QMessageBox.information(parent, "Export", f"Saved to:\n{path}")
+# ── Dialogs ────────────────────────────────────────────────────────────────────
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Copy Budget Dialog
-# ══════════════════════════════════════════════════════════════════════════════
-class CopyBudgetDialog(QtWidgets.QDialog):
-    def __init__(self, source_id, source_name, parent=None):
+class BudgetDialog(QtWidgets.QDialog):
+    def __init__(self, budget_id=None, parent=None):
         super().__init__(parent)
-        self.source_id = source_id
-        self.setWindowTitle("Copy Budget")
-        self.setMinimumWidth(380)
-        v = QtWidgets.QVBoxLayout(self)
-        v.addWidget(QtWidgets.QLabel(f"Copying: <b>{source_name}</b>"))
-        fl = QtWidgets.QFormLayout()
-        self.ef_name = QtWidgets.QLineEdit(f"Copy of {source_name}")
-        self.ef_year = QtWidgets.QSpinBox()
-        self.ef_year.setRange(2000, 2100)
-        self.ef_year.setValue(date.today().year)
-        fl.addRow("New Budget Name:", self.ef_name)
-        fl.addRow("Fiscal Year:", self.ef_year)
-        v.addLayout(fl)
-        bb = QtWidgets.QDialogButtonBox(
+        self._budget_id = budget_id
+        self.setWindowTitle("Edit Budget" if budget_id else "New Budget")
+        self.resize(460, 300)
+        _apply_blue_palette(self)
+        self.saved_id = None
+        self._build_ui()
+        if budget_id:
+            self._load()
+
+    def _build_ui(self):
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+
+        def lbl(t):
+            w = QtWidgets.QLabel(t)
+            w.setStyleSheet(LABEL_STYLE)
+            return w
+
+        self.name = QtWidgets.QLineEdit()
+        self.name.setStyleSheet(INPUT_STYLE)
+        self.name.setPlaceholderText("e.g. Operations FY2026")
+        layout.addRow(lbl("Budget Name:"), self.name)
+
+        self.year = QtWidgets.QSpinBox()
+        self.year.setRange(2000, 2100)
+        self.year.setValue(CURRENT_YEAR)
+        self.year.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Fiscal Year:"), self.year)
+
+        self.dept_combo = QtWidgets.QComboBox()
+        self.dept_combo.setStyleSheet(COMBO_STYLE)
+        self.dept_combo.setMinimumWidth(200)
+        self.dept_combo.addItem("(all departments)", None)
+        for d in _load_depts():
+            self.dept_combo.addItem(d["dept_name"], d["dept_id"])
+        layout.addRow(lbl("Department:"), self.dept_combo)
+
+        self.status_combo = QtWidgets.QComboBox()
+        self.status_combo.setStyleSheet(COMBO_STYLE)
+        for s in ("draft", "approved", "active", "closed"):
+            self.status_combo.addItem(s.capitalize(), s)
+        layout.addRow(lbl("Status:"), self.status_combo)
+
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
+
+        btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
         )
-        bb.accepted.connect(self.accept)
-        bb.rejected.connect(self.reject)
-        v.addWidget(bb)
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
 
-    def values(self):
-        return self.ef_name.text().strip(), self.ef_year.value()
+    def _load(self):
+        conn = get_db()
+        rec = conn.execute("SELECT * FROM budget WHERE id = %s",
+                           (self._budget_id,)).fetchone()
+        conn.close()
+        if not rec:
+            return
+        self.name.setText(rec["budget_name"] or "")
+        self.year.setValue(rec["fiscal_year"] or CURRENT_YEAR)
+        for i in range(self.dept_combo.count()):
+            if self.dept_combo.itemData(i) == rec["dept_id"]:
+                self.dept_combo.setCurrentIndex(i)
+                break
+        for i in range(self.status_combo.count()):
+            if self.status_combo.itemData(i) == rec["status"]:
+                self.status_combo.setCurrentIndex(i)
+                break
+        self.notes.setText(rec["notes"] or "")
+
+    def _on_ok(self):
+        name = self.name.text().strip()
+        if not name:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Budget name is required.")
+            return
+        conn = get_db()
+        if self._budget_id is None:
+            cur = conn.execute(
+                "INSERT INTO budget (budget_name, fiscal_year, dept_id, status, notes)"
+                " VALUES (%s,%s,%s,%s,%s) RETURNING id",
+                (name, self.year.value(), self.dept_combo.currentData(),
+                 self.status_combo.currentData(), self.notes.text().strip())
+            )
+            self.saved_id = cur.fetchone()['id']
+        else:
+            conn.execute(
+                "UPDATE budget SET budget_name=%s, fiscal_year=%s, dept_id=%s,"
+                " status=%s, notes=%s WHERE id=%s",
+                (name, self.year.value(), self.dept_combo.currentData(),
+                 self.status_combo.currentData(), self.notes.text().strip(),
+                 self._budget_id)
+            )
+            self.saved_id = self._budget_id
+        conn.commit()
+        conn.close()
+        self.accept()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Main Budget Window
-# ══════════════════════════════════════════════════════════════════════════════
-_TAB_KEYS = {
-    # Tab 0 – Budgets
-    'budgets': 0, 'budg_plan': 0, 'budg_over': 0, 'budg_camp': 0,
-    'eng_budg': 0, 'it_budg': 0, 'maint_budg': 0, 'prod_budg': 0,
-    'purch_budg': 0, 'hw_proc': 0, 'sw_lic': 0, 'budg_req': 0,
-    # Tab 1 – Budget Detail
-    'bud_detail': 1, 'budg_amend': 1,
-    # Tab 2 – Budget vs. Actual
-    'bva': 2, 'budg_act': 2, 'cost_analy': 2, 'spend_analy': 2,
-    # Tab 3 – Variance Report
-    'variance': 3, 'budg_rpts': 3, 'cost_rpts': 3, 'proc_rpts': 3,
-}
-
-
-class BudgetMgmtWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None, initial_tab=None):
+class BudgetLineDialog(QtWidgets.QDialog):
+    def __init__(self, budget_id, line_id=None, parent=None):
         super().__init__(parent)
-        init_db()
+        self._budget_id = budget_id
+        self._line_id = line_id
+        self.setWindowTitle("Edit Line" if line_id else "Add Budget Line")
+        self.resize(460, 300)
         _apply_blue_palette(self)
-        self._current_budget_id = None
         self._build_ui()
-        self._refresh_budgets()
-        if initial_tab in _TAB_KEYS:
-            self.tabs.setCurrentIndex(_TAB_KEYS[initial_tab])
+        if line_id:
+            self._load()
 
     def _build_ui(self):
-        root = QtWidgets.QVBoxLayout(self)
-        root.setContentsMargins(8, 8, 8, 8)
+        layout = QtWidgets.QFormLayout(self)
+        layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-        title = QtWidgets.QLabel("Budget Management")
-        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
-        root.addWidget(title)
+        def lbl(t):
+            w = QtWidgets.QLabel(t)
+            w.setStyleSheet(LABEL_STYLE)
+            return w
 
-        self.tabs = QtWidgets.QTabWidget()
-        self.tabs.setStyleSheet(TAB_STYLE)
-        root.addWidget(self.tabs)
+        self.account_combo = QtWidgets.QComboBox()
+        self.account_combo.setStyleSheet(COMBO_STYLE)
+        self.account_combo.setMinimumWidth(260)
+        self.account_combo.currentIndexChanged.connect(self._on_account_changed)
+        self.account_combo.addItem("(none)", None)
+        for a in _load_accounts():
+            self.account_combo.addItem(
+                f"{a['account_number']} — {a['account_name']}", a["id"])
+        layout.addRow(lbl("GL Account:"), self.account_combo)
 
-        self.tabs.addTab(self._build_budgets_tab(), "Budgets")
-        self.tabs.addTab(self._build_detail_tab(), "Budget Detail")
-        self.tabs.addTab(self._build_bva_tab(), "Budget vs. Actual")
-        self.tabs.addTab(self._build_variance_tab(), "Variance Report")
-        self.tabs.addTab(self._build_dept_summary_tab(), "Department Summary")
+        self.category = QtWidgets.QLineEdit()
+        self.category.setStyleSheet(INPUT_STYLE)
+        self.category.setPlaceholderText("e.g. Salaries, Supplies, Travel")
+        layout.addRow(lbl("Category:"), self.category)
 
-        self.tabs.currentChanged.connect(self._on_tab_change)
+        self.description = QtWidgets.QLineEdit()
+        self.description.setStyleSheet(INPUT_STYLE)
+        self.description.setPlaceholderText("Line item description (required)")
+        layout.addRow(lbl("Description:"), self.description)
 
-    # ── Budgets tab ───────────────────────────────────────────────────────────
-    def _build_budgets_tab(self):
-        w = QtWidgets.QWidget()
-        v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(6, 6, 6, 6)
+        self.amount = QtWidgets.QDoubleSpinBox()
+        self.amount.setRange(0, 99999999)
+        self.amount.setDecimals(2)
+        self.amount.setPrefix("$ ")
+        self.amount.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Budgeted Amount:"), self.amount)
 
-        # filter bar
-        fb = QtWidgets.QHBoxLayout()
-        fb.addWidget(QtWidgets.QLabel("Year:"))
-        self.bud_year_filter = QtWidgets.QComboBox()
-        self.bud_year_filter.addItem("All Years")
-        for yr in range(date.today().year + 1, date.today().year - 6, -1):
-            self.bud_year_filter.addItem(str(yr))
-        self.bud_year_filter.currentIndexChanged.connect(self._refresh_budgets)
-        fb.addWidget(self.bud_year_filter)
-        fb.addWidget(QtWidgets.QLabel("Status:"))
-        self.bud_status_filter = QtWidgets.QComboBox()
-        self.bud_status_filter.addItem("All Statuses")
-        for s in STATUSES:
-            self.bud_status_filter.addItem(s)
-        self.bud_status_filter.currentIndexChanged.connect(self._refresh_budgets)
-        fb.addWidget(self.bud_status_filter)
-        fb.addWidget(QtWidgets.QLabel("Department:"))
-        self.bud_dept_filter = QtWidgets.QComboBox()
-        self.bud_dept_filter.addItem("All Departments")
-        for d in DEPARTMENTS[1:]:
-            self.bud_dept_filter.addItem(d)
-        self.bud_dept_filter.currentIndexChanged.connect(self._refresh_budgets)
-        fb.addWidget(self.bud_dept_filter)
-        fb.addStretch()
-        v.addLayout(fb)
+        self.notes = QtWidgets.QLineEdit()
+        self.notes.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Notes:"), self.notes)
 
-        # table
-        self.bud_tbl = QtWidgets.QTableWidget(0, 7)
-        self.bud_tbl.setHorizontalHeaderLabels(
-            ["ID", "Budget Name", "Year", "Department", "Status", "Created By", "Created"]
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
         )
-        self.bud_tbl.setColumnWidth(0, 45)
-        self.bud_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.bud_tbl.setColumnWidth(2, 55)
-        self.bud_tbl.setColumnWidth(3, 120)
-        self.bud_tbl.setColumnWidth(4, 80)
-        self.bud_tbl.setColumnWidth(5, 110)
-        self.bud_tbl.setColumnWidth(6, 140)
-        self.bud_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.bud_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.bud_tbl.setAlternatingRowColors(True)
-        self.bud_tbl.verticalHeader().setDefaultSectionSize(24)
-        self.bud_tbl.itemSelectionChanged.connect(self._on_budget_select)
-        v.addWidget(self.bud_tbl)
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
 
-        # form
-        fg = QtWidgets.QGroupBox("Budget Details")
-        fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"
-                         "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")
-        fl = QtWidgets.QFormLayout(fg)
-        fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
+    def _on_account_changed(self):
+        if not self.description.text():
+            self.description.setText(self.account_combo.currentText().split("—")[-1].strip())
 
-        self.bud_ef_name = QtWidgets.QLineEdit()
-        self.bud_ef_year = QtWidgets.QSpinBox()
-        self.bud_ef_year.setRange(2000, 2100)
-        self.bud_ef_year.setValue(date.today().year)
-        self.bud_ef_dept = QtWidgets.QComboBox()
-        for d in DEPARTMENTS:
-            self.bud_ef_dept.addItem(d)
-        self.bud_ef_status = QtWidgets.QComboBox()
-        for s in STATUSES:
-            self.bud_ef_status.addItem(s)
-        self.bud_ef_desc = QtWidgets.QLineEdit()
-        self.bud_ef_by = QtWidgets.QLineEdit()
+    def _load(self):
+        conn = get_db()
+        rec = conn.execute("SELECT * FROM budget_line WHERE id = %s",
+                           (self._line_id,)).fetchone()
+        conn.close()
+        if not rec:
+            return
+        for i in range(self.account_combo.count()):
+            if self.account_combo.itemData(i) == rec["account_id"]:
+                self.account_combo.setCurrentIndex(i)
+                break
+        self.category.setText(rec["category"] or "")
+        self.description.setText(rec["description"] or "")
+        self.amount.setValue(rec["budgeted_amount"] or 0)
+        self.notes.setText(rec["notes"] or "")
 
-        fl.addRow("Budget Name *", self.bud_ef_name)
-        fl.addRow("Fiscal Year *", self.bud_ef_year)
-        fl.addRow("Department", self.bud_ef_dept)
-        fl.addRow("Status", self.bud_ef_status)
-        fl.addRow("Description", self.bud_ef_desc)
-        fl.addRow("Created By", self.bud_ef_by)
-        v.addWidget(fg)
+    def _on_ok(self):
+        desc = self.description.text().strip()
+        if not desc:
+            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            return
+        conn = get_db()
+        if self._line_id is None:
+            conn.execute(
+                "INSERT INTO budget_line (budget_id, account_id, category,"
+                " description, budgeted_amount, notes)"
+                " VALUES (%s,%s,%s,%s,%s,%s)",
+                (self._budget_id, self.account_combo.currentData(),
+                 self.category.text().strip(), desc,
+                 self.amount.value(), self.notes.text().strip())
+            )
+        else:
+            conn.execute(
+                "UPDATE budget_line SET account_id=%s, category=%s, description=%s,"
+                " budgeted_amount=%s, notes=%s WHERE id=%s",
+                (self.account_combo.currentData(), self.category.text().strip(),
+                 desc, self.amount.value(), self.notes.text().strip(),
+                 self._line_id)
+            )
+        conn.commit()
+        conn.close()
+        self.accept()
 
-        # buttons
-        bb = QtWidgets.QHBoxLayout()
-        for lbl, slot in [("Add Budget", self._on_bud_add),
-                          ("Update Budget", self._on_bud_update),
-                          ("Copy Budget", self._on_bud_copy),
-                          ("Delete Budget", self._on_bud_delete),
-                          ("Open Detail →", self._on_open_detail),
-                          ("Clear", self._on_bud_clear)]:
-            b = QtWidgets.QPushButton(lbl)
-            b.setStyleSheet(BTN_STYLE)
+
+# ── Main Window ────────────────────────────────────────────────────────────────
+
+class BudgetManagementWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._budget_row_ids = []
+        self._line_row_ids = []
+        self._selected_budget_id = None
+        self._selected_fiscal_year = CURRENT_YEAR
+        self._selected_line_id = None
+        self._build_ui()
+        init_db()
+        self._refresh_budgets()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(6)
+
+        # filter row
+        fr = QtWidgets.QHBoxLayout()
+        lbl_s = QtWidgets.QLabel("Status:")
+        lbl_s.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_s)
+        self.status_filter = QtWidgets.QComboBox()
+        self.status_filter.setStyleSheet(COMBO_STYLE)
+        self.status_filter.addItem("(all)", None)
+        for s in ("draft", "approved", "active", "closed"):
+            self.status_filter.addItem(s.capitalize(), s)
+        self.status_filter.currentIndexChanged.connect(self._refresh_budgets)
+        fr.addWidget(self.status_filter)
+
+        fr.addSpacing(10)
+        lbl_y = QtWidgets.QLabel("Year:")
+        lbl_y.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_y)
+        self.year_filter = QtWidgets.QSpinBox()
+        self.year_filter.setRange(2000, 2100)
+        self.year_filter.setValue(CURRENT_YEAR)
+        self.year_filter.setStyleSheet(INPUT_STYLE)
+        self.year_filter.setFixedWidth(75)
+        self.year_filter.valueChanged.connect(self._refresh_budgets)
+        fr.addWidget(self.year_filter)
+
+        fr.addSpacing(10)
+        lbl_d = QtWidgets.QLabel("Dept:")
+        lbl_d.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_d)
+        self.dept_filter = QtWidgets.QComboBox()
+        self.dept_filter.setStyleSheet(COMBO_STYLE)
+        self.dept_filter.setMinimumWidth(150)
+        self.dept_filter.addItem("(all)", None)
+        for d in _load_depts():
+            self.dept_filter.addItem(d["dept_name"], d["dept_id"])
+        self.dept_filter.currentIndexChanged.connect(self._refresh_budgets)
+        fr.addWidget(self.dept_filter)
+
+        b_all = QtWidgets.QPushButton("Show All")
+        b_all.setStyleSheet(BUTTON_STYLE)
+        b_all.setFixedHeight(28)
+        b_all.clicked.connect(self._on_show_all)
+        fr.addWidget(b_all)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
+
+        # Budget list
+        self.budget_table = QtWidgets.QTableWidget()
+        self.budget_table.setColumnCount(7)
+        self.budget_table.setHorizontalHeaderLabels(
+            ["Budget Name", "Fiscal Year", "Department",
+             "Budgeted", "Actual", "Variance", "Status"]
+        )
+        hh = self.budget_table.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.budget_table.setEditTriggers(
+            QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.budget_table.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.budget_table.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.budget_table.setAlternatingRowColors(True)
+        self.budget_table.verticalHeader().setVisible(False)
+        self.budget_table.clicked.connect(self._on_budget_clicked)
+        self.budget_table.doubleClicked.connect(self._on_edit_budget)
+        splitter.addWidget(self.budget_table)
+
+        # Budget lines detail
+        detail_w = QtWidgets.QWidget()
+        _apply_blue_palette(detail_w)
+        dv = QtWidgets.QVBoxLayout(detail_w)
+        dv.setContentsMargins(0, 4, 0, 0)
+        dlbl = QtWidgets.QLabel("Budget Lines (vs. Actual)")
+        dlbl.setStyleSheet("color: white; font-weight: bold; font-size: 13px;")
+        dv.addWidget(dlbl)
+        self.line_table = QtWidgets.QTableWidget()
+        self.line_table.setColumnCount(6)
+        self.line_table.setHorizontalHeaderLabels(
+            ["Category", "Description", "GL Account",
+             "Budgeted", "Actual", "Variance"]
+        )
+        lh = self.line_table.horizontalHeader()
+        lh.setStyleSheet("color: black; font-weight: bold;")
+        lh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        lh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.line_table.setEditTriggers(
+            QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.line_table.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.line_table.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.line_table.verticalHeader().setVisible(False)
+        self.line_table.setAlternatingRowColors(True)
+        self.line_table.clicked.connect(self._on_line_clicked)
+        dv.addWidget(self.line_table)
+        splitter.addWidget(detail_w)
+        splitter.setSizes([340, 260])
+        v.addWidget(splitter, stretch=1)
+
+        # Button rows
+        br1 = QtWidgets.QHBoxLayout()
+        for text, slot in (
+            ("New Budget",    self._on_new_budget),
+            ("Edit Budget",   self._on_edit_budget),
+            ("Approve",       lambda: self._set_budget_status("approved")),
+            ("Activate",      lambda: self._set_budget_status("active")),
+            ("Close Budget",  lambda: self._set_budget_status("closed")),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
             b.clicked.connect(slot)
-            bb.addWidget(b)
-        bb.addStretch()
-        v.addLayout(bb)
-        return w
+            br1.addWidget(b)
+        br1.addStretch()
+        v.addLayout(br1)
+
+        br2 = QtWidgets.QHBoxLayout()
+        for text, slot in (
+            ("Add Line",      self._on_add_line),
+            ("Edit Line",     self._on_edit_line),
+            ("Delete Line",   self._on_delete_line),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(30)
+            b.clicked.connect(slot)
+            br2.addWidget(b)
+        br2.addStretch()
+        v.addLayout(br2)
 
     def _refresh_budgets(self):
-        q = "SELECT * FROM budget"
-        params = []
-        where = []
-        yr = self.bud_year_filter.currentText()
-        if yr != "All Years":
-            where.append("fiscal_year=%s")
-            params.append(int(yr))
-        st = self.bud_status_filter.currentText()
-        if st != "All Statuses":
-            where.append("status=%s")
-            params.append(st)
-        dept = self.bud_dept_filter.currentText()
-        if dept != "All Departments":
-            where.append("department=%s")
-            params.append(dept)
-        if where:
-            q += " WHERE " + " AND ".join(where)
-        q += " ORDER BY fiscal_year DESC, department, budget_name"
-        with _conn() as con:
-            rows = con.execute(q, params).fetchall()
-        self.bud_tbl.setRowCount(0)
+        status = self.status_filter.currentData()
+        year = self.year_filter.value()
+        dept_id = self.dept_filter.currentData()
+
+        conds = ["b.fiscal_year = %s"]
+        params = [year]
+        if status:
+            conds.append("b.status = %s"); params.append(status)
+        if dept_id:
+            conds.append("b.dept_id = %s"); params.append(dept_id)
+        where = " AND ".join(conds)
+
+        conn = get_db()
+        try:
+            rows = conn.execute(f"""
+                SELECT b.id, b.budget_name, b.fiscal_year, b.status,
+                       d.dept_name,
+                       COALESCE(SUM(bl.budgeted_amount), 0) AS total_budgeted
+                FROM budget b
+                LEFT JOIN dept d ON d.dept_id = b.dept_id
+                LEFT JOIN budget_line bl ON bl.budget_id = b.id
+                WHERE {where}
+                GROUP BY b.id, d.dept_name
+                ORDER BY b.fiscal_year DESC, b.budget_name
+            """, params).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
+        conn.close()
+
+        self.budget_table.setRowCount(0)
+        self._budget_row_ids = []
         for row in rows:
-            r = self.bud_tbl.rowCount()
-            self.bud_tbl.insertRow(r)
-            self.bud_tbl.setItem(r, 0, _ro(str(row["id"]), QtCore.Qt.AlignmentFlag.AlignRight))
-            self.bud_tbl.setItem(r, 1, _ro(row["budget_name"]))
-            self.bud_tbl.setItem(r, 2, _ro(str(row["fiscal_year"]), QtCore.Qt.AlignmentFlag.AlignCenter))
-            self.bud_tbl.setItem(r, 3, _ro(row["department"]))
-            st_item = _ro(row["status"], QtCore.Qt.AlignmentFlag.AlignCenter)
-            self.bud_tbl.setItem(r, 4, st_item)
-            self.bud_tbl.setItem(r, 5, _ro(row["created_by"]))
-            self.bud_tbl.setItem(r, 6, _ro(row["created_at"][:16] if row["created_at"] else ""))
-            color = STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
-            for c in range(7):
-                it = self.bud_tbl.item(r, c)
-                if it:
-                    it.setBackground(color)
-            self.bud_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+            r = self.budget_table.rowCount()
+            self.budget_table.insertRow(r)
+            self._budget_row_ids.append(row["id"])
 
-    def _on_budget_select(self):
-        rows = self.bud_tbl.selectionModel().selectedRows()
-        if not rows:
-            return
-        r = rows[0].row()
-        bid = self.bud_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
-        self._current_budget_id = bid
-        self.bud_ef_name.setText(self.bud_tbl.item(r, 1).text())
-        self.bud_ef_year.setValue(int(self.bud_tbl.item(r, 2).text()))
-        didx = self.bud_ef_dept.findText(self.bud_tbl.item(r, 3).text())
-        if didx >= 0:
-            self.bud_ef_dept.setCurrentIndex(didx)
-        idx = self.bud_ef_status.findText(self.bud_tbl.item(r, 4).text())
-        if idx >= 0:
-            self.bud_ef_status.setCurrentIndex(idx)
-        with _conn() as con:
-            full = con.execute("SELECT * FROM budget WHERE id=%s", (bid,)).fetchone()
-        if full:
-            self.bud_ef_desc.setText(full["description"] or "")
-            self.bud_ef_by.setText(full["created_by"] or "")
+            budgeted = row["total_budgeted"]
+            # Compute actual from GL (sum of all lines)
+            actual = self._total_actual_for_budget(row["id"], row["fiscal_year"])
+            variance = budgeted - actual
 
-    def _form_values(self):
-        return (
-            self.bud_ef_name.text().strip(),
-            self.bud_ef_year.value(),
-            self.bud_ef_dept.currentText(),
-            self.bud_ef_status.currentText(),
-            self.bud_ef_desc.text().strip(),
-            self.bud_ef_by.text().strip(),
-        )
+            self.budget_table.setItem(r, 0, _ro(row["budget_name"]))
+            self.budget_table.setItem(r, 1, _ro(str(row["fiscal_year"])))
+            self.budget_table.setItem(r, 2, _ro(row["dept_name"] or "(all)"))
+            self.budget_table.setItem(r, 3, _ro_right(f"${budgeted:,.2f}"))
+            self.budget_table.setItem(r, 4, _ro_right(f"${actual:,.2f}"))
+            var_item = _ro_right(f"${variance:,.2f}")
+            if variance < 0:
+                var_item.setForeground(QtGui.QColor("#cc0000"))
+            self.budget_table.setItem(r, 5, var_item)
+            self.budget_table.setItem(r, 6, _ro(row["status"].capitalize()))
+            bg = QtGui.QColor(BUDGET_COLORS.get(row["status"], "#ffffff"))
+            for col in range(7):
+                self.budget_table.item(r, col).setBackground(bg)
 
-    def _on_bud_add(self):
-        name, yr, dept, status, desc, by = self._form_values()
-        if not name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Budget Name is required.")
-            return
-        with _conn() as con:
-            con.execute(
-                "INSERT INTO budget(budget_name,fiscal_year,department,status,description,created_by) "
-                "VALUES(%s,%s,%s,%s,%s,%s)", (name, yr, dept, status, desc, by)
-            )
-        self._refresh_budgets()
-        self._on_bud_clear()
+        self._selected_budget_id = None
+        self._selected_fiscal_year = year
+        self.line_table.setRowCount(0)
 
-    def _selected_budget_id(self):
-        rows = self.bud_tbl.selectionModel().selectedRows()
-        if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a budget first.")
-            return None
-        return self.bud_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
-
-    def _on_bud_update(self):
-        bid = self._selected_budget_id()
-        if bid is None:
-            return
-        name, yr, dept, status, desc, by = self._form_values()
-        if not name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Budget Name is required.")
-            return
-        with _conn() as con:
-            con.execute(
-                "UPDATE budget SET budget_name=%s,fiscal_year=%s,department=%s,status=%s,"
-                "description=%s,created_by=%s WHERE id=%s",
-                (name, yr, dept, status, desc, by, bid)
-            )
-        self._refresh_budgets()
-
-    def _on_bud_copy(self):
-        bid = self._selected_budget_id()
-        if bid is None:
-            return
-        with _conn() as con:
-            src = con.execute("SELECT * FROM budget WHERE id=%s", (bid,)).fetchone()
-        dlg = CopyBudgetDialog(bid, src["budget_name"], self)
-        if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
-            return
-        new_name, new_year = dlg.values()
-        if not new_name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "New budget name is required.")
-            return
-        with _conn() as con:
-            cur = con.execute(
-                "INSERT INTO budget(budget_name,fiscal_year,department,status,description,created_by) "
-                "VALUES(%s,%s,%s,%s,%s,%s) RETURNING id",
-                (new_name, new_year, src["department"], "Draft", src["description"], src["created_by"])
-            )
-            new_id = cur.fetchone()['id']
-            # copy lines
-            lines = con.execute(
-                "SELECT account_id, month, amount FROM budget_line WHERE budget_id=%s", (bid,)
+    def _total_actual_for_budget(self, budget_id, fiscal_year):
+        """Sum actuals for all GL accounts referenced in budget lines."""
+        conn = get_db()
+        try:
+            lines = conn.execute(
+                "SELECT account_id FROM budget_line WHERE budget_id=%s AND account_id IS NOT NULL",
+                (budget_id,)
             ).fetchall()
-            con.executemany(
-                "INSERT INTO budget_line(budget_id,account_id,month,amount) VALUES(%s,%s,%s,%s)",
-                [(new_id, ln["account_id"], ln["month"], ln["amount"]) for ln in lines]
-            )
-        QtWidgets.QMessageBox.information(self, "Copied", f"Budget copied as '{new_name}'.")
+            if not lines:
+                return 0.0
+            account_ids = [l["account_id"] for l in lines]
+            placeholders = ",".join(["%s"] * len(account_ids))
+            row = conn.execute(f"""
+                SELECT COALESCE(SUM(ABS(jl.debit - jl.credit)), 0) AS total
+                FROM gl_journal_line jl
+                JOIN gl_journal j ON j.id = jl.journal_id
+                WHERE jl.account_id IN ({placeholders})
+                  AND j.posted = 1
+                  AND EXTRACT(YEAR FROM j.journal_date::date) = %s
+            """, account_ids + [fiscal_year]).fetchone()
+            return row["total"] if row else 0.0
+        except Exception:
+            return 0.0
+        finally:
+            conn.close()
+
+    def _on_show_all(self):
+        self.status_filter.blockSignals(True)
+        self.status_filter.setCurrentIndex(0)
+        self.status_filter.blockSignals(False)
+        self.dept_filter.blockSignals(True)
+        self.dept_filter.setCurrentIndex(0)
+        self.dept_filter.blockSignals(False)
         self._refresh_budgets()
 
-    def _on_bud_delete(self):
-        bid = self._selected_budget_id()
-        if bid is None:
+    def _on_budget_clicked(self, index):
+        row = index.row()
+        if row < 0 or row >= len(self._budget_row_ids):
             return
-        if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this budget and all its line items%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
-        ) == QtWidgets.QMessageBox.StandardButton.Yes:
-            with _conn() as con:
-                con.execute("DELETE FROM budget WHERE id=%s", (bid,))
-            if self._current_budget_id == bid:
-                self._current_budget_id = None
+        self._selected_budget_id = self._budget_row_ids[row]
+        try:
+            self._selected_fiscal_year = int(
+                self.budget_table.item(row, 1).text())
+        except ValueError:
+            self._selected_fiscal_year = CURRENT_YEAR
+        self._selected_line_id = None
+        self._refresh_lines()
+
+    def _refresh_lines(self):
+        self.line_table.setRowCount(0)
+        self._line_row_ids = []
+        if self._selected_budget_id is None:
+            return
+        conn = get_db()
+        try:
+            lines = conn.execute("""
+                SELECT bl.id, bl.category, bl.description, bl.budgeted_amount,
+                       bl.account_id, a.account_number, a.account_name
+                FROM budget_line bl
+                LEFT JOIN gl_account a ON a.id = bl.account_id
+                WHERE bl.budget_id = %s
+                ORDER BY bl.category, bl.description
+            """, (self._selected_budget_id,)).fetchall()
+        except psycopg2.OperationalError:
+            lines = []
+        conn.close()
+
+        for line in lines:
+            r = self.line_table.rowCount()
+            self.line_table.insertRow(r)
+            self._line_row_ids.append(line["id"])
+
+            budgeted = line["budgeted_amount"]
+            actual = _actual_for_account(
+                line["account_id"], self._selected_fiscal_year
+            ) if line["account_id"] else 0.0
+            variance = budgeted - actual
+
+            acct_display = ""
+            if line["account_number"]:
+                acct_display = f"{line['account_number']} — {line['account_name']}"
+
+            self.line_table.setItem(r, 0, _ro(line["category"] or ""))
+            self.line_table.setItem(r, 1, _ro(line["description"]))
+            self.line_table.setItem(r, 2, _ro(acct_display))
+            self.line_table.setItem(r, 3, _ro_right(f"${budgeted:,.2f}"))
+            self.line_table.setItem(r, 4, _ro_right(f"${actual:,.2f}"))
+            var_item = _ro_right(f"${variance:,.2f}")
+            if variance < 0:
+                var_item.setForeground(QtGui.QColor("#cc0000"))
+            self.line_table.setItem(r, 5, var_item)
+
+    def _on_line_clicked(self, index):
+        row = index.row()
+        if 0 <= row < len(self._line_row_ids):
+            self._selected_line_id = self._line_row_ids[row]
+
+    def _on_new_budget(self):
+        dlg = BudgetDialog(parent=self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_budgets()
 
-    def _on_open_detail(self):
-        bid = self._selected_budget_id()
-        if bid is None:
+    def _on_edit_budget(self, _index=None):
+        if self._selected_budget_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a budget first.")
             return
-        self._current_budget_id = bid
-        self.tabs.setCurrentIndex(1)
+        dlg = BudgetDialog(budget_id=self._selected_budget_id, parent=self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh_budgets()
 
-    def _on_bud_clear(self):
-        self.bud_ef_name.clear()
-        self.bud_ef_dept.setCurrentIndex(0)
-        self.bud_ef_desc.clear()
-        self.bud_ef_by.clear()
-        self.bud_ef_year.setValue(date.today().year)
-        self.bud_ef_status.setCurrentIndex(0)
-        self.bud_tbl.clearSelection()
-        self._current_budget_id = None
-
-    # ── Budget Detail tab ─────────────────────────────────────────────────────
-    def _build_detail_tab(self):
-        w = QtWidgets.QWidget()
-        v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(6, 6, 6, 6)
-
-        # selector bar
-        sb = QtWidgets.QHBoxLayout()
-        sb.addWidget(QtWidgets.QLabel("Budget:"))
-        self.det_budget_combo = QtWidgets.QComboBox()
-        self.det_budget_combo.setMinimumWidth(300)
-        self.det_budget_combo.currentIndexChanged.connect(self._on_detail_budget_change)
-        sb.addWidget(self.det_budget_combo)
-        sb.addWidget(QtWidgets.QLabel("Show Types:"))
-        self.det_type_filter = QtWidgets.QComboBox()
-        self.det_type_filter.addItem("All Types")
-        for t in ACCT_TYPES:
-            self.det_type_filter.addItem(t)
-        self.det_type_filter.currentIndexChanged.connect(self._refresh_detail)
-        sb.addWidget(self.det_type_filter)
-        btn_load = QtWidgets.QPushButton("Load")
-        btn_load.setStyleSheet(BTN_STYLE)
-        btn_load.clicked.connect(self._refresh_detail)
-        sb.addWidget(btn_load)
-        sb.addStretch()
-        btn_save_all = QtWidgets.QPushButton("💾 Save All Changes")
-        btn_save_all.setStyleSheet(BTN_STYLE)
-        btn_save_all.clicked.connect(self._save_detail)
-        sb.addWidget(btn_save_all)
-        btn_exp = QtWidgets.QPushButton("Export CSV")
-        btn_exp.setStyleSheet(BTN_STYLE)
-        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.det_tbl, self))
-        sb.addWidget(btn_exp)
-        v.addLayout(sb)
-
-        self.det_label = QtWidgets.QLabel("Select a budget and click Load.")
-        self.det_label.setStyleSheet("color:white;font-weight:bold;padding:2px;")
-        v.addWidget(self.det_label)
-
-        # spreadsheet grid: rows = accounts, cols = Acct#, Name, Type, Jan..Dec, Total
-        col_headers = ["Acct #", "Account Name", "Type"] + MONTHS + ["Annual Total"]
-        self.det_tbl = QtWidgets.QTableWidget(0, len(col_headers))
-        self.det_tbl.setHorizontalHeaderLabels(col_headers)
-        self.det_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.det_tbl.setColumnWidth(0, 70)
-        self.det_tbl.setColumnWidth(2, 80)
-        for c in range(3, 15):
-            self.det_tbl.setColumnWidth(c, 80)
-        self.det_tbl.setColumnWidth(15, 100)
-        self.det_tbl.setAlternatingRowColors(True)
-        self.det_tbl.verticalHeader().setDefaultSectionSize(26)
-        self.det_tbl.cellChanged.connect(self._on_detail_cell_changed)
-        v.addWidget(self.det_tbl)
-
-        self.det_totals_lbl = QtWidgets.QLabel("")
-        self.det_totals_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
-        self.det_totals_lbl.setStyleSheet("font-weight:bold;font-size:13px;padding:4px 8px;color:white;")
-        v.addWidget(self.det_totals_lbl)
-
-        # quick-fill helper
-        qf = QtWidgets.QHBoxLayout()
-        qf.addWidget(QtWidgets.QLabel("Quick Fill — set monthly amount for selected row:"))
-        self.qf_amount = QtWidgets.QDoubleSpinBox()
-        self.qf_amount.setRange(0, 99_999_999)
-        self.qf_amount.setDecimals(2)
-        qf.addWidget(self.qf_amount)
-        btn_fill_monthly = QtWidgets.QPushButton("Fill All 12 Months")
-        btn_fill_monthly.setStyleSheet(BTN_STYLE)
-        btn_fill_monthly.clicked.connect(self._quick_fill_monthly)
-        btn_fill_equal = QtWidgets.QPushButton("Spread Annual Total")
-        btn_fill_equal.setStyleSheet(BTN_STYLE)
-        btn_fill_equal.clicked.connect(self._quick_fill_spread)
-        qf.addWidget(btn_fill_monthly)
-        qf.addWidget(btn_fill_equal)
-        qf.addStretch()
-        v.addLayout(qf)
-
-        return w
-
-    def _populate_det_budget_combo(self):
-        self.det_budget_combo.blockSignals(True)
-        self.det_budget_combo.clear()
-        self.det_budget_combo.addItem("-- select budget --", 0)
-        with _conn() as con:
-            rows = con.execute(
-                "SELECT id, budget_name, fiscal_year FROM budget ORDER BY fiscal_year DESC, budget_name"
-            ).fetchall()
-        for row in rows:
-            self.det_budget_combo.addItem(f"{row['fiscal_year']} — {row['budget_name']}", row["id"])
-        # restore current selection
-        if self._current_budget_id:
-            idx = self.det_budget_combo.findData(self._current_budget_id)
-            if idx >= 0:
-                self.det_budget_combo.setCurrentIndex(idx)
-        self.det_budget_combo.blockSignals(False)
-
-    def _on_detail_budget_change(self):
-        self._current_budget_id = self.det_budget_combo.currentData() or None
-
-    def _refresh_detail(self):
-        bid = self.det_budget_combo.currentData()
-        if not bid:
-            self.det_label.setText("Select a budget and click Load.")
+    def _set_budget_status(self, new_status):
+        if self._selected_budget_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a budget first.")
             return
-        self._current_budget_id = bid
-        with _conn() as con:
-            bud = con.execute("SELECT * FROM budget WHERE id=%s", (bid,)).fetchone()
-            acct_filter = self.det_type_filter.currentText()
-            if acct_filter != "All Types":
-                accounts = con.execute(
-                    "SELECT id,account_number,account_name,account_type FROM gl_account"
-                    " WHERE is_active=1 AND account_type=%s ORDER BY account_number",
-                    (acct_filter,)
-                ).fetchall()
-            else:
-                accounts = con.execute(
-                    "SELECT id,account_number,account_name,account_type FROM gl_account"
-                    " WHERE is_active=1 ORDER BY account_number"
-                ).fetchall()
-            # load existing budget lines into dict
-            lines = con.execute(
-                "SELECT account_id, month, amount FROM budget_line WHERE budget_id=%s", (bid,)
-            ).fetchall()
-        line_map = {}   # (account_id, month) -> amount
-        for ln in lines:
-            line_map[(ln["account_id"], ln["month"])] = ln["amount"]
-
-        self.det_label.setText(
-            f"  Budget: {bud['budget_name']}  |  Year: {bud['fiscal_year']}  |  "
-            f"Dept: {bud['department']}  |  Status: {bud['status']}"
+        reply = QtWidgets.QMessageBox.question(
+            self, "Confirm", f"Mark budget as {new_status}?",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
-        # block signals while filling
-        self.det_tbl.blockSignals(True)
-        self.det_tbl.setRowCount(0)
-        for acct in accounts:
-            r = self.det_tbl.rowCount()
-            self.det_tbl.insertRow(r)
-            self.det_tbl.setItem(r, 0, _ro(acct["account_number"]))
-            self.det_tbl.setItem(r, 1, _ro(acct["account_name"]))
-            self.det_tbl.setItem(r, 2, _ro(acct["account_type"]))
-            # store account_id in col 0
-            self.det_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, acct["id"])
-            row_total = 0.0
-            for m in range(1, 13):
-                amt = line_map.get((acct["id"], m), 0.0)
-                row_total += amt
-                cell = QtWidgets.QTableWidgetItem(f"{amt:.2f}" if amt else "")
-                cell.setTextAlignment(
-                    QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
-                )
-                self.det_tbl.setItem(r, 2 + m, cell)
-            # total col (read-only)
-            tot_item = _ro_r(_money(row_total) if row_total else "")
-            tot_item.setBackground(QtGui.QColor(240, 240, 240))
-            tot_item.setFont(QtGui.QFont("", -1, QtGui.QFont.Weight.Bold))
-            self.det_tbl.setItem(r, 15, tot_item)
-            # row color
-            color = ACCT_TYPE_COLORS.get(acct["account_type"], QtGui.QColor(255, 255, 255))
-            for c in [0, 1, 2]:
-                it = self.det_tbl.item(r, c)
-                if it:
-                    it.setBackground(color)
-        self.det_tbl.blockSignals(False)
-        self._update_detail_totals()
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            conn = get_db()
+            conn.execute("UPDATE budget SET status=%s WHERE id=%s",
+                         (new_status, self._selected_budget_id))
+            conn.commit()
+            conn.close()
+            self._refresh_budgets()
 
-    def _on_detail_cell_changed(self, row, col):
-        if col < 3 or col > 14:
+    def _on_add_line(self):
+        if self._selected_budget_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a budget first.")
             return
-        self._update_row_total(row)
-        self._update_detail_totals()
+        dlg = BudgetLineDialog(self._selected_budget_id, parent=self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh_budgets()
+            self._refresh_lines()
 
-    def _update_row_total(self, row):
-        total = 0.0
-        for m in range(3, 15):
-            it = self.det_tbl.item(row, m)
-            if it and it.text().strip():
-                try:
-                    total += float(it.text().replace(",", ""))
-                except ValueError:
-                    pass
-        self.det_tbl.blockSignals(True)
-        tot_item = self.det_tbl.item(row, 15)
-        if tot_item:
-            tot_item.setText(_money(total) if total else "")
-        self.det_tbl.blockSignals(False)
-
-    def _update_detail_totals(self):
-        grand = 0.0
-        for r in range(self.det_tbl.rowCount()):
-            it = self.det_tbl.item(r, 15)
-            if it and it.text().strip():
-                try:
-                    grand += float(it.text().replace(",", ""))
-                except ValueError:
-                    pass
-        self.det_totals_lbl.setText(f"Grand Annual Total: <b>{_money(grand)}</b>")
-
-    def _save_detail(self):
-        bid = self.det_budget_combo.currentData()
-        if not bid:
-            QtWidgets.QMessageBox.warning(self, "No Budget", "Load a budget first.")
+    def _on_edit_line(self):
+        if self._selected_line_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection",
+                                          "Select a budget line first.")
             return
-        to_upsert = []
-        for r in range(self.det_tbl.rowCount()):
-            aid = self.det_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
-            for m in range(1, 13):
-                it = self.det_tbl.item(r, 2 + m)
-                txt = it.text().strip().replace(",", "") if it else ""
-                try:
-                    amt = float(txt)
-                except ValueError:
-                    amt = 0.0
-                to_upsert.append((bid, aid, m, amt, amt))
-        with _conn() as con:
-            con.executemany(
-                "INSERT INTO budget_line(budget_id,account_id,month,amount) VALUES(%s,%s,%s,%s) "
-                "ON CONFLICT(budget_id,account_id,month) DO UPDATE SET amount=%s",
-                to_upsert
-            )
-        QtWidgets.QMessageBox.information(self, "Saved", "Budget lines saved.")
+        dlg = BudgetLineDialog(self._selected_budget_id,
+                               line_id=self._selected_line_id, parent=self)
+        if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._refresh_budgets()
+            self._refresh_lines()
 
-    def _quick_fill_monthly(self):
-        rows = self.det_tbl.selectionModel().selectedRows()
-        if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a row first.")
+    def _on_delete_line(self):
+        if self._selected_line_id is None:
+            QtWidgets.QMessageBox.warning(self, "No Selection",
+                                          "Select a budget line first.")
             return
-        amt = self.qf_amount.value()
-        self.det_tbl.blockSignals(True)
-        for idx in rows:
-            r = idx.row()
-            for m in range(3, 15):
-                self.det_tbl.item(r, m).setText(f"{amt:.2f}" if amt else "")
-            self._update_row_total(r)
-        self.det_tbl.blockSignals(False)
-        self._update_detail_totals()
-
-    def _quick_fill_spread(self):
-        """Spread the entered annual total evenly across 12 months."""
-        rows = self.det_tbl.selectionModel().selectedRows()
-        if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a row first.")
-            return
-        annual = self.qf_amount.value()
-        monthly = round(annual / 12, 2)
-        # last month gets remainder
-        remainder = round(annual - monthly * 11, 2)
-        self.det_tbl.blockSignals(True)
-        for idx in rows:
-            r = idx.row()
-            for m in range(3, 14):
-                self.det_tbl.item(r, m).setText(f"{monthly:.2f}" if monthly else "")
-            self.det_tbl.item(r, 14).setText(f"{remainder:.2f}" if remainder else "")
-            self._update_row_total(r)
-        self.det_tbl.blockSignals(False)
-        self._update_detail_totals()
-
-    # ── Budget vs. Actual tab ─────────────────────────────────────────────────
-    def _build_bva_tab(self):
-        w = QtWidgets.QWidget()
-        v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(6, 6, 6, 6)
-
-        fb = QtWidgets.QHBoxLayout()
-        fb.addWidget(QtWidgets.QLabel("Budget:"))
-        self.bva_combo = QtWidgets.QComboBox()
-        self.bva_combo.setMinimumWidth(280)
-        fb.addWidget(self.bva_combo)
-        fb.addWidget(QtWidgets.QLabel("From:"))
-        self.bva_from = QtWidgets.QDateEdit(calendarPopup=True)
-        self.bva_from.setDate(QtCore.QDate(QtCore.QDate.currentDate().year(), 1, 1))
-        fb.addWidget(self.bva_from)
-        fb.addWidget(QtWidgets.QLabel("To:"))
-        self.bva_to = QtWidgets.QDateEdit(calendarPopup=True)
-        self.bva_to.setDate(QtCore.QDate.currentDate())
-        fb.addWidget(self.bva_to)
-        self.bva_posted = QtWidgets.QCheckBox("Posted GL Only")
-        self.bva_posted.setChecked(True)
-        self.bva_posted.setStyleSheet("color:white;font-weight:bold;")
-        fb.addWidget(self.bva_posted)
-        btn_run = QtWidgets.QPushButton("Run Report")
-        btn_run.setStyleSheet(BTN_STYLE)
-        btn_run.clicked.connect(self._refresh_bva)
-        fb.addWidget(btn_run)
-        fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV")
-        btn_exp.setStyleSheet(BTN_STYLE)
-        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.bva_tbl, self))
-        fb.addWidget(btn_exp)
-        v.addLayout(fb)
-
-        self.bva_tbl = QtWidgets.QTableWidget(0, 8)
-        self.bva_tbl.setHorizontalHeaderLabels(
-            ["Acct #", "Account Name", "Type", "Budget", "Actual", "Variance $", "Variance %", "Status"]
+        reply = QtWidgets.QMessageBox.question(
+            self, "Confirm Delete", "Delete this budget line?",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
-        self.bva_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.bva_tbl.setColumnWidth(0, 70)
-        self.bva_tbl.setColumnWidth(2, 90)
-        self.bva_tbl.setColumnWidth(3, 110)
-        self.bva_tbl.setColumnWidth(4, 110)
-        self.bva_tbl.setColumnWidth(5, 110)
-        self.bva_tbl.setColumnWidth(6, 90)
-        self.bva_tbl.setColumnWidth(7, 90)
-        self.bva_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.bva_tbl.setAlternatingRowColors(True)
-        self.bva_tbl.verticalHeader().setDefaultSectionSize(24)
-        v.addWidget(self.bva_tbl)
-
-        self.bva_totals = QtWidgets.QLabel("")
-        self.bva_totals.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
-        self.bva_totals.setStyleSheet("font-weight:bold;font-size:13px;padding:4px 8px;")
-        v.addWidget(self.bva_totals)
-        return w
-
-    def _populate_bva_combo(self):
-        self.bva_combo.clear()
-        self.bva_combo.addItem("-- select budget --", 0)
-        with _conn() as con:
-            rows = con.execute(
-                "SELECT id, budget_name, fiscal_year FROM budget ORDER BY fiscal_year DESC, budget_name"
-            ).fetchall()
-        for row in rows:
-            self.bva_combo.addItem(f"{row['fiscal_year']} — {row['budget_name']}", row["id"])
-        if self._current_budget_id:
-            idx = self.bva_combo.findData(self._current_budget_id)
-            if idx >= 0:
-                self.bva_combo.setCurrentIndex(idx)
-
-    def _refresh_bva(self):
-        bid = self.bva_combo.currentData()
-        if not bid:
-            QtWidgets.QMessageBox.warning(self, "No Budget", "Select a budget first.")
-            return
-        d0 = self.bva_from.date().toString("yyyy-MM-dd")
-        d1 = self.bva_to.date().toString("yyyy-MM-dd")
-        # derive month range from date filter
-        m0 = self.bva_from.date().month()
-        m1 = self.bva_to.date().month()
-
-        posted_clause = "AND j.posted=1" if self.bva_posted.isChecked() else ""
-
-        # get budget amounts (sum months in range)
-        with _conn() as con:
-            bud_lines = con.execute(
-                "SELECT bl.account_id, SUM(bl.amount) AS budgeted "
-                "FROM budget_line bl "
-                "WHERE bl.budget_id=%s AND bl.month>=%s AND bl.month<=%s "
-                "GROUP BY bl.account_id",
-                (bid, m0, m1)
-            ).fetchall()
-
-            # get actual GL amounts
-            act_sql = f"""
-                SELECT l.account_id,
-                       SUM(CASE WHEN a.account_type IN ('Asset','Expense','COGS')
-                                THEN l.debit - l.credit
-                                ELSE l.credit - l.debit END) AS actual
-                FROM gl_journal_line l
-                JOIN gl_journal j ON j.id=l.journal_id
-                JOIN gl_account  a ON a.id=l.account_id
-                WHERE j.journal_date>=%s AND j.journal_date<=%s
-                  {posted_clause}
-                GROUP BY l.account_id
-            """
-            actuals = con.execute(act_sql, (d0, d1)).fetchall()
-
-            accounts = con.execute(
-                "SELECT id, account_number, account_name, account_type "
-                "FROM gl_account WHERE is_active=1 ORDER BY account_number"
-            ).fetchall()
-
-        bud_map = {r["account_id"]: r["budgeted"] for r in bud_lines}
-        act_map = {r["account_id"]: r["actual"] for r in actuals}
-
-        self.bva_tbl.setRowCount(0)
-        tot_bud = tot_act = 0.0
-        for acct in accounts:
-            aid = acct["id"]
-            budgeted = bud_map.get(aid, 0.0) or 0.0
-            actual = act_map.get(aid, 0.0) or 0.0
-            if budgeted == 0 and actual == 0:
-                continue
-            variance = actual - budgeted
-            pct = (variance / budgeted * 100) if budgeted else 0.0
-            # favorable = under budget for expense/COGS, over for revenue
-            if acct["account_type"] in ("Revenue",):
-                favorable = actual >= budgeted
-            else:
-                favorable = actual <= budgeted
-            status = "✓ On Budget" if abs(pct) < 5 else ("▲ Over" if variance > 0 else "▼ Under")
-
-            r = self.bva_tbl.rowCount()
-            self.bva_tbl.insertRow(r)
-            self.bva_tbl.setItem(r, 0, _ro(acct["account_number"]))
-            self.bva_tbl.setItem(r, 1, _ro(acct["account_name"]))
-            self.bva_tbl.setItem(r, 2, _ro(acct["account_type"]))
-            self.bva_tbl.setItem(r, 3, _ro_r(_money(budgeted)))
-            self.bva_tbl.setItem(r, 4, _ro_r(_money(actual)))
-            var_item = _ro_r(_money(abs(variance)))
-            pct_item = _ro_r(f"{pct:+.1f}%" if budgeted else "N/A")
-            st_item = _ro(status, QtCore.Qt.AlignmentFlag.AlignCenter)
-
-            var_color = QtGui.QColor("green") if favorable else QtGui.QColor("red")
-            for it in [var_item, pct_item, st_item]:
-                it.setForeground(var_color)
-            self.bva_tbl.setItem(r, 5, var_item)
-            self.bva_tbl.setItem(r, 6, pct_item)
-            self.bva_tbl.setItem(r, 7, st_item)
-
-            bg = ACCT_TYPE_COLORS.get(acct["account_type"], QtGui.QColor(255, 255, 255))
-            for c in range(8):
-                it = self.bva_tbl.item(r, c)
-                if it:
-                    it.setBackground(bg)
-            tot_bud += budgeted
-            tot_act += actual
-
-        grand_var = tot_act - tot_bud
-        self.bva_totals.setText(
-            f"Total Budget: <b>{_money(tot_bud)}</b>   "
-            f"Total Actual: <b>{_money(tot_act)}</b>   "
-            f"<span style='color:{'green' if grand_var <= 0 else 'red'};'>"
-            f"Net Variance: <b>{_money(grand_var):}</b></span>"
-        )
-
-    # ── Variance Report tab ───────────────────────────────────────────────────
-    def _build_variance_tab(self):
-        w = QtWidgets.QWidget()
-        v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(6, 6, 6, 6)
-
-        fb = QtWidgets.QHBoxLayout()
-        fb.addWidget(QtWidgets.QLabel("Budget:"))
-        self.var_combo = QtWidgets.QComboBox()
-        self.var_combo.setMinimumWidth(280)
-        fb.addWidget(self.var_combo)
-        fb.addWidget(QtWidgets.QLabel("Period:"))
-        self.var_from = QtWidgets.QDateEdit(calendarPopup=True)
-        self.var_from.setDate(QtCore.QDate(QtCore.QDate.currentDate().year(), 1, 1))
-        fb.addWidget(self.var_from)
-        fb.addWidget(QtWidgets.QLabel("to"))
-        self.var_to = QtWidgets.QDateEdit(calendarPopup=True)
-        self.var_to.setDate(QtCore.QDate.currentDate())
-        fb.addWidget(self.var_to)
-        fb.addWidget(QtWidgets.QLabel("Threshold %:"))
-        self.var_threshold = QtWidgets.QSpinBox()
-        self.var_threshold.setRange(0, 100)
-        self.var_threshold.setValue(10)
-        self.var_threshold.setSuffix("%")
-        fb.addWidget(self.var_threshold)
-        self.var_posted = QtWidgets.QCheckBox("Posted GL Only")
-        self.var_posted.setChecked(True)
-        self.var_posted.setStyleSheet("color:white;font-weight:bold;")
-        fb.addWidget(self.var_posted)
-        btn_run = QtWidgets.QPushButton("Run Variance")
-        btn_run.setStyleSheet(BTN_STYLE)
-        btn_run.clicked.connect(self._refresh_variance)
-        fb.addWidget(btn_run)
-        fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV")
-        btn_exp.setStyleSheet(BTN_STYLE)
-        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.var_tbl, self))
-        fb.addWidget(btn_exp)
-        v.addLayout(fb)
-
-        # summary cards row
-        self.var_cards = QtWidgets.QHBoxLayout()
-        self.card_over = self._make_card("Over Budget", "#ffcccc")
-        self.card_under = self._make_card("Under Budget", "#ccffcc")
-        self.card_ok = self._make_card("On Target", "#cce0ff")
-        self.card_noact = self._make_card("No Activity", "#eeeeee")
-        for card in [self.card_over, self.card_under, self.card_ok, self.card_noact]:
-            self.var_cards.addWidget(card)
-        v.addLayout(self.var_cards)
-
-        self.var_tbl = QtWidgets.QTableWidget(0, 7)
-        self.var_tbl.setHorizontalHeaderLabels(
-            ["Acct #", "Account Name", "Type", "Budget", "Actual", "Variance $", "Variance %"]
-        )
-        self.var_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.var_tbl.setColumnWidth(0, 70)
-        self.var_tbl.setColumnWidth(2, 90)
-        self.var_tbl.setColumnWidth(3, 110)
-        self.var_tbl.setColumnWidth(4, 110)
-        self.var_tbl.setColumnWidth(5, 110)
-        self.var_tbl.setColumnWidth(6, 100)
-        self.var_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.var_tbl.setAlternatingRowColors(True)
-        self.var_tbl.verticalHeader().setDefaultSectionSize(24)
-        v.addWidget(self.var_tbl)
-        return w
-
-    def _make_card(self, label, bg):
-        card = QtWidgets.QFrame()
-        card.setStyleSheet(f"background:{bg};border-radius:8px;border:1px solid #aaa;")
-        card.setMinimumHeight(70)
-        cl = QtWidgets.QVBoxLayout(card)
-        lbl = QtWidgets.QLabel(label)
-        lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        lbl.setStyleSheet("font-weight:bold;font-size:12px;")
-        val = QtWidgets.QLabel("—")
-        val.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        val.setStyleSheet("font-size:20px;font-weight:bold;")
-        cl.addWidget(lbl)
-        cl.addWidget(val)
-        card._value_label = val
-        return card
-
-    def _populate_var_combo(self):
-        self.var_combo.clear()
-        self.var_combo.addItem("-- select budget --", 0)
-        with _conn() as con:
-            rows = con.execute(
-                "SELECT id, budget_name, fiscal_year FROM budget ORDER BY fiscal_year DESC, budget_name"
-            ).fetchall()
-        for row in rows:
-            self.var_combo.addItem(f"{row['fiscal_year']} — {row['budget_name']}", row["id"])
-        if self._current_budget_id:
-            idx = self.var_combo.findData(self._current_budget_id)
-            if idx >= 0:
-                self.var_combo.setCurrentIndex(idx)
-
-    def _refresh_variance(self):
-        bid = self.var_combo.currentData()
-        if not bid:
-            QtWidgets.QMessageBox.warning(self, "No Budget", "Select a budget first.")
-            return
-        d0 = self.var_from.date().toString("yyyy-MM-dd")
-        d1 = self.var_to.date().toString("yyyy-MM-dd")
-        m0 = self.var_from.date().month()
-        m1 = self.var_to.date().month()
-        threshold = self.var_threshold.value()
-        posted_clause = "AND j.posted=1" if self.var_posted.isChecked() else ""
-
-        with _conn() as con:
-            bud_lines = con.execute(
-                "SELECT bl.account_id, SUM(bl.amount) AS budgeted "
-                "FROM budget_line bl WHERE bl.budget_id=%s AND bl.month>=%s AND bl.month<=%s "
-                "GROUP BY bl.account_id", (bid, m0, m1)
-            ).fetchall()
-            act_sql = f"""
-                SELECT l.account_id,
-                       SUM(CASE WHEN a.account_type IN ('Asset','Expense','COGS')
-                                THEN l.debit - l.credit
-                                ELSE l.credit - l.debit END) AS actual
-                FROM gl_journal_line l
-                JOIN gl_journal j ON j.id=l.journal_id
-                JOIN gl_account  a ON a.id=l.account_id
-                WHERE j.journal_date>=%s AND j.journal_date<=%s
-                  {posted_clause}
-                GROUP BY l.account_id
-            """
-            actuals = con.execute(act_sql, (d0, d1)).fetchall()
-            accounts = con.execute(
-                "SELECT id, account_number, account_name, account_type "
-                "FROM gl_account WHERE is_active=1 ORDER BY account_number"
-            ).fetchall()
-
-        bud_map = {r["account_id"]: r["budgeted"] for r in bud_lines}
-        act_map = {r["account_id"]: r["actual"] for r in actuals}
-
-        self.var_tbl.setRowCount(0)
-        cnt_over = cnt_under = cnt_ok = cnt_noact = 0
-
-        for acct in accounts:
-            aid = acct["id"]
-            budgeted = bud_map.get(aid, 0.0) or 0.0
-            actual = act_map.get(aid, 0.0) or 0.0
-            if budgeted == 0 and actual == 0:
-                continue
-            variance = actual - budgeted
-            pct = (variance / budgeted * 100) if budgeted else 0.0
-            is_revenue = acct["account_type"] in ("Revenue",)
-
-            if actual == 0 and budgeted > 0:
-                cnt_noact += 1
-                row_color = QtGui.QColor(230, 230, 230)
-            elif abs(pct) <= threshold:
-                cnt_ok += 1
-                row_color = QtGui.QColor(200, 255, 210)
-            elif (variance > 0 and not is_revenue) or (variance < 0 and is_revenue):
-                cnt_over += 1
-                row_color = QtGui.QColor(255, 200, 200)
-            else:
-                cnt_under += 1
-                row_color = QtGui.QColor(255, 255, 190)
-
-            r = self.var_tbl.rowCount()
-            self.var_tbl.insertRow(r)
-            self.var_tbl.setItem(r, 0, _ro(acct["account_number"]))
-            self.var_tbl.setItem(r, 1, _ro(acct["account_name"]))
-            self.var_tbl.setItem(r, 2, _ro(acct["account_type"]))
-            self.var_tbl.setItem(r, 3, _ro_r(_money(budgeted)))
-            self.var_tbl.setItem(r, 4, _ro_r(_money(actual)))
-            self.var_tbl.setItem(r, 5, _ro_r(f"{'-' if variance < 0 else ''}{_money(abs(variance))}"))
-            self.var_tbl.setItem(r, 6, _ro_r(f"{pct:+.1f}%" if budgeted else "N/A"))
-            for c in range(7):
-                it = self.var_tbl.item(r, c)
-                if it:
-                    it.setBackground(row_color)
-
-        # update summary cards
-        self.card_over._value_label.setText(str(cnt_over))
-        self.card_under._value_label.setText(str(cnt_under))
-        self.card_ok._value_label.setText(str(cnt_ok))
-        self.card_noact._value_label.setText(str(cnt_noact))
-
-    # ── tab change ────────────────────────────────────────────────────────────
-    def _on_tab_change(self, idx):
-        if idx == 1:
-            self._populate_det_budget_combo()
-        elif idx == 2:
-            self._populate_bva_combo()
-        elif idx == 3:
-            self._populate_var_combo()
-        elif idx == 4:
-            self._refresh_dept_summary()
-
-    # ── Department Summary tab ────────────────────────────────────────────────
-
-    def _build_dept_summary_tab(self):
-        w = QtWidgets.QWidget()
-        v = QtWidgets.QVBoxLayout(w)
-        v.setContentsMargins(6, 6, 6, 6)
-
-        fb = QtWidgets.QHBoxLayout()
-        fb.addWidget(QtWidgets.QLabel("Fiscal Year:"))
-        self.ds_year = QtWidgets.QComboBox()
-        self.ds_year.addItem("All Years")
-        for yr in range(date.today().year + 1, date.today().year - 6, -1):
-            self.ds_year.addItem(str(yr))
-        self.ds_year.setCurrentText(str(date.today().year))
-        fb.addWidget(self.ds_year)
-        fb.addWidget(QtWidgets.QLabel("Status:"))
-        self.ds_status = QtWidgets.QComboBox()
-        self.ds_status.addItem("All Statuses")
-        for s in STATUSES:
-            self.ds_status.addItem(s)
-        fb.addWidget(self.ds_status)
-        btn_run = QtWidgets.QPushButton("Refresh")
-        btn_run.setStyleSheet(BTN_STYLE)
-        btn_run.clicked.connect(self._refresh_dept_summary)
-        fb.addWidget(btn_run)
-        fb.addStretch()
-        btn_exp = QtWidgets.QPushButton("Export CSV")
-        btn_exp.setStyleSheet(BTN_STYLE)
-        btn_exp.clicked.connect(lambda: _export_table_to_csv(self.ds_tbl, self))
-        fb.addWidget(btn_exp)
-        v.addLayout(fb)
-
-        self.ds_tbl = QtWidgets.QTableWidget(0, 5)
-        self.ds_tbl.setHorizontalHeaderLabels(
-            ["Department", "Budgets", "Active", "Total Budgeted", "Avg per Budget"]
-        )
-        self.ds_tbl.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.ds_tbl.setColumnWidth(1, 80)
-        self.ds_tbl.setColumnWidth(2, 80)
-        self.ds_tbl.setColumnWidth(3, 130)
-        self.ds_tbl.setColumnWidth(4, 130)
-        self.ds_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ds_tbl.setAlternatingRowColors(True)
-        self.ds_tbl.verticalHeader().setDefaultSectionSize(28)
-        self.ds_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ds_tbl.itemSelectionChanged.connect(self._on_ds_select)
-        v.addWidget(self.ds_tbl)
-
-        self.ds_totals = QtWidgets.QLabel("")
-        self.ds_totals.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
-        self.ds_totals.setStyleSheet("font-weight:bold;font-size:13px;padding:4px 8px;color:white;")
-        v.addWidget(self.ds_totals)
-
-        lbl = QtWidgets.QLabel("Select a department row to filter the Budgets tab to that department.")
-        lbl.setStyleSheet("color:white;font-size:11px;padding:2px 4px;")
-        v.addWidget(lbl)
-        return w
-
-    def _refresh_dept_summary(self):
-        yr = self.ds_year.currentText()
-        st = self.ds_status.currentText()
-
-        q = "SELECT department, status, COUNT(*) as cnt, SUM(total) as total FROM (" \
-            "SELECT b.department, b.status, COALESCE(SUM(bl.amount),0) as total " \
-            "FROM budget b LEFT JOIN budget_line bl ON bl.budget_id=b.id"
-        params = []
-        where = []
-        if yr != "All Years":
-            where.append("b.fiscal_year=%s")
-            params.append(int(yr))
-        if st != "All Statuses":
-            where.append("b.status=%s")
-            params.append(st)
-        if where:
-            q += " WHERE " + " AND ".join(where)
-        q += " GROUP BY b.id, b.department, b.status) GROUP BY department, status ORDER BY department, status"
-
-        with _conn() as con:
-            rows = con.execute(q, params).fetchall()
-
-        # aggregate by department
-        dept_map: dict = {}
-        for row in rows:
-            d = row["department"] or "All"
-            if d not in dept_map:
-                dept_map[d] = {"budgets": 0, "active": 0, "total": 0.0}
-            dept_map[d]["budgets"] += row["cnt"]
-            if row["status"] == "Active":
-                dept_map[d]["active"] += row["cnt"]
-            dept_map[d]["total"] += row["total"] or 0.0
-
-        DEPT_COLORS = {
-            "Accounting": QtGui.QColor(220, 240, 255),
-            "Customer Service": QtGui.QColor(220, 255, 235),
-            "Engineering": QtGui.QColor(255, 245, 220),
-            "Information Technology": QtGui.QColor(240, 220, 255),
-            "Maintenance": QtGui.QColor(255, 235, 220),
-            "Marketing": QtGui.QColor(220, 255, 255),
-            "Personnel": QtGui.QColor(255, 220, 240),
-            "Production": QtGui.QColor(230, 255, 220),
-            "Purchasing": QtGui.QColor(255, 255, 220),
-            "Quality Assurance": QtGui.QColor(220, 230, 255),
-            "Sales": QtGui.QColor(255, 240, 220),
-            "Budget Management": QtGui.QColor(200, 230, 255),
-        }
-
-        self.ds_tbl.setRowCount(0)
-        grand_total = 0.0
-        for dept in sorted(dept_map.keys()):
-            info = dept_map[dept]
-            r = self.ds_tbl.rowCount()
-            self.ds_tbl.insertRow(r)
-            self.ds_tbl.setItem(r, 0, _ro(dept))
-            self.ds_tbl.setItem(r, 1, _ro(str(info["budgets"]), QtCore.Qt.AlignmentFlag.AlignCenter))
-            self.ds_tbl.setItem(r, 2, _ro(str(info["active"]), QtCore.Qt.AlignmentFlag.AlignCenter))
-            self.ds_tbl.setItem(r, 3, _ro_r(_money(info["total"])))
-            avg = info["total"] / info["budgets"] if info["budgets"] else 0.0
-            self.ds_tbl.setItem(r, 4, _ro_r(_money(avg)))
-            color = DEPT_COLORS.get(dept, QtGui.QColor(245, 245, 245))
-            for c in range(5):
-                it = self.ds_tbl.item(r, c)
-                if it:
-                    it.setBackground(color)
-            grand_total += info["total"]
-
-        total_budgets = sum(v["budgets"] for v in dept_map.values())
-        self.ds_totals.setText(
-            f"Departments: <b>{len(dept_map)}</b>   "
-            f"Total Budgets: <b>{total_budgets}</b>   "
-            f"Grand Total Budgeted: <b>{_money(grand_total)}</b>"
-        )
-
-    def _on_ds_select(self):
-        rows = self.ds_tbl.selectionModel().selectedRows()
-        if not rows:
-            return
-        dept = self.ds_tbl.item(rows[0].row(), 0).text()
-        idx = self.bud_dept_filter.findText(dept)
-        if idx >= 0:
-            self.bud_dept_filter.setCurrentIndex(idx)
-        self.tabs.setCurrentIndex(0)
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            conn = get_db()
+            conn.execute("DELETE FROM budget_line WHERE id=%s",
+                         (self._selected_line_id,))
+            conn.commit()
+            conn.close()
+            self._selected_line_id = None
+            self._refresh_budgets()
+            self._refresh_lines()
 
 
-class BudgetWindow(QtWidgets.QMainWindow):
-    def __init__(self, initial_tab=None):
+class BudgetManagementWindow(QtWidgets.QMainWindow):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("Budget Management")
-        self.resize(1200, 740)
+        self.resize(1060, 720)
         _apply_blue_palette(self)
-        self.setCentralWidget(BudgetMgmtWidget(initial_tab=initial_tab))
+        self.setCentralWidget(BudgetManagementWidget())
 
 
-# ── entry point ───────────────────────────────────────────────────────────────
-if __name__ == "__main__":
+def main():
+    init_db()
     app = QtWidgets.QApplication(sys.argv)
-    win = BudgetWindow(sys.argv[1] if len(sys.argv) > 1 else None)
-    win.show()
+    window = BudgetManagementWindow()
+    window.show()
     sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
