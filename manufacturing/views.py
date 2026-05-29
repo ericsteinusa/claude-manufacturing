@@ -511,10 +511,10 @@ _PERS_MENU = {
         ('emp_records', 'Employee Records', {
             'title': 'Employee Records',
             'items': [
-                ('view_recs', 'View Records', 'personnel_crm.py'),
-                ('new_emp', 'New Employee', 'personnel_crm.py'),
-                ('upd_rec', 'Update Record', 'personnel_crm.py'),
-                ('emp_hist', 'Employment History', 'personnel_crm.py'),
+                ('view_recs', 'View Records', 'employees.py'),
+                ('new_emp', 'New Employee', 'employees.py'),
+                ('upd_rec', 'Update Record', 'employees.py'),
+                ('emp_hist', 'Employment History', 'employees.py'),
             ],
         }),
         ('benefits', 'Benefits', {
