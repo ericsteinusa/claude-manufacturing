@@ -7,7 +7,7 @@ from Accounts_receivable import AccountsReceivableWidget
 from Credit_dept import CreditDeptWidget
 from Payroll_dept import PayrollDeptWidget
 from General_ledger import GeneralLedgerWidget
-from Budget_mgmt import BudgetMgmtWidget
+from Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
 from Bank_reconciliation import BankReconciliationWidget
 
 BUTTON_STYLE = (
