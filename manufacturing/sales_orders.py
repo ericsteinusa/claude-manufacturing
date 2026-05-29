@@ -1,5 +1,5 @@
 import sys
-import sqlite3
+import psycopg2
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -88,7 +88,7 @@ def _load_customers():
         rows = conn.execute(
             "SELECT id, company_name, first_name, last_name FROM customer ORDER BY company_name"
         ).fetchall()
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         rows = []
     conn.close()
     return rows
@@ -106,7 +106,7 @@ def _load_products():
         rows = conn.execute(
             "SELECT id, product_name FROM product ORDER BY product_name"
         ).fetchall()
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         rows = []
     conn.close()
     return rows
@@ -190,7 +190,7 @@ class NewSODialog(QtWidgets.QDialog):
             )
             self.so_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"SO number '{so_num}' already exists.")
             conn.close()
@@ -524,7 +524,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY so.order_date DESC", params).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -585,7 +585,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
                 FROM so_item si LEFT JOIN product p ON p.id = si.product_id
                 WHERE si.so_id = %s
             """, (self._selected_so_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             items = []
         conn.close()
         for item in items:

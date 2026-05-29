@@ -1,5 +1,5 @@
 import sys
-import sqlite3
+import psycopg2
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -90,7 +90,7 @@ def _load_products():
         rows = conn.execute(
             "SELECT id, product_name FROM product ORDER BY product_name"
         ).fetchall()
-    except sqlite3.OperationalError:
+    except psycopg2.OperationalError:
         rows = []
     conn.close()
     return rows
@@ -193,7 +193,7 @@ class NewWODialog(QtWidgets.QDialog):
             )
             self.wo_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"WO number '{wo_num}' already exists.")
             conn.close()
@@ -514,7 +514,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(base + where + " ORDER BY wo.due_date ASC", params).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -572,7 +572,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
                 FROM wo_material m LEFT JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = %s
             """, (self._selected_wo_id,)).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             mats = []
         conn.close()
         for mat in mats:

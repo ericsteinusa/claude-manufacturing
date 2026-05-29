@@ -1,5 +1,5 @@
 import sys
-import sqlite3
+import psycopg2
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -237,7 +237,7 @@ class CustomerDetailPanel(QtWidgets.QWidget):
                 "SELECT COUNT(*) FROM sales_order WHERE customer_id = %s",
                 (customer_id,)
             ).fetchone()[0]
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             order_count = 0
         conn.close()
         if not rec:
@@ -349,7 +349,7 @@ class CustomersWidget(QtWidgets.QWidget):
                 " email, phone_number, city, state"
                 " FROM customer ORDER BY company_name, last_name, first_name"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -443,7 +443,7 @@ class CustomersWidget(QtWidgets.QWidget):
                 " FROM sales_order WHERE customer_id = %s ORDER BY order_date DESC",
                 (self._selected_id,)
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             orders = []
         conn.close()
 

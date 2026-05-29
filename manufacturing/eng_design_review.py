@@ -1,6 +1,6 @@
 import sys
 import os
-import sqlite3
+import psycopg2
 from db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -147,7 +147,7 @@ class NewECRDialog(QtWidgets.QDialog):
             )
             self.ecr_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
                                           f"ECR number '{num}' already exists.")
             conn.close()

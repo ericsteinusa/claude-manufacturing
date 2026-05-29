@@ -3,7 +3,7 @@ General_ledger.py — General Ledger module
 Tabs: Chart of Accounts | Journal Entries | Trial Balance | Ledger View
 """
 import sys
-import sqlite3
+import psycopg2
 import os
 from db_pg import get_db
 import csv
@@ -668,7 +668,7 @@ class GeneralLedgerWidget(QtWidgets.QWidget):
                     "INSERT INTO gl_account(account_number,account_name,account_type,account_sub,is_active,notes) "
                     "VALUES(%s,%s,%s,%s,%s,%s)", (num, name, typ, sub, act, notes)
                 )
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", f"Account # {num} already exists.")
             self.statusBar().showMessage(f"Duplicate: Account # {num} already exists")
             return

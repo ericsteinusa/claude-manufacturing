@@ -1,5 +1,5 @@
 import sys
-import sqlite3
+import psycopg2
 from .db_connection import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -166,7 +166,7 @@ class AddProductDialog(QtWidgets.QDialog):
             )
             self.product_id = cur.fetchone()['id']
             conn.commit()
-        except sqlite3.IntegrityError as e:
+        except psycopg2.IntegrityError as e:
             QtWidgets.QMessageBox.warning(self, "Error", str(e))
             conn.close()
             return
@@ -473,7 +473,7 @@ class InventoryWidget(QtWidgets.QWidget):
                 "SELECT id, name, bin, amount, reorder_point, purchase_price, supplier_id"
                 " FROM product ORDER BY name"
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             rows = []
         conn.close()
 
@@ -551,7 +551,7 @@ class InventoryWidget(QtWidgets.QWidget):
                 " ORDER BY trans_date DESC, id DESC",
                 (self._selected_product_id,)
             ).fetchall()
-        except sqlite3.OperationalError:
+        except psycopg2.OperationalError:
             txns = []
         conn.close()
         for txn in txns:

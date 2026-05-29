@@ -973,7 +973,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
                   data["credit_limit"], data["status"],
                   data["changed_by"], data["reason"] or "Account opened"))
             conn.commit()
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate", "A credit account already exists for this customer.")
             conn.close()
             return
