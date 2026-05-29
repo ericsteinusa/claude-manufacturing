@@ -110,10 +110,10 @@ _MAINT_MENU = {
         ('parts_inv', 'Parts Inventory', {
             'title': 'Parts Inventory',
             'items': [
-                ('view_inv', 'View Inventory', 'Maint_Maint_menu.py'),
-                ('parts_req', 'Parts Request', 'Maint_Maint_menu.py'),
-                ('reorder', 'Reorder List', 'Maint_Maint_menu.py'),
-                ('parts_hist', 'Parts History', 'Maint_Maint_menu.py'),
+                ('view_inv', 'View Inventory', 'inventory.py'),
+                ('parts_req', 'Parts Request', 'inventory.py'),
+                ('reorder', 'Reorder List', 'inventory.py'),
+                ('parts_hist', 'Parts History', 'inventory.py'),
             ],
         }),
         ('maint_reports', 'Maintenance Reports', {
@@ -308,10 +308,10 @@ _PROD_MENU = {
         ('inventory', 'Inventory', {
             'title': 'Inventory',
             'items': [
-                ('raw_mat', 'Raw Materials', 'prod_prod_menu.py'),
-                ('fin_goods', 'Finished Goods', 'prod_prod_menu.py'),
-                ('wip_inv', 'WIP Inventory', 'prod_prod_menu.py'),
-                ('inv_rpts', 'Inventory Reports', 'prod_prod_menu.py'),
+                ('raw_mat', 'Raw Materials', 'inventory.py'),
+                ('fin_goods', 'Finished Goods', 'inventory.py'),
+                ('wip_inv', 'WIP Inventory', 'inventory.py'),
+                ('inv_rpts', 'Inventory Reports', 'inventory.py'),
             ],
         }),
         ('equip_status', 'Equipment Status', {
