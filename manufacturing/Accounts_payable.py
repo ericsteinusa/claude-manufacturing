@@ -376,8 +376,8 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self.vendor_filter.setStyleSheet(COMBO_STYLE)
         self.vendor_filter.setMinimumWidth(150)
         self.vendor_filter.addItem("(all)", None)
-        for v in _load_vendors():
-            self.vendor_filter.addItem(_vendor_label(v), v["id"])
+        for vendor in _load_vendors():
+            self.vendor_filter.addItem(_vendor_label(vendor), vendor["id"])
         self.vendor_filter.currentIndexChanged.connect(self._refresh_invoices)
         fr.addWidget(self.vendor_filter)
 

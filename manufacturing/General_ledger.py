@@ -796,6 +796,343 @@ class JournalEntriesTab(QtWidgets.QWidget):
             self._refresh_journals()
 
 
+# ── Trial Balance Tab ──────────────────────────────────────────────────────────
+
+class TrialBalanceTab(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._build_ui()
+        self._refresh()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(6, 6, 6, 6)
+        v.setSpacing(6)
+
+        fr = QtWidgets.QHBoxLayout()
+        lbl_a = QtWidgets.QLabel("As of:")
+        lbl_a.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_a)
+        self.as_of = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.as_of.setCalendarPopup(True)
+        self.as_of.setStyleSheet(INPUT_STYLE)
+        fr.addWidget(self.as_of)
+        btn = QtWidgets.QPushButton("Run")
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedHeight(28)
+        btn.clicked.connect(self._refresh)
+        fr.addWidget(btn)
+        self.zero_check = QtWidgets.QCheckBox("Hide zero balances")
+        self.zero_check.setStyleSheet("color: white; font-size: 13px;")
+        self.zero_check.setChecked(True)
+        fr.addWidget(self.zero_check)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        self.tbl = QtWidgets.QTableWidget()
+        self.tbl.setColumnCount(4)
+        self.tbl.setHorizontalHeaderLabels(["Acct #", "Account Name", "Debit", "Credit"])
+        hh = self.tbl.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.verticalHeader().setVisible(False)
+        v.addWidget(self.tbl, stretch=1)
+
+        self.totals_lbl = QtWidgets.QLabel("")
+        self.totals_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        v.addWidget(self.totals_lbl)
+
+    def _refresh(self):
+        as_of = self.as_of.date().toString("yyyy-MM-dd")
+        hide_zero = self.zero_check.isChecked()
+        conn = get_db()
+        try:
+            accounts = conn.execute(
+                "SELECT id, account_number, account_name, account_type"
+                " FROM gl_account WHERE is_active = 1 ORDER BY account_number"
+            ).fetchall()
+        except psycopg2.OperationalError:
+            accounts = []
+        conn.close()
+
+        self.tbl.setRowCount(0)
+        total_dr = total_cr = 0.0
+        for acct in accounts:
+            bal = _account_balance(acct["id"], acct["account_type"], as_of)
+            if hide_zero and abs(bal) < 0.005:
+                continue
+            r = self.tbl.rowCount()
+            self.tbl.insertRow(r)
+            self.tbl.setItem(r, 0, _ro(acct["account_number"]))
+            self.tbl.setItem(r, 1, _ro(acct["account_name"]))
+            if acct["account_type"] in DEBIT_NORMAL:
+                self.tbl.setItem(r, 2, _ro_right(f"${bal:,.2f}" if bal >= 0 else ""))
+                self.tbl.setItem(r, 3, _ro_right(f"${-bal:,.2f}" if bal < 0 else ""))
+                total_dr += max(bal, 0)
+                total_cr += max(-bal, 0)
+            else:
+                self.tbl.setItem(r, 2, _ro_right(f"${-bal:,.2f}" if bal < 0 else ""))
+                self.tbl.setItem(r, 3, _ro_right(f"${bal:,.2f}" if bal >= 0 else ""))
+                total_cr += max(bal, 0)
+                total_dr += max(-bal, 0)
+
+        balanced = abs(total_dr - total_cr) < 0.005
+        color = "color: #90ee90;" if balanced else "color: #ff9999;"
+        self.totals_lbl.setStyleSheet(f"{color} font-size: 13px; font-weight: bold;")
+        self.totals_lbl.setText(
+            f"Total Debits: ${total_dr:,.2f}    Total Credits: ${total_cr:,.2f}"
+            + ("    BALANCED" if balanced else f"    OUT OF BALANCE by ${abs(total_dr - total_cr):,.2f}")
+        )
+
+
+# ── Income Statement Tab ───────────────────────────────────────────────────────
+
+class IncomeStatementTab(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._build_ui()
+        self._refresh()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(6, 6, 6, 6)
+        v.setSpacing(6)
+
+        fr = QtWidgets.QHBoxLayout()
+        lbl_f = QtWidgets.QLabel("From:")
+        lbl_f.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_f)
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate(QtCore.QDate.currentDate().year(), 1, 1))
+        self.date_from.setCalendarPopup(True)
+        self.date_from.setStyleSheet(INPUT_STYLE)
+        fr.addWidget(self.date_from)
+        lbl_t = QtWidgets.QLabel("To:")
+        lbl_t.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_t)
+        self.date_to = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.date_to.setCalendarPopup(True)
+        self.date_to.setStyleSheet(INPUT_STYLE)
+        fr.addWidget(self.date_to)
+        btn = QtWidgets.QPushButton("Run")
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedHeight(28)
+        btn.clicked.connect(self._refresh)
+        fr.addWidget(btn)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        self.tbl = QtWidgets.QTableWidget()
+        self.tbl.setColumnCount(3)
+        self.tbl.setHorizontalHeaderLabels(["Account", "Type", "Amount"])
+        hh = self.tbl.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.verticalHeader().setVisible(False)
+        v.addWidget(self.tbl, stretch=1)
+
+        self.summary_lbl = QtWidgets.QLabel("")
+        self.summary_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        v.addWidget(self.summary_lbl)
+
+    def _section_total(self, acct_type, date_from, date_to):
+        conn = get_db()
+        try:
+            rows = conn.execute(
+                "SELECT id, account_type FROM gl_account"
+                " WHERE is_active = 1 AND account_type = %s",
+                (acct_type,)
+            ).fetchall()
+        except psycopg2.OperationalError:
+            rows = []
+        conn.close()
+        return [(r["id"], r["account_type"]) for r in rows]
+
+    def _period_balance(self, account_id, account_type, date_from, date_to):
+        conn = get_db()
+        row = conn.execute("""
+            SELECT COALESCE(SUM(jl.debit),0) AS d, COALESCE(SUM(jl.credit),0) AS c
+            FROM gl_journal_line jl
+            JOIN gl_journal j ON j.id = jl.journal_id
+            WHERE jl.account_id = %s AND j.posted = 1
+              AND j.journal_date BETWEEN %s AND %s
+        """, (account_id, date_from, date_to)).fetchone()
+        conn.close()
+        d, c = row["d"], row["c"]
+        if account_type in DEBIT_NORMAL:
+            return d - c
+        return c - d
+
+    def _refresh(self):
+        d_from = self.date_from.date().toString("yyyy-MM-dd")
+        d_to = self.date_to.date().toString("yyyy-MM-dd")
+        conn = get_db()
+        try:
+            accounts = conn.execute(
+                "SELECT id, account_number, account_name, account_type FROM gl_account"
+                " WHERE is_active = 1 AND account_type IN ('Revenue','COGS','Expense')"
+                " ORDER BY account_type, account_number"
+            ).fetchall()
+        except psycopg2.OperationalError:
+            accounts = []
+        conn.close()
+
+        self.tbl.setRowCount(0)
+        totals = {"Revenue": 0.0, "COGS": 0.0, "Expense": 0.0}
+        current_type = None
+        for acct in accounts:
+            if acct["account_type"] != current_type:
+                current_type = acct["account_type"]
+                r = self.tbl.rowCount()
+                self.tbl.insertRow(r)
+                hdr = QtWidgets.QTableWidgetItem(current_type.upper())
+                hdr.setFlags(hdr.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                hdr.setBackground(QtGui.QColor("#004499"))
+                hdr.setForeground(QtGui.QColor("white"))
+                font = hdr.font(); font.setBold(True); hdr.setFont(font)
+                self.tbl.setItem(r, 0, hdr)
+                self.tbl.setItem(r, 1, _ro(""))
+                self.tbl.setItem(r, 2, _ro(""))
+
+            bal = self._period_balance(acct["id"], acct["account_type"], d_from, d_to)
+            totals[acct["account_type"]] += bal
+            if abs(bal) < 0.005:
+                continue
+            r = self.tbl.rowCount()
+            self.tbl.insertRow(r)
+            name = f"  {acct['account_number']} — {acct['account_name']}"
+            self.tbl.setItem(r, 0, _ro(name))
+            self.tbl.setItem(r, 1, _ro(acct["account_type"]))
+            self.tbl.setItem(r, 2, _ro_right(f"${bal:,.2f}"))
+
+        revenue = totals["Revenue"]
+        cogs = totals["COGS"]
+        expenses = totals["Expense"]
+        gross_profit = revenue - cogs
+        net_income = gross_profit - expenses
+
+        color = "color: #90ee90;" if net_income >= 0 else "color: #ff9999;"
+        self.summary_lbl.setStyleSheet(f"{color} font-size: 13px; font-weight: bold;")
+        self.summary_lbl.setText(
+            f"Revenue: ${revenue:,.2f}    COGS: ${cogs:,.2f}    "
+            f"Gross Profit: ${gross_profit:,.2f}    Expenses: ${expenses:,.2f}    "
+            f"Net Income: ${net_income:,.2f}"
+        )
+
+
+# ── Balance Sheet Tab ──────────────────────────────────────────────────────────
+
+class BalanceSheetTab(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _apply_blue_palette(self)
+        self._build_ui()
+        self._refresh()
+
+    def _build_ui(self):
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(6, 6, 6, 6)
+        v.setSpacing(6)
+
+        fr = QtWidgets.QHBoxLayout()
+        lbl_a = QtWidgets.QLabel("As of:")
+        lbl_a.setStyleSheet(LABEL_STYLE)
+        fr.addWidget(lbl_a)
+        self.as_of = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
+        self.as_of.setCalendarPopup(True)
+        self.as_of.setStyleSheet(INPUT_STYLE)
+        fr.addWidget(self.as_of)
+        btn = QtWidgets.QPushButton("Run")
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedHeight(28)
+        btn.clicked.connect(self._refresh)
+        fr.addWidget(btn)
+        fr.addStretch()
+        v.addLayout(fr)
+
+        self.tbl = QtWidgets.QTableWidget()
+        self.tbl.setColumnCount(3)
+        self.tbl.setHorizontalHeaderLabels(["Account", "Type", "Balance"])
+        hh = self.tbl.horizontalHeader()
+        hh.setStyleSheet("color: black; font-weight: bold;")
+        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setAlternatingRowColors(True)
+        self.tbl.verticalHeader().setVisible(False)
+        v.addWidget(self.tbl, stretch=1)
+
+        self.summary_lbl = QtWidgets.QLabel("")
+        self.summary_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        v.addWidget(self.summary_lbl)
+
+    def _refresh(self):
+        as_of = self.as_of.date().toString("yyyy-MM-dd")
+        conn = get_db()
+        try:
+            accounts = conn.execute(
+                "SELECT id, account_number, account_name, account_type FROM gl_account"
+                " WHERE is_active = 1 AND account_type IN ('Asset','Liability','Equity')"
+                " ORDER BY account_type, account_number"
+            ).fetchall()
+        except psycopg2.OperationalError:
+            accounts = []
+        conn.close()
+
+        self.tbl.setRowCount(0)
+        totals = {"Asset": 0.0, "Liability": 0.0, "Equity": 0.0}
+        current_type = None
+        for acct in accounts:
+            if acct["account_type"] != current_type:
+                current_type = acct["account_type"]
+                r = self.tbl.rowCount()
+                self.tbl.insertRow(r)
+                hdr = QtWidgets.QTableWidgetItem(current_type.upper())
+                hdr.setFlags(hdr.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                hdr.setBackground(QtGui.QColor("#004499"))
+                hdr.setForeground(QtGui.QColor("white"))
+                font = hdr.font(); font.setBold(True); hdr.setFont(font)
+                self.tbl.setItem(r, 0, hdr)
+                self.tbl.setItem(r, 1, _ro(""))
+                self.tbl.setItem(r, 2, _ro(""))
+
+            bal = _account_balance(acct["id"], acct["account_type"], as_of)
+            totals[acct["account_type"]] += bal
+            if abs(bal) < 0.005:
+                continue
+            r = self.tbl.rowCount()
+            self.tbl.insertRow(r)
+            name = f"  {acct['account_number']} — {acct['account_name']}"
+            self.tbl.setItem(r, 0, _ro(name))
+            self.tbl.setItem(r, 1, _ro(acct["account_type"]))
+            self.tbl.setItem(r, 2, _ro_right(f"${bal:,.2f}"))
+
+        assets = totals["Asset"]
+        liabilities = totals["Liability"]
+        equity = totals["Equity"]
+        balanced = abs(assets - (liabilities + equity)) < 0.005
+        color = "color: #90ee90;" if balanced else "color: #ff9999;"
+        self.summary_lbl.setStyleSheet(f"{color} font-size: 13px; font-weight: bold;")
+        self.summary_lbl.setText(
+            f"Assets: ${assets:,.2f}    Liabilities: ${liabilities:,.2f}    "
+            f"Equity: ${equity:,.2f}    "
+            + ("BALANCED" if balanced
+               else f"OUT OF BALANCE by ${abs(assets - liabilities - equity):,.2f}")
+        )
+
+
 # ── Main Window ────────────────────────────────────────────────────────────────
 
 class GeneralLedgerWidget(QtWidgets.QWidget):
@@ -815,6 +1152,9 @@ class GeneralLedgerWidget(QtWidgets.QWidget):
         )
         tabs.addTab(JournalEntriesTab(), "Journal Entries")
         tabs.addTab(ChartOfAccountsTab(), "Chart of Accounts")
+        tabs.addTab(TrialBalanceTab(), "Trial Balance")
+        tabs.addTab(IncomeStatementTab(), "Income Statement")
+        tabs.addTab(BalanceSheetTab(), "Balance Sheet")
         layout.addWidget(tabs)
 
 
