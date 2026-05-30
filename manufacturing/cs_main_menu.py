@@ -1,7 +1,7 @@
 import sys
 import os
 import subprocess
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
