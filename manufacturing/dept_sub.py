@@ -3,68 +3,16 @@ from .db_pg import get_db
 from tkinter import *  # noqa: F401,F403,F405
 from tkinter import ttk
 
-# Database setup
-
-
-def setup_database():
-    conn = get_db()
-    cursor = conn.cursor()
-
-    # Create Parent table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS department (
-        id SERIAL PRIMARY KEY,
-        FOREIGN KEY (people_id) REFERENCES people (id)
-        FOREIGN KEY (dept_id) REFERENCES dept (id)
-        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)
-    )
-    """)
-
-    # Create Child table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS people (
-        id SERIAL PRIMARY KEY,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        employee_id INTEGER,
-        address TEXT NOT NULL,
-        city TEXT NOT NULL,
-        state TEXT NOT NULL,
-        zip_code TEXT NOT NULL,
-        email TEXT NOT NULL,
-        FOREIGN KEY (dept_id) REFERENCES dept (id)
-        FOREIGN KEY (dept_sub_id) REFERENCES dept_sub (id)
-    )
-    """)
-
-    # Create Child table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS dept (
-        dept_id SERIAL PRIMARY KEY ,
-        dept_name TEXT
-        )
-    """)
-
-    # Create Child table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS dept_sub (
-        dept_sub_id SERIAL PRIMARY KEY,
-        dept_sub_name TEXT
-        )
-    """)
-
-    # Fetch data with JOIN
-
-
 def fetch_data():
     conn = get_db()
     cursor = conn.cursor()
 
     query = """
-    SELECT dept.dept_name, dept_sub.dept_sub_name
+    SELECT COALESCE(dept.dept_name, '(unassigned)') AS dept_name,
+           COALESCE(dept_sub.dept_sub_name, '(unassigned)') AS dept_sub_name
     FROM department
-    JOIN dept ON (department.dept_id = dept.dept_id)
-    JOIN dept_sub ON (department.dept_sub_id = dept_sub.dept_sub_id)
+    LEFT JOIN dept ON (department.dept_id = dept.dept_id)
+    LEFT JOIN dept_sub ON (department.dept_sub_id = dept_sub.dept_sub_id)
     ORDER BY dept_name ASC, dept_sub_name ASC
 
     """
@@ -94,5 +42,5 @@ def create_gui():
 
 
 # Main execution
-setup_database()
-create_gui()
+if __name__ == "__main__":
+    create_gui()
