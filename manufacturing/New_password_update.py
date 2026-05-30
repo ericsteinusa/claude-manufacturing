@@ -1,7 +1,7 @@
 from .db_pg import get_db
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
-from password import Ui_MainWindow  # Import the generated Python file
+from .password import Ui_MainWindow  # Import the generated Python file
 
 
 class MainApp(QMainWindow):

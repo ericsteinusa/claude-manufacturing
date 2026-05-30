@@ -19,7 +19,7 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _placeholder_tab(label):

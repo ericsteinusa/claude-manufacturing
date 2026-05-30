@@ -6,7 +6,7 @@ import sys
 from datetime import date
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-from IT_Tasks import _apply_blue_palette
+from .IT_Tasks import _apply_blue_palette
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (

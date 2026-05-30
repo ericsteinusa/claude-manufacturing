@@ -43,7 +43,7 @@ def _launch_tab(script, label):
 
 def _do_launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class ProdMgrMenu(QtWidgets.QMainWindow):
