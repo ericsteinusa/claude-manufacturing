@@ -32,8 +32,8 @@ def validate_credentials():
         subprocess.Popen([sys.executable, "-m", "manufacturing.Company_main_menu"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     else:
         messagebox.showerror("Error", "Invalid username or Password.")
-        if messagebox.askyesno("Register", "Do you want to register as a new user%s"):
-            subprocess.Popen([sys.executable, "-m", "manufacturing.TK_Registration_form"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        if messagebox.askyesno("Register", "Do you want to register as a new user?"):
+            subprocess.Popen([sys.executable, "-m", "manufacturing.registration_form"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         else:
             messagebox.showinfo("Info", "Please try again later.")
             email_entry.delete(0, tk.END)
