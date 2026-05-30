@@ -1,6 +1,6 @@
 import sys
 import psycopg2
-from .db_connection import get_db_connection
+from .db_pg import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
