@@ -51,10 +51,12 @@ def fetch_data():
     cursor = conn.cursor()
 
     query = """
-    SELECT first_name, last_name, dept.dept_name, dept_sub.dept_sub_name
+    SELECT first_name, last_name,
+           COALESCE(dept.dept_name, '(unassigned)') AS dept_name,
+           COALESCE(dept_sub.dept_sub_name, '(unassigned)') AS dept_sub_name
     FROM people
-    JOIN dept ON (people.dept_id = dept.dept_id)
-    JOIN dept_sub ON (people.dept_sub_id = dept_sub.dept_sub_id)
+    LEFT JOIN dept ON (people.dept_id = dept.dept_id)
+    LEFT JOIN dept_sub ON (people.dept_sub_id = dept_sub.dept_sub_id)
     ORDER BY dept_sub_name ASC
 
     """
@@ -86,5 +88,6 @@ def create_gui():
 
 
 # Main execution
-setup_database()
-create_gui()
+if __name__ == "__main__":
+    setup_database()
+    create_gui()
