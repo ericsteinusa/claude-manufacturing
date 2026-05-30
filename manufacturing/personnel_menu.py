@@ -2,9 +2,9 @@ import sys
 import os
 import subprocess
 from PyQt6 import QtCore, QtWidgets
-from personnel_crm import _apply_blue_palette
-from time_clock_menu import TimeClockWidget
-from Payroll_dept import PayrollDeptWidget
+from .personnel_crm import _apply_blue_palette
+from .time_clock_menu import TimeClockWidget
+from .Payroll_dept import PayrollDeptWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -21,7 +21,7 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):

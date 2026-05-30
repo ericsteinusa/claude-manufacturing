@@ -1,14 +1,14 @@
 import sys
 from PyQt6 import QtWidgets
-from Accounts_payable import AccountsPayableWidget, _apply_blue_palette
-from Accounts_receivable import AccountsReceivableWidget
-from Credit_dept import CreditDeptWidget
-from Payroll_dept import PayrollDeptWidget
-from General_ledger import GeneralLedgerWidget
-from Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
-from Bank_reconciliation import BankReconciliationWidget
-from Tax_mgmt import TaxMgmtWidget
-from Audit_mgmt import AuditMgmtWidget
+from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
+from .Accounts_receivable import AccountsReceivableWidget
+from .Credit_dept import CreditDeptWidget
+from .Payroll_dept import PayrollDeptWidget
+from .General_ledger import GeneralLedgerWidget
+from .Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
+from .Bank_reconciliation import BankReconciliationWidget
+from .Tax_mgmt import TaxMgmtWidget
+from .Audit_mgmt import AuditMgmtWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"

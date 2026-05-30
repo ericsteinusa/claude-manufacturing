@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import QtWidgets
-from warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette
-from receiving_dept import ReceivingDeptWidget
+from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette
+from .receiving_dept import ReceivingDeptWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"

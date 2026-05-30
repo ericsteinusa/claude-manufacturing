@@ -2,13 +2,13 @@ import sys
 import os
 import subprocess
 from PyQt6 import QtCore, QtWidgets
-from Accounts_payable import AccountsPayableWidget, _apply_blue_palette
-from Accounts_receivable import AccountsReceivableWidget
-from Credit_dept import CreditDeptWidget
-from Payroll_dept import PayrollDeptWidget
-from General_ledger import GeneralLedgerWidget
-from Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
-from Bank_reconciliation import BankReconciliationWidget
+from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
+from .Accounts_receivable import AccountsReceivableWidget
+from .Credit_dept import CreditDeptWidget
+from .Payroll_dept import PayrollDeptWidget
+from .General_ledger import GeneralLedgerWidget
+from .Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
+from .Bank_reconciliation import BankReconciliationWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -25,7 +25,7 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):

@@ -2,11 +2,11 @@ import sys
 import os
 import subprocess
 from PyQt6 import QtCore, QtWidgets
-from cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
-from cs_reports import CSReportsWidget
-from cs_staff_mgmt import CSStaffMgmtWidget
-from cs_satisfaction import CSSatisfactionWidget
-from cs_escalations import CSEscalationsWidget
+from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
+from .cs_reports import CSReportsWidget
+from .cs_staff_mgmt import CSStaffMgmtWidget
+from .cs_satisfaction import CSSatisfactionWidget
+from .cs_escalations import CSEscalationsWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
@@ -23,7 +23,7 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, os.path.join(_dir, script)], cwd=_dir)
+    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
