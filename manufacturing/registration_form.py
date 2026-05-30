@@ -1,5 +1,6 @@
 from .db_pg import get_db
 import sys
+import psycopg2
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from .registration import Ui_MainWindow  # Import the generated Python file
 
@@ -53,6 +54,13 @@ class MainApp(QMainWindow):
         try:
             conn = get_db()
             cursor = conn.cursor()
+            cursor.execute("SELECT id FROM people WHERE email = %s", (email,))
+            if cursor.fetchone():
+                conn.close()
+                QMessageBox.warning(self, "Email Already Registered",
+                                    "An account with that email already exists. "
+                                    "Please use a different email address.")
+                return
             cursor.execute("INSERT INTO people (first_name, last_name, address, city, state, zip_code, email) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                            (first_name, last_name, address, city, state, zip_code, email))
             conn.commit()
@@ -66,6 +74,12 @@ class MainApp(QMainWindow):
             self.ui.state_lineEdit.clear()
             self.ui.zip_code_lineEdit.clear()
             self.ui.email_lineEdit.clear()
+        except psycopg2.IntegrityError:
+            # UNIQUE(email) violation — e.g. the email was registered between the
+            # check above and the insert.
+            QMessageBox.warning(self, "Email Already Registered",
+                                "An account with that email already exists. "
+                                "Please use a different email address.")
         except Exception as e:
             QMessageBox.critical(self, "Database Error", f"An error occurred: {e}")
 
