@@ -1302,8 +1302,6 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             return
         start_str = self.run_from.date().toString("yyyy-MM-dd")
         end_str = self.run_to.date().toString("yyyy-MM-dd")
-        fed_rate = self.run_fed_spin.value() / 100
-        state_rate = self.run_state_spin.value() / 100
         freq = self.run_freq.currentText()
 
         if QtWidgets.QMessageBox.question(
