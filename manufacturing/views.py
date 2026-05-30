@@ -1619,6 +1619,8 @@ def _get_user_profile(email: str) -> dict:
         LEFT JOIN roles r ON r.id = ur.role_id
         LEFT JOIN position pos ON pos.people_id = p.id
         WHERE p.email = %s
+        ORDER BY (r.role_name IS NOT NULL) DESC, p.id
+        LIMIT 1
     """, (email,)).fetchone()
     conn.close()
     if not row:
