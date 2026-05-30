@@ -1707,7 +1707,8 @@ def _create_user(email, password, first_name='', last_name='',
 def _reset_password(email: str, new_password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
+        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id "
+        "WHERE p.email = %s ORDER BY pw.id DESC LIMIT 1",
         (email,),
     ).fetchone()
     if row is None:
