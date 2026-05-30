@@ -1652,7 +1652,8 @@ def _is_full_access(profile: dict) -> bool:
 def _verify_login(email: str, password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.id as pw_id, pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id WHERE p.email = %s",
+        "SELECT pw.id as pw_id, pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id "
+        "WHERE p.email = %s ORDER BY pw.id DESC LIMIT 1",
         (email,),
     ).fetchone()
     if row is None:
