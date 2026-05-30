@@ -58,17 +58,19 @@ def _adapt(sql):
 
 
 class _Cursor:
-    def __init__(self, raw, conn):
+    def __init__(self, raw, conn, adapt=True):
         self._cur = raw
         self._conn = conn
+        self._adapt = adapt
         self.lastrowid = None
         self.rowcount = 0
 
     def execute(self, sql, params=None):
-        sql = _adapt(sql)
+        if self._adapt:
+            sql = _adapt(sql)
         self._cur.execute(sql, params)
         self.rowcount = self._cur.rowcount
-        if sql.strip().upper().startswith('INSERT'):
+        if self._adapt and sql.strip().upper().startswith('INSERT'):
             try:
                 tmp = self._conn.cursor()
                 tmp.execute('SAVEPOINT _lastval')
@@ -86,7 +88,8 @@ class _Cursor:
         return self
 
     def executemany(self, sql, params_seq):
-        sql = _adapt(sql)
+        if self._adapt:
+            sql = _adapt(sql)
         self._cur.executemany(sql, params_seq)
         self.rowcount = self._cur.rowcount
         return self
@@ -105,12 +108,22 @@ class _Cursor:
 
 
 class PgConnection:
-    def __init__(self):
+    """psycopg2 wrapper exposing a sqlite3-compatible API.
+
+    When ``adapt`` is True (the default), SQL passed to ``execute`` is
+    translated from SQLite dialect to PostgreSQL via :func:`_adapt`. Callers
+    that already write native PostgreSQL should construct it with
+    ``adapt=False`` (see :func:`get_db_connection`) so their SQL — e.g.
+    ``%s`` placeholders and ``::type`` casts — is passed through untouched.
+    """
+
+    def __init__(self, adapt=True):
+        self._adapt = adapt
         self._conn = psycopg2.connect(**DB_CONFIG)
 
     def cursor(self):
         raw = self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        return _Cursor(raw, self._conn)
+        return _Cursor(raw, self._conn, adapt=self._adapt)
 
     def execute(self, sql, params=None):
         cur = self.cursor()
@@ -147,4 +160,13 @@ class PgConnection:
 
 
 def get_db():
-    return PgConnection()
+    """Connection for SQLite-dialect SQL (translated to PostgreSQL)."""
+    return PgConnection(adapt=True)
+
+
+def get_db_connection():
+    """Connection for code that already writes native PostgreSQL.
+
+    SQL is passed through without dialect translation.
+    """
+    return PgConnection(adapt=False)
