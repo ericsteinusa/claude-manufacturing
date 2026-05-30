@@ -31,12 +31,13 @@ pip install PyQt6 psycopg2-binary python-dotenv
 
 ## Running the Application
 
+Run from the project root as a package module:
+
 ```bash
-cd manufacturing
-python Company_main_menu.py
+python -m manufacturing.Company_main_menu
 ```
 
-This opens the main menu where each department button launches its respective sub-menu.
+This opens the main menu where each department button launches its respective sub-menu. The department screens use package-relative imports and are spawned as `python -m manufacturing.<screen>` from the project root, so launch the app the same way rather than running a screen file directly.
 
 ## Project Structure
 
