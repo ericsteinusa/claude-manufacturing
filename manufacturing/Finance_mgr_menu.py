@@ -2,8 +2,8 @@ import sys
 from PyQt6 import QtWidgets
 from .Finance_Main_menu import _apply_blue_palette
 from .Budget_mgmt import BudgetManagementWidget
-from .Credit_dept import CreditDeptWidget
-from .Payroll_dept import PayrollDeptWidget
+from .General_ledger import GeneralLedgerWidget
+from .Tax_mgmt import TaxMgmtWidget
 from .Audit_mgmt import AuditMgmtWidget
 
 TAB_STYLE = (
@@ -33,8 +33,8 @@ class FinanceMgrMenu(QtWidgets.QMainWindow):
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(BudgetManagementWidget(), "Budget")
-        tabs.addTab(CreditDeptWidget(), "Credit")
-        tabs.addTab(PayrollDeptWidget(), "Payroll")
+        tabs.addTab(GeneralLedgerWidget(), "General Ledger")
+        tabs.addTab(TaxMgmtWidget(), "Tax")
         tabs.addTab(AuditMgmtWidget(), "Audit")
         v.addWidget(tabs)
 
