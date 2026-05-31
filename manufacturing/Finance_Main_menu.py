@@ -1,5 +1,9 @@
 import sys
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
+from .Budget_mgmt import BudgetManagementWidget
+from .Credit_dept import CreditDeptWidget
+from .Payroll_dept import PayrollDeptWidget
+from .Audit_mgmt import AuditMgmtWidget
 
 BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
@@ -21,19 +25,6 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-def _placeholder_tab(label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addStretch()
-    return w
-
-
 class FinanceMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -51,11 +42,10 @@ class FinanceMainMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_placeholder_tab("Financial Analysis"), "Financial Analysis")
-        tabs.addTab(_placeholder_tab("Financial Reporting"), "Financial Reporting")
-        tabs.addTab(_placeholder_tab("Treasury Operations"), "Treasury Operations")
-        tabs.addTab(_placeholder_tab("Capital Management"), "Capital Management")
-        tabs.addTab(_placeholder_tab("Tax Planning"), "Tax Planning")
+        tabs.addTab(BudgetManagementWidget(), "Budget")
+        tabs.addTab(CreditDeptWidget(), "Credit")
+        tabs.addTab(PayrollDeptWidget(), "Payroll")
+        tabs.addTab(AuditMgmtWidget(), "Audit")
         v.addWidget(tabs)
 
 
