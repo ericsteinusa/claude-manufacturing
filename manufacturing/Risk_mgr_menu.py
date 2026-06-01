@@ -1,13 +1,9 @@
 import sys
-import os
-import subprocess
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtWidgets
 from .Risk_mgmt_Main_menu import _apply_blue_palette
+from .Risk_mgmt import (RiskRegisterWidget, BusinessContinuityWidget,
+                        ComplianceAuditWidget, KRIWidget)
 
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
-)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
@@ -15,24 +11,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _launch(script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
-def _placeholder_tab(label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addStretch()
-    return w
 
 
 class RiskMgrMenu(QtWidgets.QMainWindow):
@@ -52,9 +30,10 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_placeholder_tab("Risk Framework"), "Risk Framework")
-        tabs.addTab(_placeholder_tab("Risk Reporting"), "Risk Reporting")
-        tabs.addTab(_placeholder_tab("Business Continuity"), "Business Continuity")
+        tabs.addTab(RiskRegisterWidget(), "Risk Register")
+        tabs.addTab(KRIWidget(), "Key Risk Indicators")
+        tabs.addTab(BusinessContinuityWidget(), "Business Continuity")
+        tabs.addTab(ComplianceAuditWidget(), "Audit && Compliance")
         v.addWidget(tabs)
 
 

@@ -1,5 +1,7 @@
 import sys
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
+from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget, InsuranceWidget,
+                        BusinessContinuityWidget, ComplianceAuditWidget)
 
 BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
@@ -21,19 +23,6 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-def _placeholder_tab(label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addStretch()
-    return w
-
-
 class RiskMgmtMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -51,11 +40,11 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_placeholder_tab("Risk Assessment"), "Risk Assessment")
-        tabs.addTab(_placeholder_tab("Risk Register"), "Risk Register")
-        tabs.addTab(_placeholder_tab("Insurance Management"), "Insurance Management")
-        tabs.addTab(_placeholder_tab("Business Continuity"), "Business Continuity")
-        tabs.addTab(_placeholder_tab("Compliance & Audit"), "Compliance & Audit")
+        tabs.addTab(RiskAssessmentWidget(), "Risk Assessment")
+        tabs.addTab(RiskRegisterWidget(), "Risk Register")
+        tabs.addTab(InsuranceWidget(), "Insurance Management")
+        tabs.addTab(BusinessContinuityWidget(), "Business Continuity")
+        tabs.addTab(ComplianceAuditWidget(), "Compliance && Audit")
         v.addWidget(tabs)
 
 

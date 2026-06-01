@@ -43,6 +43,17 @@ The Legal department provides two menus, each launched as `python -m manufacturi
 
 The Main menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Corporate Governance. The feature widgets (`ContractsWidget`, `ComplianceWidget`, `LitigationWidget`, `IPWidget`, `EmploymentLawWidget`, `GovernanceWidget`) live in `Legal_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `legal_*` tables are created and seeded automatically on first use.
 
+### Risk Management Department
+
+The Risk Management department provides two menus, each launched as `python -m manufacturing.<menu>`. Both embed their feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Risk Management Main menu | `Risk_mgmt_Main_menu` | Risk Assessment, Risk Register, Insurance Management, Business Continuity, Compliance & Audit |
+| Risk Manager menu | `Risk_mgr_menu` | Risk Register, Key Risk Indicators, Business Continuity, Audit & Compliance |
+
+The Main menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Key Risk Indicators. The feature widgets (`RiskAssessmentWidget`, `RiskRegisterWidget`, `InsuranceWidget`, `BusinessContinuityWidget`, `ComplianceAuditWidget`, `KRIWidget`) live in `Risk_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `risk_*` tables are created and seeded automatically on first use.
+
 ## Requirements
 
 - Python 3.x
