@@ -1463,9 +1463,10 @@ MENU_TREE = {
             ('risk_mgr', 'Risk Manager', {
                 'title': 'Risk Manager',
                 'items': [
-                    ('risk_framework', 'Risk Framework', 'Risk_mgr_menu.py'),
-                    ('risk_reporting', 'Risk Reporting', 'Risk_mgr_menu.py'),
+                    ('risk_register_mgr', 'Risk Register', 'Risk_mgr_menu.py'),
+                    ('kri', 'Key Risk Indicators', 'Risk_mgr_menu.py'),
                     ('biz_continuity', 'Business Continuity', 'Risk_mgr_menu.py'),
+                    ('audit_compliance', 'Audit & Compliance', 'Risk_mgr_menu.py'),
                 ],
             }),
             ('risk_assess', 'Risk Assessment', 'Risk_mgmt_Main_menu.py'),
