@@ -54,6 +54,17 @@ The Risk Management department provides two menus, each launched as `python -m m
 
 The Main menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Key Risk Indicators. The feature widgets (`RiskAssessmentWidget`, `RiskRegisterWidget`, `InsuranceWidget`, `BusinessContinuityWidget`, `ComplianceAuditWidget`, `KRIWidget`) live in `Risk_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `risk_*` tables are created and seeded automatically on first use.
 
+### Marketing Department
+
+The Marketing department's `Marketing_Main_menu` launches two sub-menus, each launched as `python -m manufacturing.<menu>`. Both embed their feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Marketing menu | `marketing_menu` | Campaigns, Leads & Contacts, Market Research, Content & Collateral, Marketing Analytics |
+| Marketing Manager menu | `marketing_mgr_menu` | Campaign Management, Budget Approvals, Performance & ROI, Market Research |
+
+The Marketing menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Budget Approvals. The feature widgets (`CampaignsWidget`, `LeadsWidget`, `MarketResearchWidget`, `ContentWidget`, `MarketingAnalyticsWidget`, `BudgetApprovalWidget`) live in `Marketing_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `marketing_*` tables are created and seeded automatically on first use.
+
 ## Requirements
 
 - Python 3.x
