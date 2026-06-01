@@ -1,13 +1,9 @@
 import sys
-import os
-import subprocess
-from PyQt6 import QtCore, QtWidgets
-from .Sales_menu import _apply_blue_palette
+from PyQt6 import QtWidgets
+from .Marketing_mgmt import (_apply_blue_palette, CampaignsWidget,
+                             BudgetApprovalWidget, MarketingAnalyticsWidget,
+                             MarketResearchWidget)
 
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
-)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
@@ -15,48 +11,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _launch(script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
-def _launch_tab(script, label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(label)
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addSpacing(12)
-    btn = QtWidgets.QPushButton(f"Open {label}")
-    btn.setStyleSheet(BUTTON_STYLE)
-    btn.setFixedHeight(44)
-    btn.setFixedWidth(260)
-    btn.clicked.connect(lambda: _launch(script))
-    row = QtWidgets.QHBoxLayout()
-    row.addStretch()
-    row.addWidget(btn)
-    row.addStretch()
-    v.addLayout(row)
-    v.addStretch()
-    return w
-
-
-def _placeholder_tab(label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addStretch()
-    return w
 
 
 class MarketingMgrMenu(QtWidgets.QMainWindow):
@@ -76,9 +30,10 @@ class MarketingMgrMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_launch_tab("Sales_menu.py", "Sales Orders"), "Sales Orders")
-        tabs.addTab(_launch_tab("customer_entry.py", "Customer Contacts"), "Customer Contacts")
-        tabs.addTab(_placeholder_tab("Campaign Reports"), "Campaign Reports")
+        tabs.addTab(CampaignsWidget(), "Campaign Management")
+        tabs.addTab(BudgetApprovalWidget(), "Budget Approvals")
+        tabs.addTab(MarketingAnalyticsWidget(), "Performance && ROI")
+        tabs.addTab(MarketResearchWidget(), "Market Research")
         v.addWidget(tabs)
 
 
