@@ -98,6 +98,16 @@ The Sales department's `Sales_Main_menu` launches the operational `Sales_menu` (
 
 The Manager menu reuses the operational `SalesOrdersWidget` and `AccountsReceivableWidget` for oversight and adds four manager registers. Those feature widgets (`QuotesWidget`, `CustomersWidget`, `SalesTargetsWidget`, `CommissionsWidget`) live in `Sales_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `sales_quote`, `sales_customer`, `sales_target`, and `sales_commission` tables are created and seeded automatically on first use.
 
+### Budget Management Department
+
+The Budget Management department's `Budget_mgr_menu` embeds the operational `BudgetManagementWidget` (the Budgets editor from `Budget_mgmt.py`) plus five manager-oversight report screens:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Budget Manager menu | `Budget_mgr_menu` | Budgets, Budget Detail, Budget vs. Actual, Variance Report, Department Summaries, Approval Workflow |
+
+The report widgets (`BudgetDetailWidget`, `BudgetVsActualWidget`, `VarianceReportWidget`, `DeptSummaryWidget`, `ApprovalWorkflowWidget`) live in `Budget_reports.py`. Unlike the generic registers, these are **data-driven views** over the existing `budget` / `budget_line` tables and GL actuals: each has a fiscal-year selector and computes budgeted-vs-actual variance (overspend shown in red). The Approval Workflow lets a manager move a budget between *draft* and *approved*. Actuals come from posted GL journal lines and read as `$0.00` when no GL data exists, so the reports still render the budgeted side on a fresh database.
+
 ## Requirements
 
 - Python 3.x
