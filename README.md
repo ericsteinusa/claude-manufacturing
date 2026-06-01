@@ -72,9 +72,11 @@ The Maintenance department's `Maint_Main_menu` launches two sub-menus, each laun
 | Menu | Module | Tabs |
 | --- | --- | --- |
 | Maintenance menu | `Maint_Maint_menu` | Work Orders, Equipment List, Parts Inventory, Maintenance Schedule, Safety Inspection |
-| Maintenance Manager menu | `Maint_mgr_menu` | Work Order Management, Downtime & Reliability, Equipment, Safety Inspections |
+| Maintenance Manager menu | `Maint_mgr_menu` | Work Order Management, Mechanics, Downtime & Reliability, Equipment, Safety Inspections |
 
-The Maintenance menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Downtime & Reliability. The feature widgets (`WorkOrdersWidget`, `EquipmentWidget`, `PartsInventoryWidget`, `MaintScheduleWidget`, `SafetyInspectionWidget`, `DowntimeWidget`) live in `Maint_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `maint_*` tables are created and seeded automatically on first use.
+The Maintenance menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Downtime & Reliability and the mechanic roster. The feature widgets (`WorkOrdersWidget`, `EquipmentWidget`, `PartsInventoryWidget`, `MaintScheduleWidget`, `SafetyInspectionWidget`, `DowntimeWidget`, `MechanicsWidget`) live in `Maint_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `maint_*` tables are created and seeded automatically on first use.
+
+On the Manager menu, the Work Order Management screen (`WorkOrderMgmtWidget`) adds an **Assign to Mechanic** action: the manager picks an active mechanic from the roster, which sets the work order's owner and moves it to *Assigned*. The mechanic roster is maintained in the Mechanics tab.
 
 ## Requirements
 

@@ -97,6 +97,16 @@ def init_db():
             status    TEXT    DEFAULT 'Ongoing',
             notes     TEXT    DEFAULT ''
         );
+
+        CREATE TABLE IF NOT EXISTS maint_mechanic (
+            id     SERIAL PRIMARY KEY,
+            name   TEXT    NOT NULL,
+            trade  TEXT    DEFAULT '',
+            shift  TEXT    DEFAULT '',
+            phone  TEXT    DEFAULT '',
+            status TEXT    DEFAULT 'Active',
+            notes  TEXT    DEFAULT ''
+        );
         """)
         _seed(con)
 
@@ -136,6 +146,12 @@ def _seed(con):
             "INSERT INTO maint_downtime (equipment,reason,category,down_date,hours,cost,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
             ("Conveyor Line A", "Motor failure", "Breakdown", today, "4", 1800, "Ongoing"))
+    if con.execute("SELECT COUNT(*) FROM maint_mechanic").fetchone()[0] == 0:
+        con.executemany(
+            "INSERT INTO maint_mechanic (name,trade,shift,phone,status) VALUES (%s,%s,%s,%s,%s)",
+            [("M. Tanaka", "Mechanical", "Day", "x4101", "Active"),
+             ("R. Okafor", "Electrical", "Day", "x4102", "Active"),
+             ("L. Petrov", "HVAC", "Swing", "x4103", "Active")])
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -178,9 +194,12 @@ STATUS_COLORS = {
     "In Stock": QtGui.QColor(200, 255, 210),
     "Passed": QtGui.QColor(200, 255, 210),
     "Resolved": QtGui.QColor(200, 255, 210),
+    "Active": QtGui.QColor(200, 255, 210),
+    "On Leave": QtGui.QColor(255, 255, 200),
     "Skipped": QtGui.QColor(220, 220, 220),
     "Retired": QtGui.QColor(220, 220, 220),
     "Discontinued": QtGui.QColor(220, 220, 220),
+    "Inactive": QtGui.QColor(220, 220, 220),
 }
 
 
@@ -378,6 +397,7 @@ class _MaintCrudWidget(QtWidgets.QWidget):
                    (f"Delete {spec['noun']}", self._delete)]
         if spec.get("action"):
             buttons.append((spec["action"]["label"], self._do_action))
+        buttons += self._extra_buttons()
         for lbl, slot in buttons:
             btn = QtWidgets.QPushButton(lbl)
             btn.setStyleSheet(BTN_STYLE)
@@ -390,6 +410,10 @@ class _MaintCrudWidget(QtWidgets.QWidget):
         w = QtWidgets.QWidget()
         w.setLayout(layout)
         return w
+
+    def _extra_buttons(self):
+        """Subclasses return a list of (label, slot) for extra action buttons."""
+        return []
 
     # ── Data ────────────────────────────────────────────────────────────────────
     def _money_keys(self):
@@ -529,6 +553,20 @@ DOWNTIME_CATEGORIES = ["Breakdown", "Planned", "Setup", "Material Shortage",
                        "Quality", "Changeover", "Other"]
 DOWNTIME_STATUSES = ["Ongoing", "Investigating", "Resolved", "Recurring"]
 
+MECHANIC_TRADES = ["Mechanical", "Electrical", "HVAC", "Hydraulics",
+                   "Welding", "General"]
+MECHANIC_SHIFTS = ["Day", "Swing", "Night"]
+MECHANIC_STATUSES = ["Active", "On Leave", "Inactive"]
+
+
+def _mechanic_names():
+    """Active mechanics from the roster, ordered by name — used for assignment."""
+    with _conn() as con:
+        rows = con.execute(
+            "SELECT name FROM maint_mechanic WHERE status='Active' ORDER BY name"
+        ).fetchall()
+    return [r["name"] for r in rows]
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
@@ -563,6 +601,37 @@ class WorkOrdersWidget(_MaintCrudWidget):
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
+
+
+class WorkOrderMgmtWidget(WorkOrdersWidget):
+    """Manager view of work orders: adds the ability to assign a mechanic.
+
+    Assigning picks an active mechanic from the roster, writes ``assigned_to``,
+    and moves the order to ``Assigned``.
+    """
+
+    def _extra_buttons(self):
+        return [("Assign to Mechanic", self._assign)]
+
+    def _assign(self, *_):
+        rid = self._selected_id()
+        if rid is None:
+            return
+        mechanics = _mechanic_names()
+        if not mechanics:
+            QtWidgets.QMessageBox.information(
+                self, "No Mechanics",
+                "No active mechanics in the roster. Add one in the Mechanics tab first.")
+            return
+        name, ok = QtWidgets.QInputDialog.getItem(
+            self, "Assign Work Order", "Mechanic:", mechanics, 0, False)
+        if not ok or not name:
+            return
+        with _conn() as con:
+            con.execute(
+                "UPDATE maint_work_order SET assigned_to=%s, status='Assigned' WHERE id=%s",
+                (name, rid))
+        self._refresh()
 
 
 class EquipmentWidget(_MaintCrudWidget):
@@ -713,6 +782,32 @@ class DowntimeWidget(_MaintCrudWidget):
     }
 
 
+class MechanicsWidget(_MaintCrudWidget):
+    SPEC = {
+        "table": "maint_mechanic",
+        "title": "Mechanics",
+        "noun": "Mechanic",
+        "statuses": MECHANIC_STATUSES,
+        "order_by": "name",
+        "action": {"label": "Mark Active", "status": "Active"},
+        "columns": [
+            ("name", "Name", None),
+            ("trade", "Trade", 130),
+            ("shift", "Shift", 100),
+            ("phone", "Phone", 110),
+            ("status", "Status", 100),
+        ],
+        "fields": [
+            {"key": "name", "label": "Name", "kind": "text"},
+            {"key": "trade", "label": "Trade", "kind": "combo", "options": MECHANIC_TRADES, "editable": True},
+            {"key": "shift", "label": "Shift", "kind": "combo", "options": MECHANIC_SHIFTS},
+            {"key": "phone", "label": "Phone", "kind": "text"},
+            {"key": "status", "label": "Status", "kind": "combo", "options": MECHANIC_STATUSES},
+            {"key": "notes", "label": "Notes", "kind": "memo"},
+        ],
+    }
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Maint_mgmt`)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -730,6 +825,7 @@ class MaintMgmtWindow(QtWidgets.QMainWindow):
         tabs.addTab(MaintScheduleWidget(), "Maintenance Schedule")
         tabs.addTab(SafetyInspectionWidget(), "Safety Inspections")
         tabs.addTab(DowntimeWidget(), "Downtime && Reliability")
+        tabs.addTab(MechanicsWidget(), "Mechanics")
         self.setCentralWidget(tabs)
 
 
