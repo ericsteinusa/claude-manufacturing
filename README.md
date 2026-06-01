@@ -65,6 +65,17 @@ The Marketing department's `Marketing_Main_menu` launches two sub-menus, each la
 
 The Marketing menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Budget Approvals. The feature widgets (`CampaignsWidget`, `LeadsWidget`, `MarketResearchWidget`, `ContentWidget`, `MarketingAnalyticsWidget`, `BudgetApprovalWidget`) live in `Marketing_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `marketing_*` tables are created and seeded automatically on first use.
 
+### Maintenance Department
+
+The Maintenance department's `Maint_Main_menu` launches two sub-menus, each launched as `python -m manufacturing.<menu>`. Both embed their feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Maintenance menu | `Maint_Maint_menu` | Work Orders, Equipment List, Parts Inventory, Maintenance Schedule, Safety Inspection |
+| Maintenance Manager menu | `Maint_mgr_menu` | Work Order Management, Downtime & Reliability, Equipment, Safety Inspections |
+
+The Maintenance menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Downtime & Reliability. The feature widgets (`WorkOrdersWidget`, `EquipmentWidget`, `PartsInventoryWidget`, `MaintScheduleWidget`, `SafetyInspectionWidget`, `DowntimeWidget`) live in `Maint_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `maint_*` tables are created and seeded automatically on first use.
+
 ## Requirements
 
 - Python 3.x
