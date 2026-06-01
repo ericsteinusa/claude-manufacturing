@@ -5,17 +5,21 @@ A desktop application built with Python and PyQt6 that provides department manag
 ## Departments
 
 - Accounting
+- Budget Management
 - Customer Service
 - Engineering
 - Finance
 - Information Technology
+- Legal
 - Maintenance
 - Marketing
 - Personnel
 - Production
 - Purchasing
 - Quality Assurance
+- Risk Management
 - Sales
+- Warehouse
 
 ### Finance Department
 
