@@ -82,6 +82,17 @@ def init_db():
             status      TEXT    DEFAULT 'Open',
             notes       TEXT    DEFAULT ''
         );
+
+        CREATE TABLE IF NOT EXISTS legal_governance (
+            id        SERIAL PRIMARY KEY,
+            item      TEXT    NOT NULL,
+            category  TEXT    DEFAULT '',
+            owner     TEXT    DEFAULT '',
+            ref_date  TEXT    DEFAULT '',
+            reference TEXT    DEFAULT '',
+            status    TEXT    DEFAULT 'Active',
+            notes     TEXT    DEFAULT ''
+        );
         """)
         _seed(con)
 
@@ -114,6 +125,11 @@ def _seed(con):
             "INSERT INTO legal_employment (matter,employee,matter_type,owner,opened_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
             ("Policy review request", "HR Department", "Policy Review", "Legal Dept", today, "Open"))
+    if con.execute("SELECT COUNT(*) FROM legal_governance").fetchone()[0] == 0:
+        con.execute(
+            "INSERT INTO legal_governance (item,category,owner,ref_date,reference,status) "
+            "VALUES (%s,%s,%s,%s,%s,%s)",
+            ("2026 Annual Report", "Filing", "Corporate Secretary", "2026-04-15", "SEC 10-K", "Pending"))
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -147,6 +163,9 @@ STATUS_COLORS = {
     "Granted": QtGui.QColor(200, 255, 210),
     "Renewed": QtGui.QColor(200, 255, 210),
     "Settled": QtGui.QColor(210, 255, 230),
+    "Filed": QtGui.QColor(200, 255, 210),
+    "Under Review": QtGui.QColor(255, 255, 200),
+    "Archived": QtGui.QColor(220, 220, 220),
     "Closed": QtGui.QColor(220, 220, 220),
     "Dismissed": QtGui.QColor(220, 220, 220),
     "Terminated": QtGui.QColor(220, 220, 220),
@@ -495,6 +514,9 @@ EMPLOYMENT_TYPES = ["Grievance", "Discrimination", "Wrongful Termination",
                     "Policy Review", "Contract", "Harassment", "Other"]
 EMPLOYMENT_STATUSES = ["Open", "Investigating", "Escalated", "Resolved", "Closed"]
 
+GOVERNANCE_CATEGORIES = ["Board Member", "Policy", "Filing", "Resolution", "Committee"]
+GOVERNANCE_STATUSES = ["Active", "Pending", "Under Review", "Filed", "Archived"]
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
@@ -645,6 +667,34 @@ class EmploymentLawWidget(_LegalCrudWidget):
     }
 
 
+class GovernanceWidget(_LegalCrudWidget):
+    SPEC = {
+        "table": "legal_governance",
+        "title": "Corporate Governance",
+        "noun": "Item",
+        "statuses": GOVERNANCE_STATUSES,
+        "order_by": "ref_date",
+        "action": {"label": "Mark Filed", "status": "Filed"},
+        "columns": [
+            ("item", "Item", None),
+            ("category", "Category", 130),
+            ("owner", "Owner", 160),
+            ("ref_date", "Date", 95),
+            ("reference", "Reference", 130),
+            ("status", "Status", 110),
+        ],
+        "fields": [
+            {"key": "item", "label": "Item", "kind": "text"},
+            {"key": "category", "label": "Category", "kind": "combo", "options": GOVERNANCE_CATEGORIES, "editable": True},
+            {"key": "owner", "label": "Owner", "kind": "text"},
+            {"key": "ref_date", "label": "Date", "kind": "date"},
+            {"key": "reference", "label": "Reference", "kind": "text"},
+            {"key": "status", "label": "Status", "kind": "combo", "options": GOVERNANCE_STATUSES},
+            {"key": "notes", "label": "Notes", "kind": "memo"},
+        ],
+    }
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Legal_mgmt`)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -661,6 +711,7 @@ class LegalMgmtWindow(QtWidgets.QMainWindow):
         tabs.addTab(LitigationWidget(), "Litigation")
         tabs.addTab(IPWidget(), "Intellectual Property")
         tabs.addTab(EmploymentLawWidget(), "Employment Law")
+        tabs.addTab(GovernanceWidget(), "Corporate Governance")
         self.setCentralWidget(tabs)
 
 
