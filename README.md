@@ -78,6 +78,16 @@ The Maintenance menu carries the full operational set, while the Manager menu is
 
 On the Manager menu, the Work Order Management screen (`WorkOrderMgmtWidget`) adds an **Assign to Mechanic** action: the manager picks an active mechanic from the roster, which sets the work order's owner and moves it to *Assigned*. The mechanic roster is maintained in the Mechanics tab.
 
+### Quality Assurance Department
+
+The Quality Assurance department's `QA_Main_menu` launches two sub-menus. The operational `Quality_Assurance_menu` / `QA_Lab_menu` cover lab work (Inspections, Defects, Specifications); the Manager menu embeds its feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| QA Manager menu | `QA_Mgr_menu` | Non-Conformance, Corrective Actions, Quality Audits, Supplier Quality |
+
+The Manager menu provides quality-oversight registers. The feature widgets (`NCRWidget`, `CAPAWidget`, `AuditsWidget`, `SupplierQualityWidget`) live in `QA_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `qa_*` tables are created and seeded automatically on first use.
+
 ## Requirements
 
 - Python 3.x
