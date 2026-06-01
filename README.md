@@ -88,6 +88,16 @@ The Quality Assurance department's `QA_Main_menu` launches two sub-menus. The op
 
 The Manager menu provides quality-oversight registers. The feature widgets (`NCRWidget`, `CAPAWidget`, `AuditsWidget`, `SupplierQualityWidget`) live in `QA_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `qa_*` tables are created and seeded automatically on first use.
 
+### Sales Department
+
+The Sales department's `Sales_Main_menu` launches the operational `Sales_menu` (Sales Orders, Customers) and the Manager menu, which embeds its feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Sales Manager menu | `Sales_mgr_menu` | Sales Orders, Quotes, Customers, Sales Targets, Commissions, Accounts Receivable |
+
+The Manager menu reuses the operational `SalesOrdersWidget` and `AccountsReceivableWidget` for oversight and adds four manager registers. Those feature widgets (`QuotesWidget`, `CustomersWidget`, `SalesTargetsWidget`, `CommissionsWidget`) live in `Sales_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `sales_quote`, `sales_customer`, `sales_target`, and `sales_commission` tables are created and seeded automatically on first use.
+
 ## Requirements
 
 - Python 3.x
