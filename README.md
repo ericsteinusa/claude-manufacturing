@@ -32,6 +32,17 @@ The Finance department provides two menus, each launched as `python -m manufactu
 
 The Main menu surfaces day-to-day operational screens (Credit, Payroll), while the Manager menu focuses on oversight (General Ledger, Tax). The shared Budget and Audit screens appear in both. Each tab hosts the corresponding feature widget (`BudgetManagementWidget`, `CreditDeptWidget`, `PayrollDeptWidget`, `GeneralLedgerWidget`, `TaxMgmtWidget`, `AuditMgmtWidget`).
 
+### Legal Department
+
+The Legal department provides two menus, each launched as `python -m manufacturing.<menu>`. Both embed their feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Legal Main menu | `Legal_Main_menu` | Contracts, Compliance, Litigation, Intellectual Property, Employment Law |
+| Legal Manager menu | `Legal_mgr_menu` | Contract Management, Litigation Management, Compliance Management, Corporate Governance |
+
+The Main menu carries the full operational set, while the Manager menu is an oversight-focused subset that adds Corporate Governance. The feature widgets (`ContractsWidget`, `ComplianceWidget`, `LitigationWidget`, `IPWidget`, `EmploymentLawWidget`, `GovernanceWidget`) live in `Legal_mgmt.py`. Each is a database-backed register (filter bar, search, table, and Add/Edit/Delete plus a status action) sharing a common base; their `legal_*` tables are created and seeded automatically on first use.
+
 ## Requirements
 
 - Python 3.x
