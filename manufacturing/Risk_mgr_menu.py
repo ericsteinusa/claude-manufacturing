@@ -33,7 +33,7 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
         tabs.addTab(RiskRegisterWidget(), "Risk Register")
         tabs.addTab(KRIWidget(), "Key Risk Indicators")
         tabs.addTab(BusinessContinuityWidget(), "Business Continuity")
-        tabs.addTab(ComplianceAuditWidget(), "Audit & Compliance")
+        tabs.addTab(ComplianceAuditWidget(), "Audit && Compliance")
         v.addWidget(tabs)
 
 

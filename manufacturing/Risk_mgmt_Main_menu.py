@@ -44,7 +44,7 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(RiskRegisterWidget(), "Risk Register")
         tabs.addTab(InsuranceWidget(), "Insurance Management")
         tabs.addTab(BusinessContinuityWidget(), "Business Continuity")
-        tabs.addTab(ComplianceAuditWidget(), "Compliance & Audit")
+        tabs.addTab(ComplianceAuditWidget(), "Compliance && Audit")
         v.addWidget(tabs)
 
 
