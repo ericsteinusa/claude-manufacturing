@@ -7,6 +7,7 @@ A desktop application built with Python and PyQt6 that provides department manag
 - Accounting
 - Customer Service
 - Engineering
+- Finance
 - Information Technology
 - Maintenance
 - Marketing
@@ -15,6 +16,17 @@ A desktop application built with Python and PyQt6 that provides department manag
 - Purchasing
 - Quality Assurance
 - Sales
+
+### Finance Department
+
+The Finance department provides two menus, each launched as `python -m manufacturing.<menu>`. Both embed their feature widgets directly as tabs:
+
+| Menu | Module | Tabs |
+| --- | --- | --- |
+| Finance Main menu | `Finance_Main_menu` | Budget, Credit, Payroll, Audit |
+| Finance Manager menu | `Finance_mgr_menu` | Budget, General Ledger, Tax, Audit |
+
+The Main menu surfaces day-to-day operational screens (Credit, Payroll), while the Manager menu focuses on oversight (General Ledger, Tax). The shared Budget and Audit screens appear in both. Each tab hosts the corresponding feature widget (`BudgetManagementWidget`, `CreditDeptWidget`, `PayrollDeptWidget`, `GeneralLedgerWidget`, `TaxMgmtWidget`, `AuditMgmtWidget`).
 
 ## Requirements
 
