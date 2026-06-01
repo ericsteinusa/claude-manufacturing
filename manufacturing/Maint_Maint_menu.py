@@ -1,16 +1,8 @@
 import sys
-from PyQt6 import QtCore, QtGui, QtWidgets
-
-
-def _apply_blue_palette(widget):
-    pal = QtGui.QPalette()
-    for g in (QtGui.QPalette.ColorGroup.Active,
-              QtGui.QPalette.ColorGroup.Inactive,
-              QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(g, QtGui.QPalette.ColorRole.Window, QtGui.QColor(0, 85, 255))
-        pal.setColor(g, QtGui.QPalette.ColorRole.Button, QtGui.QColor(0, 85, 255))
-    widget.setPalette(pal)
-
+from PyQt6 import QtWidgets
+from .Maint_mgmt import (_apply_blue_palette, WorkOrdersWidget, EquipmentWidget,
+                         PartsInventoryWidget, MaintScheduleWidget,
+                         SafetyInspectionWidget)
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -19,19 +11,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _placeholder_tab(label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(f"{label}\n(Coming Soon)")
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addStretch()
-    return w
 
 
 class MaintMenu(QtWidgets.QMainWindow):
@@ -51,11 +30,11 @@ class MaintMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_placeholder_tab("Work Orders"), "Work Orders")
-        tabs.addTab(_placeholder_tab("Equipment List"), "Equipment List")
-        tabs.addTab(_placeholder_tab("Parts Request"), "Parts Request")
-        tabs.addTab(_placeholder_tab("Maintenance Schedule"), "Maint. Schedule")
-        tabs.addTab(_placeholder_tab("Safety Inspection"), "Safety Inspection")
+        tabs.addTab(WorkOrdersWidget(), "Work Orders")
+        tabs.addTab(EquipmentWidget(), "Equipment List")
+        tabs.addTab(PartsInventoryWidget(), "Parts Inventory")
+        tabs.addTab(MaintScheduleWidget(), "Maintenance Schedule")
+        tabs.addTab(SafetyInspectionWidget(), "Safety Inspection")
         v.addWidget(tabs)
 
 
