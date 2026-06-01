@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import QtWidgets
-from .Maint_mgmt import (_apply_blue_palette, WorkOrdersWidget, DowntimeWidget,
-                         EquipmentWidget, SafetyInspectionWidget)
+from .Maint_mgmt import (_apply_blue_palette, WorkOrderMgmtWidget, MechanicsWidget,
+                         DowntimeWidget, EquipmentWidget, SafetyInspectionWidget)
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -29,7 +29,8 @@ class MaintMgrMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(WorkOrdersWidget(), "Work Order Management")
+        tabs.addTab(WorkOrderMgmtWidget(), "Work Order Management")
+        tabs.addTab(MechanicsWidget(), "Mechanics")
         tabs.addTab(DowntimeWidget(), "Downtime && Reliability")
         tabs.addTab(EquipmentWidget(), "Equipment")
         tabs.addTab(SafetyInspectionWidget(), "Safety Inspections")
