@@ -1,0 +1,11 @@
+# Ruff configuration.
+#
+# line-length is the target width used by `ruff format`. The E501
+# (line-too-long) lint rule is intentionally NOT enabled: the existing
+# codebase has thousands of pre-existing long lines, so turning E501 on
+# would break `ruff check` repo-wide. New and reformatted code should aim
+# for 79 columns; enforce E501 later once the legacy files are wrapped.
+line-length = 79
+
+[lint]
+# Keep ruff's default rule set (E4, E7, E9, F). E501 is not selected here.
