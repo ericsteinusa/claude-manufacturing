@@ -10,6 +10,9 @@ env/
 .env/
 venv/
 
+# Databases (the app uses PostgreSQL; no SQLite file should be committed)
+*.sqlite3
+
 # Qt
 *.qmlc
 *.jsc
