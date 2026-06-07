@@ -87,7 +87,11 @@
     <div class="content">
         <div class="menu-title">{% block menu_title %}{% endblock %}</div>
         <div class="dept-grid">
-            {% block grid_items %}{% endblock %}
+            {% block grid_items %}
+            {% for url, label in menu_items %}
+            <a href="{{ url }}" class="dept-btn">{{ label }}</a>
+            {% endfor %}
+            {% endblock %}
         </div>
     </div>
     {% endblock %}
