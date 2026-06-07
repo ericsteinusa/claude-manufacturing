@@ -549,7 +549,8 @@ class TimeEntriesTab(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(f"""
-                SELECT tc.id, tc.clock_in, tc.clock_out, tc.hours_worked, tc.notes,
+                SELECT tc.id, tc.clock_in, tc.clock_out, tc.hours_worked,
+                    tc.notes,
                        p.first_name, p.last_name
                 FROM time_clock tc
                 JOIN people p ON p.id = tc.people_id
@@ -758,7 +759,8 @@ class TimeOffTab(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(f"""
-                SELECT r.id, r.start_date, r.end_date, r.request_type, r.status, r.notes,
+                SELECT r.id, r.start_date, r.end_date, r.request_type,
+                    r.status, r.notes,
                        p.first_name, p.last_name
                 FROM time_off_request r
                 JOIN people p ON p.id = r.people_id

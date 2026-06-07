@@ -1,6 +1,7 @@
 """
 Payroll_dept.py — Payroll Department
-Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report | Payroll History
+Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report
+    | Payroll History
 """
 import sys
 from .db_pg import get_db
@@ -110,7 +111,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS employee_deduction (
             id                SERIAL PRIMARY KEY,
             people_id         INTEGER NOT NULL REFERENCES people(id),
-            deduction_type_id INTEGER NOT NULL REFERENCES payroll_deduction_type(id),
+            deduction_type_id INTEGER NOT NULL REFERENCES
+                payroll_deduction_type(id),
             calc_method       TEXT    DEFAULT 'flat',
             amount            REAL    DEFAULT 0.0,
             is_active         INTEGER DEFAULT 1,
@@ -121,7 +123,8 @@ def init_db():
 
         CREATE TABLE IF NOT EXISTS payroll_entry_deduction (
             id             SERIAL PRIMARY KEY,
-            entry_id       INTEGER NOT NULL REFERENCES payroll_entry(id) ON DELETE CASCADE,
+            entry_id       INTEGER NOT NULL REFERENCES payroll_entry(id) ON
+                DELETE CASCADE,
             deduction_name TEXT    NOT NULL,
             is_pre_tax     INTEGER DEFAULT 1,
             amount         REAL    NOT NULL DEFAULT 0.0
@@ -159,7 +162,8 @@ def _hours_from_timeclock(people_id, start_str, end_str):
         SELECT clock_in, clock_out FROM time_clock
         WHERE people_id=%s AND clock_in>=%s AND clock_in<=%s
           AND clock_out IS NOT NULL
-    """, (people_id, start_str + " 00:00:00", end_str + " 23:59:59")).fetchall()
+    """, (people_id, start_str + " 00:00:00",
+          end_str + " 23:59:59")).fetchall()
     conn.close()
     weekly: dict = {}
     for row in rows:
@@ -929,7 +933,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         eff_date = self.pr_date_edit.date().toString("yyyy-MM-dd")
         conn = get_db()
         conn.execute("""
-            INSERT INTO employee_pay (people_id, pay_type, pay_rate, effective_date)
+            INSERT INTO employee_pay (people_id, pay_type, pay_rate,
+                effective_date)
             VALUES (%s, %s, %s, %s)
             ON CONFLICT(people_id) DO UPDATE SET
                 pay_type=excluded.pay_type,
@@ -1433,7 +1438,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 
         conn = get_db()
         cur = conn.execute("""
-            INSERT INTO payroll_run (pay_period_start, pay_period_end, run_date, status)
+            INSERT INTO payroll_run (pay_period_start, pay_period_end,
+                run_date, status)
             VALUES (%s, %s, %s, 'processed') RETURNING id
         """, (start_str, end_str, datetime.now().strftime(DT_FMT)))
         run_id = cur.fetchone()['id']
@@ -1450,7 +1456,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             entry_cur = conn.execute("""
                 INSERT INTO payroll_entry
                     (run_id, people_id, regular_hours, overtime_hours,
-                     gross_pay, federal_tax, state_tax, social_security, medicare, net_pay,
+                     gross_pay, federal_tax, state_tax, social_security,
+                         medicare, net_pay,
                      pre_tax_deductions, post_tax_deductions)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
             """, (run_id, pid,

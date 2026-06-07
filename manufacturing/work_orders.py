@@ -542,7 +542,8 @@ class WorkOrdersWidget(QtWidgets.QWidget):
             SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
                    wo.start_date, wo.due_date, wo.status,
                    p.name AS product_name,
-                   (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id) AS mat_count
+                   (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
+                       AS mat_count
             FROM work_order wo
             LEFT JOIN product p ON p.id = wo.product_id
         """
@@ -616,7 +617,8 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             mats = conn.execute("""
-                SELECT p.name AS product_name, m.qty_required, m.qty_issued, m.notes
+                SELECT p.name AS product_name, m.qty_required, m.qty_issued,
+                    m.notes
                 FROM wo_material m LEFT JOIN product p ON p.id = m.product_id
                 WHERE m.wo_id = %s
             """, (self._selected_wo_id,)).fetchall()

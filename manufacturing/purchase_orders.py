@@ -545,7 +545,8 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         base = """
             SELECT po.id, po.po_number, po.order_date, po.expected_date,
                    po.status, po.notes, s.company_name,
-                   (SELECT COUNT(*) FROM po_item pi WHERE pi.po_id = po.id) AS item_count,
+                   (SELECT COUNT(*) FROM po_item pi WHERE pi.po_id = po.id) AS
+                       item_count,
                    (SELECT COALESCE(SUM(pi.qty_ordered * pi.unit_price),0)
                     FROM po_item pi WHERE pi.po_id = po.id) AS total
             FROM purchase_order po

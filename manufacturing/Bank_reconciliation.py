@@ -30,11 +30,13 @@ def init_db():
 
         CREATE TABLE IF NOT EXISTS bank_statement (
             id                SERIAL PRIMARY KEY,
-            bank_account_id   INTEGER NOT NULL REFERENCES bank_account(id) ON DELETE CASCADE,
+            bank_account_id   INTEGER NOT NULL REFERENCES bank_account(id) ON
+                DELETE CASCADE,
             statement_date    TEXT    NOT NULL,
             beginning_balance REAL    DEFAULT 0.0,
             ending_balance    REAL    DEFAULT 0.0,
-            status            TEXT    DEFAULT 'Open',  -- Open / In Progress / Reconciled
+            status            TEXT    DEFAULT 'Open',
+                -- Open / In Progress / Reconciled
             reconciled_by     TEXT    DEFAULT '',
             reconciled_at     TEXT    DEFAULT '',
             notes             TEXT    DEFAULT '',
@@ -43,7 +45,8 @@ def init_db():
 
         CREATE TABLE IF NOT EXISTS bank_statement_item (
             id                     SERIAL PRIMARY KEY,
-            statement_id           INTEGER NOT NULL REFERENCES bank_statement(id) ON DELETE CASCADE,
+            statement_id           INTEGER NOT NULL REFERENCES
+                bank_statement(id) ON DELETE CASCADE,
             item_date              TEXT    NOT NULL,
             description            TEXT    DEFAULT '',
             amount                 REAL    NOT NULL,
@@ -54,7 +57,8 @@ def init_db():
 
         CREATE TABLE IF NOT EXISTS bank_reconciliation (
             id                    SERIAL PRIMARY KEY,
-            statement_id          INTEGER NOT NULL REFERENCES bank_statement(id) ON DELETE CASCADE,
+            statement_id          INTEGER NOT NULL REFERENCES
+                bank_statement(id) ON DELETE CASCADE,
             journal_line_id       INTEGER REFERENCES gl_journal_line(id),
             statement_item_id     INTEGER REFERENCES bank_statement_item(id),
             matched_at            TEXT    DEFAULT (datetime('now')),
@@ -1043,7 +1047,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             gl_rows = []
             if gl_acct_id:
                 gl_rows = con.execute("""
-                    SELECT l.id, j.journal_date, j.description, l.debit, l.credit
+                    SELECT l.id, j.journal_date, j.description, l.debit,
+                        l.credit
                     FROM gl_journal_line l
                     JOIN gl_journal j ON j.id=l.journal_id
                     WHERE l.account_id=%s
@@ -1066,7 +1071,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
                 SELECT br.id,
                        j.journal_date, j.description,
                        l.debit, l.credit,
-                       si.item_date, si.description AS st_desc, si.amount AS st_amount,
+                       si.item_date, si.description AS st_desc, si.amount AS
+                           st_amount,
                        si.item_type
                 FROM bank_reconciliation br
                 LEFT JOIN gl_journal_line l  ON l.id=br.journal_line_id
@@ -1376,7 +1382,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             SELECT bs.id, ba.account_name, bs.statement_date,
                    bs.beginning_balance, bs.ending_balance, bs.status,
                    bs.reconciled_by,
-                   (SELECT COUNT(*) FROM bank_reconciliation br WHERE br.statement_id=bs.id) AS match_count
+                   (SELECT COUNT(*) FROM bank_reconciliation br WHERE
+                       br.statement_id=bs.id) AS match_count
             FROM bank_statement bs
             JOIN bank_account ba ON ba.id=bs.bank_account_id
         """

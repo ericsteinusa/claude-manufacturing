@@ -231,7 +231,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
     def _run_directory(self):
         with _conn() as con:
             rows = con.execute("""
-                SELECT p.first_name, p.last_name, p.email, p.city, p.state, p.zip_code, p.emp_id
+                SELECT p.first_name, p.last_name, p.email, p.city, p.state,
+                    p.zip_code, p.emp_id
                 FROM people p
                 WHERE p.dept_id = %s
                 ORDER BY p.last_name, p.first_name
@@ -338,7 +339,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             monthly = con.execute("""
                 SELECT strftime('%Y-%m', call_date) AS month,
                        COUNT(*) AS total,
-                       SUM(CASE WHEN completion_box=0 THEN 1 ELSE 0 END) AS open_ct,
+                       SUM(CASE WHEN completion_box=0 THEN 1 ELSE 0 END) AS
+                           open_ct,
                        SUM(completion_box) AS comp_ct
                 FROM calls2
                 WHERE call_date BETWEEN %s AND %s
@@ -502,7 +504,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
     def _run_training(self):
         with _conn() as con:
             rows = con.execute("""
-                SELECT t.id, t.people_id, t.topic, t.trainer, t.train_date, t.notes, t.completed,
+                SELECT t.id, t.people_id, t.topic, t.trainer, t.train_date,
+                    t.notes, t.completed,
                        p.first_name, p.last_name
                 FROM cs_training t
                 LEFT JOIN people p ON p.id = t.people_id
@@ -573,8 +576,10 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             return
         with _conn() as con:
             con.execute("""
-                INSERT INTO cs_training (people_id, topic, trainer, train_date, notes, completed)
-                VALUES (%(people_id)s, %(topic)s, %(trainer)s, %(train_date)s, %(notes)s, %(completed)s)
+                INSERT INTO cs_training (people_id, topic, trainer, train_date,
+                    notes, completed)
+                VALUES (%(people_id)s, %(topic)s, %(trainer)s, %(train_date)s,
+                    %(notes)s, %(completed)s)
             """, data)
         self._tr_clear()
         self._run_training()
@@ -590,8 +595,10 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         data["id"] = self._training_current_id
         with _conn() as con:
             con.execute("""
-                UPDATE cs_training SET people_id=%(people_id)s, topic=%(topic)s, trainer=%(trainer)s,
-                    train_date=%(train_date)s, notes=%(notes)s, completed=%(completed)s
+                UPDATE cs_training SET people_id=%(people_id)s,
+                    topic=%(topic)s, trainer=%(trainer)s,
+                    train_date=%(train_date)s, notes=%(notes)s,
+                        completed=%(completed)s
                 WHERE id=%(id)s
             """, data)
         self._run_training()
@@ -670,12 +677,14 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             rows = con.execute("""
                 SELECT cu.first_name, cu.last_name, cu.company_name,
                        COUNT(c2.id) AS total,
-                       SUM(CASE WHEN c2.completion_box=0 THEN 1 ELSE 0 END) AS open_ct,
+                       SUM(CASE WHEN c2.completion_box=0 THEN 1 ELSE 0 END) AS
+                           open_ct,
                        SUM(c2.completion_box) AS comp_ct
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.call_date BETWEEN %s AND %s
-                GROUP BY c2.customer_id, cu.first_name, cu.last_name, cu.company_name
+                GROUP BY c2.customer_id, cu.first_name, cu.last_name,
+                    cu.company_name
                 ORDER BY total DESC
             """, (f, t)).fetchall()
 

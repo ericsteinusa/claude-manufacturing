@@ -364,9 +364,11 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute("""
             INSERT INTO people
-                (first_name, last_name, emp_id, address, city, state, zip_code, email, dept_id, dept_Sub_id)
+                (first_name, last_name, emp_id, address, city, state, zip_code,
+                    email, dept_id, dept_Sub_id)
             VALUES
-                (:first_name, :last_name, :emp_id, :address, :city, :state, :zip_code, :email,
+                (:first_name, :last_name, :emp_id, :address, :city, :state,
+                    :zip_code, :email,
                  :dept_id, :dept_Sub_id)
         """, data)
         conn.commit()

@@ -158,7 +158,8 @@ def _ar_balance(customer_id):
     result = conn.execute("""
         SELECT COALESCE(SUM(ai.amount - COALESCE(p.paid, 0)), 0)
         FROM ar_invoice ai
-        LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
+        LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP
+            BY invoice_id) p
             ON p.invoice_id = ai.id
         WHERE ai.customer_id = %s AND ai.status IN ('open', 'partial')
     """, (customer_id,)).fetchone()[0]
@@ -283,7 +284,8 @@ class NewApplicationDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute("""
-            INSERT INTO credit_application (customer_id, applied_date, requested_limit, notes)
+            INSERT INTO credit_application (customer_id, applied_date,
+                requested_limit, notes)
             VALUES (%s, %s, %s, %s)
         """, (self.cust_combo.currentData(),
               self.app_date.date().toString("yyyy-MM-dd"),
@@ -395,9 +397,11 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             UPDATE credit_application
-            SET status=%s, approved_limit=%s, reviewed_by=%s, review_date=%s, notes=%s
+            SET status=%s, approved_limit=%s, reviewed_by=%s, review_date=%s,
+                notes=%s
             WHERE id=%s
-        """, (decision, approved_limit, reviewer, review_date, notes, self._app_id))
+        """, (decision, approved_limit, reviewer, review_date, notes,
+              self._app_id))
 
         if decision == "approved" and self.auto_update_chk.isChecked() and approved_limit:  # noqa: E501
             app = conn.execute(
@@ -414,20 +418,24 @@ class ReviewApplicationDialog(QtWidgets.QDialog):
                 old_limit = existing["credit_limit"]
                 old_status = existing["status"]
                 conn.execute("""
-                    UPDATE credit_account SET credit_limit=%s, status='good' WHERE customer_id=%s
+                    UPDATE credit_account SET credit_limit=%s, status='good'
+                        WHERE customer_id=%s
                 """, (approved_limit, cid))
             else:
                 old_limit = old_status = None
                 conn.execute("""
-                    INSERT INTO credit_account (customer_id, credit_limit, status, opened_date)
+                    INSERT INTO credit_account (customer_id, credit_limit,
+                        status, opened_date)
                     VALUES (%s, %s, 'good', %s)
                 """, (cid, approved_limit, review_date))
             # log the limit change
             conn.execute("""
                 INSERT INTO credit_limit_history
-                    (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
+                    (customer_id, changed_date, old_limit, new_limit,
+                        old_status, new_status, changed_by, reason)
                 VALUES (%s, %s, %s, %s, %s, 'good', %s, 'Application approved')
-            """, (cid, review_date, old_limit, approved_limit, old_status, reviewer))
+            """, (cid, review_date, old_limit, approved_limit,
+                  old_status, reviewer))
 
         conn.commit()
         conn.close()
@@ -1038,13 +1046,16 @@ class CreditDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             conn.execute("""
-                INSERT INTO credit_account (customer_id, credit_limit, status, terms, opened_date, notes)
-                VALUES (%(customer_id)s, %(credit_limit)s, %(status)s, %(terms)s, %(opened_date)s, %(notes)s)
+                INSERT INTO credit_account (customer_id, credit_limit, status,
+                    terms, opened_date, notes)
+                VALUES (%(customer_id)s, %(credit_limit)s, %(status)s,
+                    %(terms)s, %(opened_date)s, %(notes)s)
             """, data)
             # log the initial entry
             conn.execute("""
                 INSERT INTO credit_limit_history
-                    (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
+                    (customer_id, changed_date, old_limit, new_limit,
+                        old_status, new_status, changed_by, reason)
                 VALUES (%s, %s, NULL, %s, NULL, %s, %s, %s)
             """, (data["customer_id"], date.today().isoformat(),
                   data["credit_limit"], data["status"],
@@ -1079,7 +1090,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
         data["id"] = acct_id
         conn.execute("""
             UPDATE credit_account
-            SET customer_id=%(customer_id)s, credit_limit=%(credit_limit)s, status=%(status)s,
+            SET customer_id=%(customer_id)s, credit_limit=%(credit_limit)s,
+                status=%(status)s,
                 terms=%(terms)s, opened_date=%(opened_date)s, notes=%(notes)s
             WHERE id=%(id)s
         """, data)
@@ -1088,7 +1100,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
                     or old["status"] != data["status"]):
             conn.execute("""
                 INSERT INTO credit_limit_history
-                    (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
+                    (customer_id, changed_date, old_limit, new_limit,
+                        old_status, new_status, changed_by, reason)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (data["customer_id"], date.today().isoformat(),
                   old["credit_limit"], data["credit_limit"],
@@ -1122,8 +1135,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
     # ── Auto-Hold logic ────────────────────────────────────────────────────
 
     def _run_auto_hold(self, silent=False):
-        """Check all 'good' accounts. Auto-set to 'hold' if AR balance > credit limit.
-        Returns list of customer names that were held."""
+        """Check all 'good' accounts. Auto-set to 'hold' if AR balance >
+        credit limit. Returns list of customer names that were held."""
         conn = get_db()
         accounts = conn.execute(
             "SELECT ca.id, ca.customer_id, ca.credit_limit, c.first_name, "
@@ -1142,8 +1155,10 @@ class CreditDeptWidget(QtWidgets.QWidget):
                     "UPDATE credit_account SET status='hold' WHERE id=%s", (acct["id"],))  # noqa: E501
                 conn.execute("""
                     INSERT INTO credit_limit_history
-                        (customer_id, changed_date, old_limit, new_limit, old_status, new_status, changed_by, reason)
-                    VALUES (%s, %s, %s, %s, 'good', 'hold', 'System', 'Auto-hold: AR balance exceeded credit limit')
+                        (customer_id, changed_date, old_limit, new_limit,
+                            old_status, new_status, changed_by, reason)
+                    VALUES (%s, %s, %s, %s, 'good', 'hold', 'System',
+                        'Auto-hold: AR balance exceeded credit limit')
                 """, (acct["customer_id"], date.today().isoformat(),
                       acct["credit_limit"], acct["credit_limit"]))
                 conn.commit()
@@ -1281,11 +1296,13 @@ class CreditDeptWidget(QtWidgets.QWidget):
         rows = conn.execute("""
             SELECT ai.id, ai.invoice_number, ai.due_date, ai.invoice_date,
                    ai.amount - COALESCE(p.paid, 0) AS balance,
-                   c.id AS customer_id, c.first_name, c.last_name, c.company_name,
+                   c.id AS customer_id, c.first_name, c.last_name,
+                       c.company_name,
                    ca.status AS credit_status
             FROM ar_invoice ai
             JOIN customer c ON c.id = ai.customer_id
-            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
+            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment
+                GROUP BY invoice_id) p
                 ON p.invoice_id = ai.id
             LEFT JOIN credit_account ca ON ca.customer_id = c.id
             WHERE ai.status IN ('open','partial') AND ai.due_date < %s
@@ -1516,11 +1533,13 @@ class CreditDeptWidget(QtWidgets.QWidget):
         rows = conn.execute("""
             SELECT ai.due_date, ai.invoice_date,
                    ai.amount - COALESCE(p.paid, 0) AS balance,
-                   c.id AS customer_id, c.first_name, c.last_name, c.company_name,
+                   c.id AS customer_id, c.first_name, c.last_name,
+                       c.company_name,
                    ca.credit_limit
             FROM ar_invoice ai
             JOIN customer c ON c.id = ai.customer_id
-            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
+            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment
+                GROUP BY invoice_id) p
                 ON p.invoice_id = ai.id
             LEFT JOIN credit_account ca ON ca.customer_id = c.id
             WHERE ai.status IN ('open','partial') AND ai.invoice_date <= %s
@@ -1889,7 +1908,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
             SELECT ai.customer_id, ai.due_date,
                    ai.amount - COALESCE(p.paid, 0) AS balance
             FROM ar_invoice ai
-            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
+            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment
+                GROUP BY invoice_id) p
                 ON p.invoice_id = ai.id
             WHERE ai.status IN ('open','partial')
         """).fetchall()
@@ -2014,7 +2034,8 @@ class CreditDeptWidget(QtWidgets.QWidget):
             SELECT DISTINCT c.id, c.first_name, c.last_name, c.company_name
             FROM ar_invoice ai
             JOIN customer c ON c.id=ai.customer_id
-            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment GROUP BY invoice_id) p
+            LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM ar_payment
+                GROUP BY invoice_id) p
                 ON p.invoice_id=ai.id
             WHERE ai.status IN ('open','partial')
             ORDER BY c.company_name, c.last_name, c.first_name
@@ -2193,10 +2214,14 @@ class CreditDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             INSERT INTO collection_activity
-                (customer_id, activity_date, activity_type, contact_name, notes,
-                 amount_promised, promise_date, follow_up_date, status, created_by)
-            VALUES (%(customer_id)s, %(activity_date)s, %(activity_type)s, %(contact_name)s, %(notes)s,
-                    %(amount_promised)s, %(promise_date)s, %(follow_up_date)s, %(status)s, %(created_by)s)
+                (customer_id, activity_date, activity_type, contact_name,
+                    notes,
+                 amount_promised, promise_date, follow_up_date, status,
+                     created_by)
+            VALUES (%(customer_id)s, %(activity_date)s, %(activity_type)s,
+                %(contact_name)s, %(notes)s,
+                    %(amount_promised)s, %(promise_date)s, %(follow_up_date)s,
+                        %(status)s, %(created_by)s)
         """, {**vals, "customer_id": cid})
         conn.commit()
         conn.close()
@@ -2214,10 +2239,13 @@ class CreditDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         conn.execute("""
             UPDATE collection_activity SET
-                activity_date=%(activity_date)s, activity_type=%(activity_type)s,
+                activity_date=%(activity_date)s,
+                    activity_type=%(activity_type)s,
                 contact_name=%(contact_name)s, notes=%(notes)s,
-                amount_promised=%(amount_promised)s, promise_date=%(promise_date)s,
-                follow_up_date=%(follow_up_date)s, status=%(status)s, created_by=%(created_by)s
+                amount_promised=%(amount_promised)s,
+                    promise_date=%(promise_date)s,
+                follow_up_date=%(follow_up_date)s, status=%(status)s,
+                    created_by=%(created_by)s
             WHERE id=%(id)s
         """, {**vals, "id": aid})
         conn.commit()

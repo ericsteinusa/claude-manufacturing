@@ -554,9 +554,11 @@ class QALab(QtWidgets.QMainWindow):
         term = self.insp_search.text().strip()
 
         base = """
-            SELECT qi.id, qi.insp_number, qi.insp_date, qi.inspector, qi.result,
+            SELECT qi.id, qi.insp_number, qi.insp_date, qi.inspector,
+                qi.result,
                    p.name AS product_name, wo.wo_number,
-                   (SELECT COUNT(*) FROM qa_defect d WHERE d.insp_id = qi.id) AS defect_count
+                   (SELECT COUNT(*) FROM qa_defect d WHERE d.insp_id = qi.id)
+                       AS defect_count
             FROM qa_inspection qi
             LEFT JOIN product p  ON p.id  = qi.product_id
             LEFT JOIN work_order wo ON wo.id = qi.wo_id
@@ -900,7 +902,8 @@ class QALab(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             prods = conn.execute("""
-                SELECT DISTINCT s.product_id, p.name AS product_name FROM qa_spec s
+                SELECT DISTINCT s.product_id, p.name AS product_name FROM
+                    qa_spec s
                 JOIN product p ON p.id = s.product_id ORDER BY p.name
             """).fetchall()
         except psycopg2.OperationalError:
@@ -925,13 +928,15 @@ class QALab(QtWidgets.QMainWindow):
         try:
             if prod_id:
                 rows = conn.execute("""
-                    SELECT s.id, p.name AS product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
+                    SELECT s.id, p.name AS product_name, s.spec_name,
+                        s.min_value, s.max_value, s.unit, s.notes
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
                     WHERE s.product_id = ? ORDER BY p.name, s.spec_name
                 """, (prod_id,)).fetchall()
             else:
                 rows = conn.execute("""
-                    SELECT s.id, p.name AS product_name, s.spec_name, s.min_value, s.max_value, s.unit, s.notes
+                    SELECT s.id, p.name AS product_name, s.spec_name,
+                        s.min_value, s.max_value, s.unit, s.notes
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
                     ORDER BY p.name, s.spec_name
                 """).fetchall()

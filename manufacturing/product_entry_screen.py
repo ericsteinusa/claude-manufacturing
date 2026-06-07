@@ -246,7 +246,8 @@ class TransactionDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             INSERT INTO inventory_transaction
-                (product_id, trans_date, trans_type, quantity, reference, notes)
+                (product_id, trans_date, trans_type, quantity, reference,
+                    notes)
             VALUES (%s,%s,%s,%s,%s,%s)
         """, (pid, today, self._trans_type, stored_qty,
               self.reference.text().strip() or None,
