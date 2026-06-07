@@ -526,7 +526,8 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(f"""
-                SELECT inv.id, inv.invoice_number, inv.invoice_date, inv.due_date,
+                SELECT inv.id, inv.invoice_number, inv.invoice_date,
+                    inv.due_date,
                        inv.amount, inv.description, inv.status,
                        c.company_name, c.first_name, c.last_name,
                        COALESCE(SUM(p.amount), 0) AS received

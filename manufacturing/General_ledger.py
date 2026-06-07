@@ -778,7 +778,8 @@ class JournalEntriesTab(QtWidgets.QWidget):
             return
         conn = get_db()
         lines = conn.execute("""
-            SELECT a.account_number, a.account_name, jl.debit, jl.credit, jl.memo
+            SELECT a.account_number, a.account_name, jl.debit, jl.credit,
+                jl.memo
             FROM gl_journal_line jl
             JOIN gl_account a ON a.id = jl.account_id
             WHERE jl.journal_id = %s
@@ -1029,7 +1030,8 @@ class IncomeStatementTab(QtWidgets.QWidget):
     def _period_balance(self, account_id, account_type, date_from, date_to):
         conn = get_db()
         row = conn.execute("""
-            SELECT COALESCE(SUM(jl.debit),0) AS d, COALESCE(SUM(jl.credit),0) AS c
+            SELECT COALESCE(SUM(jl.debit),0) AS d, COALESCE(SUM(jl.credit),0)
+                AS c
             FROM gl_journal_line jl
             JOIN gl_journal j ON j.id = jl.journal_id
             WHERE jl.account_id = %s AND j.posted = 1

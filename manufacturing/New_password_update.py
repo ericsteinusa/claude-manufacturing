@@ -72,7 +72,8 @@ def save_data(self):
         return
 
     # Save data to SQLite3 database
-    cursor.execute("UPDATE passwd SET password = %s WHERE id = %s", (password, id))
+    cursor.execute("UPDATE passwd SET password = %s WHERE id = %s", (password,
+        id))
     QMessageBox.showinfo("Update Status", "Password updated successfully!")
 
     self.ui.email_lineEdit.clear()

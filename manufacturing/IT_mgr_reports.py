@@ -348,7 +348,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             task_rows = conn.execute("""
                 SELECT
                     COALESCE(department, '(none)') AS dept,
-                    SUM(CASE WHEN status IN ('pending','in_progress','on_hold') THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN status IN ('pending','in_progress','on_hold')
+                        THEN 1 ELSE 0 END),
                     SUM(CASE WHEN status='completed'  THEN 1 ELSE 0 END),
                     SUM(CASE WHEN status='cancelled'  THEN 1 ELSE 0 END),
                     COUNT(*)
@@ -359,7 +360,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             ticket_rows = conn.execute("""
                 SELECT
                     COALESCE(department, '(none)') AS dept,
-                    SUM(CASE WHEN status IN ('open','in_progress','on_hold') THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN status IN ('open','in_progress','on_hold')
+                        THEN 1 ELSE 0 END),
                     SUM(CASE WHEN status='resolved'   THEN 1 ELSE 0 END),
                     SUM(CASE WHEN status='cancelled'  THEN 1 ELSE 0 END),
                     COUNT(*)

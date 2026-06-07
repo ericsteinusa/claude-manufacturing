@@ -588,7 +588,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
 
         base = """
             SELECT ep.id, ep.project_number, ep.title, ep.engineer,
-                   ep.start_date, ep.due_date, ep.status, p.name AS product_name
+                   ep.start_date, ep.due_date, ep.status, p.name AS
+                       product_name
             FROM eng_project ep
             LEFT JOIN product p ON p.id = ep.product_id
         """
@@ -772,7 +773,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
     def _refresh_ecrs(self):
         status = self.ecr_status_filter.currentData()
         base = """
-            SELECT dr.id, dr.ecr_number, dr.title, dr.requested_by, dr.review_date, dr.status,
+            SELECT dr.id, dr.ecr_number, dr.title, dr.requested_by,
+                dr.review_date, dr.status,
                    p.name AS product_name, ep.project_number
             FROM eng_design_review dr
             LEFT JOIN product p ON p.id = dr.product_id
@@ -917,7 +919,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
         priority = self.task_pri_filter.currentData()
 
         base = """
-            SELECT t.id, t.task_name, t.assigned_to, t.due_date, t.priority, t.status,
+            SELECT t.id, t.task_name, t.assigned_to, t.due_date, t.priority,
+                t.status,
                    ep.project_number
             FROM eng_task t
             LEFT JOIN eng_project ep ON ep.id = t.project_id

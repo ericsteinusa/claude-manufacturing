@@ -215,7 +215,8 @@ class NewPODialog(QtWidgets.QDialog):
         try:
             conn.execute("""
                 INSERT INTO purchase_order
-                    (po_number, supplier_id, order_date, expected_date, status, notes)
+                    (po_number, supplier_id, order_date, expected_date, status,
+                        notes)
                 VALUES (%s,%s,%s,%s,%s,%s)
             """, (self.po_num.text().strip(),
                   self.supp_combo.currentData(),
@@ -330,7 +331,8 @@ class AddLineItemDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         conn.execute("""
-            INSERT INTO po_item (po_id, description, product_id, qty_ordered, unit_price)
+            INSERT INTO po_item (po_id, description, product_id, qty_ordered,
+                unit_price)
             VALUES (%s,%s,%s,%s,%s)
         """, (self._po_id, desc, self.prod_combo.currentData(),
               self.qty.value(), self.price.value()))
@@ -441,7 +443,8 @@ class ReceivePODialog(QtWidgets.QDialog):
                 try:
                     conn.execute("""
                         INSERT INTO inventory_transaction
-                            (product_id, trans_date, trans_type, quantity, reference, notes)
+                            (product_id, trans_date, trans_type, quantity,
+                                reference, notes)
                         VALUES (%s,%s,%s,%s,%s,%s)
                     """, (product_id, today, "receipt", qty, po_num,
                           f"Received from PO {po_num}"))

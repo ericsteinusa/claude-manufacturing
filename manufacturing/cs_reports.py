@@ -368,7 +368,8 @@ class CSReportsWidget(QtWidgets.QWidget):
             rows = con.execute("""
                 SELECT strftime('%Y-%m', call_date) AS month,
                        COUNT(*)                    AS total,
-                       SUM(CASE WHEN completion_box=0 THEN 1 ELSE 0 END) AS open_ct,
+                       SUM(CASE WHEN completion_box=0 THEN 1 ELSE 0 END) AS
+                           open_ct,
                        SUM(completion_box)          AS comp_ct
                 FROM calls2
                 WHERE call_date BETWEEN %s AND %s
@@ -452,9 +453,12 @@ class CSReportsWidget(QtWidgets.QWidget):
         with _conn() as con:
             rows = con.execute("""
                 SELECT cu.id, cu.first_name, cu.last_name, cu.company_name,
-                       COUNT(c2.id)                                           AS total,
-                       SUM(CASE WHEN c2.completion_box=0 THEN 1 ELSE 0 END)  AS open_ct,
-                       SUM(c2.completion_box)                                 AS comp_ct
+                       COUNT(c2.id)
+                           AS total,
+                       SUM(CASE WHEN c2.completion_box=0 THEN 1 ELSE 0 END)  AS
+                           open_ct,
+                       SUM(c2.completion_box)
+                           AS comp_ct
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.call_date BETWEEN %s AND %s
@@ -465,7 +469,8 @@ class CSReportsWidget(QtWidgets.QWidget):
             # Fetch per-customer resolution averages separately
             res_rows = con.execute("""
                 SELECT c2.customer_id,
-                       AVG(julianday(c2.completion_date) - julianday(c2.call_date)) AS avg_res
+                       AVG(julianday(c2.completion_date) -
+                           julianday(c2.call_date)) AS avg_res
                 FROM calls2 c2
                 WHERE c2.completion_box = 1
                   AND c2.call_date BETWEEN %s AND %s
@@ -582,7 +587,8 @@ class CSReportsWidget(QtWidgets.QWidget):
         today = date.today().isoformat()
         with _conn() as con:
             rows = con.execute("""
-                SELECT c2.id, c2.call, c2.call_date, c2.call_time, c2.comments_box,
+                SELECT c2.id, c2.call, c2.call_date, c2.call_time,
+                    c2.comments_box,
                        cu.first_name, cu.last_name, cu.company_name
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id

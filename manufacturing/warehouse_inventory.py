@@ -314,7 +314,8 @@ class WarehouseWidget(QtWidgets.QWidget):
                 SELECT p.id, p.name, p.bin, p.amount, p.reorder_point,
                        p.purchase_price,
                        COALESCE(s.company_name,
-                           TRIM(COALESCE(s.first_name,'') || ' ' || COALESCE(s.last_name,'')),
+                           TRIM(COALESCE(s.first_name,'') || ' ' ||
+                               COALESCE(s.last_name,'')),
                            '') AS supplier
                 FROM product p
                 LEFT JOIN supplier s ON s.id = p.supplier_id
@@ -513,7 +514,8 @@ class WarehouseWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute("""
                 INSERT INTO inventory_transaction
-                    (product_id, trans_date, trans_type, quantity, reference, notes)
+                    (product_id, trans_date, trans_type, quantity, reference,
+                        notes)
                 VALUES (%s, %s, 'Receive', %s, %s, %s)
             """, (pid, trans_date, qty, ref, notes))
             con.execute(
@@ -715,7 +717,8 @@ class WarehouseWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute("""
                 INSERT INTO inventory_transaction
-                    (product_id, trans_date, trans_type, quantity, reference, notes)
+                    (product_id, trans_date, trans_type, quantity, reference,
+                        notes)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (pid, trans_date, adj_type, signed_qty, ref, notes))
             con.execute(
@@ -740,7 +743,8 @@ class WarehouseWidget(QtWidgets.QWidget):
     def _load_adjust_history(self):
         with _conn() as con:
             rows = con.execute("""
-                SELECT t.trans_date, p.name, t.trans_type, t.quantity, t.reference, t.notes
+                SELECT t.trans_date, p.name, t.trans_type, t.quantity,
+                    t.reference, t.notes
                 FROM inventory_transaction t
                 JOIN product p ON p.id = t.product_id
                 WHERE t.trans_type != 'Receive'
@@ -954,7 +958,8 @@ class WarehouseWidget(QtWidgets.QWidget):
         to_s = self.txn_to.date().toString("yyyy-MM-dd")
 
         q = """
-            SELECT t.trans_date, p.name, t.trans_type, t.quantity, t.reference, t.notes
+            SELECT t.trans_date, p.name, t.trans_type, t.quantity, t.reference,
+                t.notes
             FROM inventory_transaction t
             JOIN product p ON p.id = t.product_id
             WHERE t.trans_date BETWEEN %s AND %s

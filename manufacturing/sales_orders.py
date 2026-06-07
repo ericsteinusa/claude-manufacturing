@@ -548,7 +548,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             SELECT so.id, so.so_number, so.order_date, so.ship_date,
                    so.status, so.notes,
                    c.company_name, c.first_name, c.last_name,
-                   (SELECT COUNT(*) FROM so_item si WHERE si.so_id = so.id) AS item_count,
+                   (SELECT COUNT(*) FROM so_item si WHERE si.so_id = so.id) AS
+                       item_count,
                    (SELECT COALESCE(SUM(si.qty * si.unit_price), 0)
                     FROM so_item si WHERE si.so_id = so.id) AS total
             FROM sales_order so

@@ -1,6 +1,7 @@
 """
 IT_tasks_reports.py — IT Tasks Reports
-Tabs: Task Summary | By Technician | By Department | Overdue | Recently Completed
+Tabs: Task Summary | By Technician | By Department | Overdue | Recently
+    Completed
 """
 import sys
 from datetime import date, timedelta
@@ -225,7 +226,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             rows = conn.execute("""
                 SELECT
                     COALESCE(department, '(none)') AS dept,
-                    SUM(CASE WHEN status IN ('pending','in_progress','on_hold') THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN status IN ('pending','in_progress','on_hold')
+                        THEN 1 ELSE 0 END),
                     SUM(CASE WHEN status='completed'  THEN 1 ELSE 0 END),
                     SUM(CASE WHEN status='cancelled'  THEN 1 ELSE 0 END),
                     COUNT(*)

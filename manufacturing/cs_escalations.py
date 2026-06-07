@@ -1,6 +1,7 @@
 """
 cs_escalations.py — CS Escalations
-Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution Tracking
+Tabs: Active Escalations | Escalation History | Escalation Reports | Resolution
+    Tracking
 """
 import sys
 from .db_pg import get_db
@@ -344,7 +345,8 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         f, t = self.hist_bar.from_str, self.hist_bar.to_str
         with _conn() as con:
             rows = con.execute("""
-                SELECT c2.call, c2.call_date, c2.completion_date, c2.comments_box,
+                SELECT c2.call, c2.call_date, c2.completion_date,
+                    c2.comments_box,
                        cu.first_name, cu.last_name, cu.company_name
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id

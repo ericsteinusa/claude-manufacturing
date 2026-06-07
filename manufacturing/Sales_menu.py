@@ -523,7 +523,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT i.description, p.name AS product_name, i.qty, i.unit_price
+                SELECT i.description, p.name AS product_name, i.qty,
+                    i.unit_price
                 FROM so_item i LEFT JOIN product p ON p.id = i.product_id
                 WHERE i.so_id = ?
             """, (self._selected_so_id,)).fetchall()
@@ -681,7 +682,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         if search:
             rows = conn.execute("""
                 SELECT * FROM customer
-                WHERE company_name LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR email LIKE ?
+                WHERE company_name LIKE ? OR first_name LIKE ? OR last_name
+                    LIKE ? OR email LIKE ?
                 ORDER BY company_name, last_name
             """, (f"%{search}%",) * 4).fetchall()
         else:

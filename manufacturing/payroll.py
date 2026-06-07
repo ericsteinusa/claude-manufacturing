@@ -79,7 +79,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS payroll_entry_deduction (
             id SERIAL PRIMARY KEY,
             entry_id INTEGER NOT NULL REFERENCES payroll_entry(id),
-            deduction_type_id INTEGER NOT NULL REFERENCES payroll_deduction_type(id),
+            deduction_type_id INTEGER NOT NULL REFERENCES
+                payroll_deduction_type(id),
             amount REAL DEFAULT 0
         )
     """)
@@ -557,7 +558,8 @@ class PayrollWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(f"""
-                SELECT pr.id, pr.run_number, pr.pay_period_start, pr.pay_period_end,
+                SELECT pr.id, pr.run_number, pr.pay_period_start,
+                    pr.pay_period_end,
                        pr.run_date, pr.status,
                        COUNT(pe.id) AS emp_count,
                        COALESCE(SUM(pe.gross_pay), 0) AS gross_total

@@ -488,9 +488,11 @@ class ShippingDept(QtWidgets.QMainWindow):
         d_to   = self.date_to.date().toString("yyyy-MM-dd")
 
         base = """
-            SELECT s.id, s.ship_number, s.ship_date, s.carrier, s.tracking_number, s.status,
+            SELECT s.id, s.ship_number, s.ship_date, s.carrier,
+                s.tracking_number, s.status,
                    so.so_number,
-                   (SELECT COUNT(*) FROM shipment_item si WHERE si.shipment_id = s.id) AS item_count
+                   (SELECT COUNT(*) FROM shipment_item si WHERE si.shipment_id
+                       = s.id) AS item_count
             FROM shipment s
             LEFT JOIN sales_order so ON so.id = s.so_id
         """
@@ -560,7 +562,8 @@ class ShippingDept(QtWidgets.QMainWindow):
         try:
             items = conn.execute("""
                 SELECT si.description, p.product_name, si.qty
-                FROM shipment_item si LEFT JOIN product p ON p.id = si.product_id
+                FROM shipment_item si LEFT JOIN product p ON p.id =
+                    si.product_id
                 WHERE si.shipment_id = ?
             """, (self._selected_ship_id,)).fetchall()
         except psycopg2.OperationalError:

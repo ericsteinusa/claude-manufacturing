@@ -1,6 +1,7 @@
 """
 it_calls_reports.py — IT Support Calls Reports
-Tabs: Ticket Summary | By Department | By Issue Type | Open Tickets | Asset Summary
+Tabs: Ticket Summary | By Department | By Issue Type | Open Tickets | Asset
+    Summary
 """
 import sys
 from datetime import date
@@ -182,7 +183,8 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             rows = conn.execute("""
                 SELECT
                     COALESCE(department, '(none)') AS dept,
-                    SUM(CASE WHEN status IN ('open','in_progress','on_hold') THEN 1 ELSE 0 END) AS open_cnt,
+                    SUM(CASE WHEN status IN ('open','in_progress','on_hold')
+                        THEN 1 ELSE 0 END) AS open_cnt,
                     COUNT(*) AS total
                 FROM it_ticket
                 GROUP BY dept
@@ -244,7 +246,8 @@ class _ByIssueTypeWidget(QtWidgets.QWidget):
             rows = conn.execute("""
                 SELECT
                     COALESCE(issue_type, '(none)') AS itype,
-                    SUM(CASE WHEN status IN ('open','in_progress','on_hold') THEN 1 ELSE 0 END) AS open_cnt,
+                    SUM(CASE WHEN status IN ('open','in_progress','on_hold')
+                        THEN 1 ELSE 0 END) AS open_cnt,
                     COUNT(*) AS total
                 FROM it_ticket
                 GROUP BY itype

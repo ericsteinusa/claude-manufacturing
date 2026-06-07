@@ -1,6 +1,7 @@
 """
 Sales_mgmt.py — Sales Manager feature screens
-Widgets: QuotesWidget | CustomersWidget | SalesTargetsWidget | CommissionsWidget
+Widgets: QuotesWidget | CustomersWidget | SalesTargetsWidget |
+    CommissionsWidget
 
 Each widget is a self-contained, DB-backed register (filter bar + table +
 Add/Edit/Delete + a status action) built on the shared _SalesCrudWidget base.

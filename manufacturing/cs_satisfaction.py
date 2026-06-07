@@ -257,13 +257,16 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
                 SELECT cu.id, cu.first_name, cu.last_name, cu.company_name,
                        COUNT(c2.id) AS total,
                        SUM(c2.completion_box) AS comp_ct,
-                       AVG(CASE WHEN c2.completion_box=1 AND c2.completion_date IS NOT NULL
-                                THEN julianday(c2.completion_date) - julianday(c2.call_date)
+                       AVG(CASE WHEN c2.completion_box=1 AND c2.completion_date
+                           IS NOT NULL
+                                THEN julianday(c2.completion_date) -
+                                    julianday(c2.call_date)
                                 END) AS avg_res
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.call_date BETWEEN %s AND %s
-                GROUP BY c2.customer_id, cu.id, cu.first_name, cu.last_name, cu.company_name
+                GROUP BY c2.customer_id, cu.id, cu.first_name, cu.last_name,
+                    cu.company_name
                 ORDER BY SUM(c2.completion_box) * 1.0 / COUNT(c2.id) DESC
             """, (f, t)).fetchall()
 
@@ -407,7 +410,8 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
                 FROM calls2 c2
                 LEFT JOIN customer cu ON cu.id = c2.customer_id
                 WHERE c2.call_date BETWEEN %s AND %s
-                GROUP BY c2.customer_id, cu.first_name, cu.last_name, cu.company_name
+                GROUP BY c2.customer_id, cu.first_name, cu.last_name,
+                    cu.company_name
                 HAVING COUNT(c2.id) > 0
             """, (f, t)).fetchall()
 
@@ -504,8 +508,10 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
                 SELECT strftime('%Y-%m', call_date) AS month,
                        COUNT(*) AS total,
                        SUM(completion_box) AS comp_ct,
-                       AVG(CASE WHEN completion_box=1 AND completion_date IS NOT NULL
-                                THEN julianday(completion_date) - julianday(call_date)
+                       AVG(CASE WHEN completion_box=1 AND completion_date IS
+                           NOT NULL
+                                THEN julianday(completion_date) -
+                                    julianday(call_date)
                                 END) AS avg_res
                 FROM calls2
                 WHERE call_date BETWEEN %s AND %s
@@ -746,8 +752,10 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute("""
                 INSERT INTO cs_improvement_plan
-                    (title, description, owner, target_date, status, created_date)
-                VALUES (%(title)s, %(description)s, %(owner)s, %(target_date)s, %(status)s, %(created_date)s)
+                    (title, description, owner, target_date, status,
+                        created_date)
+                VALUES (%(title)s, %(description)s, %(owner)s, %(target_date)s,
+                    %(status)s, %(created_date)s)
             """, data)
         self._plan_clear()
         self._run_plans()
@@ -764,7 +772,8 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute("""
                 UPDATE cs_improvement_plan
-                SET title=%(title)s, description=%(description)s, owner=%(owner)s,
+                SET title=%(title)s, description=%(description)s,
+                    owner=%(owner)s,
                     target_date=%(target_date)s, status=%(status)s
                 WHERE id=%(id)s
             """, data)
