@@ -1791,7 +1791,7 @@ def dashboard(request):
         dept_key = request.session.get('user_dept_key')
         if dept_key:
             return redirect('dept_menu', dept=dept_key)
-    departments = [
+    menu_items = [
         ('/dept/{}/'.format(key), label)
         for key, label in DASHBOARD_DEPARTMENTS
     ]
@@ -1800,7 +1800,7 @@ def dashboard(request):
         'user_role': request.session.get('user_role', ''),
         'dept_name': request.session.get('user_dept_name', ''),
         'full_access': request.session.get('user_full_access', False),
-        'departments': departments,
+        'menu_items': menu_items,
     })
 
 
@@ -1846,7 +1846,7 @@ def generic_menu(request, dept, subpath=''):
         'user_role': request.session.get('user_role', ''),
         'full_access': request.session.get('user_full_access', False),
         'title': node['title'],
-        'items': items,
+        'menu_items': items,
         'back_url': back_url,
     })
 
