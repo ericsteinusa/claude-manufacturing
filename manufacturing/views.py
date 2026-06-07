@@ -766,18 +766,23 @@ MENU_TREE = {
                     ('fin_reports', 'Financial Reports', {
                         'title': 'Financial Reports',
                         'items': [
-                            ('inc_stmt', 'Income Statement', 'General_ledger.py'),
-                            ('bal_sheet', 'Balance Sheet', 'General_ledger.py'),
+                            ('inc_stmt', 'Income Statement',
+                             'General_ledger.py'),
+                            ('bal_sheet', 'Balance Sheet',
+                             'General_ledger.py'),
                             ('cash_flow', 'Cash Flow', 'General_ledger.py'),
-                            ('cust_rpts', 'Custom Reports', 'General_ledger.py'),
+                            ('cust_rpts', 'Custom Reports',
+                             'General_ledger.py'),
                         ],
                     }),
                     ('budget_mgmt', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
                             ('budg_plan', 'Budget Planning', 'Budget_mgmt.py'),
-                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
-                            ('budg_amend', 'Budget Amendments', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual',
+                             'Budget_mgmt.py'),
+                            ('budg_amend', 'Budget Amendments',
+                             'Budget_mgmt.py'),
                             ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                         ],
                     }),
@@ -786,7 +791,8 @@ MENU_TREE = {
                         'items': [
                             ('audit_sched', 'Audit Schedule', 'Audit_mgmt.py'),
                             ('findings', 'Audit Findings', 'Audit_mgmt.py'),
-                            ('corr_act', 'Corrective Actions', 'Audit_mgmt.py'),
+                            ('corr_act', 'Corrective Actions',
+                             'Audit_mgmt.py'),
                             ('audit_rpts', 'Audit Reports', 'Audit_mgmt.py'),
                         ],
                     }),
@@ -837,7 +843,8 @@ MENU_TREE = {
                 'items': [
                     ('recon_acct', 'Reconcile Account', 'General_ledger.py'),
                     ('pend_items', 'Pending Items', 'General_ledger.py'),
-                    ('recon_hist', 'Reconciliation History', 'General_ledger.py'),
+                    ('recon_hist', 'Reconciliation History',
+                     'General_ledger.py'),
                     ('bank_rpts', 'Bank Reports', 'General_ledger.py'),
                 ],
             }),
@@ -853,37 +860,50 @@ MENU_TREE = {
                     ('ticket_rpts', 'Ticket Reports', {
                         'title': 'Ticket Reports',
                         'items': [
-                            ('daily_tick', 'Daily Ticket Report', 'cs_reports.py'),
+                            ('daily_tick', 'Daily Ticket Report',
+                             'cs_reports.py'),
                             ('week_sum', 'Weekly Summary', 'cs_reports.py'),
-                            ('res_analy', 'Resolution Analysis', 'cs_reports.py'),
+                            ('res_analy', 'Resolution Analysis',
+                             'cs_reports.py'),
                             ('sla_rpts', 'SLA Reports', 'cs_reports.py'),
                         ],
                     }),
                     ('staff_mgmt', 'Staff Management', {
                         'title': 'Staff Management',
                         'items': [
-                            ('staff_sched', 'Staff Schedule', 'cs_staff_mgmt.py'),
-                            ('perf_met', 'Performance Metrics', 'cs_staff_mgmt.py'),
-                            ('staff_train', 'Staff Training', 'cs_staff_mgmt.py'),
-                            ('staff_rpts', 'Staff Reports', 'cs_staff_mgmt.py'),
+                            ('staff_sched', 'Staff Schedule',
+                             'cs_staff_mgmt.py'),
+                            ('perf_met', 'Performance Metrics',
+                             'cs_staff_mgmt.py'),
+                            ('staff_train', 'Staff Training',
+                             'cs_staff_mgmt.py'),
+                            ('staff_rpts', 'Staff Reports',
+                             'cs_staff_mgmt.py'),
                         ],
                     }),
                     ('cust_sat', 'Customer Satisfaction', {
                         'title': 'Customer Satisfaction',
                         'items': [
-                            ('csat_res', 'CSAT Survey Results', 'cs_satisfaction.py'),
+                            ('csat_res', 'CSAT Survey Results',
+                             'cs_satisfaction.py'),
                             ('nps_rpts', 'NPS Reports', 'cs_satisfaction.py'),
-                            ('sat_trends', 'Satisfaction Trends', 'cs_satisfaction.py'),
-                            ('impr_plans', 'Improvement Plans', 'cs_satisfaction.py'),
+                            ('sat_trends', 'Satisfaction Trends',
+                             'cs_satisfaction.py'),
+                            ('impr_plans', 'Improvement Plans',
+                             'cs_satisfaction.py'),
                         ],
                     }),
                     ('escalations', 'Escalations', {
                         'title': 'Escalations',
                         'items': [
-                            ('act_esc', 'Active Escalations', 'cs_escalations.py'),
-                            ('esc_hist', 'Escalation History', 'cs_escalations.py'),
-                            ('esc_rpts', 'Escalation Reports', 'cs_escalations.py'),
-                            ('res_track', 'Resolution Tracking', 'cs_escalations.py'),
+                            ('act_esc', 'Active Escalations',
+                             'cs_escalations.py'),
+                            ('esc_hist', 'Escalation History',
+                             'cs_escalations.py'),
+                            ('esc_rpts', 'Escalation Reports',
+                             'cs_escalations.py'),
+                            ('res_track', 'Resolution Tracking',
+                             'cs_escalations.py'),
                         ],
                     }),
                 ],
@@ -914,14 +934,17 @@ MENU_TREE = {
                             ('res_alloc', 'Resource Allocation', 'eng_mgr.py'),
                             ('cap_plan', 'Capacity Planning', 'eng_mgr.py'),
                             ('res_rpts', 'Resource Reports', 'eng_mgr.py'),
-                            ('avail_cal', 'Availability Calendar', 'eng_mgr.py'),
+                            ('avail_cal', 'Availability Calendar',
+                             'eng_mgr.py'),
                         ],
                     }),
                     ('budget', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('eng_budg', 'Engineering Budget', 'Budget_mgmt.py'),
-                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('eng_budg', 'Engineering Budget',
+                             'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual',
+                             'Budget_mgmt.py'),
                             ('cost_rpts', 'Cost Reports', 'Budget_mgmt.py'),
                             ('budg_req', 'Budget Requests', 'Budget_mgmt.py'),
                         ],
@@ -1014,9 +1037,11 @@ MENU_TREE = {
                         'title': 'Budget & Procurement',
                         'items': [
                             ('it_budg', 'IT Budget', 'Budget_mgmt.py'),
-                            ('hw_proc', 'Hardware Procurement', 'Budget_mgmt.py'),
+                            ('hw_proc', 'Hardware Procurement',
+                             'Budget_mgmt.py'),
                             ('sw_lic', 'Software Licensing', 'Budget_mgmt.py'),
-                            ('proc_rpts', 'Procurement Reports', 'Budget_mgmt.py'),
+                            ('proc_rpts', 'Procurement Reports',
+                             'Budget_mgmt.py'),
                         ],
                     }),
                     ('vendor_con', 'Vendor Contracts', {
@@ -1042,7 +1067,8 @@ MENU_TREE = {
                         'items': [
                             ('sec_dash', 'Security Dashboard', 'IT_mgr.py'),
                             ('inc_rpts', 'Incident Reports', 'IT_mgr.py'),
-                            ('vuln_mgmt', 'Vulnerability Management', 'IT_mgr.py'),
+                            ('vuln_mgmt', 'Vulnerability Management',
+                             'IT_mgr.py'),
                             ('comp_rpts', 'Compliance Reports', 'IT_mgr.py'),
                         ],
                     }),
@@ -1061,17 +1087,22 @@ MENU_TREE = {
                     ('wo_approvals', 'Work Order Approvals', {
                         'title': 'Work Order Approvals',
                         'items': [
-                            ('pend_appr', 'Pending Approvals', 'Maint_mgr_menu.py'),
-                            ('appr_wo', 'Approved Work Orders', 'Maint_mgr_menu.py'),
+                            ('pend_appr', 'Pending Approvals',
+                             'Maint_mgr_menu.py'),
+                            ('appr_wo', 'Approved Work Orders',
+                             'Maint_mgr_menu.py'),
                             ('rej_wo', 'Rejected', 'Maint_mgr_menu.py'),
-                            ('appr_hist', 'Approval History', 'Maint_mgr_menu.py'),
+                            ('appr_hist', 'Approval History',
+                             'Maint_mgr_menu.py'),
                         ],
                     }),
                     ('budget_mgmt', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('maint_budg', 'Maintenance Budget', 'Budget_mgmt.py'),
-                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('maint_budg', 'Maintenance Budget',
+                             'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual',
+                             'Budget_mgmt.py'),
                             ('cost_analy', 'Cost Analysis', 'Budget_mgmt.py'),
                             ('budg_req', 'Budget Requests', 'Budget_mgmt.py'),
                         ],
@@ -1080,8 +1111,10 @@ MENU_TREE = {
                         'title': 'Maintenance Reports',
                         'items': [
                             ('daily_rpt', 'Daily Report', 'Maint_mgr_menu.py'),
-                            ('month_sum', 'Monthly Summary', 'Maint_mgr_menu.py'),
-                            ('equip_rpts', 'Equipment Reports', 'Maint_mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary',
+                             'Maint_mgr_menu.py'),
+                            ('equip_rpts', 'Equipment Reports',
+                             'Maint_mgr_menu.py'),
                             ('cost_rpts', 'Cost Reports', 'Maint_mgr_menu.py'),
                         ],
                     }),
@@ -1101,27 +1134,37 @@ MENU_TREE = {
                         'title': 'Marketing Budget',
                         'items': [
                             ('budg_over', 'Budget Overview', 'Budget_mgmt.py'),
-                            ('budg_camp', 'Budget by Campaign', 'Budget_mgmt.py'),
-                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('budg_camp', 'Budget by Campaign',
+                             'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual',
+                             'Budget_mgmt.py'),
                             ('budg_req', 'Budget Requests', 'Budget_mgmt.py'),
                         ],
                     }),
                     ('camp_appr', 'Campaign Approvals', {
                         'title': 'Campaign Approvals',
                         'items': [
-                            ('pend_appr', 'Pending Approvals', 'marketing_mgr_menu.py'),
-                            ('appr_camp', 'Approved Campaigns', 'marketing_mgr_menu.py'),
-                            ('camp_arch', 'Campaign Archive', 'marketing_mgr_menu.py'),
-                            ('appr_hist', 'Approval History', 'marketing_mgr_menu.py'),
+                            ('pend_appr', 'Pending Approvals',
+                             'marketing_mgr_menu.py'),
+                            ('appr_camp', 'Approved Campaigns',
+                             'marketing_mgr_menu.py'),
+                            ('camp_arch', 'Campaign Archive',
+                             'marketing_mgr_menu.py'),
+                            ('appr_hist', 'Approval History',
+                             'marketing_mgr_menu.py'),
                         ],
                     }),
                     ('mkt_reports', 'Marketing Reports', {
                         'title': 'Marketing Reports',
                         'items': [
-                            ('camp_perf', 'Campaign Performance', 'marketing_mgr_menu.py'),
-                            ('roi_rpts', 'ROI Reports', 'marketing_mgr_menu.py'),
-                            ('month_sum', 'Monthly Summary', 'marketing_mgr_menu.py'),
-                            ('kpi_dash', 'KPI Dashboard', 'marketing_mgr_menu.py'),
+                            ('camp_perf', 'Campaign Performance',
+                             'marketing_mgr_menu.py'),
+                            ('roi_rpts', 'ROI Reports',
+                             'marketing_mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary',
+                             'marketing_mgr_menu.py'),
+                            ('kpi_dash', 'KPI Dashboard',
+                             'marketing_mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1139,37 +1182,53 @@ MENU_TREE = {
                     ('hiring', 'Hiring & Recruitment', {
                         'title': 'Hiring & Recruitment',
                         'items': [
-                            ('open_pos', 'Open Positions', 'personnel_mgr_menu.py'),
-                            ('appl_track', 'Applicant Tracking', 'personnel_mgr_menu.py'),
-                            ('int_sched', 'Interview Schedule', 'personnel_mgr_menu.py'),
-                            ('offer_mgmt', 'Offer Management', 'personnel_mgr_menu.py'),
+                            ('open_pos', 'Open Positions',
+                             'personnel_mgr_menu.py'),
+                            ('appl_track', 'Applicant Tracking',
+                             'personnel_mgr_menu.py'),
+                            ('int_sched', 'Interview Schedule',
+                             'personnel_mgr_menu.py'),
+                            ('offer_mgmt', 'Offer Management',
+                             'personnel_mgr_menu.py'),
                         ],
                     }),
                     ('term', 'Terminations', {
                         'title': 'Terminations',
                         'items': [
-                            ('term_proc', 'Termination Process', 'personnel_mgr_menu.py'),
-                            ('exit_int', 'Exit Interviews', 'personnel_mgr_menu.py'),
-                            ('final_pay', 'Final Pay Processing', 'personnel_mgr_menu.py'),
-                            ('offboard', 'Offboarding Checklist', 'personnel_mgr_menu.py'),
+                            ('term_proc', 'Termination Process',
+                             'personnel_mgr_menu.py'),
+                            ('exit_int', 'Exit Interviews',
+                             'personnel_mgr_menu.py'),
+                            ('final_pay', 'Final Pay Processing',
+                             'personnel_mgr_menu.py'),
+                            ('offboard', 'Offboarding Checklist',
+                             'personnel_mgr_menu.py'),
                         ],
                     }),
                     ('salary', 'Salary Management', {
                         'title': 'Salary Management',
                         'items': [
-                            ('sal_review', 'Salary Review', 'personnel_mgr_menu.py'),
-                            ('sal_adj', 'Salary Adjustments', 'personnel_mgr_menu.py'),
-                            ('comp_rpts', 'Compensation Reports', 'personnel_mgr_menu.py'),
-                            ('pay_grades', 'Pay Grades', 'personnel_mgr_menu.py'),
+                            ('sal_review', 'Salary Review',
+                             'personnel_mgr_menu.py'),
+                            ('sal_adj', 'Salary Adjustments',
+                             'personnel_mgr_menu.py'),
+                            ('comp_rpts', 'Compensation Reports',
+                             'personnel_mgr_menu.py'),
+                            ('pay_grades', 'Pay Grades',
+                             'personnel_mgr_menu.py'),
                         ],
                     }),
                     ('hr_reports', 'HR Reports', {
                         'title': 'HR Reports',
                         'items': [
-                            ('hd_rpt', 'Headcount Report', 'personnel_mgr_menu.py'),
-                            ('turn_rpt', 'Turnover Report', 'personnel_mgr_menu.py'),
-                            ('comp_rpts', 'Compliance Reports', 'personnel_mgr_menu.py'),
-                            ('month_sum', 'Monthly Summary', 'personnel_mgr_menu.py'),
+                            ('hd_rpt', 'Headcount Report',
+                             'personnel_mgr_menu.py'),
+                            ('turn_rpt', 'Turnover Report',
+                             'personnel_mgr_menu.py'),
+                            ('comp_rpts', 'Compliance Reports',
+                             'personnel_mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary',
+                             'personnel_mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1188,27 +1247,35 @@ MENU_TREE = {
                     ('prod_reports', 'Production Reports', {
                         'title': 'Production Reports',
                         'items': [
-                            ('daily_prod', 'Daily Production', 'prod_mgr_Menu.py'),
+                            ('daily_prod', 'Daily Production',
+                             'prod_mgr_Menu.py'),
                             ('week_sum', 'Weekly Summary', 'prod_mgr_Menu.py'),
-                            ('eff_rpts', 'Efficiency Reports', 'prod_mgr_Menu.py'),
+                            ('eff_rpts', 'Efficiency Reports',
+                             'prod_mgr_Menu.py'),
                             ('kpi_dash', 'KPI Dashboard', 'prod_mgr_Menu.py'),
                         ],
                     }),
                     ('resource', 'Resource Management', {
                         'title': 'Resource Management',
                         'items': [
-                            ('res_alloc', 'Resource Allocation', 'prod_mgr_Menu.py'),
-                            ('cap_plan', 'Capacity Planning', 'prod_mgr_Menu.py'),
-                            ('res_rpts', 'Resource Reports', 'prod_mgr_Menu.py'),
-                            ('wf_plan', 'Workforce Planning', 'prod_mgr_Menu.py'),
+                            ('res_alloc', 'Resource Allocation',
+                             'prod_mgr_Menu.py'),
+                            ('cap_plan', 'Capacity Planning',
+                             'prod_mgr_Menu.py'),
+                            ('res_rpts', 'Resource Reports',
+                             'prod_mgr_Menu.py'),
+                            ('wf_plan', 'Workforce Planning',
+                             'prod_mgr_Menu.py'),
                         ],
                     }),
                     ('budget', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('prod_budg', 'Production Budget', 'Budget_mgmt.py'),
+                            ('prod_budg', 'Production Budget',
+                             'Budget_mgmt.py'),
                             ('cost_analy', 'Cost Analysis', 'Budget_mgmt.py'),
-                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual',
+                             'Budget_mgmt.py'),
                             ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                         ],
                     }),
@@ -1228,46 +1295,65 @@ MENU_TREE = {
                     ('po_approvals', 'PO Approvals', {
                         'title': 'PO Approvals',
                         'items': [
-                            ('pend_appr', 'Pending Approvals', 'Purchasing_Mgr_menu.py'),
-                            ('appr_pos', 'Approved POs', 'Purchasing_Mgr_menu.py'),
-                            ('rej_pos', 'Rejected POs', 'Purchasing_Mgr_menu.py'),
-                            ('appr_hist', 'Approval History', 'Purchasing_Mgr_menu.py'),
+                            ('pend_appr', 'Pending Approvals',
+                             'Purchasing_Mgr_menu.py'),
+                            ('appr_pos', 'Approved POs',
+                             'Purchasing_Mgr_menu.py'),
+                            ('rej_pos', 'Rejected POs',
+                             'Purchasing_Mgr_menu.py'),
+                            ('appr_hist', 'Approval History',
+                             'Purchasing_Mgr_menu.py'),
                         ],
                     }),
                     ('budget', 'Budget Management', {
                         'title': 'Budget Management',
                         'items': [
-                            ('purch_budg', 'Purchasing Budget', 'Budget_mgmt.py'),
-                            ('budg_act', 'Budget vs. Actual', 'Budget_mgmt.py'),
-                            ('spend_analy', 'Spending Analysis', 'Budget_mgmt.py'),
+                            ('purch_budg', 'Purchasing Budget',
+                             'Budget_mgmt.py'),
+                            ('budg_act', 'Budget vs. Actual',
+                             'Budget_mgmt.py'),
+                            ('spend_analy', 'Spending Analysis',
+                             'Budget_mgmt.py'),
                             ('budg_rpts', 'Budget Reports', 'Budget_mgmt.py'),
                         ],
                     }),
                     ('vendor_mgmt', 'Vendor Management', {
                         'title': 'Vendor Management',
                         'items': [
-                            ('vend_list', 'Vendor List', 'Purchasing_Mgr_menu.py'),
-                            ('vend_eval', 'Vendor Evaluation', 'Purchasing_Mgr_menu.py'),
-                            ('vend_perf', 'Vendor Performance', 'Purchasing_Mgr_menu.py'),
-                            ('appr_vend', 'Approved Vendors', 'Purchasing_Mgr_menu.py'),
+                            ('vend_list', 'Vendor List',
+                             'Purchasing_Mgr_menu.py'),
+                            ('vend_eval', 'Vendor Evaluation',
+                             'Purchasing_Mgr_menu.py'),
+                            ('vend_perf', 'Vendor Performance',
+                             'Purchasing_Mgr_menu.py'),
+                            ('appr_vend', 'Approved Vendors',
+                             'Purchasing_Mgr_menu.py'),
                         ],
                     }),
                     ('purch_rpts', 'Purchasing Reports', {
                         'title': 'Purchasing Reports',
                         'items': [
-                            ('spend_rpt', 'Spending Report', 'Purchasing_Mgr_menu.py'),
-                            ('vend_rpt', 'Vendor Report', 'Purchasing_Mgr_menu.py'),
-                            ('cat_analy', 'Category Analysis', 'Purchasing_Mgr_menu.py'),
-                            ('month_sum', 'Monthly Summary', 'Purchasing_Mgr_menu.py'),
+                            ('spend_rpt', 'Spending Report',
+                             'Purchasing_Mgr_menu.py'),
+                            ('vend_rpt', 'Vendor Report',
+                             'Purchasing_Mgr_menu.py'),
+                            ('cat_analy', 'Category Analysis',
+                             'Purchasing_Mgr_menu.py'),
+                            ('month_sum', 'Monthly Summary',
+                             'Purchasing_Mgr_menu.py'),
                         ],
                     }),
                     ('contracts', 'Contract Management', {
                         'title': 'Contract Management',
                         'items': [
-                            ('act_cont', 'Active Contracts', 'Purchasing_Mgr_menu.py'),
-                            ('pend_renew', 'Pending Renewals', 'Purchasing_Mgr_menu.py'),
-                            ('cont_arch', 'Contract Archive', 'Purchasing_Mgr_menu.py'),
-                            ('cont_rpts', 'Contract Reports', 'Purchasing_Mgr_menu.py'),
+                            ('act_cont', 'Active Contracts',
+                             'Purchasing_Mgr_menu.py'),
+                            ('pend_renew', 'Pending Renewals',
+                             'Purchasing_Mgr_menu.py'),
+                            ('cont_arch', 'Contract Archive',
+                             'Purchasing_Mgr_menu.py'),
+                            ('cont_rpts', 'Contract Reports',
+                             'Purchasing_Mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1285,19 +1371,25 @@ MENU_TREE = {
                     ('audit_mgmt', 'Audit Management', {
                         'title': 'Audit Management',
                         'items': [
-                            ('audit_sched', 'Audit Schedule', 'QA_Mgr_menu.py'),
+                            ('audit_sched', 'Audit Schedule',
+                             'QA_Mgr_menu.py'),
                             ('act_audits', 'Active Audits', 'QA_Mgr_menu.py'),
                             ('findings', 'Audit Findings', 'QA_Mgr_menu.py'),
-                            ('corr_act', 'Corrective Actions', 'QA_Mgr_menu.py'),
+                            ('corr_act', 'Corrective Actions',
+                             'QA_Mgr_menu.py'),
                         ],
                     }),
                     ('compliance', 'Compliance', {
                         'title': 'Compliance',
                         'items': [
-                            ('comp_dash', 'Compliance Dashboard', 'QA_Mgr_menu.py'),
-                            ('reg_req', 'Regulatory Requirements', 'QA_Mgr_menu.py'),
-                            ('comp_rpts', 'Compliance Reports', 'QA_Mgr_menu.py'),
-                            ('non_comp', 'Non-Compliance Issues', 'QA_Mgr_menu.py'),
+                            ('comp_dash', 'Compliance Dashboard',
+                             'QA_Mgr_menu.py'),
+                            ('reg_req', 'Regulatory Requirements',
+                             'QA_Mgr_menu.py'),
+                            ('comp_rpts', 'Compliance Reports',
+                             'QA_Mgr_menu.py'),
+                            ('non_comp', 'Non-Compliance Issues',
+                             'QA_Mgr_menu.py'),
                         ],
                     }),
                     ('corr_action', 'Corrective Actions', {
@@ -1321,10 +1413,14 @@ MENU_TREE = {
                     ('supp_qual', 'Supplier Quality', {
                         'title': 'Supplier Quality',
                         'items': [
-                            ('supp_score', 'Supplier Scorecards', 'QA_Mgr_menu.py'),
-                            ('inc_insp', 'Incoming Inspection', 'QA_Mgr_menu.py'),
-                            ('supp_audit', 'Supplier Audits', 'QA_Mgr_menu.py'),
-                            ('supp_rpts', 'Supplier Reports', 'QA_Mgr_menu.py'),
+                            ('supp_score', 'Supplier Scorecards',
+                             'QA_Mgr_menu.py'),
+                            ('inc_insp', 'Incoming Inspection',
+                             'QA_Mgr_menu.py'),
+                            ('supp_audit', 'Supplier Audits',
+                             'QA_Mgr_menu.py'),
+                            ('supp_rpts', 'Supplier Reports',
+                             'QA_Mgr_menu.py'),
                         ],
                     }),
                     ('cust_comp', 'Customer Complaints', {
@@ -1332,8 +1428,10 @@ MENU_TREE = {
                         'items': [
                             ('new_comp', 'New Complaint', 'QA_Mgr_menu.py'),
                             ('open_comp', 'Open Complaints', 'QA_Mgr_menu.py'),
-                            ('res_track', 'Resolution Tracking', 'QA_Mgr_menu.py'),
-                            ('comp_rpts', 'Complaint Reports', 'QA_Mgr_menu.py'),
+                            ('res_track', 'Resolution Tracking',
+                             'QA_Mgr_menu.py'),
+                            ('comp_rpts', 'Complaint Reports',
+                             'QA_Mgr_menu.py'),
                         ],
                     }),
                     ('doc_control', 'Document Control', {
@@ -1341,7 +1439,8 @@ MENU_TREE = {
                         'items': [
                             ('doc_lib', 'Document Library', 'QA_Mgr_menu.py'),
                             ('new_doc', 'New Document', 'QA_Mgr_menu.py'),
-                            ('doc_review', 'Document Review', 'QA_Mgr_menu.py'),
+                            ('doc_review', 'Document Review',
+                             'QA_Mgr_menu.py'),
                             ('rev_hist', 'Revision History', 'QA_Mgr_menu.py'),
                         ],
                     }),
@@ -1361,36 +1460,48 @@ MENU_TREE = {
                         'title': 'Sales Targets',
                         'items': [
                             ('set_tgt', 'Set Targets', 'Sales_mgr_menu.py'),
-                            ('tgt_act', 'Target vs. Actual', 'Sales_mgr_menu.py'),
+                            ('tgt_act', 'Target vs. Actual',
+                             'Sales_mgr_menu.py'),
                             ('tgt_rep', 'Target by Rep', 'Sales_mgr_menu.py'),
-                            ('tgt_rpts', 'Target Reports', 'Sales_mgr_menu.py'),
+                            ('tgt_rpts', 'Target Reports',
+                             'Sales_mgr_menu.py'),
                         ],
                     }),
                     ('territory', 'Territory Management', {
                         'title': 'Territory Management',
                         'items': [
                             ('terr_map', 'Territory Map', 'Sales_mgr_menu.py'),
-                            ('terr_assign', 'Territory Assignments', 'Sales_mgr_menu.py'),
-                            ('terr_perf', 'Territory Performance', 'Sales_mgr_menu.py'),
-                            ('terr_rpts', 'Territory Reports', 'Sales_mgr_menu.py'),
+                            ('terr_assign', 'Territory Assignments',
+                             'Sales_mgr_menu.py'),
+                            ('terr_perf', 'Territory Performance',
+                             'Sales_mgr_menu.py'),
+                            ('terr_rpts', 'Territory Reports',
+                             'Sales_mgr_menu.py'),
                         ],
                     }),
                     ('commission', 'Commission Tracking', {
                         'title': 'Commission Tracking',
                         'items': [
-                            ('comm_calc', 'Commission Calculator', 'Sales_mgr_menu.py'),
-                            ('comm_rpts', 'Commission Reports', 'Sales_mgr_menu.py'),
-                            ('pay_hist', 'Payment History', 'Sales_mgr_menu.py'),
-                            ('comm_plans', 'Commission Plans', 'Sales_mgr_menu.py'),
+                            ('comm_calc', 'Commission Calculator',
+                             'Sales_mgr_menu.py'),
+                            ('comm_rpts', 'Commission Reports',
+                             'Sales_mgr_menu.py'),
+                            ('pay_hist', 'Payment History',
+                             'Sales_mgr_menu.py'),
+                            ('comm_plans', 'Commission Plans',
+                             'Sales_mgr_menu.py'),
                         ],
                     }),
                     ('staff_perf', 'Staff Performance', {
                         'title': 'Staff Performance',
                         'items': [
-                            ('perf_dash', 'Performance Dashboard', 'Sales_mgr_menu.py'),
+                            ('perf_dash', 'Performance Dashboard',
+                             'Sales_mgr_menu.py'),
                             ('rep_rank', 'Rep Rankings', 'Sales_mgr_menu.py'),
-                            ('perf_revs', 'Performance Reviews', 'Sales_mgr_menu.py'),
-                            ('coaching', 'Coaching Notes', 'Sales_mgr_menu.py'),
+                            ('perf_revs', 'Performance Reviews',
+                             'Sales_mgr_menu.py'),
+                            ('coaching', 'Coaching Notes',
+                             'Sales_mgr_menu.py'),
                         ],
                     }),
                 ],
@@ -1408,7 +1519,8 @@ MENU_TREE = {
                     ('bud_detail_mgr', 'Budget Detail', 'Budget_mgr_menu.py'),
                     ('bva_mgr', 'Budget vs. Actual', 'Budget_mgr_menu.py'),
                     ('variance_mgr', 'Variance Report', 'Budget_mgr_menu.py'),
-                    ('dept_summary', 'Department Summaries', 'Budget_mgr_menu.py'),
+                    ('dept_summary', 'Department Summaries',
+                     'Budget_mgr_menu.py'),
                     ('approval_wf', 'Approval Workflow', 'Budget_mgr_menu.py'),
                 ],
             }),
@@ -1425,10 +1537,14 @@ MENU_TREE = {
                 'title': 'Finance Manager',
                 'items': [
                     ('fin_plan', 'Financial Planning', 'Finance_mgr_menu.py'),
-                    ('fin_forecast', 'Budget & Forecasting', 'Finance_mgr_menu.py'),
-                    ('treasury_mgmt', 'Treasury Management', 'Finance_mgr_menu.py'),
-                    ('invest_mgmt', 'Investment Management', 'Finance_mgr_menu.py'),
-                    ('fin_rpts_mgr', 'Financial Reports', 'Finance_mgr_menu.py'),
+                    ('fin_forecast', 'Budget & Forecasting',
+                     'Finance_mgr_menu.py'),
+                    ('treasury_mgmt', 'Treasury Management',
+                     'Finance_mgr_menu.py'),
+                    ('invest_mgmt', 'Investment Management',
+                     'Finance_mgr_menu.py'),
+                    ('fin_rpts_mgr', 'Financial Reports',
+                     'Finance_mgr_menu.py'),
                 ],
             }),
             ('fin_analysis', 'Financial Analysis', 'Finance_Main_menu.py'),
@@ -1444,9 +1560,12 @@ MENU_TREE = {
             ('legal_mgr', 'Legal Manager', {
                 'title': 'Legal Manager',
                 'items': [
-                    ('contracts_mgmt', 'Contract Management', 'Legal_mgr_menu.py'),
-                    ('litigation_mgmt', 'Litigation Management', 'Legal_mgr_menu.py'),
-                    ('compliance_mgmt', 'Compliance Management', 'Legal_mgr_menu.py'),
+                    ('contracts_mgmt', 'Contract Management',
+                     'Legal_mgr_menu.py'),
+                    ('litigation_mgmt', 'Litigation Management',
+                     'Legal_mgr_menu.py'),
+                    ('compliance_mgmt', 'Compliance Management',
+                     'Legal_mgr_menu.py'),
                     ('corp_gov', 'Corporate Governance', 'Legal_mgr_menu.py'),
                 ],
             }),
@@ -1465,8 +1584,10 @@ MENU_TREE = {
                 'items': [
                     ('risk_register_mgr', 'Risk Register', 'Risk_mgr_menu.py'),
                     ('kri', 'Key Risk Indicators', 'Risk_mgr_menu.py'),
-                    ('biz_continuity', 'Business Continuity', 'Risk_mgr_menu.py'),
-                    ('audit_compliance', 'Audit & Compliance', 'Risk_mgr_menu.py'),
+                    ('biz_continuity', 'Business Continuity',
+                     'Risk_mgr_menu.py'),
+                    ('audit_compliance', 'Audit & Compliance',
+                     'Risk_mgr_menu.py'),
                 ],
             }),
             ('risk_assess', 'Risk Assessment', 'Risk_mgmt_Main_menu.py'),
@@ -1480,7 +1601,10 @@ MENU_TREE = {
 
 
 def _walk_tree(dept, parts):
-    """Walk MENU_TREE by dept + list of key parts. Returns the node dict, or None."""
+    """Walk MENU_TREE by dept + list of key parts.
+
+    Returns the node dict, or None.
+    """
     node = MENU_TREE.get(dept)
     if node is None:
         return None
@@ -1563,13 +1687,17 @@ def _ensure_roles():
     for name, desc in [
         ('President', 'Full access — company president'),
         ('Vice President', 'Full access — company vice president'),
-        ('Department Manager', 'Full access to own department including management screens'),
+        ('Department Manager',
+         'Full access to own department including management screens'),
         ('Supervisor', 'Access to own department operational screens'),
-        ('Auditor', 'Read-only browse access across all departments — cannot launch apps'),
+        ('Auditor',
+         'Read-only browse access across all departments '
+         '— cannot launch apps'),
         ('HR / Personnel', 'Full access to Personnel department'),
     ]:
         conn.execute(
-            "INSERT INTO roles(role_name, description) SELECT %s,%s WHERE NOT EXISTS "
+            "INSERT INTO roles(role_name, description) "
+            "SELECT %s,%s WHERE NOT EXISTS "
             "(SELECT 1 FROM roles WHERE role_name=%s)", (name, desc, name)
         )
     conn.commit()
@@ -1653,7 +1781,8 @@ def _is_full_access(profile: dict) -> bool:
 def _verify_login(email: str, password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.id as pw_id, pw.password FROM passwd pw JOIN people p ON pw.people_id = p.id "
+        "SELECT pw.id as pw_id, pw.password FROM passwd pw "
+        "JOIN people p ON pw.people_id = p.id "
         "WHERE p.email = %s ORDER BY pw.id DESC LIMIT 1",
         (email,),
     ).fetchone()
@@ -1666,8 +1795,11 @@ def _verify_login(email: str, password: str) -> bool:
     else:
         ok = (password == stored)
         if ok:
-            hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-            conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
+            hashed = bcrypt.hashpw(
+                password.encode(), bcrypt.gensalt()).decode()
+            conn.execute(
+                "UPDATE passwd SET password = %s WHERE id = %s",
+                (hashed, row["pw_id"]))
             conn.commit()
     conn.close()
     return ok
@@ -1675,22 +1807,27 @@ def _verify_login(email: str, password: str) -> bool:
 
 def _email_exists(email: str) -> bool:
     conn = _get_db()
-    found = conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone()
+    found = conn.execute(
+        "SELECT id FROM people WHERE email = %s", (email,)).fetchone()
     conn.close()
     return found is not None
 
 
 def _create_user(email, password, first_name='', last_name='',
-                 address='', city='', state='', zip_code='', employee_id=0) -> bool:
+                 address='', city='', state='', zip_code='',
+                 employee_id=0) -> bool:
     try:
         conn = _get_db()
-        if conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone():
+        if conn.execute("SELECT id FROM people WHERE email = %s",
+                        (email,)).fetchone():
             conn.close()
             return False
         cursor = conn.execute(
-            "INSERT INTO people (first_name, last_name, employee_id, address, city, state, zip_code, email) "
+            "INSERT INTO people (first_name, last_name, "
+            "employee_id, address, city, state, zip_code, email) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
-            (first_name, last_name, employee_id, address, city, state, zip_code, email),
+            (first_name, last_name, employee_id,
+             address, city, state, zip_code, email),
         )
         people_id = cursor.fetchone()['id']
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
@@ -1708,7 +1845,8 @@ def _create_user(email, password, first_name='', last_name='',
 def _reset_password(email: str, new_password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
-        "SELECT pw.id as pw_id FROM passwd pw JOIN people p ON pw.people_id = p.id "
+        "SELECT pw.id as pw_id FROM passwd pw "
+        "JOIN people p ON pw.people_id = p.id "
         "WHERE p.email = %s ORDER BY pw.id DESC LIMIT 1",
         (email,),
     ).fetchone()
@@ -1716,7 +1854,8 @@ def _reset_password(email: str, new_password: str) -> bool:
         conn.close()
         return False
     hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s",
+                 (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
@@ -1764,7 +1903,8 @@ def home(request):
             request.session['user_dept_key'] = profile.get('dept_key') or ''
             request.session['user_dept_name'] = profile.get('dept_name', '')
             request.session['user_full_access'] = _is_full_access(profile)
-            request.session['user_is_manager'] = profile.get('is_manager', False)
+            request.session['user_is_manager'] = profile.get(
+                'is_manager', False)
             if request.session['user_full_access']:
                 return redirect('dashboard')
             dept_key = profile.get('dept_key')
@@ -1837,7 +1977,10 @@ def generic_menu(request, dept, subpath=''):
 
     if parts:
         parent = parts[:-1]
-        back_url = '/dept/{}/{}/'.format(dept, '/'.join(parent)) if parent else '/dept/{}/'.format(dept)
+        if parent:
+            back_url = '/dept/{}/{}/'.format(dept, '/'.join(parent))
+        else:
+            back_url = '/dept/{}/'.format(dept)
     else:
         back_url = '/dashboard/'
 
@@ -1874,7 +2017,8 @@ def run_script(request, dept, subpath):
                 module_name = os.path.splitext(target)[0]
                 project_dir = os.path.dirname(mfg_dir)
                 subprocess.Popen(
-                    [sys.executable, '-m', f'manufacturing.{module_name}', leaf_key],
+                    [sys.executable, '-m',
+                        f'manufacturing.{module_name}', leaf_key],
                     cwd=project_dir,
                 )
                 break
@@ -1913,14 +2057,17 @@ def register(request):
             error = 'Employee ID must be a number.'
 
         if error:
-            return render(request, 'register.html', {'error': error, 'form': request.POST})
+            return render(request, 'register.html', {
+                          'error': error, 'form': request.POST})
 
         emp_id = int(emp_id_text) if emp_id_text else 0
-        ok = _create_user(email, password, first, last, address, city, state, zip_code, emp_id)
+        ok = _create_user(email, password, first, last,
+                          address, city, state, zip_code, emp_id)
 
         if ok:
             return render(request, 'home.html', {
-                'success': f'Account created for {first} {last}. You can now log in.',
+                'success': f'Account created for {first} {last}. '
+                'You can now log in.',
             })
         return render(request, 'register.html', {
             'error': 'That email address is already registered.',
@@ -2055,7 +2202,8 @@ def _get_all_users_with_roles():
 
 def _get_all_roles():
     conn = _get_db()
-    rows = conn.execute("SELECT id, role_name FROM roles ORDER BY id").fetchall()
+    rows = conn.execute(
+        "SELECT id, role_name FROM roles ORDER BY id").fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
