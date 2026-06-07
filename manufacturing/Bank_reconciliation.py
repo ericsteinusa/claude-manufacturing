@@ -69,7 +69,8 @@ ITEM_TYPES = ["Credit", "Debit"]
 BLUE = QtGui.QColor(0, 85, 255)
 
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
     "QPushButton:disabled{background-color:#cccccc;color:#888888;}"
@@ -77,7 +78,8 @@ BTN_STYLE = (
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 HDR_STYLE = "font-size:22px;font-weight:bold;color:white;padding:4px;"
 
@@ -87,7 +89,12 @@ def _apply_palette(widget):
     pal.setColor(QtGui.QPalette.ColorRole.Window, BLUE)
     pal.setColor(QtGui.QPalette.ColorRole.Button, BLUE)
     pal.setColor(QtGui.QPalette.ColorRole.Base, QtGui.QColor(255, 255, 255))
-    pal.setColor(QtGui.QPalette.ColorRole.WindowText, QtGui.QColor(255, 255, 255))
+    pal.setColor(
+    QtGui.QPalette.ColorRole.WindowText,
+    QtGui.QColor(
+        255,
+        255,
+         255))
     pal.setColor(QtGui.QPalette.ColorRole.ButtonText, QtGui.QColor(0, 0, 0))
     pal.setColor(QtGui.QPalette.ColorRole.Text, QtGui.QColor(0, 0, 0))
     widget.setPalette(pal)
@@ -95,7 +102,8 @@ def _apply_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -123,17 +131,24 @@ def _export_csv(table: QtWidgets.QTableWidget, parent):
         return
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        headers = [table.horizontalHeaderItem(c).text() for c in range(table.columnCount())]
+        headers = [table.horizontalHeaderItem(
+            c).text() for c in range(table.columnCount())]
         w.writerow(headers)
         for r in range(table.rowCount()):
-            row = [table.item(r, c).text() if table.item(r, c) else "" for c in range(table.columnCount())]
+            row = [
+    table.item(
+        r,
+        c).text() if table.item(
+            r,
+            c) else "" for c in range(
+                table.columnCount())]
             w.writerow(row)
     QtWidgets.QMessageBox.information(parent, "Export", f"Saved to:\n{path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Main Window
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class BankReconciliationWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -162,7 +177,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         self.tabs.currentChanged.connect(self._on_tab_change)
 
-    # ── Bank Accounts tab ─────────────────────────────────────────────────────
+    # ── Bank Accounts tab ───────────────────────────────────────────────────
     def _build_accounts_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
@@ -170,25 +185,35 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         self.ba_tbl = QtWidgets.QTableWidget(0, 7)
         self.ba_tbl.setHorizontalHeaderLabels(
-            ["ID", "Account Name", "Bank Name", "Account #", "GL Account", "Active", "Notes"]
+            ["ID",
+    "Account Name",
+    "Bank Name",
+    "Account #",
+    "GL Account",
+    "Active",
+     "Notes"]
         )
         self.ba_tbl.setColumnWidth(0, 40)
-        self.ba_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ba_tbl.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ba_tbl.setColumnWidth(2, 140)
         self.ba_tbl.setColumnWidth(3, 120)
         self.ba_tbl.setColumnWidth(4, 160)
         self.ba_tbl.setColumnWidth(5, 55)
         self.ba_tbl.setColumnWidth(6, 160)
-        self.ba_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ba_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ba_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ba_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.ba_tbl.setAlternatingRowColors(True)
         self.ba_tbl.verticalHeader().setDefaultSectionSize(24)
         self.ba_tbl.itemSelectionChanged.connect(self._on_ba_select)
         v.addWidget(self.ba_tbl)
 
         fg = QtWidgets.QGroupBox("Account Details")
-        fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"
-                         "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")
+        fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"  # noqa: E501
+                         "border-radius:6px;}QGroupBox::title{padding:2px "
+                         "8px;}")
         fl = QtWidgets.QFormLayout(fg)
         fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
@@ -233,10 +258,12 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         with _conn() as con:
             rows = con.execute(
                 "SELECT id, account_number, account_name FROM gl_account "
-                "WHERE is_active=1 AND account_type='Asset' ORDER BY account_number"
+                "WHERE is_active=1 AND account_type='Asset' ORDER BY "
+                "account_number"
             ).fetchall()
         for r in rows:
-            self.ba_ef_gl.addItem(f"{r['account_number']} – {r['account_name']}", r["id"])
+            self.ba_ef_gl.addItem(
+                f"{r['account_number']} – {r['account_name']}", r["id"])
 
     def _refresh_accounts(self):
         with _conn() as con:
@@ -250,15 +277,23 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         for row in rows:
             r = self.ba_tbl.rowCount()
             self.ba_tbl.insertRow(r)
-            gl_text = f"{row['account_number']} – {row['account_name']}" if row["account_number"] else ""
+            gl_text = f"{
+    row['account_number']} – {
+        row['account_name']}" if row["account_number"] else ""
             self.ba_tbl.setItem(r, 0, _ro_c(str(row["id"])))
             self.ba_tbl.setItem(r, 1, _ro(row["account_name"]))
             self.ba_tbl.setItem(r, 2, _ro(row["bank_name"]))
             self.ba_tbl.setItem(r, 3, _ro(row["account_number"] or ""))
             self.ba_tbl.setItem(r, 4, _ro(gl_text))
-            self.ba_tbl.setItem(r, 5, _ro_c("Yes" if row["is_active"] else "No"))
+            self.ba_tbl.setItem(
+    r, 5, _ro_c(
+        "Yes" if row["is_active"] else "No"))
             self.ba_tbl.setItem(r, 6, _ro(row["notes"]))
-            self.ba_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+            self.ba_tbl.item(
+    r,
+    0).setData(
+        QtCore.Qt.ItemDataRole.UserRole,
+         row["id"])
             if not row["is_active"]:
                 for c in range(7):
                     it = self.ba_tbl.item(r, c)
@@ -272,7 +307,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         r = rows[0].row()
         bid = self.ba_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
-            row = con.execute("SELECT * FROM bank_account WHERE id=%s", (bid,)).fetchone()
+            row = con.execute(
+    "SELECT * FROM bank_account WHERE id=%s", (bid,)).fetchone()
         if not row:
             return
         self.ba_ef_name.setText(row["account_name"])
@@ -300,13 +336,14 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         )
 
     def _on_ba_add(self):
-        name, bank, acctno, routing, gl_id, active, notes = self._ba_form_values()
+        name, bank, acctno, routing, gl_id, active, notes = self._ba_form_values()  # noqa: E501
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Account Name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Account Name is required.")
             return
         with _conn() as con:
             con.execute(
-                "INSERT INTO bank_account(account_name,bank_name,account_number,routing_number,"
+                "INSERT INTO bank_account(account_name,bank_name,account_number,routing_number,"  # noqa: E501
                 "gl_account_id,is_active,notes) VALUES(%s,%s,%s,%s,%s,%s,%s)",
                 (name, bank, acctno, routing, gl_id, active, notes)
             )
@@ -316,22 +353,27 @@ class BankReconciliationWidget(QtWidgets.QWidget):
     def _selected_ba_id(self):
         rows = self.ba_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a bank account first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a bank account first.")
             return None
-        return self.ba_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        return self.ba_tbl.item(rows[0].row(), 0).data(
+            QtCore.Qt.ItemDataRole.UserRole)
 
     def _on_ba_update(self):
         bid = self._selected_ba_id()
         if bid is None:
             return
-        name, bank, acctno, routing, gl_id, active, notes = self._ba_form_values()
+        name, bank, acctno, routing, gl_id, active, notes = self._ba_form_values()  # noqa: E501
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Account Name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Account Name is required.")
             return
         with _conn() as con:
             con.execute(
-                "UPDATE bank_account SET account_name=%s,bank_name=%s,account_number=%s,"
-                "routing_number=%s,gl_account_id=%s,is_active=%s,notes=%s WHERE id=%s",
+                "UPDATE bank_account SET "
+                "account_name=%s,bank_name=%s,account_number=%s,"
+                "routing_number=%s,gl_account_id=%s,is_active=%s,notes=%s "
+                "WHERE id=%s",
                 (name, bank, acctno, routing, gl_id, active, notes, bid)
             )
         self._refresh_accounts()
@@ -341,8 +383,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         if bid is None:
             return
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this bank account and all its statements%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            self, "Delete", "Delete this bank account and all its statements%s",  # noqa: E501
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
                 con.execute("DELETE FROM bank_account WHERE id=%s", (bid,))
@@ -359,7 +401,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         self.ba_ef_gl.setCurrentIndex(0)
         self.ba_tbl.clearSelection()
 
-    # ── Statement Entry tab ───────────────────────────────────────────────────
+    # ── Statement Entry tab ─────────────────────────────────────────────────
     def _build_statements_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
@@ -377,7 +419,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         self.st_status_filter.addItem("All Statuses")
         for s in STATUSES:
             self.st_status_filter.addItem(s)
-        self.st_status_filter.currentIndexChanged.connect(self._refresh_statements)
+        self.st_status_filter.currentIndexChanged.connect(
+            self._refresh_statements)
         hdr.addWidget(self.st_status_filter)
         hdr.addStretch()
         v.addLayout(hdr)
@@ -385,17 +428,26 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         # Statement list (top)
         self.st_tbl = QtWidgets.QTableWidget(0, 7)
         self.st_tbl.setHorizontalHeaderLabels(
-            ["ID", "Bank Account", "Statement Date", "Beg. Balance", "End Balance", "Status", "Reconciled By"]
+            ["ID",
+    "Bank Account",
+    "Statement Date",
+    "Beg. Balance",
+    "End Balance",
+    "Status",
+     "Reconciled By"]
         )
         self.st_tbl.setColumnWidth(0, 40)
-        self.st_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.st_tbl.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.st_tbl.setColumnWidth(2, 120)
         self.st_tbl.setColumnWidth(3, 110)
         self.st_tbl.setColumnWidth(4, 110)
         self.st_tbl.setColumnWidth(5, 100)
         self.st_tbl.setColumnWidth(6, 120)
-        self.st_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.st_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.st_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.st_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.st_tbl.setAlternatingRowColors(True)
         self.st_tbl.verticalHeader().setDefaultSectionSize(24)
         self.st_tbl.setMaximumHeight(180)
@@ -404,8 +456,9 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         # Statement form
         fg = QtWidgets.QGroupBox("Statement Details")
-        fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"
-                         "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")
+        fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"  # noqa: E501
+                         "border-radius:6px;}QGroupBox::title{padding:2px "
+                         "8px;}")
         fl = QtWidgets.QFormLayout(fg)
         fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
@@ -458,22 +511,26 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         )
         self.si_tbl.setColumnWidth(0, 40)
         self.si_tbl.setColumnWidth(1, 100)
-        self.si_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.si_tbl.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.si_tbl.setColumnWidth(3, 70)
         self.si_tbl.setColumnWidth(4, 110)
         self.si_tbl.setColumnWidth(5, 70)
-        self.si_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.si_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.si_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.si_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.si_tbl.setAlternatingRowColors(True)
         self.si_tbl.verticalHeader().setDefaultSectionSize(24)
         v.addWidget(self.si_tbl)
 
         # Item entry form
         item_fg = QtWidgets.QGroupBox("Add / Edit Line Item")
-        item_fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"
-                              "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")
+        item_fg.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"  # noqa: E501
+                              "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")  # noqa: E501
         item_fl = QtWidgets.QFormLayout(item_fg)
-        item_fl.setRowWrapPolicy(QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
+        item_fl.setRowWrapPolicy(
+    QtWidgets.QFormLayout.RowWrapPolicy.WrapLongRows)
 
         self.si_ef_date = QtWidgets.QDateEdit(calendarPopup=True)
         self.si_ef_date.setDate(QtCore.QDate.currentDate())
@@ -495,7 +552,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         for lbl, slot in [("Add Item", self._on_si_add),
                           ("Delete Item", self._on_si_delete),
                           ("Clear Item", self._on_si_clear),
-                          ("Export CSV", lambda: _export_csv(self.si_tbl, self))]:
+                          ("Export CSV", lambda: _export_csv(self.si_tbl, self))]:  # noqa: E501
             b = QtWidgets.QPushButton(lbl)
             b.setStyleSheet(BTN_STYLE)
             b.clicked.connect(slot)
@@ -513,10 +570,13 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         self.st_ef_ba.addItem("-- select --", None)
         with _conn() as con:
             rows = con.execute(
-                "SELECT id, account_name, bank_name FROM bank_account WHERE is_active=1 ORDER BY account_name"
+                "SELECT id, account_name, bank_name FROM bank_account WHERE "
+                "is_active=1 ORDER BY account_name"
             ).fetchall()
         for row in rows:
-            label = f"{row['account_name']} ({row['bank_name']})" if row["bank_name"] else row["account_name"]
+            label = f"{
+    row['account_name']} ({
+        row['bank_name']})" if row["bank_name"] else row["account_name"]
             self.st_ba_filter.addItem(label, row["id"])
             self.st_ef_ba.addItem(label, row["id"])
         for combo in [self.st_ba_filter, self.st_ef_ba]:
@@ -558,8 +618,14 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             self.st_tbl.setItem(r, 4, _ro_r(_money(row["ending_balance"])))
             self.st_tbl.setItem(r, 5, _ro_c(row["status"]))
             self.st_tbl.setItem(r, 6, _ro(row["reconciled_by"] or ""))
-            self.st_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
-            color = STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
+            self.st_tbl.item(
+    r,
+    0).setData(
+        QtCore.Qt.ItemDataRole.UserRole,
+         row["id"])
+            color = STATUS_COLORS.get(
+    row["status"], QtGui.QColor(
+        255, 255, 255))
             for c in range(7):
                 it = self.st_tbl.item(r, c)
                 if it:
@@ -573,13 +639,17 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         sid = self.st_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         self._current_stmt_id = sid
         with _conn() as con:
-            row = con.execute("SELECT * FROM bank_statement WHERE id=%s", (sid,)).fetchone()
+            row = con.execute(
+    "SELECT * FROM bank_statement WHERE id=%s", (sid,)).fetchone()
         if not row:
             return
         idx = self.st_ef_ba.findData(row["bank_account_id"])
         if idx >= 0:
             self.st_ef_ba.setCurrentIndex(idx)
-        self.st_ef_date.setDate(QtCore.QDate.fromString(row["statement_date"], "yyyy-MM-dd"))
+        self.st_ef_date.setDate(
+    QtCore.QDate.fromString(
+        row["statement_date"],
+         "yyyy-MM-dd"))
         self.st_ef_beg_bal.setValue(row["beginning_balance"] or 0.0)
         self.st_ef_end_bal.setValue(row["ending_balance"] or 0.0)
         sidx = self.st_ef_status.findText(row["status"])
@@ -595,7 +665,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             return
         with _conn() as con:
             rows = con.execute(
-                "SELECT * FROM bank_statement_item WHERE statement_id=%s ORDER BY item_date, id",
+                "SELECT * FROM bank_statement_item WHERE statement_id=%s "
+                "ORDER BY item_date, id",
                 (self._current_stmt_id,)
             ).fetchall()
         self.si_tbl.setRowCount(0)
@@ -609,7 +680,11 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             self.si_tbl.setItem(r, 4, _ro_r(_money(row["amount"])))
             matched = "Yes" if row["is_matched"] else "No"
             self.si_tbl.setItem(r, 5, _ro_c(matched))
-            self.si_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+            self.si_tbl.item(
+    r,
+    0).setData(
+        QtCore.Qt.ItemDataRole.UserRole,
+         row["id"])
             if row["is_matched"]:
                 for c in range(6):
                     it = self.si_tbl.item(r, c)
@@ -630,12 +705,14 @@ class BankReconciliationWidget(QtWidgets.QWidget):
     def _on_st_add(self):
         ba_id, dt, beg, end, status, by, notes = self._st_form_values()
         if not ba_id:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Select a bank account.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Select a bank account.")
             return
         with _conn() as con:
             con.execute(
-                "INSERT INTO bank_statement(bank_account_id,statement_date,beginning_balance,"
-                "ending_balance,status,reconciled_by,notes) VALUES(%s,%s,%s,%s,%s,%s,%s)",
+                "INSERT INTO bank_statement(bank_account_id,statement_date,beginning_balance,"  # noqa: E501
+                "ending_balance,status,reconciled_by,notes) "
+                "VALUES(%s,%s,%s,%s,%s,%s,%s)",
                 (ba_id, dt, beg, end, status, by, notes)
             )
         self._refresh_statements()
@@ -644,9 +721,11 @@ class BankReconciliationWidget(QtWidgets.QWidget):
     def _selected_stmt_id(self):
         rows = self.st_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a statement first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a statement first.")
             return None
-        return self.st_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        return self.st_tbl.item(rows[0].row(), 0).data(
+            QtCore.Qt.ItemDataRole.UserRole)
 
     def _on_st_update(self):
         sid = self._selected_stmt_id()
@@ -654,12 +733,15 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             return
         ba_id, dt, beg, end, status, by, notes = self._st_form_values()
         if not ba_id:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Select a bank account.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Select a bank account.")
             return
         with _conn() as con:
             con.execute(
-                "UPDATE bank_statement SET bank_account_id=%s,statement_date=%s,beginning_balance=%s,"
-                "ending_balance=%s,status=%s,reconciled_by=%s,notes=%s WHERE id=%s",
+                "UPDATE bank_statement SET "
+                "bank_account_id=%s,statement_date=%s,beginning_balance=%s,"
+                "ending_balance=%s,status=%s,reconciled_by=%s,notes=%s WHERE "
+                "id=%s",
                 (ba_id, dt, beg, end, status, by, notes, sid)
             )
         self._refresh_statements()
@@ -670,7 +752,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             return
         if QtWidgets.QMessageBox.question(
             self, "Delete", "Delete this statement and all its line items%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
                 con.execute("DELETE FROM bank_statement WHERE id=%s", (sid,))
@@ -708,10 +790,14 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         r = rows[0].row()
         iid = self.si_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
-            row = con.execute("SELECT * FROM bank_statement_item WHERE id=%s", (iid,)).fetchone()
+            row = con.execute(
+    "SELECT * FROM bank_statement_item WHERE id=%s", (iid,)).fetchone()
         if not row:
             return
-        self.si_ef_date.setDate(QtCore.QDate.fromString(row["item_date"], "yyyy-MM-dd"))
+        self.si_ef_date.setDate(
+    QtCore.QDate.fromString(
+        row["item_date"],
+         "yyyy-MM-dd"))
         self.si_ef_desc.setText(row["description"] or "")
         idx = self.si_ef_type.findText(row["item_type"])
         if idx >= 0:
@@ -720,18 +806,20 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
     def _on_si_add(self):
         if not self._current_stmt_id:
-            QtWidgets.QMessageBox.warning(self, "No Statement", "Select a statement first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Statement", "Select a statement first.")
             return
         dt = self.si_ef_date.date().toString("yyyy-MM-dd")
         desc = self.si_ef_desc.text().strip()
         typ = self.si_ef_type.currentText()
         amt = self.si_ef_amt.value()
         if amt <= 0:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Amount must be greater than zero.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Amount must be greater than zero.")
             return
         with _conn() as con:
             con.execute(
-                "INSERT INTO bank_statement_item(statement_id,item_date,description,amount,item_type) "
+                "INSERT INTO bank_statement_item(statement_id,item_date,description,amount,item_type) "  # noqa: E501
                 "VALUES(%s,%s,%s,%s,%s)",
                 (self._current_stmt_id, dt, desc, amt, typ)
             )
@@ -741,15 +829,20 @@ class BankReconciliationWidget(QtWidgets.QWidget):
     def _on_si_delete(self):
         rows = self.si_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a line item first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a line item first.")
             return
-        iid = self.si_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        iid = self.si_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
             matched = con.execute(
-                "SELECT is_matched FROM bank_statement_item WHERE id=%s", (iid,)
+                "SELECT is_matched FROM bank_statement_item WHERE id=%s", (
+                    iid,)
             ).fetchone()
         if matched and matched["is_matched"]:
-            QtWidgets.QMessageBox.warning(self, "Matched", "Unmatch this item in Reconciliation before deleting.")
+            QtWidgets.QMessageBox.warning(
+    self, "Matched", "Unmatch this item in Reconciliation before deleting.")
             return
         with _conn() as con:
             con.execute("DELETE FROM bank_statement_item WHERE id=%s", (iid,))
@@ -762,7 +855,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         self.si_ef_amt.setValue(0.0)
         self.si_tbl.clearSelection()
 
-    # ── Reconciliation tab ────────────────────────────────────────────────────
+    # ── Reconciliation tab ──────────────────────────────────────────────────
     def _build_reconcile_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
@@ -773,7 +866,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         sel.addWidget(QtWidgets.QLabel("Statement:"))
         self.rec_stmt_combo = QtWidgets.QComboBox()
         self.rec_stmt_combo.setMinimumWidth(340)
-        self.rec_stmt_combo.currentIndexChanged.connect(self._on_rec_stmt_change)
+        self.rec_stmt_combo.currentIndexChanged.connect(
+            self._on_rec_stmt_change)
         sel.addWidget(self.rec_stmt_combo)
         btn_load = QtWidgets.QPushButton("Load")
         btn_load.setStyleSheet(BTN_STYLE)
@@ -793,7 +887,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         # Summary bar
         self.rec_summary = QtWidgets.QLabel("")
         self.rec_summary.setStyleSheet(
-            "background:rgba(255,255,255,30);border-radius:6px;padding:6px 12px;"
+            "background:rgba(255,255,255,30);border-radius:6px;padding:6px "
+            "12px;"
             "color:white;font-weight:bold;font-size:13px;"
         )
         self.rec_summary.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -804,18 +899,22 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         # Left: GL Transactions
         gl_frame = QtWidgets.QGroupBox("GL Transactions (Book Side)")
-        gl_frame.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"
-                               "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")
+        gl_frame.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"  # noqa: E501
+                               "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")  # noqa: E501
         gl_v = QtWidgets.QVBoxLayout(gl_frame)
         self.rec_gl_tbl = QtWidgets.QTableWidget(0, 5)
-        self.rec_gl_tbl.setHorizontalHeaderLabels(["Line ID", "Date", "Description", "Debit", "Credit"])
+        self.rec_gl_tbl.setHorizontalHeaderLabels(
+            ["Line ID", "Date", "Description", "Debit", "Credit"])
         self.rec_gl_tbl.setColumnWidth(0, 60)
         self.rec_gl_tbl.setColumnWidth(1, 90)
-        self.rec_gl_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.rec_gl_tbl.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.rec_gl_tbl.setColumnWidth(3, 90)
         self.rec_gl_tbl.setColumnWidth(4, 90)
-        self.rec_gl_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.rec_gl_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.rec_gl_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.rec_gl_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.rec_gl_tbl.setAlternatingRowColors(True)
         self.rec_gl_tbl.verticalHeader().setDefaultSectionSize(22)
         gl_v.addWidget(self.rec_gl_tbl)
@@ -823,17 +922,21 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         # Right: Bank Statement Items
         st_frame = QtWidgets.QGroupBox("Bank Statement Items")
-        st_frame.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"
-                               "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")
+        st_frame.setStyleSheet("QGroupBox{font-weight:bold;background:white;border:1px solid #aaa;"  # noqa: E501
+                               "border-radius:6px;}QGroupBox::title{padding:2px 8px;}")  # noqa: E501
         st_v = QtWidgets.QVBoxLayout(st_frame)
         self.rec_st_tbl = QtWidgets.QTableWidget(0, 4)
-        self.rec_st_tbl.setHorizontalHeaderLabels(["Item ID", "Date", "Description", "Amount"])
+        self.rec_st_tbl.setHorizontalHeaderLabels(
+            ["Item ID", "Date", "Description", "Amount"])
         self.rec_st_tbl.setColumnWidth(0, 60)
         self.rec_st_tbl.setColumnWidth(1, 90)
-        self.rec_st_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.rec_st_tbl.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.rec_st_tbl.setColumnWidth(3, 90)
-        self.rec_st_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.rec_st_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.rec_st_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.rec_st_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.rec_st_tbl.setAlternatingRowColors(True)
         self.rec_st_tbl.verticalHeader().setDefaultSectionSize(22)
         st_v.addWidget(self.rec_st_tbl)
@@ -857,22 +960,28 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         # Matched pairs table
         matched_lbl = QtWidgets.QLabel("Matched Pairs:")
-        matched_lbl.setStyleSheet("font-weight:bold;color:white;margin-top:4px;")
+        matched_lbl.setStyleSheet(
+            "font-weight:bold;color:white;margin-top:4px;")
         v.addWidget(matched_lbl)
 
         self.rec_match_tbl = QtWidgets.QTableWidget(0, 7)
         self.rec_match_tbl.setHorizontalHeaderLabels(
-            ["Match ID", "GL Date", "GL Description", "GL Amount", "Stmt Date", "Stmt Description", "Stmt Amount"]
+            ["Match ID", "GL Date", "GL Description", "GL Amount",
+                "Stmt Date", "Stmt Description", "Stmt Amount"]
         )
         self.rec_match_tbl.setColumnWidth(0, 70)
         self.rec_match_tbl.setColumnWidth(1, 90)
-        self.rec_match_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.rec_match_tbl.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.rec_match_tbl.setColumnWidth(3, 100)
         self.rec_match_tbl.setColumnWidth(4, 90)
-        self.rec_match_tbl.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.rec_match_tbl.horizontalHeader().setSectionResizeMode(
+            5, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.rec_match_tbl.setColumnWidth(6, 100)
-        self.rec_match_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.rec_match_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.rec_match_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.rec_match_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.rec_match_tbl.setAlternatingRowColors(True)
         self.rec_match_tbl.verticalHeader().setDefaultSectionSize(22)
         self.rec_match_tbl.setMaximumHeight(160)
@@ -893,14 +1002,15 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         self.rec_stmt_combo.addItem("-- select statement --", None)
         with _conn() as con:
             rows = con.execute(
-                "SELECT bs.id, bs.statement_date, bs.ending_balance, bs.status, ba.account_name "
+                "SELECT bs.id, bs.statement_date, bs.ending_balance, "
+                "bs.status, ba.account_name "
                 "FROM bank_statement bs "
                 "JOIN bank_account ba ON ba.id=bs.bank_account_id "
                 "ORDER BY bs.statement_date DESC"
             ).fetchall()
         for row in rows:
             label = (f"{row['account_name']} — {row['statement_date']} "
-                     f"(Bal: {_money(row['ending_balance'])}) [{row['status']}]")
+                     f"(Bal: {_money(row['ending_balance'])}) [{row['status']}]")  # noqa: E501
             self.rec_stmt_combo.addItem(label, row["id"])
         if self._current_stmt_id:
             idx = self.rec_stmt_combo.findData(self._current_stmt_id)
@@ -986,22 +1096,42 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             self.rec_gl_tbl.setItem(r, 0, _ro_c(str(row["id"])))
             self.rec_gl_tbl.setItem(r, 1, _ro_c(row["journal_date"] or ""))
             self.rec_gl_tbl.setItem(r, 2, _ro(row["description"] or ""))
-            self.rec_gl_tbl.setItem(r, 3, _ro_r(_money(row["debit"]) if row["debit"] else ""))
-            self.rec_gl_tbl.setItem(r, 4, _ro_r(_money(row["credit"]) if row["credit"] else ""))
-            self.rec_gl_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+            self.rec_gl_tbl.setItem(
+    r, 3, _ro_r(
+        _money(
+            row["debit"]) if row["debit"] else ""))
+            self.rec_gl_tbl.setItem(
+    r, 4, _ro_r(
+        _money(
+            row["credit"]) if row["credit"] else ""))
+            self.rec_gl_tbl.item(
+    r,
+    0).setData(
+        QtCore.Qt.ItemDataRole.UserRole,
+         row["id"])
 
         # Populate statement items table
         self.rec_st_tbl.setRowCount(0)
         for row in st_rows:
             r = self.rec_st_tbl.rowCount()
             self.rec_st_tbl.insertRow(r)
-            signed = row["amount"] if row["item_type"] == "Credit" else -row["amount"]
+            signed = row["amount"] if row["item_type"] == "Credit" else -row["amount"]  # noqa: E501
             self.rec_st_tbl.setItem(r, 0, _ro_c(str(row["id"])))
             self.rec_st_tbl.setItem(r, 1, _ro_c(row["item_date"]))
             self.rec_st_tbl.setItem(r, 2, _ro(row["description"]))
             self.rec_st_tbl.setItem(r, 3, _ro_r(_money(signed)))
-            self.rec_st_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
-            color = QtGui.QColor(220, 255, 220) if row["item_type"] == "Credit" else QtGui.QColor(255, 220, 220)
+            self.rec_st_tbl.item(
+    r,
+    0).setData(
+        QtCore.Qt.ItemDataRole.UserRole,
+         row["id"])
+            color = QtGui.QColor(
+    220,
+    255,
+    220) if row["item_type"] == "Credit" else QtGui.QColor(
+        255,
+        220,
+         220)
             for c in range(4):
                 it = self.rec_st_tbl.item(r, c)
                 if it:
@@ -1013,7 +1143,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             r = self.rec_match_tbl.rowCount()
             self.rec_match_tbl.insertRow(r)
             gl_amt = (row["debit"] or 0) - (row["credit"] or 0)
-            st_amt = row["st_amount"] if row["item_type"] == "Credit" else -(row["st_amount"] or 0)
+            st_amt = row["st_amount"] if row["item_type"] == "Credit" else - \
+                (row["st_amount"] or 0)
             self.rec_match_tbl.setItem(r, 0, _ro_c(str(row["id"])))
             self.rec_match_tbl.setItem(r, 1, _ro_c(row["journal_date"] or ""))
             self.rec_match_tbl.setItem(r, 2, _ro(row["description"] or ""))
@@ -1021,7 +1152,9 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             self.rec_match_tbl.setItem(r, 4, _ro_c(row["item_date"] or ""))
             self.rec_match_tbl.setItem(r, 5, _ro(row["st_desc"] or ""))
             self.rec_match_tbl.setItem(r, 6, _ro_r(_money(st_amt)))
-            self.rec_match_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+            self.rec_match_tbl.item(
+    r, 0).setData(
+        QtCore.Qt.ItemDataRole.UserRole, row["id"])
 
         # Summary
         bank_bal = stmt["ending_balance"] or 0.0
@@ -1044,33 +1177,43 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         if not gl_rows or not st_rows:
             QtWidgets.QMessageBox.warning(
                 self, "Selection",
-                "Select one GL transaction (left) and one bank statement item (right) to match."
+                "Select one GL transaction (left) and one bank statement item "
+                "(right) to match."
             )
             return
-        gl_id = self.rec_gl_tbl.item(gl_rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
-        si_id = self.rec_st_tbl.item(st_rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        gl_id = self.rec_gl_tbl.item(
+    gl_rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
+        si_id = self.rec_st_tbl.item(
+    st_rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         sid = self._current_stmt_id
         with _conn() as con:
             con.execute(
-                "INSERT INTO bank_reconciliation(statement_id,journal_line_id,statement_item_id) "
+                "INSERT INTO bank_reconciliation(statement_id,journal_line_id,statement_item_id) "  # noqa: E501
                 "VALUES(%s,%s,%s)",
                 (sid, gl_id, si_id)
             )
-            con.execute("UPDATE bank_statement_item SET is_matched=1 WHERE id=%s", (si_id,))
+            con.execute(
+    "UPDATE bank_statement_item SET is_matched=1 WHERE id=%s", (si_id,))
         self._refresh_reconcile_tab()
 
     def _on_auto_match(self):
         sid = self._current_stmt_id
         if not sid:
-            QtWidgets.QMessageBox.warning(self, "No Statement", "Load a statement first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Statement", "Load a statement first.")
             return
         with _conn() as con:
             stmt = con.execute(
                 "SELECT ba.gl_account_id FROM bank_statement bs "
-                "JOIN bank_account ba ON ba.id=bs.bank_account_id WHERE bs.id=%s", (sid,)
+                "JOIN bank_account ba ON ba.id=bs.bank_account_id WHERE "
+                "bs.id=%s", (
+                    sid,)
             ).fetchone()
             if not stmt or not stmt["gl_account_id"]:
-                QtWidgets.QMessageBox.warning(self, "No GL Account", "No GL account linked to this bank account.")
+                QtWidgets.QMessageBox.warning(
+    self, "No GL Account", "No GL account linked to this bank account.")
                 return
             gl_acct_id = stmt["gl_account_id"]
             gl_rows = con.execute("""
@@ -1084,7 +1227,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
                   )
             """, (gl_acct_id, sid)).fetchall()
             st_rows = con.execute(
-                "SELECT id, item_date, amount, item_type FROM bank_statement_item "
+                "SELECT id, item_date, amount, item_type FROM "
+                "bank_statement_item "
                 "WHERE statement_id=%s AND is_matched=0", (sid,)
             ).fetchall()
 
@@ -1096,32 +1240,40 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             for si in st_rows:
                 if si["id"] in used_si:
                     continue
-                si_signed = si["amount"] if si["item_type"] == "Credit" else -si["amount"]
-                if abs(si_signed - gl_net) < 0.005 and si["item_date"] == gl_date:
+                si_signed = si["amount"] if si["item_type"] == "Credit" else -si["amount"]  # noqa: E501
+                if abs(si_signed - \
+                       gl_net) < 0.005 and si["item_date"] == gl_date:
                     with _conn() as con:
                         con.execute(
-                            "INSERT INTO bank_reconciliation(statement_id,journal_line_id,statement_item_id) "
+                            "INSERT INTO bank_reconciliation(statement_id,journal_line_id,statement_item_id) "  # noqa: E501
                             "VALUES(%s,%s,%s)", (sid, gl["id"], si["id"])
                         )
-                        con.execute("UPDATE bank_statement_item SET is_matched=1 WHERE id=%s", (si["id"],))
+                        con.execute(
+    "UPDATE bank_statement_item SET is_matched=1 WHERE id=%s", (si["id"],))
                     used_si.add(si["id"])
                     matched_count += 1
                     break
 
-        QtWidgets.QMessageBox.information(self, "Auto-Match", f"Matched {matched_count} pair(s).")
+        QtWidgets.QMessageBox.information(
+    self, "Auto-Match", f"Matched {matched_count} pair(s).")
         self._refresh_reconcile_tab()
 
     def _on_unmatch(self):
         rows = self.rec_match_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a matched pair to unmatch.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a matched pair to unmatch.")
             return
-        match_id = self.rec_match_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        match_id = self.rec_match_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         with _conn() as con:
             match = con.execute(
-                "SELECT statement_item_id FROM bank_reconciliation WHERE id=%s", (match_id,)
+                "SELECT statement_item_id FROM bank_reconciliation WHERE id=%s", (  # noqa: E501
+                    match_id,)
             ).fetchone()
-            con.execute("DELETE FROM bank_reconciliation WHERE id=%s", (match_id,))
+            con.execute(
+    "DELETE FROM bank_reconciliation WHERE id=%s", (match_id,))
             if match and match["statement_item_id"]:
                 con.execute(
                     "UPDATE bank_statement_item SET is_matched=0 WHERE id=%s",
@@ -1132,11 +1284,13 @@ class BankReconciliationWidget(QtWidgets.QWidget):
     def _on_mark_reconciled(self):
         sid = self._current_stmt_id
         if not sid:
-            QtWidgets.QMessageBox.warning(self, "No Statement", "Load a statement first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Statement", "Load a statement first.")
             return
         with _conn() as con:
             unmatched = con.execute(
-                "SELECT COUNT(*) FROM bank_statement_item WHERE statement_id=%s AND is_matched=0", (sid,)
+                "SELECT COUNT(*) FROM bank_statement_item WHERE "
+                "statement_id=%s AND is_matched=0", (sid,)
             ).fetchone()[0]
         msg = (
             f"There are {unmatched} unmatched statement item(s).\n\n"
@@ -1146,18 +1300,20 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         )
         if QtWidgets.QMessageBox.question(
             self, "Mark Reconciled", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             with _conn() as con:
                 con.execute(
-                    "UPDATE bank_statement SET status='Reconciled', reconciled_at=datetime('now') WHERE id=%s",
+                    "UPDATE bank_statement SET status='Reconciled', "
+                    "reconciled_at=datetime('now') WHERE id=%s",
                     (sid,)
                 )
-            QtWidgets.QMessageBox.information(self, "Done", "Statement marked as Reconciled.")
+            QtWidgets.QMessageBox.information(
+    self, "Done", "Statement marked as Reconciled.")
             self._refresh_reconcile_tab()
             self._refresh_statements()
 
-    # ── History tab ───────────────────────────────────────────────────────────
+    # ── History tab ─────────────────────────────────────────────────────────
     def _build_history_tab(self):
         w = QtWidgets.QWidget()
         v = QtWidgets.QVBoxLayout(w)
@@ -1181,18 +1337,21 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 
         self.hist_tbl = QtWidgets.QTableWidget(0, 8)
         self.hist_tbl.setHorizontalHeaderLabels(
-            ["ID", "Bank Account", "Statement Date", "Beg. Balance", "End Balance",
+            ["ID", "Bank Account", "Statement Date", "Beg. Balance", "End "
+                                                                     "Balance",
              "Status", "Matches", "Reconciled By"]
         )
         self.hist_tbl.setColumnWidth(0, 40)
-        self.hist_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.hist_tbl.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.hist_tbl.setColumnWidth(2, 120)
         self.hist_tbl.setColumnWidth(3, 110)
         self.hist_tbl.setColumnWidth(4, 110)
         self.hist_tbl.setColumnWidth(5, 100)
         self.hist_tbl.setColumnWidth(6, 70)
         self.hist_tbl.setColumnWidth(7, 120)
-        self.hist_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.hist_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.hist_tbl.setAlternatingRowColors(True)
         self.hist_tbl.verticalHeader().setDefaultSectionSize(24)
         v.addWidget(self.hist_tbl)
@@ -1204,7 +1363,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         self.hist_ba_filter.addItem("All Accounts", None)
         with _conn() as con:
             rows = con.execute(
-                "SELECT id, account_name FROM bank_account ORDER BY account_name"
+                "SELECT id, account_name FROM bank_account ORDER BY "
+                "account_name"
             ).fetchall()
         for row in rows:
             self.hist_ba_filter.addItem(row["account_name"], row["id"])
@@ -1239,18 +1399,23 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             self.hist_tbl.setItem(r, 0, _ro_c(str(row["id"])))
             self.hist_tbl.setItem(r, 1, _ro(row["account_name"]))
             self.hist_tbl.setItem(r, 2, _ro_c(row["statement_date"]))
-            self.hist_tbl.setItem(r, 3, _ro_r(_money(row["beginning_balance"])))
+            self.hist_tbl.setItem(
+    r, 3, _ro_r(
+        _money(
+            row["beginning_balance"])))
             self.hist_tbl.setItem(r, 4, _ro_r(_money(row["ending_balance"])))
             self.hist_tbl.setItem(r, 5, _ro_c(row["status"]))
             self.hist_tbl.setItem(r, 6, _ro_c(str(row["match_count"])))
             self.hist_tbl.setItem(r, 7, _ro(row["reconciled_by"] or ""))
-            color = STATUS_COLORS.get(row["status"], QtGui.QColor(255, 255, 255))
+            color = STATUS_COLORS.get(
+    row["status"], QtGui.QColor(
+        255, 255, 255))
             for c in range(8):
                 it = self.hist_tbl.item(r, c)
                 if it:
                     it.setBackground(color)
 
-    # ── Tab change ────────────────────────────────────────────────────────────
+    # ── Tab change ──────────────────────────────────────────────────────────
     def _on_tab_change(self, idx):
         if idx == 1:
             self._refresh_ba_combos()
@@ -1273,7 +1438,7 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(BankReconciliationWidget())
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+# ── Entry point ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = BankReconciliationWindow()

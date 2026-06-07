@@ -10,7 +10,8 @@ from .it_calls import _apply_blue_palette
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
@@ -32,7 +33,8 @@ def _conn():
 
 def _ro(text):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     return item
 
 
@@ -44,7 +46,8 @@ def _make_count_table(headers, rows, stretch_col=0):
         stretch_col, QtWidgets.QHeaderView.ResizeMode.Stretch)
     t.verticalHeader().setVisible(False)
     t.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-    t.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+    t.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
     t.setAlternatingRowColors(True)
     for r, row in enumerate(rows):
         for c, val in enumerate(row):
@@ -53,7 +56,7 @@ def _make_count_table(headers, rows, stretch_col=0):
     return t
 
 
-# ── Ticket Summary tab ────────────────────────────────────────────────────────
+# ── Ticket Summary tab ──────────────────────────────────────────────────
 
 class _TicketSummaryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -77,10 +80,11 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl)
         self._status_tbl = QtWidgets.QTableWidget(0, 2)
         self._status_tbl.setHorizontalHeaderLabels(["Status", "Count"])
-        self._status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._status_tbl.horizontalHeader().setStretchLastSection(True)
         self._status_tbl.verticalHeader().setVisible(False)
-        self._status_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._status_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._status_tbl.setFixedHeight(150)
         v.addWidget(self._status_tbl)
 
@@ -89,10 +93,11 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl2)
         self._pri_tbl = QtWidgets.QTableWidget(0, 2)
         self._pri_tbl.setHorizontalHeaderLabels(["Priority", "Count"])
-        self._pri_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._pri_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._pri_tbl.horizontalHeader().setStretchLastSection(True)
         self._pri_tbl.verticalHeader().setVisible(False)
-        self._pri_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._pri_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._pri_tbl.setFixedHeight(130)
         v.addWidget(self._pri_tbl)
 
@@ -107,7 +112,8 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             s_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_ticket GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_ticket GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             p_rows = conn.execute(
                 "SELECT priority, COUNT(*) FROM it_ticket"
@@ -120,7 +126,10 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
 
         self._status_tbl.setRowCount(len(s_rows))
         for r, row in enumerate(s_rows):
-            self._status_tbl.setItem(r, 0, _ro(row[0].replace("_", " ").capitalize()))
+            self._status_tbl.setItem(
+    r, 0, _ro(
+        row[0].replace(
+            "_", " ").capitalize()))
             self._status_tbl.setItem(r, 1, _ro(row[1]))
 
         self._pri_tbl.setRowCount(len(p_rows))
@@ -129,7 +138,7 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
             self._pri_tbl.setItem(r, 1, _ro(row[1]))
 
 
-# ── By Department tab ─────────────────────────────────────────────────────────
+# ── By Department tab ───────────────────────────────────────────────────
 
 class _ByDepartmentWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -150,12 +159,14 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
 
         self._table = QtWidgets.QTableWidget(0, 3)
         self._table.setHorizontalHeaderLabels(["Department", "Open", "Total"])
-        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._table.horizontalHeader().setSectionResizeMode(
             0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self._table.verticalHeader().setVisible(False)
-        self._table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setAlternatingRowColors(True)
         v.addWidget(self._table, stretch=1)
 
@@ -189,7 +200,7 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── By Issue Type tab ─────────────────────────────────────────────────────────
+# ── By Issue Type tab ───────────────────────────────────────────────────
 
 class _ByIssueTypeWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -210,12 +221,14 @@ class _ByIssueTypeWidget(QtWidgets.QWidget):
 
         self._table = QtWidgets.QTableWidget(0, 3)
         self._table.setHorizontalHeaderLabels(["Issue Type", "Open", "Total"])
-        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._table.horizontalHeader().setSectionResizeMode(
             0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self._table.verticalHeader().setVisible(False)
-        self._table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setAlternatingRowColors(True)
         v.addWidget(self._table, stretch=1)
 
@@ -249,7 +262,7 @@ class _ByIssueTypeWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Open Tickets tab ──────────────────────────────────────────────────────────
+# ── Open Tickets tab ────────────────────────────────────────────────────
 
 class _OpenTicketsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -272,12 +285,14 @@ class _OpenTicketsWidget(QtWidgets.QWidget):
         self._table.setHorizontalHeaderLabels(
             ["Ticket #", "Requester", "Department", "Issue Type",
              "Priority", "Assigned To", "Due Date"])
-        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._table.horizontalHeader().setSectionResizeMode(
             1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self._table.verticalHeader().setVisible(False)
-        self._table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setAlternatingRowColors(True)
         v.addWidget(self._table, stretch=1)
 
@@ -313,7 +328,7 @@ class _OpenTicketsWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Asset Summary tab ─────────────────────────────────────────────────────────
+# ── Asset Summary tab ───────────────────────────────────────────────────
 
 class _AssetSummaryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -337,10 +352,11 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl)
         self._status_tbl = QtWidgets.QTableWidget(0, 2)
         self._status_tbl.setHorizontalHeaderLabels(["Status", "Count"])
-        self._status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._status_tbl.horizontalHeader().setStretchLastSection(True)
         self._status_tbl.verticalHeader().setVisible(False)
-        self._status_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._status_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._status_tbl.setFixedHeight(150)
         v.addWidget(self._status_tbl)
 
@@ -349,10 +365,11 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl2)
         self._type_tbl = QtWidgets.QTableWidget(0, 2)
         self._type_tbl.setHorizontalHeaderLabels(["Asset Type", "Count"])
-        self._type_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._type_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._type_tbl.horizontalHeader().setStretchLastSection(True)
         self._type_tbl.verticalHeader().setVisible(False)
-        self._type_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._type_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._type_tbl.setFixedHeight(150)
         v.addWidget(self._type_tbl)
 
@@ -367,7 +384,8 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             s_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_asset GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_asset GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             t_rows = conn.execute(
                 "SELECT COALESCE(asset_type,'(none)'), COUNT(*)"
@@ -388,7 +406,7 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
             self._type_tbl.setItem(r, 1, _ro(row[1]))
 
 
-# ── Top-level widget ──────────────────────────────────────────────────────────
+# ── Top-level widget ────────────────────────────────────────────────────
 
 class ITSupportReportsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):

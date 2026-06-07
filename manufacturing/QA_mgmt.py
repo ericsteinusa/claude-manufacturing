@@ -16,9 +16,9 @@ def _conn():
     return get_db()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Schema
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 def init_db():
     with _conn() as con:
         con.executescript("""
@@ -78,40 +78,46 @@ def _seed(con):
     today = date.today().isoformat()
     if con.execute("SELECT COUNT(*) FROM qa_ncr").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO qa_ncr (title,source,severity,product,detected_date,disposition,owner,status) "
+            "INSERT INTO qa_ncr (title,source,severity,product,detected_date,disposition,owner,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
             ("Surface finish out of spec", "In-Process", "Major", "Widget A",
              today, "Rework", "QA Inspector", "Open"))
     if con.execute("SELECT COUNT(*) FROM qa_capa").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO qa_capa (title,capa_type,ncr_ref,owner,due_date,status) "
+            "INSERT INTO qa_capa "
+            "(title,capa_type,ncr_ref,owner,due_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("Recalibrate grinding machine", "Corrective", "NCR-1", "QA Manager",
+            ("Recalibrate grinding machine", "Corrective", "NCR-1", "QA "
+                                                                    "Manager",
              "2026-06-20", "In Progress"))
     if con.execute("SELECT COUNT(*) FROM qa_audit").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO qa_audit (title,audit_type,auditor,scheduled_date,status) "
+            "INSERT INTO qa_audit "
+            "(title,audit_type,auditor,scheduled_date,status) "
             "VALUES (%s,%s,%s,%s,%s)",
-            ("ISO 9001 surveillance audit", "External", "SGS", "2026-07-15", "Scheduled"))
+            ("ISO 9001 surveillance audit", "External", "SGS", "2026-07-15", "Scheduled"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM qa_supplier").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO qa_supplier (supplier,material,rating,ppm,last_audit,status) "
+            "INSERT INTO qa_supplier "
+            "(supplier,material,rating,ppm,last_audit,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("Acme Supplies Inc.", "Steel stock", "B", "350", "2026-03-01", "Approved"))
+            ("Acme Supplies Inc.", "Steel stock", "B", "350", "2026-03-01", "Approved"))  # noqa: E501
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared styling helpers
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 
 # Row tint keyed by common status words shared across the QA registers.
@@ -148,7 +154,8 @@ def _apply_blue_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -161,9 +168,9 @@ def _color_row(table, row, color):
                 it.setBackground(color)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic record dialog — built from a list of field specs
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RecordDialog(QtWidgets.QDialog):
     """A form dialog generated from field specs.
 
@@ -188,8 +195,8 @@ class _RecordDialog(QtWidgets.QDialog):
                 self._set_value(f, w, row_data[f["key"]])
         v.addLayout(fl)
 
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
+                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)  # noqa: E501
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
@@ -242,15 +249,15 @@ class _RecordDialog(QtWidgets.QDialog):
         return out
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic register widget — one DB table, configured per subclass via SPEC
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _QACrudWidget(QtWidgets.QWidget):
     # Subclasses set SPEC = {
     #   'table', 'title', 'noun',
     #   'statuses': [...],
     #   'columns': [(field_key, header, width|None)],  # 'id' implied first
-    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update
+    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update  # noqa: E501
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
@@ -263,7 +270,7 @@ class _QACrudWidget(QtWidgets.QWidget):
         self._build_ui()
         self._refresh()
 
-    # ── UI ────────────────────────────────────────────────────────────────────
+    # ── UI ──────────────────────────────────────────────────────────────────
     def _build_ui(self):
         spec = self.SPEC
         root = QtWidgets.QVBoxLayout(self)
@@ -271,7 +278,8 @@ class _QACrudWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel(spec["title"])
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         fb = QtWidgets.QHBoxLayout()
@@ -298,8 +306,10 @@ class _QACrudWidget(QtWidgets.QWidget):
                     i, QtWidgets.QHeaderView.ResizeMode.Stretch)
             else:
                 self.tbl.setColumnWidth(i, width)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setDefaultSectionSize(24)
         self.tbl.itemDoubleClicked.connect(self._edit)
@@ -324,11 +334,12 @@ class _QACrudWidget(QtWidgets.QWidget):
         w.setLayout(layout)
         return w
 
-    # ── Data ────────────────────────────────────────────────────────────────────
+    # ── Data ────────────────────────────────────────────────────────────────
     def _refresh(self, *_):
         spec = self.SPEC
-        sf = self.status_filter.currentText() if hasattr(self, "status_filter") else "All Statuses"
-        term = self.search.text().strip().lower() if hasattr(self, "search") else ""
+        sf = self.status_filter.currentText() if hasattr(
+            self, "status_filter") else "All Statuses"
+        term = self.search.text().strip().lower() if hasattr(self, "search") else ""  # noqa: E501
         with _conn() as con:
             q = f"SELECT * FROM {spec['table']} WHERE 1=1"
             p = []
@@ -346,7 +357,9 @@ class _QACrudWidget(QtWidgets.QWidget):
             self.tbl.insertRow(r)
             for c, key in enumerate(self._col_keys):
                 if key == "id":
-                    self.tbl.setItem(r, c, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
                 else:
                     self.tbl.setItem(r, c, _ro(row[key]))
             _color_row(self.tbl, r, STATUS_COLORS.get(row["status"]))
@@ -364,7 +377,7 @@ class _QACrudWidget(QtWidgets.QWidget):
             return None
         return int(self.tbl.item(self.tbl.currentRow(), 0).text())
 
-    # ── CRUD ────────────────────────────────────────────────────────────────────
+    # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
         dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
@@ -373,7 +386,9 @@ class _QACrudWidget(QtWidgets.QWidget):
         v = dlg.values()
         keys = [f["key"] for f in spec["fields"]]
         if not v[keys[0]]:
-            QtWidgets.QMessageBox.warning(self, "Required", f"{spec['fields'][0]['label']} is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Required", f"{
+        spec['fields'][0]['label']} is required.")
             return
         cols = ",".join(keys)
         ph = ",".join(["%s"] * len(keys))
@@ -388,10 +403,16 @@ class _QACrudWidget(QtWidgets.QWidget):
         if rid is None:
             return
         with _conn() as con:
-            rd = con.execute(f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()
+            rd = con.execute(
+                f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()  # noqa: E501
         if not rd:
             return
-        dlg = _RecordDialog(f"Edit {spec['noun']}", spec["fields"], self, row_data=rd)
+        dlg = _RecordDialog(
+    f"Edit {
+        spec['noun']}",
+        spec["fields"],
+        self,
+         row_data=rd)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -427,31 +448,62 @@ class _QACrudWidget(QtWidgets.QWidget):
             params.append(date.today().isoformat())
         params.append(rid)
         with _conn() as con:
-            con.execute(f"UPDATE {spec['table']} SET {sets} WHERE id=%s", params)
+            con.execute(
+    f"UPDATE {
+        spec['table']} SET {sets} WHERE id=%s",
+         params)
         self._refresh()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Vocabularies
-# ══════════════════════════════════════════════════════════════════════════════
-NCR_SOURCES = ["Incoming", "In-Process", "Final", "Customer", "Supplier", "Audit"]
+# ═════════════════════════════════════════════════════════════════════════════
+NCR_SOURCES = [
+    "Incoming",
+    "In-Process",
+    "Final",
+    "Customer",
+    "Supplier",
+     "Audit"]
 NCR_SEVERITIES = ["Minor", "Major", "Critical"]
-NCR_DISPOSITIONS = ["Pending", "Use As-Is", "Rework", "Repair", "Scrap", "Return"]
+NCR_DISPOSITIONS = [
+    "Pending",
+    "Use As-Is",
+    "Rework",
+    "Repair",
+    "Scrap",
+     "Return"]
 NCR_STATUSES = ["Open", "Under Review", "Dispositioned", "Closed"]
 
 CAPA_TYPES = ["Corrective", "Preventive"]
 CAPA_STATUSES = ["Open", "In Progress", "Verification", "Closed", "Overdue"]
 
-AUDIT_TYPES = ["Internal", "External", "Supplier", "Process", "Product", "ISO 9001"]
-AUDIT_STATUSES = ["Scheduled", "In Progress", "Complete", "Follow-up", "Closed"]
+AUDIT_TYPES = [
+    "Internal",
+    "External",
+    "Supplier",
+    "Process",
+    "Product",
+     "ISO 9001"]
+AUDIT_STATUSES = [
+    "Scheduled",
+    "In Progress",
+    "Complete",
+    "Follow-up",
+     "Closed"]
 
 SUPPLIER_RATINGS = ["A", "B", "C", "D"]
-SUPPLIER_STATUSES = ["Pending", "Approved", "Conditional", "Probation", "Disqualified"]
+SUPPLIER_STATUSES = [
+    "Pending",
+    "Approved",
+    "Conditional",
+    "Probation",
+     "Disqualified"]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class NCRWidget(_QACrudWidget):
     SPEC = {
         "table": "qa_ncr",
@@ -459,7 +511,7 @@ class NCRWidget(_QACrudWidget):
         "noun": "NCR",
         "statuses": NCR_STATUSES,
         "order_by": "detected_date DESC",
-        "action": {"label": "Close NCR", "status": "Closed", "stamp": "closed_date"},
+        "action": {"label": "Close NCR", "status": "Closed", "stamp": "closed_date"},  # noqa: E501
         "columns": [
             ("title", "Title", None),
             ("source", "Source", 120),
@@ -471,13 +523,17 @@ class NCRWidget(_QACrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Title", "kind": "text"},
-            {"key": "source", "label": "Source", "kind": "combo", "options": NCR_SOURCES},
-            {"key": "severity", "label": "Severity", "kind": "combo", "options": NCR_SEVERITIES},
+            {"key": "source", "label": "Source",
+                "kind": "combo", "options": NCR_SOURCES},
+            {"key": "severity", "label": "Severity",
+                "kind": "combo", "options": NCR_SEVERITIES},
             {"key": "product", "label": "Product", "kind": "text"},
             {"key": "detected_date", "label": "Detected Date", "kind": "date"},
-            {"key": "disposition", "label": "Disposition", "kind": "combo", "options": NCR_DISPOSITIONS},
+            {"key": "disposition", "label": "Disposition",
+                "kind": "combo", "options": NCR_DISPOSITIONS},
             {"key": "owner", "label": "Owner", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": NCR_STATUSES},
+            {"key": "status", "label": "Status",
+                "kind": "combo", "options": NCR_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -490,7 +546,7 @@ class CAPAWidget(_QACrudWidget):
         "noun": "CAPA",
         "statuses": CAPA_STATUSES,
         "order_by": "due_date",
-        "action": {"label": "Close CAPA", "status": "Closed", "stamp": "completed_date"},
+        "action": {"label": "Close CAPA", "status": "Closed", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("title", "Title", None),
             ("capa_type", "Type", 120),
@@ -501,12 +557,14 @@ class CAPAWidget(_QACrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Title", "kind": "text"},
-            {"key": "capa_type", "label": "Type", "kind": "combo", "options": CAPA_TYPES},
+            {"key": "capa_type", "label": "Type",
+                "kind": "combo", "options": CAPA_TYPES},
             {"key": "ncr_ref", "label": "NCR Ref", "kind": "text"},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "due_date", "label": "Due Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": CAPA_STATUSES},
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
+            {"key": "status", "label": "Status",
+                "kind": "combo", "options": CAPA_STATUSES},
             {"key": "action_plan", "label": "Action Plan", "kind": "memo"},
         ],
     }
@@ -519,7 +577,7 @@ class AuditsWidget(_QACrudWidget):
         "noun": "Audit",
         "statuses": AUDIT_STATUSES,
         "order_by": "scheduled_date",
-        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},
+        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("title", "Audit", None),
             ("audit_type", "Type", 130),
@@ -530,12 +588,16 @@ class AuditsWidget(_QACrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Audit", "kind": "text"},
-            {"key": "audit_type", "label": "Type", "kind": "combo", "options": AUDIT_TYPES, "editable": True},
+            {"key": "audit_type", "label": "Type", "kind": "combo",
+                "options": AUDIT_TYPES, "editable": True},
             {"key": "auditor", "label": "Auditor", "kind": "text"},
-            {"key": "scheduled_date", "label": "Scheduled Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
+            {"key": "scheduled_date", "label": "Scheduled Date", "kind": "date"},  # noqa: E501
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
             {"key": "result", "label": "Result", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": AUDIT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": AUDIT_STATUSES},
             {"key": "findings", "label": "Findings", "kind": "memo"},
         ],
     }
@@ -560,18 +622,24 @@ class SupplierQualityWidget(_QACrudWidget):
         "fields": [
             {"key": "supplier", "label": "Supplier", "kind": "text"},
             {"key": "material", "label": "Material", "kind": "text"},
-            {"key": "rating", "label": "Rating", "kind": "combo", "options": SUPPLIER_RATINGS},
+            {"key": "rating",
+    "label": "Rating",
+    "kind": "combo",
+     "options": SUPPLIER_RATINGS},
             {"key": "ppm", "label": "PPM (defect rate)", "kind": "text"},
             {"key": "last_audit", "label": "Last Audit", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": SUPPLIER_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": SUPPLIER_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.QA_mgmt`)
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class QAMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

@@ -39,19 +39,24 @@ def check_name():
     if not email.strip():
         messagebox.showwarning("Input Error", "Please enter a name.")
     else:
-        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = %s", (email,))
+        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = %s", (email,))  # noqa: E501
         result = cursor.fetchone()
         if result:
             id = result[0]
             email = email_entry.get()
             password = password_entry.get()
-            messagebox.showinfo("Result", f"Email '{email}' exists in the database!")
             messagebox.showinfo(
-                "User Details", f"id: {result[0]}\nPeople ID: {result[1]}\nEmail: {result[2]}\nPassword: {result[3]}")
-            cursor.execute("UPDATE passwd SET password = %s WHERE id = %s", (password, id))
-            messagebox.showinfo("Update Status", "Password updated successfully!")
+    "Result", f"Email '{email}' exists in the database!")
+            messagebox.showinfo(
+                "User Details", f"id: {result[0]}\nPeople ID: {result[1]}\nEmail: {result[2]}\nPassword: {result[3]}")  # noqa: E501
+            cursor.execute(
+    "UPDATE passwd SET password = %s WHERE id = %s", (password, id))
+            messagebox.showinfo(
+    "Update Status",
+     "Password updated successfully!")
         else:
-            messagebox.showinfo("Result", f"Email '{email}' does not exist in the database.")
+            messagebox.showinfo(
+    "Result", f"Email '{email}' does not exist in the database.")
             email_entry.delete(0, tk.END)
             password_entry.delete(0, tk.END)
     # Update data into the database
@@ -77,8 +82,8 @@ def create_gui():
     y = (screen_height / 2) - (app_height / 2)
     root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
-    # my_label = Label(root, text=f'Width:{screen_width} Height{screen_height}' )
-    # background_image = PhotoImage(file="c:/source/pythonQSG/PyQt6 apps/images/personnel2.png")
+    # my_label = Label(root, text=f'Width:{screen_width} Height{screen_height}' )  # noqa: E501
+    # background_image = PhotoImage(file="c:/source/pythonQSG/PyQt6 apps/images/personnel2.png")  # noqa: E501
 
 # Create a Label with the image
 
@@ -86,18 +91,38 @@ def create_gui():
     # background_label.place(relwidth=1, relheight=1)
     # banner = tk.Label(root, text="Reset Password Form", bg = "white",
     # fg="Black", font=("Arial" , 16, "bold"))
-    # banner.place(x=140, y=20) # Place the banner at the top and stretch it horizontally
+    # banner.place(x=140, y=20) # Place the banner at the top and stretch it
+    # horizontally
 
     Label(root, text="Email:", font=("Arial", 10)).place(x=178, y=125)
     email_entry = Entry(root)
     email_entry.place(x=265, y=125)
 
-    Label(root, text="Enter New Password:", font=("Arial", 10)).place(x=100, y=175)
+    Label(
+    root,
+    text="Enter New Password:",
+    font=(
+        "Arial",
+        10)).place(
+            x=100,
+             y=175)
     password_entry = Entry(root)
     password_entry.place(x=265, y=175)
 
-    Button(root, text="Update Password", command=check_name, borderwidth=5).place(x=200, y=240)
-    Button(root, text="Exit", command=root.quit, borderwidth=5).place(x=240, y=300)
+    Button(
+    root,
+    text="Update Password",
+    command=check_name,
+    borderwidth=5).place(
+        x=200,
+         y=240)
+    Button(
+    root,
+    text="Exit",
+    command=root.quit,
+    borderwidth=5).place(
+        x=240,
+         y=300)
 
     root.mainloop()
 

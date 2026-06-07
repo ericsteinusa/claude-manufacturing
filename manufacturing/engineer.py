@@ -5,12 +5,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -100,7 +106,8 @@ def _ro(text):
 def _load_products(combo, include_none=True):
     conn = get_db()
     try:
-        prods = conn.execute("SELECT id, name AS product_name FROM product ORDER BY name").fetchall()
+        prods = conn.execute(
+            "SELECT id, name AS product_name FROM product ORDER BY name").fetchall()  # noqa: E501
     except psycopg2.OperationalError:
         prods = []
     conn.close()
@@ -115,7 +122,8 @@ def _load_projects(combo, include_none=True):
     conn = get_db()
     try:
         projs = conn.execute(
-            "SELECT id, project_number, title FROM eng_project ORDER BY project_number"
+            "SELECT id, project_number, title FROM eng_project ORDER BY "
+            "project_number"
         ).fetchall()
     except psycopg2.OperationalError:
         projs = []
@@ -132,7 +140,7 @@ def _next_num(prefix, table, column):
     conn = get_db()
     try:
         count = conn.execute(
-            f"SELECT COUNT(*) FROM {table} WHERE {column} LIKE ?", (f"{prefix}-{yr}-%",)
+            f"SELECT COUNT(*) FROM {table} WHERE {column} LIKE ?", (f"{prefix}-{yr}-%",)  # noqa: E501
         ).fetchone()[0]
     except psycopg2.OperationalError:
         count = 0
@@ -140,7 +148,7 @@ def _next_num(prefix, table, column):
     return f"{prefix}-{yr}-{count + 1:04d}"
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewProjectDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -160,7 +168,8 @@ class NewProjectDialog(QtWidgets.QDialog):
             widget.setStyleSheet(LABEL_STYLE)
             return widget
 
-        self.proj_num = QtWidgets.QLineEdit(_next_num("ENG", "eng_project", "project_number"))
+        self.proj_num = QtWidgets.QLineEdit(
+            _next_num("ENG", "eng_project", "project_number"))
         self.proj_num.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Project #:"), self.proj_num)
 
@@ -184,7 +193,8 @@ class NewProjectDialog(QtWidgets.QDialog):
         self.start_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Start Date:"), self.start_date)
 
-        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(30))
+        self.due_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(30))
         self.due_date.setCalendarPopup(True)
         self.due_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Due Date:"), self.due_date)
@@ -211,13 +221,16 @@ class NewProjectDialog(QtWidgets.QDialog):
         num = self.proj_num.text().strip()
         title = self.title.text().strip()
         if not num or not title:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Project number and title are required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Project number and title are required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO eng_project (project_number, title, product_id, engineer,"
-                " start_date, due_date, status, notes) VALUES (?,?,?,?,?,?,?,?)",
+                "INSERT INTO eng_project (project_number, title, product_id, "
+                "engineer,"
+                " start_date, due_date, status, notes) VALUES "
+                "(?,?,?,?,?,?,?,?)",
                 (num, title, self.product_combo.currentData(),
                  self.engineer.text().strip(),
                  self.start_date.date().toString("yyyy-MM-dd"),
@@ -229,7 +242,7 @@ class NewProjectDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Project number '{num}' already exists.")
+                                          f"Project number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -254,7 +267,8 @@ class NewECRDialog(QtWidgets.QDialog):
             widget.setStyleSheet(LABEL_STYLE)
             return widget
 
-        self.ecr_num = QtWidgets.QLineEdit(_next_num("ECR", "eng_design_review", "ecr_number"))
+        self.ecr_num = QtWidgets.QLineEdit(
+            _next_num("ECR", "eng_design_review", "ecr_number"))
         self.ecr_num.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("ECR #:"), self.ecr_num)
 
@@ -278,7 +292,8 @@ class NewECRDialog(QtWidgets.QDialog):
         self.requested_by.setPlaceholderText("Requester name")
         layout.addRow(lbl("Requested By:"), self.requested_by)
 
-        self.review_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(7))
+        self.review_date = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addDays(7))
         self.review_date.setCalendarPopup(True)
         self.review_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Review Date:"), self.review_date)
@@ -305,13 +320,16 @@ class NewECRDialog(QtWidgets.QDialog):
         num = self.ecr_num.text().strip()
         title = self.title.text().strip()
         if not num or not title:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "ECR number and title are required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "ECR number and title are required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO eng_design_review (ecr_number, title, product_id, project_id,"
-                " requested_by, review_date, status, notes) VALUES (?,?,?,?,?,?,?,?)",
+                "INSERT INTO eng_design_review (ecr_number, title, "
+                "product_id, project_id,"
+                " requested_by, review_date, status, notes) VALUES "
+                "(?,?,?,?,?,?,?,?)",
                 (num, title, self.product_combo.currentData(),
                  self.project_combo.currentData(),
                  self.requested_by.text().strip(),
@@ -323,7 +341,7 @@ class NewECRDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"ECR number '{num}' already exists.")
+                                          f"ECR number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -362,7 +380,8 @@ class NewTaskDialog(QtWidgets.QDialog):
         self.assigned_to.setPlaceholderText("Assigned engineer")
         layout.addRow(lbl("Assigned To:"), self.assigned_to)
 
-        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(7))
+        self.due_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(7))
         self.due_date.setCalendarPopup(True)
         self.due_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Due Date:"), self.due_date)
@@ -389,11 +408,13 @@ class NewTaskDialog(QtWidgets.QDialog):
     def _on_ok(self):
         name = self.task_name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Task description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Task description is required.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO eng_task (project_id, task_name, assigned_to, due_date, priority, notes)"
+            "INSERT INTO eng_task (project_id, task_name, assigned_to, "
+            "due_date, priority, notes)"
             " VALUES (?,?,?,?,?,?)",
             (self.project_combo.currentData(),
              name,
@@ -407,7 +428,7 @@ class NewTaskDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class EngineerMenu(QtWidgets.QMainWindow):
     def __init__(self):
@@ -428,7 +449,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
         self._tabs.setStyleSheet(
-            "QTabBar::tab{background:white; border:1px solid black; padding:4px 10px;}"
+            "QTabBar::tab{background:white; border:1px solid black; "
+            "padding:4px 10px;}"
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
@@ -462,8 +484,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
         self.proj_status_filter.setStyleSheet(COMBO_STYLE)
         self.proj_status_filter.addItem("(all)", None)
         for s in ("planning", "in_progress", "review", "complete", "on_hold"):
-            self.proj_status_filter.addItem(s.replace("_", " ").capitalize(), s)
-        self.proj_status_filter.currentIndexChanged.connect(self._refresh_projects)
+            self.proj_status_filter.addItem(
+                s.replace("_", " ").capitalize(), s)
+        self.proj_status_filter.currentIndexChanged.connect(
+            self._refresh_projects)
         fr.addWidget(self.proj_status_filter)
 
         fr.addSpacing(10)
@@ -489,17 +513,22 @@ class EngineerMenu(QtWidgets.QMainWindow):
         self.proj_table = QtWidgets.QTableWidget()
         self.proj_table.setColumnCount(7)
         self.proj_table.setHorizontalHeaderLabels(
-            ["Project #", "Title", "Product", "Engineer", "Start", "Due", "Status"]
+            ["Project #", "Title", "Product", "Engineer", "Start", "Due", "Status"]  # noqa: E501
         )
         hh = self.proj_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.proj_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.proj_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.proj_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.proj_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.proj_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.proj_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.proj_table.setAlternatingRowColors(True)
         self.proj_table.verticalHeader().setVisible(False)
         self.proj_table.clicked.connect(self._on_proj_clicked)
@@ -521,8 +550,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
         dh.setStyleSheet("color: black; font-weight: bold;")
         dh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (1, 2, 3, 4):
-            dh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.proj_task_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            dh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.proj_task_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.proj_task_table.verticalHeader().setVisible(False)
         self.proj_task_table.setAlternatingRowColors(True)
         dv.addWidget(self.proj_task_table)
@@ -533,10 +564,14 @@ class EngineerMenu(QtWidgets.QMainWindow):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Project",      self._on_new_project),
-            ("Mark In Progress", lambda: self._set_proj_status("in_progress", "Mark as In Progress?")),
-            ("Mark Review",      lambda: self._set_proj_status("review",      "Send to Review?")),
-            ("Mark Complete",    lambda: self._set_proj_status("complete",    "Mark as Complete?")),
-            ("Mark On Hold",     lambda: self._set_proj_status("on_hold",    "Put On Hold?")),
+            ("Mark In Progress", lambda: self._set_proj_status(
+                "in_progress", "Mark as In Progress?")),
+            ("Mark Review",      lambda: self._set_proj_status(
+                "review",      "Send to Review?")),
+            ("Mark Complete",    lambda: self._set_proj_status(
+                "complete",    "Mark as Complete?")),
+            ("Mark On Hold",     lambda: self._set_proj_status(
+                "on_hold",    "Put On Hold?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -568,7 +603,11 @@ class EngineerMenu(QtWidgets.QMainWindow):
 
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY ep.due_date, ep.project_number", params).fetchall()
+            rows = conn.execute(
+    base +
+    where +
+    " ORDER BY ep.due_date, ep.project_number",
+     params).fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -585,7 +624,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
             self.proj_table.setItem(r, 3, _ro(row["engineer"] or ""))
             self.proj_table.setItem(r, 4, _ro(row["start_date"] or ""))
             self.proj_table.setItem(r, 5, _ro(row["due_date"] or ""))
-            self.proj_table.setItem(r, 6, _ro(row["status"].replace("_", " ").capitalize()))
+            self.proj_table.setItem(
+    r, 6, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(PROJECT_COLORS.get(row["status"], "#ffffff"))
             for col in range(7):
                 self.proj_table.item(r, col).setBackground(bg)
@@ -615,7 +657,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
         try:
             tasks = conn.execute(
                 "SELECT task_name, assigned_to, due_date, priority, status"
-                " FROM eng_task WHERE project_id = ? ORDER BY due_date, priority DESC",
+                " FROM eng_task WHERE project_id = ? ORDER BY due_date, "
+                "priority DESC",
                 (self._selected_proj_id,)
             ).fetchall()
         except psycopg2.OperationalError:
@@ -628,7 +671,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
             self.proj_task_table.setItem(r, 1, _ro(t["assigned_to"] or ""))
             self.proj_task_table.setItem(r, 2, _ro(t["due_date"] or ""))
             self.proj_task_table.setItem(r, 3, _ro(t["priority"].capitalize()))
-            self.proj_task_table.setItem(r, 4, _ro(t["status"].replace("_", " ").capitalize()))
+            self.proj_task_table.setItem(
+    r, 4, _ro(
+        t["status"].replace(
+            "_", " ").capitalize()))
             if t["status"] != "done":
                 color = PRIORITY_COLORS.get(t["priority"])
                 if color:
@@ -642,11 +688,12 @@ class EngineerMenu(QtWidgets.QMainWindow):
 
     def _set_proj_status(self, new_status, msg):
         if self._selected_proj_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a project first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a project first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
@@ -682,17 +729,23 @@ class EngineerMenu(QtWidgets.QMainWindow):
         self.ecr_table = QtWidgets.QTableWidget()
         self.ecr_table.setColumnCount(7)
         self.ecr_table.setHorizontalHeaderLabels(
-            ["ECR #", "Title", "Product", "Project", "Requested By", "Review Date", "Status"]
+            ["ECR #", "Title", "Product", "Project",
+                "Requested By", "Review Date", "Status"]
         )
         hh = self.ecr_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ecr_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ecr_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ecr_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.ecr_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ecr_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ecr_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ecr_table.setAlternatingRowColors(True)
         self.ecr_table.verticalHeader().setVisible(False)
         v.addWidget(self.ecr_table, stretch=1)
@@ -700,9 +753,12 @@ class EngineerMenu(QtWidgets.QMainWindow):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New ECR",        self._on_new_ecr),
-            ("Submit Review",  lambda: self._set_ecr_status("in_review", "Submit for review?")),
-            ("Approve",        lambda: self._set_ecr_status("approved",  "Approve this ECR?")),
-            ("Reject",         lambda: self._set_ecr_status("rejected",  "Reject this ECR?")),
+            ("Submit Review",  lambda: self._set_ecr_status(
+                "in_review", "Submit for review?")),
+            ("Approve",        lambda: self._set_ecr_status(
+                "approved",  "Approve this ECR?")),
+            ("Reject",         lambda: self._set_ecr_status(
+                "rejected",  "Reject this ECR?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -731,7 +787,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             rows = conn.execute(
-                base + where + " ORDER BY dr.review_date DESC, dr.ecr_number DESC", params
+                base + where + " ORDER BY dr.review_date DESC, dr.ecr_number "
+                               "DESC", params
             ).fetchall()
         except psycopg2.OperationalError:
             rows = []
@@ -749,7 +806,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
             self.ecr_table.setItem(r, 3, _ro(row["project_number"] or ""))
             self.ecr_table.setItem(r, 4, _ro(row["requested_by"] or ""))
             self.ecr_table.setItem(r, 5, _ro(row["review_date"] or ""))
-            self.ecr_table.setItem(r, 6, _ro(row["status"].replace("_", " ").capitalize()))
+            self.ecr_table.setItem(
+    r, 6, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(ECR_COLORS.get(row["status"], "#ffffff"))
             for col in range(7):
                 self.ecr_table.item(r, col).setBackground(bg)
@@ -762,15 +822,16 @@ class EngineerMenu(QtWidgets.QMainWindow):
     def _set_ecr_status(self, new_status, msg):
         row = self.ecr_table.currentRow()
         if row < 0 or row >= len(self._ecr_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an ECR first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an ECR first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE eng_design_review SET status = ? WHERE id = ?",
+            conn.execute("UPDATE eng_design_review SET status = ? WHERE id = ?",  # noqa: E501
                          (new_status, self._ecr_row_ids[row]))
             conn.commit()
             conn.close()
@@ -795,7 +856,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
         self.task_status_filter.addItem("In Progress only", "in_progress")
         self.task_status_filter.addItem("Done", "done")
         self.task_status_filter.addItem("All", None)
-        self.task_status_filter.currentIndexChanged.connect(self._refresh_tasks)
+        self.task_status_filter.currentIndexChanged.connect(
+            self._refresh_tasks)
         fr.addWidget(self.task_status_filter)
 
         fr.addSpacing(10)
@@ -815,16 +877,20 @@ class EngineerMenu(QtWidgets.QMainWindow):
         self.task_table = QtWidgets.QTableWidget()
         self.task_table.setColumnCount(6)
         self.task_table.setHorizontalHeaderLabels(
-            ["Task", "Project", "Assigned To", "Due Date", "Priority", "Status"]
+            ["Task", "Project", "Assigned To", "Due Date", "Priority", "Status"]  # noqa: E501
         )
         hh = self.task_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (1, 2, 3, 4, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.task_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.task_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.task_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.task_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.task_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.task_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.task_table.setAlternatingRowColors(True)
         self.task_table.verticalHeader().setVisible(False)
         v.addWidget(self.task_table, stretch=1)
@@ -832,8 +898,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Task",         self._on_new_task),
-            ("Mark In Progress", lambda: self._set_task_status("in_progress", "Mark as In Progress?")),
-            ("Mark Done",        lambda: self._set_task_status("done",        "Mark task as Done?")),
+            ("Mark In Progress", lambda: self._set_task_status(
+                "in_progress", "Mark as In Progress?")),
+            ("Mark Done",        lambda: self._set_task_status(
+                "done",        "Mark task as Done?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -868,7 +936,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             rows = conn.execute(
-                base + where + " ORDER BY t.due_date, t.priority DESC, t.task_name", params
+                base + where + " ORDER BY t.due_date, t.priority DESC, "
+                               "t.task_name", params
             ).fetchall()
         except psycopg2.OperationalError:
             rows = []
@@ -885,7 +954,10 @@ class EngineerMenu(QtWidgets.QMainWindow):
             self.task_table.setItem(r, 2, _ro(row["assigned_to"] or ""))
             self.task_table.setItem(r, 3, _ro(row["due_date"] or ""))
             self.task_table.setItem(r, 4, _ro(row["priority"].capitalize()))
-            self.task_table.setItem(r, 5, _ro(row["status"].replace("_", " ").capitalize()))
+            self.task_table.setItem(
+    r, 5, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             if row["status"] != "done":
                 color = PRIORITY_COLORS.get(row["priority"])
                 if color:
@@ -900,11 +972,12 @@ class EngineerMenu(QtWidgets.QMainWindow):
     def _set_task_status(self, new_status, msg):
         row = self.task_table.currentRow()
         if row < 0 or row >= len(self._task_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a task first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a task first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

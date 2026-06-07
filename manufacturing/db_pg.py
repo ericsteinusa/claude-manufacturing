@@ -14,7 +14,9 @@ DB_CONFIG = {
     'port':     int(os.environ.get('DB_PORT', '5432')),
 }
 
-_RE_AUTOINCREMENT = re.compile(r'INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT', re.IGNORECASE)
+_RE_AUTOINCREMENT = re.compile(
+    r'INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT',
+     re.IGNORECASE)
 _RE_INSERT_IGNORE = re.compile(r'INSERT\s+OR\s+IGNORE\s+INTO', re.IGNORECASE)
 _RE_ROWID_STAR = re.compile(r'SELECT\s+rowid\s*,\s*\*', re.IGNORECASE)
 _RE_NAMED_PARAM = re.compile(r':([A-Za-z_]\w*)')
@@ -22,16 +24,20 @@ _RE_DATETIME_NOW = re.compile(r"datetime\s*\(\s*'now'\s*\)", re.IGNORECASE)
 _RE_DATE_NOW = re.compile(r"\bdate\s*\(\s*'now'\s*\)", re.IGNORECASE)
 # CAST(julianday('now')-julianday(X) AS INT) -> (CURRENT_DATE - X::date)
 _RE_JULIANDAY_DIFF_NOW = re.compile(
-    r"CAST\s*\(\s*julianday\s*\(\s*'now'\s*\)\s*-\s*julianday\s*\(([^)]+)\)\s*AS\s+INT\s*\)",
+    r"CAST\s*\(\s*julianday\s*\(\s*'now'\s*\)\s*-\s*julianday\s*\(([^)]+)\)\s*AS\s+INT\s*\)",  # noqa: E501
     re.IGNORECASE)
 # julianday(X) - julianday(Y) -> (X::date - Y::date)
 _RE_JULIANDAY_DIFF = re.compile(
     r"julianday\s*\(([^)]+)\)\s*-\s*julianday\s*\(([^)]+)\)",
     re.IGNORECASE)
 # strftime('%Y-%m', col) -> TO_CHAR(col::timestamp, 'YYYY-MM')
-_RE_STRFTIME_YM = re.compile(r"strftime\s*\(\s*'%Y-%m'\s*,\s*([^,)]+)\)", re.IGNORECASE)
+_RE_STRFTIME_YM = re.compile(
+    r"strftime\s*\(\s*'%Y-%m'\s*,\s*([^,)]+)\)",
+     re.IGNORECASE)
 # strftime('%Y', col) -> TO_CHAR(col::timestamp, 'YYYY')
-_RE_STRFTIME_Y = re.compile(r"strftime\s*\(\s*'%Y'\s*,\s*([^,)]+)\)", re.IGNORECASE)
+_RE_STRFTIME_Y = re.compile(
+    r"strftime\s*\(\s*'%Y'\s*,\s*([^,)]+)\)",
+     re.IGNORECASE)
 
 
 def _adapt(sql):
@@ -49,9 +55,9 @@ def _adapt(sql):
     sql = _RE_JULIANDAY_DIFF_NOW.sub(
         lambda m: f"(CURRENT_DATE - ({m.group(1).strip()})::date)", sql)
     sql = _RE_JULIANDAY_DIFF.sub(
-        lambda m: f"({m.group(1).strip()}::date - {m.group(2).strip()}::date)", sql)
+        lambda m: f"({m.group(1).strip()}::date - {m.group(2).strip()}::date)", sql)  # noqa: E501
     sql = _RE_STRFTIME_YM.sub(
-        lambda m: f"TO_CHAR(({m.group(1).strip()})::timestamp, 'YYYY-MM')", sql)
+        lambda m: f"TO_CHAR(({m.group(1).strip()})::timestamp, 'YYYY-MM')", sql)  # noqa: E501
     sql = _RE_STRFTIME_Y.sub(
         lambda m: f"TO_CHAR(({m.group(1).strip()})::timestamp, 'YYYY')", sql)
     return sql

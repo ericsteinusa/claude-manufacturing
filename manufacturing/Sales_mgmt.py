@@ -16,9 +16,9 @@ def _conn():
     return get_db()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Schema
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 def init_db():
     with _conn() as con:
         con.executescript("""
@@ -76,39 +76,44 @@ def _seed(con):
     today = date.today().isoformat()
     if con.execute("SELECT COUNT(*) FROM sales_quote").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO sales_quote (customer,description,amount,owner,quote_date,valid_until,status) "
+            "INSERT INTO sales_quote (customer,description,amount,owner,quote_date,valid_until,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Acme Corp", "500 units Widget A", 62000, "J. Rivera", today, "2026-06-30", "Sent"))
+            ("Acme Corp", "500 units Widget A", 62000, "J. Rivera", today, "2026-06-30", "Sent"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM sales_customer").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO sales_customer (name,contact,email,phone,segment,region,owner,status) "
+            "INSERT INTO sales_customer "
+            "(name,contact,email,phone,segment,region,owner,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("Acme Corp", "Jane Doe", "jane@acme.example", "555-0100", "Enterprise",
+            ("Acme Corp", "Jane Doe", "jane@acme.example", "555-0100", "Enterprise",  # noqa: E501
              "West", "J. Rivera", "Active"))
     if con.execute("SELECT COUNT(*) FROM sales_target").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO sales_target (rep,period,target,actual,region,status) "
+            "INSERT INTO sales_target "
+            "(rep,period,target,actual,region,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
             ("J. Rivera", "Q2 2026", 250000, 180000, "West", "On Track"))
     if con.execute("SELECT COUNT(*) FROM sales_commission").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO sales_commission (rep,period,sales_amount,rate,commission,status) "
+            "INSERT INTO sales_commission "
+            "(rep,period,sales_amount,rate,commission,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
             ("J. Rivera", "Q1 2026", 210000, "4%", 8400, "Pending"))
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared styling helpers
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 
 # Row tint keyed by common status words shared across the sales registers.
@@ -148,7 +153,8 @@ def _apply_blue_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -168,9 +174,9 @@ def _money(v):
         return ""
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic record dialog — built from a list of field specs
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RecordDialog(QtWidgets.QDialog):
     """A form dialog generated from field specs.
 
@@ -195,8 +201,8 @@ class _RecordDialog(QtWidgets.QDialog):
                 self._set_value(f, w, row_data[f["key"]])
         v.addLayout(fl)
 
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
+                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)  # noqa: E501
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
@@ -260,15 +266,15 @@ class _RecordDialog(QtWidgets.QDialog):
         return out
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic register widget — one DB table, configured per subclass via SPEC
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _SalesCrudWidget(QtWidgets.QWidget):
     # Subclasses set SPEC = {
     #   'table', 'title', 'noun',
     #   'statuses': [...],
     #   'columns': [(field_key, header, width|None)],  # 'id' implied first
-    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update
+    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update  # noqa: E501
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
@@ -281,7 +287,7 @@ class _SalesCrudWidget(QtWidgets.QWidget):
         self._build_ui()
         self._refresh()
 
-    # ── UI ────────────────────────────────────────────────────────────────────
+    # ── UI ──────────────────────────────────────────────────────────────────
     def _build_ui(self):
         spec = self.SPEC
         root = QtWidgets.QVBoxLayout(self)
@@ -289,7 +295,8 @@ class _SalesCrudWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel(spec["title"])
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         fb = QtWidgets.QHBoxLayout()
@@ -316,8 +323,10 @@ class _SalesCrudWidget(QtWidgets.QWidget):
                     i, QtWidgets.QHeaderView.ResizeMode.Stretch)
             else:
                 self.tbl.setColumnWidth(i, width)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setDefaultSectionSize(24)
         self.tbl.itemDoubleClicked.connect(self._edit)
@@ -342,14 +351,15 @@ class _SalesCrudWidget(QtWidgets.QWidget):
         w.setLayout(layout)
         return w
 
-    # ── Data ────────────────────────────────────────────────────────────────────
+    # ── Data ────────────────────────────────────────────────────────────────
     def _money_keys(self):
         return {f["key"] for f in self.SPEC["fields"] if f["kind"] == "money"}
 
     def _refresh(self, *_):
         spec = self.SPEC
-        sf = self.status_filter.currentText() if hasattr(self, "status_filter") else "All Statuses"
-        term = self.search.text().strip().lower() if hasattr(self, "search") else ""
+        sf = self.status_filter.currentText() if hasattr(
+            self, "status_filter") else "All Statuses"
+        term = self.search.text().strip().lower() if hasattr(self, "search") else ""  # noqa: E501
         with _conn() as con:
             q = f"SELECT * FROM {spec['table']} WHERE 1=1"
             p = []
@@ -368,9 +378,14 @@ class _SalesCrudWidget(QtWidgets.QWidget):
             self.tbl.insertRow(r)
             for c, key in enumerate(self._col_keys):
                 if key == "id":
-                    self.tbl.setItem(r, c, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
                 elif key in money_keys:
-                    self.tbl.setItem(r, c, _ro(_money(row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        _money(
+            row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
                 else:
                     self.tbl.setItem(r, c, _ro(row[key]))
             _color_row(self.tbl, r, STATUS_COLORS.get(row["status"]))
@@ -388,7 +403,7 @@ class _SalesCrudWidget(QtWidgets.QWidget):
             return None
         return int(self.tbl.item(self.tbl.currentRow(), 0).text())
 
-    # ── CRUD ────────────────────────────────────────────────────────────────────
+    # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
         dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
@@ -397,7 +412,9 @@ class _SalesCrudWidget(QtWidgets.QWidget):
         v = dlg.values()
         keys = [f["key"] for f in spec["fields"]]
         if not v[keys[0]]:
-            QtWidgets.QMessageBox.warning(self, "Required", f"{spec['fields'][0]['label']} is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Required", f"{
+        spec['fields'][0]['label']} is required.")
             return
         cols = ",".join(keys)
         ph = ",".join(["%s"] * len(keys))
@@ -412,10 +429,16 @@ class _SalesCrudWidget(QtWidgets.QWidget):
         if rid is None:
             return
         with _conn() as con:
-            rd = con.execute(f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()
+            rd = con.execute(
+                f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()  # noqa: E501
         if not rd:
             return
-        dlg = _RecordDialog(f"Edit {spec['noun']}", spec["fields"], self, row_data=rd)
+        dlg = _RecordDialog(
+    f"Edit {
+        spec['noun']}",
+        spec["fields"],
+        self,
+         row_data=rd)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -451,17 +474,31 @@ class _SalesCrudWidget(QtWidgets.QWidget):
             params.append(date.today().isoformat())
         params.append(rid)
         with _conn() as con:
-            con.execute(f"UPDATE {spec['table']} SET {sets} WHERE id=%s", params)
+            con.execute(
+    f"UPDATE {
+        spec['table']} SET {sets} WHERE id=%s",
+         params)
         self._refresh()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Vocabularies
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 QUOTE_STATUSES = ["Draft", "Sent", "Negotiation", "Won", "Lost", "Expired"]
 
-CUSTOMER_SEGMENTS = ["Enterprise", "Mid-Market", "SMB", "Government", "Reseller"]
-CUSTOMER_REGIONS = ["North", "South", "East", "West", "Central", "International"]
+CUSTOMER_SEGMENTS = [
+    "Enterprise",
+    "Mid-Market",
+    "SMB",
+    "Government",
+     "Reseller"]
+CUSTOMER_REGIONS = [
+    "North",
+    "South",
+    "East",
+    "West",
+    "Central",
+     "International"]
 CUSTOMER_STATUSES = ["Prospect", "Active", "On Hold", "Inactive"]
 
 TARGET_STATUSES = ["On Track", "At Risk", "Behind", "Met", "Exceeded"]
@@ -469,9 +506,9 @@ TARGET_STATUSES = ["On Track", "At Risk", "Behind", "Met", "Exceeded"]
 COMMISSION_STATUSES = ["Pending", "Approved", "Paid", "Disputed"]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class QuotesWidget(_SalesCrudWidget):
     SPEC = {
         "table": "sales_quote",
@@ -495,7 +532,10 @@ class QuotesWidget(_SalesCrudWidget):
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "quote_date", "label": "Quote Date", "kind": "date"},
             {"key": "valid_until", "label": "Valid Until", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": QUOTE_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": QUOTE_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -523,10 +563,15 @@ class CustomersWidget(_SalesCrudWidget):
             {"key": "contact", "label": "Contact", "kind": "text"},
             {"key": "email", "label": "Email", "kind": "text"},
             {"key": "phone", "label": "Phone", "kind": "text"},
-            {"key": "segment", "label": "Segment", "kind": "combo", "options": CUSTOMER_SEGMENTS, "editable": True},
-            {"key": "region", "label": "Region", "kind": "combo", "options": CUSTOMER_REGIONS, "editable": True},
+            {"key": "segment", "label": "Segment", "kind": "combo",
+                "options": CUSTOMER_SEGMENTS, "editable": True},
+            {"key": "region", "label": "Region", "kind": "combo",
+                "options": CUSTOMER_REGIONS, "editable": True},
             {"key": "owner", "label": "Owner", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": CUSTOMER_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": CUSTOMER_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -553,8 +598,12 @@ class SalesTargetsWidget(_SalesCrudWidget):
             {"key": "period", "label": "Period", "kind": "text"},
             {"key": "target", "label": "Target", "kind": "money"},
             {"key": "actual", "label": "Actual", "kind": "money"},
-            {"key": "region", "label": "Region", "kind": "combo", "options": CUSTOMER_REGIONS, "editable": True},
-            {"key": "status", "label": "Status", "kind": "combo", "options": TARGET_STATUSES},
+            {"key": "region", "label": "Region", "kind": "combo",
+                "options": CUSTOMER_REGIONS, "editable": True},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": TARGET_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -582,15 +631,18 @@ class CommissionsWidget(_SalesCrudWidget):
             {"key": "sales_amount", "label": "Sales Amount", "kind": "money"},
             {"key": "rate", "label": "Rate", "kind": "text"},
             {"key": "commission", "label": "Commission", "kind": "money"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": COMMISSION_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": COMMISSION_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Sales_mgmt`)
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class SalesMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

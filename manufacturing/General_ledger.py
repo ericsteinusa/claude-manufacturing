@@ -6,18 +6,25 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 ACCOUNT_TYPES = ["Asset", "Liability", "Equity", "Revenue", "COGS", "Expense"]
-# Normal balance: these types have a debit-normal balance (balance = debits - credits)
+# Normal balance: these types have a debit-normal balance (balance =
+# debits - credits)
 DEBIT_NORMAL = {"Asset", "COGS", "Expense"}
 
 
@@ -81,7 +88,8 @@ def _ro(text):
 
 def _ro_right(text):
     item = _ro(text)
-    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignRight |
+                          QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
 
@@ -106,7 +114,7 @@ def _account_balance(account_id, account_type, date_to=None):
     return c - d
 
 
-# ── Account Dialogs ────────────────────────────────────────────────────────────
+# ── Account Dialogs ─────────────────────────────────────────────────────
 
 class AccountDialog(QtWidgets.QDialog):
     def __init__(self, account_id=None, parent=None):
@@ -187,14 +195,17 @@ class AccountDialog(QtWidgets.QDialog):
         name = self.acct_name.text().strip()
         if not num or not name:
             QtWidgets.QMessageBox.warning(self, "Input Error",
-                                          "Account number and name are required.")
+                                          "Account number and name are "
+                                          "required.")
             return
         conn = get_db()
         try:
             if self._account_id is None:
                 conn.execute(
-                    "INSERT INTO gl_account (account_number, account_name, account_type,"
-                    " account_sub, is_active, notes) VALUES (%s,%s,%s,%s,%s,%s)",
+                    "INSERT INTO gl_account (account_number, account_name, "
+                    "account_type,"
+                    " account_sub, is_active, notes) VALUES "
+                    "(%s,%s,%s,%s,%s,%s)",
                     (num, name, self.type_combo.currentData(),
                      self.sub_edit.text().strip(),
                      1 if self.active_check.isChecked() else 0,
@@ -213,14 +224,14 @@ class AccountDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Account number '{num}' already exists.")
+                                          f"Account number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
         self.accept()
 
 
-# ── Journal Dialogs ────────────────────────────────────────────────────────────
+# ── Journal Dialogs ─────────────────────────────────────────────────────
 
 class NewJournalDialog(QtWidgets.QDialog):
     """Create a new journal entry with balanced debit/credit lines."""
@@ -301,21 +312,27 @@ class NewJournalDialog(QtWidgets.QDialog):
         # Lines table
         self.lines_table = QtWidgets.QTableWidget()
         self.lines_table.setColumnCount(4)
-        self.lines_table.setHorizontalHeaderLabels(["Account", "Debit", "Credit", "Memo"])
+        self.lines_table.setHorizontalHeaderLabels(
+            ["Account", "Debit", "Credit", "Memo"])
         th = self.lines_table.horizontalHeader()
         th.setStyleSheet("color: black; font-weight: bold;")
         th.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        th.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        th.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        th.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.lines_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        th.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        th.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        th.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.lines_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.lines_table.verticalHeader().setVisible(False)
         self.lines_table.setFixedHeight(160)
         v.addWidget(self.lines_table)
 
         # Totals
         tot_row = QtWidgets.QHBoxLayout()
-        self.lbl_totals = QtWidgets.QLabel("Debits: $0.00   Credits: $0.00   Difference: $0.00")
+        self.lbl_totals = QtWidgets.QLabel(
+            "Debits: $0.00   Credits: $0.00   Difference: $0.00")
         self.lbl_totals.setStyleSheet("color: white; font-size: 13px;")
         tot_row.addWidget(self.lbl_totals)
         rem_btn = QtWidgets.QPushButton("Remove Selected")
@@ -341,7 +358,7 @@ class NewJournalDialog(QtWidgets.QDialog):
             " WHERE is_active = 1 ORDER BY account_number"
         ).fetchall()
         conn.close()
-        self._acct_map = {a["id"]: f"{a['account_number']} — {a['account_name']}"
+        self._acct_map = {a["id"]: f"{a['account_number']} — {a['account_name']}"  # noqa: E501
                           for a in accts}
         for a in accts:
             self.line_acct.addItem(
@@ -388,28 +405,31 @@ class NewJournalDialog(QtWidgets.QDialog):
 
     def _on_ok(self):
         if not self._lines:
-            QtWidgets.QMessageBox.warning(self, "No Lines", "Add at least one line.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Lines", "Add at least one line.")
             return
         total_dr = sum(ln[1] for ln in self._lines)
         total_cr = sum(ln[2] for ln in self._lines)
         if abs(total_dr - total_cr) > 0.005:
             QtWidgets.QMessageBox.warning(
                 self, "Not Balanced",
-                f"Debits (${total_dr:,.2f}) must equal Credits (${total_cr:,.2f}).")
+                f"Debits (${total_dr:,.2f}) must equal Credits (${total_cr:,.2f}).")  # noqa: E501
             return
         conn = get_db()
         cur = conn.execute(
-            "INSERT INTO gl_journal (journal_date, reference, description, posted,"
+            "INSERT INTO gl_journal (journal_date, reference, description, "
+            "posted,"
             " created_by, created_at) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
             (self.jdate.date().toString("yyyy-MM-dd"),
              self.ref.text().strip(), self.desc.text().strip(),
              0, "User",
-             QtCore.QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
+             QtCore.QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))  # noqa: E501
         )
         self.journal_id = cur.fetchone()['id']
         for acct_id, dr, cr, memo in self._lines:
             conn.execute(
-                "INSERT INTO gl_journal_line (journal_id, account_id, debit, credit, memo)"
+                "INSERT INTO gl_journal_line (journal_id, account_id, debit, "
+                "credit, memo)"
                 " VALUES (%s,%s,%s,%s,%s)",
                 (self.journal_id, acct_id, dr, cr, memo)
             )
@@ -418,7 +438,7 @@ class NewJournalDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Chart of Accounts Tab ──────────────────────────────────────────────────────
+# ── Chart of Accounts Tab ───────────────────────────────────────────────
 
 class ChartOfAccountsTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -458,18 +478,26 @@ class ChartOfAccountsTab(QtWidgets.QWidget):
         self.tbl = QtWidgets.QTableWidget()
         self.tbl.setColumnCount(6)
         self.tbl.setHorizontalHeaderLabels(
-            ["Acct #", "Account Name", "Type", "Sub-Type", "Balance", "Active"])
+            ["Acct #", "Account Name", "Type", "Sub-Type", "Balance", "Active"])  # noqa: E501
         hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setVisible(False)
         self.tbl.clicked.connect(self._on_clicked)
@@ -534,7 +562,8 @@ class ChartOfAccountsTab(QtWidgets.QWidget):
 
     def _on_edit(self, _idx=None):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an account first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an account first.")
             return
         dlg = AccountDialog(account_id=self._selected_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -542,7 +571,8 @@ class ChartOfAccountsTab(QtWidgets.QWidget):
 
     def _on_toggle_active(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an account first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an account first.")
             return
         conn = get_db()
         cur = conn.execute("SELECT is_active FROM gl_account WHERE id=%s",
@@ -555,7 +585,7 @@ class ChartOfAccountsTab(QtWidgets.QWidget):
         self._refresh()
 
 
-# ── Journal Entries Tab ────────────────────────────────────────────────────────
+# ── Journal Entries Tab ─────────────────────────────────────────────────
 
 class JournalEntriesTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -584,7 +614,8 @@ class JournalEntriesTab(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_journals)
@@ -612,18 +643,26 @@ class JournalEntriesTab(QtWidgets.QWidget):
         self.journal_tbl = QtWidgets.QTableWidget()
         self.journal_tbl.setColumnCount(6)
         self.journal_tbl.setHorizontalHeaderLabels(
-            ["Date", "Reference", "Description", "Lines", "Total Debit", "Posted"])
+            ["Date", "Reference", "Description", "Lines", "Total Debit", "Posted"])  # noqa: E501
         jh = self.journal_tbl.horizontalHeader()
         jh.setStyleSheet("color: black; font-weight: bold;")
-        jh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        jh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        jh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        jh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         jh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        jh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        jh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        jh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.journal_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.journal_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.journal_tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        jh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        jh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        jh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.journal_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.journal_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.journal_tbl.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.journal_tbl.setAlternatingRowColors(True)
         self.journal_tbl.verticalHeader().setVisible(False)
         self.journal_tbl.clicked.connect(self._on_journal_clicked)
@@ -643,10 +682,14 @@ class JournalEntriesTab(QtWidgets.QWidget):
         lh = self.lines_tbl.horizontalHeader()
         lh.setStyleSheet("color: black; font-weight: bold;")
         lh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        lh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        lh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        lh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.lines_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        lh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.lines_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.lines_tbl.verticalHeader().setVisible(False)
         self.lines_tbl.setAlternatingRowColors(True)
         dv.addWidget(self.lines_tbl)
@@ -699,8 +742,10 @@ class JournalEntriesTab(QtWidgets.QWidget):
             self.journal_tbl.setItem(r, 1, _ro(row["reference"] or ""))
             self.journal_tbl.setItem(r, 2, _ro(row["description"] or ""))
             self.journal_tbl.setItem(r, 3, _ro(str(row["line_count"])))
-            self.journal_tbl.setItem(r, 4, _ro_right(f"${row['total_debit']:,.2f}"))
-            self.journal_tbl.setItem(r, 5, _ro("Yes" if row["posted"] else "No"))
+            self.journal_tbl.setItem(
+                r, 4, _ro_right(f"${row['total_debit']:,.2f}"))
+            self.journal_tbl.setItem(
+                r, 5, _ro("Yes" if row["posted"] else "No"))
             if row["posted"]:
                 bg = QtGui.QColor("#d4edda")
                 for col in range(6):
@@ -758,11 +803,13 @@ class JournalEntriesTab(QtWidgets.QWidget):
 
     def _on_post(self):
         if self._selected_journal_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a journal entry first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a journal entry first.")
             return
         reply = QtWidgets.QMessageBox.question(
-            self, "Confirm Post", "Post this journal entry? This cannot be undone.",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            self, "Confirm Post", "Post this journal entry? This cannot be "
+                                  "undone.",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)  # noqa: E501
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
             conn.execute("UPDATE gl_journal SET posted = 1 WHERE id = %s",
@@ -773,7 +820,8 @@ class JournalEntriesTab(QtWidgets.QWidget):
 
     def _on_void(self):
         if self._selected_journal_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a journal entry first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a journal entry first.")
             return
         conn = get_db()
         j = conn.execute("SELECT posted FROM gl_journal WHERE id=%s",
@@ -785,7 +833,7 @@ class JournalEntriesTab(QtWidgets.QWidget):
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Void", "Delete this unposted journal entry?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)  # noqa: E501
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
             conn.execute("DELETE FROM gl_journal_line WHERE journal_id = %s",
@@ -798,7 +846,7 @@ class JournalEntriesTab(QtWidgets.QWidget):
             self._refresh_journals()
 
 
-# ── Trial Balance Tab ──────────────────────────────────────────────────────────
+# ── Trial Balance Tab ───────────────────────────────────────────────────
 
 class TrialBalanceTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -834,20 +882,26 @@ class TrialBalanceTab(QtWidgets.QWidget):
 
         self.tbl = QtWidgets.QTableWidget()
         self.tbl.setColumnCount(4)
-        self.tbl.setHorizontalHeaderLabels(["Acct #", "Account Name", "Debit", "Credit"])
+        self.tbl.setHorizontalHeaderLabels(
+            ["Acct #", "Account Name", "Debit", "Credit"])
         hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setVisible(False)
         v.addWidget(self.tbl, stretch=1)
 
         self.totals_lbl = QtWidgets.QLabel("")
-        self.totals_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        self.totals_lbl.setStyleSheet(
+            "color: white; font-size: 13px; font-weight: bold;")
         v.addWidget(self.totals_lbl)
 
     def _refresh(self):
@@ -874,26 +928,33 @@ class TrialBalanceTab(QtWidgets.QWidget):
             self.tbl.setItem(r, 0, _ro(acct["account_number"]))
             self.tbl.setItem(r, 1, _ro(acct["account_name"]))
             if acct["account_type"] in DEBIT_NORMAL:
-                self.tbl.setItem(r, 2, _ro_right(f"${bal:,.2f}" if bal >= 0 else ""))
-                self.tbl.setItem(r, 3, _ro_right(f"${-bal:,.2f}" if bal < 0 else ""))
+                self.tbl.setItem(r, 2, _ro_right(
+                    f"${bal:,.2f}" if bal >= 0 else ""))
+                self.tbl.setItem(r, 3, _ro_right(
+                    f"${-bal:,.2f}" if bal < 0 else ""))
                 total_dr += max(bal, 0)
                 total_cr += max(-bal, 0)
             else:
-                self.tbl.setItem(r, 2, _ro_right(f"${-bal:,.2f}" if bal < 0 else ""))
-                self.tbl.setItem(r, 3, _ro_right(f"${bal:,.2f}" if bal >= 0 else ""))
+                self.tbl.setItem(r, 2, _ro_right(
+                    f"${-bal:,.2f}" if bal < 0 else ""))
+                self.tbl.setItem(r, 3, _ro_right(
+                    f"${bal:,.2f}" if bal >= 0 else ""))
                 total_cr += max(bal, 0)
                 total_dr += max(-bal, 0)
 
         balanced = abs(total_dr - total_cr) < 0.005
         color = "color: #90ee90;" if balanced else "color: #ff9999;"
-        self.totals_lbl.setStyleSheet(f"{color} font-size: 13px; font-weight: bold;")
+        self.totals_lbl.setStyleSheet(
+    f"{color} font-size: 13px; font-weight: bold;")
         self.totals_lbl.setText(
-            f"Total Debits: ${total_dr:,.2f}    Total Credits: ${total_cr:,.2f}"
-            + ("    BALANCED" if balanced else f"    OUT OF BALANCE by ${abs(total_dr - total_cr):,.2f}")
+            f"Total Debits: ${
+    total_dr:,.2f}    Total Credits: ${
+        total_cr:,.2f}"
+            + ("    BALANCED" if balanced else f"    OUT OF BALANCE by ${abs(total_dr - total_cr):,.2f}")  # noqa: E501
         )
 
 
-# ── Income Statement Tab ───────────────────────────────────────────────────────
+# ── Income Statement Tab ────────────────────────────────────────────────
 
 class IncomeStatementTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -937,15 +998,19 @@ class IncomeStatementTab(QtWidgets.QWidget):
         hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setVisible(False)
         v.addWidget(self.tbl, stretch=1)
 
         self.summary_lbl = QtWidgets.QLabel("")
-        self.summary_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        self.summary_lbl.setStyleSheet(
+            "color: white; font-size: 13px; font-weight: bold;")
         v.addWidget(self.summary_lbl)
 
     def _section_total(self, acct_type, date_from, date_to):
@@ -982,8 +1047,10 @@ class IncomeStatementTab(QtWidgets.QWidget):
         conn = get_db()
         try:
             accounts = conn.execute(
-                "SELECT id, account_number, account_name, account_type FROM gl_account"
-                " WHERE is_active = 1 AND account_type IN ('Revenue','COGS','Expense')"
+                "SELECT id, account_number, account_name, account_type FROM "
+                "gl_account"
+                " WHERE is_active = 1 AND account_type IN "
+                "('Revenue','COGS','Expense')"
                 " ORDER BY account_type, account_number"
             ).fetchall()
         except psycopg2.OperationalError:
@@ -1009,7 +1076,8 @@ class IncomeStatementTab(QtWidgets.QWidget):
                 self.tbl.setItem(r, 1, _ro(""))
                 self.tbl.setItem(r, 2, _ro(""))
 
-            bal = self._period_balance(acct["id"], acct["account_type"], d_from, d_to)
+            bal = self._period_balance(
+    acct["id"], acct["account_type"], d_from, d_to)
             totals[acct["account_type"]] += bal
             if abs(bal) < 0.005:
                 continue
@@ -1027,15 +1095,18 @@ class IncomeStatementTab(QtWidgets.QWidget):
         net_income = gross_profit - expenses
 
         color = "color: #90ee90;" if net_income >= 0 else "color: #ff9999;"
-        self.summary_lbl.setStyleSheet(f"{color} font-size: 13px; font-weight: bold;")
+        self.summary_lbl.setStyleSheet(
+    f"{color} font-size: 13px; font-weight: bold;")
         self.summary_lbl.setText(
             f"Revenue: ${revenue:,.2f}    COGS: ${cogs:,.2f}    "
-            f"Gross Profit: ${gross_profit:,.2f}    Expenses: ${expenses:,.2f}    "
+            f"Gross Profit: ${
+    gross_profit:,.2f}    Expenses: ${
+        expenses:,.2f}    "
             f"Net Income: ${net_income:,.2f}"
         )
 
 
-# ── Balance Sheet Tab ──────────────────────────────────────────────────────────
+# ── Balance Sheet Tab ───────────────────────────────────────────────────
 
 class BalanceSheetTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -1071,15 +1142,19 @@ class BalanceSheetTab(QtWidgets.QWidget):
         hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setVisible(False)
         v.addWidget(self.tbl, stretch=1)
 
         self.summary_lbl = QtWidgets.QLabel("")
-        self.summary_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        self.summary_lbl.setStyleSheet(
+            "color: white; font-size: 13px; font-weight: bold;")
         v.addWidget(self.summary_lbl)
 
     def _refresh(self):
@@ -1087,8 +1162,10 @@ class BalanceSheetTab(QtWidgets.QWidget):
         conn = get_db()
         try:
             accounts = conn.execute(
-                "SELECT id, account_number, account_name, account_type FROM gl_account"
-                " WHERE is_active = 1 AND account_type IN ('Asset','Liability','Equity')"
+                "SELECT id, account_number, account_name, account_type FROM "
+                "gl_account"
+                " WHERE is_active = 1 AND account_type IN "
+                "('Asset','Liability','Equity')"
                 " ORDER BY account_type, account_number"
             ).fetchall()
         except psycopg2.OperationalError:
@@ -1130,16 +1207,17 @@ class BalanceSheetTab(QtWidgets.QWidget):
         equity = totals["Equity"]
         balanced = abs(assets - (liabilities + equity)) < 0.005
         color = "color: #90ee90;" if balanced else "color: #ff9999;"
-        self.summary_lbl.setStyleSheet(f"{color} font-size: 13px; font-weight: bold;")
+        self.summary_lbl.setStyleSheet(
+    f"{color} font-size: 13px; font-weight: bold;")
         self.summary_lbl.setText(
             f"Assets: ${assets:,.2f}    Liabilities: ${liabilities:,.2f}    "
             f"Equity: ${equity:,.2f}    "
             + ("BALANCED" if balanced
-               else f"OUT OF BALANCE by ${abs(assets - liabilities - equity):,.2f}")
+               else f"OUT OF BALANCE by ${abs(assets - liabilities - equity):,.2f}")  # noqa: E501
         )
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class GeneralLedgerWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -1153,8 +1231,10 @@ class GeneralLedgerWidget(QtWidgets.QWidget):
         tabs.setStyleSheet(
             "QTabWidget::pane{border: none;}"
             "QTabBar::tab{background: white; color: black; padding: 6px 14px;"
-            " border: 1px solid #999; border-bottom: none; border-radius: 4px 4px 0 0;}"
-            "QTabBar::tab:selected{background: rgb(85,255,255); font-weight: bold;}"
+            " border: 1px solid #999; border-bottom: none; border-radius: 4px "
+            "4px 0 0;}"
+            "QTabBar::tab:selected{background: rgb(85,255,255); font-weight: "
+            "bold;}"
         )
         tabs.addTab(JournalEntriesTab(), "Journal Entries")
         tabs.addTab(ChartOfAccountsTab(), "Chart of Accounts")

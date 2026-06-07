@@ -4,11 +4,14 @@ from PyQt6 import QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 
@@ -60,10 +63,14 @@ class DeptSubEntry(QtWidgets.QMainWindow):
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         self.table.clicked.connect(self._on_row_clicked)
@@ -82,7 +89,8 @@ class DeptSubEntry(QtWidgets.QMainWindow):
         self.search_input.returnPressed.connect(self._on_search)
         search_row.addWidget(self.search_input)
 
-        for text, slot in (("Search", self._on_search), ("Show All", self._on_show_all)):
+        for text, slot in (("Search", self._on_search),
+                           ("Show All", self._on_show_all)):
             btn = QtWidgets.QPushButton(text)
             btn.setStyleSheet(BUTTON_STYLE)
             btn.setFixedHeight(30)
@@ -141,7 +149,8 @@ class DeptSubEntry(QtWidgets.QMainWindow):
             ).fetchall()
         else:
             rows = conn.execute(
-                "SELECT dept_sub_id, dept_sub_name FROM dept_sub ORDER BY dept_sub_name"
+                "SELECT dept_sub_id, dept_sub_name FROM dept_sub ORDER BY "
+                "dept_sub_name"
             ).fetchall()
         conn.close()
 
@@ -151,8 +160,11 @@ class DeptSubEntry(QtWidgets.QMainWindow):
             r = self.table.rowCount()
             self.table.insertRow(r)
             self._row_ids.append(row["dept_sub_id"])
-            self.table.setItem(r, 0, QtWidgets.QTableWidgetItem(row["dept_sub_name"]))
-            self.table.setItem(r, 1, QtWidgets.QTableWidgetItem(str(row["dept_sub_id"])))
+            self.table.setItem(
+    r, 0, QtWidgets.QTableWidgetItem(
+        row["dept_sub_name"]))
+            self.table.setItem(
+                r, 1, QtWidgets.QTableWidgetItem(str(row["dept_sub_id"])))
 
         self._selected_id = None
 
@@ -171,7 +183,8 @@ class DeptSubEntry(QtWidgets.QMainWindow):
         self._selected_id = self._row_ids[row]
         conn = get_db()
         rec = conn.execute(
-            "SELECT dept_sub_id, dept_sub_name FROM dept_sub WHERE dept_sub_id = ?",
+            "SELECT dept_sub_id, dept_sub_name FROM dept_sub WHERE "
+            "dept_sub_id = ?",
             (self._selected_id,)
         ).fetchone()
         conn.close()
@@ -189,10 +202,12 @@ class DeptSubEntry(QtWidgets.QMainWindow):
     def _on_add(self):
         name = self.name_input.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Sub-department name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Sub-department name is required.")
             return
         conn = get_db()
-        conn.execute("INSERT INTO dept_sub (dept_sub_name) VALUES (?)", (name,))
+        conn.execute(
+    "INSERT INTO dept_sub (dept_sub_name) VALUES (?)", (name,))
         conn.commit()
         conn.close()
         self._clear_form()
@@ -200,11 +215,13 @@ class DeptSubEntry(QtWidgets.QMainWindow):
 
     def _on_update(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a row first.")
             return
         name = self.name_input.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Sub-department name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Sub-department name is required.")
             return
         conn = get_db()
         conn.execute(
@@ -217,29 +234,32 @@ class DeptSubEntry(QtWidgets.QMainWindow):
 
     def _on_delete(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a row first.")
             return
         conn = get_db()
         emp_count = conn.execute(
-            "SELECT COUNT(*) FROM people WHERE dept_Sub_id = ?", (self._selected_id,)
+            "SELECT COUNT(*) FROM people WHERE dept_Sub_id = ?", (self._selected_id,)  # noqa: E501
         ).fetchone()[0]
         conn.close()
 
         msg = "Delete this sub-department?"
         if emp_count:
-            msg += f"\n\nWarning: {emp_count} employee(s) are assigned to it.\nThose links will be cleared."
+            msg += f"\n\nWarning: {emp_count} employee(s) are assigned to it.\nThose links will be cleared."  # noqa: E501
 
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
             conn.execute(
-                "UPDATE people SET dept_Sub_id = NULL WHERE dept_Sub_id = ?", (self._selected_id,)
+                "UPDATE people SET dept_Sub_id = NULL WHERE dept_Sub_id = ?", (
+                    self._selected_id,)
             )
             conn.execute(
-                "DELETE FROM dept_sub WHERE dept_sub_id = ?", (self._selected_id,)
+                "DELETE FROM dept_sub WHERE dept_sub_id = ?", (
+                    self._selected_id,)
             )
             conn.commit()
             conn.close()

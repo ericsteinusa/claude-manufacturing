@@ -5,8 +5,10 @@ from PyQt6 import QtCore, QtWidgets
 from .prod_prod_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -43,7 +45,10 @@ def _launch_tab(script, label):
 
 def _do_launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    subprocess.Popen([sys.executable,
+    "-m",
+    "manufacturing." + os.path.splitext(script)[0]],
+     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class ProdMgrMenu(QtWidgets.QMainWindow):
@@ -63,7 +68,11 @@ class ProdMgrMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_launch_tab("prod_prod_menu.py", "Production"), "Production")
+        tabs.addTab(
+    _launch_tab(
+        "prod_prod_menu.py",
+        "Production"),
+         "Production")
         tabs.addTab(_launch_tab("prod_ship_dept.py", "Shipping"), "Shipping")
         v.addWidget(tabs)
 

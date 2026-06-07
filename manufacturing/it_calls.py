@@ -5,15 +5,24 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
-TEXT_STYLE = "QPlainTextEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+TEXT_STYLE = (
+    "QPlainTextEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 TICKET_COLORS = {
@@ -99,7 +108,8 @@ def _next_ticket_num():
     conn = get_db()
     try:
         count = conn.execute(
-            "SELECT COUNT(*) FROM it_ticket WHERE ticket_number LIKE ?", (f"TKT-{yr}-%",)
+            "SELECT COUNT(*) FROM it_ticket WHERE ticket_number LIKE ?", (
+                f"TKT-{yr}-%",)
         ).fetchone()[0]
     except psycopg2.OperationalError:
         count = 0
@@ -107,7 +117,7 @@ def _next_ticket_num():
     return f"TKT-{yr}-{count + 1:04d}"
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewTicketDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -143,7 +153,7 @@ class NewTicketDialog(QtWidgets.QDialog):
 
         self.issue_type = QtWidgets.QComboBox()
         self.issue_type.setStyleSheet(COMBO_STYLE)
-        for t in ("Hardware", "Software", "Network", "Email", "Phone", "Printer",
+        for t in ("Hardware", "Software", "Network", "Email", "Phone", "Printer",  # noqa: E501
                   "Access / Permissions", "Account", "Other"):
             self.issue_type.addItem(t, t)
         layout.addRow(lbl("Issue Type:"), self.issue_type)
@@ -171,7 +181,8 @@ class NewTicketDialog(QtWidgets.QDialog):
         self.submitted_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Submitted:"), self.submitted_date)
 
-        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(3))
+        self.due_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(3))
         self.due_date.setCalendarPopup(True)
         self.due_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Due Date:"), self.due_date)
@@ -193,15 +204,18 @@ class NewTicketDialog(QtWidgets.QDialog):
         desc = self.description.toPlainText().strip()
         if not num or not desc:
             QtWidgets.QMessageBox.warning(self, "Input Error",
-                                          "Ticket number and description are required.")
+                                          "Ticket number and description are "
+                                          "required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO it_ticket (ticket_number, requester, department, issue_type,"
-                " description, priority, assigned_to, submitted_date, due_date, notes)"
+                "INSERT INTO it_ticket (ticket_number, requester, department, "
+                "issue_type,"
+                " description, priority, assigned_to, submitted_date, "
+                "due_date, notes)"
                 " VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (num, self.requester.text().strip(), self.department.text().strip(),
+                (num, self.requester.text().strip(), self.department.text().strip(),  # noqa: E501
                  self.issue_type.currentData(), desc,
                  self.priority_combo.currentData(),
                  self.assigned_to.text().strip(),
@@ -213,7 +227,7 @@ class NewTicketDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Ticket number '{num}' already exists.")
+                                          f"Ticket number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -265,7 +279,8 @@ class NewAssetDialog(QtWidgets.QDialog):
 
         self.assigned_to = QtWidgets.QLineEdit()
         self.assigned_to.setStyleSheet(INPUT_STYLE)
-        self.assigned_to.setPlaceholderText("Assigned user (leave blank if spare)")
+        self.assigned_to.setPlaceholderText(
+            "Assigned user (leave blank if spare)")
         layout.addRow(lbl("Assigned To:"), self.assigned_to)
 
         self.department = QtWidgets.QLineEdit()
@@ -277,7 +292,8 @@ class NewAssetDialog(QtWidgets.QDialog):
         self.purchase_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Purchase Date:"), self.purchase_date)
 
-        self.warranty_exp = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addYears(3))
+        self.warranty_exp = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addYears(3))
         self.warranty_exp.setCalendarPopup(True)
         self.warranty_exp.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Warranty Exp:"), self.warranty_exp)
@@ -303,13 +319,16 @@ class NewAssetDialog(QtWidgets.QDialog):
     def _on_ok(self):
         tag = self.asset_tag.text().strip()
         if not tag:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Asset tag is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Asset tag is required.")
             return
         conn = get_db()
         try:
             conn.execute(
-                "INSERT INTO it_asset (asset_tag, asset_type, make, model, serial_number,"
-                " assigned_to, department, purchase_date, warranty_exp, status, notes)"
+                "INSERT INTO it_asset (asset_tag, asset_type, make, model, "
+                "serial_number,"
+                " assigned_to, department, purchase_date, warranty_exp, "
+                "status, notes)"
                 " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (tag, self.asset_type.currentData(),
                  self.make.text().strip(), self.model.text().strip(),
@@ -330,7 +349,7 @@ class NewAssetDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Embeddable Widget ──────────────────────────────────────────────────────────
+# ── Embeddable Widget ───────────────────────────────────────────────────
 
 class ITSupportWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -348,9 +367,10 @@ class ITSupportWidget(QtWidgets.QWidget):
         self._tabs = QtWidgets.QTabWidget()
         self._tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"
-            "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+            "QTabBar::tab{background:white;border:2px solid black;padding:6px "
+            "18px;"
             "border-bottom:none;border-radius:4px 4px 0 0;}"
-            "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+            "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"  # noqa: E501
             "QTabBar::tab:hover{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
@@ -388,7 +408,8 @@ class ITSupportWidget(QtWidgets.QWidget):
         self.tkt_status_filter.addItem("Resolved", "resolved")
         self.tkt_status_filter.addItem("Closed", "closed")
         self.tkt_status_filter.addItem("All", None)
-        self.tkt_status_filter.currentIndexChanged.connect(self._refresh_tickets)
+        self.tkt_status_filter.currentIndexChanged.connect(
+            self._refresh_tickets)
         fr.addWidget(self.tkt_status_filter)
 
         fr.addSpacing(10)
@@ -430,13 +451,18 @@ class ITSupportWidget(QtWidgets.QWidget):
         )
         hh = self.tkt_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5, 6, 7):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.tkt_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tkt_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tkt_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tkt_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tkt_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tkt_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.tkt_table.setAlternatingRowColors(True)
         self.tkt_table.verticalHeader().setVisible(False)
         self.tkt_table.clicked.connect(self._on_ticket_clicked)
@@ -452,7 +478,7 @@ class ITSupportWidget(QtWidgets.QWidget):
         self.tkt_detail_text = QtWidgets.QPlainTextEdit()
         self.tkt_detail_text.setReadOnly(True)
         self.tkt_detail_text.setStyleSheet(
-            "QPlainTextEdit{background-color: white; border: 1px solid black;}")
+            "QPlainTextEdit{background-color: white; border: 1px solid black;}")  # noqa: E501
         dv.addWidget(self.tkt_detail_text)
         splitter.addWidget(detail_w)
         splitter.setSizes([420, 160])
@@ -461,10 +487,15 @@ class ITSupportWidget(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Ticket",      self._on_new_ticket),
-            ("Assign / Start",  lambda: self._set_tkt_status("in_progress", "Mark as In Progress?")),
-            ("Mark On Hold",    lambda: self._set_tkt_status("on_hold",     "Put On Hold?")),
-            ("Mark Resolved",   lambda: self._set_tkt_status("resolved",    "Mark as Resolved?")),
-            ("Close Ticket",    lambda: self._set_tkt_status("closed",      "Close this ticket?")),
+            ("Assign / Start",
+    lambda: self._set_tkt_status("in_progress",
+     "Mark as In Progress?")),
+            ("Mark On Hold",    lambda: self._set_tkt_status(
+                "on_hold",     "Put On Hold?")),
+            ("Mark Resolved",   lambda: self._set_tkt_status(
+                "resolved",    "Mark as Resolved?")),
+            ("Close Ticket",    lambda: self._set_tkt_status(
+                "closed",      "Close this ticket?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -491,14 +522,17 @@ class ITSupportWidget(QtWidgets.QWidget):
             conds.append("priority = ?")
             params.append(priority)
         if term:
-            conds.append("(ticket_number LIKE ? OR requester LIKE ? OR description LIKE ?)")
+            conds.append(
+                "(ticket_number LIKE ? OR requester LIKE ? OR description "
+                "LIKE ?)")
             params += [f"%{term}%", f"%{term}%", f"%{term}%"]
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
 
         conn = get_db()
         try:
             rows = conn.execute(
-                base + where + " ORDER BY submitted_date DESC, ticket_number DESC", params
+                base + where + " ORDER BY submitted_date DESC, ticket_number "
+                               "DESC", params
             ).fetchall()
         except psycopg2.OperationalError:
             rows = []
@@ -517,7 +551,10 @@ class ITSupportWidget(QtWidgets.QWidget):
             self.tkt_table.setItem(r, 4, _ro(row["priority"].capitalize()))
             self.tkt_table.setItem(r, 5, _ro(row["assigned_to"] or ""))
             self.tkt_table.setItem(r, 6, _ro(row["due_date"] or ""))
-            self.tkt_table.setItem(r, 7, _ro(row["status"].replace("_", " ").capitalize()))
+            self.tkt_table.setItem(
+    r, 7, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(TICKET_COLORS.get(row["status"], "#ffffff"))
             for col in range(8):
                 self.tkt_table.item(r, col).setBackground(bg)
@@ -532,7 +569,8 @@ class ITSupportWidget(QtWidgets.QWidget):
     def _on_tkt_show_all(self):
         self.tkt_search.clear()
         self.tkt_status_filter.blockSignals(True)
-        self.tkt_status_filter.setCurrentIndex(self.tkt_status_filter.count() - 1)
+        self.tkt_status_filter.setCurrentIndex(
+            self.tkt_status_filter.count() - 1)
         self.tkt_status_filter.blockSignals(False)
         self.tkt_pri_filter.blockSignals(True)
         self.tkt_pri_filter.setCurrentIndex(0)
@@ -553,10 +591,16 @@ class ITSupportWidget(QtWidgets.QWidget):
             return
         lines = [
             f"Ticket:      {rec['ticket_number']}",
-            f"Requester:   {rec['requester'] or '—'}  |  Dept: {rec['department'] or '—'}",
-            f"Issue Type:  {rec['issue_type'] or '—'}  |  Priority: {rec['priority'].capitalize()}",
+            f"Requester:   {
+    rec['requester'] or '—'}  |  Dept: {
+        rec['department'] or '—'}",
+            f"Issue Type:  {
+    rec['issue_type'] or '—'}  |  Priority: {
+        rec['priority'].capitalize()}",
             f"Assigned To: {rec['assigned_to'] or '—'}",
-            f"Submitted:   {rec['submitted_date'] or '—'}  |  Due: {rec['due_date'] or '—'}",
+            f"Submitted:   {
+    rec['submitted_date'] or '—'}  |  Due: {
+        rec['due_date'] or '—'}",
             "",
             "Description:",
             rec["description"] or "",
@@ -572,11 +616,12 @@ class ITSupportWidget(QtWidgets.QWidget):
 
     def _set_tkt_status(self, new_status, msg):
         if self._selected_ticket_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a ticket first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a ticket first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
@@ -584,9 +629,12 @@ class ITSupportWidget(QtWidgets.QWidget):
             params = [new_status]
             if new_status == "resolved":
                 extra = ", resolved_date = ?"
-                params.append(QtCore.QDate.currentDate().toString("yyyy-MM-dd"))
+                params.append(
+    QtCore.QDate.currentDate().toString("yyyy-MM-dd"))
             params.append(self._selected_ticket_id)
-            conn.execute(f"UPDATE it_ticket SET status = ?{extra} WHERE id = ?", params)
+            conn.execute(
+    f"UPDATE it_ticket SET status = ?{extra} WHERE id = ?",
+     params)
             conn.commit()
             conn.close()
             self._refresh_tickets()
@@ -611,7 +659,8 @@ class ITSupportWidget(QtWidgets.QWidget):
         self.asset_status_filter.addItem("In Repair", "repair")
         self.asset_status_filter.addItem("Retired", "retired")
         self.asset_status_filter.addItem("All", None)
-        self.asset_status_filter.currentIndexChanged.connect(self._refresh_assets)
+        self.asset_status_filter.currentIndexChanged.connect(
+            self._refresh_assets)
         fr.addWidget(self.asset_status_filter)
 
         fr.addSpacing(10)
@@ -624,7 +673,8 @@ class ITSupportWidget(QtWidgets.QWidget):
         for t in ("Desktop", "Laptop", "Monitor", "Server", "Printer", "Phone",
                   "Tablet", "Switch", "Router", "UPS", "Other"):
             self.asset_type_filter.addItem(t, t)
-        self.asset_type_filter.currentIndexChanged.connect(self._refresh_assets)
+        self.asset_type_filter.currentIndexChanged.connect(
+            self._refresh_assets)
         fr.addWidget(self.asset_type_filter)
 
         fr.addSpacing(10)
@@ -652,13 +702,18 @@ class ITSupportWidget(QtWidgets.QWidget):
         )
         hh = self.asset_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (1, 2, 4, 5, 6, 7, 8):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.asset_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.asset_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.asset_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.asset_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.asset_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.asset_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.asset_table.setAlternatingRowColors(True)
         self.asset_table.verticalHeader().setVisible(False)
         v.addWidget(self.asset_table, stretch=1)
@@ -666,10 +721,14 @@ class ITSupportWidget(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("Add Asset",      self._on_new_asset),
-            ("Mark Spare",     lambda: self._set_asset_status("spare",   "Mark as Spare?")),
-            ("Send to Repair", lambda: self._set_asset_status("repair",  "Send to Repair?")),
-            ("Mark Retired",   lambda: self._set_asset_status("retired", "Retire this asset?")),
-            ("Mark Active",    lambda: self._set_asset_status("active",  "Mark as Active?")),
+            ("Mark Spare",     lambda: self._set_asset_status(
+                "spare",   "Mark as Spare?")),
+            ("Send to Repair", lambda: self._set_asset_status(
+                "repair",  "Send to Repair?")),
+            ("Mark Retired",   lambda: self._set_asset_status(
+                "retired", "Retire this asset?")),
+            ("Mark Active",    lambda: self._set_asset_status(
+                "active",  "Mark as Active?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -723,7 +782,9 @@ class ITSupportWidget(QtWidgets.QWidget):
             self.asset_table.setItem(r, 6, _ro(row["department"] or ""))
             self.asset_table.setItem(r, 7, _ro(row["warranty_exp"] or ""))
             self.asset_table.setItem(r, 8, _ro(row["status"].capitalize()))
-            bg = QtGui.QColor(ASSET_STATUS_COLORS.get(row["status"], "#ffffff"))
+            bg = QtGui.QColor(
+    ASSET_STATUS_COLORS.get(
+        row["status"], "#ffffff"))
             for col in range(9):
                 self.asset_table.item(r, col).setBackground(bg)
 
@@ -745,11 +806,12 @@ class ITSupportWidget(QtWidgets.QWidget):
     def _set_asset_status(self, new_status, msg):
         row = self.asset_table.currentRow()
         if row < 0 or row >= len(self._asset_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an asset first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an asset first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
@@ -760,7 +822,7 @@ class ITSupportWidget(QtWidgets.QWidget):
             self._refresh_assets()
 
 
-# ── Standalone Window ──────────────────────────────────────────────────────────
+# ── Standalone Window ───────────────────────────────────────────────────
 
 class ITSupportMenu(QtWidgets.QMainWindow):
     def __init__(self):
@@ -778,9 +840,10 @@ class ITSupportMenu(QtWidgets.QMainWindow):
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"
-            "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
+            "QTabBar::tab{background:white;border:2px solid black;padding:6px "
+            "18px;"
             "border-bottom:none;border-radius:4px 4px 0 0;}"
-            "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+            "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"  # noqa: E501
             "QTabBar::tab:hover{background:rgb(85,255,255);}"
         )
         tabs.addTab(ITSupportWidget(), "Support Calls")

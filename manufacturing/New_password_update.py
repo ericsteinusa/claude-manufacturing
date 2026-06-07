@@ -46,15 +46,16 @@ def check_name(self):
     if not email.strip():
         QMessageBox.warning(self, "Input Error", "Please enter your email.")
     else:
-        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = %s", (email,))
+        cursor.execute("SELECT passwd.id as passwd_id, passwd.people_id as people_id, people.email as people_email, passwd.password as passwd_password FROM passwd JOIN people ON passwd.people_id = people.id WHERE people_email = %s", (email,))  # noqa: E501
         result = cursor.fetchone()
         if result:
             # id = result[0]
             email = self.ui.email_lineEdit.text()
             # password = self.ui.passwd_lineEdit.text()
-            QMessageBox.information("Result", f"Email '{email}' exists in the database!")
             QMessageBox.information(
-                "User Details", f"id: {result[0]}\nPeople ID: {result[1]}\nEmail: {result[2]}\nPassword: {result[3]}")
+    "Result", f"Email '{email}' exists in the database!")
+            QMessageBox.information(
+                "User Details", f"id: {result[0]}\nPeople ID: {result[1]}\nEmail: {result[2]}\nPassword: {result[3]}")  # noqa: E501
 
 
 '''

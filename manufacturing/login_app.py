@@ -51,7 +51,8 @@ def init_db():
         ("Viewer", "Read-only access"),
     ]
     conn.executemany(
-        "INSERT INTO roles (role_name, description) VALUES (%s, %s) ON CONFLICT (role_name) DO NOTHING",
+        "INSERT INTO roles (role_name, description) VALUES (%s, %s) ON "
+        "CONFLICT (role_name) DO NOTHING",
         default_roles,
     )
     conn.commit()
@@ -74,7 +75,8 @@ def get_all_users_with_roles():
 
 def get_all_roles():
     conn = get_db()
-    rows = conn.execute("SELECT id, role_name, description FROM roles ORDER BY id").fetchall()
+    rows = conn.execute(
+        "SELECT id, role_name, description FROM roles ORDER BY id").fetchall()
     conn.close()
     return rows
 
@@ -118,25 +120,31 @@ def verify_login(email: str, password: str) -> bool:
         # Plain-text legacy password — verify then transparently rehash
         ok = (password == stored)
         if ok:
-            hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-            conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
+            hashed = bcrypt.hashpw(
+    password.encode(),
+     bcrypt.gensalt()).decode()
+            conn.execute(
+    "UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
             conn.commit()
     conn.close()
     return ok
 
 
-def create_user(email: str, password: str, first_name: str = "", last_name: str = "",
-                address: str = "", city: str = "", state: str = "", zip_code: str = "",
+def create_user(email: str, password: str, first_name: str = "", last_name: str = "",  # noqa: E501
+                address: str = "", city: str = "", state: str = "", zip_code: str = "",  # noqa: E501
                 employee_id: int = 0) -> bool:
     try:
         conn = get_db()
-        if conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone():
+        if conn.execute("SELECT id FROM people WHERE email = %s",
+                        (email,)).fetchone():
             conn.close()
             return False
         cursor = conn.execute(
-            "INSERT INTO people (first_name, last_name, employee_id, address, city, state, zip_code, email) "
+            "INSERT INTO people (first_name, last_name, employee_id, address, "
+            "city, state, zip_code, email) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
-            (first_name, last_name, employee_id, address, city, state, zip_code, email),
+            (first_name, last_name, employee_id,
+             address, city, state, zip_code, email),
         )
         people_id = cursor.fetchone()['id']
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
@@ -151,15 +159,16 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         return False
 
 
-def change_password(email: str, current_password: str, new_password: str) -> bool:
-    """Verify current password then update to new one. Returns False if auth fails."""
+def change_password(email: str, current_password: str,
+                    new_password: str) -> bool:
+    """Verify current password then update to new one. Returns False if auth fails."""  # noqa: E501
     if not verify_login(email, current_password):
         return False
     return reset_password(email, new_password)
 
 
 def reset_password(email: str, new_password: str) -> bool:
-    """Update the password for an existing account. Returns False if email not found."""
+    """Update the password for an existing account. Returns False if email not found."""  # noqa: E501
     conn = get_db()
     row = conn.execute(
         """
@@ -174,7 +183,8 @@ def reset_password(email: str, new_password: str) -> bool:
         conn.close()
         return False
     hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-    conn.execute("UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
+    conn.execute("UPDATE passwd SET password = %s WHERE id = %s",
+                 (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
     return True
@@ -203,7 +213,8 @@ INPUT_STYLE = (
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 LINK_STYLE = (
-    "QPushButton{color: white; background: transparent; border: none; text-decoration: underline;}"
+    "QPushButton{color: white; background: transparent; border: none; "
+    "text-decoration: underline;}"
     "QPushButton:hover{color: rgb(85, 255, 255);}"
 )
 
@@ -220,7 +231,8 @@ def _apply_blue_palette(widget: QtWidgets.QWidget):
     widget.setPalette(palette)
 
 
-def _make_row(label_text: str, widget: QtWidgets.QWidget, label_width: int = 100):
+def _make_row(label_text: str, widget: QtWidgets.QWidget,
+              label_width: int = 100):
     row = QtWidgets.QHBoxLayout()
     lbl = QtWidgets.QLabel(label_text)
     lbl.setFixedWidth(label_width)
@@ -249,10 +261,13 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("Reset Your Password")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet(
+            "color: white; font-size: 16px; font-weight: bold;")
         layout.addWidget(title)
 
-        subtitle = QtWidgets.QLabel("Enter your email to verify your account,\nthen choose a new password.")
+        subtitle = QtWidgets.QLabel(
+            "Enter your email to verify your account,\nthen choose a new "
+            "password.")
         subtitle.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         subtitle.setStyleSheet("color: white; font-size: 11px;")
         layout.addWidget(subtitle)
@@ -267,18 +282,27 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
 
         # New password (hidden until email verified)
         self.new_passwd_input = QtWidgets.QLineEdit()
-        self.new_passwd_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+        self.new_passwd_input.setEchoMode(
+    QtWidgets.QLineEdit.EchoMode.Password)
         self.new_passwd_input.setPlaceholderText("Minimum 8 characters")
         self.new_passwd_input.setStyleSheet(INPUT_STYLE)
         self.new_passwd_input.setEnabled(False)
-        layout.addLayout(_make_row("New Password:", self.new_passwd_input, label_width=115))
+        layout.addLayout(
+    _make_row(
+        "New Password:",
+        self.new_passwd_input,
+         label_width=115))
 
         self.confirm_input = QtWidgets.QLineEdit()
         self.confirm_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.confirm_input.setPlaceholderText("Re-enter new password")
         self.confirm_input.setStyleSheet(INPUT_STYLE)
         self.confirm_input.setEnabled(False)
-        layout.addLayout(_make_row("Confirm:", self.confirm_input, label_width=115))
+        layout.addLayout(
+    _make_row(
+        "Confirm:",
+        self.confirm_input,
+         label_width=115))
 
         layout.addSpacing(6)
 
@@ -310,14 +334,17 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
     def _verify_email(self):
         email = self.email_input.text().strip()
         if not email or "@" not in email:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter a valid email address.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Please enter a valid email address.")
             return
 
         conn = get_db()
-        found = conn.execute("SELECT id FROM people WHERE email = %s", (email,)).fetchone()
+        found = conn.execute(
+    "SELECT id FROM people WHERE email = %s", (email,)).fetchone()
         conn.close()
 
-        # Give the same message whether found or not to avoid account enumeration
+        # Give the same message whether found or not to avoid account
+        # enumeration
         if not found:
             QtWidgets.QMessageBox.warning(
                 self, "Not Found",
@@ -338,11 +365,13 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
         confirm = self.confirm_input.text()
 
         if len(new_pw) < 8:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Password must be at least 8 characters.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Password must be at least 8 characters.")
             return
         if new_pw != confirm:
             self.confirm_input.clear()
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Passwords do not match.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Passwords do not match.")
             return
 
         self.action_btn.setEnabled(False)
@@ -356,11 +385,13 @@ class ForgotPasswordWindow(QtWidgets.QDialog):
         if ok:
             QtWidgets.QMessageBox.information(
                 self, "Success",
-                "Your password has been reset.\nYou can now log in with your new password."
+                "Your password has been reset.\nYou can now log in with your "
+                "new password."
             )
             self.accept()
         else:
-            QtWidgets.QMessageBox.warning(self, "Error", "Password reset failed. Please try again.")
+            QtWidgets.QMessageBox.warning(
+    self, "Error", "Password reset failed. Please try again.")
 
 
 # ---------------------------------------------------------------------------
@@ -382,7 +413,8 @@ class ChangePasswordWindow(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("Change Password")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet(
+            "color: white; font-size: 16px; font-weight: bold;")
         layout.addWidget(title)
         layout.addSpacing(4)
 
@@ -395,7 +427,11 @@ class ChangePasswordWindow(QtWidgets.QDialog):
         self.current_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.current_input.setPlaceholderText("Current password")
         self.current_input.setStyleSheet(INPUT_STYLE)
-        layout.addLayout(_make_row("Current:", self.current_input, label_width=115))
+        layout.addLayout(
+    _make_row(
+        "Current:",
+        self.current_input,
+         label_width=115))
 
         self.new_input = QtWidgets.QLineEdit()
         self.new_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
@@ -407,7 +443,11 @@ class ChangePasswordWindow(QtWidgets.QDialog):
         self.confirm_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.confirm_input.setPlaceholderText("Re-enter new password")
         self.confirm_input.setStyleSheet(INPUT_STYLE)
-        layout.addLayout(_make_row("Confirm:", self.confirm_input, label_width=115))
+        layout.addLayout(
+    _make_row(
+        "Confirm:",
+        self.confirm_input,
+         label_width=115))
 
         layout.addSpacing(6)
 
@@ -435,20 +475,25 @@ class ChangePasswordWindow(QtWidgets.QDialog):
         confirm = self.confirm_input.text()
 
         if not email or "@" not in email:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter a valid email address.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Please enter a valid email address.")
             return
         if not current:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter your current password.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Please enter your current password.")
             return
         if len(new_pw) < 8:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "New password must be at least 8 characters.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "New password must be at least 8 characters.")
             return
         if new_pw != confirm:
             self.confirm_input.clear()
-            QtWidgets.QMessageBox.warning(self, "Input Error", "New passwords do not match.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "New passwords do not match.")
             return
         if new_pw == current:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "New password must differ from your current password.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "New password must differ from your current password.")  # noqa: E501
             return
 
         self.submit_btn.setEnabled(False)
@@ -491,7 +536,8 @@ class RegisterWindow(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("Register New Employee")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet(
+            "color: white; font-size: 16px; font-weight: bold;")
         layout.addWidget(title)
         layout.addSpacing(6)
 
@@ -609,23 +655,28 @@ class RegisterWindow(QtWidgets.QDialog):
         zip_code = self.zip_input.text().strip()
 
         if not first or not last:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "First and last name are required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "First and last name are required.")
             return
         if not email or "@" not in email:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter a valid email address.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Please enter a valid email address.")
             return
         if len(password) < 8:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Password must be at least 8 characters.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Password must be at least 8 characters.")
             return
         if password != confirm:
             self.confirm_input.clear()
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Passwords do not match.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Passwords do not match.")
             return
 
         emp_id = 0
         if emp_id_text:
             if not emp_id_text.isdigit():
-                QtWidgets.QMessageBox.warning(self, "Input Error", "Employee ID must be a number.")
+                QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Employee ID must be a number.")
                 return
             emp_id = int(emp_id_text)
 
@@ -645,7 +696,7 @@ class RegisterWindow(QtWidgets.QDialog):
         if ok:
             QtWidgets.QMessageBox.information(
                 self, "Success",
-                f"Account created for {first} {last}.\nYou can now log in with your email and password."
+                f"Account created for {first} {last}.\nYou can now log in with your email and password."  # noqa: E501
             )
             self.registration_complete.emit()
             self.accept()
@@ -677,20 +728,28 @@ class RolesWindow(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("User Role Management")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet(
+            "color: white; font-size: 16px; font-weight: bold;")
         layout.addWidget(title)
 
         # Table
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["Name", "Email", "Current Role", "Assign Role"])
-        self.table.horizontalHeader().setStyleSheet("color: black; font-weight: bold;")
-        self.table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setHorizontalHeaderLabels(
+            ["Name", "Email", "Current Role", "Assign Role"])
+        self.table.horizontalHeader().setStyleSheet("color: black; font-weight: bold;")  # noqa: E501
+        self.table.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         layout.addWidget(self.table)
@@ -729,7 +788,8 @@ class RolesWindow(QtWidgets.QDialog):
 
             self.table.setItem(row_idx, 0, QtWidgets.QTableWidgetItem(name))
             self.table.setItem(row_idx, 1, QtWidgets.QTableWidgetItem(email))
-            self.table.setItem(row_idx, 2, QtWidgets.QTableWidgetItem(current_role))
+            self.table.setItem(
+    row_idx, 2, QtWidgets.QTableWidgetItem(current_role))
 
             combo = QtWidgets.QComboBox()
             combo.addItems(role_names)
@@ -762,7 +822,8 @@ class RolesWindow(QtWidgets.QDialog):
         users = get_all_users_with_roles()
         for row_idx, user in enumerate(users):
             current_role = user["role_name"] or "(none)"
-            self.table.setItem(row_idx, 2, QtWidgets.QTableWidgetItem(current_role))
+            self.table.setItem(
+    row_idx, 2, QtWidgets.QTableWidgetItem(current_role))
 
         QtWidgets.QMessageBox.information(
             self, "Saved", f"{saved} role assignment(s) updated."
@@ -789,7 +850,8 @@ class SessionWindow(QtWidgets.QMainWindow):
         toolbar = self.addToolBar("Session")
         toolbar.setMovable(False)
         toolbar.setStyleSheet(
-            "QToolBar { background-color: rgb(0, 60, 180); border: none; spacing: 8px; padding: 4px; }"
+            "QToolBar { background-color: rgb(0, 60, 180); border: none; "
+            "spacing: 8px; padding: 4px; }"
         )
 
         roles_btn = QtWidgets.QPushButton("User Roles")
@@ -812,7 +874,8 @@ class SessionWindow(QtWidgets.QMainWindow):
         toolbar.addWidget(spacer)
 
         user_lbl = QtWidgets.QLabel(f"Logged in as:  {self.email}")
-        user_lbl.setStyleSheet("color: white; font-size: 12px; padding-right: 12px;")
+        user_lbl.setStyleSheet(
+            "color: white; font-size: 12px; padding-right: 12px;")
         toolbar.addWidget(user_lbl)
 
         logout_btn = QtWidgets.QPushButton("Logout")
@@ -832,7 +895,7 @@ class SessionWindow(QtWidgets.QMainWindow):
     def _on_logout(self):
         reply = QtWidgets.QMessageBox.question(
             self, "Logout", "Are you sure you want to logout?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             self.logged_out.emit()
@@ -863,7 +926,8 @@ class LoginWindow(QtWidgets.QMainWindow):
 
         title = QtWidgets.QLabel("Manufacturing System Login")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet(
+            "color: white; font-size: 16px; font-weight: bold;")
         layout.addWidget(title)
 
         layout.addSpacing(10)
@@ -892,19 +956,25 @@ class LoginWindow(QtWidgets.QMainWindow):
         forgot_btn.setFixedHeight(28)
         forgot_btn.setStyleSheet(LINK_STYLE)
         forgot_btn.clicked.connect(self._open_forgot_password)
-        layout.addWidget(forgot_btn, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(
+    forgot_btn,
+     alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         change_btn = QtWidgets.QPushButton("Change Password")
         change_btn.setFixedHeight(28)
         change_btn.setStyleSheet(LINK_STYLE)
         change_btn.clicked.connect(self._open_change_password)
-        layout.addWidget(change_btn, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(
+    change_btn,
+     alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
         register_btn = QtWidgets.QPushButton("Register New User")
         register_btn.setFixedHeight(28)
         register_btn.setStyleSheet(LINK_STYLE)
         register_btn.clicked.connect(self._open_register)
-        layout.addWidget(register_btn, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(
+    register_btn,
+     alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
 
     def _open_forgot_password(self):
         dlg = ForgotPasswordWindow(self)
@@ -924,7 +994,8 @@ class LoginWindow(QtWidgets.QMainWindow):
         password = self.passwd_input.text()
 
         if not email or not password:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Please enter both email and password.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Please enter both email and password.")
             return
 
         self.login_btn.setEnabled(False)
@@ -940,7 +1011,8 @@ class LoginWindow(QtWidgets.QMainWindow):
             self.hide()
         else:
             self.passwd_input.clear()
-            QtWidgets.QMessageBox.warning(self, "Login Failed", "Invalid email or password.")
+            QtWidgets.QMessageBox.warning(
+    self, "Login Failed", "Invalid email or password.")
 
 
 # ---------------------------------------------------------------------------

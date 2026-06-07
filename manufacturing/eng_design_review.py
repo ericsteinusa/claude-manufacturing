@@ -6,15 +6,24 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+    "QComboBox{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
     "QComboBox QAbstractItemView{background-color:white;}"
 )
-TEXT_STYLE = "QPlainTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+TEXT_STYLE = (
+    "QPlainTextEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
 LABEL_STYLE = "color:white;font-size:13px;"
 
 ECR_STATUSES = ("draft", "pending", "approved", "rejected", "revision_needed")
@@ -87,11 +96,13 @@ class NewECRDialog(QtWidgets.QDialog):
         self.project_combo.addItem("(no project)", None)
         conn = get_db()
         projects = conn.execute(
-            "SELECT id, project_number, title FROM eng_project ORDER BY project_number"
+            "SELECT id, project_number, title FROM eng_project ORDER BY "
+            "project_number"
         ).fetchall()
         conn.close()
         for p in projects:
-            self.project_combo.addItem(f"{p['project_number']} — {p['title']}", p["id"])
+            self.project_combo.addItem(
+                f"{p['project_number']} — {p['title']}", p["id"])
         layout.addRow(lbl("Project:"), self.project_combo)
 
         self.requested_by = QtWidgets.QLineEdit()
@@ -99,7 +110,8 @@ class NewECRDialog(QtWidgets.QDialog):
         self.requested_by.setPlaceholderText("Requested by")
         layout.addRow(lbl("Requested By:"), self.requested_by)
 
-        self.review_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(7))
+        self.review_date = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addDays(7))
         self.review_date.setCalendarPopup(True)
         self.review_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Review Date:"), self.review_date)
@@ -135,7 +147,8 @@ class NewECRDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO eng_design_review"
-                " (ecr_number, title, project_id, requested_by, review_date, status, notes)"
+                " (ecr_number, title, project_id, requested_by, review_date, "
+                "status, notes)"
                 " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, title,
                  self.project_combo.currentData(),
@@ -148,14 +161,14 @@ class NewECRDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"ECR number '{num}' already exists.")
+                                          f"ECR number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
         self.accept()
 
 
-# ── Embeddable widget (used standalone and embedded in eng_mgr) ────────────────
+# ── Embeddable widget (used standalone and embedded in eng_mgr) ─────────
 
 class DesignReviewWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -207,17 +220,22 @@ class DesignReviewWidget(QtWidgets.QWidget):
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(
-            ["ECR #", "Title", "Project", "Requested By", "Review Date", "Status"]
+            ["ECR #", "Title", "Project", "Requested By", "Review Date", "Status"]  # noqa: E501
         )
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color:black;font-weight:bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         self.table.clicked.connect(self._on_row_clicked)
@@ -242,10 +260,14 @@ class DesignReviewWidget(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New ECR", self._on_new),
-            ("Submit for Review", lambda: self._set_status("pending", "Submit for review%s")),
-            ("Approve", lambda: self._set_status("approved", "Approve this design review%s")),
-            ("Request Revision", lambda: self._set_status("revision_needed", "Request revision%s")),
-            ("Reject", lambda: self._set_status("rejected", "Reject this design review%s")),
+            ("Submit for Review", lambda: self._set_status(
+                "pending", "Submit for review%s")),
+            ("Approve", lambda: self._set_status(
+                "approved", "Approve this design review%s")),
+            ("Request Revision", lambda: self._set_status(
+                "revision_needed", "Request revision%s")),
+            ("Reject", lambda: self._set_status(
+                "rejected", "Reject this design review%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -265,13 +287,16 @@ class DesignReviewWidget(QtWidgets.QWidget):
             conds.append("d.status = %s")
             params.append(status_val)
         if term:
-            conds.append("(d.ecr_number LIKE %s OR d.title LIKE %s OR d.requested_by LIKE %s)")
+            conds.append(
+                "(d.ecr_number LIKE %s OR d.title LIKE %s OR d.requested_by "
+                "LIKE %s)")
             params += [f"%{term}%"] * 3
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
         rows = conn.execute(
             "SELECT d.*, p.project_number, p.title as proj_title"
-            " FROM eng_design_review d LEFT JOIN eng_project p ON d.project_id = p.id"
+            " FROM eng_design_review d LEFT JOIN eng_project p ON "
+            "d.project_id = p.id"
             + where + " ORDER BY d.review_date, d.ecr_number", params
         ).fetchall()
         conn.close()
@@ -287,7 +312,10 @@ class DesignReviewWidget(QtWidgets.QWidget):
             self.table.setItem(r, 2, _ro(proj_str))
             self.table.setItem(r, 3, _ro(row["requested_by"] or ""))
             self.table.setItem(r, 4, _ro(row["review_date"] or ""))
-            self.table.setItem(r, 5, _ro(row["status"].replace("_", " ").capitalize()))
+            self.table.setItem(
+    r, 5, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(ECR_COLORS.get(row["status"], "#ffffff"))
             for col in range(6):
                 self.table.item(r, col).setBackground(bg)
@@ -309,7 +337,8 @@ class DesignReviewWidget(QtWidgets.QWidget):
         conn = get_db()
         rec = conn.execute(
             "SELECT d.*, p.project_number, p.title as proj_title"
-            " FROM eng_design_review d LEFT JOIN eng_project p ON d.project_id = p.id"
+            " FROM eng_design_review d LEFT JOIN eng_project p ON "
+            "d.project_id = p.id"
             " WHERE d.id = %s", (self._selected_id,)
         ).fetchone()
         conn.close()
@@ -340,18 +369,18 @@ class DesignReviewWidget(QtWidgets.QWidget):
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE eng_design_review SET status = %s WHERE id = %s",
+            conn.execute("UPDATE eng_design_review SET status = %s WHERE id = %s",  # noqa: E501
                          (new_status, self._selected_id))
             conn.commit()
             conn.close()
             self._refresh()
 
 
-# ── Standalone window wrapper ──────────────────────────────────────────────────
+# ── Standalone window wrapper ───────────────────────────────────────────
 
 class DesignReviewMenu(QtWidgets.QMainWindow):
     def __init__(self):

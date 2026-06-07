@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -82,7 +88,8 @@ def _load_dept_subs(dept_id):
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT dept_sub_id, dept_sub_name FROM dept_sub WHERE dept_id = %s"
+            "SELECT dept_sub_id, dept_sub_name FROM dept_sub WHERE dept_id = "
+            "%s"
             " ORDER BY dept_sub_name", (dept_id,)
         ).fetchall()
     except psycopg2.OperationalError:
@@ -94,14 +101,15 @@ def _load_dept_subs(dept_id):
 def _load_roles():
     conn = get_db()
     try:
-        rows = conn.execute("SELECT id, role_name FROM roles ORDER BY role_name").fetchall()
+        rows = conn.execute(
+            "SELECT id, role_name FROM roles ORDER BY role_name").fetchall()
     except psycopg2.OperationalError:
         rows = []
     conn.close()
     return rows
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class EmployeeDialog(QtWidgets.QDialog):
     """Shared dialog for adding and editing an employee."""
@@ -207,7 +215,7 @@ class EmployeeDialog(QtWidgets.QDialog):
         conn = get_db()
         rec = conn.execute("SELECT * FROM people WHERE id = %s",
                            (self._people_id,)).fetchone()
-        pos = conn.execute("SELECT job_title FROM position WHERE people_id = %s",
+        pos = conn.execute("SELECT job_title FROM position WHERE people_id = %s",  # noqa: E501
                            (self._people_id,)).fetchone()
         role = conn.execute(
             "SELECT role_id FROM user_roles WHERE people_id = %s",
@@ -250,10 +258,12 @@ class EmployeeDialog(QtWidgets.QDialog):
         first = self.first_name.text().strip()
         last = self.last_name.text().strip()
         if not (first or last):
-            QtWidgets.QMessageBox.warning(self, "Input Error", "First or last name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "First or last name is required.")
             return
         try:
-            emp_id = int(self.employee_id.text().strip()) if self.employee_id.text().strip() else 0
+            emp_id = int(self.employee_id.text().strip()
+                         ) if self.employee_id.text().strip() else 0
         except ValueError:
             emp_id = 0
 
@@ -261,24 +271,26 @@ class EmployeeDialog(QtWidgets.QDialog):
         try:
             if self._people_id is None:
                 cur = conn.execute(
-                    "INSERT INTO people (first_name, last_name, email, employee_id,"
+                    "INSERT INTO people (first_name, last_name, email, "
+                    "employee_id,"
                     " address, city, state, zip_code, dept_id, dept_sub_id)"
                     " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                     (first, last, self.email.text().strip(), emp_id,
                      self.address.text().strip(), self.city.text().strip(),
                      self.state.text().strip(), self.zip_code.text().strip(),
-                     self.dept_combo.currentData(), self.sub_combo.currentData())
+                     self.dept_combo.currentData(), self.sub_combo.currentData())  # noqa: E501
                 )
                 self.saved_id = cur.fetchone()['id']
             else:
                 conn.execute(
                     "UPDATE people SET first_name=%s, last_name=%s, email=%s,"
-                    " employee_id=%s, address=%s, city=%s, state=%s, zip_code=%s,"
+                    " employee_id=%s, address=%s, city=%s, state=%s, "
+                    "zip_code=%s,"
                     " dept_id=%s, dept_sub_id=%s WHERE id=%s",
                     (first, last, self.email.text().strip(), emp_id,
                      self.address.text().strip(), self.city.text().strip(),
                      self.state.text().strip(), self.zip_code.text().strip(),
-                     self.dept_combo.currentData(), self.sub_combo.currentData(),
+                     self.dept_combo.currentData(), self.sub_combo.currentData(),  # noqa: E501
                      self._people_id)
                 )
                 self.saved_id = self._people_id
@@ -288,15 +300,18 @@ class EmployeeDialog(QtWidgets.QDialog):
             title = self.job_title.text().strip()
             conn.execute(
                 "INSERT INTO position (people_id, job_title) VALUES (%s,%s)"
-                " ON CONFLICT (people_id) DO UPDATE SET job_title = EXCLUDED.job_title",
+                " ON CONFLICT (people_id) DO UPDATE SET job_title = "
+                "EXCLUDED.job_title",
                 (pid, title)
             )
             # Upsert role
             role_id = self.role_combo.currentData()
             if role_id is not None:
                 conn.execute(
-                    "INSERT INTO user_roles (people_id, role_id) VALUES (%s,%s)"
-                    " ON CONFLICT (people_id) DO UPDATE SET role_id = EXCLUDED.role_id",
+                    "INSERT INTO user_roles (people_id, role_id) VALUES "
+                    "(%s,%s)"
+                    " ON CONFLICT (people_id) DO UPDATE SET role_id = "
+                    "EXCLUDED.role_id",
                     (pid, role_id)
                 )
             conn.commit()
@@ -329,7 +344,8 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
 
         def val():
             w = QtWidgets.QLabel("")
-            w.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+            w.setStyleSheet(
+                "color: white; font-size: 13px; font-weight: bold;")
             return w
 
         self.v_name    = val()
@@ -356,11 +372,13 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
 
     def load(self, people_id):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM people WHERE id = %s", (people_id,)).fetchone()
-        pos = conn.execute("SELECT job_title FROM position WHERE people_id = %s",
+        rec = conn.execute(
+    "SELECT * FROM people WHERE id = %s", (people_id,)).fetchone()
+        pos = conn.execute("SELECT job_title FROM position WHERE people_id = %s",  # noqa: E501
                            (people_id,)).fetchone()
         role = conn.execute(
-            "SELECT r.role_name FROM user_roles ur JOIN roles r ON r.id = ur.role_id"
+            "SELECT r.role_name FROM user_roles ur JOIN roles r ON r.id = "
+            "ur.role_id"
             " WHERE ur.people_id = %s", (people_id,)
         ).fetchone()
         dept = conn.execute(
@@ -373,7 +391,8 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
         if not rec:
             self.clear()
             return
-        self.v_name.setText(f"{rec['first_name'] or ''} {rec['last_name'] or ''}".strip())
+        self.v_name.setText(
+            f"{rec['first_name'] or ''} {rec['last_name'] or ''}".strip())
         self.v_email.setText(rec["email"] or "")
         dept_str = dept["dept_name"] or "" if dept else ""
         if dept and dept["dept_sub_name"]:
@@ -381,7 +400,12 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
         self.v_dept.setText(dept_str)
         self.v_title.setText(pos["job_title"] if pos else "")
         self.v_role.setText(role["role_name"] if role else "")
-        parts = [p for p in (rec["address"], rec["city"], rec["state"], rec["zip_code"]) if p]
+        parts = [
+    p for p in (
+        rec["address"],
+        rec["city"],
+        rec["state"],
+         rec["zip_code"]) if p]
         self.v_address.setText(", ".join(parts))
 
     def clear(self):
@@ -390,7 +414,7 @@ class EmployeeDetailPanel(QtWidgets.QWidget):
             w.setText("")
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class EmployeesWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -445,20 +469,30 @@ class EmployeesWidget(QtWidgets.QWidget):
         self.emp_table = QtWidgets.QTableWidget()
         self.emp_table.setColumnCount(7)
         self.emp_table.setHorizontalHeaderLabels(
-            ["Emp ID", "First Name", "Last Name", "Email", "Department", "Job Title", "Role"]
+            ["Emp ID", "First Name", "Last Name", "Email",
+                "Department", "Job Title", "Role"]
         )
         hh = self.emp_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.emp_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.emp_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.emp_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.emp_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.emp_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.emp_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.emp_table.setAlternatingRowColors(True)
         self.emp_table.verticalHeader().setVisible(False)
         self.emp_table.clicked.connect(self._on_row_clicked)
@@ -559,7 +593,8 @@ class EmployeesWidget(QtWidgets.QWidget):
 
     def _on_edit(self, _index=None):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an employee first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an employee first.")
             return
         dlg = EmployeeDialog(people_id=self._selected_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -568,7 +603,8 @@ class EmployeesWidget(QtWidgets.QWidget):
 
     def _on_delete(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an employee first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an employee first.")
             return
         conn = get_db()
         rec = conn.execute(
@@ -576,18 +612,24 @@ class EmployeesWidget(QtWidgets.QWidget):
             (self._selected_id,)
         ).fetchone()
         conn.close()
-        name = f"{rec['first_name'] or ''} {rec['last_name'] or ''}".strip() if rec else "this employee"
+        name = f"{
+    rec['first_name'] or ''} {
+        rec['last_name'] or ''}".strip() if rec else "this employee"
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete",
             f"Delete '{name}'? This cannot be undone.",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM user_roles WHERE people_id = %s", (self._selected_id,))
-            conn.execute("DELETE FROM position WHERE people_id = %s", (self._selected_id,))
-            conn.execute("DELETE FROM passwd WHERE people_id = %s", (self._selected_id,))
-            conn.execute("DELETE FROM people WHERE id = %s", (self._selected_id,))
+            conn.execute(
+    "DELETE FROM user_roles WHERE people_id = %s", (self._selected_id,))
+            conn.execute(
+    "DELETE FROM position WHERE people_id = %s", (self._selected_id,))
+            conn.execute(
+    "DELETE FROM passwd WHERE people_id = %s", (self._selected_id,))
+            conn.execute("DELETE FROM people WHERE id = %s",
+                         (self._selected_id,))
             conn.commit()
             conn.close()
             self._selected_id = None

@@ -24,7 +24,7 @@ for script, key, shot in tests:
         print(f"  CRASHED (exit {ret})")
         print(f"  stderr: {err.decode()[:500]}")
     else:
-        subprocess.run(['import', '-window', 'root', '-crop', '1150x700+0+0', shot],
+        subprocess.run(['import', '-window', 'root', '-crop', '1150x700+0+0', shot],  # noqa: E501
                        env={**os.environ, 'DISPLAY': ':0'})
         print(f"  Running OK — screenshot saved to {shot}")
         proc.terminate()

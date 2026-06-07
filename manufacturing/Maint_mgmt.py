@@ -17,9 +17,9 @@ def _conn():
     return get_db()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Schema
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 def init_db():
     with _conn() as con:
         con.executescript("""
@@ -115,60 +115,67 @@ def _seed(con):
     today = date.today().isoformat()
     if con.execute("SELECT COUNT(*) FROM maint_work_order").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO maint_work_order (title,equipment,work_type,priority,assigned_to,requested_date,due_date,status) "
+            "INSERT INTO maint_work_order (title,equipment,work_type,priority,assigned_to,requested_date,due_date,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("Replace conveyor belt motor", "Conveyor Line A", "Repair", "High",
+            ("Replace conveyor belt motor", "Conveyor Line A", "Repair", "High",  # noqa: E501
              "M. Tanaka", today, "2026-06-10", "Open"))
     if con.execute("SELECT COUNT(*) FROM maint_equipment").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO maint_equipment (name,asset_tag,location,manufacturer,install_date,last_service,status) "
+            "INSERT INTO maint_equipment (name,asset_tag,location,manufacturer,install_date,last_service,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("CNC Milling Machine #3", "EQ-1042", "Shop Floor B", "Haas", "2022-03-15",
+            ("CNC Milling Machine #3", "EQ-1042", "Shop Floor B", "Haas", "2022-03-15",  # noqa: E501
              "2026-04-01", "Operational"))
     if con.execute("SELECT COUNT(*) FROM maint_part").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO maint_part (name,part_number,category,location,quantity,reorder_level,unit_cost,status) "
+            "INSERT INTO maint_part (name,part_number,category,location,quantity,reorder_level,unit_cost,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("Drive belt V-type", "BLT-220", "Belts", "Aisle 4 / Bin 12", "3", "5", 42.50, "Low Stock"))
+            ("Drive belt V-type", "BLT-220", "Belts", "Aisle 4 / Bin 12", "3", "5", 42.50, "Low Stock"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM maint_schedule").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO maint_schedule (task,equipment,frequency,assigned_to,last_done,next_due,status) "
+            "INSERT INTO maint_schedule "
+            "(task,equipment,frequency,assigned_to,last_done,next_due,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
             ("Lubricate bearings", "Conveyor Line A", "Monthly", "M. Tanaka",
              "2026-05-01", "2026-06-01", "Scheduled"))
     if con.execute("SELECT COUNT(*) FROM maint_inspection").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO maint_inspection (area,inspection_type,inspector,scheduled_date,status) "
+            "INSERT INTO maint_inspection "
+            "(area,inspection_type,inspector,scheduled_date,status) "
             "VALUES (%s,%s,%s,%s,%s)",
-            ("Shop Floor B", "Fire Safety", "Safety Officer", "2026-06-20", "Scheduled"))
+            ("Shop Floor B", "Fire Safety", "Safety Officer", "2026-06-20", "Scheduled"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM maint_downtime").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO maint_downtime (equipment,reason,category,down_date,hours,cost,status) "
+            "INSERT INTO maint_downtime "
+            "(equipment,reason,category,down_date,hours,cost,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Conveyor Line A", "Motor failure", "Breakdown", today, "4", 1800, "Ongoing"))
+            ("Conveyor Line A", "Motor failure", "Breakdown", today, "4", 1800, "Ongoing"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM maint_mechanic").fetchone()[0] == 0:
         con.executemany(
-            "INSERT INTO maint_mechanic (name,trade,shift,phone,status) VALUES (%s,%s,%s,%s,%s)",
+            "INSERT INTO maint_mechanic (name,trade,shift,phone,status) "
+            "VALUES (%s,%s,%s,%s,%s)",
             [("M. Tanaka", "Mechanical", "Day", "x4101", "Active"),
              ("R. Okafor", "Electrical", "Day", "x4102", "Active"),
              ("L. Petrov", "HVAC", "Swing", "x4103", "Active")])
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared styling helpers
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 
-# Row tint keyed by common status words shared across the maintenance registers.
+# Row tint keyed by common status words shared across the maintenance
+# registers.
 STATUS_COLORS = {
     "Open": QtGui.QColor(255, 230, 205),
     "Assigned": QtGui.QColor(255, 255, 200),
@@ -216,7 +223,8 @@ def _apply_blue_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -236,9 +244,9 @@ def _money(v):
         return ""
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic record dialog — built from a list of field specs
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RecordDialog(QtWidgets.QDialog):
     """A form dialog generated from field specs.
 
@@ -263,8 +271,8 @@ class _RecordDialog(QtWidgets.QDialog):
                 self._set_value(f, w, row_data[f["key"]])
         v.addLayout(fl)
 
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
+                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)  # noqa: E501
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
@@ -328,15 +336,15 @@ class _RecordDialog(QtWidgets.QDialog):
         return out
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic register widget — one DB table, configured per subclass via SPEC
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _MaintCrudWidget(QtWidgets.QWidget):
     # Subclasses set SPEC = {
     #   'table', 'title', 'noun',
     #   'statuses': [...],
     #   'columns': [(field_key, header, width|None)],  # 'id' implied first
-    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update
+    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update  # noqa: E501
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
@@ -349,7 +357,7 @@ class _MaintCrudWidget(QtWidgets.QWidget):
         self._build_ui()
         self._refresh()
 
-    # ── UI ────────────────────────────────────────────────────────────────────
+    # ── UI ──────────────────────────────────────────────────────────────────
     def _build_ui(self):
         spec = self.SPEC
         root = QtWidgets.QVBoxLayout(self)
@@ -357,7 +365,8 @@ class _MaintCrudWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel(spec["title"])
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         fb = QtWidgets.QHBoxLayout()
@@ -384,8 +393,10 @@ class _MaintCrudWidget(QtWidgets.QWidget):
                     i, QtWidgets.QHeaderView.ResizeMode.Stretch)
             else:
                 self.tbl.setColumnWidth(i, width)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setDefaultSectionSize(24)
         self.tbl.itemDoubleClicked.connect(self._edit)
@@ -412,17 +423,18 @@ class _MaintCrudWidget(QtWidgets.QWidget):
         return w
 
     def _extra_buttons(self):
-        """Subclasses return a list of (label, slot) for extra action buttons."""
+        """Subclasses return a list of (label, slot) for extra action buttons."""  # noqa: E501
         return []
 
-    # ── Data ────────────────────────────────────────────────────────────────────
+    # ── Data ────────────────────────────────────────────────────────────────
     def _money_keys(self):
         return {f["key"] for f in self.SPEC["fields"] if f["kind"] == "money"}
 
     def _refresh(self, *_):
         spec = self.SPEC
-        sf = self.status_filter.currentText() if hasattr(self, "status_filter") else "All Statuses"
-        term = self.search.text().strip().lower() if hasattr(self, "search") else ""
+        sf = self.status_filter.currentText() if hasattr(
+            self, "status_filter") else "All Statuses"
+        term = self.search.text().strip().lower() if hasattr(self, "search") else ""  # noqa: E501
         with _conn() as con:
             q = f"SELECT * FROM {spec['table']} WHERE 1=1"
             p = []
@@ -441,9 +453,14 @@ class _MaintCrudWidget(QtWidgets.QWidget):
             self.tbl.insertRow(r)
             for c, key in enumerate(self._col_keys):
                 if key == "id":
-                    self.tbl.setItem(r, c, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
                 elif key in money_keys:
-                    self.tbl.setItem(r, c, _ro(_money(row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        _money(
+            row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
                 else:
                     self.tbl.setItem(r, c, _ro(row[key]))
             _color_row(self.tbl, r, STATUS_COLORS.get(row["status"]))
@@ -461,7 +478,7 @@ class _MaintCrudWidget(QtWidgets.QWidget):
             return None
         return int(self.tbl.item(self.tbl.currentRow(), 0).text())
 
-    # ── CRUD ────────────────────────────────────────────────────────────────────
+    # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
         dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
@@ -470,7 +487,9 @@ class _MaintCrudWidget(QtWidgets.QWidget):
         v = dlg.values()
         keys = [f["key"] for f in spec["fields"]]
         if not v[keys[0]]:
-            QtWidgets.QMessageBox.warning(self, "Required", f"{spec['fields'][0]['label']} is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Required", f"{
+        spec['fields'][0]['label']} is required.")
             return
         cols = ",".join(keys)
         ph = ",".join(["%s"] * len(keys))
@@ -485,10 +504,16 @@ class _MaintCrudWidget(QtWidgets.QWidget):
         if rid is None:
             return
         with _conn() as con:
-            rd = con.execute(f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()
+            rd = con.execute(
+                f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()  # noqa: E501
         if not rd:
             return
-        dlg = _RecordDialog(f"Edit {spec['noun']}", spec["fields"], self, row_data=rd)
+        dlg = _RecordDialog(
+    f"Edit {
+        spec['noun']}",
+        spec["fields"],
+        self,
+         row_data=rd)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -524,30 +549,60 @@ class _MaintCrudWidget(QtWidgets.QWidget):
             params.append(date.today().isoformat())
         params.append(rid)
         with _conn() as con:
-            con.execute(f"UPDATE {spec['table']} SET {sets} WHERE id=%s", params)
+            con.execute(
+    f"UPDATE {
+        spec['table']} SET {sets} WHERE id=%s",
+         params)
         self._refresh()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Vocabularies
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 WORK_TYPES = ["Repair", "Inspection", "Installation", "Calibration",
               "Cleaning", "Replacement", "Preventive", "Other"]
 PRIORITIES = ["Low", "Medium", "High", "Critical"]
-WORK_ORDER_STATUSES = ["Open", "Assigned", "In Progress", "On Hold", "Completed", "Cancelled"]
+WORK_ORDER_STATUSES = [
+    "Open",
+    "Assigned",
+    "In Progress",
+    "On Hold",
+    "Completed",
+     "Cancelled"]
 
-EQUIPMENT_STATUSES = ["Operational", "Needs Service", "Under Repair", "Down", "Retired"]
+EQUIPMENT_STATUSES = [
+    "Operational",
+    "Needs Service",
+    "Under Repair",
+    "Down",
+     "Retired"]
 
 PART_CATEGORIES = ["Belts", "Bearings", "Filters", "Motors", "Electrical",
                    "Hydraulics", "Fasteners", "Lubricants", "Other"]
-PART_STATUSES = ["In Stock", "Low Stock", "On Order", "Out of Stock", "Discontinued"]
+PART_STATUSES = [
+    "In Stock",
+    "Low Stock",
+    "On Order",
+    "Out of Stock",
+     "Discontinued"]
 
-FREQUENCIES = ["Daily", "Weekly", "Monthly", "Quarterly", "Semi-Annual", "Annual"]
+FREQUENCIES = [
+    "Daily",
+    "Weekly",
+    "Monthly",
+    "Quarterly",
+    "Semi-Annual",
+     "Annual"]
 SCHEDULE_STATUSES = ["Scheduled", "Due", "Overdue", "Completed", "Skipped"]
 
 INSPECTION_TYPES = ["Fire Safety", "Electrical", "Machine Guarding", "PPE",
                     "Lockout/Tagout", "Environmental", "General"]
-INSPECTION_STATUSES = ["Scheduled", "In Progress", "Passed", "Failed", "Follow-up"]
+INSPECTION_STATUSES = [
+    "Scheduled",
+    "In Progress",
+    "Passed",
+    "Failed",
+     "Follow-up"]
 
 DOWNTIME_CATEGORIES = ["Breakdown", "Planned", "Setup", "Material Shortage",
                        "Quality", "Changeover", "Other"]
@@ -560,17 +615,18 @@ MECHANIC_STATUSES = ["Active", "On Leave", "Inactive"]
 
 
 def _mechanic_names():
-    """Active mechanics from the roster, ordered by name — used for assignment."""
+    """Active mechanics from the roster, ordered by name — used for assignment."""  # noqa: E501
     with _conn() as con:
         rows = con.execute(
-            "SELECT name FROM maint_mechanic WHERE status='Active' ORDER BY name"
+            "SELECT name FROM maint_mechanic WHERE status='Active' ORDER BY "
+            "name"
         ).fetchall()
     return [r["name"] for r in rows]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class WorkOrdersWidget(_MaintCrudWidget):
     SPEC = {
         "table": "maint_work_order",
@@ -578,7 +634,7 @@ class WorkOrdersWidget(_MaintCrudWidget):
         "noun": "Work Order",
         "statuses": WORK_ORDER_STATUSES,
         "order_by": "due_date",
-        "action": {"label": "Mark Completed", "status": "Completed", "stamp": "completed_date"},
+        "action": {"label": "Mark Completed", "status": "Completed", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("title", "Work Order", None),
             ("equipment", "Equipment", 150),
@@ -591,13 +647,18 @@ class WorkOrdersWidget(_MaintCrudWidget):
         "fields": [
             {"key": "title", "label": "Work Order", "kind": "text"},
             {"key": "equipment", "label": "Equipment", "kind": "text"},
-            {"key": "work_type", "label": "Type", "kind": "combo", "options": WORK_TYPES, "editable": True},
-            {"key": "priority", "label": "Priority", "kind": "combo", "options": PRIORITIES},
+            {"key": "work_type", "label": "Type", "kind": "combo",
+                "options": WORK_TYPES, "editable": True},
+            {"key": "priority", "label": "Priority",
+                "kind": "combo", "options": PRIORITIES},
             {"key": "assigned_to", "label": "Assigned To", "kind": "text"},
-            {"key": "requested_date", "label": "Requested Date", "kind": "date"},
+            {"key": "requested_date", "label": "Requested Date", "kind": "date"},  # noqa: E501
             {"key": "due_date", "label": "Due Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": WORK_ORDER_STATUSES},
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": WORK_ORDER_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -621,7 +682,8 @@ class WorkOrderMgmtWidget(WorkOrdersWidget):
         if not mechanics:
             QtWidgets.QMessageBox.information(
                 self, "No Mechanics",
-                "No active mechanics in the roster. Add one in the Mechanics tab first.")
+                "No active mechanics in the roster. Add one in the Mechanics "
+                "tab first.")
             return
         name, ok = QtWidgets.QInputDialog.getItem(
             self, "Assign Work Order", "Mechanic:", mechanics, 0, False)
@@ -629,7 +691,8 @@ class WorkOrderMgmtWidget(WorkOrdersWidget):
             return
         with _conn() as con:
             con.execute(
-                "UPDATE maint_work_order SET assigned_to=%s, status='Assigned' WHERE id=%s",
+                "UPDATE maint_work_order SET assigned_to=%s, "
+                "status='Assigned' WHERE id=%s",
                 (name, rid))
         self._refresh()
 
@@ -657,7 +720,10 @@ class EquipmentWidget(_MaintCrudWidget):
             {"key": "manufacturer", "label": "Manufacturer", "kind": "text"},
             {"key": "install_date", "label": "Install Date", "kind": "date"},
             {"key": "last_service", "label": "Last Service", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": EQUIPMENT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": EQUIPMENT_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -683,12 +749,14 @@ class PartsInventoryWidget(_MaintCrudWidget):
         "fields": [
             {"key": "name", "label": "Part", "kind": "text"},
             {"key": "part_number", "label": "Part #", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": PART_CATEGORIES, "editable": True},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": PART_CATEGORIES, "editable": True},
             {"key": "location", "label": "Location", "kind": "text"},
             {"key": "quantity", "label": "Quantity", "kind": "text"},
             {"key": "reorder_level", "label": "Reorder Level", "kind": "text"},
             {"key": "unit_cost", "label": "Unit Cost", "kind": "money"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": PART_STATUSES},
+            {"key": "status", "label": "Status",
+                "kind": "combo", "options": PART_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -701,7 +769,7 @@ class MaintScheduleWidget(_MaintCrudWidget):
         "noun": "Task",
         "statuses": SCHEDULE_STATUSES,
         "order_by": "next_due",
-        "action": {"label": "Mark Completed", "status": "Completed", "stamp": "last_done"},
+        "action": {"label": "Mark Completed", "status": "Completed", "stamp": "last_done"},  # noqa: E501
         "columns": [
             ("task", "Task", None),
             ("equipment", "Equipment", 160),
@@ -713,11 +781,15 @@ class MaintScheduleWidget(_MaintCrudWidget):
         "fields": [
             {"key": "task", "label": "Task", "kind": "text"},
             {"key": "equipment", "label": "Equipment", "kind": "text"},
-            {"key": "frequency", "label": "Frequency", "kind": "combo", "options": FREQUENCIES},
+            {"key": "frequency", "label": "Frequency",
+                "kind": "combo", "options": FREQUENCIES},
             {"key": "assigned_to", "label": "Assigned To", "kind": "text"},
             {"key": "last_done", "label": "Last Done", "kind": "date"},
             {"key": "next_due", "label": "Next Due", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": SCHEDULE_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": SCHEDULE_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -730,7 +802,7 @@ class SafetyInspectionWidget(_MaintCrudWidget):
         "noun": "Inspection",
         "statuses": INSPECTION_STATUSES,
         "order_by": "scheduled_date",
-        "action": {"label": "Mark Passed", "status": "Passed", "stamp": "completed_date"},
+        "action": {"label": "Mark Passed", "status": "Passed", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("area", "Area", None),
             ("inspection_type", "Type", 150),
@@ -741,12 +813,16 @@ class SafetyInspectionWidget(_MaintCrudWidget):
         ],
         "fields": [
             {"key": "area", "label": "Area", "kind": "text"},
-            {"key": "inspection_type", "label": "Type", "kind": "combo", "options": INSPECTION_TYPES, "editable": True},
+            {"key": "inspection_type", "label": "Type", "kind": "combo",
+                "options": INSPECTION_TYPES, "editable": True},
             {"key": "inspector", "label": "Inspector", "kind": "text"},
-            {"key": "scheduled_date", "label": "Scheduled Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
+            {"key": "scheduled_date", "label": "Scheduled Date", "kind": "date"},  # noqa: E501
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
             {"key": "result", "label": "Result", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": INSPECTION_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": INSPECTION_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -772,11 +848,15 @@ class DowntimeWidget(_MaintCrudWidget):
         "fields": [
             {"key": "equipment", "label": "Equipment", "kind": "text"},
             {"key": "reason", "label": "Reason", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": DOWNTIME_CATEGORIES, "editable": True},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": DOWNTIME_CATEGORIES, "editable": True},
             {"key": "down_date", "label": "Date", "kind": "date"},
             {"key": "hours", "label": "Hours", "kind": "text"},
             {"key": "cost", "label": "Cost", "kind": "money"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": DOWNTIME_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": DOWNTIME_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -799,18 +879,25 @@ class MechanicsWidget(_MaintCrudWidget):
         ],
         "fields": [
             {"key": "name", "label": "Name", "kind": "text"},
-            {"key": "trade", "label": "Trade", "kind": "combo", "options": MECHANIC_TRADES, "editable": True},
-            {"key": "shift", "label": "Shift", "kind": "combo", "options": MECHANIC_SHIFTS},
+            {"key": "trade", "label": "Trade", "kind": "combo",
+                "options": MECHANIC_TRADES, "editable": True},
+            {"key": "shift",
+    "label": "Shift",
+    "kind": "combo",
+     "options": MECHANIC_SHIFTS},
             {"key": "phone", "label": "Phone", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": MECHANIC_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": MECHANIC_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Maint_mgmt`)
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class MaintMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

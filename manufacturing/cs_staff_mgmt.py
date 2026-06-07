@@ -12,19 +12,34 @@ CS_DEPT_ID = 3
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color%(white)s;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color%(white)s;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight%(bold)s;}"
     "QPushButton%(hover)s{background-color%(rgb)s(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget:%(pane)s{border:1px solid #aaa;background%(white)s;}"
     "QTabBar:%(tab)s{background:#cce0ff;padding:6px 18px;font-weight%(bold)s;}"
-    "QTabBar:%(tab)s%(selected)s{background%(white)s;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar:%(tab)s%(selected)s{background%(white)s;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
-DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE = "QTextEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
+COMBO_STYLE = (
+    "QComboBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}QComboBox "
+    "QAbstractItemView{background-color%(white)s;}"
+)
+DATE_STYLE = (
+    "QDateEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+TEXT_STYLE = (
+    "QTextEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
 HDR_STYLE = "font-size:20px;font-weight%(bold)s;color%(white)s;padding:4px;"
 SECTION_STYLE = "font-size:13px;font-weight%(bold)s;color%(white)s;"
 LABEL_STYLE = "color%(white)s;font-size:13px;"
@@ -60,32 +75,39 @@ def _apply_palette(widget):
     widget.setPalette(pal)
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align)
     return item
 
 
 def _ro_c(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _export_table(table, parent, name="export.csv"):
     if table.rowCount() == 0:
-        QtWidgets.QMessageBox.information(parent, "Export", "No data to export.")
+        QtWidgets.QMessageBox.information(
+    parent, "Export", "No data to export.")
         return
-    path, _ = QtWidgets.QFileDialog.getSaveFileName(parent, "Export CSV", name, "CSV Files (*.csv)")
+    path, _ = QtWidgets.QFileDialog.getSaveFileName(
+    parent, "Export CSV", name, "CSV Files (*.csv)")
     if not path:
         return
-    headers = [table.horizontalHeaderItem(c).text() for c in range(table.columnCount())]
+    headers = [table.horizontalHeaderItem(
+        c).text() for c in range(table.columnCount())]
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(headers)
         for r in range(table.rowCount()):
             w.writerow([table.item(r, c).text() if table.item(r, c) else ""
                         for c in range(table.columnCount())])
-    QtWidgets.QMessageBox.information(parent, "Export Complete", f"Saved to:\n{path}")
+    QtWidgets.QMessageBox.information(
+    parent, "Export Complete", f"Saved to:\n{path}")
 
 
 def lbl(text, style=LABEL_STYLE):
@@ -105,7 +127,8 @@ class DateRangeBar(QtWidgets.QWidget):
         self.dt_from = QtWidgets.QDateEdit(calendarPopup=True)
         self.dt_from.setStyleSheet(DATE_STYLE)
         self.dt_from.setDisplayFormat("MM/dd/yyyy")
-        self.dt_from.setDate(QtCore.QDate.currentDate().addDays(-default_days_back))
+        self.dt_from.setDate(
+            QtCore.QDate.currentDate().addDays(-default_days_back))
         self.dt_to = QtWidgets.QDateEdit(calendarPopup=True)
         self.dt_to.setStyleSheet(DATE_STYLE)
         self.dt_to.setDisplayFormat("MM/dd/yyyy")
@@ -179,11 +202,14 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         self.dir_tbl.setHorizontalHeaderLabels(
             ["Name", "Email", "City", "State", "Zip", "Employee ID"])
         hh = self.dir_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (2, 3, 4, 5):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.dir_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.dir_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.dir_tbl.setAlternatingRowColors(True)
         self.dir_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.dir_tbl, stretch=1)
@@ -193,7 +219,11 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.dir_tbl, self, "cs_staff_directory.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.dir_tbl,
+        self,
+         "cs_staff_directory.csv"))
         exp_row.addWidget(btn_exp)
         v.addLayout(exp_row)
         return w
@@ -209,7 +239,9 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
 
         self.dir_tbl.setRowCount(0)
         for row in rows:
-            name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+            name = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
             r = self.dir_tbl.rowCount()
             self.dir_tbl.insertRow(r)
             self.dir_tbl.setItem(r, 0, _ro(name))
@@ -245,7 +277,9 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         ):
             card = QtWidgets.QFrame()
             card.setFrameShape(QtWidgets.QFrame.Shape.Box)
-            card.setStyleSheet("QFrame{background%(white)s;border:2px solid #0055ff;border-radius:8px;}")
+            card.setStyleSheet(
+                "QFrame{background%(white)s;border:2px solid "
+                "#0055ff;border-radius:8px;}")
             card.setFixedSize(160, 90)
             cl = QtWidgets.QVBoxLayout(card)
             cl.setContentsMargins(8, 6, 8, 6)
@@ -254,7 +288,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             tl.setStyleSheet("color:#333;font-size:12px;font-weight%(bold)s;")
             vl = QtWidgets.QLabel("—")
             vl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            vl.setStyleSheet("color:#0055ff;font-size:22px;font-weight%(bold)s;")
+            vl.setStyleSheet(
+                "color:#0055ff;font-size:22px;font-weight%(bold)s;")
             cl.addWidget(tl)
             cl.addWidget(vl)
             self._met_cards[key] = vl
@@ -268,10 +303,13 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         self.met_tbl.setHorizontalHeaderLabels(
             ["Month", "Total Calls", "Open", "Completed", "Completion Rate"])
         hh = self.met_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.met_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.met_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.met_tbl.setAlternatingRowColors(True)
         self.met_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.met_tbl, stretch=1)
@@ -281,7 +319,11 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.met_tbl, self, "cs_performance.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.met_tbl,
+        self,
+         "cs_performance.csv"))
         exp_row.addWidget(btn)
         v.addLayout(exp_row)
         return w
@@ -291,7 +333,7 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         today = date.today().isoformat()
         with _conn() as con:
             rows = con.execute(
-                "SELECT * FROM calls2 WHERE call_date BETWEEN %s AND %s", (f, t)
+                "SELECT * FROM calls2 WHERE call_date BETWEEN %s AND %s", (f, t)  # noqa: E501
             ).fetchall()
             monthly = con.execute("""
                 SELECT strftime('%Y-%m', call_date) AS month,
@@ -314,7 +356,7 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
                 return None
 
         res_days = [d for r in completed
-                    if (d := _days(r["call_date"], r["completion_date"])) is not None and d >= 0]
+                    if (d := _days(r["call_date"], r["completion_date"])) is not None and d >= 0]  # noqa: E501
         age_days = [d for r in open_rows
                     if (d := _days(r["call_date"], today)) is not None]
         avg_res = sum(res_days) / len(res_days) if res_days else None
@@ -325,8 +367,10 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         self._met_cards["open"].setText(str(len(open_rows)))
         self._met_cards["completed"].setText(str(len(completed)))
         self._met_cards["rate"].setText(f"{rate:.1f}%")
-        self._met_cards["avg_res"].setText(f"{avg_res:.1f}" if avg_res is not None else "—")
-        self._met_cards["avg_age"].setText(f"{avg_age:.1f}" if avg_age is not None else "—")
+        self._met_cards["avg_res"].setText(
+            f"{avg_res:.1f}" if avg_res is not None else "—")
+        self._met_cards["avg_age"].setText(
+            f"{avg_age:.1f}" if avg_age is not None else "—")
 
         self.met_tbl.setRowCount(0)
         for row in monthly:
@@ -335,7 +379,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             open_m = row["open_ct"] or 0
             rate_m = f"{comp_m / total_m * 100:.1f}%" if total_m else "—"
             try:
-                month_lbl = datetime.strptime(row["month"], "%Y-%m").strftime("%b %Y")
+                month_lbl = datetime.strptime(
+    row["month"], "%Y-%m").strftime("%b %Y")
             except (ValueError, TypeError):
                 month_lbl = row["month"] or ""
             r = self.met_tbl.rowCount()
@@ -358,15 +403,22 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         self.train_tbl.setHorizontalHeaderLabels(
             ["Staff Member", "Topic", "Trainer", "Date", "Notes", "Completed"])
         hh = self.train_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.train_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.train_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.train_tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.train_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.train_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.train_tbl.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.train_tbl.setAlternatingRowColors(True)
         self.train_tbl.verticalHeader().setVisible(False)
         self.train_tbl.clicked.connect(self._on_training_row_clicked)
@@ -375,7 +427,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         # Entry form
         form = QtWidgets.QGroupBox("Training Record")
         form.setStyleSheet(
-            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid "
+            "white;margin-top:8px;}"
             "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(form)
         grid.setSpacing(6)
@@ -417,9 +470,10 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         v.addWidget(form)
 
         br = QtWidgets.QHBoxLayout()
-        for text, fn in (("Add", self._tr_add), ("Update Selected", self._tr_update),
+        for text, fn in (("Add", self._tr_add), ("Update Selected", self._tr_update),  # noqa: E501
                          ("Delete Selected", self._tr_delete),
-                         ("Export CSV", lambda: _export_table(self.train_tbl, self, "cs_training.csv")),
+                         ("Export CSV", lambda: _export_table(
+                             self.train_tbl, self, "cs_training.csv")),
                          ("Clear", self._tr_clear)):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -433,7 +487,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
     def _load_staff_combo(self):
         with _conn() as con:
             staff = con.execute(
-                "SELECT id, first_name, last_name FROM people WHERE dept_id=%s ORDER BY last_name, first_name",
+                "SELECT id, first_name, last_name FROM people WHERE "
+                "dept_id=%s ORDER BY last_name, first_name",
                 (CS_DEPT_ID,)
             ).fetchall()
         self.tr_staff.blockSignals(True)
@@ -457,14 +512,18 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         self._training_ids = []
         self.train_tbl.setRowCount(0)
         for row in rows:
-            name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip() or "(unassigned)"
+            name = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip() or "(unassigned)"
             comp = "Yes" if row["completed"] else "No"
-            color = QtGui.QColor(212, 237, 218) if row["completed"] else QtGui.QColor(255, 243, 205)
+            color = QtGui.QColor(
+    212, 237, 218) if row["completed"] else QtGui.QColor(
+        255, 243, 205)
             r = self.train_tbl.rowCount()
             self.train_tbl.insertRow(r)
             self._training_ids.append(row["id"])
-            for c, val in enumerate([name, row["topic"] or "", row["trainer"] or "",
-                                     row["train_date"] or "", row["notes"] or "", comp]):
+            for c, val in enumerate([name, row["topic"] or "", row["trainer"] or "",  # noqa: E501
+                                     row["train_date"] or "", row["notes"] or "", comp]):  # noqa: E501
                 item = _ro_c(val) if c in (3, 5) else _ro(val)
                 item.setBackground(color)
                 self.train_tbl.setItem(r, c, item)
@@ -488,14 +547,16 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         if rec["train_date"]:
             try:
                 parts = rec["train_date"].split("-")
-                self.tr_date.setDate(QtCore.QDate(int(parts[0]), int(parts[1]), int(parts[2])))
+                self.tr_date.setDate(QtCore.QDate(
+                    int(parts[0]), int(parts[1]), int(parts[2])))
             except (ValueError, IndexError):
                 pass
 
     def _tr_collect(self):
         topic = self.tr_topic.text().strip()
         if not topic:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Topic is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Topic is required.")
             return None
         return {
             "people_id": self.tr_staff.currentData(),
@@ -520,7 +581,8 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
 
     def _tr_update(self):
         if self._training_current_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a record first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a record first.")
             return
         data = self._tr_collect()
         if not data:
@@ -536,14 +598,16 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
 
     def _tr_delete(self):
         if self._training_current_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a record first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a record first.")
             return
         if (QtWidgets.QMessageBox.question(
                 self, "Confirm Delete", "Delete this training record%s",
-                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)  # noqa: E501
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             with _conn() as con:
-                con.execute("DELETE FROM cs_training WHERE id=%s", (self._training_current_id,))
+                con.execute("DELETE FROM cs_training WHERE id=%s",
+                            (self._training_current_id,))
             self._tr_clear()
             self._run_training()
 
@@ -573,12 +637,14 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
 
         self.rpt_tbl = QtWidgets.QTableWidget(0, 5)
         self.rpt_tbl.setHorizontalHeaderLabels(
-            ["Customer", "Total Calls", "Open", "Completed", "Completion Rate"])
+            ["Customer", "Total Calls", "Open", "Completed", "Completion Rate"])  # noqa: E501
         hh = self.rpt_tbl.horizontalHeader()
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.rpt_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.rpt_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.rpt_tbl.setAlternatingRowColors(True)
         self.rpt_tbl.verticalHeader().setVisible(False)
         self.rpt_tbl.setSortingEnabled(True)
@@ -589,7 +655,11 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.rpt_tbl, self, "cs_staff_report.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.rpt_tbl,
+        self,
+         "cs_staff_report.csv"))
         exp_row.addWidget(btn)
         v.addLayout(exp_row)
         return w
@@ -613,8 +683,11 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         self.rpt_tbl.setRowCount(0)
         for row in rows:
             company = (row["company_name"] or "").strip()
-            contact = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
-            cust = company if company else (contact if contact else "(no customer)")
+            contact = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
+            cust = company if company else (
+    contact if contact else "(no customer)")
             total = row["total"] or 0
             comp = row["comp_ct"] or 0
             open_ct = row["open_ct"] or 0
@@ -628,7 +701,10 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             self.rpt_tbl.setItem(r, 4, _ro_c(rate))
             if open_ct > 0:
                 for c in range(5):
-                    self.rpt_tbl.item(r, c).setBackground(QtGui.QColor(255, 243, 205))
+                    self.rpt_tbl.item(
+    r, c).setBackground(
+        QtGui.QColor(
+            255, 243, 205))
         self.rpt_tbl.setSortingEnabled(True)
 
     # ── Run all ───────────────────────────────────────────────────────────

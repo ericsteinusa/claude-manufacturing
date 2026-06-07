@@ -4,14 +4,18 @@ from PyQt6 import QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
 )
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -78,11 +82,15 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         ])
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         self.table.clicked.connect(self._on_row_clicked)
@@ -99,7 +107,8 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         self.search_input.returnPressed.connect(self._on_search)
         search_row.addWidget(self.search_input)
 
-        for text, slot in (("Search", self._on_search), ("Show All", self._on_show_all)):
+        for text, slot in (("Search", self._on_search),
+                           ("Show All", self._on_show_all)):
             btn = QtWidgets.QPushButton(text)
             btn.setStyleSheet(BUTTON_STYLE)
             btn.setFixedHeight(30)
@@ -217,14 +226,16 @@ class PersonnelCRM(QtWidgets.QMainWindow):
     def _populate_dept_sub(self, dept_id):
         conn = get_db()
         subs = conn.execute(
-            "SELECT dept_sub_id, dept_sub_name FROM dept_sub ORDER BY dept_sub_name"
+            "SELECT dept_sub_id, dept_sub_name FROM dept_sub ORDER BY "
+            "dept_sub_name"
         ).fetchall()
         conn.close()
         self.dept_sub_combo.blockSignals(True)
         self.dept_sub_combo.clear()
         self.dept_sub_combo.addItem("(none)", None)
         for row in subs:
-            self.dept_sub_combo.addItem(row["dept_sub_name"], row["dept_sub_id"])
+            self.dept_sub_combo.addItem(
+    row["dept_sub_name"], row["dept_sub_id"])
         self.dept_sub_combo.blockSignals(False)
 
     # ── Table data ─────────────────────────────────────────────────────────
@@ -241,7 +252,8 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         """
         if search_term:
             rows = conn.execute(
-                q + " WHERE p.last_name LIKE ? ORDER BY p.last_name, p.first_name",
+                q + " WHERE p.last_name LIKE ? ORDER BY p.last_name, "
+                    "p.first_name",
                 (f"%{search_term}%",)
             ).fetchall()
         else:
@@ -284,7 +296,8 @@ class PersonnelCRM(QtWidgets.QMainWindow):
             return
         self._selected_row_id = self._row_ids[row]
         conn = get_db()
-        p = conn.execute("SELECT * FROM people WHERE id = ?", (self._selected_row_id,)).fetchone()
+        p = conn.execute("SELECT * FROM people WHERE id = ?",
+                         (self._selected_row_id,)).fetchone()
         conn.close()
         if not p:
             return
@@ -312,7 +325,8 @@ class PersonnelCRM(QtWidgets.QMainWindow):
     def _collect_form(self):
         emp_id_text = self.empid_input.text().strip()
         if emp_id_text and not emp_id_text.isdigit():
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Employee ID must be a number.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Employee ID must be a number.")
             return None
         return {
             "first_name":  self.fn_input.text().strip(),
@@ -344,7 +358,8 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         if data is None:
             return
         if not data["first_name"] or not data["last_name"]:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "First and last name are required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "First and last name are required.")
             return
         conn = get_db()
         conn.execute("""
@@ -361,7 +376,8 @@ class PersonnelCRM(QtWidgets.QMainWindow):
 
     def _on_update(self):
         if self._selected_row_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a row first.")
             return
         data = self._collect_form()
         if data is None:
@@ -388,15 +404,17 @@ class PersonnelCRM(QtWidgets.QMainWindow):
 
     def _on_delete(self):
         if self._selected_row_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a row first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a row first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete", "Delete this employee record?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM people WHERE id = ?", (self._selected_row_id,))
+            conn.execute("DELETE FROM people WHERE id = ?",
+                         (self._selected_row_id,))
             conn.commit()
             conn.close()
             self._clear_form()

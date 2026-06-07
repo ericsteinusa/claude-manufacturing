@@ -9,8 +9,10 @@ from .cs_satisfaction import CSSatisfactionWidget
 from .cs_escalations import CSEscalationsWidget
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -23,7 +25,10 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    subprocess.Popen([sys.executable,
+    "-m",
+    "manufacturing." + os.path.splitext(script)[0]],
+     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
@@ -72,7 +77,11 @@ class CSMgrMenu(QtWidgets.QMainWindow):
         tabs.addTab(CSStaffMgmtWidget(), "CS Staff")
         tabs.addTab(CSSatisfactionWidget(), "Satisfaction")
         tabs.addTab(CSEscalationsWidget(), "Escalations")
-        tabs.addTab(_launch_tab("customer_entry.py", "Customer Entry"), "Customer Entry")
+        tabs.addTab(
+    _launch_tab(
+        "customer_entry.py",
+        "Customer Entry"),
+         "Customer Entry")
         v.addWidget(tabs)
 
 

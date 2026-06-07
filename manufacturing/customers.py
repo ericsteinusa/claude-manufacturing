@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -63,7 +69,7 @@ def _display_name(row):
     return company if company else name
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class CustomerDialog(QtWidgets.QDialog):
     """Shared dialog for adding and editing a customer."""
@@ -165,7 +171,8 @@ class CustomerDialog(QtWidgets.QDialog):
         conn = get_db()
         if self._customer_id is None:
             cur = conn.execute(
-                "INSERT INTO customer (company_name, first_name, last_name, email,"
+                "INSERT INTO customer (company_name, first_name, last_name, "
+                "email,"
                 " phone_number, address, city, state, zip_code)"
                 " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (company, first, last,
@@ -176,8 +183,10 @@ class CustomerDialog(QtWidgets.QDialog):
             self.saved_id = cur.fetchone()['id']
         else:
             conn.execute(
-                "UPDATE customer SET company_name=%s, first_name=%s, last_name=%s,"
-                " email=%s, phone_number=%s, address=%s, city=%s, state=%s, zip_code=%s"
+                "UPDATE customer SET company_name=%s, first_name=%s, "
+                "last_name=%s,"
+                " email=%s, phone_number=%s, address=%s, city=%s, state=%s, "
+                "zip_code=%s"
                 " WHERE id=%s",
                 (company, first, last,
                  self.email.text().strip(), self.phone.text().strip(),
@@ -212,7 +221,8 @@ class CustomerDetailPanel(QtWidgets.QWidget):
 
         def val():
             w = QtWidgets.QLabel("")
-            w.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+            w.setStyleSheet(
+                "color: white; font-size: 13px; font-weight: bold;")
             return w
 
         self.v_company  = val()
@@ -257,7 +267,12 @@ class CustomerDetailPanel(QtWidgets.QWidget):
         self.v_name.setText(name)
         self.v_email.setText(rec["email"] or "")
         self.v_phone.setText(rec["phone_number"] or "")
-        parts = [p for p in (rec["address"], rec["city"], rec["state"], rec["zip_code"]) if p]
+        parts = [
+    p for p in (
+        rec["address"],
+        rec["city"],
+        rec["state"],
+         rec["zip_code"]) if p]
         self.v_address.setText(", ".join(parts))
         self.v_orders.setText(str(order_count))
 
@@ -267,7 +282,7 @@ class CustomerDetailPanel(QtWidgets.QWidget):
             w.setText("")
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class CustomersWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -308,20 +323,30 @@ class CustomersWidget(QtWidgets.QWidget):
         self.cust_table = QtWidgets.QTableWidget()
         self.cust_table.setColumnCount(7)
         self.cust_table.setHorizontalHeaderLabels(
-            ["Company", "First Name", "Last Name", "Email", "Phone", "City", "State"]
+            ["Company", "First Name", "Last Name",
+                "Email", "Phone", "City", "State"]
         )
         hh = self.cust_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.cust_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.cust_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.cust_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.cust_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.cust_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.cust_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.cust_table.setAlternatingRowColors(True)
         self.cust_table.verticalHeader().setVisible(False)
         self.cust_table.clicked.connect(self._on_row_clicked)
@@ -410,7 +435,8 @@ class CustomersWidget(QtWidgets.QWidget):
 
     def _on_edit(self, _index=None):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a customer first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a customer first.")
             return
         dlg = CustomerDialog(customer_id=self._selected_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -419,11 +445,13 @@ class CustomersWidget(QtWidgets.QWidget):
 
     def _on_delete(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a customer first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a customer first.")
             return
         conn = get_db()
         name_row = conn.execute(
-            "SELECT company_name, first_name, last_name FROM customer WHERE id = %s",
+            "SELECT company_name, first_name, last_name FROM customer WHERE "
+            "id = %s",
             (self._selected_id,)
         ).fetchone()
         conn.close()
@@ -431,11 +459,12 @@ class CustomersWidget(QtWidgets.QWidget):
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete",
             f"Delete '{name}'? This cannot be undone.",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM customer WHERE id = %s", (self._selected_id,))
+            conn.execute("DELETE FROM customer WHERE id = %s",
+                         (self._selected_id,))
             conn.commit()
             conn.close()
             self._selected_id = None
@@ -443,13 +472,15 @@ class CustomersWidget(QtWidgets.QWidget):
 
     def _on_view_orders(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a customer first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a customer first.")
             return
         conn = get_db()
         try:
             orders = conn.execute(
                 "SELECT so_number, order_date, ship_date, status"
-                " FROM sales_order WHERE customer_id = %s ORDER BY order_date DESC",
+                " FROM sales_order WHERE customer_id = %s ORDER BY order_date "
+                "DESC",
                 (self._selected_id,)
             ).fetchall()
         except psycopg2.OperationalError:
@@ -463,13 +494,16 @@ class CustomersWidget(QtWidgets.QWidget):
         vl = QtWidgets.QVBoxLayout(dlg)
         tbl = QtWidgets.QTableWidget()
         tbl.setColumnCount(4)
-        tbl.setHorizontalHeaderLabels(["SO #", "Order Date", "Ship Date", "Status"])
+        tbl.setHorizontalHeaderLabels(
+            ["SO #", "Order Date", "Ship Date", "Status"])
         hh = tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         for i in range(4):
-            hh.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            hh.setSectionResizeMode(
+    i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         tbl.verticalHeader().setVisible(False)
         tbl.setAlternatingRowColors(True)
         for o in orders:
@@ -480,7 +514,8 @@ class CustomersWidget(QtWidgets.QWidget):
             tbl.setItem(r, 2, _ro(o["ship_date"] or ""))
             tbl.setItem(r, 3, _ro((o["status"] or "").capitalize()))
         vl.addWidget(tbl)
-        close_btn = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Close)
+        close_btn = QtWidgets.QDialogButtonBox(
+    QtWidgets.QDialogButtonBox.StandardButton.Close)
         close_btn.rejected.connect(dlg.reject)
         vl.addWidget(close_btn)
         dlg.exec()

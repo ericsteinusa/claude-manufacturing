@@ -5,7 +5,10 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 class SplashScreen(QtWidgets.QSplashScreen):
     def __init__(self):
-        img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "manufacturing2.png")
+        img_path = os.path.join(
+    os.path.dirname(
+        os.path.abspath(__file__)),
+         "manufacturing2.png")
         pixmap = QtGui.QPixmap(img_path)
         super().__init__(pixmap, QtCore.Qt.WindowType.WindowStaysOnTopHint)
         self.setMask(pixmap.mask())

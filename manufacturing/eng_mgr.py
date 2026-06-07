@@ -9,8 +9,10 @@ from .eng_reports import EngReportsWidget
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -23,7 +25,10 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    subprocess.Popen([sys.executable,
+    "-m",
+    "manufacturing." + os.path.splitext(script)[0]],
+     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
@@ -77,15 +82,31 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         eng_v.setContentsMargins(0, 4, 0, 0)
         eng_tabs = QtWidgets.QTabWidget()
         eng_tabs.setStyleSheet(TAB_STYLE)
-        eng_tabs.addTab(_launch_tab("engineer.py", "Engineering Projects"), "Engineering Projects")
-        eng_tabs.addTab(_launch_tab("engineer.py", "Engineering Tasks"), "Engineering Tasks")
+        eng_tabs.addTab(
+    _launch_tab(
+        "engineer.py",
+        "Engineering Projects"),
+         "Engineering Projects")
+        eng_tabs.addTab(
+    _launch_tab(
+        "engineer.py",
+        "Engineering Tasks"),
+         "Engineering Tasks")
         eng_v.addWidget(eng_tabs)
         tabs.addTab(eng_w, "Engineers")
 
         tabs.addTab(DesignReviewWidget(), "Design Reviews")
         tabs.addTab(EngReportsWidget(), "Eng Reports")
-        tabs.addTab(_launch_tab("product_entry_screen.py", "Product Entry"), "Product Entry")
-        tabs.addTab(_launch_tab("Supplier_entry.py", "Supplier Entry"), "Supplier Entry")
+        tabs.addTab(
+    _launch_tab(
+        "product_entry_screen.py",
+        "Product Entry"),
+         "Product Entry")
+        tabs.addTab(
+    _launch_tab(
+        "Supplier_entry.py",
+        "Supplier Entry"),
+         "Supplier Entry")
 
         v.addWidget(tabs)
 

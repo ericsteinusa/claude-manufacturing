@@ -10,7 +10,8 @@ from .IT_Tasks import _apply_blue_palette
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
@@ -33,7 +34,8 @@ def _conn():
 
 def _ro(text):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     return item
 
 
@@ -45,12 +47,13 @@ def _simple_table(headers, stretch_col=0):
         stretch_col, QtWidgets.QHeaderView.ResizeMode.Stretch)
     t.verticalHeader().setVisible(False)
     t.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-    t.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+    t.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
     t.setAlternatingRowColors(True)
     return t
 
 
-# ── Overview tab ──────────────────────────────────────────────────────────────
+# ── Overview tab ────────────────────────────────────────────────────────
 
 class _OverviewWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -79,7 +82,8 @@ class _OverviewWidget(QtWidgets.QWidget):
         left.addWidget(lbl)
         self._task_status_tbl = QtWidgets.QTableWidget(0, 2)
         self._task_status_tbl.setHorizontalHeaderLabels(["Status", "Count"])
-        self._task_status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._task_status_tbl.horizontalHeader().setStyleSheet(
+            "color:black;font-weight:bold;")
         self._task_status_tbl.horizontalHeader().setStretchLastSection(True)
         self._task_status_tbl.verticalHeader().setVisible(False)
         self._task_status_tbl.setEditTriggers(
@@ -95,7 +99,8 @@ class _OverviewWidget(QtWidgets.QWidget):
         right.addWidget(lbl2)
         self._ticket_status_tbl = QtWidgets.QTableWidget(0, 2)
         self._ticket_status_tbl.setHorizontalHeaderLabels(["Status", "Count"])
-        self._ticket_status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._ticket_status_tbl.horizontalHeader().setStyleSheet(
+            "color:black;font-weight:bold;")
         self._ticket_status_tbl.horizontalHeader().setStretchLastSection(True)
         self._ticket_status_tbl.verticalHeader().setVisible(False)
         self._ticket_status_tbl.setEditTriggers(
@@ -116,7 +121,8 @@ class _OverviewWidget(QtWidgets.QWidget):
         left2.addWidget(lbl3)
         self._overdue_tbl = QtWidgets.QTableWidget(0, 2)
         self._overdue_tbl.setHorizontalHeaderLabels(["Category", "Count"])
-        self._overdue_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._overdue_tbl.horizontalHeader().setStyleSheet(
+            "color:black;font-weight:bold;")
         self._overdue_tbl.horizontalHeader().setStretchLastSection(True)
         self._overdue_tbl.verticalHeader().setVisible(False)
         self._overdue_tbl.setEditTriggers(
@@ -132,7 +138,7 @@ class _OverviewWidget(QtWidgets.QWidget):
         right2.addWidget(lbl4)
         self._asset_tbl = QtWidgets.QTableWidget(0, 2)
         self._asset_tbl.setHorizontalHeaderLabels(["Status", "Count"])
-        self._asset_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._asset_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._asset_tbl.horizontalHeader().setStretchLastSection(True)
         self._asset_tbl.verticalHeader().setVisible(False)
         self._asset_tbl.setEditTriggers(
@@ -154,23 +160,28 @@ class _OverviewWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             task_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_task GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_task GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             ticket_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_ticket GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_ticket GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             overdue_tasks = conn.execute(
                 "SELECT COUNT(*) FROM it_task"
-                " WHERE due_date < %s AND status NOT IN ('completed','cancelled')",
+                " WHERE due_date < %s AND status NOT IN "
+                "('completed','cancelled')",
                 (TODAY,)
             ).fetchone()[0]
             overdue_tickets = conn.execute(
                 "SELECT COUNT(*) FROM it_ticket"
-                " WHERE due_date < %s AND status NOT IN ('resolved','closed','cancelled')",
+                " WHERE due_date < %s AND status NOT IN "
+                "('resolved','closed','cancelled')",
                 (TODAY,)
             ).fetchone()[0]
             asset_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_asset GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_asset GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             conn.close()
         except Exception:
@@ -179,15 +190,18 @@ class _OverviewWidget(QtWidgets.QWidget):
 
         self._task_status_tbl.setRowCount(len(task_rows))
         for r, row in enumerate(task_rows):
-            self._task_status_tbl.setItem(r, 0, _ro(row[0].replace("_", " ").capitalize()))
+            self._task_status_tbl.setItem(
+                r, 0, _ro(row[0].replace("_", " ").capitalize()))
             self._task_status_tbl.setItem(r, 1, _ro(row[1]))
 
         self._ticket_status_tbl.setRowCount(len(ticket_rows))
         for r, row in enumerate(ticket_rows):
-            self._ticket_status_tbl.setItem(r, 0, _ro(row[0].replace("_", " ").capitalize()))
+            self._ticket_status_tbl.setItem(
+                r, 0, _ro(row[0].replace("_", " ").capitalize()))
             self._ticket_status_tbl.setItem(r, 1, _ro(row[1]))
 
-        overdue_data = [("Overdue Tasks", overdue_tasks), ("Overdue Tickets", overdue_tickets)]
+        overdue_data = [("Overdue Tasks", overdue_tasks),
+                         ("Overdue Tickets", overdue_tickets)]
         self._overdue_tbl.setRowCount(2)
         for r, (label, cnt) in enumerate(overdue_data):
             item = _ro(label)
@@ -204,7 +218,7 @@ class _OverviewWidget(QtWidgets.QWidget):
             self._asset_tbl.setItem(r, 1, _ro(row[1]))
 
 
-# ── By Technician tab ─────────────────────────────────────────────────────────
+# ── By Technician tab ───────────────────────────────────────────────────
 
 class _ByTechnicianWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -227,7 +241,7 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         lbl.setStyleSheet(SEC_STYLE)
         v.addWidget(lbl)
         self._task_tbl = _simple_table(
-            ["Assigned To", "Pending", "In Progress", "On Hold", "Completed", "Total"])
+            ["Assigned To", "Pending", "In Progress", "On Hold", "Completed", "Total"])  # noqa: E501
         self._task_tbl.setFixedHeight(200)
         v.addWidget(self._task_tbl)
 
@@ -235,7 +249,7 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         lbl2.setStyleSheet(SEC_STYLE)
         v.addWidget(lbl2)
         self._ticket_tbl = _simple_table(
-            ["Assigned To", "Open", "In Progress", "On Hold", "Resolved", "Total"])
+            ["Assigned To", "Open", "In Progress", "On Hold", "Resolved", "Total"])  # noqa: E501
         v.addWidget(self._ticket_tbl, stretch=1)
 
         btn = QtWidgets.QPushButton("Refresh")
@@ -288,7 +302,7 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         self._ticket_tbl.resizeColumnsToContents()
 
 
-# ── By Department tab ─────────────────────────────────────────────────────────
+# ── By Department tab ───────────────────────────────────────────────────
 
 class _ByDepartmentWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -370,7 +384,7 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
         self._ticket_tbl.resizeColumnsToContents()
 
 
-# ── Overdue tab ───────────────────────────────────────────────────────────────
+# ── Overdue tab ─────────────────────────────────────────────────────────
 
 class _OverdueWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -393,7 +407,12 @@ class _OverdueWidget(QtWidgets.QWidget):
         lbl.setStyleSheet(SEC_STYLE)
         v.addWidget(lbl)
         self._task_tbl = _simple_table(
-            ["Task #", "Task Name", "Priority", "Assigned To", "Department", "Due Date"],
+            ["Task #",
+    "Task Name",
+    "Priority",
+    "Assigned To",
+    "Department",
+     "Due Date"],
             stretch_col=1)
         self._task_tbl.setFixedHeight(220)
         v.addWidget(self._task_tbl)
@@ -402,7 +421,8 @@ class _OverdueWidget(QtWidgets.QWidget):
         lbl2.setStyleSheet(SEC_STYLE)
         v.addWidget(lbl2)
         self._ticket_tbl = _simple_table(
-            ["Ticket #", "Requester", "Priority", "Assigned To", "Department", "Due Date"],
+            ["Ticket #", "Requester", "Priority",
+                "Assigned To", "Department", "Due Date"],
             stretch_col=1)
         v.addWidget(self._ticket_tbl, stretch=1)
 
@@ -416,16 +436,20 @@ class _OverdueWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             task_rows = conn.execute(
-                "SELECT task_number, task_name, priority, assigned_to, department, due_date"
+                "SELECT task_number, task_name, priority, assigned_to, "
+                "department, due_date"
                 " FROM it_task"
-                " WHERE due_date < %s AND status NOT IN ('completed','cancelled')"
+                " WHERE due_date < %s AND status NOT IN "
+                "('completed','cancelled')"
                 " ORDER BY due_date, priority DESC",
                 (TODAY,)
             ).fetchall()
             ticket_rows = conn.execute(
-                "SELECT ticket_number, requester, priority, assigned_to, department, due_date"
+                "SELECT ticket_number, requester, priority, assigned_to, "
+                "department, due_date"
                 " FROM it_ticket"
-                " WHERE due_date < %s AND status NOT IN ('resolved','closed','cancelled')"
+                " WHERE due_date < %s AND status NOT IN "
+                "('resolved','closed','cancelled')"
                 " ORDER BY due_date, priority DESC",
                 (TODAY,)
             ).fetchall()
@@ -450,7 +474,7 @@ class _OverdueWidget(QtWidgets.QWidget):
         self._ticket_tbl.resizeColumnsToContents()
 
 
-# ── Asset Inventory tab ───────────────────────────────────────────────────────
+# ── Asset Inventory tab ─────────────────────────────────────────────────
 
 class _AssetInventoryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -478,7 +502,7 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
         left.addWidget(lbl)
         self._status_tbl = QtWidgets.QTableWidget(0, 2)
         self._status_tbl.setHorizontalHeaderLabels(["Status", "Count"])
-        self._status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._status_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._status_tbl.horizontalHeader().setStretchLastSection(True)
         self._status_tbl.verticalHeader().setVisible(False)
         self._status_tbl.setEditTriggers(
@@ -493,7 +517,7 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
         right.addWidget(lbl2)
         self._type_tbl = QtWidgets.QTableWidget(0, 2)
         self._type_tbl.setHorizontalHeaderLabels(["Asset Type", "Count"])
-        self._type_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._type_tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._type_tbl.horizontalHeader().setStretchLastSection(True)
         self._type_tbl.verticalHeader().setVisible(False)
         self._type_tbl.setEditTriggers(
@@ -508,7 +532,7 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
         lbl3.setStyleSheet(SEC_STYLE)
         v.addWidget(lbl3)
         self._all_tbl = _simple_table(
-            ["Asset Tag", "Asset Name", "Type", "Status", "Assigned To", "Department",
+            ["Asset Tag", "Asset Name", "Type", "Status", "Assigned To", "Department",  # noqa: E501
              "Purchase Date"],
             stretch_col=1)
         v.addWidget(self._all_tbl, stretch=1)
@@ -523,7 +547,8 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             status_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_asset GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_asset GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             type_rows = conn.execute(
                 "SELECT COALESCE(asset_type,'(none)'), COUNT(*)"
@@ -555,7 +580,7 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
         self._all_tbl.resizeColumnsToContents()
 
 
-# ── Top-level widget ──────────────────────────────────────────────────────────
+# ── Top-level widget ────────────────────────────────────────────────────
 
 class ITMgrReportsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):

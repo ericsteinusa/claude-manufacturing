@@ -10,12 +10,18 @@ def get_db():
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -77,7 +83,8 @@ def _next_po_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s", (f"PO-{yr}-%",)
+        "SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s", (
+            f"PO-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"PO-{yr}-{count + 1:04d}"
@@ -107,7 +114,7 @@ def _load_products():
     return rows
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewPODialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -143,7 +150,8 @@ class NewPODialog(QtWidgets.QDialog):
         self.order_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Order Date:"), self.order_date)
 
-        self.expected_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(14))
+        self.expected_date = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addDays(14))
         self.expected_date.setCalendarPopup(True)
         self.expected_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Expected Date:"), self.expected_date)
@@ -169,13 +177,16 @@ class NewPODialog(QtWidgets.QDialog):
     def _on_ok(self):
         po_num = self.po_num.text().strip()
         if not po_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "PO number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "PO number is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO purchase_order (po_number, supplier_id, order_date,"
-                " expected_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
+                "INSERT INTO purchase_order (po_number, supplier_id, "
+                "order_date,"
+                " expected_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) "
+                "RETURNING id",
                 (po_num, self.supplier_combo.currentData(),
                  self.order_date.date().toString("yyyy-MM-dd"),
                  self.expected_date.date().toString("yyyy-MM-dd"),
@@ -186,7 +197,7 @@ class NewPODialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"PO number '{po_num}' already exists.")
+                                          f"PO number '{po_num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -213,7 +224,8 @@ class AddPOItemDialog(QtWidgets.QDialog):
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
-        self.product_combo.currentIndexChanged.connect(self._on_product_changed)
+        self.product_combo.currentIndexChanged.connect(
+            self._on_product_changed)
         self.product_combo.addItem("(none)", None)
         for p in _load_products():
             self.product_combo.addItem(p["product_name"], p["id"])
@@ -253,11 +265,13 @@ class AddPOItemDialog(QtWidgets.QDialog):
     def _on_ok(self):
         desc = self.desc.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Description is required.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO po_item (po_id, description, product_id, qty_ordered, unit_price)"
+            "INSERT INTO po_item (po_id, description, product_id, "
+            "qty_ordered, unit_price)"
             " VALUES (%s,%s,%s,%s,%s)",
             (self._po_id, desc, self.product_combo.currentData(),
              self.qty.value(), self.unit_price.value())
@@ -319,7 +333,10 @@ class UpdatePODialog(QtWidgets.QDialog):
 
     def _load(self):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM purchase_order WHERE id = %s", (self._po_id,)).fetchone()
+        rec = conn.execute(
+    "SELECT * FROM purchase_order WHERE id = %s",
+    (self._po_id,
+    )).fetchone()
         conn.close()
         if not rec:
             return
@@ -329,9 +346,15 @@ class UpdatePODialog(QtWidgets.QDialog):
                 self.supplier_combo.setCurrentIndex(i)
                 break
         if rec["order_date"]:
-            self.order_date.setDate(QtCore.QDate.fromString(rec["order_date"], "yyyy-MM-dd"))
+            self.order_date.setDate(
+    QtCore.QDate.fromString(
+        rec["order_date"],
+         "yyyy-MM-dd"))
         if rec["expected_date"]:
-            self.expected_date.setDate(QtCore.QDate.fromString(rec["expected_date"], "yyyy-MM-dd"))
+            self.expected_date.setDate(
+    QtCore.QDate.fromString(
+        rec["expected_date"],
+         "yyyy-MM-dd"))
         self.notes.setText(rec["notes"] or "")
 
     def _on_ok(self):
@@ -349,7 +372,7 @@ class UpdatePODialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class PurchaseOrdersWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -398,7 +421,8 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_pos)
@@ -426,21 +450,32 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         self.po_table = QtWidgets.QTableWidget()
         self.po_table.setColumnCount(8)
         self.po_table.setHorizontalHeaderLabels(
-            ["PO #", "Supplier", "Order Date", "Expected Date", "Items", "Total", "Status", "Notes"]
+            ["PO #", "Supplier", "Order Date", "Expected Date",
+                "Items", "Total", "Status", "Notes"]
         )
         hh = self.po_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.po_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.po_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.po_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.po_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.po_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.po_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.po_table.setAlternatingRowColors(True)
         self.po_table.verticalHeader().setVisible(False)
         self.po_table.clicked.connect(self._on_po_clicked)
@@ -456,16 +491,22 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         self.item_table = QtWidgets.QTableWidget()
         self.item_table.setColumnCount(5)
         self.item_table.setHorizontalHeaderLabels(
-            ["Description", "Product", "Qty Ordered", "Unit Price", "Qty Received"]
+            ["Description", "Product", "Qty Ordered", "Unit Price", "Qty "
+                                                                    "Received"]
         )
         ih = self.item_table.horizontalHeader()
         ih.setStyleSheet("color: black; font-weight: bold;")
         ih.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        ih.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.item_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        ih.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.item_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.item_table.verticalHeader().setVisible(False)
         self.item_table.setAlternatingRowColors(True)
         dv.addWidget(self.item_table)
@@ -478,10 +519,14 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
             ("New PO",        self._on_new_po),
             ("Add Item",      self._on_add_item),
             ("Update PO",     self._on_update_po),
-            ("Mark Sent",     lambda: self._set_status("sent",      "Mark PO as Sent?")),
-            ("Mark Partial",  lambda: self._set_status("partial",   "Mark as Partial Receipt?")),
-            ("Mark Received", lambda: self._set_status("received",  "Mark as Fully Received?")),
-            ("Cancel PO",     lambda: self._set_status("cancelled", "Cancel this PO?")),
+            ("Mark Sent",     lambda: self._set_status(
+                "sent",      "Mark PO as Sent?")),
+            ("Mark Partial",  lambda: self._set_status(
+                "partial",   "Mark as Partial Receipt?")),
+            ("Mark Received", lambda: self._set_status(
+                "received",  "Mark as Fully Received?")),
+            ("Cancel PO",     lambda: self._set_status(
+                "cancelled", "Cancel this PO?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -513,13 +558,16 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         if supplier_id:
             conds.append("po.supplier_id = %s")
             params.append(supplier_id)
-        conds.append("(po.order_date IS NULL OR po.order_date BETWEEN %s AND %s)")
+        conds.append(
+            "(po.order_date IS NULL OR po.order_date BETWEEN %s AND %s)")
         params += [d_from, d_to]
         where = " WHERE " + " AND ".join(conds)
 
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY po.order_date DESC", params).fetchall()
+            rows = conn.execute(
+    base + where + " ORDER BY po.order_date DESC",
+     params).fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -601,16 +649,21 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
 
     def _on_add_item(self):
         if self._selected_po_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a PO first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a PO first.")
             return
-        dlg = AddPOItemDialog(self._selected_po_id, self._selected_po_number, self)
+        dlg = AddPOItemDialog(
+    self._selected_po_id,
+    self._selected_po_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_pos()
             self._refresh_items()
 
     def _on_update_po(self):
         if self._selected_po_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a PO first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a PO first.")
             return
         dlg = UpdatePODialog(self._selected_po_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -618,11 +671,12 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
 
     def _set_status(self, new_status, msg):
         if self._selected_po_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a PO first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a PO first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

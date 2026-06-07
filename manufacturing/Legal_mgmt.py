@@ -17,9 +17,9 @@ def _conn():
     return get_db()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Schema
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 def init_db():
     with _conn() as con:
         con.executescript("""
@@ -101,49 +101,56 @@ def _seed(con):
     today = date.today().isoformat()
     if con.execute("SELECT COUNT(*) FROM legal_contract").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO legal_contract (title,counterparty,contract_type,value,start_date,end_date,owner,status) "
+            "INSERT INTO legal_contract (title,counterparty,contract_type,value,start_date,end_date,owner,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("Master Services Agreement", "Acme Supplies Inc.", "Service Agreement",
+            ("Master Services Agreement", "Acme Supplies Inc.", "Service "
+                                                                "Agreement",
              125000, today, "2027-05-31", "Legal Dept", "Active"))
     if con.execute("SELECT COUNT(*) FROM legal_compliance").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO legal_compliance (requirement,regulation,owner,due_date,status) "
+            "INSERT INTO legal_compliance "
+            "(requirement,regulation,owner,due_date,status) "
             "VALUES (%s,%s,%s,%s,%s)",
-            ("Annual OSHA safety report", "OSHA 29 CFR 1910", "Compliance Officer", "2026-12-31", "Pending"))
+            ("Annual OSHA safety report", "OSHA 29 CFR 1910", "Compliance Officer", "2026-12-31", "Pending"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM legal_litigation").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO legal_litigation (case_name,opposing_party,court,case_type,filed_date,status) "
+            "INSERT INTO legal_litigation "
+            "(case_name,opposing_party,court,case_type,filed_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("Smith v. Company", "John Smith", "Superior Court", "Employment", today, "Open"))
+            ("Smith v. Company", "John Smith", "Superior Court", "Employment", today, "Open"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM legal_ip").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO legal_ip (title,ip_type,registration_no,jurisdiction,filed_date,expiry_date,status) "
+            "INSERT INTO legal_ip (title,ip_type,registration_no,jurisdiction,filed_date,expiry_date,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Widget Fastening Mechanism", "Patent", "US-10-987654", "USPTO", today, "2045-05-31", "Pending"))
+            ("Widget Fastening Mechanism", "Patent", "US-10-987654", "USPTO", today, "2045-05-31", "Pending"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM legal_employment").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO legal_employment (matter,employee,matter_type,owner,opened_date,status) "
+            "INSERT INTO legal_employment "
+            "(matter,employee,matter_type,owner,opened_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("Policy review request", "HR Department", "Policy Review", "Legal Dept", today, "Open"))
+            ("Policy review request", "HR Department", "Policy Review", "Legal Dept", today, "Open"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM legal_governance").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO legal_governance (item,category,owner,ref_date,reference,status) "
+            "INSERT INTO legal_governance "
+            "(item,category,owner,ref_date,reference,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("2026 Annual Report", "Filing", "Corporate Secretary", "2026-04-15", "SEC 10-K", "Pending"))
+            ("2026 Annual Report", "Filing", "Corporate Secretary", "2026-04-15", "SEC 10-K", "Pending"))  # noqa: E501
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared styling helpers
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 
 # Row tint keyed by common status words shared across the legal registers.
@@ -188,7 +195,8 @@ def _apply_blue_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -208,9 +216,9 @@ def _money(v):
         return ""
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic record dialog — built from a list of field specs
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RecordDialog(QtWidgets.QDialog):
     """A form dialog generated from field specs.
 
@@ -235,8 +243,8 @@ class _RecordDialog(QtWidgets.QDialog):
                 self._set_value(f, w, row_data[f["key"]])
         v.addLayout(fl)
 
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
+                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)  # noqa: E501
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
@@ -300,15 +308,15 @@ class _RecordDialog(QtWidgets.QDialog):
         return out
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic register widget — one DB table, configured per subclass via SPEC
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _LegalCrudWidget(QtWidgets.QWidget):
     # Subclasses set SPEC = {
     #   'table', 'title', 'noun',
     #   'statuses': [...],
     #   'columns': [(field_key, header, width|None)],  # 'id' implied first
-    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update
+    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update  # noqa: E501
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
@@ -321,7 +329,7 @@ class _LegalCrudWidget(QtWidgets.QWidget):
         self._build_ui()
         self._refresh()
 
-    # ── UI ────────────────────────────────────────────────────────────────────
+    # ── UI ──────────────────────────────────────────────────────────────────
     def _build_ui(self):
         spec = self.SPEC
         root = QtWidgets.QVBoxLayout(self)
@@ -329,7 +337,8 @@ class _LegalCrudWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel(spec["title"])
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         fb = QtWidgets.QHBoxLayout()
@@ -356,8 +365,10 @@ class _LegalCrudWidget(QtWidgets.QWidget):
                     i, QtWidgets.QHeaderView.ResizeMode.Stretch)
             else:
                 self.tbl.setColumnWidth(i, width)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setDefaultSectionSize(24)
         self.tbl.itemDoubleClicked.connect(self._edit)
@@ -382,14 +393,15 @@ class _LegalCrudWidget(QtWidgets.QWidget):
         w.setLayout(layout)
         return w
 
-    # ── Data ────────────────────────────────────────────────────────────────────
+    # ── Data ────────────────────────────────────────────────────────────────
     def _money_keys(self):
         return {f["key"] for f in self.SPEC["fields"] if f["kind"] == "money"}
 
     def _refresh(self, *_):
         spec = self.SPEC
-        sf = self.status_filter.currentText() if hasattr(self, "status_filter") else "All Statuses"
-        term = self.search.text().strip().lower() if hasattr(self, "search") else ""
+        sf = self.status_filter.currentText() if hasattr(
+            self, "status_filter") else "All Statuses"
+        term = self.search.text().strip().lower() if hasattr(self, "search") else ""  # noqa: E501
         with _conn() as con:
             q = f"SELECT * FROM {spec['table']} WHERE 1=1"
             p = []
@@ -408,9 +420,14 @@ class _LegalCrudWidget(QtWidgets.QWidget):
             self.tbl.insertRow(r)
             for c, key in enumerate(self._col_keys):
                 if key == "id":
-                    self.tbl.setItem(r, c, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
                 elif key in money_keys:
-                    self.tbl.setItem(r, c, _ro(_money(row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        _money(
+            row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
                 else:
                     self.tbl.setItem(r, c, _ro(row[key]))
             _color_row(self.tbl, r, STATUS_COLORS.get(row["status"]))
@@ -428,7 +445,7 @@ class _LegalCrudWidget(QtWidgets.QWidget):
             return None
         return int(self.tbl.item(self.tbl.currentRow(), 0).text())
 
-    # ── CRUD ────────────────────────────────────────────────────────────────────
+    # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
         dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
@@ -437,7 +454,9 @@ class _LegalCrudWidget(QtWidgets.QWidget):
         v = dlg.values()
         keys = [f["key"] for f in spec["fields"]]
         if not v[keys[0]]:
-            QtWidgets.QMessageBox.warning(self, "Required", f"{spec['fields'][0]['label']} is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Required", f"{
+        spec['fields'][0]['label']} is required.")
             return
         cols = ",".join(keys)
         ph = ",".join(["%s"] * len(keys))
@@ -452,10 +471,16 @@ class _LegalCrudWidget(QtWidgets.QWidget):
         if rid is None:
             return
         with _conn() as con:
-            rd = con.execute(f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()
+            rd = con.execute(
+                f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()  # noqa: E501
         if not rd:
             return
-        dlg = _RecordDialog(f"Edit {spec['noun']}", spec["fields"], self, row_data=rd)
+        dlg = _RecordDialog(
+    f"Edit {
+        spec['noun']}",
+        spec["fields"],
+        self,
+         row_data=rd)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -491,36 +516,65 @@ class _LegalCrudWidget(QtWidgets.QWidget):
             params.append(date.today().isoformat())
         params.append(rid)
         with _conn() as con:
-            con.execute(f"UPDATE {spec['table']} SET {sets} WHERE id=%s", params)
+            con.execute(
+    f"UPDATE {
+        spec['table']} SET {sets} WHERE id=%s",
+         params)
         self._refresh()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Vocabularies
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 CONTRACT_TYPES = ["NDA", "Service Agreement", "Lease", "Vendor", "Employment",
                   "Licensing", "Partnership", "Other"]
 CONTRACT_STATUSES = ["Draft", "Active", "Renewed", "Expired", "Terminated"]
 
 COMPLIANCE_STATUSES = ["Pending", "In Progress", "Complete", "Overdue"]
 
-LITIGATION_TYPES = ["Civil", "Contract Dispute", "IP", "Employment", "Regulatory", "Other"]
-LITIGATION_STATUSES = ["Open", "In Discovery", "Settled", "Dismissed", "Closed"]
+LITIGATION_TYPES = [
+    "Civil",
+    "Contract Dispute",
+    "IP",
+    "Employment",
+    "Regulatory",
+     "Other"]
+LITIGATION_STATUSES = [
+    "Open",
+    "In Discovery",
+    "Settled",
+    "Dismissed",
+     "Closed"]
 
 IP_TYPES = ["Patent", "Trademark", "Copyright", "Trade Secret"]
 IP_STATUSES = ["Pending", "Registered", "Granted", "Expired", "Abandoned"]
 
 EMPLOYMENT_TYPES = ["Grievance", "Discrimination", "Wrongful Termination",
                     "Policy Review", "Contract", "Harassment", "Other"]
-EMPLOYMENT_STATUSES = ["Open", "Investigating", "Escalated", "Resolved", "Closed"]
+EMPLOYMENT_STATUSES = [
+    "Open",
+    "Investigating",
+    "Escalated",
+    "Resolved",
+     "Closed"]
 
-GOVERNANCE_CATEGORIES = ["Board Member", "Policy", "Filing", "Resolution", "Committee"]
-GOVERNANCE_STATUSES = ["Active", "Pending", "Under Review", "Filed", "Archived"]
+GOVERNANCE_CATEGORIES = [
+    "Board Member",
+    "Policy",
+    "Filing",
+    "Resolution",
+     "Committee"]
+GOVERNANCE_STATUSES = [
+    "Active",
+    "Pending",
+    "Under Review",
+    "Filed",
+     "Archived"]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class ContractsWidget(_LegalCrudWidget):
     SPEC = {
         "table": "legal_contract",
@@ -541,12 +595,16 @@ class ContractsWidget(_LegalCrudWidget):
         "fields": [
             {"key": "title", "label": "Title", "kind": "text"},
             {"key": "counterparty", "label": "Counterparty", "kind": "text"},
-            {"key": "contract_type", "label": "Type", "kind": "combo", "options": CONTRACT_TYPES, "editable": True},
+            {"key": "contract_type", "label": "Type", "kind": "combo",
+                "options": CONTRACT_TYPES, "editable": True},
             {"key": "value", "label": "Value", "kind": "money"},
             {"key": "start_date", "label": "Start Date", "kind": "date"},
             {"key": "end_date", "label": "End Date", "kind": "date"},
             {"key": "owner", "label": "Owner", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": CONTRACT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": CONTRACT_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -559,7 +617,7 @@ class ComplianceWidget(_LegalCrudWidget):
         "noun": "Item",
         "statuses": COMPLIANCE_STATUSES,
         "order_by": "due_date",
-        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},
+        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("requirement", "Requirement", None),
             ("regulation", "Regulation", 160),
@@ -572,8 +630,11 @@ class ComplianceWidget(_LegalCrudWidget):
             {"key": "regulation", "label": "Regulation", "kind": "text"},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "due_date", "label": "Due Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": COMPLIANCE_STATUSES},
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": COMPLIANCE_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -597,11 +658,15 @@ class LitigationWidget(_LegalCrudWidget):
         ],
         "fields": [
             {"key": "case_name", "label": "Case Name", "kind": "text"},
-            {"key": "opposing_party", "label": "Opposing Party", "kind": "text"},
+            {"key": "opposing_party", "label": "Opposing Party", "kind": "text"},  # noqa: E501
             {"key": "court", "label": "Court", "kind": "text"},
-            {"key": "case_type", "label": "Type", "kind": "combo", "options": LITIGATION_TYPES, "editable": True},
+            {"key": "case_type", "label": "Type", "kind": "combo",
+                "options": LITIGATION_TYPES, "editable": True},
             {"key": "filed_date", "label": "Filed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": LITIGATION_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": LITIGATION_STATUSES},
             {"key": "outcome", "label": "Outcome", "kind": "text"},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
@@ -627,12 +692,14 @@ class IPWidget(_LegalCrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Title", "kind": "text"},
-            {"key": "ip_type", "label": "Type", "kind": "combo", "options": IP_TYPES},
-            {"key": "registration_no", "label": "Registration #", "kind": "text"},
+            {"key": "ip_type", "label": "Type",
+                "kind": "combo", "options": IP_TYPES},
+            {"key": "registration_no", "label": "Registration #", "kind": "text"},  # noqa: E501
             {"key": "jurisdiction", "label": "Jurisdiction", "kind": "text"},
             {"key": "filed_date", "label": "Filed Date", "kind": "date"},
             {"key": "expiry_date", "label": "Expiry Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": IP_STATUSES},
+            {"key": "status", "label": "Status",
+                "kind": "combo", "options": IP_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -645,7 +712,7 @@ class EmploymentLawWidget(_LegalCrudWidget):
         "noun": "Matter",
         "statuses": EMPLOYMENT_STATUSES,
         "order_by": "opened_date DESC",
-        "action": {"label": "Mark Resolved", "status": "Resolved", "stamp": "closed_date"},
+        "action": {"label": "Mark Resolved", "status": "Resolved", "stamp": "closed_date"},  # noqa: E501
         "columns": [
             ("matter", "Matter", None),
             ("employee", "Employee", 150),
@@ -657,11 +724,15 @@ class EmploymentLawWidget(_LegalCrudWidget):
         "fields": [
             {"key": "matter", "label": "Matter", "kind": "text"},
             {"key": "employee", "label": "Employee", "kind": "text"},
-            {"key": "matter_type", "label": "Type", "kind": "combo", "options": EMPLOYMENT_TYPES, "editable": True},
+            {"key": "matter_type", "label": "Type", "kind": "combo",
+                "options": EMPLOYMENT_TYPES, "editable": True},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "opened_date", "label": "Opened Date", "kind": "date"},
             {"key": "closed_date", "label": "Closed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": EMPLOYMENT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": EMPLOYMENT_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -685,19 +756,23 @@ class GovernanceWidget(_LegalCrudWidget):
         ],
         "fields": [
             {"key": "item", "label": "Item", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": GOVERNANCE_CATEGORIES, "editable": True},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": GOVERNANCE_CATEGORIES, "editable": True},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "ref_date", "label": "Date", "kind": "date"},
             {"key": "reference", "label": "Reference", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": GOVERNANCE_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": GOVERNANCE_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Legal_mgmt`)
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class LegalMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

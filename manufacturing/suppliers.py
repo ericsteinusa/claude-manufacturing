@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -63,7 +69,7 @@ def _display_name(row):
     return company if company else name
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class SupplierDialog(QtWidgets.QDialog):
     """Shared dialog for adding and editing a supplier."""
@@ -165,7 +171,8 @@ class SupplierDialog(QtWidgets.QDialog):
         conn = get_db()
         if self._supplier_id is None:
             cur = conn.execute(
-                "INSERT INTO supplier (company_name, first_name, last_name, email,"
+                "INSERT INTO supplier (company_name, first_name, last_name, "
+                "email,"
                 " phone_number, address, city, state, zip_code)"
                 " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (company, first, last,
@@ -176,8 +183,10 @@ class SupplierDialog(QtWidgets.QDialog):
             self.saved_id = cur.fetchone()['id']
         else:
             conn.execute(
-                "UPDATE supplier SET company_name=%s, first_name=%s, last_name=%s,"
-                " email=%s, phone_number=%s, address=%s, city=%s, state=%s, zip_code=%s"
+                "UPDATE supplier SET company_name=%s, first_name=%s, "
+                "last_name=%s,"
+                " email=%s, phone_number=%s, address=%s, city=%s, state=%s, "
+                "zip_code=%s"
                 " WHERE id=%s",
                 (company, first, last,
                  self.email.text().strip(), self.phone.text().strip(),
@@ -212,7 +221,8 @@ class SupplierDetailPanel(QtWidgets.QWidget):
 
         def val():
             w = QtWidgets.QLabel("")
-            w.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+            w.setStyleSheet(
+                "color: white; font-size: 13px; font-weight: bold;")
             return w
 
         self.v_company = val()
@@ -244,7 +254,8 @@ class SupplierDetailPanel(QtWidgets.QWidget):
         try:
             po_count = conn.execute(
                 "SELECT COUNT(*) FROM purchase_order"
-                " WHERE supplier_id = %s AND status NOT IN ('cancelled','received')",
+                " WHERE supplier_id = %s AND status NOT IN "
+                "('cancelled','received')",
                 (supplier_id,)
             ).fetchone()[0]
         except psycopg2.OperationalError:
@@ -258,7 +269,12 @@ class SupplierDetailPanel(QtWidgets.QWidget):
         self.v_contact.setText(contact)
         self.v_email.setText(rec["email"] or "")
         self.v_phone.setText(rec["phone_number"] or "")
-        parts = [p for p in (rec["address"], rec["city"], rec["state"], rec["zip_code"]) if p]
+        parts = [
+    p for p in (
+        rec["address"],
+        rec["city"],
+        rec["state"],
+         rec["zip_code"]) if p]
         self.v_address.setText(", ".join(parts))
         self.v_pos.setText(str(po_count))
 
@@ -268,7 +284,7 @@ class SupplierDetailPanel(QtWidgets.QWidget):
             w.setText("")
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class SuppliersWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -309,20 +325,30 @@ class SuppliersWidget(QtWidgets.QWidget):
         self.sup_table = QtWidgets.QTableWidget()
         self.sup_table.setColumnCount(7)
         self.sup_table.setHorizontalHeaderLabels(
-            ["Company", "First Name", "Last Name", "Email", "Phone", "City", "State"]
+            ["Company", "First Name", "Last Name",
+                "Email", "Phone", "City", "State"]
         )
         hh = self.sup_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.sup_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.sup_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.sup_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.sup_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.sup_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.sup_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.sup_table.setAlternatingRowColors(True)
         self.sup_table.verticalHeader().setVisible(False)
         self.sup_table.clicked.connect(self._on_row_clicked)
@@ -411,7 +437,8 @@ class SuppliersWidget(QtWidgets.QWidget):
 
     def _on_edit(self, _index=None):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a supplier first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a supplier first.")
             return
         dlg = SupplierDialog(supplier_id=self._selected_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -420,11 +447,13 @@ class SuppliersWidget(QtWidgets.QWidget):
 
     def _on_delete(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a supplier first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a supplier first.")
             return
         conn = get_db()
         name_row = conn.execute(
-            "SELECT company_name, first_name, last_name FROM supplier WHERE id = %s",
+            "SELECT company_name, first_name, last_name FROM supplier WHERE "
+            "id = %s",
             (self._selected_id,)
         ).fetchone()
         conn.close()
@@ -432,11 +461,12 @@ class SuppliersWidget(QtWidgets.QWidget):
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete",
             f"Delete '{name}'? This cannot be undone.",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM supplier WHERE id = %s", (self._selected_id,))
+            conn.execute("DELETE FROM supplier WHERE id = %s",
+                         (self._selected_id,))
             conn.commit()
             conn.close()
             self._selected_id = None
@@ -444,13 +474,15 @@ class SuppliersWidget(QtWidgets.QWidget):
 
     def _on_view_pos(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a supplier first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a supplier first.")
             return
         conn = get_db()
         try:
             pos = conn.execute(
                 "SELECT po_number, order_date, expected_date, status"
-                " FROM purchase_order WHERE supplier_id = %s ORDER BY order_date DESC",
+                " FROM purchase_order WHERE supplier_id = %s ORDER BY "
+                "order_date DESC",
                 (self._selected_id,)
             ).fetchall()
         except psycopg2.OperationalError:
@@ -464,13 +496,16 @@ class SuppliersWidget(QtWidgets.QWidget):
         vl = QtWidgets.QVBoxLayout(dlg)
         tbl = QtWidgets.QTableWidget()
         tbl.setColumnCount(4)
-        tbl.setHorizontalHeaderLabels(["PO #", "Order Date", "Expected Date", "Status"])
+        tbl.setHorizontalHeaderLabels(
+            ["PO #", "Order Date", "Expected Date", "Status"])
         hh = tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for i in range(1, 4):
-            hh.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         tbl.verticalHeader().setVisible(False)
         tbl.setAlternatingRowColors(True)
         for po in pos:
@@ -481,7 +516,8 @@ class SuppliersWidget(QtWidgets.QWidget):
             tbl.setItem(r, 2, _ro(po["expected_date"] or ""))
             tbl.setItem(r, 3, _ro((po["status"] or "").capitalize()))
         vl.addWidget(tbl)
-        close_btn = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Close)
+        close_btn = QtWidgets.QDialogButtonBox(
+    QtWidgets.QDialogButtonBox.StandardButton.Close)
         close_btn.rejected.connect(dlg.reject)
         vl.addWidget(close_btn)
         dlg.exec()

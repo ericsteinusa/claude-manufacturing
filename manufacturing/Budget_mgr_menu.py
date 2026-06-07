@@ -3,8 +3,10 @@ from PyQt6 import QtCore, QtWidgets
 from .Budget_mgmt import BudgetManagementWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -49,7 +51,9 @@ class BudgetMgrMenu(QtWidgets.QMainWindow):
         tabs.addTab(_placeholder_tab("Budget Detail"), "Budget Detail")
         tabs.addTab(_placeholder_tab("Budget vs. Actual"), "Budget vs. Actual")
         tabs.addTab(_placeholder_tab("Variance Report"), "Variance Report")
-        tabs.addTab(_placeholder_tab("Department Summaries"), "Department Summaries")
+        tabs.addTab(
+    _placeholder_tab("Department Summaries"),
+     "Department Summaries")
         tabs.addTab(_placeholder_tab("Approval Workflow"), "Approval Workflow")
         v.addWidget(tabs)
 

@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtGui, QtWidgets
-from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget, InsuranceWidget,
+from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget, InsuranceWidget,  # noqa: E501
                         BusinessContinuityWidget, ComplianceAuditWidget)
 
 BLUE = QtGui.QColor(0, 85, 255)

@@ -5,12 +5,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -88,7 +94,8 @@ def _next_insp_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM qa_inspection WHERE insp_number LIKE ?", (f"QA-{yr}-%",)
+        "SELECT COUNT(*) FROM qa_inspection WHERE insp_number LIKE ?", (
+            f"QA-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"QA-{yr}-{count + 1:04d}"
@@ -97,7 +104,8 @@ def _next_insp_num():
 def _load_products(combo, include_none=True):
     conn = get_db()
     try:
-        prods = conn.execute("SELECT id, name AS product_name FROM product ORDER BY name").fetchall()
+        prods = conn.execute(
+            "SELECT id, name AS product_name FROM product ORDER BY name").fetchall()  # noqa: E501
     except psycopg2.OperationalError:
         prods = []
     conn.close()
@@ -108,7 +116,7 @@ def _load_products(combo, include_none=True):
         combo.addItem(p["product_name"], p["id"])
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewInspectionDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -142,7 +150,8 @@ class NewInspectionDialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             wos = conn.execute(
-                "SELECT id, wo_number FROM work_order ORDER BY wo_number DESC LIMIT 100"
+                "SELECT id, wo_number FROM work_order ORDER BY wo_number DESC "
+                "LIMIT 100"
             ).fetchall()
         except psycopg2.OperationalError:
             wos = []
@@ -183,23 +192,25 @@ class NewInspectionDialog(QtWidgets.QDialog):
     def _on_ok(self):
         num = self.insp_num.text().strip()
         if not num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Inspection number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Inspection number is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO qa_inspection (insp_number, product_id, wo_id, insp_date,"
+                "INSERT INTO qa_inspection (insp_number, product_id, wo_id, "
+                "insp_date,"
                 " inspector, result, notes) VALUES (?,?,?,?,?,?,?)",
-                (num, self.product_combo.currentData(), self.wo_combo.currentData(),
+                (num, self.product_combo.currentData(), self.wo_combo.currentData(),  # noqa: E501
                  self.insp_date.date().toString("yyyy-MM-dd"),
-                 self.inspector.text().strip(), self.result_combo.currentData(),
+                 self.inspector.text().strip(), self.result_combo.currentData(),  # noqa: E501
                  self.notes.text().strip())
             )
             self.insp_id = cur.lastrowid
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Inspection number '{num}' already exists.")
+                                          f"Inspection number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -226,7 +237,8 @@ class LogDefectDialog(QtWidgets.QDialog):
 
         self.defect_type = QtWidgets.QLineEdit()
         self.defect_type.setStyleSheet(INPUT_STYLE)
-        self.defect_type.setPlaceholderText("e.g. Dimensional, Surface, Contamination")
+        self.defect_type.setPlaceholderText(
+            "e.g. Dimensional, Surface, Contamination")
         layout.addRow(lbl("Defect Type:"), self.defect_type)
 
         self.severity_combo = QtWidgets.QComboBox()
@@ -251,11 +263,13 @@ class LogDefectDialog(QtWidgets.QDialog):
     def _on_ok(self):
         desc = self.description.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Description is required.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO qa_defect (insp_id, defect_type, severity, description) VALUES (?,?,?,?)",
+            "INSERT INTO qa_defect (insp_id, defect_type, severity, "
+            "description) VALUES (?,?,?,?)",
             (self._insp_id, self.defect_type.text().strip(),
              self.severity_combo.currentData(), desc)
         )
@@ -324,14 +338,17 @@ class AddSpecDialog(QtWidgets.QDialog):
         prod_id = self.product_combo.currentData()
         name = self.spec_name.text().strip()
         if prod_id is None or not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Product and spec name are required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Product and spec name are required.")
             return
         if self.min_val.value() > self.max_val.value():
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Min value must be ≤ max value.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Min value must be ≤ max value.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO qa_spec (product_id, spec_name, min_value, max_value, unit, notes)"
+            "INSERT INTO qa_spec (product_id, spec_name, min_value, "
+            "max_value, unit, notes)"
             " VALUES (?,?,?,?,?,?)",
             (prod_id, name, self.min_val.value(), self.max_val.value(),
              self.unit.text().strip(), self.notes.text().strip())
@@ -341,7 +358,7 @@ class AddSpecDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class QALab(QtWidgets.QMainWindow):
     def __init__(self):
@@ -363,7 +380,8 @@ class QALab(QtWidgets.QMainWindow):
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
         self._tabs.setStyleSheet(
-            "QTabBar::tab{background:white; border:1px solid black; padding:4px 10px;}"
+            "QTabBar::tab{background:white; border:1px solid black; "
+            "padding:4px 10px;}"
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
@@ -397,8 +415,10 @@ class QALab(QtWidgets.QMainWindow):
         self.insp_result_filter.setStyleSheet(COMBO_STYLE)
         self.insp_result_filter.addItem("(all)", None)
         for s in ("pending", "passed", "failed", "on_hold"):
-            self.insp_result_filter.addItem(s.replace("_", " ").capitalize(), s)
-        self.insp_result_filter.currentIndexChanged.connect(self._refresh_inspections)
+            self.insp_result_filter.addItem(
+                s.replace("_", " ").capitalize(), s)
+        self.insp_result_filter.currentIndexChanged.connect(
+            self._refresh_inspections)
         fr.addWidget(self.insp_result_filter)
 
         fr.addSpacing(10)
@@ -408,7 +428,8 @@ class QALab(QtWidgets.QMainWindow):
         self.insp_prod_filter = QtWidgets.QComboBox()
         self.insp_prod_filter.setStyleSheet(COMBO_STYLE)
         self.insp_prod_filter.setMinimumWidth(150)
-        self.insp_prod_filter.currentIndexChanged.connect(self._refresh_inspections)
+        self.insp_prod_filter.currentIndexChanged.connect(
+            self._refresh_inspections)
         fr.addWidget(self.insp_prod_filter)
 
         fr.addSpacing(10)
@@ -433,17 +454,23 @@ class QALab(QtWidgets.QMainWindow):
         self.insp_table = QtWidgets.QTableWidget()
         self.insp_table.setColumnCount(7)
         self.insp_table.setHorizontalHeaderLabels(
-            ["Insp #", "Product", "Work Order", "Date", "Inspector", "Defects", "Result"]
+            ["Insp #", "Product", "Work Order", "Date",
+                "Inspector", "Defects", "Result"]
         )
         hh = self.insp_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.insp_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.insp_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.insp_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.insp_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.insp_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.insp_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.insp_table.setAlternatingRowColors(True)
         self.insp_table.verticalHeader().setVisible(False)
         self.insp_table.clicked.connect(self._on_insp_clicked)
@@ -465,8 +492,10 @@ class QALab(QtWidgets.QMainWindow):
         dh.setStyleSheet("color: black; font-weight: bold;")
         dh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (0, 1, 3, 4):
-            dh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.defect_detail_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            dh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.defect_detail_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.defect_detail_table.verticalHeader().setVisible(False)
         self.defect_detail_table.setAlternatingRowColors(True)
         dv.addWidget(self.defect_detail_table)
@@ -478,9 +507,12 @@ class QALab(QtWidgets.QMainWindow):
         for text, slot in (
             ("New Inspection",  self._on_new_insp),
             ("Log Defect",      self._on_log_defect),
-            ("Mark Passed",     lambda: self._set_result("passed",  "Mark as Passed?")),
-            ("Mark Failed",     lambda: self._set_result("failed",  "Mark as Failed?")),
-            ("Mark On Hold",    lambda: self._set_result("on_hold", "Put On Hold?")),
+            ("Mark Passed",     lambda: self._set_result(
+                "passed",  "Mark as Passed?")),
+            ("Mark Failed",     lambda: self._set_result(
+                "failed",  "Mark as Failed?")),
+            ("Mark On Hold",    lambda: self._set_result("on_hold", "Put On "
+                                                                    "Hold?")),
             ("Resolve Defect",  self._on_resolve_defect),
         ):
             b = QtWidgets.QPushButton(text)
@@ -543,7 +575,7 @@ class QALab(QtWidgets.QMainWindow):
 
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY qi.insp_date DESC, qi.insp_number DESC",
+            rows = conn.execute(base + where + " ORDER BY qi.insp_date DESC, qi.insp_number DESC",  # noqa: E501
                                 params).fetchall()
         except psycopg2.OperationalError:
             rows = conn.execute(
@@ -566,7 +598,10 @@ class QALab(QtWidgets.QMainWindow):
             self.insp_table.setItem(r, 3, _ro(row["insp_date"] or ""))
             self.insp_table.setItem(r, 4, _ro(row["inspector"] or ""))
             self.insp_table.setItem(r, 5, _ro(str(row["defect_count"])))
-            self.insp_table.setItem(r, 6, _ro(row["result"].replace("_", " ").capitalize()))
+            self.insp_table.setItem(
+    r, 6, _ro(
+        row["result"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(INSP_COLORS.get(row["result"], "#ffffff"))
             for col in range(7):
                 self.insp_table.item(r, col).setBackground(bg)
@@ -600,7 +635,8 @@ class QALab(QtWidgets.QMainWindow):
             return
         conn = get_db()
         defects = conn.execute(
-            "SELECT id, defect_type, severity, description, resolved FROM qa_defect WHERE insp_id = ?",
+            "SELECT id, defect_type, severity, description, resolved FROM "
+            "qa_defect WHERE insp_id = ?",
             (self._selected_insp_id,)
         ).fetchall()
         conn.close()
@@ -610,14 +646,17 @@ class QALab(QtWidgets.QMainWindow):
             self._defect_detail_ids = getattr(self, "_defect_detail_ids", [])
             self._defect_detail_ids.append(d["id"])
             self.defect_detail_table.setItem(r, 0, _ro(d["defect_type"] or ""))
-            self.defect_detail_table.setItem(r, 1, _ro(d["severity"].capitalize()))
+            self.defect_detail_table.setItem(
+                r, 1, _ro(d["severity"].capitalize()))
             self.defect_detail_table.setItem(r, 2, _ro(d["description"] or ""))
-            self.defect_detail_table.setItem(r, 3, _ro("Yes" if d["resolved"] else "No"))
+            self.defect_detail_table.setItem(
+                r, 3, _ro("Yes" if d["resolved"] else "No"))
             self.defect_detail_table.setItem(r, 4, _ro(str(d["id"])))
             sev_color = SEVERITY_COLORS.get(d["severity"])
             if sev_color and not d["resolved"]:
                 for col in range(5):
-                    self.defect_detail_table.item(r, col).setBackground(sev_color)
+                    self.defect_detail_table.item(
+                        r, col).setBackground(sev_color)
 
     def _on_new_insp(self):
         dlg = NewInspectionDialog(self)
@@ -626,20 +665,25 @@ class QALab(QtWidgets.QMainWindow):
 
     def _on_log_defect(self):
         if self._selected_insp_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an inspection first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an inspection first.")
             return
-        dlg = LogDefectDialog(self._selected_insp_id, self._selected_insp_number, self)
+        dlg = LogDefectDialog(
+    self._selected_insp_id,
+    self._selected_insp_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_inspections()
             self._refresh_defect_detail()
 
     def _set_result(self, new_result, msg):
         if self._selected_insp_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an inspection first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an inspection first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
@@ -653,10 +697,12 @@ class QALab(QtWidgets.QMainWindow):
         row = self.defect_detail_table.currentRow()
         ids = getattr(self, "_defect_detail_ids", [])
         if row < 0 or row >= len(ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a defect row first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a defect row first.")
             return
         conn = get_db()
-        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = ?", (ids[row],))
+        conn.execute(
+    "UPDATE qa_defect SET resolved = 1 WHERE id = ?", (ids[row],))
         conn.commit()
         conn.close()
         self._refresh_defect_detail()
@@ -680,7 +726,8 @@ class QALab(QtWidgets.QMainWindow):
         self.defect_sev_filter.addItem("(all)", None)
         for s in ("minor", "major", "critical"):
             self.defect_sev_filter.addItem(s.capitalize(), s)
-        self.defect_sev_filter.currentIndexChanged.connect(self._refresh_defects)
+        self.defect_sev_filter.currentIndexChanged.connect(
+            self._refresh_defects)
         fr.addWidget(self.defect_sev_filter)
 
         fr.addSpacing(10)
@@ -692,7 +739,8 @@ class QALab(QtWidgets.QMainWindow):
         self.defect_res_filter.addItem("Open only", 0)
         self.defect_res_filter.addItem("Resolved only", 1)
         self.defect_res_filter.addItem("All", None)
-        self.defect_res_filter.currentIndexChanged.connect(self._refresh_defects)
+        self.defect_res_filter.currentIndexChanged.connect(
+            self._refresh_defects)
         fr.addWidget(self.defect_res_filter)
         fr.addStretch()
         v.addLayout(fr)
@@ -700,16 +748,21 @@ class QALab(QtWidgets.QMainWindow):
         self.defect_table = QtWidgets.QTableWidget()
         self.defect_table.setColumnCount(6)
         self.defect_table.setHorizontalHeaderLabels(
-            ["Inspection #", "Product", "Defect Type", "Severity", "Description", "Resolved"]
+            ["Inspection #", "Product", "Defect Type",
+                "Severity", "Description", "Resolved"]
         )
         hh = self.defect_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (0, 1, 2, 3, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.defect_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.defect_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.defect_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.defect_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.defect_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.defect_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.defect_table.setAlternatingRowColors(True)
         self.defect_table.verticalHeader().setVisible(False)
         v.addWidget(self.defect_table, stretch=1)
@@ -747,7 +800,8 @@ class QALab(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             rows = conn.execute(
-                base + where + " ORDER BY d.resolved ASC, d.severity DESC, qi.insp_number",
+                base + where + " ORDER BY d.resolved ASC, d.severity DESC, "
+                               "qi.insp_number",
                 params
             ).fetchall()
         except psycopg2.OperationalError:
@@ -765,7 +819,8 @@ class QALab(QtWidgets.QMainWindow):
             self.defect_table.setItem(r, 2, _ro(row["defect_type"] or ""))
             self.defect_table.setItem(r, 3, _ro(row["severity"].capitalize()))
             self.defect_table.setItem(r, 4, _ro(row["description"] or ""))
-            self.defect_table.setItem(r, 5, _ro("Yes" if row["resolved"] else "No"))
+            self.defect_table.setItem(
+                r, 5, _ro("Yes" if row["resolved"] else "No"))
             if not row["resolved"]:
                 sev_color = SEVERITY_COLORS.get(row["severity"])
                 if sev_color:
@@ -775,10 +830,12 @@ class QALab(QtWidgets.QMainWindow):
     def _on_resolve_defect_tab(self):
         row = self.defect_table.currentRow()
         if row < 0 or row >= len(self._defect_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a defect first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a defect first.")
             return
         conn = get_db()
-        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = ?", (self._defect_row_ids[row],))
+        conn.execute("UPDATE qa_defect SET resolved = 1 WHERE id = ?",
+                     (self._defect_row_ids[row],))
         conn.commit()
         conn.close()
         self._refresh_defects()
@@ -813,10 +870,14 @@ class QALab(QtWidgets.QMainWindow):
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (0, 2, 3, 4, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.spec_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.spec_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.spec_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.spec_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.spec_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.spec_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.spec_table.setAlternatingRowColors(True)
         self.spec_table.verticalHeader().setVisible(False)
         v.addWidget(self.spec_table, stretch=1)
@@ -886,8 +947,10 @@ class QALab(QtWidgets.QMainWindow):
             self._spec_row_ids.append(row["id"])
             self.spec_table.setItem(r, 0, _ro(row["product_name"]))
             self.spec_table.setItem(r, 1, _ro(row["spec_name"]))
-            self.spec_table.setItem(r, 2, _ro(f"{row['min_value']:.4f}" if row["min_value"] is not None else ""))
-            self.spec_table.setItem(r, 3, _ro(f"{row['max_value']:.4f}" if row["max_value"] is not None else ""))
+            self.spec_table.setItem(
+                r, 2, _ro(f"{row['min_value']:.4f}" if row["min_value"] is not None else ""))  # noqa: E501
+            self.spec_table.setItem(
+                r, 3, _ro(f"{row['max_value']:.4f}" if row["max_value"] is not None else ""))  # noqa: E501
             self.spec_table.setItem(r, 4, _ro(row["unit"] or ""))
             self.spec_table.setItem(r, 5, _ro(row["notes"] or ""))
 
@@ -899,15 +962,17 @@ class QALab(QtWidgets.QMainWindow):
     def _on_delete_spec(self):
         row = self.spec_table.currentRow()
         if row < 0 or row >= len(self._spec_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a spec first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a spec first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete", "Delete this specification?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM qa_spec WHERE id = ?", (self._spec_row_ids[row],))
+            conn.execute("DELETE FROM qa_spec WHERE id = ?",
+                         (self._spec_row_ids[row],))
             conn.commit()
             conn.close()
             self._refresh_specs()

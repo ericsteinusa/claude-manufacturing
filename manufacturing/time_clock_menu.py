@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -75,7 +81,7 @@ def _ro(text):
 def _ro_right(text):
     item = _ro(text)
     item.setTextAlignment(
-        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)  # noqa: E501
     return item
 
 
@@ -113,7 +119,7 @@ def _hours_between(clock_in_str, clock_out_str):
     return 0.0
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class ClockInDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -139,7 +145,8 @@ class ClockInDialog(QtWidgets.QDialog):
             self.emp_combo.addItem(_emp_label(e), e["id"])
         layout.addRow(lbl("Employee:"), self.emp_combo)
 
-        self.dt_edit = QtWidgets.QDateTimeEdit(QtCore.QDateTime.currentDateTime())
+        self.dt_edit = QtWidgets.QDateTimeEdit(
+            QtCore.QDateTime.currentDateTime())
         self.dt_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.dt_edit.setCalendarPopup(True)
         self.dt_edit.setStyleSheet(INPUT_STYLE)
@@ -159,7 +166,8 @@ class ClockInDialog(QtWidgets.QDialog):
 
     def _on_ok(self):
         if not self.emp_combo.count():
-            QtWidgets.QMessageBox.warning(self, "No Employees", "No employees found.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Employees", "No employees found.")
             return
         people_id = self.emp_combo.currentData()
         clock_in = self.dt_edit.dateTime().toString("yyyy-MM-dd hh:mm:ss")
@@ -167,21 +175,23 @@ class ClockInDialog(QtWidgets.QDialog):
         # Warn if already clocked in
         conn = get_db()
         open_entry = conn.execute(
-            "SELECT id FROM time_clock WHERE people_id=%s AND clock_out IS NULL",
+            "SELECT id FROM time_clock WHERE people_id=%s AND clock_out IS "
+            "NULL",
             (people_id,)
         ).fetchone()
         if open_entry:
             reply = QtWidgets.QMessageBox.question(
                 self, "Already Clocked In",
                 "This employee has an open clock-in. Clock in again anyway?",
-                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
             )
             if reply != QtWidgets.QMessageBox.StandardButton.Yes:
                 conn.close()
                 return
 
         conn.execute(
-            "INSERT INTO time_clock (people_id, clock_in, notes) VALUES (%s,%s,%s)",
+            "INSERT INTO time_clock (people_id, clock_in, notes) VALUES "
+            "(%s,%s,%s)",
             (people_id, clock_in, self.notes.text().strip())
         )
         conn.commit()
@@ -228,7 +238,8 @@ class ClockOutDialog(QtWidgets.QDialog):
             self.emp_combo.addItem(_emp_label(e), e["id"])
         layout.addRow(lbl("Employee:"), self.emp_combo)
 
-        self.dt_edit = QtWidgets.QDateTimeEdit(QtCore.QDateTime.currentDateTime())
+        self.dt_edit = QtWidgets.QDateTimeEdit(
+            QtCore.QDateTime.currentDateTime())
         self.dt_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.dt_edit.setCalendarPopup(True)
         self.dt_edit.setStyleSheet(INPUT_STYLE)
@@ -261,7 +272,8 @@ class ClockOutDialog(QtWidgets.QDialog):
         ).fetchone()
         if not entry:
             QtWidgets.QMessageBox.warning(self, "Not Clocked In",
-                                          "No open clock-in found for this employee.")
+                                          "No open clock-in found for this "
+                                          "employee.")
             conn.close()
             return
         hours = _hours_between(entry["clock_in"], clock_out)
@@ -280,7 +292,8 @@ class TimeOffDialog(QtWidgets.QDialog):
     def __init__(self, request_id=None, parent=None):
         super().__init__(parent)
         self._request_id = request_id
-        self.setWindowTitle("Edit Request" if request_id else "New Time Off Request")
+        self.setWindowTitle(
+    "Edit Request" if request_id else "New Time Off Request")
         self.resize(440, 320)
         _apply_blue_palette(self)
         self._build_ui()
@@ -352,8 +365,14 @@ class TimeOffDialog(QtWidgets.QDialog):
             if self.type_combo.itemData(i) == rec["request_type"]:
                 self.type_combo.setCurrentIndex(i)
                 break
-        self.start_date.setDate(QtCore.QDate.fromString(rec["start_date"], "yyyy-MM-dd"))
-        self.end_date.setDate(QtCore.QDate.fromString(rec["end_date"], "yyyy-MM-dd"))
+        self.start_date.setDate(
+    QtCore.QDate.fromString(
+        rec["start_date"],
+         "yyyy-MM-dd"))
+        self.end_date.setDate(
+    QtCore.QDate.fromString(
+        rec["end_date"],
+         "yyyy-MM-dd"))
         for i in range(self.status_combo.count()):
             if self.status_combo.itemData(i) == rec["status"]:
                 self.status_combo.setCurrentIndex(i)
@@ -368,7 +387,8 @@ class TimeOffDialog(QtWidgets.QDialog):
         if self._request_id is None:
             conn.execute(
                 "INSERT INTO time_off_request"
-                " (people_id, request_date, start_date, end_date, request_type, status, notes)"
+                " (people_id, request_date, start_date, end_date, "
+                "request_type, status, notes)"
                 " VALUES (%s,%s,%s,%s,%s,%s,%s)",
                 (self.emp_combo.currentData(), today,
                  self.start_date.date().toString("yyyy-MM-dd"),
@@ -379,7 +399,8 @@ class TimeOffDialog(QtWidgets.QDialog):
             )
         else:
             conn.execute(
-                "UPDATE time_off_request SET people_id=%s, start_date=%s, end_date=%s,"
+                "UPDATE time_off_request SET people_id=%s, start_date=%s, "
+                "end_date=%s,"
                 " request_type=%s, status=%s, notes=%s WHERE id=%s",
                 (self.emp_combo.currentData(),
                  self.start_date.date().toString("yyyy-MM-dd"),
@@ -393,7 +414,7 @@ class TimeOffDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Time Entries Tab ───────────────────────────────────────────────────────────
+# ── Time Entries Tab ────────────────────────────────────────────────────
 
 class TimeEntriesTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -448,7 +469,8 @@ class TimeEntriesTab(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(-6))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addDays(-6))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh)
@@ -477,15 +499,23 @@ class TimeEntriesTab(QtWidgets.QWidget):
             ["Employee", "Clock In", "Clock Out", "Hours", "Status", "Notes"])
         hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setVisible(False)
         self.tbl.clicked.connect(self._on_clicked)
@@ -552,8 +582,11 @@ class TimeEntriesTab(QtWidgets.QWidget):
             self.tbl.setItem(r, 0, _ro(name))
             self.tbl.setItem(r, 1, _ro(row["clock_in"] or ""))
             self.tbl.setItem(r, 2, _ro(row["clock_out"] or ""))
-            self.tbl.setItem(r, 3, _ro_right(f"{hours:.2f}" if not is_open else "open"))
-            self.tbl.setItem(r, 4, _ro("Clocked In" if is_open else "Complete"))
+            self.tbl.setItem(r, 3, _ro_right(
+                f"{hours:.2f}" if not is_open else "open"))
+            self.tbl.setItem(
+    r, 4, _ro(
+        "Clocked In" if is_open else "Complete"))
             self.tbl.setItem(r, 5, _ro(row["notes"] or ""))
             if is_open:
                 bg = QtGui.QColor("#cce5ff")
@@ -565,7 +598,8 @@ class TimeEntriesTab(QtWidgets.QWidget):
             f"Total hours: {total_hours:.2f}  |  "
             f"Currently clocked in: {open_count}"
         )
-        self.clocked_in_lbl.setText(f"Currently clocked in: {open_count} employee(s)")
+        self.clocked_in_lbl.setText(
+    f"Currently clocked in: {open_count} employee(s)")
         self._selected_id = None
 
     def _on_show_all(self):
@@ -597,22 +631,24 @@ class TimeEntriesTab(QtWidgets.QWidget):
 
     def _on_delete(self):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an entry first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an entry first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete", "Delete this time entry?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM time_clock WHERE id=%s", (self._selected_id,))
+            conn.execute("DELETE FROM time_clock WHERE id=%s",
+                         (self._selected_id,))
             conn.commit()
             conn.close()
             self._selected_id = None
             self._refresh()
 
 
-# ── Time Off Tab ───────────────────────────────────────────────────────────────
+# ── Time Off Tab ────────────────────────────────────────────────────────
 
 class TimeOffTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -667,16 +703,25 @@ class TimeOffTab(QtWidgets.QWidget):
             ["Employee", "Type", "Start", "End", "Days", "Status", "Notes"])
         hh = self.tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setVisible(False)
         self.tbl.clicked.connect(self._on_clicked)
@@ -771,7 +816,8 @@ class TimeOffTab(QtWidgets.QWidget):
 
     def _on_edit(self, _index=None):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a request first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a request first.")
             return
         dlg = TimeOffDialog(request_id=self._selected_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -779,7 +825,8 @@ class TimeOffTab(QtWidgets.QWidget):
 
     def _set_status(self, new_status):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a request first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a request first.")
             return
         conn = get_db()
         conn.execute("UPDATE time_off_request SET status=%s WHERE id=%s",
@@ -789,7 +836,7 @@ class TimeOffTab(QtWidgets.QWidget):
         self._refresh()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class TimeClockWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -805,7 +852,8 @@ class TimeClockWidget(QtWidgets.QWidget):
             "QTabBar::tab{background: white; color: black; padding: 6px 14px;"
             " border: 1px solid #999; border-bottom: none;"
             " border-radius: 4px 4px 0 0;}"
-            "QTabBar::tab:selected{background: rgb(85,255,255); font-weight: bold;}"
+            "QTabBar::tab:selected{background: rgb(85,255,255); font-weight: "
+            "bold;}"
         )
         tabs.addTab(TimeEntriesTab(), "Time Entries")
         tabs.addTab(TimeOffTab(), "Time Off Requests")

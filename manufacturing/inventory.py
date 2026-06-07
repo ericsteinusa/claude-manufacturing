@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -82,7 +88,7 @@ def _row_color(amount, reorder_point):
     return COLOR_OK
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class AddProductDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -152,14 +158,17 @@ class AddProductDialog(QtWidgets.QDialog):
     def _on_ok(self):
         name = self.name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Name is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO product (name, supplier_id, bin, amount, reorder_point,"
-                " purchase_price, purchase_date) VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
-                (name, self.supplier.text().strip(), self.bin_loc.text().strip(),
+                "INSERT INTO product (name, supplier_id, bin, amount, "
+                "reorder_point,"
+                " purchase_price, purchase_date) VALUES "
+                "(%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                (name, self.supplier.text().strip(), self.bin_loc.text().strip(),  # noqa: E501
                  self.amount.value(), self.reorder_point.value(),
                  self.purchase_price.value(),
                  self.purchase_date.date().toString("yyyy-MM-dd"))
@@ -232,7 +241,10 @@ class UpdateProductDialog(QtWidgets.QDialog):
 
     def _load(self):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM product WHERE id = %s", (self._product_id,)).fetchone()
+        rec = conn.execute(
+    "SELECT * FROM product WHERE id = %s",
+    (self._product_id,
+    )).fetchone()
         conn.close()
         if not rec:
             return
@@ -248,11 +260,13 @@ class UpdateProductDialog(QtWidgets.QDialog):
     def _on_ok(self):
         name = self.name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Name is required.")
             return
         conn = get_db()
         conn.execute(
-            "UPDATE product SET name=%s, supplier_id=%s, bin=%s, reorder_point=%s,"
+            "UPDATE product SET name=%s, supplier_id=%s, bin=%s, "
+            "reorder_point=%s,"
             " purchase_price=%s, purchase_date=%s WHERE id=%s",
             (name, self.supplier.text().strip(), self.bin_loc.text().strip(),
              self.reorder_point.value(), self.purchase_price.value(),
@@ -349,7 +363,7 @@ class RecordTransactionDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class InventoryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -401,20 +415,30 @@ class InventoryWidget(QtWidgets.QWidget):
         self.inv_table = QtWidgets.QTableWidget()
         self.inv_table.setColumnCount(7)
         self.inv_table.setHorizontalHeaderLabels(
-            ["Name", "Bin", "Qty on Hand", "Reorder Point", "Unit Cost", "Supplier", "Status"]
+            ["Name", "Bin", "Qty on Hand", "Reorder Point",
+                "Unit Cost", "Supplier", "Status"]
         )
         hh = self.inv_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.inv_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.inv_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.inv_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.inv_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.inv_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.inv_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.inv_table.setAlternatingRowColors(True)
         self.inv_table.verticalHeader().setVisible(False)
         self.inv_table.clicked.connect(self._on_product_clicked)
@@ -434,12 +458,17 @@ class InventoryWidget(QtWidgets.QWidget):
         )
         ih = self.txn_table.horizontalHeader()
         ih.setStyleSheet("color: black; font-weight: bold;")
-        ih.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         ih.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.txn_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.txn_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.txn_table.verticalHeader().setVisible(False)
         self.txn_table.setAlternatingRowColors(True)
         dv.addWidget(self.txn_table)
@@ -470,7 +499,8 @@ class InventoryWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             rows = conn.execute(
-                "SELECT id, name, bin, amount, reorder_point, purchase_price, supplier_id"
+                "SELECT id, name, bin, amount, reorder_point, purchase_price, "
+                "supplier_id"
                 " FROM product ORDER BY name"
             ).fetchall()
         except psycopg2.OperationalError:
@@ -485,7 +515,7 @@ class InventoryWidget(QtWidgets.QWidget):
             amt = row["amount"] or 0
             rop = row["reorder_point"] or 0
 
-            if search and search not in name.lower() and search not in bin_loc.lower():
+            if search and search not in name.lower() and search not in bin_loc.lower():  # noqa: E501
                 continue
             if low_only and amt > rop:
                 continue
@@ -505,7 +535,8 @@ class InventoryWidget(QtWidgets.QWidget):
             self.inv_table.setItem(r, 1, _ro(bin_loc))
             self.inv_table.setItem(r, 2, _ro(str(amt)))
             self.inv_table.setItem(r, 3, _ro(str(rop)))
-            self.inv_table.setItem(r, 4, _ro(f"${row['purchase_price'] or 0:.2f}"))
+            self.inv_table.setItem(
+                r, 4, _ro(f"${row['purchase_price'] or 0:.2f}"))
             self.inv_table.setItem(r, 5, _ro(str(row["supplier_id"] or "")))
             self.inv_table.setItem(r, 6, _ro(status))
 
@@ -558,7 +589,9 @@ class InventoryWidget(QtWidgets.QWidget):
             r = self.txn_table.rowCount()
             self.txn_table.insertRow(r)
             self.txn_table.setItem(r, 0, _ro(txn["trans_date"] or ""))
-            self.txn_table.setItem(r, 1, _ro((txn["trans_type"] or "").capitalize()))
+            self.txn_table.setItem(
+    r, 1, _ro(
+        (txn["trans_type"] or "").capitalize()))
             self.txn_table.setItem(r, 2, _ro(str(txn["quantity"])))
             self.txn_table.setItem(r, 3, _ro(txn["reference"] or ""))
             self.txn_table.setItem(r, 4, _ro(txn["notes"] or ""))
@@ -570,7 +603,8 @@ class InventoryWidget(QtWidgets.QWidget):
 
     def _on_update_product(self):
         if self._selected_product_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a product first.")
             return
         dlg = UpdateProductDialog(self._selected_product_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -578,7 +612,8 @@ class InventoryWidget(QtWidgets.QWidget):
 
     def _on_record_transaction(self):
         if self._selected_product_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a product first.")
             return
         dlg = RecordTransactionDialog(
             self._selected_product_id, self._selected_product_name,
@@ -590,13 +625,15 @@ class InventoryWidget(QtWidgets.QWidget):
             for i, pid in enumerate(self._prod_row_ids):
                 if pid == self._selected_product_id:
                     self.inv_table.selectRow(i)
-                    self._on_product_clicked(self.inv_table.model().index(i, 0))
+                    self._on_product_clicked(
+                        self.inv_table.model().index(i, 0))
                     break
 
     def _quick_trans(self, trans_type):
         """Open transaction dialog pre-set to a specific type."""
         if self._selected_product_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a product first.")
             return
         dlg = RecordTransactionDialog(
             self._selected_product_id, self._selected_product_name,
@@ -612,7 +649,8 @@ class InventoryWidget(QtWidgets.QWidget):
             for i, pid in enumerate(self._prod_row_ids):
                 if pid == self._selected_product_id:
                     self.inv_table.selectRow(i)
-                    self._on_product_clicked(self.inv_table.model().index(i, 0))
+                    self._on_product_clicked(
+                        self.inv_table.model().index(i, 0))
                     break
 
 

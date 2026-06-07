@@ -1,11 +1,13 @@
 import sys
 from PyQt6 import QtWidgets
-from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette
+from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette  # noqa: E501
 from .receiving_dept import ReceivingDeptWidget
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

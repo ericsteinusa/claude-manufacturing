@@ -4,23 +4,44 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px "
+    "solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
-DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-ISPIN_STYLE = "QSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
+COMBO_STYLE = (
+    "QComboBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}QComboBox "
+    "QAbstractItemView{background-color%(white)s;}"
+)
+DATE_STYLE = (
+    "QDateEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+SPIN_STYLE = (
+    "QDoubleSpinBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+ISPIN_STYLE = (
+    "QSpinBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
 LABEL_STYLE = "color%(white)s;font-size:13px;"
 TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
-             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; "
+             "padding:6px 18px;"
              " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
-             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); "
+             "font-weight%(bold)s;}"
              "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 # Stock level row colors
-COLOR_CRITICAL = QtGui.QColor(255, 200, 200)   # red   — at or below reorder point
+# red   — at or below reorder point
+COLOR_CRITICAL = QtGui.QColor(255, 200, 200)
 COLOR_LOW = QtGui.QColor(255, 243, 205)   # amber — within 2x reorder point
 COLOR_OK = QtGui.QColor(212, 237, 218)   # green — well stocked
 
@@ -85,7 +106,8 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(str(text))
     item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
     item.setTextAlignment(align)
@@ -126,7 +148,8 @@ class TransactionDialog(QtWidgets.QDialog):
         }[self._trans_type]
         title = QtWidgets.QLabel(title_text)
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
+        title.setStyleSheet(
+            "color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
@@ -141,7 +164,8 @@ class TransactionDialog(QtWidgets.QDialog):
         self.prod_combo = QtWidgets.QComboBox()
         self.prod_combo.setStyleSheet(COMBO_STYLE)
         conn = get_db()
-        products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
+        products = conn.execute(
+            "SELECT id, name FROM product ORDER BY name").fetchall()
         conn.close()
         for p in products:
             self.prod_combo.addItem(p["name"], p["id"])
@@ -170,7 +194,7 @@ class TransactionDialog(QtWidgets.QDialog):
             self.qty.setStyleSheet(ISPIN_STYLE)
             self.qty.setRange(1, 999999)
             self.qty.setValue(1)
-            qty_label = "Qty to Receive:" if self._trans_type == "receipt" else "Qty to Issue:"
+            qty_label = "Qty to Receive:" if self._trans_type == "receipt" else "Qty to Issue:"  # noqa: E501
             layout.addLayout(row(qty_label, self.qty))
 
         self.reference = QtWidgets.QLineEdit()
@@ -199,7 +223,8 @@ class TransactionDialog(QtWidgets.QDialog):
         if pid is None:
             return
         conn = get_db()
-        p = conn.execute("SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
+        p = conn.execute(
+    "SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
         conn.close()
         if p:
             self.qty.setRange(1, max(1, p["amount"]))
@@ -211,7 +236,8 @@ class TransactionDialog(QtWidgets.QDialog):
             return
         qty_val = self.qty.value()
         if self._trans_type == "adjustment" and qty_val == 0:
-            QtWidgets.QMessageBox.warning(self, "Error", "Adjustment quantity cannot be zero.")
+            QtWidgets.QMessageBox.warning(
+    self, "Error", "Adjustment quantity cannot be zero.")
             return
 
         stored_qty = qty_val if self._trans_type != "issue" else -qty_val
@@ -230,7 +256,7 @@ class TransactionDialog(QtWidgets.QDialog):
             (stored_qty, pid))
         if self._trans_type == "receipt":
             conn.execute(
-                "UPDATE product SET purchase_date=%s WHERE id=%s", (today, pid))
+                "UPDATE product SET purchase_date=%s WHERE id=%s", (today, pid))  # noqa: E501
         conn.commit()
         conn.close()
         self.accept()
@@ -282,10 +308,14 @@ class Inventory(QtWidgets.QMainWindow):
         hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.prod_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.prod_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.prod_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.prod_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.prod_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.prod_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.prod_table.setAlternatingRowColors(True)
         self.prod_table.verticalHeader().setVisible(False)
         self.prod_table.clicked.connect(self._on_prod_row_clicked)
@@ -301,7 +331,8 @@ class Inventory(QtWidgets.QMainWindow):
         self.prod_search.setPlaceholderText("Product name")
         self.prod_search.returnPressed.connect(self._on_prod_search)
         sr.addWidget(self.prod_search)
-        for t, fn in (("Search", self._on_prod_search), ("Show All", self._load_products)):
+        for t, fn in (("Search", self._on_prod_search),
+                      ("Show All", self._load_products)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(30)
@@ -312,7 +343,8 @@ class Inventory(QtWidgets.QMainWindow):
 
         fg = QtWidgets.QGroupBox("Product Record")
         fg.setStyleSheet(
-            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid "
+            "white;margin-top:8px;}"
             "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
@@ -369,8 +401,8 @@ class Inventory(QtWidgets.QMainWindow):
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
-        for t, fn in (("Add New", self._on_prod_add), ("Update Selected", self._on_prod_update),
-                      ("Delete Selected", self._on_prod_delete), ("Clear", self._prod_clear)):
+        for t, fn in (("Add New", self._on_prod_add), ("Update Selected", self._on_prod_update),  # noqa: E501
+                      ("Delete Selected", self._on_prod_delete), ("Clear", self._prod_clear)):  # noqa: E501
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(34)
@@ -391,7 +423,8 @@ class Inventory(QtWidgets.QMainWindow):
 
         hdr = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Stock Levels  —  sorted by quantity on hand")
-        title.setStyleSheet("color%(white)s;font-size:14px;font-weight%(bold)s;")
+        title.setStyleSheet(
+            "color%(white)s;font-size:14px;font-weight%(bold)s;")
         hdr.addWidget(title)
         ref_btn = QtWidgets.QPushButton("Refresh")
         ref_btn.setStyleSheet(BUTTON_STYLE)
@@ -424,13 +457,15 @@ class Inventory(QtWidgets.QMainWindow):
         self.stock_table = QtWidgets.QTableWidget()
         self.stock_table.setColumnCount(6)
         self.stock_table.setHorizontalHeaderLabels(
-            ["Name", "Supplier", "Bin", "Qty on Hand", "Reorder Point", "Unit Cost"])
+            ["Name", "Supplier", "Bin", "Qty on Hand", "Reorder Point", "Unit Cost"])  # noqa: E501
         sh = self.stock_table.horizontalHeader()
         sh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         sh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
-            sh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.stock_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            sh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.stock_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.stock_table.setAlternatingRowColors(False)
         self.stock_table.verticalHeader().setVisible(False)
         layout.addWidget(self.stock_table, stretch=1)
@@ -457,7 +492,8 @@ class Inventory(QtWidgets.QMainWindow):
         self.tr_prod_filter.setMinimumWidth(200)
         self.tr_type_filter = QtWidgets.QComboBox()
         self.tr_type_filter.setStyleSheet(COMBO_STYLE)
-        self.tr_type_filter.addItems(["(all types)", "receipt", "issue", "adjustment"])
+        self.tr_type_filter.addItems(
+            ["(all types)", "receipt", "issue", "adjustment"])
         self.tr_from = QtWidgets.QDateEdit()
         self.tr_from.setStyleSheet(DATE_STYLE)
         self.tr_from.setCalendarPopup(True)
@@ -477,7 +513,8 @@ class Inventory(QtWidgets.QMainWindow):
         fr.addWidget(self.tr_from)
         fr.addWidget(fl("To:"))
         fr.addWidget(self.tr_to)
-        for t, fn in (("Apply", self._refresh_transactions), ("Show All", self._tr_show_all)):
+        for t, fn in (("Apply", self._refresh_transactions),
+                      ("Show All", self._tr_show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(30)
@@ -494,8 +531,10 @@ class Inventory(QtWidgets.QMainWindow):
         th.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         th.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5):
-            th.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.trans_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            th.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.trans_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.trans_table.verticalHeader().setVisible(False)
         layout.addWidget(self.trans_table, stretch=1)
 
@@ -552,18 +591,21 @@ class Inventory(QtWidgets.QMainWindow):
 
         self.prod_table.setRowCount(0)
         self._prod_row_ids = []
-        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
-        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for row in rows:
             r = self.prod_table.rowCount()
             self.prod_table.insertRow(r)
             self._prod_row_ids.append(row["id"])
-            supp = _supplier_display(row) if row["company_name"] or row["last_name"] else ""
+            supp = _supplier_display(
+                row) if row["company_name"] or row["last_name"] else ""
             rp = row["reorder_point"] if "reorder_point" in row.keys() else 0
             qty = row["amount"] or 0
             for c, (val, algn) in enumerate([
-                (row["name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (supp, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["name"], QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (supp, QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (row["bin"] or "", center),
                 (f"${row['purchase_price'] or 0:,.2f}", right),
                 (str(qty), center),
@@ -575,7 +617,8 @@ class Inventory(QtWidgets.QMainWindow):
 
     def _refresh_product_filter(self):
         conn = get_db()
-        products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
+        products = conn.execute(
+            "SELECT id, name FROM product ORDER BY name").fetchall()
         conn.close()
         self.tr_prod_filter.blockSignals(True)
         self.tr_prod_filter.clear()
@@ -618,7 +661,8 @@ class Inventory(QtWidgets.QMainWindow):
     def _collect_product_form(self):
         name = self.pf_name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Product name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Product name is required.")
             return None
         return {
             "name": name,
@@ -635,8 +679,9 @@ class Inventory(QtWidgets.QMainWindow):
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO product (name,supplier_id,bin,purchase_price,amount,reorder_point) "
-            "VALUES (%(name)s,%(supplier_id)s,%(bin)s,%(purchase_price)s,%(amount)s,%(reorder_point)s)",
+            "INSERT INTO product "
+            "(name,supplier_id,bin,purchase_price,amount,reorder_point) "
+            "VALUES (%(name)s,%(supplier_id)s,%(bin)s,%(purchase_price)s,%(amount)s,%(reorder_point)s)",  # noqa: E501
             data)
         conn.commit()
         conn.close()
@@ -646,7 +691,8 @@ class Inventory(QtWidgets.QMainWindow):
     def _on_prod_update(self):
         row = self.prod_table.currentRow()
         if row < 0 or row >= len(self._prod_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a product first.")
             return
         data = self._collect_product_form()
         if not data:
@@ -654,8 +700,9 @@ class Inventory(QtWidgets.QMainWindow):
         data["id"] = self._prod_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE product SET name=%(name)s,supplier_id=%(supplier_id)s,bin=%(bin)s,"
-            "purchase_price=%(purchase_price)s,amount=%(amount)s,reorder_point=%(reorder_point)s "
+            "UPDATE product SET "
+            "name=%(name)s,supplier_id=%(supplier_id)s,bin=%(bin)s,"
+            "purchase_price=%(purchase_price)s,amount=%(amount)s,reorder_point=%(reorder_point)s "  # noqa: E501
             "WHERE id=%(id)s",
             data)
         conn.commit()
@@ -665,24 +712,25 @@ class Inventory(QtWidgets.QMainWindow):
     def _on_prod_delete(self):
         row = self.prod_table.currentRow()
         if row < 0 or row >= len(self._prod_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a product first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a product first.")
             return
         pid = self._prod_row_ids[row]
         conn = get_db()
         tr_count = conn.execute(
-            "SELECT COUNT(*) FROM inventory_transaction WHERE product_id=%s", (pid,)
+            "SELECT COUNT(*) FROM inventory_transaction WHERE product_id=%s", (pid,)  # noqa: E501
         ).fetchone()[0]
         conn.close()
         msg = "Delete this product%s"
         if tr_count:
-            msg += f"\n\nWarning: {tr_count} transaction record(s) will also be deleted."
+            msg += f"\n\nWarning: {tr_count} transaction record(s) will also be deleted."  # noqa: E501
         if (QtWidgets.QMessageBox.question(
                 self, "Confirm Delete", msg,
-                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)  # noqa: E501
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             conn.execute(
-                "DELETE FROM inventory_transaction WHERE product_id=%s", (pid,))
+                "DELETE FROM inventory_transaction WHERE product_id=%s", (pid,))  # noqa: E501
             conn.execute("DELETE FROM product WHERE id=%s", (pid,))
             conn.commit()
             conn.close()
@@ -702,14 +750,16 @@ class Inventory(QtWidgets.QMainWindow):
         conn.close()
 
         self.stock_table.setRowCount(0)
-        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
-        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for row in rows:
             r = self.stock_table.rowCount()
             self.stock_table.insertRow(r)
             qty = int(row["amount"] or 0)
-            rp = int(row["reorder_point"] if "reorder_point" in row.keys() else 0) or 0
-            supp = _supplier_display(row) if row["company_name"] or row["last_name"] else ""
+            rp = int(row["reorder_point"]
+                     if "reorder_point" in row.keys() else 0) or 0
+            supp = _supplier_display(
+                row) if row["company_name"] or row["last_name"] else ""
             if rp > 0 and qty <= rp:
                 color = COLOR_CRITICAL
             elif rp > 0 and qty <= rp * 2:
@@ -717,8 +767,10 @@ class Inventory(QtWidgets.QMainWindow):
             else:
                 color = COLOR_OK
             for c, (val, algn) in enumerate([
-                (row["name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (supp, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["name"], QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (supp, QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (row["bin"] or "", center),
                 (str(qty), center),
                 (str(rp), center),
@@ -754,22 +806,27 @@ class Inventory(QtWidgets.QMainWindow):
 
         self.trans_table.setRowCount(0)
         self._trans_row_ids = []
-        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
-        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for row in rows:
             r = self.trans_table.rowCount()
             self.trans_table.insertRow(r)
             self._trans_row_ids.append(row["id"])
             qty = row["quantity"]
             qty_str = f"+{qty}" if qty > 0 else str(qty)
-            color = TRANS_COLORS.get(row["trans_type"], QtGui.QColor(255, 255, 255))
+            color = TRANS_COLORS.get(
+    row["trans_type"], QtGui.QColor(
+        255, 255, 255))
             for c, (val, algn) in enumerate([
                 (row["trans_date"], center),
-                (row["product_name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["product_name"], QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
                 (row["trans_type"], center),
                 (qty_str, right),
-                (row["reference"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
-                (row["notes"] or "", QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["reference"] or "", QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
+                (row["notes"] or "", QtCore.Qt.AlignmentFlag.AlignLeft |
+                 QtCore.Qt.AlignmentFlag.AlignVCenter),
             ]):
                 item = _ro(val, algn)
                 item.setBackground(color)

@@ -1,11 +1,57 @@
 # Ruff configuration.
 #
-# line-length is the target width used by `ruff format`. The E501
-# (line-too-long) lint rule is intentionally NOT enabled: the existing
-# codebase has thousands of pre-existing long lines, so turning E501 on
-# would break `ruff check` repo-wide. New and reformatted code should aim
-# for 79 columns; enforce E501 later once the legacy files are wrapped.
+# line-length is enforced via the E501 lint rule (see [lint]). Generated
+# Qt files and a few legacy scripts are excluded from linting, mirroring
+# pyrightconfig.json.
 line-length = 79
 
+# Excluded from all linting (generated or legacy/unmaintained).
+extend-exclude = [
+    "*_ui.py",
+    "*_old*.py",
+    "*_rc.py",
+    "taxes.py",
+    "cs_calls.py",
+    "customer_entry.py",
+    "TK_Login_system.py",
+    "TK_name_check_in_SQL.py",
+]
+
 [lint]
-# Keep ruff's default rule set (E4, E7, E9, F). E501 is not selected here.
+# ruff defaults (E4, E7, E9, F) plus E501 line-length enforcement.
+extend-select = ["E501"]
+
+[lint.per-file-ignores]
+# These modules embed multi-line SQL whose interior lines exceed 79
+# columns. Those lines live inside triple-quoted strings, so they can
+# neither be wrapped without altering the query nor carry a line-level
+# `# noqa`. Grandfathered here; reflow the SQL to lift the exemption.
+"manufacturing/Accounts_payable.py" = ["E501"]
+"manufacturing/Accounts_receivable.py" = ["E501"]
+"manufacturing/Bank_reconciliation.py" = ["E501"]
+"manufacturing/Credit_dept.py" = ["E501"]
+"manufacturing/General_ledger.py" = ["E501"]
+"manufacturing/IT_mgr_reports.py" = ["E501"]
+"manufacturing/IT_tasks_reports.py" = ["E501"]
+"manufacturing/New_password_update.py" = ["E501"]
+"manufacturing/Payroll_dept.py" = ["E501"]
+"manufacturing/QA_Lab_menu.py" = ["E501"]
+"manufacturing/Sales_menu.py" = ["E501"]
+"manufacturing/Sales_mgmt.py" = ["E501"]
+"manufacturing/Supplier_entry.py" = ["E501"]
+"manufacturing/cs_escalations.py" = ["E501"]
+"manufacturing/cs_reports.py" = ["E501"]
+"manufacturing/cs_satisfaction.py" = ["E501"]
+"manufacturing/cs_staff_mgmt.py" = ["E501"]
+"manufacturing/engineer.py" = ["E501"]
+"manufacturing/it_calls_reports.py" = ["E501"]
+"manufacturing/payroll.py" = ["E501"]
+"manufacturing/personnel_crm.py" = ["E501"]
+"manufacturing/prod_ship_dept.py" = ["E501"]
+"manufacturing/product_entry_screen.py" = ["E501"]
+"manufacturing/purchase_orders.py" = ["E501"]
+"manufacturing/receiving_dept.py" = ["E501"]
+"manufacturing/sales_orders.py" = ["E501"]
+"manufacturing/time_clock_menu.py" = ["E501"]
+"manufacturing/warehouse_inventory.py" = ["E501"]
+"manufacturing/work_orders.py" = ["E501"]
