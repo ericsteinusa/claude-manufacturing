@@ -17,9 +17,9 @@ def _conn():
     return get_db()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Schema
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 def init_db():
     with _conn() as con:
         con.executescript("""
@@ -101,53 +101,67 @@ def init_db():
 
 def _seed(con):
     today = date.today().isoformat()
-    if con.execute("SELECT COUNT(*) FROM marketing_campaign").fetchone()[0] == 0:
+    if con.execute(
+        "SELECT COUNT(*) FROM marketing_campaign").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO marketing_campaign (name,channel,objective,owner,start_date,end_date,budget,status) "
+            "INSERT INTO marketing_campaign "
+            "(name,channel,objective,owner,start_date,end_date,budget,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
             ("Spring Product Launch", "Email", "Launch", "Marketing Team",
              today, "2026-07-31", 45000, "Active"))
     if con.execute("SELECT COUNT(*) FROM marketing_lead").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO marketing_lead (name,company,email,source,owner,captured_date,status) "
+            "INSERT INTO marketing_lead "
+            "(name,company,email,source,owner,captured_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Jane Doe", "Acme Corp", "jane@acme.example", "Web", "SDR Team", today, "New"))
-    if con.execute("SELECT COUNT(*) FROM marketing_research").fetchone()[0] == 0:
+            ("Jane Doe", "Acme Corp", "jane@acme.example", "Web", "SDR Team", today, "New"))  # noqa: E501
+    if con.execute(
+        "SELECT COUNT(*) FROM marketing_research").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO marketing_research (title,research_type,owner,methodology,start_date,status) "
+            "INSERT INTO marketing_research "
+            "(title,research_type,owner,methodology,start_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("2026 Buyer Persona Study", "Survey", "Research Lead", "Online survey, n=500",
+            ("2026 Buyer Persona Study", "Survey", "Research Lead", "Online "
+                                                                    "survey, "
+                                                                    "n=500",
              today, "In Progress"))
-    if con.execute("SELECT COUNT(*) FROM marketing_content").fetchone()[0] == 0:
+    if con.execute(
+        "SELECT COUNT(*) FROM marketing_content").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO marketing_content (title,content_type,channel,author,due_date,status) "
+            "INSERT INTO marketing_content "
+            "(title,content_type,channel,author,due_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s)",
-            ("How Our Widget Saves Time", "Blog", "Website", "Content Team", "2026-06-15", "Draft"))
-    if con.execute("SELECT COUNT(*) FROM marketing_analytics").fetchone()[0] == 0:
+            ("How Our Widget Saves Time", "Blog", "Website", "Content Team", "2026-06-15", "Draft"))  # noqa: E501
+    if con.execute(
+        "SELECT COUNT(*) FROM marketing_analytics").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO marketing_analytics (metric,campaign,channel,target,actual,measured_date,status) "
+            "INSERT INTO marketing_analytics "
+            "(metric,campaign,channel,target,actual,measured_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Email open rate", "Spring Product Launch", "Email", "25%", "31%", today, "Exceeded"))
+            ("Email open rate", "Spring Product Launch", "Email", "25%", "31%", today, "Exceeded"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM marketing_budget").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO marketing_budget (item,campaign,category,amount,requested_by,request_date,status) "
+            "INSERT INTO marketing_budget "
+            "(item,campaign,category,amount,requested_by,request_date,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Paid social ad spend", "Spring Product Launch", "Advertising", 12000,
+            ("Paid social ad spend", "Spring Product Launch", "Advertising", 12000,  # noqa: E501
              "Marketing Team", today, "Pending"))
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared styling helpers
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 
 # Row tint keyed by common status words shared across the marketing registers.
@@ -195,7 +209,8 @@ def _apply_blue_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -215,9 +230,9 @@ def _money(v):
         return ""
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic record dialog — built from a list of field specs
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RecordDialog(QtWidgets.QDialog):
     """A form dialog generated from field specs.
 
@@ -242,8 +257,8 @@ class _RecordDialog(QtWidgets.QDialog):
                 self._set_value(f, w, row_data[f["key"]])
         v.addLayout(fl)
 
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
+                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)  # noqa: E501
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
@@ -307,15 +322,15 @@ class _RecordDialog(QtWidgets.QDialog):
         return out
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic register widget — one DB table, configured per subclass via SPEC
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _MarketingCrudWidget(QtWidgets.QWidget):
     # Subclasses set SPEC = {
     #   'table', 'title', 'noun',
     #   'statuses': [...],
     #   'columns': [(field_key, header, width|None)],  # 'id' implied first
-    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update
+    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update  # noqa: E501
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
@@ -328,7 +343,7 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
         self._build_ui()
         self._refresh()
 
-    # ── UI ────────────────────────────────────────────────────────────────────
+    # ── UI ──────────────────────────────────────────────────────────────────
     def _build_ui(self):
         spec = self.SPEC
         root = QtWidgets.QVBoxLayout(self)
@@ -336,7 +351,8 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel(spec["title"])
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         fb = QtWidgets.QHBoxLayout()
@@ -363,8 +379,10 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
                     i, QtWidgets.QHeaderView.ResizeMode.Stretch)
             else:
                 self.tbl.setColumnWidth(i, width)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setDefaultSectionSize(24)
         self.tbl.itemDoubleClicked.connect(self._edit)
@@ -389,14 +407,15 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
         w.setLayout(layout)
         return w
 
-    # ── Data ────────────────────────────────────────────────────────────────────
+    # ── Data ────────────────────────────────────────────────────────────────
     def _money_keys(self):
         return {f["key"] for f in self.SPEC["fields"] if f["kind"] == "money"}
 
     def _refresh(self, *_):
         spec = self.SPEC
-        sf = self.status_filter.currentText() if hasattr(self, "status_filter") else "All Statuses"
-        term = self.search.text().strip().lower() if hasattr(self, "search") else ""
+        sf = self.status_filter.currentText() if hasattr(
+            self, "status_filter") else "All Statuses"
+        term = self.search.text().strip().lower() if hasattr(self, "search") else ""  # noqa: E501
         with _conn() as con:
             q = f"SELECT * FROM {spec['table']} WHERE 1=1"
             p = []
@@ -415,9 +434,14 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
             self.tbl.insertRow(r)
             for c, key in enumerate(self._col_keys):
                 if key == "id":
-                    self.tbl.setItem(r, c, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
                 elif key in money_keys:
-                    self.tbl.setItem(r, c, _ro(_money(row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        _money(
+            row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
                 else:
                     self.tbl.setItem(r, c, _ro(row[key]))
             _color_row(self.tbl, r, STATUS_COLORS.get(row["status"]))
@@ -435,7 +459,7 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
             return None
         return int(self.tbl.item(self.tbl.currentRow(), 0).text())
 
-    # ── CRUD ────────────────────────────────────────────────────────────────────
+    # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
         dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
@@ -444,7 +468,9 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
         v = dlg.values()
         keys = [f["key"] for f in spec["fields"]]
         if not v[keys[0]]:
-            QtWidgets.QMessageBox.warning(self, "Required", f"{spec['fields'][0]['label']} is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Required", f"{
+        spec['fields'][0]['label']} is required.")
             return
         cols = ",".join(keys)
         ph = ",".join(["%s"] * len(keys))
@@ -459,10 +485,16 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
         if rid is None:
             return
         with _conn() as con:
-            rd = con.execute(f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()
+            rd = con.execute(
+                f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()  # noqa: E501
         if not rd:
             return
-        dlg = _RecordDialog(f"Edit {spec['noun']}", spec["fields"], self, row_data=rd)
+        dlg = _RecordDialog(
+    f"Edit {
+        spec['noun']}",
+        spec["fields"],
+        self,
+         row_data=rd)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -498,24 +530,52 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
             params.append(date.today().isoformat())
         params.append(rid)
         with _conn() as con:
-            con.execute(f"UPDATE {spec['table']} SET {sets} WHERE id=%s", params)
+            con.execute(
+    f"UPDATE {
+        spec['table']} SET {sets} WHERE id=%s",
+         params)
         self._refresh()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Vocabularies
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 CHANNELS = ["Email", "Social", "Search", "Display", "Content", "Event",
             "PR", "Direct Mail", "Webinar", "Other"]
-OBJECTIVES = ["Awareness", "Lead Gen", "Conversion", "Retention", "Launch", "Re-engagement"]
+OBJECTIVES = [
+    "Awareness",
+    "Lead Gen",
+    "Conversion",
+    "Retention",
+    "Launch",
+     "Re-engagement"]
 CAMPAIGN_STATUSES = ["Planned", "Active", "Paused", "Completed", "Cancelled"]
 
-LEAD_SOURCES = ["Web", "Referral", "Event", "Cold Outreach", "Social", "Ad", "Partner", "Other"]
-LEAD_STATUSES = ["New", "Contacted", "Qualified", "Nurturing", "Converted", "Lost"]
+LEAD_SOURCES = [
+    "Web",
+    "Referral",
+    "Event",
+    "Cold Outreach",
+    "Social",
+    "Ad",
+    "Partner",
+     "Other"]
+LEAD_STATUSES = [
+    "New",
+    "Contacted",
+    "Qualified",
+    "Nurturing",
+    "Converted",
+     "Lost"]
 
-RESEARCH_TYPES = ["Survey", "Focus Group", "Competitor Analysis", "Market Trends",
+RESEARCH_TYPES = ["Survey", "Focus Group", "Competitor Analysis", "Market Trends",  # noqa: E501
                   "Customer Interview", "Other"]
-RESEARCH_STATUSES = ["Proposed", "In Progress", "Analysis", "Complete", "Archived"]
+RESEARCH_STATUSES = [
+    "Proposed",
+    "In Progress",
+    "Analysis",
+    "Complete",
+     "Archived"]
 
 CONTENT_TYPES = ["Blog", "Whitepaper", "Video", "Infographic", "Social Post",
                  "Email", "Ad Copy", "Case Study", "Landing Page"]
@@ -528,9 +588,9 @@ BUDGET_CATEGORIES = ["Advertising", "Events", "Content", "Tools", "Agency",
 BUDGET_STATUSES = ["Pending", "Approved", "Rejected", "Paid"]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class CampaignsWidget(_MarketingCrudWidget):
     SPEC = {
         "table": "marketing_campaign",
@@ -538,7 +598,7 @@ class CampaignsWidget(_MarketingCrudWidget):
         "noun": "Campaign",
         "statuses": CAMPAIGN_STATUSES,
         "order_by": "start_date DESC",
-        "action": {"label": "Mark Completed", "status": "Completed", "stamp": "end_date"},
+        "action": {"label": "Mark Completed", "status": "Completed", "stamp": "end_date"},  # noqa: E501
         "columns": [
             ("name", "Campaign", None),
             ("channel", "Channel", 120),
@@ -550,13 +610,21 @@ class CampaignsWidget(_MarketingCrudWidget):
         ],
         "fields": [
             {"key": "name", "label": "Campaign", "kind": "text"},
-            {"key": "channel", "label": "Channel", "kind": "combo", "options": CHANNELS, "editable": True},
-            {"key": "objective", "label": "Objective", "kind": "combo", "options": OBJECTIVES},
+            {"key": "channel",
+    "label": "Channel",
+    "kind": "combo",
+    "options": CHANNELS,
+     "editable": True},
+            {"key": "objective", "label": "Objective",
+                "kind": "combo", "options": OBJECTIVES},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "start_date", "label": "Start Date", "kind": "date"},
             {"key": "end_date", "label": "End Date", "kind": "date"},
             {"key": "budget", "label": "Budget", "kind": "money"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": CAMPAIGN_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": CAMPAIGN_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -582,10 +650,12 @@ class LeadsWidget(_MarketingCrudWidget):
             {"key": "name", "label": "Name", "kind": "text"},
             {"key": "company", "label": "Company", "kind": "text"},
             {"key": "email", "label": "Email", "kind": "text"},
-            {"key": "source", "label": "Source", "kind": "combo", "options": LEAD_SOURCES, "editable": True},
+            {"key": "source", "label": "Source", "kind": "combo",
+                "options": LEAD_SOURCES, "editable": True},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "captured_date", "label": "Captured Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": LEAD_STATUSES},
+            {"key": "status", "label": "Status",
+                "kind": "combo", "options": LEAD_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -598,7 +668,7 @@ class MarketResearchWidget(_MarketingCrudWidget):
         "noun": "Study",
         "statuses": RESEARCH_STATUSES,
         "order_by": "start_date DESC",
-        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},
+        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("title", "Study", None),
             ("research_type", "Type", 160),
@@ -609,12 +679,16 @@ class MarketResearchWidget(_MarketingCrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Study", "kind": "text"},
-            {"key": "research_type", "label": "Type", "kind": "combo", "options": RESEARCH_TYPES, "editable": True},
+            {"key": "research_type", "label": "Type", "kind": "combo",
+                "options": RESEARCH_TYPES, "editable": True},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "methodology", "label": "Methodology", "kind": "text"},
             {"key": "start_date", "label": "Start Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": RESEARCH_STATUSES},
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": RESEARCH_STATUSES},
             {"key": "findings", "label": "Findings", "kind": "memo"},
         ],
     }
@@ -627,7 +701,7 @@ class ContentWidget(_MarketingCrudWidget):
         "noun": "Content",
         "statuses": CONTENT_STATUSES,
         "order_by": "due_date",
-        "action": {"label": "Mark Published", "status": "Published", "stamp": "publish_date"},
+        "action": {"label": "Mark Published", "status": "Published", "stamp": "publish_date"},  # noqa: E501
         "columns": [
             ("title", "Title", None),
             ("content_type", "Type", 130),
@@ -638,12 +712,20 @@ class ContentWidget(_MarketingCrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Title", "kind": "text"},
-            {"key": "content_type", "label": "Type", "kind": "combo", "options": CONTENT_TYPES, "editable": True},
-            {"key": "channel", "label": "Channel", "kind": "combo", "options": CHANNELS, "editable": True},
+            {"key": "content_type", "label": "Type", "kind": "combo",
+                "options": CONTENT_TYPES, "editable": True},
+            {"key": "channel",
+    "label": "Channel",
+    "kind": "combo",
+    "options": CHANNELS,
+     "editable": True},
             {"key": "author", "label": "Author", "kind": "text"},
             {"key": "due_date", "label": "Due Date", "kind": "date"},
             {"key": "publish_date", "label": "Publish Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": CONTENT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": CONTENT_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -669,11 +751,18 @@ class MarketingAnalyticsWidget(_MarketingCrudWidget):
         "fields": [
             {"key": "metric", "label": "Metric", "kind": "text"},
             {"key": "campaign", "label": "Campaign", "kind": "text"},
-            {"key": "channel", "label": "Channel", "kind": "combo", "options": CHANNELS, "editable": True},
+            {"key": "channel",
+    "label": "Channel",
+    "kind": "combo",
+    "options": CHANNELS,
+     "editable": True},
             {"key": "target", "label": "Target", "kind": "text"},
             {"key": "actual", "label": "Actual", "kind": "text"},
             {"key": "measured_date", "label": "Measured Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": ANALYTICS_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": ANALYTICS_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -698,19 +787,23 @@ class BudgetApprovalWidget(_MarketingCrudWidget):
         "fields": [
             {"key": "item", "label": "Item", "kind": "text"},
             {"key": "campaign", "label": "Campaign", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": BUDGET_CATEGORIES, "editable": True},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": BUDGET_CATEGORIES, "editable": True},
             {"key": "amount", "label": "Amount", "kind": "money"},
             {"key": "requested_by", "label": "Requested By", "kind": "text"},
             {"key": "request_date", "label": "Request Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": BUDGET_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": BUDGET_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Marketing_mgmt`)
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class MarketingMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

@@ -46,8 +46,9 @@ class MainApp(QMainWindow):
         zip_code = self.ui.zip_code_lineEdit.text()
         email = self.ui.email_lineEdit.text()
 
-        if not first_name or not last_name or not address or not city or not state or not zip_code or not email:
-            QMessageBox.warning(self, "Input Error", "All fields are required!")
+        if not first_name or not last_name or not address or not city or not state or not zip_code or not email:  # noqa: E501
+            QMessageBox.warning(
+    self, "Input Error", "All fields are required!")
             return
 
         # Save data to SQLite3 database
@@ -58,15 +59,17 @@ class MainApp(QMainWindow):
             if cursor.fetchone():
                 conn.close()
                 QMessageBox.warning(self, "Email Already Registered",
-                                    "An account with that email already exists. "
+                                    "An account with that email already "
+                                    "exists. "
                                     "Please use a different email address.")
                 return
-            cursor.execute("INSERT INTO people (first_name, last_name, address, city, state, zip_code, email) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                           (first_name, last_name, address, city, state, zip_code, email))
+            cursor.execute("INSERT INTO people (first_name, last_name, address, city, state, zip_code, email) VALUES (%s, %s, %s, %s, %s, %s, %s)",  # noqa: E501
+                           (first_name, last_name, address, city, state, zip_code, email))  # noqa: E501
             conn.commit()
             conn.close()
 
-            QMessageBox.information(self, "Success", "Data saved successfully!")
+            QMessageBox.information(
+    self, "Success", "Data saved successfully!")
             self.ui.fname_lineEdit.clear()
             self.ui.Lname_lineEdit.clear()
             self.ui.address_lineEdit.clear()
@@ -75,13 +78,14 @@ class MainApp(QMainWindow):
             self.ui.zip_code_lineEdit.clear()
             self.ui.email_lineEdit.clear()
         except psycopg2.IntegrityError:
-            # UNIQUE(email) violation — e.g. the email was registered between the
+            # UNIQUE(email) violation — e.g. the email was registered between the  # noqa: E501
             # check above and the insert.
             QMessageBox.warning(self, "Email Already Registered",
                                 "An account with that email already exists. "
                                 "Please use a different email address.")
         except Exception as e:
-            QMessageBox.critical(self, "Database Error", f"An error occurred: {e}")
+            QMessageBox.critical(
+    self, "Database Error", f"An error occurred: {e}")
 
 
 if __name__ == "__main__":

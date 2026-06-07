@@ -12,19 +12,28 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 18px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 HDR_STYLE = "font-size:20px;font-weight:bold;color:white;padding:4px;"
 SECTION_STYLE = "font-size:13px;font-weight:bold;color:white;"
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-COMBO_STYLE = "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color:white;}"
+DATE_STYLE = (
+    "QDateEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+COMBO_STYLE = (
+    "QComboBox{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}QComboBox "
+    "QAbstractItemView{background-color:white;}"
+)
 
 OVERDUE_DAYS = 7   # open calls older than this are highlighted red
 
@@ -44,23 +53,27 @@ def _apply_palette(widget):
     widget.setPalette(pal)
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align)
     return item
 
 
 def _ro_c(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _ro_r(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _days_between(d1_str, d2_str):
-    """Return integer days between two yyyy-MM-dd strings, or None on failure."""
+    """Return integer days between two yyyy-MM-dd strings, or None on failure."""  # noqa: E501
     try:
         d1 = date.fromisoformat(d1_str)
         d2 = date.fromisoformat(d2_str)
@@ -69,26 +82,30 @@ def _days_between(d1_str, d2_str):
         return None
 
 
-def _export_table(table: QtWidgets.QTableWidget, parent, default_name="cs_report.csv"):
+def _export_table(table: QtWidgets.QTableWidget, parent,
+                  default_name="cs_report.csv"):
     if table.rowCount() == 0:
-        QtWidgets.QMessageBox.information(parent, "Export", "No data to export.")
+        QtWidgets.QMessageBox.information(
+    parent, "Export", "No data to export.")
         return
     path, _ = QtWidgets.QFileDialog.getSaveFileName(
         parent, "Export to CSV", default_name, "CSV Files (*.csv)"
     )
     if not path:
         return
-    headers = [table.horizontalHeaderItem(c).text() for c in range(table.columnCount())]
+    headers = [table.horizontalHeaderItem(
+        c).text() for c in range(table.columnCount())]
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(headers)
         for r in range(table.rowCount()):
             w.writerow([table.item(r, c).text() if table.item(r, c) else ""
                         for c in range(table.columnCount())])
-    QtWidgets.QMessageBox.information(parent, "Export Complete", f"Saved to:\n{path}")
+    QtWidgets.QMessageBox.information(
+    parent, "Export Complete", f"Saved to:\n{path}")
 
 
-# ── Shared date-range widget ───────────────────────────────────────────────────
+# ── Shared date-range widget ────────────────────────────────────────────
 
 class DateRangeBar(QtWidgets.QWidget):
     """Reusable from/to date bar with a Run button."""
@@ -109,7 +126,8 @@ class DateRangeBar(QtWidgets.QWidget):
         self.dt_from = QtWidgets.QDateEdit(calendarPopup=True)
         self.dt_from.setStyleSheet(DATE_STYLE)
         self.dt_from.setDisplayFormat("MM/dd/yyyy")
-        self.dt_from.setDate(QtCore.QDate.currentDate().addDays(-default_days_back))
+        self.dt_from.setDate(
+            QtCore.QDate.currentDate().addDays(-default_days_back))
 
         self.dt_to = QtWidgets.QDateEdit(calendarPopup=True)
         self.dt_to.setStyleSheet(DATE_STYLE)
@@ -137,7 +155,7 @@ class DateRangeBar(QtWidgets.QWidget):
         return self.dt_to.date().toString("yyyy-MM-dd")
 
 
-# ── Main window ────────────────────────────────────────────────────────────────
+# ── Main window ─────────────────────────────────────────────────────────
 
 class CSReportsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -192,17 +210,20 @@ class CSReportsWidget(QtWidgets.QWidget):
             card = QtWidgets.QFrame()
             card.setFrameShape(QtWidgets.QFrame.Shape.Box)
             card.setStyleSheet(
-                "QFrame{background:white;border:2px solid #0055ff;border-radius:8px;}"
+                "QFrame{background:white;border:2px solid "
+                "#0055ff;border-radius:8px;}"
             )
             card.setFixedSize(160, 90)
             cl = QtWidgets.QVBoxLayout(card)
             cl.setContentsMargins(8, 6, 8, 6)
             title_lbl = QtWidgets.QLabel(label)
             title_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            title_lbl.setStyleSheet("color:#333;font-size:12px;font-weight:bold;")
+            title_lbl.setStyleSheet(
+                "color:#333;font-size:12px;font-weight:bold;")
             val_lbl = QtWidgets.QLabel("—")
             val_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            val_lbl.setStyleSheet("color:#0055ff;font-size:22px;font-weight:bold;")
+            val_lbl.setStyleSheet(
+                "color:#0055ff;font-size:22px;font-weight:bold;")
             cl.addWidget(title_lbl)
             cl.addWidget(val_lbl)
             self._sum_cards[key] = val_lbl
@@ -217,13 +238,16 @@ class CSReportsWidget(QtWidgets.QWidget):
 
         self.sum_tbl = QtWidgets.QTableWidget(0, 5)
         self.sum_tbl.setHorizontalHeaderLabels(
-            ["Customer", "Problem / Call", "Call Date", "Completed Date", "Resolution (days)"])
+            ["Customer", "Problem / Call", "Call Date", "Completed Date", "Resolution (days)"])  # noqa: E501
         hh = self.sum_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.sum_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.sum_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.sum_tbl.setAlternatingRowColors(True)
         self.sum_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.sum_tbl, stretch=1)
@@ -231,7 +255,11 @@ class CSReportsWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.sum_tbl, self, "cs_summary.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.sum_tbl,
+        self,
+         "cs_summary.csv"))
         exp_row = QtWidgets.QHBoxLayout()
         exp_row.addStretch()
         exp_row.addWidget(btn)
@@ -255,7 +283,7 @@ class CSReportsWidget(QtWidgets.QWidget):
         open_rows = [r for r in rows if not r["completion_box"]]
 
         res_days = [d for r in completed
-                    if (d := _days_between(r["call_date"], r["completion_date"])) is not None and d >= 0]
+                    if (d := _days_between(r["call_date"], r["completion_date"])) is not None and d >= 0]  # noqa: E501
         avg_res = (sum(res_days) / len(res_days)) if res_days else None
 
         age_days = [d for r in open_rows
@@ -268,15 +296,20 @@ class CSReportsWidget(QtWidgets.QWidget):
         self._sum_cards["open"].setText(str(len(open_rows)))
         self._sum_cards["completed"].setText(str(len(completed)))
         self._sum_cards["rate"].setText(f"{rate:.1f}%")
-        self._sum_cards["avg_res"].setText(f"{avg_res:.1f}" if avg_res is not None else "—")
-        self._sum_cards["avg_age"].setText(f"{avg_age:.1f}" if avg_age is not None else "—")
+        self._sum_cards["avg_res"].setText(
+            f"{avg_res:.1f}" if avg_res is not None else "—")
+        self._sum_cards["avg_age"].setText(
+            f"{avg_age:.1f}" if avg_age is not None else "—")
 
         # Recent completed table (last 50)
         self.sum_tbl.setRowCount(0)
         for row in completed[:50]:
             company = (row["company_name"] or "").strip()
-            contact = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
-            cust = company if company else (contact if contact else "(no customer)")
+            contact = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
+            cust = company if company else (
+    contact if contact else "(no customer)")
             res = _days_between(row["call_date"], row["completion_date"])
             r = self.sum_tbl.rowCount()
             self.sum_tbl.insertRow(r)
@@ -284,7 +317,9 @@ class CSReportsWidget(QtWidgets.QWidget):
             self.sum_tbl.setItem(r, 1, _ro(row["call"] or ""))
             self.sum_tbl.setItem(r, 2, _ro_c(row["call_date"] or ""))
             self.sum_tbl.setItem(r, 3, _ro_c(row["completion_date"] or ""))
-            self.sum_tbl.setItem(r, 4, _ro_r(str(res) if res is not None else "—"))
+            self.sum_tbl.setItem(
+    r, 4, _ro_r(
+        str(res) if res is not None else "—"))
 
     # ── Call Volume tab ───────────────────────────────────────────────────
 
@@ -302,10 +337,13 @@ class CSReportsWidget(QtWidgets.QWidget):
         self.vol_tbl.setHorizontalHeaderLabels(
             ["Month", "Total Calls", "Open", "Completed", "Completion Rate"])
         hh = self.vol_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.vol_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.vol_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.vol_tbl.setAlternatingRowColors(True)
         self.vol_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.vol_tbl, stretch=1)
@@ -313,7 +351,11 @@ class CSReportsWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.vol_tbl, self, "cs_call_volume.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.vol_tbl,
+        self,
+         "cs_call_volume.csv"))
         exp_row = QtWidgets.QHBoxLayout()
         exp_row.addStretch()
         exp_row.addWidget(btn)
@@ -343,7 +385,8 @@ class CSReportsWidget(QtWidgets.QWidget):
 
             # Format month label: "2025-04" → "Apr 2025"
             try:
-                month_lbl = datetime.strptime(row["month"], "%Y-%m").strftime("%b %Y")
+                month_lbl = datetime.strptime(
+    row["month"], "%Y-%m").strftime("%b %Y")
             except (ValueError, TypeError):
                 month_lbl = row["month"] or ""
 
@@ -381,8 +424,10 @@ class CSReportsWidget(QtWidgets.QWidget):
         hh = self.cust_tbl.horizontalHeader()
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.cust_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.cust_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.cust_tbl.setAlternatingRowColors(True)
         self.cust_tbl.verticalHeader().setVisible(False)
         self.cust_tbl.setSortingEnabled(True)
@@ -391,7 +436,11 @@ class CSReportsWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.cust_tbl, self, "cs_by_customer.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.cust_tbl,
+        self,
+         "cs_by_customer.csv"))
         exp_row = QtWidgets.QHBoxLayout()
         exp_row.addStretch()
         exp_row.addWidget(btn)
@@ -429,8 +478,11 @@ class CSReportsWidget(QtWidgets.QWidget):
         self.cust_tbl.setRowCount(0)
         for row in rows:
             company = (row["company_name"] or "").strip()
-            contact = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
-            cust = company if company else (contact if contact else "(no customer)")
+            contact = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
+            cust = company if company else (
+    contact if contact else "(no customer)")
             total = row["total"] or 0
             comp = row["comp_ct"] or 0
             open_ct = row["open_ct"] or 0
@@ -449,7 +501,10 @@ class CSReportsWidget(QtWidgets.QWidget):
 
             if open_ct > 0:
                 for c in range(6):
-                    self.cust_tbl.item(r, c).setBackground(QtGui.QColor(255, 243, 205))
+                    self.cust_tbl.item(
+    r, c).setBackground(
+        QtGui.QColor(
+            255, 243, 205))
         self.cust_tbl.setSortingEnabled(True)
 
     # ── Open Calls tab ────────────────────────────────────────────────────
@@ -462,7 +517,8 @@ class CSReportsWidget(QtWidgets.QWidget):
 
         top = QtWidgets.QHBoxLayout()
         self.open_overdue_lbl = QtWidgets.QLabel("")
-        self.open_overdue_lbl.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
+        self.open_overdue_lbl.setStyleSheet(
+            "color:white;font-size:13px;font-weight:bold;")
         top.addWidget(self.open_overdue_lbl)
         top.addStretch()
         btn_run = QtWidgets.QPushButton("Refresh")
@@ -478,12 +534,15 @@ class CSReportsWidget(QtWidgets.QWidget):
             "Days Open", "Comments"
         ])
         hh = self.open_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.open_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.open_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.open_tbl.setAlternatingRowColors(True)
         self.open_tbl.verticalHeader().setVisible(False)
         self.open_tbl.setSortingEnabled(True)
@@ -492,7 +551,8 @@ class CSReportsWidget(QtWidgets.QWidget):
         legend = QtWidgets.QHBoxLayout()
         for color, text in (
             (QtGui.QColor(255, 243, 205), f"  Open < {OVERDUE_DAYS} days  "),
-            (QtGui.QColor(255, 200, 200), f"  Overdue ≥ {OVERDUE_DAYS} days  "),
+            (QtGui.QColor(255, 200, 200),
+             f"  Overdue ≥ {OVERDUE_DAYS} days  "),
         ):
             dot = QtWidgets.QLabel("  ")
             dot.setAutoFillBackground(True)
@@ -509,7 +569,11 @@ class CSReportsWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.open_tbl, self, "cs_open_calls.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.open_tbl,
+        self,
+         "cs_open_calls.csv"))
         legend.addWidget(btn_exp)
         v.addLayout(legend)
         return w
@@ -536,11 +600,16 @@ class CSReportsWidget(QtWidgets.QWidget):
             overdue = days_open >= OVERDUE_DAYS
             if overdue:
                 overdue_count += 1
-            color = QtGui.QColor(255, 200, 200) if overdue else QtGui.QColor(255, 243, 205)
+            color = QtGui.QColor(
+    255, 200, 200) if overdue else QtGui.QColor(
+        255, 243, 205)
 
             company = (row["company_name"] or "").strip()
-            contact = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
-            cust = company if company else (contact if contact else "(no customer)")
+            contact = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
+            cust = company if company else (
+    contact if contact else "(no customer)")
 
             r = self.open_tbl.rowCount()
             self.open_tbl.insertRow(r)
@@ -556,7 +625,7 @@ class CSReportsWidget(QtWidgets.QWidget):
         self.open_tbl.setSortingEnabled(True)
         total_open = len(rows)
         self.open_overdue_lbl.setText(
-            f"{total_open} open call(s) — {overdue_count} overdue (≥{OVERDUE_DAYS} days)"
+            f"{total_open} open call(s) — {overdue_count} overdue (≥{OVERDUE_DAYS} days)"  # noqa: E501
         )
 
     # ── Run all tabs ──────────────────────────────────────────────────────

@@ -5,12 +5,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+    "QComboBox{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
     "QComboBox QAbstractItemView{background-color:white;}"
 )
 LABEL_STYLE = "color:white;font-size:13px;"
@@ -22,7 +28,12 @@ TAB_STYLE = (
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
 
-PROJECT_STATUSES = ("planning", "in_progress", "on_hold", "completed", "cancelled")
+PROJECT_STATUSES = (
+    "planning",
+    "in_progress",
+    "on_hold",
+    "completed",
+     "cancelled")
 TASK_STATUSES = ("open", "in_progress", "on_hold", "completed", "cancelled")
 ECR_STATUSES = ("draft", "pending", "approved", "rejected", "revision_needed")
 
@@ -67,12 +78,14 @@ class _StatCard(QtWidgets.QWidget):
 
 def _stat_card(title, value) -> _StatCard:
     w = _StatCard()
-    w.setStyleSheet("background-color:white;border-radius:6px;border:1px solid black;")
+    w.setStyleSheet(
+        "background-color:white;border-radius:6px;border:1px solid black;")
     v = QtWidgets.QVBoxLayout(w)
     v.setContentsMargins(10, 4, 10, 4)
     val_lbl = QtWidgets.QLabel(str(value))
     val_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    val_lbl.setStyleSheet("font-size:22px;font-weight:bold;color:black;border:none;")
+    val_lbl.setStyleSheet(
+        "font-size:22px;font-weight:bold;color:black;border:none;")
     txt_lbl = QtWidgets.QLabel(title)
     txt_lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     txt_lbl.setStyleSheet("font-size:11px;color:#333;border:none;")
@@ -82,7 +95,7 @@ def _stat_card(title, value) -> _StatCard:
     return w
 
 
-# ── Projects report tab ────────────────────────────────────────────────────────
+# ── Projects report tab ─────────────────────────────────────────────────
 
 class ProjectsReportTab(QtWidgets.QWidget):
     def __init__(self):
@@ -99,7 +112,8 @@ class ProjectsReportTab(QtWidgets.QWidget):
 
         stats = QtWidgets.QHBoxLayout()
         stats.setSpacing(8)
-        for key in ("Total", "Planning", "In Progress", "On Hold", "Completed", "Cancelled"):
+        for key in ("Total", "Planning", "In Progress",
+                    "On Hold", "Completed", "Cancelled"):
             card = _stat_card(key, 0)
             self._cards[key] = card
             stats.addWidget(card)
@@ -133,16 +147,20 @@ class ProjectsReportTab(QtWidgets.QWidget):
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(
-            ["Project #", "Title", "Engineer", "Start Date", "Due Date", "Status"]
+            ["Project #", "Title", "Engineer", "Start Date", "Due Date", "Status"]  # noqa: E501
         )
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color:black;font-weight:bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         v.addWidget(self.table, stretch=1)
@@ -160,7 +178,8 @@ class ProjectsReportTab(QtWidgets.QWidget):
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
         rows = conn.execute(
-            "SELECT * FROM eng_project" + where + " ORDER BY due_date, project_number", params
+            "SELECT * FROM eng_project" + where + \
+                " ORDER BY due_date, project_number", params
         ).fetchall()
         all_rows = conn.execute("SELECT status FROM eng_project").fetchall()
         conn.close()
@@ -169,8 +188,9 @@ class ProjectsReportTab(QtWidgets.QWidget):
         for r in all_rows:
             counts[r["status"]] = counts.get(r["status"], 0) + 1
         for key, db_key in (
-            ("Total", None), ("Planning", "planning"), ("In Progress", "in_progress"),
-            ("On Hold", "on_hold"), ("Completed", "completed"), ("Cancelled", "cancelled"),
+            ("Total", None), ("Planning", "planning"), ("In Progress", "in_progress"),  # noqa: E501
+            ("On Hold", "on_hold"), ("Completed",
+             "completed"), ("Cancelled", "cancelled"),
         ):
             val = len(all_rows) if db_key is None else counts.get(db_key, 0)
             self._cards[key]._val_lbl.setText(str(val))
@@ -184,13 +204,16 @@ class ProjectsReportTab(QtWidgets.QWidget):
             self.table.setItem(r, 2, _ro(row["engineer"] or ""))
             self.table.setItem(r, 3, _ro(row["start_date"] or ""))
             self.table.setItem(r, 4, _ro(row["due_date"] or ""))
-            self.table.setItem(r, 5, _ro(row["status"].replace("_", " ").capitalize()))
+            self.table.setItem(
+    r, 5, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(PROJECT_COLORS.get(row["status"], "#ffffff"))
             for col in range(6):
                 self.table.item(r, col).setBackground(bg)
 
 
-# ── Tasks report tab ───────────────────────────────────────────────────────────
+# ── Tasks report tab ────────────────────────────────────────────────────
 
 class TasksReportTab(QtWidgets.QWidget):
     def __init__(self):
@@ -207,7 +230,8 @@ class TasksReportTab(QtWidgets.QWidget):
 
         stats = QtWidgets.QHBoxLayout()
         stats.setSpacing(8)
-        for key in ("Total", "Open", "In Progress", "On Hold", "Completed", "Cancelled"):
+        for key in ("Total", "Open", "In Progress",
+                    "On Hold", "Completed", "Cancelled"):
             card = _stat_card(key, 0)
             self._cards[key] = card
             stats.addWidget(card)
@@ -242,16 +266,21 @@ class TasksReportTab(QtWidgets.QWidget):
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(
-            ["Task Name", "Project", "Assigned To", "Priority", "Due Date", "Status"]
+            ["Task Name", "Project", "Assigned To",
+                "Priority", "Due Date", "Status"]
         )
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color:black;font-weight:bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for col in (2, 3, 4, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         v.addWidget(self.table, stretch=1)
@@ -281,7 +310,8 @@ class TasksReportTab(QtWidgets.QWidget):
             counts[r["status"]] = counts.get(r["status"], 0) + 1
         for key, db_key in (
             ("Total", None), ("Open", "open"), ("In Progress", "in_progress"),
-            ("On Hold", "on_hold"), ("Completed", "completed"), ("Cancelled", "cancelled"),
+            ("On Hold", "on_hold"), ("Completed",
+             "completed"), ("Cancelled", "cancelled"),
         ):
             val = len(all_rows) if db_key is None else counts.get(db_key, 0)
             self._cards[key]._val_lbl.setText(str(val))
@@ -296,7 +326,10 @@ class TasksReportTab(QtWidgets.QWidget):
             self.table.setItem(r, 2, _ro(row["assigned_to"] or ""))
             self.table.setItem(r, 3, _ro(row["priority"].capitalize()))
             self.table.setItem(r, 4, _ro(row["due_date"] or ""))
-            self.table.setItem(r, 5, _ro(row["status"].replace("_", " ").capitalize()))
+            self.table.setItem(
+    r, 5, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(TASK_COLORS.get(row["status"], "#ffffff"))
             for col in range(6):
                 self.table.item(r, col).setBackground(bg)
@@ -306,7 +339,7 @@ class TasksReportTab(QtWidgets.QWidget):
                     self.table.item(r, 3).setBackground(pc)
 
 
-# ── Design Reviews report tab ──────────────────────────────────────────────────
+# ── Design Reviews report tab ───────────────────────────────────────────
 
 class DesignReviewReportTab(QtWidgets.QWidget):
     def __init__(self):
@@ -323,7 +356,8 @@ class DesignReviewReportTab(QtWidgets.QWidget):
 
         stats = QtWidgets.QHBoxLayout()
         stats.setSpacing(8)
-        for key in ("Total", "Draft", "Pending", "Approved", "Rejected", "Revision Needed"):
+        for key in ("Total", "Draft", "Pending", "Approved",
+                    "Rejected", "Revision Needed"):
             card = _stat_card(key, 0)
             self._cards[key] = card
             stats.addWidget(card)
@@ -347,16 +381,20 @@ class DesignReviewReportTab(QtWidgets.QWidget):
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(
-            ["ECR #", "Title", "Project", "Requested By", "Review Date", "Status"]
+            ["ECR #", "Title", "Project", "Requested By", "Review Date", "Status"]  # noqa: E501
         )
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color:black;font-weight:bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         v.addWidget(self.table, stretch=1)
@@ -374,7 +412,8 @@ class DesignReviewReportTab(QtWidgets.QWidget):
             " LEFT JOIN eng_project p ON d.project_id = p.id"
             + where + " ORDER BY d.review_date, d.ecr_number", params
         ).fetchall()
-        all_rows = conn.execute("SELECT status FROM eng_design_review").fetchall()
+        all_rows = conn.execute(
+            "SELECT status FROM eng_design_review").fetchall()
         conn.close()
 
         counts = {}
@@ -398,13 +437,16 @@ class DesignReviewReportTab(QtWidgets.QWidget):
             self.table.setItem(r, 2, _ro(proj_str))
             self.table.setItem(r, 3, _ro(row["requested_by"] or ""))
             self.table.setItem(r, 4, _ro(row["review_date"] or ""))
-            self.table.setItem(r, 5, _ro(row["status"].replace("_", " ").capitalize()))
+            self.table.setItem(
+    r, 5, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(ECR_COLORS.get(row["status"], "#ffffff"))
             for col in range(6):
                 self.table.item(r, col).setBackground(bg)
 
 
-# ── Embeddable widget (used standalone and embedded in eng_mgr) ────────────────
+# ── Embeddable widget (used standalone and embedded in eng_mgr) ─────────
 
 class EngReportsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -427,7 +469,7 @@ class EngReportsWidget(QtWidgets.QWidget):
         v.addWidget(tabs)
 
 
-# ── Standalone window wrapper ──────────────────────────────────────────────────
+# ── Standalone window wrapper ───────────────────────────────────────────
 
 class EngReportsMenu(QtWidgets.QMainWindow):
     def __init__(self):

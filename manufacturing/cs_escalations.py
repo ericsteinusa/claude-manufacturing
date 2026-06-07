@@ -13,16 +13,21 @@ OVERDUE_DAYS = 7   # calls open this long or more are considered escalated
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 18px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+DATE_STYLE = (
+    "QDateEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
 HDR_STYLE = "font-size:20px;font-weight:bold;color:white;padding:4px;"
 SECTION_STYLE = "font-size:13px;font-weight:bold;color:white;"
 LABEL_STYLE = "color:white;font-size:13px;"
@@ -47,36 +52,44 @@ def _apply_palette(widget):
     widget.setPalette(pal)
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align)
     return item
 
 
 def _ro_c(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _ro_r(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _export_table(table, parent, name="export.csv"):
     if table.rowCount() == 0:
-        QtWidgets.QMessageBox.information(parent, "Export", "No data to export.")
+        QtWidgets.QMessageBox.information(
+    parent, "Export", "No data to export.")
         return
-    path, _ = QtWidgets.QFileDialog.getSaveFileName(parent, "Export CSV", name, "CSV Files (*.csv)")
+    path, _ = QtWidgets.QFileDialog.getSaveFileName(
+    parent, "Export CSV", name, "CSV Files (*.csv)")
     if not path:
         return
-    headers = [table.horizontalHeaderItem(c).text() for c in range(table.columnCount())]
+    headers = [table.horizontalHeaderItem(
+        c).text() for c in range(table.columnCount())]
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(headers)
         for r in range(table.rowCount()):
             w.writerow([table.item(r, c).text() if table.item(r, c) else ""
                         for c in range(table.columnCount())])
-    QtWidgets.QMessageBox.information(parent, "Export Complete", f"Saved to:\n{path}")
+    QtWidgets.QMessageBox.information(
+    parent, "Export Complete", f"Saved to:\n{path}")
 
 
 def lbl(text, style=LABEL_STYLE):
@@ -109,7 +122,8 @@ class DateRangeBar(QtWidgets.QWidget):
         self.dt_from = QtWidgets.QDateEdit(calendarPopup=True)
         self.dt_from.setStyleSheet(DATE_STYLE)
         self.dt_from.setDisplayFormat("MM/dd/yyyy")
-        self.dt_from.setDate(QtCore.QDate.currentDate().addDays(-default_days_back))
+        self.dt_from.setDate(
+            QtCore.QDate.currentDate().addDays(-default_days_back))
         self.dt_to = QtWidgets.QDateEdit(calendarPopup=True)
         self.dt_to.setStyleSheet(DATE_STYLE)
         self.dt_to.setDisplayFormat("MM/dd/yyyy")
@@ -170,7 +184,8 @@ class CSEscalationsWidget(QtWidgets.QWidget):
 
         top = QtWidgets.QHBoxLayout()
         self.active_summary_lbl = QtWidgets.QLabel("")
-        self.active_summary_lbl.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
+        self.active_summary_lbl.setStyleSheet(
+            "color:white;font-size:13px;font-weight:bold;")
         top.addWidget(self.active_summary_lbl)
         top.addStretch()
         btn = QtWidgets.QPushButton("Refresh")
@@ -182,15 +197,18 @@ class CSEscalationsWidget(QtWidgets.QWidget):
 
         self.active_tbl = QtWidgets.QTableWidget(0, 6)
         self.active_tbl.setHorizontalHeaderLabels([
-            "Customer", "Problem / Call", "Call Date", "Days Open", "Comments", "Priority"
+            "Customer", "Problem / Call", "Call Date", "Days Open", "Comments", "Priority"  # noqa: E501
         ])
         hh = self.active_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (2, 3, 5):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.active_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.active_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.active_tbl.setAlternatingRowColors(False)
         self.active_tbl.verticalHeader().setVisible(False)
         self.active_tbl.setSortingEnabled(True)
@@ -215,7 +233,11 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.active_tbl, self, "cs_active_escalations.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.active_tbl,
+        self,
+         "cs_active_escalations.csv"))
         legend.addWidget(btn_exp)
         v.addLayout(legend)
         return w
@@ -280,7 +302,7 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         v.addWidget(self.hist_bar)
 
         info = QtWidgets.QLabel(
-            f"Showing completed calls that were open for ≥{OVERDUE_DAYS} days before resolution.")
+            f"Showing completed calls that were open for ≥{OVERDUE_DAYS} days before resolution.")  # noqa: E501
         info.setStyleSheet("color:white;font-size:12px;font-style:italic;")
         v.addWidget(info)
 
@@ -290,12 +312,15 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             "Days to Resolve", "Comments"
         ])
         hh = self.hist_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.hist_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.hist_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.hist_tbl.setAlternatingRowColors(True)
         self.hist_tbl.verticalHeader().setVisible(False)
         self.hist_tbl.setSortingEnabled(True)
@@ -306,7 +331,11 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.hist_tbl, self, "cs_escalation_history.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.hist_tbl,
+        self,
+         "cs_escalation_history.csv"))
         exp_row.addWidget(btn)
         v.addLayout(exp_row)
         return w
@@ -331,7 +360,7 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             days = _days_between(row["call_date"], row["completion_date"])
             if days is None or days < OVERDUE_DAYS:
                 continue
-            color = COLOR_CRITICAL if days >= OVERDUE_DAYS * 2 else COLOR_RESOLVED
+            color = COLOR_CRITICAL if days >= OVERDUE_DAYS * 2 else COLOR_RESOLVED  # noqa: E501
             r = self.hist_tbl.rowCount()
             self.hist_tbl.insertRow(r)
             self.hist_tbl.setItem(r, 0, _ro(_customer_name(row)))
@@ -369,7 +398,9 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         ):
             card = QtWidgets.QFrame()
             card.setFrameShape(QtWidgets.QFrame.Shape.Box)
-            card.setStyleSheet("QFrame{background:white;border:2px solid #0055ff;border-radius:8px;}")
+            card.setStyleSheet(
+                "QFrame{background:white;border:2px solid "
+                "#0055ff;border-radius:8px;}")
             card.setFixedSize(180, 90)
             cl = QtWidgets.QVBoxLayout(card)
             cl.setContentsMargins(8, 6, 8, 6)
@@ -390,13 +421,17 @@ class CSEscalationsWidget(QtWidgets.QWidget):
 
         self.rpt_tbl = QtWidgets.QTableWidget(0, 5)
         self.rpt_tbl.setHorizontalHeaderLabels([
-            "Month", "Total Calls", "Escalated", "Escalation Rate", "Avg Days Overdue"
+            "Month", "Total Calls", "Escalated", "Escalation Rate", "Avg Days "
+                                                                    "Overdue"
         ])
         hh = self.rpt_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.rpt_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.rpt_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.rpt_tbl.setAlternatingRowColors(True)
         self.rpt_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.rpt_tbl, stretch=1)
@@ -406,7 +441,11 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.rpt_tbl, self, "cs_escalation_reports.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.rpt_tbl,
+        self,
+         "cs_escalation_reports.csv"))
         exp_row.addWidget(btn)
         v.addLayout(exp_row)
         return w
@@ -425,21 +464,23 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             return row["completion_date"] if row["completion_box"] else today
 
         escalated = [r for r in all_calls
-                     if (_days_between(r["call_date"], _resolve_date(r)) or 0) >= OVERDUE_DAYS]
+                     if (_days_between(r["call_date"], _resolve_date(r)) or 0) >= OVERDUE_DAYS]  # noqa: E501
         resolved_esc = [r for r in escalated if r["completion_box"]]
         active_esc = [r for r in escalated if not r["completion_box"]]
         total_calls = len(all_calls)
         pct = len(escalated) / total_calls * 100 if total_calls else 0
 
         resolve_days = [d for r in resolved_esc
-                        if (d := _days_between(r["call_date"], r["completion_date"])) is not None]
-        avg_resolve = sum(resolve_days) / len(resolve_days) if resolve_days else None
+                        if (d := _days_between(r["call_date"], r["completion_date"])) is not None]  # noqa: E501
+        avg_resolve = sum(resolve_days) / \
+                          len(resolve_days) if resolve_days else None
 
         self._rpt_cards["total_esc"].setText(str(len(escalated)))
         self._rpt_cards["resolved"].setText(str(len(resolved_esc)))
         self._rpt_cards["active"].setText(str(len(active_esc)))
         self._rpt_cards["pct_esc"].setText(f"{pct:.1f}%")
-        self._rpt_cards["avg_resolve"].setText(f"{avg_resolve:.1f}" if avg_resolve is not None else "—")
+        self._rpt_cards["avg_resolve"].setText(
+            f"{avg_resolve:.1f}" if avg_resolve is not None else "—")
 
         # Monthly breakdown
         with _conn() as con:
@@ -457,8 +498,11 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         for row in monthly:
             m = row["month"]
             if m not in month_data:
-                month_data[m] = {"total": 0, "escalated": 0, "overdue_days": []}
-            resolve_d = row["completion_date"] if row["completion_box"] else today
+                month_data[m] = {
+    "total": 0,
+    "escalated": 0,
+     "overdue_days": []}
+            resolve_d = row["completion_date"] if row["completion_box"] else today  # noqa: E501
             days = _days_between(row["call_date"], resolve_d) or 0
             month_data[m]["total"] += 1
             if days >= OVERDUE_DAYS:
@@ -486,7 +530,10 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             self.rpt_tbl.setItem(r, 4, _ro_c(avg_od))
             if esc_m > 0 and total_m > 0 and esc_m / total_m > 0.3:
                 for c in range(5):
-                    self.rpt_tbl.item(r, c).setBackground(QtGui.QColor(255, 243, 205))
+                    self.rpt_tbl.item(
+    r, c).setBackground(
+        QtGui.QColor(
+            255, 243, 205))
 
     # ── Resolution Tracking ───────────────────────────────────────────────
 
@@ -505,10 +552,13 @@ class CSEscalationsWidget(QtWidgets.QWidget):
             "Month", "Resolved", "Avg Days", "Min Days", "Max Days", "Trend"
         ])
         hh = self.track_tbl.horizontalHeader()
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         for c in (1, 2, 3, 4, 5):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.track_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.track_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.track_tbl.setAlternatingRowColors(True)
         self.track_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.track_tbl, stretch=1)
@@ -518,7 +568,11 @@ class CSEscalationsWidget(QtWidgets.QWidget):
         btn = QtWidgets.QPushButton("Export CSV")
         btn.setStyleSheet(BUTTON_STYLE)
         btn.setFixedHeight(28)
-        btn.clicked.connect(lambda: _export_table(self.track_tbl, self, "cs_resolution_tracking.csv"))
+        btn.clicked.connect(
+    lambda: _export_table(
+        self.track_tbl,
+        self,
+         "cs_resolution_tracking.csv"))
         exp_row.addWidget(btn)
         v.addLayout(exp_row)
         return w
@@ -569,7 +623,7 @@ class CSEscalationsWidget(QtWidgets.QWidget):
                 month_lbl = month
 
             color = (QtGui.QColor(212, 237, 218) if avg <= OVERDUE_DAYS + 3
-                     else QtGui.QColor(255, 243, 205) if avg <= OVERDUE_DAYS * 2
+                     else QtGui.QColor(255, 243, 205) if avg <= OVERDUE_DAYS * 2  # noqa: E501
                      else QtGui.QColor(255, 200, 200))
 
             r = self.track_tbl.rowCount()

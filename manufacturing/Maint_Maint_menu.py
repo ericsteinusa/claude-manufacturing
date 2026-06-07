@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
-from .Maint_mgmt import (_apply_blue_palette, WorkOrdersWidget, EquipmentWidget,
+from .Maint_mgmt import (_apply_blue_palette, WorkOrdersWidget, EquipmentWidget,  # noqa: E501
                          PartsInventoryWidget, MaintScheduleWidget,
                          SafetyInspectionWidget)
 

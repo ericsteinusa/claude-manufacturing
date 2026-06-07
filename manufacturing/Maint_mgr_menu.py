@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import QtWidgets
-from .Maint_mgmt import (_apply_blue_palette, WorkOrderMgmtWidget, MechanicsWidget,
-                         DowntimeWidget, EquipmentWidget, SafetyInspectionWidget)
+from .Maint_mgmt import (_apply_blue_palette, WorkOrderMgmtWidget, MechanicsWidget,  # noqa: E501
+                         DowntimeWidget, EquipmentWidget, SafetyInspectionWidget)  # noqa: E501
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

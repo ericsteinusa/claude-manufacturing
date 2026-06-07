@@ -7,7 +7,8 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
@@ -72,7 +73,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             conn = _conn()
             rows = conn.execute(
                 "SELECT id, customer_id, call, call_date, call_time, "
-                "completion_date, completion_time, comments_box, completion_box "
+                "completion_date, completion_time, comments_box, "
+                "completion_box "
                 "FROM calls2 ORDER BY id DESC LIMIT 200"
             ).fetchall()
             conn.close()
@@ -82,6 +84,7 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         self._table.setRowCount(len(rows))
         for r, row in enumerate(rows):
             for c, val in enumerate(row):
-                self._table.setItem(r, c, QtWidgets.QTableWidgetItem(str(val or "")))
+                self._table.setItem(
+                    r, c, QtWidgets.QTableWidgetItem(str(val or "")))
 
         self._table.resizeColumnsToContents()

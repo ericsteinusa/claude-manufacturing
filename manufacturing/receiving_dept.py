@@ -10,12 +10,18 @@ def get_db():
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -77,13 +83,14 @@ def _next_rcv_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM receiving WHERE rcv_number LIKE %s", (f"RCV-{yr}-%",)
+        "SELECT COUNT(*) FROM receiving WHERE rcv_number LIKE %s", (
+            f"RCV-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"RCV-{yr}-{count + 1:04d}"
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewReceiptDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -113,7 +120,8 @@ class NewReceiptDialog(QtWidgets.QDialog):
         try:
             pos = conn.execute(
                 "SELECT id, po_number FROM purchase_order"
-                " WHERE status NOT IN ('cancelled','closed') ORDER BY po_number"
+                " WHERE status NOT IN ('cancelled','closed') ORDER BY "
+                "po_number"
             ).fetchall()
         except psycopg2.OperationalError:
             pos = []
@@ -164,13 +172,16 @@ class NewReceiptDialog(QtWidgets.QDialog):
     def _on_ok(self):
         rcv_num = self.rcv_num.text().strip()
         if not rcv_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Receipt number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Receipt number is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO receiving (rcv_number, po_id, rcv_date, supplier, carrier,"
-                " tracking_number, status, notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                "INSERT INTO receiving (rcv_number, po_id, rcv_date, "
+                "supplier, carrier,"
+                " tracking_number, status, notes) VALUES "
+                "(%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (rcv_num, self.po_combo.currentData(),
                  self.rcv_date.date().toString("yyyy-MM-dd"),
                  self.supplier.text().strip(), self.carrier.text().strip(),
@@ -181,7 +192,7 @@ class NewReceiptDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Receipt number '{rcv_num}' already exists.")
+                                          f"Receipt number '{rcv_num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -208,7 +219,8 @@ class AddReceiptItemDialog(QtWidgets.QDialog):
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
-        self.product_combo.currentIndexChanged.connect(self._on_product_changed)
+        self.product_combo.currentIndexChanged.connect(
+            self._on_product_changed)
         conn = get_db()
         try:
             prods = conn.execute(
@@ -255,12 +267,14 @@ class AddReceiptItemDialog(QtWidgets.QDialog):
     def _on_ok(self):
         desc = self.desc.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Description is required.")
             return
         conn = get_db()
         conn.execute(
             "INSERT INTO receiving_item"
-            " (receiving_id, description, product_id, qty_ordered, qty_received)"
+            " (receiving_id, description, product_id, qty_ordered, "
+            "qty_received)"
             " VALUES (%s,%s,%s,%s,%s)",
             (self._receiving_id, desc, self.product_combo.currentData(),
              self.qty_ordered.value(), self.qty_received.value())
@@ -322,12 +336,17 @@ class UpdateReceiptDialog(QtWidgets.QDialog):
 
     def _load(self):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM receiving WHERE id = %s", (self._receiving_id,)).fetchone()
+        rec = conn.execute(
+    "SELECT * FROM receiving WHERE id = %s",
+    (self._receiving_id,
+    )).fetchone()
         conn.close()
         if not rec:
             return
         if rec["rcv_date"]:
-            self.rcv_date.setDate(QtCore.QDate.fromString(rec["rcv_date"], "yyyy-MM-dd"))
+            self.rcv_date.setDate(
+    QtCore.QDate.fromString(
+        rec["rcv_date"], "yyyy-MM-dd"))
         self.supplier.setText(rec["supplier"] or "")
         self.carrier.setText(rec["carrier"] or "")
         self.tracking.setText(rec["tracking_number"] or "")
@@ -348,7 +367,7 @@ class UpdateReceiptDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class ReceivingDeptWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -384,7 +403,8 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_receipts)
@@ -412,21 +432,32 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
         self.rcv_table = QtWidgets.QTableWidget()
         self.rcv_table.setColumnCount(8)
         self.rcv_table.setHorizontalHeaderLabels(
-            ["Receipt #", "PO #", "Receive Date", "Supplier", "Carrier", "Tracking #", "Items", "Status"]
+            ["Receipt #", "PO #", "Receive Date", "Supplier",
+                "Carrier", "Tracking #", "Items", "Status"]
         )
         hh = self.rcv_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.rcv_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.rcv_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.rcv_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    7, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.rcv_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.rcv_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.rcv_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.rcv_table.setAlternatingRowColors(True)
         self.rcv_table.verticalHeader().setVisible(False)
         self.rcv_table.clicked.connect(self._on_receipt_clicked)
@@ -441,14 +472,19 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
         dv.addWidget(dlbl)
         self.item_table = QtWidgets.QTableWidget()
         self.item_table.setColumnCount(4)
-        self.item_table.setHorizontalHeaderLabels(["Description", "Product", "Qty Ordered", "Qty Received"])
+        self.item_table.setHorizontalHeaderLabels(
+            ["Description", "Product", "Qty Ordered", "Qty Received"])
         ih = self.item_table.horizontalHeader()
         ih.setStyleSheet("color: black; font-weight: bold;")
         ih.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        ih.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.item_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        ih.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.item_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.item_table.verticalHeader().setVisible(False)
         self.item_table.setAlternatingRowColors(True)
         dv.addWidget(self.item_table)
@@ -461,9 +497,12 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
             ("New Receipt", self._on_new_receipt),
             ("Add Item", self._on_add_item),
             ("Update Details", self._on_update_receipt),
-            ("Mark Partial", lambda: self._set_status("partial", "Mark as Partial Receipt?")),
-            ("Mark Received", lambda: self._set_status("received", "Mark as Fully Received?")),
-            ("Mark Rejected", lambda: self._set_status("rejected", "Mark as Rejected?")),
+            ("Mark Partial", lambda: self._set_status(
+                "partial", "Mark as Partial Receipt?")),
+            ("Mark Received", lambda: self._set_status(
+                "received", "Mark as Fully Received?")),
+            ("Mark Rejected", lambda: self._set_status(
+                "rejected", "Mark as Rejected?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -495,7 +534,9 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
 
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY r.rcv_date DESC", params).fetchall()
+            rows = conn.execute(
+    base + where + " ORDER BY r.rcv_date DESC",
+     params).fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -555,7 +596,8 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
             """, (self._selected_rcv_id,)).fetchall()
         except psycopg2.OperationalError:
             items = conn.execute(
-                "SELECT description, NULL AS product_name, qty_ordered, qty_received"
+                "SELECT description, NULL AS product_name, qty_ordered, "
+                "qty_received"
                 " FROM receiving_item WHERE receiving_id = %s",
                 (self._selected_rcv_id,)
             ).fetchall()
@@ -575,16 +617,21 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
 
     def _on_add_item(self):
         if self._selected_rcv_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a receipt first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a receipt first.")
             return
-        dlg = AddReceiptItemDialog(self._selected_rcv_id, self._selected_rcv_number, self)
+        dlg = AddReceiptItemDialog(
+    self._selected_rcv_id,
+    self._selected_rcv_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_receipts()
             self._refresh_items()
 
     def _on_update_receipt(self):
         if self._selected_rcv_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a receipt first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a receipt first.")
             return
         dlg = UpdateReceiptDialog(self._selected_rcv_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -592,11 +639,12 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
 
     def _set_status(self, new_status, msg):
         if self._selected_rcv_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a receipt first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a receipt first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

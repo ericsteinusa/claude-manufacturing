@@ -29,7 +29,12 @@ def create_gui():
     root.title("Department and Sub Department Viewer")
 
     # Treeview widget
-    tree = ttk.Treeview(root, columns=("Dept Name", "Dept Sub Name"), show="headings")
+    tree = ttk.Treeview(
+    root,
+    columns=(
+        "Dept Name",
+        "Dept Sub Name"),
+         show="headings")
     tree.heading("Dept Name", text="Dept Name")
     tree.heading("Dept Sub Name", text="Dept Sub Name")
     tree.pack(fill="both", expand=True)

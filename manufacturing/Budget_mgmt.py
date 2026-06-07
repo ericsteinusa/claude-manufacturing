@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -76,7 +82,7 @@ def _ro(text):
 def _ro_right(text):
     item = _ro(text)
     item.setTextAlignment(
-        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)  # noqa: E501
     return item
 
 
@@ -124,7 +130,7 @@ def _actual_for_account(account_id, fiscal_year):
         conn.close()
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class BudgetDialog(QtWidgets.QDialog):
     def __init__(self, budget_id=None, parent=None):
@@ -206,12 +212,14 @@ class BudgetDialog(QtWidgets.QDialog):
     def _on_ok(self):
         name = self.name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Budget name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Budget name is required.")
             return
         conn = get_db()
         if self._budget_id is None:
             cur = conn.execute(
-                "INSERT INTO budget (budget_name, fiscal_year, dept_id, status, notes)"
+                "INSERT INTO budget (budget_name, fiscal_year, dept_id, "
+                "status, notes)"
                 " VALUES (%s,%s,%s,%s,%s) RETURNING id",
                 (name, self.year.value(), self.dept_combo.currentData(),
                  self.status_combo.currentData(), self.notes.text().strip())
@@ -255,7 +263,8 @@ class BudgetLineDialog(QtWidgets.QDialog):
         self.account_combo = QtWidgets.QComboBox()
         self.account_combo.setStyleSheet(COMBO_STYLE)
         self.account_combo.setMinimumWidth(260)
-        self.account_combo.currentIndexChanged.connect(self._on_account_changed)
+        self.account_combo.currentIndexChanged.connect(
+            self._on_account_changed)
         self.account_combo.addItem("(none)", None)
         for a in _load_accounts():
             self.account_combo.addItem(
@@ -293,7 +302,8 @@ class BudgetLineDialog(QtWidgets.QDialog):
 
     def _on_account_changed(self):
         if not self.description.text():
-            self.description.setText(self.account_combo.currentText().split("—")[-1].strip())
+            self.description.setText(
+                self.account_combo.currentText().split("—")[-1].strip())
 
     def _load(self):
         conn = get_db()
@@ -314,7 +324,8 @@ class BudgetLineDialog(QtWidgets.QDialog):
     def _on_ok(self):
         desc = self.description.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Description is required.")
             return
         conn = get_db()
         if self._line_id is None:
@@ -328,9 +339,10 @@ class BudgetLineDialog(QtWidgets.QDialog):
             )
         else:
             conn.execute(
-                "UPDATE budget_line SET account_id=%s, category=%s, description=%s,"
+                "UPDATE budget_line SET account_id=%s, category=%s, "
+                "description=%s,"
                 " budgeted_amount=%s, notes=%s WHERE id=%s",
-                (self.account_combo.currentData(), self.category.text().strip(),
+                (self.account_combo.currentData(), self.category.text().strip(),  # noqa: E501
                  desc, self.amount.value(), self.notes.text().strip(),
                  self._line_id)
             )
@@ -339,7 +351,7 @@ class BudgetLineDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class BudgetManagementWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -417,12 +429,18 @@ class BudgetManagementWidget(QtWidgets.QWidget):
         hh = self.budget_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.budget_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.budget_table.setSelectionBehavior(
@@ -451,12 +469,17 @@ class BudgetManagementWidget(QtWidgets.QWidget):
         )
         lh = self.line_table.horizontalHeader()
         lh.setStyleSheet("color: black; font-weight: bold;")
-        lh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         lh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        lh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        lh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        lh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        lh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        lh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.line_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.line_table.setSelectionBehavior(
@@ -543,7 +566,8 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 
             budgeted = row["total_budgeted"]
             # Compute actual from GL (sum of all lines)
-            actual = self._total_actual_for_budget(row["id"], row["fiscal_year"])
+            actual = self._total_actual_for_budget(
+                row["id"], row["fiscal_year"])
             variance = budgeted - actual
 
             self.budget_table.setItem(r, 0, _ro(row["budget_name"]))
@@ -569,7 +593,8 @@ class BudgetManagementWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             lines = conn.execute(
-                "SELECT account_id FROM budget_line WHERE budget_id=%s AND account_id IS NOT NULL",
+                "SELECT account_id FROM budget_line WHERE budget_id=%s AND "
+                "account_id IS NOT NULL",
                 (budget_id,)
             ).fetchall()
             if not lines:
@@ -644,7 +669,9 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 
             acct_display = ""
             if line["account_number"]:
-                acct_display = f"{line['account_number']} — {line['account_name']}"
+                acct_display = f"{
+    line['account_number']} — {
+        line['account_name']}"
 
             self.line_table.setItem(r, 0, _ro(line["category"] or ""))
             self.line_table.setItem(r, 1, _ro(line["description"]))
@@ -668,7 +695,8 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 
     def _on_edit_budget(self, _index=None):
         if self._selected_budget_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a budget first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a budget first.")
             return
         dlg = BudgetDialog(budget_id=self._selected_budget_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -676,11 +704,12 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 
     def _set_budget_status(self, new_status):
         if self._selected_budget_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a budget first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a budget first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", f"Mark budget as {new_status}?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
@@ -692,7 +721,8 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 
     def _on_add_line(self):
         if self._selected_budget_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a budget first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a budget first.")
             return
         dlg = BudgetLineDialog(self._selected_budget_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -717,7 +747,7 @@ class BudgetManagementWidget(QtWidgets.QWidget):
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete", "Delete this budget line?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

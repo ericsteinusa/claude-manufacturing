@@ -14,21 +14,27 @@ DT_FMT = "%Y-%m-%d %H:%M:%S"
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
 )
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 DATE_STYLE = (
-    "QDateEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}"
+    "QDateEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 4px;}"
 )
 SPIN_STYLE = (
-    "QDoubleSpinBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 4px;}"
+    "QDoubleSpinBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 4px;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 TAB_STYLE = (
@@ -39,15 +45,20 @@ TAB_STYLE = (
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
 GRP_STYLE = (
-    "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
+    "QGroupBox{color:white;font-weight:bold;border:1px solid "
+    "white;margin-top:8px;}"
     "QGroupBox::title{subcontrol-origin:margin;left:10px;}"
 )
 
-FREQ_DIVISORS = {"Weekly": 52, "Bi-Weekly": 26, "Semi-Monthly": 24, "Monthly": 12}
+FREQ_DIVISORS = {
+    "Weekly": 52,
+    "Bi-Weekly": 26,
+    "Semi-Monthly": 24,
+     "Monthly": 12}
 DED_CATEGORIES = ["Benefits", "Retirement", "Garnishment", "Other"]
 
 
-# ── DB ─────────────────────────────────────────────────────────────────────────
+# ── DB ──────────────────────────────────────────────────────────────────
 
 
 def init_db():
@@ -116,7 +127,8 @@ def init_db():
             amount         REAL    NOT NULL DEFAULT 0.0
         );
     """)
-    # Add columns to payroll_entry for existing databases that predate this version
+    # Add columns to payroll_entry for existing databases that predate this
+    # version
     for col, defn in [
         ("pre_tax_deductions", "REAL NOT NULL DEFAULT 0.0"),
         ("post_tax_deductions", "REAL NOT NULL DEFAULT 0.0"),
@@ -139,7 +151,7 @@ def _apply_blue_palette(widget):
     widget.setPalette(pal)
 
 
-# ── Pay calculation ─────────────────────────────────────────────────────────────
+# ── Pay calculation ─────────────────────────────────────────────────────
 
 def _hours_from_timeclock(people_id, start_str, end_str):
     conn = get_db()
@@ -169,7 +181,7 @@ def _hours_from_timeclock(people_id, start_str, end_str):
     return round(reg, 2), round(ot, 2)
 
 
-def _calc_pay(pay_type, pay_rate, reg_hrs, ot_hrs, fed_rate, state_rate, pay_freq,
+def _calc_pay(pay_type, pay_rate, reg_hrs, ot_hrs, fed_rate, state_rate, pay_freq,  # noqa: E501
               pre_tax_deds=0.0, post_tax_deds=0.0):
     """Return (gross, fed_tax, state_tax, ss, medicare, net)."""
     if pay_type == "hourly":
@@ -189,7 +201,8 @@ def _money(v): return f"${v:,.2f}"
 def _pct(v): return f"{v * 100:.1f}%"
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignRight |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(text)
     item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
     item.setTextAlignment(align)
@@ -198,7 +211,8 @@ def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag
 
 def _rw(text):
     item = QtWidgets.QTableWidgetItem(text)
-    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignRight |
+                          QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
 
@@ -209,20 +223,29 @@ def _lbl(text, style=LABEL_STYLE):
 
 
 def _export_csv(table: QtWidgets.QTableWidget, parent):
-    path, _ = QtWidgets.QFileDialog.getSaveFileName(parent, "Export CSV", "", "CSV Files (*.csv)")
+    path, _ = QtWidgets.QFileDialog.getSaveFileName(
+        parent, "Export CSV", "", "CSV Files (*.csv)")
     if not path:
         return
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow([table.horizontalHeaderItem(c).text() for c in range(table.columnCount())])
+        w.writerow([table.horizontalHeaderItem(c).text()
+                   for c in range(table.columnCount())])
         for r in range(table.rowCount()):
-            w.writerow([table.item(r, c).text() if table.item(r, c) else "" for c in range(table.columnCount())])
+            w.writerow([table.item(r, c).text() if table.item(r, c)
+                       else "" for c in range(table.columnCount())])
     QtWidgets.QMessageBox.information(parent, "Export", f"Saved to:\n{path}")
 
 
-# ── Main window ─────────────────────────────────────────────────────────────────
+# ── Main window ─────────────────────────────────────────────────────────
 
-_TAB_KEYS = {'pay': 0, 'payroll': 2, 'deductions': 1, 'paystub': 3, 'ytd': 4, 'history': 5}
+_TAB_KEYS = {
+    'pay': 0,
+    'payroll': 2,
+    'deductions': 1,
+    'paystub': 3,
+    'ytd': 4,
+     'history': 5}
 
 
 class PayrollDeptWidget(QtWidgets.QWidget):
@@ -289,10 +312,14 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.pr_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.pr_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.pr_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.pr_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.pr_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.pr_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.pr_table.setAlternatingRowColors(True)
         self.pr_table.verticalHeader().setVisible(False)
         self.pr_table.clicked.connect(self._on_pr_row_clicked)
@@ -351,7 +378,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         return w
 
     def _on_pr_type_changed(self, t):
-        self.pr_rate_lbl.setText("Rate ($/hr):" if t == "hourly" else "Annual Salary ($):")
+        self.pr_rate_lbl.setText(
+    "Rate ($/hr):" if t == "hourly" else "Annual Salary ($):")
 
     # ── Deductions & Benefits tab ────────────────────────────────────────────
 
@@ -371,17 +399,23 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         lv.addWidget(_lbl("Deduction Types (Company-Wide)"))
 
         self.ded_type_tbl = QtWidgets.QTableWidget(0, 4)
-        self.ded_type_tbl.setHorizontalHeaderLabels(["ID", "Name", "Category", "Pre-Tax"])
-        self.ded_type_tbl.horizontalHeader().setStyleSheet("color: black; font-weight: bold;")
-        self.ded_type_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ded_type_tbl.setHorizontalHeaderLabels(
+            ["ID", "Name", "Category", "Pre-Tax"])
+        self.ded_type_tbl.horizontalHeader().setStyleSheet(
+            "color: black; font-weight: bold;")
+        self.ded_type_tbl.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ded_type_tbl.setColumnWidth(0, 40)
         self.ded_type_tbl.setColumnWidth(2, 100)
         self.ded_type_tbl.setColumnWidth(3, 65)
-        self.ded_type_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ded_type_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ded_type_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ded_type_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ded_type_tbl.setAlternatingRowColors(True)
         self.ded_type_tbl.verticalHeader().setVisible(False)
-        self.ded_type_tbl.itemSelectionChanged.connect(self._on_ded_type_select)
+        self.ded_type_tbl.itemSelectionChanged.connect(
+            self._on_ded_type_select)
         lv.addWidget(self.ded_type_tbl, stretch=1)
 
         type_fg = QtWidgets.QGroupBox("Deduction Type Details")
@@ -427,24 +461,29 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.ed_emp_filter = QtWidgets.QComboBox()
         self.ed_emp_filter.setStyleSheet(COMBO_STYLE)
         self.ed_emp_filter.setMinimumWidth(200)
-        self.ed_emp_filter.currentIndexChanged.connect(self._refresh_emp_deductions)
+        self.ed_emp_filter.currentIndexChanged.connect(
+            self._refresh_emp_deductions)
         ed_filter_row.addWidget(self.ed_emp_filter)
         ed_filter_row.addStretch()
         rv.addLayout(ed_filter_row)
 
         self.ed_tbl = QtWidgets.QTableWidget(0, 7)
         self.ed_tbl.setHorizontalHeaderLabels(
-            ["ID", "Employee", "Deduction", "Method", "Amount", "Pre-Tax", "Active"])
-        self.ed_tbl.horizontalHeader().setStyleSheet("color: black; font-weight: bold;")
+            ["ID", "Employee", "Deduction", "Method", "Amount", "Pre-Tax", "Active"])  # noqa: E501
+        self.ed_tbl.horizontalHeader().setStyleSheet("color: black; font-weight: bold;")  # noqa: E501
         self.ed_tbl.setColumnWidth(0, 40)
-        self.ed_tbl.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.ed_tbl.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ed_tbl.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ed_tbl.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ed_tbl.setColumnWidth(3, 65)
         self.ed_tbl.setColumnWidth(4, 90)
         self.ed_tbl.setColumnWidth(5, 65)
         self.ed_tbl.setColumnWidth(6, 55)
-        self.ed_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ed_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ed_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ed_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ed_tbl.setAlternatingRowColors(True)
         self.ed_tbl.verticalHeader().setVisible(False)
         self.ed_tbl.itemSelectionChanged.connect(self._on_ed_select)
@@ -460,7 +499,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.ed_ef_method = QtWidgets.QComboBox()
         self.ed_ef_method.setStyleSheet(COMBO_STYLE)
         self.ed_ef_method.addItems(["flat", "percent"])
-        self.ed_ef_method.currentTextChanged.connect(self._on_ed_method_changed)
+        self.ed_ef_method.currentTextChanged.connect(
+            self._on_ed_method_changed)
         self.ed_ef_amount = QtWidgets.QDoubleSpinBox()
         self.ed_ef_amount.setStyleSheet(SPIN_STYLE)
         self.ed_ef_amount.setRange(0, 99_999)
@@ -574,7 +614,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         layout.addWidget(cfg_grp)
 
         note = QtWidgets.QLabel(
-            "Reg Hours and OT Hours are editable. Active deductions are applied automatically.")
+            "Reg Hours and OT Hours are editable. Active deductions are "
+            "applied automatically.")
         note.setStyleSheet("color: rgb(200,220,255); font-size: 11px;")
         layout.addWidget(note)
 
@@ -589,8 +630,10 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in range(1, 12):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.run_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.run_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.run_table.setAlternatingRowColors(True)
         self.run_table.verticalHeader().setVisible(False)
         layout.addWidget(self.run_table, stretch=1)
@@ -630,7 +673,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.stub_run_combo = QtWidgets.QComboBox()
         self.stub_run_combo.setStyleSheet(COMBO_STYLE)
         self.stub_run_combo.setMinimumWidth(300)
-        self.stub_run_combo.currentIndexChanged.connect(self._on_stub_run_change)
+        self.stub_run_combo.currentIndexChanged.connect(
+            self._on_stub_run_change)
         sel.addWidget(self.stub_run_combo)
         sel.addWidget(_lbl("Employee:"))
         self.stub_emp_combo = QtWidgets.QComboBox()
@@ -649,7 +693,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.stub_display.setReadOnly(True)
         self.stub_display.setStyleSheet(
             "QTextEdit{background-color:white;border:2px solid black;"
-            "border-radius:6px;font-family:Courier New,monospace;font-size:13px;}"
+            "border-radius:6px;font-family:Courier "
+            "New,monospace;font-size:13px;}"
         )
         v.addWidget(self.stub_display, stretch=1)
         return w
@@ -691,14 +736,16 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.ytd_tbl = QtWidgets.QTableWidget(0, 11)
         self.ytd_tbl.setHorizontalHeaderLabels([
             "Employee", "Runs", "Reg Hours", "OT Hours",
-            "Gross Pay", "Pre-Tax Deds", "Fed Tax", "State Tax", "SS", "Medicare", "Net Pay"
+            "Gross Pay", "Pre-Tax Deds", "Fed Tax", "State Tax", "SS", "Medicare", "Net Pay"  # noqa: E501
         ])
         hh = self.ytd_tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in range(1, 11):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ytd_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.ytd_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.ytd_tbl.setAlternatingRowColors(True)
         self.ytd_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.ytd_tbl, stretch=1)
@@ -718,27 +765,36 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         layout.setSpacing(8)
 
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
-        splitter.setStyleSheet("QSplitter::handle{background: white; width: 3px;}")
+        splitter.setStyleSheet(
+            "QSplitter::handle{background: white; width: 3px;}")
 
         left = QtWidgets.QWidget()
         lv = QtWidgets.QVBoxLayout(left)
         lv.setContentsMargins(0, 0, 4, 0)
         runs_lbl = QtWidgets.QLabel("Payroll Runs")
-        runs_lbl.setStyleSheet("color: white; font-weight: bold; font-size: 13px;")
+        runs_lbl.setStyleSheet(
+            "color: white; font-weight: bold; font-size: 13px;")
         lv.addWidget(runs_lbl)
 
         self.hist_runs_table = QtWidgets.QTableWidget()
         self.hist_runs_table.setColumnCount(4)
-        self.hist_runs_table.setHorizontalHeaderLabels(["Run Date", "Period", "Employees", "Total Gross"])
+        self.hist_runs_table.setHorizontalHeaderLabels(
+            ["Run Date", "Period", "Employees", "Total Gross"])
         hl = self.hist_runs_table.horizontalHeader()
         hl.setStyleSheet("color: black; font-weight: bold;")
-        hl.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hl.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hl.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hl.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hl.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.hist_runs_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.hist_runs_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.hist_runs_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hl.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hl.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.hist_runs_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.hist_runs_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.hist_runs_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.hist_runs_table.setAlternatingRowColors(True)
         self.hist_runs_table.verticalHeader().setVisible(False)
         self.hist_runs_table.cellClicked.connect(self._on_history_run_clicked)
@@ -755,7 +811,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         rv = QtWidgets.QVBoxLayout(right)
         rv.setContentsMargins(4, 0, 0, 0)
         self.hist_detail_lbl = QtWidgets.QLabel("Select a run to view detail")
-        self.hist_detail_lbl.setStyleSheet("color: white; font-weight: bold; font-size: 13px;")
+        self.hist_detail_lbl.setStyleSheet(
+            "color: white; font-weight: bold; font-size: 13px;")
         rv.addWidget(self.hist_detail_lbl)
 
         self.hist_detail_table = QtWidgets.QTableWidget()
@@ -769,8 +826,10 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         hd.setStyleSheet("color: black; font-weight: bold;")
         hd.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in range(1, 11):
-            hd.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.hist_detail_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hd.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.hist_detail_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.hist_detail_table.setAlternatingRowColors(True)
         self.hist_detail_table.verticalHeader().setVisible(False)
         rv.addWidget(self.hist_detail_table, stretch=1)
@@ -789,9 +848,11 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _load_pay_rates(self):
         conn = get_db()
         employees = conn.execute(
-            "SELECT id, first_name, last_name, employee_id FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name, employee_id FROM people ORDER "
+            "BY last_name, first_name"
         ).fetchall()
-        pay_map = {r["people_id"]: r for r in conn.execute("SELECT * FROM employee_pay").fetchall()}
+        pay_map = {r["people_id"]: r for r in conn.execute(
+            "SELECT * FROM employee_pay").fetchall()}
         conn.close()
 
         self.pr_emp_combo.blockSignals(True)
@@ -814,18 +875,18 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             name = f"{e['last_name']}, {e['first_name']}"
             emp_id_str = str(e["employee_id"]) if e["employee_id"] else ""
             if pay:
-                rate_str = (f"${pay['pay_rate']:.2f}/hr" if pay["pay_type"] == "hourly"
+                rate_str = (f"${pay['pay_rate']:.2f}/hr" if pay["pay_type"] == "hourly"  # noqa: E501
                             else f"${pay['pay_rate']:,.0f}/yr")
                 eff_str = pay["effective_date"]
             else:
                 rate_str = "(not set)"
                 eff_str = ""
             for col, val in enumerate([name, emp_id_str,
-                                       pay["pay_type"] if pay else "", rate_str, eff_str]):
+                                       pay["pay_type"] if pay else "", rate_str, eff_str]):  # noqa: E501
                 self.pr_table.setItem(r, col, _ro(val,
-                                                  QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
+                                                  QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
                                                   if col == 0 else
-                                                  QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                                                  QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
 
     def _on_pr_row_clicked(self, index):
         row = index.row()
@@ -836,7 +897,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         if idx >= 0:
             self.pr_emp_combo.setCurrentIndex(idx)
         conn = get_db()
-        pay = conn.execute("SELECT * FROM employee_pay WHERE people_id=%s", (pid,)).fetchone()
+        pay = conn.execute(
+    "SELECT * FROM employee_pay WHERE people_id=%s", (pid,)).fetchone()
         conn.close()
         if pay:
             self.pr_type_combo.setCurrentText(pay["pay_type"])
@@ -859,7 +921,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_pr_save(self):
         pid = self.pr_emp_combo.currentData()
         if pid is None:
-            QtWidgets.QMessageBox.warning(self, "No Employee", "Select an employee first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Employee", "Select an employee first.")
             return
         pay_type = self.pr_type_combo.currentText()
         pay_rate = self.pr_rate_spin.value()
@@ -880,11 +943,12 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_pr_delete(self):
         pid = self.pr_emp_combo.currentData()
         if pid is None:
-            QtWidgets.QMessageBox.warning(self, "No Employee", "Select an employee first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Employee", "Select an employee first.")
             return
         if QtWidgets.QMessageBox.question(
             self, "Confirm", "Remove pay rate for this employee%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
             conn.execute("DELETE FROM employee_pay WHERE people_id=%s", (pid,))
@@ -906,20 +970,23 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             r = self.ded_type_tbl.rowCount()
             self.ded_type_tbl.insertRow(r)
             self.ded_type_tbl.setItem(
-                r, 0, _ro(str(row["id"]), QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                r, 0, _ro(str(row["id"]), QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ded_type_tbl.setItem(
-                r, 1, _ro(row["name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                r, 1, _ro(row["name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ded_type_tbl.setItem(
-                r, 2, _ro(row["category"], QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                r, 2, _ro(row["category"], QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ded_type_tbl.setItem(r, 3, _ro(
-                "Yes" if row["is_pre_tax"] else "No", QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
-            self.ded_type_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+                "Yes" if row["is_pre_tax"] else "No", QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
+            self.ded_type_tbl.item(
+    r, 0).setData(
+        QtCore.Qt.ItemDataRole.UserRole, row["id"])
         self._refresh_ded_type_combo()
 
     def _refresh_ded_type_combo(self):
         conn = get_db()
         types = conn.execute(
-            "SELECT id, name FROM payroll_deduction_type WHERE is_active=1 ORDER BY name"
+            "SELECT id, name FROM payroll_deduction_type WHERE is_active=1 "
+            "ORDER BY name"
         ).fetchall()
         conn.close()
         self.ed_ef_type.clear()
@@ -930,7 +997,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _refresh_emp_filter_combo(self):
         conn = get_db()
         emps = conn.execute(
-            "SELECT id, first_name, last_name FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name FROM people ORDER BY last_name, "
+            "first_name"
         ).fetchall()
         conn.close()
         for combo in [self.ed_emp_filter, self.ed_ef_emp, self.ytd_emp_filter]:
@@ -966,19 +1034,23 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             amt_str = (f"${row['amount']:.2f}" if row["calc_method"] == "flat"
                        else f"{row['amount']:.1f}%")
             self.ed_tbl.setItem(
-                r, 0, _ro(str(row["id"]), QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
-            self.ed_tbl.setItem(r, 1, _ro(f"{row['last_name']}, {row['first_name']}",
-                                QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                r, 0, _ro(str(row["id"]), QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
+            self.ed_tbl.setItem(r, 1, _ro(f"{row['last_name']}, {row['first_name']}",  # noqa: E501
+                                QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ed_tbl.setItem(
-                r, 2, _ro(row["ded_name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                r, 2, _ro(row["ded_name"], QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ed_tbl.setItem(
-                r, 3, _ro(row["calc_method"], QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                r, 3, _ro(row["calc_method"], QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ed_tbl.setItem(r, 4, _ro(amt_str))
             self.ed_tbl.setItem(r, 5, _ro(
-                "Yes" if row["is_pre_tax"] else "No", QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
+                "Yes" if row["is_pre_tax"] else "No", QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
             self.ed_tbl.setItem(r, 6, _ro(
-                "Yes" if row["is_active"] else "No", QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))
-            self.ed_tbl.item(r, 0).setData(QtCore.Qt.ItemDataRole.UserRole, row["id"])
+                "Yes" if row["is_active"] else "No", QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter))  # noqa: E501
+            self.ed_tbl.item(
+    r,
+    0).setData(
+        QtCore.Qt.ItemDataRole.UserRole,
+         row["id"])
             if not row["is_active"]:
                 for c in range(7):
                     it = self.ed_tbl.item(r, c)
@@ -990,9 +1062,12 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         if not rows:
             return
         r = rows[0].row()
-        tid = self.ded_type_tbl.item(r, 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        tid = self.ded_type_tbl.item(
+    r, 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         conn = get_db()
-        row = conn.execute("SELECT * FROM payroll_deduction_type WHERE id=%s", (tid,)).fetchone()
+        row = conn.execute(
+    "SELECT * FROM payroll_deduction_type WHERE id=%s", (tid,)).fetchone()
         conn.close()
         if row:
             self.dt_ef_name.setText(row["name"])
@@ -1004,12 +1079,15 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_dt_add(self):
         name = self.dt_ef_name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Name is required.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO payroll_deduction_type(name,category,is_pre_tax) VALUES(%s,%s,%s)",
-            (name, self.dt_ef_cat.currentText(), 1 if self.dt_ef_pretax.isChecked() else 0)
+            "INSERT INTO payroll_deduction_type(name,category,is_pre_tax) "
+            "VALUES(%s,%s,%s)",
+            (name, self.dt_ef_cat.currentText(),
+             1 if self.dt_ef_pretax.isChecked() else 0)
         )
         conn.commit()
         conn.close()
@@ -1019,17 +1097,23 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_dt_update(self):
         rows = self.ded_type_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a deduction type first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a deduction type first.")
             return
-        tid = self.ded_type_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        tid = self.ded_type_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         name = self.dt_ef_name.text().strip()
         if not name:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Name is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Name is required.")
             return
         conn = get_db()
         conn.execute(
-            "UPDATE payroll_deduction_type SET name=%s,category=%s,is_pre_tax=%s WHERE id=%s",
-            (name, self.dt_ef_cat.currentText(), 1 if self.dt_ef_pretax.isChecked() else 0, tid)
+            "UPDATE payroll_deduction_type SET "
+            "name=%s,category=%s,is_pre_tax=%s WHERE id=%s",
+            (name, self.dt_ef_cat.currentText(),
+             1 if self.dt_ef_pretax.isChecked() else 0, tid)
         )
         conn.commit()
         conn.close()
@@ -1038,15 +1122,20 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_dt_delete(self):
         rows = self.ded_type_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a deduction type first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a deduction type first.")
             return
-        tid = self.ded_type_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        tid = self.ded_type_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         if QtWidgets.QMessageBox.question(
-            self, "Delete", "Delete this deduction type%s This will remove all employee assignments.",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            self, "Delete", "Delete this deduction type%s This will remove "
+                            "all employee assignments.",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM payroll_deduction_type WHERE id=%s", (tid,))
+            conn.execute(
+    "DELETE FROM payroll_deduction_type WHERE id=%s", (tid,))
             conn.commit()
             conn.close()
             self._refresh_ded_types()
@@ -1062,9 +1151,12 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         rows = self.ed_tbl.selectionModel().selectedRows()
         if not rows:
             return
-        eid = self.ed_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        eid = self.ed_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         conn = get_db()
-        row = conn.execute("SELECT * FROM employee_deduction WHERE id=%s", (eid,)).fetchone()
+        row = conn.execute(
+    "SELECT * FROM employee_deduction WHERE id=%s", (eid,)).fetchone()
         conn.close()
         if not row:
             return
@@ -1083,14 +1175,15 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         pid = self.ed_ef_emp.currentData()
         tid = self.ed_ef_type.currentData()
         if not pid or not tid:
-            QtWidgets.QMessageBox.warning(self, "Validation", "Select employee and deduction type.")
+            QtWidgets.QMessageBox.warning(
+    self, "Validation", "Select employee and deduction type.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO employee_deduction(people_id,deduction_type_id,calc_method,amount,is_active,notes) "
+            "INSERT INTO employee_deduction(people_id,deduction_type_id,calc_method,amount,is_active,notes) "  # noqa: E501
             "VALUES(%s,%s,%s,%s,%s,%s)",
-            (pid, tid, self.ed_ef_method.currentText(), self.ed_ef_amount.value(),
-             1 if self.ed_ef_active.isChecked() else 0, self.ed_ef_notes.text().strip())
+            (pid, tid, self.ed_ef_method.currentText(), self.ed_ef_amount.value(),  # noqa: E501
+             1 if self.ed_ef_active.isChecked() else 0, self.ed_ef_notes.text().strip())  # noqa: E501
         )
         conn.commit()
         conn.close()
@@ -1100,12 +1193,16 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_ed_update(self):
         rows = self.ed_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select an assignment first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select an assignment first.")
             return
-        eid = self.ed_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        eid = self.ed_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         conn = get_db()
         conn.execute(
-            "UPDATE employee_deduction SET people_id=%s,deduction_type_id=%s,calc_method=%s,"
+            "UPDATE employee_deduction SET "
+            "people_id=%s,deduction_type_id=%s,calc_method=%s,"
             "amount=%s,is_active=%s,notes=%s WHERE id=%s",
             (self.ed_ef_emp.currentData(), self.ed_ef_type.currentData(),
              self.ed_ef_method.currentText(), self.ed_ef_amount.value(),
@@ -1119,12 +1216,15 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _on_ed_delete(self):
         rows = self.ed_tbl.selectionModel().selectedRows()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select an assignment first.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select an assignment first.")
             return
-        eid = self.ed_tbl.item(rows[0].row(), 0).data(QtCore.Qt.ItemDataRole.UserRole)
+        eid = self.ed_tbl.item(
+    rows[0].row(), 0).data(
+        QtCore.Qt.ItemDataRole.UserRole)
         if QtWidgets.QMessageBox.question(
             self, "Remove", "Remove this deduction assignment%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
             conn.execute("DELETE FROM employee_deduction WHERE id=%s", (eid,))
@@ -1143,7 +1243,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.ed_tbl.clearSelection()
 
     def _get_employee_deductions(self, people_id, gross):
-        """Return (pre_tax_total, post_tax_total, items_list) for an employee."""
+        """Return (pre_tax_total, post_tax_total, items_list) for an employee."""  # noqa: E501
         conn = get_db()
         rows = conn.execute("""
             SELECT ed.calc_method, ed.amount, dt.name, dt.is_pre_tax
@@ -1160,7 +1260,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             else:
                 amt = row["amount"]
             amt = round(amt, 2)
-            items.append({"name": row["name"], "is_pre_tax": row["is_pre_tax"], "amount": amt})
+            items.append(
+                {"name": row["name"], "is_pre_tax": row["is_pre_tax"], "amount": amt})  # noqa: E501
             if row["is_pre_tax"]:
                 pre_total += amt
             else:
@@ -1173,7 +1274,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         start_str = self.run_from.date().toString("yyyy-MM-dd")
         end_str = self.run_to.date().toString("yyyy-MM-dd")
         if start_str > end_str:
-            QtWidgets.QMessageBox.warning(self, "Invalid Range", "From date must be before To date.")
+            QtWidgets.QMessageBox.warning(
+    self, "Invalid Range", "From date must be before To date.")
             return
         fed_rate = self.run_fed_spin.value() / 100
         state_rate = self.run_state_spin.value() / 100
@@ -1203,11 +1305,13 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             else:
                 raw_gross = pay_rate / FREQ_DIVISORS.get(freq, 26)
 
-            pre_deds, post_deds, ded_items = self._get_employee_deductions(pid, raw_gross)
-            self._run_deductions[pid] = {'pre': pre_deds, 'post': post_deds, 'items': ded_items}
+            pre_deds, post_deds, ded_items = self._get_employee_deductions(
+                pid, raw_gross)
+            self._run_deductions[pid] = {
+    'pre': pre_deds, 'post': post_deds, 'items': ded_items}
 
             gross, fed, st, ss, med, net = _calc_pay(
-                pay_type, pay_rate, reg, ot, fed_rate, state_rate, freq, pre_deds, post_deds)
+                pay_type, pay_rate, reg, ot, fed_rate, state_rate, freq, pre_deds, post_deds)  # noqa: E501
             total_deds = pre_deds + post_deds
 
             r = self.run_table.rowCount()
@@ -1215,10 +1319,11 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             self._run_people_ids.append(pid)
 
             name = f"{e['last_name']}, {e['first_name']}"
-            rate_str = (f"${pay_rate:.2f}/hr" if pay_type == "hourly" else f"${pay_rate:,.0f}/yr")
+            rate_str = (f"${pay_rate:.2f}/hr" if pay_type ==
+                        "hourly" else f"${pay_rate:,.0f}/yr")
 
-            al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
-            ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+            al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+            ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
             self.run_table.setItem(r, self._C_EMP, _ro(name, al))
             self.run_table.setItem(r, self._C_TYPE, _ro(pay_type, ac))
             self.run_table.setItem(r, self._C_RATE, _ro(rate_str))
@@ -1237,7 +1342,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 
     def _on_calculate_payroll(self):
         if self.run_table.rowCount() == 0:
-            QtWidgets.QMessageBox.warning(self, "No Data", "Load employees first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Data", "Load employees first.")
             return
         fed_rate = self.run_fed_spin.value() / 100
         state_rate = self.run_state_spin.value() / 100
@@ -1251,7 +1357,15 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             if not all((type_item, rate_item, reg_item, ot_item)):
                 continue
             pay_type = type_item.text()
-            rate_str = rate_item.text().replace("$", "").replace(",", "").replace("/hr", "").replace("/yr", "")
+            rate_str = rate_item.text().replace(
+    "$",
+    "").replace(
+        ",",
+        "").replace(
+            "/hr",
+            "").replace(
+                "/yr",
+                 "")
             try:
                 pay_rate = float(rate_str)
                 reg_hrs = float(reg_item.text())
@@ -1259,16 +1373,20 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             except ValueError:
                 continue
             if reg_hrs < 0 or ot_hrs < 0:
-                QtWidgets.QMessageBox.warning(self, "Invalid", f"Row {r + 1}: hours cannot be negative.")
+                QtWidgets.QMessageBox.warning(
+    self, "Invalid", f"Row {
+        r + 1}: hours cannot be negative.")
                 return
 
             raw_gross = (pay_rate * reg_hrs + pay_rate * 1.5 * ot_hrs
-                         if pay_type == "hourly" else pay_rate / FREQ_DIVISORS.get(freq, 26))
-            pre_deds, post_deds, ded_items = self._get_employee_deductions(pid, raw_gross)
-            self._run_deductions[pid] = {'pre': pre_deds, 'post': post_deds, 'items': ded_items}
+                         if pay_type == "hourly" else pay_rate / FREQ_DIVISORS.get(freq, 26))  # noqa: E501
+            pre_deds, post_deds, ded_items = self._get_employee_deductions(
+                pid, raw_gross)
+            self._run_deductions[pid] = {
+    'pre': pre_deds, 'post': post_deds, 'items': ded_items}
 
             gross, fed, st, ss, med, net = _calc_pay(
-                pay_type, pay_rate, reg_hrs, ot_hrs, fed_rate, state_rate, freq, pre_deds, post_deds)
+                pay_type, pay_rate, reg_hrs, ot_hrs, fed_rate, state_rate, freq, pre_deds, post_deds)  # noqa: E501
             total_deds = pre_deds + post_deds
 
             self.run_table.setItem(r, self._C_DEDS, _ro(_money(total_deds)))
@@ -1286,7 +1404,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         for r in range(self.run_table.rowCount()):
             def _v(col):
                 it = self.run_table.item(r, col)
-                return float(it.text().replace("$", "").replace(",", "")) if it else 0.0
+                return float(it.text().replace(
+                    "$", "").replace(",", "")) if it else 0.0
             total_gross += _v(self._C_GROSS)
             total_net += _v(self._C_NET)
             total_deds += _v(self._C_DEDS)
@@ -1308,7 +1427,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             self, "Save Payroll Run",
             f"Save payroll run for period {start_str} – {end_str}?\n"
             f"({self.run_table.rowCount()} employees)",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) != QtWidgets.QMessageBox.StandardButton.Yes:
             return
 
@@ -1321,11 +1440,13 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 
         def _v(r, col):
             it = self.run_table.item(r, col)
-            return float(it.text().replace("$", "").replace(",", "")) if it else 0.0
+            return float(it.text().replace(
+                "$", "").replace(",", "")) if it else 0.0
 
         total_gross = total_net = 0.0
         for r, pid in enumerate(self._run_people_ids):
-            deds = self._run_deductions.get(pid, {'pre': 0.0, 'post': 0.0, 'items': []})
+            deds = self._run_deductions.get(
+                pid, {'pre': 0.0, 'post': 0.0, 'items': []})
             entry_cur = conn.execute("""
                 INSERT INTO payroll_entry
                     (run_id, people_id, regular_hours, overtime_hours,
@@ -1342,9 +1463,12 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 
             for item in deds['items']:
                 conn.execute(
-                    "INSERT INTO payroll_entry_deduction(entry_id,deduction_name,is_pre_tax,amount) "
+                    "INSERT INTO payroll_entry_deduction(entry_id,deduction_name,is_pre_tax,amount) "  # noqa: E501
                     "VALUES(%s,%s,%s,%s)",
-                    (entry_id, item["name"], item["is_pre_tax"], item["amount"])
+                    (entry_id,
+    item["name"],
+    item["is_pre_tax"],
+     item["amount"])
                 )
             total_gross += _v(r, self._C_GROSS)
             total_net += _v(r, self._C_NET)
@@ -1370,7 +1494,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self.save_run_btn.setEnabled(False)
         self.run_totals_lbl.setText("")
         self._load_history()
-        QtWidgets.QMessageBox.information(self, "Saved", "Payroll run saved successfully.")
+        QtWidgets.QMessageBox.information(
+    self, "Saved", "Payroll run saved successfully.")
 
     # ── Pay Stubs data ───────────────────────────────────────────────────────
 
@@ -1386,10 +1511,13 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         conn.close()
         for run in runs:
             try:
-                rd = datetime.strptime(run["run_date"], DT_FMT).strftime("%m/%d/%Y")
+                rd = datetime.strptime(
+    run["run_date"], DT_FMT).strftime("%m/%d/%Y")
             except ValueError:
                 rd = run["run_date"]
-            label = f"{rd}  ({run['pay_period_start']} – {run['pay_period_end']})"
+            label = f"{rd}  ({
+    run['pay_period_start']} – {
+        run['pay_period_end']})"
             self.stub_run_combo.addItem(label, run["id"])
         self.stub_run_combo.blockSignals(False)
 
@@ -1407,12 +1535,14 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         """, (run_id,)).fetchall()
         conn.close()
         for e in emps:
-            self.stub_emp_combo.addItem(f"{e['last_name']}, {e['first_name']}", e["entry_id"])
+            self.stub_emp_combo.addItem(
+                f"{e['last_name']}, {e['first_name']}", e["entry_id"])
 
     def _on_view_stub(self):
         entry_id = self.stub_emp_combo.currentData()
         if not entry_id:
-            QtWidgets.QMessageBox.warning(self, "Selection", "Select a payroll run and employee.")
+            QtWidgets.QMessageBox.warning(
+    self, "Selection", "Select a payroll run and employee.")
             return
         conn = get_db()
         entry = conn.execute("""
@@ -1426,7 +1556,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             WHERE pe.id=%s
         """, (entry_id,)).fetchone()
         ded_rows = conn.execute(
-            "SELECT * FROM payroll_entry_deduction WHERE entry_id=%s ORDER BY is_pre_tax DESC, deduction_name",
+            "SELECT * FROM payroll_entry_deduction WHERE entry_id=%s ORDER BY "
+            "is_pre_tax DESC, deduction_name",
             (entry_id,)
         ).fetchall()
         conn.close()
@@ -1441,7 +1572,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             rd = e["run_date"]
         pay_type = e["pay_type"] or "hourly"
         pay_rate = e["pay_rate"] or 0.0
-        rate_str = (f"${pay_rate:.2f}/hr" if pay_type == "hourly" else f"${pay_rate:,.2f}/yr (salary)")
+        rate_str = (f"${pay_rate:.2f}/hr" if pay_type ==
+                    "hourly" else f"${pay_rate:,.2f}/yr (salary)")
 
         W = 60
 
@@ -1460,7 +1592,10 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             divider("="),
             line("Employee:", f"{e['last_name']}, {e['first_name']}"),
             line("Employee ID:", e["employee_id"] or "—"),
-            line("Pay Period:", f"{e['pay_period_start']}  to  {e['pay_period_end']}"),
+            line(
+    "Pay Period:", f"{
+        e['pay_period_start']}  to  {
+            e['pay_period_end']}"),
             line("Payment Date:", rd),
             line("Pay Frequency:", e.get("pay_frequency", "—")),
             line("Pay Type / Rate:", rate_str),
@@ -1477,25 +1612,36 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         if pre_tax:
             stub += section("PRE-TAX DEDUCTIONS")
             for d in pre_tax:
-                stub += "\n" + line(f"  {d['deduction_name']}:", f"-{_money(d['amount'])}")
+                stub += "\n" + \
+                    line(f"  {d['deduction_name']}:",
+                         f"-{_money(d['amount'])}")
             stub += "\n" + line("  Total Pre-Tax Deductions:",
-                                f"-{_money(sum(d['amount'] for d in pre_tax))}")
+                                f"-{_money(sum(d['amount'] for d in pre_tax))}")  # noqa: E501
 
         taxable = e["gross_pay"] - (e["pre_tax_deductions"] or 0.0)
         stub += section("TAXES  (on taxable wages: " + _money(taxable) + ")")
-        stub += "\n" + line("  Federal Income Tax:", f"-{_money(e['federal_tax'])}")
-        stub += "\n" + line("  State Income Tax:", f"-{_money(e['state_tax'])}")
-        stub += "\n" + line(f"  Social Security ({_pct(SS_RATE)}):", f"-{_money(e['social_security'])}")
-        stub += "\n" + line(f"  Medicare ({_pct(MEDICARE_RATE)}):", f"-{_money(e['medicare'])}")
-        total_tax = e["federal_tax"] + e["state_tax"] + e["social_security"] + e["medicare"]
+        stub += "\n" + line("  Federal Income Tax:",
+                            f"-{_money(e['federal_tax'])}")
+        stub += "\n" + line("  State Income Tax:",
+                            f"-{_money(e['state_tax'])}")
+        stub += "\n" + \
+            line(f"  Social Security ({_pct(SS_RATE)}):",
+                 f"-{_money(e['social_security'])}")
+        stub += "\n" + \
+            line(f"  Medicare ({_pct(MEDICARE_RATE)}):",
+                 f"-{_money(e['medicare'])}")
+        total_tax = e["federal_tax"] + e["state_tax"] + \
+            e["social_security"] + e["medicare"]
         stub += "\n" + line("  Total Taxes:", f"-{_money(total_tax)}")
 
         if post_tax:
             stub += section("POST-TAX DEDUCTIONS")
             for d in post_tax:
-                stub += "\n" + line(f"  {d['deduction_name']}:", f"-{_money(d['amount'])}")
+                stub += "\n" + \
+                    line(f"  {d['deduction_name']}:",
+                         f"-{_money(d['amount'])}")
             stub += "\n" + line("  Total Post-Tax Deductions:",
-                                f"-{_money(sum(d['amount'] for d in post_tax))}")
+                                f"-{_money(sum(d['amount'] for d in post_tax))}")  # noqa: E501
 
         stub += "\n" + divider("=")
         stub += "\n" + line("NET PAY:", _money(e["net_pay"]))
@@ -1508,14 +1654,16 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _refresh_ytd_emp_combo(self):
         conn = get_db()
         emps = conn.execute(
-            "SELECT id, first_name, last_name FROM people ORDER BY last_name, first_name"
+            "SELECT id, first_name, last_name FROM people ORDER BY last_name, "
+            "first_name"
         ).fetchall()
         conn.close()
         self.ytd_emp_filter.blockSignals(True)
         self.ytd_emp_filter.clear()
         self.ytd_emp_filter.addItem("All Employees", None)
         for e in emps:
-            self.ytd_emp_filter.addItem(f"{e['last_name']}, {e['first_name']}", e["id"])
+            self.ytd_emp_filter.addItem(
+                f"{e['last_name']}, {e['first_name']}", e["id"])
         self.ytd_emp_filter.blockSignals(False)
 
     def _refresh_ytd(self):
@@ -1543,22 +1691,36 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         if pid:
             q += " AND pe.people_id=%s"
             params.append(pid)
-        q += " GROUP BY pe.people_id, p.first_name, p.last_name ORDER BY p.last_name, p.first_name"
+        q += (
+            " GROUP BY pe.people_id, p.first_name, p.last_name ORDER BY "
+            "p.last_name, p.first_name"
+        )
 
         conn = get_db()
         rows = conn.execute(q, params).fetchall()
         conn.close()
 
         self.ytd_tbl.setRowCount(0)
-        totals = {k: 0.0 for k in ["reg_hrs", "ot_hrs", "gross", "pre_deds", "fed", "state", "ss", "med", "net"]}
+        totals = {
+    k: 0.0 for k in [
+        "reg_hrs",
+        "ot_hrs",
+        "gross",
+        "pre_deds",
+        "fed",
+        "state",
+        "ss",
+        "med",
+         "net"]}
         run_count_total = 0
 
         for row in rows:
             r = self.ytd_tbl.rowCount()
             self.ytd_tbl.insertRow(r)
-            al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
-            ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-            self.ytd_tbl.setItem(r, 0, _ro(f"{row['last_name']}, {row['first_name']}", al))
+            al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+            ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+            self.ytd_tbl.setItem(
+                r, 0, _ro(f"{row['last_name']}, {row['first_name']}", al))
             self.ytd_tbl.setItem(r, 1, _ro(str(row["run_count"]), ac))
             self.ytd_tbl.setItem(r, 2, _ro(f"{(row['reg_hrs'] or 0):.2f}"))
             self.ytd_tbl.setItem(r, 3, _ro(f"{(row['ot_hrs'] or 0):.2f}"))
@@ -1582,10 +1744,13 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             totals_row = [
                 ("TOTALS", QtCore.Qt.AlignmentFlag.AlignLeft),
                 (str(run_count_total), QtCore.Qt.AlignmentFlag.AlignCenter),
-                (f"{totals['reg_hrs']:.2f}", QtCore.Qt.AlignmentFlag.AlignRight),
-                (f"{totals['ot_hrs']:.2f}", QtCore.Qt.AlignmentFlag.AlignRight),
+                (f"{totals['reg_hrs']:.2f}",
+     QtCore.Qt.AlignmentFlag.AlignRight),
+                (f"{totals['ot_hrs']:.2f}",
+     QtCore.Qt.AlignmentFlag.AlignRight),
                 (_money(totals["gross"]), QtCore.Qt.AlignmentFlag.AlignRight),
-                (_money(totals["pre_deds"]), QtCore.Qt.AlignmentFlag.AlignRight),
+                (_money(totals["pre_deds"]),
+     QtCore.Qt.AlignmentFlag.AlignRight),
                 (_money(totals["fed"]), QtCore.Qt.AlignmentFlag.AlignRight),
                 (_money(totals["state"]), QtCore.Qt.AlignmentFlag.AlignRight),
                 (_money(totals["ss"]), QtCore.Qt.AlignmentFlag.AlignRight),
@@ -1599,7 +1764,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
                 self.ytd_tbl.setItem(r, c, it)
 
         self.ytd_totals_lbl.setText(
-            f"Year: {year}  |  Employees: {self.ytd_tbl.rowCount() - (1 if self.ytd_tbl.rowCount() else 0)}  |  "
+            f"Year: {year}  |  Employees: {self.ytd_tbl.rowCount() -
+     (1 if self.ytd_tbl.rowCount() else 0)}  |  "
             f"Total Gross: {_money(totals['gross'])}  |  "
             f"Total Deductions: {_money(totals['pre_deds'])}  |  "
             f"Total Net: {_money(totals['net'])}"
@@ -1627,15 +1793,16 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             self.hist_runs_table.insertRow(r)
             self._history_run_ids.append(run["id"])
             try:
-                rd = datetime.strptime(run["run_date"], DT_FMT).strftime("%m/%d/%Y")
+                rd = datetime.strptime(
+    run["run_date"], DT_FMT).strftime("%m/%d/%Y")
             except ValueError:
                 rd = run["run_date"]
             period = f"{run['pay_period_start']}  –  {run['pay_period_end']}"
-            al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
-            ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+            al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+            ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
             for col, (val, align) in enumerate([(rd, ac), (period, al),
                                                 (str(run["emp_count"]), ac),
-                                                (_money(run["total_gross"]), QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)]):
+                                                (_money(run["total_gross"]), QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)]):  # noqa: E501
                 self.hist_runs_table.setItem(r, col, _ro(val, align))
 
         self.hist_detail_table.setRowCount(0)
@@ -1647,7 +1814,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             return
         run_id = self._history_run_ids[row]
         conn = get_db()
-        run = conn.execute("SELECT * FROM payroll_run WHERE id=%s", (run_id,)).fetchone()
+        run = conn.execute(
+    "SELECT * FROM payroll_run WHERE id=%s", (run_id,)).fetchone()
         entries = conn.execute("""
             SELECT p.first_name, p.last_name, pe.*
             FROM payroll_entry pe JOIN people p ON p.id=pe.people_id
@@ -1662,14 +1830,16 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         )
         self.hist_detail_table.setRowCount(0)
         total_gross = total_net = 0.0
-        al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
-        ar = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
+        al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        ar = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for entry in entries:
             r = self.hist_detail_table.rowCount()
             self.hist_detail_table.insertRow(r)
             name = f"{entry['last_name']}, {entry['first_name']}"
-            pre = entry["pre_tax_deductions"] if "pre_tax_deductions" in entry.keys() else 0.0
-            post = entry["post_tax_deductions"] if "post_tax_deductions" in entry.keys() else 0.0
+            pre = entry["pre_tax_deductions"] if "pre_tax_deductions" in entry.keys(  # noqa: E501
+            ) else 0.0
+            post = entry["post_tax_deductions"] if "post_tax_deductions" in entry.keys(  # noqa: E501
+            ) else 0.0
             for col, (val, align) in enumerate([
                 (name, al),
                 (f"{entry['regular_hours']:.2f}", ar),
@@ -1688,22 +1858,27 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             total_net += entry["net_pay"]
 
         self.hist_totals_lbl.setText(
-            f"Total Gross: {_money(total_gross)}    Total Net: {_money(total_net)}"
+            f"Total Gross: {
+    _money(total_gross)}    Total Net: {
+        _money(total_net)}"
             f"    Employees: {len(entries)}"
         )
 
     def _on_void_run(self):
         row = self.hist_runs_table.currentRow()
         if row < 0 or row >= len(self._history_run_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a payroll run first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a payroll run first.")
             return
         run_id = self._history_run_ids[row]
         if QtWidgets.QMessageBox.question(
-            self, "Void Run", "Permanently delete this payroll run and all its entries%s",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            self, "Void Run", "Permanently delete this payroll run and all "
+                              "its entries%s",
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM payroll_entry WHERE run_id=%s", (run_id,))
+            conn.execute(
+    "DELETE FROM payroll_entry WHERE run_id=%s", (run_id,))
             conn.execute("DELETE FROM payroll_run   WHERE id=%s", (run_id,))
             conn.commit()
             conn.close()

@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -76,7 +82,8 @@ def _next_so_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM sales_order WHERE so_number LIKE %s", (f"SO-{yr}-%",)
+        "SELECT COUNT(*) FROM sales_order WHERE so_number LIKE %s", (
+            f"SO-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"SO-{yr}-{count + 1:04d}"
@@ -86,7 +93,8 @@ def _load_customers():
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT id, company_name, first_name, last_name FROM customer ORDER BY company_name"
+            "SELECT id, company_name, first_name, last_name FROM customer "
+            "ORDER BY company_name"
         ).fetchall()
     except psycopg2.OperationalError:
         rows = []
@@ -112,7 +120,7 @@ def _load_products():
     return rows
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewSODialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -149,7 +157,8 @@ class NewSODialog(QtWidgets.QDialog):
         self.order_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Order Date:"), self.order_date)
 
-        self.ship_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(7))
+        self.ship_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(7))
         self.ship_date.setCalendarPopup(True)
         self.ship_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Ship Date:"), self.ship_date)
@@ -175,13 +184,15 @@ class NewSODialog(QtWidgets.QDialog):
     def _on_ok(self):
         so_num = self.so_num.text().strip()
         if not so_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "SO number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "SO number is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
                 "INSERT INTO sales_order (so_number, customer_id, order_date,"
-                " ship_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
+                " ship_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) "
+                "RETURNING id",
                 (so_num, self.customer_combo.currentData(),
                  self.order_date.date().toString("yyyy-MM-dd"),
                  self.ship_date.date().toString("yyyy-MM-dd"),
@@ -192,7 +203,7 @@ class NewSODialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"SO number '{so_num}' already exists.")
+                                          f"SO number '{so_num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -219,7 +230,8 @@ class AddSOItemDialog(QtWidgets.QDialog):
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
-        self.product_combo.currentIndexChanged.connect(self._on_product_changed)
+        self.product_combo.currentIndexChanged.connect(
+            self._on_product_changed)
         self.product_combo.addItem("(none)", None)
         for p in _load_products():
             self.product_combo.addItem(p["product_name"], p["id"])
@@ -259,11 +271,13 @@ class AddSOItemDialog(QtWidgets.QDialog):
     def _on_ok(self):
         desc = self.desc.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Description is required.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO so_item (so_id, description, product_id, qty, unit_price)"
+            "INSERT INTO so_item (so_id, description, product_id, qty, "
+            "unit_price)"
             " VALUES (%s,%s,%s,%s,%s)",
             (self._so_id, desc, self.product_combo.currentData(),
              self.qty.value(), self.unit_price.value())
@@ -326,7 +340,10 @@ class UpdateSODialog(QtWidgets.QDialog):
 
     def _load(self):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM sales_order WHERE id = %s", (self._so_id,)).fetchone()
+        rec = conn.execute(
+    "SELECT * FROM sales_order WHERE id = %s",
+    (self._so_id,
+    )).fetchone()
         conn.close()
         if not rec:
             return
@@ -335,15 +352,21 @@ class UpdateSODialog(QtWidgets.QDialog):
                 self.customer_combo.setCurrentIndex(i)
                 break
         if rec["order_date"]:
-            self.order_date.setDate(QtCore.QDate.fromString(rec["order_date"], "yyyy-MM-dd"))
+            self.order_date.setDate(
+    QtCore.QDate.fromString(
+        rec["order_date"],
+         "yyyy-MM-dd"))
         if rec["ship_date"]:
-            self.ship_date.setDate(QtCore.QDate.fromString(rec["ship_date"], "yyyy-MM-dd"))
+            self.ship_date.setDate(
+    QtCore.QDate.fromString(
+        rec["ship_date"], "yyyy-MM-dd"))
         self.notes.setText(rec["notes"] or "")
 
     def _on_ok(self):
         conn = get_db()
         conn.execute(
-            "UPDATE sales_order SET customer_id=%s, order_date=%s, ship_date=%s, notes=%s"
+            "UPDATE sales_order SET customer_id=%s, order_date=%s, "
+            "ship_date=%s, notes=%s"
             " WHERE id=%s",
             (self.customer_combo.currentData(),
              self.order_date.date().toString("yyyy-MM-dd"),
@@ -355,7 +378,7 @@ class UpdateSODialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class SalesOrdersWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -404,7 +427,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_orders)
@@ -432,21 +456,32 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         self.so_table = QtWidgets.QTableWidget()
         self.so_table.setColumnCount(8)
         self.so_table.setHorizontalHeaderLabels(
-            ["SO #", "Customer", "Order Date", "Ship Date", "Items", "Total", "Status", "Notes"]
+            ["SO #", "Customer", "Order Date", "Ship Date",
+                "Items", "Total", "Status", "Notes"]
         )
         hh = self.so_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.so_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.so_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.so_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.so_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.so_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.so_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.so_table.setAlternatingRowColors(True)
         self.so_table.verticalHeader().setVisible(False)
         self.so_table.clicked.connect(self._on_order_clicked)
@@ -461,14 +496,19 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         dv.addWidget(dlbl)
         self.item_table = QtWidgets.QTableWidget()
         self.item_table.setColumnCount(4)
-        self.item_table.setHorizontalHeaderLabels(["Description", "Product", "Qty", "Unit Price"])
+        self.item_table.setHorizontalHeaderLabels(
+            ["Description", "Product", "Qty", "Unit Price"])
         ih = self.item_table.horizontalHeader()
         ih.setStyleSheet("color: black; font-weight: bold;")
         ih.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        ih.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.item_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        ih.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.item_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.item_table.verticalHeader().setVisible(False)
         self.item_table.setAlternatingRowColors(True)
         dv.addWidget(self.item_table)
@@ -481,10 +521,14 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             ("New Order",      self._on_new_order),
             ("Add Item",       self._on_add_item),
             ("Update Order",   self._on_update_order),
-            ("Confirm",        lambda: self._set_status("confirmed",  "Confirm this order?")),
-            ("Mark Shipped",   lambda: self._set_status("shipped",    "Mark as Shipped?")),
-            ("Mark Invoiced",  lambda: self._set_status("invoiced",   "Mark as Invoiced?")),
-            ("Cancel",         lambda: self._set_status("cancelled",  "Cancel this order?")),
+            ("Confirm",        lambda: self._set_status(
+                "confirmed",  "Confirm this order?")),
+            ("Mark Shipped",   lambda: self._set_status(
+                "shipped",    "Mark as Shipped?")),
+            ("Mark Invoiced",  lambda: self._set_status(
+                "invoiced",   "Mark as Invoiced?")),
+            ("Cancel",         lambda: self._set_status(
+                "cancelled",  "Cancel this order?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -517,13 +561,16 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         if customer_id:
             conds.append("so.customer_id = %s")
             params.append(customer_id)
-        conds.append("(so.order_date IS NULL OR so.order_date BETWEEN %s AND %s)")
+        conds.append(
+            "(so.order_date IS NULL OR so.order_date BETWEEN %s AND %s)")
         params += [d_from, d_to]
         where = " WHERE " + " AND ".join(conds)
 
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY so.order_date DESC", params).fetchall()
+            rows = conn.execute(
+    base + where + " ORDER BY so.order_date DESC",
+     params).fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -535,7 +582,9 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             self.so_table.insertRow(r)
             self._so_row_ids.append(row["id"])
             company = row["company_name"] or ""
-            name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+            name = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
             customer_display = company if company else name
             self.so_table.setItem(r, 0, _ro(row["so_number"]))
             self.so_table.setItem(r, 1, _ro(customer_display))
@@ -603,16 +652,21 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
     def _on_add_item(self):
         if self._selected_so_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an order first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an order first.")
             return
-        dlg = AddSOItemDialog(self._selected_so_id, self._selected_so_number, self)
+        dlg = AddSOItemDialog(
+    self._selected_so_id,
+    self._selected_so_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_orders()
             self._refresh_items()
 
     def _on_update_order(self):
         if self._selected_so_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an order first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an order first.")
             return
         dlg = UpdateSODialog(self._selected_so_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -620,11 +674,12 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
     def _set_status(self, new_status, msg):
         if self._selected_so_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an order first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an order first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

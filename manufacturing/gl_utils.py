@@ -26,7 +26,8 @@ def _conn():
     return c
 
 
-def post_gl_entry(journal_date, reference, description, lines, created_by="System"):
+def post_gl_entry(journal_date, reference, description,
+                  lines, created_by="System"):
     """
     Create a draft GL journal entry and return its ID, or None if an
     account number could not be resolved against the chart of accounts.
@@ -44,20 +45,24 @@ def post_gl_entry(journal_date, reference, description, lines, created_by="Syste
             resolved = []
             for acct_num, debit, credit, memo in lines:
                 row = con.execute(
-                    "SELECT id FROM gl_account WHERE account_number=%s", (acct_num,)
+                    "SELECT id FROM gl_account WHERE account_number=%s", (
+                        acct_num,)
                 ).fetchone()
                 if not row:
                     return None
-                resolved.append((row["id"], float(debit), float(credit), str(memo)))
+                resolved.append(
+    (row["id"], float(debit), float(credit), str(memo)))
 
             cur = con.execute(
-                "INSERT INTO gl_journal(journal_date, reference, description, posted, created_by) "
+                "INSERT INTO gl_journal(journal_date, reference, description, "
+                "posted, created_by) "
                 "VALUES(%s,%s,%s,0,%s) RETURNING id",
                 (journal_date, reference, description, created_by),
             )
             jid = cur.fetchone()['id']
             con.executemany(
-                "INSERT INTO gl_journal_line(journal_id, account_id, debit, credit, memo) "
+                "INSERT INTO gl_journal_line(journal_id, account_id, debit, "
+                "credit, memo) "
                 "VALUES(%s,%s,%s,%s,%s)",
                 [(jid, aid, dr, cr, m) for aid, dr, cr, m in resolved],
             )
@@ -67,7 +72,7 @@ def post_gl_entry(journal_date, reference, description, lines, created_by="Syste
 
 
 def gl_accounts_by_type(*types):
-    """Return list of (account_number, account_name) for the given account types."""
+    """Return list of (account_number, account_name) for the given account types."""  # noqa: E501
     placeholders = ",".join("%s" for _ in types)
     with _conn() as con:
         rows = con.execute(

@@ -5,12 +5,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -83,7 +89,8 @@ def _next_wo_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM work_order WHERE wo_number LIKE ?", (f"WO-{yr}-%",)
+        "SELECT COUNT(*) FROM work_order WHERE wo_number LIKE ?", (
+            f"WO-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"WO-{yr}-{count + 1:04d}"
@@ -105,7 +112,7 @@ def _load_products(combo, include_none=True):
         combo.addItem(p["product_name"], p["id"])
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewWODialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -131,7 +138,8 @@ class NewWODialog(QtWidgets.QDialog):
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
-        self.product_combo.currentIndexChanged.connect(self._on_product_changed)
+        self.product_combo.currentIndexChanged.connect(
+            self._on_product_changed)
         _load_products(self.product_combo, include_none=True)
         layout.addRow(lbl("Finished Good:"), self.product_combo)
 
@@ -151,7 +159,8 @@ class NewWODialog(QtWidgets.QDialog):
         self.start_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Start Date:"), self.start_date)
 
-        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(7))
+        self.due_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(7))
         self.due_date.setCalendarPopup(True)
         self.due_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Due Date:"), self.due_date)
@@ -177,13 +186,16 @@ class NewWODialog(QtWidgets.QDialog):
     def _on_ok(self):
         wo_num = self.wo_num.text().strip()
         if not wo_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "WO number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "WO number is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO work_order (wo_number, product_id, description, quantity,"
-                " start_date, due_date, status, notes) VALUES (?,?,?,?,?,?,?,?)",
+                "INSERT INTO work_order (wo_number, product_id, description, "
+                "quantity,"
+                " start_date, due_date, status, notes) VALUES "
+                "(?,?,?,?,?,?,?,?)",
                 (wo_num, self.product_combo.currentData(),
                  self.desc.text().strip(), self.qty.value(),
                  self.start_date.date().toString("yyyy-MM-dd"),
@@ -193,7 +205,8 @@ class NewWODialog(QtWidgets.QDialog):
             self.wo_id = cur.lastrowid
             conn.commit()
         except psycopg2.IntegrityError:
-            QtWidgets.QMessageBox.warning(self, "Duplicate", f"WO number '{wo_num}' already exists.")
+            QtWidgets.QMessageBox.warning(
+    self, "Duplicate", f"WO number '{wo_num}' already exists.")
             conn.close()
             return
         conn.close()
@@ -245,12 +258,14 @@ class AddMaterialDialog(QtWidgets.QDialog):
     def _on_ok(self):
         prod_id = self.product_combo.currentData()
         if prod_id is None:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Select a component product.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Select a component product.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO wo_material (wo_id, product_id, qty_required, notes) VALUES (?,?,?,?)",
-            (self._wo_id, prod_id, self.qty_req.value(), self.notes.text().strip())
+            "INSERT INTO wo_material (wo_id, product_id, qty_required, notes) "
+            "VALUES (?,?,?,?)",
+            (self._wo_id, prod_id, self.qty_req.value(), self.notes.text().strip())  # noqa: E501
         )
         conn.commit()
         conn.close()
@@ -272,18 +287,21 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
 
     def _build_ui(self):
         layout = QtWidgets.QVBoxLayout(self)
-        info = QtWidgets.QLabel("Specify qty to issue from stock for each material:")
+        info = QtWidgets.QLabel(
+            "Specify qty to issue from stock for each material:")
         info.setStyleSheet(LABEL_STYLE)
         layout.addWidget(info)
 
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["Component", "Qty Required", "Qty Issued", "Issue Now"])
+        self.table.setHorizontalHeaderLabels(
+            ["Component", "Qty Required", "Qty Issued", "Issue Now"])
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (1, 2, 3):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.table.verticalHeader().setVisible(False)
         layout.addWidget(self.table)
 
@@ -333,23 +351,28 @@ class IssueMaterialsDialog(QtWidgets.QDialog):
             self.accept()
             return
         conn = get_db()
-        for mat_id, prod_id, spin in zip(self._mat_ids, self._prod_ids, self._spinboxes):
+        for mat_id, prod_id, spin in zip(
+            self._mat_ids, self._prod_ids, self._spinboxes):
             qty = spin.value()
             if qty <= 0:
                 continue
             conn.execute(
-                "UPDATE wo_material SET qty_issued = qty_issued + ? WHERE id = ?", (qty, mat_id)
+                "UPDATE wo_material SET qty_issued = qty_issued + ? WHERE id "
+                "= ?", (
+                    qty, mat_id)
             )
             conn.execute(
-                "UPDATE product SET amount = amount - ? WHERE id = ?", (qty, prod_id)
+                "UPDATE product SET amount = amount - ? WHERE id = ?", (qty,
+                                                                        prod_id)  # noqa: E501
             )
             try:
                 conn.execute(
-                    "INSERT INTO inventory_transaction (product_id, trans_date, trans_type, quantity, reference)"
+                    "INSERT INTO inventory_transaction (product_id, "
+                    "trans_date, trans_type, quantity, reference)"
                     " VALUES (?,?,?,?,?)",
-                    (prod_id, QtCore.QDate.currentDate().toString("yyyy-MM-dd"),
+                    (prod_id, QtCore.QDate.currentDate().toString("yyyy-MM-dd"),  # noqa: E501
                      "issue", -qty,
-                     conn.execute("SELECT wo_number FROM work_order WHERE id=?",
+                     conn.execute("SELECT wo_number FROM work_order WHERE id=?",  # noqa: E501
                                   (self._wo_id,)).fetchone()["wo_number"])
                 )
             except psycopg2.OperationalError:
@@ -414,22 +437,26 @@ class AddBOMItemDialog(QtWidgets.QDialog):
         prod_id = self.finished_combo.currentData()
         comp_id = self.component_combo.currentData()
         if prod_id is None or comp_id is None:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Select both products.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Select both products.")
             return
         if prod_id == comp_id:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Finished good and component must differ.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Finished good and component must differ.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO bom (product_id, component_id, qty_required, unit, notes) VALUES (?,?,?,?,?)",
-            (prod_id, comp_id, self.qty_req.value(), self.unit.text().strip(), self.notes.text().strip())
+            "INSERT INTO bom (product_id, component_id, qty_required, unit, "
+            "notes) VALUES (?,?,?,?,?)",
+            (prod_id, comp_id, self.qty_req.value(),
+             self.unit.text().strip(), self.notes.text().strip())
         )
         conn.commit()
         conn.close()
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class WorkOrders(QtWidgets.QMainWindow):
     def __init__(self):
@@ -450,7 +477,8 @@ class WorkOrders(QtWidgets.QMainWindow):
     def _build_ui(self):
         self._tabs = QtWidgets.QTabWidget()
         self._tabs.setStyleSheet(
-            "QTabBar::tab{background:white; border:1px solid black; padding:4px 10px;}"
+            "QTabBar::tab{background:white; border:1px solid black; "
+            "padding:4px 10px;}"
             "QTabBar::tab:selected{background:rgb(85,255,255);}"
         )
         self._tabs.currentChanged.connect(self._on_tab_changed)
@@ -480,7 +508,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         self.wo_status_filter = QtWidgets.QComboBox()
         self.wo_status_filter.setStyleSheet(COMBO_STYLE)
         self.wo_status_filter.addItem("(all)", None)
-        for s in ("planned", "in_progress", "completed", "on_hold", "cancelled"):
+        for s in ("planned", "in_progress",
+                  "completed", "on_hold", "cancelled"):
             self.wo_status_filter.addItem(s.replace("_", " ").capitalize(), s)
         self.wo_status_filter.currentIndexChanged.connect(self._refresh_wo)
         fr.addWidget(self.wo_status_filter)
@@ -512,17 +541,23 @@ class WorkOrders(QtWidgets.QMainWindow):
         self.wo_table = QtWidgets.QTableWidget()
         self.wo_table.setColumnCount(7)
         self.wo_table.setHorizontalHeaderLabels(
-            ["WO #", "Description", "Product", "Qty", "Start Date", "Due Date", "Status"]
+            ["WO #", "Description", "Product", "Qty",
+                "Start Date", "Due Date", "Status"]
         )
         hh = self.wo_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.wo_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.wo_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.wo_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.wo_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.wo_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.wo_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.wo_table.setAlternatingRowColors(True)
         self.wo_table.verticalHeader().setVisible(False)
         self.wo_table.clicked.connect(self._on_wo_clicked)
@@ -537,13 +572,16 @@ class WorkOrders(QtWidgets.QMainWindow):
         dv.addWidget(dlbl)
         self.mat_table = QtWidgets.QTableWidget()
         self.mat_table.setColumnCount(4)
-        self.mat_table.setHorizontalHeaderLabels(["Component", "Qty Required", "Qty Issued", "Remaining"])
+        self.mat_table.setHorizontalHeaderLabels(
+            ["Component", "Qty Required", "Qty Issued", "Remaining"])
         mh = self.mat_table.horizontalHeader()
         mh.setStyleSheet("color: black; font-weight: bold;")
         mh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (1, 2, 3):
-            mh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.mat_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            mh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.mat_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.mat_table.verticalHeader().setVisible(False)
         self.mat_table.setAlternatingRowColors(True)
         dv.addWidget(self.mat_table)
@@ -556,10 +594,14 @@ class WorkOrders(QtWidgets.QMainWindow):
             ("New Work Order",   self._on_new_wo),
             ("Add Material",     self._on_add_material),
             ("Issue Materials",  self._on_issue_materials),
-            ("Start (In Progress)", lambda: self._set_wo_status("in_progress", "Mark as In Progress?")),
-            ("Complete",         lambda: self._set_wo_status("completed",   "Mark as Completed?")),
-            ("On Hold",          lambda: self._set_wo_status("on_hold",     "Put On Hold?")),
-            ("Cancel",           lambda: self._set_wo_status("cancelled",   "Cancel this work order?")),
+            ("Start (In Progress)", lambda: self._set_wo_status(
+                "in_progress", "Mark as In Progress?")),
+            ("Complete",         lambda: self._set_wo_status(
+                "completed",   "Mark as Completed?")),
+            ("On Hold",          lambda: self._set_wo_status(
+                "on_hold",     "Put On Hold?")),
+            ("Cancel",           lambda: self._set_wo_status(
+                "cancelled",   "Cancel this work order?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -589,7 +631,11 @@ class WorkOrders(QtWidgets.QMainWindow):
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY wo.due_date, wo.wo_number", params).fetchall()
+            rows = conn.execute(
+    base +
+    where +
+    " ORDER BY wo.due_date, wo.wo_number",
+     params).fetchall()
         except psycopg2.OperationalError:
             rows = conn.execute(
                 "SELECT id, wo_number, description, NULL AS product_name,"
@@ -610,7 +656,10 @@ class WorkOrders(QtWidgets.QMainWindow):
             self.wo_table.setItem(r, 3, _ro(str(row["quantity"])))
             self.wo_table.setItem(r, 4, _ro(row["start_date"] or ""))
             self.wo_table.setItem(r, 5, _ro(row["due_date"] or ""))
-            self.wo_table.setItem(r, 6, _ro(row["status"].replace("_", " ").capitalize()))
+            self.wo_table.setItem(
+    r, 6, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(WO_COLORS.get(row["status"], "#ffffff"))
             for col in range(7):
                 self.wo_table.item(r, col).setBackground(bg)
@@ -664,32 +713,44 @@ class WorkOrders(QtWidgets.QMainWindow):
 
     def _on_add_material(self):
         if self._selected_wo_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a work order first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a work order first.")
             return
-        dlg = AddMaterialDialog(self._selected_wo_id, self._selected_wo_number, self)
+        dlg = AddMaterialDialog(
+    self._selected_wo_id,
+    self._selected_wo_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_materials()
 
     def _on_issue_materials(self):
         if self._selected_wo_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a work order first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a work order first.")
             return
-        dlg = IssueMaterialsDialog(self._selected_wo_id, self._selected_wo_number, self)
+        dlg = IssueMaterialsDialog(
+    self._selected_wo_id,
+    self._selected_wo_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_wo()
             self._refresh_materials()
 
     def _set_wo_status(self, new_status, msg):
         if self._selected_wo_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a work order first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a work order first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE work_order SET status = ? WHERE id = ?", (new_status, self._selected_wo_id))
+            conn.execute(
+    "UPDATE work_order SET status = ? WHERE id = ?",
+    (new_status,
+     self._selected_wo_id))
             conn.commit()
             conn.close()
             self._refresh_wo()
@@ -722,13 +783,18 @@ class WorkOrders(QtWidgets.QMainWindow):
         )
         hh = self.bom_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.bom_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.bom_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.bom_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.bom_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.bom_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.bom_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.bom_table.setAlternatingRowColors(True)
         self.bom_table.verticalHeader().setVisible(False)
         v.addWidget(self.bom_table, stretch=1)
@@ -751,7 +817,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             prods = conn.execute(
-                "SELECT DISTINCT b.product_id, p.name AS product_name FROM bom b"
+                "SELECT DISTINCT b.product_id, p.name AS product_name FROM "
+                "bom b"
                 " JOIN product p ON p.id = b.product_id ORDER BY p.name"
             ).fetchall()
         except psycopg2.OperationalError:
@@ -782,10 +849,11 @@ class WorkOrders(QtWidgets.QMainWindow):
                 JOIN product c  ON c.id  = b.component_id
             """
             if prod_id:
-                rows = conn.execute(base + " WHERE b.product_id = ? ORDER BY fg.name, c.name",
+                rows = conn.execute(base + " WHERE b.product_id = ? ORDER BY fg.name, c.name",  # noqa: E501
                                     (prod_id,)).fetchall()
             else:
-                rows = conn.execute(base + " ORDER BY fg.name, c.name").fetchall()
+                rows = conn.execute(
+    base + " ORDER BY fg.name, c.name").fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -811,18 +879,20 @@ class WorkOrders(QtWidgets.QMainWindow):
     def _on_delete_bom(self):
         rows = self.bom_table.selectedItems()
         if not rows:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a BOM row first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a BOM row first.")
             return
         row = self.bom_table.currentRow()
         if row < 0 or row >= len(self._bom_row_ids):
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm Delete", "Delete this BOM item?",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("DELETE FROM bom WHERE id = ?", (self._bom_row_ids[row],))
+            conn.execute("DELETE FROM bom WHERE id = ?",
+                         (self._bom_row_ids[row],))
             conn.commit()
             conn.close()
             self._refresh_bom()

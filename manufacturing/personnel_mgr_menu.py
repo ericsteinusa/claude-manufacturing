@@ -6,8 +6,10 @@ from .personnel_crm import _apply_blue_palette
 from .Payroll_dept import PayrollDeptWidget
 
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -20,7 +22,10 @@ TAB_STYLE = (
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    subprocess.Popen([sys.executable,
+    "-m",
+    "manufacturing." + os.path.splitext(script)[0]],
+     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
@@ -64,10 +69,18 @@ class PersonnelMgrMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_launch_tab("personnel_crm.py", "Personnel CRM"), "Personnel CRM")
+        tabs.addTab(
+    _launch_tab(
+        "personnel_crm.py",
+        "Personnel CRM"),
+         "Personnel CRM")
         tabs.addTab(PayrollDeptWidget(), "Payroll")
         tabs.addTab(_launch_tab("dept_entry.py", "Dept Entry"), "Dept Entry")
-        tabs.addTab(_launch_tab("dept_sub_entry.py", "Dept Sub Entry"), "Dept Sub Entry")
+        tabs.addTab(
+    _launch_tab(
+        "dept_sub_entry.py",
+        "Dept Sub Entry"),
+         "Dept Sub Entry")
         v.addWidget(tabs)
 
 

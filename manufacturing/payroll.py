@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -108,7 +114,8 @@ def _next_run_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM payroll_run WHERE run_number LIKE %s", (f"PR-{yr}-%",)
+        "SELECT COUNT(*) FROM payroll_run WHERE run_number LIKE %s", (
+            f"PR-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"PR-{yr}-{count + 1:04d}"
@@ -136,7 +143,7 @@ def _load_deduction_types():
     return rows
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewRunDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -198,13 +205,16 @@ class NewRunDialog(QtWidgets.QDialog):
     def _on_ok(self):
         run_num = self.run_num.text().strip()
         if not run_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Run number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Run number is required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO payroll_run (run_number, pay_period_start, pay_period_end,"
-                " run_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
+                "INSERT INTO payroll_run (run_number, pay_period_start, "
+                "pay_period_end,"
+                " run_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) "
+                "RETURNING id",
                 (run_num,
                  self.period_start.date().toString("yyyy-MM-dd"),
                  self.period_end.date().toString("yyyy-MM-dd"),
@@ -216,7 +226,7 @@ class NewRunDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Run number '{run_num}' already exists.")
+                                          f"Run number '{run_num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -321,15 +331,18 @@ class AddEntryDialog(QtWidgets.QDialog):
 
     def _on_ok(self):
         if not self.emp_combo.count():
-            QtWidgets.QMessageBox.warning(self, "No Employees", "No employees available.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Employees", "No employees available.")
             return
         gross = self.hours.value() * self.rate.value()
         total_ded = sum(s.value() for s in self._ded_spins.values())
         net = gross - total_ded
         conn = get_db()
         cur = conn.execute(
-            "INSERT INTO payroll_entry (run_id, people_id, hours_worked, hourly_rate,"
-            " gross_pay, net_pay, notes) VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+            "INSERT INTO payroll_entry (run_id, people_id, hours_worked, "
+            "hourly_rate,"
+            " gross_pay, net_pay, notes) VALUES (%s,%s,%s,%s,%s,%s,%s) "
+            "RETURNING id",
             (self._run_id, self.emp_combo.currentData(),
              self.hours.value(), self.rate.value(),
              gross, net, self.notes.text().strip())
@@ -338,7 +351,8 @@ class AddEntryDialog(QtWidgets.QDialog):
         for dt_id, spin in self._ded_spins.items():
             if spin.value() > 0:
                 conn.execute(
-                    "INSERT INTO payroll_entry_deduction (entry_id, deduction_type_id, amount)"
+                    "INSERT INTO payroll_entry_deduction (entry_id, "
+                    "deduction_type_id, amount)"
                     " VALUES (%s,%s,%s)",
                     (entry_id, dt_id, spin.value())
                 )
@@ -362,8 +376,10 @@ class EntryDeductionsDialog(QtWidgets.QDialog):
         hh = tbl.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         tbl.verticalHeader().setVisible(False)
         tbl.setAlternatingRowColors(True)
         conn = get_db()
@@ -379,12 +395,13 @@ class EntryDeductionsDialog(QtWidgets.QDialog):
             tbl.setItem(r, 0, _ro(row["name"]))
             tbl.setItem(r, 1, _ro(f"${row['amount']:,.2f}"))
         vl.addWidget(tbl)
-        close = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Close)
+        close = QtWidgets.QDialogButtonBox(
+    QtWidgets.QDialogButtonBox.StandardButton.Close)
         close.rejected.connect(self.reject)
         vl.addWidget(close)
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class PayrollWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -422,7 +439,8 @@ class PayrollWidget(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_runs)
@@ -457,11 +475,15 @@ class PayrollWidget(QtWidgets.QWidget):
         hh = self.run_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         for i in range(7):
-            hh.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            hh.setSectionResizeMode(
+    i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.run_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.run_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.run_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.run_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.run_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.run_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.run_table.setAlternatingRowColors(True)
         self.run_table.verticalHeader().setVisible(False)
         self.run_table.clicked.connect(self._on_run_clicked)
@@ -484,10 +506,14 @@ class PayrollWidget(QtWidgets.QWidget):
         ih.setStyleSheet("color: black; font-weight: bold;")
         ih.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for i in range(1, 6):
-            ih.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.entry_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.entry_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.entry_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            ih.setSectionResizeMode(
+    i, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.entry_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.entry_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.entry_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.entry_table.verticalHeader().setVisible(False)
         self.entry_table.setAlternatingRowColors(True)
         self.entry_table.clicked.connect(self._on_entry_clicked)
@@ -501,9 +527,12 @@ class PayrollWidget(QtWidgets.QWidget):
             ("New Run",       self._on_new_run),
             ("Add Employee",  self._on_add_entry),
             ("View Deductions", self._on_view_deductions),
-            ("Processing",    lambda: self._set_status("processing", "Mark as Processing?")),
-            ("Complete",      lambda: self._set_status("completed",  "Mark run as Completed?")),
-            ("Cancel Run",    lambda: self._set_status("cancelled",  "Cancel this payroll run?")),
+            ("Processing",    lambda: self._set_status(
+                "processing", "Mark as Processing?")),
+            ("Complete",      lambda: self._set_status(
+                "completed",  "Mark run as Completed?")),
+            ("Cancel Run",    lambda: self._set_status(
+                "cancelled",  "Cancel this payroll run?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -613,9 +642,11 @@ class PayrollWidget(QtWidgets.QWidget):
             name = f"{entry['last_name']}, {entry['first_name']}"
             self.entry_table.setItem(r, 0, _ro(name))
             self.entry_table.setItem(r, 1, _ro(f"{entry['hours_worked']:.2f}"))
-            self.entry_table.setItem(r, 2, _ro(f"${entry['hourly_rate']:,.2f}"))
+            self.entry_table.setItem(
+                r, 2, _ro(f"${entry['hourly_rate']:,.2f}"))
             self.entry_table.setItem(r, 3, _ro(f"${entry['gross_pay']:,.2f}"))
-            self.entry_table.setItem(r, 4, _ro(f"${entry['total_deductions']:,.2f}"))
+            self.entry_table.setItem(
+                r, 4, _ro(f"${entry['total_deductions']:,.2f}"))
             self.entry_table.setItem(r, 5, _ro(f"${entry['net_pay']:,.2f}"))
 
     def _on_entry_clicked(self, index):
@@ -632,9 +663,13 @@ class PayrollWidget(QtWidgets.QWidget):
 
     def _on_add_entry(self):
         if self._selected_run_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a payroll run first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a payroll run first.")
             return
-        dlg = AddEntryDialog(self._selected_run_id, self._selected_run_number, self)
+        dlg = AddEntryDialog(
+    self._selected_run_id,
+    self._selected_run_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_runs()
             self._refresh_entries()
@@ -650,11 +685,12 @@ class PayrollWidget(QtWidgets.QWidget):
 
     def _set_status(self, new_status, msg):
         if self._selected_run_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a payroll run first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a payroll run first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

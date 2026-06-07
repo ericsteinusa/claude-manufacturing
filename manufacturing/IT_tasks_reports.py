@@ -10,7 +10,8 @@ from .IT_Tasks import _apply_blue_palette
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
@@ -34,7 +35,8 @@ def _conn():
 
 def _ro(text):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     return item
 
 
@@ -46,12 +48,13 @@ def _simple_table(headers, stretch_col=0):
         stretch_col, QtWidgets.QHeaderView.ResizeMode.Stretch)
     t.verticalHeader().setVisible(False)
     t.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-    t.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+    t.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
     t.setAlternatingRowColors(True)
     return t
 
 
-# ── Task Summary tab ──────────────────────────────────────────────────────────
+# ── Task Summary tab ────────────────────────────────────────────────────
 
 class _TaskSummaryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -83,10 +86,11 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
             v.addWidget(lbl)
             tbl = QtWidgets.QTableWidget(0, 2)
             tbl.setHorizontalHeaderLabels([label.split()[-1], "Count"])
-            tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+            tbl.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
             tbl.horizontalHeader().setStretchLastSection(True)
             tbl.verticalHeader().setVisible(False)
-            tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
             tbl.setFixedHeight(height)
             v.addWidget(tbl)
             setattr(self, attr, tbl)
@@ -102,10 +106,12 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             s_rows = conn.execute(
-                "SELECT status, COUNT(*) FROM it_task GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) FROM it_task GROUP BY status ORDER "
+                "BY status"
             ).fetchall()
             p_rows = conn.execute(
-                "SELECT priority, COUNT(*) FROM it_task GROUP BY priority ORDER BY priority"
+                "SELECT priority, COUNT(*) FROM it_task GROUP BY priority "
+                "ORDER BY priority"
             ).fetchall()
             t_rows = conn.execute(
                 "SELECT COALESCE(task_type,'(none)'), COUNT(*)"
@@ -120,11 +126,12 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
                           (self._type_tbl, t_rows)]:
             tbl.setRowCount(len(rows))
             for r, row in enumerate(rows):
-                tbl.setItem(r, 0, _ro(str(row[0]).replace("_", " ").capitalize()))
+                tbl.setItem(
+                    r, 0, _ro(str(row[0]).replace("_", " ").capitalize()))
                 tbl.setItem(r, 1, _ro(row[1]))
 
 
-# ── By Technician tab ─────────────────────────────────────────────────────────
+# ── By Technician tab ───────────────────────────────────────────────────
 
 class _ByTechnicianWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -144,7 +151,7 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         v.addWidget(hdr)
 
         self._table = _simple_table(
-            ["Assigned To", "Pending", "In Progress", "On Hold", "Completed", "Total"])
+            ["Assigned To", "Pending", "In Progress", "On Hold", "Completed", "Total"])  # noqa: E501
         self._table.horizontalHeader().setSectionResizeMode(
             0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         v.addWidget(self._table, stretch=1)
@@ -181,7 +188,7 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── By Department tab ─────────────────────────────────────────────────────────
+# ── By Department tab ───────────────────────────────────────────────────
 
 class _ByDepartmentWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -237,7 +244,7 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Overdue Tasks tab ─────────────────────────────────────────────────────────
+# ── Overdue Tasks tab ───────────────────────────────────────────────────
 
 class _OverdueWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -257,7 +264,14 @@ class _OverdueWidget(QtWidgets.QWidget):
         v.addWidget(hdr)
 
         self._table = _simple_table(
-            ["Task #", "Task Name", "Type", "Priority", "Assigned To", "Department", "Due Date", "Status"],
+            ["Task #",
+    "Task Name",
+    "Type",
+    "Priority",
+    "Assigned To",
+    "Department",
+    "Due Date",
+     "Status"],
             stretch_col=1)
         v.addWidget(self._table, stretch=1)
 
@@ -274,7 +288,8 @@ class _OverdueWidget(QtWidgets.QWidget):
                 "SELECT task_number, task_name, task_type, priority,"
                 " assigned_to, department, due_date, status"
                 " FROM it_task"
-                " WHERE due_date < %s AND status NOT IN ('completed','cancelled')"
+                " WHERE due_date < %s AND status NOT IN "
+                "('completed','cancelled')"
                 " ORDER BY due_date, priority DESC",
                 (TODAY,)
             ).fetchall()
@@ -291,7 +306,7 @@ class _OverdueWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Recently Completed tab ────────────────────────────────────────────────────
+# ── Recently Completed tab ──────────────────────────────────────────────
 
 class _RecentlyCompletedWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -311,7 +326,8 @@ class _RecentlyCompletedWidget(QtWidgets.QWidget):
         v.addWidget(hdr)
 
         self._table = _simple_table(
-            ["Task #", "Task Name", "Type", "Assigned To", "Department", "Completed Date"],
+            ["Task #", "Task Name", "Type", "Assigned To",
+                "Department", "Completed Date"],
             stretch_col=1)
         v.addWidget(self._table, stretch=1)
 
@@ -345,7 +361,7 @@ class _RecentlyCompletedWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Top-level widget ──────────────────────────────────────────────────────────
+# ── Top-level widget ────────────────────────────────────────────────────
 
 class ITTasksReportsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):

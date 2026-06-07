@@ -10,7 +10,8 @@ from .IT_Tasks import _apply_blue_palette
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 12px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
@@ -32,7 +33,8 @@ def _conn():
 
 def _ro(text):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     return item
 
 
@@ -43,7 +45,8 @@ def _summary_table(headers, rows):
     t.horizontalHeader().setStretchLastSection(True)
     t.verticalHeader().setVisible(False)
     t.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-    t.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+    t.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
     t.setAlternatingRowColors(True)
     for r, row in enumerate(rows):
         for c, val in enumerate(row):
@@ -52,7 +55,7 @@ def _summary_table(headers, rows):
     return t
 
 
-# ── Task Summary tab ──────────────────────────────────────────────────────────
+# ── Task Summary tab ────────────────────────────────────────────────────
 
 class _TaskSummaryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -76,10 +79,12 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl_s)
         self._status_table = QtWidgets.QTableWidget(0, 2)
         self._status_table.setHorizontalHeaderLabels(["Status", "Count"])
-        self._status_table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._status_table.horizontalHeader().setStyleSheet(
+            "color:black;font-weight:bold;")
         self._status_table.horizontalHeader().setStretchLastSection(True)
         self._status_table.verticalHeader().setVisible(False)
-        self._status_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._status_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._status_table.setFixedHeight(160)
         v.addWidget(self._status_table)
 
@@ -88,10 +93,11 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl_p)
         self._pri_table = QtWidgets.QTableWidget(0, 2)
         self._pri_table.setHorizontalHeaderLabels(["Priority", "Count"])
-        self._pri_table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._pri_table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._pri_table.horizontalHeader().setStretchLastSection(True)
         self._pri_table.verticalHeader().setVisible(False)
-        self._pri_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._pri_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._pri_table.setFixedHeight(130)
         v.addWidget(self._pri_table)
 
@@ -106,7 +112,8 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             status_rows = conn.execute(
-                "SELECT status, COUNT(*) AS cnt FROM it_task GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) AS cnt FROM it_task GROUP BY status "
+                "ORDER BY status"
             ).fetchall()
             pri_rows = conn.execute(
                 "SELECT priority, COUNT(*) AS cnt FROM it_task"
@@ -119,7 +126,10 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
 
         self._status_table.setRowCount(len(status_rows))
         for r, row in enumerate(status_rows):
-            self._status_table.setItem(r, 0, _ro(row[0].replace("_", " ").capitalize()))
+            self._status_table.setItem(
+    r, 0, _ro(
+        row[0].replace(
+            "_", " ").capitalize()))
             self._status_table.setItem(r, 1, _ro(row[1]))
 
         self._pri_table.setRowCount(len(pri_rows))
@@ -128,7 +138,7 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
             self._pri_table.setItem(r, 1, _ro(row[1]))
 
 
-# ── Ticket Summary tab ────────────────────────────────────────────────────────
+# ── Ticket Summary tab ──────────────────────────────────────────────────
 
 class _TicketSummaryWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -152,10 +162,12 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl_s)
         self._status_table = QtWidgets.QTableWidget(0, 2)
         self._status_table.setHorizontalHeaderLabels(["Status", "Count"])
-        self._status_table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._status_table.horizontalHeader().setStyleSheet(
+            "color:black;font-weight:bold;")
         self._status_table.horizontalHeader().setStretchLastSection(True)
         self._status_table.verticalHeader().setVisible(False)
-        self._status_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._status_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._status_table.setFixedHeight(160)
         v.addWidget(self._status_table)
 
@@ -164,10 +176,11 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         v.addWidget(lbl_p)
         self._pri_table = QtWidgets.QTableWidget(0, 2)
         self._pri_table.setHorizontalHeaderLabels(["Priority", "Count"])
-        self._pri_table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+        self._pri_table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._pri_table.horizontalHeader().setStretchLastSection(True)
         self._pri_table.verticalHeader().setVisible(False)
-        self._pri_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._pri_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self._pri_table.setFixedHeight(130)
         v.addWidget(self._pri_table)
 
@@ -182,7 +195,8 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             status_rows = conn.execute(
-                "SELECT status, COUNT(*) AS cnt FROM it_ticket GROUP BY status ORDER BY status"
+                "SELECT status, COUNT(*) AS cnt FROM it_ticket GROUP BY "
+                "status ORDER BY status"
             ).fetchall()
             pri_rows = conn.execute(
                 "SELECT priority, COUNT(*) AS cnt FROM it_ticket"
@@ -195,7 +209,10 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
 
         self._status_table.setRowCount(len(status_rows))
         for r, row in enumerate(status_rows):
-            self._status_table.setItem(r, 0, _ro(row[0].replace("_", " ").capitalize()))
+            self._status_table.setItem(
+    r, 0, _ro(
+        row[0].replace(
+            "_", " ").capitalize()))
             self._status_table.setItem(r, 1, _ro(row[1]))
 
         self._pri_table.setRowCount(len(pri_rows))
@@ -204,7 +221,7 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
             self._pri_table.setItem(r, 1, _ro(row[1]))
 
 
-# ── Overdue Tasks tab ─────────────────────────────────────────────────────────
+# ── Overdue Tasks tab ───────────────────────────────────────────────────
 
 class _OverdueTasksWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -225,14 +242,16 @@ class _OverdueTasksWidget(QtWidgets.QWidget):
 
         self._table = QtWidgets.QTableWidget(0, 6)
         self._table.setHorizontalHeaderLabels(
-            ["Task #", "Task Name", "Priority", "Assigned To", "Due Date", "Status"])
-        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+            ["Task #", "Task Name", "Priority", "Assigned To", "Due Date", "Status"])  # noqa: E501
+        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._table.horizontalHeader().setStretchLastSection(True)
         self._table.horizontalHeader().setSectionResizeMode(
             1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self._table.verticalHeader().setVisible(False)
-        self._table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setAlternatingRowColors(True)
         v.addWidget(self._table, stretch=1)
 
@@ -246,9 +265,11 @@ class _OverdueTasksWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             rows = conn.execute(
-                "SELECT task_number, task_name, priority, assigned_to, due_date, status"
+                "SELECT task_number, task_name, priority, assigned_to, "
+                "due_date, status"
                 " FROM it_task"
-                " WHERE due_date < %s AND status NOT IN ('completed','cancelled')"
+                " WHERE due_date < %s AND status NOT IN "
+                "('completed','cancelled')"
                 " ORDER BY due_date",
                 (TODAY,)
             ).fetchall()
@@ -265,7 +286,7 @@ class _OverdueTasksWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Overdue Tickets tab ───────────────────────────────────────────────────────
+# ── Overdue Tickets tab ─────────────────────────────────────────────────
 
 class _OverdueTicketsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -286,12 +307,14 @@ class _OverdueTicketsWidget(QtWidgets.QWidget):
 
         self._table = QtWidgets.QTableWidget(0, 6)
         self._table.setHorizontalHeaderLabels(
-            ["Ticket #", "Requester", "Department", "Priority", "Due Date", "Status"])
-        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")
+            ["Ticket #", "Requester", "Department", "Priority", "Due Date", "Status"])  # noqa: E501
+        self._table.horizontalHeader().setStyleSheet("color:black;font-weight:bold;")  # noqa: E501
         self._table.horizontalHeader().setStretchLastSection(True)
         self._table.verticalHeader().setVisible(False)
-        self._table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setAlternatingRowColors(True)
         v.addWidget(self._table, stretch=1)
 
@@ -305,7 +328,8 @@ class _OverdueTicketsWidget(QtWidgets.QWidget):
         try:
             conn = _conn()
             rows = conn.execute(
-                "SELECT ticket_number, requester, department, priority, due_date, status"
+                "SELECT ticket_number, requester, department, priority, "
+                "due_date, status"
                 " FROM it_ticket"
                 " WHERE due_date < %s AND status NOT IN ('resolved','closed')"
                 " ORDER BY due_date",
@@ -324,7 +348,7 @@ class _OverdueTicketsWidget(QtWidgets.QWidget):
         self._table.resizeColumnsToContents()
 
 
-# ── Top-level widget ──────────────────────────────────────────────────────────
+# ── Top-level widget ────────────────────────────────────────────────────
 
 class ITTechReportsWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):

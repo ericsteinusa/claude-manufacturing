@@ -5,15 +5,24 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
-TEXT_STYLE = "QPlainTextEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+TEXT_STYLE = (
+    "QPlainTextEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 LABEL_STYLE = "color: white; font-size: 13px;"
 
 TASK_COLORS = {
@@ -81,7 +90,8 @@ def _next_task_num():
     conn = get_db()
     try:
         count = conn.execute(
-            "SELECT COUNT(*) FROM it_task WHERE task_number LIKE %s", (f"TASK-{yr}-%",)
+            "SELECT COUNT(*) FROM it_task WHERE task_number LIKE %s", (
+                f"TASK-{yr}-%",)
         ).fetchone()[0]
     except psycopg2.OperationalError:
         count = 0
@@ -89,7 +99,7 @@ def _next_task_num():
     return f"TASK-{yr}-{count + 1:04d}"
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewTaskDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -152,7 +162,8 @@ class NewTaskDialog(QtWidgets.QDialog):
         self.scheduled_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Scheduled:"), self.scheduled_date)
 
-        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(7))
+        self.due_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(7))
         self.due_date.setCalendarPopup(True)
         self.due_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Due Date:"), self.due_date)
@@ -174,13 +185,16 @@ class NewTaskDialog(QtWidgets.QDialog):
         name = self.task_name.text().strip()
         if not num or not name:
             QtWidgets.QMessageBox.warning(self, "Input Error",
-                                          "Task number and task name are required.")
+                                          "Task number and task name are "
+                                          "required.")
             return
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO it_task (task_number, task_name, task_type, description,"
-                " priority, assigned_to, department, scheduled_date, due_date, notes)"
+                "INSERT INTO it_task (task_number, task_name, task_type, "
+                "description,"
+                " priority, assigned_to, department, scheduled_date, "
+                "due_date, notes)"
                 " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, name, self.task_type.currentData(),
                  self.description.toPlainText().strip(),
@@ -195,14 +209,14 @@ class NewTaskDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Task number '{num}' already exists.")
+                                          f"Task number '{num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class ITTasksWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -290,13 +304,18 @@ class ITTasksWidget(QtWidgets.QWidget):
         )
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for col in (2, 3, 4, 5, 6, 7):
-            hh.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.table.setAlternatingRowColors(True)
         self.table.verticalHeader().setVisible(False)
         self.table.clicked.connect(self._on_row_clicked)
@@ -312,7 +331,7 @@ class ITTasksWidget(QtWidgets.QWidget):
         self.detail_text = QtWidgets.QPlainTextEdit()
         self.detail_text.setReadOnly(True)
         self.detail_text.setStyleSheet(
-            "QPlainTextEdit{background-color: white; border: 1px solid black;}")
+            "QPlainTextEdit{background-color: white; border: 1px solid black;}")  # noqa: E501
         dv.addWidget(self.detail_text)
         splitter.addWidget(detail_w)
         splitter.setSizes([440, 160])
@@ -322,10 +341,14 @@ class ITTasksWidget(QtWidgets.QWidget):
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Task", self._on_new_task),
-            ("Start Task", lambda: self._set_status("in_progress", "Mark as In Progress%s")),
-            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On Hold%s")),
-            ("Mark Complete", lambda: self._set_status("completed", "Mark as Completed%s")),
-            ("Cancel Task", lambda: self._set_status("cancelled", "Cancel this task%s")),
+            ("Start Task", lambda: self._set_status(
+                "in_progress", "Mark as In Progress%s")),
+            ("Mark On Hold", lambda: self._set_status("on_hold", "Put On "
+                                                                 "Hold%s")),
+            ("Mark Complete", lambda: self._set_status(
+                "completed", "Mark as Completed%s")),
+            ("Cancel Task", lambda: self._set_status(
+                "cancelled", "Cancel this task%s")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -355,7 +378,7 @@ class ITTasksWidget(QtWidgets.QWidget):
             conds.append("task_type = %s")
             params.append(task_type)
         if term:
-            conds.append("(task_number LIKE %s OR task_name LIKE %s OR assigned_to LIKE %s"
+            conds.append("(task_number LIKE %s OR task_name LIKE %s OR assigned_to LIKE %s"  # noqa: E501
                          " OR description LIKE %s)")
             params += [f"%{term}%"] * 4
         where = (" WHERE " + " AND ".join(conds)) if conds else ""
@@ -382,7 +405,10 @@ class ITTasksWidget(QtWidgets.QWidget):
             self.table.setItem(r, 4, _ro(row["assigned_to"] or ""))
             self.table.setItem(r, 5, _ro(row["department"] or ""))
             self.table.setItem(r, 6, _ro(row["due_date"] or ""))
-            self.table.setItem(r, 7, _ro(row["status"].replace("_", " ").capitalize()))
+            self.table.setItem(
+    r, 7, _ro(
+        row["status"].replace(
+            "_", " ").capitalize()))
             bg = QtGui.QColor(TASK_COLORS.get(row["status"], "#ffffff"))
             for col in range(8):
                 self.table.item(r, col).setBackground(bg)
@@ -419,9 +445,15 @@ class ITTasksWidget(QtWidgets.QWidget):
             return
         lines = [
             f"Task:        {rec['task_number']}  —  {rec['task_name']}",
-            f"Type:        {rec['task_type'] or '—'}  |  Priority: {rec['priority'].capitalize()}",
-            f"Assigned To: {rec['assigned_to'] or '—'}  |  Dept: {rec['department'] or '—'}",
-            f"Scheduled:   {rec['scheduled_date'] or '—'}  |  Due: {rec['due_date'] or '—'}",
+            f"Type:        {
+    rec['task_type'] or '—'}  |  Priority: {
+        rec['priority'].capitalize()}",
+            f"Assigned To: {
+    rec['assigned_to'] or '—'}  |  Dept: {
+        rec['department'] or '—'}",
+            f"Scheduled:   {
+    rec['scheduled_date'] or '—'}  |  Due: {
+        rec['due_date'] or '—'}",
         ]
         if rec["completed_date"]:
             lines.append(f"Completed:   {rec['completed_date']}")
@@ -438,11 +470,12 @@ class ITTasksWidget(QtWidgets.QWidget):
 
     def _set_status(self, new_status, msg):
         if self._selected_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a task first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a task first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
@@ -450,9 +483,12 @@ class ITTasksWidget(QtWidgets.QWidget):
             params = [new_status]
             if new_status == "completed":
                 extra = ", completed_date = %s"
-                params.append(QtCore.QDate.currentDate().toString("yyyy-MM-dd"))
+                params.append(
+    QtCore.QDate.currentDate().toString("yyyy-MM-dd"))
             params.append(self._selected_id)
-            conn.execute(f"UPDATE it_task SET status = %s{extra} WHERE id = %s", params)
+            conn.execute(
+    f"UPDATE it_task SET status = %s{extra} WHERE id = %s",
+     params)
             conn.commit()
             conn.close()
             self._refresh()

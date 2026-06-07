@@ -17,9 +17,9 @@ def _conn():
     return get_db()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Schema
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 def init_db():
     with _conn() as con:
         con.executescript("""
@@ -104,53 +104,58 @@ def _seed(con):
     today = date.today().isoformat()
     if con.execute("SELECT COUNT(*) FROM risk_assessment").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO risk_assessment (title,category,likelihood,impact,risk_level,owner,assessed_date,status) "
+            "INSERT INTO risk_assessment (title,category,likelihood,impact,risk_level,owner,assessed_date,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("Supply chain disruption", "Operational", "Possible", "Major", "High",
+            ("Supply chain disruption", "Operational", "Possible", "Major", "High",  # noqa: E501
              "Risk Manager", today, "Assessed"))
     if con.execute("SELECT COUNT(*) FROM risk_register").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO risk_register (risk,category,severity,response,owner,target_date,status,mitigation) "
+            "INSERT INTO risk_register (risk,category,severity,response,owner,target_date,status,mitigation) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("Single-source supplier dependency", "Operational", "High", "Mitigate",
-             "Procurement", "2026-09-30", "In Progress", "Qualify a secondary supplier."))
+            ("Single-source supplier dependency", "Operational", "High", "Mitigate",  # noqa: E501
+             "Procurement", "2026-09-30", "In Progress", "Qualify a secondary "
+                                                         "supplier."))
     if con.execute("SELECT COUNT(*) FROM risk_insurance").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO risk_insurance (policy,insurer,policy_type,coverage,premium,start_date,end_date,status) "
+            "INSERT INTO risk_insurance (policy,insurer,policy_type,coverage,premium,start_date,end_date,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            ("General Liability 2026", "Atlas Mutual", "Liability", 5000000, 48000,
+            ("General Liability 2026", "Atlas Mutual", "Liability", 5000000, 48000,  # noqa: E501
              today, "2027-05-31", "Active"))
     if con.execute("SELECT COUNT(*) FROM risk_continuity").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO risk_continuity (plan,scope,criticality,owner,last_tested,next_test,status) "
+            "INSERT INTO risk_continuity "
+            "(plan,scope,criticality,owner,last_tested,next_test,status) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            ("Plant outage recovery", "Production Line A", "High", "Operations",
+            ("Plant outage recovery", "Production Line A", "High", "Operations",  # noqa: E501
              "2026-01-15", "2026-07-15", "Active"))
     if con.execute("SELECT COUNT(*) FROM risk_audit").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO risk_audit (audit,framework,auditor,scheduled_date,status) "
+            "INSERT INTO risk_audit "
+            "(audit,framework,auditor,scheduled_date,status) "
             "VALUES (%s,%s,%s,%s,%s)",
-            ("Annual enterprise risk audit", "ISO 31000", "Internal Audit", "2026-08-01", "Scheduled"))
+            ("Annual enterprise risk audit", "ISO 31000", "Internal Audit", "2026-08-01", "Scheduled"))  # noqa: E501
     if con.execute("SELECT COUNT(*) FROM risk_kri").fetchone()[0] == 0:
         con.execute(
-            "INSERT INTO risk_kri (indicator,category,threshold,current_value,owner,measured_date,status) "
+            "INSERT INTO risk_kri (indicator,category,threshold,current_value,owner,measured_date,status) "  # noqa: E501
             "VALUES (%s,%s,%s,%s,%s,%s,%s)",
             ("Supplier on-time delivery", "Operational", "< 90%", "94%",
              "Procurement", today, "Normal"))
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared styling helpers
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 BTN_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 14px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 
 # Row tint keyed by common status words shared across the risk registers.
@@ -200,7 +205,8 @@ def _apply_blue_palette(widget):
 
 def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align | QtCore.Qt.AlignmentFlag.AlignVCenter)
     return item
 
@@ -220,9 +226,9 @@ def _money(v):
         return ""
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic record dialog — built from a list of field specs
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RecordDialog(QtWidgets.QDialog):
     """A form dialog generated from field specs.
 
@@ -247,8 +253,8 @@ class _RecordDialog(QtWidgets.QDialog):
                 self._set_value(f, w, row_data[f["key"]])
         v.addLayout(fl)
 
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
+                                        QtWidgets.QDialogButtonBox.StandardButton.Cancel)  # noqa: E501
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
@@ -312,15 +318,15 @@ class _RecordDialog(QtWidgets.QDialog):
         return out
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Generic register widget — one DB table, configured per subclass via SPEC
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _RiskCrudWidget(QtWidgets.QWidget):
     # Subclasses set SPEC = {
     #   'table', 'title', 'noun',
     #   'statuses': [...],
     #   'columns': [(field_key, header, width|None)],  # 'id' implied first
-    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update
+    #   'fields':  [ {key,label,kind,options?} ],       # dialog + insert/update  # noqa: E501
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
@@ -333,7 +339,7 @@ class _RiskCrudWidget(QtWidgets.QWidget):
         self._build_ui()
         self._refresh()
 
-    # ── UI ────────────────────────────────────────────────────────────────────
+    # ── UI ──────────────────────────────────────────────────────────────────
     def _build_ui(self):
         spec = self.SPEC
         root = QtWidgets.QVBoxLayout(self)
@@ -341,7 +347,8 @@ class _RiskCrudWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel(spec["title"])
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:22px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         fb = QtWidgets.QHBoxLayout()
@@ -368,8 +375,10 @@ class _RiskCrudWidget(QtWidgets.QWidget):
                     i, QtWidgets.QHeaderView.ResizeMode.Stretch)
             else:
                 self.tbl.setColumnWidth(i, width)
-        self.tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tbl.setAlternatingRowColors(True)
         self.tbl.verticalHeader().setDefaultSectionSize(24)
         self.tbl.itemDoubleClicked.connect(self._edit)
@@ -394,14 +403,15 @@ class _RiskCrudWidget(QtWidgets.QWidget):
         w.setLayout(layout)
         return w
 
-    # ── Data ────────────────────────────────────────────────────────────────────
+    # ── Data ────────────────────────────────────────────────────────────────
     def _money_keys(self):
         return {f["key"] for f in self.SPEC["fields"] if f["kind"] == "money"}
 
     def _refresh(self, *_):
         spec = self.SPEC
-        sf = self.status_filter.currentText() if hasattr(self, "status_filter") else "All Statuses"
-        term = self.search.text().strip().lower() if hasattr(self, "search") else ""
+        sf = self.status_filter.currentText() if hasattr(
+            self, "status_filter") else "All Statuses"
+        term = self.search.text().strip().lower() if hasattr(self, "search") else ""  # noqa: E501
         with _conn() as con:
             q = f"SELECT * FROM {spec['table']} WHERE 1=1"
             p = []
@@ -420,9 +430,14 @@ class _RiskCrudWidget(QtWidgets.QWidget):
             self.tbl.insertRow(r)
             for c, key in enumerate(self._col_keys):
                 if key == "id":
-                    self.tbl.setItem(r, c, _ro(row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        row["id"], QtCore.Qt.AlignmentFlag.AlignRight))
                 elif key in money_keys:
-                    self.tbl.setItem(r, c, _ro(_money(row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
+                    self.tbl.setItem(
+    r, c, _ro(
+        _money(
+            row[key]), QtCore.Qt.AlignmentFlag.AlignRight))
                 else:
                     self.tbl.setItem(r, c, _ro(row[key]))
             _color_row(self.tbl, r, STATUS_COLORS.get(row["status"]))
@@ -440,7 +455,7 @@ class _RiskCrudWidget(QtWidgets.QWidget):
             return None
         return int(self.tbl.item(self.tbl.currentRow(), 0).text())
 
-    # ── CRUD ────────────────────────────────────────────────────────────────────
+    # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
         dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
@@ -449,7 +464,9 @@ class _RiskCrudWidget(QtWidgets.QWidget):
         v = dlg.values()
         keys = [f["key"] for f in spec["fields"]]
         if not v[keys[0]]:
-            QtWidgets.QMessageBox.warning(self, "Required", f"{spec['fields'][0]['label']} is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Required", f"{
+        spec['fields'][0]['label']} is required.")
             return
         cols = ",".join(keys)
         ph = ",".join(["%s"] * len(keys))
@@ -464,10 +481,16 @@ class _RiskCrudWidget(QtWidgets.QWidget):
         if rid is None:
             return
         with _conn() as con:
-            rd = con.execute(f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()
+            rd = con.execute(
+                f"SELECT * FROM {spec['table']} WHERE id=%s", (rid,)).fetchone()  # noqa: E501
         if not rd:
             return
-        dlg = _RecordDialog(f"Edit {spec['noun']}", spec["fields"], self, row_data=rd)
+        dlg = _RecordDialog(
+    f"Edit {
+        spec['noun']}",
+        spec["fields"],
+        self,
+         row_data=rd)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -503,13 +526,16 @@ class _RiskCrudWidget(QtWidgets.QWidget):
             params.append(date.today().isoformat())
         params.append(rid)
         with _conn() as con:
-            con.execute(f"UPDATE {spec['table']} SET {sets} WHERE id=%s", params)
+            con.execute(
+    f"UPDATE {
+        spec['table']} SET {sets} WHERE id=%s",
+         params)
         self._refresh()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Vocabularies
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 RISK_CATEGORIES = ["Operational", "Financial", "Strategic", "Compliance",
                    "Hazard", "Reputational", "Cyber", "Supply Chain", "Other"]
 
@@ -517,7 +543,12 @@ LIKELIHOODS = ["Rare", "Unlikely", "Possible", "Likely", "Almost Certain"]
 IMPACTS = ["Insignificant", "Minor", "Moderate", "Major", "Severe"]
 RISK_LEVELS = ["Low", "Medium", "High", "Critical"]
 
-ASSESSMENT_STATUSES = ["Identified", "Assessed", "Mitigating", "Monitored", "Closed"]
+ASSESSMENT_STATUSES = [
+    "Identified",
+    "Assessed",
+    "Mitigating",
+    "Monitored",
+     "Closed"]
 
 RESPONSES = ["Avoid", "Mitigate", "Transfer", "Accept"]
 REGISTER_STATUSES = ["Open", "In Progress", "Mitigated", "Accepted", "Closed"]
@@ -526,17 +557,34 @@ INSURANCE_TYPES = ["Property", "Liability", "Workers Comp", "Product",
                    "Cyber", "D&O", "Auto", "Business Interruption", "Other"]
 INSURANCE_STATUSES = ["Active", "Pending", "Renewed", "Expired", "Cancelled"]
 
-CONTINUITY_STATUSES = ["Draft", "Active", "Under Review", "Needs Update", "Retired"]
+CONTINUITY_STATUSES = [
+    "Draft",
+    "Active",
+    "Under Review",
+    "Needs Update",
+     "Retired"]
 
-AUDIT_FRAMEWORKS = ["ISO 31000", "ISO 27001", "SOX", "OSHA", "NIST", "Internal", "Other"]
-AUDIT_STATUSES = ["Scheduled", "In Progress", "Complete", "Overdue", "Follow-up"]
+AUDIT_FRAMEWORKS = [
+    "ISO 31000",
+    "ISO 27001",
+    "SOX",
+    "OSHA",
+    "NIST",
+    "Internal",
+     "Other"]
+AUDIT_STATUSES = [
+    "Scheduled",
+    "In Progress",
+    "Complete",
+    "Overdue",
+     "Follow-up"]
 
 KRI_STATUSES = ["Normal", "Watch", "Warning", "Breach", "Resolved"]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete register widgets
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class RiskAssessmentWidget(_RiskCrudWidget):
     SPEC = {
         "table": "risk_assessment",
@@ -556,13 +604,20 @@ class RiskAssessmentWidget(_RiskCrudWidget):
         ],
         "fields": [
             {"key": "title", "label": "Risk", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": RISK_CATEGORIES, "editable": True},
-            {"key": "likelihood", "label": "Likelihood", "kind": "combo", "options": LIKELIHOODS},
-            {"key": "impact", "label": "Impact", "kind": "combo", "options": IMPACTS},
-            {"key": "risk_level", "label": "Risk Level", "kind": "combo", "options": RISK_LEVELS},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": RISK_CATEGORIES, "editable": True},
+            {"key": "likelihood", "label": "Likelihood",
+                "kind": "combo", "options": LIKELIHOODS},
+            {"key": "impact", "label": "Impact",
+                "kind": "combo", "options": IMPACTS},
+            {"key": "risk_level", "label": "Risk Level",
+                "kind": "combo", "options": RISK_LEVELS},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "assessed_date", "label": "Assessed Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": ASSESSMENT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": ASSESSMENT_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -587,12 +642,18 @@ class RiskRegisterWidget(_RiskCrudWidget):
         ],
         "fields": [
             {"key": "risk", "label": "Risk", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": RISK_CATEGORIES, "editable": True},
-            {"key": "severity", "label": "Severity", "kind": "combo", "options": RISK_LEVELS},
-            {"key": "response", "label": "Response", "kind": "combo", "options": RESPONSES},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": RISK_CATEGORIES, "editable": True},
+            {"key": "severity", "label": "Severity",
+                "kind": "combo", "options": RISK_LEVELS},
+            {"key": "response", "label": "Response",
+                "kind": "combo", "options": RESPONSES},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "target_date", "label": "Target Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": REGISTER_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": REGISTER_STATUSES},
             {"key": "mitigation", "label": "Mitigation", "kind": "memo"},
         ],
     }
@@ -618,12 +679,16 @@ class InsuranceWidget(_RiskCrudWidget):
         "fields": [
             {"key": "policy", "label": "Policy", "kind": "text"},
             {"key": "insurer", "label": "Insurer", "kind": "text"},
-            {"key": "policy_type", "label": "Type", "kind": "combo", "options": INSURANCE_TYPES, "editable": True},
+            {"key": "policy_type", "label": "Type", "kind": "combo",
+                "options": INSURANCE_TYPES, "editable": True},
             {"key": "coverage", "label": "Coverage", "kind": "money"},
             {"key": "premium", "label": "Premium", "kind": "money"},
             {"key": "start_date", "label": "Start Date", "kind": "date"},
             {"key": "end_date", "label": "End Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": INSURANCE_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": INSURANCE_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -636,7 +701,7 @@ class BusinessContinuityWidget(_RiskCrudWidget):
         "noun": "Plan",
         "statuses": CONTINUITY_STATUSES,
         "order_by": "next_test",
-        "action": {"label": "Mark Tested", "status": "Active", "stamp": "last_tested"},
+        "action": {"label": "Mark Tested", "status": "Active", "stamp": "last_tested"},  # noqa: E501
         "columns": [
             ("plan", "Plan", None),
             ("scope", "Scope", 160),
@@ -649,11 +714,15 @@ class BusinessContinuityWidget(_RiskCrudWidget):
         "fields": [
             {"key": "plan", "label": "Plan", "kind": "text"},
             {"key": "scope", "label": "Scope", "kind": "text"},
-            {"key": "criticality", "label": "Criticality", "kind": "combo", "options": RISK_LEVELS},
+            {"key": "criticality", "label": "Criticality",
+                "kind": "combo", "options": RISK_LEVELS},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "last_tested", "label": "Last Tested", "kind": "date"},
             {"key": "next_test", "label": "Next Test", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": CONTINUITY_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": CONTINUITY_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -666,7 +735,7 @@ class ComplianceAuditWidget(_RiskCrudWidget):
         "noun": "Audit",
         "statuses": AUDIT_STATUSES,
         "order_by": "scheduled_date",
-        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},
+        "action": {"label": "Mark Complete", "status": "Complete", "stamp": "completed_date"},  # noqa: E501
         "columns": [
             ("audit", "Audit", None),
             ("framework", "Framework", 140),
@@ -677,12 +746,16 @@ class ComplianceAuditWidget(_RiskCrudWidget):
         ],
         "fields": [
             {"key": "audit", "label": "Audit", "kind": "text"},
-            {"key": "framework", "label": "Framework", "kind": "combo", "options": AUDIT_FRAMEWORKS, "editable": True},
+            {"key": "framework", "label": "Framework", "kind": "combo",
+                "options": AUDIT_FRAMEWORKS, "editable": True},
             {"key": "auditor", "label": "Auditor", "kind": "text"},
-            {"key": "scheduled_date", "label": "Scheduled Date", "kind": "date"},
-            {"key": "completed_date", "label": "Completed Date", "kind": "date"},
+            {"key": "scheduled_date", "label": "Scheduled Date", "kind": "date"},  # noqa: E501
+            {"key": "completed_date", "label": "Completed Date", "kind": "date"},  # noqa: E501
             {"key": "finding", "label": "Finding", "kind": "text"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": AUDIT_STATUSES},
+            {"key": "status",
+    "label": "Status",
+    "kind": "combo",
+     "options": AUDIT_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
@@ -707,20 +780,22 @@ class KRIWidget(_RiskCrudWidget):
         ],
         "fields": [
             {"key": "indicator", "label": "Indicator", "kind": "text"},
-            {"key": "category", "label": "Category", "kind": "combo", "options": RISK_CATEGORIES, "editable": True},
+            {"key": "category", "label": "Category", "kind": "combo",
+                "options": RISK_CATEGORIES, "editable": True},
             {"key": "threshold", "label": "Threshold", "kind": "text"},
             {"key": "current_value", "label": "Current Value", "kind": "text"},
             {"key": "owner", "label": "Owner", "kind": "text"},
             {"key": "measured_date", "label": "Measured Date", "kind": "date"},
-            {"key": "status", "label": "Status", "kind": "combo", "options": KRI_STATUSES},
+            {"key": "status", "label": "Status",
+                "kind": "combo", "options": KRI_STATUSES},
             {"key": "notes", "label": "Notes", "kind": "memo"},
         ],
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Standalone window (for `python -m manufacturing.Risk_mgmt`)
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class RiskMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

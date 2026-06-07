@@ -11,33 +11,54 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 BLUE = QtGui.QColor(0, 85, 255)
 
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:10px;"
+    "QPushButton{background-color:white;border:2px solid "
+    "black;border-radius:10px;"
     "padding:4px 10px;font-weight:bold;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = ("QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
+COMBO_STYLE = ("QComboBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"  # noqa: E501
                "QComboBox QAbstractItemView{background-color:white;}")
-DATE_STYLE = "QDateEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color:white;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-TEXT_STYLE = "QTextEdit{background-color:white;border:2px solid black;border-radius:4px;padding:2px 6px;}"
+DATE_STYLE = (
+    "QDateEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+SPIN_STYLE = (
+    "QDoubleSpinBox{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+TEXT_STYLE = (
+    "QTextEdit{background-color:white;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
 LABEL_STYLE = "color:white;font-size:13px;"
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid #aaa;background:white;}"
     "QTabBar::tab{background:#cce0ff;padding:6px 18px;font-weight:bold;}"
-    "QTabBar::tab:selected{background:white;border-bottom:2px solid rgb(0,85,255);}"
+    "QTabBar::tab:selected{background:white;border-bottom:2px solid "
+    "rgb(0,85,255);}"
 )
 GRP_STYLE = (
-    "QGroupBox{color:white;font-weight:bold;border:1px solid white;margin-top:8px;}"
+    "QGroupBox{color:white;font-weight:bold;border:1px solid "
+    "white;margin-top:8px;}"
     "QGroupBox::title{subcontrol-origin:margin;left:10px;}"
 )
 
 COLOR_CRITICAL = QtGui.QColor(255, 200, 200)   # red  — at/below reorder point
 COLOR_LOW = QtGui.QColor(255, 243, 205)         # amber — within 2× reorder
 COLOR_OK = QtGui.QColor(212, 237, 218)          # green — well stocked
-COLOR_ZERO = QtGui.QColor(220, 220, 220)        # grey  — zero stock, no reorder set
+# grey  — zero stock, no reorder set
+COLOR_ZERO = QtGui.QColor(220, 220, 220)
 
-ADJUST_TYPES = ["Cycle Count", "Damage / Shrinkage", "Return to Vendor", "Transfer", "Other"]
+ADJUST_TYPES = [
+    "Cycle Count",
+    "Damage / Shrinkage",
+    "Return to Vendor",
+    "Transfer",
+     "Other"]
 
 
 def _conn():
@@ -84,19 +105,23 @@ def _apply_palette(widget):
     widget.setPalette(pal)
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
-    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable |
+                  QtCore.Qt.ItemFlag.ItemIsEnabled)
     item.setTextAlignment(align)
     return item
 
 
 def _ro_c(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignCenter |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _ro_r(text):
-    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+    return _ro(text, QtCore.Qt.AlignmentFlag.AlignRight |
+               QtCore.Qt.AlignmentFlag.AlignVCenter)
 
 
 def _stock_color(amount, reorder):
@@ -113,23 +138,26 @@ def _stock_color(amount, reorder):
 
 def _export_table(table, parent, default_name="inventory_export.csv"):
     if table.rowCount() == 0:
-        QtWidgets.QMessageBox.information(parent, "Export", "No data to export.")
+        QtWidgets.QMessageBox.information(
+    parent, "Export", "No data to export.")
         return
     path, _ = QtWidgets.QFileDialog.getSaveFileName(
         parent, "Export to CSV", default_name, "CSV Files (*.csv)")
     if not path:
         return
-    headers = [table.horizontalHeaderItem(c).text() for c in range(table.columnCount())]
+    headers = [table.horizontalHeaderItem(
+        c).text() for c in range(table.columnCount())]
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(headers)
         for r in range(table.rowCount()):
             w.writerow([table.item(r, c).text() if table.item(r, c) else ""
                         for c in range(table.columnCount())])
-    QtWidgets.QMessageBox.information(parent, "Export Complete", f"Saved to:\n{path}")
+    QtWidgets.QMessageBox.information(
+    parent, "Export Complete", f"Saved to:\n{path}")
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class WarehouseWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -146,7 +174,8 @@ class WarehouseWidget(QtWidgets.QWidget):
 
         title = QtWidgets.QLabel("Warehouse & Inventory Management")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size:20px;font-weight:bold;color:white;padding:4px;")
+        title.setStyleSheet(
+            "font-size:20px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
         self.tabs = QtWidgets.QTabWidget()
@@ -175,7 +204,8 @@ class WarehouseWidget(QtWidgets.QWidget):
         search_lbl.setStyleSheet(LABEL_STYLE)
         self.stock_search = QtWidgets.QLineEdit()
         self.stock_search.setStyleSheet(INPUT_STYLE)
-        self.stock_search.setPlaceholderText("Filter by product name or bin...")
+        self.stock_search.setPlaceholderText(
+            "Filter by product name or bin...")
         self.stock_search.setMinimumWidth(220)
         self.stock_search.returnPressed.connect(self._load_stock)
 
@@ -183,7 +213,8 @@ class WarehouseWidget(QtWidgets.QWidget):
         status_lbl.setStyleSheet(LABEL_STYLE)
         self.stock_status_filter = QtWidgets.QComboBox()
         self.stock_status_filter.setStyleSheet(COMBO_STYLE)
-        self.stock_status_filter.addItems(["All", "Critical (≤ Reorder)", "Low (≤ 2× Reorder)", "OK"])
+        self.stock_status_filter.addItems(
+            ["All", "Critical (≤ Reorder)", "Low (≤ 2× Reorder)", "OK"])
 
         btn_apply = QtWidgets.QPushButton("Apply")
         btn_apply.setStyleSheet(BUTTON_STYLE)
@@ -206,7 +237,11 @@ class WarehouseWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.stock_tbl, self, "stock_overview.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.stock_tbl,
+        self,
+         "stock_overview.csv"))
         fr.addWidget(btn_exp)
         v.addLayout(fr)
 
@@ -219,10 +254,14 @@ class WarehouseWidget(QtWidgets.QWidget):
         hh = self.stock_tbl.horizontalHeader()
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.stock_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.stock_tbl.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.stock_tbl.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.stock_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.stock_tbl.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.stock_tbl.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.stock_tbl.verticalHeader().setVisible(False)
         self.stock_tbl.setSortingEnabled(True)
         self.stock_tbl.clicked.connect(self._stock_row_clicked)
@@ -248,7 +287,8 @@ class WarehouseWidget(QtWidgets.QWidget):
             bottom.addWidget(lbl)
         bottom.addStretch()
         self.stock_summary_lbl = QtWidgets.QLabel("")
-        self.stock_summary_lbl.setStyleSheet("color:white;font-size:12px;font-weight:bold;")
+        self.stock_summary_lbl.setStyleSheet(
+            "color:white;font-size:12px;font-weight:bold;")
         bottom.addWidget(self.stock_summary_lbl)
         v.addLayout(bottom)
 
@@ -295,12 +335,13 @@ class WarehouseWidget(QtWidgets.QWidget):
             value = amount * unit_cost
 
             # Keyword filter
-            if keyword and keyword.lower() not in name.lower() and keyword.lower() not in bin_loc.lower():
+            if keyword and keyword.lower() not in name.lower(
+            ) and keyword.lower() not in bin_loc.lower():
                 continue
 
             # Status filter
             color = _stock_color(amount, reorder)
-            if status_filter == "Critical (≤ Reorder)" and color != COLOR_CRITICAL:
+            if status_filter == "Critical (≤ Reorder)" and color != COLOR_CRITICAL:  # noqa: E501
                 continue
             if status_filter == "Low (≤ 2× Reorder)" and color != COLOR_LOW:
                 continue
@@ -436,8 +477,10 @@ class WarehouseWidget(QtWidgets.QWidget):
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.rcv_hist_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.rcv_hist_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.rcv_hist_tbl.setAlternatingRowColors(True)
         self.rcv_hist_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.rcv_hist_tbl, stretch=1)
@@ -447,7 +490,11 @@ class WarehouseWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.rcv_hist_tbl, self, "receipts.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.rcv_hist_tbl,
+        self,
+         "receipts.csv"))
         exp_row.addWidget(btn_exp)
         v.addLayout(exp_row)
         return w
@@ -455,7 +502,8 @@ class WarehouseWidget(QtWidgets.QWidget):
     def _on_receive(self):
         pid = self.rcv_product.currentData()
         if not pid:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Select a product.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Select a product.")
             return
         qty = self.rcv_qty.value()
         trans_date = self.rcv_date.date().toString("yyyy-MM-dd")
@@ -468,12 +516,14 @@ class WarehouseWidget(QtWidgets.QWidget):
                     (product_id, trans_date, trans_type, quantity, reference, notes)
                 VALUES (%s, %s, 'Receive', %s, %s, %s)
             """, (pid, trans_date, qty, ref, notes))
-            con.execute("UPDATE product SET amount = amount + %s WHERE id=%s", (qty, pid))
+            con.execute(
+    "UPDATE product SET amount = amount + %s WHERE id=%s", (qty, pid))
 
         self._clear_receive()
         self._load_stock()
         self._load_receive_history()
-        pass  # self.statusBar().showMessage(f"Receipt posted: +{qty:,.2f} units")
+        # self.statusBar().showMessage(f"Receipt posted: +{qty:,.2f} units")
+        pass
 
     def _clear_receive(self):
         self.rcv_product.setCurrentIndex(0)
@@ -498,7 +548,8 @@ class WarehouseWidget(QtWidgets.QWidget):
             self.rcv_hist_tbl.insertRow(r)
             self.rcv_hist_tbl.setItem(r, 0, _ro_c(row["trans_date"] or ""))
             self.rcv_hist_tbl.setItem(r, 1, _ro(row["name"] or ""))
-            self.rcv_hist_tbl.setItem(r, 2, _ro_r(f"{float(row['quantity']):,.2f}"))
+            self.rcv_hist_tbl.setItem(r, 2, _ro_r(
+                f"{float(row['quantity']):,.2f}"))
             self.rcv_hist_tbl.setItem(r, 3, _ro(row["reference"] or ""))
             self.rcv_hist_tbl.setItem(r, 4, _ro(row["notes"] or ""))
 
@@ -602,8 +653,10 @@ class WarehouseWidget(QtWidgets.QWidget):
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.adj_hist_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.adj_hist_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.adj_hist_tbl.setAlternatingRowColors(True)
         self.adj_hist_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.adj_hist_tbl, stretch=1)
@@ -613,7 +666,11 @@ class WarehouseWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.adj_hist_tbl, self, "adjustments.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.adj_hist_tbl,
+        self,
+         "adjustments.csv"))
         exp_row.addWidget(btn_exp)
         v.addLayout(exp_row)
         return w
@@ -624,14 +681,17 @@ class WarehouseWidget(QtWidgets.QWidget):
             self.adj_on_hand_lbl.setText("On Hand: —")
             return
         with _conn() as con:
-            row = con.execute("SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
+            row = con.execute(
+    "SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
         if row:
-            self.adj_on_hand_lbl.setText(f"On Hand: {float(row['amount']):,.2f}")
+            self.adj_on_hand_lbl.setText(
+                f"On Hand: {float(row['amount']):,.2f}")
 
     def _on_adjust(self):
         pid = self.adj_product.currentData()
         if not pid:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Select a product.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Select a product.")
             return
         qty = self.adj_qty.value()
         direction = 1 if self.adj_direction.currentIndex() == 0 else -1
@@ -643,7 +703,8 @@ class WarehouseWidget(QtWidgets.QWidget):
 
         # Check stock won't go negative
         with _conn() as con:
-            row = con.execute("SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
+            row = con.execute(
+    "SELECT amount FROM product WHERE id=%s", (pid,)).fetchone()
             current = float(row["amount"] or 0) if row else 0
         if current + signed_qty < 0:
             QtWidgets.QMessageBox.warning(
@@ -657,12 +718,14 @@ class WarehouseWidget(QtWidgets.QWidget):
                     (product_id, trans_date, trans_type, quantity, reference, notes)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (pid, trans_date, adj_type, signed_qty, ref, notes))
-            con.execute("UPDATE product SET amount = amount + %s WHERE id=%s", (signed_qty, pid))
+            con.execute(
+    "UPDATE product SET amount = amount + %s WHERE id=%s", (signed_qty, pid))
 
         self._clear_adjust()
         self._load_stock()
         self._load_adjust_history()
-        pass  # self.statusBar().showMessage(f"Adjustment posted: {signed_qty:+,.2f} units")
+        # self.statusBar().showMessage(f"Adjustment posted: {signed_qty:+,.2f} units")  # noqa: E501
+        pass
 
     def _clear_adjust(self):
         self.adj_product.setCurrentIndex(0)
@@ -695,7 +758,9 @@ class WarehouseWidget(QtWidgets.QWidget):
             self.adj_hist_tbl.setItem(r, 3, _ro_r(f"{qty:+,.2f}"))
             self.adj_hist_tbl.setItem(r, 4, _ro(row["reference"] or ""))
             self.adj_hist_tbl.setItem(r, 5, _ro(row["notes"] or ""))
-            color = QtGui.QColor(212, 237, 218) if qty >= 0 else QtGui.QColor(255, 200, 200)
+            color = QtGui.QColor(
+    212, 237, 218) if qty >= 0 else QtGui.QColor(
+        255, 200, 200)
             for c in range(6):
                 self.adj_hist_tbl.item(r, c).setBackground(color)
 
@@ -717,7 +782,9 @@ class WarehouseWidget(QtWidgets.QWidget):
         v.addWidget(inner_tabs)
 
         inner_tabs.addTab(self._build_low_stock_report(), "Low Stock")
-        inner_tabs.addTab(self._build_txn_history_report(), "Transaction History")
+        inner_tabs.addTab(
+    self._build_txn_history_report(),
+     "Transaction History")
         inner_tabs.addTab(self._build_valuation_report(), "Valuation")
         return w
 
@@ -730,7 +797,8 @@ class WarehouseWidget(QtWidgets.QWidget):
 
         top = QtWidgets.QHBoxLayout()
         self.low_stock_lbl = QtWidgets.QLabel("")
-        self.low_stock_lbl.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
+        self.low_stock_lbl.setStyleSheet(
+            "color:white;font-size:13px;font-weight:bold;")
         top.addWidget(self.low_stock_lbl)
         top.addStretch()
         btn = QtWidgets.QPushButton("Refresh")
@@ -740,19 +808,25 @@ class WarehouseWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.low_stock_tbl, self, "low_stock.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.low_stock_tbl,
+        self,
+         "low_stock.csv"))
         top.addWidget(btn)
         top.addWidget(btn_exp)
         v.addLayout(top)
 
         self.low_stock_tbl = QtWidgets.QTableWidget(0, 6)
         self.low_stock_tbl.setHorizontalHeaderLabels(
-            ["Product", "Bin", "On Hand", "Reorder Point", "Shortage", "Status"])
+            ["Product", "Bin", "On Hand", "Reorder Point", "Shortage", "Status"])  # noqa: E501
         hh = self.low_stock_tbl.horizontalHeader()
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.low_stock_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.low_stock_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.low_stock_tbl.setAlternatingRowColors(True)
         self.low_stock_tbl.verticalHeader().setVisible(False)
         self.low_stock_tbl.setSortingEnabled(True)
@@ -786,7 +860,8 @@ class WarehouseWidget(QtWidgets.QWidget):
             self.low_stock_tbl.setItem(r, 1, _ro_c(row["bin"] or ""))
             self.low_stock_tbl.setItem(r, 2, _ro_r(f"{amount:,.2f}"))
             self.low_stock_tbl.setItem(r, 3, _ro_r(f"{reorder:,.2f}"))
-            self.low_stock_tbl.setItem(r, 4, _ro_r(f"{shortage:,.2f}" if shortage > 0 else "—"))
+            self.low_stock_tbl.setItem(r, 4, _ro_r(
+                f"{shortage:,.2f}" if shortage > 0 else "—"))
             self.low_stock_tbl.setItem(r, 5, _ro_c(status))
             for c in range(6):
                 self.low_stock_tbl.item(r, c).setBackground(color)
@@ -837,7 +912,11 @@ class WarehouseWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.txn_tbl, self, "txn_history.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.txn_tbl,
+        self,
+         "txn_history.csv"))
 
         fr.addWidget(lbl("Product:"))
         fr.addWidget(self.txn_product_filter)
@@ -859,8 +938,10 @@ class WarehouseWidget(QtWidgets.QWidget):
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.txn_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.txn_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.txn_tbl.setAlternatingRowColors(True)
         self.txn_tbl.verticalHeader().setVisible(False)
         v.addWidget(self.txn_tbl, stretch=1)
@@ -901,11 +982,14 @@ class WarehouseWidget(QtWidgets.QWidget):
             self.txn_tbl.setItem(r, 3, _ro_r(f"{qty:+,.2f}"))
             self.txn_tbl.setItem(r, 4, _ro(row["reference"] or ""))
             self.txn_tbl.setItem(r, 5, _ro(row["notes"] or ""))
-            color = QtGui.QColor(212, 237, 218) if qty >= 0 else QtGui.QColor(255, 200, 200)
+            color = QtGui.QColor(
+    212, 237, 218) if qty >= 0 else QtGui.QColor(
+        255, 200, 200)
             for c in range(6):
                 self.txn_tbl.item(r, c).setBackground(color)
 
-        pass  # self.statusBar().showMessage(f"{len(rows)} transaction(s) shown")
+        # self.statusBar().showMessage(f"{len(rows)} transaction(s) shown")
+        pass
 
     # Valuation report
     def _build_valuation_report(self):
@@ -916,7 +1000,8 @@ class WarehouseWidget(QtWidgets.QWidget):
 
         top = QtWidgets.QHBoxLayout()
         self.val_total_lbl = QtWidgets.QLabel("")
-        self.val_total_lbl.setStyleSheet("color:white;font-size:14px;font-weight:bold;")
+        self.val_total_lbl.setStyleSheet(
+            "color:white;font-size:14px;font-weight:bold;")
         top.addWidget(self.val_total_lbl)
         top.addStretch()
         btn = QtWidgets.QPushButton("Refresh")
@@ -926,7 +1011,11 @@ class WarehouseWidget(QtWidgets.QWidget):
         btn_exp = QtWidgets.QPushButton("Export CSV")
         btn_exp.setStyleSheet(BUTTON_STYLE)
         btn_exp.setFixedHeight(28)
-        btn_exp.clicked.connect(lambda: _export_table(self.val_tbl, self, "inventory_valuation.csv"))
+        btn_exp.clicked.connect(
+    lambda: _export_table(
+        self.val_tbl,
+        self,
+         "inventory_valuation.csv"))
         top.addWidget(btn)
         top.addWidget(btn_exp)
         v.addLayout(top)
@@ -937,8 +1026,10 @@ class WarehouseWidget(QtWidgets.QWidget):
         hh = self.val_tbl.horizontalHeader()
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.val_tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.val_tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.val_tbl.setAlternatingRowColors(True)
         self.val_tbl.verticalHeader().setVisible(False)
         self.val_tbl.setSortingEnabled(True)
@@ -971,7 +1062,7 @@ class WarehouseWidget(QtWidgets.QWidget):
 
         self.val_tbl.setSortingEnabled(True)
         self.val_total_lbl.setText(
-            f"{len(rows)} product(s)   |   Total Inventory Value: ${total:,.2f}")
+            f"{len(rows)} product(s)   |   Total Inventory Value: ${total:,.2f}")  # noqa: E501
 
     # ── Shared helpers ─────────────────────────────────────────────────────
 
@@ -980,11 +1071,12 @@ class WarehouseWidget(QtWidgets.QWidget):
             products = con.execute(
                 "SELECT id, name FROM product ORDER BY name").fetchall()
 
-        for combo in (self.rcv_product, self.adj_product, self.txn_product_filter):
+        for combo in (self.rcv_product, self.adj_product,
+                      self.txn_product_filter):
             pid = combo.currentData()
             combo.blockSignals(True)
             combo.clear()
-            placeholder = "(all products)" if combo is self.txn_product_filter else "-- select product --"
+            placeholder = "(all products)" if combo is self.txn_product_filter else "-- select product --"  # noqa: E501
             combo.addItem(placeholder, None)
             for p in products:
                 combo.addItem(p["name"], p["id"])

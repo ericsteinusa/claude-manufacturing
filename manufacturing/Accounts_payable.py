@@ -6,12 +6,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -79,7 +85,7 @@ def _ro(text):
 def _ro_right(text):
     item = _ro(text)
     item.setTextAlignment(
-        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)  # noqa: E501
     return item
 
 
@@ -111,7 +117,7 @@ def _invoice_status(amount, paid):
     return "partial"
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class InvoiceDialog(QtWidgets.QDialog):
     def __init__(self, invoice_id=None, parent=None):
@@ -152,7 +158,8 @@ class InvoiceDialog(QtWidgets.QDialog):
         self.inv_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Invoice Date:"), self.inv_date)
 
-        self.due_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addDays(30))
+        self.due_date = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addDays(30))
         self.due_date.setCalendarPopup(True)
         self.due_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Due Date:"), self.due_date)
@@ -211,13 +218,15 @@ class InvoiceDialog(QtWidgets.QDialog):
     def _on_ok(self):
         inv_num = self.inv_num.text().strip()
         if not inv_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Invoice number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Invoice number is required.")
             return
         conn = get_db()
         try:
             if self._invoice_id is None:
                 cur = conn.execute(
-                    "INSERT INTO ap_invoice (vendor_id, invoice_number, invoice_date,"
+                    "INSERT INTO ap_invoice (vendor_id, invoice_number, "
+                    "invoice_date,"
                     " due_date, amount, description, status)"
                     " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                     (self.vendor_combo.currentData(), inv_num,
@@ -268,7 +277,8 @@ class RecordPaymentDialog(QtWidgets.QDialog):
             return w
 
         bal_lbl = QtWidgets.QLabel(f"${self._balance:,.2f}")
-        bal_lbl.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        bal_lbl.setStyleSheet(
+            "color: white; font-size: 13px; font-weight: bold;")
         layout.addRow(lbl("Balance Due:"), bal_lbl)
 
         self.pay_date = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
@@ -321,7 +331,8 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         )
         # Update invoice status
         paid = conn.execute(
-            "SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE invoice_id=%s",
+            "SELECT COALESCE(SUM(amount),0) FROM ap_payment WHERE "
+            "invoice_id=%s",
             (self._invoice_id,)
         ).fetchone()[0]
         inv = conn.execute(
@@ -336,7 +347,7 @@ class RecordPaymentDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class AccountsPayableWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -385,7 +396,8 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         lbl_f = QtWidgets.QLabel("Due From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_invoices)
@@ -394,7 +406,8 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         lbl_t = QtWidgets.QLabel("To:")
         lbl_t.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_t)
-        self.date_to = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(3))
+        self.date_to = QtWidgets.QDateEdit(
+    QtCore.QDate.currentDate().addMonths(3))
         self.date_to.setCalendarPopup(True)
         self.date_to.setStyleSheet(INPUT_STYLE)
         self.date_to.dateChanged.connect(self._refresh_invoices)
@@ -419,13 +432,20 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         )
         hh = self.inv_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.inv_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -453,10 +473,14 @@ class AccountsPayableWidget(QtWidgets.QWidget):
             ["Date", "Amount", "Method", "Reference", "Notes"])
         ph = self.pay_table.horizontalHeader()
         ph.setStyleSheet("color: black; font-weight: bold;")
-        ph.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ph.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ph.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ph.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ph.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ph.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ph.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ph.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         ph.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.pay_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -530,7 +554,9 @@ class AccountsPayableWidget(QtWidgets.QWidget):
             self.inv_table.insertRow(r)
             self._inv_row_ids.append(row["id"])
             company = row["company_name"] or ""
-            name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+            name = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
             vendor_display = company if company else name
             paid = row["paid"]
             balance = row["amount"] - paid
@@ -583,7 +609,7 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         self._selected_inv_number = self.inv_table.item(row, 0).text()
         try:
             self._selected_balance = float(
-                self.inv_table.item(row, 6).text().replace("$", "").replace(",", ""))
+                self.inv_table.item(row, 6).text().replace("$", "").replace(",", ""))  # noqa: E501
         except ValueError:
             self._selected_balance = 0.0
         self._refresh_payments()
@@ -596,7 +622,8 @@ class AccountsPayableWidget(QtWidgets.QWidget):
         try:
             payments = conn.execute(
                 "SELECT payment_date, amount, payment_method, reference, notes"
-                " FROM ap_payment WHERE invoice_id = %s ORDER BY payment_date DESC",
+                " FROM ap_payment WHERE invoice_id = %s ORDER BY payment_date "
+                "DESC",
                 (self._selected_inv_id,)
             ).fetchall()
         except psycopg2.OperationalError:
@@ -618,7 +645,8 @@ class AccountsPayableWidget(QtWidgets.QWidget):
 
     def _on_edit_invoice(self, _index=None):
         if self._selected_inv_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an invoice first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an invoice first.")
             return
         dlg = InvoiceDialog(invoice_id=self._selected_inv_id, parent=self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -626,11 +654,13 @@ class AccountsPayableWidget(QtWidgets.QWidget):
 
     def _on_record_payment(self):
         if self._selected_inv_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an invoice first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an invoice first.")
             return
         if self._selected_balance <= 0:
             QtWidgets.QMessageBox.information(self, "Fully Paid",
-                                              "This invoice is already fully paid.")
+                                              "This invoice is already fully "
+                                              "paid.")
             return
         dlg = RecordPaymentDialog(
             self._selected_inv_id, self._selected_inv_number,
@@ -642,12 +672,13 @@ class AccountsPayableWidget(QtWidgets.QWidget):
 
     def _set_status(self, new_status):
         if self._selected_inv_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select an invoice first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select an invoice first.")
             return
         msg = f"Mark invoice as {new_status}?"
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

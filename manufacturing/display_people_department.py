@@ -73,7 +73,14 @@ def create_gui():
     root.title("Employee Department Viewer")
 
     # Treeview widget
-    tree = ttk.Treeview(root, columns=("First Name", "Last Name", "Dept Name", "Dept Sub Name"), show="headings")
+    tree = ttk.Treeview(
+    root,
+    columns=(
+        "First Name",
+        "Last Name",
+        "Dept Name",
+        "Dept Sub Name"),
+         show="headings")
     tree.heading("First Name", text="First Name")
     tree.heading("Last Name", text="Last Name")
     tree.heading("Dept Name", text="Dept Name")
@@ -83,7 +90,14 @@ def create_gui():
     # Insert data into Treeview
     data = fetch_data()
     for people_first_Name, people_last_name, dept_name, dept_sub_name in data:
-        tree.insert("", "end", values=(people_first_Name, people_last_name, dept_name, dept_sub_name))
+        tree.insert(
+    "",
+    "end",
+    values=(
+        people_first_Name,
+        people_last_name,
+        dept_name,
+         dept_sub_name))
     root.mainloop()
 
 

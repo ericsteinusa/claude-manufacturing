@@ -5,8 +5,10 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -29,7 +31,10 @@ def _apply_blue_palette(widget):
 
 def _launch(script):
     _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable, "-m", "manufacturing." + os.path.splitext(script)[0]], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    subprocess.Popen([sys.executable,
+    "-m",
+    "manufacturing." + os.path.splitext(script)[0]],
+     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
@@ -73,7 +78,11 @@ class EngineeringMainMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = QtWidgets.QTabWidget()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(_launch_tab("eng_mgr.py", "Engineering Manager"), "Engineering Manager")
+        tabs.addTab(
+    _launch_tab(
+        "eng_mgr.py",
+        "Engineering Manager"),
+         "Engineering Manager")
         tabs.addTab(_launch_tab("engineer.py", "Engineers"), "Engineers")
         v.addWidget(tabs)
 

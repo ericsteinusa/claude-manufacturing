@@ -13,9 +13,9 @@ app = QtWidgets.QApplication(sys.argv)
 
 # (module, class_name, friendly_name)
 WINDOWS = [
-    ("Accounts_receivable",  "AccountsReceivable",       "Accounts Receivable"),
+    ("Accounts_receivable",  "AccountsReceivable",       "Accounts Receivable"),  # noqa: E501
     ("Audit_mgmt",           "AuditWindow",               "Audit Mgmt"),
-    ("Bank_reconciliation",  "BankReconciliationWindow",  "Bank Reconciliation"),
+    ("Bank_reconciliation",  "BankReconciliationWindow",  "Bank Reconciliation"),  # noqa: E501
     ("Budget_mgmt",          "BudgetWindow",              "Budget Mgmt"),
     ("Credit_dept",          "CreditDept",                "Credit Dept"),
     ("General_ledger",       "GeneralLedgerWindow",       "General Ledger"),
@@ -33,7 +33,7 @@ WINDOWS = [
     ("IT_technician",        "ITTechnicianMenu",          "IT Technician"),
     ("IT_tech_reports",      "ITTechReportsWidget",       "IT Tech Reports"),
     ("it_calls",             "ITSupportMenu",             "IT Calls"),
-    ("it_calls_reports",     "ITSupportReportsWidget",    "IT Support Reports"),
+    ("it_calls_reports",     "ITSupportReportsWidget",    "IT Support Reports"),  # noqa: E501
     ("IT_Tasks",             "ITTasksMenu",               "IT Tasks"),
     ("IT_tasks_reports",     "ITTasksReportsWidget",      "IT Tasks Reports"),
     ("IT_reports",           "ITReportsWidget",           "IT Reports"),
@@ -55,12 +55,12 @@ WINDOWS = [
     ("Sales_menu",           "SalesOrders",               "Sales Orders"),
     ("Sales_mgr_menu",       "SalesMgrMenu",              "Sales Mgr"),
     ("warehouse_inventory",  "WarehouseWindow",           "Warehouse"),
-    ("Supplier_entry",       "Purchasing",                "Supplier/Purchasing"),
-    ("Accounting_manager",   "AccountingManagerWindow",   "Accounting Manager"),
+    ("Supplier_entry",       "Purchasing",                "Supplier/Purchasing"),  # noqa: E501
+    ("Accounting_manager",   "AccountingManagerWindow",   "Accounting Manager"),  # noqa: E501
     ("cs_menu",              "CSMenu",                    "CS Menu"),
     ("cs_mgr_menu",          "CSMgrMenu",                 "CS Mgr Menu"),
     ("Purchasing_menu",      "PurchasingMenu",            "Purchasing Menu"),
-    ("Purchasing_Mgr_menu",  "PurchasingMgrMenu",         "Purchasing Mgr Menu"),
+    ("Purchasing_Mgr_menu",  "PurchasingMgrMenu",         "Purchasing Mgr Menu"),  # noqa: E501
     ("Maint_Maint_menu",     "MaintMenu",                 "Maintenance Menu"),
     ("Maint_mgr_menu",       "MaintMgrMenu",              "Maintenance Mgr"),
     ("Budget_mgr_menu",      "BudgetMgrMenu",             "Budget Mgr"),
@@ -108,7 +108,7 @@ for mod_name, cls_name, label in WINDOWS:
         short = tb[-1]
         results.append((label, "FAIL", [short], []))
 
-# ── Print results ──────────────────────────────────────────────────────────────
+# ── Print results ───────────────────────────────────────────────────────
 print()
 print("=" * 70)
 ok  = sum(1 for _,s,_,_ in results if s == "OK")

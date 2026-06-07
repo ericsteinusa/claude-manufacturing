@@ -5,12 +5,18 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
+    "rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
+)
 COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px;}"
+    "QComboBox{background-color: white; border: 2px solid black; "
+    "border-radius: 4px; padding: 2px 6px;}"
     "QComboBox QAbstractItemView{background-color: white;}"
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
@@ -70,13 +76,14 @@ def _next_ship_num():
     yr = QtCore.QDate.currentDate().year()
     conn = get_db()
     count = conn.execute(
-        "SELECT COUNT(*) FROM shipment WHERE ship_number LIKE ?", (f"SH-{yr}-%",)
+        "SELECT COUNT(*) FROM shipment WHERE ship_number LIKE ?", (
+            f"SH-{yr}-%",)
     ).fetchone()[0]
     conn.close()
     return f"SH-{yr}-{count + 1:04d}"
 
 
-# ── Dialogs ────────────────────────────────────────────────────────────────────
+# ── Dialogs ─────────────────────────────────────────────────────────────
 
 class NewShipmentDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -106,7 +113,8 @@ class NewShipmentDialog(QtWidgets.QDialog):
         try:
             sos = conn.execute(
                 "SELECT id, so_number FROM sales_order"
-                " WHERE status NOT IN ('cancelled','invoiced') ORDER BY so_number"
+                " WHERE status NOT IN ('cancelled','invoiced') ORDER BY "
+                "so_number"
             ).fetchall()
         except psycopg2.OperationalError:
             sos = []
@@ -152,7 +160,8 @@ class NewShipmentDialog(QtWidgets.QDialog):
     def _on_ok(self):
         ship_num = self.ship_num.text().strip()
         if not ship_num:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Shipment number is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Shipment number is required.")
             return
         conn = get_db()
         try:
@@ -168,7 +177,7 @@ class NewShipmentDialog(QtWidgets.QDialog):
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
-                                          f"Shipment number '{ship_num}' already exists.")
+                                          f"Shipment number '{ship_num}' already exists.")  # noqa: E501
             conn.close()
             return
         conn.close()
@@ -195,7 +204,8 @@ class AddShipItemDialog(QtWidgets.QDialog):
 
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
-        self.product_combo.currentIndexChanged.connect(self._on_product_changed)
+        self.product_combo.currentIndexChanged.connect(
+            self._on_product_changed)
         conn = get_db()
         try:
             prods = conn.execute(
@@ -236,12 +246,14 @@ class AddShipItemDialog(QtWidgets.QDialog):
     def _on_ok(self):
         desc = self.desc.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Input Error", "Description is required.")
             return
         conn = get_db()
         conn.execute(
-            "INSERT INTO shipment_item (shipment_id, description, product_id, qty) VALUES (?,?,?,?)",
-            (self._shipment_id, desc, self.product_combo.currentData(), self.qty.value())
+            "INSERT INTO shipment_item (shipment_id, description, product_id, "
+            "qty) VALUES (?,?,?,?)",
+            (self._shipment_id, desc, self.product_combo.currentData(), self.qty.value())  # noqa: E501
         )
         conn.commit()
         conn.close()
@@ -295,12 +307,17 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
 
     def _load(self):
         conn = get_db()
-        rec = conn.execute("SELECT * FROM shipment WHERE id = ?", (self._shipment_id,)).fetchone()
+        rec = conn.execute(
+    "SELECT * FROM shipment WHERE id = ?",
+    (self._shipment_id,
+    )).fetchone()
         conn.close()
         if not rec:
             return
         if rec["ship_date"]:
-            self.ship_date.setDate(QtCore.QDate.fromString(rec["ship_date"], "yyyy-MM-dd"))
+            self.ship_date.setDate(
+    QtCore.QDate.fromString(
+        rec["ship_date"], "yyyy-MM-dd"))
         self.carrier.setText(rec["carrier"] or "")
         self.tracking.setText(rec["tracking_number"] or "")
         self.notes.setText(rec["notes"] or "")
@@ -308,7 +325,8 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
     def _on_ok(self):
         conn = get_db()
         conn.execute(
-            "UPDATE shipment SET ship_date=?, carrier=?, tracking_number=?, notes=? WHERE id=?",
+            "UPDATE shipment SET ship_date=?, carrier=?, tracking_number=?, "
+            "notes=? WHERE id=?",
             (self.ship_date.date().toString("yyyy-MM-dd"),
              self.carrier.text().strip(), self.tracking.text().strip(),
              self.notes.text().strip(), self._shipment_id)
@@ -318,7 +336,7 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
         self.accept()
 
 
-# ── Main Window ────────────────────────────────────────────────────────────────
+# ── Main Window ─────────────────────────────────────────────────────────
 
 class ShippingDept(QtWidgets.QMainWindow):
     def __init__(self):
@@ -359,7 +377,8 @@ class ShippingDept(QtWidgets.QMainWindow):
         lbl_f = QtWidgets.QLabel("From:")
         lbl_f.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_f)
-        self.date_from = QtWidgets.QDateEdit(QtCore.QDate.currentDate().addMonths(-3))
+        self.date_from = QtWidgets.QDateEdit(
+            QtCore.QDate.currentDate().addMonths(-3))
         self.date_from.setCalendarPopup(True)
         self.date_from.setStyleSheet(INPUT_STYLE)
         self.date_from.dateChanged.connect(self._refresh_shipments)
@@ -387,20 +406,30 @@ class ShippingDept(QtWidgets.QMainWindow):
         self.ship_table = QtWidgets.QTableWidget()
         self.ship_table.setColumnCount(7)
         self.ship_table.setHorizontalHeaderLabels(
-            ["Ship #", "Sales Order", "Ship Date", "Carrier", "Tracking #", "Items", "Status"]
+            ["Ship #", "Sales Order", "Ship Date",
+                "Carrier", "Tracking #", "Items", "Status"]
         )
         hh = self.ship_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.ship_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ship_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ship_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        hh.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.ship_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ship_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ship_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ship_table.setAlternatingRowColors(True)
         self.ship_table.verticalHeader().setVisible(False)
         self.ship_table.clicked.connect(self._on_shipment_clicked)
@@ -415,13 +444,17 @@ class ShippingDept(QtWidgets.QMainWindow):
         dv.addWidget(dlbl)
         self.item_table = QtWidgets.QTableWidget()
         self.item_table.setColumnCount(3)
-        self.item_table.setHorizontalHeaderLabels(["Description", "Product", "Qty"])
+        self.item_table.setHorizontalHeaderLabels(
+            ["Description", "Product", "Qty"])
         ih = self.item_table.horizontalHeader()
         ih.setStyleSheet("color: black; font-weight: bold;")
         ih.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        ih.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        ih.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.item_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        ih.setSectionResizeMode(
+    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        ih.setSectionResizeMode(
+    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.item_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.item_table.verticalHeader().setVisible(False)
         self.item_table.setAlternatingRowColors(True)
         dv.addWidget(self.item_table)
@@ -434,9 +467,12 @@ class ShippingDept(QtWidgets.QMainWindow):
             ("New Shipment",    self._on_new_shipment),
             ("Add Item",        self._on_add_item),
             ("Update Details",  self._on_update_shipment),
-            ("Mark Shipped",    lambda: self._set_status("shipped",   "Mark as Shipped?")),
-            ("Mark Delivered",  lambda: self._set_status("delivered", "Mark as Delivered?")),
-            ("Mark Returned",   lambda: self._set_status("returned",  "Mark as Returned?")),
+            ("Mark Shipped",    lambda: self._set_status(
+                "shipped",   "Mark as Shipped?")),
+            ("Mark Delivered",  lambda: self._set_status(
+                "delivered", "Mark as Delivered?")),
+            ("Mark Returned",   lambda: self._set_status(
+                "returned",  "Mark as Returned?")),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -468,7 +504,9 @@ class ShippingDept(QtWidgets.QMainWindow):
 
         conn = get_db()
         try:
-            rows = conn.execute(base + where + " ORDER BY s.ship_date DESC", params).fetchall()
+            rows = conn.execute(
+    base + where + " ORDER BY s.ship_date DESC",
+     params).fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -527,7 +565,8 @@ class ShippingDept(QtWidgets.QMainWindow):
             """, (self._selected_ship_id,)).fetchall()
         except psycopg2.OperationalError:
             items = conn.execute(
-                "SELECT description, NULL AS product_name, qty FROM shipment_item WHERE shipment_id = ?",
+                "SELECT description, NULL AS product_name, qty FROM "
+                "shipment_item WHERE shipment_id = ?",
                 (self._selected_ship_id,)
             ).fetchall()
         conn.close()
@@ -545,16 +584,21 @@ class ShippingDept(QtWidgets.QMainWindow):
 
     def _on_add_item(self):
         if self._selected_ship_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a shipment first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a shipment first.")
             return
-        dlg = AddShipItemDialog(self._selected_ship_id, self._selected_ship_number, self)
+        dlg = AddShipItemDialog(
+    self._selected_ship_id,
+    self._selected_ship_number,
+     self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_shipments()
             self._refresh_items()
 
     def _on_update_shipment(self):
         if self._selected_ship_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a shipment first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a shipment first.")
             return
         dlg = UpdateShipmentDialog(self._selected_ship_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -562,11 +606,12 @@ class ShippingDept(QtWidgets.QMainWindow):
 
     def _set_status(self, new_status, msg):
         if self._selected_ship_id is None:
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a shipment first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a shipment first.")
             return
         reply = QtWidgets.QMessageBox.question(
             self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No  # noqa: E501
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()

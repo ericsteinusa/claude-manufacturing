@@ -6,19 +6,39 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; border-radius: 10px;}"
-    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px solid rgb(85, 255, 255);}"
+    "QPushButton{background-color: white; border: 2px solid black; "
+    "border-radius: 10px;}"
+    "QPushButton%(hover)s{background-color: rgb(85, 255, 255); border: 2px "
+    "solid rgb(85, 255, 255);}"
 )
-INPUT_STYLE = "QLineEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}"
-COMBO_STYLE = "QComboBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 6px;}QComboBox QAbstractItemView{background-color%(white)s;}"
-DATE_STYLE = "QDateEdit{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-SPIN_STYLE = "QDoubleSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
-ISPIN_STYLE = "QSpinBox{background-color%(white)s;border:2px solid black;border-radius:4px;padding:2px 4px;}"
+INPUT_STYLE = (
+    "QLineEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}"
+)
+COMBO_STYLE = (
+    "QComboBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 6px;}QComboBox "
+    "QAbstractItemView{background-color%(white)s;}"
+)
+DATE_STYLE = (
+    "QDateEdit{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+SPIN_STYLE = (
+    "QDoubleSpinBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
+ISPIN_STYLE = (
+    "QSpinBox{background-color%(white)s;border:2px solid "
+    "black;border-radius:4px;padding:2px 4px;}"
+)
 LABEL_STYLE = "color%(white)s;font-size:13px;"
 TAB_STYLE = ("QTabWidget:%(pane)s{border:1px solid black;}"
-             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; padding:6px 18px;"
+             "QTabBar:%(tab)s{background%(white)s; border:2px solid black; "
+             "padding:6px 18px;"
              " border-bottom%(none)s; border-radius:4px 4px 0 0;}"
-             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); font-weight%(bold)s;}"
+             "QTabBar:%(tab)s%(selected)s{background%(rgb)s(85,255,255); "
+             "font-weight%(bold)s;}"
              "QTabBar:%(tab)s%(hover)s{background%(rgb)s(85,255,255);}")
 
 PO_COLORS = {
@@ -85,7 +105,8 @@ def _money(v):
     return f"${v:,.2f}"
 
 
-def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter):
+def _ro(text, align=QtCore.Qt.AlignmentFlag.AlignLeft |
+        QtCore.Qt.AlignmentFlag.AlignVCenter):
     item = QtWidgets.QTableWidgetItem(str(text))
     item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
     item.setTextAlignment(align)
@@ -101,7 +122,7 @@ def _supplier_display(row):
 def _next_po_num():
     yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s",
+    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s",  # noqa: E501
                      (f"PO-{yr}-%",)).fetchone()[0]
     conn.close()
     return f"PO-{yr}-{n + 1:04d}"
@@ -125,7 +146,8 @@ class NewPODialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("New Purchase Order")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
+        title.setStyleSheet(
+            "color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
@@ -186,7 +208,7 @@ class NewPODialog(QtWidgets.QDialog):
         layout.addLayout(btn_row)
 
     def _on_save(self):
-        if self.supp_combo.count() == 0 or self.supp_combo.currentData() is None:
+        if self.supp_combo.count() == 0 or self.supp_combo.currentData() is None:  # noqa: E501
             QtWidgets.QMessageBox.warning(self, "Error", "Select a supplier.")
             return
         conn = get_db()
@@ -203,7 +225,8 @@ class NewPODialog(QtWidgets.QDialog):
                   self.notes.text().strip() or None))
             conn.commit()
         except psycopg2.IntegrityError:
-            QtWidgets.QMessageBox.warning(self, "Duplicate", "PO number already exists.")
+            QtWidgets.QMessageBox.warning(
+    self, "Duplicate", "PO number already exists.")
             conn.close()
             return
         conn.close()
@@ -226,7 +249,8 @@ class AddLineItemDialog(QtWidgets.QDialog):
 
         title = QtWidgets.QLabel("Add Line Item")
         title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("color%(white)s;font-size:15px;font-weight%(bold)s;")
+        title.setStyleSheet(
+            "color%(white)s;font-size:15px;font-weight%(bold)s;")
         layout.addWidget(title)
 
         def row(lbl_text, widget, lbl_w=120):
@@ -248,7 +272,8 @@ class AddLineItemDialog(QtWidgets.QDialog):
         self.prod_combo.addItem("(none — new item)", None)
         conn = get_db()
         try:
-            products = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
+            products = conn.execute(
+                "SELECT id, name FROM product ORDER BY name").fetchall()
             for p in products:
                 self.prod_combo.addItem(p["name"], p["id"])
         except psycopg2.OperationalError:
@@ -271,7 +296,8 @@ class AddLineItemDialog(QtWidgets.QDialog):
         layout.addLayout(row("Unit Price:", self.price))
 
         btn_row = QtWidgets.QHBoxLayout()
-        for text, slot in (("Add Item", self._on_save), ("Cancel", self.reject)):
+        for text, slot in (("Add Item", self._on_save),
+                           ("Cancel", self.reject)):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(32)
@@ -285,7 +311,8 @@ class AddLineItemDialog(QtWidgets.QDialog):
             return
         conn = get_db()
         try:
-            p = conn.execute("SELECT name, purchase_price FROM product WHERE id=%s", (pid,)).fetchone()
+            p = conn.execute(
+    "SELECT name, purchase_price FROM product WHERE id=%s", (pid,)).fetchone()
             if p:
                 if not self.desc.text().strip():
                     self.desc.setText(p["name"])
@@ -298,7 +325,8 @@ class AddLineItemDialog(QtWidgets.QDialog):
     def _on_save(self):
         desc = self.desc.text().strip()
         if not desc:
-            QtWidgets.QMessageBox.warning(self, "Error", "Description is required.")
+            QtWidgets.QMessageBox.warning(
+    self, "Error", "Description is required.")
             return
         conn = get_db()
         conn.execute("""
@@ -325,7 +353,7 @@ class ReceivePODialog(QtWidgets.QDialog):
         conn = get_db()
         po = conn.execute(
             "SELECT po.*, s.first_name, s.last_name, s.company_name "
-            "FROM purchase_order po JOIN supplier s ON s.id=po.supplier_id WHERE po.id=%s",
+            "FROM purchase_order po JOIN supplier s ON s.id=po.supplier_id WHERE po.id=%s",  # noqa: E501
             (self._po_id,)
         ).fetchone()
         items = conn.execute(
@@ -339,7 +367,8 @@ class ReceivePODialog(QtWidgets.QDialog):
 
         info = QtWidgets.QLabel(
             f"PO: {po['po_number']}  |  Supplier: {_supplier_display(po)}")
-        info.setStyleSheet("color%(white)s;font-size:13px;font-weight%(bold)s;")
+        info.setStyleSheet(
+            "color%(white)s;font-size:13px;font-weight%(bold)s;")
         layout.addWidget(info)
 
         lbl = QtWidgets.QLabel("Enter quantity to receive for each open item:")
@@ -349,17 +378,19 @@ class ReceivePODialog(QtWidgets.QDialog):
         tbl = QtWidgets.QTableWidget()
         tbl.setColumnCount(5)
         tbl.setHorizontalHeaderLabels(
-            ["Description", "Ordered", "Already Received", "Remaining", "Receive Now"])
+            ["Description", "Ordered", "Already Received", "Remaining", "Receive Now"])  # noqa: E501
         hh = tbl.horizontalHeader()
         hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        tbl.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         tbl.verticalHeader().setVisible(False)
         layout.addWidget(tbl, stretch=1)
 
-        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for item in items:
             remaining = item["qty_ordered"] - item["qty_received"]
             if remaining <= 0:
@@ -378,7 +409,8 @@ class ReceivePODialog(QtWidgets.QDialog):
             self._spins.append((item["id"], item["product_id"], spin))
 
         btn_row = QtWidgets.QHBoxLayout()
-        for text, slot in (("Receive", self._on_receive), ("Cancel", self.reject)):
+        for text, slot in (("Receive", self._on_receive),
+                           ("Cancel", self.reject)):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(32)
@@ -399,7 +431,8 @@ class ReceivePODialog(QtWidgets.QDialog):
             if qty <= 0:
                 continue
             conn.execute(
-                "UPDATE po_item SET qty_received = qty_received + %s WHERE id=%s",
+                "UPDATE po_item SET qty_received = qty_received + %s WHERE "
+                "id=%s",
                 (qty, item_id))
             if product_id:
                 conn.execute(
@@ -420,9 +453,11 @@ class ReceivePODialog(QtWidgets.QDialog):
             (self._po_id,)
         ).fetchall()
         if all_items:
-            all_recv = all(i["qty_received"] >= i["qty_ordered"] for i in all_items)
+            all_recv = all(i["qty_received"] >= i["qty_ordered"]
+                           for i in all_items)
             any_recv = any(i["qty_received"] > 0 for i in all_items)
-            new_status = "received" if all_recv else ("partial" if any_recv else "open")
+            new_status = "received" if all_recv else (
+                "partial" if any_recv else "open")
             conn.execute("UPDATE purchase_order SET status=%s WHERE id=%s",
                          (new_status, self._po_id))
         conn.commit()
@@ -466,15 +501,19 @@ class Purchasing(QtWidgets.QMainWindow):
         self.supp_table = QtWidgets.QTableWidget()
         self.supp_table.setColumnCount(7)
         self.supp_table.setHorizontalHeaderLabels(
-            ["Company / Name", "Contact", "Phone", "Email", "City", "State", "Zip"])
+            ["Company / Name", "Contact", "Phone", "Email", "City", "State", "Zip"])  # noqa: E501
         hh = self.supp_table.horizontalHeader()
         hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.supp_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.supp_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.supp_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.supp_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.supp_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.supp_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.supp_table.setAlternatingRowColors(True)
         self.supp_table.verticalHeader().setVisible(False)
         self.supp_table.clicked.connect(self._on_supp_row_clicked)
@@ -490,7 +529,8 @@ class Purchasing(QtWidgets.QMainWindow):
         self.supp_search.setPlaceholderText("Company or last name")
         self.supp_search.returnPressed.connect(self._on_supp_search)
         sr.addWidget(self.supp_search)
-        for t, fn in (("Search", self._on_supp_search), ("Show All", self._load_suppliers)):
+        for t, fn in (("Search", self._on_supp_search),
+                      ("Show All", self._load_suppliers)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(30)
@@ -501,7 +541,8 @@ class Purchasing(QtWidgets.QMainWindow):
 
         fg = QtWidgets.QGroupBox("Supplier Record")
         fg.setStyleSheet(
-            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:8px;}"
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid "
+            "white;margin-top:8px;}"
             "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         grid = QtWidgets.QGridLayout(fg)
         grid.setSpacing(6)
@@ -552,8 +593,8 @@ class Purchasing(QtWidgets.QMainWindow):
         layout.addWidget(fg)
 
         br = QtWidgets.QHBoxLayout()
-        for t, fn in (("Add New", self._on_supp_add), ("Update Selected", self._on_supp_update),
-                      ("Delete Selected", self._on_supp_delete), ("Clear", self._supp_clear)):
+        for t, fn in (("Add New", self._on_supp_add), ("Update Selected", self._on_supp_update),  # noqa: E501
+                      ("Delete Selected", self._on_supp_delete), ("Clear", self._supp_clear)):  # noqa: E501
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(34)
@@ -584,7 +625,8 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_supp_filter.setMinimumWidth(200)
         self.po_status_filter = QtWidgets.QComboBox()
         self.po_status_filter.setStyleSheet(COMBO_STYLE)
-        self.po_status_filter.addItems(["(all status)", "open", "partial", "received", "cancelled"])
+        self.po_status_filter.addItems(
+            ["(all status)", "open", "partial", "received", "cancelled"])
         self.po_from = QtWidgets.QDateEdit()
         self.po_from.setStyleSheet(DATE_STYLE)
         self.po_from.setCalendarPopup(True)
@@ -604,7 +646,8 @@ class Purchasing(QtWidgets.QMainWindow):
         fr.addWidget(self.po_from)
         fr.addWidget(fl("To:"))
         fr.addWidget(self.po_to)
-        for t, fn in (("Apply", self._refresh_pos), ("Show All", self._po_show_all)):
+        for t, fn in (("Apply", self._refresh_pos),
+                      ("Show All", self._po_show_all)):
             b = QtWidgets.QPushButton(t)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(30)
@@ -616,15 +659,19 @@ class Purchasing(QtWidgets.QMainWindow):
         self.po_table = QtWidgets.QTableWidget()
         self.po_table.setColumnCount(7)
         self.po_table.setHorizontalHeaderLabels(
-            ["PO Number", "Supplier", "Order Date", "Expected Date", "Items", "Total", "Status"])
+            ["PO Number", "Supplier", "Order Date", "Expected Date", "Items", "Total", "Status"])  # noqa: E501
         hh = self.po_table.horizontalHeader()
         hh.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (0, 2, 3, 4, 5, 6):
-            hh.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.po_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.po_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.po_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+            hh.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.po_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.po_table.setSelectionBehavior(
+    QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.po_table.setSelectionMode(
+    QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.po_table.verticalHeader().setVisible(False)
         self.po_table.clicked.connect(self._on_po_row_clicked)
         layout.addWidget(self.po_table, stretch=1)
@@ -644,20 +691,23 @@ class Purchasing(QtWidgets.QMainWindow):
 
         self.po_detail_grp = QtWidgets.QGroupBox("PO Line Items")
         self.po_detail_grp.setStyleSheet(
-            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid white;margin-top:6px;}"
+            "QGroupBox{color%(white)s;font-weight%(bold)s;border:1px solid "
+            "white;margin-top:6px;}"
             "QGroupBox:%(title)s{subcontrol-origin%(margin)s;left:10px;}")
         self.po_detail_grp.setVisible(False)
         dv = QtWidgets.QVBoxLayout(self.po_detail_grp)
         self.po_items_table = QtWidgets.QTableWidget()
         self.po_items_table.setColumnCount(6)
         self.po_items_table.setHorizontalHeaderLabels(
-            ["Description", "Product", "Qty Ordered", "Qty Received", "Remaining", "Line Total"])
+            ["Description", "Product", "Qty Ordered", "Qty Received", "Remaining", "Line Total"])  # noqa: E501
         ph = self.po_items_table.horizontalHeader()
         ph.setStyleSheet("color%(black)s;font-weight%(bold)s;")
         ph.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         for c in (1, 2, 3, 4, 5):
-            ph.setSectionResizeMode(c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.po_items_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            ph.setSectionResizeMode(
+    c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.po_items_table.setEditTriggers(
+    QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.po_items_table.setAlternatingRowColors(True)
         self.po_items_table.verticalHeader().setVisible(False)
         self.po_items_table.setFixedHeight(150)
@@ -675,13 +725,15 @@ class Purchasing(QtWidgets.QMainWindow):
         conn = get_db()
         if search:
             rows = conn.execute(
-                "SELECT * FROM supplier WHERE company_name LIKE %s OR last_name LIKE %s "
+                "SELECT * FROM supplier WHERE company_name LIKE %s OR "
+                "last_name LIKE %s "
                 "ORDER BY company_name, last_name, first_name",
                 (f"%{search}%", f"%{search}%")
             ).fetchall()
         else:
             rows = conn.execute(
-                "SELECT * FROM supplier ORDER BY company_name, last_name, first_name"
+                "SELECT * FROM supplier ORDER BY company_name, last_name, "
+                "first_name"
             ).fetchall()
         conn.close()
 
@@ -691,7 +743,9 @@ class Purchasing(QtWidgets.QMainWindow):
             r = self.supp_table.rowCount()
             self.supp_table.insertRow(r)
             self._supp_row_ids.append(row["id"])
-            contact = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+            contact = f"{
+    row['first_name'] or ''} {
+        row['last_name'] or ''}".strip()
             primary = (row["company_name"] or "").strip() or contact
             for c, v in enumerate([
                 primary,
@@ -744,7 +798,7 @@ class Purchasing(QtWidgets.QMainWindow):
 
     def _supp_clear(self):
         for w in (self.sf_company, self.sf_first, self.sf_last, self.sf_phone,
-                  self.sf_email, self.sf_addr, self.sf_city, self.sf_state, self.sf_zip):
+                  self.sf_email, self.sf_addr, self.sf_city, self.sf_state, self.sf_zip):  # noqa: E501
             w.clear()
         self.supp_table.clearSelection()
 
@@ -774,8 +828,9 @@ class Purchasing(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute(
             "INSERT INTO supplier "
-            "(company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "
-            "VALUES (%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,"
+            "(company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "  # noqa: E501
+            "VALUES "
+            "(%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,"
             "%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)",
             data)
         conn.commit()
@@ -786,7 +841,8 @@ class Purchasing(QtWidgets.QMainWindow):
     def _on_supp_update(self):
         row = self.supp_table.currentRow()
         if row < 0 or row >= len(self._supp_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a supplier first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a supplier first.")
             return
         data = self._collect_supplier_form()
         if not data:
@@ -794,9 +850,10 @@ class Purchasing(QtWidgets.QMainWindow):
         data["id"] = self._supp_row_ids[row]
         conn = get_db()
         conn.execute(
-            "UPDATE supplier SET company_name=%(company_name)s,first_name=%(first_name)s,"
-            "last_name=%(last_name)s,phone_number=%(phone_number)s,email=%(email)s,"
-            "address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s WHERE id=%(id)s",
+            "UPDATE supplier SET "
+            "company_name=%(company_name)s,first_name=%(first_name)s,"
+            "last_name=%(last_name)s,phone_number=%(phone_number)s,email=%(email)s,"  # noqa: E501
+            "address=%(address)s,city=%(city)s,state=%(state)s,zip_code=%(zip_code)s WHERE id=%(id)s",  # noqa: E501
             data)
         conn.commit()
         conn.close()
@@ -805,7 +862,8 @@ class Purchasing(QtWidgets.QMainWindow):
     def _on_supp_delete(self):
         row = self.supp_table.currentRow()
         if row < 0 or row >= len(self._supp_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a supplier first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a supplier first.")
             return
         sid = self._supp_row_ids[row]
         conn = get_db()
@@ -815,18 +873,19 @@ class Purchasing(QtWidgets.QMainWindow):
         conn.close()
         msg = "Delete this supplier%s"
         if po_count:
-            msg += (f"\n\nWarning: {po_count} purchase order(s) reference this supplier."
+            msg += (f"\n\nWarning: {po_count} purchase order(s) reference this supplier."  # noqa: E501
                     " They will also be deleted.")
         if (QtWidgets.QMessageBox.question(
                 self, "Confirm Delete", msg,
-                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)  # noqa: E501
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
             po_ids = [r[0] for r in conn.execute(
-                "SELECT id FROM purchase_order WHERE supplier_id=%s", (sid,)).fetchall()]
+                "SELECT id FROM purchase_order WHERE supplier_id=%s", (sid,)).fetchall()]  # noqa: E501
             for pid in po_ids:
                 conn.execute("DELETE FROM po_item WHERE po_id=%s", (pid,))
-            conn.execute("DELETE FROM purchase_order WHERE supplier_id=%s", (sid,))
+            conn.execute(
+    "DELETE FROM purchase_order WHERE supplier_id=%s", (sid,))
             conn.execute("DELETE FROM supplier WHERE id=%s", (sid,))
             conn.commit()
             conn.close()
@@ -843,7 +902,8 @@ class Purchasing(QtWidgets.QMainWindow):
         to_s = self.po_to.date().toString("yyyy-MM-dd")
         conn = get_db()
         q = (
-            "SELECT po.id, po.po_number, po.order_date, po.expected_date, po.status, "
+            "SELECT po.id, po.po_number, po.order_date, po.expected_date, "
+            "po.status, "
             "s.first_name, s.last_name, s.company_name, "
             "COUNT(pi.id) as item_count, "
             "COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) as total "
@@ -859,15 +919,19 @@ class Purchasing(QtWidgets.QMainWindow):
         if status != "(all status)":
             q += " AND po.status=%s"
             params.append(status)
-        q += " GROUP BY po.id, po.po_number, po.order_date, po.expected_date, po.status, s.first_name, s.last_name, s.company_name ORDER BY po.order_date DESC"
+        q += (
+            " GROUP BY po.id, po.po_number, po.order_date, po.expected_date, "
+            "po.status, s.first_name, s.last_name, s.company_name ORDER BY "
+            "po.order_date DESC"
+        )
         rows = conn.execute(q, params).fetchall()
         conn.close()
 
         self.po_table.setRowCount(0)
         self._po_row_ids = []
-        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
-        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
-        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        left = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for row in rows:
             r = self.po_table.rowCount()
             self.po_table.insertRow(r)
@@ -909,16 +973,18 @@ class Purchasing(QtWidgets.QMainWindow):
         conn.close()
 
         self.po_items_table.setRowCount(0)
-        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter
-        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+        right = QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
+        center = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
         for item in items:
             r = self.po_items_table.rowCount()
             self.po_items_table.insertRow(r)
             remaining = item["qty_ordered"] - item["qty_received"]
             self.po_items_table.setItem(r, 0, _ro(item["description"]))
             self.po_items_table.setItem(r, 1, _ro(item["product_name"] or ""))
-            self.po_items_table.setItem(r, 2, _ro(str(item["qty_ordered"]), center))
-            self.po_items_table.setItem(r, 3, _ro(str(item["qty_received"]), center))
+            self.po_items_table.setItem(
+                r, 2, _ro(str(item["qty_ordered"]), center))
+            self.po_items_table.setItem(
+                r, 3, _ro(str(item["qty_received"]), center))
             self.po_items_table.setItem(r, 4, _ro(str(remaining), center))
             self.po_items_table.setItem(r, 5, _ro(
                 _money(item["qty_ordered"] * item["unit_price"]), right))
@@ -933,7 +999,8 @@ class Purchasing(QtWidgets.QMainWindow):
     def _on_add_line(self):
         row = self.po_table.currentRow()
         if row < 0 or row >= len(self._po_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a PO first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a PO first.")
             return
         po_id = self._po_row_ids[row]
         conn = get_db()
@@ -956,7 +1023,8 @@ class Purchasing(QtWidgets.QMainWindow):
     def _on_receive_po(self):
         row = self.po_table.currentRow()
         if row < 0 or row >= len(self._po_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a PO first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a PO first.")
             return
         po_id = self._po_row_ids[row]
         conn = get_db()
@@ -973,7 +1041,7 @@ class Purchasing(QtWidgets.QMainWindow):
             return
         if item_count == 0:
             QtWidgets.QMessageBox.warning(
-                self, "No Items", "Add line items to this PO before receiving.")
+                self, "No Items", "Add line items to this PO before receiving.")  # noqa: E501
             return
         dlg = ReceivePODialog(po_id, self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
@@ -986,7 +1054,8 @@ class Purchasing(QtWidgets.QMainWindow):
     def _on_cancel_po(self):
         row = self.po_table.currentRow()
         if row < 0 or row >= len(self._po_row_ids):
-            QtWidgets.QMessageBox.warning(self, "No Selection", "Select a PO first.")
+            QtWidgets.QMessageBox.warning(
+    self, "No Selection", "Select a PO first.")
             return
         po_id = self._po_row_ids[row]
         conn = get_db()
@@ -995,14 +1064,16 @@ class Purchasing(QtWidgets.QMainWindow):
         ).fetchone()["status"]
         conn.close()
         if status == "cancelled":
-            QtWidgets.QMessageBox.information(self, "Already Cancelled", "PO is already cancelled.")
+            QtWidgets.QMessageBox.information(
+    self, "Already Cancelled", "PO is already cancelled.")
             return
         if (QtWidgets.QMessageBox.question(
                 self, "Cancel PO", "Mark this PO as cancelled%s",
-                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)  # noqa: E501
                 == QtWidgets.QMessageBox.StandardButton.Yes):
             conn = get_db()
-            conn.execute("UPDATE purchase_order SET status='cancelled' WHERE id=%s", (po_id,))
+            conn.execute(
+    "UPDATE purchase_order SET status='cancelled' WHERE id=%s", (po_id,))
             conn.commit()
             conn.close()
             self._refresh_pos()
