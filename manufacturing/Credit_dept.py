@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 import psycopg2
 from .db_pg import get_db
 import csv
