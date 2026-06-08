@@ -74,6 +74,7 @@ def get_all_users_with_roles():
         ORDER BY p.last_name, p.first_name
     """).fetchall()
     conn.close()
+    log.debug("Loaded %d user(s) with roles", len(rows))
     return rows
 
 
@@ -82,6 +83,7 @@ def get_all_roles():
     rows = conn.execute(
         "SELECT id, role_name, description FROM roles ORDER BY id").fetchall()
     conn.close()
+    log.debug("Loaded %d role(s)", len(rows))
     return rows
 
 
@@ -180,6 +182,8 @@ def change_password(email: str, current_password: str,
                     new_password: str) -> bool:
     """Verify current password then update to new one. Returns False if auth fails."""  # noqa: E501
     if not verify_login(email, current_password):
+        log.warning(
+            "Password change denied for %s: current password incorrect", email)
         return False
     return reset_password(email, new_password)
 
