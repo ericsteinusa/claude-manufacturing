@@ -1,6 +1,4 @@
-import os
-import sys
-import subprocess
+from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .IT_Tasks import _apply_blue_palette
 
@@ -17,14 +15,6 @@ LAUNCH_ITEMS = [
     ("Department and Sub List", "dept_sub.py"),
     ("People and Dept",         "display_people_department.py"),
 ]
-
-
-def _launch(script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable,
-    "-m",
-    "manufacturing." + os.path.splitext(script)[0]],
-     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class ITReportsWidget(QtWidgets.QWidget):

@@ -1,6 +1,5 @@
 import sys
-import os
-import subprocess
+from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -27,14 +26,6 @@ def _apply_blue_palette(widget):
         pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
         pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
     widget.setPalette(pal)
-
-
-def _launch(script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable,
-    "-m",
-    "manufacturing." + os.path.splitext(script)[0]],
-     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
