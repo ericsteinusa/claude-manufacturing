@@ -134,7 +134,17 @@ class PgConnection:
 
     def __init__(self, adapt=True):
         self._adapt = adapt
-        self._conn = psycopg2.connect(**DB_CONFIG)
+        try:
+            self._conn = psycopg2.connect(**DB_CONFIG)
+        except Exception:
+            log.error(
+                "Failed to connect to database %s on %s:%s",
+                DB_CONFIG['dbname'], DB_CONFIG['host'], DB_CONFIG['port'],
+                exc_info=True)
+            raise
+        log.debug(
+            "Connected to database %s on %s:%s (adapt=%s)",
+            DB_CONFIG['dbname'], DB_CONFIG['host'], DB_CONFIG['port'], adapt)
 
     def cursor(self):
         raw = self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -150,11 +160,14 @@ class PgConnection:
 
     def executescript(self, script):
         cur = self.cursor()
+        count = 0
         for stmt in script.split(';'):
             stmt = stmt.strip()
             if stmt:
                 cur.execute(stmt)
+                count += 1
         self._conn.commit()
+        log.debug("executescript ran %d statement(s)", count)
         return cur
 
     def commit(self):
