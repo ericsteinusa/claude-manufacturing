@@ -2,7 +2,10 @@ import sys
 import bcrypt
 import psycopg2
 from .db_pg import get_db
+from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
+
+log = get_logger(__name__)
 
 
 def init_db():
@@ -57,6 +60,7 @@ def init_db():
     )
     conn.commit()
     conn.close()
+    log.info("Auth schema initialized (people, passwd, roles, user_roles)")
 
 
 def get_all_users_with_roles():
@@ -89,6 +93,7 @@ def set_user_role(people_id: int, role_id: int):
     """, (people_id, role_id))
     conn.commit()
     conn.close()
+    log.info("Set role_id=%s for people_id=%s", role_id, people_id)
 
 
 def remove_user_role(people_id: int):
@@ -96,6 +101,7 @@ def remove_user_role(people_id: int):
     conn.execute("DELETE FROM user_roles WHERE people_id = %s", (people_id,))
     conn.commit()
     conn.close()
+    log.info("Removed role for people_id=%s", people_id)
 
 
 def verify_login(email: str, password: str) -> bool:
@@ -111,6 +117,7 @@ def verify_login(email: str, password: str) -> bool:
     ).fetchone()
     if row is None:
         conn.close()
+        log.warning("Login failed for %s: no such account", email)
         return False
 
     stored = row["password"]
@@ -126,7 +133,12 @@ def verify_login(email: str, password: str) -> bool:
             conn.execute(
     "UPDATE passwd SET password = %s WHERE id = %s", (hashed, row["pw_id"]))
             conn.commit()
+            log.info("Rehashed legacy plain-text password for %s", email)
     conn.close()
+    if ok:
+        log.info("Login succeeded for %s", email)
+    else:
+        log.warning("Login failed for %s: incorrect password", email)
     return ok
 
 
@@ -138,6 +150,7 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         if conn.execute("SELECT id FROM people WHERE email = %s",
                         (email,)).fetchone():
             conn.close()
+            log.warning("User creation rejected: %s already exists", email)
             return False
         cursor = conn.execute(
             "INSERT INTO people (first_name, last_name, employee_id, address, "
@@ -154,8 +167,12 @@ def create_user(email: str, password: str, first_name: str = "", last_name: str 
         )
         conn.commit()
         conn.close()
+        log.info("Created user %s (people_id=%s)", email, people_id)
         return True
     except psycopg2.IntegrityError:
+        log.warning(
+            "User creation failed for %s: integrity error", email,
+            exc_info=True)
         return False
 
 
@@ -181,12 +198,14 @@ def reset_password(email: str, new_password: str) -> bool:
     ).fetchone()
     if row is None:
         conn.close()
+        log.warning("Password reset failed for %s: no such account", email)
         return False
     hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
     conn.execute("UPDATE passwd SET password = %s WHERE id = %s",
                  (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
+    log.info("Password reset for %s", email)
     return True
 
 
