@@ -18,7 +18,9 @@ Usage:
 """
 
 from .db_pg import get_db
+from .log_utils import get_logger
 
+log = get_logger(__name__)
 
 
 def _conn():
@@ -49,6 +51,9 @@ def post_gl_entry(journal_date, reference, description,
                         acct_num,)
                 ).fetchone()
                 if not row:
+                    log.warning(
+                        "GL entry %s aborted: account number %s not found "
+                        "in chart of accounts", reference, acct_num)
                     return None
                 resolved.append(
     (row["id"], float(debit), float(credit), str(memo)))
@@ -66,8 +71,11 @@ def post_gl_entry(journal_date, reference, description,
                 "VALUES(%s,%s,%s,%s,%s)",
                 [(jid, aid, dr, cr, m) for aid, dr, cr, m in resolved],
             )
+        log.info("Posted GL journal entry %s (reference %s)", jid, reference)
         return jid
     except Exception:
+        log.error(
+            "Failed to post GL entry (reference %s)", reference, exc_info=True)
         return None
 
 
