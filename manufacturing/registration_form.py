@@ -1,5 +1,6 @@
 from .db_pg import get_db
 from .log_utils import get_logger
+from .schema import init_schema
 import sys
 import psycopg2
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
@@ -21,23 +22,7 @@ class MainApp(QMainWindow):
         self.ui.submit_pushButton.clicked.connect(self.save_data)
 
     def initialize_database(self):
-        # Connect to SQLite3 database and create table if it doesn't exist
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS people (
-            id SERIAL PRIMARY KEY,
-            first_name text not null,
-            last_name text not null,
-            address text not null,
-            city text not null,
-            state text not null,
-            zip_code text not null,
-            email text NOT NULL
-        )
-        """)
-        conn.commit()
-        conn.close()
+        init_schema()
         log.debug("Ensured people table exists")
 
     def save_data(self):

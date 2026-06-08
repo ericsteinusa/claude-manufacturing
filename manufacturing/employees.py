@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .schema import init_schema
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -28,32 +29,7 @@ def get_db():
 
 
 def init_db():
-    conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS people (
-            id SERIAL PRIMARY KEY,
-            first_name TEXT,
-            last_name TEXT,
-            employee_id INTEGER,
-            address TEXT,
-            city TEXT,
-            state TEXT,
-            zip_code TEXT,
-            email TEXT,
-            dept_id INTEGER,
-            dept_sub_id INTEGER,
-            emp_id INTEGER
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS position (
-            id SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL UNIQUE,
-            job_title TEXT NOT NULL DEFAULT ''
-        )
-    """)
-    conn.commit()
-    conn.close()
+    init_schema()
 
 
 def _apply_blue_palette(widget):
