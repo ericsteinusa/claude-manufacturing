@@ -162,7 +162,7 @@ def _ro_r(text):
 def _money(v):
     try:
         return f"{float(v):,.2f}" if v else "0.00"
-    except Exception:
+    except (ValueError, TypeError):
         return "0.00"
 
 
