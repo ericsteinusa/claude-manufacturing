@@ -4,7 +4,11 @@ import psycopg2
 import psycopg2.extras
 from dotenv import load_dotenv
 
+from .log_utils import get_logger
+
 load_dotenv()
+
+log = get_logger(__name__)
 
 DB_CONFIG = {
     'host':     os.environ.get('DB_HOST', 'localhost'),
@@ -85,11 +89,16 @@ class _Cursor:
                     self.lastrowid = tmp.fetchone()[0]
                     tmp.execute('RELEASE SAVEPOINT _lastval')
                 except Exception:
+                    log.debug(
+                        "lastval() unavailable after INSERT; "
+                        "lastrowid left unset", exc_info=True)
                     tmp.execute('ROLLBACK TO SAVEPOINT _lastval')
                     tmp.execute('RELEASE SAVEPOINT _lastval')
                     self.lastrowid = None
                 tmp.close()
             except Exception:
+                log.debug(
+                    "Could not determine lastrowid for INSERT", exc_info=True)
                 self.lastrowid = None
         return self
 
@@ -161,6 +170,9 @@ class PgConnection:
         if exc_type is None:
             self._conn.commit()
         else:
+            log.warning(
+                "Rolling back transaction due to %s", exc_type.__name__,
+                exc_info=(exc_type, exc_val, exc_tb))
             self._conn.rollback()
         self._conn.close()
 
