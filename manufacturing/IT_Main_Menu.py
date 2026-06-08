@@ -1,11 +1,7 @@
 import sys
-import os
-import subprocess
+from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
 from .IT_Tasks import _apply_blue_palette
-from .log_utils import get_logger
-
-log = get_logger(__name__)
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -20,18 +16,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _launch(script):
-    module = "manufacturing." + os.path.splitext(script)[0]
-    log.info("Launching module %s", module)
-    try:
-        subprocess.Popen(
-            [sys.executable, "-m", module],
-            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    except Exception:
-        log.error("Failed to launch %s", module, exc_info=True)
-        raise
 
 
 def _launch_tab(script, label):

@@ -1,11 +1,6 @@
 import sys
-import os
-import subprocess
+from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
-
-from .log_utils import get_logger
-
-log = get_logger(__name__)
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -31,18 +26,6 @@ def _apply_blue_palette(widget):
         pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
         pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
     widget.setPalette(pal)
-
-
-def _launch(script):
-    module = "manufacturing." + os.path.splitext(script)[0]
-    log.info("Launching department module %s", module)
-    try:
-        subprocess.Popen(
-            [sys.executable, "-m", module],
-            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    except Exception:
-        log.error("Failed to launch %s", module, exc_info=True)
-        raise
 
 
 def _launch_tab(script, label):

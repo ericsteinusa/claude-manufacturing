@@ -1,6 +1,5 @@
 import sys
-import os
-import subprocess
+from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -39,14 +38,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _launch(script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable,
-    "-m",
-    "manufacturing." + os.path.splitext(script)[0]],
-     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _launch_tab(script, label):
