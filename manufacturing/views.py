@@ -5,6 +5,10 @@ import bcrypt
 import psycopg2
 from django.shortcuts import render, redirect
 
+from .log_utils import get_logger
+
+log = get_logger(__name__)
+
 
 # Each item: (key, label, target)
 # target is a script filename (str = leaf) or a dict (sub-menu node).
@@ -1679,6 +1683,7 @@ def _init_schema():
         conn.execute(ddl)
     conn.commit()
     conn.close()
+    log.debug("Ensured %d application table(s) exist", len(tables))
 
 
 def _ensure_roles():
@@ -1702,6 +1707,7 @@ def _ensure_roles():
         )
     conn.commit()
     conn.close()
+    log.debug("Ensured default roles exist")
 
 
 DEPT_MENU_KEY = {
@@ -1788,6 +1794,7 @@ def _verify_login(email: str, password: str) -> bool:
     ).fetchone()
     if row is None:
         conn.close()
+        log.warning("Login failed for %s: no such account", email)
         return False
     stored = row["password"]
     if stored.startswith("$2b$") or stored.startswith("$2a$"):
@@ -1801,7 +1808,12 @@ def _verify_login(email: str, password: str) -> bool:
                 "UPDATE passwd SET password = %s WHERE id = %s",
                 (hashed, row["pw_id"]))
             conn.commit()
+            log.info("Rehashed legacy plain-text password for %s", email)
     conn.close()
+    if ok:
+        log.info("Login succeeded for %s", email)
+    else:
+        log.warning("Login failed for %s: incorrect password", email)
     return ok
 
 
@@ -1821,6 +1833,7 @@ def _create_user(email, password, first_name='', last_name='',
         if conn.execute("SELECT id FROM people WHERE email = %s",
                         (email,)).fetchone():
             conn.close()
+            log.warning("User creation rejected: %s already exists", email)
             return False
         cursor = conn.execute(
             "INSERT INTO people (first_name, last_name, "
@@ -1837,8 +1850,12 @@ def _create_user(email, password, first_name='', last_name='',
         )
         conn.commit()
         conn.close()
+        log.info("Created user %s (people_id=%s)", email, people_id)
         return True
     except psycopg2.IntegrityError:
+        log.warning(
+            "User creation failed for %s: integrity error", email,
+            exc_info=True)
         return False
 
 
@@ -1852,12 +1869,14 @@ def _reset_password(email: str, new_password: str) -> bool:
     ).fetchone()
     if row is None:
         conn.close()
+        log.warning("Password reset failed for %s: no such account", email)
         return False
     hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
     conn.execute("UPDATE passwd SET password = %s WHERE id = %s",
                  (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
+    log.info("Password reset for %s", email)
     return True
 
 
@@ -1945,7 +1964,10 @@ def dashboard(request):
 
 
 def logout(request):
+    email = request.session.get('user_email')
     request.session.flush()
+    if email:
+        log.info("User %s logged out", email)
     return redirect('home')
 
 
@@ -2016,11 +2038,21 @@ def run_script(request, dept, subpath):
                 mfg_dir = os.path.dirname(__file__)
                 module_name = os.path.splitext(target)[0]
                 project_dir = os.path.dirname(mfg_dir)
-                subprocess.Popen(
-                    [sys.executable, '-m',
-                        f'manufacturing.{module_name}', leaf_key],
-                    cwd=project_dir,
-                )
+                log.info(
+                    "User %s launching manufacturing.%s (%s/%s)",
+                    request.session.get('user_email'), module_name,
+                    dept, subpath)
+                try:
+                    subprocess.Popen(
+                        [sys.executable, '-m',
+                            f'manufacturing.{module_name}', leaf_key],
+                        cwd=project_dir,
+                    )
+                except Exception:
+                    log.error(
+                        "Failed to launch manufacturing.%s", module_name,
+                        exc_info=True)
+                    raise
                 break
     if parent_parts:
         return redirect('/dept/{}/{}/'.format(dept, '/'.join(parent_parts)))
@@ -2167,6 +2199,9 @@ def change_password(request):
             })
 
         if not _verify_login(email, current):
+            log.warning(
+                "Password change denied for %s: current password incorrect",
+                email)
             return render(request, 'change_password.html', {
                 'error': 'Incorrect email or current password.',
                 'email_value': email,
@@ -2216,13 +2251,18 @@ def _set_user_role(people_id: int, role_id: int):
     """, (people_id, role_id))
     conn.commit()
     conn.close()
+    log.info("Set role_id=%s for people_id=%s", role_id, people_id)
 
 
 def _remove_user_role(people_id: int):
     conn = _get_db()
-    conn.execute("DELETE FROM user_roles WHERE people_id = %s", (people_id,))
+    cur = conn.execute(
+        "DELETE FROM user_roles WHERE people_id = %s", (people_id,))
+    removed = cur.rowcount
     conn.commit()
     conn.close()
+    if removed:
+        log.info("Removed role for people_id=%s", people_id)
 
 
 _ROLE_ADMIN_ROLES = FULL_ACCESS_ROLES | {'Admin'}
