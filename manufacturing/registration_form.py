@@ -1,8 +1,11 @@
 from .db_pg import get_db
+from .log_utils import get_logger
 import sys
 import psycopg2
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from .registration import Ui_MainWindow  # Import the generated Python file
+
+log = get_logger(__name__)
 
 
 class MainApp(QMainWindow):
@@ -35,6 +38,7 @@ class MainApp(QMainWindow):
         """)
         conn.commit()
         conn.close()
+        log.debug("Ensured people table exists")
 
     def save_data(self):
         # Get input data from the form
@@ -58,6 +62,8 @@ class MainApp(QMainWindow):
             cursor.execute("SELECT id FROM people WHERE email = %s", (email,))
             if cursor.fetchone():
                 conn.close()
+                log.warning(
+                    "Registration rejected: %s already exists", email)
                 QMessageBox.warning(self, "Email Already Registered",
                                     "An account with that email already "
                                     "exists. "
@@ -68,6 +74,7 @@ class MainApp(QMainWindow):
             conn.commit()
             conn.close()
 
+            log.info("Registered new person %s", email)
             QMessageBox.information(
     self, "Success", "Data saved successfully!")
             self.ui.fname_lineEdit.clear()
@@ -80,10 +87,15 @@ class MainApp(QMainWindow):
         except psycopg2.IntegrityError:
             # UNIQUE(email) violation — e.g. the email was registered between the  # noqa: E501
             # check above and the insert.
+            log.warning(
+                "Registration race for %s: email already exists", email,
+                exc_info=True)
             QMessageBox.warning(self, "Email Already Registered",
                                 "An account with that email already exists. "
                                 "Please use a different email address.")
         except Exception as e:
+            log.error(
+                "Registration failed for %s", email, exc_info=True)
             QMessageBox.critical(
     self, "Database Error", f"An error occurred: {e}")
 
