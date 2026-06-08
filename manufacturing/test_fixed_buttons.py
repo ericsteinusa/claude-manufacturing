@@ -3,7 +3,7 @@ import os
 import time
 import subprocess
 
-mfg = '/home/eric/tester/manufacture/manufacturing'
+mfg = os.path.dirname(os.path.abspath(__file__))
 tests = [
     ('Accounts_payable.py', 'acct_pay', '/tmp/test_ap.png'),
     ('Accounts_receivable.py', 'acct_rcv', '/tmp/test_ar.png'),

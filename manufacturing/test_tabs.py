@@ -3,7 +3,7 @@ import sys
 import os
 import traceback
 import importlib
-_DIR = r"C:\tester\manufacture\manufacturing"
+_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_DIR)
 sys.path.insert(0, _DIR)
 
