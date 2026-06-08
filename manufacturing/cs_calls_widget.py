@@ -3,7 +3,10 @@ cs_calls_widget.py — PyQt6 Customer Service Calls widget.
 Replaces the legacy tkinter cs_calls.py for embedding in tabbed menus.
 """
 from .db_pg import get_db
+from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
+
+log = get_logger(__name__)
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -79,6 +82,9 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))

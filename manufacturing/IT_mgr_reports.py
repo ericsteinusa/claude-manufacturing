@@ -5,8 +5,11 @@ Tabs: Overview | By Technician | By Department | Overdue | Asset Inventory
 import sys
 from datetime import date
 from .db_pg import get_db
+from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .IT_Tasks import _apply_blue_palette
+
+log = get_logger(__name__)
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -185,6 +188,9 @@ class _OverviewWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             task_rows = ticket_rows = asset_rows = []
             overdue_tasks = overdue_tickets = 0
 
@@ -287,6 +293,9 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
             """).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             task_rows = ticket_rows = []
 
         self._task_tbl.setRowCount(len(task_rows))
@@ -371,6 +380,9 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             """).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             task_rows = ticket_rows = []
 
         self._task_tbl.setRowCount(len(task_rows))
@@ -457,6 +469,9 @@ class _OverdueWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             task_rows = ticket_rows = []
 
         self._task_tbl.setRowCount(len(task_rows))
@@ -563,6 +578,9 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             status_rows = type_rows = all_rows = []
 
         self._status_tbl.setRowCount(len(status_rows))

@@ -6,9 +6,13 @@ Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report
 import sys
 from .db_pg import get_db
 from .gl_utils import post_gl_entry
+from .log_utils import get_logger
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
+
+log = get_logger(__name__)
+
 SS_RATE      = 0.062
 MEDICARE_RATE = 0.0145
 DT_FMT = "%Y-%m-%d %H:%M:%S"
@@ -139,7 +143,10 @@ def init_db():
         try:
             conn.execute(f"ALTER TABLE payroll_entry ADD COLUMN {col} {defn}")
         except Exception:
-            pass
+            # Expected when the column already exists on an up-to-date DB.
+            log.debug(
+                "Could not add column %s (likely already exists)", col,
+                exc_info=True)
     conn.commit()
     conn.close()
 
