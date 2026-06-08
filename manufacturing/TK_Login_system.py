@@ -5,7 +5,10 @@ import tkinter as tk
 from tkinter import messagebox, PhotoImage
 from tkinter import *  # noqa: F401,F403,F405
 from .db_pg import get_db
+from .log_utils import get_logger
 import subprocess
+
+log = get_logger(__name__)
 
 root = None
 email_entry = None
@@ -28,11 +31,14 @@ def validate_credentials():
     conn.close()
 
     if result:
+        log.info("Login succeeded for %s", email)
         root.destroy()
         subprocess.Popen([sys.executable, "-m", "manufacturing.Company_main_menu"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     else:
+        log.warning("Login failed for %s: invalid email or password", email)
         messagebox.showerror("Error", "Invalid username or Password.")
         if messagebox.askyesno("Register", "Do you want to register as a new user?"):
+            log.info("Launching registration form for %s", email)
             subprocess.Popen([sys.executable, "-m", "manufacturing.registration_form"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         else:
             messagebox.showinfo("Info", "Please try again later.")
