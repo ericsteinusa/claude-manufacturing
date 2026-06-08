@@ -118,3 +118,55 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+# Logging
+# Mirrors manufacturing/log_utils.py: honours the LOG_LEVEL and LOG_FILE
+# environment variables and uses the same line format, so the Django web
+# process and the standalone desktop tools log consistently. Set LOG_FILE to
+# also write to a file; set DJANGO_LOG_LEVEL to tune Django's own verbosity.
+
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO').upper()
+LOG_FILE = os.environ.get('LOG_FILE')
+
+_LOG_HANDLER_DEFS = {
+    'console': {
+        'class': 'logging.StreamHandler',
+        'formatter': 'standard',
+    },
+}
+if LOG_FILE:
+    _LOG_HANDLER_DEFS['file'] = {
+        'class': 'logging.FileHandler',
+        'filename': LOG_FILE,
+        'formatter': 'standard',
+    }
+_LOG_HANDLERS = list(_LOG_HANDLER_DEFS)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s %(levelname)-8s %(name)s: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': _LOG_HANDLER_DEFS,
+    'root': {
+        'handlers': _LOG_HANDLERS,
+        'level': LOG_LEVEL,
+    },
+    'loggers': {
+        'django': {
+            'handlers': _LOG_HANDLERS,
+            'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO').upper(),
+            'propagate': False,
+        },
+        'manufacturing': {
+            'handlers': _LOG_HANDLERS,
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+    },
+}

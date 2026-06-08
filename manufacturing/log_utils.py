@@ -27,8 +27,17 @@ def _configure():
     if _configured:
         return
 
-    level = os.environ.get("LOG_LEVEL", "INFO").upper()
     root = logging.getLogger()
+    # If logging has already been configured elsewhere — e.g. Django's
+    # LOGGING in settings.py when running the web app — don't add a second
+    # set of handlers (which would duplicate every line). Standalone desktop
+    # tools, where nothing else configures logging, fall through and set up
+    # their own console/file handlers below.
+    if root.handlers:
+        _configured = True
+        return
+
+    level = os.environ.get("LOG_LEVEL", "INFO").upper()
     root.setLevel(getattr(logging, level, logging.INFO))
 
     formatter = logging.Formatter(_LOG_FORMAT, _DATE_FORMAT)
