@@ -89,4 +89,6 @@ def gl_accounts_by_type(*types):
             f"ORDER BY account_number",
             types,
         ).fetchall()
+    log.debug(
+        "gl_accounts_by_type(%s) returned %d account(s)", types, len(rows))
     return [(r["account_number"], r["account_name"]) for r in rows]
