@@ -123,7 +123,7 @@ def _ro_c(text):
 def _money(v):
     try:
         return f"{float(v):,.2f}" if v is not None else "0.00"
-    except Exception:
+    except (ValueError, TypeError):
         return "0.00"
 
 
