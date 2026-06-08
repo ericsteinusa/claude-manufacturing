@@ -1,0 +1,8 @@
+# Development / CI dependencies (in addition to requirements.txt).
+#
+# Install with:  pip install -r requirements-dev.txt
+#
+# ruff is pinned to match the version run in CI (.github/workflows/ruff.yml).
+
+pytest==9.0.3
+ruff==0.15.15
