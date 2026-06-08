@@ -6,8 +6,11 @@ Tabs: Task Summary | By Technician | By Department | Overdue | Recently
 import sys
 from datetime import date, timedelta
 from .db_pg import get_db
+from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .IT_Tasks import _apply_blue_palette
+
+log = get_logger(__name__)
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -120,6 +123,9 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             s_rows = p_rows = t_rows = []
 
         for tbl, rows in [(self._status_tbl, s_rows),
@@ -180,6 +186,9 @@ class _ByTechnicianWidget(QtWidgets.QWidget):
             """).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))
@@ -237,6 +246,9 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             """).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))
@@ -297,6 +309,9 @@ class _OverdueWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))
@@ -352,6 +367,9 @@ class _RecentlyCompletedWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))

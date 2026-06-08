@@ -5,8 +5,11 @@ Tabs: Task Summary | Ticket Summary | Overdue Tasks | Overdue Tickets
 import sys
 from datetime import date
 from .db_pg import get_db
+from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .IT_Tasks import _apply_blue_palette
+
+log = get_logger(__name__)
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -122,6 +125,9 @@ class _TaskSummaryWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             status_rows, pri_rows = [], []
 
         self._status_table.setRowCount(len(status_rows))
@@ -205,6 +211,9 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             status_rows, pri_rows = [], []
 
         self._status_table.setRowCount(len(status_rows))
@@ -275,6 +284,9 @@ class _OverdueTasksWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))
@@ -337,6 +349,9 @@ class _OverdueTicketsWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))

@@ -6,8 +6,11 @@ Tabs: Ticket Summary | By Department | By Issue Type | Open Tickets | Asset
 import sys
 from datetime import date
 from .db_pg import get_db
+from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .it_calls import _apply_blue_palette
+
+log = get_logger(__name__)
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -123,6 +126,9 @@ class _TicketSummaryWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             s_rows, p_rows = [], []
 
         self._status_tbl.setRowCount(len(s_rows))
@@ -192,6 +198,9 @@ class _ByDepartmentWidget(QtWidgets.QWidget):
             """).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))
@@ -255,6 +264,9 @@ class _ByIssueTypeWidget(QtWidgets.QWidget):
             """).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         self._table.setRowCount(len(rows))
@@ -317,6 +329,9 @@ class _OpenTicketsWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             rows = []
 
         OVERDUE_BG = QtGui.QColor(248, 215, 218)
@@ -396,6 +411,9 @@ class _AssetSummaryWidget(QtWidgets.QWidget):
             ).fetchall()
             conn.close()
         except Exception:
+            log.warning(
+                "Report query failed; using empty result",
+                exc_info=True)
             s_rows, t_rows = [], []
 
         self._status_tbl.setRowCount(len(s_rows))
