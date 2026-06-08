@@ -1625,65 +1625,16 @@ def _walk_tree(dept, parts):
 
 
 from .db_pg import get_db as _get_db  # noqa: E402
+from .schema import init_schema  # noqa: E402
 
 
 def _init_schema():
-    """Create application tables if they don't exist."""
-    conn = _get_db()
-    tables = [
-        """CREATE TABLE IF NOT EXISTS people (
-            id SERIAL PRIMARY KEY,
-            first_name TEXT NOT NULL DEFAULT '',
-            last_name TEXT NOT NULL DEFAULT '',
-            employee_id INTEGER NOT NULL DEFAULT 0,
-            address TEXT NOT NULL DEFAULT '',
-            city TEXT NOT NULL DEFAULT '',
-            state TEXT NOT NULL DEFAULT '',
-            zip_code TEXT NOT NULL DEFAULT '',
-            email TEXT NOT NULL DEFAULT '',
-            dept_id INTEGER,
-            dept_sub_id INTEGER
-        )""",
-        """CREATE TABLE IF NOT EXISTS passwd (
-            id SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            FOREIGN KEY (people_id) REFERENCES people(id)
-        )""",
-        """CREATE TABLE IF NOT EXISTS roles (
-            id SERIAL PRIMARY KEY,
-            role_name TEXT NOT NULL UNIQUE,
-            description TEXT
-        )""",
-        """CREATE TABLE IF NOT EXISTS user_roles (
-            id SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL UNIQUE,
-            role_id INTEGER NOT NULL,
-            FOREIGN KEY (people_id) REFERENCES people(id),
-            FOREIGN KEY (role_id) REFERENCES roles(id)
-        )""",
-        """CREATE TABLE IF NOT EXISTS dept (
-            dept_id SERIAL PRIMARY KEY,
-            dept_name TEXT NOT NULL UNIQUE
-        )""",
-        """CREATE TABLE IF NOT EXISTS dept_sub (
-            dept_sub_id SERIAL PRIMARY KEY,
-            dept_id INTEGER,
-            dept_sub_name TEXT NOT NULL,
-            FOREIGN KEY (dept_id) REFERENCES dept(dept_id)
-        )""",
-        """CREATE TABLE IF NOT EXISTS position (
-            id SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL UNIQUE,
-            job_title TEXT NOT NULL DEFAULT '',
-            FOREIGN KEY (people_id) REFERENCES people(id)
-        )""",
-    ]
-    for ddl in tables:
-        conn.execute(ddl)
-    conn.commit()
-    conn.close()
-    log.debug("Ensured %d application table(s) exist", len(tables))
+    """Create application tables if they don't exist.
+
+    Thin wrapper around the canonical schema module, kept for the
+    AppConfig.ready() hook in apps.py.
+    """
+    init_schema()
 
 
 def _ensure_roles():

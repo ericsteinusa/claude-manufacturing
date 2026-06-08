@@ -1,5 +1,6 @@
 # ruff: noqa: F403,F405
 from .db_pg import get_db
+from .schema import init_schema
 from tkinter import *  # noqa: F401,F403,F405
 from tkinter import ttk
 
@@ -7,41 +8,7 @@ from tkinter import ttk
 
 
 def setup_database():
-    conn = get_db()
-    cursor = conn.cursor()
-
-    # Create Parent table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS people (
-        id SERIAL PRIMARY KEY,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        employee_id INTEGER,
-        address TEXT NOT NULL,
-        city TEXT NOT NULL,
-        state TEXT NOT NULL,
-        zip_code TEXT NOT NULL,
-        email TEXT NOT NULL,
-        dept_id INTEGER,
-        dept_sub_id INTEGER
-    )
-    """)
-
-    # Create Child table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS dept (
-        dept_id SERIAL PRIMARY KEY ,
-        dept_name TEXT
-        )
-    """)
-
-    # Create Child table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS dept_sub (
-        dept_sub_id SERIAL PRIMARY KEY,
-        dept_sub_name TEXT
-        )
-    """)
+    init_schema()
 
     # Fetch data with JOIN
 

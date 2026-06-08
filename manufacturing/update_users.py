@@ -3,26 +3,14 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import *  # noqa: F401,F403,F405
 from .db_pg import get_db
+from .schema import init_schema
 
 
 
 
 # Database setup
 def setup_database():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS people (
-            id SERIAL PRIMARY KEY,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                address TEXT NOT NULL,
-                city TEXT NOT NULL,
-                state TEXT NOT NULL,
-                zip_code TEXT NOT NULL,
-                email TEXT NOT NULL
-            )
-        ''')
+    init_schema()
 
 
 global email_entry, password_entry

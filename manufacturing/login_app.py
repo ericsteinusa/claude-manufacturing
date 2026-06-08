@@ -3,50 +3,15 @@ import bcrypt
 import psycopg2
 from .db_pg import get_db
 from .log_utils import get_logger
+from .schema import init_schema
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 log = get_logger(__name__)
 
 
 def init_db():
+    init_schema()
     conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS people (
-            id SERIAL PRIMARY KEY,
-            first_name TEXT NOT NULL,
-            last_name TEXT NOT NULL,
-            employee_id INTEGER NOT NULL DEFAULT 0,
-            address TEXT NOT NULL,
-            city TEXT NOT NULL,
-            state TEXT NOT NULL,
-            zip_code TEXT NOT NULL,
-            email TEXT NOT NULL
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS passwd (
-            id SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            FOREIGN KEY (people_id) REFERENCES people(id)
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS roles (
-            id SERIAL PRIMARY KEY,
-            role_name TEXT NOT NULL UNIQUE,
-            description TEXT
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS user_roles (
-            id SERIAL PRIMARY KEY,
-            people_id INTEGER NOT NULL UNIQUE,
-            role_id INTEGER NOT NULL,
-            FOREIGN KEY (people_id) REFERENCES people(id),
-            FOREIGN KEY (role_id) REFERENCES roles(id)
-        )
-    """)
     default_roles = [
         ("Admin", "Full access to all screens and settings"),
         ("Manager", "Access to department management screens"),

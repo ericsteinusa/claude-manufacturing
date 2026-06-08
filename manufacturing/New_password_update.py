@@ -1,4 +1,5 @@
 from .db_pg import get_db
+from .schema import init_schema
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from .password import Ui_MainWindow  # Import the generated Python file
@@ -14,25 +15,7 @@ class MainApp(QMainWindow):
         self.initialize_database()
 
     def initialize_database(self):
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS people (
-            id SERIAL PRIMARY KEY,
-            first_name TEXT NOT NULL,
-            last_name TEXT NOT NULL,
-            employee_id INTEGER NOT NULL DEFAULT 0,
-            address TEXT NOT NULL,
-            city TEXT NOT NULL,
-            state TEXT NOT NULL,
-            zip_code TEXT NOT NULL,
-            email TEXT NOT NULL
-        )
-    ''')
-        print("Database connected successfully!")
-
-        conn.commit()
-        conn.close()
+        init_schema()
 
 # Connect the Submit button to the save_data method
     #    self.ui.submit_Button.clicked.connect(self.check_name)
