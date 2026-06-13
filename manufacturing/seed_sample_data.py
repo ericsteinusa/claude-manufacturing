@@ -2,11 +2,12 @@
 
 Inserts ~40 sample employees, one or more per sub-department, so every
 department and sub-department is staffed. Each person is assigned the
-correct parent department, their sub-department, and a role inferred from
-the sub-department title (Manager -> Department Manager, Supervisor/Lead/
-Foreman -> Supervisor, Personnel staff -> HR / Personnel, otherwise the
-general-staff role). It also backfills ``dept_sub.dept_id`` so every
-sub-department is linked to its parent department.
+correct parent department, their sub-department, a ``position.job_title``
+matching the sub-department title, and a role inferred from that title
+(Manager -> Department Manager, Supervisor/Lead/Foreman -> Supervisor,
+Personnel staff -> HR / Personnel, otherwise the general-staff role). It
+also backfills ``dept_sub.dept_id`` so every sub-department is linked to
+its parent department.
 
 Sample people are tagged with an ``@example.com`` email so the seed is
 idempotent and fully reversible.
@@ -175,12 +176,13 @@ def sample_present(conn):
 
 
 def remove_sample(conn):
-    """Delete sample people (and their roles). Returns count removed."""
+    """Delete sample people (roles + positions too). Returns count removed."""
     ids = [r["id"] for r in conn.execute(
         "SELECT id FROM people WHERE email LIKE %s",
         ("%" + SAMPLE_EMAIL_DOMAIN,)).fetchall()]
     for pid in ids:
         conn.execute("DELETE FROM user_roles WHERE people_id=%s", (pid,))
+        conn.execute("DELETE FROM position WHERE people_id=%s", (pid,))
         conn.execute("DELETE FROM people WHERE id=%s", (pid,))
     return len(ids)
 
@@ -214,6 +216,10 @@ def seed(conn):
                 conn.execute(
                     "INSERT INTO user_roles (people_id, role_id) "
                     "VALUES (%s,%s)", (pid, role_id))
+            # Job title mirrors the sub-department title.
+            conn.execute(
+                "INSERT INTO position (people_id, job_title) VALUES (%s,%s)",
+                (pid, sub_name))
             emp_id += 1
             added += 1
     return added
