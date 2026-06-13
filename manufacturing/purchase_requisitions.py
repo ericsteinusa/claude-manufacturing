@@ -557,7 +557,7 @@ class _RequisitionViewBase(QtWidgets.QWidget):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT ri.description, p.product_name, ri.qty,
+                SELECT ri.description, p.name AS product_name, ri.qty,
                        ri.est_unit_price
                 FROM requisition_item ri
                 LEFT JOIN product p ON p.id = ri.product_id
