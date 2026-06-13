@@ -32,9 +32,10 @@ GREEN = QtGui.QColor("#1a7f37")
 
 def _m(x):
     try:
-        return f"${float(x):,.2f}"
+        v = float(x)
     except (TypeError, ValueError):
         return ""
+    return f"-${abs(v):,.2f}" if round(v, 2) < 0 else f"${abs(v):,.2f}"
 
 
 def _pct(variance, budgeted):
