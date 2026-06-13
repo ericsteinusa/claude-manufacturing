@@ -106,7 +106,7 @@ def _load_products():
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT id, product_name FROM product ORDER BY product_name"
+            "SELECT id, name AS product_name FROM product ORDER BY name"
         ).fetchall()
     except psycopg2.OperationalError:
         rows = []
@@ -626,7 +626,7 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT pi.description, p.product_name, pi.qty_ordered,
+                SELECT pi.description, p.name AS product_name, pi.qty_ordered,
                        pi.unit_price, pi.qty_received
                 FROM po_item pi LEFT JOIN product p ON p.id = pi.product_id
                 WHERE pi.po_id = %s
