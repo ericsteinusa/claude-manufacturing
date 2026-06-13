@@ -1,5 +1,6 @@
 import sys
 from .launch_utils import launch as _launch
+from .purchase_requisitions import RequisitionApprovalsWidget
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -91,6 +92,7 @@ class PurchasingMgrMenu(QtWidgets.QMainWindow):
         "product_entry_screen.py",
         "Product Entry"),
          "Product Entry")
+        tabs.addTab(RequisitionApprovalsWidget(), "Requisition Approvals")
         v.addWidget(tabs)
 
 
