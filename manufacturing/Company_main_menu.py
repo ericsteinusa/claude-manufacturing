@@ -84,6 +84,9 @@ class CompanyMainMenuWidget(QtWidgets.QWidget):
         tabs.setTabPosition(QtWidgets.QTabWidget.TabPosition.North)
         for label, script in DEPARTMENTS:
             tabs.addTab(_launch_tab(script, label), label)
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 
