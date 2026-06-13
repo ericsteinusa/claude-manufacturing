@@ -1638,27 +1638,12 @@ def _init_schema():
 
 
 def _ensure_roles():
-    """Insert any missing roles into the roles table."""
-    conn = _get_db()
-    for name, desc in [
-        ('President', 'Full access — company president'),
-        ('Vice President', 'Full access — company vice president'),
-        ('Department Manager',
-         'Full access to own department including management screens'),
-        ('Supervisor', 'Access to own department operational screens'),
-        ('Auditor',
-         'Read-only browse access across all departments '
-         '— cannot launch apps'),
-        ('HR / Personnel', 'Full access to Personnel department'),
-    ]:
-        conn.execute(
-            "INSERT INTO roles(role_name, description) "
-            "SELECT %s,%s WHERE NOT EXISTS "
-            "(SELECT 1 FROM roles WHERE role_name=%s)", (name, desc, name)
-        )
-    conn.commit()
-    conn.close()
-    log.debug("Ensured default roles exist")
+    """Ensure the canonical roles exist.
+
+    Delegates to schema.init_schema(), which seeds schema.DEFAULT_ROLES —
+    the single source of truth for the role vocabulary.
+    """
+    init_schema()
 
 
 DEPT_MENU_KEY = {
@@ -1717,7 +1702,7 @@ def _get_user_profile(email: str) -> dict:
     dept_sub_id = row['dept_sub_id']
     is_manager = (
         dept_sub_id in MANAGER_DEPT_SUB_IDS
-        or role_name in {'Department Manager', 'Admin'} | FULL_ACCESS_ROLES
+        or role_name in {'Department Manager'} | FULL_ACCESS_ROLES
     )
     return {
         'people_id': row['id'],
@@ -1731,8 +1716,8 @@ def _get_user_profile(email: str) -> dict:
 
 
 def _is_full_access(profile: dict) -> bool:
-    """President, Vice President, and Admin roles see all departments."""
-    return profile.get('role_name') in FULL_ACCESS_ROLES | {'Admin'}
+    """President and Vice President roles see all departments."""
+    return profile.get('role_name') in FULL_ACCESS_ROLES
 
 
 def _verify_login(email: str, password: str) -> bool:
@@ -2216,7 +2201,8 @@ def _remove_user_role(people_id: int):
         log.info("Removed role for people_id=%s", people_id)
 
 
-_ROLE_ADMIN_ROLES = FULL_ACCESS_ROLES | {'Admin'}
+# Roles permitted to administer user_roles (President / Vice President).
+_ROLE_ADMIN_ROLES = FULL_ACCESS_ROLES
 
 
 def user_roles(request):

@@ -10,21 +10,9 @@ log = get_logger(__name__)
 
 
 def init_db():
+    # init_schema() creates the auth tables and seeds the canonical roles
+    # (schema.DEFAULT_ROLES) — the single source of truth for the vocabulary.
     init_schema()
-    conn = get_db()
-    default_roles = [
-        ("Admin", "Full access to all screens and settings"),
-        ("Manager", "Access to department management screens"),
-        ("Employee", "Standard employee access"),
-        ("Viewer", "Read-only access"),
-    ]
-    conn.executemany(
-        "INSERT INTO roles (role_name, description) VALUES (%s, %s) ON "
-        "CONFLICT (role_name) DO NOTHING",
-        default_roles,
-    )
-    conn.commit()
-    conn.close()
     log.info("Auth schema initialized (people, passwd, roles, user_roles)")
 
 
