@@ -147,19 +147,27 @@ def _next_req_num():
     return f"REQ-{yr}-{count + 1:04d}"
 
 
-# Roles permitted to authorize requisitions raised in their own department.
-# Matches the role names actually present in the ``roles`` table.
-AUTHORIZER_ROLES = (
-    "Department Manager",
-    "Supervisor",
+# Roles permitted to authorize requisitions, matching the role names
+# actually present in the ``roles`` table. Senior leadership can authorize
+# any department; the rest only their own.
+COMPANY_WIDE_ROLES = (
     "President",
     "Vice President",
 )
+AUTHORIZER_ROLES = (
+    "Department Manager",
+    "Supervisor",
+) + COMPANY_WIDE_ROLES
 
 
 def _is_manager(role_name):
-    """Roles that may authorize their department's requests."""
+    """Roles that may authorize requisitions."""
     return role_name in AUTHORIZER_ROLES
+
+
+def _is_company_wide(role_name):
+    """Roles that may authorize any department's requests, not just theirs."""
+    return role_name in COMPANY_WIDE_ROLES
 
 
 def _load_people():
@@ -712,7 +720,8 @@ class RequisitionsWidget(_RequisitionViewBase):
         if not hasattr(self, "_buttons"):
             return
         p = self._acting()
-        is_mgr = _is_manager((p["role_name"] if p else None) or "")
+        role = (p["role_name"] if p else None) or ""
+        is_mgr = _is_manager(role)
         sel = self._selected_id is not None
         is_own = bool(p) and sel and self._selected_requester() == p["id"]
         submitted = self._selected_status == "submitted"
@@ -722,11 +731,11 @@ class RequisitionsWidget(_RequisitionViewBase):
         self._buttons["submit"].setEnabled(is_own and draft)
         self._buttons["cancel"].setEnabled(
             is_own and self._selected_status in ("draft", "submitted"))
-        # A manager may authorize/deny submitted requests in their own dept,
-        # but not their own request.
-        can_decide = (is_mgr and submitted and bool(p)
-                      and self._selected_dept() == p["dept_id"]
-                      and not is_own)
+        # A manager may authorize/deny submitted requests in their own dept
+        # (senior leadership in any dept), but never their own request.
+        in_scope = (_is_company_wide(role)
+                    or self._selected_dept() == p["dept_id"]) if p else False
+        can_decide = (is_mgr and submitted and in_scope and not is_own)
         self._buttons["authorize"].setEnabled(can_decide)
         self._buttons["deny"].setEnabled(can_decide)
 
