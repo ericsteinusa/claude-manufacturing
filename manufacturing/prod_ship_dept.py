@@ -209,7 +209,7 @@ class AddShipItemDialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             prods = conn.execute(
-                "SELECT id, product_name FROM product ORDER BY product_name"
+                "SELECT id, name AS product_name FROM product ORDER BY name"
             ).fetchall()
         except psycopg2.OperationalError:
             prods = []
@@ -561,7 +561,7 @@ class ShippingDept(QtWidgets.QMainWindow):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT si.description, p.product_name, si.qty
+                SELECT si.description, p.name AS product_name, si.qty
                 FROM shipment_item si LEFT JOIN product p ON p.id =
                     si.product_id
                 WHERE si.shipment_id = ?

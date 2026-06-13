@@ -224,7 +224,7 @@ class AddReceiptItemDialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             prods = conn.execute(
-                "SELECT id, product_name FROM product ORDER BY product_name"
+                "SELECT id, name AS product_name FROM product ORDER BY name"
             ).fetchall()
         except psycopg2.OperationalError:
             prods = []
@@ -591,7 +591,7 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             items = conn.execute("""
-                SELECT ri.description, p.product_name, ri.qty_ordered,
+                SELECT ri.description, p.name AS product_name, ri.qty_ordered,
                     ri.qty_received
                 FROM receiving_item ri LEFT JOIN product p ON p.id =
                     ri.product_id
