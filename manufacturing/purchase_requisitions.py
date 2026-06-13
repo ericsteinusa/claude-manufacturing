@@ -74,6 +74,7 @@ def init_db():
             req_number TEXT NOT NULL UNIQUE,
             requester_id INTEGER,
             dept_id INTEGER,
+            dept_sub_id INTEGER,
             needed_date TEXT,
             justification TEXT,
             status TEXT DEFAULT 'draft',
@@ -85,6 +86,11 @@ def init_db():
     conn.execute(
         "ALTER TABLE purchase_requisition "
         "ADD COLUMN IF NOT EXISTS po_id INTEGER")
+    # Requester's sub-department, captured for display (added to pre-existing
+    # tables too); authorization is still gated at the department level.
+    conn.execute(
+        "ALTER TABLE purchase_requisition "
+        "ADD COLUMN IF NOT EXISTS dept_sub_id INTEGER")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS requisition_item (
             id SERIAL PRIMARY KEY,
@@ -141,9 +147,19 @@ def _next_req_num():
     return f"REQ-{yr}-{count + 1:04d}"
 
 
+# Roles permitted to authorize requisitions raised in their own department.
+# Matches the role names actually present in the ``roles`` table.
+AUTHORIZER_ROLES = (
+    "Department Manager",
+    "Supervisor",
+    "President",
+    "Vice President",
+)
+
+
 def _is_manager(role_name):
-    """Managers (and Admins) may authorize their department's requests."""
-    return role_name in ("Manager", "Admin")
+    """Roles that may authorize their department's requests."""
+    return role_name in AUTHORIZER_ROLES
 
 
 def _load_people():
@@ -154,9 +170,11 @@ def _load_people():
             SELECT p.id,
                    p.first_name, p.last_name,
                    p.dept_id, d.dept_name,
+                   p.dept_sub_id, ds.dept_sub_name,
                    r.role_name
             FROM people p
             LEFT JOIN dept d ON d.dept_id = p.dept_id
+            LEFT JOIN dept_sub ds ON ds.dept_sub_id = p.dept_sub_id
             LEFT JOIN user_roles ur ON ur.people_id = p.id
             LEFT JOIN roles r ON r.id = ur.role_id
             ORDER BY p.last_name, p.first_name
@@ -172,13 +190,14 @@ def _load_people():
 class NewRequisitionDialog(QtWidgets.QDialog):
     """Create a draft requisition for the acting person's department."""
 
-    def __init__(self, requester_id, dept_id, parent=None):
+    def __init__(self, requester_id, dept_id, dept_sub_id=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle("New Purchase Requisition")
         self.resize(480, 260)
         _apply_blue_palette(self)
         self._requester_id = requester_id
         self._dept_id = dept_id
+        self._dept_sub_id = dept_sub_id
         self.req_id = None
         self._build_ui()
 
@@ -224,9 +243,11 @@ class NewRequisitionDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO purchase_requisition (req_number, requester_id, "
-                "dept_id, needed_date, justification, status, created_date) "
-                "VALUES (%s,%s,%s,%s,%s,'draft',%s) RETURNING id",
+                "dept_id, dept_sub_id, needed_date, justification, status, "
+                "created_date) "
+                "VALUES (%s,%s,%s,%s,%s,%s,'draft',%s) RETURNING id",
                 (req_num, self._requester_id, self._dept_id,
+                 self._dept_sub_id,
                  self.needed_date.date().toString("yyyy-MM-dd"),
                  self.justification.text().strip(), _today())
             )
@@ -382,16 +403,16 @@ class _RequisitionViewBase(QtWidgets.QWidget):
 
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(7)
+        self.table.setColumnCount(8)
         self.table.setHorizontalHeaderLabels(
-            ["Req #", "Requester", "Department", "Needed By",
+            ["Req #", "Requester", "Department", "Sub-Dept", "Needed By",
              "Items", "Est. Total", "Status"])
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
-        for c in range(6):
+        for c in range(7):
             hh.setSectionResizeMode(
                 c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(
@@ -486,13 +507,14 @@ class _RequisitionViewBase(QtWidgets.QWidget):
             self.table.setItem(r, 0, _ro(row["req_number"]))
             self.table.setItem(r, 1, _ro(name))
             self.table.setItem(r, 2, _ro(row["dept_name"] or ""))
-            self.table.setItem(r, 3, _ro(row["needed_date"] or ""))
-            self.table.setItem(r, 4, _ro(str(row["item_count"])))
-            self.table.setItem(r, 5, _ro(f"${row['total']:,.2f}"))
+            self.table.setItem(r, 3, _ro(row["dept_sub_name"] or ""))
+            self.table.setItem(r, 4, _ro(row["needed_date"] or ""))
+            self.table.setItem(r, 5, _ro(str(row["item_count"])))
+            self.table.setItem(r, 6, _ro(f"${row['total']:,.2f}"))
             self.table.setItem(
-                r, 6, _ro(REQ_STATUS_LABELS.get(status, status)))
+                r, 7, _ro(REQ_STATUS_LABELS.get(status, status)))
             bg = QtGui.QColor(REQ_COLORS.get(status, "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.table.item(r, col).setBackground(bg)
         self._selected_id = None
         self._selected_number = None
@@ -622,9 +644,11 @@ class RequisitionsWidget(_RequisitionViewBase):
             name = f"{p['first_name'] or ''} " \
                    f"{p['last_name'] or ''}".strip() or "(unnamed)"
             dept = p["dept_name"] or "no dept"
+            sub = p["dept_sub_name"]
+            where = f"{dept} / {sub}" if sub else dept
             role = p["role_name"] or "Employee"
             self.person_combo.addItem(
-                f"{name} — {dept} [{role}]", p["id"])
+                f"{name} — {where} [{role}]", p["id"])
         self.person_combo.currentIndexChanged.connect(self._on_person_changed)
         hr.addWidget(self.person_combo)
 
@@ -746,7 +770,8 @@ class RequisitionsWidget(_RequisitionViewBase):
             QtWidgets.QMessageBox.warning(
                 self, "No Person", "Select who you are acting as first.")
             return
-        dlg = NewRequisitionDialog(p["id"], p["dept_id"], self)
+        dlg = NewRequisitionDialog(
+            p["id"], p["dept_id"], p["dept_sub_id"], self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self.refresh()
 
@@ -969,8 +994,8 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
 # Shared SELECT used by both views; callers append WHERE/ORDER BY.
 _ROW_QUERY = """
     SELECT pr.id, pr.req_number, pr.needed_date, pr.status,
-           pr.requester_id, pr.dept_id,
-           pe.first_name, pe.last_name, d.dept_name,
+           pr.requester_id, pr.dept_id, pr.dept_sub_id,
+           pe.first_name, pe.last_name, d.dept_name, ds.dept_sub_name,
            (SELECT COUNT(*) FROM requisition_item ri
             WHERE ri.req_id = pr.id) AS item_count,
            (SELECT COALESCE(SUM(ri.qty * ri.est_unit_price), 0)
@@ -978,6 +1003,7 @@ _ROW_QUERY = """
     FROM purchase_requisition pr
     LEFT JOIN people pe ON pe.id = pr.requester_id
     LEFT JOIN dept d ON d.dept_id = pr.dept_id
+    LEFT JOIN dept_sub ds ON ds.dept_sub_id = pr.dept_sub_id
 """
 
 
