@@ -21,7 +21,8 @@ from .Budget_mgmt import (get_db, init_db, _apply_blue_palette, _ro, _ro_right,
                           _actual_for_account, CURRENT_YEAR, BUDGET_COLORS)
 
 BUTTON_STYLE = (
-    "QPushButton{background-color:white;border:2px solid black;border-radius:8px;"
+    "QPushButton{background-color:white;border:2px solid black;"
+    "border-radius:8px;"
     "padding:4px 10px;}"
     "QPushButton:hover{background-color:rgb(85,255,255);}"
 )
@@ -42,9 +43,9 @@ def _pct(variance, budgeted):
     return f"{variance / budgeted * 100:+.1f}%"
 
 
-# ── Data helpers ────────────────────────────────────────────────────────────────
+# ── Data helpers ─────────────────────────────────────────────────────────────
 def _budgets_for_year(year):
-    """One row per budget for the year, with its department and budgeted total."""
+    """One row per budget for the year: department + budgeted total."""
     conn = get_db()
     try:
         rows = conn.execute("""
@@ -70,7 +71,8 @@ def _budget_lines(year):
     try:
         rows = conn.execute("""
             SELECT b.budget_name, b.status, d.dept_name,
-                   bl.account_id, bl.category, bl.description, bl.budgeted_amount
+                   bl.account_id, bl.category, bl.description,
+                   bl.budgeted_amount
             FROM budget b
             LEFT JOIN dept d ON d.dept_id = b.dept_id
             JOIN budget_line bl ON bl.budget_id = b.id
@@ -85,11 +87,12 @@ def _budget_lines(year):
 
 
 def _budget_actual(budget_id, year):
-    """Sum posted-GL actuals across the accounts referenced by a budget's lines."""
+    """Sum posted-GL actuals across a budget's referenced accounts."""
     conn = get_db()
     try:
         lines = conn.execute(
-            "SELECT account_id FROM budget_line WHERE budget_id=%s AND account_id IS NOT NULL",
+            "SELECT account_id FROM budget_line "
+            "WHERE budget_id=%s AND account_id IS NOT NULL",
             (budget_id,)).fetchall()
         ids = [ln["account_id"] for ln in lines]
         if not ids:
@@ -110,9 +113,9 @@ def _budget_actual(budget_id, year):
         conn.close()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Shared report base — year selector + table + optional summary line
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class _BudgetReport(QtWidgets.QWidget):
     TITLE = ""
     HEADERS = []            # (label, stretch_bool)
@@ -180,7 +183,10 @@ class _BudgetReport(QtWidgets.QWidget):
             v.addLayout(br)
 
     def _set_row(self, r, values):
-        """values: list of (text, kind) where kind is 'l'eft, 'r'ight, or a QColor for right+colored."""
+        """values: list of (text, kind).
+
+        kind is 'l'eft, 'r'ight, or a QColor for right-aligned + colored.
+        """
         self.table.insertRow(r)
         for c, item in enumerate(values):
             text, kind = item
@@ -200,9 +206,9 @@ class _BudgetReport(QtWidgets.QWidget):
         raise NotImplementedError
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # Concrete reports
-# ══════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 class BudgetDetailWidget(_BudgetReport):
     TITLE = "Budget Detail — All Lines"
     HEADERS = [("Budget", False), ("Department", False), ("Category", False),
@@ -220,7 +226,8 @@ class BudgetDetailWidget(_BudgetReport):
                 (ln["description"] or "", "l"),
                 (_m(ln["budgeted_amount"]), "r"),
             ])
-        self.summary.setText(f"{self.table.rowCount()} lines · Budgeted {_m(total)}")
+        self.summary.setText(
+            f"{self.table.rowCount()} lines · Budgeted {_m(total)}")
 
 
 class BudgetVsActualWidget(_BudgetReport):
@@ -252,7 +259,8 @@ class BudgetVsActualWidget(_BudgetReport):
             for c in range(len(self.HEADERS)):
                 self.table.item(r, c).setBackground(bg)
         tv = tb - ta
-        self.summary.setText(f"Budgeted {_m(tb)} · Actual {_m(ta)} · Variance {_m(tv)}")
+        self.summary.setText(
+            f"Budgeted {_m(tb)} · Actual {_m(ta)} · Variance {_m(tv)}")
 
 
 class VarianceReportWidget(_BudgetReport):
@@ -266,7 +274,8 @@ class VarianceReportWidget(_BudgetReport):
         rows = []
         for ln in _budget_lines(year):
             budgeted = ln["budgeted_amount"] or 0
-            actual = _actual_for_account(ln["account_id"], year) if ln["account_id"] else 0.0
+            actual = (_actual_for_account(ln["account_id"], year)
+                      if ln["account_id"] else 0.0)
             rows.append((ln, budgeted, actual, budgeted - actual))
         rows.sort(key=lambda t: t[3])  # most negative (overspent) first
         for ln, budgeted, actual, variance in rows:
@@ -314,7 +323,9 @@ class DeptSummaryWidget(_BudgetReport):
                 (_m(variance), RED if variance < 0 else "r"),
                 (_pct(variance, budgeted), RED if variance < 0 else "r"),
             ])
-        self.summary.setText(f"{len(agg)} departments · Budgeted {_m(tb)} · Actual {_m(ta)}")
+        self.summary.setText(
+            f"{len(agg)} departments · Budgeted {_m(tb)} "
+            f"· Actual {_m(ta)}")
 
 
 class ApprovalWorkflowWidget(_BudgetReport):
@@ -342,7 +353,9 @@ class ApprovalWorkflowWidget(_BudgetReport):
                 self.table.item(r, c).setBackground(bg)
             if b["status"] == "draft":
                 pending += 1
-        self.summary.setText(f"{self.table.rowCount()} budgets · {pending} awaiting approval")
+        self.summary.setText(
+            f"{self.table.rowCount()} budgets · "
+            f"{pending} awaiting approval")
 
     def _selected_budget_id(self):
         r = self.table.currentRow()
@@ -353,11 +366,13 @@ class ApprovalWorkflowWidget(_BudgetReport):
     def _set_status(self, status):
         bid = self._selected_budget_id()
         if bid is None:
-            QtWidgets.QMessageBox.information(self, "No selection", "Select a budget first.")
+            QtWidgets.QMessageBox.information(
+                self, "No selection", "Select a budget first.")
             return
         conn = get_db()
         try:
-            conn.execute("UPDATE budget SET status=%s WHERE id=%s", (status, bid))
+            conn.execute(
+                "UPDATE budget SET status=%s WHERE id=%s", (status, bid))
             conn.commit()
         finally:
             conn.close()
