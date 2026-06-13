@@ -17,7 +17,8 @@ Run standalone:  ``python -m manufacturing.purchase_requisitions``
 import sys
 import psycopg2
 from .db_pg import get_db_connection
-from .purchase_orders import _load_products
+from .purchase_orders import (_load_products, _next_po_num,
+                              init_db as _po_init_db)
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -76,9 +77,14 @@ def init_db():
             needed_date TEXT,
             justification TEXT,
             status TEXT DEFAULT 'draft',
-            created_date TEXT
+            created_date TEXT,
+            po_id INTEGER
         )
     """)
+    # Link to a generated supplier PO (added to pre-existing tables too).
+    conn.execute(
+        "ALTER TABLE purchase_requisition "
+        "ADD COLUMN IF NOT EXISTS po_id INTEGER")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS requisition_item (
             id SERIAL PRIMARY KEY,
@@ -586,6 +592,13 @@ class _RequisitionViewBase(QtWidgets.QWidget):
         conn.commit()
         conn.close()
 
+    def _confirm(self, msg):
+        reply = QtWidgets.QMessageBox.question(
+            self, "Confirm", msg,
+            QtWidgets.QMessageBox.StandardButton.Yes |
+            QtWidgets.QMessageBox.StandardButton.No)
+        return reply == QtWidgets.QMessageBox.StandardButton.Yes
+
 
 # ── Department screen ───────────────────────────────────────────────────
 
@@ -793,13 +806,6 @@ class RequisitionsWidget(_RequisitionViewBase):
             "department", p["id"], decision, dlg.comment, new_status)
         self.refresh()
 
-    def _confirm(self, msg):
-        reply = QtWidgets.QMessageBox.question(
-            self, "Confirm", msg,
-            QtWidgets.QMessageBox.StandardButton.Yes |
-            QtWidgets.QMessageBox.StandardButton.No)
-        return reply == QtWidgets.QMessageBox.StandardButton.Yes
-
 
 # ── Purchasing Manager inbox ────────────────────────────────────────────
 
@@ -834,6 +840,11 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
             b.setFixedHeight(32)
             b.clicked.connect(slot)
             br.addWidget(b)
+        self.btn_create_po = QtWidgets.QPushButton("Create PO")
+        self.btn_create_po.setStyleSheet(BUTTON_STYLE)
+        self.btn_create_po.setFixedHeight(32)
+        self.btn_create_po.clicked.connect(self._on_create_po)
+        br.addWidget(self.btn_create_po)
         br.addStretch()
         v.addLayout(br)
         self._on_selection_changed()
@@ -843,7 +854,10 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
         if self.include_decided.isChecked():
             cond = "pr.status IN ('dept_approved','approved','denied')"
         else:
-            cond = "pr.status = 'dept_approved'"
+            # Pending decisions plus approved requisitions still awaiting
+            # conversion to a PO.
+            cond = ("(pr.status = 'dept_approved' OR "
+                    "(pr.status = 'approved' AND pr.po_id IS NULL))")
         try:
             rows = conn.execute(
                 _ROW_QUERY + " WHERE " + cond +
@@ -854,11 +868,24 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
         return rows
 
     def _on_selection_changed(self):
-        if not hasattr(self, "btn_approve"):
+        if not hasattr(self, "btn_create_po"):
             return
         pending = self._selected_status == "dept_approved"
         self.btn_approve.setEnabled(pending)
         self.btn_deny.setEnabled(pending)
+        self.btn_create_po.setEnabled(
+            self._selected_status == "approved"
+            and self._selected_req_field("po_id") is None)
+
+    def _selected_req_field(self, field):
+        if self._selected_id is None:
+            return None
+        conn = get_db()
+        rec = conn.execute(
+            f"SELECT {field} FROM purchase_requisition WHERE id = %s",
+            (self._selected_id,)).fetchone()
+        conn.close()
+        return rec[field] if rec else None
 
     def _decide(self, decision, new_status, title):
         if not self._require_selection():
@@ -875,6 +902,67 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
         # no in-screen person selector on this inbox.
         self._record_decision(
             "purchasing", None, decision, dlg.comment, new_status)
+        self.refresh()
+
+    def _on_create_po(self):
+        if not self._require_selection():
+            return
+        if self._selected_status != "approved":
+            QtWidgets.QMessageBox.warning(
+                self, "Not Approved",
+                "Only approved requisitions can become a PO.")
+            return
+        existing = self._selected_req_field("po_id")
+        if existing:
+            conn = get_db()
+            po = conn.execute(
+                "SELECT po_number FROM purchase_order WHERE id = %s",
+                (existing,)).fetchone()
+            conn.close()
+            num = po["po_number"] if po else f"#{existing}"
+            QtWidgets.QMessageBox.information(
+                self, "Already Converted",
+                f"This requisition is already linked to PO {num}.")
+            return
+        if not self._confirm(
+                "Create a draft purchase order from this requisition? "
+                "Line items carry over; set the supplier afterward in the "
+                "Purchase Orders screen."):
+            return
+
+        _po_init_db()
+        po_number = _next_po_num()
+        needed = self._selected_req_field("needed_date")
+        expected = needed or QtCore.QDate.currentDate().addDays(
+            14).toString("yyyy-MM-dd")
+        conn = get_db()
+        po_id = conn.execute(
+            "INSERT INTO purchase_order (po_number, supplier_id, "
+            "order_date, expected_date, status, notes) "
+            "VALUES (%s, NULL, %s, %s, 'draft', %s) RETURNING id",
+            (po_number, _today(), expected,
+             f"From requisition {self._selected_number}")
+        ).fetchone()["id"]
+        items = conn.execute(
+            "SELECT description, product_id, qty, est_unit_price "
+            "FROM requisition_item WHERE req_id = %s",
+            (self._selected_id,)).fetchall()
+        for it in items:
+            conn.execute(
+                "INSERT INTO po_item (po_id, description, product_id, "
+                "qty_ordered, unit_price) VALUES (%s,%s,%s,%s,%s)",
+                (po_id, it["description"], it["product_id"], it["qty"],
+                 it["est_unit_price"]))
+        conn.execute(
+            "UPDATE purchase_requisition SET po_id = %s WHERE id = %s",
+            (po_id, self._selected_id))
+        conn.commit()
+        conn.close()
+        QtWidgets.QMessageBox.information(
+            self, "PO Created",
+            f"Created draft {po_number} from {self._selected_number} "
+            f"({len(items)} item(s)).\nSet the supplier in the Purchase "
+            f"Orders screen.")
         self.refresh()
 
 
