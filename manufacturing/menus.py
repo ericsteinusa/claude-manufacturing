@@ -740,10 +740,12 @@ _PURCH_MENU = {
         ('requisitions', 'Requisitions', {
             'title': 'Requisitions',
             'items': [
-                ('new_req', 'New Requisition', 'Purchasing_menu.py'),
-                ('pend_appr', 'Pending Approval', 'Purchasing_menu.py'),
-                ('appr_reqs', 'Approved Requisitions', 'Purchasing_menu.py'),
-                ('req_hist', 'Requisition History', 'Purchasing_menu.py'),
+                ('new_req', 'New Requisition', 'purchase_requisitions.py'),
+                ('pend_appr', 'Pending Approval', 'Purchasing_Mgr_menu.py'),
+                ('appr_reqs', 'Approved Requisitions',
+                 'purchase_requisitions.py'),
+                ('req_hist', 'Requisition History',
+                 'purchase_requisitions.py'),
             ],
         }),
     ],

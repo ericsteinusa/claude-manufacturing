@@ -77,6 +77,9 @@ class AccountingMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(GeneralLedgerWidget(), "General Ledger")
         tabs.addTab(BudgetMgmtWidget(), "Budget")
         tabs.addTab(BankReconciliationWidget(), "Bank Recon")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

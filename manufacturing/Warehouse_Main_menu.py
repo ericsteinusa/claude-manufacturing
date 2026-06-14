@@ -2,6 +2,7 @@ import sys
 from PyQt6 import QtWidgets
 from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette  # noqa: E501
 from .receiving_dept import ReceivingDeptWidget
+from .purchase_requisitions import RequisitionsWidget
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -37,6 +38,7 @@ class WarehouseMainMenu(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(WarehouseWidget(), "Inventory")
         tabs.addTab(ReceivingDeptWidget(), "Receiving")
+        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
         v.addWidget(tabs)
 
 

@@ -65,6 +65,9 @@ class MarketingMainMenu(QtWidgets.QMainWindow):
         "Marketing Manager"),
          "Marketing Manager")
         tabs.addTab(_launch_tab("marketing_menu.py", "Marketing"), "Marketing")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

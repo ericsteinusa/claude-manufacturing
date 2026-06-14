@@ -70,6 +70,9 @@ class ProductionMainMenu(QtWidgets.QMainWindow):
         "Production"),
          "Production")
         tabs.addTab(_launch_tab("prod_ship_dept.py", "Shipping"), "Shipping")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

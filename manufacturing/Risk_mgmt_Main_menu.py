@@ -2,6 +2,7 @@ import sys
 from PyQt6 import QtGui, QtWidgets
 from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget, InsuranceWidget,  # noqa: E501
                         BusinessContinuityWidget, ComplianceAuditWidget)
+from .purchase_requisitions import RequisitionsWidget
 
 BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
@@ -45,6 +46,7 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(InsuranceWidget(), "Insurance Management")
         tabs.addTab(BusinessContinuityWidget(), "Business Continuity")
         tabs.addTab(ComplianceAuditWidget(), "Compliance && Audit")
+        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
         v.addWidget(tabs)
 
 

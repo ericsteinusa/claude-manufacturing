@@ -4,6 +4,7 @@ from .Budget_mgmt import BudgetManagementWidget
 from .Credit_dept import CreditDeptWidget
 from .Payroll_dept import PayrollDeptWidget
 from .Audit_mgmt import AuditMgmtWidget
+from .purchase_requisitions import RequisitionsWidget
 
 BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
@@ -46,6 +47,7 @@ class FinanceMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(CreditDeptWidget(), "Credit")
         tabs.addTab(PayrollDeptWidget(), "Payroll")
         tabs.addTab(AuditMgmtWidget(), "Audit")
+        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
         v.addWidget(tabs)
 
 
