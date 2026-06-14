@@ -113,8 +113,56 @@ _RECONCILE = {
 }
 
 
+# Canonical role vocabulary — the single source of truth for the roles
+# table. Seeded by init_schema(); both the desktop login (login_app) and
+# the web layer (views) rely on these rather than defining their own set.
+DEFAULT_ROLES = [
+    ('President', 'Full access — company president'),
+    ('Vice President', 'Full access — company vice president'),
+    ('Department Manager',
+     'Full access to own department including management screens'),
+    ('Supervisor', 'Access to own department operational screens'),
+    ('Auditor',
+     'Read-only browse access across all departments — cannot launch apps'),
+    ('HR / Personnel', 'Full access to Personnel department'),
+]
+
+
+# Roles seeded by older builds, mapped to the canonical role that grants the
+# same access level. init_schema() reassigns any user still holding a legacy
+# role and then drops the orphaned legacy rows, so the obsolete vocabulary
+# can't lock anyone out or linger in the role-admin UI.
+_LEGACY_ROLE_MIGRATION = {
+    'Admin': 'President',            # legacy superuser -> full access
+    'Manager': 'Department Manager',
+    'Employee': 'Supervisor',        # standard/general-staff access
+    'Viewer': 'Auditor',             # read-only access
+}
+
+
+def _migrate_legacy_roles(conn):
+    """Reassign users off legacy roles, then delete the orphaned rows.
+
+    Idempotent and a no-op on databases that only ever had the canonical
+    vocabulary: each statement matches nothing when the legacy role is
+    absent. The canonical targets are guaranteed to exist because
+    DEFAULT_ROLES is seeded immediately before this runs.
+    """
+    for legacy, canonical in _LEGACY_ROLE_MIGRATION.items():
+        conn.execute(
+            "UPDATE user_roles SET role_id = "
+            "(SELECT id FROM roles WHERE role_name = %s) "
+            "WHERE role_id = (SELECT id FROM roles WHERE role_name = %s)",
+            (canonical, legacy))
+        conn.execute(
+            "DELETE FROM roles WHERE role_name = %s", (legacy,))
+
+
 def init_schema():
-    """Create and reconcile the application's core tables (idempotent)."""
+    """Create and reconcile the core tables and seed default roles.
+
+    Idempotent: safe to call on every startup.
+    """
     conn = get_db()
     try:
         for _name, ddl in _TABLES:
@@ -124,7 +172,15 @@ def init_schema():
                 conn.execute(
                     f"ALTER TABLE {table} "
                     f"ADD COLUMN IF NOT EXISTS {col} {col_def}")
+        for name, desc in DEFAULT_ROLES:
+            conn.execute(
+                "INSERT INTO roles (role_name, description) "
+                "SELECT %s, %s WHERE NOT EXISTS "
+                "(SELECT 1 FROM roles WHERE role_name = %s)",
+                (name, desc, name))
+        _migrate_legacy_roles(conn)
         conn.commit()
     finally:
         conn.close()
-    log.debug("Schema initialized and reconciled (%d tables)", len(_TABLES))
+    log.debug("Schema initialized and reconciled (%d tables, %d roles)",
+              len(_TABLES), len(DEFAULT_ROLES))
