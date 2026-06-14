@@ -75,6 +75,9 @@ class EngineeringMainMenu(QtWidgets.QMainWindow):
         "Engineering Manager"),
          "Engineering Manager")
         tabs.addTab(_launch_tab("engineer.py", "Engineers"), "Engineers")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

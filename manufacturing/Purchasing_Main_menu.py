@@ -79,6 +79,9 @@ class PurchasingMainMenu(QtWidgets.QMainWindow):
         "Purchasing_menu.py",
         "Purchasing"),
          "Purchasing")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

@@ -2,6 +2,7 @@ import sys
 from PyQt6 import QtGui, QtWidgets
 from .Legal_mgmt import (ContractsWidget, ComplianceWidget, LitigationWidget,
                          IPWidget, EmploymentLawWidget)
+from .purchase_requisitions import RequisitionsWidget
 
 BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
@@ -45,6 +46,7 @@ class LegalMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(LitigationWidget(), "Litigation")
         tabs.addTab(IPWidget(), "Intellectual Property")
         tabs.addTab(EmploymentLawWidget(), "Employment Law")
+        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
         v.addWidget(tabs)
 
 

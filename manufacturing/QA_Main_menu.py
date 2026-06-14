@@ -65,6 +65,9 @@ class QAMainMenu(QtWidgets.QMainWindow):
         "Quality_Assurance_menu.py",
         "Quality Assurance"),
          "Quality Assurance")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

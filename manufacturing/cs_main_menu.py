@@ -66,6 +66,9 @@ class CSMainMenu(QtWidgets.QMainWindow):
         "Customer Service"),
          "Customer Service")
         tabs.addTab(CustomerServiceCallsWidget(), "Customer Calls")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

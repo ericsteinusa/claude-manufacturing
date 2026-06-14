@@ -65,6 +65,9 @@ class ITMainMenu(QtWidgets.QMainWindow):
         "IT_technician.py",
         "IT Technician"),
          "IT Technician")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

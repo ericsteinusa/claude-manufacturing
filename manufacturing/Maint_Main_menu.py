@@ -79,6 +79,9 @@ class MaintenanceMainMenu(QtWidgets.QMainWindow):
         "Maint_Maint_menu.py",
         "Maintenance"),
          "Maintenance")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 

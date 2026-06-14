@@ -65,6 +65,9 @@ class PersonnelMainMenu(QtWidgets.QMainWindow):
         "Personnel Manager"),
          "Personnel Manager")
         tabs.addTab(_launch_tab("personnel_menu.py", "Personnel"), "Personnel")
+        tabs.addTab(
+            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            "Purchase Requisitions")
         v.addWidget(tabs)
 
 
