@@ -128,6 +128,36 @@ DEFAULT_ROLES = [
 ]
 
 
+# Roles seeded by older builds, mapped to the canonical role that grants the
+# same access level. init_schema() reassigns any user still holding a legacy
+# role and then drops the orphaned legacy rows, so the obsolete vocabulary
+# can't lock anyone out or linger in the role-admin UI.
+_LEGACY_ROLE_MIGRATION = {
+    'Admin': 'President',            # legacy superuser -> full access
+    'Manager': 'Department Manager',
+    'Employee': 'Supervisor',        # standard/general-staff access
+    'Viewer': 'Auditor',             # read-only access
+}
+
+
+def _migrate_legacy_roles(conn):
+    """Reassign users off legacy roles, then delete the orphaned rows.
+
+    Idempotent and a no-op on databases that only ever had the canonical
+    vocabulary: each statement matches nothing when the legacy role is
+    absent. The canonical targets are guaranteed to exist because
+    DEFAULT_ROLES is seeded immediately before this runs.
+    """
+    for legacy, canonical in _LEGACY_ROLE_MIGRATION.items():
+        conn.execute(
+            "UPDATE user_roles SET role_id = "
+            "(SELECT id FROM roles WHERE role_name = %s) "
+            "WHERE role_id = (SELECT id FROM roles WHERE role_name = %s)",
+            (canonical, legacy))
+        conn.execute(
+            "DELETE FROM roles WHERE role_name = %s", (legacy,))
+
+
 def init_schema():
     """Create and reconcile the core tables and seed default roles.
 
@@ -148,6 +178,7 @@ def init_schema():
                 "SELECT %s, %s WHERE NOT EXISTS "
                 "(SELECT 1 FROM roles WHERE role_name = %s)",
                 (name, desc, name))
+        _migrate_legacy_roles(conn)
         conn.commit()
     finally:
         conn.close()

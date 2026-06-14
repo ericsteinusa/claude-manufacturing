@@ -44,22 +44,14 @@ def _init_schema():
     init_schema()
 
 
-def _ensure_roles():
-    """Ensure the canonical roles exist.
-
-    Delegates to schema.init_schema(), which seeds schema.DEFAULT_ROLES --
-    the single source of truth for the role vocabulary.
-    """
-    init_schema()
-
-
 # ---------------------------------------------------------------------------
 # Login / dashboard / logout
 # ---------------------------------------------------------------------------
 
 
 def home(request):
-    _ensure_roles()
+    # Schema and canonical roles are seeded once at startup by
+    # AppConfig.ready() (-> _init_schema), so no per-request seeding here.
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
