@@ -637,7 +637,27 @@ class RequisitionsWidget(_RequisitionViewBase):
 
     The acting person is chosen from a top-bar selector; their role and
     department gate which actions are available.
+
+    ``default_dept`` (the host department's name) pre-selects the first
+    person in that department, so the screen opens scoped to whoever
+    launched it rather than to the first person company-wide.
     """
+
+    def __init__(self, default_dept=None, parent=None):
+        self._default_dept = default_dept
+        super().__init__(parent)
+
+    def _select_default_person(self):
+        """Pre-select the first person in the host department, if given."""
+        dept = getattr(self, "_default_dept", None)
+        if not dept:
+            return
+        for i in range(self.person_combo.count()):
+            pid = self.person_combo.itemData(i)
+            person = next((p for p in self._people if p["id"] == pid), None)
+            if person and person["dept_name"] == dept:
+                self.person_combo.setCurrentIndex(i)
+                return
 
     def _build_header(self, v):
         hr = QtWidgets.QHBoxLayout()
@@ -657,6 +677,9 @@ class RequisitionsWidget(_RequisitionViewBase):
             role = p["role_name"] or "Employee"
             self.person_combo.addItem(
                 f"{name} — {where} [{role}]", p["id"])
+        # Select the host-department default before wiring the change signal,
+        # so it doesn't fire a refresh() before the table is built.
+        self._select_default_person()
         self.person_combo.currentIndexChanged.connect(self._on_person_changed)
         hr.addWidget(self.person_combo)
 
@@ -1019,18 +1042,20 @@ _ROW_QUERY = """
 # ── Standalone window ───────────────────────────────────────────────────
 
 class PurchaseRequisitionsWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, default_dept=None):
         super().__init__()
         self.setWindowTitle("Purchase Requisitions")
         self.resize(1040, 700)
         _apply_blue_palette(self)
-        self.setCentralWidget(RequisitionsWidget())
+        self.setCentralWidget(RequisitionsWidget(default_dept))
 
 
 def main():
     init_db()
+    # Optional positional arg: the host department to scope the picker to.
+    default_dept = sys.argv[1] if len(sys.argv) > 1 else None
     app = QtWidgets.QApplication(sys.argv)
-    window = PurchaseRequisitionsWindow()
+    window = PurchaseRequisitionsWindow(default_dept)
     window.show()
     sys.exit(app.exec())
 

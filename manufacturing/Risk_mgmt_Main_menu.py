@@ -46,7 +46,8 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(InsuranceWidget(), "Insurance Management")
         tabs.addTab(BusinessContinuityWidget(), "Business Continuity")
         tabs.addTab(ComplianceAuditWidget(), "Compliance && Audit")
-        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
+        tabs.addTab(RequisitionsWidget(default_dept="Risk Management"),
+                    "Purchase Requisitions")
         v.addWidget(tabs)
 
 
