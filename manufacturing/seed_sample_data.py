@@ -9,6 +9,10 @@ Personnel staff -> HR / Personnel, otherwise the general-staff role). It
 also backfills ``dept_sub.dept_id`` so every sub-department is linked to
 its parent department.
 
+Each sample person also gets a ``passwd`` row with a shared, well-known
+development password (``SAMPLE_PASSWORD``) so the accounts can be used to
+log in through the web app.
+
 Sample people are tagged with an ``@example.com`` email so the seed is
 idempotent and fully reversible.
 
@@ -25,10 +29,16 @@ database are skipped with a warning.
 import argparse
 import sys
 
+import bcrypt
+
 from .db_pg import get_db_connection
 from .schema import init_schema
 
 SAMPLE_EMAIL_DOMAIN = "@example.com"
+
+# Shared development password given to every sample account so they can log
+# in through the web app. Sample data only — not for production use.
+SAMPLE_PASSWORD = "Sample123!"
 
 # Every sub-department mapped to its parent department (by name). Used both
 # to backfill dept_sub.dept_id and to resolve a new hire's department.
@@ -181,6 +191,7 @@ def remove_sample(conn):
         "SELECT id FROM people WHERE email LIKE %s",
         ("%" + SAMPLE_EMAIL_DOMAIN,)).fetchall()]
     for pid in ids:
+        conn.execute("DELETE FROM passwd WHERE people_id=%s", (pid,))
         conn.execute("DELETE FROM user_roles WHERE people_id=%s", (pid,))
         conn.execute("DELETE FROM position WHERE people_id=%s", (pid,))
         conn.execute("DELETE FROM people WHERE id=%s", (pid,))
@@ -193,6 +204,10 @@ def seed(conn):
     base = conn.execute(
         "SELECT COALESCE(MAX(employee_id), 0) FROM people").fetchone()[0]
     emp_id = max(1000, base) + 1
+
+    # All sample accounts share one password; hash it once and reuse.
+    hashed_pw = bcrypt.hashpw(
+        SAMPLE_PASSWORD.encode(), bcrypt.gensalt()).decode()
 
     names = _name_pool()
     added = 0
@@ -220,6 +235,10 @@ def seed(conn):
             conn.execute(
                 "INSERT INTO position (people_id, job_title) VALUES (%s,%s)",
                 (pid, sub_name))
+            # Credentials so the sample account can log in.
+            conn.execute(
+                "INSERT INTO passwd (people_id, password) VALUES (%s,%s)",
+                (pid, hashed_pw))
             emp_id += 1
             added += 1
     return added
@@ -252,6 +271,7 @@ def main(argv=None):
         added = seed(conn)
         conn.commit()
         print(f"linked {linked} sub-departments; inserted {added} people")
+        print(f"sample login password: {SAMPLE_PASSWORD!r}")
     finally:
         conn.close()
 
