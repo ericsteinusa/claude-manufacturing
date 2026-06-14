@@ -1,8 +1,11 @@
 """seed_sample_data.py — populate sample personnel across all departments.
 
-Inserts ~40 sample employees, one or more per sub-department, so every
-department and sub-department is staffed. Each person is assigned the
-correct parent department, their sub-department, a ``position.job_title``
+Inserts ~50 sample employees, one or more per sub-department, so every
+department and sub-department is staffed. Departments the app has menus
+for but that lack ``dept`` rows (Finance, Legal, Risk Management,
+Warehouse) are created first, so they get staffed too. Each person is
+assigned the correct parent department, their sub-department, a
+``position.job_title``
 matching the sub-department title, and a role inferred from that title
 (Manager -> Department Manager, Supervisor/Lead/Foreman -> Supervisor,
 Personnel staff -> HR / Personnel, otherwise the general-staff role). It
@@ -24,7 +27,10 @@ Usage::
 
 Lookups are by name (not hard-coded ids), so the script tolerates
 differing primary keys; sub-departments or departments absent from the
-database are skipped with a warning.
+database are skipped with a warning, except the NEW_DEPARTMENTS above,
+which are created if missing. Those created dept/dept_sub rows are
+structural and are left in place by ``--remove`` (only people are
+removed); re-running is idempotent.
 """
 import argparse
 import sys
@@ -75,9 +81,28 @@ SUB_PARENTS = {
     "Production Personnel": "Production",
     "Sales Manager": "Sales",
     "Sales Personnel": "Sales",
+    "Finance Manager": "Finance",
+    "Finance Personnel": "Finance",
+    "Legal Manager": "Legal",
+    "Legal Personnel": "Legal",
+    "Risk Manager": "Risk Management",
+    "Risk Personnel": "Risk Management",
+    "Warehouse Manager": "Warehouse",
+    "Warehouse Personnel": "Warehouse",
 }
 
-# How many sample hires to add per sub-department (sums to 41). Weighted so
+# Departments (and their sub-departments) that the app has menu screens for
+# but that were never created as ``dept`` rows, so they had no staff and the
+# requisition screen's host-department default fell back to company-wide.
+# ``ensure_departments`` creates these (idempotently) before seeding people.
+NEW_DEPARTMENTS = {
+    "Finance": ["Finance Manager", "Finance Personnel"],
+    "Legal": ["Legal Manager", "Legal Personnel"],
+    "Risk Management": ["Risk Manager", "Risk Personnel"],
+    "Warehouse": ["Warehouse Manager", "Warehouse Personnel"],
+}
+
+# How many sample hires to add per sub-department (sums to 53). Weighted so
 # previously-empty departments/sub-departments and thin teams get covered.
 HIRES = {
     # A President gives a sample full-access account (President / Vice
@@ -110,6 +135,14 @@ HIRES = {
     "Accounts receivable Supervisor": 1,
     "Customer Service Manager": 1,
     "Engineer Manager": 1,
+    "Finance Manager": 1,
+    "Finance Personnel": 2,
+    "Legal Manager": 1,
+    "Legal Personnel": 2,
+    "Risk Manager": 1,
+    "Risk Personnel": 2,
+    "Warehouse Manager": 1,
+    "Warehouse Personnel": 2,
 }
 
 FIRST_NAMES = [
@@ -169,6 +202,49 @@ def _lookup_ids(conn):
              for r in conn.execute(
                  "SELECT id, role_name FROM roles").fetchall()}
     return depts, subs, roles
+
+
+def ensure_departments(conn):
+    """Create dept/dept_sub rows for NEW_DEPARTMENTS if absent.
+
+    Idempotent: resolves by name and inserts only what's missing, so the
+    departments the app already has menus for (Finance, Legal, Risk
+    Management, Warehouse) exist and can be staffed. Returns
+    ``(depts_created, subs_created)``.
+    """
+    # Existing dept/dept_sub rows were inserted with explicit ids, leaving the
+    # SERIAL sequences behind, so assign ids by MAX+1 (as seed() does for
+    # employee_id) rather than relying on the sequence default.
+    next_dept = conn.execute(
+        "SELECT COALESCE(MAX(dept_id), 0) FROM dept").fetchone()[0] + 1
+    next_sub = conn.execute(
+        "SELECT COALESCE(MAX(dept_sub_id), 0) FROM dept_sub").fetchone()[0] + 1
+    depts_created = subs_created = 0
+    for dept_name, sub_names in NEW_DEPARTMENTS.items():
+        row = conn.execute(
+            "SELECT dept_id FROM dept WHERE dept_name=%s",
+            (dept_name,)).fetchone()
+        if row:
+            dept_id = row["dept_id"]
+        else:
+            dept_id = next_dept
+            next_dept += 1
+            conn.execute(
+                "INSERT INTO dept (dept_id, dept_name) VALUES (%s,%s)",
+                (dept_id, dept_name))
+            depts_created += 1
+        for sub_name in sub_names:
+            exists = conn.execute(
+                "SELECT 1 FROM dept_sub WHERE dept_sub_name=%s AND dept_id=%s",
+                (sub_name, dept_id)).fetchone()
+            if not exists:
+                conn.execute(
+                    "INSERT INTO dept_sub (dept_sub_id, dept_id, "
+                    "dept_sub_name) VALUES (%s,%s,%s)",
+                    (next_sub, dept_id, sub_name))
+                next_sub += 1
+                subs_created += 1
+    return depts_created, subs_created
 
 
 def link_sub_departments(conn, depts, subs):
@@ -270,10 +346,12 @@ def main(argv=None):
             print("Sample people already present; use --reset to recreate.")
             return
 
+        dept_n, sub_n = ensure_departments(conn)
         depts, subs, _ = _lookup_ids(conn)
         linked = link_sub_departments(conn, depts, subs)
         added = seed(conn)
         conn.commit()
+        print(f"created {dept_n} departments, {sub_n} sub-departments")
         print(f"linked {linked} sub-departments; inserted {added} people")
         print(f"sample login password: {SAMPLE_PASSWORD!r}")
     finally:
