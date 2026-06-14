@@ -38,7 +38,8 @@ class WarehouseMainMenu(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(WarehouseWidget(), "Inventory")
         tabs.addTab(ReceivingDeptWidget(), "Receiving")
-        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
+        tabs.addTab(RequisitionsWidget(default_dept="Warehouse"),
+                    "Purchase Requisitions")
         v.addWidget(tabs)
 
 

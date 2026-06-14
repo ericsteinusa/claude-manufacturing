@@ -24,7 +24,7 @@ log = get_logger(__name__)
 _CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def launch(script):
+def launch(script, *args):
     """Launch a sibling manufacturing module in a new process.
 
     Parameters
@@ -33,11 +33,14 @@ def launch(script):
         A module name or filename (e.g. "IT_mgr" or "IT_mgr.py"); any
         extension is stripped before building the ``manufacturing.<name>``
         module path.
+    *args : str
+        Extra positional arguments forwarded to the module's ``sys.argv``
+        (e.g. a host department name for a screen that scopes to it).
     """
     module = "manufacturing." + os.path.splitext(script)[0]
-    log.info("Launching module %s", module)
+    log.info("Launching module %s args=%s", module, args)
     try:
-        subprocess.Popen([sys.executable, "-m", module], cwd=_CWD)
+        subprocess.Popen([sys.executable, "-m", module, *args], cwd=_CWD)
     except Exception:
         log.error("Failed to launch %s", module, exc_info=True)
         raise

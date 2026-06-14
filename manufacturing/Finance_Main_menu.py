@@ -47,7 +47,8 @@ class FinanceMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(CreditDeptWidget(), "Credit")
         tabs.addTab(PayrollDeptWidget(), "Payroll")
         tabs.addTab(AuditMgmtWidget(), "Audit")
-        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
+        tabs.addTab(RequisitionsWidget(default_dept="Finance"),
+                    "Purchase Requisitions")
         v.addWidget(tabs)
 
 

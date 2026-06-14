@@ -46,7 +46,8 @@ class LegalMainMenu(QtWidgets.QMainWindow):
         tabs.addTab(LitigationWidget(), "Litigation")
         tabs.addTab(IPWidget(), "Intellectual Property")
         tabs.addTab(EmploymentLawWidget(), "Employment Law")
-        tabs.addTab(RequisitionsWidget(), "Purchase Requisitions")
+        tabs.addTab(RequisitionsWidget(default_dept="Legal"),
+                    "Purchase Requisitions")
         v.addWidget(tabs)
 
 

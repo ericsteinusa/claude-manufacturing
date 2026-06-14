@@ -18,7 +18,7 @@ TAB_STYLE = (
 )
 
 
-def _launch_tab(script, label):
+def _launch_tab(script, label, *args):
     w = QtWidgets.QWidget()
     _apply_blue_palette(w)
     v = QtWidgets.QVBoxLayout(w)
@@ -32,7 +32,7 @@ def _launch_tab(script, label):
     btn.setStyleSheet(BUTTON_STYLE)
     btn.setFixedHeight(44)
     btn.setFixedWidth(260)
-    btn.clicked.connect(lambda: _launch(script))
+    btn.clicked.connect(lambda: _launch(script, *args))
     row = QtWidgets.QHBoxLayout()
     row.addStretch()
     row.addWidget(btn)
@@ -66,7 +66,8 @@ class PersonnelMainMenu(QtWidgets.QMainWindow):
          "Personnel Manager")
         tabs.addTab(_launch_tab("personnel_menu.py", "Personnel"), "Personnel")
         tabs.addTab(
-            _launch_tab("purchase_requisitions.py", "Purchase Requisitions"),
+            _launch_tab("purchase_requisitions.py",
+                        "Purchase Requisitions", "Personnel"),
             "Purchase Requisitions")
         v.addWidget(tabs)
 
