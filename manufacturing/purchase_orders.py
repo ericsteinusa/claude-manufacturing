@@ -1,6 +1,9 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .purchase_orders_core import (  # noqa: F401  (re-exported for the GUI)
+    PO_STATUSES, PO_STATUS_COLORS, ensure_po_tables,
+    next_po_number, list_pos, get_po, get_po_items)
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -26,39 +29,14 @@ COMBO_STYLE = (
 )
 LABEL_STYLE = "color: white; font-size: 13px;"
 
-PO_COLORS = {
-    "draft":     "#ffffff",
-    "sent":      "#cce5ff",
-    "partial":   "#fff3cd",
-    "received":  "#d4edda",
-    "cancelled": "#dcdcdc",
-}
+# Status -> row colour, sourced from the Qt-free core so the desktop table and
+# the web list stay in sync.
+PO_COLORS = PO_STATUS_COLORS
 
 
 def init_db():
     conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS purchase_order (
-            id SERIAL PRIMARY KEY,
-            po_number TEXT NOT NULL UNIQUE,
-            supplier_id INTEGER,
-            order_date TEXT,
-            expected_date TEXT,
-            status TEXT DEFAULT 'draft',
-            notes TEXT
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS po_item (
-            id SERIAL PRIMARY KEY,
-            po_id INTEGER NOT NULL REFERENCES purchase_order(id),
-            description TEXT NOT NULL,
-            product_id INTEGER,
-            qty_ordered INTEGER DEFAULT 1,
-            unit_price REAL DEFAULT 0.0,
-            qty_received INTEGER DEFAULT 0
-        )
-    """)
+    ensure_po_tables(conn)
     conn.commit()
     conn.close()
 
