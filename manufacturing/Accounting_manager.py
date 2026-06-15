@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
+from .button_nav import ButtonNav
 from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
 from .Accounts_receivable import AccountsReceivableWidget
 from .Credit_dept import CreditDeptWidget
@@ -40,7 +41,7 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(AccountsPayableWidget(), "Accounts Payable")
         tabs.addTab(AccountsReceivableWidget(), "Accounts Receivable")

@@ -1,6 +1,7 @@
 import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
+from .button_nav import ButtonNav
 from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 
 BUTTON_STYLE = (
@@ -57,7 +58,7 @@ class CSMainMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(_launch_tab("cs_mgr_menu.py", "CS Manager"), "CS Manager")
         tabs.addTab(

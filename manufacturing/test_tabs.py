@@ -8,6 +8,7 @@ os.chdir(_DIR)
 sys.path.insert(0, _DIR)
 
 from PyQt6 import QtWidgets  # noqa: E402
+from button_nav import ButtonNav  # noqa: E402
 
 app = QtWidgets.QApplication(sys.argv)
 
@@ -70,7 +71,8 @@ WINDOWS = [
 ]
 
 def find_tab_widgets(win):
-    return win.findChildren(QtWidgets.QTabWidget)
+    return (win.findChildren(QtWidgets.QTabWidget)
+            + win.findChildren(ButtonNav))
 
 results = []
 

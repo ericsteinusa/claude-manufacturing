@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
+from .button_nav import ButtonNav
 from .Finance_Main_menu import _apply_blue_palette
 from .Budget_mgmt import BudgetManagementWidget
 from .General_ledger import GeneralLedgerWidget
@@ -30,7 +31,7 @@ class FinanceMgrMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(BudgetManagementWidget(), "Budget")
         tabs.addTab(GeneralLedgerWidget(), "General Ledger")

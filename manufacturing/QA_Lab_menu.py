@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -378,7 +379,7 @@ class QALab(QtWidgets.QMainWindow):
         self._refresh_specs()
 
     def _build_ui(self):
-        self._tabs = QtWidgets.QTabWidget()
+        self._tabs = ButtonNav()
         self._tabs.setStyleSheet(
             "QTabBar::tab{background:white; border:1px solid black; "
             "padding:4px 10px;}"

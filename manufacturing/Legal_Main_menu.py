@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtGui, QtWidgets
+from .button_nav import ButtonNav
 from .Legal_mgmt import (ContractsWidget, ComplianceWidget, LitigationWidget,
                          IPWidget, EmploymentLawWidget)
 from .purchase_requisitions import RequisitionsWidget
@@ -39,7 +40,7 @@ class LegalMainMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ContractsWidget(), "Contracts")
         tabs.addTab(ComplianceWidget(), "Compliance")

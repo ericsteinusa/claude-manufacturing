@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtGui, QtWidgets
+from .button_nav import ButtonNav
 from .Budget_mgmt import BudgetManagementWidget
 from .Credit_dept import CreditDeptWidget
 from .Payroll_dept import PayrollDeptWidget
@@ -41,7 +42,7 @@ class FinanceMainMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(BudgetManagementWidget(), "Budget")
         tabs.addTab(CreditDeptWidget(), "Credit")

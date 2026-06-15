@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtGui, QtWidgets
+from .button_nav import ButtonNav
 from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget, InsuranceWidget,  # noqa: E501
                         BusinessContinuityWidget, ComplianceAuditWidget)
 from .purchase_requisitions import RequisitionsWidget
@@ -39,7 +40,7 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(RiskAssessmentWidget(), "Risk Assessment")
         tabs.addTab(RiskRegisterWidget(), "Risk Register")

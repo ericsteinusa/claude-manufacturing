@@ -1,6 +1,7 @@
 import sys
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -283,7 +284,7 @@ class Inventory(QtWidgets.QMainWindow):
         self.setCentralWidget(central)
         outer = QtWidgets.QVBoxLayout(central)
         outer.setContentsMargins(10, 10, 10, 10)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(tabs)
         tabs.addTab(self._build_products_tab(), "Products")

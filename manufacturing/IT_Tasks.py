@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -518,7 +519,7 @@ class ITTasksMenu(QtWidgets.QMainWindow):
 
         from .IT_reports import ITReportsWidget
         from .IT_tasks_reports import ITTasksReportsWidget
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ITTasksWidget(), "IT Tasks")
         tabs.addTab(ITTasksReportsWidget(), "Task Reports")

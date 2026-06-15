@@ -17,6 +17,7 @@ budgeted side on a fresh database.
 """
 import sys
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 from .Budget_mgmt import (get_db, init_db, _apply_blue_palette, _ro, _ro_right,
                           _actual_for_account, CURRENT_YEAR, BUDGET_COLORS)
 
@@ -392,7 +393,7 @@ if __name__ == "__main__":
     win.setWindowTitle("Budget Reports")
     win.resize(1150, 740)
     _apply_blue_palette(win)
-    tabs = QtWidgets.QTabWidget()
+    tabs = ButtonNav()
     tabs.addTab(BudgetDetailWidget(), "Budget Detail")
     tabs.addTab(BudgetVsActualWidget(), "Budget vs. Actual")
     tabs.addTab(VarianceReportWidget(), "Variance Report")

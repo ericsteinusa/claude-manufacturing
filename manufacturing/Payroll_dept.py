@@ -10,6 +10,7 @@ from .log_utils import get_logger
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 log = get_logger(__name__)
 
@@ -296,7 +297,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     def _build_ui(self):
         outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
-        self.tabs = QtWidgets.QTabWidget()
+        self.tabs = ButtonNav()
         self.tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(self.tabs)
         self.tabs.addTab(self._build_pay_rates_tab(), "Pay Rates")

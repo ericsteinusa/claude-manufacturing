@@ -7,6 +7,7 @@ from .db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 CS_DEPT_ID = 3
 
@@ -171,7 +172,7 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         title.setStyleSheet(HDR_STYLE)
         root.addWidget(title)
 
-        self.tabs = QtWidgets.QTabWidget()
+        self.tabs = ButtonNav()
         self.tabs.setStyleSheet(TAB_STYLE)
         root.addWidget(self.tabs)
 

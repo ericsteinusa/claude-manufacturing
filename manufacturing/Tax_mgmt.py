@@ -6,6 +6,7 @@ import sys
 from .db_pg import get_db
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 
 
@@ -429,7 +430,7 @@ class TaxMgmtWidget(QtWidgets.QWidget):
             "font-size:22px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
-        self.tabs = QtWidgets.QTabWidget()
+        self.tabs = ButtonNav()
         self.tabs.setStyleSheet(TAB_STYLE)
         root.addWidget(self.tabs)
 

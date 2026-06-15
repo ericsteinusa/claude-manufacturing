@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 from PyQt6 import QtCore, QtWidgets
+from .button_nav import ButtonNav
 from .QA_Lab_menu import _apply_blue_palette
 
 BUTTON_STYLE = (
@@ -66,7 +67,7 @@ class QualityAssuranceMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(_launch_tab("QA_Lab_menu.py", "QA Lab"), "QA Lab")
         v.addWidget(tabs)
