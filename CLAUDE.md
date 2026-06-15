@@ -56,4 +56,8 @@ Notes below are the non-obvious things that have bitten past changes.
 - People: `python -m manufacturing.seed_sample_data` (tagged `@example.com`).
 - Products + BOMs + demand for BOM/MRP:
   `python -m manufacturing.seed_sample_products` (tagged `bin='SAMPLE'`).
-  Both seeds are idempotent and support `--reset` / `--remove`.
+- Purchase orders for the web PO pages (every status + a partial receipt):
+  `python -m manufacturing.seed_sample_pos` (tagged `po_number` prefix
+  `SMPL-PO-`; line items use the `bin='SAMPLE'` products, so run that seed
+  first to link them).
+- All seeds are idempotent and support `--reset` / `--remove`.
