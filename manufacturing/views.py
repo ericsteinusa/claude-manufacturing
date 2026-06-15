@@ -12,6 +12,10 @@ from django.shortcuts import render, redirect
 
 from .log_utils import get_logger
 from .schema import init_schema
+from .db_pg import get_db_connection
+from .purchase_orders_core import (
+    PO_STATUSES, PO_STATUS_COLORS, list_pos, get_po, get_po_items,
+)
 from .menus import (
     DASHBOARD_DEPARTMENTS,
     MANAGER_MENU_KEYS,
@@ -33,6 +37,15 @@ from .accounts import (
 )
 
 log = get_logger(__name__)
+
+# Menu leaves that are served as web pages rather than launched as a desktop
+# Qt subprocess via run_script. Keyed by (dept, leaf_key) -> URL. The PO
+# viewer (open/status/history) all land on the filterable list.
+WEB_LEAF_URLS = {
+    ('purchasing', 'open_pos'): '/po/',
+    ('purchasing', 'po_status'): '/po/',
+    ('purchasing', 'po_hist'): '/po/',
+}
 
 
 def _init_schema():
@@ -140,6 +153,9 @@ def generic_menu(request, dept, subpath=''):
         new_parts = parts + [key]
         if isinstance(target, dict):
             url = '/dept/{}/{}/'.format(dept, '/'.join(new_parts))
+        elif (dept, key) in WEB_LEAF_URLS:
+            # Served as a real web page instead of launching a desktop window.
+            url = WEB_LEAF_URLS[(dept, key)]
         else:
             url = '/run/{}/{}/'.format(dept, '/'.join(new_parts))
         items.append((url, label))
@@ -388,3 +404,85 @@ def user_roles(request):
 
     users = _get_all_users_with_roles()
     return render(request, 'user_roles.html', {'users': users, 'roles': roles})
+
+
+# ---------------------------------------------------------------------------
+# Purchase orders (web)
+# ---------------------------------------------------------------------------
+
+
+def _po_access(request):
+    """Gate PO pages: logged in, and either full access or Purchasing dept.
+
+    Returns a redirect response to send the user to, or ``None`` if allowed.
+    Mirrors the dept gating in :func:`generic_menu`.
+    """
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') != 'purchasing':
+            return redirect('dashboard')
+    return None
+
+
+def _po_context(request, **extra):
+    """Toolbar context shared by the PO templates (matches base.html)."""
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def po_list(request):
+    denied = _po_access(request)
+    if denied:
+        return denied
+
+    status = request.GET.get('status') or None
+    if status not in PO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        pos = list_pos(conn, status=status)
+    finally:
+        conn.close()
+
+    for po in pos:
+        po['status_color'] = PO_STATUS_COLORS.get(po['status'], '#ffffff')
+
+    return render(request, 'po_list.html', _po_context(
+        request,
+        pos=pos,
+        status=status,
+        statuses=PO_STATUSES,
+        back_url='/dept/purchasing/purch/purch_orders/',
+    ))
+
+
+def po_detail(request, po_id):
+    denied = _po_access(request)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        po = get_po(conn, po_id)
+        items = get_po_items(conn, po_id) if po else []
+    finally:
+        conn.close()
+
+    if not po:
+        return redirect('po_list')
+
+    po['status_color'] = PO_STATUS_COLORS.get(po['status'], '#ffffff')
+
+    return render(request, 'po_detail.html', _po_context(
+        request,
+        po=po,
+        items=items,
+        back_url='/po/',
+    ))

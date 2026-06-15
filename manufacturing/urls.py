@@ -13,6 +13,8 @@ urlpatterns = [
      name='forgot_password_reset'),
     path('change-password/', views.change_password, name='change_password'),
     path('user-roles/', views.user_roles, name='user_roles'),
+    path('po/', views.po_list, name='po_list'),
+    path('po/<int:po_id>/', views.po_detail, name='po_detail'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),

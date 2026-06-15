@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ po.po_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.po-wrap { width: 100%; max-width: 900px; }
+.po-card {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 20px;
+}
+.po-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.po-head h2 { font-size: 20px; }
+.pill {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    border: 1px solid #999; font-size: 12px;
+}
+.po-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px;
+           font-size: 13px; }
+.po-meta b { color: #003cb4; }
+.po-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+}
+.po-table th, .po-table td {
+    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
+    font-size: 13px;
+}
+.po-table th { background: rgb(0, 60, 180); color: white; }
+.po-table td.num, .po-table th.num { text-align: right; }
+.po-table tfoot td { font-weight: bold; background: #eef6ff; }
+.po-empty { color: #555; padding: 8px 0; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="po-wrap">
+        <div class="po-card">
+            <div class="po-head">
+                <h2>{{ po.po_number }}</h2>
+                <span class="pill" style="background: {{ po.status_color }};">
+                    {{ po.status|capfirst }}
+                </span>
+            </div>
+            <div class="po-meta">
+                <div><b>Supplier:</b> {{ po.company_name|default:"—" }}</div>
+                <div><b>Total:</b> ${{ po.total|floatformat:2 }}</div>
+                <div><b>Order Date:</b> {{ po.order_date|default:"—" }}</div>
+                <div><b>Expected:</b> {{ po.expected_date|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;">
+                    <b>Notes:</b> {{ po.notes|default:"—" }}</div>
+            </div>
+        </div>
+
+        {% if items %}
+        <table class="po-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Product</th>
+                    <th class="num">Qty</th>
+                    <th class="num">Unit Price</th>
+                    <th class="num">Received</th>
+                    <th class="num">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.description }}</td>
+                    <td>{{ it.product_name|default:"" }}</td>
+                    <td class="num">{{ it.qty_ordered }}</td>
+                    <td class="num">${{ it.unit_price|floatformat:2 }}</td>
+                    <td class="num">{{ it.qty_received }}</td>
+                    <td class="num">${{ it.line_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="num">Total</td>
+                    <td class="num">${{ po.total|floatformat:2 }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        {% else %}
+        <div class="po-card po-empty">This purchase order has no line items.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
