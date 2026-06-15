@@ -165,6 +165,40 @@ def get_components(conn, product_id):
     ).fetchall()
 
 
+# ── Work-order explosion ────────────────────────────────────────────────
+
+def explode_quantity(qty_per, wo_quantity, scrap_pct=0.0):
+    """Component quantity needed for a work order, inflated for scrap.
+
+    Pure (unit-tested): ``qty_per`` of the component is needed per finished
+    unit; multiply by the order quantity and add the expected scrap fraction.
+    """
+    return qty_per * wo_quantity * (1.0 + (scrap_pct or 0.0) / 100.0)
+
+
+def explode_bom_to_wo(conn, wo_id, product_id, wo_quantity):
+    """Populate ``wo_material`` from the finished good's single-level BOM.
+
+    Returns the number of component lines created. A no-op (returns 0) when
+    the product has no BOM, so a work order for an item without a BOM keeps
+    its hand-entered material list working exactly as before. Issued
+    quantities start at zero; only the required quantity is seeded.
+
+    Runs on the caller's connection and does not commit, so it composes into
+    the same transaction that inserts the work order.
+    """
+    components = get_components(conn, product_id)
+    for c in components:
+        qty = explode_quantity(
+            c["qty_required"], wo_quantity, c["scrap_pct"])
+        note = c["notes"] or "from BOM"
+        conn.execute(
+            "INSERT INTO wo_material (wo_id, product_id, qty_required, notes) "
+            "VALUES (%s, %s, %s, %s)",
+            (wo_id, c["component_id"], qty, note))
+    return len(components)
+
+
 # ── Item-master editor ──────────────────────────────────────────────────
 
 def _apply_blue_palette(widget):

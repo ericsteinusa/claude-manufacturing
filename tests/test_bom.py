@@ -6,7 +6,9 @@ component" relationships, and answers whether adding one more edge would close
 a cycle.
 """
 
-from manufacturing.bom import would_create_cycle
+import pytest
+
+from manufacturing.bom import would_create_cycle, explode_quantity
 
 
 def test_self_reference_is_a_cycle():
@@ -43,3 +45,22 @@ def test_diamond_does_not_false_positive():
     # 1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4 (diamond). Adding 1 -> 4 is still acyclic.
     edges = [(1, 2), (1, 3), (2, 4), (3, 4)]
     assert would_create_cycle(edges, 1, 4) is False
+
+
+# ── explode_quantity ────────────────────────────────────────────────────
+
+def test_explode_no_scrap_scales_by_order_qty():
+    assert explode_quantity(2.0, 10, 0.0) == 20.0
+
+
+def test_explode_scrap_inflates_requirement():
+    # 5% scrap on 100 units of 1-per = 105.
+    assert explode_quantity(1.0, 100, 5.0) == pytest.approx(105.0)
+
+
+def test_explode_none_scrap_treated_as_zero():
+    assert explode_quantity(3.0, 4, None) == 12.0
+
+
+def test_explode_fractional_qty_per():
+    assert explode_quantity(0.5, 3, 0.0) == pytest.approx(1.5)

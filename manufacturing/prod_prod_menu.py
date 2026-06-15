@@ -2,7 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from .bom import (init_item_master, bom_would_create_cycle,
-                  ItemSettingsDialog)
+                  explode_bom_to_wo, ItemSettingsDialog)
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -126,6 +126,7 @@ class NewWODialog(QtWidgets.QDialog):
         self.resize(480, 310)
         _apply_blue_palette(self)
         self.wo_id = None
+        self._exploded = 0
         self._build_ui()
 
     def _build_ui(self):
@@ -208,6 +209,13 @@ class NewWODialog(QtWidgets.QDialog):
                  "planned", self.notes.text().strip())
             )
             self.wo_id = cur.lastrowid
+            # Seed the material list from the finished good's BOM, in the same
+            # transaction. No-op when the product has no BOM.
+            pid = self.product_combo.currentData()
+            self._exploded = 0
+            if pid is not None and self.wo_id is not None:
+                self._exploded = explode_bom_to_wo(
+                    conn, self.wo_id, pid, self.qty.value())
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(
@@ -215,6 +223,10 @@ class NewWODialog(QtWidgets.QDialog):
             conn.close()
             return
         conn.close()
+        if self._exploded:
+            QtWidgets.QMessageBox.information(
+                self, "BOM Applied",
+                f"Added {self._exploded} material line(s) from the BOM.")
         self.accept()
 
 
