@@ -7,6 +7,9 @@ persistence live in :mod:`manufacturing.accounts`.
 import os
 import sys
 import subprocess
+from datetime import date, timedelta
+
+import psycopg2
 
 from django.shortcuts import render, redirect
 
@@ -15,6 +18,8 @@ from .schema import init_schema
 from .db_pg import get_db_connection
 from .purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS, list_pos, get_po, get_po_items,
+    next_po_number, load_suppliers, load_products,
+    create_po, update_po, add_po_item, delete_po_item,
 )
 from .menus import (
     DASHBOARD_DEPARTMENTS,
@@ -42,6 +47,7 @@ log = get_logger(__name__)
 # Qt subprocess via run_script. Keyed by (dept, leaf_key) -> URL. The PO
 # viewer (open/status/history) all land on the filterable list.
 WEB_LEAF_URLS = {
+    ('purchasing', 'new_po'): '/po/new/',
     ('purchasing', 'open_pos'): '/po/',
     ('purchasing', 'po_status'): '/po/',
     ('purchasing', 'po_hist'): '/po/',
@@ -411,17 +417,20 @@ def user_roles(request):
 # ---------------------------------------------------------------------------
 
 
-def _po_access(request):
+def _po_access(request, write=False):
     """Gate PO pages: logged in, and either full access or Purchasing dept.
 
-    Returns a redirect response to send the user to, or ``None`` if allowed.
-    Mirrors the dept gating in :func:`generic_menu`.
+    With ``write=True`` also blocks ``READ_ONLY_ROLES`` from mutating (they may
+    still view), mirroring the gating in :func:`run_script`. Returns a redirect
+    response to send the user to, or ``None`` if allowed.
     """
     if not request.session.get('user_email'):
         return redirect('home')
     if not request.session.get('user_full_access'):
         if request.session.get('user_dept_key') != 'purchasing':
             return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('po_list')
     return None
 
 
@@ -459,6 +468,7 @@ def po_list(request):
         pos=pos,
         status=status,
         statuses=PO_STATUSES,
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
         back_url='/dept/purchasing/purch/purch_orders/',
     ))
 
@@ -468,10 +478,12 @@ def po_detail(request, po_id):
     if denied:
         return denied
 
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     try:
         po = get_po(conn, po_id)
         items = get_po_items(conn, po_id) if po else []
+        products = load_products(conn) if (po and can_edit) else []
     finally:
         conn.close()
 
@@ -484,5 +496,168 @@ def po_detail(request, po_id):
         request,
         po=po,
         items=items,
+        products=products,
+        can_edit=can_edit,
         back_url='/po/',
     ))
+
+
+# New POs may be created in either of these states; the rest of the workflow
+# (sent -> partial -> received, cancelled) is driven by the status actions.
+_PO_NEW_STATUSES = ('draft', 'sent')
+
+
+def _int_or_none(value):
+    """Coerce a form value to int, or None when blank/invalid (PO supplier and
+    product columns are integer, so a text param would be rejected)."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _po_header_form(request):
+    """Pull + validate PO header fields from POST. Returns (data, error)."""
+    po_number = (request.POST.get('po_number') or '').strip()
+    status = request.POST.get('status') or 'draft'
+    data = {
+        'po_number': po_number,
+        'supplier_id': _int_or_none(request.POST.get('supplier_id')),
+        'order_date': (request.POST.get('order_date') or '').strip() or None,
+        'expected_date':
+            (request.POST.get('expected_date') or '').strip() or None,
+        'status': status if status in _PO_NEW_STATUSES else 'draft',
+        'notes': (request.POST.get('notes') or '').strip() or None,
+    }
+    if not po_number:
+        return data, 'PO number is required.'
+    return data, None
+
+
+def po_new(request):
+    denied = _po_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        if request.method == 'POST':
+            data, error = _po_header_form(request)
+            if not error:
+                try:
+                    po_id = create_po(conn, **data)
+                    conn.commit()
+                    return redirect('po_detail', po_id=po_id)
+                except psycopg2.IntegrityError:
+                    conn.rollback()
+                    error = ("PO number '%s' already exists."
+                             % data['po_number'])
+            suppliers = load_suppliers(conn)
+            return render(request, 'po_form.html', _po_context(
+                request, mode='new', error=error, form=data,
+                suppliers=suppliers, statuses=_PO_NEW_STATUSES,
+                back_url='/po/'))
+
+        form = {
+            'po_number': next_po_number(conn),
+            'supplier_id': None,
+            'order_date': date.today().isoformat(),
+            'expected_date': (date.today() + timedelta(days=14)).isoformat(),
+            'status': 'draft',
+            'notes': '',
+        }
+        suppliers = load_suppliers(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'po_form.html', _po_context(
+        request, mode='new', form=form, suppliers=suppliers,
+        statuses=_PO_NEW_STATUSES, back_url='/po/'))
+
+
+def po_edit(request, po_id):
+    denied = _po_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        po = get_po(conn, po_id)
+        if not po:
+            return redirect('po_list')
+
+        if request.method == 'POST':
+            update_po(
+                conn, po_id,
+                supplier_id=_int_or_none(request.POST.get('supplier_id')),
+                order_date=(request.POST.get('order_date') or '').strip()
+                or None,
+                expected_date=(request.POST.get('expected_date') or '').strip()
+                or None,
+                notes=(request.POST.get('notes') or '').strip() or None,
+            )
+            conn.commit()
+            return redirect('po_detail', po_id=po_id)
+
+        suppliers = load_suppliers(conn)
+    finally:
+        conn.close()
+
+    # po_number/status are not editable here, but shown read-only.
+    form = {
+        'po_number': po['po_number'],
+        'supplier_id': po['supplier_id'],
+        'order_date': po['order_date'] or '',
+        'expected_date': po['expected_date'] or '',
+        'status': po['status'],
+        'notes': po['notes'] or '',
+    }
+    return render(request, 'po_form.html', _po_context(
+        request, mode='edit', po=po, form=form, suppliers=suppliers,
+        back_url='/po/%s/' % po_id))
+
+
+def po_add_item(request, po_id):
+    denied = _po_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('po_detail', po_id=po_id)
+
+    description = (request.POST.get('description') or '').strip()
+    product_id = _int_or_none(request.POST.get('product_id'))
+    try:
+        qty = int(request.POST.get('qty_ordered') or 1)
+    except ValueError:
+        qty = 1
+    try:
+        unit_price = float(request.POST.get('unit_price') or 0)
+    except ValueError:
+        unit_price = 0.0
+
+    conn = get_db_connection()
+    try:
+        po = get_po(conn, po_id)
+        if po and description and qty >= 1 and unit_price >= 0:
+            add_po_item(conn, po_id, description, product_id=product_id,
+                        qty_ordered=qty, unit_price=unit_price)
+            conn.commit()
+    finally:
+        conn.close()
+    return redirect('po_detail', po_id=po_id)
+
+
+def po_remove_item(request, po_id):
+    denied = _po_access(request, write=True)
+    if denied:
+        return denied
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        if item_id:
+            conn = get_db_connection()
+            try:
+                delete_po_item(conn, item_id, po_id=po_id)
+                conn.commit()
+            finally:
+                conn.close()
+    return redirect('po_detail', po_id=po_id)

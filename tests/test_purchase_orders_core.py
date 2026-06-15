@@ -12,12 +12,14 @@ import pytest
 from manufacturing.purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS,
     list_pos, get_po, get_po_items, next_po_number,
+    create_po, update_po, add_po_item, delete_po_item,
 )
 
 
 class _FakeCursor:
-    def __init__(self, rows):
+    def __init__(self, rows, rowcount=0):
         self._rows = rows
+        self.rowcount = rowcount
 
     def fetchall(self):
         return self._rows
@@ -29,13 +31,14 @@ class _FakeCursor:
 class _FakeConn:
     """Records every (sql, params) and replays preset rows."""
 
-    def __init__(self, rows=None):
+    def __init__(self, rows=None, rowcount=0):
         self.rows = rows or []
+        self.rowcount = rowcount
         self.calls = []
 
     def execute(self, sql, params=None):
         self.calls.append((sql, list(params or [])))
-        return _FakeCursor(self.rows)
+        return _FakeCursor(self.rows, self.rowcount)
 
     @property
     def last_sql(self):
@@ -139,3 +142,50 @@ def test_get_po_items_computes_line_total_floats():
     assert items[0]["unit_price"] == pytest.approx(1.25)
     assert items[0]["line_total"] == pytest.approx(12.50)
     assert isinstance(items[0]["line_total"], float)
+
+
+# ── writes: create / update / items ───────────────────────────────────────
+
+def test_create_po_returns_new_id_from_returning():
+    conn = _FakeConn(rows=[{"id": 42}])
+    new_id = create_po(conn, "PO-2026-0007", supplier_id=3,
+                       order_date="2026-06-01", status="sent", notes="hi")
+    assert new_id == 42
+    assert conn.last_sql.strip().upper().startswith(
+        "INSERT INTO PURCHASE_ORDER")
+    assert "RETURNING id" in conn.last_sql
+    assert conn.last_params == [
+        "PO-2026-0007", 3, "2026-06-01", None, "sent", "hi"]
+
+
+def test_update_po_sets_editable_fields_only():
+    conn = _FakeConn()
+    update_po(conn, 5, supplier_id=2, order_date="2026-06-02",
+              expected_date="2026-06-20", notes="x")
+    sql = conn.last_sql.upper()
+    assert sql.strip().startswith("UPDATE PURCHASE_ORDER")
+    assert "PO_NUMBER" not in sql and "STATUS" not in sql
+    assert conn.last_params == [2, "2026-06-02", "2026-06-20", "x", 5]
+
+
+def test_add_po_item_inserts_line():
+    conn = _FakeConn()
+    add_po_item(conn, 5, "Bolt", product_id=2, qty_ordered=10,
+                unit_price=1.25)
+    assert "INSERT INTO po_item" in conn.last_sql
+    assert conn.last_params == [5, "Bolt", 2, 10, 1.25]
+
+
+def test_delete_po_item_scopes_to_po_when_given():
+    conn = _FakeConn(rowcount=1)
+    n = delete_po_item(conn, 9, po_id=5)
+    assert n == 1
+    assert "AND po_id=%s" in conn.last_sql
+    assert conn.last_params == [9, 5]
+
+
+def test_delete_po_item_without_po_scope():
+    conn = _FakeConn(rowcount=1)
+    delete_po_item(conn, 9)
+    assert "AND po_id" not in conn.last_sql
+    assert conn.last_params == [9]

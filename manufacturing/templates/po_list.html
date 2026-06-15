@@ -4,6 +4,7 @@
 
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">Back</a>
+{% if can_edit %}<a href="/po/new/" class="btn">+ New PO</a>{% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}
 
