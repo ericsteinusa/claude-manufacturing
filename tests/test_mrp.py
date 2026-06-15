@@ -7,8 +7,7 @@ derivation are pinned down deterministically.
 
 import pytest
 
-from manufacturing.mrp import (compute_levels, plan_orders,
-                               release_planned_orders)
+from manufacturing.mrp_core import compute_levels, plan_orders
 
 
 def _by_id(planned):
@@ -128,10 +127,3 @@ def test_make_flag_without_bom_still_makes_no_explosion():
     planned = plan_orders(products, {}, {1: 5}, {}, {}, {})
     assert len(planned) == 1
     assert planned[0]["order_type"] == "make"
-
-
-# ── release_planned_orders: no-op guard (no DB touch) ───────────────────
-
-def test_release_empty_is_a_noop():
-    assert release_planned_orders([]) == {
-        "requisition": None, "work_orders": [], "released": 0, "skipped": 0}

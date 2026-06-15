@@ -8,7 +8,7 @@ a cycle.
 
 import pytest
 
-from manufacturing.bom import would_create_cycle, explode_quantity
+from manufacturing.bom_core import would_create_cycle, explode_quantity
 
 
 def test_self_reference_is_a_cycle():

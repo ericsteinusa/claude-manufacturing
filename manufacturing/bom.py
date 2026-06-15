@@ -32,10 +32,15 @@ import sys
 import psycopg2
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .bom_core import would_create_cycle, explode_quantity
 from .db_pg import get_db_connection
 from .log_utils import get_logger
 
 log = get_logger(__name__)
+
+# Re-exported for callers that import them from this module. The pure
+# implementations live in bom_core so they can be imported without Qt.
+__all__ = ["would_create_cycle", "explode_quantity"]
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -109,34 +114,7 @@ def init_item_master():
         conn.close()
 
 
-# ── Cycle protection (pure) ─────────────────────────────────────────────
-
-def would_create_cycle(edges, parent_id, component_id):
-    """Return True if adding parent_id -> component_id would form a cycle.
-
-    ``edges`` is an iterable of ``(parent_id, component_id)`` pairs describing
-    existing "parent is built from component" relationships. A new edge closes
-    a cycle when the parent is the component itself, or when the parent is
-    already reachable from the component (the component transitively requires
-    the parent).
-    """
-    if parent_id == component_id:
-        return True
-    adjacency = {}
-    for p, c in edges:
-        adjacency.setdefault(p, []).append(c)
-    stack = [component_id]
-    seen = set()
-    while stack:
-        node = stack.pop()
-        if node == parent_id:
-            return True
-        if node in seen:
-            continue
-        seen.add(node)
-        stack.extend(adjacency.get(node, []))
-    return False
-
+# ── Cycle protection ────────────────────────────────────────────────────
 
 def bom_would_create_cycle(conn, parent_id, component_id):
     """DB-backed cycle check across the flat ``bom`` edge list."""
@@ -166,15 +144,6 @@ def get_components(conn, product_id):
 
 
 # ── Work-order explosion ────────────────────────────────────────────────
-
-def explode_quantity(qty_per, wo_quantity, scrap_pct=0.0):
-    """Component quantity needed for a work order, inflated for scrap.
-
-    Pure (unit-tested): ``qty_per`` of the component is needed per finished
-    unit; multiply by the order quantity and add the expected scrap fraction.
-    """
-    return qty_per * wo_quantity * (1.0 + (scrap_pct or 0.0) / 100.0)
-
 
 def explode_bom_to_wo(conn, wo_id, product_id, wo_quantity):
     """Populate ``wo_material`` from the finished good's single-level BOM.
