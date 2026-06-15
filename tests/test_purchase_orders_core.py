@@ -13,6 +13,7 @@ from manufacturing.purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS,
     list_pos, get_po, get_po_items, next_po_number,
     create_po, update_po, add_po_item, delete_po_item,
+    allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
 
 
@@ -189,3 +190,49 @@ def test_delete_po_item_without_po_scope():
     delete_po_item(conn, 9)
     assert "AND po_id" not in conn.last_sql
     assert conn.last_params == [9]
+
+
+# ── status transitions ────────────────────────────────────────────────────
+
+def test_allowed_transitions_follow_the_workflow():
+    assert set(allowed_transitions("draft")) == {"sent", "cancelled"}
+    assert set(allowed_transitions("sent")) == {"partial", "received",
+                                                "cancelled"}
+    assert set(allowed_transitions("partial")) == {"received", "cancelled"}
+
+
+def test_terminal_states_have_no_transitions():
+    assert allowed_transitions("received") == ()
+    assert allowed_transitions("cancelled") == ()
+    assert allowed_transitions("bogus") == ()
+
+
+def test_can_transition_rejects_skips_and_reopens():
+    assert can_transition("draft", "sent")
+    assert not can_transition("draft", "received")   # can't skip sent
+    assert not can_transition("received", "sent")    # can't reopen
+    assert not can_transition("cancelled", "draft")
+
+
+def test_set_po_status_updates_status():
+    conn = _FakeConn()
+    set_po_status(conn, 5, "sent")
+    assert "UPDATE purchase_order SET status=%s" in conn.last_sql
+    assert conn.last_params == ["sent", 5]
+
+
+# ── receiving ──────────────────────────────────────────────────────────────
+
+def test_receive_po_item_scopes_to_po_when_given():
+    conn = _FakeConn(rowcount=1)
+    n = receive_po_item(conn, 9, 3, po_id=5)
+    assert n == 1
+    assert "AND po_id=%s" in conn.last_sql
+    assert conn.last_params == [3, 9, 5]
+
+
+def test_receive_po_item_without_po_scope():
+    conn = _FakeConn(rowcount=1)
+    receive_po_item(conn, 9, 2)
+    assert "AND po_id" not in conn.last_sql
+    assert conn.last_params == [2, 9]

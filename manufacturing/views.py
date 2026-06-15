@@ -17,9 +17,11 @@ from .log_utils import get_logger
 from .schema import init_schema
 from .db_pg import get_db_connection
 from .purchase_orders_core import (
-    PO_STATUSES, PO_STATUS_COLORS, list_pos, get_po, get_po_items,
+    PO_STATUSES, PO_STATUS_COLORS, PO_STATUS_ACTION_LABELS,
+    list_pos, get_po, get_po_items,
     next_po_number, load_suppliers, load_products,
     create_po, update_po, add_po_item, delete_po_item,
+    allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
 from .menus import (
     DASHBOARD_DEPARTMENTS,
@@ -492,12 +494,21 @@ def po_detail(request, po_id):
 
     po['status_color'] = PO_STATUS_COLORS.get(po['status'], '#ffffff')
 
+    status_actions = [
+        (target, PO_STATUS_ACTION_LABELS.get(target, target))
+        for target in allowed_transitions(po['status'])
+    ] if can_edit else []
+    # Receiving is offered once the PO is out (sent/partial).
+    can_receive = can_edit and po['status'] in ('sent', 'partial')
+
     return render(request, 'po_detail.html', _po_context(
         request,
         po=po,
         items=items,
         products=products,
         can_edit=can_edit,
+        status_actions=status_actions,
+        can_receive=can_receive,
         back_url='/po/',
     ))
 
@@ -660,4 +671,47 @@ def po_remove_item(request, po_id):
                 conn.commit()
             finally:
                 conn.close()
+    return redirect('po_detail', po_id=po_id)
+
+
+def po_set_status(request, po_id):
+    denied = _po_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('po_detail', po_id=po_id)
+
+    target = request.POST.get('status')
+    conn = get_db_connection()
+    try:
+        po = get_po(conn, po_id)
+        if po and can_transition(po['status'], target):
+            set_po_status(conn, po_id, target)
+            conn.commit()
+    finally:
+        conn.close()
+    return redirect('po_detail', po_id=po_id)
+
+
+def po_receive_item(request, po_id):
+    denied = _po_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('po_detail', po_id=po_id)
+
+    item_id = _int_or_none(request.POST.get('item_id'))
+    qty = _int_or_none(request.POST.get('qty_received'))
+    if item_id is not None and qty is not None and qty >= 0:
+        conn = get_db_connection()
+        try:
+            # Clamp to the ordered quantity so receipts can't exceed the order.
+            item = next((i for i in get_po_items(conn, po_id)
+                         if i['id'] == item_id), None)
+            if item is not None:
+                qty = min(qty, item['qty_ordered'])
+                receive_po_item(conn, item_id, qty, po_id=po_id)
+                conn.commit()
+        finally:
+            conn.close()
     return redirect('po_detail', po_id=po_id)
