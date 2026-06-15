@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block page_title %}{% if mode == 'edit' %}Edit {{ form.po_number }}{% else %}New Purchase Order{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.po-form-wrap { width: 100%; max-width: 520px; }
+.po-form {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 20px 24px;
+}
+.po-form .row { margin-bottom: 14px; }
+.po-form label { display: block; font-size: 13px; font-weight: bold;
+                 color: #003cb4; margin-bottom: 4px; }
+.po-form input, .po-form select {
+    width: 100%; padding: 6px 8px; border: 2px solid black;
+    border-radius: 4px; font-size: 13px;
+}
+.po-form input[readonly] { background: #eee; }
+.po-actions { display: flex; gap: 10px; margin-top: 18px; }
+.po-error {
+    background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
+    padding: 8px 12px; margin-bottom: 14px; font-size: 13px; color: #900;
+}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="po-form-wrap">
+        <div class="menu-title">
+            {% if mode == 'edit' %}Edit {{ form.po_number }}{% else %}New Purchase Order{% endif %}
+        </div>
+
+        {% if error %}<div class="po-error">{{ error }}</div>{% endif %}
+
+        <form class="po-form" method="post"
+              action="{% if mode == 'edit' %}/po/{{ po.id }}/edit/{% else %}/po/new/{% endif %}">
+            {% csrf_token %}
+
+            <div class="row">
+                <label>PO Number</label>
+                {% if mode == 'edit' %}
+                <input type="text" value="{{ form.po_number }}" readonly>
+                {% else %}
+                <input type="text" name="po_number" value="{{ form.po_number }}"
+                       required>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <label>Supplier</label>
+                <select name="supplier_id">
+                    <option value="">(none)</option>
+                    {% for s in suppliers %}
+                    <option value="{{ s.id }}"
+                        {% if s.id == form.supplier_id %}selected{% endif %}>
+                        {{ s.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+                <label>Order Date</label>
+                <input type="date" name="order_date" value="{{ form.order_date }}">
+            </div>
+
+            <div class="row">
+                <label>Expected Date</label>
+                <input type="date" name="expected_date"
+                       value="{{ form.expected_date }}">
+            </div>
+
+            {% if mode == 'edit' %}
+            <div class="row">
+                <label>Status</label>
+                <input type="text" value="{{ form.status|capfirst }}" readonly>
+            </div>
+            {% else %}
+            <div class="row">
+                <label>Status</label>
+                <select name="status">
+                    {% for s in statuses %}
+                    <option value="{{ s }}"
+                        {% if s == form.status %}selected{% endif %}>
+                        {{ s|capfirst }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <label>Notes</label>
+                <input type="text" name="notes" value="{{ form.notes }}">
+            </div>
+
+            <div class="po-actions">
+                <button type="submit" class="btn">
+                    {% if mode == 'edit' %}Save{% else %}Create PO{% endif %}</button>
+                <a href="{{ back_url }}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

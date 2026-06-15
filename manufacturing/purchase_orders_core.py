@@ -13,6 +13,8 @@ and lifetime; pass a :func:`manufacturing.db_pg.get_db_connection` connection
 
 from datetime import date
 
+import psycopg2
+
 from .mrp_core import next_sequence_number
 
 # Workflow states a PO moves through, in order. ``cancelled`` is terminal.
@@ -147,6 +149,83 @@ def get_po_items(conn, po_id):
         d["line_total"] = float(d["line_total"] or 0.0)
         items.append(d)
     return items
+
+
+def load_suppliers(conn):
+    """Return ``[{id, company_name}]`` for the supplier picker (empty if the
+    table is absent)."""
+    try:
+        rows = conn.execute(
+            "SELECT id, company_name FROM supplier ORDER BY company_name"
+        ).fetchall()
+    except psycopg2.Error:
+        return []
+    return [dict(r) for r in rows]
+
+
+def load_products(conn):
+    """Return ``[{id, product_name}]`` for the product picker (empty if the
+    table is absent)."""
+    try:
+        rows = conn.execute(
+            "SELECT id, name AS product_name FROM product ORDER BY name"
+        ).fetchall()
+    except psycopg2.Error:
+        return []
+    return [dict(r) for r in rows]
+
+
+def create_po(conn, po_number, supplier_id=None, order_date=None,
+              expected_date=None, status="draft", notes=None):
+    """Insert a PO header and return its new id. Does not commit.
+
+    Raises ``psycopg2.IntegrityError`` if ``po_number`` already exists (the
+    column is UNIQUE); the caller is expected to surface that to the user.
+    """
+    row = conn.execute(
+        "INSERT INTO purchase_order (po_number, supplier_id, order_date,"
+        " expected_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s)"
+        " RETURNING id",
+        (po_number, supplier_id, order_date, expected_date, status, notes)
+    ).fetchone()
+    return row["id"]
+
+
+def update_po(conn, po_id, supplier_id=None, order_date=None,
+              expected_date=None, notes=None):
+    """Update the editable header fields of a PO. Does not commit.
+
+    Status and po_number are intentionally not touched here — status changes
+    go through the dedicated workflow action.
+    """
+    conn.execute(
+        "UPDATE purchase_order SET supplier_id=%s, order_date=%s,"
+        " expected_date=%s, notes=%s WHERE id=%s",
+        (supplier_id, order_date, expected_date, notes, po_id)
+    )
+
+
+def add_po_item(conn, po_id, description, product_id=None,
+                qty_ordered=1, unit_price=0.0):
+    """Append a line item to a PO. Does not commit."""
+    conn.execute(
+        "INSERT INTO po_item (po_id, description, product_id,"
+        " qty_ordered, unit_price) VALUES (%s,%s,%s,%s,%s)",
+        (po_id, description, product_id, qty_ordered, unit_price)
+    )
+
+
+def delete_po_item(conn, item_id, po_id=None):
+    """Remove a line item. If ``po_id`` is given, only delete when the item
+    belongs to it (guards against cross-PO deletes from a forged id). Does not
+    commit. Returns the number of rows deleted.
+    """
+    if po_id is None:
+        cur = conn.execute("DELETE FROM po_item WHERE id=%s", (item_id,))
+    else:
+        cur = conn.execute(
+            "DELETE FROM po_item WHERE id=%s AND po_id=%s", (item_id, po_id))
+    return cur.rowcount
 
 
 def _po_dict(row):
