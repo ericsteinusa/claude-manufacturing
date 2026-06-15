@@ -30,6 +30,35 @@ PO_STATUS_COLORS = {
     "cancelled": "#dcdcdc",
 }
 
+# Allowed forward status moves. ``received`` and ``cancelled`` are terminal.
+# (The desktop lets any button set any status; the web enforces this so the
+# workflow can't skip or reopen states.)
+PO_STATUS_TRANSITIONS = {
+    "draft":     ("sent", "cancelled"),
+    "sent":      ("partial", "received", "cancelled"),
+    "partial":   ("received", "cancelled"),
+    "received":  (),
+    "cancelled": (),
+}
+
+# Button label shown for a transition into each status.
+PO_STATUS_ACTION_LABELS = {
+    "sent":      "Mark Sent",
+    "partial":   "Mark Partial",
+    "received":  "Mark Received",
+    "cancelled": "Cancel PO",
+}
+
+
+def allowed_transitions(current):
+    """Statuses ``current`` may move to (empty tuple for unknown/terminal)."""
+    return PO_STATUS_TRANSITIONS.get(current, ())
+
+
+def can_transition(current, target):
+    """True if a PO in ``current`` status may move to ``target``."""
+    return target in PO_STATUS_TRANSITIONS.get(current, ())
+
 
 def ensure_po_tables(conn):
     """Create the ``purchase_order`` / ``po_item`` tables if absent.
@@ -225,6 +254,31 @@ def delete_po_item(conn, item_id, po_id=None):
     else:
         cur = conn.execute(
             "DELETE FROM po_item WHERE id=%s AND po_id=%s", (item_id, po_id))
+    return cur.rowcount
+
+
+def set_po_status(conn, po_id, new_status):
+    """Set a PO's status. Does not commit and does not check the transition —
+    callers should gate with :func:`can_transition` first."""
+    conn.execute(
+        "UPDATE purchase_order SET status=%s WHERE id=%s",
+        (new_status, po_id))
+
+
+def receive_po_item(conn, item_id, qty_received, po_id=None):
+    """Record received quantity for a line item. Does not commit.
+
+    If ``po_id`` is given, only updates when the item belongs to it (guards a
+    forged item id). Returns the number of rows updated.
+    """
+    if po_id is None:
+        cur = conn.execute(
+            "UPDATE po_item SET qty_received=%s WHERE id=%s",
+            (qty_received, item_id))
+    else:
+        cur = conn.execute(
+            "UPDATE po_item SET qty_received=%s WHERE id=%s AND po_id=%s",
+            (qty_received, item_id, po_id))
     return cur.rowcount
 
 

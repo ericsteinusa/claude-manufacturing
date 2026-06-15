@@ -36,6 +36,17 @@
 .po-table tfoot td { font-weight: bold; background: #eef6ff; }
 .po-empty { color: #555; padding: 8px 0; }
 .btn-sm { padding: 2px 10px; font-size: 12px; }
+.btn-danger { background: #f8d7da; border-color: #c33; }
+.btn-danger:hover { background: #f1aeb5; }
+.po-status-actions {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+    padding-top: 12px; border-top: 1px solid #ddd;
+}
+.po-status-actions form { margin: 0; }
+.receive-form { display: flex; gap: 4px; justify-content: flex-end; }
+.receive-form input[type=number] {
+    width: 64px; padding: 2px 4px; border: 2px solid black; border-radius: 4px;
+}
 .add-item { margin-top: 16px; }
 .add-item .grid {
     display: grid;
@@ -69,6 +80,20 @@
                 <div style="grid-column: 1 / -1;">
                     <b>Notes:</b> {{ po.notes|default:"—" }}</div>
             </div>
+            {% if status_actions %}
+            <div class="po-status-actions">
+                {% for target, label in status_actions %}
+                <form method="post" action="/po/{{ po.id }}/status/"
+                      {% if target == 'cancelled' %}onsubmit="return confirm('Cancel this PO?');"{% endif %}>
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="{{ target }}">
+                    <button type="submit"
+                            class="btn btn-sm{% if target == 'cancelled' %} btn-danger{% endif %}">
+                        {{ label }}</button>
+                </form>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
         {% if items %}
@@ -80,6 +105,7 @@
                     <th class="num">Qty</th>
                     <th class="num">Unit Price</th>
                     <th class="num">Received</th>
+                    {% if can_receive %}<th class="num">Receive</th>{% endif %}
                     <th class="num">Line Total</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr>
@@ -92,6 +118,19 @@
                     <td class="num">{{ it.qty_ordered }}</td>
                     <td class="num">${{ it.unit_price|floatformat:2 }}</td>
                     <td class="num">{{ it.qty_received }}</td>
+                    {% if can_receive %}
+                    <td class="num">
+                        <form method="post" action="/po/{{ po.id }}/items/receive/"
+                              class="receive-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" value="{{ it.id }}">
+                            <input type="number" name="qty_received" min="0"
+                                   max="{{ it.qty_ordered }}"
+                                   value="{{ it.qty_received }}">
+                            <button type="submit" class="btn btn-sm">Save</button>
+                        </form>
+                    </td>
+                    {% endif %}
                     <td class="num">${{ it.line_total|floatformat:2 }}</td>
                     {% if can_edit %}
                     <td class="num">
@@ -109,6 +148,7 @@
             <tfoot>
                 <tr>
                     <td colspan="5" class="num">Total</td>
+                    {% if can_receive %}<td></td>{% endif %}
                     <td class="num">${{ po.total|floatformat:2 }}</td>
                     {% if can_edit %}<td></td>{% endif %}
                 </tr>
