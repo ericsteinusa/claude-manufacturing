@@ -1,11 +1,12 @@
-"""seed_sample_products.py — sample products and BOMs for testing.
+"""seed_sample_products.py — sample products, BOMs and demand for testing.
 
-Seeds a small but multi-level product structure so the BOM editor, work-order
-explosion and the MRP engine can be exercised against realistic data. Sample
-products are tagged by ``bin = 'SAMPLE'`` so they are easy to spot in the
-inventory screen and to remove cleanly. (``bin`` is used rather than
-``supplier_id`` because the live ``product.supplier_id`` column is an integer
-foreign-key-style id, not free text.)
+Seeds a small but multi-level product structure plus some firm sales-order
+demand, so the BOM editor, work-order explosion and the MRP engine can be
+exercised end to end against realistic data. Sample products are tagged by
+``bin = 'SAMPLE'`` so they are easy to spot in the inventory screen and to
+remove cleanly. (``bin`` is used rather than ``supplier_id`` because the live
+``product.supplier_id`` column is an integer foreign-key-style id, not free
+text.)
 
 The structure (two finished bikes that share sub-assemblies, so a component
 has more than one parent — good for testing the level-by-level explosion):
@@ -28,18 +29,20 @@ Usage::
     python -m manufacturing.seed_sample_products --reset     # remove + re-add
     python -m manufacturing.seed_sample_products --remove    # remove only
 
-Removal deletes the sample BOM rows and then the sample products. If you have
-released MRP suggestions into requisitions/work orders that reference these
-products, remove those first.
+Removal deletes the sample sales orders, BOM rows and then the sample
+products. If you have released MRP suggestions into requisitions/work orders
+that reference these products, remove those first.
 """
 
 import argparse
 import sys
+from datetime import date, timedelta
 
 from .db_pg import get_db_connection
 
 
-SAMPLE_TAG = "SAMPLE"  # stored in product.bin to mark sample rows
+SAMPLE_TAG = "SAMPLE"      # stored in product.bin to mark sample rows
+SAMPLE_SO_PREFIX = "SMPL-SO-"  # sample sales-order number prefix
 
 # name, item_type, on-hand, reorder_point, unit_cost, lead_time_days, uom
 PRODUCTS = [
@@ -83,6 +86,16 @@ BOMS = {
     ],
 }
 
+# Sample demand. so_number_suffix, status, [(product_name, qty, unit_price)].
+# MRP counts only 'confirmed' orders as demand; the 'draft' one is seeded to
+# demonstrate that it is correctly excluded from the plan.
+SALES_ORDERS = [
+    ("1", "confirmed", [("Mountain Bike", 10, 450.00)]),
+    ("2", "confirmed", [("Road Bike", 4, 520.00),
+                        ("Mountain Bike", 2, 450.00)]),
+    ("3", "draft",     [("Road Bike", 5, 520.00)]),
+]
+
 
 def ensure_tables(conn):
     """Create the product / bom tables and item-master columns (idempotent).
@@ -123,6 +136,27 @@ def ensure_tables(conn):
     """)
     conn.execute(
         "ALTER TABLE bom ADD COLUMN IF NOT EXISTS scrap_pct REAL DEFAULT 0.0")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS sales_order (
+            id SERIAL PRIMARY KEY,
+            so_number TEXT NOT NULL UNIQUE,
+            customer_id INTEGER,
+            order_date TEXT,
+            ship_date TEXT,
+            status TEXT DEFAULT 'draft',
+            notes TEXT
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS so_item (
+            id SERIAL PRIMARY KEY,
+            so_id INTEGER NOT NULL REFERENCES sales_order(id),
+            description TEXT NOT NULL,
+            product_id INTEGER,
+            qty INTEGER DEFAULT 1,
+            unit_price REAL DEFAULT 0.0
+        )
+    """)
 
 
 def _sample_ids(conn):
@@ -140,16 +174,26 @@ def sample_present(conn):
 
 
 def remove_sample(conn):
-    """Delete sample BOM rows and sample products. Returns counts."""
+    """Delete sample sales orders, BOM rows and products. Returns counts."""
+    so_ids = [r["id"] for r in conn.execute(
+        "SELECT id FROM sales_order WHERE so_number LIKE %s",
+        (SAMPLE_SO_PREFIX + "%",)).fetchall()]
+    soi_n = so_n = 0
+    if so_ids:
+        soi_n = conn.execute(
+            "DELETE FROM so_item WHERE so_id = ANY(%s)", (so_ids,)).rowcount
+        so_n = conn.execute(
+            "DELETE FROM sales_order WHERE id = ANY(%s)", (so_ids,)).rowcount
+
     ids = list(_sample_ids(conn).values())
-    if not ids:
-        return 0, 0
-    bom_n = conn.execute(
-        "DELETE FROM bom WHERE product_id = ANY(%s) "
-        "OR component_id = ANY(%s)", (ids, ids)).rowcount
-    prod_n = conn.execute(
-        "DELETE FROM product WHERE id = ANY(%s)", (ids,)).rowcount
-    return prod_n, bom_n
+    bom_n = prod_n = 0
+    if ids:
+        bom_n = conn.execute(
+            "DELETE FROM bom WHERE product_id = ANY(%s) "
+            "OR component_id = ANY(%s)", (ids, ids)).rowcount
+        prod_n = conn.execute(
+            "DELETE FROM product WHERE id = ANY(%s)", (ids,)).rowcount
+    return prod_n, bom_n, so_n, soi_n
 
 
 def seed_products(conn):
@@ -198,6 +242,39 @@ def seed_boms(conn):
     return added
 
 
+def seed_sales_orders(conn):
+    """Insert any missing sample sales orders. Returns (orders, lines)."""
+    ids = _sample_ids(conn)
+    today = date.today().isoformat()
+    ship = (date.today() + timedelta(days=21)).isoformat()
+    orders = lines = 0
+    for suffix, status, items in SALES_ORDERS:
+        so_number = SAMPLE_SO_PREFIX + suffix
+        existing = conn.execute(
+            "SELECT id FROM sales_order WHERE so_number = %s",
+            (so_number,)).fetchone()
+        if existing:
+            continue
+        cur = conn.execute(
+            "INSERT INTO sales_order (so_number, order_date, ship_date, "
+            "status, notes) VALUES (%s,%s,%s,%s,'sample') RETURNING id",
+            (so_number, today, ship, status))
+        so_id = cur.fetchone()["id"]
+        orders += 1
+        for prod_name, qty, price in items:
+            pid = ids.get(prod_name)
+            if pid is None:
+                print(f"  skip SO line (missing product): {prod_name!r}",
+                      file=sys.stderr)
+                continue
+            conn.execute(
+                "INSERT INTO so_item (so_id, description, product_id, qty, "
+                "unit_price) VALUES (%s,%s,%s,%s,%s)",
+                (so_id, prod_name, pid, qty, price))
+            lines += 1
+    return orders, lines
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Seed sample products and BOMs.")
@@ -211,8 +288,9 @@ def main(argv=None):
     try:
         ensure_tables(conn)
         if args.remove or args.reset:
-            prod_n, bom_n = remove_sample(conn)
-            print(f"removed {prod_n} sample products, {bom_n} BOM lines")
+            prod_n, bom_n, so_n, soi_n = remove_sample(conn)
+            print(f"removed {prod_n} sample products, {bom_n} BOM lines, "
+                  f"{so_n} sales orders ({soi_n} lines)")
             if args.remove:
                 conn.commit()
                 return
@@ -223,8 +301,10 @@ def main(argv=None):
 
         products_n = seed_products(conn)
         boms_n = seed_boms(conn)
+        orders_n, so_lines_n = seed_sales_orders(conn)
         conn.commit()
-        print(f"inserted {products_n} products, {boms_n} BOM lines")
+        print(f"inserted {products_n} products, {boms_n} BOM lines, "
+              f"{orders_n} sales orders ({so_lines_n} lines)")
     finally:
         conn.close()
 
