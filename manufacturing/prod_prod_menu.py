@@ -1,6 +1,8 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .bom import (init_item_master, bom_would_create_cycle,
+                  explode_bom_to_wo, ItemSettingsDialog)
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -67,6 +69,9 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    # Reconcile the item-master (make/buy, lead time, uom) and the bom
+    # scrap_pct column. Resilient if product/bom don't exist yet.
+    init_item_master()
 
 
 def _apply_blue_palette(widget):
@@ -121,6 +126,7 @@ class NewWODialog(QtWidgets.QDialog):
         self.resize(480, 310)
         _apply_blue_palette(self)
         self.wo_id = None
+        self._exploded = 0
         self._build_ui()
 
     def _build_ui(self):
@@ -203,6 +209,13 @@ class NewWODialog(QtWidgets.QDialog):
                  "planned", self.notes.text().strip())
             )
             self.wo_id = cur.lastrowid
+            # Seed the material list from the finished good's BOM, in the same
+            # transaction. No-op when the product has no BOM.
+            pid = self.product_combo.currentData()
+            self._exploded = 0
+            if pid is not None and self.wo_id is not None:
+                self._exploded = explode_bom_to_wo(
+                    conn, self.wo_id, pid, self.qty.value())
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(
@@ -210,6 +223,10 @@ class NewWODialog(QtWidgets.QDialog):
             conn.close()
             return
         conn.close()
+        if self._exploded:
+            QtWidgets.QMessageBox.information(
+                self, "BOM Applied",
+                f"Added {self._exploded} material line(s) from the BOM.")
         self.accept()
 
 
@@ -421,6 +438,13 @@ class AddBOMItemDialog(QtWidgets.QDialog):
         self.unit.setPlaceholderText("e.g. each, kg, L")
         layout.addRow(lbl("Unit:"), self.unit)
 
+        self.scrap_pct = QtWidgets.QDoubleSpinBox()
+        self.scrap_pct.setRange(0.0, 100.0)
+        self.scrap_pct.setDecimals(2)
+        self.scrap_pct.setSuffix(" %")
+        self.scrap_pct.setStyleSheet(INPUT_STYLE)
+        layout.addRow(lbl("Scrap:"), self.scrap_pct)
+
         self.notes = QtWidgets.QLineEdit()
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
@@ -445,11 +469,19 @@ class AddBOMItemDialog(QtWidgets.QDialog):
     self, "Input Error", "Finished good and component must differ.")
             return
         conn = get_db()
+        if bom_would_create_cycle(conn, prod_id, comp_id):
+            conn.close()
+            QtWidgets.QMessageBox.warning(
+                self, "Input Error",
+                "That component already (directly or indirectly) requires "
+                "this finished good — it would create a BOM cycle.")
+            return
         conn.execute(
             "INSERT INTO bom (product_id, component_id, qty_required, unit, "
-            "notes) VALUES (?,?,?,?,?)",
+            "scrap_pct, notes) VALUES (?,?,?,?,?,?)",
             (prod_id, comp_id, self.qty_req.value(),
-             self.unit.text().strip(), self.notes.text().strip())
+             self.unit.text().strip(), self.scrap_pct.value(),
+             self.notes.text().strip())
         )
         conn.commit()
         conn.close()
@@ -777,16 +809,17 @@ class WorkOrders(QtWidgets.QMainWindow):
         v.addLayout(fr)
 
         self.bom_table = QtWidgets.QTableWidget()
-        self.bom_table.setColumnCount(5)
+        self.bom_table.setColumnCount(6)
         self.bom_table.setHorizontalHeaderLabels(
-            ["Finished Good", "Component", "Qty Required", "Unit", "Notes"]
+            ["Finished Good", "Component", "Qty Required", "Unit",
+             "Scrap %", "Notes"]
         )
         hh = self.bom_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4):
+        for col in (2, 3, 4, 5):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.bom_table.setEditTriggers(
@@ -803,6 +836,7 @@ class WorkOrders(QtWidgets.QMainWindow):
         for text, slot in (
             ("Add BOM Item",     self._on_add_bom),
             ("Delete Selected",  self._on_delete_bom),
+            ("Item Settings…",   self._on_item_settings),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -843,7 +877,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         try:
             base = """
                 SELECT b.id, fg.name AS fg_name, c.name AS comp_name,
-                       b.qty_required, b.unit, b.notes
+                       b.qty_required, b.unit,
+                       COALESCE(b.scrap_pct, 0.0) AS scrap_pct, b.notes
                 FROM bom b
                 JOIN product fg ON fg.id = b.product_id
                 JOIN product c  ON c.id  = b.component_id
@@ -868,13 +903,17 @@ class WorkOrders(QtWidgets.QMainWindow):
             self.bom_table.setItem(r, 1, _ro(row["comp_name"]))
             self.bom_table.setItem(r, 2, _ro(f"{row['qty_required']:.3f}"))
             self.bom_table.setItem(r, 3, _ro(row["unit"] or ""))
-            self.bom_table.setItem(r, 4, _ro(row["notes"] or ""))
+            self.bom_table.setItem(r, 4, _ro(f"{row['scrap_pct']:g}"))
+            self.bom_table.setItem(r, 5, _ro(row["notes"] or ""))
         self._selected_bom_id = None
 
     def _on_add_bom(self):
         dlg = AddBOMItemDialog(self)
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self._refresh_bom()
+
+    def _on_item_settings(self):
+        ItemSettingsDialog(self).exec()
 
     def _on_delete_bom(self):
         rows = self.bom_table.selectedItems()
