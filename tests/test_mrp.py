@@ -7,7 +7,8 @@ derivation are pinned down deterministically.
 
 import pytest
 
-from manufacturing.mrp_core import compute_levels, plan_orders
+from manufacturing.mrp_core import (compute_levels, plan_orders,
+                                    next_sequence_number)
 
 
 def _by_id(planned):
@@ -127,3 +128,20 @@ def test_make_flag_without_bom_still_makes_no_explosion():
     planned = plan_orders(products, {}, {1: 5}, {}, {}, {})
     assert len(planned) == 1
     assert planned[0]["order_type"] == "make"
+
+
+# ── next_sequence_number ────────────────────────────────────────────────
+
+def test_sequence_starts_at_one_when_empty():
+    assert next_sequence_number([], "WO-2026-") == "WO-2026-0001"
+
+
+def test_sequence_is_max_plus_one_not_count():
+    # Robust to gaps: 0001 + 0003 present -> next is 0004, never a duplicate.
+    nums = ["WO-2026-0001", "WO-2026-0003"]
+    assert next_sequence_number(nums, "WO-2026-") == "WO-2026-0004"
+
+
+def test_sequence_ignores_other_prefixes_and_malformed():
+    nums = ["WO-2025-0099", "WO-2026-0002", "WO-2026-bad", None]
+    assert next_sequence_number(nums, "WO-2026-") == "WO-2026-0003"

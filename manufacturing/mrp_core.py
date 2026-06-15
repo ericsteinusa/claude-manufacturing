@@ -11,6 +11,25 @@ from collections import defaultdict
 from .bom_core import explode_quantity
 
 
+def next_sequence_number(existing, prefix):
+    """Return the next ``<prefix><NNNN>`` after the ones in ``existing``.
+
+    Uses the maximum numeric suffix + 1 (not a count), so it is robust to gaps
+    left by deleted rows. Malformed entries are ignored. When the caller passes
+    the numbers from its *open transaction's* connection, sequential calls
+    within one uncommitted transaction keep producing distinct numbers — which
+    a COUNT(*) on a separate connection cannot do.
+    """
+    highest = 0
+    for value in existing:
+        if value and value.startswith(prefix):
+            try:
+                highest = max(highest, int(value[len(prefix):]))
+            except ValueError:
+                continue
+    return f"{prefix}{highest + 1:04d}"
+
+
 def compute_levels(product_ids, edges):
     """Low-level codes for the BOM graph.
 
