@@ -74,6 +74,9 @@ class ProductionMainMenu(QtWidgets.QMainWindow):
             _launch_tab("purchase_requisitions.py",
                         "Purchase Requisitions", "Production"),
             "Purchase Requisitions")
+        tabs.addTab(
+            _launch_tab("mrp.py", "Material Requirements (MRP)"),
+            "Material Requirements (MRP)")
         v.addWidget(tabs)
 
 
