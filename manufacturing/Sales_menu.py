@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -319,7 +320,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
     def _build_ui(self):
         v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        self._tabs = QtWidgets.QTabWidget()
+        self._tabs = ButtonNav()
         self._tabs.setStyleSheet(TAB_STYLE)
         self._tabs.currentChanged.connect(self._on_tab_changed)
         v.addWidget(self._tabs)

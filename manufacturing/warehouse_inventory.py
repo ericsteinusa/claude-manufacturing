@@ -6,6 +6,7 @@ import sys
 from .db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -178,7 +179,7 @@ class WarehouseWidget(QtWidgets.QWidget):
             "font-size:20px;font-weight:bold;color:white;padding:4px;")
         root.addWidget(title)
 
-        self.tabs = QtWidgets.QTabWidget()
+        self.tabs = ButtonNav()
         self.tabs.setStyleSheet(TAB_STYLE)
         self.tabs.currentChanged.connect(self._on_tab_change)
         root.addWidget(self.tabs)
@@ -781,7 +782,7 @@ class WarehouseWidget(QtWidgets.QWidget):
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(8)
 
-        inner_tabs = QtWidgets.QTabWidget()
+        inner_tabs = ButtonNav()
         inner_tabs.setStyleSheet(TAB_STYLE)
         v.addWidget(inner_tabs)
 

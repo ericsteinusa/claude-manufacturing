@@ -9,6 +9,7 @@ Schema is created and seeded on first use via init_db().
 import sys
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 from .db_pg import get_db
 
 
@@ -646,7 +647,7 @@ class QAMgmtWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("QA Management")
         self.resize(1150, 740)
         _apply_blue_palette(self)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(NCRWidget(), "Non-Conformance")
         tabs.addTab(CAPAWidget(), "Corrective Actions")

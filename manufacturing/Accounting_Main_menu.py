@@ -1,6 +1,7 @@
 import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
+from .button_nav import ButtonNav
 from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
 from .Accounts_receivable import AccountsReceivableWidget
 from .Credit_dept import CreditDeptWidget
@@ -63,7 +64,7 @@ class AccountingMainMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(
     _launch_tab(

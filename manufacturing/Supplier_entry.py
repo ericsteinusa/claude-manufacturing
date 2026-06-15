@@ -3,6 +3,7 @@ import psycopg2
 from .db_pg import get_db
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -487,7 +488,7 @@ class Purchasing(QtWidgets.QMainWindow):
         self.setCentralWidget(central)
         outer = QtWidgets.QVBoxLayout(central)
         outer.setContentsMargins(10, 10, 10, 10)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(tabs)
         tabs.addTab(self._build_suppliers_tab(), "Suppliers")

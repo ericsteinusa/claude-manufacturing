@@ -4,6 +4,7 @@ from .db_pg import get_db
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -488,7 +489,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
     def _build_ui(self):
         outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 10, 10, 10)
-        self.tabs = QtWidgets.QTabWidget()
+        self.tabs = ButtonNav()
         self.tabs.setStyleSheet(TAB_STYLE)
         outer.addWidget(self.tabs)
         self.tabs.addTab(self._build_accounts_tab(), "Credit Accounts")

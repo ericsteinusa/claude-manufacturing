@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -364,7 +365,7 @@ class ITSupportWidget(QtWidgets.QWidget):
         self._refresh_assets()
 
     def _build_ui(self):
-        self._tabs = QtWidgets.QTabWidget()
+        self._tabs = ButtonNav()
         self._tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"
             "QTabBar::tab{background:white;border:2px solid black;padding:6px "
@@ -837,7 +838,7 @@ class ITSupportMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(
             "QTabWidget::pane{border:1px solid black;}"
             "QTabBar::tab{background:white;border:2px solid black;padding:6px "

@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -1229,7 +1230,7 @@ class GeneralLedgerWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(
             "QTabWidget::pane{border: none;}"
             "QTabBar::tab{background: white; color: black; padding: 6px 14px;"

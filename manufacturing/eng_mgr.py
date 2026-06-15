@@ -1,6 +1,7 @@
 import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 from .engineer import _apply_blue_palette
 from .eng_design_review import DesignReviewWidget
@@ -63,7 +64,7 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
 
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
 
         # Engineers tab: nested Projects + Tasks tabs
@@ -71,7 +72,7 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         _apply_blue_palette(eng_w)
         eng_v = QtWidgets.QVBoxLayout(eng_w)
         eng_v.setContentsMargins(0, 4, 0, 0)
-        eng_tabs = QtWidgets.QTabWidget()
+        eng_tabs = ButtonNav()
         eng_tabs.setStyleSheet(TAB_STYLE)
         eng_tabs.addTab(
     _launch_tab(

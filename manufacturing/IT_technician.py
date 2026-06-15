@@ -1,6 +1,7 @@
 import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
+from .button_nav import ButtonNav
 from .IT_Tasks import ITTasksWidget, _apply_blue_palette
 from .it_calls import ITSupportWidget
 
@@ -59,7 +60,7 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ITTasksWidget(), "IT Tasks")
         tabs.addTab(ITSupportWidget(), "IT Support Calls")

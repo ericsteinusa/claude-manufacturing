@@ -1,6 +1,7 @@
 import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
+from .button_nav import ButtonNav
 from .personnel_crm import _apply_blue_palette
 from .Payroll_dept import PayrollDeptWidget
 
@@ -58,7 +59,7 @@ class PersonnelMgrMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(
     _launch_tab(

@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
+from .button_nav import ButtonNav
 from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette  # noqa: E501
 from .receiving_dept import ReceivingDeptWidget
 from .purchase_requisitions import RequisitionsWidget
@@ -34,7 +35,7 @@ class WarehouseMainMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(WarehouseWidget(), "Inventory")
         tabs.addTab(ReceivingDeptWidget(), "Receiving")

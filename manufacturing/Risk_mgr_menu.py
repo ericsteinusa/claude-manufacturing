@@ -1,5 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
+from .button_nav import ButtonNav
 from .Risk_mgmt_Main_menu import _apply_blue_palette
 from .Risk_mgmt import (RiskRegisterWidget, BusinessContinuityWidget,
                         ComplianceAuditWidget, KRIWidget)
@@ -28,7 +29,7 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(RiskRegisterWidget(), "Risk Register")
         tabs.addTab(KRIWidget(), "Key Risk Indicators")

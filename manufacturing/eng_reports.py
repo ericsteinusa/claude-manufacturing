@@ -1,6 +1,7 @@
 import sys
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -458,7 +459,7 @@ class EngReportsWidget(QtWidgets.QWidget):
         v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(4, 4, 4, 4)
         v.setSpacing(0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         self.proj_tab = ProjectsReportTab()
         self.task_tab = TasksReportTab()

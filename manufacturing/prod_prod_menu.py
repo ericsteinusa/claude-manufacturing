@@ -4,6 +4,7 @@ from .db_pg import get_db
 from .bom import (init_item_master, bom_would_create_cycle,
                   explode_bom_to_wo, ItemSettingsDialog)
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -507,7 +508,7 @@ class WorkOrders(QtWidgets.QMainWindow):
         self._refresh_bom()
 
     def _build_ui(self):
-        self._tabs = QtWidgets.QTabWidget()
+        self._tabs = ButtonNav()
         self._tabs.setStyleSheet(
             "QTabBar::tab{background:white; border:1px solid black; "
             "padding:4px 10px;}"

@@ -8,6 +8,7 @@ from datetime import date
 from .db_pg import get_db
 from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .button_nav import ButtonNav
 from .it_calls import _apply_blue_palette
 
 log = get_logger(__name__)
@@ -435,7 +436,7 @@ class ITSupportReportsWidget(QtWidgets.QWidget):
         _apply_blue_palette(self)
         v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        tabs = QtWidgets.QTabWidget()
+        tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(_TicketSummaryWidget(),  "Ticket Summary")
         tabs.addTab(_ByDepartmentWidget(),   "By Department")
