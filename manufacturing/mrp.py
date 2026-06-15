@@ -37,8 +37,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .bom import explode_bom_to_wo
 from .db_pg import get_db_connection
-from .mrp_core import compute_levels, plan_orders
-from .prod_prod_menu import _next_wo_num
+from .mrp_core import compute_levels, plan_orders, next_sequence_number
 from .purchase_requisitions import _next_req_num
 
 # Re-exported so callers/tests can reach the pure planning core; the
@@ -291,9 +290,24 @@ def _create_requisition(conn, buys):
     return req_number
 
 
+def _next_wo_number(conn):
+    """Next WO number, computed on the *transaction's* connection.
+
+    Reusing the release connection means WOs inserted earlier in the same
+    (uncommitted) transaction are visible, so releasing several make
+    suggestions at once yields distinct numbers instead of colliding on the
+    first — which a fresh-connection COUNT(*) would.
+    """
+    prefix = f"WO-{date.today().year}-"
+    rows = conn.execute(
+        "SELECT wo_number FROM work_order WHERE wo_number LIKE %s",
+        (prefix + "%",)).fetchall()
+    return next_sequence_number([r["wo_number"] for r in rows], prefix)
+
+
 def _create_work_order(conn, row):
     """Create one planned work order for a make suggestion and explode it."""
-    wo_number = _next_wo_num()
+    wo_number = _next_wo_number(conn)
     today = date.today()
     due = (today + timedelta(days=row["lead_time_days"] or 0)).isoformat()
     qty = int(math.ceil(row["qty"]))
