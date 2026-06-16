@@ -2,7 +2,7 @@ import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
 from .button_nav import ButtonNav
-from .personnel_crm import _apply_blue_palette
+from .personnel_crm import _apply_blue_palette, init_db
 from .time_clock_menu import TimeClockWidget
 from .Payroll_dept import PayrollDeptWidget
 
@@ -48,8 +48,7 @@ def _launch_tab(script, label):
 class PersonnelMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        import personnel_crm as _pcrm
-        _pcrm.init_db()
+        init_db()
         self.setWindowTitle("Personnel Menu")
         self.resize(1100, 720)
         _apply_blue_palette(self)
