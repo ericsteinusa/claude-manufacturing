@@ -1617,6 +1617,7 @@ DEPT_MENU_KEY = {
     'Finance': 'finance',
     'Legal': 'legal',
     'Risk Management': 'risk_management',
+    'Warehouse': 'warehouse',
 }
 
 DASHBOARD_DEPARTMENTS = [
@@ -1636,6 +1637,44 @@ DASHBOARD_DEPARTMENTS = [
     ('legal', 'Legal'),
     ('risk_management', 'Risk Management'),
 ]
+
+# Department main-menu scripts, keyed by dept_key. Used to scope a non-admin
+# user to their own department after login (see login_app.SessionWindow). The
+# company dashboard keeps its own parallel ordered list of the same scripts in
+# Company_main_menu.DEPARTMENTS — keep the two in sync when adding a dept.
+DEPT_MAIN_MENU = {
+    'accounting':        'Accounting_Main_menu.py',
+    'customer_service':  'cs_main_menu.py',
+    'engineering':       'engineering_Main_menu.py',
+    'finance':           'Finance_Main_menu.py',
+    'information_tech':  'IT_Main_Menu.py',
+    'legal':             'Legal_Main_menu.py',
+    'maintenance':       'Maint_Main_menu.py',
+    'marketing':         'Marketing_Main_menu.py',
+    'personnel':         'Personnel_Main_menu.py',
+    'production':        'Production_Main_menu.py',
+    'purchasing':        'Purchasing_Main_menu.py',
+    'quality_assurance': 'QA_Main_menu.py',
+    'risk_management':   'Risk_mgmt_Main_menu.py',
+    'sales':             'Sales_Main_menu.py',
+    'warehouse':         'Warehouse_Main_menu.py',
+    'budget_management': 'Budget_mgmt.py',
+}
+
+
+def main_menu_script_for_dept(dept_name):
+    """Return the department main-menu script for a DB ``dept_name``, or None.
+
+    Maps the department name to its menu key (:data:`DEPT_MENU_KEY`) and then
+    to the main-menu script (:data:`DEPT_MAIN_MENU`). Returns ``None`` when
+    the department is unknown or has no dedicated menu (e.g. ``Company`` or
+    ``Labs``), so callers can fall back to the full company menu.
+    """
+    key = DEPT_MENU_KEY.get(dept_name or '')
+    if key is None:
+        return None
+    return DEPT_MAIN_MENU.get(key)
+
 
 # Menu node keys that are only shown to managers.
 MANAGER_MENU_KEYS = {

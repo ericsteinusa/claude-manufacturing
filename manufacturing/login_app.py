@@ -4,6 +4,9 @@ import psycopg2
 from .db_pg import get_db
 from .log_utils import get_logger
 from .schema import init_schema
+from .accounts import _get_user_profile, _is_full_access
+from .launch_utils import launch as _launch
+from .menus import main_menu_script_for_dept
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 log = get_logger(__name__)
@@ -815,12 +818,60 @@ class SessionWindow(QtWidgets.QMainWindow):
     def __init__(self, email: str, parent=None):
         super().__init__(parent)
         self.email = email
+        self._profile = _get_user_profile(email) or {}
         _apply_blue_palette(self)
         self._build_ui()
 
-    def _build_ui(self):
+    def _make_central(self):
+        """Return ``(central_widget, script_to_autolaunch_or_None)``.
+
+        President / Vice President (full access) get the full company menu.
+        Everyone else is scoped to their own department: the department's main
+        menu is auto-opened on login and a landing widget lets them reopen it.
+        Users whose department has no dedicated menu fall back to the full
+        company menu.
+        """
         from .Company_main_menu import CompanyMainMenuWidget
-        self.setCentralWidget(CompanyMainMenuWidget())
+        if _is_full_access(self._profile):
+            return CompanyMainMenuWidget(), None
+        dept_name = self._profile.get('dept_name') or ''
+        script = main_menu_script_for_dept(dept_name)
+        if not script:
+            log.warning(
+                "No department menu for %s (dept=%r); showing company menu",
+                self.email, dept_name)
+            return CompanyMainMenuWidget(), None
+        return self._dept_landing(dept_name, script), script
+
+    def _dept_landing(self, dept_name: str, script: str):
+        w = QtWidgets.QWidget()
+        _apply_blue_palette(w)
+        v = QtWidgets.QVBoxLayout(w)
+        v.addStretch()
+        lbl = QtWidgets.QLabel(dept_name)
+        lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        lbl.setStyleSheet("color:white;font-size:24px;font-weight:bold;")
+        v.addWidget(lbl)
+        v.addSpacing(12)
+        btn = QtWidgets.QPushButton(f"Open {dept_name}")
+        btn.setStyleSheet(BUTTON_STYLE)
+        btn.setFixedHeight(44)
+        btn.setFixedWidth(260)
+        btn.clicked.connect(lambda: _launch(script))
+        row = QtWidgets.QHBoxLayout()
+        row.addStretch()
+        row.addWidget(btn)
+        row.addStretch()
+        v.addLayout(row)
+        v.addStretch()
+        return w
+
+    def _build_ui(self):
+        central, autolaunch = self._make_central()
+        self.setCentralWidget(central)
+        # Auto-open the user's department menu once the window is shown.
+        if autolaunch:
+            QtCore.QTimer.singleShot(0, lambda: _launch(autolaunch))
 
         # Toolbar with session controls
         toolbar = self.addToolBar("Session")
