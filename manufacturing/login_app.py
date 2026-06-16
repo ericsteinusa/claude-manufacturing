@@ -819,7 +819,7 @@ class SessionWindow(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        from Company_main_menu import CompanyMainMenuWidget
+        from .Company_main_menu import CompanyMainMenuWidget
         self.setCentralWidget(CompanyMainMenuWidget())
 
         # Toolbar with session controls
