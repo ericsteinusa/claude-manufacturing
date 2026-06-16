@@ -135,19 +135,41 @@ def init_db():
             amount         REAL    NOT NULL DEFAULT 0.0
         );
     """)
-    # Add columns to payroll_entry for existing databases that predate this
-    # version
-    for col, defn in [
-        ("pre_tax_deductions", "REAL NOT NULL DEFAULT 0.0"),
-        ("post_tax_deductions", "REAL NOT NULL DEFAULT 0.0"),
+    # Backfill columns on databases whose tables predate later schema
+    # versions. CREATE TABLE IF NOT EXISTS leaves a pre-existing table as-is,
+    # so its live columns can lag the DDL above (e.g. payroll_deduction_type
+    # shipped as id/name/description on some DBs). Each ALTER is idempotent.
+    for table, col, defn in [
+        ("payroll_entry", "pre_tax_deductions", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "post_tax_deductions", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "regular_hours", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "overtime_hours", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "federal_tax", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "state_tax", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "social_security", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_entry", "medicare", "REAL NOT NULL DEFAULT 0.0"),
+        ("payroll_deduction_type", "category", "TEXT DEFAULT 'Other'"),
+        ("payroll_deduction_type", "is_pre_tax", "INTEGER DEFAULT 1"),
+        ("payroll_deduction_type", "is_active", "INTEGER DEFAULT 1"),
+        ("payroll_entry_deduction", "deduction_name", "TEXT"),
+        ("payroll_entry_deduction", "is_pre_tax", "INTEGER DEFAULT 1"),
     ]:
         try:
-            conn.execute(f"ALTER TABLE payroll_entry ADD COLUMN {col} {defn}")
+            conn.execute(
+                f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col} {defn}")
         except Exception:
-            # Expected when the column already exists on an up-to-date DB.
             log.debug(
-                "Could not add column %s (likely already exists)", col,
+                "Could not add %s.%s (likely already exists)", table, col,
                 exc_info=True)
+    # Some payroll_entry_deduction tables predate the deduction_name snapshot
+    # and were created with a NOT NULL deduction_type_id the app never
+    # populates; relax it so deduction inserts succeed.
+    try:
+        conn.execute("ALTER TABLE payroll_entry_deduction "
+                     "ALTER COLUMN deduction_type_id DROP NOT NULL")
+    except Exception:
+        log.debug("Could not relax NOT NULL on "
+                  "payroll_entry_deduction.deduction_type_id", exc_info=True)
     conn.commit()
     conn.close()
 
