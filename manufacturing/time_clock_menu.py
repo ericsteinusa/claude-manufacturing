@@ -59,6 +59,12 @@ def init_db():
             notes TEXT DEFAULT ''
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE time_clock ADD COLUMN IF NOT EXISTS hours_worked REAL"
+        )
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
