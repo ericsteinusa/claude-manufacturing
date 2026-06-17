@@ -59,6 +59,29 @@ def init_db():
             notes TEXT DEFAULT ''
         )
     """)
+    # Backfill: an older monthly-budget schema omitted dept_id/notes on budget
+    # and used month/amount instead of category/description/budgeted_amount on
+    # budget_line. Add the expected columns so both old and new DBs work.
+    for table, col, defn in [
+        ("budget",      "dept_id",         "INTEGER"),
+        ("budget",      "notes",           "TEXT DEFAULT ''"),
+        ("budget_line", "category",        "TEXT DEFAULT ''"),
+        ("budget_line", "description",     "TEXT DEFAULT ''"),
+        ("budget_line", "budgeted_amount", "REAL DEFAULT 0"),
+        ("budget_line", "notes",           "TEXT DEFAULT ''"),
+    ]:
+        try:
+            conn.execute(
+                f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col} {defn}")
+        except Exception:
+            pass
+    # Old schema had month NOT NULL; make it nullable so INSERTs that don't
+    # supply month (all current code) don't fail.
+    try:
+        conn.execute(
+            "ALTER TABLE budget_line ALTER COLUMN month DROP NOT NULL")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
