@@ -38,13 +38,13 @@ def init_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS product (
             id SERIAL PRIMARY KEY,
-            supplier_id TEXT,
+            supplier_id INTEGER REFERENCES supplier(id),
             name TEXT NOT NULL,
             purchase_date TEXT,
             purchase_price REAL DEFAULT 0.0,
             bin TEXT,
-            amount INTEGER DEFAULT 0,
-            reorder_point INTEGER DEFAULT 0
+            amount REAL DEFAULT 0.0,
+            reorder_point REAL DEFAULT 0.0
         )
     """)
     conn.execute("""
@@ -53,13 +53,40 @@ def init_db():
             product_id INTEGER NOT NULL REFERENCES product(id),
             trans_date TEXT,
             trans_type TEXT,
-            quantity INTEGER DEFAULT 0,
+            quantity REAL DEFAULT 0,
             reference TEXT,
             notes TEXT
         )
     """)
+    # Backfill: older DBs may have supplier_id as TEXT; cast to INTEGER so the
+    # supplier FK join works correctly.
+    try:
+        conn.execute(
+            "ALTER TABLE product ALTER COLUMN supplier_id TYPE INTEGER"
+            " USING supplier_id::integer")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
+
+
+def _load_suppliers():
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT id, company_name, first_name, last_name FROM supplier"
+            " ORDER BY company_name, last_name"
+        ).fetchall()
+    except psycopg2.OperationalError:
+        rows = []
+    conn.close()
+    return rows
+
+
+def _supplier_label(row):
+    company = row["company_name"] or ""
+    name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+    return company if company else name
 
 
 def _apply_blue_palette(widget):
@@ -113,10 +140,13 @@ class AddProductDialog(QtWidgets.QDialog):
         self.name.setPlaceholderText("Product or part name (required)")
         layout.addRow(lbl("Name:"), self.name)
 
-        self.supplier = QtWidgets.QLineEdit()
-        self.supplier.setStyleSheet(INPUT_STYLE)
-        self.supplier.setPlaceholderText("Supplier name or ID")
-        layout.addRow(lbl("Supplier:"), self.supplier)
+        self.supplier_combo = QtWidgets.QComboBox()
+        self.supplier_combo.setStyleSheet(COMBO_STYLE)
+        self.supplier_combo.setMinimumWidth(220)
+        self.supplier_combo.addItem("(none)", None)
+        for s in _load_suppliers():
+            self.supplier_combo.addItem(_supplier_label(s), s["id"])
+        layout.addRow(lbl("Supplier:"), self.supplier_combo)
 
         self.bin_loc = QtWidgets.QLineEdit()
         self.bin_loc.setStyleSheet(INPUT_STYLE)
@@ -168,7 +198,8 @@ class AddProductDialog(QtWidgets.QDialog):
                 "reorder_point,"
                 " purchase_price, purchase_date) VALUES "
                 "(%s,%s,%s,%s,%s,%s,%s) RETURNING id",
-                (name, self.supplier.text().strip(), self.bin_loc.text().strip(),  # noqa: E501
+                (name, self.supplier_combo.currentData(),
+                 self.bin_loc.text().strip(),  # noqa: E501
                  self.amount.value(), self.reorder_point.value(),
                  self.purchase_price.value(),
                  self.purchase_date.date().toString("yyyy-MM-dd"))
@@ -206,9 +237,13 @@ class UpdateProductDialog(QtWidgets.QDialog):
         self.name.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Name:"), self.name)
 
-        self.supplier = QtWidgets.QLineEdit()
-        self.supplier.setStyleSheet(INPUT_STYLE)
-        layout.addRow(lbl("Supplier:"), self.supplier)
+        self.supplier_combo = QtWidgets.QComboBox()
+        self.supplier_combo.setStyleSheet(COMBO_STYLE)
+        self.supplier_combo.setMinimumWidth(220)
+        self.supplier_combo.addItem("(none)", None)
+        for s in _load_suppliers():
+            self.supplier_combo.addItem(_supplier_label(s), s["id"])
+        layout.addRow(lbl("Supplier:"), self.supplier_combo)
 
         self.bin_loc = QtWidgets.QLineEdit()
         self.bin_loc.setStyleSheet(INPUT_STYLE)
@@ -249,7 +284,10 @@ class UpdateProductDialog(QtWidgets.QDialog):
         if not rec:
             return
         self.name.setText(rec["name"] or "")
-        self.supplier.setText(str(rec["supplier_id"] or ""))
+        for i in range(self.supplier_combo.count()):
+            if self.supplier_combo.itemData(i) == rec["supplier_id"]:
+                self.supplier_combo.setCurrentIndex(i)
+                break
         self.bin_loc.setText(str(rec["bin"] or ""))
         self.reorder_point.setValue(rec["reorder_point"] or 0)
         self.purchase_price.setValue(rec["purchase_price"] or 0.0)
@@ -268,7 +306,8 @@ class UpdateProductDialog(QtWidgets.QDialog):
             "UPDATE product SET name=%s, supplier_id=%s, bin=%s, "
             "reorder_point=%s,"
             " purchase_price=%s, purchase_date=%s WHERE id=%s",
-            (name, self.supplier.text().strip(), self.bin_loc.text().strip(),
+            (name, self.supplier_combo.currentData(),
+             self.bin_loc.text().strip(),
              self.reorder_point.value(), self.purchase_price.value(),
              self.purchase_date.date().toString("yyyy-MM-dd"),
              self._product_id)
@@ -498,11 +537,16 @@ class InventoryWidget(QtWidgets.QWidget):
 
         conn = get_db()
         try:
-            rows = conn.execute(
-                "SELECT id, name, bin, amount, reorder_point, purchase_price, "
-                "supplier_id"
-                " FROM product ORDER BY name"
-            ).fetchall()
+            rows = conn.execute("""
+                SELECT p.id, p.name, p.bin, p.amount, p.reorder_point,
+                       p.purchase_price, p.supplier_id,
+                       COALESCE(s.company_name,
+                           NULLIF(TRIM(CONCAT(s.first_name, ' ',
+                               s.last_name)), '')) AS supplier_name
+                FROM product p
+                LEFT JOIN supplier s ON s.id = p.supplier_id
+                ORDER BY p.name
+            """).fetchall()
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -537,7 +581,7 @@ class InventoryWidget(QtWidgets.QWidget):
             self.inv_table.setItem(r, 3, _ro(str(rop)))
             self.inv_table.setItem(
                 r, 4, _ro(f"${row['purchase_price'] or 0:.2f}"))
-            self.inv_table.setItem(r, 5, _ro(str(row["supplier_id"] or "")))
+            self.inv_table.setItem(r, 5, _ro(row["supplier_name"] or ""))
             self.inv_table.setItem(r, 6, _ro(status))
 
             bg = QtGui.QColor(_row_color(amt, rop))
