@@ -62,6 +62,21 @@ def init_db():
             notes TEXT
         )
     """)
+    # Backfill: an older DB may have ap_invoice.vendor_id pointing to a
+    # separate `vendors` table (not `supplier`) with a NOT NULL constraint.
+    # The code reads vendors from `supplier`, so that FK is wrong and blocks
+    # every insert. Drop it and make vendor_id nullable to match the DDL above.
+    try:
+        conn.execute(
+            "ALTER TABLE ap_invoice"
+            " DROP CONSTRAINT IF EXISTS ap_invoice_vendor_id_fkey")
+    except Exception:
+        pass
+    try:
+        conn.execute(
+            "ALTER TABLE ap_invoice ALTER COLUMN vendor_id DROP NOT NULL")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
