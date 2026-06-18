@@ -17,8 +17,9 @@ venv/
 *.qmlc
 *.jsc
 
-# Claude Code
-.claude/
+# Claude Code — ignore session/settings data, but commit project skills
+.claude/*
+!.claude/skills
 
 # Editor
 manufacturing/.vscode/
