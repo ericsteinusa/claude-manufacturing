@@ -6,6 +6,8 @@ Notes below are the non-obvious things that have bitten past changes.
 
 ## Workflow
 - Always use **feature branches + PRs**; never commit directly to `main`.
+- A pre-push hook in `.githooks/pre-push` blocks direct pushes to `main`.
+  Activate it once per clone: `git config core.hooksPath .githooks`
 
 ## Testing & CI
 - CI runners **lack `libEGL`**, so `import PyQt6` fails there. Any module that
