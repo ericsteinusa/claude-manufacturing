@@ -66,4 +66,8 @@ Notes below are the non-obvious things that have bitten past changes.
   `python -m manufacturing.seed_sample_pos` (tagged `po_number` prefix
   `SMPL-PO-`; line items use the `bin='SAMPLE'` products, so run that seed
   first to link them).
+- Work orders (every status + materials):
+  `python -m manufacturing.seed_sample_wos` (tagged `wo_number` prefix
+  `SMPL-WO-`; materials use the `bin='SAMPLE'` products, so run that seed
+  first to link them).
 - All seeds are idempotent and support `--reset` / `--remove`.
