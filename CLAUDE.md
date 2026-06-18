@@ -70,4 +70,8 @@ Notes below are the non-obvious things that have bitten past changes.
   `python -m manufacturing.seed_sample_wos` (tagged `wo_number` prefix
   `SMPL-WO-`; materials use the `bin='SAMPLE'` products, so run that seed
   first to link them).
+- Inventory alerts (drives 3 sample products below reorder point):
+  `python -m manufacturing.seed_sample_alerts` (updates `amount` on Rim,
+  Tire, Inner Tube; requires `seed_sample_products` first). Supports
+  `--remove` to restore original amounts.
 - All seeds are idempotent and support `--reset` / `--remove`.
