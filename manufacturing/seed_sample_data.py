@@ -303,10 +303,10 @@ def seed(conn):
             email = f"{first.lower()}.{last.lower()}{SAMPLE_EMAIL_DOMAIN}"
             pid = conn.execute(
                 "INSERT INTO people (first_name, last_name, employee_id, "
-                "email, dept_id, dept_sub_id) VALUES (%s,%s,%s,%s,%s,%s) "
-                "RETURNING id",
+                "email, dept_id, dept_sub_id, address, city, state, zip_code)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (first, last, emp_id, email, depts[dept_name],
-                 subs[sub_name])).fetchone()["id"]
+                 subs[sub_name], "", "", "", "")).fetchone()["id"]
             if role_id is not None:
                 conn.execute(
                     "INSERT INTO user_roles (people_id, role_id) "
