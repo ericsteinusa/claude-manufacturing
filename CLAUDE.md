@@ -17,6 +17,10 @@ Notes below are the non-obvious things that have bitten past changes.
 - Run the GUI/integration checks locally headless with
   `QT_QPA_PLATFORM=offscreen`; widgets can be driven and captured via
   `QWidget.grab().save(path)`.
+- **Windows offscreen fonts:** pip-installed PyQt6 ships no fonts, so
+  offscreen text renders as boxes. Fix once with `python setup_qt_fonts.py`
+  (copies Arial/Verdana/Tahoma/Courier from `C:\Windows\Fonts` into the
+  PyQt6 Qt6 fonts dir). Linux uses system fontconfig and needs no fix.
 
 ## Web UI (Django) & menu routing
 - The same department menu tree (`menus.MENU_TREE`) is also served as a web app
