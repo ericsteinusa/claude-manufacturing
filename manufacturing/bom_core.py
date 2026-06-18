@@ -33,7 +33,7 @@ def would_create_cycle(edges, parent_id, component_id):
     return False
 
 
-def explode_quantity(qty_per, wo_quantity, scrap_pct=0.0):
+def explode_quantity(qty_per, wo_quantity, scrap_pct: float | None = 0.0):
     """Component quantity needed for a work order, inflated for scrap.
 
     ``qty_per`` of the component is needed per finished unit; multiply by the

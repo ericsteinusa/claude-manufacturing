@@ -129,6 +129,7 @@ def test_get_po_normalises_total_and_count():
         "total": None,
     }])
     po = get_po(conn, 5)
+    assert po is not None
     assert po["total"] == 0.0
     assert po["item_count"] == 0
 

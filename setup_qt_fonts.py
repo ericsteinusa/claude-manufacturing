@@ -12,7 +12,7 @@ try:
 except ImportError:
     sys.exit("PyQt6 not installed in this environment.")
 
-fonts_dir = os.path.join(os.path.dirname(PyQt6.__file__), "Qt6", "lib", "fonts")
+fonts_dir = os.path.join(os.path.dirname(PyQt6.__file__ or ""), "Qt6", "lib", "fonts")
 os.makedirs(fonts_dir, exist_ok=True)
 
 win_fonts = r"C:\Windows\Fonts"

@@ -856,6 +856,8 @@ class RequisitionsWidget(_RequisitionViewBase):
         if not self._require_selection():
             return
         p = self._acting()
+        if p is None:
+            return
         dlg = DecisionDialog(title, self)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return

@@ -17,6 +17,7 @@ argument if given, otherwise from stdin.
 import json
 import os
 import sys
+import urllib.error
 import urllib.request
 
 

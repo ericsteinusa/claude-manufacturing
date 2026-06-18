@@ -132,7 +132,7 @@ def _gather_inputs(conn, horizon_days=None):
         "FROM so_item si JOIN sales_order so ON so.id = si.so_id "
         f"WHERE so.status IN ({placeholders}) AND si.product_id IS NOT NULL"
     )
-    params = list(DEMAND_SO_STATUSES)
+    params: list[str] = list(DEMAND_SO_STATUSES)
     if horizon_days is not None:
         cutoff = (date.today() + timedelta(days=horizon_days)).isoformat()
         demand_sql += " AND (so.ship_date IS NULL OR so.ship_date <= %s)"
