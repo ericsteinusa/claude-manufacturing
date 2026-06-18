@@ -1,4 +1,7 @@
 {
+  "venvPath": "..",
+  "venv": "virt",
+  "extraPaths": ["../virt/Lib/python3.12/site-packages"],
   "exclude": [
     "manufacturing/*_ui.py",
     "manufacturing/*_old.py",

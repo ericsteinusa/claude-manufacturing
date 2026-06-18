@@ -106,7 +106,7 @@ class ButtonNav(QtWidgets.QWidget):
 
     # The old tab CSS targeted QTabBar; it no longer applies. Accept the call
     # so existing ``setStyleSheet(TAB_STYLE)`` lines keep working as no-ops.
-    def setStyleSheet(self, _style=""):
+    def setStyleSheet(self, styleSheet: str = "") -> None:  # type: ignore[override]
         pass
 
     def setTabPosition(self, _position):
