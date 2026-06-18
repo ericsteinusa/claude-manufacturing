@@ -262,7 +262,7 @@ class _QACrudWidget(QtWidgets.QWidget):
     #   'order_by': field_key,
     #   'action': {'label', 'status', 'stamp'(optional date field key)},
     # }
-    SPEC = None
+    SPEC: dict = {}
 
     def __init__(self, parent=None):
         super().__init__(parent)
