@@ -149,3 +149,4 @@ The app connects to a PostgreSQL database (`company_db`) via `psycopg2`, using t
 
 
  
+ 
