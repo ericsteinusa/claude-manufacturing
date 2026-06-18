@@ -70,6 +70,7 @@ DEPARTMENTS = [
     ("Sales",             "Sales_Main_menu.py"),
     ("Warehouse",         "Warehouse_Main_menu.py"),
     ("Budget Management", "Budget_mgmt.py"),
+    ("Reports",           "Reports_Main_menu.py"),
 ]
 
 

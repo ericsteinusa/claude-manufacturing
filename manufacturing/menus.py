@@ -1597,6 +1597,12 @@ MENU_TREE = {
             ('comp_audit', 'Compliance & Audit', 'Risk_mgmt_Main_menu.py'),
         ],
     },
+    'reports': {
+        'title': 'Reports',
+        'items': [
+            ('rpt_dashboard', 'Dashboard', 'Reports_Main_menu.py'),
+        ],
+    },
 }
 
 
@@ -1618,6 +1624,7 @@ DEPT_MENU_KEY = {
     'Legal': 'legal',
     'Risk Management': 'risk_management',
     'Warehouse': 'warehouse',
+    'Reports': 'reports',
 }
 
 DASHBOARD_DEPARTMENTS = [
@@ -1636,6 +1643,7 @@ DASHBOARD_DEPARTMENTS = [
     ('finance', 'Finance'),
     ('legal', 'Legal'),
     ('risk_management', 'Risk Management'),
+    ('reports', 'Reports'),
 ]
 
 # Department main-menu scripts, keyed by dept_key. Used to scope a non-admin
@@ -1659,6 +1667,7 @@ DEPT_MAIN_MENU = {
     'sales':             'Sales_Main_menu.py',
     'warehouse':         'Warehouse_Main_menu.py',
     'budget_management': 'Budget_mgmt.py',
+    'reports':           'Reports_Main_menu.py',
 }
 
 
