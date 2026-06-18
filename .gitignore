@@ -21,6 +21,24 @@ venv/
 .claude/*
 !.claude/skills
 
+# Local launchers and one-off scripts
+launch_app.bat
+run.py
+run_login_test.bat
+run_login_test.py
+verify_production.py
+
+# Captured output logs
+*.txt
+
+# Qt generated files
+manufacturing/*_rc.py
+manufacturing/*.ui
+
+# SQLite leftovers (app uses PostgreSQL)
+*.db
+manufacturing/create_missing_tables.sql
+
 # Editor
 manufacturing/.vscode/
 
