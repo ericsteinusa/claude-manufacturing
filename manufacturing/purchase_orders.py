@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 import psycopg2
 from .db_pg import get_db_connection
 from .purchase_orders_core import (  # noqa: F401  (re-exported for the GUI)
