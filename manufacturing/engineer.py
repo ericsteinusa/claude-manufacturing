@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -86,6 +87,21 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    try:
+        conn = get_db()
+        conn.execute(
+            "ALTER TABLE eng_project"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.execute(
+            "ALTER TABLE eng_design_review"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.execute(
+            "ALTER TABLE eng_task"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 
 def _apply_blue_palette(widget):
@@ -210,6 +226,10 @@ class NewProjectDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -230,14 +250,15 @@ class NewProjectDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO eng_project (project_number, title, product_id, "
                 "engineer,"
-                " start_date, due_date, status, notes) VALUES "
-                "(?,?,?,?,?,?,?,?)",
+                " start_date, due_date, status, notes, created_by) VALUES "
+                "(?,?,?,?,?,?,?,?,?)",
                 (num, title, self.product_combo.currentData(),
                  self.engineer.text().strip(),
                  self.start_date.date().toString("yyyy-MM-dd"),
                  self.due_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.project_id = cur.lastrowid
             conn.commit()
@@ -309,6 +330,10 @@ class NewECRDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -329,14 +354,15 @@ class NewECRDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO eng_design_review (ecr_number, title, "
                 "product_id, project_id,"
-                " requested_by, review_date, status, notes) VALUES "
-                "(?,?,?,?,?,?,?,?)",
+                " requested_by, review_date, status, notes, created_by) VALUES "
+                "(?,?,?,?,?,?,?,?,?)",
                 (num, title, self.product_combo.currentData(),
                  self.project_combo.currentData(),
                  self.requested_by.text().strip(),
                  self.review_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.ecr_id = cur.lastrowid
             conn.commit()
@@ -398,6 +424,10 @@ class NewTaskDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -415,14 +445,15 @@ class NewTaskDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute(
             "INSERT INTO eng_task (project_id, task_name, assigned_to, "
-            "due_date, priority, notes)"
-            " VALUES (?,?,?,?,?,?)",
+            "due_date, priority, notes, created_by)"
+            " VALUES (?,?,?,?,?,?,?)",
             (self.project_combo.currentData(),
              name,
              self.assigned_to.text().strip(),
              self.due_date.date().toString("yyyy-MM-dd"),
              self.priority_combo.currentData(),
-             self.notes.text().strip())
+             self.notes.text().strip(),
+             get_current_user_email() or None)
         )
         conn.commit()
         conn.close()
@@ -434,7 +465,8 @@ class NewTaskDialog(QtWidgets.QDialog):
 class EngineerMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Engineers")
+        email = get_current_user_email()
+        self.setWindowTitle(f"Engineers — {email}" if email else "Engineers")
         self.resize(980, 660)
         _apply_blue_palette(self)
         self._proj_row_ids = []
@@ -512,16 +544,17 @@ class EngineerMenu(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.proj_table = QtWidgets.QTableWidget()
-        self.proj_table.setColumnCount(7)
+        self.proj_table.setColumnCount(8)
         self.proj_table.setHorizontalHeaderLabels(
-            ["Project #", "Title", "Product", "Engineer", "Start", "Due", "Status"]  # noqa: E501
+            ["Project #", "Title", "Product", "Engineer", "Start", "Due",
+             "Status", "Created By"]  # noqa: E501
         )
         hh = self.proj_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5, 6):
+        for col in (2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.proj_table.setEditTriggers(
@@ -589,8 +622,8 @@ class EngineerMenu(QtWidgets.QMainWindow):
 
         base = """
             SELECT ep.id, ep.project_number, ep.title, ep.engineer,
-                   ep.start_date, ep.due_date, ep.status, p.name AS
-                       product_name
+                   ep.start_date, ep.due_date, ep.status, ep.created_by,
+                   p.name AS product_name
             FROM eng_project ep
             LEFT JOIN product p ON p.id = ep.product_id
         """
@@ -630,8 +663,9 @@ class EngineerMenu(QtWidgets.QMainWindow):
     r, 6, _ro(
         row["status"].replace(
             "_", " ").capitalize()))
+            self.proj_table.setItem(r, 7, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(PROJECT_COLORS.get(row["status"], "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.proj_table.item(r, col).setBackground(bg)
 
         self._selected_proj_id = None
@@ -729,17 +763,17 @@ class EngineerMenu(QtWidgets.QMainWindow):
         v.addLayout(fr)
 
         self.ecr_table = QtWidgets.QTableWidget()
-        self.ecr_table.setColumnCount(7)
+        self.ecr_table.setColumnCount(8)
         self.ecr_table.setHorizontalHeaderLabels(
             ["ECR #", "Title", "Product", "Project",
-                "Requested By", "Review Date", "Status"]
+             "Requested By", "Review Date", "Status", "Created By"]
         )
         hh = self.ecr_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5, 6):
+        for col in (2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ecr_table.setEditTriggers(
@@ -775,7 +809,7 @@ class EngineerMenu(QtWidgets.QMainWindow):
         status = self.ecr_status_filter.currentData()
         base = """
             SELECT dr.id, dr.ecr_number, dr.title, dr.requested_by,
-                dr.review_date, dr.status,
+                dr.review_date, dr.status, dr.created_by,
                    p.name AS product_name, ep.project_number
             FROM eng_design_review dr
             LEFT JOIN product p ON p.id = dr.product_id
@@ -813,8 +847,9 @@ class EngineerMenu(QtWidgets.QMainWindow):
     r, 6, _ro(
         row["status"].replace(
             "_", " ").capitalize()))
+            self.ecr_table.setItem(r, 7, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(ECR_COLORS.get(row["status"], "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.ecr_table.item(r, col).setBackground(bg)
 
     def _on_new_ecr(self):
@@ -878,14 +913,15 @@ class EngineerMenu(QtWidgets.QMainWindow):
         v.addLayout(fr)
 
         self.task_table = QtWidgets.QTableWidget()
-        self.task_table.setColumnCount(6)
+        self.task_table.setColumnCount(7)
         self.task_table.setHorizontalHeaderLabels(
-            ["Task", "Project", "Assigned To", "Due Date", "Priority", "Status"]  # noqa: E501
+            ["Task", "Project", "Assigned To", "Due Date", "Priority",
+             "Status", "Created By"]  # noqa: E501
         )
         hh = self.task_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (1, 2, 3, 4, 5):
+        for col in (1, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.task_table.setEditTriggers(
@@ -921,7 +957,7 @@ class EngineerMenu(QtWidgets.QMainWindow):
 
         base = """
             SELECT t.id, t.task_name, t.assigned_to, t.due_date, t.priority,
-                t.status,
+                t.status, t.created_by,
                    ep.project_number
             FROM eng_task t
             LEFT JOIN eng_project ep ON ep.id = t.project_id
@@ -962,10 +998,11 @@ class EngineerMenu(QtWidgets.QMainWindow):
     r, 5, _ro(
         row["status"].replace(
             "_", " ").capitalize()))
+            self.task_table.setItem(r, 6, _ro(row["created_by"] or ""))
             if row["status"] != "done":
                 color = PRIORITY_COLORS.get(row["priority"])
                 if color:
-                    for col in range(6):
+                    for col in range(7):
                         self.task_table.item(r, col).setBackground(color)
 
     def _on_new_task(self):
