@@ -17,6 +17,7 @@ Run standalone:  ``python -m manufacturing.purchase_requisitions``
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from .purchase_orders import (_load_products, _next_po_num,
                               init_db as _po_init_db)
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -91,6 +92,9 @@ def init_db():
     conn.execute(
         "ALTER TABLE purchase_requisition "
         "ADD COLUMN IF NOT EXISTS dept_sub_id INTEGER")
+    conn.execute(
+        "ALTER TABLE purchase_requisition "
+        "ADD COLUMN IF NOT EXISTS created_by TEXT")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS requisition_item (
             id SERIAL PRIMARY KEY,
@@ -268,12 +272,13 @@ class NewRequisitionDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO purchase_requisition (req_number, requester_id, "
                 "dept_id, dept_sub_id, needed_date, justification, status, "
-                "created_date) "
-                "VALUES (%s,%s,%s,%s,%s,%s,'draft',%s) RETURNING id",
+                "created_date, created_by) "
+                "VALUES (%s,%s,%s,%s,%s,%s,'draft',%s,%s) RETURNING id",
                 (req_num, self._requester_id, self._dept_id,
                  self._dept_sub_id,
                  self.needed_date.date().toString("yyyy-MM-dd"),
-                 self.justification.text().strip(), _today())
+                 self.justification.text().strip(), _today(),
+                 get_current_user_email() or None)
             )
             self.req_id = cur.fetchone()["id"]
             conn.commit()
@@ -427,16 +432,18 @@ class _RequisitionViewBase(QtWidgets.QWidget):
 
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(8)
+        self.table.setColumnCount(9)
         self.table.setHorizontalHeaderLabels(
             ["Req #", "Requester", "Department", "Sub-Dept", "Needed By",
-             "Items", "Est. Total", "Status"])
+             "Items", "Est. Total", "Status", "Created By"])
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         for c in range(7):
             hh.setSectionResizeMode(
                 c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(
+            8, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(
@@ -537,8 +544,9 @@ class _RequisitionViewBase(QtWidgets.QWidget):
             self.table.setItem(r, 6, _ro(f"${row['total']:,.2f}"))
             self.table.setItem(
                 r, 7, _ro(REQ_STATUS_LABELS.get(status, status)))
+            self.table.setItem(r, 8, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(REQ_COLORS.get(status, "#ffffff"))
-            for col in range(8):
+            for col in range(9):
                 self.table.item(r, col).setBackground(bg)
         self._selected_id = None
         self._selected_number = None
@@ -1013,10 +1021,11 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
         conn = get_db()
         po_id = conn.execute(
             "INSERT INTO purchase_order (po_number, supplier_id, "
-            "order_date, expected_date, status, notes) "
-            "VALUES (%s, NULL, %s, %s, 'draft', %s) RETURNING id",
+            "order_date, expected_date, status, notes, created_by) "
+            "VALUES (%s, NULL, %s, %s, 'draft', %s, %s) RETURNING id",
             (po_number, _today(), expected,
-             f"From requisition {self._selected_number}")
+             f"From requisition {self._selected_number}",
+             get_current_user_email() or None)
         ).fetchone()["id"]
         items = conn.execute(
             "SELECT description, product_id, qty, est_unit_price "
@@ -1044,7 +1053,7 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
 # Shared SELECT used by both views; callers append WHERE/ORDER BY.
 _ROW_QUERY = """
     SELECT pr.id, pr.req_number, pr.needed_date, pr.status,
-           pr.requester_id, pr.dept_id, pr.dept_sub_id,
+           pr.requester_id, pr.dept_id, pr.dept_sub_id, pr.created_by,
            pe.first_name, pe.last_name, d.dept_name, ds.dept_sub_name,
            (SELECT COUNT(*) FROM requisition_item ri
             WHERE ri.req_id = pr.id) AS item_count,
@@ -1062,7 +1071,10 @@ _ROW_QUERY = """
 class PurchaseRequisitionsWindow(QtWidgets.QMainWindow):
     def __init__(self, default_dept=None):
         super().__init__()
-        self.setWindowTitle("Purchase Requisitions")
+        email = get_current_user_email()
+        title = (f"Purchase Requisitions — {email}"
+                 if email else "Purchase Requisitions")
+        self.setWindowTitle(title)
         self.resize(1040, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(RequisitionsWidget(default_dept))
