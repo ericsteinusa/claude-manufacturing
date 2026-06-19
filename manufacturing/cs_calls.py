@@ -10,13 +10,17 @@ import sys
 
 from PyQt6 import QtWidgets
 
+from .accounts import get_current_user_email
 from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 
 
 class CustomerServiceCalls(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Customer Service Calls")
+        email = get_current_user_email()
+        title = (f"Customer Service Calls — {email}" if email
+                 else "Customer Service Calls")
+        self.setWindowTitle(title)
         self.resize(1210, 650)
         _apply_blue_palette(self)
         self.setCentralWidget(CustomerServiceCallsWidget())
