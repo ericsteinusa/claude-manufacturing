@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -423,7 +424,7 @@ class NewJournalDialog(QtWidgets.QDialog):
             " created_by, created_at) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
             (self.jdate.date().toString("yyyy-MM-dd"),
              self.ref.text().strip(), self.desc.text().strip(),
-             0, "User",
+             0, get_current_user_email() or "",
              QtCore.QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))  # noqa: E501
         )
         self.journal_id = cur.fetchone()['id']
@@ -642,9 +643,10 @@ class JournalEntriesTab(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.journal_tbl = QtWidgets.QTableWidget()
-        self.journal_tbl.setColumnCount(6)
+        self.journal_tbl.setColumnCount(7)
         self.journal_tbl.setHorizontalHeaderLabels(
-            ["Date", "Reference", "Description", "Lines", "Total Debit", "Posted"])  # noqa: E501
+            ["Date", "Reference", "Description", "Lines", "Total Debit",
+             "Posted", "Created By"])
         jh = self.journal_tbl.horizontalHeader()
         jh.setStyleSheet("color: black; font-weight: bold;")
         jh.setSectionResizeMode(
@@ -658,6 +660,8 @@ class JournalEntriesTab(QtWidgets.QWidget):
     4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         jh.setSectionResizeMode(
     5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        jh.setSectionResizeMode(
+    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.journal_tbl.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.journal_tbl.setSelectionBehavior(
@@ -725,12 +729,14 @@ class JournalEntriesTab(QtWidgets.QWidget):
         conn = get_db()
         rows = conn.execute(f"""
             SELECT j.id, j.journal_date, j.reference, j.description, j.posted,
+                   j.created_by,
                    COUNT(jl.id) AS line_count,
                    COALESCE(SUM(jl.debit), 0) AS total_debit
             FROM gl_journal j
             LEFT JOIN gl_journal_line jl ON jl.journal_id = j.id
             WHERE {where}
-            GROUP BY j.id ORDER BY j.journal_date DESC, j.id DESC
+            GROUP BY j.id, j.created_by
+            ORDER BY j.journal_date DESC, j.id DESC
         """, params).fetchall()
         conn.close()
         self.journal_tbl.setRowCount(0)
@@ -747,9 +753,10 @@ class JournalEntriesTab(QtWidgets.QWidget):
                 r, 4, _ro_right(f"${row['total_debit']:,.2f}"))
             self.journal_tbl.setItem(
                 r, 5, _ro("Yes" if row["posted"] else "No"))
+            self.journal_tbl.setItem(r, 6, _ro(row["created_by"] or ""))
             if row["posted"]:
                 bg = QtGui.QColor("#d4edda")
-                for col in range(6):
+                for col in range(7):
                     self.journal_tbl.item(r, col).setBackground(bg)
         self._selected_journal_id = None
         self.lines_tbl.setRowCount(0)
@@ -1250,7 +1257,9 @@ class GeneralLedgerWidget(QtWidgets.QWidget):
 class GeneralLedgerWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("General Ledger")
+        email = get_current_user_email()
+        title = f"General Ledger — {email}" if email else "General Ledger"
+        self.setWindowTitle(title)
         self.resize(1060, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(GeneralLedgerWidget())

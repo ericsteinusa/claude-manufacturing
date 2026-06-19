@@ -1,6 +1,7 @@
 import sys
 from PyQt6 import QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
 from .Accounts_receivable import AccountsReceivableWidget
 from .Credit_dept import CreditDeptWidget
@@ -29,7 +30,10 @@ TAB_STYLE = (
 class AccountingManagerWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Accounting Manager")
+        email = get_current_user_email()
+        title = (f"Accounting Manager — {email}" if email
+                 else "Accounting Manager")
+        self.setWindowTitle(title)
         self.resize(1200, 760)
         _apply_blue_palette(self)
         self._build_ui()

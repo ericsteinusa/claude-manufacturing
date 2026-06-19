@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -45,7 +46,8 @@ def init_db():
             fiscal_year INTEGER NOT NULL,
             dept_id INTEGER,
             status TEXT DEFAULT 'draft',
-            notes TEXT DEFAULT ''
+            notes TEXT DEFAULT '',
+            created_by TEXT
         )
     """)
     conn.execute("""
@@ -65,6 +67,7 @@ def init_db():
     for table, col, defn in [
         ("budget",      "dept_id",         "INTEGER"),
         ("budget",      "notes",           "TEXT DEFAULT ''"),
+        ("budget",      "created_by",      "TEXT"),
         ("budget_line", "category",        "TEXT DEFAULT ''"),
         ("budget_line", "description",     "TEXT DEFAULT ''"),
         ("budget_line", "budgeted_amount", "REAL DEFAULT 0"),
@@ -205,6 +208,11 @@ class BudgetDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -242,10 +250,11 @@ class BudgetDialog(QtWidgets.QDialog):
         if self._budget_id is None:
             cur = conn.execute(
                 "INSERT INTO budget (budget_name, fiscal_year, dept_id, "
-                "status, notes)"
-                " VALUES (%s,%s,%s,%s,%s) RETURNING id",
+                "status, notes, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
                 (name, self.year.value(), self.dept_combo.currentData(),
-                 self.status_combo.currentData(), self.notes.text().strip())
+                 self.status_combo.currentData(), self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.saved_id = cur.fetchone()['id']
         else:
@@ -444,10 +453,10 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 
         # Budget list
         self.budget_table = QtWidgets.QTableWidget()
-        self.budget_table.setColumnCount(7)
+        self.budget_table.setColumnCount(8)
         self.budget_table.setHorizontalHeaderLabels(
             ["Budget Name", "Fiscal Year", "Department",
-             "Budgeted", "Actual", "Variance", "Status"]
+             "Budgeted", "Actual", "Variance", "Status", "Created By"]
         )
         hh = self.budget_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -464,6 +473,8 @@ class BudgetManagementWidget(QtWidgets.QWidget):
     5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(
     6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    7, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.budget_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.budget_table.setSelectionBehavior(
@@ -567,13 +578,13 @@ class BudgetManagementWidget(QtWidgets.QWidget):
         try:
             rows = conn.execute(f"""
                 SELECT b.id, b.budget_name, b.fiscal_year, b.status,
-                       d.dept_name,
+                       b.created_by, d.dept_name,
                        COALESCE(SUM(bl.budgeted_amount), 0) AS total_budgeted
                 FROM budget b
                 LEFT JOIN dept d ON d.dept_id = b.dept_id
                 LEFT JOIN budget_line bl ON bl.budget_id = b.id
                 WHERE {where}
-                GROUP BY b.id, d.dept_name
+                GROUP BY b.id, b.created_by, d.dept_name
                 ORDER BY b.fiscal_year DESC, b.budget_name
             """, params).fetchall()
         except psycopg2.OperationalError:
@@ -603,8 +614,9 @@ class BudgetManagementWidget(QtWidgets.QWidget):
                 var_item.setForeground(QtGui.QColor("#cc0000"))
             self.budget_table.setItem(r, 5, var_item)
             self.budget_table.setItem(r, 6, _ro(row["status"].capitalize()))
+            self.budget_table.setItem(r, 7, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(BUDGET_COLORS.get(row["status"], "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.budget_table.item(r, col).setBackground(bg)
 
         self._selected_budget_id = None
@@ -786,7 +798,10 @@ class BudgetManagementWidget(QtWidgets.QWidget):
 class BudgetManagementWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Budget Management")
+        email = get_current_user_email()
+        title = (f"Budget Management — {email}" if email
+                 else "Budget Management")
+        self.setWindowTitle(title)
         self.resize(1060, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(BudgetManagementWidget())

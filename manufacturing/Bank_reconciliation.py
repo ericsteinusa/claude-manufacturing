@@ -4,6 +4,7 @@ Tabs: Bank Accounts | Statement Entry | Reconciliation | History
 """
 import sys
 from .db_pg import get_db
+from .accounts import get_current_user_email
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
@@ -66,6 +67,13 @@ def init_db():
             matched_by            TEXT    DEFAULT ''
         );
         """)
+    try:
+        with _conn() as con:
+            con.execute(
+                "ALTER TABLE bank_statement"
+                " ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
 
 
 STATUSES = ["Open", "In Progress", "Reconciled"]
@@ -431,7 +439,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         v.addLayout(hdr)
 
         # Statement list (top)
-        self.st_tbl = QtWidgets.QTableWidget(0, 7)
+        self.st_tbl = QtWidgets.QTableWidget(0, 8)
         self.st_tbl.setHorizontalHeaderLabels(
             ["ID",
     "Bank Account",
@@ -439,7 +447,8 @@ class BankReconciliationWidget(QtWidgets.QWidget):
     "Beg. Balance",
     "End Balance",
     "Status",
-     "Reconciled By"]
+    "Reconciled By",
+    "Created By"]
         )
         self.st_tbl.setColumnWidth(0, 40)
         self.st_tbl.horizontalHeader().setSectionResizeMode(
@@ -623,6 +632,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             self.st_tbl.setItem(r, 4, _ro_r(_money(row["ending_balance"])))
             self.st_tbl.setItem(r, 5, _ro_c(row["status"]))
             self.st_tbl.setItem(r, 6, _ro(row["reconciled_by"] or ""))
+            self.st_tbl.setItem(r, 7, _ro(row["created_by"] or ""))
             self.st_tbl.item(
     r,
     0).setData(
@@ -631,7 +641,7 @@ class BankReconciliationWidget(QtWidgets.QWidget):
             color = STATUS_COLORS.get(
     row["status"], QtGui.QColor(
         255, 255, 255))
-            for c in range(7):
+            for c in range(8):
                 it = self.st_tbl.item(r, c)
                 if it:
                     it.setBackground(color)
@@ -716,9 +726,10 @@ class BankReconciliationWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute(
                 "INSERT INTO bank_statement(bank_account_id,statement_date,beginning_balance,"  # noqa: E501
-                "ending_balance,status,reconciled_by,notes) "
-                "VALUES(%s,%s,%s,%s,%s,%s,%s)",
-                (ba_id, dt, beg, end, status, by, notes)
+                "ending_balance,status,reconciled_by,notes,created_by) "
+                "VALUES(%s,%s,%s,%s,%s,%s,%s,%s)",
+                (ba_id, dt, beg, end, status, by, notes,
+                 get_current_user_email() or None)
             )
         self._refresh_statements()
         self._on_st_clear()
@@ -1440,7 +1451,10 @@ class BankReconciliationWidget(QtWidgets.QWidget):
 class BankReconciliationWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Bank Reconciliation")
+        email = get_current_user_email()
+        title = (f"Bank Reconciliation — {email}" if email
+                 else "Bank Reconciliation")
+        self.setWindowTitle(title)
         self.resize(1200, 780)
         _apply_palette(self)
         self.setCentralWidget(BankReconciliationWidget())

@@ -4,6 +4,7 @@ Tabs: Audit Schedule | Audit Findings | Corrective Actions | Audit Reports
 """
 import sys
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
@@ -56,6 +57,19 @@ def init_db():
         if con.execute(
             "SELECT COUNT(*) FROM audit_schedule").fetchone()[0] == 0:
             _seed(con)
+    try:
+        with _conn() as con:
+            con.execute(
+                "ALTER TABLE audit_schedule"
+                " ADD COLUMN IF NOT EXISTS created_by TEXT")
+            con.execute(
+                "ALTER TABLE audit_finding"
+                " ADD COLUMN IF NOT EXISTS created_by TEXT")
+            con.execute(
+                "ALTER TABLE corrective_action"
+                " ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
 
 
 def _seed(con):
@@ -412,9 +426,10 @@ class AuditMgmtWidget(QtWidgets.QWidget):
         fb.addStretch()
         v.addLayout(fb)
 
-        self.sched_tbl = QtWidgets.QTableWidget(0, 7)
+        self.sched_tbl = QtWidgets.QTableWidget(0, 8)
         self.sched_tbl.setHorizontalHeaderLabels(
-            ["ID", "Audit Name", "Type", "Department", "Auditor", "Scheduled", "Status"])  # noqa: E501
+            ["ID", "Audit Name", "Type", "Department", "Auditor", "Scheduled",
+             "Status", "Created By"])  # noqa: E501
         self.sched_tbl.setColumnWidth(0, 40)
         self.sched_tbl.horizontalHeader().setSectionResizeMode(
             1, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -472,6 +487,7 @@ class AuditMgmtWidget(QtWidgets.QWidget):
             self.sched_tbl.setItem(r, 4, _ro(row["auditor"]))
             self.sched_tbl.setItem(r, 5, _ro(row["scheduled"]))
             self.sched_tbl.setItem(r, 6, _ro(row["status"]))
+            self.sched_tbl.setItem(r, 7, _ro(row["created_by"] or ""))
             _color_row(self.sched_tbl, r, STATUS_COLORS.get(row["status"]))
 
     def _add_audit(self, *_):
@@ -479,8 +495,9 @@ class AuditMgmtWidget(QtWidgets.QWidget):
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("INSERT INTO audit_schedule (audit_name,audit_type,department,auditor,scheduled,completed,status,notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
-                            (v["audit_name"], v["audit_type"], v["department"], v["auditor"], v["scheduled"], v["completed"], v["status"], v["notes"]))  # noqa: E501
+                con.execute("INSERT INTO audit_schedule (audit_name,audit_type,department,auditor,scheduled,completed,status,notes,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
+                            (v["audit_name"], v["audit_type"], v["department"], v["auditor"], v["scheduled"], v["completed"], v["status"], v["notes"],  # noqa: E501
+                             get_current_user_email() or None))
             self._refresh_schedule()
 
     def _edit_audit(self, *_):
@@ -544,9 +561,10 @@ class AuditMgmtWidget(QtWidgets.QWidget):
         fb.addStretch()
         v.addLayout(fb)
 
-        self.find_tbl = QtWidgets.QTableWidget(0, 7)
+        self.find_tbl = QtWidgets.QTableWidget(0, 8)
         self.find_tbl.setHorizontalHeaderLabels(
-            ["ID", "Reference", "Description", "Severity", "Department", "Found Date", "Status"])  # noqa: E501
+            ["ID", "Reference", "Description", "Severity", "Department",
+             "Found Date", "Status", "Created By"])  # noqa: E501
         self.find_tbl.setColumnWidth(0, 40)
         self.find_tbl.setColumnWidth(1, 90)
         self.find_tbl.horizontalHeader().setSectionResizeMode(
@@ -604,6 +622,7 @@ class AuditMgmtWidget(QtWidgets.QWidget):
             self.find_tbl.setItem(r, 4, _ro(row["department"]))
             self.find_tbl.setItem(r, 5, _ro(row["found_date"]))
             self.find_tbl.setItem(r, 6, _ro(row["status"]))
+            self.find_tbl.setItem(r, 7, _ro(row["created_by"] or ""))
             _color_row(self.find_tbl, r, SEVERITY_COLORS.get(row["severity"]))
 
     def _add_finding(self, *_):
@@ -611,8 +630,9 @@ class AuditMgmtWidget(QtWidgets.QWidget):
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("INSERT INTO audit_finding (finding_ref,description,severity,department,found_date,status,notes) VALUES (%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
-                            (v["finding_ref"], v["description"], v["severity"], v["department"], v["found_date"], v["status"], v["notes"]))  # noqa: E501
+                con.execute("INSERT INTO audit_finding (finding_ref,description,severity,department,found_date,status,notes,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
+                            (v["finding_ref"], v["description"], v["severity"], v["department"], v["found_date"], v["status"], v["notes"],  # noqa: E501
+                             get_current_user_email() or None))
             self._refresh_findings()
             self._refresh_reports()
 
@@ -670,9 +690,10 @@ class AuditMgmtWidget(QtWidgets.QWidget):
         fb.addStretch()
         v.addLayout(fb)
 
-        self.ca_tbl = QtWidgets.QTableWidget(0, 6)
+        self.ca_tbl = QtWidgets.QTableWidget(0, 7)
         self.ca_tbl.setHorizontalHeaderLabels(
-            ["ID", "Description", "Assigned To", "Due Date", "Completed", "Status"])  # noqa: E501
+            ["ID", "Description", "Assigned To", "Due Date", "Completed",
+             "Status", "Created By"])  # noqa: E501
         self.ca_tbl.setColumnWidth(0, 40)
         self.ca_tbl.horizontalHeader().setSectionResizeMode(
             1, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -723,6 +744,7 @@ class AuditMgmtWidget(QtWidgets.QWidget):
             self.ca_tbl.setItem(r, 3, _ro(row["due_date"]))
             self.ca_tbl.setItem(r, 4, _ro(row["completed"]))
             self.ca_tbl.setItem(r, 5, _ro(row["status"]))
+            self.ca_tbl.setItem(r, 6, _ro(row["created_by"] or ""))
             _color_row(self.ca_tbl, r, STATUS_COLORS.get(row["status"]))
 
     def _add_ca(self, *_):
@@ -730,8 +752,9 @@ class AuditMgmtWidget(QtWidgets.QWidget):
         if dlg.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             v = dlg.values()
             with _conn() as con:
-                con.execute("INSERT INTO corrective_action (description,assigned_to,due_date,completed,status,notes) VALUES (%s,%s,%s,%s,%s,%s)",  # noqa: E501
-                            (v["description"], v["assigned_to"], v["due_date"], v["completed"], v["status"], v["notes"]))  # noqa: E501
+                con.execute("INSERT INTO corrective_action (description,assigned_to,due_date,completed,status,notes,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
+                            (v["description"], v["assigned_to"], v["due_date"], v["completed"], v["status"], v["notes"],  # noqa: E501
+                             get_current_user_email() or None))
             self._refresh_corrective()
             self._refresh_reports()
 
@@ -898,7 +921,9 @@ class AuditMgmtWidget(QtWidgets.QWidget):
 class AuditWindow(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
-        self.setWindowTitle("Audit Management")
+        email = get_current_user_email()
+        title = f"Audit Management — {email}" if email else "Audit Management"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(AuditMgmtWidget(initial_tab=initial_tab))

@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -48,7 +49,8 @@ def init_db():
             due_date TEXT,
             amount REAL DEFAULT 0,
             description TEXT,
-            status TEXT DEFAULT 'open'
+            status TEXT DEFAULT 'open',
+            created_by TEXT
         )
     """)
     conn.execute("""
@@ -62,6 +64,11 @@ def init_db():
             notes TEXT
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE ar_invoice ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -181,6 +188,11 @@ class InvoiceDialog(QtWidgets.QDialog):
             self.status_combo.addItem(s.capitalize(), s)
         layout.addRow(lbl("Status:"), self.status_combo)
 
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -226,13 +238,14 @@ class InvoiceDialog(QtWidgets.QDialog):
                 cur = conn.execute(
                     "INSERT INTO ar_invoice (customer_id, invoice_number, "
                     "invoice_date,"
-                    " due_date, amount, description, status)"
-                    " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                    " due_date, amount, description, status, created_by)"
+                    " VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                     (self.customer_combo.currentData(), inv_num,
                      self.inv_date.date().toString("yyyy-MM-dd"),
                      self.due_date.date().toString("yyyy-MM-dd"),
                      self.amount.value(), self.description.text().strip(),
-                     self.status_combo.currentData())
+                     self.status_combo.currentData(),
+                     get_current_user_email() or None)
                 )
                 self.saved_id = cur.fetchone()['id']
             else:
@@ -422,10 +435,10 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.inv_table = QtWidgets.QTableWidget()
-        self.inv_table.setColumnCount(8)
+        self.inv_table.setColumnCount(9)
         self.inv_table.setHorizontalHeaderLabels(
             ["Invoice #", "Customer", "Invoice Date", "Due Date",
-             "Amount", "Received", "Balance", "Status"]
+             "Amount", "Received", "Balance", "Status", "Created By"]
         )
         hh = self.inv_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -443,7 +456,9 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
     5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(
     6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(
+    7, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(8, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.inv_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.inv_table.setSelectionBehavior(
@@ -529,13 +544,15 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
                 SELECT inv.id, inv.invoice_number, inv.invoice_date,
                     inv.due_date,
                        inv.amount, inv.description, inv.status,
+                       inv.created_by,
                        c.company_name, c.first_name, c.last_name,
                        COALESCE(SUM(p.amount), 0) AS received
                 FROM ar_invoice inv
                 LEFT JOIN customer c ON c.id = inv.customer_id
                 LEFT JOIN ar_payment p ON p.invoice_id = inv.id
                 WHERE {where}
-                GROUP BY inv.id, c.company_name, c.first_name, c.last_name
+                GROUP BY inv.id, inv.created_by,
+                         c.company_name, c.first_name, c.last_name
                 ORDER BY inv.due_date ASC, inv.id DESC
             """, params).fetchall()
         except psycopg2.OperationalError:
@@ -566,8 +583,9 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
             self.inv_table.setItem(r, 5, _ro_right(f"${received:,.2f}"))
             self.inv_table.setItem(r, 6, _ro_right(f"${balance:,.2f}"))
             self.inv_table.setItem(r, 7, _ro(row["status"].capitalize()))
+            self.inv_table.setItem(r, 8, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(INV_COLORS.get(row["status"], "#ffffff"))
-            for col in range(8):
+            for col in range(9):
                 self.inv_table.item(r, col).setBackground(bg)
 
         total_outstanding = total_amount - total_received
@@ -685,7 +703,10 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
 class AccountsReceivableWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Accounts Receivable")
+        email = get_current_user_email()
+        title = (f"Accounts Receivable — {email}" if email
+                 else "Accounts Receivable")
+        self.setWindowTitle(title)
         self.resize(1060, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(AccountsReceivableWidget())
