@@ -3,6 +3,7 @@ from PyQt6 import QtWidgets
 from .button_nav import ButtonNav
 from .Maint_mgmt import (_apply_blue_palette, WorkOrderMgmtWidget, MechanicsWidget,  # noqa: E501
                          DowntimeWidget, EquipmentWidget, SafetyInspectionWidget)  # noqa: E501
+from .accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -16,7 +17,10 @@ TAB_STYLE = (
 class MaintMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Maintenance Manager Menu")
+        email = get_current_user_email()
+        title = (f"Maintenance Manager Menu — {email}" if email
+                 else "Maintenance Manager Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

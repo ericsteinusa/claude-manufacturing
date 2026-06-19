@@ -4,6 +4,7 @@ from .button_nav import ButtonNav
 from .Maint_mgmt import (_apply_blue_palette, WorkOrdersWidget, EquipmentWidget,  # noqa: E501
                          PartsInventoryWidget, MaintScheduleWidget,
                          SafetyInspectionWidget)
+from .accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -17,7 +18,9 @@ TAB_STYLE = (
 class MaintMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Maintenance Menu")
+        email = get_current_user_email()
+        title = f"Maintenance Menu — {email}" if email else "Maintenance Menu"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

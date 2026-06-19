@@ -12,6 +12,7 @@ from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 from .db_pg import get_db
+from .accounts import get_current_user_email
 
 
 def _conn():
@@ -110,6 +111,16 @@ def init_db():
         );
         """)
         _seed(con)
+    try:
+        with _conn() as con:
+            for tbl in ("maint_work_order", "maint_equipment", "maint_part",
+                        "maint_schedule", "maint_inspection", "maint_downtime",
+                        "maint_mechanic"):
+                con.execute(
+                    f"ALTER TABLE {tbl}"
+                    " ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
 
 
 def _seed(con):
@@ -255,7 +266,7 @@ class _RecordDialog(QtWidgets.QDialog):
     kind is one of: text, memo, combo, date, money.
     """
 
-    def __init__(self, title, fields, parent=None, row_data=None):
+    def __init__(self, title, fields, parent=None, row_data=None, created_by=None):  # noqa: E501
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setMinimumWidth(440)
@@ -270,6 +281,8 @@ class _RecordDialog(QtWidgets.QDialog):
             fl.addRow(f["label"] + ":", w)
             if row_data is not None:
                 self._set_value(f, w, row_data[f["key"]])
+        if created_by is not None:
+            fl.addRow("Created by:", QtWidgets.QLabel(created_by or "(unknown)"))
         v.addLayout(fl)
 
         bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
@@ -384,7 +397,8 @@ class _MaintCrudWidget(QtWidgets.QWidget):
         fb.addStretch()
         root.addWidget(self._wrap(fb))
 
-        cols = [("id", "ID", 40)] + spec["columns"]
+        cols = ([("id", "ID", 40)] + spec["columns"]
+                + [("created_by", "Created By", 160)])
         self._col_keys = [c[0] for c in cols]
         self.tbl = QtWidgets.QTableWidget(0, len(cols))
         self.tbl.setHorizontalHeaderLabels([c[1] for c in cols])
@@ -482,7 +496,9 @@ class _MaintCrudWidget(QtWidgets.QWidget):
     # ── CRUD ────────────────────────────────────────────────────────────────
     def _add(self, *_):
         spec = self.SPEC
-        dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self)
+        email = get_current_user_email()
+        dlg = _RecordDialog(f"New {spec['noun']}", spec["fields"], self,
+                            created_by=email)
         if dlg.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         v = dlg.values()
@@ -492,11 +508,11 @@ class _MaintCrudWidget(QtWidgets.QWidget):
     self, "Required", f"{
         spec['fields'][0]['label']} is required.")
             return
-        cols = ",".join(keys)
-        ph = ",".join(["%s"] * len(keys))
+        cols = ",".join(keys) + ",created_by"
+        ph = ",".join(["%s"] * len(keys)) + ",%s"
         with _conn() as con:
             con.execute(f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
-                        [v[k] for k in keys])
+                        [v[k] for k in keys] + [email or None])
         self._refresh()
 
     def _edit(self, *_):
@@ -902,7 +918,10 @@ class MechanicsWidget(_MaintCrudWidget):
 class MaintMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Maintenance Management")
+        email = get_current_user_email()
+        title = (f"Maintenance Management — {email}" if email
+                 else "Maintenance Management")
+        self.setWindowTitle(title)
         self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()

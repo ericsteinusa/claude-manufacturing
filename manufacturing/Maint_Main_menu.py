@@ -1,5 +1,6 @@
 import sys
 from .launch_utils import launch as _launch
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -56,7 +57,10 @@ def _launch_tab(script, label, *args):
 class MaintenanceMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Maintenance Main Menu")
+        email = get_current_user_email()
+        title = (f"Maintenance Main Menu — {email}" if email
+                 else "Maintenance Main Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
