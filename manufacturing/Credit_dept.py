@@ -2,6 +2,7 @@ import sys
 import sqlite3
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 import csv
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -91,7 +92,8 @@ def init_db():
             status           TEXT    NOT NULL DEFAULT 'pending',
             reviewed_by      TEXT,
             review_date      TEXT,
-            notes            TEXT
+            notes            TEXT,
+            created_by       TEXT
         )
     """)
     conn.execute("""
@@ -122,6 +124,12 @@ def init_db():
             created_by      TEXT    DEFAULT ''
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE credit_application"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -287,12 +295,13 @@ class NewApplicationDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute("""
             INSERT INTO credit_application (customer_id, applied_date,
-                requested_limit, notes)
-            VALUES (%s, %s, %s, %s)
+                requested_limit, notes, created_by)
+            VALUES (%s, %s, %s, %s, %s)
         """, (self.cust_combo.currentData(),
               self.app_date.date().toString("yyyy-MM-dd"),
               self.req_limit.value(),
-              self.notes.toPlainText().strip() or None))
+              self.notes.toPlainText().strip() or None,
+              get_current_user_email() or None))
         conn.commit()
         conn.close()
         self.accept()
@@ -1807,6 +1816,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
 
         self.col_ef_by = QtWidgets.QLineEdit()
         self.col_ef_by.setStyleSheet(INPUT_STYLE)
+        self.col_ef_by.setText(get_current_user_email() or "")
 
         fl.addRow(self._make_lbl("Date:"), self.col_ef_date)
         fl.addRow(self._make_lbl("Type:"), self.col_ef_type)
@@ -2281,7 +2291,7 @@ class CreditDeptWidget(QtWidgets.QWidget):
         self.col_ef_promise_date.setDate(QtCore.QDate.currentDate())
         self.col_ef_followup.setDate(QtCore.QDate.currentDate().addDays(7))
         self.col_ef_status.setCurrentIndex(0)
-        self.col_ef_by.clear()
+        self.col_ef_by.setText(get_current_user_email() or "")
         self.col_act_tbl.clearSelection()
         self._col_selected_act_id = None
 
@@ -2299,7 +2309,10 @@ class CreditDeptWidget(QtWidgets.QWidget):
 class CreditDept(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
-        self.setWindowTitle("Credit Department")
+        email = get_current_user_email()
+        title = (f"Credit Department — {email}" if email
+                 else "Credit Department")
+        self.setWindowTitle(title)
         self.resize(1150, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(CreditDeptWidget(initial_tab=initial_tab))

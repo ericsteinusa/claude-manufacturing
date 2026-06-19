@@ -4,6 +4,7 @@ Tabs: Tax Calendar | Tax Filing | Tax Payments | Tax Reports
 """
 import sys
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
@@ -57,6 +58,16 @@ def init_db():
         """)
         if con.execute("SELECT COUNT(*) FROM tax_calendar").fetchone()[0] == 0:
             _seed_calendar(con)
+    try:
+        with _conn() as con:
+            con.execute(
+                "ALTER TABLE tax_filing"
+                " ADD COLUMN IF NOT EXISTS created_by TEXT")
+            con.execute(
+                "ALTER TABLE tax_payment"
+                " ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
 
 
 def _seed_calendar(con):
@@ -605,10 +616,11 @@ class TaxMgmtWidget(QtWidgets.QWidget):
         fb.addStretch()
         v.addLayout(fb)
 
-        self.fil_tbl = QtWidgets.QTableWidget(0, 9)
+        self.fil_tbl = QtWidgets.QTableWidget(0, 10)
         self.fil_tbl.setHorizontalHeaderLabels(
             ["ID", "Tax Type", "Jurisdiction", "Period", "Amount Due",
-                "Amount Paid", "Due Date", "Filed Date", "Status"]
+                "Amount Paid", "Due Date", "Filed Date", "Status",
+                "Created By"]
         )
         self.fil_tbl.setColumnWidth(0, 45)
         self.fil_tbl.horizontalHeader().setSectionResizeMode(
@@ -620,6 +632,7 @@ class TaxMgmtWidget(QtWidgets.QWidget):
         self.fil_tbl.setColumnWidth(6, 90)
         self.fil_tbl.setColumnWidth(7, 90)
         self.fil_tbl.setColumnWidth(8, 80)
+        self.fil_tbl.setColumnWidth(9, 160)
         self.fil_tbl.setSelectionBehavior(
     QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.fil_tbl.setEditTriggers(
@@ -679,6 +692,7 @@ class TaxMgmtWidget(QtWidgets.QWidget):
             self.fil_tbl.setItem(r, 6, _ro(row["due_date"]))
             self.fil_tbl.setItem(r, 7, _ro(row["filed_date"]))
             self.fil_tbl.setItem(r, 8, _ro(row["status"]))
+            self.fil_tbl.setItem(r, 9, _ro(row["created_by"] or ""))
             _color_row(self.fil_tbl, r, row["status"])
             total_due += float(row["amount_due"] or 0)
             total_paid += float(row["amount_paid"] or 0)
@@ -696,9 +710,10 @@ class TaxMgmtWidget(QtWidgets.QWidget):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "INSERT INTO tax_filing (tax_type,jurisdiction,period,amount_due,amount_paid,due_date,filed_date,status,reference,notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
+                    "INSERT INTO tax_filing (tax_type,jurisdiction,period,amount_due,amount_paid,due_date,filed_date,status,reference,notes,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
                     (v["tax_type"], v["jurisdiction"], v["period"], v["amount_due"], v["amount_paid"],  # noqa: E501
-                     v["due_date"], v["filed_date"], v["status"], v["reference"], v["notes"])  # noqa: E501
+                     v["due_date"], v["filed_date"], v["status"], v["reference"], v["notes"],  # noqa: E501
+                     get_current_user_email() or None)
                 )
             self._refresh_filings()
             self._refresh_reports()
@@ -770,10 +785,10 @@ class TaxMgmtWidget(QtWidgets.QWidget):
         fb.addStretch()
         v.addLayout(fb)
 
-        self.pay_tbl = QtWidgets.QTableWidget(0, 8)
+        self.pay_tbl = QtWidgets.QTableWidget(0, 9)
         self.pay_tbl.setHorizontalHeaderLabels(
             ["ID", "Tax Type", "Jurisdiction", "Period",
-                "Amount", "Payment Date", "Method", "Reference"]
+                "Amount", "Payment Date", "Method", "Reference", "Created By"]
         )
         self.pay_tbl.setColumnWidth(0, 45)
         self.pay_tbl.horizontalHeader().setSectionResizeMode(
@@ -784,6 +799,7 @@ class TaxMgmtWidget(QtWidgets.QWidget):
         self.pay_tbl.setColumnWidth(5, 100)
         self.pay_tbl.setColumnWidth(6, 110)
         self.pay_tbl.setColumnWidth(7, 120)
+        self.pay_tbl.setColumnWidth(8, 160)
         self.pay_tbl.setSelectionBehavior(
     QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.pay_tbl.setEditTriggers(
@@ -840,6 +856,7 @@ class TaxMgmtWidget(QtWidgets.QWidget):
             self.pay_tbl.setItem(r, 5, _ro(row["payment_date"]))
             self.pay_tbl.setItem(r, 6, _ro(row["method"]))
             self.pay_tbl.setItem(r, 7, _ro(row["reference"]))
+            self.pay_tbl.setItem(r, 8, _ro(row["created_by"] or ""))
             total += float(row["amount"] or 0)
         self.pay_total_lbl.setText(f"Total Payments: ${total:,.2f}")
 
@@ -849,9 +866,10 @@ class TaxMgmtWidget(QtWidgets.QWidget):
             v = dlg.values()
             with _conn() as con:
                 con.execute(
-                    "INSERT INTO tax_payment (tax_type,jurisdiction,period,amount,payment_date,method,reference,notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
+                    "INSERT INTO tax_payment (tax_type,jurisdiction,period,amount,payment_date,method,reference,notes,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",  # noqa: E501
                     (v["tax_type"], v["jurisdiction"], v["period"], v["amount"],  # noqa: E501
-                     v["payment_date"], v["method"], v["reference"], v["notes"])  # noqa: E501
+                     v["payment_date"], v["method"], v["reference"], v["notes"],  # noqa: E501
+                     get_current_user_email() or None)
                 )
             self._refresh_payments()
             self._refresh_reports()
@@ -1016,7 +1034,9 @@ class TaxMgmtWidget(QtWidgets.QWidget):
 class TaxWindow(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
-        self.setWindowTitle("Tax Management")
+        email = get_current_user_email()
+        title = f"Tax Management — {email}" if email else "Tax Management"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(TaxMgmtWidget(initial_tab=initial_tab))
