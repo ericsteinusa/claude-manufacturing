@@ -9,6 +9,7 @@ import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 
 OVERDUE_DAYS = 7   # calls open this long or more are considered escalated
@@ -653,7 +654,9 @@ class CSEscalationsWidget(QtWidgets.QWidget):
 class CSEscalationsWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CS Escalations")
+        email = get_current_user_email()
+        title = f"CS Escalations — {email}" if email else "CS Escalations"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSEscalationsWidget())

@@ -7,6 +7,7 @@ from .cs_reports import CSReportsWidget
 from .cs_staff_mgmt import CSStaffMgmtWidget
 from .cs_satisfaction import CSSatisfactionWidget
 from .cs_escalations import CSEscalationsWidget
+from .accounts import get_current_user_email
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -50,7 +51,10 @@ def _launch_tab(script, label):
 class CSMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Customer Service Manager Menu")
+        email = get_current_user_email()
+        title = (f"Customer Service Manager Menu — {email}" if email
+                 else "Customer Service Manager Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
