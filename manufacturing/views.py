@@ -556,7 +556,9 @@ def po_new(request):
             data, error = _po_header_form(request)
             if not error:
                 try:
-                    po_id = create_po(conn, **data)
+                    po_id = create_po(
+                        conn, **data,
+                        created_by=request.session.get('user_email'))
                     conn.commit()
                     return redirect('po_detail', po_id=po_id)
                 except psycopg2.IntegrityError:

@@ -2,6 +2,7 @@ import sys
 import sqlite3
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from .purchase_orders_core import (  # noqa: F401  (re-exported for the GUI)
     PO_STATUSES, PO_STATUS_COLORS, ensure_po_tables,
     next_po_number, list_pos, get_po, get_po_items)
@@ -117,6 +118,11 @@ class NewPODialog(QtWidgets.QDialog):
         self.po_num.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("PO Number:"), self.po_num)
 
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         self.supplier_combo = QtWidgets.QComboBox()
         self.supplier_combo.setStyleSheet(COMBO_STYLE)
         self.supplier_combo.addItem("(none)", None)
@@ -162,15 +168,15 @@ class NewPODialog(QtWidgets.QDialog):
         conn = get_db()
         try:
             cur = conn.execute(
-                "INSERT INTO purchase_order (po_number, supplier_id, "
-                "order_date,"
-                " expected_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) "
-                "RETURNING id",
+                "INSERT INTO purchase_order (po_number, supplier_id,"
+                " order_date, expected_date, status, notes, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (po_num, self.supplier_combo.currentData(),
                  self.order_date.date().toString("yyyy-MM-dd"),
                  self.expected_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.po_id = cur.fetchone()['id']
             conn.commit()
@@ -427,10 +433,10 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.po_table = QtWidgets.QTableWidget()
-        self.po_table.setColumnCount(8)
+        self.po_table.setColumnCount(9)
         self.po_table.setHorizontalHeaderLabels(
             ["PO #", "Supplier", "Order Date", "Expected Date",
-                "Items", "Total", "Status", "Notes"]
+             "Items", "Total", "Status", "Notes", "Created By"]
         )
         hh = self.po_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -449,6 +455,8 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         hh.setSectionResizeMode(
     6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(
+    8, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.po_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.po_table.setSelectionBehavior(
@@ -523,7 +531,7 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
 
         base = """
             SELECT po.id, po.po_number, po.order_date, po.expected_date,
-                   po.status, po.notes, s.company_name,
+                   po.status, po.notes, po.created_by, s.company_name,
                    (SELECT COUNT(*) FROM po_item pi WHERE pi.po_id = po.id) AS
                        item_count,
                    (SELECT COALESCE(SUM(pi.qty_ordered * pi.unit_price),0)
@@ -566,8 +574,9 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
             self.po_table.setItem(r, 5, _ro(f"${row['total']:,.2f}"))
             self.po_table.setItem(r, 6, _ro(row["status"].capitalize()))
             self.po_table.setItem(r, 7, _ro(row["notes"] or ""))
+            self.po_table.setItem(r, 8, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(PO_COLORS.get(row["status"], "#ffffff"))
-            for col in range(8):
+            for col in range(9):
                 self.po_table.item(r, col).setBackground(bg)
 
         self._selected_po_id = None
@@ -670,7 +679,9 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
 class PurchaseOrdersWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Purchase Orders")
+        email = get_current_user_email()
+        title = f"Purchase Orders — {email}" if email else "Purchase Orders"
+        self.setWindowTitle(title)
         self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(PurchaseOrdersWidget())
