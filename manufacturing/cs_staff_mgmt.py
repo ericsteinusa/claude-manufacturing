@@ -8,6 +8,7 @@ import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 CS_DEPT_ID = 3
 
@@ -159,6 +160,13 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         super().__init__(parent)
         _apply_palette(self)
         self._training_current_id = None
+        try:
+            with _conn() as con:
+                con.execute(
+                    "ALTER TABLE cs_training"
+                    " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        except Exception:
+            pass
         self._build_ui()
         self._run_all()
 
@@ -569,6 +577,7 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
             "train_date": self.tr_date.date().toString("yyyy-MM-dd"),
             "notes": self.tr_notes.text().strip() or None,
             "completed": 1 if self.tr_completed.isChecked() else 0,
+            "created_by": get_current_user_email() or None,
         }
 
     def _tr_add(self):
@@ -578,9 +587,9 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
         with _conn() as con:
             con.execute("""
                 INSERT INTO cs_training (people_id, topic, trainer, train_date,
-                    notes, completed)
+                    notes, completed, created_by)
                 VALUES (%(people_id)s, %(topic)s, %(trainer)s, %(train_date)s,
-                    %(notes)s, %(completed)s)
+                    %(notes)s, %(completed)s, %(created_by)s)
             """, data)
         self._tr_clear()
         self._run_training()
@@ -731,7 +740,10 @@ class CSStaffMgmtWidget(QtWidgets.QWidget):
 class CSStaffMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CS Staff Management")
+        email = get_current_user_email()
+        title = (f"CS Staff Management — {email}" if email
+                 else "CS Staff Management")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSStaffMgmtWidget())

@@ -8,6 +8,7 @@ import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -163,6 +164,13 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
         super().__init__(parent)
         _apply_palette(self)
         self._plan_current_id = None
+        try:
+            with _conn() as con:
+                con.execute(
+                    "ALTER TABLE cs_improvement_plan"
+                    " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        except Exception:
+            pass
         self._build_ui()
         self._run_all()
 
@@ -744,6 +752,7 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
             "target_date": self.pl_target.date().toString("yyyy-MM-dd"),
             "status": self.pl_status.currentText(),
             "created_date": date.today().isoformat(),
+            "created_by": get_current_user_email() or None,
         }
 
     def _plan_add(self):
@@ -754,9 +763,9 @@ class CSSatisfactionWidget(QtWidgets.QWidget):
             con.execute("""
                 INSERT INTO cs_improvement_plan
                     (title, description, owner, target_date, status,
-                        created_date)
+                        created_date, created_by)
                 VALUES (%(title)s, %(description)s, %(owner)s, %(target_date)s,
-                    %(status)s, %(created_date)s)
+                    %(status)s, %(created_date)s, %(created_by)s)
             """, data)
         self._plan_clear()
         self._run_plans()
@@ -823,7 +832,10 @@ def _mk_lbl(text):
 class CSSatisfactionWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Customer Satisfaction")
+        email = get_current_user_email()
+        title = (f"Customer Satisfaction — {email}" if email
+                 else "Customer Satisfaction")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSSatisfactionWidget())

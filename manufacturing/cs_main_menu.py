@@ -3,6 +3,7 @@ from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
 from .button_nav import ButtonNav
 from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
+from .accounts import get_current_user_email
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -46,7 +47,10 @@ def _launch_tab(script, label, *args):
 class CSMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Customer Service Main Menu")
+        email = get_current_user_email()
+        title = (f"Customer Service Main Menu — {email}" if email
+                 else "Customer Service Main Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

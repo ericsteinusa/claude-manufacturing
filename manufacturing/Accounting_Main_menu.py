@@ -3,6 +3,7 @@ from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
 from .button_nav import ButtonNav
 from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
+from .accounts import get_current_user_email
 from .Accounts_receivable import AccountsReceivableWidget
 from .Credit_dept import CreditDeptWidget
 from .Payroll_dept import PayrollDeptWidget
@@ -52,7 +53,10 @@ def _launch_tab(script, label, *args):
 class AccountingMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Accounting Main Menu")
+        email = get_current_user_email()
+        title = (f"Accounting Main Menu — {email}" if email
+                 else "Accounting Main Menu")
+        self.setWindowTitle(title)
         self.resize(1200, 760)
         _apply_blue_palette(self)
         self._build_ui()
