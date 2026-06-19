@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -65,8 +66,13 @@ def init_db():
             due_date      TEXT,
             resolved_date TEXT,
             status        TEXT DEFAULT 'open',
-            notes         TEXT
+            notes         TEXT,
+            created_by    TEXT
         )
+    """)
+    conn.execute("""
+        ALTER TABLE it_ticket
+        ADD COLUMN IF NOT EXISTS created_by TEXT
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS it_asset (
@@ -192,6 +198,11 @@ class NewTicketDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -212,17 +223,17 @@ class NewTicketDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO it_ticket (ticket_number, requester, department, "
-                "issue_type,"
-                " description, priority, assigned_to, submitted_date, "
-                "due_date, notes)"
-                " VALUES (?,?,?,?,?,?,?,?,?,?)",
+                "issue_type, description, priority, assigned_to, "
+                "submitted_date, due_date, notes, created_by)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (num, self.requester.text().strip(), self.department.text().strip(),  # noqa: E501
                  self.issue_type.currentData(), desc,
                  self.priority_combo.currentData(),
                  self.assigned_to.text().strip(),
                  self.submitted_date.date().toString("yyyy-MM-dd"),
                  self.due_date.date().toString("yyyy-MM-dd"),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.ticket_id = cur.lastrowid
             conn.commit()
@@ -445,17 +456,17 @@ class ITSupportWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.tkt_table = QtWidgets.QTableWidget()
-        self.tkt_table.setColumnCount(8)
+        self.tkt_table.setColumnCount(9)
         self.tkt_table.setHorizontalHeaderLabels(
             ["Ticket #", "Requester", "Department", "Issue Type",
-             "Priority", "Assigned To", "Due Date", "Status"]
+             "Priority", "Assigned To", "Due Date", "Status", "Created By"]
         )
         hh = self.tkt_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5, 6, 7):
+        for col in (2, 3, 4, 5, 6, 7, 8):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.tkt_table.setEditTriggers(
@@ -556,8 +567,9 @@ class ITSupportWidget(QtWidgets.QWidget):
     r, 7, _ro(
         row["status"].replace(
             "_", " ").capitalize()))
+            self.tkt_table.setItem(r, 8, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(TICKET_COLORS.get(row["status"], "#ffffff"))
-            for col in range(8):
+            for col in range(9):
                 self.tkt_table.item(r, col).setBackground(bg)
             if row["status"] not in ("resolved", "closed"):
                 pc = PRIORITY_COLORS.get(row["priority"])
@@ -828,7 +840,9 @@ class ITSupportWidget(QtWidgets.QWidget):
 class ITSupportMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("IT Support")
+        email = get_current_user_email()
+        title = f"IT Support — {email}" if email else "IT Support"
+        self.setWindowTitle(title)
         self.resize(1020, 680)
         _apply_blue_palette(self)
         from .it_calls_reports import ITSupportReportsWidget
