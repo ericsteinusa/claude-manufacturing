@@ -5,6 +5,7 @@ Tabs: Pay Rates | Deductions & Benefits | Run Payroll | Pay Stubs | YTD Report
 """
 import sys
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from .gl_utils import post_gl_entry
 from .log_utils import get_logger
 import csv
@@ -154,6 +155,7 @@ def init_db():
         ("payroll_deduction_type", "is_active", "INTEGER DEFAULT 1"),
         ("payroll_entry_deduction", "deduction_name", "TEXT"),
         ("payroll_entry_deduction", "is_pre_tax", "INTEGER DEFAULT 1"),
+        ("payroll_run", "created_by", "TEXT"),
     ]:
         try:
             conn.execute(
@@ -688,6 +690,12 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         bot.addWidget(self.save_run_btn)
 
         bot.addSpacing(20)
+        _email = get_current_user_email()
+        if _email:
+            by_lbl = QtWidgets.QLabel(f"Created by: {_email}")
+            by_lbl.setStyleSheet("color: white; font-size: 12px;")
+            bot.addWidget(by_lbl)
+            bot.addSpacing(20)
         self.run_totals_lbl = QtWidgets.QLabel("")
         self.run_totals_lbl.setStyleSheet("color: white; font-size: 13px;")
         bot.addWidget(self.run_totals_lbl)
@@ -812,9 +820,9 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         lv.addWidget(runs_lbl)
 
         self.hist_runs_table = QtWidgets.QTableWidget()
-        self.hist_runs_table.setColumnCount(4)
+        self.hist_runs_table.setColumnCount(5)
         self.hist_runs_table.setHorizontalHeaderLabels(
-            ["Run Date", "Period", "Employees", "Total Gross"])
+            ["Run Date", "Period", "Employees", "Total Gross", "Created By"])
         hl = self.hist_runs_table.horizontalHeader()
         hl.setStyleSheet("color: black; font-weight: bold;")
         hl.setSectionResizeMode(
@@ -824,6 +832,8 @@ class PayrollDeptWidget(QtWidgets.QWidget):
     2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hl.setSectionResizeMode(
     3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hl.setSectionResizeMode(
+    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.hist_runs_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.hist_runs_table.setSelectionBehavior(
@@ -1472,9 +1482,10 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         cur = conn.execute("""
             INSERT INTO payroll_run (pay_period_start, pay_period_end,
-                run_date, status)
-            VALUES (%s, %s, %s, 'processed') RETURNING id
-        """, (start_str, end_str, datetime.now().strftime(DT_FMT)))
+                run_date, status, created_by)
+            VALUES (%s, %s, %s, 'processed', %s) RETURNING id
+        """, (start_str, end_str, datetime.now().strftime(DT_FMT),
+              get_current_user_email() or None))
         run_id = cur.fetchone()['id']
 
         def _v(r, col):
@@ -1817,11 +1828,13 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         runs = conn.execute("""
             SELECT pr.id, pr.run_date, pr.pay_period_start, pr.pay_period_end,
+                   pr.created_by,
                    COUNT(pe.id) AS emp_count,
                    COALESCE(SUM(pe.gross_pay), 0) AS total_gross
             FROM payroll_run pr
             LEFT JOIN payroll_entry pe ON pe.run_id=pr.id
-            GROUP BY pr.id
+            GROUP BY pr.id, pr.run_date, pr.pay_period_start,
+                     pr.pay_period_end, pr.created_by
             ORDER BY pr.run_date DESC
         """).fetchall()
         conn.close()
@@ -1840,9 +1853,11 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             period = f"{run['pay_period_start']}  –  {run['pay_period_end']}"
             al = QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
             ac = QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter  # noqa: E501
-            for col, (val, align) in enumerate([(rd, ac), (period, al),
-                                                (str(run["emp_count"]), ac),
-                                                (_money(run["total_gross"]), QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter)]):  # noqa: E501
+            for col, (val, align) in enumerate([
+                    (rd, ac), (period, al),
+                    (str(run["emp_count"]), ac),
+                    (_money(run["total_gross"]), QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignVCenter),  # noqa: E501
+                    (run["created_by"] or "", al)]):
                 self.hist_runs_table.setItem(r, col, _ro(val, align))
 
         self.hist_detail_table.setRowCount(0)
@@ -1941,7 +1956,9 @@ class PayrollDeptWidget(QtWidgets.QWidget):
 class PayrollDept(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
-        self.setWindowTitle("Payroll Department")
+        email = get_current_user_email()
+        title = f"Payroll Department — {email}" if email else "Payroll Department"
+        self.setWindowTitle(title)
         self.resize(1280, 740)
         _apply_blue_palette(self)
         self.setCentralWidget(PayrollDeptWidget(initial_tab=initial_tab))
