@@ -6,6 +6,7 @@ in a window by ``cs_calls.py`` for the desktop menu-leaf launch.
 """
 from .db_pg import get_db
 from .log_utils import get_logger
+from .accounts import get_current_user_email
 from .cs_calls_core import (
     format_customer_label, parse_customer_id, validate_call)
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -25,7 +26,8 @@ GROUP_STYLE = "QGroupBox{color:white;font-weight:bold;}"
 INPUT_STYLE = "background:white;border:1px solid black;border-radius:4px;"
 
 COLS = ["ID", "Customer", "Problem", "Call Date", "Call Time",
-        "Completion Date", "Completion Time", "Comments", "Completed"]
+        "Completion Date", "Completion Time", "Comments", "Completed",
+        "Created By"]
 
 
 def _apply_blue_palette(widget):
@@ -58,7 +60,12 @@ def _ensure_schema():
                 customer_id INTEGER REFERENCES customer(id),
                 call TEXT, call_date TEXT, call_time TEXT,
                 completion_date TEXT, completion_time TEXT,
-                comments_box TEXT, completion_box INTEGER DEFAULT 0)
+                comments_box TEXT, completion_box INTEGER DEFAULT 0,
+                created_by TEXT)
+        """)
+        conn.execute("""
+            ALTER TABLE calls2
+            ADD COLUMN IF NOT EXISTS created_by TEXT
         """)
         conn.commit()
         conn.close()
@@ -180,6 +187,12 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
 
         grid.addWidget(_lbl("Comments:"), 3, 0)
         grid.addWidget(self._comments, 3, 1, 1, 5)
+
+        self._created_by_display = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        self._created_by_display.setStyleSheet(LABEL_STYLE)
+        grid.addWidget(_lbl("Created by:"), 4, 0)
+        grid.addWidget(self._created_by_display, 4, 1, 1, 5)
         return box
 
     # -- Data -----------------------------------------------------------
@@ -205,7 +218,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
         sql = (
             "SELECT c.id, c.customer_id, cu.first_name, cu.last_name, "
             "c.call, c.call_date, c.call_time, c.completion_date, "
-            "c.completion_time, c.comments_box, c.completion_box "
+            "c.completion_time, c.comments_box, c.completion_box, "
+            "c.created_by "
             "FROM calls2 c LEFT JOIN customer cu ON cu.id = c.customer_id "
         )
         params = ()
@@ -231,7 +245,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             completed = "Yes" if row["completion_box"] else "No"
             values = [row["id"], customer, row["call"], row["call_date"],
                       row["call_time"], row["completion_date"],
-                      row["completion_time"], row["comments_box"], completed]
+                      row["completion_time"], row["comments_box"], completed,
+                      row["created_by"]]
             for c, val in enumerate(values):
                 item = QtWidgets.QTableWidgetItem(str(val if val is not None
                                                       else ""))
@@ -301,11 +316,11 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             conn.execute(
                 "INSERT INTO calls2 (customer_id, call, call_date, call_time, "
                 "completion_date, completion_time, comments_box, "
-                "completion_box) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                "completion_box, created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (parse_customer_id(vals["customer_id"]), vals["call"],
                  vals["call_date"], vals["call_time"], vals["completion_date"],
                  vals["completion_time"], vals["comments_box"],
-                 vals["completion_box"]))
+                 vals["completion_box"], get_current_user_email() or None))
             conn.commit()
             conn.close()
         except Exception:
