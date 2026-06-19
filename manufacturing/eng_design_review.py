@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -128,6 +129,10 @@ class NewECRDialog(QtWidgets.QDialog):
         self.notes.setFixedHeight(100)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -148,14 +153,15 @@ class NewECRDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO eng_design_review"
                 " (ecr_number, title, project_id, requested_by, review_date, "
-                "status, notes)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                "status, notes, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, title,
                  self.project_combo.currentData(),
                  self.requested_by.text().strip(),
                  self.review_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.toPlainText().strip())
+                 self.notes.toPlainText().strip(),
+                 get_current_user_email() or None)
             )
             self.ecr_id = cur.fetchone()['id']
             conn.commit()
@@ -218,16 +224,17 @@ class DesignReviewWidget(QtWidgets.QWidget):
 
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(7)
         self.table.setHorizontalHeaderLabels(
-            ["ECR #", "Title", "Project", "Requested By", "Review Date", "Status"]  # noqa: E501
+            ["ECR #", "Title", "Project", "Requested By", "Review Date",
+             "Status", "Created By"]  # noqa: E501
         )
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color:black;font-weight:bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5):
+        for col in (2, 3, 4, 5, 6):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.table.setEditTriggers(
@@ -316,8 +323,9 @@ class DesignReviewWidget(QtWidgets.QWidget):
     r, 5, _ro(
         row["status"].replace(
             "_", " ").capitalize()))
+            self.table.setItem(r, 6, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(ECR_COLORS.get(row["status"], "#ffffff"))
-            for col in range(6):
+            for col in range(7):
                 self.table.item(r, col).setBackground(bg)
         self._selected_id = None
         self.detail_text.clear()
@@ -385,7 +393,10 @@ class DesignReviewWidget(QtWidgets.QWidget):
 class DesignReviewMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Engineering Design Reviews")
+        email = get_current_user_email()
+        title = (f"Engineering Design Reviews — {email}" if email
+                 else "Engineering Design Reviews")
+        self.setWindowTitle(title)
         self.resize(1060, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(DesignReviewWidget())
