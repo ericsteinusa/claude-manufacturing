@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .accounts import get_current_user_email
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -52,6 +53,11 @@ def init_db():
             qty INTEGER DEFAULT 1
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE shipment ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -149,6 +155,11 @@ class NewShipmentDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        self._created_by = get_current_user_email() or None
+        cb_lbl = QtWidgets.QLabel(self._created_by or "(unknown)")
+        cb_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), cb_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -167,11 +178,13 @@ class NewShipmentDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO shipment (ship_number, so_id, ship_date, carrier,"
-                " tracking_number, status, notes) VALUES (?,?,?,?,?,?,?)",
+                " tracking_number, status, notes, created_by)"
+                " VALUES (?,?,?,?,?,?,?,?)",
                 (ship_num, self.so_combo.currentData(),
                  self.ship_date.date().toString("yyyy-MM-dd"),
                  self.carrier.text().strip(), self.tracking.text().strip(),
-                 self.status_combo.currentData(), self.notes.text().strip())
+                 self.status_combo.currentData(), self.notes.text().strip(),
+                 self._created_by)
             )
             self.shipment_id = cur.lastrowid
             conn.commit()
@@ -341,7 +354,10 @@ class UpdateShipmentDialog(QtWidgets.QDialog):
 class ShippingDept(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Shipping Department")
+        email = get_current_user_email()
+        title = (f"Shipping Department — {email}" if email
+                 else "Shipping Department")
+        self.setWindowTitle(title)
         self.resize(920, 640)
         _apply_blue_palette(self)
         self._ship_row_ids = []
@@ -404,10 +420,10 @@ class ShippingDept(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.ship_table = QtWidgets.QTableWidget()
-        self.ship_table.setColumnCount(7)
+        self.ship_table.setColumnCount(8)
         self.ship_table.setHorizontalHeaderLabels(
             ["Ship #", "Sales Order", "Ship Date",
-                "Carrier", "Tracking #", "Items", "Status"]
+                "Carrier", "Tracking #", "Items", "Status", "Created By"]
         )
         hh = self.ship_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -424,6 +440,8 @@ class ShippingDept(QtWidgets.QMainWindow):
     5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(
     6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    7, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ship_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.ship_table.setSelectionBehavior(
@@ -489,7 +507,7 @@ class ShippingDept(QtWidgets.QMainWindow):
 
         base = """
             SELECT s.id, s.ship_number, s.ship_date, s.carrier,
-                s.tracking_number, s.status,
+                s.tracking_number, s.status, s.created_by,
                    so.so_number,
                    (SELECT COUNT(*) FROM shipment_item si WHERE si.shipment_id
                        = s.id) AS item_count
@@ -526,8 +544,9 @@ class ShippingDept(QtWidgets.QMainWindow):
             self.ship_table.setItem(r, 4, _ro(row["tracking_number"] or ""))
             self.ship_table.setItem(r, 5, _ro(str(row["item_count"])))
             self.ship_table.setItem(r, 6, _ro(row["status"].capitalize()))
+            self.ship_table.setItem(r, 7, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(SHIP_COLORS.get(row["status"], "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.ship_table.item(r, col).setBackground(bg)
 
         self._selected_ship_id = None

@@ -5,6 +5,7 @@ from .bom import (init_item_master, bom_would_create_cycle,
                   explode_bom_to_wo, ItemSettingsDialog)
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -68,6 +69,11 @@ def init_db():
             notes TEXT
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE work_order ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
     # Reconcile the item-master (make/buy, lead time, uom) and the bom
@@ -177,6 +183,11 @@ class NewWODialog(QtWidgets.QDialog):
         self.notes.setPlaceholderText("Optional notes")
         layout.addRow(lbl("Notes:"), self.notes)
 
+        self._created_by = get_current_user_email() or None
+        cb_lbl = QtWidgets.QLabel(self._created_by or "(unknown)")
+        cb_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), cb_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -201,13 +212,14 @@ class NewWODialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO work_order (wo_number, product_id, description, "
                 "quantity,"
-                " start_date, due_date, status, notes) VALUES "
-                "(?,?,?,?,?,?,?,?)",
+                " start_date, due_date, status, notes, created_by) VALUES "
+                "(?,?,?,?,?,?,?,?,?)",
                 (wo_num, self.product_combo.currentData(),
                  self.desc.text().strip(), self.qty.value(),
                  self.start_date.date().toString("yyyy-MM-dd"),
                  self.due_date.date().toString("yyyy-MM-dd"),
-                 "planned", self.notes.text().strip())
+                 "planned", self.notes.text().strip(),
+                 self._created_by)
             )
             self.wo_id = cur.lastrowid
             # Seed the material list from the finished good's BOM, in the same
@@ -494,7 +506,10 @@ class AddBOMItemDialog(QtWidgets.QDialog):
 class WorkOrders(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Production / Work Orders")
+        email = get_current_user_email()
+        title = (f"Production / Work Orders — {email}" if email
+                 else "Production / Work Orders")
+        self.setWindowTitle(title)
         self.resize(920, 640)
         _apply_blue_palette(self)
         self._wo_row_ids = []
@@ -572,17 +587,17 @@ class WorkOrders(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.wo_table = QtWidgets.QTableWidget()
-        self.wo_table.setColumnCount(7)
+        self.wo_table.setColumnCount(8)
         self.wo_table.setHorizontalHeaderLabels(
             ["WO #", "Description", "Product", "Qty",
-                "Start Date", "Due Date", "Status"]
+                "Start Date", "Due Date", "Status", "Created By"]
         )
         hh = self.wo_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5, 6):
+        for col in (2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.wo_table.setEditTriggers(
@@ -650,7 +665,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         term   = self.wo_search.text().strip()
         base = """
             SELECT wo.id, wo.wo_number, wo.description, p.name AS product_name,
-                   wo.quantity, wo.start_date, wo.due_date, wo.status
+                   wo.quantity, wo.start_date, wo.due_date, wo.status,
+                   wo.created_by
             FROM work_order wo
             LEFT JOIN product p ON p.id = wo.product_id
         """
@@ -672,7 +688,8 @@ class WorkOrders(QtWidgets.QMainWindow):
         except psycopg2.OperationalError:
             rows = conn.execute(
                 "SELECT id, wo_number, description, NULL AS product_name,"
-                " quantity, start_date, due_date, status FROM work_order"
+                " quantity, start_date, due_date, status,"
+                " NULL AS created_by FROM work_order"
                 + where + " ORDER BY due_date, wo_number", params
             ).fetchall()
         conn.close()
@@ -693,8 +710,9 @@ class WorkOrders(QtWidgets.QMainWindow):
     r, 6, _ro(
         row["status"].replace(
             "_", " ").capitalize()))
+            self.wo_table.setItem(r, 7, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(WO_COLORS.get(row["status"], "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.wo_table.item(r, col).setBackground(bg)
 
         self._selected_wo_id = None
