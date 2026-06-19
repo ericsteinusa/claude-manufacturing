@@ -4,6 +4,7 @@ import subprocess
 from PyQt6 import QtCore, QtWidgets
 from .button_nav import ButtonNav
 from .QA_Lab_menu import _apply_blue_palette
+from .accounts import get_current_user_email
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -55,7 +56,10 @@ def _do_launch(script):
 class QualityAssuranceMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Quality Assurance Menu")
+        email = get_current_user_email()
+        title = (f"Quality Assurance Menu — {email}" if email
+                 else "Quality Assurance Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

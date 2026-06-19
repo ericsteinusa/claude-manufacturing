@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -73,6 +74,21 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    try:
+        conn = get_db()
+        conn.execute(
+            "ALTER TABLE qa_inspection"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.execute(
+            "ALTER TABLE qa_defect"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.execute(
+            "ALTER TABLE qa_spec"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 
 def _apply_blue_palette(widget):
@@ -182,6 +198,10 @@ class NewInspectionDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -201,11 +221,12 @@ class NewInspectionDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO qa_inspection (insp_number, product_id, wo_id, "
                 "insp_date,"
-                " inspector, result, notes) VALUES (?,?,?,?,?,?,?)",
+                " inspector, result, notes, created_by) VALUES (?,?,?,?,?,?,?,?)",
                 (num, self.product_combo.currentData(), self.wo_combo.currentData(),  # noqa: E501
                  self.insp_date.date().toString("yyyy-MM-dd"),
                  self.inspector.text().strip(), self.result_combo.currentData(),  # noqa: E501
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.insp_id = cur.lastrowid
             conn.commit()
@@ -253,6 +274,10 @@ class LogDefectDialog(QtWidgets.QDialog):
         self.description.setPlaceholderText("Describe the defect (required)")
         layout.addRow(lbl("Description:"), self.description)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -270,9 +295,10 @@ class LogDefectDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute(
             "INSERT INTO qa_defect (insp_id, defect_type, severity, "
-            "description) VALUES (?,?,?,?)",
+            "description, created_by) VALUES (?,?,?,?,?)",
             (self._insp_id, self.defect_type.text().strip(),
-             self.severity_combo.currentData(), desc)
+             self.severity_combo.currentData(), desc,
+             get_current_user_email() or None)
         )
         conn.commit()
         conn.close()
@@ -327,6 +353,10 @@ class AddSpecDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")  # noqa: E501
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -349,10 +379,11 @@ class AddSpecDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute(
             "INSERT INTO qa_spec (product_id, spec_name, min_value, "
-            "max_value, unit, notes)"
-            " VALUES (?,?,?,?,?,?)",
+            "max_value, unit, notes, created_by)"
+            " VALUES (?,?,?,?,?,?,?)",
             (prod_id, name, self.min_val.value(), self.max_val.value(),
-             self.unit.text().strip(), self.notes.text().strip())
+             self.unit.text().strip(), self.notes.text().strip(),
+             get_current_user_email() or None)
         )
         conn.commit()
         conn.close()
@@ -364,7 +395,9 @@ class AddSpecDialog(QtWidgets.QDialog):
 class QALab(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("QA Laboratory")
+        email = get_current_user_email()
+        title = f"QA Laboratory — {email}" if email else "QA Laboratory"
+        self.setWindowTitle(title)
         self.resize(960, 660)
         _apply_blue_palette(self)
         self._insp_row_ids = []
@@ -453,17 +486,17 @@ class QALab(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.insp_table = QtWidgets.QTableWidget()
-        self.insp_table.setColumnCount(7)
+        self.insp_table.setColumnCount(8)
         self.insp_table.setHorizontalHeaderLabels(
             ["Insp #", "Product", "Work Order", "Date",
-                "Inspector", "Defects", "Result"]
+             "Inspector", "Defects", "Result", "Created By"]
         )
         hh = self.insp_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5, 6):
+        for col in (2, 3, 4, 5, 6, 7):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.insp_table.setEditTriggers(
@@ -556,7 +589,7 @@ class QALab(QtWidgets.QMainWindow):
 
         base = """
             SELECT qi.id, qi.insp_number, qi.insp_date, qi.inspector,
-                qi.result,
+                qi.result, qi.created_by,
                    p.name AS product_name, wo.wo_number,
                    (SELECT COUNT(*) FROM qa_defect d WHERE d.insp_id = qi.id)
                        AS defect_count
@@ -605,8 +638,9 @@ class QALab(QtWidgets.QMainWindow):
     r, 6, _ro(
         row["result"].replace(
             "_", " ").capitalize()))
+            self.insp_table.setItem(r, 7, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(INSP_COLORS.get(row["result"], "#ffffff"))
-            for col in range(7):
+            for col in range(8):
                 self.insp_table.item(r, col).setBackground(bg)
 
         self._selected_insp_id = None
@@ -749,15 +783,15 @@ class QALab(QtWidgets.QMainWindow):
         v.addLayout(fr)
 
         self.defect_table = QtWidgets.QTableWidget()
-        self.defect_table.setColumnCount(6)
+        self.defect_table.setColumnCount(7)
         self.defect_table.setHorizontalHeaderLabels(
             ["Inspection #", "Product", "Defect Type",
-                "Severity", "Description", "Resolved"]
+             "Severity", "Description", "Resolved", "Created By"]
         )
         hh = self.defect_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (0, 1, 2, 3, 5):
+        for col in (0, 1, 2, 3, 5, 6):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.defect_table.setEditTriggers(
@@ -786,7 +820,7 @@ class QALab(QtWidgets.QMainWindow):
 
         base = """
             SELECT d.id, d.defect_type, d.severity, d.description, d.resolved,
-                   qi.insp_number, p.name AS product_name
+                   d.created_by, qi.insp_number, p.name AS product_name
             FROM qa_defect d
             JOIN qa_inspection qi ON qi.id = d.insp_id
             LEFT JOIN product p ON p.id = qi.product_id
@@ -824,10 +858,11 @@ class QALab(QtWidgets.QMainWindow):
             self.defect_table.setItem(r, 4, _ro(row["description"] or ""))
             self.defect_table.setItem(
                 r, 5, _ro("Yes" if row["resolved"] else "No"))
+            self.defect_table.setItem(r, 6, _ro(row["created_by"] or ""))
             if not row["resolved"]:
                 sev_color = SEVERITY_COLORS.get(row["severity"])
                 if sev_color:
-                    for col in range(6):
+                    for col in range(7):
                         self.defect_table.item(r, col).setBackground(sev_color)
 
     def _on_resolve_defect_tab(self):
@@ -865,14 +900,15 @@ class QALab(QtWidgets.QMainWindow):
         v.addLayout(fr)
 
         self.spec_table = QtWidgets.QTableWidget()
-        self.spec_table.setColumnCount(6)
+        self.spec_table.setColumnCount(7)
         self.spec_table.setHorizontalHeaderLabels(
-            ["Product", "Spec Name", "Min Value", "Max Value", "Unit", "Notes"]
+            ["Product", "Spec Name", "Min Value", "Max Value", "Unit", "Notes",
+             "Created By"]
         )
         hh = self.spec_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (0, 2, 3, 4, 5):
+        for col in (0, 2, 3, 4, 5, 6):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.spec_table.setEditTriggers(
@@ -930,14 +966,14 @@ class QALab(QtWidgets.QMainWindow):
             if prod_id:
                 rows = conn.execute("""
                     SELECT s.id, p.name AS product_name, s.spec_name,
-                        s.min_value, s.max_value, s.unit, s.notes
+                        s.min_value, s.max_value, s.unit, s.notes, s.created_by
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
                     WHERE s.product_id = ? ORDER BY p.name, s.spec_name
                 """, (prod_id,)).fetchall()
             else:
                 rows = conn.execute("""
                     SELECT s.id, p.name AS product_name, s.spec_name,
-                        s.min_value, s.max_value, s.unit, s.notes
+                        s.min_value, s.max_value, s.unit, s.notes, s.created_by
                     FROM qa_spec s JOIN product p ON p.id = s.product_id
                     ORDER BY p.name, s.spec_name
                 """).fetchall()
@@ -959,6 +995,7 @@ class QALab(QtWidgets.QMainWindow):
                 r, 3, _ro(f"{row['max_value']:.4f}" if row["max_value"] is not None else ""))  # noqa: E501
             self.spec_table.setItem(r, 4, _ro(row["unit"] or ""))
             self.spec_table.setItem(r, 5, _ro(row["notes"] or ""))
+            self.spec_table.setItem(r, 6, _ro(row["created_by"] or ""))
 
     def _on_add_spec(self):
         dlg = AddSpecDialog(self)
