@@ -74,8 +74,13 @@ def ensure_po_tables(conn):
             order_date TEXT,
             expected_date TEXT,
             status TEXT DEFAULT 'draft',
-            notes TEXT
+            notes TEXT,
+            created_by TEXT
         )
+    """)
+    conn.execute("""
+        ALTER TABLE purchase_order
+        ADD COLUMN IF NOT EXISTS created_by TEXT
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS po_item (
@@ -116,7 +121,8 @@ def list_pos(conn, status=None, supplier_id=None,
     """
     sql = """
         SELECT po.id, po.po_number, po.order_date, po.expected_date,
-               po.status, po.notes, po.supplier_id, s.company_name,
+               po.status, po.notes, po.created_by, po.supplier_id,
+               s.company_name,
                (SELECT COUNT(*) FROM po_item pi WHERE pi.po_id = po.id)
                    AS item_count,
                (SELECT COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0)
@@ -148,7 +154,8 @@ def get_po(conn, po_id):
     """Return one PO header dict (with supplier name + totals), or None."""
     row = conn.execute("""
         SELECT po.id, po.po_number, po.order_date, po.expected_date,
-               po.status, po.notes, po.supplier_id, s.company_name,
+               po.status, po.notes, po.created_by, po.supplier_id,
+               s.company_name,
                (SELECT COUNT(*) FROM po_item pi WHERE pi.po_id = po.id)
                    AS item_count,
                (SELECT COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0)
@@ -205,7 +212,8 @@ def load_products(conn):
 
 
 def create_po(conn, po_number, supplier_id=None, order_date=None,
-              expected_date=None, status="draft", notes=None):
+              expected_date=None, status="draft", notes=None,
+              created_by=None):
     """Insert a PO header and return its new id. Does not commit.
 
     Raises ``psycopg2.IntegrityError`` if ``po_number`` already exists (the
@@ -213,9 +221,10 @@ def create_po(conn, po_number, supplier_id=None, order_date=None,
     """
     row = conn.execute(
         "INSERT INTO purchase_order (po_number, supplier_id, order_date,"
-        " expected_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s)"
-        " RETURNING id",
-        (po_number, supplier_id, order_date, expected_date, status, notes)
+        " expected_date, status, notes, created_by)"
+        " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (po_number, supplier_id, order_date, expected_date, status, notes,
+         created_by)
     ).fetchone()
     return row["id"]
 

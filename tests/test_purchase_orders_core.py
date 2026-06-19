@@ -157,7 +157,7 @@ def test_create_po_returns_new_id_from_returning():
         "INSERT INTO PURCHASE_ORDER")
     assert "RETURNING id" in conn.last_sql
     assert conn.last_params == [
-        "PO-2026-0007", 3, "2026-06-01", None, "sent", "hi"]
+        "PO-2026-0007", 3, "2026-06-01", None, "sent", "hi", None]
 
 
 def test_update_po_sets_editable_fields_only():

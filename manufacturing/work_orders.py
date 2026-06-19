@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -47,8 +48,13 @@ def init_db():
             start_date TEXT,
             due_date TEXT,
             status TEXT DEFAULT 'draft',
-            notes TEXT
+            notes TEXT,
+            created_by TEXT
         )
+    """)
+    conn.execute("""
+        ALTER TABLE work_order
+        ADD COLUMN IF NOT EXISTS created_by TEXT
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wo_material (
@@ -127,6 +133,11 @@ class NewWODialog(QtWidgets.QDialog):
         self.wo_num.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("WO Number:"), self.wo_num)
 
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         self.product_combo = QtWidgets.QComboBox()
         self.product_combo.setStyleSheet(COMBO_STYLE)
         self.product_combo.setMinimumWidth(200)
@@ -192,16 +203,15 @@ class NewWODialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO work_order (wo_number, product_id, description, "
-                "quantity,"
-                " start_date, due_date, status, notes) VALUES "
-                "(%s,%s,%s,%s,%s,%s,%s,%s)"
-                " RETURNING id",
+                "quantity, start_date, due_date, status, notes, created_by) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (wo_num, self.product_combo.currentData(),
                  self.desc.text().strip(), self.quantity.value(),
                  self.start_date.date().toString("yyyy-MM-dd"),
                  self.due_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.wo_id = cur.fetchone()['id']
             conn.commit()
@@ -448,10 +458,10 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.wo_table = QtWidgets.QTableWidget()
-        self.wo_table.setColumnCount(8)
+        self.wo_table.setColumnCount(9)
         self.wo_table.setHorizontalHeaderLabels(
             ["WO #", "Product", "Description", "Qty",
-                "Start Date", "Due Date", "Materials", "Status"]
+             "Start Date", "Due Date", "Materials", "Status", "Created By"]
         )
         hh = self.wo_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -470,6 +480,8 @@ class WorkOrdersWidget(QtWidgets.QWidget):
     6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(
     7, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(
+    8, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.wo_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.wo_table.setSelectionBehavior(
@@ -540,7 +552,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
 
         base = """
             SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
-                   wo.start_date, wo.due_date, wo.status,
+                   wo.start_date, wo.due_date, wo.status, wo.created_by,
                    p.name AS product_name,
                    (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
                        AS mat_count
@@ -582,8 +594,9 @@ class WorkOrdersWidget(QtWidgets.QWidget):
     r, 7, _ro(
         status_val.replace(
             "_", " ").capitalize()))
+            self.wo_table.setItem(r, 8, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(WO_COLORS.get(status_val, "#ffffff"))
-            for col in range(8):
+            for col in range(9):
                 self.wo_table.item(r, col).setBackground(bg)
 
         self._selected_wo_id = None
@@ -681,7 +694,9 @@ class WorkOrdersWidget(QtWidgets.QWidget):
 class WorkOrdersWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Work Orders")
+        email = get_current_user_email()
+        title = f"Work Orders — {email}" if email else "Work Orders"
+        self.setWindowTitle(title)
         self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(WorkOrdersWidget())

@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -45,8 +46,13 @@ def init_db():
             order_date TEXT,
             ship_date TEXT,
             status TEXT DEFAULT 'draft',
-            notes TEXT
+            notes TEXT,
+            created_by TEXT
         )
+    """)
+    conn.execute("""
+        ALTER TABLE sales_order
+        ADD COLUMN IF NOT EXISTS created_by TEXT
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS so_item (
@@ -144,6 +150,11 @@ class NewSODialog(QtWidgets.QDialog):
         self.so_num.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("SO Number:"), self.so_num)
 
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         self.customer_combo = QtWidgets.QComboBox()
         self.customer_combo.setStyleSheet(COMBO_STYLE)
         self.customer_combo.setMinimumWidth(200)
@@ -191,13 +202,14 @@ class NewSODialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO sales_order (so_number, customer_id, order_date,"
-                " ship_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s) "
-                "RETURNING id",
+                " ship_date, status, notes, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (so_num, self.customer_combo.currentData(),
                  self.order_date.date().toString("yyyy-MM-dd"),
                  self.ship_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.so_id = cur.fetchone()['id']
             conn.commit()
@@ -454,10 +466,10 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.so_table = QtWidgets.QTableWidget()
-        self.so_table.setColumnCount(8)
+        self.so_table.setColumnCount(9)
         self.so_table.setHorizontalHeaderLabels(
             ["SO #", "Customer", "Order Date", "Ship Date",
-                "Items", "Total", "Status", "Notes"]
+             "Items", "Total", "Status", "Notes", "Created By"]
         )
         hh = self.so_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -476,6 +488,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         hh.setSectionResizeMode(
     6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(7, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(
+    8, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.so_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.so_table.setSelectionBehavior(
@@ -546,7 +560,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 
         base = """
             SELECT so.id, so.so_number, so.order_date, so.ship_date,
-                   so.status, so.notes,
+                   so.status, so.notes, so.created_by,
                    c.company_name, c.first_name, c.last_name,
                    (SELECT COUNT(*) FROM so_item si WHERE si.so_id = so.id) AS
                        item_count,
@@ -595,8 +609,9 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             self.so_table.setItem(r, 5, _ro(f"${row['total']:,.2f}"))
             self.so_table.setItem(r, 6, _ro(row["status"].capitalize()))
             self.so_table.setItem(r, 7, _ro(row["notes"] or ""))
+            self.so_table.setItem(r, 8, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(SO_COLORS.get(row["status"], "#ffffff"))
-            for col in range(8):
+            for col in range(9):
                 self.so_table.item(r, col).setBackground(bg)
 
         self._selected_so_id = None
@@ -695,7 +710,9 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 class SalesOrdersWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sales Orders")
+        email = get_current_user_email()
+        title = f"Sales Orders — {email}" if email else "Sales Orders"
+        self.setWindowTitle(title)
         self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(SalesOrdersWidget())

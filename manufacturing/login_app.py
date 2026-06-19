@@ -1,10 +1,11 @@
+import os
 import sys
 import bcrypt
 import psycopg2
 from .db_pg import get_db
 from .log_utils import get_logger
 from .schema import init_schema
-from .accounts import _get_user_profile, _is_full_access
+from .accounts import _get_user_profile, _is_full_access, _USER_ENV_VAR
 from .launch_utils import launch as _launch
 from .menus import main_menu_script_for_dept
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -818,6 +819,7 @@ class SessionWindow(QtWidgets.QMainWindow):
     def __init__(self, email: str, parent=None):
         super().__init__(parent)
         self.email = email
+        os.environ[_USER_ENV_VAR] = email
         self._profile = _get_user_profile(email) or {}
         _apply_blue_palette(self)
         self._build_ui()

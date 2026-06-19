@@ -1,5 +1,6 @@
 """User accounts: authentication, registration, and role persistence."""
 
+import os
 import bcrypt
 import psycopg2
 
@@ -8,6 +9,21 @@ from .log_utils import get_logger
 from .menus import DEPT_MENU_KEY
 
 log = get_logger(__name__)
+
+# Environment variable used to propagate the logged-in user's email to every
+# subprocess spawned from the session (set once by login_app.SessionWindow).
+_USER_ENV_VAR = 'MFGAPP_USER'
+
+
+def get_current_user_email() -> str:
+    """Return the email of the user who launched this process, or ''."""
+    return os.environ.get(_USER_ENV_VAR, '')
+
+
+def get_current_user_profile() -> dict:
+    """Return the profile dict for the currently logged-in user, or {}."""
+    email = get_current_user_email()
+    return _get_user_profile(email) if email else {}
 
 
 FULL_ACCESS_ROLES = {'President', 'Vice President'}
