@@ -136,15 +136,31 @@ def _today():
     return QtCore.QDate.currentDate().toString("yyyy-MM-dd")
 
 
-def _next_req_num():
-    yr = QtCore.QDate.currentDate().year()
-    conn = get_db()
-    count = conn.execute(
-        "SELECT COUNT(*) FROM purchase_requisition "
-        "WHERE req_number LIKE %s", (f"REQ-{yr}-%",)
-    ).fetchone()[0]
-    conn.close()
-    return f"REQ-{yr}-{count + 1:04d}"
+def _next_req_num(conn=None):
+    """Return the next REQ-YYYY-NNNN number.
+
+    Accepts an optional *conn* so callers inside an open transaction can pass
+    their connection — uncommitted rows on the same connection are then visible,
+    preventing duplicate numbers when several requisitions are inserted in one
+    transaction.  When called without a connection a fresh one is opened and
+    closed (backwards-compatible, but subject to the usual gap/race caveats).
+    """
+    from .mrp_core import next_sequence_number
+    import datetime
+    yr = datetime.date.today().year
+    prefix = f"REQ-{yr}-"
+    own_conn = conn is None
+    if own_conn:
+        conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT req_number FROM purchase_requisition "
+            "WHERE req_number LIKE %s", (prefix + "%",)
+        ).fetchall()
+    finally:
+        if own_conn:
+            conn.close()
+    return next_sequence_number([r["req_number"] for r in rows], prefix)
 
 
 # Roles permitted to authorize requisitions, matching the role names

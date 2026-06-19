@@ -266,7 +266,7 @@ def release_planned_orders(order_ids):
 
 def _create_requisition(conn, buys):
     """Create one draft requisition holding all the buy lines."""
-    req_number = _next_req_num()
+    req_number = _next_req_num(conn)
     today = date.today().isoformat()
     dept = conn.execute(
         "SELECT dept_id FROM dept WHERE dept_name = %s", ("Purchasing",)
