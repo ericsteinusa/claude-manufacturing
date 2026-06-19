@@ -3,6 +3,7 @@ from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
 from .button_nav import ButtonNav
 from .Sales_menu import _apply_blue_palette
+from .accounts import get_current_user_email
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -46,7 +47,9 @@ def _launch_tab(script, label, *args):
 class SalesMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sales Main Menu")
+        email = get_current_user_email()
+        title = f"Sales Main Menu — {email}" if email else "Sales Main Menu"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

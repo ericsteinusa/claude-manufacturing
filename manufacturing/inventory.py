@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .accounts import get_current_user_email
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -64,6 +65,14 @@ def init_db():
         conn.execute(
             "ALTER TABLE product ALTER COLUMN supplier_id TYPE INTEGER"
             " USING supplier_id::integer")
+    except Exception:
+        pass
+    try:
+        conn.execute(
+            "ALTER TABLE product ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.execute(
+            "ALTER TABLE inventory_transaction"
+            " ADD COLUMN IF NOT EXISTS created_by TEXT")
     except Exception:
         pass
     conn.commit()
@@ -177,6 +186,11 @@ class AddProductDialog(QtWidgets.QDialog):
         self.purchase_date.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Purchase Date:"), self.purchase_date)
 
+        self._created_by = get_current_user_email() or None
+        cb_lbl = QtWidgets.QLabel(self._created_by or "(unknown)")
+        cb_lbl.setStyleSheet("color: white; font-size: 13px;")
+        layout.addRow(QtWidgets.QLabel("Created by:"), cb_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -196,13 +210,14 @@ class AddProductDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO product (name, supplier_id, bin, amount, "
                 "reorder_point,"
-                " purchase_price, purchase_date) VALUES "
-                "(%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                " purchase_price, purchase_date, created_by) VALUES "
+                "(%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (name, self.supplier_combo.currentData(),
                  self.bin_loc.text().strip(),  # noqa: E501
                  self.amount.value(), self.reorder_point.value(),
                  self.purchase_price.value(),
-                 self.purchase_date.date().toString("yyyy-MM-dd"))
+                 self.purchase_date.date().toString("yyyy-MM-dd"),
+                 self._created_by)
             )
             self.product_id = cur.fetchone()['id']
             conn.commit()
@@ -362,6 +377,11 @@ class RecordTransactionDialog(QtWidgets.QDialog):
         self.notes.setStyleSheet(INPUT_STYLE)
         layout.addRow(lbl("Notes:"), self.notes)
 
+        self._created_by = get_current_user_email() or None
+        cb_lbl = QtWidgets.QLabel(self._created_by or "(unknown)")
+        cb_lbl.setStyleSheet("color: white; font-size: 13px;")
+        layout.addRow(lbl("Created by:"), cb_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -385,13 +405,15 @@ class RecordTransactionDialog(QtWidgets.QDialog):
         conn = get_db()
         conn.execute(
             "INSERT INTO inventory_transaction"
-            " (product_id, trans_date, trans_type, quantity, reference, notes)"
-            " VALUES (%s,%s,%s,%s,%s,%s)",
+            " (product_id, trans_date, trans_type, quantity, reference, notes,"
+            " created_by)"
+            " VALUES (%s,%s,%s,%s,%s,%s,%s)",
             (self._product_id,
              self.trans_date.date().toString("yyyy-MM-dd"),
              trans_type, qty,
              self.reference.text().strip(),
-             self.notes.text().strip())
+             self.notes.text().strip(),
+             self._created_by)
         )
         conn.execute(
             "UPDATE product SET amount = %s WHERE id = %s",
@@ -452,26 +474,17 @@ class InventoryWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.inv_table = QtWidgets.QTableWidget()
-        self.inv_table.setColumnCount(7)
+        self.inv_table.setColumnCount(8)
         self.inv_table.setHorizontalHeaderLabels(
             ["Name", "Bin", "Qty on Hand", "Reorder Point",
-                "Unit Cost", "Supplier", "Status"]
+             "Unit Cost", "Supplier", "Status", "Created By"]
         )
         hh = self.inv_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        hh.setSectionResizeMode(
-    1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(
-    2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(
-    3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(
-    4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(
-    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        hh.setSectionResizeMode(
-    6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        for _c in (1, 2, 3, 4, 5, 6, 7):
+            hh.setSectionResizeMode(
+    _c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.inv_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.inv_table.setSelectionBehavior(
@@ -491,9 +504,9 @@ class InventoryWidget(QtWidgets.QWidget):
         dlbl.setStyleSheet("color: white; font-weight: bold; font-size: 13px;")
         dv.addWidget(dlbl)
         self.txn_table = QtWidgets.QTableWidget()
-        self.txn_table.setColumnCount(5)
+        self.txn_table.setColumnCount(6)
         self.txn_table.setHorizontalHeaderLabels(
-            ["Date", "Type", "Quantity", "Reference", "Notes"]
+            ["Date", "Type", "Quantity", "Reference", "Notes", "Created By"]
         )
         ih = self.txn_table.horizontalHeader()
         ih.setStyleSheet("color: black; font-weight: bold;")
@@ -506,6 +519,8 @@ class InventoryWidget(QtWidgets.QWidget):
         ih.setSectionResizeMode(
     3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         ih.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        ih.setSectionResizeMode(
+    5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.txn_table.setEditTriggers(
     QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.txn_table.verticalHeader().setVisible(False)
@@ -539,7 +554,7 @@ class InventoryWidget(QtWidgets.QWidget):
         try:
             rows = conn.execute("""
                 SELECT p.id, p.name, p.bin, p.amount, p.reorder_point,
-                       p.purchase_price, p.supplier_id,
+                       p.purchase_price, p.supplier_id, p.created_by,
                        COALESCE(s.company_name,
                            NULLIF(TRIM(CONCAT(s.first_name, ' ',
                                s.last_name)), '')) AS supplier_name
@@ -583,9 +598,10 @@ class InventoryWidget(QtWidgets.QWidget):
                 r, 4, _ro(f"${row['purchase_price'] or 0:.2f}"))
             self.inv_table.setItem(r, 5, _ro(row["supplier_name"] or ""))
             self.inv_table.setItem(r, 6, _ro(status))
+            self.inv_table.setItem(r, 7, _ro(row["created_by"] or ""))
 
             bg = QtGui.QColor(_row_color(amt, rop))
-            for col in range(7):
+            for col in range(8):
                 self.inv_table.item(r, col).setBackground(bg)
 
         self._selected_product_id = None
@@ -621,7 +637,8 @@ class InventoryWidget(QtWidgets.QWidget):
         conn = get_db()
         try:
             txns = conn.execute(
-                "SELECT trans_date, trans_type, quantity, reference, notes"
+                "SELECT trans_date, trans_type, quantity, reference, notes,"
+                " created_by"
                 " FROM inventory_transaction WHERE product_id = %s"
                 " ORDER BY trans_date DESC, id DESC",
                 (self._selected_product_id,)
@@ -639,6 +656,7 @@ class InventoryWidget(QtWidgets.QWidget):
             self.txn_table.setItem(r, 2, _ro(str(txn["quantity"])))
             self.txn_table.setItem(r, 3, _ro(txn["reference"] or ""))
             self.txn_table.setItem(r, 4, _ro(txn["notes"] or ""))
+            self.txn_table.setItem(r, 5, _ro(txn["created_by"] or ""))
 
     def _on_add_product(self):
         dlg = AddProductDialog(self)
@@ -701,7 +719,8 @@ class InventoryWidget(QtWidgets.QWidget):
 class InventoryWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Inventory")
+        email = get_current_user_email()
+        self.setWindowTitle(f"Inventory — {email}" if email else "Inventory")
         self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(InventoryWidget())

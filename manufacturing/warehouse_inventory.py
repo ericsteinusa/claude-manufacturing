@@ -7,6 +7,7 @@ from .db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -165,6 +166,13 @@ class WarehouseWidget(QtWidgets.QWidget):
         super().__init__(parent)
         _apply_palette(self)
         self._current_product_id = None
+        try:
+            with _conn() as con:
+                con.execute(
+                    "ALTER TABLE inventory_transaction"
+                    " ADD COLUMN IF NOT EXISTS created_by TEXT")
+        except Exception:
+            pass
         self._build_ui()
         self._refresh_all()
 
@@ -472,13 +480,14 @@ class WarehouseWidget(QtWidgets.QWidget):
         hist_lbl.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
         v.addWidget(hist_lbl)
 
-        self.rcv_hist_tbl = QtWidgets.QTableWidget(0, 5)
+        self.rcv_hist_tbl = QtWidgets.QTableWidget(0, 6)
         self.rcv_hist_tbl.setHorizontalHeaderLabels(
-            ["Date", "Product", "Qty Received", "Reference", "Notes"])
+            ["Date", "Product", "Qty Received", "Reference", "Notes",
+             "Created By"])
         hh = self.rcv_hist_tbl.horizontalHeader()
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for c in (0, 2, 3):
+        for c in (0, 2, 3, 5):
             hh.setSectionResizeMode(
     c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.rcv_hist_tbl.setEditTriggers(
@@ -516,9 +525,10 @@ class WarehouseWidget(QtWidgets.QWidget):
             con.execute("""
                 INSERT INTO inventory_transaction
                     (product_id, trans_date, trans_type, quantity, reference,
-                        notes)
-                VALUES (%s, %s, 'Receive', %s, %s, %s)
-            """, (pid, trans_date, qty, ref, notes))
+                        notes, created_by)
+                VALUES (%s, %s, 'Receive', %s, %s, %s, %s)
+            """, (pid, trans_date, qty, ref, notes,
+                  get_current_user_email() or None))
             con.execute(
     "UPDATE product SET amount = amount + %s WHERE id=%s", (qty, pid))
 
@@ -538,7 +548,8 @@ class WarehouseWidget(QtWidgets.QWidget):
     def _load_receive_history(self):
         with _conn() as con:
             rows = con.execute("""
-                SELECT t.trans_date, p.name, t.quantity, t.reference, t.notes
+                SELECT t.trans_date, p.name, t.quantity, t.reference, t.notes,
+                       t.created_by
                 FROM inventory_transaction t
                 JOIN product p ON p.id = t.product_id
                 WHERE t.trans_type = 'Receive'
@@ -555,6 +566,7 @@ class WarehouseWidget(QtWidgets.QWidget):
                 f"{float(row['quantity']):,.2f}"))
             self.rcv_hist_tbl.setItem(r, 3, _ro(row["reference"] or ""))
             self.rcv_hist_tbl.setItem(r, 4, _ro(row["notes"] or ""))
+            self.rcv_hist_tbl.setItem(r, 5, _ro(row["created_by"] or ""))
 
     def _set_receive_product(self, product_id):
         idx = self.rcv_product.findData(product_id)
@@ -649,13 +661,14 @@ class WarehouseWidget(QtWidgets.QWidget):
         hist_lbl.setStyleSheet("color:white;font-size:13px;font-weight:bold;")
         v.addWidget(hist_lbl)
 
-        self.adj_hist_tbl = QtWidgets.QTableWidget(0, 6)
+        self.adj_hist_tbl = QtWidgets.QTableWidget(0, 7)
         self.adj_hist_tbl.setHorizontalHeaderLabels(
-            ["Date", "Product", "Type", "Qty Change", "Reference", "Notes"])
+            ["Date", "Product", "Type", "Qty Change", "Reference", "Notes",
+             "Created By"])
         hh = self.adj_hist_tbl.horizontalHeader()
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for c in (0, 2, 3, 4):
+        for c in (0, 2, 3, 4, 6):
             hh.setSectionResizeMode(
     c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.adj_hist_tbl.setEditTriggers(
@@ -719,9 +732,10 @@ class WarehouseWidget(QtWidgets.QWidget):
             con.execute("""
                 INSERT INTO inventory_transaction
                     (product_id, trans_date, trans_type, quantity, reference,
-                        notes)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (pid, trans_date, adj_type, signed_qty, ref, notes))
+                        notes, created_by)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (pid, trans_date, adj_type, signed_qty, ref, notes,
+                  get_current_user_email() or None))
             con.execute(
     "UPDATE product SET amount = amount + %s WHERE id=%s", (signed_qty, pid))
 
@@ -745,7 +759,7 @@ class WarehouseWidget(QtWidgets.QWidget):
         with _conn() as con:
             rows = con.execute("""
                 SELECT t.trans_date, p.name, t.trans_type, t.quantity,
-                    t.reference, t.notes
+                    t.reference, t.notes, t.created_by
                 FROM inventory_transaction t
                 JOIN product p ON p.id = t.product_id
                 WHERE t.trans_type != 'Receive'
@@ -763,10 +777,11 @@ class WarehouseWidget(QtWidgets.QWidget):
             self.adj_hist_tbl.setItem(r, 3, _ro_r(f"{qty:+,.2f}"))
             self.adj_hist_tbl.setItem(r, 4, _ro(row["reference"] or ""))
             self.adj_hist_tbl.setItem(r, 5, _ro(row["notes"] or ""))
+            self.adj_hist_tbl.setItem(r, 6, _ro(row["created_by"] or ""))
             color = QtGui.QColor(
     212, 237, 218) if qty >= 0 else QtGui.QColor(
         255, 200, 200)
-            for c in range(6):
+            for c in range(7):
                 self.adj_hist_tbl.item(r, c).setBackground(color)
 
     def _set_adjust_product(self, product_id):
@@ -1112,7 +1127,10 @@ class WarehouseWidget(QtWidgets.QWidget):
 class WarehouseWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Warehouse & Inventory")
+        email = get_current_user_email()
+        title = (f"Warehouse & Inventory — {email}" if email
+                 else "Warehouse & Inventory")
+        self.setWindowTitle(title)
         self.resize(1200, 780)
         _apply_palette(self)
         self.setCentralWidget(WarehouseWidget())

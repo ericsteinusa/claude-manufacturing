@@ -5,6 +5,7 @@ from .Sales_menu import _apply_blue_palette, SalesOrdersWidget
 from .Accounts_receivable import AccountsReceivableWidget
 from .Sales_mgmt import (QuotesWidget, CustomersWidget, SalesTargetsWidget,
                          CommissionsWidget)
+from .accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -18,7 +19,9 @@ TAB_STYLE = (
 class SalesMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sales Manager Menu")
+        email = get_current_user_email()
+        title = f"Sales Manager Menu — {email}" if email else "Sales Manager Menu"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

@@ -3,6 +3,7 @@ import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -71,7 +72,14 @@ def init_db():
         )
     """)
     conn.commit()
-    conn.close()
+    try:
+        conn = get_db()
+        conn.execute(
+            "ALTER TABLE sales_order ADD COLUMN IF NOT EXISTS created_by TEXT")
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 
 def _apply_blue_palette(widget):
@@ -164,6 +172,10 @@ class NewOrderDialog(QtWidgets.QDialog):
         self.notes.setPlaceholderText("Optional notes")
         layout.addRow(lbl("Notes:"), self.notes)
 
+        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")
+        created_by_lbl.setStyleSheet(LABEL_STYLE)
+        layout.addRow(lbl("Created by:"), created_by_lbl)
+
         btns = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -182,13 +194,14 @@ class NewOrderDialog(QtWidgets.QDialog):
         try:
             cur = conn.execute(
                 "INSERT INTO sales_order (so_number, customer_id, order_date, "
-                "ship_date, status, notes)"
-                " VALUES (?,?,?,?,?,?)",
+                "ship_date, status, notes, created_by)"
+                " VALUES (?,?,?,?,?,?,?)",
                 (so_num, self.customer_combo.currentData(),
                  self.order_date.date().toString("yyyy-MM-dd"),
                  self.ship_date.date().toString("yyyy-MM-dd"),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(),
+                 get_current_user_email() or None)
             )
             self.so_id = cur.lastrowid
             conn.commit()
@@ -371,15 +384,16 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
 
         self.ord_table = QtWidgets.QTableWidget()
-        self.ord_table.setColumnCount(6)
+        self.ord_table.setColumnCount(7)
         self.ord_table.setHorizontalHeaderLabels(
-            ["SO #", "Customer", "Order Date", "Ship Date", "Total", "Status"])
+            ["SO #", "Customer", "Order Date", "Ship Date", "Total", "Status",
+             "Created By"])
         hh = self.ord_table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(
     0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         hh.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for col in (2, 3, 4, 5):
+        for col in (2, 3, 4, 5, 6):
             hh.setSectionResizeMode(
     col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ord_table.setEditTriggers(
@@ -465,6 +479,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         status  = self.ord_status_filter.currentData()
         base = """
             SELECT so.id, so.so_number, so.order_date, so.ship_date, so.status,
+                   so.created_by,
                    c.first_name, c.last_name, c.company_name,
                    COALESCE(SUM(i.qty * i.unit_price), 0.0) AS total
             FROM sales_order so
@@ -502,8 +517,9 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             self.ord_table.setItem(r, 3, _ro(row["ship_date"] or ""))
             self.ord_table.setItem(r, 4, _ro(f"${row['total']:,.2f}"))
             self.ord_table.setItem(r, 5, _ro(row["status"].capitalize()))
+            self.ord_table.setItem(r, 6, _ro(row["created_by"] or ""))
             bg = QtGui.QColor(SO_COLORS.get(row["status"], "#ffffff"))
-            for col in range(6):
+            for col in range(7):
                 self.ord_table.item(r, col).setBackground(bg)
         self._selected_so_id = None
         self._selected_so_number = None
@@ -818,7 +834,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
 class SalesOrders(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sales")
+        email = get_current_user_email()
+        self.setWindowTitle(f"Sales — {email}" if email else "Sales")
         self.resize(920, 640)
         _apply_blue_palette(self)
         self.setCentralWidget(SalesOrdersWidget())

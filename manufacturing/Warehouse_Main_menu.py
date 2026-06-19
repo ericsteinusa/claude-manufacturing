@@ -4,6 +4,7 @@ from .button_nav import ButtonNav
 from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette  # noqa: E501
 from .receiving_dept import ReceivingDeptWidget
 from .purchase_requisitions import RequisitionsWidget
+from .accounts import get_current_user_email
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -23,7 +24,10 @@ TAB_STYLE = (
 class WarehouseMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Warehouse & Inventory Menu")
+        email = get_current_user_email()
+        title = (f"Warehouse & Inventory Menu — {email}" if email
+                 else "Warehouse & Inventory Menu")
+        self.setWindowTitle(title)
         self.resize(1200, 780)
         _apply_blue_palette(self)
         self._build_ui()
