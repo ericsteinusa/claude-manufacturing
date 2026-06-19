@@ -2,6 +2,7 @@ import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
@@ -56,7 +57,10 @@ def _launch_tab(script, label, *args):
 class PurchasingMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Purchasing Main Menu")
+        email = get_current_user_email()
+        title = (f"Purchasing Main Menu — {email}" if email
+                 else "Purchasing Main Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

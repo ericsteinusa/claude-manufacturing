@@ -3,6 +3,7 @@ from .launch_utils import launch as _launch
 from .purchase_requisitions import RequisitionApprovalsWidget
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
+from .accounts import get_current_user_email
 
 
 def _apply_blue_palette(widget):
@@ -69,7 +70,10 @@ def _launch_tab(script, label):
 class PurchasingMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Purchasing Manager Menu")
+        email = get_current_user_email()
+        title = (f"Purchasing Manager Menu — {email}" if email
+                 else "Purchasing Manager Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

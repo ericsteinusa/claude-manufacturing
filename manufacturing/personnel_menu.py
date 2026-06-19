@@ -5,6 +5,7 @@ from .button_nav import ButtonNav
 from .personnel_crm import _apply_blue_palette, init_db
 from .time_clock_menu import TimeClockWidget
 from .Payroll_dept import PayrollDeptWidget
+from .accounts import get_current_user_email
 
 BUTTON_STYLE = (
     "QPushButton{background-color: white; border: 2px solid black; "
@@ -49,7 +50,9 @@ class PersonnelMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         init_db()
-        self.setWindowTitle("Personnel Menu")
+        email = get_current_user_email()
+        title = f"Personnel Menu — {email}" if email else "Personnel Menu"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

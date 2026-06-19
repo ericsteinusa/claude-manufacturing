@@ -1,5 +1,6 @@
 import sys
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtGui, QtWidgets
 
 BLUE = QtGui.QColor(0, 85, 255)
@@ -37,7 +38,8 @@ def init_db():
     """)
     for col in ("emp_id INTEGER",
                 "dept_id INTEGER REFERENCES dept(dept_id)",
-                "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)"):
+                "dept_Sub_id INTEGER REFERENCES dept_sub(dept_sub_id)",
+                "created_by TEXT"):
         conn.execute(f"ALTER TABLE people ADD COLUMN IF NOT EXISTS {col}")
     conn.commit()
     conn.close()
@@ -56,7 +58,9 @@ def _apply_blue_palette(widget):
 class PersonnelCRM(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Personnel CRM")
+        email = get_current_user_email()
+        title = f"Personnel CRM — {email}" if email else "Personnel CRM"
+        self.setWindowTitle(title)
         self.resize(1300, 720)
         _apply_blue_palette(self)
         self._selected_row_id = None
@@ -74,11 +78,11 @@ class PersonnelCRM(QtWidgets.QMainWindow):
 
         # ── Table ──────────────────────────────────────────────────────────
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(10)
+        self.table.setColumnCount(11)
         self.table.setHorizontalHeaderLabels([
             "First Name", "Last Name", "Emp ID",
             "Address", "City", "State", "Zip", "Email",
-            "Department", "Dept Sub",
+            "Department", "Dept Sub", "Created By",
         ])
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
@@ -245,7 +249,7 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         q = """
             SELECT p.id, p.first_name, p.last_name, p.emp_id,
                    p.address, p.city, p.state, p.zip_code, p.email,
-                   d.dept_name, ds.dept_sub_name
+                   p.created_by, d.dept_name, ds.dept_sub_name
             FROM people p
             LEFT JOIN dept d    ON d.dept_id     = p.dept_id
             LEFT JOIN dept_sub ds ON ds.dept_sub_id = p.dept_Sub_id
@@ -275,6 +279,7 @@ class PersonnelCRM(QtWidgets.QMainWindow):
                 row["state"] or "", row["zip_code"] or "",
                 row["email"] or "",
                 row["dept_name"] or "", row["dept_sub_name"] or "",
+                row["created_by"] or "",
             ]):
                 self.table.setItem(r, col, QtWidgets.QTableWidgetItem(val))
 
@@ -361,15 +366,16 @@ class PersonnelCRM(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(
     self, "Input Error", "First and last name are required.")
             return
+        data["created_by"] = get_current_user_email() or None
         conn = get_db()
         conn.execute("""
             INSERT INTO people
                 (first_name, last_name, emp_id, address, city, state, zip_code,
-                    email, dept_id, dept_Sub_id)
+                    email, dept_id, dept_Sub_id, created_by)
             VALUES
                 (:first_name, :last_name, :emp_id, :address, :city, :state,
                     :zip_code, :email,
-                 :dept_id, :dept_Sub_id)
+                 :dept_id, :dept_Sub_id, :created_by)
         """, data)
         conn.commit()
         conn.close()
