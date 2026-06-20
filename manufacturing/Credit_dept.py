@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 import psycopg2
 from .db_pg import get_db
 from .accounts import get_current_user_email

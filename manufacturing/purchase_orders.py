@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
@@ -60,14 +59,10 @@ def _ro(text):
 
 
 def _next_po_num():
-    yr = QtCore.QDate.currentDate().year()
     conn = get_db()
-    count = conn.execute(
-        "SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s", (
-            f"PO-{yr}-%",)
-    ).fetchone()[0]
+    num = next_po_number(conn)
     conn.close()
-    return f"PO-{yr}-{count + 1:04d}"
+    return num
 
 
 def _load_suppliers():

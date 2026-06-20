@@ -1,8 +1,10 @@
 import sys
 import psycopg2
+from datetime import date
 from .db_pg import get_db
 from .bom import (init_item_master, bom_would_create_cycle,
                   explode_bom_to_wo, ItemSettingsDialog)
+from .mrp_core import next_sequence_number
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 from .accounts import get_current_user_email
@@ -98,14 +100,14 @@ def _ro(text):
 
 
 def _next_wo_num():
-    yr = QtCore.QDate.currentDate().year()
+    prefix = f"WO-{date.today().year}-"
     conn = get_db()
-    count = conn.execute(
-        "SELECT COUNT(*) FROM work_order WHERE wo_number LIKE ?", (
-            f"WO-{yr}-%",)
-    ).fetchone()[0]
+    rows = conn.execute(
+        "SELECT wo_number FROM work_order WHERE wo_number LIKE %s",
+        (prefix + "%",)
+    ).fetchall()
     conn.close()
-    return f"WO-{yr}-{count + 1:04d}"
+    return next_sequence_number([r["wo_number"] for r in rows], prefix)
 
 
 def _load_products(combo, include_none=True):

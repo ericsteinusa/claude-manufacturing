@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db
 from .accounts import get_current_user_email
+from .purchase_orders_core import next_po_number
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
@@ -132,12 +133,10 @@ def _supplier_display(row):
 
 
 def _next_po_num():
-    yr = date.today().year
     conn = get_db()
-    n = conn.execute("SELECT COUNT(*) FROM purchase_order WHERE po_number LIKE %s",  # noqa: E501
-                     (f"PO-{yr}-%",)).fetchone()[0]
+    num = next_po_number(conn)
     conn.close()
-    return f"PO-{yr}-{n + 1:04d}"
+    return num
 
 
 # ── Dialogs ────────────────────────────────────────────────────────────────
