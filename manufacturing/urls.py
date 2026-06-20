@@ -23,6 +23,7 @@ urlpatterns = [
     path('po/<int:po_id>/items/receive/', views.po_receive_item,
          name='po_receive_item'),
     path('po/<int:po_id>/status/', views.po_set_status, name='po_set_status'),
+    path('reports/', views.reports_dashboard, name='reports_dashboard'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),
