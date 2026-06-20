@@ -1,47 +1,27 @@
 import sys
 from PyQt6 import QtWidgets
-from .qt_theme import BUTTON_STYLE
-
-from .button_nav import ButtonNav
-from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette  # noqa: E501
+from .qt_theme import apply_blue_palette as _apply_blue_palette
+from .dept_menu_widget import DeptMenuWidget
+from .warehouse_inventory import WarehouseWidget
 from .receiving_dept import ReceivingDeptWidget
 from .purchase_requisitions import RequisitionsWidget
-from .accounts import get_current_user_email
 
-TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid black;}"
-    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
-    "border-bottom:none;border-radius:4px 4px 0 0;}"
-    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
-    "QTabBar::tab:hover{background:rgb(85,255,255);}"
-)
+_TITLE = "Warehouse && Inventory Menu"
+_ITEMS = [
+    ("Inventory",  WarehouseWidget),
+    ("Receiving",  ReceivingDeptWidget),
+    ("Purchase Requisitions",
+     lambda: RequisitionsWidget(default_dept="Warehouse")),
+]
 
 
 class WarehouseMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        email = get_current_user_email()
-        title = (f"Warehouse & Inventory Menu — {email}" if email
-                 else "Warehouse & Inventory Menu")
-        self.setWindowTitle(title)
+        self.setWindowTitle(_TITLE)
         self.resize(1200, 780)
         _apply_blue_palette(self)
-        self._build_ui()
-
-    def _build_ui(self):
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8)
-        v.setSpacing(0)
-        tabs = ButtonNav()
-        tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(WarehouseWidget(), "Inventory")
-        tabs.addTab(ReceivingDeptWidget(), "Receiving")
-        tabs.addTab(RequisitionsWidget(default_dept="Warehouse"),
-                    "Purchase Requisitions")
-        v.addWidget(tabs)
+        self.setCentralWidget(DeptMenuWidget(_TITLE, _ITEMS))
 
 
 if __name__ == "__main__":

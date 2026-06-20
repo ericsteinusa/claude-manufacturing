@@ -1,49 +1,30 @@
 import sys
-from PyQt6 import QtGui, QtWidgets
-from .qt_theme import BLUE, apply_blue_palette as _apply_blue_palette
-
-from .button_nav import ButtonNav
+from PyQt6 import QtWidgets
+from .qt_theme import apply_blue_palette as _apply_blue_palette
+from .dept_menu_widget import DeptMenuWidget
 from .Legal_mgmt import (ContractsWidget, ComplianceWidget, LitigationWidget,
-                         IPWidget, EmploymentLawWidget)
+                          IPWidget, EmploymentLawWidget)
 from .purchase_requisitions import RequisitionsWidget
-from .accounts import get_current_user_email
 
-TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid black;}"
-    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
-    "border-bottom:none;border-radius:4px 4px 0 0;}"
-    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
-    "QTabBar::tab:hover{background:rgb(85,255,255);}"
-)
+_TITLE = "Legal Main Menu"
+_ITEMS = [
+    ("Contracts",            ContractsWidget),
+    ("Compliance",           ComplianceWidget),
+    ("Litigation",           LitigationWidget),
+    ("Intellectual Property", IPWidget),
+    ("Employment Law",       EmploymentLawWidget),
+    ("Purchase Requisitions",
+     lambda: RequisitionsWidget(default_dept="Legal")),
+]
 
 
 class LegalMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        email = get_current_user_email()
-        title = f"Legal Main Menu — {email}" if email else "Legal Main Menu"
-        self.setWindowTitle(title)
+        self.setWindowTitle(_TITLE)
         self.resize(1100, 720)
         _apply_blue_palette(self)
-        self._build_ui()
-
-    def _build_ui(self):
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8)
-        v.setSpacing(0)
-        tabs = ButtonNav()
-        tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(ContractsWidget(), "Contracts")
-        tabs.addTab(ComplianceWidget(), "Compliance")
-        tabs.addTab(LitigationWidget(), "Litigation")
-        tabs.addTab(IPWidget(), "Intellectual Property")
-        tabs.addTab(EmploymentLawWidget(), "Employment Law")
-        tabs.addTab(RequisitionsWidget(default_dept="Legal"),
-                    "Purchase Requisitions")
-        v.addWidget(tabs)
+        self.setCentralWidget(DeptMenuWidget(_TITLE, _ITEMS))
 
 
 if __name__ == "__main__":
