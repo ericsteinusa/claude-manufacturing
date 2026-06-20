@@ -23,7 +23,13 @@ from .purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
-from .work_orders_core import WO_STATUSES, WO_STATUS_COLORS
+from .work_orders_core import (
+    WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,
+    list_wos, get_wo, get_wo_materials,
+    next_wo_number, load_products as load_wo_products,
+    create_wo, update_wo, add_wo_material, set_wo_status, can_transition,
+    allowed_transitions as wo_allowed_transitions,
+)
 from .reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary,
 )
@@ -58,6 +64,14 @@ WEB_LEAF_URLS = {
     ('purchasing', 'po_status'): '/po/',
     ('purchasing', 'po_hist'): '/po/',
     ('reports', 'rpt_dashboard'): '/reports/',
+    ('maintenance', 'create_wo'): '/wo/new/',
+    ('maintenance', 'open_wo'): '/wo/?status=open',
+    ('maintenance', 'inprog_wo'): '/wo/?status=in_progress',
+    ('maintenance', 'comp_wo'): '/wo/?status=completed',
+    ('production', 'create_wo'): '/wo/new/',
+    ('production', 'open_wo'): '/wo/?status=open',
+    ('production', 'inprog_wo'): '/wo/?status=in_progress',
+    ('production', 'comp_wo'): '/wo/?status=completed',
 }
 
 
@@ -784,3 +798,270 @@ def reports_dashboard(request):
         'wo_statuses': _status_pills(WO_STATUSES, WO_STATUS_COLORS,
                                      wo['by_status'] if wo else {}),
     })
+
+
+# ---------------------------------------------------------------------------
+# Work orders (web)
+# ---------------------------------------------------------------------------
+
+_WO_DEPT_KEYS = {'maintenance', 'production'}
+_WO_NEW_STATUSES = ('draft', 'open')
+
+
+def _wo_access(request, write=False):
+    """Gate WO pages: login + full_access or maintenance/production dept.
+
+    With ``write=True`` also blocks READ_ONLY_ROLES from mutating.
+    Returns a redirect or None if allowed.
+    """
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _WO_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('wo_list')
+    return None
+
+
+def _wo_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def wo_list(request):
+    denied = _wo_access(request)
+    if denied:
+        return denied
+
+    status = request.GET.get('status') or None
+    if status not in WO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        wos = list_wos(conn, status=status)
+    finally:
+        conn.close()
+
+    for wo in wos:
+        wo['status_color'] = WO_STATUS_COLORS.get(wo['status'], '#ffffff')
+        wo['status_label'] = wo['status'].replace('_', ' ').title()
+
+    dept = request.session.get('user_dept_key', 'production')
+    back_url = f'/dept/{dept}/work_orders/' if dept in _WO_DEPT_KEYS else '/dashboard/'
+
+    return render(request, 'wo_list.html', _wo_context(
+        request,
+        wos=wos,
+        status=status,
+        statuses=[(s, s.replace('_', ' ').title()) for s in WO_STATUSES],
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        back_url=back_url,
+    ))
+
+
+def wo_detail(request, wo_id):
+    denied = _wo_access(request)
+    if denied:
+        return denied
+
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    try:
+        wo = get_wo(conn, wo_id)
+        materials = get_wo_materials(conn, wo_id) if wo else []
+        products = load_wo_products(conn) if (wo and can_edit) else []
+    finally:
+        conn.close()
+
+    if not wo:
+        return redirect('wo_list')
+
+    wo['status_color'] = WO_STATUS_COLORS.get(wo['status'], '#ffffff')
+    wo['status_label'] = wo['status'].replace('_', ' ').title()
+    status_actions = [
+        (target, WO_STATUS_ACTION_LABELS.get(target, target))
+        for target in wo_allowed_transitions(wo['status'])
+    ] if can_edit else []
+
+    return render(request, 'wo_detail.html', _wo_context(
+        request,
+        wo=wo,
+        materials=materials,
+        products=products,
+        can_edit=can_edit,
+        status_actions=status_actions,
+        back_url='/wo/',
+    ))
+
+
+def _wo_header_form(request):
+    """Pull + validate WO header fields from POST. Returns (data, error)."""
+    wo_number = (request.POST.get('wo_number') or '').strip()
+    status = request.POST.get('status') or 'draft'
+    try:
+        quantity = int(request.POST.get('quantity') or 1)
+        quantity = max(1, quantity)
+    except ValueError:
+        quantity = 1
+    data = {
+        'wo_number': wo_number,
+        'product_id': _int_or_none(request.POST.get('product_id')),
+        'description': (request.POST.get('description') or '').strip() or None,
+        'quantity': quantity,
+        'start_date': (request.POST.get('start_date') or '').strip() or None,
+        'due_date': (request.POST.get('due_date') or '').strip() or None,
+        'status': status if status in _WO_NEW_STATUSES else 'draft',
+        'notes': (request.POST.get('notes') or '').strip() or None,
+    }
+    if not wo_number:
+        return data, 'WO number is required.'
+    return data, None
+
+
+def wo_new(request):
+    denied = _wo_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        if request.method == 'POST':
+            data, error = _wo_header_form(request)
+            if not error:
+                try:
+                    wo_id = create_wo(
+                        conn, **data,
+                        created_by=request.session.get('user_email'))
+                    conn.commit()
+                    return redirect('wo_detail', wo_id=wo_id)
+                except psycopg2.IntegrityError:
+                    conn.rollback()
+                    error = ("WO number '%s' already exists."
+                             % data['wo_number'])
+            products = load_wo_products(conn)
+            return render(request, 'wo_form.html', _wo_context(
+                request, mode='new', error=error, form=data,
+                products=products, statuses=_WO_NEW_STATUSES,
+                back_url='/wo/'))
+
+        form = {
+            'wo_number': next_wo_number(conn),
+            'product_id': None,
+            'description': '',
+            'quantity': 1,
+            'start_date': date.today().isoformat(),
+            'due_date': '',
+            'status': 'draft',
+            'notes': '',
+        }
+        products = load_wo_products(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'wo_form.html', _wo_context(
+        request, mode='new', form=form, products=products,
+        statuses=_WO_NEW_STATUSES, back_url='/wo/'))
+
+
+def wo_edit(request, wo_id):
+    denied = _wo_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        wo = get_wo(conn, wo_id)
+        if not wo:
+            return redirect('wo_list')
+
+        if request.method == 'POST':
+            try:
+                quantity = int(request.POST.get('quantity') or 1)
+                quantity = max(1, quantity)
+            except ValueError:
+                quantity = 1
+            update_wo(
+                conn, wo_id,
+                product_id=_int_or_none(request.POST.get('product_id')),
+                description=(request.POST.get('description') or '').strip()
+                or None,
+                quantity=quantity,
+                start_date=(request.POST.get('start_date') or '').strip()
+                or None,
+                due_date=(request.POST.get('due_date') or '').strip() or None,
+                notes=(request.POST.get('notes') or '').strip() or None,
+            )
+            conn.commit()
+            return redirect('wo_detail', wo_id=wo_id)
+
+        products = load_wo_products(conn)
+    finally:
+        conn.close()
+
+    form = {
+        'wo_number': wo['wo_number'],
+        'product_id': wo.get('product_id'),
+        'description': wo.get('description') or '',
+        'quantity': wo.get('quantity') or 1,
+        'start_date': wo.get('start_date') or '',
+        'due_date': wo.get('due_date') or '',
+        'status': wo['status'],
+        'notes': wo.get('notes') or '',
+    }
+    return render(request, 'wo_form.html', _wo_context(
+        request, mode='edit', wo=wo, form=form, products=products,
+        back_url='/wo/%s/' % wo_id))
+
+
+def wo_add_material(request, wo_id):
+    denied = _wo_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('wo_detail', wo_id=wo_id)
+
+    product_id = _int_or_none(request.POST.get('product_id'))
+    try:
+        qty_required = int(request.POST.get('qty_required') or 1)
+        qty_required = max(1, qty_required)
+    except ValueError:
+        qty_required = 1
+    notes = (request.POST.get('notes') or '').strip() or None
+
+    if product_id is not None:
+        conn = get_db_connection()
+        try:
+            wo = get_wo(conn, wo_id)
+            if wo:
+                add_wo_material(conn, wo_id, product_id,
+                                qty_required=qty_required, notes=notes)
+                conn.commit()
+        finally:
+            conn.close()
+    return redirect('wo_detail', wo_id=wo_id)
+
+
+def wo_set_status(request, wo_id):
+    denied = _wo_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('wo_detail', wo_id=wo_id)
+
+    target = request.POST.get('status')
+    conn = get_db_connection()
+    try:
+        wo = get_wo(conn, wo_id)
+        if wo and can_transition(wo['status'], target):
+            set_wo_status(conn, wo_id, target)
+            conn.commit()
+    finally:
+        conn.close()
+    return redirect('wo_detail', wo_id=wo_id)

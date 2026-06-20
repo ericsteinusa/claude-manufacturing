@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block page_title %}Work Orders{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if can_edit %}<a href="/wo/new/" class="btn">+ New WO</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.wo-wrap { width: 100%; max-width: 1000px; }
+.wo-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.wo-filters a {
+    background: white; border: 2px solid black; border-radius: 10px;
+    padding: 4px 12px; font-size: 13px; text-decoration: none; color: black;
+}
+.wo-filters a.active { background: rgb(85, 255, 255); }
+.wo-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+}
+.wo-table th, .wo-table td {
+    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
+    font-size: 13px;
+}
+.wo-table th { background: rgb(0, 60, 180); color: white; }
+.wo-table td.num, .wo-table th.num { text-align: right; }
+.wo-table tr:hover td { background: #eef6ff; }
+.wo-table a { color: #003cb4; font-weight: bold; text-decoration: none; }
+.pill {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    border: 1px solid #999; font-size: 12px;
+}
+.wo-empty { color: white; margin-top: 16px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Work Orders</div>
+    <div class="wo-wrap">
+        <div class="wo-filters">
+            <a href="/wo/" class="{% if not status %}active{% endif %}">All</a>
+            {% for val, label in statuses %}
+            <a href="/wo/?status={{ val }}"
+               class="{% if status == val %}active{% endif %}">{{ label }}</a>
+            {% endfor %}
+        </div>
+
+        {% if wos %}
+        <table class="wo-table">
+            <thead>
+                <tr>
+                    <th>WO #</th>
+                    <th>Product</th>
+                    <th>Description</th>
+                    <th class="num">Qty</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th class="num">Materials</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wo in wos %}
+                <tr>
+                    <td><a href="/wo/{{ wo.id }}/">{{ wo.wo_number }}</a></td>
+                    <td>{{ wo.product_name|default:"" }}</td>
+                    <td>{{ wo.description|default:"" }}</td>
+                    <td class="num">{{ wo.quantity }}</td>
+                    <td>{{ wo.due_date|default:"" }}</td>
+                    <td>
+                        <span class="pill" style="background: {{ wo.status_color }};">
+                            {{ wo.status_label }}
+                        </span>
+                    </td>
+                    <td class="num">{{ wo.mat_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="wo-empty">No work orders{% if status %} with that status{% endif %}.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

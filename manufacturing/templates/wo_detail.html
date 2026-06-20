@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ wo.wo_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if can_edit %}<a href="/wo/{{ wo.id }}/edit/" class="btn">Edit</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.wo-wrap { width: 100%; max-width: 900px; }
+.wo-card {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 20px;
+}
+.wo-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.wo-head h2 { font-size: 20px; }
+.pill {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    border: 1px solid #999; font-size: 12px;
+}
+.wo-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px;
+           font-size: 13px; }
+.wo-meta b { color: #003cb4; }
+.wo-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+}
+.wo-table th, .wo-table td {
+    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
+    font-size: 13px;
+}
+.wo-table th { background: rgb(0, 60, 180); color: white; }
+.wo-table td.num, .wo-table th.num { text-align: right; }
+.wo-empty { color: #555; padding: 8px 0; }
+.btn-sm { padding: 2px 10px; font-size: 12px; }
+.btn-danger { background: #f8d7da; border-color: #c33; }
+.btn-danger:hover { background: #f1aeb5; }
+.wo-status-actions {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+    padding-top: 12px; border-top: 1px solid #ddd;
+}
+.wo-status-actions form { margin: 0; }
+.add-mat { margin-top: 16px; }
+.add-mat h3 { color: white; font-size: 15px; margin-bottom: 8px; }
+.add-mat .grid {
+    display: grid;
+    grid-template-columns: 2fr 0.8fr 1.4fr auto;
+    gap: 8px; align-items: end;
+}
+.add-mat label { display: block; font-size: 12px; font-weight: bold;
+                 color: #003cb4; margin-bottom: 3px; }
+.add-mat input, .add-mat select {
+    width: 100%; padding: 5px 7px; border: 2px solid black;
+    border-radius: 4px; font-size: 13px;
+}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="wo-wrap">
+        <div class="wo-card">
+            <div class="wo-head">
+                <h2>{{ wo.wo_number }}</h2>
+                <span class="pill" style="background: {{ wo.status_color }};">
+                    {{ wo.status_label }}
+                </span>
+            </div>
+            <div class="wo-meta">
+                <div><b>Product:</b> {{ wo.product_name|default:"—" }}</div>
+                <div><b>Quantity:</b> {{ wo.quantity }}</div>
+                <div><b>Start Date:</b> {{ wo.start_date|default:"—" }}</div>
+                <div><b>Due Date:</b> {{ wo.due_date|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;">
+                    <b>Description:</b> {{ wo.description|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;">
+                    <b>Notes:</b> {{ wo.notes|default:"—" }}</div>
+            </div>
+            {% if status_actions %}
+            <div class="wo-status-actions">
+                {% for target, label in status_actions %}
+                <form method="post" action="/wo/{{ wo.id }}/status/"
+                      {% if target == 'cancelled' %}onsubmit="return confirm('Cancel this work order?');"{% endif %}>
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="{{ target }}">
+                    <button type="submit"
+                            class="btn btn-sm{% if target == 'cancelled' %} btn-danger{% endif %}">
+                        {{ label }}</button>
+                </form>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        {% if materials %}
+        <table class="wo-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="num">Qty Required</th>
+                    <th class="num">Qty Issued</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in materials %}
+                <tr>
+                    <td>{{ m.product_name|default:"—" }}</td>
+                    <td class="num">{{ m.qty_required }}</td>
+                    <td class="num">{{ m.qty_issued }}</td>
+                    <td>{{ m.notes|default:"" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="wo-card wo-empty">No materials assigned to this work order.</div>
+        {% endif %}
+
+        {% if can_edit %}
+        <div class="add-mat">
+            <h3>Add Material</h3>
+            <form method="post" action="/wo/{{ wo.id }}/materials/add/">
+                {% csrf_token %}
+                <div class="grid">
+                    <div>
+                        <label>Product</label>
+                        <select name="product_id" required>
+                            <option value="">(select product)</option>
+                            {% for p in products %}
+                            <option value="{{ p.id }}">{{ p.product_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Qty Required</label>
+                        <input type="number" name="qty_required" min="1" value="1">
+                    </div>
+                    <div>
+                        <label>Notes (optional)</label>
+                        <input type="text" name="notes">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
