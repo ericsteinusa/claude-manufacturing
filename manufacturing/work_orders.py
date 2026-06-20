@@ -2,10 +2,13 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
-from .work_orders_core import next_wo_number
+from .work_orders_core import (
+    next_wo_number, WO_STATUS_COLORS,
+    ensure_wo_tables, list_wos, get_wo_materials, load_products,
+    create_wo, update_wo, add_wo_material, set_wo_status,
+)
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -14,14 +17,7 @@ from .qt_theme import (
     ro as _ro,
 )
 
-
-WO_COLORS = {
-    "draft":       "#ffffff",
-    "open":        "#cce5ff",
-    "in_progress": "#fff3cd",
-    "completed":   "#d4edda",
-    "cancelled":   "#dcdcdc",
-}
+WO_COLORS = WO_STATUS_COLORS
 
 
 def get_db():
@@ -30,34 +26,7 @@ def get_db():
 
 def init_db():
     conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS work_order (
-            id SERIAL PRIMARY KEY,
-            wo_number TEXT NOT NULL UNIQUE,
-            product_id INTEGER,
-            description TEXT,
-            quantity INTEGER DEFAULT 1,
-            start_date TEXT,
-            due_date TEXT,
-            status TEXT DEFAULT 'draft',
-            notes TEXT,
-            created_by TEXT
-        )
-    """)
-    conn.execute("""
-        ALTER TABLE work_order
-        ADD COLUMN IF NOT EXISTS created_by TEXT
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS wo_material (
-            id SERIAL PRIMARY KEY,
-            wo_id INTEGER NOT NULL REFERENCES work_order(id),
-            product_id INTEGER,
-            qty_required INTEGER DEFAULT 1,
-            qty_issued INTEGER DEFAULT 0,
-            notes TEXT
-        )
-    """)
+    ensure_wo_tables(conn)
     conn.commit()
     conn.close()
 
@@ -71,12 +40,7 @@ def _next_wo_num():
 
 def _load_products():
     conn = get_db()
-    try:
-        rows = conn.execute(
-            "SELECT id, name AS product_name FROM product ORDER BY name"
-        ).fetchall()
-    except psycopg2.OperationalError:
-        rows = []
+    rows = load_products(conn)
     conn.close()
     return rows
 
@@ -173,19 +137,17 @@ class NewWODialog(QtWidgets.QDialog):
             return
         conn = get_db()
         try:
-            cur = conn.execute(
-                "INSERT INTO work_order (wo_number, product_id, description, "
-                "quantity, start_date, due_date, status, notes, created_by) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
-                (wo_num, self.product_combo.currentData(),
-                 self.desc.text().strip(), self.quantity.value(),
-                 self.start_date.date().toString("yyyy-MM-dd"),
-                 self.due_date.date().toString("yyyy-MM-dd"),
-                 self.status_combo.currentData(),
-                 self.notes.text().strip(),
-                 get_current_user_email() or None)
+            self.wo_id = create_wo(
+                conn, wo_num,
+                product_id=self.product_combo.currentData(),
+                description=self.desc.text().strip(),
+                quantity=self.quantity.value(),
+                start_date=self.start_date.date().toString("yyyy-MM-dd"),
+                due_date=self.due_date.date().toString("yyyy-MM-dd"),
+                status=self.status_combo.currentData(),
+                notes=self.notes.text().strip(),
+                created_by=get_current_user_email() or None,
             )
-            self.wo_id = cur.fetchone()['id']
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
@@ -251,13 +213,12 @@ class AddMaterialDialog(QtWidgets.QDialog):
     self, "Input Error", "Select a material/product.")
             return
         conn = get_db()
-        conn.execute(
-            "INSERT INTO wo_material (wo_id, product_id, qty_required, "
-            "qty_issued, notes)"
-            " VALUES (%s,%s,%s,%s,%s)",
-            (self._wo_id, self.product_combo.currentData(),
-             self.qty_required.value(), self.qty_issued.value(),
-             self.notes.text().strip())
+        add_wo_material(
+            conn, self._wo_id,
+            product_id=self.product_combo.currentData(),
+            qty_required=self.qty_required.value(),
+            qty_issued=self.qty_issued.value(),
+            notes=self.notes.text().strip(),
         )
         conn.commit()
         conn.close()
@@ -352,14 +313,14 @@ class UpdateWODialog(QtWidgets.QDialog):
 
     def _on_ok(self):
         conn = get_db()
-        conn.execute(
-            "UPDATE work_order SET product_id=%s, description=%s, quantity=%s,"
-            " start_date=%s, due_date=%s, notes=%s WHERE id=%s",
-            (self.product_combo.currentData(), self.desc.text().strip(),
-             self.quantity.value(),
-             self.start_date.date().toString("yyyy-MM-dd"),
-             self.due_date.date().toString("yyyy-MM-dd"),
-             self.notes.text().strip(), self._wo_id)
+        update_wo(
+            conn, self._wo_id,
+            product_id=self.product_combo.currentData(),
+            description=self.desc.text().strip(),
+            quantity=self.quantity.value(),
+            start_date=self.start_date.date().toString("yyyy-MM-dd"),
+            due_date=self.due_date.date().toString("yyyy-MM-dd"),
+            notes=self.notes.text().strip(),
         )
         conn.commit()
         conn.close()
@@ -522,28 +483,10 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         d_from = self.date_from.date().toString("yyyy-MM-dd")
         d_to = self.date_to.date().toString("yyyy-MM-dd")
 
-        base = """
-            SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
-                   wo.start_date, wo.due_date, wo.status, wo.created_by,
-                   p.name AS product_name,
-                   (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
-                       AS mat_count
-            FROM work_order wo
-            LEFT JOIN product p ON p.id = wo.product_id
-        """
-        conds, params = [], []
-        if status:
-            conds.append("wo.status = %s")
-            params.append(status)
-        conds.append("(wo.due_date IS NULL OR wo.due_date BETWEEN %s AND %s)")
-        params += [d_from, d_to]
-        where = " WHERE " + " AND ".join(conds)
-
         conn = get_db()
         try:
-            rows = conn.execute(
-    base + where + " ORDER BY wo.due_date ASC",
-     params).fetchall()
+            rows = list_wos(conn, status=status,
+                            date_from=d_from, date_to=d_to)
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -601,12 +544,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
             return
         conn = get_db()
         try:
-            mats = conn.execute("""
-                SELECT p.name AS product_name, m.qty_required, m.qty_issued,
-                    m.notes
-                FROM wo_material m LEFT JOIN product p ON p.id = m.product_id
-                WHERE m.wo_id = %s
-            """, (self._selected_wo_id,)).fetchall()
+            mats = get_wo_materials(conn, self._selected_wo_id)
         except psycopg2.OperationalError:
             mats = []
         conn.close()
@@ -656,8 +594,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE work_order SET status = %s WHERE id = %s",
-                         (new_status, self._selected_wo_id))
+            set_wo_status(conn, self._selected_wo_id, new_status)
             conn.commit()
             conn.close()
             self._refresh_orders()
