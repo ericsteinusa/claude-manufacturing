@@ -23,6 +23,10 @@ from .purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
+from .work_orders_core import WO_STATUSES, WO_STATUS_COLORS
+from .reports_core import (
+    po_summary, wo_summary, inventory_alerts, cs_summary,
+)
 from .menus import (
     DASHBOARD_DEPARTMENTS,
     MANAGER_MENU_KEYS,
@@ -53,6 +57,7 @@ WEB_LEAF_URLS = {
     ('purchasing', 'open_pos'): '/po/',
     ('purchasing', 'po_status'): '/po/',
     ('purchasing', 'po_hist'): '/po/',
+    ('reports', 'rpt_dashboard'): '/reports/',
 }
 
 
@@ -717,3 +722,65 @@ def po_receive_item(request, po_id):
         finally:
             conn.close()
     return redirect('po_detail', po_id=po_id)
+
+
+# ---------------------------------------------------------------------------
+# Reports dashboard (web)
+# ---------------------------------------------------------------------------
+
+
+def _reports_access(request):
+    """Gate the reports dashboard: logged in + full access or reports dept."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') != 'reports':
+            return redirect('dashboard')
+    return None
+
+
+def reports_dashboard(request):
+    denied = _reports_access(request)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        try:
+            po = po_summary(conn)
+        except Exception:
+            po = None
+        try:
+            wo = wo_summary(conn)
+        except Exception:
+            wo = None
+        try:
+            inv = inventory_alerts(conn)
+        except Exception:
+            inv = None
+        try:
+            cs = cs_summary(conn)
+        except Exception:
+            cs = None
+    finally:
+        conn.close()
+
+    def _status_pills(statuses_tuple, colors, by_status):
+        return [
+            (s.replace('_', ' ').title(), by_status.get(s, 0), colors.get(s, '#fff'))
+            for s in statuses_tuple
+        ]
+
+    return render(request, 'reports_dashboard.html', {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'po': po,
+        'wo': wo,
+        'inv': inv,
+        'cs': cs,
+        'po_statuses': _status_pills(PO_STATUSES, PO_STATUS_COLORS,
+                                     po['by_status'] if po else {}),
+        'wo_statuses': _status_pills(WO_STATUSES, WO_STATUS_COLORS,
+                                     wo['by_status'] if wo else {}),
+    })

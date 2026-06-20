@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block page_title %}Reports Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dept/reports/" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.rpt-content {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.rpt-title {
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 24px;
+}
+.rpt-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 460px);
+    gap: 20px;
+    max-width: 960px;
+    width: 100%;
+}
+.kpi-card {
+    background: white;
+    border: 2px solid black;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.kpi-head {
+    background: rgb(0, 60, 180);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 9px 14px;
+}
+.kpi-body {
+    padding: 14px 16px;
+}
+.kpi-spend {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+.kpi-sublabel {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 12px;
+}
+.kpi-overdue {
+    display: inline-block;
+    background: #fde8e8;
+    border: 1px solid #e00;
+    border-radius: 6px;
+    color: #c00;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+}
+.kpi-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.kpi-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid #bbb;
+    font-size: 12px;
+}
+.kpi-link {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #003cb4;
+    text-decoration: none;
+}
+.kpi-link:hover { text-decoration: underline; }
+.kpi-nums {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.kpi-num-box { text-align: center; }
+.kpi-num-val {
+    font-size: 26px;
+    font-weight: bold;
+    color: #003cb4;
+}
+.kpi-num-lbl {
+    font-size: 11px;
+    color: #666;
+}
+.kpi-alert-count {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+.kpi-alert-count.ok { color: #1a7a1a; }
+.kpi-alert-count.warn { color: #c00; }
+.alert-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 10px;
+}
+.alert-tbl th {
+    background: rgb(0, 60, 180);
+    color: white;
+    padding: 4px 8px;
+    text-align: left;
+    font-weight: normal;
+}
+.alert-tbl td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #eee;
+}
+.alert-tbl tr:last-child td { border-bottom: none; }
+.alert-tbl td.num { text-align: right; }
+.unavail { color: #999; font-size: 13px; font-style: italic; }
+{% endblock %}
+
+{% block body %}
+<div class="rpt-content">
+    <div class="rpt-title">Reports Dashboard</div>
+    <div class="rpt-grid">
+
+        {# ── Purchase Orders ──────────────────────────────────────── #}
+        <div class="kpi-card">
+            <div class="kpi-head">Purchase Orders</div>
+            <div class="kpi-body">
+                {% if po %}
+                <div class="kpi-spend">${{ po.total_spend|floatformat:2 }}</div>
+                <div class="kpi-sublabel">total active spend</div>
+                {% if po.overdue %}
+                <div class="kpi-overdue">&#9888; {{ po.overdue }} overdue</div>
+                {% endif %}
+                <div class="kpi-pills">
+                    {% for label, count, color in po_statuses %}
+                    <span class="kpi-pill" style="background:{{ color }}">
+                        {{ label }} ({{ count }})
+                    </span>
+                    {% endfor %}
+                </div>
+                <a href="/po/" class="kpi-link">View purchase orders &rarr;</a>
+                {% else %}
+                <p class="unavail">Data unavailable</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Work Orders ──────────────────────────────────────────── #}
+        <div class="kpi-card">
+            <div class="kpi-head">Work Orders</div>
+            <div class="kpi-body">
+                {% if wo %}
+                <div class="kpi-pills">
+                    {% for label, count, color in wo_statuses %}
+                    <span class="kpi-pill" style="background:{{ color }}">
+                        {{ label }} ({{ count }})
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="unavail">Data unavailable</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Inventory Alerts ─────────────────────────────────────── #}
+        <div class="kpi-card">
+            <div class="kpi-head">Inventory Alerts</div>
+            <div class="kpi-body">
+                {% if inv %}
+                <div class="kpi-alert-count {% if inv.alert_count %}warn{% else %}ok{% endif %}">
+                    {{ inv.alert_count }}
+                </div>
+                <div class="kpi-sublabel">
+                    item{{ inv.alert_count|pluralize }} at or below reorder point
+                </div>
+                {% if inv.items %}
+                <table class="alert-tbl">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>On Hand</th>
+                            <th>Reorder At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in inv.items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td class="num">{{ item.on_hand|floatformat:0 }}</td>
+                            <td class="num">{{ item.reorder_point|floatformat:0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+                {% else %}
+                <p class="unavail">Data unavailable</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Customer Service ─────────────────────────────────────── #}
+        <div class="kpi-card">
+            <div class="kpi-head">Customer Service</div>
+            <div class="kpi-body">
+                {% if cs %}
+                <div class="kpi-nums">
+                    <div class="kpi-num-box">
+                        <div class="kpi-num-val">{{ cs.total }}</div>
+                        <div class="kpi-num-lbl">Total</div>
+                    </div>
+                    <div class="kpi-num-box">
+                        <div class="kpi-num-val">{{ cs.open }}</div>
+                        <div class="kpi-num-lbl">Open</div>
+                    </div>
+                    <div class="kpi-num-box">
+                        <div class="kpi-num-val">{{ cs.closed }}</div>
+                        <div class="kpi-num-lbl">Closed</div>
+                    </div>
+                    <div class="kpi-num-box">
+                        <div class="kpi-num-val">{{ cs.today }}</div>
+                        <div class="kpi-num-lbl">Today</div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="unavail">Data unavailable</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
