@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -43,6 +44,11 @@ def init_db():
             email TEXT
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -173,12 +179,13 @@ class SupplierDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO supplier (company_name, first_name, last_name, "
                 "email,"
-                " phone_number, address, city, state, zip_code)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                " phone_number, address, city, state, zip_code, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (company, first, last,
                  self.email.text().strip(), self.phone.text().strip(),
                  self.address.text().strip(), self.city.text().strip(),
-                 self.state.text().strip(), self.zip_code.text().strip())
+                 self.state.text().strip(), self.zip_code.text().strip(),
+                 get_current_user_email() or None)
             )
             self.saved_id = cur.fetchone()['id']
         else:
@@ -526,7 +533,9 @@ class SuppliersWidget(QtWidgets.QWidget):
 class SuppliersWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Suppliers")
+        email = get_current_user_email()
+        title = f"Suppliers — {email}" if email else "Suppliers"
+        self.setWindowTitle(title)
         self.resize(1000, 660)
         _apply_blue_palette(self)
         self.setCentralWidget(SuppliersWidget())

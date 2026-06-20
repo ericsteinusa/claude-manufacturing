@@ -2,6 +2,7 @@ import sys
 import sqlite3
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -60,6 +61,11 @@ def init_db():
             qty_received INTEGER DEFAULT 0
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE receiving ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -181,13 +187,13 @@ class NewReceiptDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO receiving (rcv_number, po_id, rcv_date, "
                 "supplier, carrier,"
-                " tracking_number, status, notes) VALUES "
-                "(%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                " tracking_number, status, notes, created_by) VALUES "
+                "(%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (rcv_num, self.po_combo.currentData(),
                  self.rcv_date.date().toString("yyyy-MM-dd"),
                  self.supplier.text().strip(), self.carrier.text().strip(),
                  self.tracking.text().strip(), self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(), get_current_user_email() or None)
             )
             self.receiving_id = cur.fetchone()['id']
             conn.commit()
@@ -662,7 +668,10 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
 class ReceivingDept(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Receiving Department")
+        email = get_current_user_email()
+        title = (f"Receiving Department — {email}" if email
+                 else "Receiving Department")
+        self.setWindowTitle(title)
         self.resize(980, 660)
         _apply_blue_palette(self)
         self.setCentralWidget(ReceivingDeptWidget())

@@ -12,6 +12,7 @@ from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 from .db_pg import get_db
+from .accounts import get_current_user_email
 
 
 def _conn():
@@ -99,6 +100,14 @@ def init_db():
         );
         """)
         _seed(con)
+        for tbl in ("risk_assessment", "risk_register", "risk_insurance",
+                    "risk_continuity", "risk_audit", "risk_kri"):
+            try:
+                con.execute(
+                    f"ALTER TABLE {tbl} "
+                    "ADD COLUMN IF NOT EXISTS created_by TEXT")
+            except Exception:
+                pass
 
 
 def _seed(con):
@@ -469,11 +478,11 @@ class _RiskCrudWidget(QtWidgets.QWidget):
     self, "Required", f"{
         spec['fields'][0]['label']} is required.")
             return
-        cols = ",".join(keys)
-        ph = ",".join(["%s"] * len(keys))
+        cols = ",".join(keys) + ",created_by"
+        ph = ",".join(["%s"] * len(keys)) + ",%s"
         with _conn() as con:
             con.execute(f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
-                        [v[k] for k in keys])
+                        [v[k] for k in keys] + [get_current_user_email() or None])
         self._refresh()
 
     def _edit(self, *_):
@@ -800,7 +809,9 @@ class KRIWidget(_RiskCrudWidget):
 class RiskMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Risk Management")
+        email = get_current_user_email()
+        title = f"Risk Management — {email}" if email else "Risk Management"
+        self.setWindowTitle(title)
         self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()

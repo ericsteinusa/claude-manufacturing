@@ -4,6 +4,7 @@ from .button_nav import ButtonNav
 from .Marketing_mgmt import (_apply_blue_palette, CampaignsWidget, LeadsWidget,
                              MarketResearchWidget, ContentWidget,
                              MarketingAnalyticsWidget)
+from .accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -17,7 +18,9 @@ TAB_STYLE = (
 class MarketingMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Marketing Menu")
+        email = get_current_user_email()
+        title = f"Marketing Menu — {email}" if email else "Marketing Menu"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

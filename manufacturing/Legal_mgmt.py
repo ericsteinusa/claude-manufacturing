@@ -12,6 +12,7 @@ from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 from .db_pg import get_db
+from .accounts import get_current_user_email
 
 
 def _conn():
@@ -96,6 +97,14 @@ def init_db():
         );
         """)
         _seed(con)
+        for tbl in ("legal_contract", "legal_compliance", "legal_litigation",
+                    "legal_ip", "legal_employment", "legal_governance"):
+            try:
+                con.execute(
+                    f"ALTER TABLE {tbl} "
+                    "ADD COLUMN IF NOT EXISTS created_by TEXT")
+            except Exception:
+                pass
 
 
 def _seed(con):
@@ -459,11 +468,11 @@ class _LegalCrudWidget(QtWidgets.QWidget):
     self, "Required", f"{
         spec['fields'][0]['label']} is required.")
             return
-        cols = ",".join(keys)
-        ph = ",".join(["%s"] * len(keys))
+        cols = ",".join(keys) + ",created_by"
+        ph = ",".join(["%s"] * len(keys)) + ",%s"
         with _conn() as con:
             con.execute(f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
-                        [v[k] for k in keys])
+                        [v[k] for k in keys] + [get_current_user_email() or None])
         self._refresh()
 
     def _edit(self, *_):
@@ -777,7 +786,9 @@ class GovernanceWidget(_LegalCrudWidget):
 class LegalMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Legal Management")
+        email = get_current_user_email()
+        title = f"Legal Management — {email}" if email else "Legal Management"
+        self.setWindowTitle(title)
         self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()
