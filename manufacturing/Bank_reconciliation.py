@@ -7,8 +7,9 @@ from .db_pg import get_db
 from .accounts import get_current_user_email
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .button_nav import ButtonNav
+from .qt_theme import BLUE
 
+from .button_nav import ButtonNav
 
 
 def _conn():
@@ -78,8 +79,6 @@ def init_db():
 
 STATUSES = ["Open", "In Progress", "Reconciled"]
 ITEM_TYPES = ["Credit", "Debit"]
-
-BLUE = QtGui.QColor(0, 85, 255)
 
 BTN_STYLE = (
     "QPushButton{background-color:white;border:2px solid "

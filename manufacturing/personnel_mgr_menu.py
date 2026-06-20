@@ -1,17 +1,12 @@
 import sys
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
+from .qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+
 from .button_nav import ButtonNav
-from .personnel_crm import _apply_blue_palette
 from .Payroll_dept import PayrollDeptWidget
 from .accounts import get_current_user_email
 
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"

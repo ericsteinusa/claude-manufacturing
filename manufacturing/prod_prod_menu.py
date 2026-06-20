@@ -5,26 +5,18 @@ from .bom import (init_item_master, bom_would_create_cycle,
                   explode_bom_to_wo, ItemSettingsDialog)
 from .work_orders_core import next_wo_number
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import (
+    BLUE,
+    BUTTON_STYLE,
+    INPUT_STYLE,
+    COMBO_STYLE,
+    LABEL_STYLE,
+    apply_blue_palette as _apply_blue_palette,
+    ro as _ro,
+)
+
 from .button_nav import ButtonNav
 from .accounts import get_current_user_email
-
-BLUE = QtGui.QColor(0, 85, 255)
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
-INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-)
-COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-    "QComboBox QAbstractItemView{background-color: white;}"
-)
-LABEL_STYLE = "color: white; font-size: 13px;"
 
 WO_COLORS = {
     "planned":     "#ffffff",
@@ -80,22 +72,6 @@ def init_db():
     # Reconcile the item-master (make/buy, lead time, uom) and the bom
     # scrap_pct column. Resilient if product/bom don't exist yet.
     init_item_master()
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
-
-
-def _ro(text):
-    item = QtWidgets.QTableWidgetItem(text)
-    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-    return item
 
 
 def _next_wo_num():

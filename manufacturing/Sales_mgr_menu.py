@@ -1,7 +1,8 @@
 import sys
 from PyQt6 import QtWidgets
 from .button_nav import ButtonNav
-from .Sales_menu import _apply_blue_palette, SalesOrdersWidget
+from .Sales_menu import SalesOrdersWidget
+from .qt_theme import apply_blue_palette as _apply_blue_palette
 from .Accounts_receivable import AccountsReceivableWidget
 from .Sales_mgmt import (QuotesWidget, CustomersWidget, SalesTargetsWidget,
                          CommissionsWidget)

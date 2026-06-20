@@ -8,12 +8,11 @@ from datetime import date, timedelta
 from .db_pg import get_db
 from .log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .button_nav import ButtonNav
-from .IT_Tasks import _apply_blue_palette
+from .qt_theme import BLUE, apply_blue_palette as _apply_blue_palette
 
+from .button_nav import ButtonNav
 log = get_logger(__name__)
 
-BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color:white;border:2px solid "
     "black;border-radius:8px;"

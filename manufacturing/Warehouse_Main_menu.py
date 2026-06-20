@@ -1,17 +1,13 @@
 import sys
 from PyQt6 import QtWidgets
+from .qt_theme import BUTTON_STYLE
+
 from .button_nav import ButtonNav
 from .warehouse_inventory import WarehouseWidget, _apply_palette as _apply_blue_palette  # noqa: E501
 from .receiving_dept import ReceivingDeptWidget
 from .purchase_requisitions import RequisitionsWidget
 from .accounts import get_current_user_email
 
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"

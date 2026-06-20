@@ -1,11 +1,12 @@
 import sys
 
 from PyQt6 import QtGui, QtWidgets
+from .qt_theme import BLUE
+
 
 from .button_nav import ButtonNav
 from .reports_dashboard import ReportsDashboardWidget
 
-BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"

@@ -10,10 +10,11 @@ from .accounts import get_current_user_email
 from .cs_calls_core import (
     format_customer_label, parse_customer_id, validate_call)
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import BLUE, apply_blue_palette as _apply_blue_palette
+
 
 log = get_logger(__name__)
 
-BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (
     "QPushButton{background-color:white;border:2px solid "
     "black;border-radius:8px;"
@@ -28,16 +29,6 @@ INPUT_STYLE = "background:white;border:1px solid black;border-radius:4px;"
 COLS = ["ID", "Customer", "Problem", "Call Date", "Call Time",
         "Completion Date", "Completion Time", "Comments", "Completed",
         "Created By"]
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
 
 
 def _ensure_schema():

@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import QtWidgets
 from .button_nav import ButtonNav
-from .Legal_Main_menu import _apply_blue_palette
+from .qt_theme import apply_blue_palette as _apply_blue_palette
 from .Legal_mgmt import (ContractsWidget, LitigationWidget, ComplianceWidget,
                          GovernanceWidget)
 from .accounts import get_current_user_email

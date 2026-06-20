@@ -1,12 +1,13 @@
 import sys
 from PyQt6 import QtGui, QtWidgets
+from .qt_theme import BLUE, apply_blue_palette as _apply_blue_palette
+
 from .button_nav import ButtonNav
 from .Legal_mgmt import (ContractsWidget, ComplianceWidget, LitigationWidget,
                          IPWidget, EmploymentLawWidget)
 from .purchase_requisitions import RequisitionsWidget
 from .accounts import get_current_user_email
 
-BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
@@ -14,16 +15,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
 
 
 class LegalMainMenu(QtWidgets.QMainWindow):
