@@ -40,7 +40,37 @@ def launch(script, *args):
     module = "manufacturing." + os.path.splitext(script)[0]
     log.info("Launching module %s args=%s", module, args)
     try:
-        subprocess.Popen([sys.executable, "-m", module, *args], cwd=_CWD)
+        import tempfile, threading, time
+        err_path = os.path.join(
+            tempfile.gettempdir(),
+            f'mfg_{os.path.splitext(script)[0]}.log',
+        )
+        with open(err_path, 'w') as err_file:
+            p = subprocess.Popen(
+                [sys.executable, "-m", module, *args],
+                cwd=_CWD,
+                stderr=err_file,
+                stdout=err_file,
+            )
+
+        def _watch(proc, path, mod_name):
+            time.sleep(4)           # give window time to appear
+            if proc.poll() is None:
+                return              # still running — all good
+            rc = proc.returncode
+            if rc in (0, -15, 15, -2):  # normal exits
+                return
+            try:
+                with open(path) as f:
+                    msg = f.read(4000).strip()
+            except OSError:
+                msg = "(no output captured)"
+            log.error("Module %s crashed (rc=%s):\n%s", mod_name, rc, msg)
+            print(f"\n[ERROR] {mod_name} crashed (rc={rc}):\n{msg}\n",
+                  flush=True)
+
+        threading.Thread(target=_watch, args=(p, err_path, module),
+                         daemon=True).start()
     except Exception:
         log.error("Failed to launch %s", module, exc_info=True)
         raise
