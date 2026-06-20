@@ -23,7 +23,7 @@ def main():
 
     def launch_login():
         splash.finish(None)
-        from login_app import init_db, LoginWindow, SessionWindow
+        from .login_app import init_db, LoginWindow, SessionWindow
 
         init_db()
 
