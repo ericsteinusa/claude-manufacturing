@@ -42,3 +42,11 @@ def test_validate_call_requires_customer_and_problem():
 def test_validate_call_blank_problem_only():
     assert validate_call(7, "   ") == [
         "Please enter the call / problem description."]
+
+
+def test_format_customer_label_both_names_none():
+    assert format_customer_label(3, None, None) == "3"
+
+
+def test_parse_customer_id_trailing_dash_empty_name():
+    assert parse_customer_id("7 - ") == 7

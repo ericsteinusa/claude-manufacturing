@@ -2,6 +2,7 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
+from .sales_orders_core import next_so_number
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -85,14 +86,10 @@ def _ro(text):
 
 
 def _next_so_num():
-    yr = QtCore.QDate.currentDate().year()
     conn = get_db()
-    count = conn.execute(
-        "SELECT COUNT(*) FROM sales_order WHERE so_number LIKE %s", (
-            f"SO-{yr}-%",)
-    ).fetchone()[0]
+    num = next_so_number(conn)
     conn.close()
-    return f"SO-{yr}-{count + 1:04d}"
+    return num
 
 
 def _load_customers():
