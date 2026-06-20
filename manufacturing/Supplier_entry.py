@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
@@ -88,6 +89,16 @@ def init_db():
             qty_received INTEGER NOT NULL DEFAULT 0
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE supplier ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
+    try:
+        conn.execute(
+            "ALTER TABLE purchase_order ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -217,14 +228,15 @@ class NewPODialog(QtWidgets.QDialog):
             conn.execute("""
                 INSERT INTO purchase_order
                     (po_number, supplier_id, order_date, expected_date, status,
-                        notes)
-                VALUES (%s,%s,%s,%s,%s,%s)
+                        notes, created_by)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
             """, (self.po_num.text().strip(),
                   self.supp_combo.currentData(),
                   self.order_date.date().toString("yyyy-MM-dd"),
                   self.exp_date.date().toString("yyyy-MM-dd"),
                   "open",
-                  self.notes.text().strip() or None))
+                  self.notes.text().strip() or None,
+                  get_current_user_email() or None))
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(
@@ -474,7 +486,9 @@ class ReceivePODialog(QtWidgets.QDialog):
 class Purchasing(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Purchasing")
+        email = get_current_user_email()
+        title = f"Purchasing — {email}" if email else "Purchasing"
+        self.setWindowTitle(title)
         self.resize(1150, 700)
         _apply_blue_palette(self)
         self._supp_row_ids = []
@@ -832,11 +846,13 @@ class Purchasing(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute(
             "INSERT INTO supplier "
-            "(company_name,first_name,last_name,phone_number,email,address,city,state,zip_code) "  # noqa: E501
-            "VALUES "
-            "(%(company_name)s,%(first_name)s,%(last_name)s,%(phone_number)s,"
-            "%(email)s,%(address)s,%(city)s,%(state)s,%(zip_code)s)",
-            data)
+            "(company_name,first_name,last_name,phone_number,email,"
+            "address,city,state,zip_code,created_by) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            (data["company_name"], data["first_name"], data["last_name"],
+             data["phone_number"], data["email"], data["address"],
+             data["city"], data["state"], data["zip_code"],
+             get_current_user_email() or None))
         conn.commit()
         conn.close()
         self._supp_clear()

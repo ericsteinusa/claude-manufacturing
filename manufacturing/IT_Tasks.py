@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -66,6 +67,11 @@ def init_db():
             notes          TEXT
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE it_task ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -195,8 +201,8 @@ class NewTaskDialog(QtWidgets.QDialog):
                 "INSERT INTO it_task (task_number, task_name, task_type, "
                 "description,"
                 " priority, assigned_to, department, scheduled_date, "
-                "due_date, notes)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+                "due_date, notes, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
                 (num, name, self.task_type.currentData(),
                  self.description.toPlainText().strip(),
                  self.priority_combo.currentData(),
@@ -204,7 +210,7 @@ class NewTaskDialog(QtWidgets.QDialog):
                  self.department.text().strip(),
                  self.scheduled_date.date().toString("yyyy-MM-dd"),
                  self.due_date.date().toString("yyyy-MM-dd"),
-                 self.notes.text().strip())
+                 self.notes.text().strip(), get_current_user_email() or None)
             )
             self.task_id = cur.fetchone()['id']
             conn.commit()
@@ -506,7 +512,9 @@ TAB_STYLE = (
 class ITTasksMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("IT Tasks")
+        email = get_current_user_email()
+        title = f"IT Tasks — {email}" if email else "IT Tasks"
+        self.setWindowTitle(title)
         self.resize(1060, 700)
         _apply_blue_palette(self)
 

@@ -4,6 +4,7 @@ from .button_nav import ButtonNav
 from .Legal_Main_menu import _apply_blue_palette
 from .Legal_mgmt import (ContractsWidget, LitigationWidget, ComplianceWidget,
                          GovernanceWidget)
+from .accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -17,7 +18,9 @@ TAB_STYLE = (
 class LegalMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Legal Manager Menu")
+        email = get_current_user_email()
+        title = f"Legal Manager Menu — {email}" if email else "Legal Manager Menu"
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

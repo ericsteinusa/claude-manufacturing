@@ -4,6 +4,7 @@ from .button_nav import ButtonNav
 from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget, InsuranceWidget,  # noqa: E501
                         BusinessContinuityWidget, ComplianceAuditWidget)
 from .purchase_requisitions import RequisitionsWidget
+from .accounts import get_current_user_email
 
 BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
@@ -28,7 +29,10 @@ def _apply_blue_palette(widget):
 class RiskMgmtMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Risk Management Main Menu")
+        email = get_current_user_email()
+        title = (f"Risk Management Main Menu — {email}" if email
+                 else "Risk Management Main Menu")
+        self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()

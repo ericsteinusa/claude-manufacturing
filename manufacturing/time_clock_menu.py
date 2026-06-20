@@ -1,6 +1,7 @@
 import sys
 import psycopg2
 from .db_pg import get_db_connection
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -63,6 +64,17 @@ def init_db():
         conn.execute(
             "ALTER TABLE time_clock ADD COLUMN IF NOT EXISTS hours_worked REAL"
         )
+    except Exception:
+        pass
+    try:
+        conn.execute(
+            "ALTER TABLE time_clock ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
+    try:
+        conn.execute(
+            "ALTER TABLE time_off_request "
+            "ADD COLUMN IF NOT EXISTS created_by TEXT")
     except Exception:
         pass
     conn.commit()
@@ -197,9 +209,10 @@ class ClockInDialog(QtWidgets.QDialog):
                 return
 
         conn.execute(
-            "INSERT INTO time_clock (people_id, clock_in, notes) VALUES "
-            "(%s,%s,%s)",
-            (people_id, clock_in, self.notes.text().strip())
+            "INSERT INTO time_clock (people_id, clock_in, notes, created_by)"
+            " VALUES (%s,%s,%s,%s)",
+            (people_id, clock_in, self.notes.text().strip(),
+             get_current_user_email() or None)
         )
         conn.commit()
         conn.close()
@@ -395,14 +408,14 @@ class TimeOffDialog(QtWidgets.QDialog):
             conn.execute(
                 "INSERT INTO time_off_request"
                 " (people_id, request_date, start_date, end_date, "
-                "request_type, status, notes)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                "request_type, status, notes, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                 (self.emp_combo.currentData(), today,
                  self.start_date.date().toString("yyyy-MM-dd"),
                  self.end_date.date().toString("yyyy-MM-dd"),
                  self.type_combo.currentData(),
                  self.status_combo.currentData(),
-                 self.notes.text().strip())
+                 self.notes.text().strip(), get_current_user_email() or None)
             )
         else:
             conn.execute(
@@ -872,7 +885,9 @@ class TimeClockWidget(QtWidgets.QWidget):
 class TimeClockWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Time Clock")
+        email = get_current_user_email()
+        title = f"Time Clock — {email}" if email else "Time Clock"
+        self.setWindowTitle(title)
         self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(TimeClockWidget())

@@ -12,6 +12,7 @@ from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 from .db_pg import get_db
+from .accounts import get_current_user_email
 
 
 def _conn():
@@ -98,6 +99,14 @@ def init_db():
         );
         """)
         _seed(con)
+        for tbl in ("marketing_campaign", "marketing_lead", "marketing_research",
+                    "marketing_content", "marketing_analytics", "marketing_budget"):
+            try:
+                con.execute(
+                    f"ALTER TABLE {tbl} "
+                    "ADD COLUMN IF NOT EXISTS created_by TEXT")
+            except Exception:
+                pass
 
 
 def _seed(con):
@@ -473,11 +482,11 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
     self, "Required", f"{
         spec['fields'][0]['label']} is required.")
             return
-        cols = ",".join(keys)
-        ph = ",".join(["%s"] * len(keys))
+        cols = ",".join(keys) + ",created_by"
+        ph = ",".join(["%s"] * len(keys)) + ",%s"
         with _conn() as con:
             con.execute(f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
-                        [v[k] for k in keys])
+                        [v[k] for k in keys] + [get_current_user_email() or None])
         self._refresh()
 
     def _edit(self, *_):
@@ -808,7 +817,9 @@ class BudgetApprovalWidget(_MarketingCrudWidget):
 class MarketingMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Marketing Management")
+        email = get_current_user_email()
+        title = f"Marketing Management — {email}" if email else "Marketing Management"
+        self.setWindowTitle(title)
         self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()

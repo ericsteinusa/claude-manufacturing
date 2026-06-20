@@ -1,5 +1,6 @@
 import sys
 from .db_pg import get_db
+from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .button_nav import ButtonNav
 
@@ -93,6 +94,16 @@ def init_db():
             notes      TEXT
         )
     """)
+    try:
+        conn.execute(
+            "ALTER TABLE product ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
+    try:
+        conn.execute(
+            "ALTER TABLE inventory_transaction ADD COLUMN IF NOT EXISTS created_by TEXT")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -248,11 +259,12 @@ class TransactionDialog(QtWidgets.QDialog):
         conn.execute("""
             INSERT INTO inventory_transaction
                 (product_id, trans_date, trans_type, quantity, reference,
-                    notes)
-            VALUES (%s,%s,%s,%s,%s,%s)
+                    notes, created_by)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
         """, (pid, today, self._trans_type, stored_qty,
               self.reference.text().strip() or None,
-              self.notes.text().strip() or None))
+              self.notes.text().strip() or None,
+              get_current_user_email() or None))
         conn.execute(
             "UPDATE product SET amount = amount + %s WHERE id=%s",
             (stored_qty, pid))
@@ -269,7 +281,9 @@ class TransactionDialog(QtWidgets.QDialog):
 class Inventory(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Inventory")
+        email = get_current_user_email()
+        title = f"Inventory — {email}" if email else "Inventory"
+        self.setWindowTitle(title)
         self.resize(1100, 680)
         _apply_blue_palette(self)
         self._prod_row_ids = []
@@ -679,11 +693,12 @@ class Inventory(QtWidgets.QMainWindow):
         data = self._collect_product_form()
         if not data:
             return
+        data["created_by"] = get_current_user_email() or None
         conn = get_db()
         conn.execute(
             "INSERT INTO product "
-            "(name,supplier_id,bin,purchase_price,amount,reorder_point) "
-            "VALUES (%(name)s,%(supplier_id)s,%(bin)s,%(purchase_price)s,%(amount)s,%(reorder_point)s)",  # noqa: E501
+            "(name,supplier_id,bin,purchase_price,amount,reorder_point,created_by) "
+            "VALUES (%(name)s,%(supplier_id)s,%(bin)s,%(purchase_price)s,%(amount)s,%(reorder_point)s,%(created_by)s)",  # noqa: E501
             data)
         conn.commit()
         conn.close()
