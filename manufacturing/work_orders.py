@@ -1,9 +1,8 @@
 import sys
 import psycopg2
-from datetime import date
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
-from .mrp_core import next_sequence_number
+from .work_orders_core import next_wo_number
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -89,14 +88,10 @@ def _ro(text):
 
 
 def _next_wo_num():
-    prefix = f"WO-{date.today().year}-"
     conn = get_db()
-    rows = conn.execute(
-        "SELECT wo_number FROM work_order WHERE wo_number LIKE %s",
-        (prefix + "%",)
-    ).fetchall()
+    num = next_wo_number(conn)
     conn.close()
-    return next_sequence_number([r["wo_number"] for r in rows], prefix)
+    return num
 
 
 def _load_products():

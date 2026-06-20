@@ -237,3 +237,22 @@ def test_receive_po_item_without_po_scope():
     receive_po_item(conn, 9, 2)
     assert "AND po_id" not in conn.last_sql
     assert conn.last_params == [2, 9]
+
+
+def test_set_po_status_does_not_guard_transition():
+    # set_po_status is intentionally unconditional; callers gate with
+    # can_transition. Verify it accepts any status without raising.
+    conn = _FakeConn()
+    set_po_status(conn, 5, "received")   # legal
+    set_po_status(conn, 5, "draft")      # illegal reopen — no exception raised
+    assert len(conn.calls) == 2
+
+
+def test_transition_workflow_draft_to_received():
+    # Happy path: gate every step with can_transition before calling set_po_status.
+    conn = _FakeConn()
+    assert can_transition("draft", "sent")
+    set_po_status(conn, 1, "sent")
+    assert can_transition("sent", "received")
+    set_po_status(conn, 1, "received")
+    assert not can_transition("received", "sent")   # terminal — no further moves

@@ -18,6 +18,7 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
+from .purchase_requisitions_core import can_authorize
 from .purchase_orders import (_load_products, _next_po_num,
                               init_db as _po_init_db)
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -170,24 +171,6 @@ def _next_req_num(conn=None):
 # Roles permitted to authorize requisitions, matching the role names
 # actually present in the ``roles`` table. Senior leadership can authorize
 # any department; the rest only their own.
-COMPANY_WIDE_ROLES = (
-    "President",
-    "Vice President",
-)
-AUTHORIZER_ROLES = (
-    "Department Manager",
-    "Supervisor",
-) + COMPANY_WIDE_ROLES
-
-
-def _is_manager(role_name):
-    """Roles that may authorize requisitions."""
-    return role_name in AUTHORIZER_ROLES
-
-
-def _is_company_wide(role_name):
-    """Roles that may authorize any department's requests, not just theirs."""
-    return role_name in COMPANY_WIDE_ROLES
 
 
 def _load_people():
@@ -768,21 +751,21 @@ class RequisitionsWidget(_RequisitionViewBase):
             return
         p = self._acting()
         role = (p["role_name"] if p else None) or ""
-        is_mgr = _is_manager(role)
         sel = self._selected_id is not None
         is_own = bool(p) and sel and self._selected_requester() == p["id"]
-        submitted = self._selected_status == "submitted"
         draft = self._selected_status == "draft"
         self._buttons["new"].setEnabled(bool(p))
         self._buttons["add"].setEnabled(is_own and draft)
         self._buttons["submit"].setEnabled(is_own and draft)
         self._buttons["cancel"].setEnabled(
             is_own and self._selected_status in ("draft", "submitted"))
-        # A manager may authorize/deny submitted requests in their own dept
-        # (senior leadership in any dept), but never their own request.
-        in_scope = (_is_company_wide(role)
-                    or self._selected_dept() == p["dept_id"]) if p else False
-        can_decide = (is_mgr and submitted and in_scope and not is_own)
+        can_decide = can_authorize(
+            role,
+            self._selected_status or "",
+            self._selected_dept(),
+            p["dept_id"] if p else None,
+            is_own,
+        )
         self._buttons["authorize"].setEnabled(can_decide)
         self._buttons["deny"].setEnabled(can_decide)
 
