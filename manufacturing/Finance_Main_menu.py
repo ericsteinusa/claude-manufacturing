@@ -29,7 +29,14 @@ class FinanceMainMenu(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    import traceback
     app = QtWidgets.QApplication(sys.argv)
-    w = FinanceMainMenu()
-    w.show()
-    sys.exit(app.exec())
+    try:
+        w = FinanceMainMenu()
+        w.show()
+        sys.exit(app.exec())
+    except Exception:
+        msg = traceback.format_exc()
+        print(msg, file=sys.stderr, flush=True)
+        QtWidgets.QMessageBox.critical(None, "Finance Menu Error", msg)
+        sys.exit(1)
