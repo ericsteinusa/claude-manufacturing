@@ -2,15 +2,10 @@ import sys
 from .launch_utils import launch as _launch
 from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import BLUE, BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+
 from .button_nav import ButtonNav
 
-BLUE = QtGui.QColor(0, 85, 255)
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
@@ -18,16 +13,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
 
 
 def _launch_tab(script, label, *args):

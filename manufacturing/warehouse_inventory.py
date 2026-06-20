@@ -6,11 +6,11 @@ import sys
 from .db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import BLUE
+
 from .button_nav import ButtonNav
 from .accounts import get_current_user_email
 
-
-BLUE = QtGui.QColor(0, 85, 255)
 
 BUTTON_STYLE = (
     "QPushButton{background-color:white;border:2px solid "

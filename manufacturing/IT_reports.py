@@ -1,13 +1,6 @@
 from .launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .IT_Tasks import _apply_blue_palette
-
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
+from .qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
 
 LAUNCH_ITEMS = [
     ("Department Entry",        "dept_entry.py"),

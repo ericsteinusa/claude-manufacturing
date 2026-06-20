@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import QtWidgets
 from .button_nav import ButtonNav
-from .Risk_mgmt_Main_menu import _apply_blue_palette
+from .qt_theme import apply_blue_palette as _apply_blue_palette
 from .Risk_mgmt import (RiskRegisterWidget, BusinessContinuityWidget,
                         ComplianceAuditWidget, KRIWidget)
 from .accounts import get_current_user_email

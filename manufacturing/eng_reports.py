@@ -1,16 +1,11 @@
 import sys
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import BLUE, BUTTON_STYLE, apply_blue_palette as _apply_blue_palette, ro as _ro
+
 from .button_nav import ButtonNav
 
 
-BLUE = QtGui.QColor(0, 85, 255)
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
 INPUT_STYLE = (
     "QLineEdit{background-color:white;border:2px solid "
     "black;border-radius:4px;padding:2px 6px;}"
@@ -55,22 +50,6 @@ PRIORITY_COLORS = {
     "high": QtGui.QColor(255, 243, 205),
     "medium": QtGui.QColor(220, 235, 255),
 }
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
-
-
-def _ro(text):
-    item = QtWidgets.QTableWidgetItem(text)
-    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-    return item
 
 
 class _StatCard(QtWidgets.QWidget):

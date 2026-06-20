@@ -19,32 +19,18 @@ import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
 from .purchase_requisitions_core import can_authorize
-from .purchase_orders import (_load_products, _next_po_num,
-                              init_db as _po_init_db)
+from .purchase_orders_core import (load_products, next_po_number,
+                                   ensure_po_tables)
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import (
+    BUTTON_STYLE, INPUT_STYLE, COMBO_STYLE, LABEL_STYLE,
+    apply_blue_palette as _apply_blue_palette, ro as _ro,
+)
 
 
 def get_db():
     return get_db_connection()
 
-
-BLUE = QtGui.QColor(0, 85, 255)
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
-INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-)
-COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-    "QComboBox QAbstractItemView{background-color: white;}"
-)
-LABEL_STYLE = "color: white; font-size: 13px;"
 
 REQ_COLORS = {
     "draft":         "#ffffff",
@@ -119,22 +105,6 @@ def init_db():
     """)
     conn.commit()
     conn.close()
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
-
-
-def _ro(text):
-    item = QtWidgets.QTableWidgetItem(text)
-    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-    return item
 
 
 def _today():
@@ -298,8 +268,10 @@ class AddRequisitionItemDialog(QtWidgets.QDialog):
         self.product_combo.currentIndexChanged.connect(
             self._on_product_changed)
         self.product_combo.addItem("(none)", None)
-        for p in _load_products():
+        _pconn = get_db()
+        for p in load_products(_pconn):
             self.product_combo.addItem(p["product_name"], p["id"])
+        _pconn.close()
         layout.addRow(lbl("Product (opt):"), self.product_combo)
 
         self.desc = QtWidgets.QLineEdit()
@@ -996,12 +968,12 @@ class RequisitionApprovalsWidget(_RequisitionViewBase):
                 "Purchase Orders screen."):
             return
 
-        _po_init_db()
-        po_number = _next_po_num()
         needed = self._selected_req_field("needed_date")
         expected = needed or QtCore.QDate.currentDate().addDays(
             14).toString("yyyy-MM-dd")
         conn = get_db()
+        ensure_po_tables(conn)
+        po_number = next_po_number(conn)
         po_id = conn.execute(
             "INSERT INTO purchase_order (po_number, supplier_id, "
             "order_date, expected_date, status, notes, created_by) "

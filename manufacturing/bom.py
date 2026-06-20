@@ -31,6 +31,15 @@ import sys
 
 import psycopg2
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import (
+    BLUE,
+    BUTTON_STYLE,
+    INPUT_STYLE,
+    COMBO_STYLE,
+    LABEL_STYLE,
+    apply_blue_palette as _apply_blue_palette,
+)
+
 
 from .bom_core import would_create_cycle, explode_quantity
 from .db_pg import get_db_connection
@@ -42,24 +51,6 @@ log = get_logger(__name__)
 # implementations live in bom_core so they can be imported without Qt.
 __all__ = ["would_create_cycle", "explode_quantity"]
 
-
-BLUE = QtGui.QColor(0, 85, 255)
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
-INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-)
-COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-    "QComboBox QAbstractItemView{background-color: white;}"
-)
-LABEL_STYLE = "color: white; font-size: 13px;"
 
 ITEM_TYPES = ("make", "buy")
 
@@ -169,15 +160,6 @@ def explode_bom_to_wo(conn, wo_id, product_id, wo_quantity):
 
 
 # ── Item-master editor ──────────────────────────────────────────────────
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
 
 
 def _lbl(t):

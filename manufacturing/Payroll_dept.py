@@ -11,6 +11,15 @@ from .log_utils import get_logger
 import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import (
+    BLUE,
+    BUTTON_STYLE,
+    INPUT_STYLE,
+    COMBO_STYLE,
+    LABEL_STYLE,
+    apply_blue_palette as _apply_blue_palette,
+)
+
 from .button_nav import ButtonNav
 
 log = get_logger(__name__)
@@ -20,22 +29,6 @@ SS_RATE      = 0.062
 MEDICARE_RATE = 0.0145
 DT_FMT = "%Y-%m-%d %H:%M:%S"
 
-BLUE = QtGui.QColor(0, 85, 255)
-BUTTON_STYLE = (
-    "QPushButton{background-color: white; border: 2px solid black; "
-    "border-radius: 10px;}"
-    "QPushButton:hover{background-color: rgb(85, 255, 255); border: 2px solid "
-    "rgb(85, 255, 255);}"
-)
-INPUT_STYLE = (
-    "QLineEdit{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-)
-COMBO_STYLE = (
-    "QComboBox{background-color: white; border: 2px solid black; "
-    "border-radius: 4px; padding: 2px 6px;}"
-    "QComboBox QAbstractItemView{background-color: white;}"
-)
 DATE_STYLE = (
     "QDateEdit{background-color: white; border: 2px solid black; "
     "border-radius: 4px; padding: 2px 4px;}"
@@ -44,7 +37,6 @@ SPIN_STYLE = (
     "QDoubleSpinBox{background-color: white; border: 2px solid black; "
     "border-radius: 4px; padding: 2px 4px;}"
 )
-LABEL_STYLE = "color: white; font-size: 13px;"
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white; border:2px solid black; padding:6px 18px;"
@@ -175,16 +167,6 @@ def init_db():
                   "payroll_entry_deduction.deduction_type_id", exc_info=True)
     conn.commit()
     conn.close()
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
 
 
 # ── Pay calculation ─────────────────────────────────────────────────────

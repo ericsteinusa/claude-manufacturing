@@ -1,5 +1,7 @@
 import sys
 from PyQt6 import QtGui, QtWidgets
+from .qt_theme import BLUE, apply_blue_palette as _apply_blue_palette
+
 from .button_nav import ButtonNav
 from .Budget_mgmt import BudgetManagementWidget
 from .Credit_dept import CreditDeptWidget
@@ -7,7 +9,6 @@ from .Payroll_dept import PayrollDeptWidget
 from .Audit_mgmt import AuditMgmtWidget
 from .purchase_requisitions import RequisitionsWidget
 
-BLUE = QtGui.QColor(0, 85, 255)
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
     "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
@@ -15,16 +16,6 @@ TAB_STYLE = (
     "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
     "QTabBar::tab:hover{background:rgb(85,255,255);}"
 )
-
-
-def _apply_blue_palette(widget):
-    pal = widget.palette()
-    for group in (QtGui.QPalette.ColorGroup.Active,
-                  QtGui.QPalette.ColorGroup.Inactive,
-                  QtGui.QPalette.ColorGroup.Disabled):
-        pal.setColor(group, QtGui.QPalette.ColorRole.Window, BLUE)
-        pal.setColor(group, QtGui.QPalette.ColorRole.Button, BLUE)
-    widget.setPalette(pal)
 
 
 class FinanceMainMenu(QtWidgets.QMainWindow):

@@ -9,6 +9,8 @@ from .accounts import _get_user_profile, _is_full_access, _USER_ENV_VAR
 from .launch_utils import launch as _launch
 from .menus import main_menu_script_for_dept
 from PyQt6 import QtCore, QtGui, QtWidgets
+from .qt_theme import BLUE, LABEL_STYLE
+
 
 log = get_logger(__name__)
 
@@ -173,8 +175,6 @@ def reset_password(email: str, new_password: str) -> bool:
 # ---------------------------------------------------------------------------
 # Shared styles
 # ---------------------------------------------------------------------------
-BLUE = QtGui.QColor(0, 85, 255)
-
 BUTTON_STYLE = (
     "QPushButton{"
     "background-color: white;"
@@ -191,7 +191,6 @@ INPUT_STYLE = (
     "border-radius: 4px;"
     "padding: 2px 6px;}"
 )
-LABEL_STYLE = "color: white; font-size: 13px;"
 LINK_STYLE = (
     "QPushButton{color: white; background: transparent; border: none; "
     "text-decoration: underline;}"
