@@ -49,7 +49,7 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        from IT_tech_reports import ITTechReportsWidget
+        from .IT_tech_reports import ITTechReportsWidget
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
         self.setCentralWidget(central)
