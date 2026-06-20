@@ -122,8 +122,8 @@ def _email_exists(email: str) -> bool:
 def _create_user(email, password, first_name='', last_name='',
                  address='', city='', state='', zip_code='',
                  employee_id=0) -> bool:
+    conn = _get_db()
     try:
-        conn = _get_db()
         if conn.execute("SELECT id FROM people WHERE email = %s",
                         (email,)).fetchone():
             conn.close()
@@ -150,6 +150,7 @@ def _create_user(email, password, first_name='', last_name='',
         log.warning(
             "User creation failed for %s: integrity error", email,
             exc_info=True)
+        conn.close()
         return False
 
 
