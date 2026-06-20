@@ -8,6 +8,7 @@ Widget results are lazily created and cached: re-clicking the same button
 reuses the cached widget without re-calling the factory.
 Script items re-launch on every click.
 """
+import traceback
 from PyQt6 import QtCore, QtWidgets
 from .accounts import get_current_user_email
 from .qt_theme import apply_blue_palette as _apply_blue_palette
@@ -122,7 +123,13 @@ class DeptMenuWidget(QtWidgets.QWidget):
             self._set_checked(idx)
             return
 
-        result = self._factories[idx]()
+        try:
+            result = self._factories[idx]()
+        except Exception:
+            msg = traceback.format_exc()
+            QtWidgets.QMessageBox.critical(self, "Error opening panel", msg)
+            self._set_checked(-1)
+            return
 
         if not isinstance(result, QtWidgets.QWidget):
             # Script launched — collapse stack, clear highlights
