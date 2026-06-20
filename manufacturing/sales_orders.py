@@ -2,10 +2,14 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
-from .sales_orders_core import next_so_number
+from .sales_orders_core import (
+    next_so_number, SO_STATUS_COLORS, customer_label as _customer_label,
+    ensure_so_tables, list_sos, get_so_items,
+    load_customers, load_products,
+    create_so, update_so, add_so_item, set_so_status,
+)
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -14,14 +18,7 @@ from .qt_theme import (
     ro as _ro,
 )
 
-
-SO_COLORS = {
-    "draft":     "#ffffff",
-    "confirmed": "#cce5ff",
-    "shipped":   "#fff3cd",
-    "invoiced":  "#d4edda",
-    "cancelled": "#dcdcdc",
-}
+SO_COLORS = SO_STATUS_COLORS
 
 
 def get_db():
@@ -30,32 +27,7 @@ def get_db():
 
 def init_db():
     conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS sales_order (
-            id SERIAL PRIMARY KEY,
-            so_number TEXT NOT NULL UNIQUE,
-            customer_id INTEGER,
-            order_date TEXT,
-            ship_date TEXT,
-            status TEXT DEFAULT 'draft',
-            notes TEXT,
-            created_by TEXT
-        )
-    """)
-    conn.execute("""
-        ALTER TABLE sales_order
-        ADD COLUMN IF NOT EXISTS created_by TEXT
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS so_item (
-            id SERIAL PRIMARY KEY,
-            so_id INTEGER NOT NULL REFERENCES sales_order(id),
-            description TEXT NOT NULL,
-            product_id INTEGER,
-            qty INTEGER DEFAULT 1,
-            unit_price REAL DEFAULT 0.0
-        )
-    """)
+    ensure_so_tables(conn)
     conn.commit()
     conn.close()
 
@@ -69,31 +41,14 @@ def _next_so_num():
 
 def _load_customers():
     conn = get_db()
-    try:
-        rows = conn.execute(
-            "SELECT id, company_name, first_name, last_name FROM customer "
-            "ORDER BY company_name"
-        ).fetchall()
-    except psycopg2.OperationalError:
-        rows = []
+    rows = load_customers(conn)
     conn.close()
     return rows
 
 
-def _customer_label(row):
-    company = row["company_name"] or ""
-    name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
-    return company if company else name
-
-
 def _load_products():
     conn = get_db()
-    try:
-        rows = conn.execute(
-            "SELECT id, name AS product_name FROM product ORDER BY name"
-        ).fetchall()
-    except psycopg2.OperationalError:
-        rows = []
+    rows = load_products(conn)
     conn.close()
     return rows
 
@@ -172,18 +127,15 @@ class NewSODialog(QtWidgets.QDialog):
             return
         conn = get_db()
         try:
-            cur = conn.execute(
-                "INSERT INTO sales_order (so_number, customer_id, order_date,"
-                " ship_date, status, notes, created_by)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
-                (so_num, self.customer_combo.currentData(),
-                 self.order_date.date().toString("yyyy-MM-dd"),
-                 self.ship_date.date().toString("yyyy-MM-dd"),
-                 self.status_combo.currentData(),
-                 self.notes.text().strip(),
-                 get_current_user_email() or None)
+            self.so_id = create_so(
+                conn, so_num,
+                customer_id=self.customer_combo.currentData(),
+                order_date=self.order_date.date().toString("yyyy-MM-dd"),
+                ship_date=self.ship_date.date().toString("yyyy-MM-dd"),
+                status=self.status_combo.currentData(),
+                notes=self.notes.text().strip(),
+                created_by=get_current_user_email() or None,
             )
-            self.so_id = cur.fetchone()['id']
             conn.commit()
         except psycopg2.IntegrityError:
             QtWidgets.QMessageBox.warning(self, "Duplicate",
@@ -259,12 +211,11 @@ class AddSOItemDialog(QtWidgets.QDialog):
     self, "Input Error", "Description is required.")
             return
         conn = get_db()
-        conn.execute(
-            "INSERT INTO so_item (so_id, description, product_id, qty, "
-            "unit_price)"
-            " VALUES (%s,%s,%s,%s,%s)",
-            (self._so_id, desc, self.product_combo.currentData(),
-             self.qty.value(), self.unit_price.value())
+        add_so_item(
+            conn, self._so_id, desc,
+            product_id=self.product_combo.currentData(),
+            qty=self.qty.value(),
+            unit_price=self.unit_price.value(),
         )
         conn.commit()
         conn.close()
@@ -348,14 +299,12 @@ class UpdateSODialog(QtWidgets.QDialog):
 
     def _on_ok(self):
         conn = get_db()
-        conn.execute(
-            "UPDATE sales_order SET customer_id=%s, order_date=%s, "
-            "ship_date=%s, notes=%s"
-            " WHERE id=%s",
-            (self.customer_combo.currentData(),
-             self.order_date.date().toString("yyyy-MM-dd"),
-             self.ship_date.date().toString("yyyy-MM-dd"),
-             self.notes.text().strip(), self._so_id)
+        update_so(
+            conn, self._so_id,
+            customer_id=self.customer_combo.currentData(),
+            order_date=self.order_date.date().toString("yyyy-MM-dd"),
+            ship_date=self.ship_date.date().toString("yyyy-MM-dd"),
+            notes=self.notes.text().strip(),
         )
         conn.commit()
         conn.close()
@@ -530,34 +479,10 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         d_from = self.date_from.date().toString("yyyy-MM-dd")
         d_to = self.date_to.date().toString("yyyy-MM-dd")
 
-        base = """
-            SELECT so.id, so.so_number, so.order_date, so.ship_date,
-                   so.status, so.notes, so.created_by,
-                   c.company_name, c.first_name, c.last_name,
-                   (SELECT COUNT(*) FROM so_item si WHERE si.so_id = so.id) AS
-                       item_count,
-                   (SELECT COALESCE(SUM(si.qty * si.unit_price), 0)
-                    FROM so_item si WHERE si.so_id = so.id) AS total
-            FROM sales_order so
-            LEFT JOIN customer c ON c.id = so.customer_id
-        """
-        conds, params = [], []
-        if status:
-            conds.append("so.status = %s")
-            params.append(status)
-        if customer_id:
-            conds.append("so.customer_id = %s")
-            params.append(customer_id)
-        conds.append(
-            "(so.order_date IS NULL OR so.order_date BETWEEN %s AND %s)")
-        params += [d_from, d_to]
-        where = " WHERE " + " AND ".join(conds)
-
         conn = get_db()
         try:
-            rows = conn.execute(
-    base + where + " ORDER BY so.order_date DESC",
-     params).fetchall()
+            rows = list_sos(conn, status=status, customer_id=customer_id,
+                            date_from=d_from, date_to=d_to)
         except psycopg2.OperationalError:
             rows = []
         conn.close()
@@ -568,13 +493,8 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             r = self.so_table.rowCount()
             self.so_table.insertRow(r)
             self._so_row_ids.append(row["id"])
-            company = row["company_name"] or ""
-            name = f"{
-    row['first_name'] or ''} {
-        row['last_name'] or ''}".strip()
-            customer_display = company if company else name
             self.so_table.setItem(r, 0, _ro(row["so_number"]))
-            self.so_table.setItem(r, 1, _ro(customer_display))
+            self.so_table.setItem(r, 1, _ro(_customer_label(row)))
             self.so_table.setItem(r, 2, _ro(row["order_date"] or ""))
             self.so_table.setItem(r, 3, _ro(row["ship_date"] or ""))
             self.so_table.setItem(r, 4, _ro(str(row["item_count"])))
@@ -617,12 +537,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             return
         conn = get_db()
         try:
-            items = conn.execute("""
-                SELECT si.description, p.name AS product_name,
-                       si.qty, si.unit_price
-                FROM so_item si LEFT JOIN product p ON p.id = si.product_id
-                WHERE si.so_id = %s
-            """, (self._selected_so_id,)).fetchall()
+            items = get_so_items(conn, self._selected_so_id)
         except psycopg2.OperationalError:
             items = []
         conn.close()
@@ -672,8 +587,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
         )
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
             conn = get_db()
-            conn.execute("UPDATE sales_order SET status = %s WHERE id = %s",
-                         (new_status, self._selected_so_id))
+            set_so_status(conn, self._selected_so_id, new_status)
             conn.commit()
             conn.close()
             self._refresh_orders()
