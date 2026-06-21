@@ -31,8 +31,10 @@ verify_production.py
 # Captured output logs
 *.txt
 
-# Qt generated files
+# Qt generated files (root and all department subdirectories)
+manufacturing/**/*_rc.py
 manufacturing/*_rc.py
+manufacturing/**/*.ui
 manufacturing/*.ui
 
 # SQLite leftovers (app uses PostgreSQL)

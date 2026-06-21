@@ -9,17 +9,17 @@ from manufacturing.menus import (
 
 
 def test_known_departments_resolve_to_scripts():
-    assert main_menu_script_for_dept("Personnel") == "Personnel_Main_menu.py"
-    assert main_menu_script_for_dept("Accounting") == "Accounting_Main_menu.py"
-    assert main_menu_script_for_dept("Customer Service") == "cs_main_menu.py"
-    assert main_menu_script_for_dept("Warehouse") == "Warehouse_Main_menu.py"
+    assert main_menu_script_for_dept("Personnel") == "personnel/Personnel_Main_menu.py"
+    assert main_menu_script_for_dept("Accounting") == "accounting/Accounting_Main_menu.py"
+    assert main_menu_script_for_dept("Customer Service") == "customer_service/cs_main_menu.py"
+    assert main_menu_script_for_dept("Warehouse") == "production/Warehouse_Main_menu.py"
 
 
 def test_dept_name_alias_resolves():
     # The dev DB stores "Information Technologies"; both names map to IT.
     assert main_menu_script_for_dept(
-        "Information Technologies") == "IT_Main_Menu.py"
-    assert main_menu_script_for_dept("Information Tech") == "IT_Main_Menu.py"
+        "Information Technologies") == "it/IT_Main_Menu.py"
+    assert main_menu_script_for_dept("Information Tech") == "it/IT_Main_Menu.py"
 
 
 def test_unknown_or_menuless_departments_return_none():
