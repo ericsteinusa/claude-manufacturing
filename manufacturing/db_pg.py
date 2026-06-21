@@ -145,7 +145,13 @@ class PgConnection:
         log.debug(
             "Connected to database %s on %s:%s (adapt=%s)",
             DB_CONFIG['dbname'], DB_CONFIG['host'], DB_CONFIG['port'], adapt)
-        user = os.environ.get('MFGAPP_USER', '')
+        # Prefer the per-thread user (set by Django middleware for web
+        # requests) over the env var (set by the desktop login shell).
+        try:
+            from .audit_core import get_thread_user
+            user = get_thread_user() or os.environ.get('MFGAPP_USER', '')
+        except Exception:
+            user = os.environ.get('MFGAPP_USER', '')
         if user:
             cur = self._conn.cursor()
             cur.execute(
