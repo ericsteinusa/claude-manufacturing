@@ -17,6 +17,11 @@ from .log_utils import get_logger
 from .schema import init_schema
 from .db_pg import get_db_connection
 from .audit_core import get_recent, get_history, AUDITED_TABLES
+from .approval_core import (
+    needs_approval, request_approval, approve_po, reject_po,
+    get_pending_approvals, count_pending, get_po_approval,
+    APPROVAL_THRESHOLD, APPROVAL_ROLES,
+)
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -199,12 +204,20 @@ def dashboard(request):
         ('/dept/{}/'.format(key), label)
         for key, label in DASHBOARD_DEPARTMENTS
     ]
+    pending_approvals = 0
+    if request.session.get('user_role') in APPROVAL_ROLES:
+        conn = get_db_connection()
+        try:
+            pending_approvals = count_pending(conn)
+        finally:
+            conn.close()
     return render(request, 'dashboard.html', {
         'email': email,
         'user_role': request.session.get('user_role', ''),
         'dept_name': request.session.get('user_dept_name', ''),
         'full_access': request.session.get('user_full_access', False),
         'menu_items': menu_items,
+        'pending_approvals': pending_approvals,
     })
 
 
@@ -563,6 +576,7 @@ def po_detail(request, po_id):
         po = get_po(conn, po_id)
         items = get_po_items(conn, po_id) if po else []
         products = load_products(conn) if (po and can_edit) else []
+        approval = get_po_approval(conn, po_id) if po else None
     finally:
         conn.close()
 
@@ -586,6 +600,8 @@ def po_detail(request, po_id):
         can_edit=can_edit,
         status_actions=status_actions,
         can_receive=can_receive,
+        approval=approval,
+        approval_threshold=APPROVAL_THRESHOLD,
         back_url='/po/',
     ))
 
@@ -790,7 +806,13 @@ def po_set_status(request, po_id):
     try:
         po = get_po(conn, po_id)
         if po and can_transition(po['status'], target):
-            set_po_status(conn, po_id, target)
+            if target == 'sent' and needs_approval(po.get('total', 0)):
+                request_approval(
+                    conn, po_id,
+                    requested_by=request.session.get('user_email', ''),
+                )
+            else:
+                set_po_status(conn, po_id, target)
             conn.commit()
     finally:
         conn.close()
@@ -2253,3 +2275,80 @@ def periods(request):
         'full_access': request.session.get('user_full_access', False),
         'can_write': request.session.get('user_role', '') in PERIOD_ADMIN_ROLES,
     })
+
+
+# ---------------------------------------------------------------------------
+# PO approval workflow
+# ---------------------------------------------------------------------------
+
+def _approval_access(request):
+    """Redirect if the user is not authorised to approve/reject POs."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if request.session.get('user_role') not in APPROVAL_ROLES:
+        return redirect('dashboard')
+    return None
+
+
+def po_approvals(request):
+    """Queue of POs waiting for approval (President / VP only)."""
+    denied = _approval_access(request)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        pending = get_pending_approvals(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'po_approvals.html', {
+        'pending': pending,
+        'threshold': APPROVAL_THRESHOLD,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })
+
+
+def po_approve(request, approval_id):
+    """Approve a pending PO."""
+    denied = _approval_access(request)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('po_approvals')
+
+    notes = (request.POST.get('notes') or '').strip()
+    conn = get_db_connection()
+    try:
+        approve_po(conn, approval_id,
+                   decided_by=request.session.get('user_email', ''),
+                   notes=notes)
+        conn.commit()
+    except ValueError:
+        conn.rollback()
+    finally:
+        conn.close()
+    return redirect('po_approvals')
+
+
+def po_reject(request, approval_id):
+    """Reject a pending PO, returning it to draft."""
+    denied = _approval_access(request)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('po_approvals')
+
+    notes = (request.POST.get('notes') or '').strip()
+    conn = get_db_connection()
+    try:
+        reject_po(conn, approval_id,
+                  decided_by=request.session.get('user_email', ''),
+                  notes=notes)
+        conn.commit()
+    except ValueError:
+        conn.rollback()
+    finally:
+        conn.close()
+    return redirect('po_approvals')

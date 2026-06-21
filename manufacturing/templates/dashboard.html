@@ -7,6 +7,9 @@
 {% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' %}
 <a href="{% url 'periods' %}" class="btn">Periods</a>
+<a href="{% url 'po_approvals' %}" class="btn">
+    PO Approvals{% if pending_approvals %} ({{ pending_approvals }}){% endif %}
+</a>
 {% endif %}
 {% endblock %}
 

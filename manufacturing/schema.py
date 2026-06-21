@@ -143,6 +143,18 @@ _TABLES = [
             error_msg TEXT NOT NULL DEFAULT ''
         )
     """),
+    ("po_approval", """
+        CREATE TABLE IF NOT EXISTS po_approval (
+            id SERIAL PRIMARY KEY,
+            po_id INTEGER NOT NULL REFERENCES purchase_order(id),
+            requested_by TEXT NOT NULL DEFAULT '',
+            requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            status TEXT NOT NULL DEFAULT 'pending',
+            decided_by TEXT NOT NULL DEFAULT '',
+            decided_at TIMESTAMPTZ,
+            notes TEXT NOT NULL DEFAULT ''
+        )
+    """),
     ("closed_periods", """
         CREATE TABLE IF NOT EXISTS closed_periods (
             id SERIAL PRIMARY KEY,
