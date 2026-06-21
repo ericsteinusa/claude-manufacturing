@@ -4,6 +4,47 @@ PyQt6 desktop app over a Django/Postgres backend (`db_pg.get_db_connection`),
 plus a Django web UI that renders the same menus (see *Web UI* below).
 Notes below are the non-obvious things that have bitten past changes.
 
+## Directory structure
+
+`manufacturing/` is organized into department subpackages plus a shared root:
+
+```
+manufacturing/
+  ├── accounting/        Accounting, A/P, A/R, General Ledger
+  ├── customer_service/  CS calls, escalations, satisfaction, staff
+  ├── customers/         Customer & supplier master files, credit
+  ├── engineering/       Design, specs, reviews, reports
+  ├── finance/           Audit, bank reconciliation, budget, tax
+  ├── it/                Help desk, tasks, technician views
+  ├── legal/             Contracts, compliance, risk management
+  ├── maintenance/       Equipment, PM schedules, work orders
+  ├── marketing/         Campaigns, leads, analytics
+  ├── payroll/           Payroll processing
+  ├── personnel/         Employee directory, dept/sub-dept, HR
+  ├── production/        BOM, MRP, work orders, inventory, warehouse
+  ├── purchasing/        Purchase orders, menus
+  ├── quality/           QA lab, NCR, CAPA, audits
+  ├── reports/           Dashboard and KPI reports
+  ├── sales/             Sales orders, quotes, targets
+  ├── time_clock/        Clock in/out, time-off, TK login
+  │
+  ├── *_core.py          Qt-free business logic (stay at root — imported by
+  │                      views.py, seeds, and cross-dept callers)
+  ├── accounts.py        Cross-cutting user/session helpers
+  ├── dept_menu_widget.py Shared Qt widget used by all dept main menus
+  ├── purchase_requisitions.py  Used by 4+ non-purchasing departments
+  ├── menus.py / views.py / urls.py  Django routing
+  ├── db_pg.py / schema.py / gl_utils.py  DB & shared utilities
+  ├── qt_theme.py / button_nav.py / launch_utils.py  Qt helpers
+  ├── seed_sample_*.py   Dev-DB seeders
+  └── templates/         Django HTML templates
+```
+
+**Import conventions for code in a subpackage:**
+- Root module: `from ..db_pg import get_db_connection`
+- Same subpackage: `from .purchase_orders_core import …`
+- Cross-dept: `from ..customers.Credit_dept import CreditDeptWidget`
+
 ## Workflow
 - Always use **feature branches + PRs**; never commit directly to `main`.
 - A pre-push hook in `.githooks/pre-push` blocks direct pushes to `main`.
@@ -16,6 +57,9 @@ Notes below are the non-obvious things that have bitten past changes.
   modules import/re-export from them. Examples: `bom_core.py` (cycle guard,
   `explode_quantity`) and `mrp_core.py` (`compute_levels`, `plan_orders`,
   `next_sequence_number`). Tests import the `*_core` modules only.
+- All `*_core.py` files live at the **package root** (`manufacturing/`), not
+  inside subpackages, because `views.py` and seeds import them directly and
+  several are shared across departments.
 - Run the GUI/integration checks locally headless with
   `QT_QPA_PLATFORM=offscreen`; widgets can be driven and captured via
   `QWidget.grab().save(path)`.
@@ -26,11 +70,13 @@ Notes below are the non-obvious things that have bitten past changes.
 
 ## Web UI (Django) & menu routing
 - The same department menu tree (`menus.MENU_TREE`) is also served as a web app
-  (`python manage.py runserver`). A menu leaf whose target is a **module-name
-  string** is, by default, **launched as a desktop Qt subprocess on the server**
-  by `views.run_script` (the `/run/<dept>/<path>/` links) — so clicking it in a
-  browser renders **nothing** (and fails headless: no `libEGL`). Most leaves are
-  still desktop-only.
+  (`python manage.py runserver`). A menu leaf whose target is a **subdir-prefixed
+  filename string** (e.g. `'production/work_orders.py'`) is, by default,
+  **launched as a desktop Qt subprocess on the server** by `views.run_script`
+  (the `/run/<dept>/<path>/` links) — so clicking it in a browser renders
+  **nothing** (and fails headless: no `libEGL`). Most leaves are still
+  desktop-only. `run_script` converts the path to a dotted module name
+  (`production/work_orders.py` → `manufacturing.production.work_orders`).
 - To serve a leaf as a **real web page** instead, add
   `(dept, leaf_key) -> url` to **`views.WEB_LEAF_URLS`**; `generic_menu` then
   emits that URL in place of the `/run/...` launcher link. No change to the
