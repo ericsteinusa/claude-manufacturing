@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ person.first_name }} {{ person.last_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if can_edit %}<a href="/people/{{ person.id }}/edit/" class="btn">Edit</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.pd-wrap { width: 100%; max-width: 700px; }
+.pd-card {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 20px 24px; margin-bottom: 16px;
+}
+.pd-name { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+.pd-title { font-size: 14px; color: #555; margin-bottom: 16px; }
+.pd-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px;
+    font-size: 13px;
+}
+.pd-grid b { color: #003cb4; }
+.pd-full { grid-column: 1 / -1; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="pd-wrap">
+        <div class="pd-card">
+            <div class="pd-name">{{ person.first_name }} {{ person.last_name }}</div>
+            <div class="pd-title">{{ person.job_title|default:"No title on record" }}</div>
+            <div class="pd-grid">
+                <div><b>Employee #:</b> {{ person.employee_id|default:"—" }}</div>
+                <div><b>Role:</b> {{ person.role_name|default:"—" }}</div>
+                <div><b>Department:</b> {{ person.dept_name|default:"—" }}</div>
+                <div><b>Sub-Dept:</b> {{ person.dept_sub_name|default:"—" }}</div>
+                <div><b>Email:</b> {{ person.email|default:"—" }}</div>
+                <div></div>
+                <div class="pd-full"><b>Address:</b>
+                    {% if person.address %}
+                        {{ person.address }}, {{ person.city }}, {{ person.state }} {{ person.zip_code }}
+                    {% else %}—{% endif %}
+                </div>
+                {% if person.created_by %}
+                <div class="pd-full"><b>Created by:</b> {{ person.created_by }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

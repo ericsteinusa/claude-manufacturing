@@ -95,6 +95,19 @@ _TABLES = [
             is_active BOOLEAN NOT NULL DEFAULT TRUE
         )
     """),
+    ("time_off_request", """
+        CREATE TABLE IF NOT EXISTS time_off_request (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL REFERENCES people(id),
+            request_date TEXT,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            request_type TEXT NOT NULL DEFAULT 'Vacation',
+            status TEXT NOT NULL DEFAULT 'pending',
+            notes TEXT,
+            created_by TEXT
+        )
+    """),
 ]
 
 # Columns backfilled onto pre-existing tables that may have been created from
@@ -114,6 +127,7 @@ _RECONCILE = {
         ("email", "TEXT NOT NULL DEFAULT ''"),
         ("dept_id", "INTEGER"),
         ("dept_sub_id", "INTEGER"),
+        ("created_by", "TEXT"),
     ],
     "dept_sub": [
         ("dept_id", "INTEGER"),

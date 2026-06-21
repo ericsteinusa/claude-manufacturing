@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block page_title %}Request Time Off{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.tof-wrap { width: 100%; max-width: 480px; }
+.tof-form {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 20px 24px;
+}
+.tof-form .row { margin-bottom: 14px; }
+.tof-form .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.tof-form label { display: block; font-size: 13px; font-weight: bold;
+                  color: #003cb4; margin-bottom: 4px; }
+.tof-form input, .tof-form select, .tof-form textarea {
+    width: 100%; padding: 6px 8px; border: 2px solid black;
+    border-radius: 4px; font-size: 13px; box-sizing: border-box;
+}
+.tof-form textarea { resize: vertical; height: 70px; }
+.tof-actions { display: flex; gap: 10px; margin-top: 18px; }
+.tof-error {
+    background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
+    padding: 8px 12px; margin-bottom: 14px; font-size: 13px; color: #900;
+}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Request Time Off</div>
+    <div class="tof-wrap">
+        {% if error %}<div class="tof-error">{{ error }}</div>{% endif %}
+
+        <form class="tof-form" method="post" action="/time-off/new/">
+            {% csrf_token %}
+            <div class="row2">
+                <div>
+                    <label>Start Date *</label>
+                    <input type="date" name="start_date" value="{{ form.start_date }}" required>
+                </div>
+                <div>
+                    <label>End Date *</label>
+                    <input type="date" name="end_date" value="{{ form.end_date }}" required>
+                </div>
+            </div>
+            <div class="row">
+                <label>Request Type</label>
+                <select name="request_type">
+                    {% for t in types %}
+                    <option value="{{ t }}"
+                        {% if t == form.request_type %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row">
+                <label>Notes</label>
+                <textarea name="notes">{{ form.notes }}</textarea>
+            </div>
+            <div class="tof-actions">
+                <button type="submit" class="btn">Submit Request</button>
+                <a href="{{ back_url }}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

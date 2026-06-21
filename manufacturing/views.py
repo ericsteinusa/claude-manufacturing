@@ -23,6 +23,14 @@ from .purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
+from .personnel_core import (
+    TIME_OFF_STATUSES, TIME_OFF_TYPES,
+    list_people, get_person, get_person_by_email,
+    create_person, update_person,
+    load_depts, load_dept_subs,
+    list_time_off_requests, get_time_off_request,
+    create_time_off_request, set_time_off_status,
+)
 from .sales_orders_core import (
     SO_STATUSES, SO_STATUS_COLORS, SO_STATUS_ACTION_LABELS,
     list_sos, get_so, get_so_items,
@@ -86,6 +94,15 @@ WEB_LEAF_URLS = {
     ('sales', 'open_orders'): '/so/?status=confirmed',
     ('sales', 'order_hist'): '/so/',
     ('sales', 'order_stat'): '/so/',
+    ('personnel', 'view_recs'): '/people/',
+    ('personnel', 'new_emp'): '/people/new/',
+    ('personnel', 'upd_rec'): '/people/',
+    ('personnel', 'emp_hist'): '/people/',
+    ('personnel', 'disp_dept'): '/people/',
+    ('personnel', 'submit_req'): '/time-off/new/',
+    ('personnel', 'pend_req'): '/time-off/?status=pending',
+    ('personnel', 'appr_req'): '/time-off/?status=approved',
+    ('personnel', 'req_hist'): '/time-off/',
 }
 
 
@@ -1357,3 +1374,330 @@ def so_set_status(request, so_id):
     finally:
         conn.close()
     return redirect('so_detail', so_id=so_id)
+
+
+# ---------------------------------------------------------------------------
+# Personnel — employee directory + time-off requests (web)
+# ---------------------------------------------------------------------------
+
+_PERSONNEL_ROLES = {'HR / Personnel'}
+
+
+def _people_access(request, write=False):
+    """Gate personnel pages: logged in + full_access, HR/Personnel role, or
+    personnel dept. With write=True also blocks READ_ONLY_ROLES.
+    """
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        role = request.session.get('user_role', '')
+        dept = request.session.get('user_dept_key', '')
+        if role not in _PERSONNEL_ROLES and dept != 'personnel':
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('people_list')
+    return None
+
+
+def _people_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def _is_hr(request):
+    """True if the user has personnel/HR access (can approve time-off etc.)."""
+    return (
+        request.session.get('user_full_access')
+        or request.session.get('user_role') in _PERSONNEL_ROLES
+        or request.session.get('user_dept_key') == 'personnel'
+    )
+
+
+def people_list(request):
+    denied = _people_access(request)
+    if denied:
+        return denied
+
+    dept_id = _int_or_none(request.GET.get('dept_id'))
+    search = (request.GET.get('search') or '').strip() or None
+
+    conn = get_db_connection()
+    try:
+        people = list_people(conn, dept_id=dept_id, search=search)
+        depts = load_depts(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'people_list.html', _people_context(
+        request,
+        people=people,
+        depts=depts,
+        dept_id=dept_id,
+        search=search or '',
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        back_url='/dept/personnel/pers_menu/emp_records/',
+    ))
+
+
+def people_detail(request, person_id):
+    denied = _people_access(request)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        person = get_person(conn, person_id)
+    finally:
+        conn.close()
+
+    if not person:
+        return redirect('people_list')
+
+    return render(request, 'people_detail.html', _people_context(
+        request,
+        person=person,
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        back_url='/people/',
+    ))
+
+
+def _people_form(request):
+    """Pull + validate person fields from POST. Returns (data, error)."""
+    first_name = (request.POST.get('first_name') or '').strip()
+    last_name = (request.POST.get('last_name') or '').strip()
+    if not first_name or not last_name:
+        data = {k: (request.POST.get(k) or '') for k in [
+            'first_name', 'last_name', 'employee_id', 'email',
+            'job_title', 'address', 'city', 'state', 'zip_code']}
+        data['dept_id'] = _int_or_none(request.POST.get('dept_id'))
+        data['dept_sub_id'] = _int_or_none(request.POST.get('dept_sub_id'))
+        return data, 'First name and last name are required.'
+    return {
+        'first_name': first_name,
+        'last_name': last_name,
+        'employee_id': _int_or_none(request.POST.get('employee_id')) or 0,
+        'email': (request.POST.get('email') or '').strip(),
+        'job_title': (request.POST.get('job_title') or '').strip(),
+        'address': (request.POST.get('address') or '').strip(),
+        'city': (request.POST.get('city') or '').strip(),
+        'state': (request.POST.get('state') or '').strip(),
+        'zip_code': (request.POST.get('zip_code') or '').strip(),
+        'dept_id': _int_or_none(request.POST.get('dept_id')),
+        'dept_sub_id': _int_or_none(request.POST.get('dept_sub_id')),
+    }, None
+
+
+def people_new(request):
+    denied = _people_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        if request.method == 'POST':
+            data, error = _people_form(request)
+            if not error:
+                person_id = create_person(
+                    conn, **data,
+                    created_by=request.session.get('user_email'))
+                conn.commit()
+                return redirect('people_detail', person_id=person_id)
+            depts = load_depts(conn)
+            dept_subs = load_dept_subs(conn)
+            return render(request, 'people_form.html', _people_context(
+                request, mode='new', error=error, form=data,
+                depts=depts, dept_subs=dept_subs, back_url='/people/'))
+
+        depts = load_depts(conn)
+        dept_subs = load_dept_subs(conn)
+    finally:
+        conn.close()
+
+    form = {
+        'first_name': '', 'last_name': '', 'employee_id': '', 'email': '',
+        'job_title': '', 'address': '', 'city': '', 'state': '',
+        'zip_code': '', 'dept_id': None, 'dept_sub_id': None,
+    }
+    return render(request, 'people_form.html', _people_context(
+        request, mode='new', form=form, depts=depts, dept_subs=dept_subs,
+        back_url='/people/'))
+
+
+def people_edit(request, person_id):
+    denied = _people_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        person = get_person(conn, person_id)
+        if not person:
+            return redirect('people_list')
+
+        if request.method == 'POST':
+            data, error = _people_form(request)
+            if not error:
+                update_person(conn, person_id, **data)
+                conn.commit()
+                return redirect('people_detail', person_id=person_id)
+            depts = load_depts(conn)
+            dept_subs = load_dept_subs(conn)
+            return render(request, 'people_form.html', _people_context(
+                request, mode='edit', person=person, error=error, form=data,
+                depts=depts, dept_subs=dept_subs,
+                back_url='/people/%s/' % person_id))
+
+        depts = load_depts(conn)
+        dept_subs = load_dept_subs(conn)
+    finally:
+        conn.close()
+
+    form = {
+        'first_name': person['first_name'],
+        'last_name': person['last_name'],
+        'employee_id': person['employee_id'] or '',
+        'email': person['email'] or '',
+        'job_title': person['job_title'] or '',
+        'address': person['address'] or '',
+        'city': person['city'] or '',
+        'state': person['state'] or '',
+        'zip_code': person['zip_code'] or '',
+        'dept_id': person['dept_id'],
+        'dept_sub_id': person['dept_sub_id'],
+    }
+    return render(request, 'people_form.html', _people_context(
+        request, mode='edit', person=person, form=form,
+        depts=depts, dept_subs=dept_subs,
+        back_url='/people/%s/' % person_id))
+
+
+# --- Time-off requests ---
+
+def time_off_list(request):
+    if not request.session.get('user_email'):
+        return redirect('home')
+
+    status = request.GET.get('status') or None
+    if status not in TIME_OFF_STATUSES:
+        status = None
+
+    is_hr_user = _is_hr(request)
+    email = request.session.get('user_email', '')
+
+    conn = get_db_connection()
+    try:
+        people_id = None
+        if not is_hr_user:
+            p = get_person_by_email(conn, email)
+            people_id = p['id'] if p else -1
+        requests = list_time_off_requests(conn, people_id=people_id,
+                                          status=status)
+    finally:
+        conn.close()
+
+    back_url = (
+        '/dept/personnel/pers_menu/time_clock/time_off/'
+        if request.session.get('user_dept_key') == 'personnel'
+        else '/dashboard/'
+    )
+    return render(request, 'time_off_list.html', _people_context(
+        request,
+        requests=requests,
+        status=status,
+        statuses=TIME_OFF_STATUSES,
+        is_hr=is_hr_user,
+        back_url=back_url,
+    ))
+
+
+def time_off_new(request):
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('time_off_list')
+
+    email = request.session.get('user_email', '')
+
+    if request.method == 'POST':
+        start_date = (request.POST.get('start_date') or '').strip()
+        end_date = (request.POST.get('end_date') or '').strip()
+        request_type = request.POST.get('request_type') or 'Vacation'
+        if request_type not in TIME_OFF_TYPES:
+            request_type = 'Vacation'
+        notes = (request.POST.get('notes') or '').strip() or None
+        error = None
+        if not start_date or not end_date:
+            error = 'Start date and end date are required.'
+        elif end_date < start_date:
+            error = 'End date must be on or after start date.'
+        if not error:
+            conn = get_db_connection()
+            try:
+                p = get_person_by_email(conn, email)
+                if not p:
+                    error = 'Your employee record was not found.'
+                else:
+                    create_time_off_request(
+                        conn, p['id'], start_date, end_date,
+                        request_type=request_type, notes=notes,
+                        created_by=email)
+                    conn.commit()
+                    return redirect('time_off_list')
+            finally:
+                conn.close()
+        return render(request, 'time_off_form.html', _people_context(
+            request, error=error,
+            form={'start_date': start_date, 'end_date': end_date,
+                  'request_type': request_type, 'notes': notes or ''},
+            types=TIME_OFF_TYPES, back_url='/time-off/'))
+
+    form = {
+        'start_date': date.today().isoformat(),
+        'end_date': '',
+        'request_type': 'Vacation',
+        'notes': '',
+    }
+    return render(request, 'time_off_form.html', _people_context(
+        request, form=form, types=TIME_OFF_TYPES, back_url='/time-off/'))
+
+
+def time_off_detail(request, req_id):
+    if not request.session.get('user_email'):
+        return redirect('home')
+
+    is_hr_user = _is_hr(request)
+    email = request.session.get('user_email', '')
+
+    conn = get_db_connection()
+    try:
+        req = get_time_off_request(conn, req_id)
+        if not req:
+            return redirect('time_off_list')
+
+        # Non-HR users may only view their own requests.
+        if not is_hr_user:
+            p = get_person_by_email(conn, email)
+            if not p or p['id'] != req['people_id']:
+                return redirect('time_off_list')
+
+        if request.method == 'POST' and is_hr_user:
+            new_status = request.POST.get('status')
+            if new_status in TIME_OFF_STATUSES and new_status != 'pending':
+                set_time_off_status(conn, req_id, new_status)
+                conn.commit()
+                return redirect('time_off_detail', req_id=req_id)
+    finally:
+        conn.close()
+
+    return render(request, 'time_off_detail.html', _people_context(
+        request,
+        req=req,
+        is_hr=is_hr_user,
+        can_act=is_hr_user and req['status'] == 'pending',
+        back_url='/time-off/',
+    ))

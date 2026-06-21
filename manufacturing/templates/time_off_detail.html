@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block page_title %}Time-Off Request #{{ req.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.tod-wrap { width: 100%; max-width: 560px; }
+.tod-card {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 20px 24px; margin-bottom: 16px;
+}
+.tod-header { display: flex; justify-content: space-between; align-items: flex-start;
+              margin-bottom: 16px; }
+.tod-id { font-size: 20px; font-weight: bold; }
+.tod-badge {
+    padding: 4px 14px; border-radius: 14px; font-size: 13px;
+    font-weight: bold; border: 1px solid #999; text-transform: capitalize;
+}
+.tod-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px;
+    font-size: 13px;
+}
+.tod-grid b { color: #003cb4; }
+.tod-full { grid-column: 1 / -1; }
+.tod-notes { background: #f5f5f5; border-radius: 4px; padding: 8px 10px;
+             font-size: 13px; margin-top: 4px; white-space: pre-wrap; }
+.tod-actions { display: flex; gap: 10px; margin-top: 16px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="tod-wrap">
+        <div class="tod-card">
+            <div class="tod-header">
+                <div class="tod-id">Request #{{ req.id }}</div>
+                <span class="tod-badge" style="background:{{ req.status_color }};">
+                    {{ req.status }}
+                </span>
+            </div>
+            <div class="tod-grid">
+                <div><b>Employee:</b> {{ req.first_name }} {{ req.last_name }}</div>
+                <div><b>Type:</b> {{ req.request_type }}</div>
+                <div><b>Start Date:</b> {{ req.start_date }}</div>
+                <div><b>End Date:</b> {{ req.end_date }}</div>
+                <div><b>Submitted:</b> {{ req.request_date|default:"—" }}</div>
+                <div><b>Submitted by:</b> {{ req.created_by|default:"—" }}</div>
+                {% if req.notes %}
+                <div class="tod-full">
+                    <b>Notes:</b>
+                    <div class="tod-notes">{{ req.notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if can_act %}
+        <div class="tod-actions">
+            <form method="post" action="/time-off/{{ req.id }}/" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="approved">
+                <button type="submit" class="btn"
+                        style="background:#28a745;border-color:#28a745;">
+                    Approve</button>
+            </form>
+            <form method="post" action="/time-off/{{ req.id }}/" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="denied">
+                <button type="submit" class="btn"
+                        style="background:#dc3545;border-color:#dc3545;">
+                    Deny</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
