@@ -17,6 +17,7 @@ tables created from an older, narrower definition by adding any missing
 columns (``ALTER TABLE ... ADD COLUMN IF NOT EXISTS``).
 """
 
+from .audit_core import install_triggers
 from .db_pg import get_db
 from .log_utils import get_logger
 
@@ -142,6 +143,27 @@ _TABLES = [
             error_msg TEXT NOT NULL DEFAULT ''
         )
     """),
+    ("audit_log", """
+        CREATE TABLE IF NOT EXISTS audit_log (
+            id BIGSERIAL PRIMARY KEY,
+            table_name TEXT NOT NULL,
+            record_id INTEGER,
+            action TEXT NOT NULL,
+            changed_by TEXT NOT NULL DEFAULT '',
+            changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            old_values JSONB,
+            new_values JSONB
+        )
+    """),
+]
+
+_AUDIT_INDEXES = [
+    "CREATE INDEX IF NOT EXISTS audit_log_table_record "
+    "ON audit_log(table_name, record_id)",
+    "CREATE INDEX IF NOT EXISTS audit_log_changed_at "
+    "ON audit_log(changed_at DESC)",
+    "CREATE INDEX IF NOT EXISTS audit_log_changed_by "
+    "ON audit_log(changed_by)",
 ]
 
 # Columns backfilled onto pre-existing tables that may have been created from
@@ -235,6 +257,8 @@ def init_schema():
                 conn.execute(
                     f"ALTER TABLE {table} "
                     f"ADD COLUMN IF NOT EXISTS {col} {col_def}")
+        for idx_sql in _AUDIT_INDEXES:
+            conn.execute(idx_sql)
         for name, desc in DEFAULT_ROLES:
             conn.execute(
                 "INSERT INTO roles (role_name, description) "
@@ -251,6 +275,7 @@ def init_schema():
         conn.commit()
     finally:
         conn.close()
+    install_triggers()
     log.debug(
         "Schema initialized and reconciled (%d tables, %d roles)",
         len(_TABLES), len(DEFAULT_ROLES))

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block page_title %}Audit Log — Manufacturing System{% endblock %}
+
+{% block extra_styles %}
+.audit-wrap {
+    width: 100%;
+    max-width: 1100px;
+}
+.audit-wrap h2 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.filter-bar label { color: white; font-size: 13px; }
+.filter-bar select,
+.filter-bar input {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+}
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+}
+.audit-table th {
+    background: rgb(0, 60, 180);
+    color: white;
+    padding: 8px 12px;
+    text-align: left;
+}
+.audit-table td {
+    padding: 7px 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+.audit-table tr:hover td { background: #f0f4ff; }
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+}
+.badge-INSERT { background: #28a745; }
+.badge-UPDATE { background: #fd7e14; }
+.badge-DELETE { background: #dc3545; }
+.empty { color: #ccc; font-style: italic; padding: 20px; text-align: center; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="audit-wrap">
+    <h2>Audit Log</h2>
+    <form method="get" class="filter-bar">
+        <label>Table:
+            <select name="table">
+                <option value="">All tables</option>
+                {% for t in audited_tables %}
+                <option value="{{ t }}" {% if t == table_filter %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>User:
+            <input type="text" name="user" value="{{ user_filter }}" placeholder="email fragment">
+        </label>
+        <button type="submit" class="btn">Filter</button>
+        {% if table_filter or user_filter %}
+        <a href="{% url 'audit_log' %}" class="btn">Clear</a>
+        {% endif %}
+    </form>
+
+    <table class="audit-table">
+        <thead>
+            <tr>
+                <th>When</th>
+                <th>Table</th>
+                <th>Record</th>
+                <th>Action</th>
+                <th>Changed by</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entry in entries %}
+            <tr>
+                <td>{{ entry.changed_at }}</td>
+                <td>{{ entry.table_name }}</td>
+                <td>{{ entry.record_id }}</td>
+                <td><span class="badge badge-{{ entry.action }}">{{ entry.action }}</span></td>
+                <td>{{ entry.changed_by|default:"—" }}</td>
+                <td>
+                    <a href="{% url 'audit_record' entry.table_name entry.record_id %}" class="btn">History</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6" class="empty">No audit entries found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}
