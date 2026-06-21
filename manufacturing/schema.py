@@ -143,6 +143,17 @@ _TABLES = [
             error_msg TEXT NOT NULL DEFAULT ''
         )
     """),
+    ("closed_periods", """
+        CREATE TABLE IF NOT EXISTS closed_periods (
+            id SERIAL PRIMARY KEY,
+            period_year INTEGER NOT NULL,
+            period_month INTEGER NOT NULL,
+            closed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            closed_by TEXT NOT NULL DEFAULT '',
+            notes TEXT NOT NULL DEFAULT '',
+            UNIQUE(period_year, period_month)
+        )
+    """),
     ("audit_log", """
         CREATE TABLE IF NOT EXISTS audit_log (
             id BIGSERIAL PRIMARY KEY,
