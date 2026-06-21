@@ -119,6 +119,29 @@ _TABLES = [
             created_by TEXT
         )
     """),
+    ("time_clock_devices", """
+        CREATE TABLE IF NOT EXISTS time_clock_devices (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            location TEXT NOT NULL DEFAULT '',
+            device_type TEXT NOT NULL DEFAULT 'manual',
+            ip_address TEXT NOT NULL DEFAULT '',
+            port INTEGER NOT NULL DEFAULT 0,
+            config_json TEXT NOT NULL DEFAULT '{}',
+            enabled BOOLEAN NOT NULL DEFAULT TRUE,
+            created_by TEXT
+        )
+    """),
+    ("time_clock_sync_log", """
+        CREATE TABLE IF NOT EXISTS time_clock_sync_log (
+            id SERIAL PRIMARY KEY,
+            device_id INTEGER NOT NULL REFERENCES time_clock_devices(id),
+            synced_at TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'ok',
+            records_imported INTEGER NOT NULL DEFAULT 0,
+            error_msg TEXT NOT NULL DEFAULT ''
+        )
+    """),
 ]
 
 # Columns backfilled onto pre-existing tables that may have been created from

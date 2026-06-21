@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block page_title %}{% if is_new %}Add Time Clock{% else %}Edit Time Clock{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if not is_new %}
+<a href="/time-clock/devices/" class="btn">All Devices</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.tcf-wrap { width: 100%; max-width: 680px; }
+.tcf-card {
+    background: white; border: 2px solid black; border-radius: 8px;
+    padding: 22px 28px; margin-bottom: 24px;
+}
+.tcf-row { margin-bottom: 14px; }
+.tcf-row label { display: block; font-size: 12px; font-weight: bold;
+                 color: #003cb4; margin-bottom: 4px; }
+.tcf-row input[type=text], .tcf-row input[type=number],
+.tcf-row select, .tcf-row textarea {
+    width: 100%; box-sizing: border-box;
+    padding: 7px 10px; border: 2px solid black; border-radius: 4px;
+    font-size: 13px; font-family: inherit;
+}
+.tcf-row textarea { height: 80px; font-family: monospace; font-size: 12px; }
+.tcf-type-help {
+    font-size: 12px; color: #555; margin-top: 5px; display: none;
+}
+.tcf-section {
+    display: none; border-top: 1px solid #ccc; padding-top: 12px; margin-top: 4px;
+}
+.tcf-section.visible { display: block; }
+.tcf-section-title {
+    font-size: 11px; font-weight: bold; color: #888;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+}
+.tcf-hint { font-size: 11px; color: #777; margin-top: 3px; }
+.tcf-err { background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
+           padding: 10px 14px; color: #900; margin-bottom: 16px; }
+.tcf-btns { display: flex; gap: 10px; margin-top: 20px; }
+.tcf-del { background: #dc3545; color: white; border: none; border-radius: 4px;
+           padding: 7px 18px; font-size: 13px; cursor: pointer;
+           font-weight: bold; }
+.tcf-del:hover { background: #c82333; }
+
+/* Sync log */
+.tcl-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+    font-size: 12px;
+}
+.tcl-table th, .tcl-table td { padding: 6px 10px; border-bottom: 1px solid #eee; }
+.tcl-table th { background: rgb(0,60,180); color: white; }
+.badge-ok  { background:#d4edda; border:1px solid #999; border-radius:10px;
+             padding:1px 8px; font-size:11px; font-weight:bold; }
+.badge-err { background:#f8d7da; border:1px solid #999; border-radius:10px;
+             padding:1px 8px; font-size:11px; font-weight:bold; }
+.badge-par { background:#fff3cd; border:1px solid #999; border-radius:10px;
+             padding:1px 8px; font-size:11px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">{% if is_new %}Add Time Clock Device{% else %}{{ form.name }}{% endif %}</div>
+    <div class="tcf-wrap">
+
+        {% if error %}<div class="tcf-err">{{ error }}</div>{% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="tcf-card">
+
+                <!-- ── Step 1: What type of time clock? ── -->
+                <div class="tcf-row">
+                    <label for="id_device_type">What type of time clock is this?</label>
+                    <select id="id_device_type" name="device_type" onchange="onTypeChange(this.value)" required>
+                        <option value="">— select a type —</option>
+                        <option value="csv"       {% if form.device_type == 'csv' %}selected{% endif %}>CSV File Import — clock exports a CSV to a shared folder</option>
+                        <option value="http_rest" {% if form.device_type == 'http_rest' %}selected{% endif %}>HTTP REST API — clock has a web API you can poll</option>
+                        <option value="zkteco"    {% if form.device_type == 'zkteco' %}selected{% endif %}>ZKTeco Terminal — fingerprint / badge terminal (TCP port 4370)</option>
+                        <option value="manual"    {% if form.device_type == 'manual' %}selected{% endif %}>Manual Entry — punches entered via the web UI (no polling)</option>
+                    </select>
+                </div>
+
+                <!-- ── Step 2: Name + Location (always shown once type chosen) ── -->
+                <div id="section-basic" class="tcf-section {% if form.device_type %}visible{% endif %}">
+                    <div class="tcf-section-title">Device Info</div>
+                    <div class="tcf-row">
+                        <label for="id_name">Device Name *</label>
+                        <input type="text" id="id_name" name="name"
+                               value="{{ form.name|default:'' }}"
+                               placeholder="e.g. Front Door Clock" required>
+                    </div>
+                    <div class="tcf-row">
+                        <label for="id_location">Location</label>
+                        <input type="text" id="id_location" name="location"
+                               value="{{ form.location|default:'' }}"
+                               placeholder="e.g. Main Entrance">
+                    </div>
+                    {% if not is_new %}
+                    <div class="tcf-row" style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="id_enabled" name="enabled"
+                               {% if form.enabled %}checked{% endif %} style="width:auto;">
+                        <label for="id_enabled" style="margin:0;color:#333;font-size:13px;">Enabled</label>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- ── CSV config ── -->
+                <div id="section-csv" class="tcf-section {% if form.device_type == 'csv' %}visible{% endif %}">
+                    <div class="tcf-section-title">CSV Configuration</div>
+                    <div class="tcf-row">
+                        <label>CSV File Path</label>
+                        <input type="text" id="csv_file_path" name="csv_file_path"
+                               placeholder="/shared/timeclock/punches.csv">
+                        <div class="tcf-hint">
+                            The server-side path to the CSV the clock writes.<br>
+                            Expected columns: <code>employee_id, datetime, direction</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── HTTP REST config ── -->
+                <div id="section-http_rest" class="tcf-section {% if form.device_type == 'http_rest' %}visible{% endif %}">
+                    <div class="tcf-section-title">HTTP REST Configuration</div>
+                    <div class="tcf-row">
+                        <label>Base URL</label>
+                        <input type="text" id="http_base_url" name="http_base_url"
+                               placeholder="http://192.168.1.50">
+                    </div>
+                    <div class="tcf-row">
+                        <label>API Endpoint</label>
+                        <input type="text" id="http_endpoint" name="http_endpoint"
+                               placeholder="/api/punches" value="/api/punches">
+                    </div>
+                    <div class="tcf-row">
+                        <label>API Key (optional)</label>
+                        <input type="text" id="http_api_key" name="http_api_key"
+                               placeholder="Bearer token or key">
+                    </div>
+                    <div class="tcf-hint">
+                        Response must be a JSON array:
+                        <code>[{"employee_id":1001,"datetime":"2026-06-21 08:05:00","direction":"in"},...]</code>
+                    </div>
+                </div>
+
+                <!-- ── ZKTeco config ── -->
+                <div id="section-zkteco" class="tcf-section {% if form.device_type == 'zkteco' %}visible{% endif %}">
+                    <div class="tcf-section-title">ZKTeco Terminal Configuration</div>
+                    <div class="tcf-row">
+                        <label>IP Address</label>
+                        <input type="text" id="id_ip_address" name="ip_address"
+                               value="{{ form.ip_address|default:'' }}"
+                               placeholder="192.168.1.100">
+                    </div>
+                    <div class="tcf-row">
+                        <label>Port</label>
+                        <input type="number" id="id_port" name="port"
+                               value="{{ form.port|default:'4370' }}"
+                               placeholder="4370">
+                    </div>
+                    <div class="tcf-row">
+                        <label>Device Password (usually 0)</label>
+                        <input type="text" id="zk_password" name="zk_password"
+                               placeholder="0">
+                    </div>
+                    <div class="tcf-hint">
+                        Requires <code>pip install pyzk</code> on the server.
+                        The terminal must be on the same network as the server.
+                    </div>
+                </div>
+
+                <!-- ── Manual: no extra config ── -->
+                <div id="section-manual" class="tcf-section {% if form.device_type == 'manual' %}visible{% endif %}">
+                    <div class="tcf-section-title">Manual Entry</div>
+                    <p style="font-size:13px;color:#555;margin:0;">
+                        No connection needed. Employees punch in and out via the
+                        web Time Clock page. Use "Poll Now" on the device to confirm
+                        (it will always return 0 records).
+                    </p>
+                </div>
+
+                <!-- Hidden config_json field — built by JS before submit -->
+                <input type="hidden" id="id_config_json" name="config_json" value="{{ form.config_json|default:'{}' }}">
+
+            </div><!-- .tcf-card -->
+
+            <div class="tcf-btns">
+                <button type="submit" class="btn" style="padding:8px 24px;font-size:14px;font-weight:bold;">
+                    {% if is_new %}Add Device{% else %}Save Changes{% endif %}
+                </button>
+                <a href="{{ back_url }}" class="btn" style="padding:8px 18px;">Cancel</a>
+            </div>
+
+        </form>
+
+        {% if not is_new %}
+        <form id="delete-form" method="post" action="/time-clock/devices/{{ device_id }}/delete/"
+              style="margin-top:10px;"
+              onsubmit="return confirm('Delete this device and all sync history?')">
+            {% csrf_token %}
+            <button type="submit" class="tcf-del">Delete Device</button>
+        </form>
+        {% endif %}
+
+        <!-- ── Sync log (edit page only) ── -->
+        {% if not is_new %}
+        <div style="margin-top:28px;">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;">
+                <div class="menu-title" style="font-size:16px;margin:0;">Sync History</div>
+                <form method="post" action="/time-clock/devices/{{ device_id }}/poll/">
+                    {% csrf_token %}
+                    <button type="submit" class="btn" style="padding:5px 14px;font-size:13px;">Poll Now</button>
+                </form>
+            </div>
+            {% if sync_log %}
+            <table class="tcl-table">
+                <thead>
+                    <tr><th>When</th><th>Status</th><th>Records</th><th>Message</th></tr>
+                </thead>
+                <tbody>
+                    {% for entry in sync_log %}
+                    <tr>
+                        <td>{{ entry.synced_at }}</td>
+                        <td>
+                            {% if entry.status == 'ok' %}<span class="badge-ok">OK</span>
+                            {% elif entry.status == 'error' %}<span class="badge-err">Error</span>
+                            {% else %}<span class="badge-par">Partial</span>{% endif %}
+                        </td>
+                        <td>{{ entry.records_imported }}</td>
+                        <td style="color:#900;font-size:11px;">{{ entry.error_msg|default:"" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:white;font-size:13px;">No sync history yet. Click "Poll Now" to test the connection.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+// Populate the individual config fields from the stored config_json on page load
+(function () {
+    var raw = document.getElementById('id_config_json').value;
+    var cfg = {};
+    try { cfg = JSON.parse(raw); } catch(e) {}
+
+    // CSV
+    if (cfg.file_path) document.getElementById('csv_file_path').value = cfg.file_path;
+    // HTTP
+    if (cfg.base_url)  document.getElementById('http_base_url').value  = cfg.base_url;
+    if (cfg.endpoint)  document.getElementById('http_endpoint').value   = cfg.endpoint;
+    if (cfg.api_key)   document.getElementById('http_api_key').value    = cfg.api_key;
+    // ZKTeco
+    if (cfg.password !== undefined)
+        document.getElementById('zk_password').value = cfg.password;
+})();
+
+function onTypeChange(type) {
+    // Show/hide sections
+    var sections = ['basic','csv','http_rest','zkteco','manual'];
+    sections.forEach(function(s) {
+        var el = document.getElementById('section-' + s);
+        if (el) el.classList.remove('visible');
+    });
+    if (type) {
+        var basic = document.getElementById('section-basic');
+        if (basic) basic.classList.add('visible');
+        var sec = document.getElementById('section-' + type);
+        if (sec) sec.classList.add('visible');
+    }
+}
+
+// Before submit: build config_json from the visible type's fields
+document.querySelector('form').addEventListener('submit', function() {
+    var type = document.getElementById('id_device_type').value;
+    var cfg = {};
+    if (type === 'csv') {
+        cfg.file_path = document.getElementById('csv_file_path').value;
+    } else if (type === 'http_rest') {
+        cfg.base_url  = document.getElementById('http_base_url').value;
+        cfg.endpoint  = document.getElementById('http_endpoint').value;
+        cfg.api_key   = document.getElementById('http_api_key').value;
+    } else if (type === 'zkteco') {
+        var ip = document.getElementById('id_ip_address').value;
+        var port = document.getElementById('id_port').value;
+        var pwd = document.getElementById('zk_password').value;
+        cfg.ip = ip;
+        cfg.port = parseInt(port) || 4370;
+        cfg.password = parseInt(pwd) || 0;
+    }
+    document.getElementById('id_config_json').value = JSON.stringify(cfg);
+});
+</script>
+{% endblock %}
