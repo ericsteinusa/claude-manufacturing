@@ -14,10 +14,34 @@ log = get_logger(__name__)
 # subprocess spawned from the session (set once by login_app.SessionWindow).
 _USER_ENV_VAR = 'MFGAPP_USER'
 
+# Environment variable used to propagate the selected location name to every
+# subprocess spawned from the session (set once by login_app.SessionWindow).
+_LOCATION_ENV_VAR = 'MFGAPP_LOCATION'
+
 
 def get_current_user_email() -> str:
     """Return the email of the user who launched this process, or ''."""
     return os.environ.get(_USER_ENV_VAR, '')
+
+
+def get_current_location() -> str:
+    """Return the location name selected at login for this process, or ''."""
+    return os.environ.get(_LOCATION_ENV_VAR, '')
+
+
+def list_locations() -> list[dict]:
+    """Return active locations as [{id, name, code}, ...] sorted by name."""
+    conn = _get_db()
+    try:
+        rows = conn.execute(
+            "SELECT id, name, code FROM location "
+            "WHERE is_active ORDER BY name"
+        ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
+    finally:
+        conn.close()
 
 
 def get_current_user_profile() -> dict:

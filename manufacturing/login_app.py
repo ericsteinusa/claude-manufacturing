@@ -5,7 +5,10 @@ import psycopg2
 from .db_pg import get_db
 from .log_utils import get_logger
 from .schema import init_schema
-from .accounts import _get_user_profile, _is_full_access, _USER_ENV_VAR
+from .accounts import (
+    _get_user_profile, _is_full_access, _USER_ENV_VAR, _LOCATION_ENV_VAR,
+    list_locations,
+)
 from .launch_utils import launch as _launch
 from .menus import main_menu_script_for_dept
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -810,15 +813,68 @@ class RolesWindow(QtWidgets.QDialog):
 
 
 # ---------------------------------------------------------------------------
+# Location picker  (shown after login, before the main session window)
+# ---------------------------------------------------------------------------
+class LocationPickerDialog(QtWidgets.QDialog):
+    """Modal dialog that asks the user which site/location they are at."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Select Location")
+        self.setFixedSize(360, 180)
+        _apply_blue_palette(self)
+        self.selected_location = ""
+        self._build_ui()
+
+    def _build_ui(self):
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(40, 30, 40, 20)
+        layout.setSpacing(16)
+
+        title = QtWidgets.QLabel("Where are you working today?")
+        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet(
+            "color: white; font-size: 13px; font-weight: bold;"
+        )
+        layout.addWidget(title)
+
+        self.combo = QtWidgets.QComboBox()
+        self.combo.setStyleSheet(INPUT_STYLE)
+        locations = list_locations()
+        for loc in locations:
+            self.combo.addItem(loc["name"], loc["id"])
+        layout.addWidget(self.combo)
+
+        btn_row = QtWidgets.QHBoxLayout()
+        ok_btn = QtWidgets.QPushButton("Continue")
+        ok_btn.setFixedHeight(32)
+        ok_btn.setStyleSheet(BUTTON_STYLE)
+        ok_btn.clicked.connect(self._on_ok)
+        cancel_btn = QtWidgets.QPushButton("Cancel")
+        cancel_btn.setFixedHeight(32)
+        cancel_btn.setStyleSheet(BUTTON_STYLE)
+        cancel_btn.clicked.connect(self.reject)
+        btn_row.addWidget(ok_btn)
+        btn_row.addWidget(cancel_btn)
+        layout.addLayout(btn_row)
+
+    def _on_ok(self):
+        self.selected_location = self.combo.currentText()
+        self.accept()
+
+
+# ---------------------------------------------------------------------------
 # Session window  (shown after login, hosts the main app + logout button)
 # ---------------------------------------------------------------------------
 class SessionWindow(QtWidgets.QMainWindow):
     logged_out = QtCore.pyqtSignal()
 
-    def __init__(self, email: str, parent=None):
+    def __init__(self, email: str, location: str = "", parent=None):
         super().__init__(parent)
         self.email = email
+        self.location = location
         os.environ[_USER_ENV_VAR] = email
+        os.environ[_LOCATION_ENV_VAR] = location
         self._profile = _get_user_profile(email) or {}
         _apply_blue_palette(self)
         self._build_ui()
@@ -900,6 +956,13 @@ class SessionWindow(QtWidgets.QMainWindow):
             QtWidgets.QSizePolicy.Policy.Preferred,
         )
         toolbar.addWidget(spacer)
+
+        if self.location:
+            loc_lbl = QtWidgets.QLabel(f"Location:  {self.location}")
+            loc_lbl.setStyleSheet(
+                "color: white; font-size: 12px; padding-right: 16px;"
+            )
+            toolbar.addWidget(loc_lbl)
 
         user_lbl = QtWidgets.QLabel(f"Logged in as:  {self.email}")
         user_lbl.setStyleSheet(
@@ -1054,7 +1117,11 @@ def main():
     login = LoginWindow()
 
     def on_login(email: str):
-        session = SessionWindow(email)
+        picker = LocationPickerDialog()
+        if picker.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+            login.show()
+            return
+        session = SessionWindow(email, picker.selected_location)
         session.logged_out.connect(on_logout)
         # Keep a reference so it isn't garbage-collected
         login._session = session

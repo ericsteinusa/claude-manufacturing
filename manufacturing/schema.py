@@ -87,6 +87,14 @@ _TABLES = [
             FOREIGN KEY (people_id) REFERENCES people(id)
         )
     """),
+    ("location", """
+        CREATE TABLE IF NOT EXISTS location (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE,
+            code TEXT NOT NULL DEFAULT '',
+            is_active BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    """),
 ]
 
 # Columns backfilled onto pre-existing tables that may have been created from
@@ -116,6 +124,13 @@ _RECONCILE = {
 # Canonical role vocabulary — the single source of truth for the roles
 # table. Seeded by init_schema(); both the desktop login (login_app) and
 # the web layer (views) rely on these rather than defining their own set.
+DEFAULT_LOCATIONS = [
+    ('Main Plant', 'MAIN'),
+    ('Warehouse', 'WH'),
+    ('Office', 'OFF'),
+]
+
+
 DEFAULT_ROLES = [
     ('President', 'Full access — company president'),
     ('Vice President', 'Full access — company vice president'),
@@ -179,8 +194,15 @@ def init_schema():
                 "(SELECT 1 FROM roles WHERE role_name = %s)",
                 (name, desc, name))
         _migrate_legacy_roles(conn)
+        for name, code in DEFAULT_LOCATIONS:
+            conn.execute(
+                "INSERT INTO location (name, code) "
+                "SELECT %s, %s WHERE NOT EXISTS "
+                "(SELECT 1 FROM location WHERE name = %s)",
+                (name, code, name))
         conn.commit()
     finally:
         conn.close()
-    log.debug("Schema initialized and reconciled (%d tables, %d roles)",
-              len(_TABLES), len(DEFAULT_ROLES))
+    log.debug(
+        "Schema initialized and reconciled (%d tables, %d roles)",
+        len(_TABLES), len(DEFAULT_ROLES))
