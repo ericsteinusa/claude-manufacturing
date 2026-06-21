@@ -5,6 +5,9 @@
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">Back</a>
 {% if can_edit %}<a href="/po/{{ po.id }}/edit/" class="btn">Edit</a>{% endif %}
+{% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
+<a href="{% url 'audit_record' 'purchase_order' po.id %}" class="btn">History</a>
+{% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}
 
