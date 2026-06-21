@@ -18,27 +18,29 @@ import psycopg2
 from .mrp_core import next_sequence_number
 
 # Workflow states a PO moves through, in order. ``cancelled`` is terminal.
-PO_STATUSES = ("draft", "sent", "partial", "received", "cancelled")
+PO_STATUSES = ("draft", "pending_approval", "sent", "partial", "received", "cancelled")
 
 # Row background colours, shared with the desktop table (mirrored in the web
 # list as a status pill). Keyed by status; unknown statuses fall back to white.
 PO_STATUS_COLORS = {
-    "draft":     "#ffffff",
-    "sent":      "#cce5ff",
-    "partial":   "#fff3cd",
-    "received":  "#d4edda",
-    "cancelled": "#dcdcdc",
+    "draft":            "#ffffff",
+    "pending_approval": "#fff0b3",
+    "sent":             "#cce5ff",
+    "partial":          "#fff3cd",
+    "received":         "#d4edda",
+    "cancelled":        "#dcdcdc",
 }
 
 # Allowed forward status moves. ``received`` and ``cancelled`` are terminal.
-# (The desktop lets any button set any status; the web enforces this so the
-# workflow can't skip or reopen states.)
+# ``pending_approval`` is entered automatically by the approval intercept, not
+# via a status button, so it has no outbound web transitions of its own.
 PO_STATUS_TRANSITIONS = {
-    "draft":     ("sent", "cancelled"),
-    "sent":      ("partial", "received", "cancelled"),
-    "partial":   ("received", "cancelled"),
-    "received":  (),
-    "cancelled": (),
+    "draft":            ("sent", "cancelled"),
+    "pending_approval": ("cancelled",),
+    "sent":             ("partial", "received", "cancelled"),
+    "partial":          ("received", "cancelled"),
+    "received":         (),
+    "cancelled":        (),
 }
 
 # Button label shown for a transition into each status.

@@ -83,6 +83,16 @@
                 <div style="grid-column: 1 / -1;">
                     <b>Notes:</b> {{ po.notes|default:"—" }}</div>
             </div>
+            {% if po.status == 'pending_approval' and approval %}
+            <div style="margin-top:14px;padding:10px 14px;background:#fff0b3;
+                        border:1px solid #e0b800;border-radius:4px;font-size:13px;">
+                <b>Awaiting approval</b> — this PO exceeds the ${{ approval_threshold|floatformat:0 }}
+                approval threshold. Requested by {{ approval.requested_by }}.
+                {% if user_role == 'President' or user_role == 'Vice President' %}
+                <a href="{% url 'po_approvals' %}" style="color:#003cb4;">Go to approval queue &rarr;</a>
+                {% endif %}
+            </div>
+            {% endif %}
             {% if status_actions %}
             <div class="po-status-actions">
                 {% for target, label in status_actions %}
