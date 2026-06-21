@@ -1,11 +1,11 @@
 import sys
 import psycopg2
-from .db_pg import get_db
-from .accounts import get_current_user_email
-from .purchase_orders_core import next_po_number
+from ..db_pg import get_db
+from ..accounts import get_current_user_email
+from ..purchase_orders_core import next_po_number
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
 BLUE = QtGui.QColor(0, 85, 255)
 BUTTON_STYLE = (

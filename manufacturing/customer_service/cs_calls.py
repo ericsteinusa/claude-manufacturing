@@ -10,7 +10,7 @@ import sys
 
 from PyQt6 import QtWidgets
 
-from .accounts import get_current_user_email
+from ..accounts import get_current_user_email
 from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 
 

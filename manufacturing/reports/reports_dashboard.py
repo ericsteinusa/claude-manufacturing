@@ -6,8 +6,8 @@ import datetime
 
 from PyQt6 import QtCore, QtWidgets
 
-from .db_pg import get_db_connection
-from .reports_core import cs_summary, inventory_alerts, po_summary, wo_summary
+from ..db_pg import get_db_connection
+from ..reports_core import cs_summary, inventory_alerts, po_summary, wo_summary
 
 PO_STATUS_COLORS = {
     "draft":     "#f8f9fa",

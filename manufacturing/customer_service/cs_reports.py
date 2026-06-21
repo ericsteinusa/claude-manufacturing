@@ -3,13 +3,13 @@ cs_reports.py — Customer Service Reports
 Tabs: Summary | Call Volume | By Customer | Open Calls
 """
 import sys
-from .db_pg import get_db
+from ..db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BLUE
+from ..qt_theme import BLUE
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
 
 BUTTON_STYLE = (

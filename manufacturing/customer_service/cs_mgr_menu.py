@@ -1,15 +1,15 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import BUTTON_STYLE
+from ..qt_theme import BUTTON_STYLE
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 from .cs_calls_widget import CustomerServiceCallsWidget, _apply_blue_palette
 from .cs_reports import CSReportsWidget
 from .cs_staff_mgmt import CSStaffMgmtWidget
 from .cs_satisfaction import CSSatisfactionWidget
 from .cs_escalations import CSEscalationsWidget
-from .accounts import get_current_user_email
+from ..accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

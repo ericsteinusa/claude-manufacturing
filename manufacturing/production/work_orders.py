@@ -1,14 +1,14 @@
 import sys
 import psycopg2
-from .db_pg import get_db_connection
-from .accounts import get_current_user_email
-from .work_orders_core import (
+from ..db_pg import get_db_connection
+from ..accounts import get_current_user_email
+from ..work_orders_core import (
     next_wo_number, WO_STATUS_COLORS,
     ensure_wo_tables, list_wos, get_wo_materials, load_products,
     create_wo, update_wo, add_wo_material, set_wo_status,
 )
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,

@@ -34,7 +34,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from PyQt6 import QtGui, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     LABEL_STYLE,
@@ -43,11 +43,11 @@ from .qt_theme import (
 )
 
 
-from .accounts import get_current_user_email
+from ..accounts import get_current_user_email
 from .bom import explode_bom_to_wo
-from .db_pg import get_db_connection
-from .mrp_core import compute_levels, plan_orders, next_sequence_number
-from .purchase_requisitions import _next_req_num
+from ..db_pg import get_db_connection
+from ..mrp_core import compute_levels, plan_orders, next_sequence_number
+from ..purchase_requisitions import _next_req_num
 
 # Re-exported so callers/tests can reach the pure planning core; the
 # implementations live in mrp_core (importable without Qt).

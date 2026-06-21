@@ -1,10 +1,10 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
-from .dept_menu_widget import DeptMenuWidget
-from .time_clock_menu import TimeClockWidget
-from .Payroll_dept import PayrollDeptWidget
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
+from ..dept_menu_widget import DeptMenuWidget
+from ..time_clock.time_clock_menu import TimeClockWidget
+from ..payroll.Payroll_dept import PayrollDeptWidget
 
 _TITLE = "Personnel Menu"
 _ITEMS = [

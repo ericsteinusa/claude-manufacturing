@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 from .Budget_mgmt import BudgetManagementWidget, _apply_blue_palette
 from .Budget_reports import (BudgetDetailWidget, BudgetVsActualWidget,
                              VarianceReportWidget, DeptSummaryWidget,

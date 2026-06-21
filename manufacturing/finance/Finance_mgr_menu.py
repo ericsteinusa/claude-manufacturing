@@ -1,9 +1,9 @@
 import sys
 from PyQt6 import QtWidgets
-from .button_nav import ButtonNav
-from .qt_theme import apply_blue_palette as _apply_blue_palette
+from ..button_nav import ButtonNav
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
 from .Budget_mgmt import BudgetManagementWidget
-from .General_ledger import GeneralLedgerWidget
+from ..accounting.General_ledger import GeneralLedgerWidget
 from .Tax_mgmt import TaxMgmtWidget
 from .Audit_mgmt import AuditMgmtWidget
 

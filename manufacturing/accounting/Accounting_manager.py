@@ -1,17 +1,17 @@
 import sys
 from PyQt6 import QtWidgets
 
-from .button_nav import ButtonNav
-from .accounts import get_current_user_email
+from ..button_nav import ButtonNav
+from ..accounts import get_current_user_email
 from .Accounts_payable import AccountsPayableWidget, _apply_blue_palette
 from .Accounts_receivable import AccountsReceivableWidget
-from .Credit_dept import CreditDeptWidget
-from .Payroll_dept import PayrollDeptWidget
+from ..customers.Credit_dept import CreditDeptWidget
+from ..payroll.Payroll_dept import PayrollDeptWidget
 from .General_ledger import GeneralLedgerWidget
-from .Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
-from .Bank_reconciliation import BankReconciliationWidget
-from .Tax_mgmt import TaxMgmtWidget
-from .Audit_mgmt import AuditMgmtWidget
+from ..finance.Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
+from ..finance.Bank_reconciliation import BankReconciliationWidget
+from ..finance.Tax_mgmt import TaxMgmtWidget
+from ..finance.Audit_mgmt import AuditMgmtWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

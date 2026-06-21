@@ -4,8 +4,8 @@ import os
 import tkinter as tk
 from tkinter import messagebox, PhotoImage
 from tkinter import *  # noqa: F401,F403,F405
-from .db_pg import get_db
-from .log_utils import get_logger
+from ..db_pg import get_db
+from ..log_utils import get_logger
 import subprocess
 
 log = get_logger(__name__)

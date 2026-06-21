@@ -1,12 +1,12 @@
 import sys
 from PyQt6 import QtWidgets
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 from .Sales_menu import SalesOrdersWidget
-from .qt_theme import apply_blue_palette as _apply_blue_palette
-from .Accounts_receivable import AccountsReceivableWidget
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
+from ..accounting.Accounts_receivable import AccountsReceivableWidget
 from .Sales_mgmt import (QuotesWidget, CustomersWidget, SalesTargetsWidget,
                          CommissionsWidget)
-from .accounts import get_current_user_email
+from ..accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

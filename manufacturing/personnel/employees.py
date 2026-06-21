@@ -1,9 +1,9 @@
 import sys
 import psycopg2
-from .db_pg import get_db_connection
-from .schema import init_schema
+from ..db_pg import get_db_connection
+from ..schema import init_schema
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,

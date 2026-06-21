@@ -1,9 +1,9 @@
 import sys
 import psycopg2
-from .db_pg import get_db_connection
-from .accounts import get_current_user_email
+from ..db_pg import get_db_connection
+from ..accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -12,7 +12,7 @@ from .qt_theme import (
     ro as _ro,
 )
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
 
 TIME_OFF_TYPES = ["Vacation", "Sick", "Personal", "Bereavement", "Other"]
