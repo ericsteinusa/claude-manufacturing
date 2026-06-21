@@ -4,18 +4,33 @@ audit_core.py — Database-level audit trail via PostgreSQL triggers.
 Every INSERT, UPDATE, and DELETE on audited tables is captured in
 ``audit_log`` by a single PL/pgSQL trigger function.  The ``changed_by``
 field is populated from the PostgreSQL session variable ``app.current_user``,
-which callers set via :func:`set_audit_user` before performing writes.
+set on every new connection from two sources (in priority order):
 
-Desktop modules have ``MFGAPP_USER`` propagated by the login shell, and
-``db_pg.get_db`` / ``get_db_connection`` set the variable automatically
-from that env var on every new connection.
+1. ``_CURRENT_USER`` thread-local — set by ``AuditUserMiddleware`` for each
+   Django request (web path).
+2. ``MFGAPP_USER`` environment variable — propagated to subprocesses by the
+   desktop login shell (desktop path).
 
-Web views call ``set_audit_user`` explicitly inside request handlers that
-write to the database.
+Web callers can also call :func:`set_audit_user` directly on an open
+connection to override within a transaction.
 """
+
+import threading
 
 from .db_pg import get_db_connection
 from .log_utils import get_logger
+
+_CURRENT_USER = threading.local()
+
+
+def get_thread_user() -> str:
+    """Return the user email stored on the current thread, or empty string."""
+    return getattr(_CURRENT_USER, 'email', '')
+
+
+def set_thread_user(email: str) -> None:
+    """Store a user email on the current thread for audit logging."""
+    _CURRENT_USER.email = email or ''
 
 log = get_logger(__name__)
 
