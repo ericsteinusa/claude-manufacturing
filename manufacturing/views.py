@@ -23,6 +23,11 @@ from .purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
+from .time_clock_core import (
+    get_current_entry, clock_in as tc_clock_in, clock_out_entry,
+    list_entries, total_hours as tc_total_hours,
+    get_period_dates, get_attendance,
+)
 from .personnel_core import (
     TIME_OFF_STATUSES, TIME_OFF_TYPES,
     list_people, get_person, get_person_by_email,
@@ -103,6 +108,17 @@ WEB_LEAF_URLS = {
     ('personnel', 'pend_req'): '/time-off/?status=pending',
     ('personnel', 'appr_req'): '/time-off/?status=approved',
     ('personnel', 'req_hist'): '/time-off/',
+    ('personnel', 'punch_in'): '/time-clock/',
+    ('personnel', 'punch_out'): '/time-clock/',
+    ('personnel', 'cur_status'): '/time-clock/',
+    ('personnel', 'today_hrs'): '/time-clock/hours/',
+    ('personnel', 'week_hrs'): '/time-clock/hours/?period=week',
+    ('personnel', 'month_hrs'): '/time-clock/hours/?period=month',
+    ('personnel', 'period_hrs'): '/time-clock/hours/?period=month',
+    ('personnel', 'daily_att'): '/time-clock/attendance/',
+    ('personnel', 'month_sum'): '/time-clock/attendance/?period=month',
+    ('personnel', 'tard_rpt'): '/time-clock/attendance/',
+    ('personnel', 'abs_rpt'): '/time-clock/attendance/',
 }
 
 
@@ -1700,4 +1716,131 @@ def time_off_detail(request, req_id):
         is_hr=is_hr_user,
         can_act=is_hr_user and req['status'] == 'pending',
         back_url='/time-off/',
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Time clock — punch in/out, hours, attendance (web)
+# ---------------------------------------------------------------------------
+
+_TC_BACK = '/dept/personnel/pers_menu/time_clock/'
+
+
+def _tc_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def time_clock_status(request):
+    """Punch in / punch out page and current status."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    email = request.session.get('user_email', '')
+
+    conn = get_db_connection()
+    try:
+        person = get_person_by_email(conn, email)
+        if not person:
+            return render(request, 'time_clock_status.html', _tc_context(
+                request, error='Your employee record was not found.',
+                current=None, today_entries=[], back_url=_TC_BACK))
+
+        people_id = person['id']
+
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            current = get_current_entry(conn, people_id)
+            if action == 'clock_in' and not current:
+                tc_clock_in(conn, people_id, created_by=email)
+                conn.commit()
+            elif action == 'clock_out' and current:
+                clock_out_entry(conn, current['id'])
+                conn.commit()
+            return redirect('time_clock_status')
+
+        current = get_current_entry(conn, people_id)
+        today = __import__('datetime').date.today().isoformat()
+        today_entries = list_entries(conn, people_id,
+                                     date_from=today, date_to=today)
+        _, total_fmt = tc_total_hours(today_entries)
+    finally:
+        conn.close()
+
+    return render(request, 'time_clock_status.html', _tc_context(
+        request,
+        current=current,
+        today_entries=today_entries,
+        total_fmt=total_fmt,
+        back_url=_TC_BACK,
+    ))
+
+
+def time_clock_hours(request):
+    """View personal hours for today / this week / this month."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    email = request.session.get('user_email', '')
+
+    period = request.GET.get('period', 'today')
+    if period not in ('today', 'week', 'month'):
+        period = 'today'
+    date_from, date_to = get_period_dates(period)
+
+    conn = get_db_connection()
+    try:
+        person = get_person_by_email(conn, email)
+        if not person:
+            return render(request, 'time_clock_hours.html', _tc_context(
+                request, error='Your employee record was not found.',
+                entries=[], period=period, total_fmt='0:00',
+                back_url=_TC_BACK))
+        entries = list_entries(conn, person['id'],
+                               date_from=date_from, date_to=date_to)
+        _, total_fmt = tc_total_hours(entries)
+    finally:
+        conn.close()
+
+    return render(request, 'time_clock_hours.html', _tc_context(
+        request,
+        entries=entries,
+        period=period,
+        date_from=date_from,
+        date_to=date_to,
+        total_fmt=total_fmt,
+        back_url=_TC_BACK,
+    ))
+
+
+def time_clock_attendance(request):
+    """HR attendance view — all employees for a given date."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _is_hr(request):
+        return redirect('time_clock_status')
+
+    date_str = (request.GET.get('date') or '').strip()
+    if not date_str:
+        date_str = __import__('datetime').date.today().isoformat()
+
+    conn = get_db_connection()
+    try:
+        attendance = get_attendance(conn, date_str)
+    finally:
+        conn.close()
+
+    present = sum(1 for p in attendance if p['present'])
+    absent = len(attendance) - present
+
+    return render(request, 'time_clock_attendance.html', _tc_context(
+        request,
+        attendance=attendance,
+        date_str=date_str,
+        present=present,
+        absent=absent,
+        back_url=_TC_BACK,
     ))

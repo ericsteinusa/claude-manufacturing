@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block page_title %}My Hours{% endblock %}
+
+{% block toolbar_left %}
+<a href="/time-clock/" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.tch-wrap { width: 100%; max-width: 700px; }
+.tch-pills { display: flex; gap: 8px; margin-bottom: 16px; }
+.tch-pill {
+    padding: 5px 18px; border: 2px solid black; border-radius: 20px;
+    font-size: 13px; font-weight: bold; text-decoration: none; color: black;
+    background: white;
+}
+.tch-pill.active { background: rgb(0,60,180); color: white; border-color: rgb(0,60,180); }
+.tch-range { font-size: 12px; color: #cce; margin-bottom: 14px; }
+.tch-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+}
+.tch-table th, .tch-table td {
+    padding: 8px 10px; font-size: 13px; text-align: left;
+    border-bottom: 1px solid #ccc;
+}
+.tch-table th { background: rgb(0,60,180); color: white; }
+.tch-table tfoot td { background: #f0f4ff; font-weight: bold; }
+.tch-empty { color: white; margin-top: 12px; }
+.badge-prog { background: #fff3cd; border: 1px solid #999;
+              border-radius: 10px; padding: 1px 8px; font-size: 11px; }
+.tch-error { background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
+             padding: 10px 14px; color: #900; margin-bottom: 14px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">My Hours</div>
+    <div class="tch-wrap">
+        {% if error %}<div class="tch-error">{{ error }}</div>{% endif %}
+
+        <div class="tch-pills">
+            <a href="/time-clock/hours/?period=today"
+               class="tch-pill {% if period == 'today' %}active{% endif %}">Today</a>
+            <a href="/time-clock/hours/?period=week"
+               class="tch-pill {% if period == 'week' %}active{% endif %}">This Week</a>
+            <a href="/time-clock/hours/?period=month"
+               class="tch-pill {% if period == 'month' %}active{% endif %}">This Month</a>
+        </div>
+
+        <div class="tch-range">
+            {{ date_from }}{% if date_from != date_to %} &ndash; {{ date_to }}{% endif %}
+        </div>
+
+        {% if entries %}
+        <table class="tch-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Clock In</th>
+                    <th>Clock Out</th>
+                    <th>Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in entries %}
+                <tr>
+                    <td>{{ e.clock_in|slice:":10" }}</td>
+                    <td>{{ e.clock_in|slice:"11:16" }}</td>
+                    <td>
+                        {% if e.clock_out %}
+                            {{ e.clock_out|slice:"11:16" }}
+                        {% else %}
+                            <span class="badge-prog">in progress</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ e.hours_fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align:right;">Total</td>
+                    <td>{{ total_fmt }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        {% else %}
+        <div class="tch-empty">No time entries for this period.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -108,6 +108,17 @@ _TABLES = [
             created_by TEXT
         )
     """),
+    ("time_clock", """
+        CREATE TABLE IF NOT EXISTS time_clock (
+            id SERIAL PRIMARY KEY,
+            people_id INTEGER NOT NULL REFERENCES people(id),
+            clock_in TEXT NOT NULL,
+            clock_out TEXT,
+            hours_worked REAL,
+            notes TEXT DEFAULT '',
+            created_by TEXT
+        )
+    """),
 ]
 
 # Columns backfilled onto pre-existing tables that may have been created from
