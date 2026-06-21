@@ -21,7 +21,7 @@ def is_manager(role_name):
 
 
 def is_company_wide(role_name):
-    """True if role may authorize any department's requests (not just their own)."""
+    """True if role may authorize any department's requests (not just own)."""
     return role_name in COMPANY_WIDE_ROLES
 
 
@@ -31,9 +31,10 @@ def can_authorize(role, status, req_dept_id, actor_dept_id, is_own):
     Rules:
     - Actor must hold an authorizer role (manager / supervisor / executive)
     - Requisition must be in 'submitted' status
-    - Actor must be in scope: company-wide role OR same department as the request
+    - Actor must be in scope: company-wide role OR same dept as the request
     - Actor cannot authorize their own request
-    - None dept IDs are never treated as matching (prevents accidental cross-dept access)
+    - None dept IDs are never treated as matching (prevents accidental
+      cross-dept access)
     """
     if not is_manager(role):
         return False

@@ -40,7 +40,9 @@ def launch(script, *args):
     module = "manufacturing." + os.path.splitext(script)[0]
     log.info("Launching module %s args=%s", module, args)
     try:
-        import tempfile, threading, time
+        import tempfile
+        import threading
+        import time
         err_path = os.path.join(
             tempfile.gettempdir(),
             f'mfg_{os.path.splitext(script)[0]}.log',

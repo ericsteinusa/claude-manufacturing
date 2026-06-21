@@ -12,7 +12,6 @@ import csv
 from datetime import datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -1449,8 +1448,6 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             return
         start_str = self.run_from.date().toString("yyyy-MM-dd")
         end_str = self.run_to.date().toString("yyyy-MM-dd")
-        fed_rate = self.run_fed_spin.value() / 100
-        state_rate = self.run_state_spin.value() / 100
         freq = self.run_freq.currentText()
 
         if QtWidgets.QMessageBox.question(
@@ -1939,7 +1936,9 @@ class PayrollDept(QtWidgets.QMainWindow):
     def __init__(self, initial_tab=None):
         super().__init__()
         email = get_current_user_email()
-        title = f"Payroll Department — {email}" if email else "Payroll Department"
+        title = (
+            f"Payroll Department — {email}" if email else "Payroll Department"
+        )
         self.setWindowTitle(title)
         self.resize(1280, 740)
         _apply_blue_palette(self)

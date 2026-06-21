@@ -11,10 +11,15 @@ def connect_to_database():
     db.setPort(5432)
 
     if not db.open():
-        QMessageBox.critical(None, 'Database Connection', 'Failed to connect to the database.')
+        QMessageBox.critical(
+            None, 'Database Connection', 'Failed to connect to the database.'
+        )
         return False
     else:
-        QMessageBox.information(None, 'Database Connection', 'Successfully connected to the database.')
+        QMessageBox.information(
+            None, 'Database Connection',
+            'Successfully connected to the database.'
+        )
         return True
 
 if __name__ == "__main__":

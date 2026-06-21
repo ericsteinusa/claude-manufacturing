@@ -1,9 +1,8 @@
 import sys
 from .db_pg import get_db
 from .accounts import get_current_user_email
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,

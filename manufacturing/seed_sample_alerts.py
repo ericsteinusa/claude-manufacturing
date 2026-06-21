@@ -10,7 +10,7 @@ must exist with ``bin = 'SAMPLE'``).
 Usage::
 
     python -m manufacturing.seed_sample_alerts            # apply (idempotent)
-    python -m manufacturing.seed_sample_alerts --remove   # restore original amounts
+    python -m manufacturing.seed_sample_alerts --remove   # restore originals
 """
 
 import argparse
@@ -57,7 +57,10 @@ def apply_alerts(conn):
     for name, alert_amt, _ in ALERT_LEVELS:
         pid = products.get(name)
         if pid is None:
-            print(f"  skip (not found): {name!r} — run seed_sample_products first")
+            print(
+                f"  skip (not found): {name!r}"
+                " — run seed_sample_products first"
+            )
             continue
         conn.execute(
             "UPDATE product SET amount = %s WHERE id = %s", (alert_amt, pid)
@@ -83,7 +86,9 @@ def remove_alerts(conn):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description="Drive sample products below reorder point for dashboard demos.")
+        description=(
+            "Drive sample products below reorder point for dashboard demos."
+        ))
     parser.add_argument("--remove", action="store_true",
                         help="restore original amounts (undo alert levels)")
     args = parser.parse_args(argv)
@@ -97,7 +102,10 @@ def main(argv=None):
             return
 
         if alerts_active(conn):
-            print("Alert levels already applied; use --remove to restore originals.")
+            print(
+                "Alert levels already applied;"
+                " use --remove to restore originals."
+            )
             return
 
         n = apply_alerts(conn)

@@ -6,7 +6,6 @@ from .bom import (init_item_master, bom_would_create_cycle,
 from .work_orders_core import next_wo_number
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,

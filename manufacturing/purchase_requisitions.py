@@ -115,7 +115,8 @@ def _next_req_num(conn=None):
     """Return the next REQ-YYYY-NNNN number.
 
     Accepts an optional *conn* so callers inside an open transaction can pass
-    their connection — uncommitted rows on the same connection are then visible,
+    their connection — uncommitted rows on the same connection are then
+    visible,
     preventing duplicate numbers when several requisitions are inserted in one
     transaction.  When called without a connection a fresh one is opened and
     closed (backwards-compatible, but subject to the usual gap/race caveats).

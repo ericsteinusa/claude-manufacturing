@@ -97,7 +97,8 @@ def init_db():
         pass
     try:
         conn.execute(
-            "ALTER TABLE purchase_order ADD COLUMN IF NOT EXISTS created_by TEXT")
+            "ALTER TABLE purchase_order ADD COLUMN"
+            " IF NOT EXISTS created_by TEXT")
     except Exception:
         pass
     conn.commit()

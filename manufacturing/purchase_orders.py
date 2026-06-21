@@ -7,7 +7,6 @@ from .purchase_orders_core import (  # noqa: F401  (re-exported for the GUI)
     next_po_number, list_pos, get_po, get_po_items)
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,

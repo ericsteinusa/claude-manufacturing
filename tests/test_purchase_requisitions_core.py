@@ -64,5 +64,7 @@ def test_can_authorize_denied_wrong_department():
 
 def test_can_authorize_denied_when_dept_ids_are_none():
     # None dept IDs must not match each other — prevents accidental access.
-    assert not can_authorize("Department Manager", "submitted",
-                             req_dept_id=None, actor_dept_id=None, is_own=False)
+    assert not can_authorize(
+        "Department Manager", "submitted",
+        req_dept_id=None, actor_dept_id=None, is_own=False
+    )

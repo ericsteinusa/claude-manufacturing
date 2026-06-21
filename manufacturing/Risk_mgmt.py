@@ -481,8 +481,9 @@ class _RiskCrudWidget(QtWidgets.QWidget):
         cols = ",".join(keys) + ",created_by"
         ph = ",".join(["%s"] * len(keys)) + ",%s"
         with _conn() as con:
-            con.execute(f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
-                        [v[k] for k in keys] + [get_current_user_email() or None])
+            con.execute(
+                f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
+                [v[k] for k in keys] + [get_current_user_email() or None])
         self._refresh()
 
     def _edit(self, *_):

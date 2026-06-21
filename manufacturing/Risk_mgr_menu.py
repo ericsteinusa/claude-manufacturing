@@ -19,7 +19,9 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         email = get_current_user_email()
-        title = f"Risk Manager Menu — {email}" if email else "Risk Manager Menu"
+        title = (
+            f"Risk Manager Menu — {email}" if email else "Risk Manager Menu"
+        )
         self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)

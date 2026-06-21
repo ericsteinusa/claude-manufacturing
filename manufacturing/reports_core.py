@@ -27,7 +27,9 @@ def po_summary(conn) -> dict:
     ).fetchone()
     overdue = overdue_row["n"] if overdue_row else 0
 
-    return {"by_status": by_status, "total_spend": total_spend, "overdue": overdue}
+    return {
+        "by_status": by_status, "total_spend": total_spend, "overdue": overdue
+    }
 
 
 def wo_summary(conn) -> dict:

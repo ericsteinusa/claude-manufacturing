@@ -4,7 +4,6 @@ from .db_pg import get_db
 from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -197,7 +196,8 @@ class NewInspectionDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO qa_inspection (insp_number, product_id, wo_id, "
                 "insp_date,"
-                " inspector, result, notes, created_by) VALUES (?,?,?,?,?,?,?,?)",
+                " inspector, result, notes, created_by)"
+                " VALUES (?,?,?,?,?,?,?,?)",
                 (num, self.product_combo.currentData(), self.wo_combo.currentData(),  # noqa: E501
                  self.insp_date.date().toString("yyyy-MM-dd"),
                  self.inspector.text().strip(), self.result_combo.currentData(),  # noqa: E501

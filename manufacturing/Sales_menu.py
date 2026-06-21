@@ -3,7 +3,6 @@ import psycopg2
 from .db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -149,7 +148,9 @@ class NewOrderDialog(QtWidgets.QDialog):
         self.notes.setPlaceholderText("Optional notes")
         layout.addRow(lbl("Notes:"), self.notes)
 
-        created_by_lbl = QtWidgets.QLabel(get_current_user_email() or "(unknown)")
+        created_by_lbl = QtWidgets.QLabel(
+            get_current_user_email() or "(unknown)"
+        )
         created_by_lbl.setStyleSheet(LABEL_STYLE)
         layout.addRow(lbl("Created by:"), created_by_lbl)
 

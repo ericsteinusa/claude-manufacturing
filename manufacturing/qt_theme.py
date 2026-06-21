@@ -1,7 +1,9 @@
 """Shared PyQt6 theme constants and stateless helpers.
 
 Import only what a module needs:
-    from .qt_theme import BLUE, BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+    from .qt_theme import (
+        BLUE, BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+    )
     from .qt_theme import ro as _ro
 """
 from PyQt6 import QtCore, QtGui, QtWidgets

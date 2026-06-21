@@ -1,13 +1,12 @@
 """Tests for the Qt-free work-order helpers (work_orders_core)."""
 from datetime import date
 
-import pytest
 
 from manufacturing.work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_TRANSITIONS,
     allowed_transitions, can_transition,
-    next_wo_number, list_wos, get_wo, get_wo_materials,
-    load_products, create_wo, update_wo, add_wo_material, set_wo_status,
+    next_wo_number, list_wos, load_products,
+    create_wo, update_wo, add_wo_material, set_wo_status,
 )
 
 
@@ -60,8 +59,10 @@ def test_all_statuses_have_transition_entries():
 
 def test_allowed_transitions_follow_workflow():
     assert set(allowed_transitions("draft"))       == {"open", "cancelled"}
-    assert set(allowed_transitions("open"))        == {"in_progress", "cancelled"}
-    assert set(allowed_transitions("in_progress")) == {"completed", "cancelled"}
+    assert set(allowed_transitions("open")) == {"in_progress", "cancelled"}
+    assert set(allowed_transitions("in_progress")) == {
+        "completed", "cancelled"
+    }
 
 
 def test_terminal_states_have_no_transitions():

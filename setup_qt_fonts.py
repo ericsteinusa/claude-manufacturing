@@ -5,14 +5,18 @@ QT_QPA_PLATFORM=offscreen renders text correctly (not as boxes).
 Run once after installing PyQt6:
     python setup_qt_fonts.py
 """
-import os, shutil, sys
+import os
+import shutil
+import sys
 
 try:
     import PyQt6
 except ImportError:
     sys.exit("PyQt6 not installed in this environment.")
 
-fonts_dir = os.path.join(os.path.dirname(PyQt6.__file__ or ""), "Qt6", "lib", "fonts")
+fonts_dir = os.path.join(
+    os.path.dirname(PyQt6.__file__ or ""), "Qt6", "lib", "fonts"
+)
 os.makedirs(fonts_dir, exist_ok=True)
 
 win_fonts = r"C:\Windows\Fonts"

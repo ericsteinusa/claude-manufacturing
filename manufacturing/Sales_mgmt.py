@@ -78,7 +78,8 @@ def init_db():
             for tbl in ("sales_quote", "sales_customer",
                         "sales_target", "sales_commission"):
                 con.execute(
-                    f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT")
+                    f"ALTER TABLE {tbl} ADD COLUMN"
+                    " IF NOT EXISTS created_by TEXT")
     except Exception:
         pass
 
@@ -195,7 +196,9 @@ class _RecordDialog(QtWidgets.QDialog):
     kind is one of: text, memo, combo, date, money.
     """
 
-    def __init__(self, title, fields, parent=None, row_data=None, created_by=None):
+    def __init__(
+        self, title, fields, parent=None, row_data=None, created_by=None
+    ):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setMinimumWidth(440)
@@ -211,7 +214,9 @@ class _RecordDialog(QtWidgets.QDialog):
             if row_data is not None:
                 self._set_value(f, w, row_data[f["key"]])
         if created_by is not None:
-            fl.addRow("Created by:", QtWidgets.QLabel(created_by or "(unknown)"))
+            fl.addRow(
+                "Created by:", QtWidgets.QLabel(created_by or "(unknown)")
+            )
         v.addLayout(fl)
 
         bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501
@@ -326,7 +331,10 @@ class _SalesCrudWidget(QtWidgets.QWidget):
         fb.addStretch()
         root.addWidget(self._wrap(fb))
 
-        cols = [("id", "ID", 40)] + spec["columns"] + [("created_by", "Created By", 160)]
+        cols = (
+            [("id", "ID", 40)] + spec["columns"]
+            + [("created_by", "Created By", 160)]
+        )
         self._col_keys = [c[0] for c in cols]
         self.tbl = QtWidgets.QTableWidget(0, len(cols))
         self.tbl.setHorizontalHeaderLabels([c[1] for c in cols])

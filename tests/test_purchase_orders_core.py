@@ -249,10 +249,11 @@ def test_set_po_status_does_not_guard_transition():
 
 
 def test_transition_workflow_draft_to_received():
-    # Happy path: gate every step with can_transition before calling set_po_status.
+    # Happy path: gate every step with can_transition before set_po_status.
     conn = _FakeConn()
     assert can_transition("draft", "sent")
     set_po_status(conn, 1, "sent")
     assert can_transition("sent", "received")
     set_po_status(conn, 1, "received")
-    assert not can_transition("received", "sent")   # terminal — no further moves
+    # terminal — no further moves
+    assert not can_transition("received", "sent")

@@ -99,8 +99,10 @@ def init_db():
         );
         """)
         _seed(con)
-        for tbl in ("marketing_campaign", "marketing_lead", "marketing_research",
-                    "marketing_content", "marketing_analytics", "marketing_budget"):
+        for tbl in (
+            "marketing_campaign", "marketing_lead", "marketing_research",
+            "marketing_content", "marketing_analytics", "marketing_budget"
+        ):
             try:
                 con.execute(
                     f"ALTER TABLE {tbl} "
@@ -485,8 +487,9 @@ class _MarketingCrudWidget(QtWidgets.QWidget):
         cols = ",".join(keys) + ",created_by"
         ph = ",".join(["%s"] * len(keys)) + ",%s"
         with _conn() as con:
-            con.execute(f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
-                        [v[k] for k in keys] + [get_current_user_email() or None])
+            con.execute(
+                f"INSERT INTO {spec['table']} ({cols}) VALUES ({ph})",
+                [v[k] for k in keys] + [get_current_user_email() or None])
         self._refresh()
 
     def _edit(self, *_):
@@ -818,7 +821,10 @@ class MarketingMgmtWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         email = get_current_user_email()
-        title = f"Marketing Management — {email}" if email else "Marketing Management"
+        title = (
+            f"Marketing Management — {email}"
+            if email else "Marketing Management"
+        )
         self.setWindowTitle(title)
         self.resize(1150, 740)
         _apply_blue_palette(self)

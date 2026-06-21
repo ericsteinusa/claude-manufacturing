@@ -27,7 +27,8 @@ from .work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,
     list_wos, get_wo, get_wo_materials,
     next_wo_number, load_products as load_wo_products,
-    create_wo, update_wo, add_wo_material, set_wo_status, can_transition,
+    create_wo, update_wo, add_wo_material, set_wo_status,
+    can_transition as wo_can_transition,
     allowed_transitions as wo_allowed_transitions,
 )
 from .reports_core import (
@@ -781,7 +782,8 @@ def reports_dashboard(request):
 
     def _status_pills(statuses_tuple, colors, by_status):
         return [
-            (s.replace('_', ' ').title(), by_status.get(s, 0), colors.get(s, '#fff'))
+            (s.replace('_', ' ').title(), by_status.get(s, 0),
+             colors.get(s, '#fff'))
             for s in statuses_tuple
         ]
 
@@ -854,7 +856,10 @@ def wo_list(request):
         wo['status_label'] = wo['status'].replace('_', ' ').title()
 
     dept = request.session.get('user_dept_key', 'production')
-    back_url = f'/dept/{dept}/work_orders/' if dept in _WO_DEPT_KEYS else '/dashboard/'
+    back_url = (
+        f'/dept/{dept}/work_orders/'
+        if dept in _WO_DEPT_KEYS else '/dashboard/'
+    )
 
     return render(request, 'wo_list.html', _wo_context(
         request,
@@ -1059,7 +1064,7 @@ def wo_set_status(request, wo_id):
     conn = get_db_connection()
     try:
         wo = get_wo(conn, wo_id)
-        if wo and can_transition(wo['status'], target):
+        if wo and wo_can_transition(wo['status'], target):
             set_wo_status(conn, wo_id, target)
             conn.commit()
     finally:

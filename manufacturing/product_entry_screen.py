@@ -101,7 +101,8 @@ def init_db():
         pass
     try:
         conn.execute(
-            "ALTER TABLE inventory_transaction ADD COLUMN IF NOT EXISTS created_by TEXT")
+            "ALTER TABLE inventory_transaction ADD COLUMN"
+            " IF NOT EXISTS created_by TEXT")
     except Exception:
         pass
     conn.commit()
@@ -697,7 +698,8 @@ class Inventory(QtWidgets.QMainWindow):
         conn = get_db()
         conn.execute(
             "INSERT INTO product "
-            "(name,supplier_id,bin,purchase_price,amount,reorder_point,created_by) "
+            "(name,supplier_id,bin,purchase_price,"
+            "amount,reorder_point,created_by) "
             "VALUES (%(name)s,%(supplier_id)s,%(bin)s,%(purchase_price)s,%(amount)s,%(reorder_point)s,%(created_by)s)",  # noqa: E501
             data)
         conn.commit()

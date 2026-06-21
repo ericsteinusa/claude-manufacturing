@@ -9,8 +9,8 @@ from .log_utils import get_logger
 from .accounts import get_current_user_email
 from .cs_calls_core import (
     format_customer_label, parse_customer_id, validate_call)
-from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BLUE, apply_blue_palette as _apply_blue_palette
+from PyQt6 import QtCore, QtWidgets
+from .qt_theme import apply_blue_palette as _apply_blue_palette
 
 
 log = get_logger(__name__)
@@ -307,7 +307,8 @@ class CustomerServiceCallsWidget(QtWidgets.QWidget):
             conn.execute(
                 "INSERT INTO calls2 (customer_id, call, call_date, call_time, "
                 "completion_date, completion_time, comments_box, "
-                "completion_box, created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                "completion_box, created_by)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (parse_customer_id(vals["customer_id"]), vals["call"],
                  vals["call_date"], vals["call_time"], vals["completion_date"],
                  vals["completion_time"], vals["comments_box"],

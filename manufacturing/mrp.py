@@ -33,9 +33,8 @@ import sys
 from collections import defaultdict
 from datetime import date, timedelta
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     LABEL_STYLE,

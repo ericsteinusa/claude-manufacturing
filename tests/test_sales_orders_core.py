@@ -58,7 +58,8 @@ def test_all_statuses_have_transition_entries():
 # ── customer_label ────────────────────────────────────────────────────────
 
 def test_customer_label_prefers_company_name():
-    row = {"company_name": "Acme Inc", "first_name": "John", "last_name": "Doe"}
+    row = {"company_name": "Acme Inc", "first_name": "John",
+           "last_name": "Doe"}
     assert customer_label(row) == "Acme Inc"
 
 
@@ -153,7 +154,8 @@ def test_list_sos_customer_and_date_filters():
 def test_list_sos_normalises_total_and_count():
     conn = _FakeConn(rows=[{
         "id": 1, "so_number": "SO-2026-0001", "order_date": "2026-06-01",
-        "ship_date": None, "status": "draft", "notes": None, "created_by": None,
+        "ship_date": None, "status": "draft", "notes": None,
+        "created_by": None,
         "customer_id": 2, "company_name": "Acme", "first_name": None,
         "last_name": None, "item_count": 3, "total": "75.50",
     }])
@@ -172,7 +174,8 @@ def test_get_so_returns_none_when_absent():
 def test_get_so_normalises_null_total():
     conn = _FakeConn(rows=[{
         "id": 5, "so_number": "SO-2026-0005", "order_date": None,
-        "ship_date": None, "status": "draft", "notes": None, "created_by": None,
+        "ship_date": None, "status": "draft", "notes": None,
+        "created_by": None,
         "customer_id": None, "company_name": None, "first_name": None,
         "last_name": None, "item_count": None, "total": None,
     }])

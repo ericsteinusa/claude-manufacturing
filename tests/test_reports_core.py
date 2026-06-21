@@ -29,7 +29,7 @@ class _FakeConn:
         return _FakeCursor(rows)
 
 
-# ── po_summary ────────────────────────────────────────────────────────────────
+# ── po_summary ───────────────────────────────────────────────────────────────
 
 def test_po_summary_counts_by_status():
     conn = _FakeConn([
@@ -62,7 +62,7 @@ def test_po_summary_spend_excludes_cancelled():
     assert result["total_spend"] == 250.0
 
 
-# ── wo_summary ────────────────────────────────────────────────────────────────
+# ── wo_summary ───────────────────────────────────────────────────────────────
 
 def test_wo_summary_by_status():
     conn = _FakeConn([
@@ -78,7 +78,7 @@ def test_wo_summary_empty():
     assert result["by_status"] == {}
 
 
-# ── inventory_alerts ──────────────────────────────────────────────────────────
+# ── inventory_alerts ─────────────────────────────────────────────────────────
 
 def test_inventory_alerts_returns_items_and_count():
     conn = _FakeConn([
@@ -98,7 +98,7 @@ def test_inventory_alerts_none_below_reorder():
     assert result["items"] == []
 
 
-# ── cs_summary ────────────────────────────────────────────────────────────────
+# ── cs_summary ───────────────────────────────────────────────────────────────
 
 def test_cs_summary_computes_closed():
     conn = _FakeConn([

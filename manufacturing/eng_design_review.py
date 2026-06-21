@@ -3,7 +3,9 @@ import psycopg2
 from .db_pg import get_db
 from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BLUE, BUTTON_STYLE, apply_blue_palette as _apply_blue_palette, ro as _ro
+from .qt_theme import (
+    BUTTON_STYLE, apply_blue_palette as _apply_blue_palette, ro as _ro
+)
 
 
 INPUT_STYLE = (

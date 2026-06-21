@@ -1,7 +1,7 @@
 import sys
 from .launch_utils import launch as _launch
-from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BLUE, BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+from PyQt6 import QtCore, QtWidgets
+from .qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
 
 from .button_nav import ButtonNav
 

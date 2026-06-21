@@ -19,7 +19,9 @@ class LegalMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         email = get_current_user_email()
-        title = f"Legal Manager Menu — {email}" if email else "Legal Manager Menu"
+        title = (
+            f"Legal Manager Menu — {email}" if email else "Legal Manager Menu"
+        )
         self.setWindowTitle(title)
         self.resize(1100, 720)
         _apply_blue_palette(self)

@@ -25,7 +25,9 @@ import psycopg2  # noqa: E402
 import psycopg2.errors  # noqa: E402
 import psycopg2.extras  # noqa: E402
 
-SQLITE_PATH = os.path.join(os.path.dirname(__file__), 'manufacturing', 'company.db')
+SQLITE_PATH = os.path.join(
+    os.path.dirname(__file__), 'manufacturing', 'company.db'
+)
 
 
 def pg_connect():
@@ -39,7 +41,7 @@ def pg_connect():
 
 
 def _insert_rows(cur, table, col_names, rows):
-    """Insert rows, skipping duplicates via savepoints. Returns insert count."""
+    """Insert rows, skipping duplicates via savepoints. Returns count."""
     if not rows:
         return 0
     placeholders = ', '.join(['%s'] * len(col_names))
@@ -76,7 +78,7 @@ def _reset_sequence(cur, table, pk_col='id'):
 
 
 def _create_missing_tables(cur):
-    """Create tables that exist in SQLite but haven't been initialised in PG yet."""
+    """Create tables that exist in SQLite but not yet initialised in PG."""
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS calls (
@@ -248,7 +250,9 @@ def migrate():
     # ── 3. Migrate in FK-safe order ──────────────────────────────────────────
 
     # roles
-    rows = sq.execute('SELECT id, role_name, description FROM roles').fetchall()
+    rows = sq.execute(
+        'SELECT id, role_name, description FROM roles'
+    ).fetchall()
     data = [(r['id'], r['role_name'], r['description'] or '') for r in rows]
     n = _insert_rows(cur, 'roles', ['id', 'role_name', 'description'], data)
     totals['roles'] = n
@@ -260,9 +264,13 @@ def migrate():
     totals['dept'] = n
 
     # dept_sub  (SQLite has no dept_id column — insert NULL)
-    rows = sq.execute('SELECT dept_sub_id, dept_sub_name FROM dept_sub').fetchall()
+    rows = sq.execute(
+        'SELECT dept_sub_id, dept_sub_name FROM dept_sub'
+    ).fetchall()
     data = [(r['dept_sub_id'], None, r['dept_sub_name']) for r in rows]
-    n = _insert_rows(cur, 'dept_sub', ['dept_sub_id', 'dept_id', 'dept_sub_name'], data)
+    n = _insert_rows(
+        cur, 'dept_sub', ['dept_sub_id', 'dept_id', 'dept_sub_name'], data
+    )
     totals['dept_sub'] = n
 
     # people  (deduplicate by email — skip id=0 blank record)
@@ -303,17 +311,23 @@ def migrate():
         else:
             hashed = bcrypt.hashpw(raw.encode(), bcrypt.gensalt()).decode()
         passwd_rows.append((r['id'], r['people_id'], hashed))
-    n = _insert_rows(cur, 'passwd', ['id', 'people_id', 'password'], passwd_rows)
+    n = _insert_rows(
+        cur, 'passwd', ['id', 'people_id', 'password'], passwd_rows
+    )
     totals['passwd'] = n
 
     # user_roles
-    rows = sq.execute('SELECT id, people_id, role_id FROM user_roles').fetchall()
+    rows = sq.execute(
+        'SELECT id, people_id, role_id FROM user_roles'
+    ).fetchall()
     data = [(r['id'], r['people_id'], r['role_id']) for r in rows]
     n = _insert_rows(cur, 'user_roles', ['id', 'people_id', 'role_id'], data)
     totals['user_roles'] = n
 
     # position  (map SQLite 'position' column → PG 'job_title')
-    rows = sq.execute('SELECT id, people_id, position FROM position').fetchall()
+    rows = sq.execute(
+        'SELECT id, people_id, position FROM position'
+    ).fetchall()
     data = [(r['id'], r['people_id'], r['position'] or '') for r in rows]
     n = _insert_rows(cur, 'position', ['id', 'people_id', 'job_title'], data)
     totals['position'] = n
@@ -329,15 +343,23 @@ def migrate():
     totals['customer'] = n
 
     # department (people-dept mapping)
-    rows = sq.execute('SELECT id, people_id, dept_id, dept_sub_id FROM department').fetchall()
-    data = [(r['id'], r['people_id'], r['dept_id'], r['dept_sub_id']) for r in rows]
-    n = _insert_rows(cur, 'department', ['id', 'people_id', 'dept_id', 'dept_sub_id'], data)
+    rows = sq.execute(
+        'SELECT id, people_id, dept_id, dept_sub_id FROM department'
+    ).fetchall()
+    data = [
+        (r['id'], r['people_id'], r['dept_id'], r['dept_sub_id']) for r in rows
+    ]
+    n = _insert_rows(
+        cur, 'department', ['id', 'people_id', 'dept_id', 'dept_sub_id'], data
+    )
     totals['department'] = n
 
     # gl_account
     rows = sq.execute('SELECT * FROM gl_account').fetchall()
-    data = [(r['id'], r['account_number'], r['account_name'], r['account_type'],
-             r['account_sub'], r['is_active'], r['notes']) for r in rows]
+    data = [
+        (r['id'], r['account_number'], r['account_name'], r['account_type'],
+         r['account_sub'], r['is_active'], r['notes']) for r in rows
+    ]
     n = _insert_rows(cur, 'gl_account',
         ['id', 'account_number', 'account_name', 'account_type',
          'account_sub', 'is_active', 'notes'], data)
@@ -372,8 +394,11 @@ def migrate():
 
     # product
     rows = sq.execute('SELECT * FROM product').fetchall()
-    data = [(r['id'], r['supplier_id'], r['name'], r['purchase_date'],
-             r['purchase_price'], r['bin'], r['amount'], r['reorder_point']) for r in rows]
+    data = [
+        (r['id'], r['supplier_id'], r['name'], r['purchase_date'],
+         r['purchase_price'], r['bin'], r['amount'], r['reorder_point'])
+        for r in rows
+    ]
     n = _insert_rows(cur, 'product',
         ['id', 'supplier_id', 'name', 'purchase_date',
          'purchase_price', 'bin', 'amount', 'reorder_point'], data)
@@ -381,22 +406,28 @@ def migrate():
 
     # calls
     rows = sq.execute('SELECT * FROM calls').fetchall()
-    data = [(r['id'], r['customer_id'], r['call'], r['call_date'], r['call_time'],
-             r['completion_date'], r['completion_time'],
-             r['comments_box'], r['completion_box']) for r in rows]
+    data = [
+        (r['id'], r['customer_id'], r['call'], r['call_date'], r['call_time'],
+         r['completion_date'], r['completion_time'],
+         r['comments_box'], r['completion_box']) for r in rows
+    ]
     n = _insert_rows(cur, 'calls',
         ['id', 'customer_id', 'call', 'call_date', 'call_time',
-         'completion_date', 'completion_time', 'comments_box', 'completion_box'], data)
+         'completion_date', 'completion_time',
+         'comments_box', 'completion_box'], data)
     totals['calls'] = n
 
     # calls2
     rows = sq.execute('SELECT * FROM calls2').fetchall()
-    data = [(r['id'], r['customer_id'], r['call'], r['call_date'], r['call_time'],
-             r['completion_date'], r['completion_time'],
-             r['comments_box'], r['completion_box']) for r in rows]
+    data = [
+        (r['id'], r['customer_id'], r['call'], r['call_date'], r['call_time'],
+         r['completion_date'], r['completion_time'],
+         r['comments_box'], r['completion_box']) for r in rows
+    ]
     n = _insert_rows(cur, 'calls2',
         ['id', 'customer_id', 'call', 'call_date', 'call_time',
-         'completion_date', 'completion_time', 'comments_box', 'completion_box'], data)
+         'completion_date', 'completion_time',
+         'comments_box', 'completion_box'], data)
     totals['calls2'] = n
 
     # tax
@@ -410,13 +441,17 @@ def migrate():
     data = [(r['id'], r['tax_type'], r['description'], r['due_date'],
              r['period'], r['status'], r['notes']) for r in rows]
     n = _insert_rows(cur, 'tax_calendar',
-        ['id', 'tax_type', 'description', 'due_date', 'period', 'status', 'notes'], data)
+        ['id', 'tax_type', 'description', 'due_date',
+         'period', 'status', 'notes'], data)
     totals['tax_calendar'] = n
 
     # audit_schedule
     rows = sq.execute('SELECT * FROM audit_schedule').fetchall()
-    data = [(r['id'], r['audit_name'], r['audit_type'], r['department'],
-             r['auditor'], r['scheduled'], r['completed'], r['status'], r['notes']) for r in rows]
+    data = [
+        (r['id'], r['audit_name'], r['audit_type'], r['department'],
+         r['auditor'], r['scheduled'], r['completed'], r['status'], r['notes'])
+        for r in rows
+    ]
     n = _insert_rows(cur, 'audit_schedule',
         ['id', 'audit_name', 'audit_type', 'department',
          'auditor', 'scheduled', 'completed', 'status', 'notes'], data)

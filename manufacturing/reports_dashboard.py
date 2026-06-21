@@ -117,7 +117,9 @@ class ReportsDashboardWidget(QtWidgets.QWidget):
 
         row1 = QtWidgets.QHBoxLayout()
         for status, color in PO_STATUS_COLORS.items():
-            row1.addWidget(_kpi_card(str(by_status.get(status, 0)), status.capitalize(), color))
+            row1.addWidget(_kpi_card(
+                str(by_status.get(status, 0)), status.capitalize(), color
+            ))
         row1.addStretch()
         self._po_layout.addLayout(row1)
 
@@ -125,7 +127,9 @@ class ReportsDashboardWidget(QtWidgets.QWidget):
         spend = f"${data['total_spend']:,.0f}"
         overdue = data["overdue"]
         row2.addWidget(_kpi_card(spend, "Total Spend", "#e8f4f8"))
-        row2.addWidget(_kpi_card(str(overdue), "Overdue", "#f8d7da" if overdue else "#f8f9fa"))
+        row2.addWidget(_kpi_card(
+            str(overdue), "Overdue", "#f8d7da" if overdue else "#f8f9fa"
+        ))
         row2.addStretch()
         self._po_layout.addLayout(row2)
 
@@ -136,13 +140,17 @@ class ReportsDashboardWidget(QtWidgets.QWidget):
         row1 = QtWidgets.QHBoxLayout()
         for status, color in WO_STATUS_COLORS.items():
             label = status.replace("_", " ").capitalize()
-            row1.addWidget(_kpi_card(str(by_status.get(status, 0)), label, color))
+            row1.addWidget(
+                _kpi_card(str(by_status.get(status, 0)), label, color)
+            )
         row1.addStretch()
         self._wo_layout.addLayout(row1)
 
         active = by_status.get("open", 0) + by_status.get("in_progress", 0)
         row2 = QtWidgets.QHBoxLayout()
-        row2.addWidget(_kpi_card(str(active), "Active (Open + In Progress)", "#fff3cd"))
+        row2.addWidget(
+            _kpi_card(str(active), "Active (Open + In Progress)", "#fff3cd")
+        )
         row2.addStretch()
         self._wo_layout.addLayout(row2)
 
@@ -152,33 +160,50 @@ class ReportsDashboardWidget(QtWidgets.QWidget):
 
         row1 = QtWidgets.QHBoxLayout()
         color = "#f8d7da" if count > 0 else "#d4edda"
-        row1.addWidget(_kpi_card(str(count), "Items Below Reorder Point", color))
+        row1.addWidget(
+            _kpi_card(str(count), "Items Below Reorder Point", color)
+        )
         row1.addStretch()
         self._inv_layout.addLayout(row1)
 
         items = data["items"]
         if items:
             tbl = QtWidgets.QTableWidget(len(items), 3)
-            tbl.setHorizontalHeaderLabels(["Product", "On Hand", "Reorder Point"])
+            tbl.setHorizontalHeaderLabels(
+                ["Product", "On Hand", "Reorder Point"]
+            )
             hdr = tbl.horizontalHeader()
             if hdr:
-                hdr.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+                hdr.setSectionResizeMode(
+                    0, QtWidgets.QHeaderView.ResizeMode.Stretch
+                )
             vh = tbl.verticalHeader()
             if vh:
                 vh.setVisible(False)
-            tbl.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            tbl.setEditTriggers(
+                QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers
+            )
             tbl.setMaximumHeight(200)
             for i, item in enumerate(items):
-                tbl.setItem(i, 0, QtWidgets.QTableWidgetItem(str(item["name"])))
-                tbl.setItem(i, 1, QtWidgets.QTableWidgetItem(str(item["on_hand"])))
-                tbl.setItem(i, 2, QtWidgets.QTableWidgetItem(str(item["reorder_point"])))
+                tbl.setItem(
+                    i, 0, QtWidgets.QTableWidgetItem(str(item["name"]))
+                )
+                tbl.setItem(
+                    i, 1, QtWidgets.QTableWidgetItem(str(item["on_hand"]))
+                )
+                tbl.setItem(i, 2, QtWidgets.QTableWidgetItem(
+                    str(item["reorder_point"])
+                ))
             self._inv_layout.addWidget(tbl)
 
     def _populate_cs(self, data: dict) -> None:
         _clear(self._cs_layout)
         row = QtWidgets.QHBoxLayout()
         row.addWidget(_kpi_card(str(data["total"]), "Total Calls", "#f8f9fa"))
-        row.addWidget(_kpi_card(str(data["open"]), "Open", "#fff3cd" if data["open"] else "#f8f9fa"))
+        row.addWidget(
+            _kpi_card(str(data["open"]), "Open",
+                      "#fff3cd" if data["open"] else "#f8f9fa")
+        )
         row.addWidget(_kpi_card(str(data["closed"]), "Closed", "#d4edda"))
         row.addWidget(_kpi_card(str(data["today"]), "Today", "#cce5ff"))
         row.addStretch()
@@ -199,4 +224,6 @@ class ReportsDashboardWidget(QtWidgets.QWidget):
             ts = datetime.datetime.now().strftime("%H:%M:%S")
             self._status_lbl.setText(f"Updated {ts}")
         except Exception as exc:
-            QtWidgets.QMessageBox.warning(self, "Error", f"Could not load data:\n{exc}")
+            QtWidgets.QMessageBox.warning(
+                self, "Error", f"Could not load data:\n{exc}"
+            )

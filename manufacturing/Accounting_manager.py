@@ -1,6 +1,5 @@
 import sys
 from PyQt6 import QtWidgets
-from .qt_theme import BUTTON_STYLE
 
 from .button_nav import ButtonNav
 from .accounts import get_current_user_email

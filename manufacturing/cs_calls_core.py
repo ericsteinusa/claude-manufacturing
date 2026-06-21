@@ -11,7 +11,9 @@ CALL_COLUMNS = ("customer_id", "call", "call_date", "call_time",
                 "completion_box")
 
 
-def format_customer_label(customer_id, first_name: str | None = "", last_name: str | None = "") -> str:
+def format_customer_label(
+    customer_id, first_name: str | None = "", last_name: str | None = ""
+) -> str:
     """Combobox label like ``"7 - Jane Doe"`` (id alone when no name)."""
     parts = [p for p in (first_name or "", last_name or "") if p]
     name = " ".join(parts).strip()

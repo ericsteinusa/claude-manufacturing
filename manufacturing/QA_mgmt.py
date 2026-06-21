@@ -204,7 +204,9 @@ class _RecordDialog(QtWidgets.QDialog):
             if row_data is not None:
                 self._set_value(f, w, row_data[f["key"]])
         if created_by is not None:
-            fl.addRow("Created by:", QtWidgets.QLabel(created_by or "(unknown)"))
+            fl.addRow(
+                "Created by:", QtWidgets.QLabel(created_by or "(unknown)")
+            )
         v.addLayout(fl)
 
         bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok |  # noqa: E501

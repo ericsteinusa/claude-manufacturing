@@ -2,12 +2,10 @@ import sys
 import psycopg2
 from .db_pg import get_db_connection
 from .accounts import get_current_user_email
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
-    COMBO_STYLE,
     LABEL_STYLE,
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,

@@ -78,7 +78,7 @@ STATEMENTS = [
         notes     TEXT    DEFAULT ''
     )""",
 
-    # --------------------------------------------------------------- Maintenance
+    # ---------------------------------------------------------- Maintenance
     """CREATE TABLE IF NOT EXISTS maint_equipment (
         id           SERIAL PRIMARY KEY,
         name         TEXT    NOT NULL,
@@ -246,7 +246,7 @@ STATEMENTS = [
         released_ref   TEXT
     )""",
 
-    # -------------------------------------------------------- Purchase Requisitions
+    # ------------------------------------------------- Purchase Requisitions
     """CREATE TABLE IF NOT EXISTS purchase_requisition (
         id            SERIAL PRIMARY KEY,
         req_number    TEXT    NOT NULL UNIQUE,

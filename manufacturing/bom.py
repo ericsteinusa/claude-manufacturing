@@ -30,10 +30,8 @@ unit tested without a database.
 import sys
 
 import psycopg2
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 from .qt_theme import (
-    BLUE,
-    BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,

@@ -4,7 +4,6 @@ from .db_pg import get_db
 from .accounts import get_current_user_email
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .qt_theme import (
-    BLUE,
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -330,7 +329,8 @@ class NewECRDialog(QtWidgets.QDialog):
             cur = conn.execute(
                 "INSERT INTO eng_design_review (ecr_number, title, "
                 "product_id, project_id,"
-                " requested_by, review_date, status, notes, created_by) VALUES "
+                " requested_by, review_date, status, notes, created_by)"
+                " VALUES "
                 "(?,?,?,?,?,?,?,?,?)",
                 (num, title, self.product_combo.currentData(),
                  self.project_combo.currentData(),
