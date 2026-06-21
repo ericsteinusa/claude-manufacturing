@@ -17,6 +17,10 @@ from .log_utils import get_logger
 from .schema import init_schema
 from .db_pg import get_db_connection
 from .audit_core import get_recent, get_history, AUDITED_TABLES
+from .period_locking_core import (
+    is_period_locked, close_period, reopen_period,
+    list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
+)
 from .purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS, PO_STATUS_ACTION_LABELS,
     list_pos, get_po, get_po_items,
@@ -627,6 +631,10 @@ def po_new(request):
     try:
         if request.method == 'POST':
             data, error = _po_header_form(request)
+            if not error and is_period_locked(conn, data.get('order_date')):
+                error = ("Period %s is closed."
+                         % period_label(*map(int,
+                             data['order_date'][:7].split('-'))))
             if not error:
                 try:
                     po_id = create_po(
@@ -673,11 +681,32 @@ def po_edit(request, po_id):
             return redirect('po_list')
 
         if request.method == 'POST':
+            order_date = (request.POST.get('order_date') or '').strip() or None
+            if is_period_locked(conn, order_date or po.get('order_date', '')):
+                lbl = period_label(*map(int,
+                    (order_date or po['order_date'])[:7].split('-')))
+                suppliers = load_suppliers(conn)
+                form = {
+                    'po_number': po['po_number'],
+                    'supplier_id': _int_or_none(
+                        request.POST.get('supplier_id')),
+                    'order_date': order_date or po['order_date'] or '',
+                    'expected_date': (
+                        request.POST.get('expected_date') or '').strip()
+                        or po.get('expected_date') or '',
+                    'status': po['status'],
+                    'notes': (request.POST.get('notes') or '').strip()
+                             or po.get('notes') or '',
+                }
+                return render(request, 'po_form.html', _po_context(
+                    request, mode='edit', po=po, form=form,
+                    suppliers=suppliers,
+                    error="Period %s is closed." % lbl,
+                    back_url='/po/%s/' % po_id))
             update_po(
                 conn, po_id,
                 supplier_id=_int_or_none(request.POST.get('supplier_id')),
-                order_date=(request.POST.get('order_date') or '').strip()
-                or None,
+                order_date=order_date,
                 expected_date=(request.POST.get('expected_date') or '').strip()
                 or None,
                 notes=(request.POST.get('notes') or '').strip() or None,
@@ -992,6 +1021,10 @@ def wo_new(request):
     try:
         if request.method == 'POST':
             data, error = _wo_header_form(request)
+            if not error and is_period_locked(conn, data.get('start_date')):
+                error = ("Period %s is closed."
+                         % period_label(*map(int,
+                             data['start_date'][:7].split('-'))))
             if not error:
                 try:
                     wo_id = create_wo(
@@ -1045,14 +1078,38 @@ def wo_edit(request, wo_id):
                 quantity = max(1, quantity)
             except ValueError:
                 quantity = 1
+            start_date = (request.POST.get('start_date') or '').strip() or None
+            if is_period_locked(conn, start_date or wo.get('start_date', '')):
+                lbl = period_label(*map(int,
+                    (start_date or wo['start_date'])[:7].split('-')))
+                products = load_wo_products(conn)
+                form = {
+                    'wo_number': wo['wo_number'],
+                    'product_id': _int_or_none(
+                        request.POST.get('product_id')),
+                    'description': (
+                        request.POST.get('description') or '').strip()
+                        or wo.get('description') or '',
+                    'quantity': quantity,
+                    'start_date': start_date or wo.get('start_date') or '',
+                    'due_date': (request.POST.get('due_date') or '').strip()
+                                or wo.get('due_date') or '',
+                    'status': wo['status'],
+                    'notes': (request.POST.get('notes') or '').strip()
+                             or wo.get('notes') or '',
+                }
+                return render(request, 'wo_form.html', _wo_context(
+                    request, mode='edit', wo=wo, form=form,
+                    products=products,
+                    error="Period %s is closed." % lbl,
+                    back_url='/wo/%s/' % wo_id))
             update_wo(
                 conn, wo_id,
                 product_id=_int_or_none(request.POST.get('product_id')),
                 description=(request.POST.get('description') or '').strip()
                 or None,
                 quantity=quantity,
-                start_date=(request.POST.get('start_date') or '').strip()
-                or None,
+                start_date=start_date,
                 due_date=(request.POST.get('due_date') or '').strip() or None,
                 notes=(request.POST.get('notes') or '').strip() or None,
             )
@@ -1258,6 +1315,10 @@ def so_new(request):
     try:
         if request.method == 'POST':
             data, error = _so_header_form(request)
+            if not error and is_period_locked(conn, data.get('order_date')):
+                error = ("Period %s is closed."
+                         % period_label(*map(int,
+                             data['order_date'][:7].split('-'))))
             if not error:
                 try:
                     so_id = create_so(
@@ -1304,11 +1365,32 @@ def so_edit(request, so_id):
             return redirect('so_list')
 
         if request.method == 'POST':
+            order_date = (request.POST.get('order_date') or '').strip() or None
+            if is_period_locked(conn, order_date or so.get('order_date', '')):
+                lbl = period_label(*map(int,
+                    (order_date or so['order_date'])[:7].split('-')))
+                customers = load_customers(conn)
+                form = {
+                    'so_number': so['so_number'],
+                    'customer_id': _int_or_none(
+                        request.POST.get('customer_id')),
+                    'order_date': order_date or so['order_date'] or '',
+                    'ship_date': (
+                        request.POST.get('ship_date') or '').strip()
+                        or so.get('ship_date') or '',
+                    'status': so['status'],
+                    'notes': (request.POST.get('notes') or '').strip()
+                             or so.get('notes') or '',
+                }
+                return render(request, 'so_form.html', _so_context(
+                    request, mode='edit', so=so, form=form,
+                    customers=customers,
+                    error="Period %s is closed." % lbl,
+                    back_url='/so/%s/' % so_id))
             update_so(
                 conn, so_id,
                 customer_id=_int_or_none(request.POST.get('customer_id')),
-                order_date=(request.POST.get('order_date') or '').strip()
-                or None,
+                order_date=order_date,
                 ship_date=(request.POST.get('ship_date') or '').strip()
                 or None,
                 notes=(request.POST.get('notes') or '').strip() or None,
@@ -2086,4 +2168,88 @@ def audit_record(request, table_name: str, record_id: int):
         'history': history,
         'user_role': request.session.get('user_role', ''),
         'full_access': request.session.get('user_full_access', False),
+    })
+
+
+# ---------------------------------------------------------------------------
+# Period locking management
+# ---------------------------------------------------------------------------
+
+def _periods_access(request, *, write: bool = False):
+    """Return a redirect if the user may not access the periods page."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    role = request.session.get('user_role', '')
+    if write and role not in PERIOD_ADMIN_ROLES:
+        return redirect('periods')
+    if not write and role not in PERIOD_ADMIN_ROLES:
+        return redirect('dashboard')
+    return None
+
+
+def periods(request):
+    """List closed periods and show close/reopen controls."""
+    denied = _periods_access(request)
+    if denied:
+        return denied
+
+    error = None
+    if request.method == 'POST':
+        action = request.POST.get('action', '')
+        conn = get_db_connection()
+        try:
+            if action == 'close':
+                try:
+                    year = int(request.POST.get('year', 0))
+                    month = int(request.POST.get('month', 0))
+                    notes = (request.POST.get('notes') or '').strip()
+                    close_period(
+                        conn, year, month,
+                        closed_by=request.session.get('user_email', ''),
+                        notes=notes,
+                    )
+                    conn.commit()
+                except (ValueError, TypeError) as exc:
+                    conn.rollback()
+                    error = str(exc)
+            elif action == 'reopen':
+                try:
+                    period_id = int(request.POST.get('period_id', 0))
+                    reopen_period(
+                        conn, period_id,
+                        reopened_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                except (ValueError, TypeError) as exc:
+                    conn.rollback()
+                    error = str(exc)
+        finally:
+            conn.close()
+        if not error:
+            return redirect('periods')
+
+    closed = list_periods(limit=36)
+    closed_keys = {(p['period_year'], p['period_month']): p
+                   for p in closed}
+    months = recent_months(13)
+    calendar = []
+    for year, month in months:
+        entry = closed_keys.get((year, month))
+        calendar.append({
+            'year': year,
+            'month': month,
+            'label': period_label(year, month),
+            'closed': entry is not None,
+            'period_id': entry['id'] if entry else None,
+            'closed_by': entry['closed_by'] if entry else '',
+            'closed_at': entry['closed_at'] if entry else None,
+            'notes': entry['notes'] if entry else '',
+        })
+
+    return render(request, 'periods.html', {
+        'calendar': calendar,
+        'error': error,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'can_write': request.session.get('user_role', '') in PERIOD_ADMIN_ROLES,
     })

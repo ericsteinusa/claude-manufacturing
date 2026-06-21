@@ -64,6 +64,7 @@ urlpatterns = [
     path('audit/', views.audit_log, name='audit_log'),
     path('audit/<str:table_name>/<int:record_id>/',
          views.audit_record, name='audit_record'),
+    path('periods/', views.periods, name='periods'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),

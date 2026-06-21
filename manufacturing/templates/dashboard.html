@@ -5,6 +5,9 @@
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
 <a href="{% url 'audit_log' %}" class="btn">Audit Log</a>
 {% endif %}
+{% if user_role == 'President' or user_role == 'Vice President' %}
+<a href="{% url 'periods' %}" class="btn">Periods</a>
+{% endif %}
 {% endblock %}
 
 {% block menu_title %}Company Main Menu{% endblock %}
