@@ -100,7 +100,9 @@ def get_pending_approvals(conn) -> list[dict]:
     """Return all POs awaiting approval, newest first."""
     rows = conn.execute(
         "SELECT a.id, a.po_id, a.requested_by, a.requested_at, "
-        "       po.po_number, po.total, s.company_name "
+        "       po.po_number, s.company_name, "
+        "       (SELECT COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) "
+        "        FROM po_item pi WHERE pi.po_id = po.id) AS total "
         "FROM po_approval a "
         "JOIN purchase_order po ON po.id = a.po_id "
         "LEFT JOIN supplier s ON s.id = po.supplier_id "
