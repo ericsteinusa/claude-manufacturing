@@ -16,6 +16,7 @@ from django.shortcuts import render, redirect
 from .log_utils import get_logger
 from .schema import init_schema
 from .db_pg import get_db_connection
+from .audit_core import get_recent, get_history, AUDITED_TABLES
 from .purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS, PO_STATUS_ACTION_LABELS,
     list_pos, get_po, get_po_items,
@@ -67,6 +68,7 @@ from .menus import (
     _walk_tree,
 )
 from .accounts import (
+    FULL_ACCESS_ROLES,
     READ_ONLY_ROLES,
     _ROLE_ADMIN_ROLES,
     _get_user_profile,
@@ -2033,3 +2035,55 @@ def tc_device_delete(request, device_id: int):
         conn.close()
 
     return redirect('tc_device_list')
+
+
+# ---------------------------------------------------------------------------
+# Audit log
+# ---------------------------------------------------------------------------
+
+_AUDIT_ROLES = FULL_ACCESS_ROLES | {'Auditor'}
+
+
+def _audit_access(request):
+    return request.session.get('user_role') in _AUDIT_ROLES
+
+
+def audit_log(request):
+    """Recent audit log entries, filterable by table and user."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _audit_access(request):
+        return redirect('dashboard')
+
+    table_filter = request.GET.get('table', '')
+    user_filter = request.GET.get('user', '')
+    entries = get_recent(
+        limit=200,
+        table_name=table_filter or None,
+        changed_by=user_filter or None,
+    )
+    return render(request, 'audit_log.html', {
+        'entries': entries,
+        'audited_tables': sorted(AUDITED_TABLES),
+        'table_filter': table_filter,
+        'user_filter': user_filter,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })
+
+
+def audit_record(request, table_name: str, record_id: int):
+    """Full history for a single record."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _audit_access(request):
+        return redirect('dashboard')
+
+    history = get_history(table_name, record_id)
+    return render(request, 'audit_record.html', {
+        'table_name': table_name,
+        'record_id': record_id,
+        'history': history,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })

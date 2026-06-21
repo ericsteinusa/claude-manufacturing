@@ -145,6 +145,12 @@ class PgConnection:
         log.debug(
             "Connected to database %s on %s:%s (adapt=%s)",
             DB_CONFIG['dbname'], DB_CONFIG['host'], DB_CONFIG['port'], adapt)
+        user = os.environ.get('MFGAPP_USER', '')
+        if user:
+            cur = self._conn.cursor()
+            cur.execute(
+                "SELECT set_config('app.current_user', %s, FALSE)", (user,))
+            cur.close()
 
     def cursor(self):
         raw = self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
