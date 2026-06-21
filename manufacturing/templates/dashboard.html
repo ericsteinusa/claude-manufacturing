@@ -2,6 +2,9 @@
 
 {% block toolbar_left %}
 <a href="{% url 'user_roles' %}" class="btn">User Roles</a>
+{% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
+<a href="{% url 'audit_log' %}" class="btn">Audit Log</a>
+{% endif %}
 {% endblock %}
 
 {% block menu_title %}Company Main Menu{% endblock %}
