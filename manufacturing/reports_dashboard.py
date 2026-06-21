@@ -64,8 +64,8 @@ def _clear(layout: QtWidgets.QLayout) -> None:
         w = item.widget()
         if w:
             w.deleteLater()
-        elif item.layout():
-            _clear(item.layout())
+        elif sub := item.layout():
+            _clear(sub)
 
 
 class ReportsDashboardWidget(QtWidgets.QWidget):
