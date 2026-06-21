@@ -23,6 +23,16 @@ from .purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
+from .time_clock_core import (
+    get_current_entry, clock_in as tc_clock_in, clock_out_entry,
+    list_entries, total_hours as tc_total_hours,
+    get_period_dates, get_attendance,
+)
+from .time_clock_poller_core import (
+    DEVICE_TYPES, DEVICE_TYPE_LABELS,
+    list_devices, get_device, create_device, update_device, delete_device,
+    list_sync_log, poll_device,
+)
 from .personnel_core import (
     TIME_OFF_STATUSES, TIME_OFF_TYPES,
     list_people, get_person, get_person_by_email,
@@ -103,6 +113,17 @@ WEB_LEAF_URLS = {
     ('personnel', 'pend_req'): '/time-off/?status=pending',
     ('personnel', 'appr_req'): '/time-off/?status=approved',
     ('personnel', 'req_hist'): '/time-off/',
+    ('personnel', 'punch_in'): '/time-clock/',
+    ('personnel', 'punch_out'): '/time-clock/',
+    ('personnel', 'cur_status'): '/time-clock/',
+    ('personnel', 'today_hrs'): '/time-clock/hours/',
+    ('personnel', 'week_hrs'): '/time-clock/hours/?period=week',
+    ('personnel', 'month_hrs'): '/time-clock/hours/?period=month',
+    ('personnel', 'period_hrs'): '/time-clock/hours/?period=month',
+    ('personnel', 'daily_att'): '/time-clock/attendance/',
+    ('personnel', 'month_sum'): '/time-clock/attendance/?period=month',
+    ('personnel', 'tard_rpt'): '/time-clock/attendance/',
+    ('personnel', 'abs_rpt'): '/time-clock/attendance/',
 }
 
 
@@ -1701,3 +1722,314 @@ def time_off_detail(request, req_id):
         can_act=is_hr_user and req['status'] == 'pending',
         back_url='/time-off/',
     ))
+
+
+# ---------------------------------------------------------------------------
+# Time clock — punch in/out, hours, attendance (web)
+# ---------------------------------------------------------------------------
+
+_TC_BACK = '/dept/personnel/pers_menu/time_clock/'
+
+
+def _tc_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def time_clock_status(request):
+    """Punch in / punch out page and current status."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    email = request.session.get('user_email', '')
+
+    conn = get_db_connection()
+    try:
+        person = get_person_by_email(conn, email)
+        if not person:
+            return render(request, 'time_clock_status.html', _tc_context(
+                request, error='Your employee record was not found.',
+                current=None, today_entries=[], back_url=_TC_BACK))
+
+        people_id = person['id']
+
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            current = get_current_entry(conn, people_id)
+            if action == 'clock_in' and not current:
+                tc_clock_in(conn, people_id, created_by=email)
+                conn.commit()
+            elif action == 'clock_out' and current:
+                clock_out_entry(conn, current['id'])
+                conn.commit()
+            return redirect('time_clock_status')
+
+        current = get_current_entry(conn, people_id)
+        today = __import__('datetime').date.today().isoformat()
+        today_entries = list_entries(conn, people_id,
+                                     date_from=today, date_to=today)
+        _, total_fmt = tc_total_hours(today_entries)
+    finally:
+        conn.close()
+
+    return render(request, 'time_clock_status.html', _tc_context(
+        request,
+        current=current,
+        today_entries=today_entries,
+        total_fmt=total_fmt,
+        back_url=_TC_BACK,
+    ))
+
+
+def time_clock_hours(request):
+    """View personal hours for today / this week / this month."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    email = request.session.get('user_email', '')
+
+    period = request.GET.get('period', 'today')
+    if period not in ('today', 'week', 'month'):
+        period = 'today'
+    date_from, date_to = get_period_dates(period)
+
+    conn = get_db_connection()
+    try:
+        person = get_person_by_email(conn, email)
+        if not person:
+            return render(request, 'time_clock_hours.html', _tc_context(
+                request, error='Your employee record was not found.',
+                entries=[], period=period, total_fmt='0:00',
+                back_url=_TC_BACK))
+        entries = list_entries(conn, person['id'],
+                               date_from=date_from, date_to=date_to)
+        _, total_fmt = tc_total_hours(entries)
+    finally:
+        conn.close()
+
+    return render(request, 'time_clock_hours.html', _tc_context(
+        request,
+        entries=entries,
+        period=period,
+        date_from=date_from,
+        date_to=date_to,
+        total_fmt=total_fmt,
+        back_url=_TC_BACK,
+    ))
+
+
+def time_clock_attendance(request):
+    """HR attendance view — all employees for a given date."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _is_hr(request):
+        return redirect('time_clock_status')
+
+    date_str = (request.GET.get('date') or '').strip()
+    if not date_str:
+        date_str = __import__('datetime').date.today().isoformat()
+
+    conn = get_db_connection()
+    try:
+        attendance = get_attendance(conn, date_str)
+    finally:
+        conn.close()
+
+    present = sum(1 for p in attendance if p['present'])
+    absent = len(attendance) - present
+
+    return render(request, 'time_clock_attendance.html', _tc_context(
+        request,
+        attendance=attendance,
+        date_str=date_str,
+        present=present,
+        absent=absent,
+        back_url=_TC_BACK,
+    ))
+
+
+# ── Time Clock Device Management ──────────────────────────────────────────
+
+_DEV_BACK = '/time-clock/devices/'
+
+
+def _dev_access(request):
+    """Return True if the logged-in user can manage time clock devices."""
+    return _is_hr(request)
+
+
+def tc_device_list(request):
+    """List all registered time clock terminals."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _dev_access(request):
+        return redirect('time_clock_status')
+
+    conn = get_db_connection()
+    try:
+        devices = list_devices(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'tc_device_list.html', _tc_context(
+        request,
+        devices=devices,
+        device_type_labels=DEVICE_TYPE_LABELS,
+        back_url='/time-clock/',
+    ))
+
+
+def tc_device_new(request):
+    """Add a new time clock device — asks for type, then shows config fields."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _dev_access(request):
+        return redirect('time_clock_status')
+
+    error = ''
+    form: dict = {
+        'name': '', 'location': '', 'device_type': '',
+        'ip_address': '', 'port': '', 'config_json': '{}',
+    }
+
+    if request.method == 'POST':
+        form = {
+            'name': request.POST.get('name', '').strip(),
+            'location': request.POST.get('location', '').strip(),
+            'device_type': request.POST.get('device_type', '').strip(),
+            'ip_address': request.POST.get('ip_address', '').strip(),
+            'port': request.POST.get('port', '').strip(),
+            'config_json': request.POST.get('config_json', '{}').strip(),
+        }
+        if not form['name']:
+            error = 'Name is required.'
+        elif form['device_type'] not in DEVICE_TYPES:
+            error = 'Please select a valid device type.'
+        else:
+            try:
+                port = int(form['port']) if form['port'] else 0
+            except ValueError:
+                port = 0
+            conn = get_db_connection()
+            try:
+                create_device(
+                    conn,
+                    name=form['name'],
+                    location=form['location'],
+                    device_type=form['device_type'],
+                    ip_address=form['ip_address'],
+                    port=port,
+                    config_json=form['config_json'] or '{}',
+                    created_by=request.session.get('user_email'),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+            return redirect('tc_device_list')
+
+    return render(request, 'tc_device_form.html', _tc_context(
+        request,
+        form=form,
+        error=error,
+        device_types=DEVICE_TYPES,
+        device_type_labels=DEVICE_TYPE_LABELS,
+        is_new=True,
+        back_url=_DEV_BACK,
+    ))
+
+
+def tc_device_detail(request, device_id: int):
+    """Edit a device or view its sync log."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _dev_access(request):
+        return redirect('time_clock_status')
+
+    conn = get_db_connection()
+    try:
+        device = get_device(conn, device_id)
+        if not device:
+            return redirect('tc_device_list')
+
+        error = ''
+        if request.method == 'POST':
+            name = request.POST.get('name', '').strip()
+            location = request.POST.get('location', '').strip()
+            device_type = request.POST.get('device_type', '').strip()
+            ip_address = request.POST.get('ip_address', '').strip()
+            port_str = request.POST.get('port', '').strip()
+            config_json = request.POST.get('config_json', '{}').strip()
+            enabled = request.POST.get('enabled') == 'on'
+
+            if not name:
+                error = 'Name is required.'
+            elif device_type not in DEVICE_TYPES:
+                error = 'Please select a valid device type.'
+            else:
+                try:
+                    port = int(port_str) if port_str else 0
+                except ValueError:
+                    port = 0
+                update_device(conn, device_id,
+                              name=name, location=location,
+                              device_type=device_type,
+                              ip_address=ip_address, port=port,
+                              config_json=config_json or '{}',
+                              enabled=enabled)
+                conn.commit()
+                return redirect('tc_device_detail', device_id=device_id)
+
+            device = get_device(conn, device_id)
+
+        sync_log = list_sync_log(conn, device_id=device_id, limit=20)
+    finally:
+        conn.close()
+
+    return render(request, 'tc_device_form.html', _tc_context(
+        request,
+        form=device,
+        error=error,
+        device_types=DEVICE_TYPES,
+        device_type_labels=DEVICE_TYPE_LABELS,
+        is_new=False,
+        device_id=device_id,
+        sync_log=sync_log,
+        back_url=_DEV_BACK,
+    ))
+
+
+def tc_device_poll(request, device_id: int):
+    """Trigger an immediate poll of a device."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _dev_access(request) or request.method != 'POST':
+        return redirect('tc_device_list')
+
+    conn = get_db_connection()
+    try:
+        result = poll_device(conn, device_id)
+        conn.commit()
+    finally:
+        conn.close()
+
+    return redirect('tc_device_detail', device_id=device_id)
+
+
+def tc_device_delete(request, device_id: int):
+    """Delete a device and its sync log."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not _dev_access(request) or request.method != 'POST':
+        return redirect('tc_device_list')
+
+    conn = get_db_connection()
+    try:
+        delete_device(conn, device_id)
+        conn.commit()
+    finally:
+        conn.close()
+
+    return redirect('tc_device_list')

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block page_title %}Time Clock{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+<a href="/time-clock/hours/" class="btn">My Hours</a>
+{% if is_hr %}<a href="/time-clock/attendance/" class="btn">Attendance</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.tc-wrap { width: 100%; max-width: 620px; }
+.tc-card {
+    background: white; border: 2px solid black; border-radius: 8px;
+    padding: 28px 32px; margin-bottom: 20px; text-align: center;
+}
+.tc-status-label {
+    font-size: 13px; font-weight: bold; text-transform: uppercase;
+    letter-spacing: 2px; color: #555; margin-bottom: 8px;
+}
+.tc-status {
+    font-size: 28px; font-weight: bold; margin-bottom: 6px;
+}
+.tc-since { font-size: 13px; color: #555; margin-bottom: 20px; }
+.tc-btn {
+    display: inline-block; padding: 14px 40px; border: 2px solid black;
+    border-radius: 6px; font-size: 16px; font-weight: bold;
+    cursor: pointer; text-decoration: none; transition: opacity .15s;
+}
+.tc-btn:hover { opacity: .85; }
+.tc-btn-in  { background: #28a745; color: white; border-color: #28a745; }
+.tc-btn-out { background: #dc3545; color: white; border-color: #dc3545; }
+.tc-log-title {
+    font-size: 13px; font-weight: bold; color: #cce; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+}
+.tc-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+}
+.tc-table th, .tc-table td {
+    padding: 7px 10px; font-size: 13px; text-align: left;
+    border-bottom: 1px solid #ccc;
+}
+.tc-table th { background: rgb(0,60,180); color: white; }
+.tc-total { text-align: right; font-size: 13px; color: white;
+            margin-top: 6px; font-weight: bold; }
+.tc-error { background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
+            padding: 10px 14px; color: #900; margin-bottom: 16px; }
+.dot-in  { color: #28a745; }
+.dot-out { color: #6c757d; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Time Clock</div>
+    <div class="tc-wrap">
+        {% if error %}
+        <div class="tc-error">{{ error }}</div>
+        {% else %}
+
+        <div class="tc-card">
+            <div class="tc-status-label">Current Status</div>
+            {% if current %}
+            <div class="tc-status dot-in">&#9679; Clocked In</div>
+            <div class="tc-since">Since {{ current.clock_in }}</div>
+            <form method="post" action="/time-clock/">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="clock_out">
+                <button type="submit" class="tc-btn tc-btn-out">Clock Out</button>
+            </form>
+            {% else %}
+            <div class="tc-status dot-out">&#9679; Clocked Out</div>
+            <div class="tc-since">&nbsp;</div>
+            <form method="post" action="/time-clock/">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="clock_in">
+                <button type="submit" class="tc-btn tc-btn-in">Clock In</button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if today_entries %}
+        <div class="tc-log-title">Today&rsquo;s Log</div>
+        <table class="tc-table">
+            <thead>
+                <tr>
+                    <th>Clock In</th>
+                    <th>Clock Out</th>
+                    <th>Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in today_entries %}
+                <tr>
+                    <td>{{ e.clock_in|slice:"11:16" }}</td>
+                    <td>{% if e.clock_out %}{{ e.clock_out|slice:"11:16" }}{% else %}<em>in progress</em>{% endif %}</td>
+                    <td>{{ e.hours_fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="tc-total">Total today: {{ total_fmt }}</div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

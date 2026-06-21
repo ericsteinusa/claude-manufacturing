@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block page_title %}Time Clock Devices{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+<a href="/time-clock/devices/new/" class="btn">+ Add Device</a>
+{% endblock %}
+
+{% block extra_styles %}
+.tcd-wrap { width: 100%; max-width: 960px; }
+.tcd-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden;
+}
+.tcd-table th, .tcd-table td {
+    padding: 8px 12px; font-size: 13px; text-align: left;
+    border-bottom: 1px solid #ccc;
+}
+.tcd-table th { background: rgb(0,60,180); color: white; }
+.tcd-table tr:hover td { background: #eef6ff; }
+.tcd-actions { display: flex; gap: 6px; }
+.badge-ok { background: #d4edda; border: 1px solid #999; border-radius: 10px;
+            padding: 2px 8px; font-size: 11px; font-weight: bold; }
+.badge-err { background: #f8d7da; border: 1px solid #999; border-radius: 10px;
+             padding: 2px 8px; font-size: 11px; font-weight: bold; }
+.badge-dis { background: #e9ecef; border: 1px solid #999; border-radius: 10px;
+             padding: 2px 8px; font-size: 11px; }
+.tcd-empty { color: white; margin-top: 20px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Time Clock Devices</div>
+    <div class="tcd-wrap">
+        {% if devices %}
+        <table class="tcd-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>IP Address</th>
+                    <th>Last Sync</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in devices %}
+                <tr>
+                    <td><a href="/time-clock/devices/{{ d.id }}/" style="color:#003cb4;font-weight:bold;">{{ d.name }}</a></td>
+                    <td>{{ d.location|default:"—" }}</td>
+                    <td>{{ device_type_labels|dictsort:d.device_type }}</td>
+                    <td>{{ d.ip_address|default:"—" }}</td>
+                    <td style="font-size:12px;">{{ d.last_sync_at|default:"Never" }}</td>
+                    <td>
+                        {% if not d.enabled %}
+                            <span class="badge-dis">Disabled</span>
+                        {% elif d.last_status == 'ok' %}
+                            <span class="badge-ok">OK</span>
+                        {% elif d.last_status == 'error' %}
+                            <span class="badge-err">Error</span>
+                        {% elif d.last_status == 'partial' %}
+                            <span class="badge-dis">Partial</span>
+                        {% else %}
+                            <span class="badge-dis">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="tcd-actions">
+                            <a href="/time-clock/devices/{{ d.id }}/" class="btn" style="font-size:12px;padding:3px 10px;">Edit</a>
+                            <form method="post" action="/time-clock/devices/{{ d.id }}/poll/" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn" style="font-size:12px;padding:3px 10px;"
+                                    {% if not d.enabled %}disabled{% endif %}>Poll</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="tcd-empty">No time clock devices registered yet. <a href="/time-clock/devices/new/" style="color:#adf;">Add one.</a></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
