@@ -23,6 +23,15 @@ from .purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
+from .sales_orders_core import (
+    SO_STATUSES, SO_STATUS_COLORS, SO_STATUS_ACTION_LABELS,
+    list_sos, get_so, get_so_items,
+    next_so_number, load_customers, load_products as load_so_products,
+    create_so, update_so, add_so_item, delete_so_item,
+    allowed_transitions as so_allowed_transitions,
+    can_transition as so_can_transition,
+    set_so_status,
+)
 from .work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,
     list_wos, get_wo, get_wo_materials,
@@ -73,6 +82,10 @@ WEB_LEAF_URLS = {
     ('production', 'open_wo'): '/wo/?status=open',
     ('production', 'inprog_wo'): '/wo/?status=in_progress',
     ('production', 'comp_wo'): '/wo/?status=completed',
+    ('sales', 'new_order'): '/so/new/',
+    ('sales', 'open_orders'): '/so/?status=confirmed',
+    ('sales', 'order_hist'): '/so/',
+    ('sales', 'order_stat'): '/so/',
 }
 
 
@@ -1070,3 +1083,277 @@ def wo_set_status(request, wo_id):
     finally:
         conn.close()
     return redirect('wo_detail', wo_id=wo_id)
+
+
+# ---------------------------------------------------------------------------
+# Sales orders (web)
+# ---------------------------------------------------------------------------
+
+_SO_NEW_STATUSES = ('draft', 'confirmed')
+
+
+def _so_access(request, write=False):
+    """Gate SO pages: logged in, and either full access or Sales dept.
+
+    With ``write=True`` also blocks ``READ_ONLY_ROLES`` from mutating.
+    Returns a redirect or None if allowed.
+    """
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') != 'sales':
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('so_list')
+    return None
+
+
+def _so_context(request, **extra):
+    """Toolbar context shared by the SO templates."""
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def _so_customer_name(so):
+    return (
+        so.get('company_name')
+        or f"{so.get('first_name') or ''} {so.get('last_name') or ''}".strip()
+        or '—'
+    )
+
+
+def so_list(request):
+    denied = _so_access(request)
+    if denied:
+        return denied
+
+    status = request.GET.get('status') or None
+    if status not in SO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        sos = list_sos(conn, status=status)
+    finally:
+        conn.close()
+
+    for so in sos:
+        so['status_color'] = SO_STATUS_COLORS.get(so['status'], '#ffffff')
+        so['customer_name'] = _so_customer_name(so)
+
+    return render(request, 'so_list.html', _so_context(
+        request,
+        sos=sos,
+        status=status,
+        statuses=SO_STATUSES,
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        back_url='/dept/sales/sales/sales_orders/',
+    ))
+
+
+def so_detail(request, so_id):
+    denied = _so_access(request)
+    if denied:
+        return denied
+
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    try:
+        so = get_so(conn, so_id)
+        items = get_so_items(conn, so_id) if so else []
+        products = load_so_products(conn) if (so and can_edit) else []
+    finally:
+        conn.close()
+
+    if not so:
+        return redirect('so_list')
+
+    so['status_color'] = SO_STATUS_COLORS.get(so['status'], '#ffffff')
+    so['customer_name'] = _so_customer_name(so)
+
+    status_actions = [
+        (target, SO_STATUS_ACTION_LABELS.get(target, target))
+        for target in so_allowed_transitions(so['status'])
+    ] if can_edit else []
+
+    return render(request, 'so_detail.html', _so_context(
+        request,
+        so=so,
+        items=items,
+        products=products,
+        can_edit=can_edit,
+        status_actions=status_actions,
+        back_url='/so/',
+    ))
+
+
+def _so_header_form(request):
+    """Pull + validate SO header fields from POST. Returns (data, error)."""
+    so_number = (request.POST.get('so_number') or '').strip()
+    status = request.POST.get('status') or 'draft'
+    data = {
+        'so_number': so_number,
+        'customer_id': _int_or_none(request.POST.get('customer_id')),
+        'order_date': (request.POST.get('order_date') or '').strip() or None,
+        'ship_date': (request.POST.get('ship_date') or '').strip() or None,
+        'status': status if status in _SO_NEW_STATUSES else 'draft',
+        'notes': (request.POST.get('notes') or '').strip() or None,
+    }
+    if not so_number:
+        return data, 'SO number is required.'
+    return data, None
+
+
+def so_new(request):
+    denied = _so_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        if request.method == 'POST':
+            data, error = _so_header_form(request)
+            if not error:
+                try:
+                    so_id = create_so(
+                        conn, **data,
+                        created_by=request.session.get('user_email'))
+                    conn.commit()
+                    return redirect('so_detail', so_id=so_id)
+                except psycopg2.IntegrityError:
+                    conn.rollback()
+                    error = ("SO number '%s' already exists."
+                             % data['so_number'])
+            customers = load_customers(conn)
+            return render(request, 'so_form.html', _so_context(
+                request, mode='new', error=error, form=data,
+                customers=customers, statuses=_SO_NEW_STATUSES,
+                back_url='/so/'))
+
+        form = {
+            'so_number': next_so_number(conn),
+            'customer_id': None,
+            'order_date': date.today().isoformat(),
+            'ship_date': '',
+            'status': 'draft',
+            'notes': '',
+        }
+        customers = load_customers(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'so_form.html', _so_context(
+        request, mode='new', form=form, customers=customers,
+        statuses=_SO_NEW_STATUSES, back_url='/so/'))
+
+
+def so_edit(request, so_id):
+    denied = _so_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        so = get_so(conn, so_id)
+        if not so:
+            return redirect('so_list')
+
+        if request.method == 'POST':
+            update_so(
+                conn, so_id,
+                customer_id=_int_or_none(request.POST.get('customer_id')),
+                order_date=(request.POST.get('order_date') or '').strip()
+                or None,
+                ship_date=(request.POST.get('ship_date') or '').strip()
+                or None,
+                notes=(request.POST.get('notes') or '').strip() or None,
+            )
+            conn.commit()
+            return redirect('so_detail', so_id=so_id)
+
+        customers = load_customers(conn)
+    finally:
+        conn.close()
+
+    form = {
+        'so_number': so['so_number'],
+        'customer_id': so['customer_id'],
+        'order_date': so['order_date'] or '',
+        'ship_date': so['ship_date'] or '',
+        'status': so['status'],
+        'notes': so['notes'] or '',
+    }
+    return render(request, 'so_form.html', _so_context(
+        request, mode='edit', so=so, form=form, customers=customers,
+        back_url='/so/%s/' % so_id))
+
+
+def so_add_item(request, so_id):
+    denied = _so_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('so_detail', so_id=so_id)
+
+    description = (request.POST.get('description') or '').strip()
+    product_id = _int_or_none(request.POST.get('product_id'))
+    try:
+        qty = int(request.POST.get('qty') or 1)
+        qty = max(1, qty)
+    except ValueError:
+        qty = 1
+    try:
+        unit_price = float(request.POST.get('unit_price') or 0)
+    except ValueError:
+        unit_price = 0.0
+
+    conn = get_db_connection()
+    try:
+        so = get_so(conn, so_id)
+        if so and description and qty >= 1 and unit_price >= 0:
+            add_so_item(conn, so_id, description, product_id=product_id,
+                        qty=qty, unit_price=unit_price)
+            conn.commit()
+    finally:
+        conn.close()
+    return redirect('so_detail', so_id=so_id)
+
+
+def so_remove_item(request, so_id):
+    denied = _so_access(request, write=True)
+    if denied:
+        return denied
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        if item_id:
+            conn = get_db_connection()
+            try:
+                delete_so_item(conn, item_id, so_id=so_id)
+                conn.commit()
+            finally:
+                conn.close()
+    return redirect('so_detail', so_id=so_id)
+
+
+def so_set_status(request, so_id):
+    denied = _so_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('so_detail', so_id=so_id)
+
+    target = request.POST.get('status')
+    conn = get_db_connection()
+    try:
+        so = get_so(conn, so_id)
+        if so and so_can_transition(so['status'], target):
+            set_so_status(conn, so_id, target)
+            conn.commit()
+    finally:
+        conn.close()
+    return redirect('so_detail', so_id=so_id)

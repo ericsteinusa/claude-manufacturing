@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block page_title %}{% if mode == 'edit' %}Edit {{ form.so_number }}{% else %}New Sales Order{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.so-form-wrap { width: 100%; max-width: 520px; }
+.so-form {
+    background: white; border: 2px solid black; border-radius: 6px;
+    padding: 20px 24px;
+}
+.so-form .row { margin-bottom: 14px; }
+.so-form label { display: block; font-size: 13px; font-weight: bold;
+                 color: #003cb4; margin-bottom: 4px; }
+.so-form input, .so-form select {
+    width: 100%; padding: 6px 8px; border: 2px solid black;
+    border-radius: 4px; font-size: 13px;
+}
+.so-form input[readonly] { background: #eee; }
+.so-actions { display: flex; gap: 10px; margin-top: 18px; }
+.so-error {
+    background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
+    padding: 8px 12px; margin-bottom: 14px; font-size: 13px; color: #900;
+}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="so-form-wrap">
+        <div class="menu-title">
+            {% if mode == 'edit' %}Edit {{ form.so_number }}{% else %}New Sales Order{% endif %}
+        </div>
+
+        {% if error %}<div class="so-error">{{ error }}</div>{% endif %}
+
+        <form class="so-form" method="post"
+              action="{% if mode == 'edit' %}/so/{{ so.id }}/edit/{% else %}/so/new/{% endif %}">
+            {% csrf_token %}
+
+            <div class="row">
+                <label>SO Number</label>
+                {% if mode == 'edit' %}
+                <input type="text" value="{{ form.so_number }}" readonly>
+                {% else %}
+                <input type="text" name="so_number" value="{{ form.so_number }}"
+                       required>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <label>Customer</label>
+                <select name="customer_id">
+                    <option value="">(none)</option>
+                    {% for c in customers %}
+                    <option value="{{ c.id }}"
+                        {% if c.id == form.customer_id %}selected{% endif %}>
+                        {{ c.company_name|default:"" }}{% if not c.company_name %}{{ c.first_name }} {{ c.last_name }}{% endif %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+                <label>Order Date</label>
+                <input type="date" name="order_date" value="{{ form.order_date }}">
+            </div>
+
+            <div class="row">
+                <label>Ship Date</label>
+                <input type="date" name="ship_date" value="{{ form.ship_date }}">
+            </div>
+
+            {% if mode == 'edit' %}
+            <div class="row">
+                <label>Status</label>
+                <input type="text" value="{{ form.status|capfirst }}" readonly>
+            </div>
+            {% else %}
+            <div class="row">
+                <label>Status</label>
+                <select name="status">
+                    {% for s in statuses %}
+                    <option value="{{ s }}"
+                        {% if s == form.status %}selected{% endif %}>
+                        {{ s|capfirst }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <label>Notes</label>
+                <input type="text" name="notes" value="{{ form.notes }}">
+            </div>
+
+            <div class="so-actions">
+                <button type="submit" class="btn">
+                    {% if mode == 'edit' %}Save{% else %}Create Order{% endif %}</button>
+                <a href="{{ back_url }}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
