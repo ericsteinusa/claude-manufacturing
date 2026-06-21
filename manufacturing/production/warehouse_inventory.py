@@ -3,13 +3,13 @@ warehouse_inventory.py — Warehouse & Inventory Management
 Tabs: Stock Overview | Receive Stock | Adjustments | Reports
 """
 import sys
-from .db_pg import get_db
+from ..db_pg import get_db
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BLUE
+from ..qt_theme import BLUE
 
-from .button_nav import ButtonNav
-from .accounts import get_current_user_email
+from ..button_nav import ButtonNav
+from ..accounts import get_current_user_email
 
 
 BUTTON_STYLE = (

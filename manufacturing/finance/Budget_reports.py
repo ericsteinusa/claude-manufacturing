@@ -17,7 +17,7 @@ budgeted side on a fresh database.
 """
 import sys
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 from .Budget_mgmt import (get_db, init_db, _apply_blue_palette, _ro, _ro_right,
                           _actual_for_account, CURRENT_YEAR, BUDGET_COLORS)
 

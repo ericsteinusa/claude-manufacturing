@@ -1,10 +1,10 @@
 import sys
 from PyQt6 import QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
-from .dept_menu_widget import DeptMenuWidget
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
+from ..dept_menu_widget import DeptMenuWidget
 from .Legal_mgmt import (ContractsWidget, ComplianceWidget, LitigationWidget,
                           IPWidget, EmploymentLawWidget)
-from .purchase_requisitions import RequisitionsWidget
+from ..purchase_requisitions import RequisitionsWidget
 
 _TITLE = "Legal Main Menu"
 _ITEMS = [

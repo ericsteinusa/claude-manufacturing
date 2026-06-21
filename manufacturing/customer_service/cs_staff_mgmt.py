@@ -3,12 +3,12 @@ cs_staff_mgmt.py — CS Staff Management
 Tabs: Staff Directory | Performance Metrics | Staff Training | Staff Reports
 """
 import sys
-from .db_pg import get_db
+from ..db_pg import get_db
 import csv
 from datetime import date, datetime
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .button_nav import ButtonNav
-from .accounts import get_current_user_email
+from ..button_nav import ButtonNav
+from ..accounts import get_current_user_email
 
 CS_DEPT_ID = 3
 

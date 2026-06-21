@@ -1,10 +1,10 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BUTTON_STYLE
+from ..qt_theme import BUTTON_STYLE
 
-from .button_nav import ButtonNav
-from .accounts import get_current_user_email
+from ..button_nav import ButtonNav
+from ..accounts import get_current_user_email
 
 
 def _apply_blue_palette(widget):

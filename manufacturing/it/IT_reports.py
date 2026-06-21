@@ -1,6 +1,6 @@
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+from ..qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
 
 LAUNCH_ITEMS = [
     ("Department Entry",        "dept_entry.py"),

@@ -5,12 +5,12 @@ Tabs: Task Summary | By Technician | By Department | Overdue | Recently
 """
 import sys
 from datetime import date, timedelta
-from .db_pg import get_db
-from .log_utils import get_logger
+from ..db_pg import get_db
+from ..log_utils import get_logger
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 log = get_logger(__name__)
 
 BUTTON_STYLE = (

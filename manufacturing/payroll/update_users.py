@@ -2,8 +2,8 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import *  # noqa: F401,F403,F405
-from .db_pg import get_db
-from .schema import init_schema
+from ..db_pg import get_db
+from ..schema import init_schema
 
 
 

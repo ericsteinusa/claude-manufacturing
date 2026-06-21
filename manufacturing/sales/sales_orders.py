@@ -1,15 +1,15 @@
 import sys
 import psycopg2
-from .db_pg import get_db_connection
-from .accounts import get_current_user_email
-from .sales_orders_core import (
+from ..db_pg import get_db_connection
+from ..accounts import get_current_user_email
+from ..sales_orders_core import (
     next_so_number, SO_STATUS_COLORS, customer_label as _customer_label,
     ensure_so_tables, list_sos, get_so_items,
     load_customers, load_products,
     create_so, update_so, add_so_item, set_so_status,
 )
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,

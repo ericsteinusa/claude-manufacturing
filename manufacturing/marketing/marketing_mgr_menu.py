@@ -1,10 +1,10 @@
 import sys
 from PyQt6 import QtWidgets
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 from .Marketing_mgmt import (_apply_blue_palette, CampaignsWidget,
                              BudgetApprovalWidget, MarketingAnalyticsWidget,
                              MarketResearchWidget)
-from .accounts import get_current_user_email
+from ..accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

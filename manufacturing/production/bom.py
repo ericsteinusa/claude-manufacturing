@@ -31,7 +31,7 @@ import sys
 
 import psycopg2
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,
@@ -39,9 +39,9 @@ from .qt_theme import (
 )
 
 
-from .bom_core import would_create_cycle, explode_quantity
-from .db_pg import get_db_connection
-from .log_utils import get_logger
+from ..bom_core import would_create_cycle, explode_quantity
+from ..db_pg import get_db_connection
+from ..log_utils import get_logger
 
 log = get_logger(__name__)
 

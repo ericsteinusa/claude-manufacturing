@@ -1,9 +1,9 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import BUTTON_STYLE
+from ..qt_theme import BUTTON_STYLE
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 from .IT_Tasks import ITTasksWidget, _apply_blue_palette
 from .it_calls import ITSupportWidget
 

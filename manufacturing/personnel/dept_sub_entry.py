@@ -1,7 +1,7 @@
 import sys
-from .db_pg import get_db
+from ..db_pg import get_db
 from PyQt6 import QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     LABEL_STYLE,

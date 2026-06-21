@@ -4,13 +4,13 @@ Full add/update/delete/search screen over the ``calls2`` table, replacing the
 legacy tkinter ``cs_calls.py``. Embedded as a tab by the CS menus and wrapped
 in a window by ``cs_calls.py`` for the desktop menu-leaf launch.
 """
-from .db_pg import get_db
-from .log_utils import get_logger
-from .accounts import get_current_user_email
-from .cs_calls_core import (
+from ..db_pg import get_db
+from ..log_utils import get_logger
+from ..accounts import get_current_user_email
+from ..cs_calls_core import (
     format_customer_label, parse_customer_id, validate_call)
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
 
 
 log = get_logger(__name__)

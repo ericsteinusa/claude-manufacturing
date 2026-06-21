@@ -278,7 +278,7 @@ def run_script(request, dept, subpath):
         for key, _label, target in node['items']:
             if key == leaf_key and isinstance(target, str):
                 mfg_dir = os.path.dirname(__file__)
-                module_name = os.path.splitext(target)[0]
+                module_name = os.path.splitext(target)[0].replace('/', '.').replace(os.sep, '.')
                 project_dir = os.path.dirname(mfg_dir)
                 log.info(
                     "User %s launching manufacturing.%s (%s/%s)",

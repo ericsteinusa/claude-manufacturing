@@ -1,7 +1,7 @@
 # ruff: noqa: F403,F405
 from tkinter import messagebox
 from tkinter import *  # noqa: F401,F403,F405
-from .db_pg import get_db
+from ..db_pg import get_db
 
 
 # Function to check if the name exists in the database

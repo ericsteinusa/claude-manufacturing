@@ -1,9 +1,9 @@
 import sys
-from .db_pg import get_db
+from ..db_pg import get_db
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette, ro as _ro
+from ..qt_theme import apply_blue_palette as _apply_blue_palette, ro as _ro
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
 
 INPUT_STYLE = (

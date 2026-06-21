@@ -1,15 +1,15 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
-from .dept_menu_widget import DeptMenuWidget
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
+from ..dept_menu_widget import DeptMenuWidget
 from .Accounts_payable import AccountsPayableWidget
 from .Accounts_receivable import AccountsReceivableWidget
-from .Credit_dept import CreditDeptWidget
-from .Payroll_dept import PayrollDeptWidget
+from ..customers.Credit_dept import CreditDeptWidget
+from ..payroll.Payroll_dept import PayrollDeptWidget
 from .General_ledger import GeneralLedgerWidget
-from .Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
-from .Bank_reconciliation import BankReconciliationWidget
+from ..finance.Budget_mgmt import BudgetManagementWidget as BudgetMgmtWidget
+from ..finance.Bank_reconciliation import BankReconciliationWidget
 
 _TITLE = "Accounting Main Menu"
 _ITEMS = [

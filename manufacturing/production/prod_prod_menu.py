@@ -1,11 +1,11 @@
 import sys
 import psycopg2
-from .db_pg import get_db
+from ..db_pg import get_db
 from .bom import (init_item_master, bom_would_create_cycle,
                   explode_bom_to_wo, ItemSettingsDialog)
-from .work_orders_core import next_wo_number
+from ..work_orders_core import next_wo_number
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import (
+from ..qt_theme import (
     BUTTON_STYLE,
     INPUT_STYLE,
     COMBO_STYLE,
@@ -14,8 +14,8 @@ from .qt_theme import (
     ro as _ro,
 )
 
-from .button_nav import ButtonNav
-from .accounts import get_current_user_email
+from ..button_nav import ButtonNav
+from ..accounts import get_current_user_email
 
 WO_COLORS = {
     "planned":     "#ffffff",

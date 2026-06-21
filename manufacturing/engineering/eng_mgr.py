@@ -1,11 +1,11 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+from ..qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
-from .accounts import get_current_user_email
+from ..accounts import get_current_user_email
 from .eng_design_review import DesignReviewWidget
 from .eng_reports import EngReportsWidget
 

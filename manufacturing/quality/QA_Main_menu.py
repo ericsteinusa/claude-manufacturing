@@ -1,8 +1,8 @@
 import sys
-from .launch_utils import launch as _launch
+from ..launch_utils import launch as _launch
 from PyQt6 import QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
-from .dept_menu_widget import DeptMenuWidget
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
+from ..dept_menu_widget import DeptMenuWidget
 
 _TITLE = "QA Main Menu"
 _ITEMS = [

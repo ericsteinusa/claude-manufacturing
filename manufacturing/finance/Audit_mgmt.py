@@ -3,11 +3,11 @@ Audit_mgmt.py — Audit Management module
 Tabs: Audit Schedule | Audit Findings | Corrective Actions | Audit Reports
 """
 import sys
-from .db_pg import get_db
-from .accounts import get_current_user_email
+from ..db_pg import get_db
+from ..accounts import get_current_user_email
 from datetime import date
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
 
 

@@ -2,10 +2,10 @@ import sys
 import os
 import subprocess
 from PyQt6 import QtCore, QtWidgets
-from .qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+from ..qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
 
-from .button_nav import ButtonNav
-from .accounts import get_current_user_email
+from ..button_nav import ButtonNav
+from ..accounts import get_current_user_email
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"

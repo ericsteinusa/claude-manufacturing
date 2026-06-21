@@ -3,13 +3,13 @@ Bank_reconciliation.py — Bank Reconciliation module
 Tabs: Bank Accounts | Statement Entry | Reconciliation | History
 """
 import sys
-from .db_pg import get_db
-from .accounts import get_current_user_email
+from ..db_pg import get_db
+from ..accounts import get_current_user_email
 import csv
 from PyQt6 import QtCore, QtGui, QtWidgets
-from .qt_theme import BLUE
+from ..qt_theme import BLUE
 
-from .button_nav import ButtonNav
+from ..button_nav import ButtonNav
 
 
 def _conn():

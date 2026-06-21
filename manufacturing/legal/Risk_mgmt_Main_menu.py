@@ -1,11 +1,11 @@
 import sys
 from PyQt6 import QtWidgets
-from .qt_theme import apply_blue_palette as _apply_blue_palette
-from .dept_menu_widget import DeptMenuWidget
+from ..qt_theme import apply_blue_palette as _apply_blue_palette
+from ..dept_menu_widget import DeptMenuWidget
 from .Risk_mgmt import (RiskAssessmentWidget, RiskRegisterWidget,
                          InsuranceWidget, BusinessContinuityWidget,
                          ComplianceAuditWidget)
-from .purchase_requisitions import RequisitionsWidget
+from ..purchase_requisitions import RequisitionsWidget
 
 _TITLE = "Risk Management Main Menu"
 _ITEMS = [
