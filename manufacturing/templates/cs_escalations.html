@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block page_title %}CS Escalations{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs/" class="btn">All Tickets</a>
+<a href="/cs/new/" class="btn">+ New Ticket</a>
+<a href="/cs/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:1100px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.summary-bar { display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+.stat-card { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 22px; text-align:center; min-width:140px; }
+.stat-card .num { font-size:28px; font-weight:bold; }
+.stat-card .lbl { font-size:12px; color:#666; margin-top:2px; }
+.critical-card { border-color:#c62828; }
+.critical-card .num { color:#c62828; }
+.high-card { border-color:#e65100; }
+.high-card .num { color:#e65100; }
+.cs-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; }
+.cs-table th, .cs-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.cs-table th { background:rgb(0,60,180); color:white; }
+.cs-table tr:last-child td { border-bottom:none; }
+.row-critical td { background:#fff0f0; }
+.row-high td { background:#fffbe6; }
+.pri-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+    font-size:11px; font-weight:bold; }
+.pri-critical { background:#fce8e8; color:#c62828; }
+.pri-high { background:#fff3e0; color:#e65100; }
+.empty-note { color:#cce; font-size:14px; margin-top:20px; }
+.legend { display:flex; gap:16px; margin-top:12px; font-size:12px; color:#aaa; }
+.legend span { display:flex; align-items:center; gap:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>&#9888; Escalations — Open Tickets &ge;7 Days</h2>
+
+    <div class="summary-bar">
+        <div class="stat-card critical-card">
+            <div class="num">{{ critical_count }}</div>
+            <div class="lbl">Critical (&ge;14 days)</div>
+        </div>
+        <div class="stat-card high-card">
+            <div class="num">{{ high_count }}</div>
+            <div class="lbl">High (&ge;7 days)</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" style="color:#333;">{{ tickets|length }}</div>
+            <div class="lbl">Total Escalations</div>
+        </div>
+    </div>
+
+    {% if tickets %}
+    <table class="cs-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Description</th>
+                <th>Opened</th>
+                <th>Days Open</th>
+                <th>Priority</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in tickets %}
+            <tr class="row-{{ t.priority }}">
+                <td>{{ t.id }}</td>
+                <td>{{ t.customer_name }}</td>
+                <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    {{ t.call|truncatechars:90 }}</td>
+                <td>{{ t.call_date }}</td>
+                <td><strong>{{ t.days_open }}</strong> days</td>
+                <td><span class="pri-badge pri-{{ t.priority }}">
+                    {{ t.priority|capfirst }}</span></td>
+                <td><a href="/cs/{{ t.id }}/" class="btn"
+                       style="padding:2px 10px;font-size:12px;">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="legend">
+        <span><span style="width:12px;height:12px;background:#fff0f0;border:1px solid #e57373;display:inline-block;"></span>
+            Critical &ge;14 days</span>
+        <span><span style="width:12px;height:12px;background:#fffbe6;border:1px solid #ffb74d;display:inline-block;"></span>
+            High &ge;7 days</span>
+    </div>
+    {% else %}
+    <p class="empty-note">No escalated tickets — all open tickets are within the 7-day threshold.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

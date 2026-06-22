@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block page_title %}New CS Ticket{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs/" class="btn">Back to Tickets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:700px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:16px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row textarea { resize:vertical; min-height:80px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.save-btn { padding:8px 24px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:14px; cursor:pointer;
+    font-weight:bold; margin-top:16px; }
+.save-btn:hover { background:rgb(0,40,140); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>New Support Ticket</h2>
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row full">
+                    <label>Customer *</label>
+                    <select name="customer_id" required>
+                        <option value="">— select customer —</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}"
+                            {% if form.customer_id == c.id|stringformat:"s" %}selected{% endif %}>
+                            {{ c.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row full">
+                    <label>Problem / Description *</label>
+                    <textarea name="call" rows="4" required
+                        placeholder="Describe the customer's issue…">{{ form.call|default:"" }}</textarea>
+                </div>
+                <div class="form-row">
+                    <label>Call Date</label>
+                    <input type="date" name="call_date"
+                           value="{{ form.call_date|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Call Time</label>
+                    <input type="time" name="call_time"
+                           value="{{ form.call_time|default:'' }}">
+                </div>
+                <div class="form-row full">
+                    <label>Comments / Notes</label>
+                    <textarea name="comments" rows="3"
+                        placeholder="Internal notes…">{{ form.comments|default:"" }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="save-btn">Create Ticket</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

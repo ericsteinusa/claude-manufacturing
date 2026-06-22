@@ -48,6 +48,13 @@ from .contacts_core import (
     get_supplier, create_supplier, update_supplier,
     get_supplier_orders,
 )
+from .cs_calls_core import (
+    validate_call, PLAN_STATUSES,
+    load_customers_for_cs,
+    list_tickets, get_ticket, create_ticket, update_ticket, close_ticket,
+    get_escalations, get_summary_stats, get_monthly_volume,
+    list_plans, create_plan, update_plan,
+)
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -178,6 +185,13 @@ WEB_LEAF_URLS = {
     ('maintenance', 'parts_req'): '/inventory/',
     ('maintenance', 'reorder'): '/inventory/?filter=low',
     ('maintenance', 'parts_hist'): '/inventory/',
+    # Customer Service tickets
+    ('customer_service', 'cs_calls'): '/cs/',
+    ('customer_service', 'all_tickets'): '/cs/',
+    ('customer_service', 'my_tickets'): '/cs/?my=1',
+    ('customer_service', 'hi_pri'): '/cs/escalations/',
+    ('customer_service', 'tick_search'): '/cs/',
+    ('customer_service', 'new_return'): '/cs/new/',
     # Customers
     ('customers', 'acct_list'): '/customers/',
     ('customers', 'new_acct'): '/customers/new/',
@@ -3233,6 +3247,273 @@ def supplier_detail(request, supplier_id):
         new_url='/suppliers/new/',
         order_label='Purchase Order',
         order_url_prefix='/po/',
+        error=error,
+        success=success,
+        can_edit=can_edit,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Customer Service tickets (web)
+# ---------------------------------------------------------------------------
+
+_CS_DEPT_KEYS = {'customer_service', 'sales', 'customers'}
+
+
+def _cs_access(request, write=False):
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _CS_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('cs_ticket_list')
+    return None
+
+
+def _cs_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'can_edit': request.session.get('user_role') not in READ_ONLY_ROLES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def cs_ticket_list(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    search = request.GET.get('search', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+    my_only = request.GET.get('my', '') == '1'
+    created_by = request.session.get('user_email', '') if my_only else None
+    conn = get_db_connection()
+    try:
+        tickets = list_tickets(
+            conn,
+            search=search or None,
+            status=status_filter or None,
+            created_by=created_by,
+        )
+        open_count = sum(1 for t in tickets if t['status'] == 'open')
+        overdue_count = sum(1 for t in tickets
+                           if t['priority'] in ('high', 'critical'))
+    finally:
+        conn.close()
+    return render(request, 'cs_list.html', _cs_context(
+        request,
+        tickets=tickets,
+        open_count=open_count,
+        overdue_count=overdue_count,
+        search=search,
+        status_filter=status_filter,
+        my_only=my_only,
+    ))
+
+
+def cs_ticket_new(request):
+    denied = _cs_access(request, write=True)
+    if denied:
+        return denied
+    conn = get_db_connection()
+    error = None
+    customers = []
+    try:
+        customers = load_customers_for_cs(conn)
+        if request.method == 'POST':
+            cid_raw = request.POST.get('customer_id', '')
+            try:
+                customer_id = int(cid_raw)
+            except (TypeError, ValueError):
+                customer_id = None
+            call_text = request.POST.get('call', '')
+            errors = validate_call(customer_id, call_text)
+            if errors:
+                error = '; '.join(errors)
+            else:
+                import datetime as _dt
+                today = _dt.date.today().isoformat()
+                now_time = _dt.datetime.now().strftime('%H:%M')
+                tid = create_ticket(
+                    conn,
+                    customer_id=customer_id,
+                    call=call_text,
+                    call_date=request.POST.get('call_date', '') or today,
+                    call_time=request.POST.get('call_time', '') or now_time,
+                    comments=request.POST.get('comments', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('cs_ticket_detail', ticket_id=tid)
+    except Exception as e:
+        conn.rollback()
+        error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'cs_new.html', _cs_context(
+        request,
+        customers=customers,
+        error=error,
+        form=request.POST if request.method == 'POST' else {},
+    ))
+
+
+def cs_ticket_detail(request, ticket_id):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = None
+    success = None
+    ticket = None
+    customers = []
+    try:
+        ticket = get_ticket(conn, ticket_id)
+        if not ticket:
+            return redirect('cs_ticket_list')
+        customers = load_customers_for_cs(conn) if can_edit else []
+
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+            try:
+                if action == 'close':
+                    close_ticket(conn, ticket_id,
+                                 comments=request.POST.get('comments', ''))
+                    conn.commit()
+                    success = 'Ticket closed.'
+                elif action == 'update':
+                    try:
+                        cid = int(request.POST.get('customer_id', 0))
+                    except ValueError:
+                        cid = ticket['customer_id']
+                    update_ticket(
+                        conn, ticket_id,
+                        customer_id=cid,
+                        call=request.POST.get('call', ''),
+                        call_date=request.POST.get('call_date', ''),
+                        call_time=request.POST.get('call_time', ''),
+                        completion_date=request.POST.get('completion_date', ''),
+                        completion_time=request.POST.get('completion_time', ''),
+                        comments=request.POST.get('comments', ''),
+                        completed=request.POST.get('completed') == '1',
+                    )
+                    conn.commit()
+                    success = 'Ticket updated.'
+                ticket = get_ticket(conn, ticket_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'cs_detail.html', _cs_context(
+        request,
+        ticket=ticket,
+        customers=customers,
+        error=error,
+        success=success,
+        can_edit=can_edit,
+    ))
+
+
+def cs_escalations(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    conn = get_db_connection()
+    try:
+        tickets = get_escalations(conn)
+        critical_count = sum(1 for t in tickets if t['priority'] == 'critical')
+        high_count = sum(1 for t in tickets if t['priority'] == 'high')
+    finally:
+        conn.close()
+    return render(request, 'cs_escalations.html', _cs_context(
+        request,
+        tickets=tickets,
+        critical_count=critical_count,
+        high_count=high_count,
+    ))
+
+
+def cs_reports(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    try:
+        days = int(request.GET.get('days', 365))
+    except ValueError:
+        days = 365
+    conn = get_db_connection()
+    try:
+        stats = get_summary_stats(conn, days)
+        monthly = get_monthly_volume(conn, days)
+        open_tickets = list_tickets(conn, status='open')
+        overdue_count = sum(1 for t in open_tickets
+                           if t['priority'] in ('high', 'critical'))
+    finally:
+        conn.close()
+    return render(request, 'cs_reports.html', _cs_context(
+        request,
+        stats=stats,
+        monthly=monthly,
+        open_count=len(open_tickets),
+        overdue_count=overdue_count,
+        days=days,
+    ))
+
+
+def cs_plans(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_filter = request.GET.get('status', '').strip()
+    conn = get_db_connection()
+    error = None
+    success = None
+    plans = []
+    try:
+        plans = list_plans(conn, status=status_filter or None)
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+            try:
+                if action == 'create':
+                    create_plan(
+                        conn,
+                        title=request.POST.get('title', ''),
+                        description=request.POST.get('description', ''),
+                        owner=request.POST.get('owner', ''),
+                        target_date=request.POST.get('target_date', ''),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Plan created.'
+                elif action == 'update':
+                    pid = int(request.POST.get('plan_id', 0))
+                    update_plan(
+                        conn, pid,
+                        title=request.POST.get('title', ''),
+                        description=request.POST.get('description', ''),
+                        owner=request.POST.get('owner', ''),
+                        target_date=request.POST.get('target_date', ''),
+                        status=request.POST.get('status', 'Open'),
+                    )
+                    conn.commit()
+                    success = 'Plan updated.'
+                plans = list_plans(conn, status=status_filter or None)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'cs_plans.html', _cs_context(
+        request,
+        plans=plans,
+        plan_statuses=PLAN_STATUSES,
+        status_filter=status_filter,
         error=error,
         success=success,
         can_edit=can_edit,
