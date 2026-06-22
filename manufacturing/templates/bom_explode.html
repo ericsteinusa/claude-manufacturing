@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block page_title %}Exploded BOM — {{ product.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back to BOM</a>
+<a href="/bom/" class="btn">All Products</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.explode-wrap { width: 100%; max-width: 960px; }
+.explode-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.explode-wrap p.sub { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.qty-form { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; }
+.qty-form label { color: white; font-size: 13px; }
+.qty-form input { padding: 4px 8px; border: 2px solid black; border-radius: 4px;
+    font-size: 13px; width: 80px; }
+.explode-table { width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+.explode-table th, .explode-table td { padding: 7px 10px; text-align: left;
+    border-bottom: 1px solid #ddd; font-size: 13px; }
+.explode-table th { background: rgb(0,60,180); color: white; }
+.explode-table tr:last-child td { border-bottom: none; }
+.explode-table td.num, .explode-table th.num { text-align: right; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 10px;
+    border: 1px solid; font-size: 11px; }
+.badge-make { background: #d0e8ff; border-color: #3070c0; color: #1a4080; }
+.badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
+.depth-indent { display: inline-block; }
+.level-label { font-size: 10px; color: #999; font-weight: normal; margin-left: 4px; }
+.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+.total-row td { font-weight: bold; background: #eef6ff; border-top: 2px solid #ccc; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="explode-wrap">
+    <h2>Exploded BOM: {{ product.name }}</h2>
+    <p class="sub">All components needed at every level to build
+        <strong style="color:white;">{{ qty|floatformat:"g" }} {{ product.uom }}</strong>
+        of <strong style="color:white;">{{ product.name }}</strong>.</p>
+
+    <!-- Qty selector -->
+    <form method="get" class="qty-form">
+        <label>Build quantity:</label>
+        <input type="number" name="qty" min="0.001" step="any" value="{{ qty }}">
+        <button type="submit" class="btn">Recalculate</button>
+    </form>
+
+    {% if explosion %}
+    <table class="explode-table">
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Type</th>
+                <th class="num">Qty Needed</th>
+                <th>Unit</th>
+                <th class="num">On Hand</th>
+                <th class="num">Lead Time</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in explosion %}
+            <tr style="{% if row.depth == 0 %}background:#f7faff;{% endif %}">
+                <td>
+                    <span class="depth-indent"
+                          style="padding-left: {{ row.depth|add:row.depth|add:row.depth|add:row.depth }}px;">
+                        {% if row.depth > 0 %}
+                        <span style="color:#aaa;">{% for i in row.depth|rjust:row.depth %}└─{% endfor %}</span>
+                        {% endif %}
+                        <a href="/bom/{{ row.component_id }}/"
+                           style="color:rgb(0,60,180);">{{ row.component_name }}</a>
+                        <span class="level-label">L{{ row.depth }}</span>
+                    </span>
+                </td>
+                <td><span class="badge badge-{{ row.item_type }}">
+                    {{ row.item_type|capfirst }}</span></td>
+                <td class="num"><strong>{{ row.qty_needed|floatformat:4 }}</strong></td>
+                <td>{{ row.unit }}</td>
+                <td class="num">
+                    {{ row.on_hand|floatformat:0 }}
+                    {% if row.on_hand < row.qty_needed %}
+                    <span style="color:#c33;font-size:11px;">▼ short</span>
+                    {% endif %}
+                </td>
+                <td class="num">
+                    {% if row.lead_time_days %}{{ row.lead_time_days }} d{% else %}—{% endif %}
+                </td>
+                <td style="color:#666;">{{ row.notes|default:"" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="color:#cce;font-size:12px;">
+        {{ explosion|length }} component line{{ explosion|length|pluralize }} across all levels.
+        {% with max_depth=explosion|last %}
+        {% endwith %}
+    </p>
+    {% else %}
+    <p class="empty-note">
+        {{ product.name }} has no BOM components.
+        <a href="/bom/{{ product.id }}/" style="color:#99f;">Add components →</a>
+    </p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

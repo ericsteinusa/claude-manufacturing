@@ -22,6 +22,11 @@ from .approval_core import (
     get_pending_approvals, count_pending, get_po_approval,
     APPROVAL_THRESHOLD, APPROVAL_ROLES,
 )
+from .bom_web_core import (
+    list_products, get_product, get_bom, explode_bom,
+    add_bom_line, update_bom_line, delete_bom_line,
+    update_item_master, ITEM_TYPES,
+)
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -135,6 +140,11 @@ WEB_LEAF_URLS = {
     ('personnel', 'month_sum'): '/time-clock/attendance/?period=month',
     ('personnel', 'tard_rpt'): '/time-clock/attendance/',
     ('personnel', 'abs_rpt'): '/time-clock/attendance/',
+    ('engineering', 'bom_list'): '/bom/',
+    ('engineering', 'new_bom'): '/bom/',
+    ('engineering', 'bom_rev'): '/bom/',
+    ('engineering', 'bom_rpts'): '/bom/',
+    ('production', 'bom_list'): '/bom/',
 }
 
 
@@ -2352,3 +2362,196 @@ def po_reject(request, approval_id):
     finally:
         conn.close()
     return redirect('po_approvals')
+
+
+# ---------------------------------------------------------------------------
+# Bill of Materials (web)
+# ---------------------------------------------------------------------------
+
+_BOM_DEPT_KEYS = {'engineering', 'production'}
+
+
+def _bom_access(request, write=False):
+    """Gate BOM pages: logged in + full_access or engineering/production dept.
+
+    With ``write=True`` also blocks READ_ONLY_ROLES from mutating.
+    Returns a redirect or None if allowed.
+    """
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _BOM_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('bom_list')
+    return None
+
+
+def _bom_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def bom_list(request):
+    denied = _bom_access(request)
+    if denied:
+        return denied
+
+    item_type = request.GET.get('item_type') or None
+    if item_type not in ITEM_TYPES:
+        item_type = None
+
+    conn = get_db_connection()
+    try:
+        products = list_products(conn, item_type=item_type)
+    finally:
+        conn.close()
+
+    dept = request.session.get('user_dept_key', 'engineering')
+    back_url = (
+        f'/dept/{dept}/eng_menu/bom/'
+        if dept in _BOM_DEPT_KEYS else '/dashboard/'
+    )
+
+    return render(request, 'bom_list.html', _bom_context(
+        request,
+        products=products,
+        item_type=item_type,
+        item_types=ITEM_TYPES,
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        back_url=back_url,
+    ))
+
+
+def bom_detail(request, product_id):
+    denied = _bom_access(request)
+    if denied:
+        return denied
+
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    try:
+        product = get_product(conn, product_id)
+        if not product:
+            return redirect('bom_list')
+
+        error = None
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+
+            if action == 'update_item_master':
+                update_item_master(
+                    conn, product_id,
+                    item_type=request.POST.get('item_type', 'buy'),
+                    lead_time_days=_int_or_none(
+                        request.POST.get('lead_time_days')) or 0,
+                    uom=(request.POST.get('uom') or 'ea').strip() or 'ea',
+                )
+                conn.commit()
+                return redirect('bom_detail', product_id=product_id)
+
+            elif action == 'add_line':
+                component_id = _int_or_none(request.POST.get('component_id'))
+                try:
+                    qty = float(request.POST.get('qty_required') or 1.0)
+                    qty = max(0.0, qty)
+                except ValueError:
+                    qty = 1.0
+                try:
+                    scrap_pct = float(request.POST.get('scrap_pct') or 0.0)
+                    scrap_pct = max(0.0, scrap_pct)
+                except ValueError:
+                    scrap_pct = 0.0
+                unit = (request.POST.get('unit') or 'ea').strip() or 'ea'
+                notes = (request.POST.get('notes') or '').strip()
+                if component_id is None:
+                    error = 'Please select a component.'
+                else:
+                    ok, msg = add_bom_line(
+                        conn, product_id, component_id,
+                        qty_required=qty, unit=unit,
+                        notes=notes, scrap_pct=scrap_pct,
+                    )
+                    if ok:
+                        conn.commit()
+                        return redirect('bom_detail', product_id=product_id)
+                    error = msg
+
+            elif action == 'update_line':
+                line_id = _int_or_none(request.POST.get('line_id'))
+                try:
+                    qty = float(request.POST.get('qty_required') or 1.0)
+                    qty = max(0.0, qty)
+                except ValueError:
+                    qty = 1.0
+                try:
+                    scrap_pct = float(request.POST.get('scrap_pct') or 0.0)
+                    scrap_pct = max(0.0, scrap_pct)
+                except ValueError:
+                    scrap_pct = 0.0
+                unit = (request.POST.get('unit') or 'ea').strip() or 'ea'
+                notes = (request.POST.get('notes') or '').strip()
+                if line_id is not None:
+                    update_bom_line(conn, line_id, qty_required=qty,
+                                    unit=unit, notes=notes, scrap_pct=scrap_pct)
+                    conn.commit()
+                return redirect('bom_detail', product_id=product_id)
+
+            elif action == 'delete_line':
+                line_id = _int_or_none(request.POST.get('line_id'))
+                if line_id is not None:
+                    delete_bom_line(conn, line_id)
+                    conn.commit()
+                return redirect('bom_detail', product_id=product_id)
+
+        lines = get_bom(conn, product_id)
+        all_products = list_products(conn)
+        used_ids = {line['component_id'] for line in lines} | {product_id}
+        available_components = [p for p in all_products if p['id'] not in used_ids]
+    finally:
+        conn.close()
+
+    return render(request, 'bom_detail.html', _bom_context(
+        request,
+        product=product,
+        lines=lines,
+        available_components=available_components,
+        item_types=ITEM_TYPES,
+        can_edit=can_edit,
+        error=error,
+        back_url='/bom/',
+    ))
+
+
+def bom_explode(request, product_id):
+    denied = _bom_access(request)
+    if denied:
+        return denied
+
+    try:
+        qty = float(request.GET.get('qty') or 1.0)
+        qty = max(0.0, qty)
+    except ValueError:
+        qty = 1.0
+
+    conn = get_db_connection()
+    try:
+        product = get_product(conn, product_id)
+        if not product:
+            return redirect('bom_list')
+        explosion = explode_bom(conn, product_id, qty=qty)
+    finally:
+        conn.close()
+
+    return render(request, 'bom_explode.html', _bom_context(
+        request,
+        product=product,
+        explosion=explosion,
+        qty=qty,
+        back_url=f'/bom/{product_id}/',
+    ))
