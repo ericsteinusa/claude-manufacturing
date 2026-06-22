@@ -31,6 +31,15 @@ from .mrp_web_core import (
     get_demand_details, get_scheduled_receipts_detail,
     run_mrp, release_plan as mrp_release_plan,
 )
+from .inventory_core import (
+    TRANS_TYPES,
+    list_products as inv_list_products,
+    get_product as inv_get_product,
+    get_transactions, get_alert_counts,
+    load_suppliers as inv_load_suppliers,
+    record_transaction, create_product as inv_create_product,
+    update_product as inv_update_product,
+)
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -153,6 +162,14 @@ WEB_LEAF_URLS = {
     ('production', 'run_mrp'): '/mrp/',
     ('production', 'mrp_demand'): '/mrp/',
     ('production', 'mrp_rpts'): '/mrp/',
+    ('production', 'raw_mat'): '/inventory/?item_type=buy',
+    ('production', 'fin_goods'): '/inventory/?item_type=make',
+    ('production', 'wip_inv'): '/inventory/',
+    ('production', 'inv_rpts'): '/inventory/',
+    ('maintenance', 'view_inv'): '/inventory/',
+    ('maintenance', 'parts_req'): '/inventory/',
+    ('maintenance', 'reorder'): '/inventory/?filter=low',
+    ('maintenance', 'parts_hist'): '/inventory/',
 }
 
 
@@ -2713,3 +2730,212 @@ def mrp_release(request):
         created_wos=created_wos,
         created_pos=created_pos,
     ))
+
+
+# ---------------------------------------------------------------------------
+# Inventory (web)
+# ---------------------------------------------------------------------------
+
+_INV_DEPT_KEYS = {'production', 'engineering', 'maintenance', 'purchasing'}
+
+
+def _inv_access(request, write=False):
+    """Gate inventory pages: logged-in + full_access or relevant dept."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _INV_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('inventory_list')
+    return None
+
+
+def _inv_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'can_edit': request.session.get('user_role') not in READ_ONLY_ROLES,
+        'trans_types': TRANS_TYPES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def inventory_list(request):
+    denied = _inv_access(request)
+    if denied:
+        return denied
+
+    search = request.GET.get('search', '').strip()
+    filter_status = request.GET.get('filter') or None
+    if filter_status not in ('low', 'zero'):
+        filter_status = None
+    item_type = request.GET.get('item_type') or None
+    if item_type not in ('make', 'buy'):
+        item_type = None
+
+    conn = get_db_connection()
+    try:
+        products = inv_list_products(conn, search=search,
+                                     filter_status=filter_status,
+                                     item_type=item_type)
+        alerts = get_alert_counts(conn)
+    finally:
+        conn.close()
+
+    return render(request, 'inventory_list.html', _inv_context(
+        request,
+        products=products,
+        search=search,
+        filter_status=filter_status,
+        item_type=item_type,
+        alert_zero=alerts['zero_count'],
+        alert_low=alerts['low_count'],
+    ))
+
+
+def inventory_new(request):
+    denied = _inv_access(request, write=True)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    error = None
+    try:
+        suppliers = inv_load_suppliers(conn)
+        if request.method == 'POST':
+            try:
+                product_id = inv_create_product(
+                    conn,
+                    name=request.POST.get('name', ''),
+                    supplier_id=_int_or_none(request.POST.get('supplier_id')),
+                    bin_loc=request.POST.get('bin_loc', ''),
+                    amount=float(request.POST.get('amount') or 0),
+                    reorder_point=float(request.POST.get('reorder_point') or 0),
+                    purchase_price=float(request.POST.get('purchase_price') or 0),
+                    item_type=request.POST.get('item_type', 'buy'),
+                    lead_time_days=int(request.POST.get('lead_time_days') or 0),
+                    uom=request.POST.get('uom', 'ea'),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('inventory_detail', product_id=product_id)
+            except (ValueError, Exception) as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+
+    return render(request, 'inventory_new.html', _inv_context(
+        request,
+        suppliers=suppliers,
+        error=error,
+        form=request.POST if request.method == 'POST' else {},
+    ))
+
+
+def inventory_detail(request, product_id):
+    denied = _inv_access(request)
+    if denied:
+        return denied
+
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = None
+    success = None
+    try:
+        product = inv_get_product(conn, product_id)
+        if not product:
+            return redirect('inventory_list')
+
+        suppliers = inv_load_suppliers(conn) if can_edit else []
+
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+
+            if action == 'update':
+                try:
+                    inv_update_product(
+                        conn, product_id,
+                        name=request.POST.get('name', ''),
+                        supplier_id=_int_or_none(request.POST.get('supplier_id')),
+                        bin_loc=request.POST.get('bin_loc', ''),
+                        reorder_point=float(request.POST.get('reorder_point') or 0),
+                        purchase_price=float(request.POST.get('purchase_price') or 0),
+                        item_type=request.POST.get('item_type', 'buy'),
+                        lead_time_days=int(request.POST.get('lead_time_days') or 0),
+                        uom=request.POST.get('uom', 'ea'),
+                    )
+                    conn.commit()
+                    product = inv_get_product(conn, product_id)
+                    success = 'Product updated.'
+                except (ValueError, Exception) as e:
+                    conn.rollback()
+                    error = str(e)
+
+        transactions = get_transactions(conn, product_id)
+    finally:
+        conn.close()
+
+    amt = product['amount']
+    rop = product['reorder_point']
+    if amt <= 0:
+        stock_status = 'zero'
+    elif rop > 0 and amt <= rop:
+        stock_status = 'low'
+    else:
+        stock_status = 'ok'
+
+    return render(request, 'inventory_detail.html', _inv_context(
+        request,
+        product=product,
+        suppliers=suppliers,
+        transactions=transactions,
+        stock_status=stock_status,
+        error=error,
+        success=success,
+        can_edit=can_edit,
+        back_url='/inventory/',
+    ))
+
+
+def inventory_transaction(request, product_id):
+    """POST only — record a stock movement for a product."""
+    denied = _inv_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('inventory_detail', product_id=product_id)
+
+    conn = get_db_connection()
+    try:
+        product = inv_get_product(conn, product_id)
+        if not product:
+            return redirect('inventory_list')
+
+        trans_type = request.POST.get('trans_type', '')
+        qty_raw = request.POST.get('quantity', '').strip()
+        try:
+            qty = float(qty_raw)
+        except ValueError:
+            qty = 0.0
+
+        if trans_type in TRANS_TYPES and qty != 0:
+            record_transaction(
+                conn, product_id,
+                trans_type=trans_type,
+                quantity=qty,
+                reference=request.POST.get('reference', '').strip(),
+                notes=request.POST.get('notes', '').strip(),
+                created_by=request.session.get('user_email', ''),
+            )
+            conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+    return redirect('inventory_detail', product_id=product_id)

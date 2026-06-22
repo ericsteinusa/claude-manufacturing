@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block page_title %}{{ product.name }} — Inventory{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">Back</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.inv-wrap { width: 100%; max-width: 1020px; }
+.inv-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 18px 22px; margin-bottom: 20px; }
+.card h3 { font-size: 14px; color: #444; margin-bottom: 14px;
+    border-bottom: 1px solid #ddd; padding-bottom: 6px; font-weight: bold; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+.form-row { display: flex; flex-direction: column; gap: 3px; }
+.form-row label { font-size: 12px; color: #666; font-weight: bold; }
+.form-row input, .form-row select { padding: 5px 8px; border: 1px solid #ccc;
+    border-radius: 4px; font-size: 13px; }
+.form-row input[readonly] { background: #f5f5f5; color: #666; }
+.stock-display { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
+.stock-ok   { color: #1a5a20; }
+.stock-low  { color: #7a4000; }
+.stock-zero { color: #900; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 10px;
+    border: 1px solid; font-size: 12px; }
+.badge-zero { background: #fcc; border-color: #c33; color: #900; }
+.badge-low  { background: #ffe5cc; border-color: #c80; color: #640; }
+.badge-ok   { background: #d0f0d0; border-color: #3a3; color: #141; }
+.badge-make { background: #d0e8ff; border-color: #3070c0; color: #1a4080; }
+.badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
+.txn-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-top: 6px; }
+.txn-form select, .txn-form input[type=number], .txn-form input[type=text] {
+    padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+.txn-form select { min-width: 110px; }
+.txn-form input[type=number] { width: 100px; }
+.txn-form input[type=text] { flex: 1; min-width: 140px; }
+.trans-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.trans-table th, .trans-table td { padding: 7px 10px; text-align: left;
+    border-bottom: 1px solid #eee; }
+.trans-table th { color: #666; font-weight: bold; background: #f8f8f8; font-size: 12px; }
+.trans-table td.num { text-align: right; }
+.trans-table .type-receive { color: #1a7a30; font-weight: bold; }
+.trans-table .type-issue   { color: #900; font-weight: bold; }
+.trans-table .type-return  { color: #1a7a30; }
+.trans-table .type-adjust  { color: #a06010; font-weight: bold; }
+.msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#1a5a20;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.save-btn { padding: 7px 22px; background: rgb(0,60,180); color: white;
+    border: none; border-radius: 5px; font-size: 13px; cursor: pointer; font-weight: bold; }
+.save-btn:hover { background: rgb(0,40,140); }
+.txn-btn { padding: 6px 16px; background: #1a7a30; color: white;
+    border: none; border-radius: 5px; font-size: 13px; cursor: pointer; font-weight: bold; }
+.txn-btn:hover { background: #0e5520; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="inv-wrap">
+    <h2>{{ product.name }}</h2>
+
+    {% if success %}
+    <div class="msg-ok">{{ success }}</div>
+    {% endif %}
+    {% if error %}
+    <div class="msg-err">{{ error }}</div>
+    {% endif %}
+
+    <!-- Stock status banner -->
+    <div style="display:flex;gap:20px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <div>
+            <div class="stock-display stock-{{ stock_status }}">
+                {{ product.amount|floatformat:"g" }}
+                <span style="font-size:16px;font-weight:normal;">{{ product.uom }}</span>
+            </div>
+            <div style="font-size:12px;color:#666;">On Hand</div>
+        </div>
+        <div>
+            <span class="badge badge-{{ stock_status }}">
+                {% if stock_status == 'zero' %}Zero Stock
+                {% elif stock_status == 'low' %}Below Reorder
+                {% else %}In Stock{% endif %}
+            </span>
+            &nbsp;
+            <span class="badge badge-{{ product.item_type }}">{{ product.item_type|capfirst }}</span>
+        </div>
+        {% if product.reorder_point %}
+        <div style="color:#666;font-size:13px;">
+            Reorder point: <strong>{{ product.reorder_point|floatformat:"g" }}</strong>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Transaction entry -->
+    {% if can_edit %}
+    <div class="card">
+        <h3>Record Stock Movement</h3>
+        <form method="post" action="/inventory/{{ product.id }}/transaction/">
+            {% csrf_token %}
+            <div class="txn-form">
+                <select name="trans_type">
+                    {% for t in trans_types %}
+                    <option value="{{ t }}">{{ t|capfirst }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="quantity" step="any" placeholder="Qty" required>
+                <input type="text" name="reference" placeholder="Reference (PO#, WO#…)">
+                <input type="text" name="notes" placeholder="Notes">
+                <button type="submit" class="txn-btn">Record</button>
+            </div>
+            <p style="color:#888;font-size:11px;margin-top:6px;">
+                Receive / Return: adds to stock &nbsp;|&nbsp;
+                Issue: subtracts from stock &nbsp;|&nbsp;
+                Adjust: enter a positive or negative signed quantity
+            </p>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Product master edit -->
+    {% if can_edit %}
+    <div class="card">
+        <h3>Product Details</h3>
+        <form method="post" action="/inventory/{{ product.id }}/">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ product.name }}" required>
+                </div>
+                <div class="form-row">
+                    <label>Item Type</label>
+                    <select name="item_type">
+                        <option value="buy" {% if product.item_type == 'buy' %}selected{% endif %}>Buy</option>
+                        <option value="make" {% if product.item_type == 'make' %}selected{% endif %}>Make</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Supplier</label>
+                    <select name="supplier_id">
+                        <option value="">(none)</option>
+                        {% for s in suppliers %}
+                        <option value="{{ s.id }}"
+                            {% if s.id == product.supplier_id %}selected{% endif %}>
+                            {{ s.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>UOM</label>
+                    <input type="text" name="uom" value="{{ product.uom }}" placeholder="ea">
+                </div>
+                <div class="form-row">
+                    <label>Bin / Location</label>
+                    <input type="text" name="bin_loc" value="{{ product.bin|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Lead Time (days)</label>
+                    <input type="number" name="lead_time_days" min="0"
+                           value="{{ product.lead_time_days }}">
+                </div>
+                <div class="form-row">
+                    <label>Reorder Point</label>
+                    <input type="number" name="reorder_point" min="0" step="any"
+                           value="{{ product.reorder_point }}">
+                </div>
+                <div class="form-row">
+                    <label>Unit Cost ($)</label>
+                    <input type="number" name="purchase_price" min="0" step="0.01"
+                           value="{{ product.purchase_price }}">
+                </div>
+            </div>
+            <div style="margin-top:14px;">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/bom/{{ product.id }}/" style="margin-left:14px;
+                   color:rgb(0,60,180);font-size:13px;">View BOM &rarr;</a>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <h3>Product Details</h3>
+        <div class="form-grid">
+            <div class="form-row"><label>Bin</label><span>{{ product.bin|default:"—" }}</span></div>
+            <div class="form-row"><label>UOM</label><span>{{ product.uom }}</span></div>
+            <div class="form-row"><label>Lead Time</label><span>{{ product.lead_time_days }} days</span></div>
+            <div class="form-row"><label>Reorder Point</label><span>{{ product.reorder_point }}</span></div>
+            <div class="form-row"><label>Unit Cost</label>
+                <span>{% if product.purchase_price %}${{ product.purchase_price|floatformat:2 }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="form-row"><label>Supplier</label><span>{{ product.supplier_name|default:"—" }}</span></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Transaction history -->
+    <div class="card">
+        <h3>Transaction History (last 50)</h3>
+        {% if transactions %}
+        <table class="trans-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th class="num">Qty</th>
+                    <th>Reference</th>
+                    <th>Notes</th>
+                    <th>By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.trans_date }}</td>
+                    <td><span class="type-{{ t.trans_type }}">{{ t.trans_type|capfirst }}</span></td>
+                    <td class="num">
+                        {% if t.trans_type == 'issue' %}
+                        <span style="color:#c00;">−{{ t.quantity|floatformat:"g" }}</span>
+                        {% elif t.trans_type == 'adjust' and t.quantity < 0 %}
+                        <span style="color:#c00;">{{ t.quantity|floatformat:"g" }}</span>
+                        {% else %}
+                        <span style="color:#1a7a30;">+{{ t.quantity|floatformat:"g" }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#555;">{{ t.reference|default:"—" }}</td>
+                    <td style="color:#666;font-size:12px;">{{ t.notes|default:"" }}</td>
+                    <td style="color:#888;font-size:11px;">{{ t.created_by|default:"" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#aaa;font-size:13px;">No transactions recorded yet.</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
