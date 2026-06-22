@@ -294,6 +294,15 @@ _PROD_MENU = {
                 ('comp_wo', 'Completed', 'production/work_orders.py'),
             ],
         }),
+        ('mrp', 'MRP Planning', {
+            'title': 'Material Requirements Planning',
+            'items': [
+                ('mrp_home', 'MRP Home', 'production/mrp.py'),
+                ('run_mrp', 'Run MRP Plan', 'production/mrp.py'),
+                ('mrp_demand', 'View Demand', 'production/mrp.py'),
+                ('mrp_rpts', 'MRP Reports', 'production/mrp.py'),
+            ],
+        }),
         ('prod_schedule', 'Production Schedule', {
             'title': 'Production Schedule',
             'items': [

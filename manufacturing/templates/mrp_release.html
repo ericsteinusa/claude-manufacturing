@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block page_title %}MRP Release Results{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mrp/" class="btn">New MRP Run</a>
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/po/" class="btn">Purchase Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.mrp-wrap { width: 100%; max-width: 900px; }
+.mrp-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.mrp-wrap p.sub { color: #cce; font-size: 13px; margin-bottom: 18px; }
+.result-section { margin-bottom: 26px; }
+.result-section h3 { color: white; font-size: 15px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+.result-table { width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden; }
+.result-table th, .result-table td { padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid #ddd; font-size: 13px; }
+.result-table th { background: rgb(0,60,180); color: white; }
+.result-table tr:last-child td { border-bottom: none; }
+.success-banner { background: rgba(0,80,0,0.35); border: 1px solid #4a4;
+    border-radius: 6px; padding: 14px 20px; color: #cfc; font-size: 14px;
+    margin-bottom: 20px; }
+.empty-note { color: #aac; font-size: 13px; padding: 8px 0; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="mrp-wrap">
+    <h2>MRP Plan Released</h2>
+    <p class="sub">The following orders were created. Edit each one to set
+        dates, assign suppliers, and confirm before production begins.</p>
+
+    <div class="success-banner">
+        &#10003; Released {{ created_wos|length }} Work Order{{ created_wos|length|pluralize }}
+        and {{ created_pos|length }} Purchase Order{{ created_pos|length|pluralize }}.
+    </div>
+
+    {% if created_wos %}
+    <div class="result-section">
+        <h3>Work Orders Created</h3>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>WO Number</th>
+                    <th>Product</th>
+                    <th class="num" style="text-align:right;">Qty</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wo in created_wos %}
+                <tr>
+                    <td><strong>{{ wo.wo_number }}</strong></td>
+                    <td>{{ wo.product_name }}</td>
+                    <td style="text-align:right;">{{ wo.qty|floatformat:0 }}</td>
+                    <td><a href="/wo/{{ wo.wo_id }}/" class="btn"
+                           style="padding:2px 10px;font-size:12px;">View WO</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if created_pos %}
+    <div class="result-section">
+        <h3>Draft Purchase Orders Created</h3>
+        <p style="color:#fc9;font-size:12px;margin-bottom:8px;">
+            These POs have no supplier assigned. Open each one to add a supplier before sending.
+        </p>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>PO Number</th>
+                    <th>Product</th>
+                    <th class="num" style="text-align:right;">Qty</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for po in created_pos %}
+                <tr>
+                    <td><strong>{{ po.po_number }}</strong></td>
+                    <td>{{ po.product_name }}</td>
+                    <td style="text-align:right;">{{ po.qty|floatformat:0 }}</td>
+                    <td><a href="/po/{{ po.po_id }}/" class="btn"
+                           style="padding:2px 10px;font-size:12px;">View PO</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if not created_wos and not created_pos %}
+    <p class="empty-note">No orders were released.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
