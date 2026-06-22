@@ -120,6 +120,21 @@ def count_pending(conn) -> int:
     return row[0] if row else 0
 
 
+def get_approval_by_id(conn, approval_id: int) -> dict | None:
+    """Return an approval record with PO details, or None if not found."""
+    row = conn.execute(
+        "SELECT a.id, a.po_id, a.requested_by, a.status, "
+        "       po.po_number, "
+        "       (SELECT COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) "
+        "        FROM po_item pi WHERE pi.po_id = po.id) AS total "
+        "FROM po_approval a "
+        "JOIN purchase_order po ON po.id = a.po_id "
+        "WHERE a.id = %s",
+        (approval_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
 def get_po_approval(conn, po_id: int) -> dict | None:
     """Return the most recent approval record for a PO, or None."""
     row = conn.execute(

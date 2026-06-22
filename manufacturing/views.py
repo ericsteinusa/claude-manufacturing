@@ -20,8 +20,10 @@ from .audit_core import get_recent, get_history, AUDITED_TABLES
 from .approval_core import (
     needs_approval, request_approval, approve_po, reject_po,
     get_pending_approvals, count_pending, get_po_approval,
+    get_approval_by_id,
     APPROVAL_THRESHOLD, APPROVAL_ROLES,
 )
+from .notify_core import notify_approval_requested, notify_approval_decided
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -803,17 +805,25 @@ def po_set_status(request, po_id):
 
     target = request.POST.get('status')
     conn = get_db_connection()
+    _notify_approval_args = None
     try:
         po = get_po(conn, po_id)
         if po and can_transition(po['status'], target):
             if target == 'sent' and needs_approval(po.get('total', 0)):
-                request_approval(
-                    conn, po_id,
-                    requested_by=request.session.get('user_email', ''),
+                requester = request.session.get('user_email', '')
+                request_approval(conn, po_id, requested_by=requester)
+                _notify_approval_args = dict(
+                    po_number=po['po_number'],
+                    po_id=po_id,
+                    total=po.get('total', 0),
+                    requested_by=requester,
+                    site_url=request.build_absolute_uri('/'),
                 )
             else:
                 set_po_status(conn, po_id, target)
-            conn.commit()
+        conn.commit()
+        if _notify_approval_args:
+            notify_approval_requested(conn, **_notify_approval_args)
     finally:
         conn.close()
     return redirect('po_detail', po_id=po_id)
@@ -2319,12 +2329,22 @@ def po_approve(request, approval_id):
         return redirect('po_approvals')
 
     notes = (request.POST.get('notes') or '').strip()
+    decided_by = request.session.get('user_email', '')
     conn = get_db_connection()
     try:
-        approve_po(conn, approval_id,
-                   decided_by=request.session.get('user_email', ''),
-                   notes=notes)
+        appr = get_approval_by_id(conn, approval_id)
+        approve_po(conn, approval_id, decided_by=decided_by, notes=notes)
         conn.commit()
+        if appr:
+            notify_approval_decided(
+                requester_email=appr['requested_by'],
+                po_number=appr['po_number'],
+                total=appr['total'],
+                approved=True,
+                notes=notes,
+                decided_by=decided_by,
+                site_url=request.build_absolute_uri('/'),
+            )
     except ValueError:
         conn.rollback()
     finally:
@@ -2341,12 +2361,22 @@ def po_reject(request, approval_id):
         return redirect('po_approvals')
 
     notes = (request.POST.get('notes') or '').strip()
+    decided_by = request.session.get('user_email', '')
     conn = get_db_connection()
     try:
-        reject_po(conn, approval_id,
-                  decided_by=request.session.get('user_email', ''),
-                  notes=notes)
+        appr = get_approval_by_id(conn, approval_id)
+        reject_po(conn, approval_id, decided_by=decided_by, notes=notes)
         conn.commit()
+        if appr:
+            notify_approval_decided(
+                requester_email=appr['requested_by'],
+                po_number=appr['po_number'],
+                total=appr['total'],
+                approved=False,
+                notes=notes,
+                decided_by=decided_by,
+                site_url=request.build_absolute_uri('/'),
+            )
     except ValueError:
         conn.rollback()
     finally:
