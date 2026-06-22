@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block page_title %}{{ contact_type_plural|capfirst }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="{{ new_url }}" class="btn">+ New {{ contact_type|capfirst }}</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.contacts-wrap { width: 100%; max-width: 960px; }
+.contacts-wrap h2 { color: white; font-size: 20px; margin-bottom: 14px; }
+.search-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+.search-box { padding: 6px 12px; border: 2px solid black; border-radius: 6px;
+    font-size: 13px; width: 240px; }
+.contacts-table { width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+.contacts-table th, .contacts-table td { padding: 9px 14px; text-align: left;
+    border-bottom: 1px solid #ddd; font-size: 13px; }
+.contacts-table th { background: rgb(0,60,180); color: white; }
+.contacts-table tr:last-child td { border-bottom: none; }
+.contacts-table tr:hover td { background: #f0f4ff; }
+.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="contacts-wrap">
+    <h2>{{ contact_type_plural|capfirst }}</h2>
+
+    <form method="get" action="{{ list_url }}" class="search-row">
+        <input type="text" name="search" class="search-box"
+               placeholder="Search by name, company, or email…"
+               value="{{ search }}">
+        <button type="submit" class="btn" style="padding:6px 14px;font-size:12px;">Search</button>
+        {% if search %}
+        <a href="{{ list_url }}" style="color:#aac;font-size:12px;">Clear</a>
+        {% endif %}
+    </form>
+
+    {% if contacts %}
+    <table class="contacts-table">
+        <thead>
+            <tr>
+                <th>Name / Company</th>
+                <th>Contact</th>
+                <th>Phone</th>
+                <th>City, State</th>
+                <th>Email</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in contacts %}
+            <tr>
+                <td>
+                    <a href="{{ detail_base }}{{ c.id }}/"
+                       style="color:rgb(0,60,180);font-weight:bold;">
+                        {% if c.company_name %}{{ c.company_name }}{% else %}
+                        {{ c.first_name }} {{ c.last_name }}{% endif %}
+                    </a>
+                    {% if c.company_name and c.first_name %}
+                    <div style="font-size:11px;color:#888;">
+                        {{ c.first_name }} {{ c.last_name }}</div>
+                    {% endif %}
+                </td>
+                <td style="color:#666;">
+                    {% if c.company_name and c.first_name %}
+                    {{ c.first_name }} {{ c.last_name }}
+                    {% endif %}
+                </td>
+                <td style="color:#555;">{{ c.phone_number|default:"—" }}</td>
+                <td style="color:#555;">
+                    {% if c.city %}{{ c.city }}{% if c.state %}, {{ c.state }}{% endif %}
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    {% if c.email %}
+                    <a href="mailto:{{ c.email }}" style="color:rgb(0,60,180);">{{ c.email }}</a>
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    <a href="{{ detail_base }}{{ c.id }}/" class="btn"
+                       style="padding:2px 10px;font-size:12px;">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p style="color:#aac;font-size:12px;">
+        {{ contacts|length }} {{ contact_type }}{{ contacts|length|pluralize }}
+        {% if search %} matching "{{ search }}"{% endif %}
+    </p>
+    {% else %}
+    <p class="empty-note">
+        No {{ contact_type_plural }} found{% if search %} matching "{{ search }}"{% endif %}.
+        {% if can_edit %}
+        <a href="{{ new_url }}" style="color:#99f;">Add one &rarr;</a>
+        {% endif %}
+    </p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

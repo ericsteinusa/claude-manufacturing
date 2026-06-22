@@ -40,6 +40,14 @@ from .inventory_core import (
     record_transaction, create_product as inv_create_product,
     update_product as inv_update_product,
 )
+from .contacts_core import (
+    contact_label,
+    list_customers, get_customer, create_customer, update_customer,
+    get_customer_orders,
+    list_suppliers as contacts_list_suppliers,
+    get_supplier, create_supplier, update_supplier,
+    get_supplier_orders,
+)
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -170,6 +178,27 @@ WEB_LEAF_URLS = {
     ('maintenance', 'parts_req'): '/inventory/',
     ('maintenance', 'reorder'): '/inventory/?filter=low',
     ('maintenance', 'parts_hist'): '/inventory/',
+    # Customers
+    ('customers', 'acct_list'): '/customers/',
+    ('customers', 'new_acct'): '/customers/new/',
+    ('customers', 'acct_det'): '/customers/',
+    ('customers', 'acct_hist'): '/customers/',
+    ('customer_service', 'cust_entry'): '/customers/new/',
+    ('customer_service', 'acct_list'): '/customers/',
+    ('customer_service', 'new_acct'): '/customers/new/',
+    ('customer_service', 'acct_det'): '/customers/',
+    ('customer_service', 'acct_hist'): '/customers/',
+    ('sales', 'acct_list'): '/customers/',
+    ('sales', 'new_acct'): '/customers/new/',
+    ('sales', 'acct_det'): '/customers/',
+    ('sales', 'acct_hist'): '/customers/',
+    # Suppliers / Vendors
+    ('customers', 'sup_entry'): '/suppliers/new/',
+    ('customers', 'vend_list'): '/suppliers/',
+    ('customers', 'new_vend'): '/suppliers/new/',
+    ('purchasing', 'sup_entry'): '/suppliers/new/',
+    ('purchasing', 'vend_list'): '/suppliers/',
+    ('purchasing', 'new_vend'): '/suppliers/new/',
 }
 
 
@@ -2939,3 +2968,272 @@ def inventory_transaction(request, product_id):
         conn.close()
 
     return redirect('inventory_detail', product_id=product_id)
+
+
+# ---------------------------------------------------------------------------
+# Customers (web)
+# ---------------------------------------------------------------------------
+
+_CUSTOMER_DEPT_KEYS = {'customers', 'customer_service', 'sales'}
+_SUPPLIER_DEPT_KEYS = {'customers', 'purchasing', 'sales'}
+
+
+def _customer_access(request, write=False):
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _CUSTOMER_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('customer_list')
+    return None
+
+
+def _supplier_access(request, write=False):
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _SUPPLIER_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('supplier_list')
+    return None
+
+
+def _contacts_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'can_edit': request.session.get('user_role') not in READ_ONLY_ROLES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def customer_list(request):
+    denied = _customer_access(request)
+    if denied:
+        return denied
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        customers = list_customers(conn, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'contacts_list.html', _contacts_context(
+        request,
+        contacts=customers,
+        search=search,
+        contact_type='customer',
+        contact_type_plural='customers',
+        list_url='/customers/',
+        new_url='/customers/new/',
+        detail_base='/customers/',
+    ))
+
+
+def customer_new(request):
+    denied = _customer_access(request, write=True)
+    if denied:
+        return denied
+    error = None
+    conn = get_db_connection()
+    try:
+        if request.method == 'POST':
+            try:
+                cid = create_customer(
+                    conn,
+                    first_name=request.POST.get('first_name', ''),
+                    last_name=request.POST.get('last_name', ''),
+                    company_name=request.POST.get('company_name', ''),
+                    phone_number=request.POST.get('phone_number', ''),
+                    address=request.POST.get('address', ''),
+                    city=request.POST.get('city', ''),
+                    state=request.POST.get('state', ''),
+                    zip_code=request.POST.get('zip_code', ''),
+                    email=request.POST.get('email', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('customer_detail', customer_id=cid)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'contacts_new.html', _contacts_context(
+        request,
+        contact_type='customer',
+        contact_type_plural='customers',
+        list_url='/customers/',
+        error=error,
+        form=request.POST if request.method == 'POST' else {},
+    ))
+
+
+def customer_detail(request, customer_id):
+    denied = _customer_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = None
+    success = None
+    try:
+        contact = get_customer(conn, customer_id)
+        if not contact:
+            return redirect('customer_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_customer(
+                    conn, customer_id,
+                    first_name=request.POST.get('first_name', ''),
+                    last_name=request.POST.get('last_name', ''),
+                    company_name=request.POST.get('company_name', ''),
+                    phone_number=request.POST.get('phone_number', ''),
+                    address=request.POST.get('address', ''),
+                    city=request.POST.get('city', ''),
+                    state=request.POST.get('state', ''),
+                    zip_code=request.POST.get('zip_code', ''),
+                    email=request.POST.get('email', ''),
+                )
+                conn.commit()
+                contact = get_customer(conn, customer_id)
+                success = 'Customer updated.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        orders = get_customer_orders(conn, customer_id)
+    finally:
+        conn.close()
+    return render(request, 'contacts_detail.html', _contacts_context(
+        request,
+        contact=contact,
+        orders=orders,
+        contact_type='customer',
+        contact_type_plural='customers',
+        list_url='/customers/',
+        new_url='/customers/new/',
+        order_label='Sales Order',
+        order_url_prefix='/so/',
+        error=error,
+        success=success,
+        can_edit=can_edit,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Suppliers (web)
+# ---------------------------------------------------------------------------
+
+def supplier_list(request):
+    denied = _supplier_access(request)
+    if denied:
+        return denied
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        suppliers = contacts_list_suppliers(conn, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'contacts_list.html', _contacts_context(
+        request,
+        contacts=suppliers,
+        search=search,
+        contact_type='supplier',
+        contact_type_plural='suppliers',
+        list_url='/suppliers/',
+        new_url='/suppliers/new/',
+        detail_base='/suppliers/',
+    ))
+
+
+def supplier_new(request):
+    denied = _supplier_access(request, write=True)
+    if denied:
+        return denied
+    error = None
+    conn = get_db_connection()
+    try:
+        if request.method == 'POST':
+            try:
+                sid = create_supplier(
+                    conn,
+                    first_name=request.POST.get('first_name', ''),
+                    last_name=request.POST.get('last_name', ''),
+                    company_name=request.POST.get('company_name', ''),
+                    phone_number=request.POST.get('phone_number', ''),
+                    address=request.POST.get('address', ''),
+                    city=request.POST.get('city', ''),
+                    state=request.POST.get('state', ''),
+                    zip_code=request.POST.get('zip_code', ''),
+                    email=request.POST.get('email', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('supplier_detail', supplier_id=sid)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'contacts_new.html', _contacts_context(
+        request,
+        contact_type='supplier',
+        contact_type_plural='suppliers',
+        list_url='/suppliers/',
+        error=error,
+        form=request.POST if request.method == 'POST' else {},
+    ))
+
+
+def supplier_detail(request, supplier_id):
+    denied = _supplier_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = None
+    success = None
+    try:
+        contact = get_supplier(conn, supplier_id)
+        if not contact:
+            return redirect('supplier_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_supplier(
+                    conn, supplier_id,
+                    first_name=request.POST.get('first_name', ''),
+                    last_name=request.POST.get('last_name', ''),
+                    company_name=request.POST.get('company_name', ''),
+                    phone_number=request.POST.get('phone_number', ''),
+                    address=request.POST.get('address', ''),
+                    city=request.POST.get('city', ''),
+                    state=request.POST.get('state', ''),
+                    zip_code=request.POST.get('zip_code', ''),
+                    email=request.POST.get('email', ''),
+                )
+                conn.commit()
+                contact = get_supplier(conn, supplier_id)
+                success = 'Supplier updated.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        orders = get_supplier_orders(conn, supplier_id)
+    finally:
+        conn.close()
+    return render(request, 'contacts_detail.html', _contacts_context(
+        request,
+        contact=contact,
+        orders=orders,
+        contact_type='supplier',
+        contact_type_plural='suppliers',
+        list_url='/suppliers/',
+        new_url='/suppliers/new/',
+        order_label='Purchase Order',
+        order_url_prefix='/po/',
+        error=error,
+        success=success,
+        can_edit=can_edit,
+    ))
