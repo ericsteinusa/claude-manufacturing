@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block page_title %}MRP Plan{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mrp/" class="btn">Back to MRP</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.mrp-wrap { width: 100%; max-width: 1080px; }
+.mrp-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.mrp-wrap p.sub { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.summary-bar { display: flex; gap: 20px; margin-bottom: 18px; flex-wrap: wrap; }
+.sum-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px; padding: 10px 20px; color: #cce; font-size: 13px; min-width: 130px; }
+.sum-card strong { color: white; font-size: 22px; display: block; }
+.plan-table { width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+.plan-table th, .plan-table td { padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid #ddd; font-size: 13px; }
+.plan-table th { background: rgb(0,60,180); color: white; }
+.plan-table tr:last-child td { border-bottom: none; }
+.plan-table td.num, .plan-table th.num { text-align: right; }
+.plan-table tr:hover td { background: #f0f4ff; }
+.plan-table tr.selected-row td { background: #eeffee; }
+.badge { display: inline-block; padding: 1px 9px; border-radius: 10px;
+    border: 1px solid; font-size: 11px; }
+.badge-make { background: #d0e8ff; border-color: #3070c0; color: #1a4080; }
+.badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
+.badge-wo   { background: #d0ffe0; border-color: #3a9a50; color: #1a5830; }
+.badge-po   { background: #fff0d0; border-color: #b87020; color: #7a4010; }
+.qty-input { width: 70px; padding: 3px 6px; border: 1px solid #aaa;
+    border-radius: 4px; font-size: 12px; text-align: right; }
+.select-all-bar { display: flex; gap: 10px; align-items: center;
+    margin-bottom: 10px; }
+.select-all-bar a { color: #9cf; font-size: 12px; cursor: pointer; text-decoration: underline; }
+.release-btn { display: inline-block; padding: 10px 28px; background: #1a7a30;
+    color: white; border: none; border-radius: 6px; font-size: 15px;
+    font-weight: bold; cursor: pointer; }
+.release-btn:hover { background: #0e5520; }
+.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="mrp-wrap">
+    <h2>MRP Plan — Review &amp; Release</h2>
+    <p class="sub">
+        Select the planned orders you want to release.
+        Make orders create Work Orders; Buy orders create draft Purchase Orders (assign supplier after).
+    </p>
+
+    <div class="summary-bar">
+        <div class="sum-card"><strong>{{ make_count }}</strong> Make orders</div>
+        <div class="sum-card"><strong>{{ buy_count }}</strong> Buy orders</div>
+        <div class="sum-card"><strong>{{ make_count|add:buy_count }}</strong> Total</div>
+    </div>
+
+    {% if plan_list %}
+    <form method="post" action="/mrp/release/" id="releaseForm">
+        {% csrf_token %}
+
+        <div class="select-all-bar">
+            <span style="color:#cce;font-size:12px;">Select:</span>
+            <a onclick="setAll(true)">All</a>
+            <a onclick="setAll(false)">None</a>
+            <a onclick="setType('make')">All Make</a>
+            <a onclick="setType('buy')">All Buy</a>
+        </div>
+
+        <table class="plan-table">
+            <thead>
+                <tr>
+                    <th style="width:36px;"><input type="checkbox" id="chkAll" onclick="toggleAll(this)"></th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                    <th class="num">Qty</th>
+                    <th class="num">Lead Time</th>
+                    <th class="num">Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i, item in plan %}
+                <tr id="row_{{ i }}">
+                    <td><input type="checkbox" name="select" value="{{ i }}"
+                               class="row-check" data-type="{{ item.order_type }}"
+                               checked onchange="rowHighlight(this)"></td>
+                    <td>
+                        <a href="/bom/{{ item.product_id }}/"
+                           style="color:rgb(0,60,180);font-weight:bold;">
+                            {{ item.product_name }}</a>
+                    </td>
+                    <td><span class="badge badge-{{ item.order_type }}">
+                        {{ item.order_type|capfirst }}</span></td>
+                    <td>
+                        {% if item.order_type == 'make' %}
+                        <span class="badge badge-wo">&#10003; Work Order</span>
+                        {% else %}
+                        <span class="badge badge-po">&#10003; Draft PO</span>
+                        {% endif %}
+                    </td>
+                    <td class="num">
+                        <input type="number" name="qty_{{ i }}" class="qty-input"
+                               value="{{ item.qty|floatformat:4 }}"
+                               min="0.0001" step="any">
+                    </td>
+                    <td class="num">
+                        {% if item.lead_time_days %}{{ item.lead_time_days }} d{% else %}—{% endif %}
+                    </td>
+                    <td class="num">{{ item.due_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if can_edit %}
+        <button type="submit" class="release-btn">Release Selected Orders</button>
+        <a href="/mrp/" style="margin-left:16px;color:#aac;font-size:13px;">Discard plan</a>
+        {% else %}
+        <p style="color:#fc9;font-size:13px;">Read-only role — cannot release orders.</p>
+        {% endif %}
+    </form>
+    {% else %}
+    <p class="empty-note">No planned orders. The MRP run found no net requirements.
+        <a href="/mrp/" style="color:#99f;">Back to MRP &rarr;</a>
+    </p>
+    {% endif %}
+</div>
+</div>
+
+<script>
+function toggleAll(cb) {
+    document.querySelectorAll('.row-check').forEach(c => {
+        c.checked = cb.checked;
+        rowHighlight(c);
+    });
+}
+function setAll(v) {
+    document.querySelectorAll('.row-check').forEach(c => {
+        c.checked = v;
+        rowHighlight(c);
+    });
+    var chkAll = document.getElementById('chkAll');
+    if (chkAll) chkAll.checked = v;
+}
+function setType(t) {
+    document.querySelectorAll('.row-check').forEach(c => {
+        if (c.dataset.type === t) { c.checked = true; rowHighlight(c); }
+        else { c.checked = false; rowHighlight(c); }
+    });
+}
+function rowHighlight(cb) {
+    var row = cb.closest('tr');
+    if (row) row.classList.toggle('selected-row', cb.checked);
+}
+// Init highlight on load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.row-check').forEach(rowHighlight);
+});
+</script>
+{% endblock %}

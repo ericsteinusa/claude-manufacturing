@@ -27,6 +27,10 @@ from .bom_web_core import (
     add_bom_line, update_bom_line, delete_bom_line,
     update_item_master, ITEM_TYPES,
 )
+from .mrp_web_core import (
+    get_demand_details, get_scheduled_receipts_detail,
+    run_mrp, release_plan as mrp_release_plan,
+)
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -145,6 +149,10 @@ WEB_LEAF_URLS = {
     ('engineering', 'bom_rev'): '/bom/',
     ('engineering', 'bom_rpts'): '/bom/',
     ('production', 'bom_list'): '/bom/',
+    ('production', 'mrp_home'): '/mrp/',
+    ('production', 'run_mrp'): '/mrp/',
+    ('production', 'mrp_demand'): '/mrp/',
+    ('production', 'mrp_rpts'): '/mrp/',
 }
 
 
@@ -2554,4 +2562,154 @@ def bom_explode(request, product_id):
         explosion=explosion,
         qty=qty,
         back_url=f'/bom/{product_id}/',
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Material Requirements Planning (web)
+# ---------------------------------------------------------------------------
+
+_MRP_DEPT_KEYS = {'production', 'engineering'}
+
+
+def _mrp_access(request, write=False):
+    """Gate MRP pages: logged-in + full_access or production/engineering dept."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key') not in _MRP_DEPT_KEYS:
+            return redirect('dashboard')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('mrp_home')
+    return None
+
+
+def _mrp_context(request, **extra):
+    ctx = {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'can_edit': request.session.get('user_role') not in READ_ONLY_ROLES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def mrp_home(request):
+    denied = _mrp_access(request)
+    if denied:
+        return denied
+
+    conn = get_db_connection()
+    try:
+        demand_rows = get_demand_details(conn)
+        scheduled = get_scheduled_receipts_detail(conn)
+    finally:
+        conn.close()
+
+    # Annotate each demand row with scheduled receipts and net requirement.
+    for row in demand_rows:
+        row['scheduled'] = scheduled.get(row['id'], 0.0)
+        row['net'] = max(0.0, row['demand_qty'] - row['on_hand'] - row['scheduled'])
+
+    has_plan = 'mrp_plan' in request.session and bool(request.session['mrp_plan'])
+    return render(request, 'mrp_home.html', _mrp_context(
+        request,
+        demand_rows=demand_rows,
+        has_plan=has_plan,
+    ))
+
+
+def mrp_run(request):
+    denied = _mrp_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('mrp_home')
+
+    conn = get_db_connection()
+    try:
+        plan = run_mrp(conn)
+    finally:
+        conn.close()
+
+    request.session['mrp_plan'] = plan
+    return redirect('mrp_plan')
+
+
+def mrp_plan(request):
+    denied = _mrp_access(request)
+    if denied:
+        return denied
+
+    plan = request.session.get('mrp_plan') or []
+    if not plan:
+        return redirect('mrp_home')
+
+    make_count = sum(1 for p in plan if p['order_type'] == 'make')
+    buy_count = sum(1 for p in plan if p['order_type'] == 'buy')
+
+    return render(request, 'mrp_plan.html', _mrp_context(
+        request,
+        plan=enumerate(plan),
+        plan_list=plan,
+        make_count=make_count,
+        buy_count=buy_count,
+    ))
+
+
+def mrp_release(request):
+    denied = _mrp_access(request, write=True)
+    if denied:
+        return denied
+    if request.method != 'POST':
+        return redirect('mrp_plan')
+
+    plan = request.session.get('mrp_plan') or []
+    if not plan:
+        return redirect('mrp_home')
+
+    selected = request.POST.getlist('select')
+    selected_indices = set()
+    for v in selected:
+        try:
+            selected_indices.add(int(v))
+        except ValueError:
+            pass
+
+    # Apply qty overrides from form
+    items_to_release = []
+    for i, item in enumerate(plan):
+        if i not in selected_indices:
+            continue
+        override = request.POST.get(f'qty_{i}', '').strip()
+        try:
+            qty = float(override)
+            if qty <= 0:
+                qty = item['qty']
+        except (ValueError, TypeError):
+            qty = item['qty']
+        items_to_release.append({**item, 'qty': qty})
+
+    if not items_to_release:
+        return redirect('mrp_plan')
+
+    released_by = request.session.get('user_email', '')
+    conn = get_db_connection()
+    try:
+        created_wos, created_pos = mrp_release_plan(conn, items_to_release, released_by)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+    # Clear plan from session after release
+    request.session.pop('mrp_plan', None)
+
+    return render(request, 'mrp_release.html', _mrp_context(
+        request,
+        created_wos=created_wos,
+        created_pos=created_pos,
     ))
