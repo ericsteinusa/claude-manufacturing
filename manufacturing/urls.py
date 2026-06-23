@@ -176,6 +176,7 @@ urlpatterns = [
     path('sales/orders/<int:so_id>/', views.sales_order_detail, name='sales_order_detail'),
     path('sales/quotes/', views.sales_quotes, name='sales_quotes'),
     path('sales/targets/', views.sales_targets, name='sales_targets'),
+    path('prod/', views.prod_dashboard, name='prod_dashboard'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),

@@ -240,6 +240,9 @@ WEB_LEAF_URLS = {
     ('engineering', 'standards'): '/eng/reports/',
     ('sales', 'sales_mgr'): '/sales/',
     ('sales', 'sales'): '/sales/orders/',
+    ('production', 'prod_mgr'): '/prod/',
+    ('production', 'prod'): '/wo/',
+    ('production', 'shipping'): '/wo/',
     ('production', 'bom_list'): '/bom/',
     ('production', 'mrp_home'): '/mrp/',
     ('production', 'run_mrp'): '/mrp/',
@@ -6131,3 +6134,41 @@ def sales_targets(request):
                      filter_rep=rep_filter, filter_period=period_filter,
                      error=error, success=success)
     return render(request, 'sales_targets.html', ctx)
+
+from .production_core import get_production_dashboard
+
+
+def _prod_access(request, write=False):
+    if not request.session.get('user_email'):
+        return redirect('/')
+    role = request.session.get('user_role', '')
+    dept = request.session.get('user_dept', '')
+    if role in FULL_ACCESS_ROLES:
+        return None
+    if dept != 'production':
+        return redirect('/dashboard/')
+    if write and role in READ_ONLY_ROLES:
+        return redirect('/prod/')
+    return None
+
+
+def _prod_ctx(request, **extra):
+    role = request.session.get('user_role', '')
+    return {
+        'email': request.session.get('user_email', ''),
+        'user_role': role,
+        'full_access': role in FULL_ACCESS_ROLES,
+        'can_edit': role not in READ_ONLY_ROLES,
+        **extra,
+    }
+
+
+def prod_dashboard(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_production_dashboard(conn)
+    ctx = _prod_ctx(request, **data)
+    return render(request, 'prod_dashboard.html', ctx)
+
