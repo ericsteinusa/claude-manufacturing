@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block page_title %}{% if ecr %}{{ ecr.ecr_number }}{% else %}New ECR{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/eng/ecrs/" class="btn">All ECRs</a>
+<a href="/eng/projects/" class="btn">Projects</a>
+<a href="/eng/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:800px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.meta-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:10px; }
+.meta-item .lbl { font-size:11px; color:#555; font-weight:bold; }
+.meta-item .val { font-size:14px; color:#222; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-act { padding:6px 16px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.st-draft     { background:#e8f4fd; color:#0c5460; }
+.st-pending   { background:#fff3cd; color:#856404; }
+.st-approved  { background:#d4edda; color:#0a3622; }
+.st-rejected  { background:#f8d7da; color:#842029; }
+.st-revision_needed { background:#ffe8c0; color:#7a4000; }
+.msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.status-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>{% if ecr %}ECR: {{ ecr.ecr_number }} — {{ ecr.title }}{% else %}New ECR / Design Review{% endif %}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if ecr %}
+    <!-- Status chip + quick change -->
+    <div class="card">
+        <div class="status-row">
+            <span><strong>Status:</strong></span>
+            <span class="badge st-{{ ecr.status }}">{{ ecr.status }}</span>
+            {% if can_edit %}
+            <form method="post" style="display:inline;margin-left:12px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="status">
+                <select name="new_status" onchange="this.form.submit()">
+                    {% for s in ECR_STATUSES %}
+                    <option value="{{ s }}" {% if ecr.status == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+        </div>
+        <div class="meta-row">
+            <div class="meta-item"><div class="lbl">ECR #</div><div class="val">{{ ecr.ecr_number }}</div></div>
+            <div class="meta-item"><div class="lbl">Project</div><div class="val">{% if ecr.project_number %}{{ ecr.project_number }} — {{ ecr.project_title }}{% else %}—{% endif %}</div></div>
+            <div class="meta-item"><div class="lbl">Requested By</div><div class="val">{{ ecr.requested_by|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Review Date</div><div class="val">{{ ecr.review_date|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Created By</div><div class="val">{{ ecr.created_by|default:"—" }}</div></div>
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit ECR</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:3;min-width:220px;"><label>Title *</label>
+                    <input type="text" name="title" value="{{ ecr.title }}" required></div>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>Project</label>
+                    <select name="project_id">
+                        <option value="">—</option>
+                        {% for p in projects %}
+                        <option value="{{ p.id }}" {% if ecr.project_id == p.id %}selected{% endif %}>{{ p.project_number }} — {{ p.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>Requested By</label>
+                    <select name="requested_by">
+                        <option value="">—</option>
+                        {% for p in people %}
+                        <option value="{{ p.email }}" {% if ecr.requested_by == p.email %}selected{% endif %}>{{ p.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row"><label>Review Date</label>
+                    <input type="date" name="review_date" value="{{ ecr.review_date|default:'' }}"></div>
+                <div class="form-row"><label>Status</label>
+                    <select name="status">
+                        {% for s in ECR_STATUSES %}
+                        <option value="{{ s }}" {% if ecr.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label>
+                <textarea name="notes" rows="3">{{ ecr.notes|default:"" }}</textarea></div>
+            <button type="submit" class="btn-act">Save Changes</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="meta-row">
+            <div class="meta-item" style="flex:1;"><div class="lbl">Notes</div><div class="val">{{ ecr.notes|default:"—" }}</div></div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- New ECR -->
+    <div class="card">
+        <h3>ECR Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row"><label>ECR # (auto)</label>
+                    <input type="text" name="ecr_number" value="{{ new_ecr_num }}" placeholder="Auto-assigned"></div>
+                <div class="form-row" style="flex:3;min-width:220px;"><label>Title *</label>
+                    <input type="text" name="title" required></div>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>Project</label>
+                    <select name="project_id">
+                        <option value="">—</option>
+                        {% for p in projects %}
+                        <option value="{{ p.id }}">{{ p.project_number }} — {{ p.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>Requested By</label>
+                    <select name="requested_by">
+                        <option value="">—</option>
+                        {% for p in people %}
+                        <option value="{{ p.email }}">{{ p.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row"><label>Review Date</label>
+                    <input type="date" name="review_date"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label>
+                <textarea name="notes" rows="3"></textarea></div>
+            <button type="submit" class="btn-act">Create ECR</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

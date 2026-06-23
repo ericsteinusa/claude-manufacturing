@@ -229,6 +229,15 @@ WEB_LEAF_URLS = {
     ('engineering', 'new_bom'): '/bom/',
     ('engineering', 'bom_rev'): '/bom/',
     ('engineering', 'bom_rpts'): '/bom/',
+    ('engineering', 'eng_mgr'): '/eng/',
+    ('engineering', 'engineers'): '/eng/',
+    ('engineering', 'proj_mgmt'): '/eng/projects/',
+    ('engineering', 'design_docs'): '/eng/ecrs/',
+    ('engineering', 'bom'): '/bom/',
+    ('engineering', 'chg_orders'): '/eng/ecrs/',
+    ('engineering', 'test_val'): '/eng/projects/?status=in_progress',
+    ('engineering', 'eng_reports'): '/eng/reports/',
+    ('engineering', 'standards'): '/eng/reports/',
     ('production', 'bom_list'): '/bom/',
     ('production', 'mrp_home'): '/mrp/',
     ('production', 'run_mrp'): '/mrp/',
@@ -5577,3 +5586,273 @@ def gl_balance_sheet(request):
     conn.close()
     ctx = _acct_ctx(request, as_of=as_of, **result)
     return render(request, 'gl_balance_sheet.html', ctx)
+
+
+from .engineering_core import (
+    PROJECT_STATUSES, TASK_STATUSES, ECR_STATUSES, PRIORITIES,
+    load_products, load_people,
+    get_eng_dashboard, next_project_number, next_ecr_number,
+    list_projects, get_project, create_project, update_project,
+    list_project_tasks, create_task, update_task, get_task,
+    list_ecrs, get_ecr, create_ecr, update_ecr, set_ecr_status,
+    eng_reports as _eng_reports_data,
+)
+
+_ENGINEERING_DEPT_KEYS = {'engineering'}
+
+
+def _eng_access(request, write=False):
+    if request.session.get('user_role') in FULL_ACCESS_ROLES:
+        return None
+    dept = request.session.get('user_dept', '')
+    if dept not in _ENGINEERING_DEPT_KEYS:
+        return redirect('/dashboard/')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('/dashboard/')
+    return None
+
+
+def _eng_ctx(request, **extra):
+    role = request.session.get('user_role', '')
+    ctx = {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': role,
+        'full_access': role in FULL_ACCESS_ROLES,
+        'can_edit': role not in READ_ONLY_ROLES,
+        'PROJECT_STATUSES': PROJECT_STATUSES,
+        'TASK_STATUSES': TASK_STATUSES,
+        'ECR_STATUSES': ECR_STATUSES,
+        'PRIORITIES': PRIORITIES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def eng_dashboard(request):
+    block = _eng_access(request)
+    if block:
+        return block
+    with get_db_connection() as conn:
+        dash = get_eng_dashboard(conn)
+        recent_projects = list_projects(conn)[:8]
+        recent_ecrs = list_ecrs(conn)[:8]
+    ctx = _eng_ctx(request, dash=dash,
+                   recent_projects=recent_projects, recent_ecrs=recent_ecrs)
+    return render(request, 'eng_dashboard.html', ctx)
+
+
+def eng_projects(request):
+    block = _eng_access(request)
+    if block:
+        return block
+    status = request.GET.get('status', '')
+    engineer = request.GET.get('engineer', '')
+    search = request.GET.get('search', '')
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST' and request.POST.get('action') == 'new':
+            block2 = _eng_access(request, write=True)
+            if block2:
+                return block2
+            try:
+                pid = create_project(
+                    conn,
+                    project_number='',
+                    title=request.POST.get('title', '').strip(),
+                    product_id=request.POST.get('product_id') or None,
+                    engineer=request.POST.get('engineer', '').strip(),
+                    start_date=request.POST.get('start_date', ''),
+                    due_date=request.POST.get('due_date', '') or None,
+                    status=request.POST.get('status', 'planning'),
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect(f'/eng/projects/{pid}/')
+            except Exception as e:
+                error = str(e)
+        projects = list_projects(conn, status=status or None,
+                                 engineer=engineer or None,
+                                 search=search or None)
+        products = load_products(conn)
+        people = load_people(conn)
+    ctx = _eng_ctx(request, projects=projects, products=products, people=people,
+                   filter_status=status, filter_engineer=engineer,
+                   filter_search=search, error=error, success=success)
+    return render(request, 'eng_projects.html', ctx)
+
+
+def eng_project_detail(request, project_id=None):
+    block = _eng_access(request)
+    if block:
+        return block
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST':
+            block2 = _eng_access(request, write=True)
+            if block2:
+                return block2
+            action = request.POST.get('action', '')
+            try:
+                if action == 'save':
+                    if project_id:
+                        update_project(
+                            conn, project_id,
+                            title=request.POST.get('title', '').strip(),
+                            product_id=request.POST.get('product_id') or None,
+                            engineer=request.POST.get('engineer', '').strip(),
+                            start_date=request.POST.get('start_date', ''),
+                            due_date=request.POST.get('due_date', '') or None,
+                            status=request.POST.get('status', 'planning'),
+                            notes=request.POST.get('notes', '').strip(),
+                        )
+                        conn.commit()
+                        success = 'Project updated.'
+                elif action == 'add_task':
+                    create_task(
+                        conn,
+                        project_id=project_id,
+                        task_name=request.POST.get('task_name', '').strip(),
+                        assigned_to=request.POST.get('assigned_to', '').strip(),
+                        due_date=request.POST.get('due_date', '') or None,
+                        priority=request.POST.get('priority', 'medium'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Task added.'
+                elif action == 'update_task':
+                    update_task(
+                        conn,
+                        task_id=int(request.POST.get('task_id', 0)),
+                        task_name=request.POST.get('task_name', '').strip(),
+                        assigned_to=request.POST.get('assigned_to', '').strip(),
+                        due_date=request.POST.get('due_date', '') or None,
+                        priority=request.POST.get('priority', 'medium'),
+                        status=request.POST.get('status', 'open'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Task updated.'
+            except Exception as e:
+                error = str(e)
+        project = get_project(conn, project_id) if project_id else None
+        tasks = list_project_tasks(conn, project_id) if project_id else []
+        products = load_products(conn)
+        people = load_people(conn)
+        new_proj_num = next_project_number(conn) if not project_id else ''
+    ctx = _eng_ctx(request, project=project, tasks=tasks,
+                   products=products, people=people,
+                   new_proj_num=new_proj_num,
+                   error=error, success=success)
+    return render(request, 'eng_project_detail.html', ctx)
+
+
+def eng_ecrs(request):
+    block = _eng_access(request)
+    if block:
+        return block
+    status = request.GET.get('status', '')
+    proj_filter = request.GET.get('project_id', '')
+    search = request.GET.get('search', '')
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST' and request.POST.get('action') == 'new':
+            block2 = _eng_access(request, write=True)
+            if block2:
+                return block2
+            try:
+                eid = create_ecr(
+                    conn,
+                    ecr_number='',
+                    title=request.POST.get('title', '').strip(),
+                    product_id=request.POST.get('product_id') or None,
+                    project_id=request.POST.get('project_id') or None,
+                    requested_by=request.POST.get('requested_by', '').strip(),
+                    review_date=request.POST.get('review_date', '') or None,
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect(f'/eng/ecrs/{eid}/')
+            except Exception as e:
+                error = str(e)
+        ecrs = list_ecrs(conn,
+                         status=status or None,
+                         project_id=int(proj_filter) if proj_filter.isdigit() else None,
+                         search=search or None)
+        projects = list_projects(conn)
+        products = load_products(conn)
+        people = load_people(conn)
+    ctx = _eng_ctx(request, ecrs=ecrs, projects=projects, products=products,
+                   people=people, filter_status=status,
+                   filter_project=proj_filter, filter_search=search,
+                   error=error, success=success)
+    return render(request, 'eng_ecrs.html', ctx)
+
+
+def eng_ecr_detail(request, ecr_id=None):
+    block = _eng_access(request)
+    if block:
+        return block
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST':
+            block2 = _eng_access(request, write=True)
+            if block2:
+                return block2
+            action = request.POST.get('action', '')
+            try:
+                if action == 'save' and ecr_id:
+                    update_ecr(
+                        conn, ecr_id,
+                        title=request.POST.get('title', '').strip(),
+                        product_id=request.POST.get('product_id') or None,
+                        project_id=request.POST.get('project_id') or None,
+                        requested_by=request.POST.get('requested_by', '').strip(),
+                        review_date=request.POST.get('review_date', '') or None,
+                        status=request.POST.get('status', 'draft'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'ECR updated.'
+                elif action == 'status' and ecr_id:
+                    set_ecr_status(conn, ecr_id,
+                                   request.POST.get('new_status', 'draft'))
+                    conn.commit()
+                    success = 'Status updated.'
+                elif action == 'create':
+                    eid = create_ecr(
+                        conn,
+                        ecr_number=request.POST.get('ecr_number', '').strip(),
+                        title=request.POST.get('title', '').strip(),
+                        product_id=request.POST.get('product_id') or None,
+                        project_id=request.POST.get('project_id') or None,
+                        requested_by=request.POST.get('requested_by', '').strip(),
+                        review_date=request.POST.get('review_date', '') or None,
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    return redirect(f'/eng/ecrs/{eid}/')
+            except Exception as e:
+                error = str(e)
+        ecr = get_ecr(conn, ecr_id) if ecr_id else None
+        projects = list_projects(conn)
+        products = load_products(conn)
+        people = load_people(conn)
+        new_ecr_num = next_ecr_number(conn) if not ecr_id else ''
+    ctx = _eng_ctx(request, ecr=ecr, projects=projects, products=products,
+                   people=people, new_ecr_num=new_ecr_num,
+                   error=error, success=success)
+    return render(request, 'eng_ecr_detail.html', ctx)
+
+
+def eng_reports_view(request):
+    block = _eng_access(request)
+    if block:
+        return block
+    with get_db_connection() as conn:
+        data = _eng_reports_data(conn)
+    ctx = _eng_ctx(request, **data)
+    return render(request, 'eng_reports.html', ctx)

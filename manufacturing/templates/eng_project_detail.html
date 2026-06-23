@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block page_title %}{% if project %}{{ project.project_number }}{% else %}New Project{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/eng/projects/" class="btn">All Projects</a>
+<a href="/eng/ecrs/" class="btn">ECRs</a>
+<a href="/eng/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.meta-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:12px; }
+.meta-item .lbl { font-size:11px; color:#555; font-weight:bold; }
+.meta-item .val { font-size:14px; color:#222; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc;
+    border-radius:4px; font-size:13px; }
+.btn-act { padding:6px 16px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-planning    { background:#e8f4fd; color:#0c5460; }
+.st-in_progress { background:#fff3cd; color:#856404; }
+.st-on_hold     { background:#f8d7da; color:#842029; }
+.st-completed   { background:#d4edda; color:#0a3622; }
+.st-cancelled   { background:#e2e3e5; color:#383d41; }
+.st-open { background:#fff; border:1px solid #ccc; color:#333; }
+.pri-critical { background:#f8d7da; color:#842029; }
+.pri-high     { background:#fff3cd; color:#856404; }
+.pri-medium   { background:#e8f4fd; color:#0c5460; }
+.pri-low      { background:#e2e3e5; color:#383d41; }
+.msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.edit-row { display:none; background:#f8f9ff; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>{% if project %}Project: {{ project.project_number }} — {{ project.title }}{% else %}New Project{% endif %}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if project %}
+    <div class="card">
+        {% if can_edit %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:3;min-width:220px;">
+                    <label>Title *</label>
+                    <input type="text" name="title" value="{{ project.title }}" required>
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in PROJECT_STATUSES %}
+                        <option value="{{ s }}" {% if project.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;">
+                    <label>Engineer</label>
+                    <select name="engineer">
+                        <option value="">—</option>
+                        {% for p in people %}
+                        <option value="{{ p.email }}" {% if project.engineer == p.email %}selected{% endif %}>{{ p.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ project.start_date|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" value="{{ project.due_date|default:'' }}">
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px;">
+                <label>Notes</label>
+                <textarea name="notes" rows="2">{{ project.notes|default:"" }}</textarea>
+            </div>
+            <button type="submit" class="btn-act">Save Changes</button>
+        </form>
+        {% else %}
+        <div class="meta-row">
+            <div class="meta-item"><div class="lbl">Status</div><div class="val"><span class="badge st-{{ project.status }}">{{ project.status }}</span></div></div>
+            <div class="meta-item"><div class="lbl">Engineer</div><div class="val">{{ project.engineer|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Start</div><div class="val">{{ project.start_date|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Due</div><div class="val">{{ project.due_date|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Notes</div><div class="val">{{ project.notes|default:"—" }}</div></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Tasks</h3>
+        <table class="list-table" id="task-table">
+            <thead><tr>
+                <th>Task</th><th>Assigned To</th><th>Priority</th>
+                <th>Status</th><th>Due</th>{% if can_edit %}<th></th>{% endif %}
+            </tr></thead>
+            <tbody>
+            {% for t in tasks %}
+            <tr>
+                <td>{{ t.task_name }}</td>
+                <td>{{ t.assigned_to|default:"—" }}</td>
+                <td><span class="badge pri-{{ t.priority }}">{{ t.priority }}</span></td>
+                <td><span class="badge st-{{ t.status }}">{{ t.status }}</span></td>
+                <td>{{ t.due_date|default:"—" }}</td>
+                {% if can_edit %}
+                <td><button type="button" class="btn-act" style="padding:3px 10px;font-size:11px;"
+                    onclick="openTaskEdit({{ t.id }},'{{ t.task_name|escapejs }}','{{ t.assigned_to|default:''|escapejs }}','{{ t.due_date|default:'' }}','{{ t.priority }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">Edit</button></td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;padding:12px;">No tasks yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if can_edit %}
+        <div id="task-edit-form" style="display:none;background:#f8f9ff;border:1px solid #cce;border-radius:6px;padding:14px;margin-top:12px;">
+            <h3 style="font-size:13px;color:#333;margin:0 0 10px;">Edit Task</h3>
+            <form method="post" id="edit-task-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_task">
+                <input type="hidden" name="task_id" id="edit-task-id">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                    <div class="form-row" style="flex:2;min-width:160px;"><label>Task Name *</label><input type="text" name="task_name" id="edit-task-name" required></div>
+                    <div class="form-row" style="flex:1;min-width:120px;"><label>Assigned To</label><input type="text" name="assigned_to" id="edit-assigned-to"></div>
+                    <div class="form-row"><label>Due Date</label><input type="date" name="due_date" id="edit-due-date"></div>
+                    <div class="form-row"><label>Priority</label>
+                        <select name="priority" id="edit-priority">
+                            {% for pr in PRIORITIES %}<option value="{{ pr }}">{{ pr }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row"><label>Status</label>
+                        <select name="status" id="edit-status">
+                            {% for s in TASK_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-bottom:8px;"><label>Notes</label><textarea name="notes" id="edit-notes" rows="2"></textarea></div>
+                <button type="submit" class="btn-act">Save Task</button>
+                <button type="button" class="btn-act" style="background:#888;" onclick="document.getElementById('task-edit-form').style.display='none'">Cancel</button>
+            </form>
+        </div>
+
+        <div style="margin-top:14px;">
+            <h3 style="font-size:13px;color:#333;margin:0 0 8px;">Add Task</h3>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_task">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                    <div class="form-row" style="flex:2;min-width:160px;"><label>Task Name *</label><input type="text" name="task_name" required></div>
+                    <div class="form-row" style="flex:1;min-width:120px;"><label>Assigned To</label><input type="text" name="assigned_to"></div>
+                    <div class="form-row"><label>Due Date</label><input type="date" name="due_date"></div>
+                    <div class="form-row"><label>Priority</label>
+                        <select name="priority">{% for pr in PRIORITIES %}<option value="{{ pr }}" {% if pr == 'medium' %}selected{% endif %}>{{ pr }}</option>{% endfor %}</select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-act">Add Task</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <!-- New Project form -->
+    <div class="card">
+        <h3>Project Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row">
+                    <label>Project # (auto)</label>
+                    <input type="text" name="project_number" value="{{ new_proj_num }}" placeholder="Auto-assigned">
+                </div>
+                <div class="form-row" style="flex:3;min-width:220px;"><label>Title *</label><input type="text" name="title" required></div>
+                <div class="form-row"><label>Status</label>
+                    <select name="status">{% for s in PROJECT_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}</select>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>Engineer</label>
+                    <select name="engineer"><option value="">—</option>
+                    {% for p in people %}<option value="{{ p.email }}">{{ p.label }}</option>{% endfor %}</select>
+                </div>
+                <div class="form-row"><label>Start Date</label><input type="date" name="start_date"></div>
+                <div class="form-row"><label>Due Date</label><input type="date" name="due_date"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label><textarea name="notes" rows="2"></textarea></div>
+            <button type="submit" class="btn-act">Create Project</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+<script>
+function openTaskEdit(id, name, assigned, dueDate, priority, status, notes) {
+    document.getElementById('edit-task-id').value = id;
+    document.getElementById('edit-task-name').value = name;
+    document.getElementById('edit-assigned-to').value = assigned;
+    document.getElementById('edit-due-date').value = dueDate;
+    document.getElementById('edit-priority').value = priority;
+    document.getElementById('edit-status').value = status;
+    document.getElementById('edit-notes').value = notes;
+    document.getElementById('task-edit-form').style.display = 'block';
+    document.getElementById('task-edit-form').scrollIntoView({behavior:'smooth'});
+}
+</script>
+{% endblock %}
