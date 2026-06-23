@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block page_title %}Audit #{{ audit.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/audits/" class="btn">All Audits</a>
+<a href="/qa/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.qa-wrap { width:100%; max-width:900px; }
+.qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row.span2 { grid-column:span 2; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.overdue-notice { background:#fff0f0; border:1px solid #c62828; border-radius:5px;
+    padding:8px 14px; color:#c62828; font-size:13px; margin-bottom:12px; }
+.complete-card { border-color:#1a6b1a !important; }
+.complete-card h3 { color:#1a6b1a !important; }
+.btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.ok-btn { padding:7px 20px; background:#1a6b1a; color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.ok-btn:hover { background:#145214; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="qa-wrap">
+    <h2>Audit #{{ audit.id }} &mdash; {{ audit.title }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+    {% if audit.is_overdue %}<div class="overdue-notice">&#9888; This audit is past its scheduled date.</div>{% endif %}
+
+    {% if audit.status not in 'Complete,Closed' and can_edit %}
+    <div class="card complete-card">
+        <h3>Complete Audit</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="complete">
+            <div class="form-grid">
+                <div class="form-row span2">
+                    <label>Overall Result</label>
+                    <input type="text" name="result" placeholder="Pass / Fail / Conditional…">
+                </div>
+                <div class="form-row full">
+                    <label>Findings</label>
+                    <textarea name="findings" rows="3"
+                        placeholder="Key findings from the audit…">{{ audit.findings|default:'' }}</textarea>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button type="submit" class="ok-btn">Mark Complete</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Audit Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid">
+                <div class="form-row span2">
+                    <label>Title *</label>
+                    {% if can_edit %}
+                    <input type="text" name="title" value="{{ audit.title }}" required>
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.title }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    {% if can_edit %}
+                    <select name="status">
+                        {% for st in audit_statuses %}
+                        <option {% if audit.status == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.status }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Type</label>
+                    {% if can_edit %}
+                    <select name="audit_type">
+                        {% for t in audit_types %}
+                        <option {% if audit.audit_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.audit_type }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Auditor</label>
+                    {% if can_edit %}
+                    <input type="text" name="auditor" value="{{ audit.auditor|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.auditor|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Scheduled Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="scheduled_date" value="{{ audit.scheduled_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.scheduled_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Completed Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="completed_date" value="{{ audit.completed_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.completed_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Result</label>
+                    {% if can_edit %}
+                    <input type="text" name="result" value="{{ audit.result|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ audit.result|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row full">
+                    <label>Findings</label>
+                    {% if can_edit %}
+                    <textarea name="findings" rows="5">{{ audit.findings|default:'' }}</textarea>
+                    {% else %}
+                    <textarea class="ro" readonly rows="5">{{ audit.findings|default:'' }}</textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/qa/audits/" style="color:#aad;font-size:13px;">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

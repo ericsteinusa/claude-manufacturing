@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block page_title %}Inspection {{ inspection.insp_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/inspections/" class="btn">All Inspections</a>
+<a href="/qa/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.qa-wrap { width:100%; max-width:900px; }
+.qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; margin-bottom:14px; }
+.info-item label { display:block; font-size:11px; color:#888; font-weight:bold; text-transform:uppercase; margin-bottom:2px; }
+.info-item .val { font-size:14px; color:#222; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.res-passed { background:#e8f5e9; color:#1a6b1a; }
+.res-failed { background:#ffebee; color:#c62828; }
+.res-pending { background:#e8eaf6; color:#3949ab; }
+.res-on_hold { background:#fff3e0; color:#e65100; }
+.result-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+.rbtn { padding:6px 16px; border:2px solid #aaa; border-radius:5px;
+    font-size:13px; font-weight:bold; cursor:pointer; background:white; }
+.rbtn:hover { border-color:rgb(0,60,180); color:rgb(0,60,180); }
+.rbtn.active-passed { background:#e8f5e9; border-color:#1a6b1a; color:#1a6b1a; }
+.rbtn.active-failed { background:#ffebee; border-color:#c62828; color:#c62828; }
+.rbtn.active-pending { background:#e8eaf6; border-color:#3949ab; color:#3949ab; }
+.rbtn.active-on_hold { background:#fff3e0; border-color:#e65100; color:#e65100; }
+.defect-table { width:100%; border-collapse:collapse; font-size:13px; }
+.defect-table th,.defect-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #eee; }
+.defect-table th { background:#f0f4ff; color:#333; }
+.defect-table tr:last-child td { border-bottom:none; }
+.sev-minor { color:#1a6b1a; font-weight:bold; }
+.sev-major { color:#e65100; font-weight:bold; }
+.sev-critical { color:#c62828; font-weight:bold; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row textarea { resize:vertical; min-height:60px; }
+.form-grid2 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.resolve-btn { padding:4px 12px; background:#fff3e0; border:1px solid #e65100;
+    border-radius:4px; font-size:12px; cursor:pointer; color:#e65100; }
+.resolve-btn:hover { background:#e65100; color:white; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.resolved-row td { opacity:0.55; text-decoration:line-through; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="qa-wrap">
+    <h2>{{ inspection.insp_number }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <!-- Info card -->
+    <div class="card">
+        <h3>Inspection Details</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Product</label>
+                <div class="val">{{ inspection.product_name|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Inspector</label>
+                <div class="val">{{ inspection.inspector|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Date</label>
+                <div class="val">{{ inspection.insp_date }}</div>
+            </div>
+            <div class="info-item">
+                <label>Result</label>
+                <div class="val"><span class="badge res-{{ inspection.result }}">{{ inspection.result|title }}</span></div>
+            </div>
+            {% if inspection.notes %}
+            <div class="info-item" style="grid-column:1/-1;">
+                <label>Notes</label>
+                <div class="val">{{ inspection.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if can_edit %}
+        <div style="margin-top:10px;">
+            <div style="font-size:12px;color:#555;font-weight:bold;margin-bottom:6px;">Update Result</div>
+            <div class="result-btns">
+                {% for r in 'passed,failed,on_hold,pending'|split:',' %}
+                <form method="post" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="{{ r }}">
+                    <button type="submit"
+                        class="rbtn {% if inspection.result == r %}active-{{ r }}{% endif %}">
+                        {{ r|title }}
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Defects card -->
+    <div class="card">
+        <h3>Defects ({{ defects|length }})</h3>
+
+        {% if defects %}
+        <table class="defect-table">
+            <thead><tr>
+                <th>Type</th><th>Severity</th><th>Description</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody>
+            {% for d in defects %}
+            <tr class="{% if d.resolved %}resolved-row{% endif %}">
+                <td>{{ d.defect_type|default:"—" }}</td>
+                <td class="sev-{{ d.severity }}">{{ d.severity }}</td>
+                <td>{{ d.description }}</td>
+                <td>{% if d.resolved %}Resolved{% else %}<strong>Open</strong>{% endif %}</td>
+                <td>
+                {% if not d.resolved and can_edit %}
+                <form method="post" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="resolve_defect">
+                    <input type="hidden" name="defect_id" value="{{ d.id }}">
+                    <button type="submit" class="resolve-btn">Resolve</button>
+                </form>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#aaa;font-size:13px;">No defects logged.</p>
+        {% endif %}
+
+        {% if can_edit %}
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #eee;">
+            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:10px;">Log Defect</div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="log_defect">
+                <div class="form-grid2">
+                    <div class="form-row">
+                        <label>Type</label>
+                        <input type="text" name="defect_type" placeholder="Visual, Dimensional…">
+                    </div>
+                    <div class="form-row">
+                        <label>Severity</label>
+                        <select name="severity">
+                            {% for s in defect_severities %}<option>{{ s }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label>Description *</label>
+                    <textarea name="description" rows="2" required
+                        placeholder="Describe the defect…"></textarea>
+                </div>
+                <button type="submit" class="save-btn">Log Defect</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

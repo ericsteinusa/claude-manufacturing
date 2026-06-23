@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block page_title %}CAPA #{{ capa.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/capa/" class="btn">All CAPAs</a>
+<a href="/qa/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.qa-wrap { width:100%; max-width:900px; }
+.qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row.span2 { grid-column:span 2; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.overdue-notice { background:#fff0f0; border:1px solid #c62828; border-radius:5px;
+    padding:8px 14px; color:#c62828; font-size:13px; margin-bottom:12px; }
+.btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.close-btn { padding:7px 20px; background:#c62828; color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.close-btn:hover { background:#8b1a1a; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="qa-wrap">
+    <h2>CAPA #{{ capa.id }} &mdash; {{ capa.title }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+    {% if capa.is_overdue %}<div class="overdue-notice">&#9888; This CAPA is past its due date.</div>{% endif %}
+
+    {% if capa.status != 'Closed' and can_edit %}
+    <div class="card" style="border-color:#c62828;">
+        <h3 style="color:#c62828;">Close CAPA</h3>
+        <p style="font-size:13px;color:#555;margin:0 0 12px;">
+            Sets status to Closed and stamps today's completed date.</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="close">
+            <button type="submit" class="close-btn">Close CAPA</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>CAPA Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid">
+                <div class="form-row span2">
+                    <label>Title *</label>
+                    {% if can_edit %}
+                    <input type="text" name="title" value="{{ capa.title }}" required>
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.title }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    {% if can_edit %}
+                    <select name="status">
+                        {% for st in capa_statuses %}
+                        <option {% if capa.status == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.status }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Type</label>
+                    {% if can_edit %}
+                    <select name="capa_type">
+                        {% for t in capa_types %}
+                        <option {% if capa.capa_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.capa_type }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>NCR Reference</label>
+                    {% if can_edit %}
+                    <input type="text" name="ncr_ref" value="{{ capa.ncr_ref|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.ncr_ref|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Owner</label>
+                    {% if can_edit %}
+                    <input type="text" name="owner" value="{{ capa.owner|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.owner|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Due Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="due_date" value="{{ capa.due_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.due_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Completed Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="completed_date" value="{{ capa.completed_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ capa.completed_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row full">
+                    <label>Action Plan</label>
+                    {% if can_edit %}
+                    <textarea name="action_plan" rows="4">{{ capa.action_plan|default:'' }}</textarea>
+                    {% else %}
+                    <textarea class="ro" readonly rows="4">{{ capa.action_plan|default:'' }}</textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/qa/capa/" style="color:#aad;font-size:13px;">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
