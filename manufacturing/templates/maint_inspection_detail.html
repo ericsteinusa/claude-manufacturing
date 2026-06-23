@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block page_title %}Inspection #{{ inspection.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/inspections/" class="btn">All Inspections</a>
+<a href="/maint/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:860px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.overdue-notice { background:#fff0f0; border:1px solid #c62828; border-radius:5px;
+    padding:8px 14px; color:#c62828; font-size:13px; margin-bottom:12px; }
+.btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Inspection: {{ inspection.area }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+    {% if inspection.is_overdue %}<div class="overdue-notice">&#9888; This inspection is past its scheduled date.</div>{% endif %}
+
+    {% if inspection.status == 'Scheduled' or inspection.status == 'In Progress' %}
+    {% if can_edit %}
+    <div class="card" style="border-color:#1a6b1a;">
+        <h3 style="color:#1a6b1a;">Complete Inspection</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="complete">
+            <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                    <label style="font-size:12px;color:#555;font-weight:bold;">Result</label>
+                    <input type="text" name="result" placeholder="Pass / Fail / Notes"
+                           style="padding:6px 10px;border:1px solid #ccc;border-radius:4px;font-size:13px;width:200px;">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:200px;">
+                    <label style="font-size:12px;color:#555;font-weight:bold;">Findings</label>
+                    <textarea name="notes" rows="2" style="padding:6px 10px;border:1px solid #ccc;
+                        border-radius:4px;font-size:13px;resize:vertical;"></textarea>
+                </div>
+                <button type="submit" class="save-btn" style="background:#1a6b1a;">Mark Complete</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <div class="card">
+        <h3>Inspection Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Area *</label>
+                    {% if can_edit %}
+                    <input type="text" name="area" value="{{ inspection.area }}" required>
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.area }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Type</label>
+                    {% if can_edit %}
+                    <select name="inspection_type">
+                        {% for t in inspection_types %}
+                        <option {% if inspection.inspection_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.inspection_type|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    {% if can_edit %}
+                    <select name="status">
+                        {% for st in inspection_statuses %}
+                        <option {% if inspection.status == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.status }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Inspector</label>
+                    {% if can_edit %}
+                    <input type="text" name="inspector" value="{{ inspection.inspector|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.inspector|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Scheduled Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="scheduled_date" value="{{ inspection.scheduled_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.scheduled_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Completed Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="completed_date" value="{{ inspection.completed_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.completed_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Result</label>
+                    {% if can_edit %}
+                    <input type="text" name="result" value="{{ inspection.result|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ inspection.result|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    {% if can_edit %}
+                    <textarea name="notes" rows="4">{{ inspection.notes|default:'' }}</textarea>
+                    {% else %}
+                    <textarea class="ro" readonly rows="4">{{ inspection.notes|default:'' }}</textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/maint/inspections/" style="color:#aad;font-size:13px;">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

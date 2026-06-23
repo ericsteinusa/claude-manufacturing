@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block page_title %}WO #{{ wo.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/wo/" class="btn">All WOs</a>
+<a href="/maint/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:900px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row.span2 { grid-column:span 2; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.overdue-notice { background:#fff0f0; border:1px solid #c62828; border-radius:5px;
+    padding:8px 14px; color:#c62828; font-size:13px; margin-bottom:12px; }
+.btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.ok-btn { padding:7px 20px; background:#1a6b1a; color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.ok-btn:hover { background:#145214; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>WO #{{ wo.id }} &mdash; {{ wo.title }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+    {% if wo.is_overdue %}<div class="overdue-notice">&#9888; This work order is past its due date.</div>{% endif %}
+
+    {% if wo.status not in 'Completed,Cancelled' and can_edit %}
+    <div class="card" style="border-color:#1a6b1a;">
+        <h3 style="color:#1a6b1a;">Complete Work Order</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="complete">
+            <button type="submit" class="ok-btn">Mark Complete</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Work Order Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid">
+                <div class="form-row span2">
+                    <label>Title *</label>
+                    {% if can_edit %}
+                    <input type="text" name="title" value="{{ wo.title }}" required>
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.title }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    {% if can_edit %}
+                    <select name="status">
+                        {% for st in wo_statuses %}
+                        <option {% if wo.status == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.status }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Equipment</label>
+                    {% if can_edit %}
+                    <input type="text" name="equipment" value="{{ wo.equipment|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.equipment|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Work Type</label>
+                    {% if can_edit %}
+                    <select name="work_type">
+                        {% for t in work_types %}
+                        <option {% if wo.work_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.work_type|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Priority</label>
+                    {% if can_edit %}
+                    <select name="priority">
+                        {% for p in priorities %}
+                        <option {% if wo.priority == p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.priority }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Assigned To</label>
+                    {% if can_edit %}
+                    <select name="assigned_to">
+                        <option value="">— Unassigned —</option>
+                        {% for m in mechanics %}
+                        <option {% if wo.assigned_to == m.name %}selected{% endif %}>{{ m.name }}</option>
+                        {% endfor %}
+                        {% if wo.assigned_to and wo.assigned_to not in mechanics|join:"," %}
+                        <option selected>{{ wo.assigned_to }}</option>
+                        {% endif %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.assigned_to|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Requested Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="requested_date" value="{{ wo.requested_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.requested_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Due Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="due_date" value="{{ wo.due_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.due_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Completed Date</label>
+                    {% if can_edit %}
+                    <input type="date" name="completed_date" value="{{ wo.completed_date|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.completed_date|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    {% if can_edit %}
+                    <textarea name="notes" rows="4">{{ wo.notes|default:'' }}</textarea>
+                    {% else %}
+                    <textarea class="ro" readonly rows="4">{{ wo.notes|default:'' }}</textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/maint/wo/" style="color:#aad;font-size:13px;">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

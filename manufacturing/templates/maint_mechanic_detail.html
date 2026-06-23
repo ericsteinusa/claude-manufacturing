@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block page_title %}{{ mechanic.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/mechanics/" class="btn">All Mechanics</a>
+<a href="/maint/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:800px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>{{ mechanic.name }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Mechanic Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Name *</label>
+                    {% if can_edit %}
+                    <input type="text" name="name" value="{{ mechanic.name }}" required>
+                    {% else %}
+                    <input class="ro" readonly value="{{ mechanic.name }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    {% if can_edit %}
+                    <select name="status">
+                        {% for st in mechanic_statuses %}
+                        <option {% if mechanic.status == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ mechanic.status }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Trade</label>
+                    {% if can_edit %}
+                    <select name="trade">
+                        {% for t in mechanic_trades %}
+                        <option {% if mechanic.trade == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ mechanic.trade|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Shift</label>
+                    {% if can_edit %}
+                    <select name="shift">
+                        {% for s in mechanic_shifts %}
+                        <option {% if mechanic.shift == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ mechanic.shift|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Phone</label>
+                    {% if can_edit %}
+                    <input type="text" name="phone" value="{{ mechanic.phone|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ mechanic.phone|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    {% if can_edit %}
+                    <textarea name="notes" rows="4">{{ mechanic.notes|default:'' }}</textarea>
+                    {% else %}
+                    <textarea class="ro" readonly rows="4">{{ mechanic.notes|default:'' }}</textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/maint/mechanics/" style="color:#aad;font-size:13px;">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
