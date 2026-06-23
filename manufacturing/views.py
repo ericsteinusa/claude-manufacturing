@@ -238,6 +238,8 @@ WEB_LEAF_URLS = {
     ('engineering', 'test_val'): '/eng/projects/?status=in_progress',
     ('engineering', 'eng_reports'): '/eng/reports/',
     ('engineering', 'standards'): '/eng/reports/',
+    ('sales', 'sales_mgr'): '/sales/',
+    ('sales', 'sales'): '/sales/orders/',
     ('production', 'bom_list'): '/bom/',
     ('production', 'mrp_home'): '/mrp/',
     ('production', 'run_mrp'): '/mrp/',
@@ -5856,3 +5858,276 @@ def eng_reports_view(request):
         data = _eng_reports_data(conn)
     ctx = _eng_ctx(request, **data)
     return render(request, 'eng_reports.html', ctx)
+
+from .sales_core import (
+    SO_STATUSES, SO_STATUS_ACTION_LABELS,
+    allowed_transitions, can_transition, customer_label,
+    next_so_number, list_sos, get_so, get_so_items,
+    load_customers, load_products,
+    create_so, update_so, add_so_item, delete_so_item, set_so_status,
+    QUOTE_STATUSES, TARGET_STATUSES,
+    get_sales_dashboard,
+    list_quotes, get_quote, create_quote, update_quote, set_quote_status,
+    list_targets, create_target, update_target,
+)
+
+_SALES_DEPT_KEYS = {'sales'}
+
+
+def _sales_access(request, write=False):
+    if request.session.get('user_role') in FULL_ACCESS_ROLES:
+        return None
+    dept = request.session.get('user_dept', '')
+    if dept not in _SALES_DEPT_KEYS:
+        return redirect('/dashboard/')
+    if write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return redirect('/dashboard/')
+    return None
+
+
+def _sales_ctx(request, **extra):
+    role = request.session.get('user_role', '')
+    ctx = {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': role,
+        'full_access': role in FULL_ACCESS_ROLES,
+        'can_edit': role not in READ_ONLY_ROLES,
+        'SO_STATUSES': SO_STATUSES,
+        'SO_STATUS_ACTION_LABELS': SO_STATUS_ACTION_LABELS,
+        'QUOTE_STATUSES': QUOTE_STATUSES,
+        'TARGET_STATUSES': TARGET_STATUSES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+def sales_dashboard(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    with get_db_connection() as conn:
+        dash = get_sales_dashboard(conn)
+        recent_orders = list_sos(conn)[:8]
+        recent_quotes = list_quotes(conn)[:8]
+    ctx = _sales_ctx(request, dash=dash,
+                     recent_orders=recent_orders, recent_quotes=recent_quotes)
+    return render(request, 'sales_dashboard.html', ctx)
+
+
+def sales_orders_list(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    status = request.GET.get('status', '')
+    customer_id = request.GET.get('customer_id', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST' and request.POST.get('action') == 'new':
+            block2 = _sales_access(request, write=True)
+            if block2:
+                return block2
+            try:
+                so_num = next_so_number(conn)
+                so_id = create_so(
+                    conn,
+                    so_number=so_num,
+                    customer_id=request.POST.get('customer_id') or None,
+                    order_date=request.POST.get('order_date') or None,
+                    ship_date=request.POST.get('ship_date') or None,
+                    status='draft',
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect(f'/sales/orders/{so_id}/')
+            except Exception as e:
+                error = str(e)
+        orders = list_sos(conn,
+                          status=status or None,
+                          customer_id=int(customer_id) if customer_id.isdigit() else None,
+                          date_from=date_from or None,
+                          date_to=date_to or None)
+        customers = load_customers(conn)
+    ctx = _sales_ctx(request, orders=orders, customers=customers,
+                     filter_status=status, filter_customer=customer_id,
+                     filter_date_from=date_from, filter_date_to=date_to,
+                     error=error, success=success)
+    return render(request, 'sales_orders.html', ctx)
+
+
+def sales_order_detail(request, so_id=None):
+    block = _sales_access(request)
+    if block:
+        return block
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST':
+            block2 = _sales_access(request, write=True)
+            if block2:
+                return block2
+            action = request.POST.get('action', '')
+            try:
+                if action == 'save' and so_id:
+                    update_so(conn, so_id,
+                              customer_id=request.POST.get('customer_id') or None,
+                              order_date=request.POST.get('order_date') or None,
+                              ship_date=request.POST.get('ship_date') or None,
+                              notes=request.POST.get('notes', '').strip())
+                    conn.commit()
+                    success = 'Order updated.'
+                elif action == 'status' and so_id:
+                    new_status = request.POST.get('new_status', '')
+                    so = get_so(conn, so_id)
+                    if so and can_transition(so['status'], new_status):
+                        set_so_status(conn, so_id, new_status)
+                        conn.commit()
+                        success = f'Status changed to {new_status}.'
+                    else:
+                        error = 'Invalid status transition.'
+                elif action == 'add_item' and so_id:
+                    add_so_item(conn, so_id,
+                                description=request.POST.get('description', '').strip(),
+                                product_id=request.POST.get('product_id') or None,
+                                qty=int(request.POST.get('qty', 1) or 1),
+                                unit_price=float(request.POST.get('unit_price', 0) or 0))
+                    conn.commit()
+                    success = 'Line item added.'
+                elif action == 'delete_item':
+                    item_id = int(request.POST.get('item_id', 0))
+                    delete_so_item(conn, item_id, so_id=so_id)
+                    conn.commit()
+                    success = 'Line item removed.'
+            except Exception as e:
+                error = str(e)
+        so = get_so(conn, so_id) if so_id else None
+        items = get_so_items(conn, so_id) if so_id else []
+        customers = load_customers(conn)
+        products = load_products(conn)
+        transitions = allowed_transitions(so['status']) if so else ()
+    ctx = _sales_ctx(request, so=so, items=items,
+                     customers=customers, products=products,
+                     transitions=transitions,
+                     error=error, success=success)
+    return render(request, 'sales_order_detail.html', ctx)
+
+
+def sales_quotes(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    status = request.GET.get('status', '')
+    search = request.GET.get('search', '')
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST':
+            block2 = _sales_access(request, write=True)
+            if block2:
+                return block2
+            action = request.POST.get('action', '')
+            try:
+                if action == 'new':
+                    qid = create_quote(
+                        conn,
+                        customer=request.POST.get('customer', '').strip(),
+                        description=request.POST.get('description', '').strip(),
+                        amount=request.POST.get('amount', 0),
+                        owner=request.POST.get('owner', '').strip(),
+                        quote_date=request.POST.get('quote_date') or None,
+                        valid_until=request.POST.get('valid_until') or None,
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = f'Quote #{qid} created.'
+                elif action == 'update':
+                    update_quote(
+                        conn,
+                        quote_id=int(request.POST.get('quote_id', 0)),
+                        customer=request.POST.get('customer', '').strip(),
+                        description=request.POST.get('description', '').strip(),
+                        amount=request.POST.get('amount', 0),
+                        owner=request.POST.get('owner', '').strip(),
+                        quote_date=request.POST.get('quote_date') or None,
+                        valid_until=request.POST.get('valid_until') or None,
+                        status=request.POST.get('status', 'Draft'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Quote updated.'
+                elif action == 'set_status':
+                    set_quote_status(conn,
+                                     int(request.POST.get('quote_id', 0)),
+                                     request.POST.get('new_status', 'Draft'))
+                    conn.commit()
+                    success = 'Quote status updated.'
+            except Exception as e:
+                error = str(e)
+        quotes = list_quotes(conn, status=status or None,
+                             search=search or None)
+    ctx = _sales_ctx(request, quotes=quotes,
+                     filter_status=status, filter_search=search,
+                     error=error, success=success)
+    return render(request, 'sales_quotes.html', ctx)
+
+
+def sales_targets(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    rep_filter = request.GET.get('rep', '')
+    period_filter = request.GET.get('period', '')
+    error = success = ''
+    with get_db_connection() as conn:
+        if request.method == 'POST':
+            block2 = _sales_access(request, write=True)
+            if block2:
+                return block2
+            action = request.POST.get('action', '')
+            try:
+                if action == 'new':
+                    create_target(
+                        conn,
+                        rep=request.POST.get('rep', '').strip(),
+                        period=request.POST.get('period', '').strip(),
+                        target=request.POST.get('target', 0),
+                        actual=request.POST.get('actual', 0),
+                        region=request.POST.get('region', '').strip(),
+                        status=request.POST.get('status', 'On Track'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Target added.'
+                elif action == 'update':
+                    update_target(
+                        conn,
+                        target_id=int(request.POST.get('target_id', 0)),
+                        rep=request.POST.get('rep', '').strip(),
+                        period=request.POST.get('period', '').strip(),
+                        target=request.POST.get('target', 0),
+                        actual=request.POST.get('actual', 0),
+                        region=request.POST.get('region', '').strip(),
+                        status=request.POST.get('status', 'On Track'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Target updated.'
+            except Exception as e:
+                error = str(e)
+        targets = list_targets(conn,
+                               rep=rep_filter or None,
+                               period=period_filter or None)
+        periods = conn.execute(
+            "SELECT DISTINCT period FROM sales_target ORDER BY period DESC"
+        ).fetchall()
+        reps = conn.execute(
+            "SELECT DISTINCT rep FROM sales_target ORDER BY rep"
+        ).fetchall()
+    ctx = _sales_ctx(request, targets=targets,
+                     periods=[r['period'] for r in periods],
+                     reps=[r['rep'] for r in reps],
+                     filter_rep=rep_filter, filter_period=period_filter,
+                     error=error, success=success)
+    return render(request, 'sales_targets.html', ctx)

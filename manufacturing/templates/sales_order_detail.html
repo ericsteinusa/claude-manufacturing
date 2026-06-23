@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block page_title %}{% if so %}{{ so.so_number }}{% else %}New Order{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/orders/" class="btn">All Orders</a>
+<a href="/sales/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.meta-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:10px; }
+.meta-item .lbl { font-size:11px; color:#555; font-weight:bold; }
+.meta-item .val { font-size:14px; color:#222; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-act { padding:6px 16px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.btn-danger { padding:5px 12px; background:#c33; color:white;
+    border:none; border-radius:4px; font-size:12px; cursor:pointer; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table th.num { text-align:right; }
+.totals-row { background:#e8eef8; font-weight:bold; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.st-draft     { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-confirmed { background:#cce5ff; color:#004085; }
+.st-shipped   { background:#fff3cd; color:#856404; }
+.st-invoiced  { background:#d4edda; color:#0a3622; }
+.st-cancelled { background:#e2e3e5; color:#383d41; }
+.msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>{% if so %}{{ so.so_number }}{% else %}New Sales Order{% endif %}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if so %}
+    <!-- Header card -->
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+            <div class="meta-row">
+                <div class="meta-item">
+                    <div class="lbl">Status</div>
+                    <div class="val"><span class="badge st-{{ so.status }}">{{ so.status }}</span></div>
+                </div>
+                <div class="meta-item">
+                    <div class="lbl">Customer</div>
+                    <div class="val">{% if so.company_name %}{{ so.company_name }}{% else %}{{ so.first_name }} {{ so.last_name }}{% endif %}</div>
+                </div>
+                <div class="meta-item"><div class="lbl">Order Date</div><div class="val">{{ so.order_date|default:"—" }}</div></div>
+                <div class="meta-item"><div class="lbl">Ship Date</div><div class="val">{{ so.ship_date|default:"—" }}</div></div>
+                <div class="meta-item"><div class="lbl">Created By</div><div class="val">{{ so.created_by|default:"—" }}</div></div>
+            </div>
+            {% if can_edit and transitions %}
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                {% for t in transitions %}
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="status">
+                    <input type="hidden" name="new_status" value="{{ t }}">
+                    <button type="submit" class="btn-act"
+                        onclick="return confirm('Move to {{ t }}?')">
+                        {{ SO_STATUS_ACTION_LABELS|get_item:t|default:t }}
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% if so.notes %}<div style="margin-top:10px;font-size:13px;color:#555;">{{ so.notes }}</div>{% endif %}
+    </div>
+
+    {% if can_edit and so.status == 'draft' %}
+    <!-- Edit header -->
+    <div class="card">
+        <h3>Edit Order</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:2;min-width:180px;"><label>Customer</label>
+                    <select name="customer_id">
+                        <option value="">— No customer —</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}" {% if so.customer_id == c.id %}selected{% endif %}>
+                            {% if c.company_name %}{{ c.company_name }}{% else %}{{ c.first_name }} {{ c.last_name }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row"><label>Order Date</label><input type="date" name="order_date" value="{{ so.order_date|default:'' }}"></div>
+                <div class="form-row"><label>Ship Date</label><input type="date" name="ship_date" value="{{ so.ship_date|default:'' }}"></div>
+                <div class="form-row" style="flex:2;min-width:180px;"><label>Notes</label><input type="text" name="notes" value="{{ so.notes|default:'' }}"></div>
+            </div>
+            <button type="submit" class="btn-act">Save</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Line items -->
+    <div class="card">
+        <h3>Line Items</h3>
+        <table class="list-table">
+            <thead><tr>
+                <th>Description</th><th>Product</th>
+                <th class="num">Qty</th><th class="num">Unit Price</th>
+                <th class="num">Line Total</th>
+                {% if can_edit and so.status == 'draft' %}<th></th>{% endif %}
+            </tr></thead>
+            <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td>{{ item.product_name|default:"—" }}</td>
+                <td class="num">{{ item.qty }}</td>
+                <td class="num">${{ item.unit_price|floatformat:2 }}</td>
+                <td class="num">${{ item.line_total|floatformat:2 }}</td>
+                {% if can_edit and so.status == 'draft' %}
+                <td>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_item">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="submit" class="btn-danger"
+                            onclick="return confirm('Remove this line?')">✕</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="{% if can_edit and so.status == 'draft' %}6{% else %}5{% endif %}"
+                style="color:#888;text-align:center;padding:12px;">No line items yet.</td></tr>
+            {% endfor %}
+            </tbody>
+            {% if items %}
+            <tfoot>
+            <tr class="totals-row">
+                <td colspan="{% if can_edit and so.status == 'draft' %}4{% else %}3{% endif %}">TOTAL</td>
+                <td class="num" colspan="2">${{ so.total|floatformat:2 }}</td>
+            </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+
+        {% if can_edit and so.status == 'draft' %}
+        <div style="margin-top:14px;">
+            <h3 style="font-size:13px;color:#333;margin:0 0 8px;">Add Line Item</h3>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_item">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                    <div class="form-row" style="flex:3;min-width:160px;"><label>Description *</label>
+                        <input type="text" name="description" required></div>
+                    <div class="form-row" style="flex:2;min-width:140px;"><label>Product</label>
+                        <select name="product_id">
+                            <option value="">—</option>
+                            {% for p in products %}
+                            <option value="{{ p.id }}">{{ p.product_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row"><label>Qty</label>
+                        <input type="number" name="qty" value="1" min="1" style="width:70px;"></div>
+                    <div class="form-row"><label>Unit Price</label>
+                        <input type="number" name="unit_price" value="0" step="0.01" min="0" style="width:100px;"></div>
+                </div>
+                <button type="submit" class="btn-act">Add Item</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% endif %}
+</div>
+</div>
+{% endblock %}

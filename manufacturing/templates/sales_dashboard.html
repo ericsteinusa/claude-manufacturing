@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/orders/" class="btn">Orders</a>
+<a href="/sales/quotes/" class="btn">Quotes</a>
+<a href="/sales/targets/" class="btn">Targets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.nav-btn { background:white; border:2px solid black; border-radius:7px;
+    padding:16px 10px; text-align:center; font-weight:bold; font-size:13px;
+    color:rgb(0,60,180); text-decoration:none; display:block; }
+.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:130px; flex:1; text-align:center; }
+.kpi .val { font-size:26px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .val.money { font-size:20px; }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.section-hdr { color:white; font-size:15px; font-weight:bold; margin:16px 0 8px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:7px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft     { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-confirmed { background:#cce5ff; color:#004085; }
+.st-shipped   { background:#fff3cd; color:#856404; }
+.st-invoiced  { background:#d4edda; color:#0a3622; }
+.st-cancelled { background:#e2e3e5; color:#383d41; }
+.st-Draft   { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-Sent    { background:#cce5ff; color:#004085; }
+.st-Won     { background:#d4edda; color:#0a3622; }
+.st-Lost    { background:#f8d7da; color:#842029; }
+.st-Expired { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Sales Dashboard</h2>
+
+    <div class="nav-grid">
+        <a href="/sales/orders/" class="nav-btn">Sales Orders</a>
+        <a href="/sales/orders/new/" class="nav-btn">New Order</a>
+        <a href="/sales/quotes/" class="nav-btn">Quotes</a>
+        <a href="/sales/targets/" class="nav-btn">Targets &amp; Actuals</a>
+        <a href="/sales/orders/?status=draft" class="nav-btn">Draft Orders</a>
+        <a href="/sales/orders/?status=confirmed" class="nav-btn">Confirmed Orders</a>
+        <a href="/sales/quotes/?status=Sent" class="nav-btn">Open Quotes</a>
+        <a href="/ar/" class="nav-btn">Accounts Receivable</a>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="val">{{ dash.orders.confirmed|default:0 }}</div><div class="lbl">Confirmed Orders</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.shipped|default:0 }}</div><div class="lbl">Shipped</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.invoiced|default:0 }}</div><div class="lbl">Invoiced</div></div>
+        <div class="kpi"><div class="val money">${{ dash.orders.total_value|floatformat:0|default:0 }}</div><div class="lbl">Total Order Value</div></div>
+        <div class="kpi"><div class="val">{{ dash.quotes.sent|default:0 }}</div><div class="lbl">Open Quotes</div></div>
+        <div class="kpi"><div class="val money">${{ dash.quotes.won_value|floatformat:0|default:0 }}</div><div class="lbl">Won Quote Value</div></div>
+    </div>
+
+    <div class="two-col">
+        <div>
+            <div class="section-hdr">Recent Orders</div>
+            <table class="list-table">
+                <thead><tr><th>SO #</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead>
+                <tbody>
+                {% for o in recent_orders %}
+                <tr onclick="location.href='/sales/orders/{{ o.id }}/'">
+                    <td>{{ o.so_number }}</td>
+                    <td>{{ o.company_name|default:o.first_name }}</td>
+                    <td><span class="badge st-{{ o.status }}">{{ o.status }}</span></td>
+                    <td>${{ o.total|floatformat:2 }}</td>
+                </tr>
+                {% empty %}<tr><td colspan="4" style="color:#888;">No orders yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <div class="section-hdr">Recent Quotes</div>
+            <table class="list-table">
+                <thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for q in recent_quotes %}
+                <tr onclick="location.href='/sales/quotes/'">
+                    <td>{{ q.customer }}</td>
+                    <td>${{ q.amount|floatformat:2 }}</td>
+                    <td><span class="badge st-{{ q.status }}">{{ q.status }}</span></td>
+                </tr>
+                {% empty %}<tr><td colspan="3" style="color:#888;">No quotes yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

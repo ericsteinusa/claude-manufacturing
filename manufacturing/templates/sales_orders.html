@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Orders{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Dashboard</a>
+<a href="/sales/quotes/" class="btn">Quotes</a>
+<a href="/sales/targets/" class="btn">Targets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select,.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr.data-row:hover td { background:#f0f4ff; cursor:pointer; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft     { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-confirmed { background:#cce5ff; color:#004085; }
+.st-shipped   { background:#fff3cd; color:#856404; }
+.st-invoiced  { background:#d4edda; color:#0a3622; }
+.st-cancelled { background:#e2e3e5; color:#383d41; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Sales Orders</h2>
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Status:</label>
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for s in SO_STATUSES %}
+            <option value="{{ s }}" {% if filter_status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Customer:</label>
+        <select name="customer_id" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for c in customers %}
+            <option value="{{ c.id }}" {% if filter_customer == c.id|stringformat:"s" %}selected{% endif %}>
+                {% if c.company_name %}{{ c.company_name }}{% else %}{{ c.first_name }} {{ c.last_name }}{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+        <label>From:</label>
+        <input type="date" name="date_from" value="{{ filter_date_from }}">
+        <label>To:</label>
+        <input type="date" name="date_to" value="{{ filter_date_to }}">
+        <button type="submit" class="btn-sm">Filter</button>
+        <a href="/sales/orders/" style="color:#aad;font-size:13px;">Clear</a>
+    </form>
+
+    <table class="list-table">
+        <thead><tr>
+            <th>SO #</th><th>Customer</th><th>Order Date</th>
+            <th>Ship Date</th><th>Status</th><th class="num">Items</th><th class="num">Total</th>
+        </tr></thead>
+        <tbody>
+        {% for o in orders %}
+        <tr class="data-row" onclick="location.href='/sales/orders/{{ o.id }}/'">
+            <td>{{ o.so_number }}</td>
+            <td>{% if o.company_name %}{{ o.company_name }}{% else %}{{ o.first_name }} {{ o.last_name }}{% endif %}</td>
+            <td>{{ o.order_date|default:"—" }}</td>
+            <td>{{ o.ship_date|default:"—" }}</td>
+            <td><span class="badge st-{{ o.status }}">{{ o.status }}</span></td>
+            <td class="num">{{ o.item_count }}</td>
+            <td class="num">${{ o.total|floatformat:2 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="color:#888;text-align:center;padding:16px;">No orders found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Sales Order</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="new">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:2;min-width:180px;">
+                    <label>Customer</label>
+                    <select name="customer_id">
+                        <option value="">— No customer —</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}">{% if c.company_name %}{{ c.company_name }}{% else %}{{ c.first_name }} {{ c.last_name }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row"><label>Order Date</label><input type="date" name="order_date"></div>
+                <div class="form-row"><label>Ship Date</label><input type="date" name="ship_date"></div>
+                <div class="form-row" style="flex:2;min-width:180px;"><label>Notes</label><input type="text" name="notes"></div>
+            </div>
+            <button type="submit" class="btn-sm">Create Order</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
