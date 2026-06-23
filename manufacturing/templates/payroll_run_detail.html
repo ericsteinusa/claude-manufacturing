@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block page_title %}Payroll Run{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/history/" class="btn">All Runs</a>
+<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.meta { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 20px; margin-bottom:16px; display:flex; gap:30px; flex-wrap:wrap; }
+.meta-item { display:flex; flex-direction:column; }
+.meta-item .lbl { font-size:11px; color:#666; font-weight:bold; }
+.meta-item .val { font-size:14px; color:#222; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; text-align:right;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th:first-child,.list-table td:first-child { text-align:left; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+.totals-row { background:rgb(220,235,255); font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Payroll Run — {{ run.pay_period_start }} to {{ run.pay_period_end }}</h2>
+
+    <div class="meta">
+        <div class="meta-item">
+            <span class="lbl">Run Date</span>
+            <span class="val">{{ run.run_date|slice:":10" }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="lbl">Status</span>
+            <span class="val">{{ run.status|default:"processed" }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="lbl">Created By</span>
+            <span class="val">{{ run.created_by|default:"—" }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="lbl">Employees</span>
+            <span class="val">{{ entries|length }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="lbl">Total Gross</span>
+            <span class="val">${{ total_gross|floatformat:2 }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="lbl">Total Net</span>
+            <span class="val">${{ total_net|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    {% if entries %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Employee</th>
+            <th>Reg Hrs</th><th>OT Hrs</th>
+            <th>Gross Pay</th><th>Pre-Tax Deds</th>
+            <th>Fed Tax</th><th>State Tax</th>
+            <th>SS</th><th>Medicare</th>
+            <th>Post-Tax Deds</th><th>Net Pay</th>
+        </tr></thead>
+        <tbody>
+        {% for e in entries %}
+        <tr onclick="location='/payroll/stubs/{{ e.id }}/'">
+            <td><strong>{{ e.last_name }}, {{ e.first_name }}</strong></td>
+            <td>{{ e.regular_hours|floatformat:2 }}</td>
+            <td>{{ e.overtime_hours|floatformat:2 }}</td>
+            <td>${{ e.gross_pay|floatformat:2 }}</td>
+            <td>${{ e.pre_tax_deductions|floatformat:2 }}</td>
+            <td>${{ e.federal_tax|floatformat:2 }}</td>
+            <td>${{ e.state_tax|floatformat:2 }}</td>
+            <td>${{ e.social_security|floatformat:2 }}</td>
+            <td>${{ e.medicare|floatformat:2 }}</td>
+            <td>${{ e.post_tax_deductions|floatformat:2 }}</td>
+            <td><strong>${{ e.net_pay|floatformat:2 }}</strong></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr class="totals-row">
+            <td>TOTALS</td>
+            <td colspan="2"></td>
+            <td>${{ total_gross|floatformat:2 }}</td>
+            <td colspan="5"></td>
+            <td></td>
+            <td>${{ total_net|floatformat:2 }}</td>
+        </tr>
+        </tfoot>
+    </table>
+    <p style="color:#aac;font-size:12px;">Click a row to view that employee's pay stub.</p>
+    {% else %}
+    <p style="color:#cce;font-size:14px;">No entries for this run.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block page_title %}Payroll{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
+<a href="/payroll/deductions/" class="btn">Deductions</a>
+<a href="/payroll/history/" class="btn">History</a>
+<a href="/payroll/ytd/" class="btn">YTD Report</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.kpi-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 20px; min-width:150px; flex:1; }
+.kpi .num { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:12px; color:#666; margin-top:3px; }
+.card { background:white; border:2px solid black; border-radius:8px;
+    padding:18px 22px; margin-bottom:18px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+.nav-btn { display:inline-block; padding:8px 16px; background:rgb(0,60,180);
+    color:white; border-radius:5px; font-size:13px; font-weight:bold;
+    text-decoration:none; margin:4px; }
+.nav-btn:hover { background:rgb(0,40,140); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Payroll Department</h2>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="num">{{ counts.total_runs }}</div>
+            <div class="lbl">Payroll Runs</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ counts.emp_with_rates }}</div>
+            <div class="lbl">Employees with Pay Rates</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ counts.total_people }}</div>
+            <div class="lbl">Total Employees</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ counts.active_ded_types }}</div>
+            <div class="lbl">Active Deduction Types</div>
+        </div>
+        <div class="kpi">
+            <div class="num">${{ counts.ytd_gross|floatformat:0 }}</div>
+            <div class="lbl">YTD Gross Payroll</div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
+        <a href="/payroll/pay-rates/" class="nav-btn">Pay Rates</a>
+        <a href="/payroll/deductions/" class="nav-btn">Deductions &amp; Benefits</a>
+        <a href="/payroll/history/" class="nav-btn">Payroll History</a>
+        <a href="/payroll/ytd/" class="nav-btn">YTD Report</a>
+    </div>
+
+    {% if recent_runs %}
+    <div class="card">
+        <h3>Recent Payroll Runs</h3>
+        <table class="list-table">
+            <thead><tr>
+                <th>Run Date</th><th>Period</th>
+                <th>Employees</th><th>Total Gross</th><th>Net Pay</th><th>Status</th>
+            </tr></thead>
+            <tbody>
+            {% for r in recent_runs %}
+            <tr onclick="location='/payroll/history/{{ r.id }}/'">
+                <td>{{ r.run_date|slice:":10" }}</td>
+                <td>{{ r.pay_period_start }} – {{ r.pay_period_end }}</td>
+                <td>{{ r.emp_count }}</td>
+                <td><strong>${{ r.total_gross|floatformat:2 }}</strong></td>
+                <td>${{ r.total_net|floatformat:2 }}</td>
+                <td>{{ r.status|default:"processed" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top:10px;">
+            <a href="/payroll/history/" style="color:#36c;font-size:13px;">View all runs →</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <h3>No Payroll Runs Yet</h3>
+        <p style="color:#666;font-size:13px;">Payroll runs are created from the desktop application.</p>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

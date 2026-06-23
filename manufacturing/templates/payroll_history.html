@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}Payroll History{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
+<a href="/payroll/ytd/" class="btn">YTD Report</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Payroll History</h2>
+
+    {% if runs %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Run Date</th><th>Period</th>
+            <th>Employees</th><th>Total Gross</th><th>Total Net</th>
+            <th>Status</th><th>Created By</th>
+        </tr></thead>
+        <tbody>
+        {% for r in runs %}
+        <tr onclick="location='/payroll/history/{{ r.id }}/'">
+            <td>{{ r.run_date|slice:":10" }}</td>
+            <td>{{ r.pay_period_start }} – {{ r.pay_period_end }}</td>
+            <td>{{ r.emp_count }}</td>
+            <td><strong>${{ r.total_gross|floatformat:2 }}</strong></td>
+            <td>${{ r.total_net|floatformat:2 }}</td>
+            <td>{{ r.status|default:"processed" }}</td>
+            <td>{{ r.created_by|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#cce;font-size:14px;">No payroll runs found. Payroll runs are created from the desktop application.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block page_title %}Deductions & Benefits{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
+<a href="/payroll/history/" class="btn">History</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
+.yes { background:#e8f5e9; color:#1a6b1a; }
+.no  { background:#f5f5f5; color:#aaa; }
+.form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.save-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:8px; }
+.save-btn:hover { background:rgb(0,40,140); }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.section-hdr { color:white; font-size:16px; font-weight:bold; margin:16px 0 8px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Deductions &amp; Benefits</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="two-col">
+        <!-- Deduction Types -->
+        <div class="card">
+            <h3>Deduction Types</h3>
+            {% if ded_types %}
+            <table class="list-table">
+                <thead><tr>
+                    <th>Name</th><th>Category</th><th>Pre-Tax</th><th>Active</th>
+                </tr></thead>
+                <tbody>
+                {% for d in ded_types %}
+                <tr>
+                    <td><strong>{{ d.name }}</strong></td>
+                    <td>{{ d.category }}</td>
+                    <td><span class="badge {% if d.is_pre_tax %}yes{% else %}no{% endif %}">
+                        {% if d.is_pre_tax %}Yes{% else %}No{% endif %}</span></td>
+                    <td><span class="badge {% if d.is_active %}yes{% else %}no{% endif %}">
+                        {% if d.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:#888;font-size:13px;">No deduction types defined.</p>
+            {% endif %}
+
+            {% if can_edit %}
+            <hr style="margin:14px 0;">
+            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">Add Deduction Type</div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_type">
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label>Name *</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Category</label>
+                        <select name="category">
+                            {% for c in ded_categories %}<option>{{ c }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row full">
+                        <label><input type="checkbox" name="is_pre_tax" value="1" checked> Pre-Tax Deduction</label>
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">Add Type</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Assign Deductions -->
+        <div class="card">
+            <h3>Assign Deductions to Employees</h3>
+
+            <form method="get" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;">
+                <label style="font-size:12px;color:#555;font-weight:bold;">Filter by Employee:</label>
+                <select name="people_id" onchange="this.form.submit()"
+                        style="padding:5px 9px;border:1px solid #ccc;border-radius:4px;font-size:13px;">
+                    <option value="">All Employees</option>
+                    {% for p in people %}
+                    <option value="{{ p.id }}" {% if people_filter == p.id|stringformat:"s" %}selected{% endif %}>
+                        {{ p.last_name }}, {{ p.first_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            {% if emp_deds %}
+            <table class="list-table" style="margin-bottom:12px;">
+                <thead><tr>
+                    <th>Employee</th><th>Deduction</th><th>Method</th><th>Amount</th><th>Active</th>
+                    {% if can_edit %}<th></th>{% endif %}
+                </tr></thead>
+                <tbody>
+                {% for d in emp_deds %}
+                <tr {% if not d.is_active %}style="opacity:0.6"{% endif %}>
+                    <td>{{ d.last_name }}, {{ d.first_name }}</td>
+                    <td>{{ d.ded_name }}<br><span style="color:#888;font-size:11px;">{{ d.category }}</span></td>
+                    <td>{{ d.calc_method }}</td>
+                    <td>{% if d.calc_method == "percent" %}{{ d.amount|floatformat:1 }}%{% else %}${{ d.amount|floatformat:2 }}{% endif %}</td>
+                    <td><span class="badge {% if d.is_active %}yes{% else %}no{% endif %}">
+                        {% if d.is_active %}Yes{% else %}No{% endif %}</span></td>
+                    {% if can_edit %}
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_assign">
+                            <input type="hidden" name="emp_ded_id" value="{{ d.id }}">
+                            {% if people_filter %}<input type="hidden" name="next_people_id" value="{{ people_filter }}">{% endif %}
+                            <button type="submit" style="background:#c33;color:white;border:none;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:11px;"
+                                onclick="return confirm('Remove this assignment?')">Remove</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:#888;font-size:13px;margin-bottom:12px;">No deduction assignments found.</p>
+            {% endif %}
+
+            {% if can_edit %}
+            <hr style="margin:12px 0;">
+            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">Assign Deduction</div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="assign">
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label>Employee *</label>
+                        <select name="people_id" required>
+                            <option value="">-- select --</option>
+                            {% for p in people %}
+                            <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Deduction Type *</label>
+                        <select name="deduction_type_id" required>
+                            <option value="">-- select --</option>
+                            {% for t in active_types %}
+                            <option value="{{ t.id }}">{{ t.name }} ({{ t.category }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Method</label>
+                        <select name="calc_method">
+                            {% for m in ded_methods %}<option>{{ m }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Amount ($/%)</label>
+                        <input type="number" name="amount" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-row full">
+                        <label><input type="checkbox" name="is_active" value="1" checked> Active</label>
+                    </div>
+                    <div class="form-row full">
+                        <label>Notes</label>
+                        <input type="text" name="notes">
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">Assign Deduction</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

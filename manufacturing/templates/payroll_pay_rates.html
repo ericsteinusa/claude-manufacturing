@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block page_title %}Pay Rates{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/payroll/deductions/" class="btn">Deductions</a>
+<a href="/payroll/history/" class="btn">History</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.search-input { padding:5px 10px; border-radius:4px; border:1px solid #ccc; font-size:13px; width:200px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr.no-rate td { color:#999; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.badge-hourly { background:#e8f5e9; color:#1a6b1a; }
+.badge-salary { background:#e8eaf6; color:#3949ab; }
+.badge-none   { background:#f5f5f5; color:#aaa; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-row { display:flex; gap:10px; margin-top:12px; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.del-btn { padding:7px 16px; background:#c33; color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; }
+.del-btn:hover { background:#a00; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Employee Pay Rates</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="toolbar">
+        <form method="get" style="display:flex;gap:6px;align-items:center;">
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search by name…">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            {% if search %}<a href="/payroll/pay-rates/" style="color:#aad;font-size:13px;">Clear</a>{% endif %}
+        </form>
+    </div>
+
+    <table class="list-table">
+        <thead><tr>
+            <th>Employee</th><th>Emp ID</th><th>Pay Type</th><th>Pay Rate</th><th>Effective Date</th>
+            {% if can_edit %}<th>Edit</th>{% endif %}
+        </tr></thead>
+        <tbody>
+        {% for e in employees %}
+        <tr {% if not e.pay_type %}class="no-rate"{% endif %}>
+            <td><strong>{{ e.last_name }}, {{ e.first_name }}</strong></td>
+            <td>{{ e.employee_id|default:"—" }}</td>
+            <td>
+                {% if e.pay_type %}
+                <span class="badge badge-{{ e.pay_type }}">{{ e.pay_type }}</span>
+                {% else %}<span class="badge badge-none">not set</span>{% endif %}
+            </td>
+            <td>
+                {% if e.pay_type == "hourly" %}${{ e.pay_rate|floatformat:2 }}/hr
+                {% elif e.pay_type == "salary" %}${{ e.pay_rate|floatformat:0 }}/yr
+                {% else %}—{% endif %}
+            </td>
+            <td>{{ e.effective_date|default:"—" }}</td>
+            {% if can_edit %}
+            <td>
+                <button class="save-btn" style="padding:3px 12px;font-size:12px;"
+                    onclick="openEdit({{ e.people_id }},'{{ e.pay_type|default:'hourly' }}',
+                    '{{ e.pay_rate|default:'' }}','{{ e.effective_date|default:'' }}')">Edit</button>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <div class="card" id="edit-card" style="display:none;">
+        <h3 id="edit-title">Edit Pay Rate</h3>
+        <form method="post" id="edit-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="upsert">
+            <input type="hidden" name="people_id" id="edit-pid">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Employee</label>
+                    <select name="people_id" id="edit-emp-sel">
+                        {% for p in people %}
+                        <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Pay Type</label>
+                    <select name="pay_type" id="edit-type">
+                        {% for t in pay_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Rate ($/hr or annual salary)</label>
+                    <input type="number" name="pay_rate" id="edit-rate" step="0.01" min="0">
+                </div>
+                <div class="form-row">
+                    <label>Effective Date</label>
+                    <input type="date" name="effective_date" id="edit-date">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save</button>
+                <button type="button" class="del-btn" id="del-btn"
+                    onclick="confirmDelete()">Remove Rate</button>
+                <button type="button" onclick="document.getElementById('edit-card').style.display='none'"
+                    style="background:none;border:none;color:#aad;cursor:pointer;font-size:13px;">Cancel</button>
+            </div>
+        </form>
+        <form method="post" id="del-form" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="people_id" id="del-pid">
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+        <h3>Add / Update Pay Rate</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="upsert">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Employee *</label>
+                    <select name="people_id" required>
+                        <option value="">-- select --</option>
+                        {% for p in people %}
+                        <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Pay Type *</label>
+                    <select name="pay_type">
+                        {% for t in pay_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Rate ($)</label>
+                    <input type="number" name="pay_rate" step="0.01" min="0" value="0">
+                </div>
+                <div class="form-row">
+                    <label>Effective Date</label>
+                    <input type="date" name="effective_date">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Pay Rate</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+
+<script>
+function openEdit(pid, payType, payRate, effDate) {
+    document.getElementById('edit-card').style.display = '';
+    document.getElementById('edit-pid').value = pid;
+    document.getElementById('del-pid').value = pid;
+    var sel = document.getElementById('edit-emp-sel');
+    for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value == pid) { sel.selectedIndex = i; break; }
+    }
+    var tsel = document.getElementById('edit-type');
+    for (var i = 0; i < tsel.options.length; i++) {
+        if (tsel.options[i].value == payType) { tsel.selectedIndex = i; break; }
+    }
+    document.getElementById('edit-rate').value = payRate;
+    document.getElementById('edit-date').value = effDate;
+    document.getElementById('edit-card').scrollIntoView({behavior:'smooth'});
+}
+function confirmDelete() {
+    if (confirm('Remove this pay rate?')) {
+        document.getElementById('del-form').submit();
+    }
+}
+</script>
+{% endblock %}
