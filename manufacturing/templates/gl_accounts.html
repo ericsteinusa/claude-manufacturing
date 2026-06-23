@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block page_title %}Chart of Accounts{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/" class="btn">G/L Dashboard</a>
+<a href="/gl/journals/" class="btn">Journals</a>
+<a href="/gl/trial-balance/" class="btn">Trial Balance</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select,.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table tr:hover td { background:#f0f4ff; }
+.badge-active { background:#d1e7dd; color:#0a3622; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
+.badge-inactive { background:#e2e3e5; color:#41464b; padding:2px 7px; border-radius:4px; font-size:11px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; margin-top:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px 16px; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row.wide { grid-column: span 2; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Chart of Accounts</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Type:</label>
+        <select name="type" onchange="this.form.submit()">
+            <option value="">(all)</option>
+            {% for t in account_types %}<option value="{{ t }}" {% if acct_type == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+        <label><input type="checkbox" name="active" value="0" {% if not active_only %}checked{% endif %} onchange="this.form.submit()"> Show Inactive</label>
+    </form>
+
+    {% if accounts %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Acct #</th><th>Account Name</th><th>Type</th><th>Sub-Type</th>
+            <th class="num">Balance</th><th>Status</th>
+            {% if can_edit %}<th>Edit</th>{% endif %}
+        </tr></thead>
+        <tbody>
+        {% for a in accounts %}
+        <tr>
+            <td><strong>{{ a.account_number }}</strong></td>
+            <td>{{ a.account_name }}</td>
+            <td>{{ a.account_type }}</td>
+            <td>{{ a.account_sub|default:"—" }}</td>
+            <td class="num">${{ a.balance|floatformat:2 }}</td>
+            <td><span class="{% if a.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                {% if a.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+            {% if can_edit %}
+            <td>
+                <button class="btn-sm" style="padding:3px 10px;font-size:11px;"
+                    onclick="openEdit({{ a.id }},'{{ a.account_number }}','{{ a.account_name }}','{{ a.account_type }}','{{ a.account_sub|default:'' }}',{{ a.is_active }},'{{ a.notes|default:'' }}')">Edit</button>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#cce;font-size:14px;">No accounts found.</p>
+    {% endif %}
+
+    {% if can_edit %}
+    <div class="card" id="edit-card" style="display:none;">
+        <h3 id="edit-hdr">Edit Account</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="acct_id" id="edit-id">
+            <div class="form-grid">
+                <div class="form-row"><label>Account # *</label>
+                    <input type="text" name="account_number" id="edit-num" required></div>
+                <div class="form-row wide"><label>Account Name *</label>
+                    <input type="text" name="account_name" id="edit-name" required></div>
+                <div class="form-row"><label>Type</label>
+                    <select name="account_type" id="edit-type">
+                        {% for t in account_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+                    </select></div>
+                <div class="form-row"><label>Sub-Type</label>
+                    <input type="text" name="account_sub" id="edit-sub" placeholder="e.g. Current, Fixed"></div>
+                <div class="form-row"><label><input type="checkbox" name="is_active" id="edit-active" value="1"> Active</label></div>
+                <div class="form-row wide"><label>Notes</label>
+                    <input type="text" name="notes" id="edit-notes"></div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px;">
+                <button type="submit" class="btn-sm">Save</button>
+                <button type="button" onclick="document.getElementById('edit-card').style.display='none'"
+                    style="background:none;border:none;color:#aad;cursor:pointer;font-size:13px;">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+        <h3>Add Account</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="form-grid">
+                <div class="form-row"><label>Account # *</label>
+                    <input type="text" name="account_number" required placeholder="e.g. 1000"></div>
+                <div class="form-row wide"><label>Account Name *</label>
+                    <input type="text" name="account_name" required></div>
+                <div class="form-row"><label>Type</label>
+                    <select name="account_type">
+                        {% for t in account_types %}<option>{{ t }}</option>{% endfor %}
+                    </select></div>
+                <div class="form-row"><label>Sub-Type</label>
+                    <input type="text" name="account_sub" placeholder="e.g. Current"></div>
+                <div class="form-row wide"><label>Notes</label>
+                    <input type="text" name="notes"></div>
+            </div>
+            <div style="margin-top:10px;">
+                <button type="submit" class="btn-sm">Add Account</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+
+<script>
+function openEdit(id, num, name, type, sub, active, notes) {
+    document.getElementById('edit-card').style.display = '';
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-num').value = num;
+    document.getElementById('edit-name').value = name;
+    var tsel = document.getElementById('edit-type');
+    for (var i = 0; i < tsel.options.length; i++) {
+        if (tsel.options[i].value == type) { tsel.selectedIndex = i; break; }
+    }
+    document.getElementById('edit-sub').value = sub;
+    document.getElementById('edit-active').checked = !!active;
+    document.getElementById('edit-notes').value = notes;
+    document.getElementById('edit-card').scrollIntoView({behavior:'smooth'});
+}
+</script>
+{% endblock %}

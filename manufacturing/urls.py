@@ -145,6 +145,23 @@ urlpatterns = [
     path('payroll/history/<int:run_id>/', views.payroll_run_detail, name='payroll_run_detail'),
     path('payroll/stubs/<int:entry_id>/', views.payroll_stub_detail, name='payroll_stub_detail'),
     path('payroll/ytd/', views.payroll_ytd, name='payroll_ytd'),
+    # Accounts Payable
+    path('ap/', views.ap_list, name='ap_list'),
+    path('ap/new/', views.ap_invoice_detail, name='ap_invoice_new'),
+    path('ap/<int:inv_id>/', views.ap_invoice_detail, name='ap_invoice_detail'),
+    # Accounts Receivable
+    path('ar/', views.ar_list, name='ar_list'),
+    path('ar/new/', views.ar_invoice_detail, name='ar_invoice_new'),
+    path('ar/<int:inv_id>/', views.ar_invoice_detail, name='ar_invoice_detail'),
+    # General Ledger
+    path('gl/', views.gl_dashboard, name='gl_dashboard'),
+    path('gl/accounts/', views.gl_accounts, name='gl_accounts'),
+    path('gl/journals/', views.gl_journals, name='gl_journals'),
+    path('gl/journals/new/', views.gl_journal_detail, name='gl_journal_new'),
+    path('gl/journals/<int:journal_id>/', views.gl_journal_detail, name='gl_journal_detail'),
+    path('gl/trial-balance/', views.gl_trial_balance, name='gl_trial_balance'),
+    path('gl/income-statement/', views.gl_income_statement, name='gl_income_statement'),
+    path('gl/balance-sheet/', views.gl_balance_sheet, name='gl_balance_sheet'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),

@@ -356,6 +356,23 @@ WEB_LEAF_URLS = {
     ('accounting', 'pay_hist'):   '/payroll/history/',
     ('personnel', 'pay_rates'):   '/payroll/pay-rates/',
     ('personnel', 'deductions'):  '/payroll/deductions/',
+    # Accounts Payable
+    ('accounting', 'acct_pay'):   '/ap/',
+    ('accounting', 'acct_mgr'):   '/ap/',
+    ('accounting', 'ap'):         '/ap/',
+    ('accounting', 'acct_rcv'):   '/ar/',
+    ('accounting', 'rcv'):        '/ar/',
+    # General Ledger / Financial Reports
+    ('accounting', 'inc_stmt'):   '/gl/income-statement/',
+    ('accounting', 'bal_sheet'):  '/gl/balance-sheet/',
+    ('accounting', 'cash_flow'):  '/gl/',
+    ('accounting', 'cust_rpts'):  '/gl/',
+    ('accounting', 'fin_reports'): '/gl/',
+    ('accounting', 'credit'):     '/gl/',
+    ('finance', 'fin_plan'):      '/gl/',
+    ('finance', 'fin_forecast'):  '/gl/',
+    ('finance', 'fin_analysis'):  '/gl/',
+    ('finance', 'fin_reporting'): '/gl/',
 }
 
 
@@ -5083,3 +5100,480 @@ def payroll_ytd(request):
         year=year, years=years,
         people=people, people_id=pid,
     ))
+
+
+from .accounting_core import (
+    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, DEBIT_NORMAL,
+    load_vendors, load_customers,
+    get_ap_dashboard, list_ap_invoices, get_ap_invoice,
+    create_ap_invoice, update_ap_invoice, set_ap_status,
+    list_ap_payments, record_ap_payment,
+    get_ar_dashboard, list_ar_invoices, get_ar_invoice,
+    create_ar_invoice, update_ar_invoice, set_ar_status,
+    list_ar_payments, record_ar_payment,
+    list_accounts, get_account, create_account, update_account, account_balance,
+    list_journals, get_journal, get_journal_lines,
+    create_journal, post_journal, void_journal,
+    trial_balance, income_statement, balance_sheet,
+)
+
+_ACCOUNTING_DEPT_KEYS = {'accounting', 'finance'}
+
+
+def _acct_access(request, write=False):
+    email = request.session.get('user_email')
+    if not email:
+        return redirect('/')
+    role = request.session.get('user_role', '')
+    if role in FULL_ACCESS_ROLES:
+        return None
+    dept = request.session.get('user_dept', '')
+    if dept not in _ACCOUNTING_DEPT_KEYS:
+        return redirect('/dashboard/')
+    if write and role in READ_ONLY_ROLES:
+        return redirect('/dashboard/')
+    return None
+
+
+def _acct_ctx(request, **extra):
+    role = request.session.get('user_role', '')
+    ctx = {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': role,
+        'full_access': role in FULL_ACCESS_ROLES,
+        'can_edit': role not in READ_ONLY_ROLES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+# ── Accounts Payable ────────────────────────────────────────────────────────
+
+def ap_list(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    success = error = ''
+    if request.method == 'POST':
+        block = _acct_access(request, write=True)
+        if block:
+            conn.close()
+            return block
+        action = request.POST.get('action', '')
+        try:
+            if action == 'new':
+                create_ap_invoice(
+                    conn,
+                    request.POST.get('vendor_id') or None,
+                    request.POST.get('invoice_number', '').strip(),
+                    request.POST.get('invoice_date', ''),
+                    request.POST.get('due_date', ''),
+                    request.POST.get('amount', 0),
+                    request.POST.get('description', '').strip(),
+                    request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'Invoice created.'
+        except Exception as exc:
+            error = str(exc)
+    status  = request.GET.get('status', '')
+    vendor_id = request.GET.get('vendor_id', '')
+    date_from = request.GET.get('date_from', '')
+    date_to   = request.GET.get('date_to', '')
+    invoices = list_ap_invoices(
+        conn,
+        status=status or None,
+        vendor_id=int(vendor_id) if vendor_id else None,
+        date_from=date_from or None,
+        date_to=date_to or None,
+    )
+    dashboard = get_ap_dashboard(conn)
+    vendors   = load_vendors(conn)
+    conn.close()
+    ctx = _acct_ctx(request,
+        invoices=invoices, dashboard=dashboard, vendors=vendors,
+        statuses=INVOICE_STATUSES, payment_methods=PAYMENT_METHODS,
+        status=status, vendor_id=vendor_id,
+        date_from=date_from, date_to=date_to,
+        success=success, error=error,
+    )
+    return render(request, 'ap_list.html', ctx)
+
+
+def ap_invoice_detail(request, inv_id=None):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    success = error = ''
+    if request.method == 'POST':
+        block = _acct_access(request, write=True)
+        if block:
+            conn.close()
+            return block
+        action = request.POST.get('action', '')
+        try:
+            if action == 'save' and inv_id:
+                update_ap_invoice(
+                    conn, inv_id,
+                    request.POST.get('vendor_id') or None,
+                    request.POST.get('invoice_number', '').strip(),
+                    request.POST.get('invoice_date', ''),
+                    request.POST.get('due_date', ''),
+                    request.POST.get('amount', 0),
+                    request.POST.get('description', '').strip(),
+                    request.POST.get('status', 'open'),
+                )
+                conn.commit()
+                success = 'Invoice updated.'
+            elif action == 'payment' and inv_id:
+                record_ap_payment(
+                    conn, inv_id,
+                    request.POST.get('payment_date', ''),
+                    request.POST.get('amount', 0),
+                    request.POST.get('method', 'Check'),
+                    request.POST.get('reference', '').strip(),
+                    request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Payment recorded.'
+            elif action == 'status' and inv_id:
+                set_ap_status(conn, inv_id, request.POST.get('new_status', 'open'))
+                conn.commit()
+                success = 'Status updated.'
+        except Exception as exc:
+            error = str(exc)
+    invoice  = get_ap_invoice(conn, inv_id) if inv_id else None
+    payments = list_ap_payments(conn, inv_id) if inv_id else []
+    vendors  = load_vendors(conn)
+    conn.close()
+    if inv_id and not invoice:
+        return redirect('/ap/')
+    ctx = _acct_ctx(request,
+        invoice=invoice, payments=payments, vendors=vendors,
+        statuses=INVOICE_STATUSES, payment_methods=PAYMENT_METHODS,
+        inv_id=inv_id, success=success, error=error,
+    )
+    return render(request, 'ap_invoice_detail.html', ctx)
+
+
+# ── Accounts Receivable ─────────────────────────────────────────────────────
+
+def ar_list(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    success = error = ''
+    if request.method == 'POST':
+        block = _acct_access(request, write=True)
+        if block:
+            conn.close()
+            return block
+        action = request.POST.get('action', '')
+        try:
+            if action == 'new':
+                create_ar_invoice(
+                    conn,
+                    request.POST.get('customer_id') or None,
+                    request.POST.get('invoice_number', '').strip(),
+                    request.POST.get('invoice_date', ''),
+                    request.POST.get('due_date', ''),
+                    request.POST.get('amount', 0),
+                    request.POST.get('description', '').strip(),
+                    request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'Invoice created.'
+        except Exception as exc:
+            error = str(exc)
+    status      = request.GET.get('status', '')
+    customer_id = request.GET.get('customer_id', '')
+    date_from   = request.GET.get('date_from', '')
+    date_to     = request.GET.get('date_to', '')
+    invoices  = list_ar_invoices(
+        conn,
+        status=status or None,
+        customer_id=int(customer_id) if customer_id else None,
+        date_from=date_from or None,
+        date_to=date_to or None,
+    )
+    dashboard = get_ar_dashboard(conn)
+    customers = load_customers(conn)
+    conn.close()
+    ctx = _acct_ctx(request,
+        invoices=invoices, dashboard=dashboard, customers=customers,
+        statuses=INVOICE_STATUSES, payment_methods=PAYMENT_METHODS,
+        status=status, customer_id=customer_id,
+        date_from=date_from, date_to=date_to,
+        success=success, error=error,
+    )
+    return render(request, 'ar_list.html', ctx)
+
+
+def ar_invoice_detail(request, inv_id=None):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    success = error = ''
+    if request.method == 'POST':
+        block = _acct_access(request, write=True)
+        if block:
+            conn.close()
+            return block
+        action = request.POST.get('action', '')
+        try:
+            if action == 'save' and inv_id:
+                update_ar_invoice(
+                    conn, inv_id,
+                    request.POST.get('customer_id') or None,
+                    request.POST.get('invoice_number', '').strip(),
+                    request.POST.get('invoice_date', ''),
+                    request.POST.get('due_date', ''),
+                    request.POST.get('amount', 0),
+                    request.POST.get('description', '').strip(),
+                    request.POST.get('status', 'open'),
+                )
+                conn.commit()
+                success = 'Invoice updated.'
+            elif action == 'payment' and inv_id:
+                record_ar_payment(
+                    conn, inv_id,
+                    request.POST.get('payment_date', ''),
+                    request.POST.get('amount', 0),
+                    request.POST.get('method', 'Check'),
+                    request.POST.get('reference', '').strip(),
+                    request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Payment recorded.'
+            elif action == 'status' and inv_id:
+                set_ar_status(conn, inv_id, request.POST.get('new_status', 'open'))
+                conn.commit()
+                success = 'Status updated.'
+        except Exception as exc:
+            error = str(exc)
+    invoice   = get_ar_invoice(conn, inv_id) if inv_id else None
+    payments  = list_ar_payments(conn, inv_id) if inv_id else []
+    customers = load_customers(conn)
+    conn.close()
+    if inv_id and not invoice:
+        return redirect('/ar/')
+    ctx = _acct_ctx(request,
+        invoice=invoice, payments=payments, customers=customers,
+        statuses=INVOICE_STATUSES, payment_methods=PAYMENT_METHODS,
+        inv_id=inv_id, success=success, error=error,
+    )
+    return render(request, 'ar_invoice_detail.html', ctx)
+
+
+# ── General Ledger ───────────────────────────────────────────────────────────
+
+def gl_dashboard(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    ap_dash = get_ap_dashboard(conn)
+    ar_dash = get_ar_dashboard(conn)
+    acct_count = len(list_accounts(conn, active_only=True))
+    recent_journals = list_journals(conn)[:8]
+    conn.close()
+    ctx = _acct_ctx(request,
+        ap=ap_dash, ar=ar_dash,
+        acct_count=acct_count,
+        recent_journals=recent_journals,
+    )
+    return render(request, 'gl_dashboard.html', ctx)
+
+
+def gl_accounts(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    success = error = ''
+    if request.method == 'POST':
+        block = _acct_access(request, write=True)
+        if block:
+            conn.close()
+            return block
+        action = request.POST.get('action', '')
+        try:
+            if action == 'create':
+                create_account(
+                    conn,
+                    request.POST.get('account_number', '').strip(),
+                    request.POST.get('account_name', '').strip(),
+                    request.POST.get('account_type', 'Expense'),
+                    request.POST.get('account_sub', '').strip(),
+                    request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Account created.'
+            elif action == 'update':
+                update_account(
+                    conn,
+                    int(request.POST.get('acct_id')),
+                    request.POST.get('account_number', '').strip(),
+                    request.POST.get('account_name', '').strip(),
+                    request.POST.get('account_type', 'Expense'),
+                    request.POST.get('account_sub', '').strip(),
+                    bool(request.POST.get('is_active')),
+                    request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Account updated.'
+        except Exception as exc:
+            error = str(exc)
+    acct_type  = request.GET.get('type', '')
+    active_only = request.GET.get('active', '1') != '0'
+    accounts = list_accounts(conn, acct_type=acct_type or None, active_only=active_only)
+    accts_with_bal = []
+    for a in accounts:
+        d = dict(a)
+        d['balance'] = account_balance(conn, a['id'], a['account_type'])
+        accts_with_bal.append(d)
+    conn.close()
+    ctx = _acct_ctx(request,
+        accounts=accts_with_bal, account_types=ACCOUNT_TYPES,
+        acct_type=acct_type, active_only=active_only,
+        success=success, error=error,
+    )
+    return render(request, 'gl_accounts.html', ctx)
+
+
+def gl_journals(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    posted_param = request.GET.get('posted', '')
+    date_from    = request.GET.get('date_from', '')
+    date_to      = request.GET.get('date_to', '')
+    posted = None
+    if posted_param == '1':
+        posted = True
+    elif posted_param == '0':
+        posted = False
+    journals = list_journals(conn,
+        posted=posted,
+        date_from=date_from or None,
+        date_to=date_to or None,
+    )
+    conn.close()
+    ctx = _acct_ctx(request,
+        journals=journals,
+        posted_param=posted_param,
+        date_from=date_from, date_to=date_to,
+    )
+    return render(request, 'gl_journals.html', ctx)
+
+
+def gl_journal_detail(request, journal_id=None):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    success = error = ''
+    if request.method == 'POST':
+        action = request.POST.get('action', '')
+        try:
+            if action == 'create':
+                block = _acct_access(request, write=True)
+                if block:
+                    conn.close()
+                    return block
+                # Parse lines from POST: account_id[], debit[], credit[], memo[]
+                acct_ids = request.POST.getlist('account_id')
+                debits   = request.POST.getlist('debit')
+                credits  = request.POST.getlist('credit')
+                memos    = request.POST.getlist('memo')
+                lines = [
+                    (int(acct_ids[i]), float(debits[i] or 0),
+                     float(credits[i] or 0), memos[i] if i < len(memos) else '')
+                    for i in range(len(acct_ids))
+                    if acct_ids[i]
+                ]
+                new_id = create_journal(
+                    conn,
+                    request.POST.get('journal_date', ''),
+                    request.POST.get('reference', '').strip(),
+                    request.POST.get('description', '').strip(),
+                    lines,
+                    request.session.get('user_email', ''),
+                )
+                conn.commit()
+                conn.close()
+                return redirect(f'/gl/journals/{new_id}/')
+            elif action == 'post' and journal_id:
+                block = _acct_access(request, write=True)
+                if block:
+                    conn.close()
+                    return block
+                post_journal(conn, journal_id)
+                conn.commit()
+                success = 'Journal entry posted.'
+            elif action == 'void' and journal_id:
+                block = _acct_access(request, write=True)
+                if block:
+                    conn.close()
+                    return block
+                void_journal(conn, journal_id)
+                conn.commit()
+                conn.close()
+                return redirect('/gl/journals/')
+        except Exception as exc:
+            error = str(exc)
+    journal  = get_journal(conn, journal_id) if journal_id else None
+    lines    = get_journal_lines(conn, journal_id) if journal_id else []
+    accounts = list_accounts(conn, active_only=True)
+    conn.close()
+    if journal_id and not journal:
+        return redirect('/gl/journals/')
+    ctx = _acct_ctx(request,
+        journal=journal, lines=lines, accounts=accounts,
+        journal_id=journal_id, success=success, error=error,
+    )
+    return render(request, 'gl_journal_detail.html', ctx)
+
+
+def gl_trial_balance(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    as_of = request.GET.get('as_of', '')
+    result = trial_balance(conn, as_of=as_of or None)
+    conn.close()
+    ctx = _acct_ctx(request, as_of=as_of, **result)
+    return render(request, 'gl_trial_balance.html', ctx)
+
+
+def gl_income_statement(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    import datetime as _dt
+    today = _dt.date.today()
+    date_from = request.GET.get('date_from', f'{today.year}-01-01')
+    date_to   = request.GET.get('date_to', today.isoformat())
+    conn = get_db_connection()
+    result = income_statement(conn, date_from, date_to)
+    conn.close()
+    ctx = _acct_ctx(request, date_from=date_from, date_to=date_to, **result)
+    return render(request, 'gl_income_statement.html', ctx)
+
+
+def gl_balance_sheet(request):
+    block = _acct_access(request)
+    if block:
+        return block
+    as_of = request.GET.get('as_of', '')
+    conn = get_db_connection()
+    result = balance_sheet(conn, as_of=as_of or None)
+    conn.close()
+    ctx = _acct_ctx(request, as_of=as_of, **result)
+    return render(request, 'gl_balance_sheet.html', ctx)

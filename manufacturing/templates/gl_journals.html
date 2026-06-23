@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block page_title %}Journal Entries{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/" class="btn">G/L Dashboard</a>
+<a href="/gl/accounts/" class="btn">Chart of Accounts</a>
+{% if can_edit %}<a href="/gl/journals/new/" class="btn">New Entry</a>{% endif %}
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select,.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; }
+.list-table th,.list-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.badge-posted  { background:#d1e7dd; color:#0a3622; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
+.badge-unposted{ background:#fff3cd; color:#856404; padding:2px 7px; border-radius:4px; font-size:11px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Journal Entries</h2>
+
+    <form method="get" class="filter-bar">
+        <label>Posted:</label>
+        <select name="posted" onchange="this.form.submit()">
+            <option value="">All</option>
+            <option value="1" {% if posted_param == '1' %}selected{% endif %}>Posted Only</option>
+            <option value="0" {% if posted_param == '0' %}selected{% endif %}>Unposted Only</option>
+        </select>
+        <label>From:</label>
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <label>To:</label>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <button type="submit" class="btn-sm">Filter</button>
+        {% if posted_param or date_from or date_to %}
+        <a href="/gl/journals/" style="color:#aad;font-size:13px;">Clear</a>
+        {% endif %}
+    </form>
+
+    {% if journals %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Date</th><th>Reference</th><th>Description</th>
+            <th>Lines</th><th class="num">Total Dr</th>
+            <th>Posted</th><th>Created By</th>
+        </tr></thead>
+        <tbody>
+        {% for j in journals %}
+        <tr onclick="location='/gl/journals/{{ j.id }}/'">
+            <td>{{ j.journal_date }}</td>
+            <td>{{ j.reference|default:"—" }}</td>
+            <td>{{ j.description|default:"—" }}</td>
+            <td>{{ j.line_count }}</td>
+            <td class="num">${{ j.total_debit|floatformat:2 }}</td>
+            <td><span class="{% if j.posted %}badge-posted{% else %}badge-unposted{% endif %}">
+                {% if j.posted %}Posted{% else %}Unposted{% endif %}</span></td>
+            <td>{{ j.created_by|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#cce;font-size:14px;">No journal entries found.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
