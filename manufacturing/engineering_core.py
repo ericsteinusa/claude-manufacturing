@@ -337,6 +337,94 @@ def set_ecr_status(conn, ecr_id, status):
 # Engineering Reports
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Standards & Compliance
+# ---------------------------------------------------------------------------
+
+ENG_STANDARD_STATUSES = ('Active', 'Under Review', 'Superseded', 'Withdrawn')
+ENG_STANDARD_CATEGORIES = (
+    'ISO', 'ANSI', 'ASME', 'IEEE', 'OSHA', 'Internal', 'Industry', 'Regulatory', 'Other',
+)
+
+
+def list_eng_standards(conn, status=None, category=None, search=None) -> list:
+    sql = (
+        "SELECT id, standard_number, title, category, version, "
+        "status, review_date, created_by "
+        "FROM eng_standard WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if category:
+        sql += " AND category = %s"
+        params.append(category)
+    if search:
+        sql += " AND (standard_number ILIKE %s OR title ILIKE %s OR description ILIKE %s)"
+        params.extend([f"%{search}%"] * 3)
+    sql += " ORDER BY category, standard_number"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_eng_standard(conn, spec_id: int) -> dict | None:
+    row = conn.execute(
+        "SELECT * FROM eng_standard WHERE id = %s", (spec_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_eng_standard(conn, standard_number: str, title: str,
+                        category: str, version: str, status: str,
+                        review_date: str, description: str, notes: str,
+                        created_by: str) -> int:
+    if not title.strip():
+        raise ValueError("Title is required.")
+    row = conn.execute(
+        "INSERT INTO eng_standard "
+        "(standard_number, title, category, version, status, "
+        "review_date, description, notes, created_by, created_date) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,CURRENT_DATE) RETURNING id",
+        (standard_number, title.strip(), category, version,
+         status or 'Active', review_date or None,
+         description, notes, created_by),
+    ).fetchone()
+    return row['id']
+
+
+def update_eng_standard(conn, spec_id: int, **fields) -> None:
+    allowed = {
+        'standard_number', 'title', 'category', 'version',
+        'status', 'review_date', 'description', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE eng_standard SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [spec_id],
+    )
+
+
+def init_eng_standard_table(conn) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS eng_standard (
+            id              SERIAL PRIMARY KEY,
+            standard_number TEXT DEFAULT '',
+            title           TEXT NOT NULL,
+            category        TEXT DEFAULT '',
+            version         TEXT DEFAULT '',
+            status          TEXT DEFAULT 'Active',
+            review_date     TEXT,
+            description     TEXT DEFAULT '',
+            notes           TEXT DEFAULT '',
+            created_by      TEXT DEFAULT '',
+            created_date    TEXT DEFAULT ''
+        )
+    """)
+
+
 def eng_reports(conn):
     proj_by_status = conn.execute("""
         SELECT status, COUNT(*) AS cnt FROM eng_project GROUP BY status ORDER BY status

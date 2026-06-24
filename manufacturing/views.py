@@ -304,6 +304,53 @@ WEB_LEAF_URLS = {
     ('engineering', 'test_val'): '/eng/projects/?status=in_progress',
     ('engineering', 'eng_reports'): '/eng/reports/',
     ('engineering', 'standards'): '/eng/reports/',
+    # Engineering Projects (engineer menu)
+    ('engineering', 'act_proj'):   '/eng/projects/',
+    ('engineering', 'new_proj'):   '/eng/projects/',
+    ('engineering', 'proj_time'):  '/eng/projects/',
+    ('engineering', 'proj_rpts'):  '/eng/projects/',
+    # Design Documents / ECRs
+    ('engineering', 'doc_lib'):    '/eng/ecrs/',
+    ('engineering', 'new_doc'):    '/eng/ecrs/',
+    ('engineering', 'doc_review'): '/eng/ecrs/',
+    ('engineering', 'archive'):    '/eng/ecrs/',
+    ('engineering', 'new_co'):     '/eng/ecrs/',
+    ('engineering', 'appr_chg'):   '/eng/ecrs/',
+    ('engineering', 'chg_hist'):   '/eng/ecrs/',
+    # Test & Validation → tasks
+    ('engineering', 'test_plans'): '/eng/tasks/',
+    ('engineering', 'test_res'):   '/eng/tasks/',
+    ('engineering', 'val_rpts'):   '/eng/tasks/',
+    ('engineering', 'issue_track'): '/eng/tasks/',
+    # Engineering Reports
+    ('engineering', 'proj_stat'):  '/eng/reports/',
+    ('engineering', 'design_rev'): '/eng/reports/',
+    ('engineering', 'res_rpt'):    '/eng/reports/',
+    ('engineering', 'cust_rpts'):  '/eng/reports/',
+    # Standards & Compliance
+    ('engineering', 'std_lib'):    '/eng/specs/',
+    ('engineering', 'comp_chk'):   '/eng/specs/',
+    ('engineering', 'audit_res'):  '/eng/specs/',
+    ('engineering', 'reg_upd'):    '/eng/specs/',
+    # Manager: Project Approvals
+    ('engineering', 'pend_appr'):  '/eng/projects/',
+    ('engineering', 'appr_proj'):  '/eng/projects/',
+    ('engineering', 'rej_proj'):   '/eng/projects/',
+    ('engineering', 'appr_hist'):  '/eng/projects/',
+    # Manager: Resource Management
+    ('engineering', 'res_alloc'):  '/eng/',
+    ('engineering', 'cap_plan'):   '/eng/',
+    ('engineering', 'res_rpts'):   '/eng/reports/',
+    ('engineering', 'avail_cal'):  '/eng/',
+    # Manager: Budget
+    ('engineering', 'eng_budg'):   '/fin/budgets/',
+    ('engineering', 'budg_act'):   '/fin/budgets/',
+    ('engineering', 'cost_rpts'):  '/fin/budgets/',
+    ('engineering', 'budg_req'):   '/fin/budgets/',
+    # Manager: Engineering Reports
+    ('engineering', 'res_util'):   '/eng/reports/',
+    ('engineering', 'kpi_dash'):   '/eng/reports/',
+    ('engineering', 'month_rpts'): '/eng/reports/',
     ('sales', 'sales_mgr'): '/sales/',
     ('sales', 'sales'): '/sales/orders/',
     ('production', 'prod_mgr'): '/prod/',
@@ -6139,7 +6186,11 @@ from .engineering_core import (  # noqa: E402
     load_products, load_people,  # noqa: F811
     get_eng_dashboard, next_project_number, next_ecr_number,
     list_projects, get_project, create_project, update_project,
-    list_project_tasks, create_task, update_task, list_ecrs, get_ecr, create_ecr, update_ecr, set_ecr_status,
+    list_project_tasks, list_tasks, get_task, create_task, update_task,
+    list_ecrs, get_ecr, create_ecr, update_ecr, set_ecr_status,
+    ENG_STANDARD_STATUSES, ENG_STANDARD_CATEGORIES,
+    list_eng_standards, get_eng_standard,
+    create_eng_standard, update_eng_standard, init_eng_standard_table,
     eng_reports as _eng_reports_data,
 )
 
@@ -6401,6 +6452,174 @@ def eng_reports_view(request):
         data = _eng_reports_data(conn)
     ctx = _eng_ctx(request, **data)
     return render(request, 'eng_reports.html', ctx)
+
+
+def eng_tasks_list(request):
+    block = _eng_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    priority_f = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    with get_db_connection() as conn:
+        if request.method == 'POST' and can_edit:
+            try:
+                create_task(
+                    conn,
+                    project_id=request.POST.get('project_id') or None,
+                    task_name=request.POST.get('task_name', '').strip(),
+                    assigned_to=request.POST.get('assigned_to', '').strip(),
+                    due_date=request.POST.get('due_date', '') or None,
+                    priority=request.POST.get('priority', 'medium'),
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('eng_tasks_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        tasks = list_tasks(
+            conn,
+            status=status_f or None,
+            priority=priority_f or None,
+        )
+        projects = list_projects(conn)
+        people = load_people(conn)
+    return render(request, 'eng_tasks_list.html', _eng_ctx(
+        request, tasks=tasks, projects=projects, people=people,
+        status_filter=status_f, priority_filter=priority_f,
+        TASK_STATUSES=TASK_STATUSES, PRIORITIES=PRIORITIES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def eng_task_detail(request, task_id):
+    block = _eng_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    with get_db_connection() as conn:
+        task = get_task(conn, task_id)
+        if not task:
+            return redirect('eng_tasks_list')
+        task = dict(task)
+        projects = list_projects(conn) if can_edit else []
+        people = load_people(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                update_task(
+                    conn, task_id,
+                    task_name=request.POST.get('task_name', '').strip(),
+                    assigned_to=request.POST.get('assigned_to', '').strip(),
+                    due_date=request.POST.get('due_date', '') or None,
+                    priority=request.POST.get('priority', 'medium'),
+                    status=request.POST.get('status', 'open'),
+                    notes=request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Task updated.'
+                task = dict(get_task(conn, task_id))
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    return render(request, 'eng_task_detail.html', _eng_ctx(
+        request, task=task, projects=projects, people=people, can_edit=can_edit,
+        TASK_STATUSES=TASK_STATUSES, PRIORITIES=PRIORITIES,
+        error=error, success=success,
+    ))
+
+
+def eng_specs_list(request):
+    block = _eng_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    cat_f = request.GET.get('category', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_eng_standard_table(conn)
+        specs = list_eng_standards(
+            conn, status=status_f or None,
+            category=cat_f or None, search=search or None,
+        )
+        if request.method == 'POST' and can_edit:
+            try:
+                create_eng_standard(
+                    conn,
+                    standard_number=request.POST.get('standard_number', ''),
+                    title=request.POST.get('title', ''),
+                    category=request.POST.get('category', ''),
+                    version=request.POST.get('version', ''),
+                    status=request.POST.get('status', 'Active'),
+                    review_date=request.POST.get('review_date', ''),
+                    description=request.POST.get('description', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('eng_specs_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                specs = list_eng_standards(
+                    conn, status=status_f or None,
+                    category=cat_f or None, search=search or None,
+                )
+    finally:
+        conn.close()
+    return render(request, 'eng_specs_list.html', _eng_ctx(
+        request, specs=specs, status_filter=status_f, category_filter=cat_f,
+        search=search, spec_statuses=ENG_STANDARD_STATUSES,
+        spec_categories=ENG_STANDARD_CATEGORIES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def eng_spec_detail(request, spec_id):
+    block = _eng_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        spec = get_eng_standard(conn, spec_id)
+        if not spec:
+            return redirect('eng_specs_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_eng_standard(
+                    conn, spec_id,
+                    standard_number=request.POST.get('standard_number', ''),
+                    title=request.POST.get('title', ''),
+                    category=request.POST.get('category', ''),
+                    version=request.POST.get('version', ''),
+                    status=request.POST.get('status', ''),
+                    review_date=request.POST.get('review_date', ''),
+                    description=request.POST.get('description', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Standard updated.'
+                spec = get_eng_standard(conn, spec_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'eng_spec_detail.html', _eng_ctx(
+        request, spec=spec, can_edit=can_edit,
+        spec_statuses=ENG_STANDARD_STATUSES, spec_categories=ENG_STANDARD_CATEGORIES,
+        error=error, success=success,
+    ))
+
 
 from .sales_core import (  # noqa: E402
     SO_STATUSES, SO_STATUS_ACTION_LABELS,  # noqa: F811

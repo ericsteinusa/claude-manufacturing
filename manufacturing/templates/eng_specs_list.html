@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block page_title %}Standards &amp; Compliance{% endblock %}
+
+{% block toolbar_left %}
+<a href="/eng/" class="btn">Eng Dashboard</a>
+<a href="/eng/projects/" class="btn">Projects</a>
+<a href="/eng/tasks/" class="btn">Tasks</a>
+<a href="/eng/ecrs/" class="btn">ECRs</a>
+<a href="/eng/specs/" class="btn">Standards</a>
+<a href="/eng/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.es-wrap { width:100%; max-width:1200px; }
+.es-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-Active       { background:#d4edda; color:#0a3622; }
+.s-UnderReview  { background:#fff3cd; color:#856404; }
+.s-Superseded   { background:#e2e3e5; color:#383d41; }
+.s-Withdrawn    { background:#f8d7da; color:#721c24; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="es-wrap">
+    <h2>Standards &amp; Compliance</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in spec_statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for c in spec_categories %}
+            <option value="{{ c }}"{% if category_filter == c %} selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search number / title…">
+        <button type="submit">Filter</button>
+        <a href="/eng/specs/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Standard #</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Version</th>
+                    <th>Review Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in specs %}
+            <tr>
+                <td><a href="/eng/specs/{{ s.id }}/">{{ s.standard_number|default:"—" }}</a></td>
+                <td><a href="/eng/specs/{{ s.id }}/">{{ s.title }}</a></td>
+                <td>{{ s.category|default:"—" }}</td>
+                <td>{{ s.version|default:"—" }}</td>
+                <td>{{ s.review_date|default:"—" }}</td>
+                <td><span class="badge s-{{ s.status|cut:' ' }}">{{ s.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No standards found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Standard</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Standard Number</label>
+                    <input type="text" name="standard_number" placeholder="e.g. ISO-9001">
+                </div>
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" required placeholder="Standard title">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category">
+                        {% for c in spec_categories %}
+                        <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Version</label>
+                    <input type="text" name="version" placeholder="e.g. 2015">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in spec_statuses %}
+                        <option value="{{ s }}"{% if s == 'Active' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Review Date</label>
+                    <input type="date" name="review_date">
+                </div>
+                <div class="form-group full-span">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Brief description of this standard"></textarea>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Standard</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
