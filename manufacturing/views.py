@@ -140,6 +140,7 @@ from .personnel_core import (
     load_depts, load_dept_subs,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
+    get_personnel_dashboard,
 )
 from .sales_orders_core import (
     SO_STATUSES, SO_STATUS_COLORS, SO_STATUS_ACTION_LABELS,
@@ -332,7 +333,6 @@ WEB_LEAF_URLS = {
     ('quality_assurance', 'new_comp'): '/qa/ncr/',
     ('quality_assurance', 'open_comp'): '/qa/ncr/?status=Open',
     # Customer Service tickets
-    ('customer_service', 'cs_calls'): '/cs/',
     ('customer_service', 'all_tickets'): '/cs/',
     ('customer_service', 'my_tickets'): '/cs/?my=1',
     ('customer_service', 'hi_pri'): '/cs/escalations/',
@@ -387,6 +387,96 @@ WEB_LEAF_URLS = {
     ('finance', 'fin_forecast'):  '/gl/',
     ('finance', 'fin_analysis'):  '/gl/',
     ('finance', 'fin_reporting'): '/gl/',
+    # Purchasing dashboard
+    ('purchasing', 'prod_entry'):  '/inventory/new/',
+    ('purchasing', 'vend_eval'):   '/suppliers/',
+    ('purchasing', 'vend_perf'):   '/suppliers/',
+    ('purchasing', 'vend_cont'):   '/suppliers/',
+    ('purchasing', 'spend_sum'):   '/purch/',
+    ('purchasing', 'po_rpts'):     '/purch/',
+    ('purchasing', 'budg_act'):    '/purch/',
+    ('purchasing', 'cat_rpts'):    '/purch/',
+    ('purchasing', 'act_cont'):    '/purch/',
+    ('purchasing', 'new_cont'):    '/purch/',
+    ('purchasing', 'cont_renew'):  '/purch/',
+    ('purchasing', 'cont_arch'):   '/purch/',
+    ('purchasing', 'pend_recv'):   '/po/',
+    ('purchasing', 'recv_items'):  '/po/',
+    ('purchasing', 'disc_rpts'):   '/po/',
+    ('purchasing', 'recv_hist'):   '/po/',
+    ('purchasing', 'new_req'):     '/po/new/',
+    ('purchasing', 'pend_appr'):   '/po/approvals/',
+    ('purchasing', 'appr_reqs'):   '/po/',
+    ('purchasing', 'appr_pos'):    '/po/',
+    ('purchasing', 'rej_pos'):     '/po/',
+    ('purchasing', 'appr_hist'):   '/po/',
+    ('purchasing', 'purch_budg'):  '/purch/',
+    ('purchasing', 'budg_rpts'):   '/purch/',
+    ('purchasing', 'spend_analy'): '/purch/',
+    ('purchasing', 'vend_rpt'):    '/purch/',
+    ('purchasing', 'cat_analy'):   '/purch/',
+    ('purchasing', 'month_sum'):   '/purch/',
+    ('purchasing', 'spend_rpt'):   '/purch/',
+    ('purchasing', 'pend_renew'):  '/purch/',
+    ('purchasing', 'cont_rpts'):   '/purch/',
+    # Personnel dashboard
+    ('personnel', 'pers_crm'):     '/people/',
+    ('personnel', 'reg_form'):     '/register/',
+    ('personnel', 'upd_pass'):     '/change-password/',
+    ('personnel', 'dept_entry'):   '/pers/',
+    ('personnel', 'dept_sub'):     '/pers/',
+    ('personnel', 'ben_enroll'):   '/payroll/',
+    ('personnel', 'ben_sum'):      '/payroll/',
+    ('personnel', 'cobra'):        '/payroll/',
+    ('personnel', 'ben_rpts'):     '/payroll/',
+    ('personnel', 'sched_rev'):    '/people/',
+    ('personnel', 'pend_revs'):    '/people/',
+    ('personnel', 'rev_hist'):     '/people/',
+    ('personnel', 'perf_rpts'):    '/people/',
+    ('personnel', 'new_rec'):      '/people/',
+    ('personnel', 'rec_hist'):     '/people/',
+    ('personnel', 'disc_rpts'):    '/people/',
+    ('personnel', 'train_cal'):    '/people/',
+    ('personnel', 'train_recs'):   '/people/',
+    ('personnel', 'course_mgmt'):  '/people/',
+    ('personnel', 'cert_track'):   '/people/',
+    ('personnel', 'hire_chk'):     '/people/',
+    ('personnel', 'onb_stat'):     '/people/',
+    ('personnel', 'doc_coll'):     '/people/',
+    ('personnel', 'onb_rpts'):     '/people/',
+    ('personnel', 'open_pos'):     '/pers/',
+    ('personnel', 'appl_track'):   '/pers/',
+    ('personnel', 'int_sched'):    '/pers/',
+    ('personnel', 'offer_mgmt'):   '/pers/',
+    ('personnel', 'term_proc'):    '/pers/',
+    ('personnel', 'exit_int'):     '/pers/',
+    ('personnel', 'final_pay'):    '/payroll/',
+    ('personnel', 'offboard'):     '/pers/',
+    ('personnel', 'sal_review'):   '/payroll/pay-rates/',
+    ('personnel', 'sal_adj'):      '/payroll/pay-rates/',
+    ('personnel', 'comp_rpts'):    '/payroll/',
+    ('personnel', 'pay_grades'):   '/payroll/pay-rates/',
+    ('personnel', 'hd_rpt'):       '/pers/',
+    ('personnel', 'turn_rpt'):     '/pers/',
+    ('personnel', 'month_sum'):    '/pers/',
+    # Customer Service dashboard
+    ('customer_service', 'cs_calls'): '/cs-dash/',
+    ('customer_service', 'daily_tick'):  '/cs/reports/',
+    ('customer_service', 'week_sum'):    '/cs/reports/',
+    ('customer_service', 'res_analy'):   '/cs/reports/',
+    ('customer_service', 'sla_rpts'):    '/cs/reports/',
+    ('customer_service', 'staff_sched'): '/cs-dash/',
+    ('customer_service', 'perf_met'):    '/cs-dash/',
+    ('customer_service', 'staff_train'): '/cs-dash/',
+    ('customer_service', 'staff_rpts'):  '/cs-dash/',
+    ('customer_service', 'csat_res'):    '/cs/reports/',
+    ('customer_service', 'nps_rpts'):    '/cs/reports/',
+    ('customer_service', 'sat_trends'):  '/cs/reports/',
+    ('customer_service', 'impr_plans'):  '/cs/plans/',
+    ('customer_service', 'act_esc'):     '/cs/escalations/',
+    ('customer_service', 'esc_hist'):    '/cs/escalations/',
+    ('customer_service', 'esc_rpts'):    '/cs/escalations/',
+    ('customer_service', 'res_track'):   '/cs/escalations/',
 }
 
 
@@ -6136,6 +6226,7 @@ def sales_targets(request):
     return render(request, 'sales_targets.html', ctx)
 
 from .production_core import get_production_dashboard
+from .purchasing_core import get_purchasing_dashboard
 
 
 def _prod_access(request, write=False):
@@ -6171,4 +6262,58 @@ def prod_dashboard(request):
         data = get_production_dashboard(conn)
     ctx = _prod_ctx(request, **data)
     return render(request, 'prod_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Purchasing dashboard
+# ---------------------------------------------------------------------------
+
+def _purch_ctx(request, **extra):
+    role = request.session.get('user_role', '')
+    return {
+        'email': request.session.get('user_email', ''),
+        'user_role': role,
+        'full_access': request.session.get('user_full_access', False),
+        'can_edit': role not in READ_ONLY_ROLES,
+        **extra,
+    }
+
+
+def purch_dashboard(request):
+    err = _po_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_purchasing_dashboard(conn)
+    ctx = _purch_ctx(request, **data)
+    return render(request, 'purchasing_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Personnel dashboard
+# ---------------------------------------------------------------------------
+
+def pers_dashboard(request):
+    err = _people_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_personnel_dashboard(conn)
+    ctx = _people_context(request, **data)
+    return render(request, 'personnel_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Customer Service dashboard
+# ---------------------------------------------------------------------------
+
+def cs_dashboard_view(request):
+    err = _cs_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        stats = get_summary_stats(conn)
+        recent_tickets = list_tickets(conn)[:8]
+    ctx = _cs_context(request, stats=stats, recent_tickets=recent_tickets)
+    return render(request, 'cs_dashboard.html', ctx)
 

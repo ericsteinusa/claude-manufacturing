@@ -213,3 +213,49 @@ def set_time_off_status(conn, req_id, status):
         "UPDATE time_off_request SET status = %s WHERE id = %s",
         (status, req_id)
     )
+
+
+def get_personnel_dashboard(conn) -> dict:
+    """Return dict with keys: employees, by_dept, time_off, recent_employees.
+
+    employees:        {total}
+    by_dept:          list of {dept_name, count} top-6 by headcount
+    time_off:         {pending, approved}
+    recent_employees: list of last 8 people rows
+                      (id, first_name, last_name, email, dept_name, job_title)
+    """
+    emp_row = conn.execute(
+        "SELECT COUNT(*) AS total FROM people"
+    ).fetchone()
+
+    dept_rows = conn.execute(
+        "SELECT d.dept_name, COUNT(p.id) AS count "
+        "FROM dept d "
+        "LEFT JOIN people p ON p.dept_id = d.dept_id "
+        "GROUP BY d.dept_id, d.dept_name "
+        "ORDER BY count DESC LIMIT 6"
+    ).fetchall()
+
+    to_row = conn.execute(
+        "SELECT "
+        "COUNT(*) FILTER (WHERE status = 'pending') AS pending, "
+        "COUNT(*) FILTER (WHERE status = 'approved') AS approved "
+        "FROM time_off_request"
+    ).fetchone()
+
+    recent_rows = conn.execute(
+        "SELECT p.id, p.first_name, p.last_name, p.email, "
+        "COALESCE(d.dept_name, '') AS dept_name, "
+        "COALESCE(pos.job_title, '') AS job_title "
+        "FROM people p "
+        "LEFT JOIN dept d ON d.dept_id = p.dept_id "
+        "LEFT JOIN position pos ON pos.people_id = p.id "
+        "ORDER BY p.id DESC LIMIT 8"
+    ).fetchall()
+
+    return {
+        'employees': dict(emp_row) if emp_row else {},
+        'by_dept': [dict(r) for r in dept_rows],
+        'time_off': dict(to_row) if to_row else {},
+        'recent_employees': [dict(r) for r in recent_rows],
+    }
