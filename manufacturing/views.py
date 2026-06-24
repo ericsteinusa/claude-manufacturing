@@ -181,7 +181,14 @@ from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
 from .finance_core import get_finance_dashboard
 from .it_core import get_it_dashboard
-from .legal_core import get_legal_dashboard
+from .legal_core import (
+    get_legal_dashboard,
+    list_contracts, get_contract, create_contract, update_contract,
+    list_compliance, get_compliance_item, create_compliance, update_compliance,
+    list_litigation, get_litigation_case, create_litigation, update_litigation,
+    CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
+    LITIGATION_TYPES, LITIGATION_STATUSES,
+)
 from .marketing_core import get_marketing_dashboard
 
 log = get_logger(__name__)
@@ -500,14 +507,14 @@ WEB_LEAF_URLS = {
     ('marketing', 'budg_act'):    '/mkt/',
     ('marketing', 'budg_req'):    '/mkt/',
     # Legal / Risk Management dashboard
-    ('legal', 'contracts'):          '/legal/',
-    ('legal', 'compliance'):         '/legal/',
-    ('legal', 'litigation'):         '/legal/',
+    ('legal', 'contracts'):          '/legal/contracts/',
+    ('legal', 'compliance'):         '/legal/compliance/',
+    ('legal', 'litigation'):         '/legal/litigation/',
     ('legal', 'ip_mgmt'):            '/legal/',
     ('legal', 'emp_law'):            '/legal/',
-    ('legal', 'contracts_mgmt'):     '/legal/',
-    ('legal', 'litigation_mgmt'):    '/legal/',
-    ('legal', 'compliance_mgmt'):    '/legal/',
+    ('legal', 'contracts_mgmt'):     '/legal/contracts/',
+    ('legal', 'litigation_mgmt'):    '/legal/litigation/',
+    ('legal', 'compliance_mgmt'):    '/legal/compliance/',
     ('legal', 'corp_gov'):           '/legal/',
     ('risk_management', 'risk_assess'):      '/legal/',
     ('risk_management', 'risk_register'):    '/legal/',
@@ -6496,6 +6503,243 @@ def legal_dashboard(request):
         data = get_legal_dashboard(conn)
     ctx = _legal_ctx(request, **data)
     return render(request, 'legal_dashboard.html', ctx)
+
+
+def legal_contract_list(request):
+    err = _legal_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('contract_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        contracts = list_contracts(conn, status=status_f or None,
+                                   contract_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_contract(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    counterparty=request.POST.get('counterparty', ''),
+                    contract_type=request.POST.get('contract_type', ''),
+                    value=float(request.POST.get('value', 0) or 0),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    owner=request.POST.get('owner', ''),
+                    status=request.POST.get('status', 'Draft'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('legal_contract_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                contracts = list_contracts(conn, status=status_f or None,
+                                           contract_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'legal_contract_list.html', _legal_ctx(
+        request, contracts=contracts, status_filter=status_f, type_filter=type_f,
+        search=search, contract_statuses=CONTRACT_STATUSES, contract_types=CONTRACT_TYPES,
+        error=error, success=success,
+    ))
+
+
+def legal_contract_detail(request, contract_id):
+    err = _legal_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    contract = None
+    try:
+        contract = get_contract(conn, contract_id)
+        if not contract:
+            return redirect('legal_contract_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_contract(
+                    conn, contract_id,
+                    title=request.POST.get('title', ''),
+                    counterparty=request.POST.get('counterparty', ''),
+                    contract_type=request.POST.get('contract_type', ''),
+                    value=float(request.POST.get('value', 0) or 0),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    owner=request.POST.get('owner', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Contract updated.'
+                contract = get_contract(conn, contract_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'legal_contract_detail.html', _legal_ctx(
+        request, contract=contract, can_edit=can_edit,
+        contract_statuses=CONTRACT_STATUSES, contract_types=CONTRACT_TYPES,
+        error=error, success=success,
+    ))
+
+
+def legal_compliance_list(request):
+    err = _legal_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        items = list_compliance(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_compliance(
+                    conn,
+                    requirement=request.POST.get('requirement', ''),
+                    regulation=request.POST.get('regulation', ''),
+                    owner=request.POST.get('owner', ''),
+                    due_date=request.POST.get('due_date', ''),
+                    status=request.POST.get('status', 'Pending'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('legal_compliance_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                items = list_compliance(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'legal_compliance_list.html', _legal_ctx(
+        request, items=items, status_filter=status_f, search=search,
+        compliance_statuses=COMPLIANCE_STATUSES, error=error, success=success,
+    ))
+
+
+def legal_compliance_detail(request, item_id):
+    err = _legal_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    item = None
+    try:
+        item = get_compliance_item(conn, item_id)
+        if not item:
+            return redirect('legal_compliance_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_compliance(
+                    conn, item_id,
+                    requirement=request.POST.get('requirement', ''),
+                    regulation=request.POST.get('regulation', ''),
+                    owner=request.POST.get('owner', ''),
+                    due_date=request.POST.get('due_date', ''),
+                    completed_date=request.POST.get('completed_date', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Item updated.'
+                item = get_compliance_item(conn, item_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'legal_compliance_detail.html', _legal_ctx(
+        request, item=item, can_edit=can_edit,
+        compliance_statuses=COMPLIANCE_STATUSES, error=error, success=success,
+    ))
+
+
+def legal_litigation_list(request):
+    err = _legal_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('case_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        cases = list_litigation(conn, status=status_f or None,
+                                case_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_litigation(
+                    conn,
+                    case_name=request.POST.get('case_name', ''),
+                    opposing_party=request.POST.get('opposing_party', ''),
+                    court=request.POST.get('court', ''),
+                    case_type=request.POST.get('case_type', ''),
+                    filed_date=request.POST.get('filed_date', ''),
+                    status=request.POST.get('status', 'Open'),
+                    outcome=request.POST.get('outcome', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('legal_litigation_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                cases = list_litigation(conn, status=status_f or None,
+                                        case_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'legal_litigation_list.html', _legal_ctx(
+        request, cases=cases, status_filter=status_f, type_filter=type_f,
+        search=search, litigation_statuses=LITIGATION_STATUSES,
+        litigation_types=LITIGATION_TYPES, error=error, success=success,
+    ))
+
+
+def legal_litigation_detail(request, case_id):
+    err = _legal_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    case = None
+    try:
+        case = get_litigation_case(conn, case_id)
+        if not case:
+            return redirect('legal_litigation_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_litigation(
+                    conn, case_id,
+                    case_name=request.POST.get('case_name', ''),
+                    opposing_party=request.POST.get('opposing_party', ''),
+                    court=request.POST.get('court', ''),
+                    case_type=request.POST.get('case_type', ''),
+                    filed_date=request.POST.get('filed_date', ''),
+                    status=request.POST.get('status', ''),
+                    outcome=request.POST.get('outcome', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Case updated.'
+                case = get_litigation_case(conn, case_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'legal_litigation_detail.html', _legal_ctx(
+        request, case=case, can_edit=can_edit,
+        litigation_statuses=LITIGATION_STATUSES, litigation_types=LITIGATION_TYPES,
+        error=error, success=success,
+    ))
 
 
 # ---------------------------------------------------------------------------
