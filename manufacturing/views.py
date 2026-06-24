@@ -139,9 +139,15 @@ from .personnel_core import (
     TIME_OFF_STATUSES, TIME_OFF_TYPES,
     list_people, get_person, get_person_by_email,
     create_person, update_person,
-    load_depts, load_dept_subs,
+    load_depts, load_dept_subs, list_dept_subs_with_dept,
+    get_dept, create_dept, update_dept,
+    get_dept_sub, create_dept_sub, update_dept_sub,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
+    REVIEW_STATUSES, REVIEW_TYPES, REVIEW_RATINGS,
+    list_reviews, get_review, create_review, update_review, init_review_table,
+    TRAINING_STATUSES, TRAINING_TYPES,
+    list_trainings, get_training, create_training, update_training, init_training_table,
     get_personnel_dashboard,
 )
 from .sales_orders_core import (
@@ -537,27 +543,27 @@ WEB_LEAF_URLS = {
     ('personnel', 'pers_crm'):     '/people/',
     ('personnel', 'reg_form'):     '/register/',
     ('personnel', 'upd_pass'):     '/change-password/',
-    ('personnel', 'dept_entry'):   '/pers/',
-    ('personnel', 'dept_sub'):     '/pers/',
+    ('personnel', 'dept_entry'):   '/pers/depts/',
+    ('personnel', 'dept_sub'):     '/pers/depts/',
     ('personnel', 'ben_enroll'):   '/payroll/',
     ('personnel', 'ben_sum'):      '/payroll/',
     ('personnel', 'cobra'):        '/payroll/',
     ('personnel', 'ben_rpts'):     '/payroll/',
-    ('personnel', 'sched_rev'):    '/people/',
-    ('personnel', 'pend_revs'):    '/people/',
-    ('personnel', 'rev_hist'):     '/people/',
-    ('personnel', 'perf_rpts'):    '/people/',
-    ('personnel', 'new_rec'):      '/people/',
-    ('personnel', 'rec_hist'):     '/people/',
-    ('personnel', 'disc_rpts'):    '/people/',
-    ('personnel', 'train_cal'):    '/people/',
-    ('personnel', 'train_recs'):   '/people/',
-    ('personnel', 'course_mgmt'):  '/people/',
-    ('personnel', 'cert_track'):   '/people/',
-    ('personnel', 'hire_chk'):     '/people/',
-    ('personnel', 'onb_stat'):     '/people/',
-    ('personnel', 'doc_coll'):     '/people/',
-    ('personnel', 'onb_rpts'):     '/people/',
+    ('personnel', 'sched_rev'):    '/pers/reviews/',
+    ('personnel', 'pend_revs'):    '/pers/reviews/?status=Scheduled',
+    ('personnel', 'rev_hist'):     '/pers/reviews/?status=Completed',
+    ('personnel', 'perf_rpts'):    '/pers/reviews/',
+    ('personnel', 'new_rec'):      '/pers/reviews/',
+    ('personnel', 'rec_hist'):     '/pers/reviews/',
+    ('personnel', 'disc_rpts'):    '/pers/reviews/',
+    ('personnel', 'train_cal'):    '/pers/training/',
+    ('personnel', 'train_recs'):   '/pers/training/',
+    ('personnel', 'course_mgmt'):  '/pers/training/',
+    ('personnel', 'cert_track'):   '/pers/training/?type=Certification',
+    ('personnel', 'hire_chk'):     '/pers/training/?type=Compliance',
+    ('personnel', 'onb_stat'):     '/pers/training/',
+    ('personnel', 'doc_coll'):     '/pers/training/',
+    ('personnel', 'onb_rpts'):     '/pers/training/',
     ('personnel', 'open_pos'):     '/pers/',
     ('personnel', 'appl_track'):   '/pers/',
     ('personnel', 'int_sched'):    '/pers/',
@@ -7219,6 +7225,219 @@ def pers_dashboard(request):
         data = get_personnel_dashboard(conn)
     ctx = _people_context(request, **data)
     return render(request, 'personnel_dashboard.html', ctx)
+
+
+def pers_depts(request):
+    err = _people_access(request)
+    if err:
+        return err
+    can_edit = _is_hr(request)
+    error = success = None
+    conn = get_db_connection()
+    try:
+        depts = load_depts(conn)
+        dept_subs = list_dept_subs_with_dept(conn)
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+            try:
+                if action == 'new_dept':
+                    create_dept(conn, request.POST.get('dept_name', ''))
+                    conn.commit()
+                    return redirect('pers_depts')
+                elif action == 'edit_dept':
+                    dept_id = int(request.POST.get('dept_id', 0))
+                    update_dept(conn, dept_id, request.POST.get('dept_name', ''))
+                    conn.commit()
+                    return redirect('pers_depts')
+                elif action == 'new_sub':
+                    dept_id = int(request.POST.get('dept_id', 0))
+                    create_dept_sub(conn, dept_id, request.POST.get('dept_sub_name', ''))
+                    conn.commit()
+                    return redirect('pers_depts')
+                elif action == 'edit_sub':
+                    sub_id = int(request.POST.get('dept_sub_id', 0))
+                    dept_id = int(request.POST.get('dept_id', 0))
+                    update_dept_sub(conn, sub_id, dept_id, request.POST.get('dept_sub_name', ''))
+                    conn.commit()
+                    return redirect('pers_depts')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                depts = load_depts(conn)
+                dept_subs = list_dept_subs_with_dept(conn)
+    finally:
+        conn.close()
+    return render(request, 'pers_depts.html', _people_context(
+        request, depts=depts, dept_subs=dept_subs,
+        can_edit=can_edit, error=error, success=success,
+    ))
+
+
+def pers_reviews_list(request):
+    err = _people_access(request)
+    if err:
+        return err
+    can_edit = _is_hr(request)
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_review_table(conn)
+        conn.commit()
+        reviews = list_reviews(conn, status=status_f or None, search=search or None)
+        people = list_people(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                rid = create_review(
+                    conn,
+                    people_id=int(request.POST.get('people_id', 0)),
+                    review_type=request.POST.get('review_type', 'Annual'),
+                    review_date=request.POST.get('review_date', ''),
+                    reviewer=request.POST.get('reviewer', '').strip(),
+                    rating=request.POST.get('rating', ''),
+                    status=request.POST.get('status', 'Scheduled'),
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('pers_review_detail', review_id=rid)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                reviews = list_reviews(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'pers_reviews_list.html', _people_context(
+        request, reviews=reviews, people=people,
+        status_filter=status_f, search=search,
+        REVIEW_STATUSES=REVIEW_STATUSES, REVIEW_TYPES=REVIEW_TYPES, REVIEW_RATINGS=REVIEW_RATINGS,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def pers_review_detail(request, review_id):
+    err = _people_access(request)
+    if err:
+        return err
+    can_edit = _is_hr(request)
+    error = success = None
+    conn = get_db_connection()
+    try:
+        review = get_review(conn, review_id)
+        if not review:
+            return redirect('pers_reviews_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_review(
+                    conn, review_id,
+                    review_type=request.POST.get('review_type', ''),
+                    review_date=request.POST.get('review_date', ''),
+                    reviewer=request.POST.get('reviewer', '').strip(),
+                    rating=request.POST.get('rating', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Review updated.'
+                review = get_review(conn, review_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'pers_review_detail.html', _people_context(
+        request, review=review, can_edit=can_edit,
+        REVIEW_STATUSES=REVIEW_STATUSES, REVIEW_TYPES=REVIEW_TYPES, REVIEW_RATINGS=REVIEW_RATINGS,
+        error=error, success=success,
+    ))
+
+
+def pers_training_list(request):
+    err = _people_access(request)
+    if err:
+        return err
+    can_edit = _is_hr(request)
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_training_table(conn)
+        conn.commit()
+        trainings = list_trainings(
+            conn, status=status_f or None,
+            training_type=type_f or None, search=search or None,
+        )
+        people = list_people(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                tid = create_training(
+                    conn,
+                    people_id=int(request.POST.get('people_id', 0)),
+                    course_name=request.POST.get('course_name', ''),
+                    training_type=request.POST.get('training_type', 'Other'),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    status=request.POST.get('status', 'Scheduled'),
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('pers_training_detail', training_id=tid)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                trainings = list_trainings(
+                    conn, status=status_f or None,
+                    training_type=type_f or None, search=search or None,
+                )
+    finally:
+        conn.close()
+    return render(request, 'pers_training_list.html', _people_context(
+        request, trainings=trainings, people=people,
+        status_filter=status_f, type_filter=type_f, search=search,
+        TRAINING_STATUSES=TRAINING_STATUSES, TRAINING_TYPES=TRAINING_TYPES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def pers_training_detail(request, training_id):
+    err = _people_access(request)
+    if err:
+        return err
+    can_edit = _is_hr(request)
+    error = success = None
+    conn = get_db_connection()
+    try:
+        training = get_training(conn, training_id)
+        if not training:
+            return redirect('pers_training_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_training(
+                    conn, training_id,
+                    course_name=request.POST.get('course_name', ''),
+                    training_type=request.POST.get('training_type', ''),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', '').strip(),
+                )
+                conn.commit()
+                success = 'Training record updated.'
+                training = get_training(conn, training_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'pers_training_detail.html', _people_context(
+        request, training=training, can_edit=can_edit,
+        TRAINING_STATUSES=TRAINING_STATUSES, TRAINING_TYPES=TRAINING_TYPES,
+        error=error, success=success,
+    ))
 
 
 # ---------------------------------------------------------------------------
