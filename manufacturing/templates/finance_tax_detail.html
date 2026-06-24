@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block page_title %}Tax Filing — {{ filing.tax_type }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/fin/" class="btn">Finance Dashboard</a>
+<a href="/fin/budgets/" class="btn">Budgets</a>
+<a href="/fin/audits/" class="btn">Audits</a>
+<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
+<a href="/fin/tax/" class="btn">Tax Filings</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.fn-wrap { width:100%; max-width:1100px; }
+.fn-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending { background:#fff3cd; color:#856404; }
+.s-filed   { background:#d1ecf1; color:#0c5460; }
+.s-paid    { background:#d4edda; color:#0a3622; }
+.s-overdue { background:#f8d7da; color:#721c24; }
+.s-amended { background:#e2e3e5; color:#383d41; }
+.kpi-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:24px; font-weight:bold; color:rgb(0,40,160); }
+.kpi.red .val { color:#c33; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="fn-wrap">
+    <h2>{{ filing.tax_type }}{% if filing.jurisdiction %} — {{ filing.jurisdiction }}{% endif %}
+        <span class="badge s-{{ filing.status|lower }}" style="font-size:14px;">{{ filing.status }}</span>
+    </h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Amount Due</div>
+            <div class="val">${{ filing.amount_due|floatformat:2 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Amount Paid</div>
+            <div class="val">${{ filing.amount_paid|floatformat:2 }}</div>
+        </div>
+        <div class="kpi{% if filing.status == 'Overdue' %} red{% endif %}">
+            <div class="lbl">Due Date</div>
+            <div class="val" style="font-size:18px;">{{ filing.due_date|default:"—" }}</div>
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Filing</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tax Type *</label>
+                    <select name="tax_type" required>
+                        {% for t in tax_types %}
+                        <option value="{{ t }}"{% if filing.tax_type == t %} selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Jurisdiction</label>
+                    <input type="text" name="jurisdiction" value="{{ filing.jurisdiction|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Period</label>
+                    <input type="text" name="period" value="{{ filing.period|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Amount Due ($)</label>
+                    <input type="number" name="amount_due" value="{{ filing.amount_due }}" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Amount Paid ($)</label>
+                    <input type="number" name="amount_paid" value="{{ filing.amount_paid }}" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in tax_statuses %}
+                        <option value="{{ s }}"{% if filing.status == s %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" value="{{ filing.due_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Filed Date</label>
+                    <input type="date" name="filed_date" value="{{ filing.filed_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Reference #</label>
+                    <input type="text" name="reference" value="{{ filing.reference|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ filing.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <table class="list-table">
+            <tr><th>Period</th><td>{{ filing.period|default:"—" }}</td></tr>
+            <tr><th>Filed Date</th><td>{{ filing.filed_date|default:"—" }}</td></tr>
+            <tr><th>Reference</th><td>{{ filing.reference|default:"—" }}</td></tr>
+            <tr><th>Notes</th><td>{{ filing.notes|default:"—" }}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

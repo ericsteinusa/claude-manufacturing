@@ -179,7 +179,19 @@ from .accounts import (
 
 from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
-from .finance_core import get_finance_dashboard
+from .finance_core import (
+    get_finance_dashboard,
+    BUDGET_STATUSES, AUDIT_TYPES, AUDIT_STATUSES, FINDING_SEVERITIES,
+    TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
+    list_budgets, get_budget, get_budget_lines,
+    create_budget, update_budget, create_budget_line, delete_budget_line,
+    list_audits, get_audit_record, get_audit_findings,
+    create_audit, update_audit_record, create_audit_finding,
+    list_bank_accounts, get_bank_account, list_bank_statements,
+    create_bank_account, update_bank_account,
+    list_tax_filings, get_tax_filing,
+    create_tax_filing, update_tax_filing,
+)
 from .it_core import (
     get_it_dashboard,
     list_tickets as list_it_tickets,
@@ -399,14 +411,14 @@ WEB_LEAF_URLS = {
     ('accounting', 'cust_rpts'):  '/gl/',
     ('accounting', 'fin_reports'): '/gl/',
     ('accounting', 'credit'):     '/gl/',
-    ('finance', 'fin_plan'):       '/fin/',
-    ('finance', 'fin_forecast'):   '/fin/',
-    ('finance', 'fin_analysis'):   '/fin/',
-    ('finance', 'fin_reporting'):  '/fin/',
-    ('finance', 'treasury_ops'):   '/fin/',
+    ('finance', 'fin_plan'):       '/fin/budgets/',
+    ('finance', 'fin_forecast'):   '/fin/budgets/',
+    ('finance', 'fin_analysis'):   '/fin/audits/',
+    ('finance', 'fin_reporting'):  '/fin/audits/',
+    ('finance', 'treasury_ops'):   '/fin/bank-rec/',
     ('finance', 'capital_mgmt'):   '/fin/',
-    ('finance', 'tax_planning'):   '/fin/',
-    ('finance', 'treasury_mgmt'):  '/fin/',
+    ('finance', 'tax_planning'):   '/fin/tax/',
+    ('finance', 'treasury_mgmt'):  '/fin/bank-rec/',
     ('finance', 'invest_mgmt'):    '/fin/',
     ('finance', 'fin_rpts_mgr'):   '/gl/',
     # Purchasing dashboard
@@ -7214,5 +7226,400 @@ def mkt_content_detail(request, item_id):
         request, item=item, can_edit=can_edit,
         content_statuses=CONTENT_STATUSES, content_types=CONTENT_TYPES,
         channels=CHANNELS, error=error, success=success,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Finance sub-pages — budgets, audits, bank rec, tax
+# ---------------------------------------------------------------------------
+
+def _fin_ctx(request, **extra):
+    role = request.session.get('user_role', '')
+    ctx = {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': role,
+        'full_access': role in FULL_ACCESS_ROLES,
+        'can_edit': role not in READ_ONLY_ROLES,
+    }
+    ctx.update(extra)
+    return ctx
+
+
+# ── Budgets ──────────────────────────────────────────────────────────────────
+
+def fin_budget_list(request):
+    err = _acct_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    year_f = request.GET.get('fiscal_year', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        budgets = list_budgets(
+            conn,
+            status=status_f or None,
+            fiscal_year=int(year_f) if year_f.isdigit() else None,
+            search=search or None,
+        )
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_budget(
+                    conn,
+                    budget_name=request.POST.get('budget_name', ''),
+                    fiscal_year=int(request.POST.get('fiscal_year') or 0),
+                    status=request.POST.get('status', 'draft'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('fin_budget_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                budgets = list_budgets(conn, status=status_f or None,
+                                       fiscal_year=int(year_f) if year_f.isdigit() else None,
+                                       search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'finance_budget_list.html', _fin_ctx(
+        request, budgets=budgets, status_filter=status_f, year_filter=year_f,
+        search=search, budget_statuses=BUDGET_STATUSES, error=error, success=success,
+    ))
+
+
+def fin_budget_detail(request, budget_id):
+    err = _acct_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        budget = get_budget(conn, budget_id)
+        if not budget:
+            return redirect('fin_budget_list')
+        action = request.POST.get('action', 'update') if request.method == 'POST' else None
+        if action == 'update' and can_edit:
+            try:
+                update_budget(
+                    conn, budget_id,
+                    budget_name=request.POST.get('budget_name', ''),
+                    fiscal_year=int(request.POST.get('fiscal_year') or budget['fiscal_year']),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Budget updated.'
+                budget = get_budget(conn, budget_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        elif action == 'add_line' and can_edit:
+            try:
+                create_budget_line(
+                    conn, budget_id,
+                    category=request.POST.get('category', ''),
+                    description=request.POST.get('description', ''),
+                    budgeted_amount=float(request.POST.get('budgeted_amount') or 0),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('fin_budget_detail', budget_id=budget_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        elif action == 'del_line' and can_edit:
+            try:
+                delete_budget_line(conn, int(request.POST.get('line_id', 0)))
+                conn.commit()
+                return redirect('fin_budget_detail', budget_id=budget_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        lines = get_budget_lines(conn, budget_id)
+        total_budgeted = sum(ln['budgeted_amount'] or 0 for ln in lines)
+    finally:
+        conn.close()
+    return render(request, 'finance_budget_detail.html', _fin_ctx(
+        request, budget=budget, lines=lines, total_budgeted=total_budgeted,
+        can_edit=can_edit, budget_statuses=BUDGET_STATUSES,
+        error=error, success=success,
+    ))
+
+
+# ── Audits ───────────────────────────────────────────────────────────────────
+
+def fin_audit_list(request):
+    err = _acct_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('audit_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        audits = list_audits(conn, status=status_f or None,
+                             audit_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_audit(
+                    conn,
+                    audit_name=request.POST.get('audit_name', ''),
+                    audit_type=request.POST.get('audit_type', ''),
+                    department=request.POST.get('department', ''),
+                    auditor=request.POST.get('auditor', ''),
+                    scheduled=request.POST.get('scheduled', ''),
+                    status=request.POST.get('status', 'Scheduled'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('fin_audit_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                audits = list_audits(conn, status=status_f or None,
+                                     audit_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'finance_audit_list.html', _fin_ctx(
+        request, audits=audits, status_filter=status_f, type_filter=type_f,
+        search=search, audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
+        error=error, success=success,
+    ))
+
+
+def fin_audit_detail(request, audit_id):
+    err = _acct_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        audit = get_audit_record(conn, audit_id)
+        if not audit:
+            return redirect('fin_audit_list')
+        action = request.POST.get('action', 'update') if request.method == 'POST' else None
+        if action == 'update' and can_edit:
+            try:
+                update_audit_record(
+                    conn, audit_id,
+                    audit_name=request.POST.get('audit_name', ''),
+                    audit_type=request.POST.get('audit_type', ''),
+                    department=request.POST.get('department', ''),
+                    auditor=request.POST.get('auditor', ''),
+                    scheduled=request.POST.get('scheduled', '') or None,
+                    completed=request.POST.get('completed', '') or None,
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Audit updated.'
+                audit = get_audit_record(conn, audit_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        elif action == 'add_finding' and can_edit:
+            try:
+                create_audit_finding(
+                    conn, audit_id,
+                    finding_ref=request.POST.get('finding_ref', ''),
+                    description=request.POST.get('description', ''),
+                    severity=request.POST.get('severity', 'Minor'),
+                    department=request.POST.get('department', ''),
+                    found_date=request.POST.get('found_date', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('fin_audit_detail', audit_id=audit_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        findings = get_audit_findings(conn, audit_id)
+    finally:
+        conn.close()
+    return render(request, 'finance_audit_detail.html', _fin_ctx(
+        request, audit=audit, findings=findings, can_edit=can_edit,
+        audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
+        finding_severities=FINDING_SEVERITIES,
+        error=error, success=success,
+    ))
+
+
+# ── Bank Reconciliation ──────────────────────────────────────────────────────
+
+def fin_bank_rec_list(request):
+    err = _acct_access(request)
+    if err:
+        return err
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        accounts = list_bank_accounts(conn, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_bank_account(
+                    conn,
+                    account_name=request.POST.get('account_name', ''),
+                    bank_name=request.POST.get('bank_name', ''),
+                    account_number=request.POST.get('account_number', ''),
+                    routing_number=request.POST.get('routing_number', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('fin_bank_rec_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                accounts = list_bank_accounts(conn, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'finance_bank_rec_list.html', _fin_ctx(
+        request, accounts=accounts, search=search, error=error, success=success,
+    ))
+
+
+def fin_bank_rec_detail(request, account_id):
+    err = _acct_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        account = get_bank_account(conn, account_id)
+        if not account:
+            return redirect('fin_bank_rec_list')
+        action = request.POST.get('action', 'update') if request.method == 'POST' else None
+        if action == 'update' and can_edit:
+            try:
+                update_bank_account(
+                    conn, account_id,
+                    account_name=request.POST.get('account_name', ''),
+                    bank_name=request.POST.get('bank_name', ''),
+                    account_number=request.POST.get('account_number', ''),
+                    routing_number=request.POST.get('routing_number', ''),
+                    is_active=int(request.POST.get('is_active', 1)),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Account updated.'
+                account = get_bank_account(conn, account_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        elif action == 'add_statement' and can_edit:
+            try:
+                conn.execute(
+                    "INSERT INTO bank_statement "
+                    "(bank_account_id, statement_date, beginning_balance, ending_balance, status, notes) "
+                    "VALUES (%s,%s,%s,%s,%s,%s)",
+                    (account_id,
+                     request.POST.get('statement_date', ''),
+                     float(request.POST.get('beginning_balance') or 0),
+                     float(request.POST.get('ending_balance') or 0),
+                     request.POST.get('status', 'Open'),
+                     request.POST.get('notes', '')),
+                )
+                conn.commit()
+                return redirect('fin_bank_rec_detail', account_id=account_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        statements = list_bank_statements(conn, account_id)
+    finally:
+        conn.close()
+    return render(request, 'finance_bank_rec_detail.html', _fin_ctx(
+        request, account=account, statements=statements, can_edit=can_edit,
+        statement_statuses=BANK_STATEMENT_STATUSES,
+        error=error, success=success,
+    ))
+
+
+# ── Tax Filings ──────────────────────────────────────────────────────────────
+
+def fin_tax_list(request):
+    err = _acct_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('tax_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        filings = list_tax_filings(conn, status=status_f or None,
+                                   tax_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_tax_filing(
+                    conn,
+                    tax_type=request.POST.get('tax_type', ''),
+                    jurisdiction=request.POST.get('jurisdiction', ''),
+                    period=request.POST.get('period', ''),
+                    amount_due=float(request.POST.get('amount_due') or 0),
+                    due_date=request.POST.get('due_date', ''),
+                    status=request.POST.get('status', 'Pending'),
+                    reference=request.POST.get('reference', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('fin_tax_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                filings = list_tax_filings(conn, status=status_f or None,
+                                           tax_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'finance_tax_list.html', _fin_ctx(
+        request, filings=filings, status_filter=status_f, type_filter=type_f,
+        search=search, tax_types=TAX_TYPES, tax_statuses=TAX_FILING_STATUSES,
+        error=error, success=success,
+    ))
+
+
+def fin_tax_detail(request, filing_id):
+    err = _acct_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        filing = get_tax_filing(conn, filing_id)
+        if not filing:
+            return redirect('fin_tax_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_tax_filing(
+                    conn, filing_id,
+                    tax_type=request.POST.get('tax_type', ''),
+                    jurisdiction=request.POST.get('jurisdiction', ''),
+                    period=request.POST.get('period', ''),
+                    amount_due=float(request.POST.get('amount_due') or 0),
+                    amount_paid=float(request.POST.get('amount_paid') or 0),
+                    filed_date=request.POST.get('filed_date', '') or None,
+                    due_date=request.POST.get('due_date', '') or None,
+                    status=request.POST.get('status', ''),
+                    reference=request.POST.get('reference', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Filing updated.'
+                filing = get_tax_filing(conn, filing_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'finance_tax_detail.html', _fin_ctx(
+        request, filing=filing, can_edit=can_edit,
+        tax_types=TAX_TYPES, tax_statuses=TAX_FILING_STATUSES,
+        error=error, success=success,
     ))
 
