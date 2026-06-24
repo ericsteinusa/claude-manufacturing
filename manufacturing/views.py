@@ -466,6 +466,25 @@ WEB_LEAF_URLS = {
     ('personnel', 'turn_rpt'):     '/pers/',
     ('personnel', 'month_sum'):    '/pers/',
     # Customer Service dashboard
+    # Legal / Risk Management dashboard
+    ('legal', 'contracts'):          '/legal/',
+    ('legal', 'compliance'):         '/legal/',
+    ('legal', 'litigation'):         '/legal/',
+    ('legal', 'ip_mgmt'):            '/legal/',
+    ('legal', 'emp_law'):            '/legal/',
+    ('legal', 'contracts_mgmt'):     '/legal/',
+    ('legal', 'litigation_mgmt'):    '/legal/',
+    ('legal', 'compliance_mgmt'):    '/legal/',
+    ('legal', 'corp_gov'):           '/legal/',
+    ('risk_management', 'risk_assess'):      '/legal/',
+    ('risk_management', 'risk_register'):    '/legal/',
+    ('risk_management', 'insurance'):        '/legal/',
+    ('risk_management', 'biz_cont'):         '/legal/',
+    ('risk_management', 'comp_audit'):       '/legal/',
+    ('risk_management', 'risk_register_mgr'): '/legal/',
+    ('risk_management', 'kri'):              '/legal/',
+    ('risk_management', 'biz_continuity'):   '/legal/',
+    ('risk_management', 'audit_compliance'): '/legal/',
     # Information Technology dashboard
     ('information_tech', 'it_calls'):    '/it/',
     ('information_tech', 'it_tasks'):    '/it/',
@@ -6279,6 +6298,7 @@ from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
 from .finance_core import get_finance_dashboard
 from .it_core import get_it_dashboard
+from .legal_core import get_legal_dashboard
 
 
 def _prod_access(request, write=False):
@@ -6416,4 +6436,41 @@ def it_dashboard(request):
         data = get_it_dashboard(conn)
     ctx = _it_ctx(request, **data)
     return render(request, 'it_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Legal dashboard
+# ---------------------------------------------------------------------------
+
+_LEGAL_DEPT_KEYS = {'legal', 'risk_management'}
+
+
+def _legal_access(request):
+    email = request.session.get('user_email')
+    if not email:
+        return redirect('/')
+    role = request.session.get('user_role', '')
+    if role in FULL_ACCESS_ROLES:
+        return None
+    if request.session.get('user_dept', '') not in _LEGAL_DEPT_KEYS:
+        return redirect('/dashboard/')
+    return None
+
+
+def _legal_ctx(request, **extra):
+    return {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        **extra,
+    }
+
+
+def legal_dashboard(request):
+    err = _legal_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_legal_dashboard(conn)
+    ctx = _legal_ctx(request, **data)
+    return render(request, 'legal_dashboard.html', ctx)
 

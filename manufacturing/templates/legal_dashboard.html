@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block page_title %}Legal Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/legal/" class="btn">Legal Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
+    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+    font-size:13px; text-decoration:none; }
+.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.section-label { color:white; font-size:14px; font-weight:bold; margin-bottom:8px; margin-top:4px; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi.red { border-color:#c33; }
+.kpi.red .val { color:#c33; }
+.kpi.yellow { border-color:#b8860b; }
+.kpi.yellow .val { color:#b8860b; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-active   { background:#d4edda; color:#0a3622; }
+.st-draft    { background:#fff3cd; color:#856404; }
+.st-expired  { background:#e2e3e5; color:#383d41; }
+.st-signed   { background:#d1ecf1; color:#0c5460; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Legal Dashboard</h2>
+
+    <div class="nav-grid">
+        <a href="/dept/legal/" class="nav-btn">Legal Menu</a>
+        <a href="/dept/legal/legal_mgr/" class="nav-btn">Legal Manager</a>
+        <a href="/dept/risk_management/" class="nav-btn">Risk Management</a>
+        <a href="/dashboard/" class="nav-btn">Home</a>
+    </div>
+
+    <div class="section-label">Contracts</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Contracts</div>
+            <div class="val">{{ contracts.total|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Active</div>
+            <div class="val">{{ contracts.active|default:0 }}</div>
+        </div>
+        <div class="kpi{% if contracts.draft %} yellow{% endif %}">
+            <div class="lbl">Draft</div>
+            <div class="val">{{ contracts.draft|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">Compliance</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Items</div>
+            <div class="val">{{ compliance.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if compliance.pending %} yellow{% endif %}">
+            <div class="lbl">Pending</div>
+            <div class="val">{{ compliance.pending|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Completed</div>
+            <div class="val">{{ compliance.completed|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">Litigation</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Cases</div>
+            <div class="val">{{ litigation.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if litigation.open %} red{% endif %}">
+            <div class="lbl">Open</div>
+            <div class="val">{{ litigation.open|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Closed</div>
+            <div class="val">{{ litigation.closed|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Contracts</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Counterparty</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in recent_contracts %}
+            <tr>
+                <td>{{ c.title }}</td>
+                <td>{{ c.counterparty|default:"—" }}</td>
+                <td>{{ c.contract_type|default:"—" }}</td>
+                <td>{% if c.value %}${{ c.value|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td>{{ c.end_date|default:"—" }}</td>
+                <td><span class="badge st-{{ c.status|lower }}">{{ c.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;">No contracts found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}
