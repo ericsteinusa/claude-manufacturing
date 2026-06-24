@@ -9,8 +9,10 @@ from manufacturing.purchasing_core import get_purchasing_dashboard
 
 def _conn(po_row, recent_rows):
     c = MagicMock()
-    mock1 = MagicMock(); mock1.fetchone.return_value = po_row
-    mock2 = MagicMock(); mock2.fetchall.return_value = recent_rows
+    mock1 = MagicMock()
+    mock1.fetchone.return_value = po_row
+    mock2 = MagicMock()
+    mock2.fetchall.return_value = recent_rows
     c.execute.side_effect = [mock1, mock2]
     return c
 

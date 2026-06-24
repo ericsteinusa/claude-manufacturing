@@ -13,10 +13,14 @@ from manufacturing.personnel_core import get_personnel_dashboard
 
 def _conn(emp_row, dept_rows, to_row, recent_rows):
     c = MagicMock()
-    m1 = MagicMock(); m1.fetchone.return_value = emp_row
-    m2 = MagicMock(); m2.fetchall.return_value = dept_rows
-    m3 = MagicMock(); m3.fetchone.return_value = to_row
-    m4 = MagicMock(); m4.fetchall.return_value = recent_rows
+    m1 = MagicMock()
+    m1.fetchone.return_value = emp_row
+    m2 = MagicMock()
+    m2.fetchall.return_value = dept_rows
+    m3 = MagicMock()
+    m3.fetchone.return_value = to_row
+    m4 = MagicMock()
+    m4.fetchall.return_value = recent_rows
     c.execute.side_effect = [m1, m2, m3, m4]
     return c
 

@@ -76,7 +76,7 @@ def test_install_triggers_drops_and_creates_trigger_per_table():
     for table in AUDITED_TABLES:
         assert any(f'DROP TRIGGER IF EXISTS _audit ON {table}' in s
                    for s in sqls), f"missing DROP TRIGGER for {table}"
-        assert any(f'CREATE TRIGGER _audit' in s and table in s
+        assert any('CREATE TRIGGER _audit' in s and table in s
                    for s in sqls), f"missing CREATE TRIGGER for {table}"
 
 

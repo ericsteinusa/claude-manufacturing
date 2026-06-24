@@ -146,7 +146,7 @@ from .sales_orders_core import (
     set_so_status,
 )
 from .work_orders_core import (
-    WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,
+    WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
     next_wo_number, load_products as load_wo_products,
     create_wo, update_wo, add_wo_material, set_wo_status,
@@ -177,6 +177,13 @@ from .accounts import (
     _remove_user_role,
 )
 
+from .production_core import get_production_dashboard
+from .purchasing_core import get_purchasing_dashboard
+from .finance_core import get_finance_dashboard
+from .it_core import get_it_dashboard
+from .legal_core import get_legal_dashboard
+from .marketing_core import get_marketing_dashboard
+
 log = get_logger(__name__)
 
 # Menu leaves that are served as web pages rather than launched as a desktop
@@ -188,10 +195,6 @@ WEB_LEAF_URLS = {
     ('purchasing', 'po_status'): '/po/',
     ('purchasing', 'po_hist'): '/po/',
     ('reports', 'rpt_dashboard'): '/reports/',
-    ('maintenance', 'create_wo'): '/wo/new/',
-    ('maintenance', 'open_wo'): '/wo/?status=open',
-    ('maintenance', 'inprog_wo'): '/wo/?status=in_progress',
-    ('maintenance', 'comp_wo'): '/wo/?status=completed',
     ('production', 'create_wo'): '/wo/new/',
     ('production', 'open_wo'): '/wo/?status=open',
     ('production', 'inprog_wo'): '/wo/?status=in_progress',
@@ -217,7 +220,6 @@ WEB_LEAF_URLS = {
     ('personnel', 'month_hrs'): '/time-clock/hours/?period=month',
     ('personnel', 'period_hrs'): '/time-clock/hours/?period=month',
     ('personnel', 'daily_att'): '/time-clock/attendance/',
-    ('personnel', 'month_sum'): '/time-clock/attendance/?period=month',
     ('personnel', 'tard_rpt'): '/time-clock/attendance/',
     ('personnel', 'abs_rpt'): '/time-clock/attendance/',
     ('engineering', 'bom_list'): '/bom/',
@@ -247,10 +249,6 @@ WEB_LEAF_URLS = {
     ('production', 'fin_goods'): '/inventory/?item_type=make',
     ('production', 'wip_inv'): '/inventory/',
     ('production', 'inv_rpts'): '/inventory/',
-    ('maintenance', 'view_inv'): '/inventory/',
-    ('maintenance', 'parts_req'): '/inventory/',
-    ('maintenance', 'reorder'): '/inventory/?filter=low',
-    ('maintenance', 'parts_hist'): '/inventory/',
     # Maintenance
     ('maintenance', 'maint'): '/maint/',
     ('maintenance', 'maint_mgr'): '/maint/',
@@ -2562,7 +2560,7 @@ def tc_device_poll(request, device_id: int):
 
     conn = get_db_connection()
     try:
-        result = poll_device(conn, device_id)
+        poll_device(conn, device_id)
         conn.commit()
     finally:
         conn.close()
@@ -5310,8 +5308,8 @@ def payroll_ytd(request):
     ))
 
 
-from .accounting_core import (
-    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors, load_customers,
+from .accounting_core import (  # noqa: E402
+    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors, load_customers,  # noqa: F811
     get_ap_dashboard, list_ap_invoices, get_ap_invoice,
     create_ap_invoice, update_ap_invoice, set_ap_status,
     list_ap_payments, record_ap_payment,
@@ -5786,9 +5784,9 @@ def gl_balance_sheet(request):
     return render(request, 'gl_balance_sheet.html', ctx)
 
 
-from .engineering_core import (
-    PROJECT_STATUSES, TASK_STATUSES, ECR_STATUSES, PRIORITIES,
-    load_products, load_people,
+from .engineering_core import (  # noqa: E402
+    PROJECT_STATUSES, TASK_STATUSES, ECR_STATUSES, PRIORITIES,  # noqa: F811
+    load_products, load_people,  # noqa: F811
     get_eng_dashboard, next_project_number, next_ecr_number,
     list_projects, get_project, create_project, update_project,
     list_project_tasks, create_task, update_task, list_ecrs, get_ecr, create_ecr, update_ecr, set_ecr_status,
@@ -6054,11 +6052,11 @@ def eng_reports_view(request):
     ctx = _eng_ctx(request, **data)
     return render(request, 'eng_reports.html', ctx)
 
-from .sales_core import (
-    SO_STATUSES, SO_STATUS_ACTION_LABELS,
-    allowed_transitions, can_transition, next_so_number, list_sos, get_so, get_so_items,
-    load_customers, load_products,
-    create_so, update_so, add_so_item, delete_so_item, set_so_status,
+from .sales_core import (  # noqa: E402
+    SO_STATUSES, SO_STATUS_ACTION_LABELS,  # noqa: F811
+    allowed_transitions, can_transition, next_so_number, list_sos, get_so, get_so_items,  # noqa: F811
+    load_customers, load_products,  # noqa: F811
+    create_so, update_so, add_so_item, delete_so_item, set_so_status,  # noqa: F811
     QUOTE_STATUSES, TARGET_STATUSES,
     get_sales_dashboard,
     list_quotes, create_quote, update_quote, set_quote_status,
@@ -6325,14 +6323,6 @@ def sales_targets(request):
                      filter_rep=rep_filter, filter_period=period_filter,
                      error=error, success=success)
     return render(request, 'sales_targets.html', ctx)
-
-from .production_core import get_production_dashboard
-from .purchasing_core import get_purchasing_dashboard
-from .finance_core import get_finance_dashboard
-from .it_core import get_it_dashboard
-from .legal_core import get_legal_dashboard
-from .marketing_core import get_marketing_dashboard
-
 
 def _prod_access(request, write=False):
     if not request.session.get('user_email'):

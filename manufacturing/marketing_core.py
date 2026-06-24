@@ -19,14 +19,14 @@ def get_marketing_dashboard(conn) -> dict:
     ).fetchone()
     campaigns = dict(c) if c else {'total': 0, 'active': 0, 'planned': 0}
 
-    l = conn.execute(
+    leads_row = conn.execute(
         "SELECT "
         "COUNT(*) AS total, "
         "COUNT(*) FILTER (WHERE status = 'New') AS new_count, "
         "COUNT(*) FILTER (WHERE status = 'Qualified') AS qualified "
         "FROM marketing_lead"
     ).fetchone()
-    leads = dict(l) if l else {'total': 0, 'new_count': 0, 'qualified': 0}
+    leads = dict(leads_row) if leads_row else {'total': 0, 'new_count': 0, 'qualified': 0}
 
     ct = conn.execute(
         "SELECT "
