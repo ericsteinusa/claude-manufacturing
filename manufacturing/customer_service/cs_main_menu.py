@@ -7,8 +7,8 @@ from .cs_calls_widget import CustomerServiceCallsWidget
 
 _TITLE = "Customer Service Main Menu"
 _ITEMS = [
-    ("CS Manager",       lambda: _launch("cs_mgr_menu.py")),
-    ("Customer Service", lambda: _launch("cs_menu.py")),
+    ("CS Manager",       lambda: _launch("customer_service/cs_mgr_menu.py")),
+    ("Customer Service", lambda: _launch("customer_service/cs_menu.py")),
     ("Customer Calls",   CustomerServiceCallsWidget),
     ("Purchase Requisitions",
      lambda: _launch("purchase_requisitions.py", "Customer Service")),

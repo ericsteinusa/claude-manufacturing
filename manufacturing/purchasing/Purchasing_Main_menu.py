@@ -6,11 +6,11 @@ from ..dept_menu_widget import DeptMenuWidget
 
 _TITLE = "Purchasing Main Menu"
 _ITEMS = [
-    ("Purchasing Manager", lambda: _launch("Purchasing_Mgr_menu.py")),
-    ("Purchasing",         lambda: _launch("Purchasing_menu.py")),
+    ("Purchasing Manager", lambda: _launch("purchasing/Purchasing_Mgr_menu.py")),
+    ("Purchasing",         lambda: _launch("purchasing/Purchasing_menu.py")),
     ("Purchase Requisitions",
      lambda: _launch("purchase_requisitions.py", "Purchasing")),
-    ("Material Requirements (MRP)", lambda: _launch("mrp.py")),
+    ("Material Requirements (MRP)", lambda: _launch("production/mrp.py")),
 ]
 
 
