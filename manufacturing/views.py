@@ -191,7 +191,15 @@ from .accounts import (
     _remove_user_role,
 )
 
-from .production_core import get_production_dashboard
+from .production_core import (
+    get_production_dashboard,
+    list_scheduled_wos,
+    get_prod_reports,
+    SHIPMENT_STATUSES,
+    list_shipments, get_shipment, get_shipment_items,
+    create_shipment, update_shipment, add_shipment_item,
+    init_shipment_tables,
+)
 from .purchasing_core import get_purchasing_dashboard
 from .finance_core import (
     get_finance_dashboard,
@@ -371,6 +379,64 @@ WEB_LEAF_URLS = {
     ('production', 'fin_goods'): '/inventory/?item_type=make',
     ('production', 'wip_inv'): '/inventory/',
     ('production', 'inv_rpts'): '/inventory/',
+    # Production Schedule
+    ('production', 'daily_sched'):  '/prod/schedule/',
+    ('production', 'week_sched'):   '/prod/schedule/',
+    ('production', 'month_sched'):  '/prod/schedule/',
+    ('production', 'sched_cal'):    '/prod/schedule/',
+    # Equipment Status → Maintenance
+    ('production', 'equip_list'):   '/maint/equipment/',
+    ('production', 'stat_dash'):    '/maint/',
+    ('production', 'down_log'):     '/maint/downtime/',
+    ('production', 'maint_req'):    '/maint/wo/',
+    # Quality Control → QA
+    ('production', 'insp_res'):     '/qa/inspections/',
+    ('production', 'non_conf'):     '/qa/ncr/',
+    ('production', 'qc_rpts'):      '/qa/',
+    ('production', 'rej_analy'):    '/qa/ncr/',
+    # Production Reports
+    ('production', 'daily_prod'):   '/prod/reports/',
+    ('production', 'week_sum'):     '/prod/reports/',
+    ('production', 'eff_rpt'):      '/prod/reports/',
+    ('production', 'scrap_rpt'):    '/prod/reports/',
+    ('production', 'eff_rpts'):     '/prod/reports/',
+    ('production', 'kpi_dash'):     '/prod/reports/',
+    # Labor Tracking → Reports
+    ('production', 'cur_labor'):    '/prod/reports/',
+    ('production', 'labor_shft'):   '/prod/reports/',
+    ('production', 'labor_job'):    '/prod/reports/',
+    ('production', 'labor_rpts'):   '/prod/reports/',
+    # Resource Management
+    ('production', 'res_alloc'):    '/prod/',
+    ('production', 'cap_plan'):     '/prod/',
+    ('production', 'res_rpts'):     '/prod/reports/',
+    ('production', 'wf_plan'):      '/prod/',
+    # Budget → Finance
+    ('production', 'prod_budg'):    '/fin/budgets/',
+    ('production', 'cost_analy'):   '/fin/budgets/',
+    ('production', 'budg_act'):     '/fin/budgets/',
+    ('production', 'budg_rpts'):    '/fin/budgets/',
+    # Shipping
+    ('production', 'new_ship'):     '/prod/shipping/',
+    ('production', 'pend_ship'):    '/prod/shipping/?status=pending',
+    ('production', 'shipped'):      '/prod/shipping/?status=delivered',
+    ('production', 'deliv_conf'):   '/prod/shipping/',
+    ('production', 'today_sched'):  '/prod/schedule/',
+    ('production', 'rush_orders'):  '/prod/schedule/',
+    ('production', 'carr_list'):    '/prod/shipping/',
+    ('production', 'carr_rates'):   '/prod/shipping/',
+    ('production', 'perf_rpts'):    '/prod/reports/',
+    ('production', 'carr_cont'):    '/prod/shipping/',
+    # Receiving → PO receipts
+    ('production', 'inbound'):      '/po/',
+    ('production', 'recv_items'):   '/po/',
+    ('production', 'recv_rpts'):    '/po/',
+    ('production', 'disc_rpts'):    '/po/',
+    # Tracking
+    ('production', 'track_ship'):   '/prod/shipping/',
+    ('production', 'ship_hist'):    '/prod/shipping/',
+    ('production', 'del_conf'):     '/prod/shipping/',
+    ('production', 'exc_rpts'):     '/prod/shipping/',
     # Maintenance
     ('maintenance', 'maint'): '/maint/',
     ('maintenance', 'maint_mgr'): '/maint/',
@@ -7186,6 +7252,131 @@ def prod_dashboard(request):
         data = get_production_dashboard(conn)
     ctx = _prod_ctx(request, **data)
     return render(request, 'prod_dashboard.html', ctx)
+
+
+def prod_schedule(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    with get_db_connection() as conn:
+        wos = list_scheduled_wos(
+            conn,
+            date_from=date_from or None,
+            date_to=date_to or None,
+            status=status_f or None,
+        )
+    return render(request, 'prod_schedule.html', _prod_ctx(
+        request, wos=wos,
+        date_from=date_from, date_to=date_to, status_filter=status_f,
+        WO_STATUSES=WO_STATUSES,
+    ))
+
+
+def prod_reports_view(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_prod_reports(conn)
+    return render(request, 'prod_reports.html', _prod_ctx(request, **data))
+
+
+def prod_shipping_list(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_shipment_tables(conn)
+        conn.commit()
+        shipments = list_shipments(conn, status=status_f or None, search=search or None)
+        sales_orders = list_sos(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                sid = create_shipment(
+                    conn,
+                    so_id=_int_or_none(request.POST.get('so_id')),
+                    ship_date=request.POST.get('ship_date', ''),
+                    carrier=request.POST.get('carrier', '').strip(),
+                    tracking_number=request.POST.get('tracking_number', '').strip(),
+                    status=request.POST.get('status', 'pending'),
+                    notes=request.POST.get('notes', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('prod_shipping_detail', shipment_id=sid)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                shipments = list_shipments(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'prod_shipping_list.html', _prod_ctx(
+        request, shipments=shipments, sales_orders=sales_orders,
+        status_filter=status_f, search=search,
+        SHIPMENT_STATUSES=SHIPMENT_STATUSES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def prod_shipping_detail(request, shipment_id):
+    err = _prod_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        shipment = get_shipment(conn, shipment_id)
+        if not shipment:
+            return redirect('prod_shipping_list')
+        items = get_shipment_items(conn, shipment_id)
+        products = load_wo_products(conn) if can_edit else []
+        sales_orders = list_sos(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'edit')
+            try:
+                if action == 'add_item':
+                    add_shipment_item(
+                        conn, shipment_id,
+                        description=request.POST.get('description', '').strip(),
+                        product_id=_int_or_none(request.POST.get('product_id')),
+                        qty=int(request.POST.get('qty') or 1),
+                    )
+                    conn.commit()
+                    return redirect('prod_shipping_detail', shipment_id=shipment_id)
+                else:
+                    update_shipment(
+                        conn, shipment_id,
+                        so_id=_int_or_none(request.POST.get('so_id')),
+                        ship_date=request.POST.get('ship_date', ''),
+                        carrier=request.POST.get('carrier', '').strip(),
+                        tracking_number=request.POST.get('tracking_number', '').strip(),
+                        status=request.POST.get('status', ''),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Shipment updated.'
+                    shipment = get_shipment(conn, shipment_id)
+                    items = get_shipment_items(conn, shipment_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'prod_shipping_detail.html', _prod_ctx(
+        request, shipment=shipment, items=items,
+        products=products, sales_orders=sales_orders,
+        SHIPMENT_STATUSES=SHIPMENT_STATUSES,
+        error=error, success=success, can_edit=can_edit,
+    ))
 
 
 # ---------------------------------------------------------------------------

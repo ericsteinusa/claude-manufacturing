@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block page_title %}Production Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/schedule/" class="btn">Schedule</a>
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/prod/shipping/" class="btn">Shipping</a>
+<a href="/inventory/" class="btn">Inventory</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.pr-wrap { width:100%; max-width:1100px; }
+.pr-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:120px; flex:1; text-align:center; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft       { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-open        { background:#cce5ff; color:#004085; }
+.st-in_progress { background:#fff3cd; color:#856404; }
+.st-completed   { background:#d4edda; color:#0a3622; }
+.st-cancelled   { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="pr-wrap">
+    <h2>Production Reports</h2>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="val">{{ completed_today }}</div>
+            <div class="lbl">Completed Today</div>
+        </div>
+        <div class="kpi">
+            <div class="val">{{ completed_week }}</div>
+            <div class="lbl">Completed This Week</div>
+        </div>
+        <div class="kpi">
+            <div class="val">{{ completed_month }}</div>
+            <div class="lbl">Completed This Month</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="{% if overdue %}color:#c33;{% endif %}">{{ overdue|length }}</div>
+            <div class="lbl">Overdue WOs</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Work Orders by Status</h3>
+            <table class="list-table">
+                <thead><tr><th>Status</th><th style="text-align:right;">Count</th></tr></thead>
+                <tbody>
+                {% for row in by_status %}
+                <tr>
+                    <td><span class="badge st-{{ row.status }}">{{ row.status|title }}</span></td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" style="color:#888;text-align:center;">No data.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Low Stock Alerts</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th style="text-align:right;">On Hand</th>
+                        <th style="text-align:right;">Reorder Pt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for s in low_stock %}
+                <tr>
+                    <td><a href="/inventory/{{ s.id }}/">{{ s.name }}</a></td>
+                    <td style="text-align:right;">{{ s.amount|floatformat:0 }}</td>
+                    <td style="text-align:right;color:#c33;font-weight:bold;">{{ s.reorder_point|floatformat:0 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="color:#888;text-align:center;">No low stock items.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Overdue Work Orders</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>WO #</th>
+                    <th>Description</th>
+                    <th>Product</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for wo in overdue %}
+            <tr>
+                <td><a href="/wo/{{ wo.id }}/">{{ wo.wo_number }}</a></td>
+                <td>{{ wo.description|default:"—" }}</td>
+                <td>{{ wo.product_name|default:"—" }}</td>
+                <td style="color:#c33;font-weight:bold;">{{ wo.due_date }}</td>
+                <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No overdue work orders.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

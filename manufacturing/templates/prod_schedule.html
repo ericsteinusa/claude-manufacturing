@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block page_title %}Production Schedule{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/schedule/" class="btn">Schedule</a>
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/prod/shipping/" class="btn">Shipping</a>
+<a href="/bom/" class="btn">BOM</a>
+<a href="/mrp/" class="btn">MRP</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ps-wrap { width:100%; max-width:1200px; }
+.ps-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=date], .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.filter-bar label { color:white; font-size:13px; font-weight:bold; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft       { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-open        { background:#cce5ff; color:#004085; }
+.st-in_progress { background:#fff3cd; color:#856404; }
+.st-completed   { background:#d4edda; color:#0a3622; }
+.st-cancelled   { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ps-wrap">
+    <h2>Production Schedule</h2>
+
+    <form method="get" class="filter-bar">
+        <label>From:</label>
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <label>To:</label>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in WO_STATUSES %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="/prod/schedule/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>WO #</th>
+                    <th>Description</th>
+                    <th>Product</th>
+                    <th style="text-align:right;">Qty</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for wo in wos %}
+            <tr>
+                <td><a href="/wo/{{ wo.id }}/">{{ wo.wo_number }}</a></td>
+                <td>{{ wo.description|default:"—" }}</td>
+                <td>{{ wo.product_name|default:"—" }}</td>
+                <td style="text-align:right;">{{ wo.quantity|default:"—" }}</td>
+                <td>{{ wo.due_date|default:"—" }}</td>
+                <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No work orders found for this schedule.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p style="color:white;font-size:13px;">
+        {{ wos|length }} work order{{ wos|length|pluralize }} shown.
+        <a href="/wo/new/" style="color:#aef;">+ New Work Order</a>
+    </p>
+
+</div>
+</div>
+{% endblock %}
