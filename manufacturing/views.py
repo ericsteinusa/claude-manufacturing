@@ -180,7 +180,17 @@ from .accounts import (
 from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
 from .finance_core import get_finance_dashboard
-from .it_core import get_it_dashboard
+from .it_core import (
+    get_it_dashboard,
+    list_tickets as list_it_tickets,
+    get_ticket as get_it_ticket,
+    create_ticket as create_it_ticket,
+    update_ticket as update_it_ticket,
+    set_ticket_status as set_it_ticket_status,
+    next_ticket_number,
+    list_assets, get_asset, create_asset, update_asset,
+    TICKET_STATUSES, TICKET_PRIORITIES, ISSUE_TYPES, ASSET_STATUSES, ASSET_TYPES,
+)
 from .legal_core import (
     get_legal_dashboard,
     list_contracts, get_contract, create_contract, update_contract,
@@ -526,16 +536,16 @@ WEB_LEAF_URLS = {
     ('risk_management', 'biz_continuity'):   '/legal/',
     ('risk_management', 'audit_compliance'): '/legal/',
     # Information Technology dashboard
-    ('information_tech', 'it_calls'):    '/it/',
-    ('information_tech', 'it_tasks'):    '/it/',
-    ('information_tech', 'new_ticket'):  '/it/',
-    ('information_tech', 'open_tick'):   '/it/',
-    ('information_tech', 'my_tickets'):  '/it/',
-    ('information_tech', 'tick_hist'):   '/it/',
-    ('information_tech', 'asset_inv'):   '/it/',
-    ('information_tech', 'new_asset'):   '/it/',
-    ('information_tech', 'asset_hist'):  '/it/',
-    ('information_tech', 'disposition'): '/it/',
+    ('information_tech', 'it_calls'):    '/it/tickets/',
+    ('information_tech', 'it_tasks'):    '/it/tickets/',
+    ('information_tech', 'new_ticket'):  '/it/tickets/',
+    ('information_tech', 'open_tick'):   '/it/tickets/?status=open',
+    ('information_tech', 'my_tickets'):  '/it/tickets/?status=in_progress',
+    ('information_tech', 'tick_hist'):   '/it/tickets/?status=resolved',
+    ('information_tech', 'asset_inv'):   '/it/assets/',
+    ('information_tech', 'new_asset'):   '/it/assets/',
+    ('information_tech', 'asset_hist'):  '/it/assets/?status=retired',
+    ('information_tech', 'disposition'): '/it/assets/',
     ('information_tech', 'net_dash'):    '/it/',
     ('information_tech', 'bw_monitor'):  '/it/',
     ('information_tech', 'net_map'):     '/it/',
@@ -6466,6 +6476,185 @@ def it_dashboard(request):
         data = get_it_dashboard(conn)
     ctx = _it_ctx(request, **data)
     return render(request, 'it_dashboard.html', ctx)
+
+
+def it_ticket_list(request):
+    err = _it_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    priority_f = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        tickets = list_it_tickets(conn, status=status_f or None,
+                                  priority=priority_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                num = next_ticket_number(conn)
+                create_it_ticket(
+                    conn,
+                    ticket_number=num,
+                    requester=request.POST.get('requester', ''),
+                    department=request.POST.get('department', ''),
+                    issue_type=request.POST.get('issue_type', ''),
+                    description=request.POST.get('description', ''),
+                    priority=request.POST.get('priority', 'medium'),
+                    assigned_to=request.POST.get('assigned_to', ''),
+                    submitted_date=request.POST.get('submitted_date', '') or date.today().isoformat(),
+                    due_date=request.POST.get('due_date', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_ticket_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                tickets = list_it_tickets(conn, status=status_f or None,
+                                          priority=priority_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_ticket_list.html', _it_ctx(
+        request, tickets=tickets, status_filter=status_f, priority_filter=priority_f,
+        search=search, ticket_statuses=TICKET_STATUSES, ticket_priorities=TICKET_PRIORITIES,
+        issue_types=ISSUE_TYPES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+def it_ticket_detail(request, ticket_id):
+    err = _it_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    ticket = None
+    try:
+        ticket = get_it_ticket(conn, ticket_id)
+        if not ticket:
+            return redirect('it_ticket_list')
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'status':
+                    set_it_ticket_status(conn, ticket_id, request.POST.get('status', ''))
+                    success = 'Status updated.'
+                else:
+                    update_it_ticket(
+                        conn, ticket_id,
+                        requester=request.POST.get('requester', ''),
+                        department=request.POST.get('department', ''),
+                        issue_type=request.POST.get('issue_type', ''),
+                        description=request.POST.get('description', ''),
+                        priority=request.POST.get('priority', ''),
+                        assigned_to=request.POST.get('assigned_to', ''),
+                        submitted_date=request.POST.get('submitted_date', ''),
+                        due_date=request.POST.get('due_date', ''),
+                        notes=request.POST.get('notes', ''),
+                    )
+                    success = 'Ticket updated.'
+                conn.commit()
+                ticket = get_it_ticket(conn, ticket_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_ticket_detail.html', _it_ctx(
+        request, ticket=ticket, can_edit=can_edit,
+        ticket_statuses=TICKET_STATUSES, ticket_priorities=TICKET_PRIORITIES,
+        issue_types=ISSUE_TYPES, error=error, success=success,
+    ))
+
+
+def it_asset_list(request):
+    err = _it_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('asset_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        assets = list_assets(conn, status=status_f or None,
+                             asset_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_asset(
+                    conn,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    asset_type=request.POST.get('asset_type', ''),
+                    make=request.POST.get('make', ''),
+                    model=request.POST.get('model', ''),
+                    serial_number=request.POST.get('serial_number', ''),
+                    assigned_to=request.POST.get('assigned_to', ''),
+                    department=request.POST.get('department', ''),
+                    purchase_date=request.POST.get('purchase_date', ''),
+                    warranty_exp=request.POST.get('warranty_exp', ''),
+                    status=request.POST.get('status', 'active'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('it_asset_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                assets = list_assets(conn, status=status_f or None,
+                                     asset_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_asset_list.html', _it_ctx(
+        request, assets=assets, status_filter=status_f, type_filter=type_f,
+        search=search, asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
+        error=error, success=success,
+    ))
+
+
+def it_asset_detail(request, asset_id):
+    err = _it_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    asset = None
+    try:
+        asset = get_asset(conn, asset_id)
+        if not asset:
+            return redirect('it_asset_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_asset(
+                    conn, asset_id,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    asset_type=request.POST.get('asset_type', ''),
+                    make=request.POST.get('make', ''),
+                    model=request.POST.get('model', ''),
+                    serial_number=request.POST.get('serial_number', ''),
+                    assigned_to=request.POST.get('assigned_to', ''),
+                    department=request.POST.get('department', ''),
+                    purchase_date=request.POST.get('purchase_date', ''),
+                    warranty_exp=request.POST.get('warranty_exp', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Asset updated.'
+                asset = get_asset(conn, asset_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_asset_detail.html', _it_ctx(
+        request, asset=asset, can_edit=can_edit,
+        asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
+        error=error, success=success,
+    ))
 
 
 # ---------------------------------------------------------------------------
