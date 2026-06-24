@@ -466,6 +466,47 @@ WEB_LEAF_URLS = {
     ('personnel', 'turn_rpt'):     '/pers/',
     ('personnel', 'month_sum'):    '/pers/',
     # Customer Service dashboard
+    # Marketing dashboard
+    ('marketing', 'act_camp'):    '/mkt/',
+    ('marketing', 'new_camp'):    '/mkt/',
+    ('marketing', 'camp_cal'):    '/mkt/',
+    ('marketing', 'camp_res'):    '/mkt/',
+    ('marketing', 'res_proj'):    '/mkt/',
+    ('marketing', 'comp_analy'):  '/mkt/',
+    ('marketing', 'surv_mgmt'):   '/mkt/',
+    ('marketing', 'mkt_trends'):  '/mkt/',
+    ('marketing', 'ad_mgmt'):     '/mkt/',
+    ('marketing', 'ad_budget'):   '/mkt/',
+    ('marketing', 'ad_perf'):     '/mkt/',
+    ('marketing', 'ad_cal'):      '/mkt/',
+    ('marketing', 'web_analy'):   '/mkt/',
+    ('marketing', 'camp_analy'):  '/mkt/',
+    ('marketing', 'sales_analy'): '/mkt/',
+    ('marketing', 'cust_rpts'):   '/mkt/',
+    ('marketing', 'cont_cal'):    '/mkt/',
+    ('marketing', 'blog'):        '/mkt/',
+    ('marketing', 'mkt_mat'):     '/mkt/',
+    ('marketing', 'cont_arch'):   '/mkt/',
+    ('marketing', 'post_mgmt'):   '/mkt/',
+    ('marketing', 'social_cal'):  '/mkt/',
+    ('marketing', 'eng_rpts'):    '/mkt/',
+    ('marketing', 'acct_mgmt'):   '/mkt/',
+    ('marketing', 'email_camp'):  '/mkt/',
+    ('marketing', 'sub_lists'):   '/mkt/',
+    ('marketing', 'email_tmpl'):  '/mkt/',
+    ('marketing', 'email_analy'): '/mkt/',
+    ('marketing', 'pend_appr'):   '/mkt/',
+    ('marketing', 'appr_camp'):   '/mkt/',
+    ('marketing', 'camp_arch'):   '/mkt/',
+    ('marketing', 'appr_hist'):   '/mkt/',
+    ('marketing', 'camp_perf'):   '/mkt/',
+    ('marketing', 'roi_rpts'):    '/mkt/',
+    ('marketing', 'month_sum'):   '/mkt/',
+    ('marketing', 'kpi_dash'):    '/mkt/',
+    ('marketing', 'budg_over'):   '/mkt/',
+    ('marketing', 'budg_camp'):   '/mkt/',
+    ('marketing', 'budg_act'):    '/mkt/',
+    ('marketing', 'budg_req'):    '/mkt/',
     # Legal / Risk Management dashboard
     ('legal', 'contracts'):          '/legal/',
     ('legal', 'compliance'):         '/legal/',
@@ -6299,6 +6340,7 @@ from .purchasing_core import get_purchasing_dashboard
 from .finance_core import get_finance_dashboard
 from .it_core import get_it_dashboard
 from .legal_core import get_legal_dashboard
+from .marketing_core import get_marketing_dashboard
 
 
 def _prod_access(request, write=False):
@@ -6473,4 +6515,38 @@ def legal_dashboard(request):
         data = get_legal_dashboard(conn)
     ctx = _legal_ctx(request, **data)
     return render(request, 'legal_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Marketing dashboard
+# ---------------------------------------------------------------------------
+
+def _mkt_access(request):
+    email = request.session.get('user_email')
+    if not email:
+        return redirect('/')
+    role = request.session.get('user_role', '')
+    if role in FULL_ACCESS_ROLES:
+        return None
+    if request.session.get('user_dept', '') != 'marketing':
+        return redirect('/dashboard/')
+    return None
+
+
+def _mkt_ctx(request, **extra):
+    return {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        **extra,
+    }
+
+
+def mkt_dashboard(request):
+    err = _mkt_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_marketing_dashboard(conn)
+    ctx = _mkt_ctx(request, **data)
+    return render(request, 'marketing_dashboard.html', ctx)
 

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block page_title %}Marketing Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mkt/" class="btn">Marketing Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
+    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+    font-size:13px; text-decoration:none; }
+.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.section-label { color:white; font-size:14px; font-weight:bold; margin-bottom:8px; margin-top:4px; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi.green { border-color:#198754; }
+.kpi.green .val { color:#198754; }
+.kpi.yellow { border-color:#b8860b; }
+.kpi.yellow .val { color:#b8860b; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-active    { background:#d4edda; color:#0a3622; }
+.st-planned   { background:#d1ecf1; color:#0c5460; }
+.st-completed { background:#e2e3e5; color:#383d41; }
+.st-paused    { background:#fff3cd; color:#856404; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Marketing Dashboard</h2>
+
+    <div class="nav-grid">
+        <a href="/dept/marketing/" class="nav-btn">Marketing Menu</a>
+        <a href="/dept/marketing/mkt_mgr/" class="nav-btn">Marketing Manager</a>
+        <a href="/customers/" class="nav-btn">Customers</a>
+        <a href="/dashboard/" class="nav-btn">Home</a>
+    </div>
+
+    <div class="section-label">Campaigns</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total</div>
+            <div class="val">{{ campaigns.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if campaigns.active %} green{% endif %}">
+            <div class="lbl">Active</div>
+            <div class="val">{{ campaigns.active|default:0 }}</div>
+        </div>
+        <div class="kpi{% if campaigns.planned %} yellow{% endif %}">
+            <div class="lbl">Planned</div>
+            <div class="val">{{ campaigns.planned|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">Leads</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Leads</div>
+            <div class="val">{{ leads.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if leads.new_count %} yellow{% endif %}">
+            <div class="lbl">New</div>
+            <div class="val">{{ leads.new_count|default:0 }}</div>
+        </div>
+        <div class="kpi{% if leads.qualified %} green{% endif %}">
+            <div class="lbl">Qualified</div>
+            <div class="val">{{ leads.qualified|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">Content</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Items</div>
+            <div class="val">{{ content.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if content.draft %} yellow{% endif %}">
+            <div class="lbl">Draft</div>
+            <div class="val">{{ content.draft|default:0 }}</div>
+        </div>
+        <div class="kpi{% if content.published %} green{% endif %}">
+            <div class="lbl">Published</div>
+            <div class="val">{{ content.published|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Campaigns</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Channel</th>
+                    <th>Objective</th>
+                    <th>Budget</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in recent_campaigns %}
+            <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.channel|default:"—" }}</td>
+                <td>{{ c.objective|default:"—"|truncatechars:40 }}</td>
+                <td>{% if c.budget %}${{ c.budget|floatformat:0 }}{% else %}—{% endif %}</td>
+                <td>{{ c.start_date|default:"—" }}</td>
+                <td>{{ c.end_date|default:"—" }}</td>
+                <td><span class="badge st-{{ c.status|lower }}">{{ c.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;">No campaigns found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}
