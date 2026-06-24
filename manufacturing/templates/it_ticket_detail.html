@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block page_title %}Ticket {{ ticket.ticket_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/it/" class="btn">IT Dashboard</a>
+<a href="/it/tickets/" class="btn">Tickets</a>
+<a href="/it/assets/" class="btn">Assets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.it-wrap { width:100%; max-width:900px; }
+.it-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.field-group { display:flex; flex-direction:column; gap:3px; }
+.field-group label { font-size:11px; font-weight:bold; color:#666; text-transform:uppercase; }
+.field-group .val { font-size:14px; color:#222; }
+.full-span { grid-column:1/-1; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:80px; resize:vertical; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.p-low      { background:#e2e3e5; color:#383d41; }
+.p-medium   { background:#d1ecf1; color:#0c5460; }
+.p-high     { background:#fff3cd; color:#856404; }
+.p-critical { background:#f8d7da; color:#721c24; }
+.s-open        { background:#d1ecf1; color:#0c5460; }
+.s-in_progress { background:#fff3cd; color:#856404; }
+.s-resolved    { background:#d4edda; color:#0a3622; }
+.s-closed      { background:#e2e3e5; color:#383d41; }
+.status-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:4px; }
+.btn-status { padding:6px 14px; border:2px solid black; border-radius:6px; font-size:13px;
+    font-weight:bold; background:white; cursor:pointer; }
+.btn-status:hover { background:rgb(0,60,180); color:white; }
+.btn-save { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-save:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="it-wrap">
+    <h2>Ticket {{ ticket.ticket_number }}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <div class="field-grid">
+            <div class="field-group">
+                <label>Status</label>
+                <div class="val"><span class="badge s-{{ ticket.status }}">{{ ticket.status|capfirst }}</span></div>
+            </div>
+            <div class="field-group">
+                <label>Priority</label>
+                <div class="val"><span class="badge p-{{ ticket.priority }}">{{ ticket.priority|capfirst }}</span></div>
+            </div>
+            <div class="field-group">
+                <label>Requester</label>
+                <div class="val">{{ ticket.requester|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Department</label>
+                <div class="val">{{ ticket.department|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Issue Type</label>
+                <div class="val">{{ ticket.issue_type|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Assigned To</label>
+                <div class="val">{{ ticket.assigned_to|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Submitted</label>
+                <div class="val">{{ ticket.submitted_date|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Due Date</label>
+                <div class="val">{{ ticket.due_date|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Resolved</label>
+                <div class="val">{{ ticket.resolved_date|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Created By</label>
+                <div class="val">{{ ticket.created_by|default:"—" }}</div>
+            </div>
+            <div class="field-group full-span">
+                <label>Description</label>
+                <div class="val">{{ ticket.description }}</div>
+            </div>
+            {% if ticket.notes %}
+            <div class="field-group full-span">
+                <label>Notes</label>
+                <div class="val">{{ ticket.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Change Status</h3>
+        <div class="status-bar">
+            {% for s in ticket_statuses %}
+            <form method="post" style="margin:0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="status">
+                <input type="hidden" name="status" value="{{ s }}">
+                <button type="submit" class="btn-status">{{ s|capfirst }}</button>
+            </form>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Edit Ticket</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Requester</label>
+                    <input type="text" name="requester" value="{{ ticket.requester|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" name="department" value="{{ ticket.department|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Issue Type</label>
+                    <select name="issue_type">
+                        {% for it in issue_types %}
+                        <option value="{{ it }}"{% if ticket.issue_type == it %} selected{% endif %}>{{ it }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select name="priority">
+                        {% for p in ticket_priorities %}
+                        <option value="{{ p }}"{% if ticket.priority == p %} selected{% endif %}>{{ p|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assigned To</label>
+                    <input type="text" name="assigned_to" value="{{ ticket.assigned_to|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" value="{{ ticket.due_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Submitted Date</label>
+                    <input type="date" name="submitted_date" value="{{ ticket.submitted_date|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Description</label>
+                    <textarea name="description">{{ ticket.description }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" name="notes" value="{{ ticket.notes|default:'' }}">
+                </div>
+            </div>
+            <button type="submit" class="btn-save">Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
