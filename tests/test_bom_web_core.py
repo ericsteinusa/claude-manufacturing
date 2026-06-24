@@ -3,7 +3,7 @@ Tests for bom_web_core.py — Qt-free BOM data layer.
 """
 
 import pytest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 from manufacturing.bom_web_core import (
     list_products, get_product, get_bom,

@@ -7,7 +7,7 @@ get_summary_stats, get_monthly_volume, list_plans, create_plan, update_plan.
 """
 
 import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from manufacturing.cs_calls_core import (
     OVERDUE_DAYS, CRITICAL_DAYS,

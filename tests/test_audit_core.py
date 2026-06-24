@@ -4,7 +4,6 @@ Uses a fake connection to verify that install_triggers issues the right SQL
 and that the query helpers (get_recent, get_history) build correct queries.
 """
 
-import pytest
 from unittest.mock import patch
 
 from manufacturing.audit_core import (

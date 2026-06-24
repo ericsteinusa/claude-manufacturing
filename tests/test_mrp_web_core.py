@@ -3,7 +3,7 @@ Tests for mrp_web_core.py — Qt-free MRP data layer.
 """
 
 import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 from datetime import date
 
 from manufacturing.mrp_web_core import (

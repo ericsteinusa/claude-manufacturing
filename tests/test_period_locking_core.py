@@ -7,7 +7,7 @@ touching the real database.
 
 import pytest
 from datetime import date
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from manufacturing.period_locking_core import (
     is_period_locked,

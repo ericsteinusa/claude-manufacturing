@@ -1,6 +1,5 @@
 """Qt-free purchasing dashboard data layer."""
 
-from datetime import date
 
 
 def get_purchasing_dashboard(conn) -> dict:

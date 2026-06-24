@@ -6,15 +6,10 @@ Pure unit tests — no Qt, no live DB.  All DB calls go to a MagicMock.
 
 import datetime
 import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock
 
 from manufacturing.quality_core import (
-    NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
-    CAPA_STATUSES, CAPA_TYPES,
-    AUDIT_STATUSES, AUDIT_TYPES,
-    SUPPLIER_STATUSES, SUPPLIER_RATINGS,
-    INSP_RESULTS, DEFECT_SEVERITIES,
-    get_dashboard_counts,
+    NCR_STATUSES, CAPA_STATUSES, AUDIT_STATUSES, SUPPLIER_STATUSES, INSP_RESULTS, get_dashboard_counts,
     list_ncrs, get_ncr, create_ncr, update_ncr, close_ncr,
     list_capas, get_capa, create_capa, update_capa, close_capa,
     list_audits, get_audit, create_audit, update_audit, complete_audit,

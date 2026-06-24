@@ -2,7 +2,6 @@
 Tests for manufacturing/purchasing_core.py — pure unit tests, no Qt, no DB.
 """
 
-import pytest
 from unittest.mock import MagicMock
 
 from manufacturing.purchasing_core import get_purchasing_dashboard

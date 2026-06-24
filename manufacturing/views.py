@@ -41,7 +41,6 @@ from .inventory_core import (
     update_product as inv_update_product,
 )
 from .contacts_core import (
-    contact_label,
     list_customers, get_customer, create_customer, update_customer,
     get_customer_orders,
     list_suppliers as contacts_list_suppliers,
@@ -82,19 +81,14 @@ from .maintenance_core import (
 )
 from .payroll_core import (
     SS_RATE, MEDICARE_RATE,
-    FREQUENCIES as PAYROLL_FREQUENCIES,
     PAY_TYPES, DED_CATEGORIES, DED_METHODS,
     get_dashboard_counts as payroll_get_dashboard_counts,
     load_people as payroll_load_people,
-    list_pay_rates, get_pay_rate, upsert_pay_rate, delete_pay_rate,
-    list_deduction_types, get_deduction_type,
-    create_deduction_type, update_deduction_type,
-    list_employee_deductions, get_employee_deduction,
-    create_employee_deduction, update_employee_deduction,
-    delete_employee_deduction,
+    list_pay_rates, upsert_pay_rate, delete_pay_rate,
+    list_deduction_types, create_deduction_type, update_deduction_type,
+    list_employee_deductions, create_employee_deduction, delete_employee_deduction,
     list_payroll_runs, get_payroll_run, get_run_entries,
-    get_pay_stub, get_stub_deductions, list_run_employees,
-    get_ytd,
+    get_pay_stub, get_stub_deductions, get_ytd,
 )
 from .quality_core import (
     NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
@@ -5317,15 +5311,14 @@ def payroll_ytd(request):
 
 
 from .accounting_core import (
-    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, DEBIT_NORMAL,
-    load_vendors, load_customers,
+    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors, load_customers,
     get_ap_dashboard, list_ap_invoices, get_ap_invoice,
     create_ap_invoice, update_ap_invoice, set_ap_status,
     list_ap_payments, record_ap_payment,
     get_ar_dashboard, list_ar_invoices, get_ar_invoice,
     create_ar_invoice, update_ar_invoice, set_ar_status,
     list_ar_payments, record_ar_payment,
-    list_accounts, get_account, create_account, update_account, account_balance,
+    list_accounts, create_account, update_account, account_balance,
     list_journals, get_journal, get_journal_lines,
     create_journal, post_journal, void_journal,
     trial_balance, income_statement, balance_sheet,
@@ -5798,8 +5791,7 @@ from .engineering_core import (
     load_products, load_people,
     get_eng_dashboard, next_project_number, next_ecr_number,
     list_projects, get_project, create_project, update_project,
-    list_project_tasks, create_task, update_task, get_task,
-    list_ecrs, get_ecr, create_ecr, update_ecr, set_ecr_status,
+    list_project_tasks, create_task, update_task, list_ecrs, get_ecr, create_ecr, update_ecr, set_ecr_status,
     eng_reports as _eng_reports_data,
 )
 
@@ -6064,13 +6056,12 @@ def eng_reports_view(request):
 
 from .sales_core import (
     SO_STATUSES, SO_STATUS_ACTION_LABELS,
-    allowed_transitions, can_transition, customer_label,
-    next_so_number, list_sos, get_so, get_so_items,
+    allowed_transitions, can_transition, next_so_number, list_sos, get_so, get_so_items,
     load_customers, load_products,
     create_so, update_so, add_so_item, delete_so_item, set_so_status,
     QUOTE_STATUSES, TARGET_STATUSES,
     get_sales_dashboard,
-    list_quotes, get_quote, create_quote, update_quote, set_quote_status,
+    list_quotes, create_quote, update_quote, set_quote_status,
     list_targets, create_target, update_target,
 )
 

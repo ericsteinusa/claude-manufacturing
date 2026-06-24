@@ -7,13 +7,8 @@ import pytest
 from unittest.mock import MagicMock
 
 from manufacturing.maintenance_core import (
-    WO_STATUSES, WORK_TYPES, PRIORITIES,
-    EQUIPMENT_STATUSES, SCHEDULE_STATUSES, FREQUENCIES,
-    INSPECTION_STATUSES, INSPECTION_TYPES,
-    DOWNTIME_STATUSES, DOWNTIME_CATEGORIES,
-    PART_STATUSES, PART_CATEGORIES,
-    MECHANIC_STATUSES, MECHANIC_TRADES, MECHANIC_SHIFTS,
-    get_dashboard_counts,
+    WO_STATUSES, PRIORITIES,
+    EQUIPMENT_STATUSES, SCHEDULE_STATUSES, DOWNTIME_STATUSES, get_dashboard_counts,
     load_mechanics,
     list_work_orders, get_work_order, create_work_order,
     update_work_order, complete_work_order,

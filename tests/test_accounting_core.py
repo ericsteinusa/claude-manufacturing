@@ -13,7 +13,7 @@ from manufacturing.accounting_core import (
     list_ap_payments, record_ap_payment,
     get_ar_dashboard, list_ar_invoices, get_ar_invoice,
     create_ar_invoice, update_ar_invoice, set_ar_status,
-    list_ar_payments, record_ar_payment,
+    record_ar_payment,
     list_accounts, get_account, create_account, update_account, account_balance,
     list_journals, get_journal, get_journal_lines,
     create_journal, post_journal, void_journal,
