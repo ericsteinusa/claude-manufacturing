@@ -8,11 +8,11 @@ from .accounting_core import get_ap_dashboard, get_ar_dashboard
 
 BUDGET_STATUSES = ('draft', 'approved', 'active', 'closed')
 
-AUDIT_TYPES = (
+FIN_AUDIT_TYPES = (
     'Internal', 'External', 'Compliance', 'Operational',
     'Financial', 'IT', 'Tax', 'Other',
 )
-AUDIT_STATUSES = ('Scheduled', 'In Progress', 'Completed', 'Cancelled')
+FIN_AUDIT_STATUSES = ('Scheduled', 'In Progress', 'Completed', 'Cancelled')
 FINDING_SEVERITIES = ('Minor', 'Moderate', 'Major', 'Critical')
 FINDING_STATUSES = ('Open', 'In Progress', 'Resolved', 'Closed')
 

@@ -345,3 +345,309 @@ def update_plan(conn, plan_id: int, title: str, description: str,
         (title.strip(), description.strip(), owner.strip(),
          target_date, status, plan_id),
     )
+
+
+# ---------------------------------------------------------------------------
+# Returns & Refunds
+# ---------------------------------------------------------------------------
+
+RETURN_STATUSES = ('Pending', 'Approved', 'Refunded', 'Rejected', 'Closed')
+RETURN_REASONS = (
+    'Defective', 'Wrong Item', 'Changed Mind', 'Damaged in Shipping',
+    'Not as Described', 'Duplicate Order', 'Other',
+)
+
+
+def list_returns(conn, status=None, search=None) -> list:
+    sql = (
+        "SELECT r.id, r.return_date, r.reason, r.refund_amount, r.status, "
+        "r.created_by, r.notes, "
+        "COALESCE(NULLIF(c.company_name,''), "
+        "  TRIM(COALESCE(c.first_name,'') || ' ' || COALESCE(c.last_name,'')), "
+        "  c.first_name, 'Unknown') AS customer_name "
+        "FROM cs_return r "
+        "LEFT JOIN customer c ON c.id = r.customer_id "
+        "WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND r.status = %s"
+        params.append(status)
+    if search:
+        sql += (" AND (c.first_name ILIKE %s OR c.last_name ILIKE %s "
+                "OR c.company_name ILIKE %s OR r.reason ILIKE %s "
+                "OR r.notes ILIKE %s)")
+        params.extend([f"%{search}%"] * 5)
+    sql += " ORDER BY r.return_date DESC NULLS LAST, r.id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_return(conn, return_id: int) -> dict | None:
+    row = conn.execute(
+        "SELECT r.*, "
+        "COALESCE(NULLIF(c.company_name,''), "
+        "  TRIM(COALESCE(c.first_name,'') || ' ' || COALESCE(c.last_name,'')), "
+        "  c.first_name, 'Unknown') AS customer_name "
+        "FROM cs_return r "
+        "LEFT JOIN customer c ON c.id = r.customer_id "
+        "WHERE r.id = %s",
+        (return_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_return(conn, customer_id, return_date: str, reason: str,
+                  items_returned: str, refund_amount: float,
+                  status: str, notes: str, created_by: str) -> int:
+    row = conn.execute(
+        "INSERT INTO cs_return "
+        "(customer_id, return_date, reason, items_returned, refund_amount, "
+        "status, notes, created_by, created_date) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,CURRENT_DATE) RETURNING id",
+        (customer_id or None, return_date or None, reason,
+         items_returned, refund_amount or 0,
+         status or 'Pending', notes, created_by),
+    ).fetchone()
+    return row['id']
+
+
+def update_return(conn, return_id: int, **fields) -> None:
+    allowed = {
+        'customer_id', 'return_date', 'reason', 'items_returned',
+        'refund_amount', 'status', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE cs_return SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [return_id],
+    )
+
+
+def init_return_table(conn) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cs_return (
+            id             SERIAL PRIMARY KEY,
+            customer_id    INTEGER REFERENCES customer(id),
+            return_date    TEXT,
+            reason         TEXT DEFAULT '',
+            items_returned TEXT DEFAULT '',
+            refund_amount  REAL DEFAULT 0,
+            status         TEXT DEFAULT 'Pending',
+            notes          TEXT DEFAULT '',
+            created_by     TEXT DEFAULT '',
+            created_date   TEXT DEFAULT ''
+        )
+    """)
+
+
+# ---------------------------------------------------------------------------
+# Knowledge Base
+# ---------------------------------------------------------------------------
+
+KB_STATUSES = ('Draft', 'Published', 'Archived')
+KB_CATEGORIES = (
+    'Product', 'Shipping', 'Returns', 'Account', 'Billing',
+    'Technical', 'Policy', 'FAQ', 'Other',
+)
+
+
+def list_kb_articles(conn, status=None, category=None, search=None) -> list:
+    sql = (
+        "SELECT id, title, category, author, published_date, "
+        "status, view_count, tags "
+        "FROM cs_kb_article WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if category:
+        sql += " AND category = %s"
+        params.append(category)
+    if search:
+        sql += " AND (title ILIKE %s OR content ILIKE %s OR tags ILIKE %s)"
+        params.extend([f"%{search}%"] * 3)
+    sql += " ORDER BY published_date DESC NULLS LAST, id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_kb_article(conn, article_id: int) -> dict | None:
+    row = conn.execute(
+        "SELECT * FROM cs_kb_article WHERE id = %s", (article_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_kb_article(conn, title: str, category: str, content: str,
+                      author: str, published_date: str, status: str,
+                      tags: str, created_by: str) -> int:
+    row = conn.execute(
+        "INSERT INTO cs_kb_article "
+        "(title, category, content, author, published_date, status, "
+        "tags, view_count, created_by, created_date) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,0,%s,CURRENT_DATE) RETURNING id",
+        (title, category, content, author,
+         published_date or None, status or 'Draft', tags, created_by),
+    ).fetchone()
+    return row['id']
+
+
+def update_kb_article(conn, article_id: int, **fields) -> None:
+    allowed = {
+        'title', 'category', 'content', 'author',
+        'published_date', 'status', 'tags',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE cs_kb_article SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [article_id],
+    )
+
+
+def init_kb_table(conn) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cs_kb_article (
+            id             SERIAL PRIMARY KEY,
+            title          TEXT NOT NULL,
+            category       TEXT DEFAULT '',
+            content        TEXT DEFAULT '',
+            author         TEXT DEFAULT '',
+            published_date TEXT,
+            status         TEXT DEFAULT 'Draft',
+            tags           TEXT DEFAULT '',
+            view_count     INTEGER DEFAULT 0,
+            created_by     TEXT DEFAULT '',
+            created_date   TEXT DEFAULT ''
+        )
+    """)
+
+
+# ---------------------------------------------------------------------------
+# Surveys & Feedback
+# ---------------------------------------------------------------------------
+
+SURVEY_TYPES = ('CSAT', 'NPS', 'Post-Purchase', 'Product', 'Support', 'Other')
+SURVEY_STATUSES = ('Draft', 'Active', 'Closed')
+
+
+def list_surveys(conn, status=None, survey_type=None, search=None) -> list:
+    sql = (
+        "SELECT id, title, survey_type, status, start_date, end_date, "
+        "response_count, avg_score, created_by "
+        "FROM cs_survey WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if survey_type:
+        sql += " AND survey_type = %s"
+        params.append(survey_type)
+    if search:
+        sql += " AND (title ILIKE %s OR description ILIKE %s)"
+        params.extend([f"%{search}%"] * 2)
+    sql += " ORDER BY created_date DESC, id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_survey(conn, survey_id: int) -> dict | None:
+    row = conn.execute(
+        "SELECT * FROM cs_survey WHERE id = %s", (survey_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def get_survey_responses(conn, survey_id: int) -> list:
+    rows = conn.execute(
+        "SELECT r.*, "
+        "COALESCE(NULLIF(c.company_name,''), "
+        "  TRIM(COALESCE(c.first_name,'') || ' ' || COALESCE(c.last_name,'')), "
+        "  c.first_name, NULL) AS customer_name "
+        "FROM cs_survey_response r "
+        "LEFT JOIN customer c ON c.id = r.customer_id "
+        "WHERE r.survey_id = %s ORDER BY r.response_date DESC, r.id DESC",
+        (survey_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def create_survey(conn, title: str, description: str, survey_type: str,
+                  status: str, start_date: str, end_date: str,
+                  created_by: str) -> int:
+    row = conn.execute(
+        "INSERT INTO cs_survey "
+        "(title, description, survey_type, status, start_date, end_date, "
+        "response_count, avg_score, created_by, created_date) "
+        "VALUES (%s,%s,%s,%s,%s,%s,0,NULL,%s,CURRENT_DATE) RETURNING id",
+        (title, description, survey_type or 'CSAT', status or 'Draft',
+         start_date or None, end_date or None, created_by),
+    ).fetchone()
+    return row['id']
+
+
+def update_survey(conn, survey_id: int, **fields) -> None:
+    allowed = {
+        'title', 'description', 'survey_type', 'status',
+        'start_date', 'end_date',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE cs_survey SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [survey_id],
+    )
+
+
+def add_survey_response(conn, survey_id: int, customer_id,
+                        score: int, comments: str,
+                        response_date: str) -> None:
+    conn.execute(
+        "INSERT INTO cs_survey_response "
+        "(survey_id, customer_id, score, comments, response_date) "
+        "VALUES (%s,%s,%s,%s,%s)",
+        (survey_id, customer_id or None, score,
+         comments, response_date or None),
+    )
+    conn.execute(
+        "UPDATE cs_survey SET "
+        "response_count = (SELECT COUNT(*) FROM cs_survey_response WHERE survey_id = %s), "
+        "avg_score = (SELECT ROUND(AVG(score)::numeric, 1) FROM cs_survey_response WHERE survey_id = %s) "
+        "WHERE id = %s",
+        (survey_id, survey_id, survey_id),
+    )
+
+
+def init_survey_tables(conn) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cs_survey (
+            id             SERIAL PRIMARY KEY,
+            title          TEXT NOT NULL,
+            description    TEXT DEFAULT '',
+            survey_type    TEXT DEFAULT 'CSAT',
+            status         TEXT DEFAULT 'Draft',
+            start_date     TEXT,
+            end_date       TEXT,
+            response_count INTEGER DEFAULT 0,
+            avg_score      REAL,
+            created_by     TEXT DEFAULT '',
+            created_date   TEXT DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cs_survey_response (
+            id            SERIAL PRIMARY KEY,
+            survey_id     INTEGER NOT NULL REFERENCES cs_survey(id) ON DELETE CASCADE,
+            customer_id   INTEGER REFERENCES customer(id),
+            score         INTEGER,
+            comments      TEXT DEFAULT '',
+            response_date TEXT
+        )
+    """)

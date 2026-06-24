@@ -616,19 +616,19 @@ _CS_MENU = {
         ('svc_reports', 'Service Reports', {
             'title': 'Service Reports',
             'items': [
-                ('daily_rpt', 'Daily Report', 'customer_service/cs_calls.py'),
-                ('week_sum', 'Weekly Summary', 'customer_service/cs_calls.py'),
-                ('res_rpts', 'Resolution Reports', 'customer_service/cs_calls.py'),
-                ('csat_rpts', 'Customer Satisfaction', 'customer_service/cs_calls.py'),
+                ('daily_rpt', 'Daily Report', 'customer_service/cs_reports.py'),
+                ('week_sum', 'Weekly Summary', 'customer_service/cs_reports.py'),
+                ('res_rpts', 'Resolution Reports', 'customer_service/cs_reports.py'),
+                ('csat_rpts', 'Customer Satisfaction', 'customer_service/cs_reports.py'),
             ],
         }),
         ('surveys', 'Surveys & Feedback', {
             'title': 'Surveys & Feedback',
             'items': [
-                ('act_surv', 'Active Surveys', 'customer_service/cs_calls.py'),
-                ('new_surv', 'Create Survey', 'customer_service/cs_calls.py'),
-                ('surv_res', 'Survey Results', 'customer_service/cs_calls.py'),
-                ('feed_rpts', 'Feedback Reports', 'customer_service/cs_calls.py'),
+                ('act_surv', 'Active Surveys', 'customer_service/cs_satisfaction.py'),
+                ('new_surv', 'Create Survey', 'customer_service/cs_satisfaction.py'),
+                ('surv_res', 'Survey Results', 'customer_service/cs_satisfaction.py'),
+                ('feed_rpts', 'Feedback Reports', 'customer_service/cs_satisfaction.py'),
             ],
         }),
     ],

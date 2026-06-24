@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block page_title %}Returns & Refunds{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs-dash/" class="btn">CS Dashboard</a>
+<a href="/cs/" class="btn">Tickets</a>
+<a href="/cs/returns/" class="btn">Returns</a>
+<a href="/cs/kb/" class="btn">Knowledge Base</a>
+<a href="/cs/surveys/" class="btn">Surveys</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:1200px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending  { background:#fff3cd; color:#856404; }
+.s-approved { background:#d1ecf1; color:#0c5460; }
+.s-refunded { background:#d4edda; color:#0a3622; }
+.s-rejected { background:#f8d7da; color:#721c24; }
+.s-closed   { background:#e2e3e5; color:#383d41; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>Returns &amp; Refunds</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in return_statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search customer / reason / notes…">
+        <button type="submit">Filter</button>
+        <a href="/cs/returns/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Return Date</th>
+                    <th>Reason</th>
+                    <th style="text-align:right;">Refund Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in returns %}
+            <tr>
+                <td><a href="/cs/returns/{{ r.id }}/">RET-{{ r.id }}</a></td>
+                <td>{{ r.customer_name|default:"—" }}</td>
+                <td>{{ r.return_date|default:"—" }}</td>
+                <td>{{ r.reason|default:"—" }}</td>
+                <td style="text-align:right;">${{ r.refund_amount|floatformat:2 }}</td>
+                <td><span class="badge s-{{ r.status|lower }}">{{ r.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No returns found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Return</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Return Date</label>
+                    <input type="date" name="return_date">
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <select name="reason">
+                        {% for r in return_reasons %}
+                        <option value="{{ r }}">{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in return_statuses %}
+                        <option value="{{ s }}"{% if s == 'Pending' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Refund Amount ($)</label>
+                    <input type="number" name="refund_amount" min="0" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group full-span">
+                    <label>Items Returned</label>
+                    <textarea name="items_returned" placeholder="Describe items…"></textarea>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Return</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

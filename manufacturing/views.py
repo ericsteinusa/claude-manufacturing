@@ -53,6 +53,14 @@ from .cs_calls_core import (
     list_tickets, get_ticket, create_ticket, update_ticket, close_ticket,
     get_escalations, get_summary_stats, get_monthly_volume,
     list_plans, create_plan, update_plan,
+    RETURN_STATUSES, RETURN_REASONS,
+    list_returns, get_return, create_return, update_return,
+    KB_STATUSES, KB_CATEGORIES,
+    list_kb_articles, get_kb_article, create_kb_article, update_kb_article,
+    SURVEY_TYPES, SURVEY_STATUSES,
+    list_surveys, get_survey, get_survey_responses,
+    create_survey, update_survey, add_survey_response,
+    init_return_table, init_kb_table, init_survey_tables,
 )
 from .maintenance_core import (
     WO_STATUSES, WORK_TYPES, PRIORITIES,
@@ -181,12 +189,12 @@ from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
 from .finance_core import (
     get_finance_dashboard,
-    BUDGET_STATUSES, AUDIT_TYPES, AUDIT_STATUSES, FINDING_SEVERITIES,
+    BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
     list_budgets, get_budget, get_budget_lines,
     create_budget, update_budget, create_budget_line, delete_budget_line,
-    list_audits, get_audit_record, get_audit_findings,
-    create_audit, update_audit_record, create_audit_finding,
+    list_audits as list_fin_audits, get_audit_record, get_audit_findings,
+    create_audit as create_fin_audit, update_audit_record, create_audit_finding,
     list_bank_accounts, get_bank_account, list_bank_statements,
     create_bank_account, update_bank_account,
     list_tax_filings, get_tax_filing,
@@ -615,6 +623,24 @@ WEB_LEAF_URLS = {
     ('customer_service', 'esc_hist'):    '/cs/escalations/',
     ('customer_service', 'esc_rpts'):    '/cs/escalations/',
     ('customer_service', 'res_track'):   '/cs/escalations/',
+    # Returns & Refunds
+    ('customer_service', 'pend_ret'):    '/cs/returns/',
+    ('customer_service', 'refund_proc'): '/cs/returns/',
+    ('customer_service', 'ret_rpts'):    '/cs/returns/',
+    # Knowledge Base
+    ('customer_service', 'browse'):      '/cs/kb/',
+    ('customer_service', 'create_art'):  '/cs/kb/',
+    ('customer_service', 'art_mgmt'):    '/cs/kb/',
+    ('customer_service', 'kb_search'):   '/cs/kb/',
+    # Service Reports
+    ('customer_service', 'daily_rpt'):   '/cs/reports/',
+    ('customer_service', 'res_rpts'):    '/cs/reports/',
+    ('customer_service', 'csat_rpts'):   '/cs/reports/',
+    # Surveys & Feedback
+    ('customer_service', 'act_surv'):    '/cs/surveys/',
+    ('customer_service', 'new_surv'):    '/cs/surveys/',
+    ('customer_service', 'surv_res'):    '/cs/surveys/',
+    ('customer_service', 'feed_rpts'):   '/cs/surveys/',
 }
 
 
@@ -3919,6 +3945,269 @@ def cs_plans(request):
         error=error,
         success=success,
         can_edit=can_edit,
+    ))
+
+
+def cs_returns_list(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_return_table(conn)
+        returns = list_returns(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and can_edit:
+            try:
+                cid = request.POST.get('customer_id') or None
+                create_return(
+                    conn,
+                    customer_id=int(cid) if cid else None,
+                    return_date=request.POST.get('return_date', ''),
+                    reason=request.POST.get('reason', ''),
+                    items_returned=request.POST.get('items_returned', ''),
+                    refund_amount=float(request.POST.get('refund_amount') or 0),
+                    status=request.POST.get('status', 'Pending'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('cs_returns_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                returns = list_returns(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'cs_returns_list.html', _cs_context(
+        request, returns=returns, status_filter=status_f, search=search,
+        return_statuses=RETURN_STATUSES, return_reasons=RETURN_REASONS,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def cs_returns_detail(request, return_id):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        ret = get_return(conn, return_id)
+        if not ret:
+            return redirect('cs_returns_list')
+        customers = load_customers_for_cs(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                cid = request.POST.get('customer_id') or None
+                update_return(
+                    conn, return_id,
+                    customer_id=int(cid) if cid else None,
+                    return_date=request.POST.get('return_date', ''),
+                    reason=request.POST.get('reason', ''),
+                    items_returned=request.POST.get('items_returned', ''),
+                    refund_amount=float(request.POST.get('refund_amount') or 0),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Return updated.'
+                ret = get_return(conn, return_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'cs_returns_detail.html', _cs_context(
+        request, ret=ret, customers=customers, can_edit=can_edit,
+        return_statuses=RETURN_STATUSES, return_reasons=RETURN_REASONS,
+        error=error, success=success,
+    ))
+
+
+def cs_kb_list(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    cat_f = request.GET.get('category', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_kb_table(conn)
+        articles = list_kb_articles(
+            conn, status=status_f or None,
+            category=cat_f or None, search=search or None,
+        )
+        if request.method == 'POST' and can_edit:
+            try:
+                create_kb_article(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    category=request.POST.get('category', ''),
+                    content=request.POST.get('content', ''),
+                    author=request.POST.get('author', ''),
+                    published_date=request.POST.get('published_date', ''),
+                    status=request.POST.get('status', 'Draft'),
+                    tags=request.POST.get('tags', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('cs_kb_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                articles = list_kb_articles(
+                    conn, status=status_f or None,
+                    category=cat_f or None, search=search or None,
+                )
+    finally:
+        conn.close()
+    return render(request, 'cs_kb_list.html', _cs_context(
+        request, articles=articles, status_filter=status_f,
+        category_filter=cat_f, search=search,
+        kb_statuses=KB_STATUSES, kb_categories=KB_CATEGORIES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def cs_kb_detail(request, article_id):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        article = get_kb_article(conn, article_id)
+        if not article:
+            return redirect('cs_kb_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_kb_article(
+                    conn, article_id,
+                    title=request.POST.get('title', ''),
+                    category=request.POST.get('category', ''),
+                    content=request.POST.get('content', ''),
+                    author=request.POST.get('author', ''),
+                    published_date=request.POST.get('published_date', ''),
+                    status=request.POST.get('status', ''),
+                    tags=request.POST.get('tags', ''),
+                )
+                conn.commit()
+                success = 'Article updated.'
+                article = get_kb_article(conn, article_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'cs_kb_detail.html', _cs_context(
+        request, article=article, can_edit=can_edit,
+        kb_statuses=KB_STATUSES, kb_categories=KB_CATEGORIES,
+        error=error, success=success,
+    ))
+
+
+def cs_surveys_list(request):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('survey_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_survey_tables(conn)
+        surveys = list_surveys(
+            conn, status=status_f or None,
+            survey_type=type_f or None, search=search or None,
+        )
+        if request.method == 'POST' and can_edit:
+            try:
+                create_survey(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    description=request.POST.get('description', ''),
+                    survey_type=request.POST.get('survey_type', 'CSAT'),
+                    status=request.POST.get('status', 'Draft'),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('cs_surveys_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                surveys = list_surveys(
+                    conn, status=status_f or None,
+                    survey_type=type_f or None, search=search or None,
+                )
+    finally:
+        conn.close()
+    return render(request, 'cs_surveys_list.html', _cs_context(
+        request, surveys=surveys, status_filter=status_f, type_filter=type_f,
+        search=search, survey_types=SURVEY_TYPES, survey_statuses=SURVEY_STATUSES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def cs_surveys_detail(request, survey_id):
+    denied = _cs_access(request)
+    if denied:
+        return denied
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        survey = get_survey(conn, survey_id)
+        if not survey:
+            return redirect('cs_surveys_list')
+        responses = get_survey_responses(conn, survey_id)
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'respond':
+                    cid = request.POST.get('customer_id') or None
+                    add_survey_response(
+                        conn, survey_id,
+                        customer_id=int(cid) if cid else None,
+                        score=int(request.POST.get('score') or 0),
+                        comments=request.POST.get('comments', ''),
+                        response_date=request.POST.get('response_date', ''),
+                    )
+                else:
+                    update_survey(
+                        conn, survey_id,
+                        title=request.POST.get('title', ''),
+                        description=request.POST.get('description', ''),
+                        survey_type=request.POST.get('survey_type', ''),
+                        status=request.POST.get('status', ''),
+                        start_date=request.POST.get('start_date', ''),
+                        end_date=request.POST.get('end_date', ''),
+                    )
+                    success = 'Survey updated.'
+                conn.commit()
+                survey = get_survey(conn, survey_id)
+                responses = get_survey_responses(conn, survey_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'cs_surveys_detail.html', _cs_context(
+        request, survey=survey, responses=responses, can_edit=can_edit,
+        survey_types=SURVEY_TYPES, survey_statuses=SURVEY_STATUSES,
+        error=error, success=success,
     ))
 
 
@@ -7361,11 +7650,11 @@ def fin_audit_list(request):
     error = success = None
     conn = get_db_connection()
     try:
-        audits = list_audits(conn, status=status_f or None,
-                             audit_type=type_f or None, search=search or None)
+        audits = list_fin_audits(conn, status=status_f or None,
+                                 audit_type=type_f or None, search=search or None)
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             try:
-                create_audit(
+                create_fin_audit(
                     conn,
                     audit_name=request.POST.get('audit_name', ''),
                     audit_type=request.POST.get('audit_type', ''),
@@ -7380,13 +7669,13 @@ def fin_audit_list(request):
             except Exception as e:
                 conn.rollback()
                 error = str(e)
-                audits = list_audits(conn, status=status_f or None,
-                                     audit_type=type_f or None, search=search or None)
+                audits = list_fin_audits(conn, status=status_f or None,
+                                         audit_type=type_f or None, search=search or None)
     finally:
         conn.close()
     return render(request, 'finance_audit_list.html', _fin_ctx(
         request, audits=audits, status_filter=status_f, type_filter=type_f,
-        search=search, audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
+        search=search, audit_statuses=FIN_AUDIT_STATUSES, audit_types=FIN_AUDIT_TYPES,
         error=error, success=success,
     ))
 
@@ -7443,7 +7732,7 @@ def fin_audit_detail(request, audit_id):
         conn.close()
     return render(request, 'finance_audit_detail.html', _fin_ctx(
         request, audit=audit, findings=findings, can_edit=can_edit,
-        audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
+        audit_statuses=FIN_AUDIT_STATUSES, audit_types=FIN_AUDIT_TYPES,
         finding_severities=FINDING_SEVERITIES,
         error=error, success=success,
     ))

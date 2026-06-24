@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block page_title %}Survey — {{ survey.title }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs-dash/" class="btn">CS Dashboard</a>
+<a href="/cs/" class="btn">Tickets</a>
+<a href="/cs/returns/" class="btn">Returns</a>
+<a href="/cs/kb/" class="btn">Knowledge Base</a>
+<a href="/cs/surveys/" class="btn">Surveys</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:1100px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.kpi-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:24px; font-weight:bold; color:rgb(0,40,160); }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:70px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.btn-add { padding:7px 18px; background:#28a745; color:white;
+    border:none; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-add:hover { background:#218838; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft  { background:#e2e3e5; color:#383d41; }
+.s-active { background:#d4edda; color:#0a3622; }
+.s-closed { background:#f8d7da; color:#721c24; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>{{ survey.title }}
+        <span class="badge s-{{ survey.status|lower }}" style="font-size:14px;">{{ survey.status }}</span>
+        <span style="font-size:14px;color:white;font-weight:normal;margin-left:8px;">{{ survey.survey_type }}</span>
+    </h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Responses</div>
+            <div class="val">{{ survey.response_count|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Avg Score</div>
+            <div class="val">{{ survey.avg_score|default:"—" }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Period</div>
+            <div class="val" style="font-size:14px;">
+                {{ survey.start_date|default:"—" }} → {{ survey.end_date|default:"—" }}
+            </div>
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Survey</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" required value="{{ survey.title }}">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select name="survey_type">
+                        {% for t in survey_types %}
+                        <option value="{{ t }}"{% if survey.survey_type == t %} selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in survey_statuses %}
+                        <option value="{{ s }}"{% if survey.status == s %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ survey.start_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" value="{{ survey.end_date|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Description</label>
+                    <textarea name="description">{{ survey.description|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Responses ({{ responses|length }})</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th style="text-align:right;">Score</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in responses %}
+            <tr>
+                <td>{{ r.response_date|default:"—" }}</td>
+                <td>{{ r.customer_name|default:"Anonymous" }}</td>
+                <td style="text-align:right;font-weight:bold;">{{ r.score|default:"—" }}</td>
+                <td>{{ r.comments|default:"—"|truncatechars:80 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">No responses yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Response</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="respond">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Response Date</label>
+                    <input type="date" name="response_date">
+                </div>
+                <div class="form-group">
+                    <label>Score (0–10)</label>
+                    <input type="number" name="score" min="0" max="10" placeholder="0–10">
+                </div>
+                <div class="form-group full-span">
+                    <label>Comments</label>
+                    <textarea name="comments" placeholder="Customer feedback…"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-add">Add Response</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
