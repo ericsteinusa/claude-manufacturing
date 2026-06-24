@@ -247,6 +247,31 @@ WEB_LEAF_URLS = {
     ('sales', 'open_orders'): '/so/?status=confirmed',
     ('sales', 'order_hist'): '/so/',
     ('sales', 'order_stat'): '/so/',
+    # Sales quotes
+    ('sales', 'new_quote'):  '/sales/quotes/',
+    ('sales', 'act_quotes'): '/sales/quotes/',
+    ('sales', 'quote_hist'): '/sales/quotes/',
+    ('sales', 'conv_order'): '/sales/quotes/',
+    # Sales reports
+    ('sales', 'daily_sales'): '/sales/',
+    ('sales', 'month_sales'): '/sales/',
+    ('sales', 'annual_rpt'):  '/sales/',
+    ('sales', 'by_rep'):      '/sales/',
+    # Leads & Opportunities
+    ('sales', 'new_lead'):  '/sales/leads/',
+    ('sales', 'act_leads'): '/sales/leads/',
+    ('sales', 'opp_pipe'):  '/sales/leads/',
+    ('sales', 'lead_rpts'): '/sales/leads/',
+    # Sales Contracts
+    ('sales', 'act_cont'):   '/sales/contracts/',
+    ('sales', 'new_cont'):   '/sales/contracts/',
+    ('sales', 'cont_renew'): '/sales/contracts/',
+    ('sales', 'cont_arch'):  '/sales/contracts/',
+    # Forecasting
+    ('sales', 'cur_fore'):  '/sales/forecast/',
+    ('sales', 'fore_rep'):  '/sales/forecast/',
+    ('sales', 'fore_prod'): '/sales/forecast/',
+    ('sales', 'fore_rpts'): '/sales/forecast/',
     ('personnel', 'view_recs'): '/people/',
     ('personnel', 'new_emp'): '/people/new/',
     ('personnel', 'upd_rec'): '/people/',
@@ -6386,6 +6411,15 @@ from .sales_core import (  # noqa: E402
     get_sales_dashboard,
     list_quotes, create_quote, update_quote, set_quote_status,
     list_targets, create_target, update_target,
+    SALES_LEAD_STATUSES, SALES_LEAD_SOURCES, SALES_LEAD_PRIORITIES,
+    list_sales_leads, get_sales_lead, create_sales_lead, update_sales_lead,
+    init_sales_lead_table,
+    SALES_CONTRACT_STATUSES,
+    list_sales_contracts, get_sales_contract,
+    create_sales_contract, update_sales_contract, init_sales_contract_table,
+    FORECAST_PERIODS, FORECAST_STATUSES,
+    list_forecasts, get_forecast, create_forecast, update_forecast,
+    init_sales_forecast_table,
 )
 
 _SALES_DEPT_KEYS = {'sales'}
@@ -6648,6 +6682,251 @@ def sales_targets(request):
                      filter_rep=rep_filter, filter_period=period_filter,
                      error=error, success=success)
     return render(request, 'sales_targets.html', ctx)
+
+
+def sales_leads_list(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_lead_table(conn)
+        leads = list_sales_leads(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and can_edit:
+            try:
+                create_sales_lead(
+                    conn,
+                    company=request.POST.get('company', ''),
+                    contact=request.POST.get('contact', ''),
+                    source=request.POST.get('source', ''),
+                    status=request.POST.get('status', 'New'),
+                    priority=request.POST.get('priority', 'Medium'),
+                    estimated_value=float(request.POST.get('estimated_value') or 0),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('sales_leads_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                leads = list_sales_leads(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_leads_list.html', _sales_ctx(
+        request, leads=leads, status_filter=status_f, search=search,
+        lead_statuses=SALES_LEAD_STATUSES, lead_sources=SALES_LEAD_SOURCES,
+        lead_priorities=SALES_LEAD_PRIORITIES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def sales_leads_detail(request, lead_id):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        lead = get_sales_lead(conn, lead_id)
+        if not lead:
+            return redirect('sales_leads_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_sales_lead(
+                    conn, lead_id,
+                    company=request.POST.get('company', ''),
+                    contact=request.POST.get('contact', ''),
+                    source=request.POST.get('source', ''),
+                    status=request.POST.get('status', ''),
+                    priority=request.POST.get('priority', ''),
+                    estimated_value=float(request.POST.get('estimated_value') or 0),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Lead updated.'
+                lead = get_sales_lead(conn, lead_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'sales_leads_detail.html', _sales_ctx(
+        request, lead=lead, can_edit=can_edit,
+        lead_statuses=SALES_LEAD_STATUSES, lead_sources=SALES_LEAD_SOURCES,
+        lead_priorities=SALES_LEAD_PRIORITIES,
+        error=error, success=success,
+    ))
+
+
+def sales_contracts_list(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_contract_table(conn)
+        contracts = list_sales_contracts(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and can_edit:
+            try:
+                create_sales_contract(
+                    conn,
+                    customer=request.POST.get('customer', ''),
+                    title=request.POST.get('title', ''),
+                    value=float(request.POST.get('value') or 0),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    renewal_date=request.POST.get('renewal_date', ''),
+                    status=request.POST.get('status', 'Draft'),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('sales_contracts_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                contracts = list_sales_contracts(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_contracts_list.html', _sales_ctx(
+        request, contracts=contracts, status_filter=status_f, search=search,
+        contract_statuses=SALES_CONTRACT_STATUSES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def sales_contracts_detail(request, contract_id):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        contract = get_sales_contract(conn, contract_id)
+        if not contract:
+            return redirect('sales_contracts_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_sales_contract(
+                    conn, contract_id,
+                    customer=request.POST.get('customer', ''),
+                    title=request.POST.get('title', ''),
+                    value=float(request.POST.get('value') or 0),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    renewal_date=request.POST.get('renewal_date', ''),
+                    status=request.POST.get('status', ''),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Contract updated.'
+                contract = get_sales_contract(conn, contract_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'sales_contracts_detail.html', _sales_ctx(
+        request, contract=contract, can_edit=can_edit,
+        contract_statuses=SALES_CONTRACT_STATUSES,
+        error=error, success=success,
+    ))
+
+
+def sales_forecast_list(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    period_f = request.GET.get('period', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_forecast_table(conn)
+        forecasts = list_forecasts(conn, period=period_f or None, search=search or None)
+        if request.method == 'POST' and can_edit:
+            try:
+                create_forecast(
+                    conn,
+                    rep=request.POST.get('rep', ''),
+                    period=request.POST.get('period', ''),
+                    fiscal_year=int(request.POST.get('fiscal_year') or 0),
+                    product_line=request.POST.get('product_line', ''),
+                    expected_value=float(request.POST.get('expected_value') or 0),
+                    probability=int(request.POST.get('probability') or 0),
+                    status=request.POST.get('status', 'Draft'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('sales_forecast_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                forecasts = list_forecasts(conn, period=period_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_forecast_list.html', _sales_ctx(
+        request, forecasts=forecasts, period_filter=period_f, search=search,
+        forecast_periods=FORECAST_PERIODS, forecast_statuses=FORECAST_STATUSES,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def sales_forecast_detail(request, forecast_id):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        forecast = get_forecast(conn, forecast_id)
+        if not forecast:
+            return redirect('sales_forecast_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_forecast(
+                    conn, forecast_id,
+                    rep=request.POST.get('rep', ''),
+                    period=request.POST.get('period', ''),
+                    fiscal_year=int(request.POST.get('fiscal_year') or 0),
+                    product_line=request.POST.get('product_line', ''),
+                    expected_value=float(request.POST.get('expected_value') or 0),
+                    probability=int(request.POST.get('probability') or 0),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Forecast updated.'
+                forecast = get_forecast(conn, forecast_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'sales_forecast_detail.html', _sales_ctx(
+        request, forecast=forecast, can_edit=can_edit,
+        forecast_periods=FORECAST_PERIODS, forecast_statuses=FORECAST_STATUSES,
+        error=error, success=success,
+    ))
+
 
 def _prod_access(request, write=False):
     if not request.session.get('user_email'):
