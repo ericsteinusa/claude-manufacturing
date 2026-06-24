@@ -199,7 +199,14 @@ from .legal_core import (
     CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
     LITIGATION_TYPES, LITIGATION_STATUSES,
 )
-from .marketing_core import get_marketing_dashboard
+from .marketing_core import (
+    get_marketing_dashboard,
+    list_campaigns, get_campaign, create_campaign, update_campaign,
+    list_leads, get_lead, create_lead, update_lead,
+    list_content, get_content_item, create_content, update_content,
+    CHANNELS, OBJECTIVES, CAMPAIGN_STATUSES,
+    LEAD_SOURCES, LEAD_STATUSES, CONTENT_TYPES, CONTENT_STATUSES,
+)
 
 log = get_logger(__name__)
 
@@ -475,11 +482,11 @@ WEB_LEAF_URLS = {
     ('personnel', 'turn_rpt'):     '/pers/',
     ('personnel', 'month_sum'):    '/pers/',
     # Customer Service dashboard
-    # Marketing dashboard
-    ('marketing', 'act_camp'):    '/mkt/',
-    ('marketing', 'new_camp'):    '/mkt/',
-    ('marketing', 'camp_cal'):    '/mkt/',
-    ('marketing', 'camp_res'):    '/mkt/',
+    # Marketing dashboard + sub-pages
+    ('marketing', 'act_camp'):    '/mkt/campaigns/',
+    ('marketing', 'new_camp'):    '/mkt/campaigns/',
+    ('marketing', 'camp_cal'):    '/mkt/campaigns/',
+    ('marketing', 'camp_res'):    '/mkt/campaigns/',
     ('marketing', 'res_proj'):    '/mkt/',
     ('marketing', 'comp_analy'):  '/mkt/',
     ('marketing', 'surv_mgmt'):   '/mkt/',
@@ -489,20 +496,20 @@ WEB_LEAF_URLS = {
     ('marketing', 'ad_perf'):     '/mkt/',
     ('marketing', 'ad_cal'):      '/mkt/',
     ('marketing', 'web_analy'):   '/mkt/',
-    ('marketing', 'camp_analy'):  '/mkt/',
+    ('marketing', 'camp_analy'):  '/mkt/campaigns/',
     ('marketing', 'sales_analy'): '/mkt/',
     ('marketing', 'cust_rpts'):   '/mkt/',
-    ('marketing', 'cont_cal'):    '/mkt/',
-    ('marketing', 'blog'):        '/mkt/',
-    ('marketing', 'mkt_mat'):     '/mkt/',
-    ('marketing', 'cont_arch'):   '/mkt/',
-    ('marketing', 'post_mgmt'):   '/mkt/',
-    ('marketing', 'social_cal'):  '/mkt/',
+    ('marketing', 'cont_cal'):    '/mkt/content/',
+    ('marketing', 'blog'):        '/mkt/content/',
+    ('marketing', 'mkt_mat'):     '/mkt/content/',
+    ('marketing', 'cont_arch'):   '/mkt/content/',
+    ('marketing', 'post_mgmt'):   '/mkt/content/',
+    ('marketing', 'social_cal'):  '/mkt/content/',
     ('marketing', 'eng_rpts'):    '/mkt/',
     ('marketing', 'acct_mgmt'):   '/mkt/',
-    ('marketing', 'email_camp'):  '/mkt/',
-    ('marketing', 'sub_lists'):   '/mkt/',
-    ('marketing', 'email_tmpl'):  '/mkt/',
+    ('marketing', 'email_camp'):  '/mkt/campaigns/',
+    ('marketing', 'sub_lists'):   '/mkt/leads/',
+    ('marketing', 'email_tmpl'):  '/mkt/content/',
     ('marketing', 'email_analy'): '/mkt/',
     ('marketing', 'pend_appr'):   '/mkt/',
     ('marketing', 'appr_camp'):   '/mkt/',
@@ -6963,4 +6970,249 @@ def mkt_dashboard(request):
         data = get_marketing_dashboard(conn)
     ctx = _mkt_ctx(request, **data)
     return render(request, 'marketing_dashboard.html', ctx)
+
+
+def mkt_campaign_list(request):
+    err = _mkt_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    channel_f = request.GET.get('channel', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        campaigns = list_campaigns(conn, status=status_f or None,
+                                   channel=channel_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_campaign(
+                    conn,
+                    name=request.POST.get('name', ''),
+                    channel=request.POST.get('channel', ''),
+                    objective=request.POST.get('objective', ''),
+                    owner=request.POST.get('owner', ''),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    status=request.POST.get('status', 'Planned'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_campaign_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                campaigns = list_campaigns(conn, status=status_f or None,
+                                           channel=channel_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_campaign_list.html', _mkt_ctx(
+        request, campaigns=campaigns, status_filter=status_f, channel_filter=channel_f,
+        search=search, campaign_statuses=CAMPAIGN_STATUSES, channels=CHANNELS,
+        objectives=OBJECTIVES, error=error, success=success,
+    ))
+
+
+def mkt_campaign_detail(request, campaign_id):
+    err = _mkt_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    campaign = None
+    try:
+        campaign = get_campaign(conn, campaign_id)
+        if not campaign:
+            return redirect('mkt_campaign_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_campaign(
+                    conn, campaign_id,
+                    name=request.POST.get('name', ''),
+                    channel=request.POST.get('channel', ''),
+                    objective=request.POST.get('objective', ''),
+                    owner=request.POST.get('owner', ''),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Campaign updated.'
+                campaign = get_campaign(conn, campaign_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_campaign_detail.html', _mkt_ctx(
+        request, campaign=campaign, can_edit=can_edit,
+        campaign_statuses=CAMPAIGN_STATUSES, channels=CHANNELS, objectives=OBJECTIVES,
+        error=error, success=success,
+    ))
+
+
+def mkt_lead_list(request):
+    err = _mkt_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    source_f = request.GET.get('source', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        leads = list_leads(conn, status=status_f or None,
+                           source=source_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_lead(
+                    conn,
+                    name=request.POST.get('name', ''),
+                    company=request.POST.get('company', ''),
+                    email=request.POST.get('email', ''),
+                    source=request.POST.get('source', ''),
+                    owner=request.POST.get('owner', ''),
+                    captured_date=request.POST.get('captured_date', ''),
+                    status=request.POST.get('status', 'New'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_lead_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                leads = list_leads(conn, status=status_f or None,
+                                   source=source_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_lead_list.html', _mkt_ctx(
+        request, leads=leads, status_filter=status_f, source_filter=source_f,
+        search=search, lead_statuses=LEAD_STATUSES, lead_sources=LEAD_SOURCES,
+        error=error, success=success,
+    ))
+
+
+def mkt_lead_detail(request, lead_id):
+    err = _mkt_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    lead = None
+    try:
+        lead = get_lead(conn, lead_id)
+        if not lead:
+            return redirect('mkt_lead_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_lead(
+                    conn, lead_id,
+                    name=request.POST.get('name', ''),
+                    company=request.POST.get('company', ''),
+                    email=request.POST.get('email', ''),
+                    source=request.POST.get('source', ''),
+                    owner=request.POST.get('owner', ''),
+                    captured_date=request.POST.get('captured_date', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Lead updated.'
+                lead = get_lead(conn, lead_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_lead_detail.html', _mkt_ctx(
+        request, lead=lead, can_edit=can_edit,
+        lead_statuses=LEAD_STATUSES, lead_sources=LEAD_SOURCES,
+        error=error, success=success,
+    ))
+
+
+def mkt_content_list(request):
+    err = _mkt_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('content_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        items = list_content(conn, status=status_f or None,
+                             content_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_content(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    content_type=request.POST.get('content_type', ''),
+                    channel=request.POST.get('channel', ''),
+                    author=request.POST.get('author', ''),
+                    due_date=request.POST.get('due_date', ''),
+                    publish_date=request.POST.get('publish_date', ''),
+                    status=request.POST.get('status', 'Draft'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_content_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                items = list_content(conn, status=status_f or None,
+                                     content_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_content_list.html', _mkt_ctx(
+        request, items=items, status_filter=status_f, type_filter=type_f,
+        search=search, content_statuses=CONTENT_STATUSES, content_types=CONTENT_TYPES,
+        channels=CHANNELS, error=error, success=success,
+    ))
+
+
+def mkt_content_detail(request, item_id):
+    err = _mkt_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    item = None
+    try:
+        item = get_content_item(conn, item_id)
+        if not item:
+            return redirect('mkt_content_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_content(
+                    conn, item_id,
+                    title=request.POST.get('title', ''),
+                    content_type=request.POST.get('content_type', ''),
+                    channel=request.POST.get('channel', ''),
+                    author=request.POST.get('author', ''),
+                    due_date=request.POST.get('due_date', ''),
+                    publish_date=request.POST.get('publish_date', ''),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Content updated.'
+                item = get_content_item(conn, item_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_content_detail.html', _mkt_ctx(
+        request, item=item, can_edit=can_edit,
+        content_statuses=CONTENT_STATUSES, content_types=CONTENT_TYPES,
+        channels=CHANNELS, error=error, success=success,
+    ))
 
