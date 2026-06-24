@@ -383,10 +383,16 @@ WEB_LEAF_URLS = {
     ('accounting', 'cust_rpts'):  '/gl/',
     ('accounting', 'fin_reports'): '/gl/',
     ('accounting', 'credit'):     '/gl/',
-    ('finance', 'fin_plan'):      '/gl/',
-    ('finance', 'fin_forecast'):  '/gl/',
-    ('finance', 'fin_analysis'):  '/gl/',
-    ('finance', 'fin_reporting'): '/gl/',
+    ('finance', 'fin_plan'):       '/fin/',
+    ('finance', 'fin_forecast'):   '/fin/',
+    ('finance', 'fin_analysis'):   '/fin/',
+    ('finance', 'fin_reporting'):  '/fin/',
+    ('finance', 'treasury_ops'):   '/fin/',
+    ('finance', 'capital_mgmt'):   '/fin/',
+    ('finance', 'tax_planning'):   '/fin/',
+    ('finance', 'treasury_mgmt'):  '/fin/',
+    ('finance', 'invest_mgmt'):    '/fin/',
+    ('finance', 'fin_rpts_mgr'):   '/gl/',
     # Purchasing dashboard
     ('purchasing', 'prod_entry'):  '/inventory/new/',
     ('purchasing', 'vend_eval'):   '/suppliers/',
@@ -6227,6 +6233,7 @@ def sales_targets(request):
 
 from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
+from .finance_core import get_finance_dashboard
 
 
 def _prod_access(request, write=False):
@@ -6316,4 +6323,18 @@ def cs_dashboard_view(request):
         recent_tickets = list_tickets(conn)[:8]
     ctx = _cs_context(request, stats=stats, recent_tickets=recent_tickets)
     return render(request, 'cs_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Finance dashboard
+# ---------------------------------------------------------------------------
+
+def fin_dashboard(request):
+    err = _acct_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_finance_dashboard(conn)
+    ctx = _acct_ctx(request, **data)
+    return render(request, 'finance_dashboard.html', ctx)
 
