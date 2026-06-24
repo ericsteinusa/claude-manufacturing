@@ -466,6 +466,50 @@ WEB_LEAF_URLS = {
     ('personnel', 'turn_rpt'):     '/pers/',
     ('personnel', 'month_sum'):    '/pers/',
     # Customer Service dashboard
+    # Information Technology dashboard
+    ('information_tech', 'it_calls'):    '/it/',
+    ('information_tech', 'it_tasks'):    '/it/',
+    ('information_tech', 'new_ticket'):  '/it/',
+    ('information_tech', 'open_tick'):   '/it/',
+    ('information_tech', 'my_tickets'):  '/it/',
+    ('information_tech', 'tick_hist'):   '/it/',
+    ('information_tech', 'asset_inv'):   '/it/',
+    ('information_tech', 'new_asset'):   '/it/',
+    ('information_tech', 'asset_hist'):  '/it/',
+    ('information_tech', 'disposition'): '/it/',
+    ('information_tech', 'net_dash'):    '/it/',
+    ('information_tech', 'bw_monitor'):  '/it/',
+    ('information_tech', 'net_map'):     '/it/',
+    ('information_tech', 'inc_log'):     '/it/',
+    ('information_tech', 'pend_inst'):   '/it/',
+    ('information_tech', 'sw_inv'):      '/it/',
+    ('information_tech', 'lic_mgmt'):    '/it/',
+    ('information_tech', 'inst_hist'):   '/it/',
+    ('information_tech', 'new_repair'):  '/it/',
+    ('information_tech', 'inprog'):      '/it/',
+    ('information_tech', 'comp_rep'):    '/it/',
+    ('information_tech', 'rep_hist'):    '/it/',
+    ('information_tech', 'create_acct'): '/it/',
+    ('information_tech', 'reset_pw'):    '/it/',
+    ('information_tech', 'acct_stat'):   '/it/',
+    ('information_tech', 'acct_audit'):  '/it/',
+    ('information_tech', 'it_budg'):     '/it/',
+    ('information_tech', 'hw_proc'):     '/it/',
+    ('information_tech', 'sw_lic'):      '/it/',
+    ('information_tech', 'proc_rpts'):   '/it/',
+    ('information_tech', 'act_cont'):    '/it/',
+    ('information_tech', 'cont_renew'):  '/it/',
+    ('information_tech', 'vend_perf'):   '/it/',
+    ('information_tech', 'cont_arch'):   '/it/',
+    ('information_tech', 'act_proj'):    '/it/',
+    ('information_tech', 'proj_pipe'):   '/it/',
+    ('information_tech', 'proj_rpts'):   '/it/',
+    ('information_tech', 'res_alloc'):   '/it/',
+    ('information_tech', 'sec_dash'):    '/it/',
+    ('information_tech', 'inc_rpts'):    '/it/',
+    ('information_tech', 'vuln_mgmt'):   '/it/',
+    ('information_tech', 'comp_rpts'):   '/it/',
+    # Customer Service dashboard
     ('customer_service', 'cs_calls'): '/cs-dash/',
     ('customer_service', 'daily_tick'):  '/cs/reports/',
     ('customer_service', 'week_sum'):    '/cs/reports/',
@@ -6234,6 +6278,7 @@ def sales_targets(request):
 from .production_core import get_production_dashboard
 from .purchasing_core import get_purchasing_dashboard
 from .finance_core import get_finance_dashboard
+from .it_core import get_it_dashboard
 
 
 def _prod_access(request, write=False):
@@ -6337,4 +6382,38 @@ def fin_dashboard(request):
         data = get_finance_dashboard(conn)
     ctx = _acct_ctx(request, **data)
     return render(request, 'finance_dashboard.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# IT dashboard
+# ---------------------------------------------------------------------------
+
+def _it_access(request):
+    email = request.session.get('user_email')
+    if not email:
+        return redirect('/')
+    role = request.session.get('user_role', '')
+    if role in FULL_ACCESS_ROLES:
+        return None
+    if request.session.get('user_dept', '') != 'information_tech':
+        return redirect('/dashboard/')
+    return None
+
+
+def _it_ctx(request, **extra):
+    return {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        **extra,
+    }
+
+
+def it_dashboard(request):
+    err = _it_access(request)
+    if err:
+        return err
+    with get_db_connection() as conn:
+        data = get_it_dashboard(conn)
+    ctx = _it_ctx(request, **data)
+    return render(request, 'it_dashboard.html', ctx)
 

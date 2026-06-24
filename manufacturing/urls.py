@@ -178,6 +178,7 @@ urlpatterns = [
     path('sales/targets/', views.sales_targets, name='sales_targets'),
     path('prod/', views.prod_dashboard, name='prod_dashboard'),
     path('fin/', views.fin_dashboard, name='fin_dashboard'),
+    path('it/', views.it_dashboard, name='it_dashboard'),
     path('purch/', views.purch_dashboard, name='purch_dashboard'),
     path('pers/', views.pers_dashboard, name='pers_dashboard'),
     path('cs-dash/', views.cs_dashboard_view, name='cs_dashboard'),
