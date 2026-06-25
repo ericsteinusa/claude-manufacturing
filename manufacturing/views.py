@@ -749,6 +749,7 @@ WEB_LEAF_URLS = {
     ('accounting', 'gen_ledger'):    '/gl/',
     ('accounting', 'budget_mgmt'):   '/fin/budgets/',
     ('accounting', 'budg_plan'):     '/fin/budgets/',
+    ('accounting', 'budg_act'):      '/fin/budgets/',
     ('accounting', 'budg_amend'):    '/fin/budgets/',
     ('accounting', 'budg_rpts'):     '/fin/budgets/',
     ('accounting', 'tax_mgmt'):      '/fin/tax/',
@@ -771,6 +772,17 @@ WEB_LEAF_URLS = {
     ('accounting', 'findings'):      '/fin/audits/',
     ('accounting', 'corr_act'):      '/fin/audits/',
     ('accounting', 'audit_rpts'):    '/fin/audits/',
+    # Budget Management department
+    ('budget_management', 'bud_overview'):  '/fin/budgets/',
+    ('budget_management', 'bud_detail_mgr'): '/fin/budgets/',
+    ('budget_management', 'bva_mgr'):       '/fin/budgets/',
+    ('budget_management', 'variance_mgr'):  '/fin/budgets/',
+    ('budget_management', 'dept_summary'):  '/fin/budgets/',
+    ('budget_management', 'approval_wf'):   '/fin/budgets/',
+    ('budget_management', 'budgets'):       '/fin/budgets/',
+    ('budget_management', 'bud_detail'):    '/fin/budgets/',
+    ('budget_management', 'bva'):           '/fin/budgets/',
+    ('budget_management', 'variance'):      '/fin/budgets/',
     # Finance — manager + top-level leaves
     ('finance', 'fin_mgr'):          '/fin/',
     # Legal / Risk Management dashboard
