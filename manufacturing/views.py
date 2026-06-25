@@ -308,6 +308,26 @@ WEB_LEAF_URLS = {
     ('sales', 'fore_rep'):  '/sales/forecast/',
     ('sales', 'fore_prod'): '/sales/forecast/',
     ('sales', 'fore_rpts'): '/sales/forecast/',
+    # Sales Targets (manager sub-menu)
+    ('sales', 'set_tgt'):   '/sales/targets/',
+    ('sales', 'tgt_act'):   '/sales/targets/',
+    ('sales', 'tgt_rep'):   '/sales/targets/',
+    ('sales', 'tgt_rpts'):  '/sales/targets/',
+    # Territory Management
+    ('sales', 'terr_map'):    '/sales/territories/',
+    ('sales', 'terr_assign'): '/sales/territories/',
+    ('sales', 'terr_perf'):   '/sales/territories/performance/',
+    ('sales', 'terr_rpts'):   '/sales/territories/',
+    # Commission Tracking
+    ('sales', 'comm_calc'):  '/sales/commissions/',
+    ('sales', 'comm_rpts'):  '/sales/commissions/',
+    ('sales', 'pay_hist'):   '/sales/commissions/history/',
+    ('sales', 'comm_plans'): '/sales/commissions/plans/',
+    # Staff Performance
+    ('sales', 'perf_dash'):  '/sales/performance/',
+    ('sales', 'rep_rank'):   '/sales/performance/',
+    ('sales', 'perf_revs'):  '/sales/performance/reviews/',
+    ('sales', 'coaching'):   '/sales/performance/coaching/',
     ('personnel', 'view_recs'): '/people/',
     ('personnel', 'new_emp'): '/people/new/',
     ('personnel', 'upd_rec'): '/people/',
@@ -6944,6 +6964,21 @@ from .sales_core import (  # noqa: E402
     FORECAST_PERIODS, FORECAST_STATUSES,
     list_forecasts, get_forecast, create_forecast, update_forecast,
     init_sales_forecast_table,
+    # Territories
+    TERRITORY_STATUSES,
+    init_sales_territory_table, list_territories, create_territory, update_territory, get_territory_performance,
+    # Commissions
+    COMMISSION_PLAN_TYPES, COMMISSION_STATUSES,
+    init_commission_tables,
+    list_commission_plans, create_commission_plan, update_commission_plan,
+    list_commissions, create_commission, update_commission,
+    get_commission_summary,
+    # Performance
+    get_sales_performance,
+    COACHING_NOTE_STATUSES, PERF_REVIEW_STATUSES,
+    init_sales_performance_tables,
+    list_coaching_notes, create_coaching_note,
+    list_perf_reviews, create_perf_review,
 )
 
 _SALES_DEPT_KEYS = {'sales'}
@@ -9385,4 +9420,355 @@ def acct_dashboard(request):
         conn.close()
     return render(request, 'acct_dashboard.html', _acct_ctx(
         request, ap=ap, ar=ar, recent_journals=recent_journals,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Sales — Territory Management
+# ---------------------------------------------------------------------------
+
+def sales_territories(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_territory_table(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'new')
+            try:
+                if action == 'update':
+                    update_territory(
+                        conn,
+                        territory_id=int(request.POST.get('territory_id', 0)),
+                        name=request.POST.get('name', '').strip(),
+                        region=request.POST.get('region', '').strip(),
+                        assigned_rep=request.POST.get('assigned_rep', '').strip(),
+                        status=request.POST.get('status', 'Active'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Territory updated.'
+                else:
+                    create_territory(
+                        conn,
+                        name=request.POST.get('name', '').strip(),
+                        region=request.POST.get('region', '').strip(),
+                        assigned_rep=request.POST.get('assigned_rep', '').strip(),
+                        status=request.POST.get('status', 'Active'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Territory created.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        territories = list_territories(conn, status=status_f or None,
+                                       search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_territories.html', _sales_ctx(
+        request,
+        territories=territories,
+        status_filter=status_f,
+        search=search,
+        TERRITORY_STATUSES=TERRITORY_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+def sales_territory_performance(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    try:
+        init_sales_territory_table(conn)
+        conn.commit()
+        territories = get_territory_performance(conn)
+    finally:
+        conn.close()
+    return render(request, 'sales_territory_performance.html', _sales_ctx(
+        request, territories=territories,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Sales — Commission Tracking
+# ---------------------------------------------------------------------------
+
+def sales_commissions(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    rep_f = request.GET.get('rep', '').strip()
+    period_f = request.GET.get('period', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_commission_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'new')
+            try:
+                plan_id_raw = request.POST.get('plan_id', '') or None
+                plan_id = int(plan_id_raw) if plan_id_raw else None
+                if action == 'update':
+                    update_commission(
+                        conn,
+                        commission_id=int(request.POST.get('commission_id', 0)),
+                        rep=request.POST.get('rep', '').strip(),
+                        period=request.POST.get('period', '').strip(),
+                        plan_id=plan_id,
+                        sale_amount=float(request.POST.get('sale_amount') or 0),
+                        commission=float(request.POST.get('commission') or 0),
+                        status=request.POST.get('status', 'Pending'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Commission record updated.'
+                else:
+                    create_commission(
+                        conn,
+                        rep=request.POST.get('rep', '').strip(),
+                        period=request.POST.get('period', '').strip(),
+                        plan_id=plan_id,
+                        sale_amount=float(request.POST.get('sale_amount') or 0),
+                        commission=float(request.POST.get('commission') or 0),
+                        status=request.POST.get('status', 'Pending'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Commission record added.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        commissions = list_commissions(
+            conn,
+            rep=rep_f or None,
+            period=period_f or None,
+            status=status_f or None,
+        )
+        summary = get_commission_summary(conn)
+        plans = list_commission_plans(conn, active_only=True)
+        periods = conn.execute(
+            "SELECT DISTINCT period FROM sales_commission"
+            " ORDER BY period DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    return render(request, 'sales_commissions.html', _sales_ctx(
+        request,
+        commissions=commissions,
+        summary=summary,
+        plans=plans,
+        periods=[r['period'] for r in periods],
+        rep_filter=rep_f,
+        period_filter=period_f,
+        status_filter=status_f,
+        COMMISSION_STATUSES=COMMISSION_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+def sales_commission_history(request):
+    """Payment history view — shows only Paid commissions."""
+    block = _sales_access(request)
+    if block:
+        return block
+    rep_f = request.GET.get('rep', '').strip()
+    period_f = request.GET.get('period', '').strip()
+    conn = get_db_connection()
+    try:
+        init_commission_tables(conn)
+        conn.commit()
+        paid = list_commissions(conn, rep=rep_f or None,
+                                period=period_f or None, status='Paid')
+        periods = conn.execute(
+            "SELECT DISTINCT period FROM sales_commission"
+            " WHERE status='Paid' ORDER BY period DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    return render(request, 'sales_commission_history.html', _sales_ctx(
+        request,
+        paid=paid,
+        periods=[r['period'] for r in periods],
+        rep_filter=rep_f,
+        period_filter=period_f,
+    ))
+
+
+def sales_commission_plans(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_commission_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'new')
+            try:
+                if action == 'update':
+                    update_commission_plan(
+                        conn,
+                        plan_id=int(request.POST.get('plan_id', 0)),
+                        name=request.POST.get('name', '').strip(),
+                        plan_type=request.POST.get('plan_type', 'Flat Rate'),
+                        rate=float(request.POST.get('rate') or 0),
+                        description=request.POST.get('description', '').strip(),
+                        active=request.POST.get('active') == 'on',
+                    )
+                    conn.commit()
+                    success = 'Plan updated.'
+                else:
+                    create_commission_plan(
+                        conn,
+                        name=request.POST.get('name', '').strip(),
+                        plan_type=request.POST.get('plan_type', 'Flat Rate'),
+                        rate=float(request.POST.get('rate') or 0),
+                        description=request.POST.get('description', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Plan created.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        plans = list_commission_plans(conn)
+    finally:
+        conn.close()
+    return render(request, 'sales_commission_plans.html', _sales_ctx(
+        request,
+        plans=plans,
+        COMMISSION_PLAN_TYPES=COMMISSION_PLAN_TYPES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Sales — Staff Performance
+# ---------------------------------------------------------------------------
+
+def sales_performance(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    conn = get_db_connection()
+    try:
+        data = get_sales_performance(conn)
+    finally:
+        conn.close()
+    return render(request, 'sales_performance.html', _sales_ctx(
+        request, **data,
+    ))
+
+
+def sales_performance_reviews(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    rep_f = request.GET.get('rep', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_performance_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            try:
+                create_perf_review(
+                    conn,
+                    rep=request.POST.get('rep', '').strip(),
+                    review_date=request.POST.get('review_date', '').strip(),
+                    period=request.POST.get('period', '').strip(),
+                    rating=request.POST.get('rating', '').strip(),
+                    strengths=request.POST.get('strengths', '').strip(),
+                    improvements=request.POST.get('improvements', '').strip(),
+                    goals=request.POST.get('goals', '').strip(),
+                    status=request.POST.get('status', 'Scheduled'),
+                    reviewer=request.POST.get('reviewer', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'Review scheduled.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        reviews = list_perf_reviews(conn, rep=rep_f or None,
+                                    status=status_f or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_performance_reviews.html', _sales_ctx(
+        request,
+        reviews=reviews,
+        rep_filter=rep_f,
+        status_filter=status_f,
+        PERF_REVIEW_STATUSES=PERF_REVIEW_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+def sales_coaching(request):
+    block = _sales_access(request)
+    if block:
+        return block
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    rep_f = request.GET.get('rep', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_performance_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            try:
+                create_coaching_note(
+                    conn,
+                    rep=request.POST.get('rep', '').strip(),
+                    subject=request.POST.get('subject', '').strip(),
+                    note=request.POST.get('note', '').strip(),
+                    status=request.POST.get('status', 'Open'),
+                    coach=request.POST.get('coach', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'Coaching note added.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        notes = list_coaching_notes(conn, rep=rep_f or None,
+                                    status=status_f or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_coaching.html', _sales_ctx(
+        request,
+        notes=notes,
+        rep_filter=rep_f,
+        status_filter=status_f,
+        COACHING_NOTE_STATUSES=COACHING_NOTE_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
     ))
