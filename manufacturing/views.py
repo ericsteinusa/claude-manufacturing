@@ -194,7 +194,7 @@ from .accounts import (
     _set_user_role,
     _remove_user_role,
 )
-from .auth_decorators import dept_required, login_required
+from .auth_decorators import dept_required, login_required, role_required
 
 from .production_core import (
     get_production_dashboard,
@@ -2195,20 +2195,6 @@ def so_set_status(request, so_id):
 _PERSONNEL_ROLES = {'HR / Personnel'}
 
 
-def _people_access(request, write=False):
-    """Gate personnel pages: logged in + full_access, HR/Personnel role, or
-    personnel dept. With write=True also blocks READ_ONLY_ROLES.
-    """
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        role = request.session.get('user_role', '')
-        dept = request.session.get('user_dept_key', '')
-        if role not in _PERSONNEL_ROLES and dept != 'personnel':
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('people_list')
-    return None
 
 
 def _people_context(request, **extra):
@@ -2230,10 +2216,8 @@ def _is_hr(request):
     )
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def people_list(request):
-    denied = _people_access(request)
-    if denied:
-        return denied
 
     dept_id = _int_or_none(request.GET.get('dept_id'))
     search = (request.GET.get('search') or '').strip() or None
@@ -2256,10 +2240,8 @@ def people_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def people_detail(request, person_id):
-    denied = _people_access(request)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2304,10 +2286,8 @@ def _people_form(request):
     }, None
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, write_redirect='people_list')
 def people_new(request):
-    denied = _people_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2340,10 +2320,8 @@ def people_new(request):
         back_url='/people/'))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, write_redirect='people_list')
 def people_edit(request, person_id):
-    denied = _people_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2647,17 +2625,9 @@ def time_clock_attendance(request):
 _DEV_BACK = '/time-clock/devices/'
 
 
-def _dev_access(request):
-    """Return True if the logged-in user can manage time clock devices."""
-    return _is_hr(request)
-
-
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_list(request):
     """List all registered time clock terminals."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request):
-        return redirect('time_clock_status')
 
     conn = get_db_connection()
     try:
@@ -2673,12 +2643,9 @@ def tc_device_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_new(request):
     """Add a new time clock device — asks for type, then shows config fields."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request):
-        return redirect('time_clock_status')
 
     error = ''
     form: dict = {
@@ -2732,12 +2699,9 @@ def tc_device_new(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_detail(request, device_id: int):
     """Edit a device or view its sync log."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request):
-        return redirect('time_clock_status')
 
     conn = get_db_connection()
     try:
@@ -2792,11 +2756,10 @@ def tc_device_detail(request, device_id: int):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_poll(request, device_id: int):
     """Trigger an immediate poll of a device."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request) or request.method != 'POST':
+    if request.method != 'POST':
         return redirect('tc_device_list')
 
     conn = get_db_connection()
@@ -2809,11 +2772,10 @@ def tc_device_poll(request, device_id: int):
     return redirect('tc_device_detail', device_id=device_id)
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_delete(request, device_id: int):
     """Delete a device and its sync log."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request) or request.method != 'POST':
+    if request.method != 'POST':
         return redirect('tc_device_list')
 
     conn = get_db_connection()
@@ -2927,16 +2889,9 @@ def tc_schedule(request):
 _AUDIT_ROLES = FULL_ACCESS_ROLES | {'Auditor'}
 
 
-def _audit_access(request):
-    return request.session.get('user_role') in _AUDIT_ROLES
-
-
+@role_required(_AUDIT_ROLES)
 def audit_log(request):
     """Recent audit log entries, filterable by table and user."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _audit_access(request):
-        return redirect('dashboard')
 
     table_filter = request.GET.get('table', '')
     user_filter = request.GET.get('user', '')
@@ -2955,12 +2910,9 @@ def audit_log(request):
     })
 
 
+@role_required(_AUDIT_ROLES)
 def audit_record(request, table_name: str, record_id: int):
     """Full history for a single record."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _audit_access(request):
-        return redirect('dashboard')
 
     history = get_history(table_name, record_id)
     return render(request, 'audit_record.html', {
@@ -2976,23 +2928,9 @@ def audit_record(request, table_name: str, record_id: int):
 # Period locking management
 # ---------------------------------------------------------------------------
 
-def _periods_access(request, *, write: bool = False):
-    """Return a redirect if the user may not access the periods page."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    role = request.session.get('user_role', '')
-    if write and role not in PERIOD_ADMIN_ROLES:
-        return redirect('periods')
-    if not write and role not in PERIOD_ADMIN_ROLES:
-        return redirect('dashboard')
-    return None
-
-
+@role_required(PERIOD_ADMIN_ROLES)
 def periods(request):
     """List closed periods and show close/reopen controls."""
-    denied = _periods_access(request)
-    if denied:
-        return denied
 
     error = None
     if request.method == 'POST':
@@ -3060,20 +2998,9 @@ def periods(request):
 # PO approval workflow
 # ---------------------------------------------------------------------------
 
-def _approval_access(request):
-    """Redirect if the user is not authorised to approve/reject POs."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if request.session.get('user_role') not in APPROVAL_ROLES:
-        return redirect('dashboard')
-    return None
-
-
+@role_required(APPROVAL_ROLES)
 def po_approvals(request):
     """Queue of POs waiting for approval (President / VP only)."""
-    denied = _approval_access(request)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -3089,11 +3016,9 @@ def po_approvals(request):
     })
 
 
+@role_required(APPROVAL_ROLES)
 def po_approve(request, approval_id):
     """Approve a pending PO."""
-    denied = _approval_access(request)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_approvals')
 
@@ -3111,11 +3036,9 @@ def po_approve(request, approval_id):
     return redirect('po_approvals')
 
 
+@role_required(APPROVAL_ROLES)
 def po_reject(request, approval_id):
     """Reject a pending PO, returning it to draft."""
-    denied = _approval_access(request)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_approvals')
 
@@ -7472,20 +7395,16 @@ def purch_reports_view(request):
 # Personnel dashboard
 # ---------------------------------------------------------------------------
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_dashboard(request):
-    err = _people_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_personnel_dashboard(conn)
     ctx = _people_context(request, **data)
     return render(request, 'personnel_dashboard.html', ctx)
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_depts(request):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     error = success = None
     conn = get_db_connection()
@@ -7528,10 +7447,8 @@ def pers_depts(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_reviews_list(request):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -7571,10 +7488,8 @@ def pers_reviews_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_review_detail(request, review_id):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     error = success = None
     conn = get_db_connection()
@@ -7608,10 +7523,8 @@ def pers_review_detail(request, review_id):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_training_list(request):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('type', '').strip()
@@ -7658,10 +7571,8 @@ def pers_training_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_training_detail(request, training_id):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     error = success = None
     conn = get_db_connection()

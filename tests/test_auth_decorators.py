@@ -6,7 +6,7 @@ verify which named URL (or path) is passed to it, not the resolved URL.
 
 from unittest.mock import patch, MagicMock
 
-from manufacturing.auth_decorators import dept_required, login_required
+from manufacturing.auth_decorators import dept_required, login_required, role_required
 
 
 # ---------------------------------------------------------------------------
@@ -167,4 +167,87 @@ class TestDeptRequiredPassthrough:
         def my_view(request):
             return 'ok'
         wrapped = login_required(my_view)
+        assert wrapped.__name__ == 'my_view'
+
+
+# ---------------------------------------------------------------------------
+# dept_required — role_keys parameter
+# ---------------------------------------------------------------------------
+
+class TestDeptRequiredRoleKeys:
+    def test_role_key_grants_access_without_dept(self):
+        view = dept_required('personnel', role_keys={'HR / Personnel'})(_sentinel)
+        assert view(_req(user_email='a@b.com', user_dept_key='sales',
+                         user_role='HR / Personnel')) == 'ok'
+
+    def test_dept_still_grants_access_without_role(self):
+        view = dept_required('personnel', role_keys={'HR / Personnel'})(_sentinel)
+        assert view(_req(user_email='a@b.com', user_dept_key='personnel',
+                         user_role='Employee')) == 'ok'
+
+    def test_neither_dept_nor_role_is_denied(self):
+        view = dept_required('personnel', role_keys={'HR / Personnel'})(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_dept_key='sales', user_role='Employee'))
+            mock_redir.assert_called_once_with('dashboard')
+
+    def test_full_access_bypasses_both_checks(self):
+        view = dept_required('personnel', role_keys={'HR / Personnel'})(_sentinel)
+        assert view(_req(user_email='a@b.com', user_full_access=True,
+                         user_dept_key='sales', user_role='Employee')) == 'ok'
+
+
+# ---------------------------------------------------------------------------
+# dept_required — deny_redirect parameter
+# ---------------------------------------------------------------------------
+
+class TestDeptRequiredDenyRedirect:
+    def test_custom_deny_redirect_used_on_dept_fail(self):
+        view = dept_required('personnel', deny_redirect='time_clock_status')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_dept_key='sales'))
+            mock_redir.assert_called_once_with('time_clock_status')
+
+    def test_default_deny_redirect_is_dashboard(self):
+        view = dept_required('personnel')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_dept_key='sales'))
+            mock_redir.assert_called_once_with('dashboard')
+
+
+# ---------------------------------------------------------------------------
+# role_required
+# ---------------------------------------------------------------------------
+
+class TestRoleRequired:
+    def test_allows_matching_role(self):
+        view = role_required({'President', 'Vice President'})(_sentinel)
+        assert view(_req(user_email='a@b.com', user_role='President')) == 'ok'
+
+    def test_blocks_non_matching_role(self):
+        view = role_required({'President', 'Vice President'})(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_role='Employee'))
+            mock_redir.assert_called_once_with('dashboard')
+
+    def test_redirects_anonymous_to_home(self):
+        view = role_required({'President'})(_sentinel)
+        with _patched() as mock_redir:
+            view(_req())
+            mock_redir.assert_called_once_with('home')
+
+    def test_single_string_role(self):
+        view = role_required('Auditor')(_sentinel)
+        assert view(_req(user_email='a@b.com', user_role='Auditor')) == 'ok'
+
+    def test_custom_deny_redirect(self):
+        view = role_required({'President'}, deny_redirect='po_list')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_role='Employee'))
+            mock_redir.assert_called_once_with('po_list')
+
+    def test_functools_wraps_preserves_name(self):
+        def my_view(request):
+            return 'ok'
+        wrapped = role_required('President')(my_view)
         assert wrapped.__name__ == 'my_view'

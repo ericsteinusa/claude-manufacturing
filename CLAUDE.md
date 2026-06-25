@@ -84,8 +84,17 @@ manufacturing/
   (`/po/...`, `views.po_*`, `purchase_orders_core.py`) route all four
   Purchasing → Purchase Orders leaves this way.
 - Web views run where `import PyQt6` fails, so they must import the Qt-free
-  `*_core.py` modules only (same rule as tests — see above). Gate writes with
-  the dept/role checks used by the PO views (`_po_access`; `READ_ONLY_ROLES`).
+  `*_core.py` modules only (same rule as tests — see above).
+- **Access control** is enforced via decorators in `auth_decorators.py`:
+  - `@login_required` — redirect to `'home'` if no active session.
+  - `@dept_required(dept_keys, *, role_keys=None, write_redirect=None, deny_redirect='dashboard')`
+    — allow logged-in users whose `user_dept_key` matches (or whose role is in
+    `role_keys`); full-access roles (President, VP) always bypass. Pass
+    `write_redirect` to also block `READ_ONLY_ROLES` (Auditor) on mutating views.
+  - `@role_required(role_keys, *, deny_redirect='dashboard')` — allow only
+    users whose `user_role` is in `role_keys` (no dept check).
+  - Session keys set at login: `user_email`, `user_role`, `user_dept_key`,
+    `user_full_access`, `user_dept_name`, `user_is_manager`.
 
 ## Database gotchas
 - **Live schema can diverge from the `CREATE TABLE` DDL.** Modules use
