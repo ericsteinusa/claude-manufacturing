@@ -145,6 +145,8 @@ urlpatterns = [
     path('payroll/history/<int:run_id>/', views.payroll_run_detail, name='payroll_run_detail'),
     path('payroll/stubs/<int:entry_id>/', views.payroll_stub_detail, name='payroll_stub_detail'),
     path('payroll/ytd/', views.payroll_ytd, name='payroll_ytd'),
+    # Accounting dashboard
+    path('acct/', views.acct_dashboard, name='acct_dashboard'),
     # Accounts Payable
     path('ap/', views.ap_list, name='ap_list'),
     path('ap/new/', views.ap_invoice_detail, name='ap_invoice_new'),

@@ -560,9 +560,10 @@ WEB_LEAF_URLS = {
     ('accounting', 'pay_hist'):   '/payroll/history/',
     ('personnel', 'pay_rates'):   '/payroll/pay-rates/',
     ('personnel', 'deductions'):  '/payroll/deductions/',
+    # Accounting dashboard
+    ('accounting', 'acct_mgr'):   '/acct/',
     # Accounts Payable
     ('accounting', 'acct_pay'):   '/ap/',
-    ('accounting', 'acct_mgr'):   '/ap/',
     ('accounting', 'ap'):         '/ap/',
     ('accounting', 'acct_rcv'):   '/ar/',
     ('accounting', 'rcv'):        '/ar/',
@@ -699,6 +700,34 @@ WEB_LEAF_URLS = {
     ('marketing', 'budg_camp'):   '/mkt/',
     ('marketing', 'budg_act'):    '/mkt/',
     ('marketing', 'budg_req'):    '/mkt/',
+    # Accounting — General Ledger & sub-menus
+    ('accounting', 'gen_ledger'):    '/gl/',
+    ('accounting', 'budget_mgmt'):   '/fin/budgets/',
+    ('accounting', 'budg_plan'):     '/fin/budgets/',
+    ('accounting', 'budg_amend'):    '/fin/budgets/',
+    ('accounting', 'budg_rpts'):     '/fin/budgets/',
+    ('accounting', 'tax_mgmt'):      '/fin/tax/',
+    ('accounting', 'tax_cal'):       '/fin/tax/',
+    ('accounting', 'tax_filing'):    '/fin/tax/',
+    ('accounting', 'tax_pay'):       '/fin/tax/',
+    ('accounting', 'tax_rpts'):      '/fin/tax/',
+    ('accounting', 'exp_reports'):   '/ap/',
+    ('accounting', 'sub_exp'):       '/ap/',
+    ('accounting', 'pend_appr'):     '/ap/',
+    ('accounting', 'appr_exp'):      '/ap/',
+    ('accounting', 'exp_sum'):       '/ap/',
+    ('accounting', 'bank_recon'):    '/fin/bank-rec/',
+    ('accounting', 'recon_acct'):    '/fin/bank-rec/',
+    ('accounting', 'pend_items'):    '/fin/bank-rec/',
+    ('accounting', 'recon_hist'):    '/fin/bank-rec/',
+    ('accounting', 'bank_rpts'):     '/fin/bank-rec/',
+    ('accounting', 'audit_mgmt'):    '/fin/audits/',
+    ('accounting', 'audit_sched'):   '/fin/audits/',
+    ('accounting', 'findings'):      '/fin/audits/',
+    ('accounting', 'corr_act'):      '/fin/audits/',
+    ('accounting', 'audit_rpts'):    '/fin/audits/',
+    # Finance — manager + top-level leaves
+    ('finance', 'fin_mgr'):          '/fin/',
     # Legal / Risk Management dashboard
     ('legal', 'contracts'):          '/legal/contracts/',
     ('legal', 'compliance'):         '/legal/compliance/',
@@ -8961,3 +8990,32 @@ def fin_tax_detail(request, filing_id):
         error=error, success=success,
     ))
 
+
+# ---------------------------------------------------------------------------
+# Accounting dashboard
+# ---------------------------------------------------------------------------
+
+def acct_dashboard(request):
+    """Accounting department landing page — AP, AR, and GL summary."""
+    err = _acct_access(request)
+    if err:
+        return err
+    conn = get_db_connection()
+    try:
+        ap = get_ap_dashboard(conn)
+        ar = get_ar_dashboard(conn)
+        recent_journals = conn.execute(
+            "SELECT j.id, j.journal_date, j.reference, j.description, j.posted, "
+            "COUNT(jl.id) AS line_count, "
+            "COALESCE(SUM(jl.debit), 0) AS total_debit "
+            "FROM gl_journal j "
+            "LEFT JOIN gl_journal_line jl ON jl.journal_id = j.id "
+            "GROUP BY j.id "
+            "ORDER BY j.journal_date DESC, j.id DESC LIMIT 8"
+        ).fetchall()
+        recent_journals = [dict(r) for r in recent_journals]
+    finally:
+        conn.close()
+    return render(request, 'acct_dashboard.html', _acct_ctx(
+        request, ap=ap, ar=ar, recent_journals=recent_journals,
+    ))
