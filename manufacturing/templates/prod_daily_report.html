@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block page_title %}Daily Production Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/prod/daily-report/" class="btn">Daily Report</a>
+<a href="/prod/performance/" class="btn">Performance</a>
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.dr-wrap { width:100%; max-width:1100px; }
+.dr-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.date-bar { display:flex; gap:10px; align-items:center; margin-bottom:16px; }
+.date-bar label { color:white; font-size:13px; font-weight:bold; }
+.date-bar input[type=date] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.date-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.date-bar button:hover { background:rgb(0,60,180); color:white; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:120px; flex:1; text-align:center; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft       { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-open        { background:#cce5ff; color:#004085; }
+.st-in_progress { background:#fff3cd; color:#856404; }
+.st-completed   { background:#d4edda; color:#0a3622; }
+.st-cancelled   { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="dr-wrap">
+    <h2>Daily Production Report</h2>
+
+    <form method="get" class="date-bar">
+        <label for="rdate">Report Date:</label>
+        <input type="date" id="rdate" name="date" value="{{ report_date }}">
+        <button type="submit">Load</button>
+    </form>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="val" style="color:#0a3622;">{{ completed_count }}</div>
+            <div class="lbl">WOs Completed</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#856404;">{{ started_count }}</div>
+            <div class="lbl">In Progress</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#004085;">{{ opened_count }}</div>
+            <div class="lbl">Opened / Due</div>
+        </div>
+        <div class="kpi">
+            <div class="val">{{ shipments_today }}</div>
+            <div class="lbl">Shipments Out</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Work Orders Due {{ report_date }}</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>WO #</th>
+                    <th>Description</th>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for wo in wo_detail %}
+            <tr>
+                <td><a href="/wo/{{ wo.id }}/">{{ wo.wo_number }}</a></td>
+                <td>{{ wo.description|default:"—" }}</td>
+                <td>{{ wo.product_name|default:"—" }}</td>
+                <td>{{ wo.quantity|default:"—" }}</td>
+                <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No work orders due on this date.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

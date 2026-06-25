@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block page_title %}Tracking Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/shipping/" class="btn">Shipping</a>
+<a href="/prod/tracking/" class="btn">Tracking</a>
+<a href="/prod/delivery-status/" class="btn">Delivery Status</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.td-wrap { width:100%; max-width:1100px; }
+.td-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:120px; flex:1; text-align:center; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending    { background:#cce5ff; color:#004085; }
+.s-in_transit { background:#fff3cd; color:#856404; }
+.s-delivered  { background:#d4edda; color:#0a3622; }
+.s-cancelled  { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="td-wrap">
+    <h2>Tracking Dashboard</h2>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="val">{{ counts.total|default:0 }}</div>
+            <div class="lbl">Total Shipments</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#004085;">{{ counts.pending|default:0 }}</div>
+            <div class="lbl">Pending</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#856404;">{{ counts.in_transit|default:0 }}</div>
+            <div class="lbl">In Transit</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#0a3622;">{{ counts.delivered|default:0 }}</div>
+            <div class="lbl">Delivered</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#383d41;">{{ counts.cancelled|default:0 }}</div>
+            <div class="lbl">Cancelled</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Shipments</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Ship #</th>
+                    <th>SO #</th>
+                    <th>Ship Date</th>
+                    <th>Carrier</th>
+                    <th>Tracking #</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in shipments %}
+            <tr>
+                <td><a href="/prod/shipping/{{ s.id }}/">{{ s.ship_number }}</a></td>
+                <td>{% if s.so_number %}<a href="/so/{{ s.so_id }}/">{{ s.so_number }}</a>{% else %}—{% endif %}</td>
+                <td>{{ s.ship_date|default:"—" }}</td>
+                <td>{{ s.carrier|default:"—" }}</td>
+                <td>{{ s.tracking_number|default:"—" }}</td>
+                <td><span class="badge s-{{ s.status }}">{{ s.status|title }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No shipments on record.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

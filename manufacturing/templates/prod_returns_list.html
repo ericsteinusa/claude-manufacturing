@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block page_title %}Returns / RMA{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/shipping/" class="btn">Shipping</a>
+<a href="/prod/returns/" class="btn">Returns</a>
+<a href="/prod/returns/reports/" class="btn">Returns Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ret-wrap { width:100%; max-width:1200px; }
+.ret-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.rs-pending    { background:#cce5ff; color:#004085; }
+.rs-approved   { background:#d4edda; color:#0a3622; }
+.rs-received   { background:#d1ecf1; color:#0c5460; }
+.rs-inspecting { background:#fff3cd; color:#856404; }
+.rs-resolved   { background:#d4edda; color:#0a3622; }
+.rs-rejected   { background:#f8d7da; color:#721c24; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ret-wrap">
+    <h2>Returns / RMA</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in RMA_STATUSES %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="RMA # / customer / description…">
+        <button type="submit">Filter</button>
+        <a href="/prod/returns/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>RMA #</th>
+                    <th>Customer</th>
+                    <th>SO #</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rmas %}
+            <tr>
+                <td><a href="/prod/returns/{{ r.id }}/">{{ r.rma_number }}</a></td>
+                <td>{{ r.customer|default:"—" }}</td>
+                <td>{% if r.so_number %}<a href="/so/{{ r.so_id }}/">{{ r.so_number }}</a>{% else %}—{% endif %}</td>
+                <td>{{ r.reason|default:"—"|title }}</td>
+                <td><span class="badge rs-{{ r.status }}">{{ r.status|title }}</span></td>
+                <td>{{ r.created_at|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No returns found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Return / RMA</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Customer</label>
+                    <input type="text" name="customer" placeholder="Customer name">
+                </div>
+                <div class="form-group">
+                    <label>Sales Order</label>
+                    <select name="so_id">
+                        <option value="">— None —</option>
+                        {% for so in sales_orders %}
+                        <option value="{{ so.id }}">{{ so.so_number }}{% if so.customer_name %} — {{ so.customer_name }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <select name="reason">
+                        {% for r in RMA_REASONS %}
+                        <option value="{{ r }}">{{ r|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Describe the return / issue…"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create RMA</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

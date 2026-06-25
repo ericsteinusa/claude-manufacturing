@@ -203,6 +203,14 @@ from .production_core import (
     list_shipments, get_shipment, get_shipment_items,
     create_shipment, update_shipment, add_shipment_item,
     init_shipment_tables,
+    get_tracking_dashboard,
+    get_delivery_status,
+    get_daily_report,
+    get_performance_report,
+    RMA_STATUSES, RMA_REASONS,
+    init_rma_table,
+    list_rmas, get_rma, create_rma, update_rma,
+    get_rma_reports,
 )
 from .purchasing_core import (
     get_purchasing_dashboard,
@@ -466,6 +474,17 @@ WEB_LEAF_URLS = {
     ('production', 'ship_hist'):    '/prod/shipping/',
     ('production', 'del_conf'):     '/prod/shipping/',
     ('production', 'exc_rpts'):     '/prod/shipping/',
+    # Tracking dashboard & delivery status
+    ('production', 'track_dash'):   '/prod/tracking/',
+    ('production', 'deliv_stat'):   '/prod/delivery-status/',
+    # Daily & performance reports
+    ('production', 'daily_rpt'):    '/prod/daily-report/',
+    ('production', 'perf_rpt'):     '/prod/performance/',
+    # Returns / RMA
+    ('production', 'new_return'):   '/prod/returns/new/',
+    ('production', 'pend_ret'):     '/prod/returns/?status=pending',
+    ('production', 'ret_hist'):     '/prod/returns/',
+    ('production', 'ret_rpts'):     '/prod/returns/reports/',
     # Maintenance
     ('maintenance', 'maint'): '/maint/',
     ('maintenance', 'maint_mgr'): '/maint/',
@@ -7590,6 +7609,180 @@ def prod_shipping_detail(request, shipment_id):
         products=products, sales_orders=sales_orders,
         SHIPMENT_STATUSES=SHIPMENT_STATUSES,
         error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def prod_tracking_dashboard(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    conn = get_db_connection()
+    try:
+        init_shipment_tables(conn)
+        conn.commit()
+        data = get_tracking_dashboard(conn)
+    finally:
+        conn.close()
+    return render(request, 'prod_tracking_dashboard.html', _prod_ctx(
+        request, SHIPMENT_STATUSES=SHIPMENT_STATUSES, **data,
+    ))
+
+
+def prod_delivery_status(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        init_shipment_tables(conn)
+        conn.commit()
+        shipments = get_delivery_status(
+            conn, status_filter=status_f or None, search=search or None
+        )
+    finally:
+        conn.close()
+    return render(request, 'prod_delivery_status.html', _prod_ctx(
+        request, shipments=shipments,
+        status_filter=status_f, search=search,
+        SHIPMENT_STATUSES=SHIPMENT_STATUSES,
+    ))
+
+
+def prod_daily_report(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    report_date = request.GET.get('date', '').strip() or None
+    with get_db_connection() as conn:
+        data = get_daily_report(conn, report_date=report_date)
+    return render(request, 'prod_daily_report.html', _prod_ctx(
+        request, WO_STATUSES=WO_STATUSES, **data,
+    ))
+
+
+def prod_performance_report(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    try:
+        days = int(request.GET.get('days', 30))
+    except (TypeError, ValueError):
+        days = 30
+    conn = get_db_connection()
+    try:
+        init_shipment_tables(conn)
+        conn.commit()
+        data = get_performance_report(conn, days=days)
+    finally:
+        conn.close()
+    return render(request, 'prod_performance_report.html', _prod_ctx(
+        request, **data,
+    ))
+
+
+def prod_returns_list(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_shipment_tables(conn)
+        init_rma_table(conn)
+        conn.commit()
+        rmas = list_rmas(conn, status=status_f or None, search=search or None)
+        sales_orders = list_sos(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                rma_id = create_rma(
+                    conn,
+                    so_id=_int_or_none(request.POST.get('so_id')),
+                    customer=request.POST.get('customer', '').strip(),
+                    reason=request.POST.get('reason', 'other'),
+                    description=request.POST.get('description', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('prod_returns_detail', rma_id=rma_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rmas = list_rmas(
+                    conn, status=status_f or None, search=search or None
+                )
+    finally:
+        conn.close()
+    return render(request, 'prod_returns_list.html', _prod_ctx(
+        request, rmas=rmas, sales_orders=sales_orders,
+        status_filter=status_f, search=search,
+        RMA_STATUSES=RMA_STATUSES, RMA_REASONS=RMA_REASONS,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def prod_returns_new(request):
+    """Shortcut that redirects to the list page (which includes the create form)."""
+    return redirect('/prod/returns/')
+
+
+def prod_returns_detail(request, rma_id):
+    err = _prod_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_rma_table(conn)
+        conn.commit()
+        rma = get_rma(conn, rma_id)
+        if not rma:
+            return redirect('prod_returns_list')
+        sales_orders = list_sos(conn) if can_edit else []
+        if request.method == 'POST' and can_edit:
+            try:
+                update_rma(
+                    conn, rma_id,
+                    so_id=_int_or_none(request.POST.get('so_id')),
+                    customer=request.POST.get('customer', '').strip(),
+                    reason=request.POST.get('reason', 'other'),
+                    status=request.POST.get('status', ''),
+                    description=request.POST.get('description', '').strip(),
+                    resolution=request.POST.get('resolution', '').strip(),
+                )
+                conn.commit()
+                success = 'Return updated.'
+                rma = get_rma(conn, rma_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'prod_returns_detail.html', _prod_ctx(
+        request, rma=rma, sales_orders=sales_orders,
+        RMA_STATUSES=RMA_STATUSES, RMA_REASONS=RMA_REASONS,
+        error=error, success=success, can_edit=can_edit,
+    ))
+
+
+def prod_returns_reports(request):
+    err = _prod_access(request)
+    if err:
+        return err
+    conn = get_db_connection()
+    try:
+        init_rma_table(conn)
+        conn.commit()
+        data = get_rma_reports(conn)
+    finally:
+        conn.close()
+    return render(request, 'prod_returns_reports.html', _prod_ctx(
+        request, RMA_STATUSES=RMA_STATUSES, RMA_REASONS=RMA_REASONS, **data,
     ))
 
 
