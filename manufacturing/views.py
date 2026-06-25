@@ -8239,12 +8239,10 @@ def fin_dashboard(request):
 def _it_access(request):
     email = request.session.get('user_email')
     if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if request.session.get('user_dept', '') != 'information_tech':
-        return redirect('/dashboard/')
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key', '') != 'information_tech':
+            return redirect('dashboard')
     return None
 
 
@@ -8455,12 +8453,10 @@ _LEGAL_DEPT_KEYS = {'legal', 'risk_management'}
 def _legal_access(request):
     email = request.session.get('user_email')
     if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if request.session.get('user_dept', '') not in _LEGAL_DEPT_KEYS:
-        return redirect('/dashboard/')
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key', '') not in _LEGAL_DEPT_KEYS:
+            return redirect('dashboard')
     return None
 
 
@@ -8726,12 +8722,10 @@ def legal_litigation_detail(request, case_id):
 def _mkt_access(request):
     email = request.session.get('user_email')
     if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if request.session.get('user_dept', '') != 'marketing':
-        return redirect('/dashboard/')
+        return redirect('home')
+    if not request.session.get('user_full_access'):
+        if request.session.get('user_dept_key', '') != 'marketing':
+            return redirect('dashboard')
     return None
 
 
