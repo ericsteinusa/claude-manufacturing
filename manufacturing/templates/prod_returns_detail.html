@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block page_title %}RMA {{ rma.rma_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/returns/" class="btn">Returns</a>
+<a href="/prod/returns/reports/" class="btn">Returns Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rd-wrap { width:100%; max-width:900px; }
+.rd-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.rs-pending    { background:#cce5ff; color:#004085; }
+.rs-approved   { background:#d4edda; color:#0a3622; }
+.rs-received   { background:#d1ecf1; color:#0c5460; }
+.rs-inspecting { background:#fff3cd; color:#856404; }
+.rs-resolved   { background:#d4edda; color:#0a3622; }
+.rs-rejected   { background:#f8d7da; color:#721c24; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.detail-item label { display:block; font-size:11px; font-weight:bold; color:#777; text-transform:uppercase; margin-bottom:2px; }
+.detail-item span { font-size:14px; color:#222; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:80px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rd-wrap">
+    <h2>RMA {{ rma.rma_number }}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>RMA Number</label>
+                <span>{{ rma.rma_number }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Status</label>
+                <span><span class="badge rs-{{ rma.status }}">{{ rma.status|title }}</span></span>
+            </div>
+            <div class="detail-item">
+                <label>Customer</label>
+                <span>{{ rma.customer|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Sales Order</label>
+                <span>{% if rma.so_number %}<a href="/so/{{ rma.so_id }}/">{{ rma.so_number }}</a>{% else %}—{% endif %}</span>
+            </div>
+            <div class="detail-item">
+                <label>Reason</label>
+                <span>{{ rma.reason|default:"—"|title }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Created</label>
+                <span>{{ rma.created_at|default:"—" }}</span>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:bold;color:#777;text-transform:uppercase;">Description</label>
+            <div style="font-size:14px;color:#222;margin-top:4px;">{{ rma.description|default:"—" }}</div>
+        </div>
+        {% if rma.resolution %}
+        <div>
+            <label style="font-size:11px;font-weight:bold;color:#777;text-transform:uppercase;">Resolution</label>
+            <div style="font-size:14px;color:#222;margin-top:4px;">{{ rma.resolution }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit RMA</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Customer</label>
+                    <input type="text" name="customer" value="{{ rma.customer|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Sales Order</label>
+                    <select name="so_id">
+                        <option value="">— None —</option>
+                        {% for so in sales_orders %}
+                        <option value="{{ so.id }}"{% if so.id == rma.so_id %} selected{% endif %}>
+                            {{ so.so_number }}{% if so.customer_name %} — {{ so.customer_name }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <select name="reason">
+                        {% for r in RMA_REASONS %}
+                        <option value="{{ r }}"{% if r == rma.reason %} selected{% endif %}>{{ r|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in RMA_STATUSES %}
+                        <option value="{{ s }}"{% if s == rma.status %} selected{% endif %}>{{ s|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Description</label>
+                    <textarea name="description">{{ rma.description|default:'' }}</textarea>
+                </div>
+                <div class="form-group full-span">
+                    <label>Resolution</label>
+                    <textarea name="resolution">{{ rma.resolution|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
