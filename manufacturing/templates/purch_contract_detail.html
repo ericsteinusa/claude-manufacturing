@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block page_title %}Contract — {{ contract.contract_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/purch/" class="btn">Purchasing</a>
+<a href="/purch/contracts/" class="btn">Contracts</a>
+<a href="/purch/reports/" class="btn">Reports</a>
+<a href="/po/" class="btn">Purchase Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.pc-wrap { width:100%; max-width:900px; }
+.pc-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:80px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.ro-table { width:100%; border-collapse:collapse; }
+.ro-table th, .ro-table td { padding:8px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.ro-table th { width:160px; background:#f5f5f5; font-weight:bold; }
+.ro-table tr:last-child td, .ro-table tr:last-child th { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-Active          { background:#d4edda; color:#0a3622; }
+.s-Pending-Renewal { background:#fff3cd; color:#856404; }
+.s-Expired         { background:#e2e3e5; color:#383d41; }
+.s-Cancelled       { background:#f8d7da; color:#721c24; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="pc-wrap">
+    <h2>
+        {{ contract.contract_number }}
+        <span class="badge s-{{ contract.status|cut:' ' }}" style="font-size:14px;">{{ contract.status }}</span>
+    </h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Contract</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" value="{{ contract.title }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Supplier</label>
+                    <select name="supplier_id">
+                        <option value="">— None —</option>
+                        {% for s in suppliers %}
+                        <option value="{{ s.id }}"{% if contract.supplier_id == s.id %} selected{% endif %}>{{ s.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="">— Select —</option>
+                        {% for cat in CONTRACT_CATEGORIES %}
+                        <option value="{{ cat }}"{% if contract.category == cat %} selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in CONTRACT_STATUSES %}
+                        <option value="{{ s }}"{% if contract.status == s %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ contract.start_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" value="{{ contract.end_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Value ($)</label>
+                    <input type="number" name="value" step="0.01" min="0" value="{{ contract.value|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ contract.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <table class="ro-table">
+            <tr><th>Title</th><td>{{ contract.title }}</td></tr>
+            <tr><th>Supplier</th><td>{{ contract.supplier_name|default:"—" }}</td></tr>
+            <tr><th>Category</th><td>{{ contract.category|default:"—" }}</td></tr>
+            <tr><th>Status</th><td><span class="badge s-{{ contract.status|cut:' ' }}">{{ contract.status }}</span></td></tr>
+            <tr><th>Start Date</th><td>{{ contract.start_date|default:"—" }}</td></tr>
+            <tr><th>End Date</th><td>{{ contract.end_date|default:"—" }}</td></tr>
+            <tr><th>Value</th><td>{% if contract.value %}${{ contract.value|floatformat:2 }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Created By</th><td>{{ contract.created_by|default:"—" }}</td></tr>
+            <tr><th>Created Date</th><td>{{ contract.created_date|default:"—" }}</td></tr>
+            <tr><th>Notes</th><td><pre style="margin:0;white-space:pre-wrap;font-family:inherit;">{{ contract.notes|default:"—" }}</pre></td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

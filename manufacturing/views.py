@@ -140,8 +140,8 @@ from .personnel_core import (
     list_people, get_person, get_person_by_email,
     create_person, update_person,
     load_depts, load_dept_subs, list_dept_subs_with_dept,
-    get_dept, create_dept, update_dept,
-    get_dept_sub, create_dept_sub, update_dept_sub,
+    create_dept, update_dept,
+    create_dept_sub, update_dept_sub,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
     REVIEW_STATUSES, REVIEW_TYPES, REVIEW_RATINGS,
@@ -200,7 +200,17 @@ from .production_core import (
     create_shipment, update_shipment, add_shipment_item,
     init_shipment_tables,
 )
-from .purchasing_core import get_purchasing_dashboard
+from .purchasing_core import (
+    get_purchasing_dashboard,
+    CONTRACT_STATUSES as PURCH_CONTRACT_STATUSES,
+    CONTRACT_CATEGORIES as PURCH_CONTRACT_CATEGORIES,
+    list_contracts as list_purch_contracts,
+    get_contract as get_purch_contract,
+    create_contract as create_purch_contract,
+    update_contract as update_purch_contract,
+    init_purch_contract_table,
+    get_purch_reports,
+)
 from .finance_core import (
     get_finance_dashboard,
     BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
@@ -578,33 +588,35 @@ WEB_LEAF_URLS = {
     ('purchasing', 'vend_eval'):   '/suppliers/',
     ('purchasing', 'vend_perf'):   '/suppliers/',
     ('purchasing', 'vend_cont'):   '/suppliers/',
-    ('purchasing', 'spend_sum'):   '/purch/',
-    ('purchasing', 'po_rpts'):     '/purch/',
-    ('purchasing', 'budg_act'):    '/purch/',
-    ('purchasing', 'cat_rpts'):    '/purch/',
-    ('purchasing', 'act_cont'):    '/purch/',
-    ('purchasing', 'new_cont'):    '/purch/',
-    ('purchasing', 'cont_renew'):  '/purch/',
-    ('purchasing', 'cont_arch'):   '/purch/',
+    ('purchasing', 'spend_sum'):   '/purch/reports/',
+    ('purchasing', 'po_rpts'):     '/purch/reports/',
+    ('purchasing', 'budg_act'):    '/purch/reports/',
+    ('purchasing', 'cat_rpts'):    '/purch/reports/',
+    ('purchasing', 'act_cont'):    '/purch/contracts/',
+    ('purchasing', 'new_cont'):    '/purch/contracts/',
+    ('purchasing', 'cont_renew'):  '/purch/contracts/',
+    ('purchasing', 'cont_arch'):   '/purch/contracts/',
     ('purchasing', 'pend_recv'):   '/po/',
     ('purchasing', 'recv_items'):  '/po/',
     ('purchasing', 'disc_rpts'):   '/po/',
     ('purchasing', 'recv_hist'):   '/po/',
+    ('purchasing', 'req_hist'):    '/po/',
     ('purchasing', 'new_req'):     '/po/new/',
     ('purchasing', 'pend_appr'):   '/po/approvals/',
     ('purchasing', 'appr_reqs'):   '/po/',
     ('purchasing', 'appr_pos'):    '/po/',
     ('purchasing', 'rej_pos'):     '/po/',
     ('purchasing', 'appr_hist'):   '/po/',
-    ('purchasing', 'purch_budg'):  '/purch/',
-    ('purchasing', 'budg_rpts'):   '/purch/',
-    ('purchasing', 'spend_analy'): '/purch/',
-    ('purchasing', 'vend_rpt'):    '/purch/',
-    ('purchasing', 'cat_analy'):   '/purch/',
-    ('purchasing', 'month_sum'):   '/purch/',
-    ('purchasing', 'spend_rpt'):   '/purch/',
-    ('purchasing', 'pend_renew'):  '/purch/',
-    ('purchasing', 'cont_rpts'):   '/purch/',
+    ('purchasing', 'purch_budg'):  '/purch/reports/',
+    ('purchasing', 'budg_rpts'):   '/purch/reports/',
+    ('purchasing', 'spend_analy'): '/purch/reports/',
+    ('purchasing', 'vend_rpt'):    '/purch/reports/',
+    ('purchasing', 'cat_analy'):   '/purch/reports/',
+    ('purchasing', 'month_sum'):   '/purch/reports/',
+    ('purchasing', 'spend_rpt'):   '/purch/reports/',
+    ('purchasing', 'pend_renew'):  '/purch/contracts/',
+    ('purchasing', 'cont_rpts'):   '/purch/contracts/',
+    ('purchasing', 'appr_vend'):   '/suppliers/',
     # Personnel dashboard
     ('personnel', 'pers_crm'):     '/people/',
     ('personnel', 'reg_form'):     '/register/',
@@ -6533,7 +6545,6 @@ def eng_tasks_list(request):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     priority_f = request.GET.get('priority', '').strip()
-    search = request.GET.get('search', '').strip()
     error = success = None
     with get_db_connection() as conn:
         if request.method == 'POST' and can_edit:
@@ -7402,6 +7413,136 @@ def purch_dashboard(request):
         data = get_purchasing_dashboard(conn)
     ctx = _purch_ctx(request, **data)
     return render(request, 'purchasing_dashboard.html', ctx)
+
+
+def purch_contracts_list(request):
+    err = _po_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    try:
+        init_purch_contract_table(conn)
+        if request.method == 'POST' and can_edit:
+            title = request.POST.get('title', '').strip()
+            if not title:
+                error = 'Title is required.'
+            else:
+                try:
+                    sup_id = request.POST.get('supplier_id') or None
+                    val_str = request.POST.get('value', '').strip()
+                    val = float(val_str) if val_str else None
+                    create_purch_contract(
+                        conn,
+                        title=title,
+                        category=request.POST.get('category', ''),
+                        supplier_id=int(sup_id) if sup_id else None,
+                        start_date=request.POST.get('start_date', '').strip() or None,
+                        end_date=request.POST.get('end_date', '').strip() or None,
+                        value=val,
+                        status=request.POST.get('status', 'Active'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    success = 'Contract created.'
+                except Exception as exc:
+                    error = str(exc)
+
+        status_filter = request.GET.get('status', '')
+        search = request.GET.get('search', '')
+        contracts = list_purch_contracts(conn, status=status_filter or None, search=search or None)
+        suppliers = conn.execute(
+            "SELECT id, company_name FROM supplier ORDER BY company_name"
+        ).fetchall()
+    finally:
+        conn.close()
+
+    ctx = _purch_ctx(
+        request,
+        contracts=contracts,
+        suppliers=[dict(s) for s in suppliers],
+        CONTRACT_STATUSES=PURCH_CONTRACT_STATUSES,
+        CONTRACT_CATEGORIES=PURCH_CONTRACT_CATEGORIES,
+        status_filter=status_filter,
+        search=search,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    )
+    return render(request, 'purch_contracts_list.html', ctx)
+
+
+def purch_contract_detail(request, contract_id):
+    err = _po_access(request)
+    if err:
+        return err
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    try:
+        init_purch_contract_table(conn)
+        contract = get_purch_contract(conn, contract_id)
+        if contract is None:
+            conn.close()
+            return redirect('purch_contracts_list')
+        if request.method == 'POST' and can_edit:
+            title = request.POST.get('title', '').strip()
+            if not title:
+                error = 'Title is required.'
+            else:
+                try:
+                    sup_id = request.POST.get('supplier_id') or None
+                    val_str = request.POST.get('value', '').strip()
+                    val = float(val_str) if val_str else None
+                    update_purch_contract(
+                        conn,
+                        contract_id,
+                        title=title,
+                        category=request.POST.get('category', ''),
+                        supplier_id=int(sup_id) if sup_id else None,
+                        start_date=request.POST.get('start_date', '').strip() or None,
+                        end_date=request.POST.get('end_date', '').strip() or None,
+                        value=val,
+                        status=request.POST.get('status', 'Active'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    success = 'Contract updated.'
+                    contract = get_purch_contract(conn, contract_id)
+                except Exception as exc:
+                    error = str(exc)
+
+        suppliers = conn.execute(
+            "SELECT id, company_name FROM supplier ORDER BY company_name"
+        ).fetchall()
+    finally:
+        conn.close()
+
+    ctx = _purch_ctx(
+        request,
+        contract=contract,
+        suppliers=[dict(s) for s in suppliers],
+        CONTRACT_STATUSES=PURCH_CONTRACT_STATUSES,
+        CONTRACT_CATEGORIES=PURCH_CONTRACT_CATEGORIES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    )
+    return render(request, 'purch_contract_detail.html', ctx)
+
+
+def purch_reports_view(request):
+    err = _po_access(request)
+    if err:
+        return err
+    conn = get_db_connection()
+    try:
+        init_purch_contract_table(conn)
+        data = get_purch_reports(conn)
+    finally:
+        conn.close()
+    ctx = _purch_ctx(request, **data)
+    return render(request, 'purch_reports.html', ctx)
 
 
 # ---------------------------------------------------------------------------
