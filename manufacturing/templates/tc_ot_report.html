@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block page_title %}Overtime Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/time-clock/" class="btn">Time Clock</a>
+<a href="/time-clock/attendance/" class="btn">Attendance</a>
+<a href="/time-clock/hours/" class="btn">My Hours</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.ot-wrap { width: 100%; max-width: 1100px; }
+.ot-wrap h2 { color: white; font-size: 20px; margin-bottom: 14px; }
+.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+.filter-bar select, .filter-bar input[type=date], .filter-bar input[type=text] {
+    padding: 6px 10px; border: 2px solid black; border-radius: 6px; font-size: 13px; }
+.filter-bar button { padding: 6px 14px; background: white; border: 2px solid black;
+    border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+.filter-bar button:hover { background: rgb(0,60,180); color: white; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+        padding: 16px 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 12px; font-size: 15px; color: #333; }
+.stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.stat-box { background: white; border: 2px solid black; border-radius: 8px;
+            padding: 12px 22px; text-align: center; min-width: 110px; }
+.stat-box .n { font-size: 26px; font-weight: bold; color: rgb(0,60,180); }
+.stat-box .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; }
+.list-table { width: 100%; border-collapse: collapse; }
+.list-table th, .list-table td { padding: 7px 10px; border-bottom: 1px solid #ddd; font-size: 13px; }
+.list-table th { background: rgb(0,60,180); color: white; }
+.list-table tbody tr:hover { background: #f0f4ff; }
+.list-table a { color: rgb(0,40,160); text-decoration: none; font-weight: bold; }
+.list-table a:hover { text-decoration: underline; }
+.ot-flag { color: #c00; font-weight: bold; }
+.tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.tab { padding: 6px 16px; border: 2px solid black; border-radius: 6px;
+       font-size: 13px; font-weight: bold; text-decoration: none; color: black; background: white; }
+.tab.active { background: rgb(0,60,180); color: white; border-color: rgb(0,60,180); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ot-wrap">
+    <h2>Overtime Reports</h2>
+
+    <form method="get" class="filter-bar">
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <span style="color:white;">to</span>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <button type="submit">Apply</button>
+        <a href="/time-clock/ot/" style="color:white;font-size:13px;margin-left:4px;">Reset</a>
+    </form>
+
+    <div class="tabs">
+        <a href="?mode=all&date_from={{ date_from }}&date_to={{ date_to }}"
+           class="tab {% if mode == 'all' %}active{% endif %}">All Employees</a>
+        <a href="?mode=mine&date_from={{ date_from }}&date_to={{ date_to }}"
+           class="tab {% if mode == 'mine' %}active{% endif %}">My OT</a>
+    </div>
+
+    {% if mode == 'mine' %}
+    <div class="stat-row">
+        <div class="stat-box">
+            <div class="n">{{ my_ot.total_hours_fmt }}</div>
+            <div class="lbl">Total Hours</div>
+        </div>
+        <div class="stat-box">
+            <div class="n {% if my_ot.ot_hours > 0 %}ot-flag{% endif %}">{{ my_ot.ot_hours_fmt }}</div>
+            <div class="lbl">Overtime</div>
+        </div>
+        <div class="stat-box">
+            <div class="n">{{ my_ot.daily_ot|floatformat:1 }}h</div>
+            <div class="lbl">Daily OT Accum.</div>
+        </div>
+        <div class="stat-box">
+            <div class="n">{{ my_ot.weekly_ot|floatformat:1 }}h</div>
+            <div class="lbl">Weekly OT Accum.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Daily Breakdown</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Hours Worked</th>
+                    <th>Overtime</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for d in my_ot.by_day %}
+            <tr>
+                <td>{{ d.date }}</td>
+                <td>{{ d.hours_fmt }}</td>
+                <td>{% if d.ot_hours > 0 %}<span class="ot-flag">{{ d.ot_hours_fmt }}</span>{% else %}—{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" style="color:#888;text-align:center;">No entries for this period.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="card">
+        <h3>OT Summary — All Employees</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Department</th>
+                    <th>Total Hours</th>
+                    <th>Overtime</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in all_ot %}
+            <tr>
+                <td>{{ r.last_name }}, {{ r.first_name }}</td>
+                <td>{{ r.dept_name }}</td>
+                <td>{{ r.total_hours_fmt }}</td>
+                <td>{% if r.ot_hours > 0 %}<span class="ot-flag">{{ r.ot_hours_fmt }}</span>{% else %}—{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">No time entries for this period.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -130,6 +130,9 @@ from .time_clock_core import (
     list_entries, total_hours as tc_total_hours,
     get_period_dates, get_attendance,
 )
+from .time_clock_web_core import (
+    get_ot_report, get_ot_report_all, get_schedule_summary,
+)
 from .time_clock_poller_core import (
     DEVICE_TYPES, DEVICE_TYPE_LABELS,
     list_devices, get_device, create_device, update_device, delete_device,
@@ -315,6 +318,21 @@ WEB_LEAF_URLS = {
     ('personnel', 'daily_att'): '/time-clock/attendance/',
     ('personnel', 'tard_rpt'): '/time-clock/attendance/',
     ('personnel', 'abs_rpt'): '/time-clock/attendance/',
+    # Time clock — schedules
+    ('personnel', 'my_sched'):  '/time-clock/schedule/',
+    ('personnel', 'upcoming'):  '/time-clock/schedule/',
+    ('personnel', 'sched_cal'): '/time-clock/schedule/',
+    ('personnel', 'swap_req'):  '/time-clock/schedule/',
+    # Time clock — overtime reports
+    ('personnel', 'cur_ot'):    '/time-clock/ot/',
+    ('personnel', 'hist_ot'):   '/time-clock/ot/',
+    ('personnel', 'ot_by_emp'): '/time-clock/ot/?mode=all',
+    ('personnel', 'ot_appr'):   '/time-clock/ot/?mode=all',
+    # Time clock — shift management
+    ('personnel', 'view_shfts'):  '/time-clock/schedule/',
+    ('personnel', 'assign_emp'):  '/time-clock/schedule/',
+    ('personnel', 'shft_tmpl'):   '/time-clock/schedule/',
+    ('personnel', 'swap_mgmt'):   '/time-clock/schedule/',
     ('engineering', 'bom_list'): '/bom/',
     ('engineering', 'new_bom'): '/bom/',
     ('engineering', 'bom_rev'): '/bom/',
@@ -2830,6 +2848,109 @@ def tc_device_delete(request, device_id: int):
         conn.close()
 
     return redirect('tc_device_list')
+
+
+# ---------------------------------------------------------------------------
+# Time clock — Overtime Report
+# ---------------------------------------------------------------------------
+
+def _tc_ot_access(request):
+    """Gate: must be logged in; non-full-access users may only view their own OT."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+    return None
+
+
+def tc_ot_report(request):
+    """Overtime report: 'mine' (default) or 'all' (managers/full-access only)."""
+    err = _tc_ot_access(request)
+    if err:
+        return err
+
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    mode = request.GET.get('mode', 'mine')
+
+    # Only full-access / managers may see all-employee OT
+    if mode == 'all' and not request.session.get('user_full_access'):
+        mode = 'mine'
+
+    my_ot = None
+    all_ot = None
+
+    conn = get_db_connection()
+    try:
+        if mode == 'mine':
+            email = request.session.get('user_email', '')
+            from .personnel_core import get_person_by_email
+            person = get_person_by_email(conn, email)
+            if person:
+                my_ot = get_ot_report(conn, person['id'],
+                                      date_from=date_from or None,
+                                      date_to=date_to or None)
+                if not date_from:
+                    date_from = my_ot['date_from']
+                if not date_to:
+                    date_to = my_ot['date_to']
+            else:
+                my_ot = {
+                    'total_hours': 0.0, 'total_hours_fmt': '0:00',
+                    'ot_hours': 0.0, 'ot_hours_fmt': '0:00',
+                    'daily_ot': 0.0, 'weekly_ot': 0.0,
+                    'by_day': [], 'entries': [],
+                }
+        else:
+            all_ot = get_ot_report_all(conn,
+                                       date_from=date_from or None,
+                                       date_to=date_to or None)
+            if not date_from or not date_to:
+                from datetime import datetime
+                today = datetime.now()
+                date_from = date_from or today.replace(day=1).strftime('%Y-%m-%d')
+                date_to = date_to or today.strftime('%Y-%m-%d')
+    finally:
+        conn.close()
+
+    return render(request, 'tc_ot_report.html', {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'mode': mode,
+        'date_from': date_from,
+        'date_to': date_to,
+        'my_ot': my_ot,
+        'all_ot': all_ot or [],
+    })
+
+
+# ---------------------------------------------------------------------------
+# Time clock — Schedule Summary
+# ---------------------------------------------------------------------------
+
+def tc_schedule(request):
+    """Schedule / shift summary derived from clock-in records."""
+    if not request.session.get('user_email'):
+        return redirect('home')
+
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+
+    conn = get_db_connection()
+    try:
+        summary = get_schedule_summary(conn,
+                                       date_from=date_from or None,
+                                       date_to=date_to or None)
+    finally:
+        conn.close()
+
+    return render(request, 'tc_schedule.html', {
+        'user_email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+        'date_from': summary['date_from'],
+        'date_to': summary['date_to'],
+        'summary': summary,
+    })
 
 
 # ---------------------------------------------------------------------------

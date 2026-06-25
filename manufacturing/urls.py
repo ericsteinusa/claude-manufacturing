@@ -51,6 +51,8 @@ urlpatterns = [
     path('time-clock/hours/', views.time_clock_hours, name='time_clock_hours'),
     path('time-clock/attendance/', views.time_clock_attendance,
          name='time_clock_attendance'),
+    path('time-clock/ot/', views.tc_ot_report, name='tc_ot_report'),
+    path('time-clock/schedule/', views.tc_schedule, name='tc_schedule'),
     path('time-clock/devices/', views.tc_device_list,
          name='tc_device_list'),
     path('time-clock/devices/new/', views.tc_device_new,
