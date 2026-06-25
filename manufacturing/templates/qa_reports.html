@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block page_title %}QA Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">QA Dashboard</a>
+<a href="/qa/reports/" class="btn">Reports</a>
+<a href="/qa/ncr/" class="btn">NCRs</a>
+<a href="/qa/capa/" class="btn">CAPAs</a>
+<a href="/qa/audits/" class="btn">Audits</a>
+<a href="/qa/inspections/" class="btn">Inspections</a>
+<a href="/qa/suppliers/" class="btn">Supplier Quality</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.qr-wrap { width:100%; max-width:1100px; }
+.qr-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:150px; flex:1; text-align:center; }
+.kpi .val { font-size:26px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .val.warn { color:#e65100; }
+.kpi .val.danger { color:#c62828; }
+.kpi .val.good { color:#1a6b1a; }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.sev-Minor    { background:#d4edda; color:#0a3622; }
+.sev-Major    { background:#fff3cd; color:#856404; }
+.sev-Critical { background:#f8d7da; color:#721c24; }
+.bar-wrap { display:flex; gap:6px; align-items:center; }
+.bar { height:14px; background:rgb(0,60,180); border-radius:3px; min-width:4px; }
+.bar.passed { background:#1a6b1a; }
+.bar.failed  { background:#c62828; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="qr-wrap">
+    <h2>Quality Assurance Reports</h2>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="val {% if kpis.open_ncrs %}warn{% endif %}">{{ kpis.open_ncrs|default:0 }}</div>
+            <div class="lbl">Open NCRs</div>
+        </div>
+        <div class="kpi">
+            <div class="val {% if kpis.open_capas %}warn{% endif %}">{{ kpis.open_capas|default:0 }}</div>
+            <div class="lbl">Open CAPAs</div>
+        </div>
+        <div class="kpi">
+            <div class="val {% if kpis.overdue_capas %}danger{% endif %}">{{ kpis.overdue_capas|default:0 }}</div>
+            <div class="lbl">Overdue CAPAs</div>
+        </div>
+        <div class="kpi">
+            <div class="val">{{ kpis.total_insp|default:0 }}</div>
+            <div class="lbl">Total Inspections</div>
+        </div>
+        <div class="kpi">
+            {% if kpis.pass_rate is not None %}
+            <div class="val {% if kpis.pass_rate >= 95 %}good{% elif kpis.pass_rate >= 80 %}warn{% else %}danger{% endif %}">{{ kpis.pass_rate }}%</div>
+            {% else %}
+            <div class="val" style="color:#aaa;">—</div>
+            {% endif %}
+            <div class="lbl">Inspection Pass Rate</div>
+        </div>
+        <div class="kpi">
+            <div class="val {% if kpis.failed_insp %}warn{% endif %}">{{ kpis.failed_insp|default:0 }}</div>
+            <div class="lbl">Failed Inspections</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Open NCRs by Severity</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Severity</th>
+                        <th style="text-align:right;">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in ncrs_by_severity %}
+                <tr>
+                    <td><span class="badge sev-{{ row.severity }}">{{ row.severity }}</span></td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" style="color:#888;text-align:center;">No open NCRs.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Open NCRs by Source</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th style="text-align:right;">Count</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in ncrs_by_source %}
+                <tr>
+                    <td>{{ row.source }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                    <td>
+                        <div class="bar-wrap">
+                            <div class="bar" style="width:{{ row.cnt }}0px;max-width:100px;"></div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="color:#888;text-align:center;">No open NCRs.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>CAPAs by Status</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th style="text-align:right;">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in capas_by_status %}
+                <tr>
+                    <td>{{ row.status }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" style="color:#888;text-align:center;">No CAPAs.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Audits by Type</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Audit Type</th>
+                        <th style="text-align:right;">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in audits_by_type %}
+                <tr>
+                    <td>{{ row.audit_type }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" style="color:#888;text-align:center;">No audits.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Inspections by Result</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Result</th>
+                        <th style="text-align:right;">Count</th>
+                        <th>Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in insp_by_result %}
+                <tr>
+                    <td>{{ row.result|capfirst }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                    <td>
+                        <div class="bar-wrap">
+                            <div class="bar {% if row.result == 'passed' %}passed{% elif row.result == 'failed' %}failed{% endif %}"
+                                 style="width:{{ row.pct }}px;max-width:100px;"></div>
+                            <span style="font-size:11px;color:#666;">{{ row.pct }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="color:#888;text-align:center;">No inspections.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Monthly Inspections (Last 6 Months)</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th style="text-align:right;">Count</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in monthly_insp %}
+                <tr>
+                    <td>{{ row.month }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                    <td>
+                        <div class="bar-wrap">
+                            <div class="bar" style="width:{{ row.cnt }}0px;max-width:100px;"></div>
+                            <span style="font-size:11px;color:#666;">{{ row.cnt }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="color:#888;text-align:center;">No inspections in the last 6 months.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Supplier Quality Rating Breakdown</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Rating</th>
+                    <th style="text-align:right;">Supplier Count</th>
+                    <th>Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in suppliers_by_rating %}
+            <tr>
+                <td style="font-weight:bold;">{{ row.rating|default:"Unrated" }}</td>
+                <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                <td>
+                    <div class="bar-wrap">
+                        <div class="bar" style="width:{{ row.cnt }}0px;max-width:100px;"></div>
+                        <span style="font-size:11px;color:#666;">{{ row.cnt }}</span>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" style="color:#888;text-align:center;">No supplier quality records.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

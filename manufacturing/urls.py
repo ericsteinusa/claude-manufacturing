@@ -135,6 +135,7 @@ urlpatterns = [
          name='qa_inspection_list'),
     path('qa/inspections/<int:insp_id>/', views.qa_inspection_detail,
          name='qa_inspection_detail'),
+    path('qa/reports/', views.qa_reports_view, name='qa_reports'),
     path('periods/', views.periods, name='periods'),
     path('po/approvals/', views.po_approvals, name='po_approvals'),
     path('po/approvals/<int:approval_id>/approve/', views.po_approve, name='po_approve'),

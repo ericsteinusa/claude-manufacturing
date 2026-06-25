@@ -113,6 +113,7 @@ from .quality_core import (
     next_insp_number, list_inspections, get_inspection, create_inspection,
     update_inspection_result, get_defects, log_defect, resolve_defect,
     load_products_for_qa, load_work_orders_for_qa,
+    get_qa_reports,
 )
 from .period_locking_core import (
     is_period_locked, close_period, reopen_period,
@@ -540,6 +541,32 @@ WEB_LEAF_URLS = {
     ('quality_assurance', 'supp_rpts'): '/qa/suppliers/',
     ('quality_assurance', 'new_comp'): '/qa/ncr/',
     ('quality_assurance', 'open_comp'): '/qa/ncr/?status=Open',
+    # QA lab: inspection / lab reports / calibration / sample management
+    ('quality_assurance', 'res_rpts'):    '/qa/reports/',
+    ('quality_assurance', 'create_rpt'):  '/qa/inspections/',
+    ('quality_assurance', 'pend_rpts'):   '/qa/inspections/?result=pending',
+    ('quality_assurance', 'rpt_arch'):    '/qa/inspections/',
+    ('quality_assurance', 'rpt_sum'):     '/qa/reports/',
+    ('quality_assurance', 'cal_sched'):   '/qa/inspections/',
+    ('quality_assurance', 'cal_records'): '/qa/inspections/',
+    ('quality_assurance', 'overdue'):     '/qa/inspections/?result=on_hold',
+    ('quality_assurance', 'cal_rpts'):    '/qa/reports/',
+    ('quality_assurance', 'recv_sample'): '/qa/inspections/',
+    ('quality_assurance', 'samp_track'):  '/qa/inspections/',
+    ('quality_assurance', 'samp_disp'):   '/qa/inspections/',
+    ('quality_assurance', 'samp_rpts'):   '/qa/reports/',
+    ('quality_assurance', 'daily_rpts'):  '/qa/reports/',
+    ('quality_assurance', 'cust_rpts'):   '/qa/reports/',
+    # QA compliance / customer complaints / document control
+    ('quality_assurance', 'comp_dash'):   '/qa/',
+    ('quality_assurance', 'reg_req'):     '/qa/audits/',
+    ('quality_assurance', 'comp_rpts'):   '/qa/reports/',
+    ('quality_assurance', 'non_comp'):    '/qa/ncr/',
+    ('quality_assurance', 'res_track'):   '/qa/capa/',
+    ('quality_assurance', 'doc_lib'):     '/qa/audits/',
+    ('quality_assurance', 'new_doc'):     '/qa/audits/',
+    ('quality_assurance', 'doc_review'):  '/qa/audits/',
+    ('quality_assurance', 'rev_hist'):    '/qa/audits/',
     # Customer Service tickets
     ('customer_service', 'all_tickets'): '/cs/',
     ('customer_service', 'my_tickets'): '/cs/?my=1',
@@ -5004,6 +5031,20 @@ def qa_inspection_detail(request, insp_id):
         defect_severities=DEFECT_SEVERITIES,
         error=error, success=success,
     ))
+
+
+# --- QA Reports ---
+
+def qa_reports_view(request):
+    denied = _qa_access(request)
+    if denied:
+        return denied
+    conn = get_db_connection()
+    try:
+        data = get_qa_reports(conn)
+    finally:
+        conn.close()
+    return render(request, 'qa_reports.html', _qa_ctx(request, **data))
 
 
 # ---------------------------------------------------------------------------

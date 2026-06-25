@@ -448,3 +448,95 @@ def load_work_orders_for_qa(conn) -> list[dict]:
         "SELECT id, wo_number FROM work_order ORDER BY id DESC LIMIT 100"
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# QA Reports
+# ---------------------------------------------------------------------------
+
+def get_qa_reports(conn) -> dict:
+    """Return aggregated QA statistics for the reports page.
+
+    Covers NCRs by severity, CAPAs by status, audit results, inspection
+    pass/fail rates, and monthly inspection volume (last 6 months).
+    """
+    today = _today()
+
+    # NCR counts by severity
+    rows = conn.execute(
+        "SELECT severity, COUNT(*) AS cnt FROM qa_ncr "
+        "WHERE status != 'Closed' GROUP BY severity ORDER BY severity"
+    ).fetchall()
+    ncrs_by_severity = [dict(r) for r in rows]
+
+    # NCR counts by source
+    rows = conn.execute(
+        "SELECT source, COUNT(*) AS cnt FROM qa_ncr "
+        "WHERE status != 'Closed' GROUP BY source ORDER BY cnt DESC"
+    ).fetchall()
+    ncrs_by_source = [dict(r) for r in rows]
+
+    # CAPA counts by status
+    rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM qa_capa GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+    capas_by_status = [dict(r) for r in rows]
+
+    # Audit counts by type
+    rows = conn.execute(
+        "SELECT audit_type, COUNT(*) AS cnt FROM qa_audit GROUP BY audit_type ORDER BY cnt DESC"
+    ).fetchall()
+    audits_by_type = [dict(r) for r in rows]
+
+    # Inspection pass/fail counts
+    rows = conn.execute(
+        "SELECT result, COUNT(*) AS cnt FROM qa_inspection GROUP BY result ORDER BY result"
+    ).fetchall()
+    insp_by_result = [dict(r) for r in rows]
+    total_insp = sum(r['cnt'] for r in insp_by_result) or 1
+    for r in insp_by_result:
+        r['pct'] = round(r['cnt'] * 100 / total_insp)
+
+    # Monthly inspection volume (last 6 months)
+    rows = conn.execute(
+        "SELECT TO_CHAR(insp_date::date, 'YYYY-MM') AS month, COUNT(*) AS cnt "
+        "FROM qa_inspection "
+        "WHERE insp_date >= (CURRENT_DATE - INTERVAL '6 months')::text "
+        "GROUP BY month ORDER BY month"
+    ).fetchall()
+    monthly_insp = [dict(r) for r in rows]
+
+    # Supplier quality rating breakdown
+    rows = conn.execute(
+        "SELECT rating, COUNT(*) AS cnt FROM qa_supplier GROUP BY rating ORDER BY rating"
+    ).fetchall()
+    suppliers_by_rating = [dict(r) for r in rows]
+
+    # KPI totals
+    totals = conn.execute(
+        "SELECT "
+        "(SELECT COUNT(*) FROM qa_ncr WHERE status != 'Closed') AS open_ncrs, "
+        "(SELECT COUNT(*) FROM qa_capa WHERE status NOT IN ('Closed','Overdue')) AS open_capas, "
+        "(SELECT COUNT(*) FROM qa_capa WHERE due_date != '' AND due_date < %s "
+        "  AND status NOT IN ('Closed')) AS overdue_capas, "
+        "(SELECT COUNT(*) FROM qa_inspection WHERE result = 'passed') AS passed_insp, "
+        "(SELECT COUNT(*) FROM qa_inspection WHERE result = 'failed') AS failed_insp, "
+        "(SELECT COUNT(*) FROM qa_inspection) AS total_insp ",
+        (today,),
+    ).fetchone()
+    kpis = dict(totals) if totals else {}
+    total_closed = (kpis.get('passed_insp') or 0) + (kpis.get('failed_insp') or 0)
+    kpis['pass_rate'] = (
+        round(kpis['passed_insp'] * 100 / total_closed) if total_closed else None
+    )
+
+    return {
+        'kpis': kpis,
+        'ncrs_by_severity': ncrs_by_severity,
+        'ncrs_by_source': ncrs_by_source,
+        'capas_by_status': capas_by_status,
+        'audits_by_type': audits_by_type,
+        'insp_by_result': insp_by_result,
+        'monthly_insp': monthly_insp,
+        'suppliers_by_rating': suppliers_by_rating,
+    }
