@@ -583,3 +583,205 @@ def update_network_device(conn, device_id: int, **fields) -> None:
         f"UPDATE it_network_device SET {set_clause} WHERE id = %s",
         list(cols.values()) + [device_id],
     )
+
+
+# ---------------------------------------------------------------------------
+# Network Incidents
+# ---------------------------------------------------------------------------
+
+INCIDENT_SEVERITIES = ('info', 'warning', 'critical')
+INCIDENT_STATUSES = ('open', 'investigating', 'resolved')
+
+_CREATE_INCIDENT_TABLE = """
+CREATE TABLE IF NOT EXISTS it_network_incident (
+    id               SERIAL PRIMARY KEY,
+    title            TEXT DEFAULT '',
+    severity         TEXT DEFAULT 'info',
+    status           TEXT DEFAULT 'open',
+    description      TEXT DEFAULT '',
+    affected_systems TEXT DEFAULT '',
+    reported_date    DATE,
+    resolved_date    DATE,
+    notes            TEXT DEFAULT '',
+    created_by       TEXT DEFAULT ''
+)
+"""
+
+
+def _ensure_incident_table(conn) -> None:
+    conn.execute(_CREATE_INCIDENT_TABLE)
+    conn.commit()
+
+
+def list_incidents(conn, status=None, severity=None, search=None) -> list:
+    _ensure_incident_table(conn)
+    sql = (
+        "SELECT id, title, severity, status, affected_systems, "
+        "reported_date, resolved_date "
+        "FROM it_network_incident WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if severity:
+        sql += " AND severity = %s"
+        params.append(severity)
+    if search:
+        sql += " AND (title ILIKE %s OR affected_systems ILIKE %s OR description ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY reported_date DESC, id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_incident(conn, incident_id: int) -> dict | None:
+    _ensure_incident_table(conn)
+    row = conn.execute(
+        "SELECT * FROM it_network_incident WHERE id = %s", (incident_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_incident(
+    conn, title: str, severity: str, description: str,
+    affected_systems: str, reported_date: str, notes: str, created_by: str,
+) -> int:
+    _ensure_incident_table(conn)
+    cur = conn.execute(
+        "INSERT INTO it_network_incident "
+        "(title, severity, status, description, affected_systems, "
+        "reported_date, notes, created_by) "
+        "VALUES (%s,%s,'open',%s,%s,%s,%s,%s) RETURNING id",
+        (title, severity or 'info', description, affected_systems,
+         reported_date or date.today().isoformat(), notes, created_by),
+    )
+    return cur.fetchone()[0]
+
+
+def update_incident(conn, incident_id: int, **fields) -> None:
+    allowed = {
+        'title', 'severity', 'status', 'description',
+        'affected_systems', 'reported_date', 'resolved_date', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE it_network_incident SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [incident_id],
+    )
+
+
+def set_incident_status(conn, incident_id: int, status: str) -> None:
+    resolved = date.today().isoformat() if status == 'resolved' else None
+    if resolved:
+        conn.execute(
+            "UPDATE it_network_incident SET status = %s, resolved_date = %s WHERE id = %s",
+            (status, resolved, incident_id),
+        )
+    else:
+        conn.execute(
+            "UPDATE it_network_incident SET status = %s, resolved_date = NULL WHERE id = %s",
+            (status, incident_id),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Bandwidth Log
+# ---------------------------------------------------------------------------
+
+_CREATE_BANDWIDTH_TABLE = """
+CREATE TABLE IF NOT EXISTS it_bandwidth_log (
+    id             SERIAL PRIMARY KEY,
+    interface_name TEXT DEFAULT '',
+    recorded_at    TIMESTAMP DEFAULT NOW(),
+    mbps_in        REAL DEFAULT 0,
+    mbps_out       REAL DEFAULT 0,
+    notes          TEXT DEFAULT '',
+    created_by     TEXT DEFAULT ''
+)
+"""
+
+
+def _ensure_bandwidth_table(conn) -> None:
+    conn.execute(_CREATE_BANDWIDTH_TABLE)
+    conn.commit()
+
+
+def list_bandwidth_logs(conn, interface=None, limit: int = 200) -> list:
+    _ensure_bandwidth_table(conn)
+    sql = (
+        "SELECT id, interface_name, recorded_at, mbps_in, mbps_out, notes "
+        "FROM it_bandwidth_log WHERE TRUE"
+    )
+    params: list = []
+    if interface:
+        sql += " AND interface_name = %s"
+        params.append(interface)
+    sql += " ORDER BY recorded_at DESC, id DESC"
+    if limit:
+        sql += f" LIMIT {int(limit)}"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def list_bandwidth_interfaces(conn) -> list[str]:
+    _ensure_bandwidth_table(conn)
+    rows = conn.execute(
+        "SELECT DISTINCT interface_name FROM it_bandwidth_log ORDER BY interface_name"
+    ).fetchall()
+    return [r[0] for r in rows if r[0]]
+
+
+def create_bandwidth_log(
+    conn, interface_name: str, mbps_in: float, mbps_out: float,
+    notes: str, created_by: str,
+) -> int:
+    _ensure_bandwidth_table(conn)
+    cur = conn.execute(
+        "INSERT INTO it_bandwidth_log "
+        "(interface_name, mbps_in, mbps_out, notes, created_by) "
+        "VALUES (%s,%s,%s,%s,%s) RETURNING id",
+        (interface_name, mbps_in or 0, mbps_out or 0, notes, created_by),
+    )
+    return cur.fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# Network Dashboard
+# ---------------------------------------------------------------------------
+
+def get_network_dashboard_stats(conn) -> dict:
+    _ensure_network_table(conn)
+    _ensure_incident_table(conn)
+
+    dev_rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM it_network_device GROUP BY status"
+    ).fetchall()
+    by_status = {r['status']: r['cnt'] for r in dev_rows}
+
+    type_rows = conn.execute(
+        "SELECT device_type, COUNT(*) AS cnt FROM it_network_device "
+        "GROUP BY device_type ORDER BY cnt DESC"
+    ).fetchall()
+
+    open_incidents = conn.execute(
+        "SELECT COUNT(*) FROM it_network_incident WHERE status != 'resolved'"
+    ).fetchone()[0]
+
+    recent_inc = conn.execute(
+        "SELECT id, title, severity, status, reported_date "
+        "FROM it_network_incident "
+        "ORDER BY reported_date DESC, id DESC LIMIT 6"
+    ).fetchall()
+
+    return {
+        'total': sum(by_status.values()),
+        'online': by_status.get('online', 0),
+        'offline': by_status.get('offline', 0),
+        'maintenance': by_status.get('maintenance', 0),
+        'unknown': by_status.get('unknown', 0),
+        'by_type': [dict(r) for r in type_rows],
+        'open_incidents': open_incidents,
+        'recent_incidents': [dict(r) for r in recent_inc],
+    }

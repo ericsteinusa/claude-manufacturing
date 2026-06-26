@@ -7,6 +7,7 @@ from ..button_nav import ButtonNav
 from .IT_Tasks import ITTasksWidget, _apply_blue_palette
 from .it_calls import ITSupportWidget
 from .it_network_devices import ITNetworkDevicesWidget
+from .it_network_status import ITNetworkStatusWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -62,6 +63,7 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         tabs.addTab(ITTasksWidget(), "IT Tasks")
         tabs.addTab(ITSupportWidget(), "IT Support Calls")
         tabs.addTab(ITNetworkDevicesWidget(), "Network Devices")
+        tabs.addTab(ITNetworkStatusWidget(), "Network Status")
         tabs.addTab(ITTechReportsWidget(), "Reports")
         v.addWidget(tabs)
 
