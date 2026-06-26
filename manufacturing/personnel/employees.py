@@ -589,7 +589,6 @@ class EmployeesWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Employees")
-        self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(EmployeesWidget())
 
@@ -598,7 +597,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = EmployeesWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

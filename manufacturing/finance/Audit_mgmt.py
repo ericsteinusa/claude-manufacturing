@@ -924,7 +924,6 @@ class AuditWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Audit Management — {email}" if email else "Audit Management"
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(AuditMgmtWidget(initial_tab=initial_tab))
 
@@ -932,5 +931,5 @@ class AuditWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = AuditWindow(sys.argv[1] if len(sys.argv) > 1 else None)
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

@@ -374,7 +374,6 @@ class QALab(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"QA Laboratory — {email}" if email else "QA Laboratory"
         self.setWindowTitle(title)
-        self.resize(960, 660)
         _apply_blue_palette(self)
         self._insp_row_ids = []
         self._selected_insp_id = None
@@ -1001,7 +1000,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = QALab()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

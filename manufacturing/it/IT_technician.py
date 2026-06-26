@@ -6,6 +6,7 @@ from ..qt_theme import BUTTON_STYLE
 from ..button_nav import ButtonNav
 from .IT_Tasks import ITTasksWidget, _apply_blue_palette
 from .it_calls import ITSupportWidget
+from .it_repairs_software import ITRepairsWidget, ITSoftwareWidget, ITLicensesWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -44,7 +45,6 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("IT Technician")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -60,6 +60,9 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(ITTasksWidget(), "IT Tasks")
         tabs.addTab(ITSupportWidget(), "IT Support Calls")
+        tabs.addTab(ITRepairsWidget(), "Hardware Repairs")
+        tabs.addTab(ITSoftwareWidget(), "Software Installations")
+        tabs.addTab(ITLicensesWidget(), "Licenses")
         tabs.addTab(ITTechReportsWidget(), "Reports")
         v.addWidget(tabs)
 
@@ -67,5 +70,5 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ITTechnicianMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

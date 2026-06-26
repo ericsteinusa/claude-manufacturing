@@ -1131,7 +1131,6 @@ class WarehouseWindow(QtWidgets.QMainWindow):
         title = (f"Warehouse & Inventory — {email}" if email
                  else "Warehouse & Inventory")
         self.setWindowTitle(title)
-        self.resize(1200, 780)
         _apply_palette(self)
         self.setCentralWidget(WarehouseWidget())
 
@@ -1140,5 +1139,5 @@ if __name__ == "__main__":
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     win = WarehouseWindow()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

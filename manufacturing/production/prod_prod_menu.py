@@ -482,7 +482,6 @@ class WorkOrders(QtWidgets.QMainWindow):
         title = (f"Production / Work Orders — {email}" if email
                  else "Production / Work Orders")
         self.setWindowTitle(title)
-        self.resize(920, 640)
         _apply_blue_palette(self)
         self._wo_row_ids = []
         self._selected_wo_id = None
@@ -932,7 +931,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = WorkOrders()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

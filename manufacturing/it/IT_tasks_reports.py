@@ -406,5 +406,5 @@ if __name__ == "__main__":
     w.setWindowTitle("IT Tasks Reports")
     w.resize(960, 640)
     w.setCentralWidget(ITTasksReportsWidget())
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

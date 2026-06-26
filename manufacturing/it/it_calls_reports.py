@@ -452,5 +452,5 @@ if __name__ == "__main__":
     w.setWindowTitle("IT Support Reports")
     w.resize(960, 640)
     w.setCentralWidget(ITSupportReportsWidget())
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

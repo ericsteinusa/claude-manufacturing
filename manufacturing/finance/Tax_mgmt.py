@@ -1037,7 +1037,6 @@ class TaxWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Tax Management — {email}" if email else "Tax Management"
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(TaxMgmtWidget(initial_tab=initial_tab))
 
@@ -1045,5 +1044,5 @@ class TaxWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = TaxWindow(sys.argv[1] if len(sys.argv) > 1 else None)
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

@@ -1031,7 +1031,6 @@ class PurchaseRequisitionsWindow(QtWidgets.QMainWindow):
         title = (f"Purchase Requisitions — {email}"
                  if email else "Purchase Requisitions")
         self.setWindowTitle(title)
-        self.resize(1040, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(RequisitionsWidget(default_dept))
 
@@ -1042,7 +1041,7 @@ def main():
     default_dept = sys.argv[1] if len(sys.argv) > 1 else None
     app = QtWidgets.QApplication(sys.argv)
     window = PurchaseRequisitionsWindow(default_dept)
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

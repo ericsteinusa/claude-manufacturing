@@ -490,7 +490,6 @@ class ITTasksMenu(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"IT Tasks — {email}" if email else "IT Tasks"
         self.setWindowTitle(title)
-        self.resize(1060, 700)
         _apply_blue_palette(self)
 
         central = QtWidgets.QWidget()
@@ -514,7 +513,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = ITTasksMenu()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

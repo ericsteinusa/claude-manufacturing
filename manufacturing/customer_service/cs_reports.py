@@ -648,7 +648,6 @@ class CSReportsWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Customer Service Reports")
-        self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSReportsWidget())
 
@@ -656,5 +655,5 @@ class CSReportsWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = CSReportsWindow()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

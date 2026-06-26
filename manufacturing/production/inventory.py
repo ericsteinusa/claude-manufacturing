@@ -696,7 +696,6 @@ class InventoryWindow(QtWidgets.QMainWindow):
         super().__init__()
         email = get_current_user_email()
         self.setWindowTitle(f"Inventory — {email}" if email else "Inventory")
-        self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(InventoryWidget())
 
@@ -705,7 +704,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = InventoryWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 
