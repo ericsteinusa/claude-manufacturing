@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block page_title %}IT Tickets{% endblock %}
+{% block page_title %}Network Devices{% endblock %}
 
 {% block toolbar_left %}
 <a href="/it/" class="btn">IT Dashboard</a>
@@ -31,21 +31,22 @@
 .list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
 .list-table a:hover { text-decoration:underline; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
-.p-low      { background:#e2e3e5; color:#383d41; }
-.p-medium   { background:#d1ecf1; color:#0c5460; }
-.p-high     { background:#fff3cd; color:#856404; }
-.p-critical { background:#f8d7da; color:#721c24; }
-.s-open        { background:#d1ecf1; color:#0c5460; }
-.s-in_progress { background:#fff3cd; color:#856404; }
-.s-resolved    { background:#d4edda; color:#0a3622; }
-.s-closed      { background:#e2e3e5; color:#383d41; }
+.s-online      { background:#d4edda; color:#0a3622; }
+.s-offline     { background:#f8d7da; color:#721c24; }
+.s-unknown     { background:#e2e3e5; color:#383d41; }
+.s-maintenance { background:#fff3cd; color:#856404; }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+.dot-online      { background:#28a745; }
+.dot-offline     { background:#dc3545; }
+.dot-unknown     { background:#6c757d; }
+.dot-maintenance { background:#ffc107; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .form-grid.three { grid-template-columns:1fr 1fr 1fr; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
 .form-group label { font-size:12px; font-weight:bold; color:#444; }
 .form-group input, .form-group select, .form-group textarea {
     padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
-.form-group textarea { height:70px; resize:vertical; }
+.form-group textarea { height:60px; resize:vertical; }
 .full-span { grid-column:1/-1; }
 .btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
     border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
@@ -58,7 +59,7 @@
 {% block body %}
 <div class="content">
 <div class="it-wrap">
-    <h2>IT Support Tickets</h2>
+    <h2>Network Devices</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -66,104 +67,114 @@
     <form method="get" class="filter-bar">
         <select name="status">
             <option value="">All Statuses</option>
-            {% for s in ticket_statuses %}
+            {% for s in device_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
-        <select name="priority">
-            <option value="">All Priorities</option>
-            {% for p in ticket_priorities %}
-            <option value="{{ p }}"{% if priority_filter == p %} selected{% endif %}>{{ p|capfirst }}</option>
+        <select name="device_type">
+            <option value="">All Types</option>
+            {% for t in device_types %}
+            <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search…">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search hostname / IP / location…">
         <button type="submit">Filter</button>
-        <a href="/it/tickets/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <a href="/it/network/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Ticket #</th>
-                    <th>Requester</th>
-                    <th>Dept</th>
-                    <th>Issue Type</th>
-                    <th>Priority</th>
                     <th>Status</th>
-                    <th>Submitted</th>
-                    <th>Due</th>
-                    <th>Assigned To</th>
+                    <th>Hostname</th>
+                    <th>IP Address</th>
+                    <th>MAC Address</th>
+                    <th>Type</th>
+                    <th>Manufacturer / Model</th>
+                    <th>Location</th>
+                    <th>Last Seen</th>
                 </tr>
             </thead>
             <tbody>
-            {% for t in tickets %}
+            {% for d in devices %}
             <tr>
-                <td><a href="/it/tickets/{{ t.id }}/">{{ t.ticket_number }}</a></td>
-                <td>{{ t.requester|default:"—" }}</td>
-                <td>{{ t.department|default:"—" }}</td>
-                <td>{{ t.issue_type|default:"—" }}</td>
-                <td><span class="badge p-{{ t.priority }}">{{ t.priority|capfirst }}</span></td>
-                <td><span class="badge s-{{ t.status }}">{{ t.status|capfirst }}</span></td>
-                <td>{{ t.submitted_date|default:"—" }}</td>
-                <td>{{ t.due_date|default:"—" }}</td>
-                <td>{{ t.assigned_to|default:"—" }}</td>
+                <td>
+                    <span class="status-dot dot-{{ d.status }}"></span>
+                    <span class="badge s-{{ d.status }}">{{ d.status|capfirst }}</span>
+                </td>
+                <td><a href="/it/network/{{ d.id }}/">{{ d.hostname|default:"—" }}</a></td>
+                <td style="font-family:monospace;">{{ d.ip_address|default:"—" }}</td>
+                <td style="font-family:monospace;font-size:11px;">{{ d.mac_address|default:"—" }}</td>
+                <td>{{ d.device_type|default:"—" }}</td>
+                <td>{{ d.manufacturer|default:"" }}{% if d.manufacturer and d.model %} / {% endif %}{{ d.model|default:"" }}</td>
+                <td>{{ d.location|default:"—" }}</td>
+                <td>{{ d.last_seen|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" style="color:#888;text-align:center;">No tickets found.</td></tr>
+            <tr><td colspan="8" style="color:#888;text-align:center;">No network devices found.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    {% if user_role != 'viewer' and user_role != 'read_only' %}
+    {% if user_role != 'Auditor' %}
     <div class="card">
-        <h3>New Ticket</h3>
+        <h3>Add Network Device</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Requester</label>
-                    <input type="text" name="requester" placeholder="Person submitting">
+                    <label>Hostname *</label>
+                    <input type="text" name="hostname" placeholder="e.g. sw-floor2-01">
                 </div>
                 <div class="form-group">
-                    <label>Department</label>
-                    <input type="text" name="department" placeholder="Requester's dept">
+                    <label>IP Address</label>
+                    <input type="text" name="ip_address" placeholder="e.g. 192.168.1.10">
                 </div>
                 <div class="form-group">
-                    <label>Issue Type</label>
-                    <select name="issue_type">
-                        {% for t in issue_types %}
+                    <label>MAC Address</label>
+                    <input type="text" name="mac_address" placeholder="e.g. AA:BB:CC:DD:EE:FF">
+                </div>
+                <div class="form-group">
+                    <label>Device Type</label>
+                    <select name="device_type">
+                        <option value="">— Select —</option>
+                        {% for t in device_types %}
                         <option value="{{ t }}">{{ t }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Priority</label>
-                    <select name="priority">
-                        {% for p in ticket_priorities %}
-                        <option value="{{ p }}"{% if p == 'medium' %} selected{% endif %}>{{ p|capfirst }}</option>
+                    <label>Manufacturer</label>
+                    <input type="text" name="manufacturer" placeholder="e.g. Cisco">
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <input type="text" name="model" placeholder="e.g. Catalyst 2960">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" placeholder="e.g. Server Room A">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in device_statuses %}
+                        <option value="{{ s }}"{% if s == 'online' %} selected{% endif %}>{{ s|capfirst }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Assigned To</label>
-                    <input type="text" name="assigned_to" placeholder="Technician">
-                </div>
-                <div class="form-group">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date">
+                    <label>Last Seen</label>
+                    <input type="date" name="last_seen" value="{{ today }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description *</label>
-                    <textarea name="description" placeholder="Describe the issue (required)"></textarea>
-                </div>
-                <div class="form-group">
                     <label>Notes</label>
-                    <input type="text" name="notes">
+                    <input type="text" name="notes" placeholder="Optional notes">
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Ticket</button>
+            <button type="submit" class="btn-submit">Add Device</button>
         </form>
     </div>
     {% endif %}

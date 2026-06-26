@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block page_title %}IT Tickets{% endblock %}
+{% block page_title %}Hardware Repairs{% endblock %}
 
 {% block toolbar_left %}
 <a href="/it/" class="btn">IT Dashboard</a>
@@ -37,8 +37,8 @@
 .p-critical { background:#f8d7da; color:#721c24; }
 .s-open        { background:#d1ecf1; color:#0c5460; }
 .s-in_progress { background:#fff3cd; color:#856404; }
-.s-resolved    { background:#d4edda; color:#0a3622; }
-.s-closed      { background:#e2e3e5; color:#383d41; }
+.s-completed   { background:#d4edda; color:#0a3622; }
+.s-cancelled   { background:#e2e3e5; color:#383d41; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .form-grid.three { grid-template-columns:1fr 1fr 1fr; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
@@ -58,7 +58,7 @@
 {% block body %}
 <div class="content">
 <div class="it-wrap">
-    <h2>IT Support Tickets</h2>
+    <h2>Hardware Repairs</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -66,82 +66,74 @@
     <form method="get" class="filter-bar">
         <select name="status">
             <option value="">All Statuses</option>
-            {% for s in ticket_statuses %}
+            {% for s in repair_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <select name="priority">
             <option value="">All Priorities</option>
-            {% for p in ticket_priorities %}
+            {% for p in repair_priorities %}
             <option value="{{ p }}"{% if priority_filter == p %} selected{% endif %}>{{ p|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search…">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search asset / reporter…">
         <button type="submit">Filter</button>
-        <a href="/it/tickets/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <a href="/it/repairs/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Ticket #</th>
-                    <th>Requester</th>
-                    <th>Dept</th>
-                    <th>Issue Type</th>
+                    <th>#</th>
+                    <th>Asset Tag</th>
+                    <th>Problem</th>
+                    <th>Reported By</th>
+                    <th>Reported</th>
                     <th>Priority</th>
                     <th>Status</th>
-                    <th>Submitted</th>
-                    <th>Due</th>
                     <th>Assigned To</th>
+                    <th>Completed</th>
                 </tr>
             </thead>
             <tbody>
-            {% for t in tickets %}
+            {% for r in repairs %}
             <tr>
-                <td><a href="/it/tickets/{{ t.id }}/">{{ t.ticket_number }}</a></td>
-                <td>{{ t.requester|default:"—" }}</td>
-                <td>{{ t.department|default:"—" }}</td>
-                <td>{{ t.issue_type|default:"—" }}</td>
-                <td><span class="badge p-{{ t.priority }}">{{ t.priority|capfirst }}</span></td>
-                <td><span class="badge s-{{ t.status }}">{{ t.status|capfirst }}</span></td>
-                <td>{{ t.submitted_date|default:"—" }}</td>
-                <td>{{ t.due_date|default:"—" }}</td>
-                <td>{{ t.assigned_to|default:"—" }}</td>
+                <td><a href="/it/repairs/{{ r.id }}/">{{ r.id }}</a></td>
+                <td>{{ r.asset_tag|default:"—" }}</td>
+                <td>{{ r.problem_description|truncatechars:60 }}</td>
+                <td>{{ r.reported_by|default:"—" }}</td>
+                <td>{{ r.reported_date|default:"—" }}</td>
+                <td><span class="badge p-{{ r.priority }}">{{ r.priority|capfirst }}</span></td>
+                <td><span class="badge s-{{ r.status }}">{{ r.status|capfirst }}</span></td>
+                <td>{{ r.assigned_to|default:"—" }}</td>
+                <td>{{ r.completed_date|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" style="color:#888;text-align:center;">No tickets found.</td></tr>
+            <tr><td colspan="9" style="color:#888;text-align:center;">No repairs found.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    {% if user_role != 'viewer' and user_role != 'read_only' %}
+    {% if user_role not in 'Auditor' %}
     <div class="card">
-        <h3>New Ticket</h3>
+        <h3>New Repair Request</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Requester</label>
-                    <input type="text" name="requester" placeholder="Person submitting">
+                    <label>Asset Tag</label>
+                    <input type="text" name="asset_tag" placeholder="e.g. LPT-042">
                 </div>
                 <div class="form-group">
-                    <label>Department</label>
-                    <input type="text" name="department" placeholder="Requester's dept">
-                </div>
-                <div class="form-group">
-                    <label>Issue Type</label>
-                    <select name="issue_type">
-                        {% for t in issue_types %}
-                        <option value="{{ t }}">{{ t }}</option>
-                        {% endfor %}
-                    </select>
+                    <label>Reported By</label>
+                    <input type="text" name="reported_by" placeholder="Name of reporter">
                 </div>
                 <div class="form-group">
                     <label>Priority</label>
                     <select name="priority">
-                        {% for p in ticket_priorities %}
+                        {% for p in repair_priorities %}
                         <option value="{{ p }}"{% if p == 'medium' %} selected{% endif %}>{{ p|capfirst }}</option>
                         {% endfor %}
                     </select>
@@ -151,19 +143,19 @@
                     <input type="text" name="assigned_to" placeholder="Technician">
                 </div>
                 <div class="form-group">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date">
-                </div>
-                <div class="form-group full-span">
-                    <label>Description *</label>
-                    <textarea name="description" placeholder="Describe the issue (required)"></textarea>
+                    <label>Reported Date</label>
+                    <input type="date" name="reported_date" value="{{ today }}">
                 </div>
                 <div class="form-group">
                     <label>Notes</label>
-                    <input type="text" name="notes">
+                    <input type="text" name="notes" placeholder="Optional notes">
+                </div>
+                <div class="form-group full-span">
+                    <label>Problem Description *</label>
+                    <textarea name="problem_description" placeholder="Describe the hardware issue"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Ticket</button>
+            <button type="submit" class="btn-submit">Submit Repair Request</button>
         </form>
     </div>
     {% endif %}

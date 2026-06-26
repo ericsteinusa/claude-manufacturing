@@ -247,6 +247,14 @@ from .it_core import (
     next_ticket_number,
     list_assets, get_asset, create_asset, update_asset,
     TICKET_STATUSES, TICKET_PRIORITIES, ISSUE_TYPES, ASSET_STATUSES, ASSET_TYPES,
+    list_repairs, get_repair, create_repair, update_repair, set_repair_status,
+    REPAIR_STATUSES, REPAIR_PRIORITIES,
+    list_software, get_software, create_software, update_software,
+    SOFTWARE_STATUSES,
+    list_licenses, get_license, create_license, update_license,
+    LICENSE_TYPES, LICENSE_STATUSES,
+    list_network_devices, get_network_device, create_network_device, update_network_device,
+    NETWORK_DEVICE_TYPES, NETWORK_DEVICE_STATUSES,
 )
 from .legal_core import (
     get_legal_dashboard,
@@ -855,18 +863,18 @@ WEB_LEAF_URLS = {
     ('information_tech', 'new_asset'):   '/it/assets/',
     ('information_tech', 'asset_hist'):  '/it/assets/?status=retired',
     ('information_tech', 'disposition'): '/it/assets/',
-    ('information_tech', 'net_dash'):    '/it/',
-    ('information_tech', 'bw_monitor'):  '/it/',
-    ('information_tech', 'net_map'):     '/it/',
-    ('information_tech', 'inc_log'):     '/it/',
-    ('information_tech', 'pend_inst'):   '/it/',
-    ('information_tech', 'sw_inv'):      '/it/',
-    ('information_tech', 'lic_mgmt'):    '/it/',
-    ('information_tech', 'inst_hist'):   '/it/',
-    ('information_tech', 'new_repair'):  '/it/',
-    ('information_tech', 'inprog'):      '/it/',
-    ('information_tech', 'comp_rep'):    '/it/',
-    ('information_tech', 'rep_hist'):    '/it/',
+    ('information_tech', 'net_dash'):    '/it/network/',
+    ('information_tech', 'bw_monitor'):  '/it/network/',
+    ('information_tech', 'net_map'):     '/it/network/',
+    ('information_tech', 'inc_log'):     '/it/network/',
+    ('information_tech', 'pend_inst'):   '/it/software/?status=pending',
+    ('information_tech', 'sw_inv'):      '/it/software/',
+    ('information_tech', 'lic_mgmt'):    '/it/licenses/',
+    ('information_tech', 'inst_hist'):   '/it/software/?status=installed',
+    ('information_tech', 'new_repair'):  '/it/repairs/',
+    ('information_tech', 'inprog'):      '/it/repairs/?status=in_progress',
+    ('information_tech', 'comp_rep'):    '/it/repairs/?status=completed',
+    ('information_tech', 'rep_hist'):    '/it/repairs/',
     ('information_tech', 'create_acct'): '/it/',
     ('information_tech', 'reset_pw'):    '/it/',
     ('information_tech', 'acct_stat'):   '/it/',
@@ -7818,6 +7826,326 @@ def it_asset_detail(request, asset_id):
     return render(request, 'it_asset_detail.html', _it_ctx(
         request, asset=asset, can_edit=can_edit,
         asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_repairs_list(request):
+    status_f = request.GET.get('status', '').strip()
+    priority_f = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        repairs = list_repairs(conn, status=status_f or None,
+                               priority=priority_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_repair(
+                    conn,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    problem_description=request.POST.get('problem_description', ''),
+                    reported_by=request.POST.get('reported_by', ''),
+                    reported_date=request.POST.get('reported_date', '') or date.today().isoformat(),
+                    assigned_to=request.POST.get('assigned_to', ''),
+                    priority=request.POST.get('priority', 'medium'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_repairs_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                repairs = list_repairs(conn, status=status_f or None,
+                                       priority=priority_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_repairs_list.html', _it_ctx(
+        request, repairs=repairs, status_filter=status_f, priority_filter=priority_f,
+        search=search, repair_statuses=REPAIR_STATUSES, repair_priorities=REPAIR_PRIORITIES,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_repairs_detail(request, repair_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    repair = None
+    try:
+        repair = get_repair(conn, repair_id)
+        if not repair:
+            return redirect('it_repairs_list')
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'status':
+                    set_repair_status(conn, repair_id, request.POST.get('status', ''))
+                    success = 'Status updated.'
+                else:
+                    update_repair(
+                        conn, repair_id,
+                        asset_tag=request.POST.get('asset_tag', ''),
+                        problem_description=request.POST.get('problem_description', ''),
+                        reported_by=request.POST.get('reported_by', ''),
+                        reported_date=request.POST.get('reported_date', ''),
+                        assigned_to=request.POST.get('assigned_to', ''),
+                        priority=request.POST.get('priority', ''),
+                        resolution=request.POST.get('resolution', ''),
+                        notes=request.POST.get('notes', ''),
+                    )
+                    success = 'Repair updated.'
+                conn.commit()
+                repair = get_repair(conn, repair_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_repairs_detail.html', _it_ctx(
+        request, repair=repair, can_edit=can_edit,
+        repair_statuses=REPAIR_STATUSES, repair_priorities=REPAIR_PRIORITIES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_software_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        installs = list_software(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_software(
+                    conn,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    software_name=request.POST.get('software_name', ''),
+                    version=request.POST.get('version', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    install_date=request.POST.get('install_date', '') or date.today().isoformat(),
+                    status=request.POST.get('status', 'installed'),
+                    installed_by=request.POST.get('installed_by', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_software_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                installs = list_software(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_software_list.html', _it_ctx(
+        request, installs=installs, status_filter=status_f, search=search,
+        software_statuses=SOFTWARE_STATUSES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_software_detail(request, sw_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    install = None
+    try:
+        install = get_software(conn, sw_id)
+        if not install:
+            return redirect('it_software_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_software(
+                    conn, sw_id,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    software_name=request.POST.get('software_name', ''),
+                    version=request.POST.get('version', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    install_date=request.POST.get('install_date', ''),
+                    status=request.POST.get('status', ''),
+                    installed_by=request.POST.get('installed_by', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Record updated.'
+                install = get_software(conn, sw_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_software_detail.html', _it_ctx(
+        request, install=install, can_edit=can_edit,
+        software_statuses=SOFTWARE_STATUSES, error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_license_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        licenses = list_licenses(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_license(
+                    conn,
+                    software_name=request.POST.get('software_name', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    license_key=request.POST.get('license_key', ''),
+                    license_type=request.POST.get('license_type', 'perpetual'),
+                    seats=int(request.POST.get('seats', '1') or 1),
+                    seats_used=int(request.POST.get('seats_used', '0') or 0),
+                    purchase_date=request.POST.get('purchase_date', '') or None,
+                    expiry_date=request.POST.get('expiry_date', '') or None,
+                    cost=float(request.POST.get('cost', '0') or 0),
+                    status=request.POST.get('status', 'active'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_license_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                licenses = list_licenses(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_license_list.html', _it_ctx(
+        request, licenses=licenses, status_filter=status_f, search=search,
+        license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_license_detail(request, license_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    lic = None
+    try:
+        lic = get_license(conn, license_id)
+        if not lic:
+            return redirect('it_license_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_license(
+                    conn, license_id,
+                    software_name=request.POST.get('software_name', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    license_key=request.POST.get('license_key', ''),
+                    license_type=request.POST.get('license_type', ''),
+                    seats=int(request.POST.get('seats', '1') or 1),
+                    seats_used=int(request.POST.get('seats_used', '0') or 0),
+                    purchase_date=request.POST.get('purchase_date', '') or None,
+                    expiry_date=request.POST.get('expiry_date', '') or None,
+                    cost=float(request.POST.get('cost', '0') or 0),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'License updated.'
+                lic = get_license(conn, license_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_license_detail.html', _it_ctx(
+        request, lic=lic, can_edit=can_edit,
+        license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_network_list(request):
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('device_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        devices = list_network_devices(conn, status=status_f or None,
+                                       device_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_network_device(
+                    conn,
+                    hostname=request.POST.get('hostname', ''),
+                    ip_address=request.POST.get('ip_address', ''),
+                    mac_address=request.POST.get('mac_address', ''),
+                    device_type=request.POST.get('device_type', ''),
+                    manufacturer=request.POST.get('manufacturer', ''),
+                    model=request.POST.get('model', ''),
+                    location=request.POST.get('location', ''),
+                    status=request.POST.get('status', 'unknown'),
+                    last_seen=request.POST.get('last_seen', '') or None,
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_network_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                devices = list_network_devices(conn, status=status_f or None,
+                                               device_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_network_list.html', _it_ctx(
+        request, devices=devices, status_filter=status_f, type_filter=type_f,
+        search=search, device_types=NETWORK_DEVICE_TYPES,
+        device_statuses=NETWORK_DEVICE_STATUSES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_network_detail(request, device_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    device = None
+    try:
+        device = get_network_device(conn, device_id)
+        if not device:
+            return redirect('it_network_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_network_device(
+                    conn, device_id,
+                    hostname=request.POST.get('hostname', ''),
+                    ip_address=request.POST.get('ip_address', ''),
+                    mac_address=request.POST.get('mac_address', ''),
+                    device_type=request.POST.get('device_type', ''),
+                    manufacturer=request.POST.get('manufacturer', ''),
+                    model=request.POST.get('model', ''),
+                    location=request.POST.get('location', ''),
+                    status=request.POST.get('status', ''),
+                    last_seen=request.POST.get('last_seen', '') or None,
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Device updated.'
+                device = get_network_device(conn, device_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_network_detail.html', _it_ctx(
+        request, device=device, can_edit=can_edit,
+        device_types=NETWORK_DEVICE_TYPES, device_statuses=NETWORK_DEVICE_STATUSES,
         error=error, success=success,
     ))
 

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block page_title %}IT Assets{% endblock %}
+{% block page_title %}License Management{% endblock %}
 
 {% block toolbar_left %}
 <a href="/it/" class="btn">IT Dashboard</a>
@@ -31,17 +31,20 @@
 .list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
 .list-table a:hover { text-decoration:underline; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
-.s-active  { background:#d4edda; color:#0a3622; }
-.s-spare   { background:#d1ecf1; color:#0c5460; }
-.s-repair  { background:#fff3cd; color:#856404; }
-.s-retired { background:#e2e3e5; color:#383d41; }
-.s-lost    { background:#f8d7da; color:#721c24; }
+.s-active    { background:#d4edda; color:#0a3622; }
+.s-expired   { background:#f8d7da; color:#721c24; }
+.s-cancelled { background:#e2e3e5; color:#383d41; }
+.seats-bar { display:flex; align-items:center; gap:6px; }
+.seats-progress { height:8px; background:#e9ecef; border-radius:4px; flex:1; min-width:60px; overflow:hidden; }
+.seats-fill { height:100%; background:rgb(0,60,180); border-radius:4px; }
+.seats-fill.warn { background:#dc3545; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .form-grid.three { grid-template-columns:1fr 1fr 1fr; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
 .form-group label { font-size:12px; font-weight:bold; color:#444; }
 .form-group input, .form-group select, .form-group textarea {
     padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
 .full-span { grid-column:1/-1; }
 .btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
     border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
@@ -54,7 +57,7 @@
 {% block body %}
 <div class="content">
 <div class="it-wrap">
-    <h2>IT Asset Inventory</h2>
+    <h2>Software License Management</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -62,116 +65,120 @@
     <form method="get" class="filter-bar">
         <select name="status">
             <option value="">All Statuses</option>
-            {% for s in asset_statuses %}
+            {% for s in license_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
-        <select name="asset_type">
-            <option value="">All Types</option>
-            {% for t in asset_types %}
-            <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search tag / make / model…">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search software / vendor…">
         <button type="submit">Filter</button>
-        <a href="/it/assets/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <a href="/it/licenses/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Asset Tag</th>
+                    <th>#</th>
+                    <th>Software</th>
+                    <th>Vendor</th>
                     <th>Type</th>
-                    <th>Make</th>
-                    <th>Model</th>
-                    <th>Serial #</th>
-                    <th>Assigned To</th>
-                    <th>Dept</th>
-                    <th>Warranty Exp</th>
+                    <th>Seats Used / Total</th>
+                    <th>Purchase Date</th>
+                    <th>Expiry Date</th>
+                    <th>Cost</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-            {% for a in assets %}
+            {% for lic in licenses %}
             <tr>
-                <td><a href="/it/assets/{{ a.id }}/">{{ a.asset_tag }}</a></td>
-                <td>{{ a.asset_type|default:"—" }}</td>
-                <td>{{ a.make|default:"—" }}</td>
-                <td>{{ a.model|default:"—" }}</td>
-                <td>{{ a.serial_number|default:"—" }}</td>
-                <td>{{ a.assigned_to|default:"—" }}</td>
-                <td>{{ a.department|default:"—" }}</td>
-                <td>{{ a.warranty_exp|default:"—" }}</td>
-                <td><span class="badge s-{{ a.status }}">{{ a.status|capfirst }}</span></td>
+                <td><a href="/it/licenses/{{ lic.id }}/">{{ lic.id }}</a></td>
+                <td><a href="/it/licenses/{{ lic.id }}/">{{ lic.software_name|default:"—" }}</a></td>
+                <td>{{ lic.vendor|default:"—" }}</td>
+                <td>{{ lic.license_type|capfirst }}</td>
+                <td>
+                    <div class="seats-bar">
+                        <span>{{ lic.seats_used }}/{{ lic.seats }}</span>
+                        {% if lic.seats > 0 %}
+                        <div class="seats-progress">
+                            <div class="seats-fill{% if lic.seats_used >= lic.seats %} warn{% endif %}"
+                                 style="width:{% widthratio lic.seats_used lic.seats 100 %}%"></div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ lic.purchase_date|default:"—" }}</td>
+                <td>{{ lic.expiry_date|default:"—" }}</td>
+                <td>${{ lic.cost|floatformat:2 }}</td>
+                <td><span class="badge s-{{ lic.status }}">{{ lic.status|capfirst }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" style="color:#888;text-align:center;">No assets found.</td></tr>
+            <tr><td colspan="9" style="color:#888;text-align:center;">No licenses found.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    {% if user_role != 'viewer' and user_role != 'read_only' %}
+    {% if user_role != 'Auditor' %}
     <div class="card">
-        <h3>New Asset</h3>
+        <h3>Add License</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Asset Tag *</label>
-                    <input type="text" name="asset_tag" placeholder="Unique asset tag" required>
+                    <label>Software Name *</label>
+                    <input type="text" name="software_name" placeholder="e.g. Adobe Acrobat">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
-                    <select name="asset_type">
-                        {% for t in asset_types %}
-                        <option value="{{ t }}">{{ t }}</option>
+                    <label>Vendor</label>
+                    <input type="text" name="vendor" placeholder="e.g. Adobe">
+                </div>
+                <div class="form-group">
+                    <label>License Type</label>
+                    <select name="license_type">
+                        {% for t in license_types %}
+                        <option value="{{ t }}">{{ t|capfirst }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <select name="status">
-                        {% for s in asset_statuses %}
-                        <option value="{{ s }}"{% if s == 'active' %} selected{% endif %}>{{ s|capfirst }}</option>
-                        {% endfor %}
-                    </select>
+                    <label>Seats</label>
+                    <input type="number" name="seats" value="1" min="1">
                 </div>
                 <div class="form-group">
-                    <label>Make</label>
-                    <input type="text" name="make" placeholder="e.g. Dell, HP">
+                    <label>Seats Used</label>
+                    <input type="number" name="seats_used" value="0" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Model</label>
-                    <input type="text" name="model">
-                </div>
-                <div class="form-group">
-                    <label>Serial #</label>
-                    <input type="text" name="serial_number">
-                </div>
-                <div class="form-group">
-                    <label>Assigned To</label>
-                    <input type="text" name="assigned_to" placeholder="Leave blank if spare">
-                </div>
-                <div class="form-group">
-                    <label>Department</label>
-                    <input type="text" name="department">
+                    <label>Cost ($)</label>
+                    <input type="number" name="cost" value="0" step="0.01" min="0">
                 </div>
                 <div class="form-group">
                     <label>Purchase Date</label>
                     <input type="date" name="purchase_date">
                 </div>
                 <div class="form-group">
-                    <label>Warranty Exp</label>
-                    <input type="date" name="warranty_exp">
+                    <label>Expiry Date</label>
+                    <input type="date" name="expiry_date">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in license_statuses %}
+                        <option value="{{ s }}"{% if s == 'active' %} selected{% endif %}>{{ s|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>License Key</label>
+                    <input type="text" name="license_key" placeholder="Optional — keep confidential">
                 </div>
                 <div class="form-group full-span">
                     <label>Notes</label>
-                    <input type="text" name="notes">
+                    <input type="text" name="notes" placeholder="Optional notes">
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Asset</button>
+            <button type="submit" class="btn-submit">Add License</button>
         </form>
     </div>
     {% endif %}
