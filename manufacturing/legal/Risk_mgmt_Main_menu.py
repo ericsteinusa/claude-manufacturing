@@ -23,7 +23,6 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(_TITLE)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(DeptMenuWidget(_TITLE, _ITEMS))
 
@@ -31,5 +30,5 @@ class RiskMgmtMainMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = RiskMgmtMainMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())
