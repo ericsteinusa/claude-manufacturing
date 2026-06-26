@@ -1,4 +1,4 @@
-"""Qt-free Marketing data layer — dashboard, campaigns, leads, content."""
+"""Qt-free Marketing data layer — dashboard, campaigns, leads, content, ads, research, analytics."""
 
 CHANNELS = (
     'Email', 'Social', 'Search', 'Display', 'Content',
@@ -19,6 +19,18 @@ CONTENT_TYPES = (
     'Email', 'Ad Copy', 'Case Study', 'Landing Page',
 )
 CONTENT_STATUSES = ('Draft', 'In Review', 'Approved', 'Published', 'Archived')
+
+AD_CHANNELS = (
+    'Google Ads', 'Facebook', 'Instagram', 'LinkedIn', 'Twitter/X',
+    'Display', 'Email', 'Print', 'Radio', 'TV', 'Other',
+)
+AD_STATUSES = ('Draft', 'Scheduled', 'Active', 'Paused', 'Completed', 'Cancelled')
+
+RESEARCH_TYPES = (
+    'Survey', 'Focus Group', 'Competitor Analysis', 'Market Trend',
+    'Customer Interview', 'A/B Test', 'Other',
+)
+RESEARCH_STATUSES = ('Planned', 'In Progress', 'Completed', 'Cancelled')
 
 
 # ---------------------------------------------------------------------------
@@ -250,3 +262,247 @@ def update_content(conn, item_id: int, **fields) -> None:
         f"UPDATE marketing_content SET {set_clause} WHERE id = %s",
         list(cols.values()) + [item_id],
     )
+
+
+# ---------------------------------------------------------------------------
+# Advertising
+# ---------------------------------------------------------------------------
+
+_CREATE_AD_TABLE = """
+CREATE TABLE IF NOT EXISTS marketing_ad (
+    id           SERIAL PRIMARY KEY,
+    name         TEXT DEFAULT '',
+    channel      TEXT DEFAULT '',
+    campaign_name TEXT DEFAULT '',
+    budget       REAL DEFAULT 0,
+    spend        REAL DEFAULT 0,
+    impressions  INTEGER DEFAULT 0,
+    clicks       INTEGER DEFAULT 0,
+    conversions  INTEGER DEFAULT 0,
+    start_date   DATE,
+    end_date     DATE,
+    status       TEXT DEFAULT 'Draft',
+    owner        TEXT DEFAULT '',
+    notes        TEXT DEFAULT ''
+)
+"""
+
+
+def _ensure_ad_table(conn) -> None:
+    conn.execute(_CREATE_AD_TABLE)
+    conn.commit()
+
+
+def list_ads(conn, status=None, channel=None, search=None) -> list:
+    _ensure_ad_table(conn)
+    sql = (
+        "SELECT id, name, channel, campaign_name, budget, spend, "
+        "impressions, clicks, conversions, start_date, end_date, status, owner "
+        "FROM marketing_ad WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if channel:
+        sql += " AND channel = %s"
+        params.append(channel)
+    if search:
+        sql += " AND (name ILIKE %s OR campaign_name ILIKE %s OR owner ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_ad(conn, ad_id: int) -> dict | None:
+    _ensure_ad_table(conn)
+    row = conn.execute("SELECT * FROM marketing_ad WHERE id = %s", (ad_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def create_ad(
+    conn, name: str, channel: str, campaign_name: str, budget: float, spend: float,
+    impressions: int, clicks: int, conversions: int,
+    start_date: str, end_date: str, status: str, owner: str, notes: str,
+) -> int:
+    _ensure_ad_table(conn)
+    cur = conn.execute(
+        "INSERT INTO marketing_ad "
+        "(name, channel, campaign_name, budget, spend, impressions, clicks, conversions, "
+        "start_date, end_date, status, owner, notes) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (name, channel, campaign_name, budget or 0, spend or 0,
+         impressions or 0, clicks or 0, conversions or 0,
+         start_date or None, end_date or None, status or 'Draft', owner, notes),
+    )
+    return cur.fetchone()[0]
+
+
+def update_ad(conn, ad_id: int, **fields) -> None:
+    allowed = {
+        'name', 'channel', 'campaign_name', 'budget', 'spend',
+        'impressions', 'clicks', 'conversions',
+        'start_date', 'end_date', 'status', 'owner', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE marketing_ad SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [ad_id],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Market Research
+# ---------------------------------------------------------------------------
+
+_CREATE_RESEARCH_TABLE = """
+CREATE TABLE IF NOT EXISTS marketing_research (
+    id           SERIAL PRIMARY KEY,
+    title        TEXT DEFAULT '',
+    research_type TEXT DEFAULT '',
+    description  TEXT DEFAULT '',
+    owner        TEXT DEFAULT '',
+    start_date   DATE,
+    end_date     DATE,
+    status       TEXT DEFAULT 'Planned',
+    findings     TEXT DEFAULT '',
+    budget       REAL DEFAULT 0,
+    notes        TEXT DEFAULT ''
+)
+"""
+
+
+def _ensure_research_table(conn) -> None:
+    conn.execute(_CREATE_RESEARCH_TABLE)
+    conn.commit()
+
+
+def list_research(conn, status=None, research_type=None, search=None) -> list:
+    _ensure_research_table(conn)
+    sql = (
+        "SELECT id, title, research_type, owner, start_date, end_date, status, budget "
+        "FROM marketing_research WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if research_type:
+        sql += " AND research_type = %s"
+        params.append(research_type)
+    if search:
+        sql += " AND (title ILIKE %s OR owner ILIKE %s OR description ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_research_project(conn, project_id: int) -> dict | None:
+    _ensure_research_table(conn)
+    row = conn.execute(
+        "SELECT * FROM marketing_research WHERE id = %s", (project_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_research(
+    conn, title: str, research_type: str, description: str, owner: str,
+    start_date: str, end_date: str, status: str, budget: float, notes: str,
+) -> int:
+    _ensure_research_table(conn)
+    cur = conn.execute(
+        "INSERT INTO marketing_research "
+        "(title, research_type, description, owner, start_date, end_date, status, budget, notes) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (title, research_type, description, owner,
+         start_date or None, end_date or None, status or 'Planned', budget or 0, notes),
+    )
+    return cur.fetchone()[0]
+
+
+def update_research(conn, project_id: int, **fields) -> None:
+    allowed = {
+        'title', 'research_type', 'description', 'owner',
+        'start_date', 'end_date', 'status', 'findings', 'budget', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE marketing_research SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [project_id],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Analytics (aggregated read-only)
+# ---------------------------------------------------------------------------
+
+def get_analytics_data(conn) -> dict:
+    """Aggregate metrics from campaigns, leads, ads, and content for the analytics page."""
+    _ensure_ad_table(conn)
+
+    camp = conn.execute(
+        "SELECT "
+        "COUNT(*) AS total, "
+        "COUNT(*) FILTER (WHERE status = 'Active') AS active, "
+        "COUNT(*) FILTER (WHERE status = 'Completed') AS completed, "
+        "COALESCE(SUM(budget), 0) AS total_budget "
+        "FROM marketing_campaign"
+    ).fetchone()
+    campaigns = dict(camp) if camp else {}
+
+    leads = conn.execute(
+        "SELECT "
+        "COUNT(*) AS total, "
+        "COUNT(*) FILTER (WHERE status = 'Converted') AS converted, "
+        "COUNT(*) FILTER (WHERE status = 'New') AS new_count, "
+        "COUNT(*) FILTER (WHERE status = 'Qualified') AS qualified "
+        "FROM marketing_lead"
+    ).fetchone()
+    leads_data = dict(leads) if leads else {}
+
+    ads = conn.execute(
+        "SELECT "
+        "COUNT(*) AS total, "
+        "COALESCE(SUM(budget), 0) AS total_budget, "
+        "COALESCE(SUM(spend), 0) AS total_spend, "
+        "COALESCE(SUM(impressions), 0) AS total_impressions, "
+        "COALESCE(SUM(clicks), 0) AS total_clicks, "
+        "COALESCE(SUM(conversions), 0) AS total_conversions "
+        "FROM marketing_ad"
+    ).fetchone()
+    ads_data = dict(ads) if ads else {}
+
+    content = conn.execute(
+        "SELECT "
+        "COUNT(*) AS total, "
+        "COUNT(*) FILTER (WHERE status = 'Published') AS published, "
+        "COUNT(*) FILTER (WHERE status = 'Draft') AS draft "
+        "FROM marketing_content"
+    ).fetchone()
+    content_data = dict(content) if content else {}
+
+    recent_leads = conn.execute(
+        "SELECT source, COUNT(*) AS cnt FROM marketing_lead "
+        "GROUP BY source ORDER BY cnt DESC LIMIT 6"
+    ).fetchall()
+
+    channel_perf = conn.execute(
+        "SELECT channel, COUNT(*) AS cnt, COALESCE(SUM(spend), 0) AS spend, "
+        "COALESCE(SUM(clicks), 0) AS clicks, COALESCE(SUM(conversions), 0) AS conversions "
+        "FROM marketing_ad GROUP BY channel ORDER BY spend DESC LIMIT 8"
+    ).fetchall()
+
+    return {
+        'campaigns': campaigns,
+        'leads': leads_data,
+        'ads': ads_data,
+        'content': content_data,
+        'leads_by_source': [dict(r) for r in recent_leads],
+        'channel_performance': [dict(r) for r in channel_perf],
+    }

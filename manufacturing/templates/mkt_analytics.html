@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block page_title %}Marketing Analytics{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mkt/" class="btn">Marketing</a>
+<a href="/mkt/campaigns/" class="btn">Campaigns</a>
+<a href="/mkt/leads/" class="btn">Leads</a>
+<a href="/mkt/ads/" class="btn">Advertising</a>
+<a href="/mkt/research/" class="btn">Research</a>
+<a href="/mkt/analytics/" class="btn">Analytics</a>
+<a href="/mkt/content/" class="btn">Content</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.mkt-wrap { width:100%; max-width:1100px; }
+.mkt-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; border-bottom:1px solid #eee; padding-bottom:8px; }
+.kpi-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:4px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 20px;
+    min-width:140px; flex:1; text-align:center; }
+.kpi .num { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:12px; color:#666; margin-top:3px; text-transform:uppercase; }
+.kpi .sub { font-size:11px; color:#999; margin-top:2px; }
+.section-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.metric { text-align:right; font-variant-numeric:tabular-nums; }
+.bar-cell { display:flex; align-items:center; gap:8px; }
+.bar { height:10px; background:rgb(0,60,180); border-radius:3px; min-width:2px; }
+.lead-source-row { display:flex; justify-content:space-between; align-items:center;
+    padding:6px 0; border-bottom:1px solid #eee; font-size:13px; }
+.lead-source-row:last-child { border-bottom:none; }
+.lead-bar-wrap { flex:1; margin:0 12px; height:8px; background:#e9ecef; border-radius:4px; overflow:hidden; }
+.lead-bar { height:100%; background:rgb(0,60,180); border-radius:4px; }
+.empty-msg { color:#888; font-size:13px; text-align:center; padding:16px 0; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="mkt-wrap">
+    <h2>Marketing Analytics</h2>
+
+    <div class="kpi-row" style="margin-bottom:16px;">
+        <div class="kpi">
+            <div class="num">{{ campaigns.total|default:0 }}</div>
+            <div class="lbl">Campaigns</div>
+            <div class="sub">{{ campaigns.active|default:0 }} active</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ leads.total|default:0 }}</div>
+            <div class="lbl">Leads</div>
+            <div class="sub">{{ leads.converted|default:0 }} converted</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ ads.total|default:0 }}</div>
+            <div class="lbl">Ads</div>
+            <div class="sub">${{ ads.total_spend|floatformat:0 }} spend</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ ads.total_impressions|default:0 }}</div>
+            <div class="lbl">Impressions</div>
+            <div class="sub">{{ ads.total_clicks|default:0 }} clicks</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ ads.total_conversions|default:0 }}</div>
+            <div class="lbl">Conversions</div>
+            <div class="sub">from ads</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ content.published|default:0 }}</div>
+            <div class="lbl">Published</div>
+            <div class="sub">{{ content.draft|default:0 }} in draft</div>
+        </div>
+    </div>
+
+    <div class="section-row">
+        <div class="card">
+            <h3>Leads by Source</h3>
+            {% if leads_by_source %}
+            {% with max_leads=leads_by_source.0.cnt %}
+            {% for row in leads_by_source %}
+            <div class="lead-source-row">
+                <span style="min-width:110px;">{{ row.source|default:"Unknown" }}</span>
+                <div class="lead-bar-wrap">
+                    {% if max_leads %}
+                    <div class="lead-bar" style="width:{% widthratio row.cnt max_leads 100 %}%"></div>
+                    {% endif %}
+                </div>
+                <span style="font-weight:bold;min-width:30px;text-align:right;">{{ row.cnt }}</span>
+            </div>
+            {% endfor %}
+            {% endwith %}
+            {% else %}
+            <div class="empty-msg">No lead data yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>Ad Performance by Channel</h3>
+            {% if channel_performance %}
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Channel</th>
+                        <th class="metric">Ads</th>
+                        <th class="metric">Spend</th>
+                        <th class="metric">Clicks</th>
+                        <th class="metric">Conv.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in channel_performance %}
+                <tr>
+                    <td>{{ row.channel|default:"—" }}</td>
+                    <td class="metric">{{ row.cnt }}</td>
+                    <td class="metric">${{ row.spend|floatformat:0 }}</td>
+                    <td class="metric">{{ row.clicks }}</td>
+                    <td class="metric">{{ row.conversions }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-msg">No ad performance data yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Summary</h3>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+            <div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Campaigns</div>
+                <div style="font-size:13px;">Total: <strong>{{ campaigns.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">Active: <strong>{{ campaigns.active|default:0 }}</strong></div>
+                <div style="font-size:13px;">Completed: <strong>{{ campaigns.completed|default:0 }}</strong></div>
+                <div style="font-size:13px;">Total Budget: <strong>${{ campaigns.total_budget|floatformat:0 }}</strong></div>
+            </div>
+            <div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Leads</div>
+                <div style="font-size:13px;">Total: <strong>{{ leads.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">New: <strong>{{ leads.new_count|default:0 }}</strong></div>
+                <div style="font-size:13px;">Qualified: <strong>{{ leads.qualified|default:0 }}</strong></div>
+                <div style="font-size:13px;">Converted: <strong>{{ leads.converted|default:0 }}</strong></div>
+            </div>
+            <div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Advertising</div>
+                <div style="font-size:13px;">Total Ads: <strong>{{ ads.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">Budget: <strong>${{ ads.total_budget|floatformat:0 }}</strong></div>
+                <div style="font-size:13px;">Spend: <strong>${{ ads.total_spend|floatformat:0 }}</strong></div>
+                <div style="font-size:13px;">Impressions: <strong>{{ ads.total_impressions|default:0 }}</strong></div>
+            </div>
+            <div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Content</div>
+                <div style="font-size:13px;">Total: <strong>{{ content.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">Published: <strong>{{ content.published|default:0 }}</strong></div>
+                <div style="font-size:13px;">In Draft: <strong>{{ content.draft|default:0 }}</strong></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}

@@ -271,6 +271,10 @@ from .marketing_core import (
     list_content, get_content_item, create_content, update_content,
     CHANNELS, OBJECTIVES, CAMPAIGN_STATUSES,
     LEAD_SOURCES, LEAD_STATUSES, CONTENT_TYPES, CONTENT_STATUSES,
+    list_ads, get_ad, create_ad, update_ad, AD_CHANNELS, AD_STATUSES,
+    list_research, get_research_project, create_research, update_research,
+    RESEARCH_TYPES, RESEARCH_STATUSES,
+    get_analytics_data,
 )
 
 log = get_logger(__name__)
@@ -757,38 +761,38 @@ WEB_LEAF_URLS = {
     ('marketing', 'new_camp'):    '/mkt/campaigns/',
     ('marketing', 'camp_cal'):    '/mkt/campaigns/',
     ('marketing', 'camp_res'):    '/mkt/campaigns/',
-    ('marketing', 'res_proj'):    '/mkt/',
-    ('marketing', 'comp_analy'):  '/mkt/',
-    ('marketing', 'surv_mgmt'):   '/mkt/',
-    ('marketing', 'mkt_trends'):  '/mkt/',
-    ('marketing', 'ad_mgmt'):     '/mkt/',
-    ('marketing', 'ad_budget'):   '/mkt/',
-    ('marketing', 'ad_perf'):     '/mkt/',
-    ('marketing', 'ad_cal'):      '/mkt/',
-    ('marketing', 'web_analy'):   '/mkt/',
-    ('marketing', 'camp_analy'):  '/mkt/campaigns/',
-    ('marketing', 'sales_analy'): '/mkt/',
-    ('marketing', 'cust_rpts'):   '/mkt/',
+    ('marketing', 'res_proj'):    '/mkt/research/',
+    ('marketing', 'comp_analy'):  '/mkt/research/',
+    ('marketing', 'surv_mgmt'):   '/mkt/research/',
+    ('marketing', 'mkt_trends'):  '/mkt/research/',
+    ('marketing', 'ad_mgmt'):     '/mkt/ads/',
+    ('marketing', 'ad_budget'):   '/mkt/ads/',
+    ('marketing', 'ad_perf'):     '/mkt/ads/',
+    ('marketing', 'ad_cal'):      '/mkt/ads/',
+    ('marketing', 'web_analy'):   '/mkt/analytics/',
+    ('marketing', 'camp_analy'):  '/mkt/analytics/',
+    ('marketing', 'sales_analy'): '/mkt/analytics/',
+    ('marketing', 'cust_rpts'):   '/mkt/analytics/',
     ('marketing', 'cont_cal'):    '/mkt/content/',
     ('marketing', 'blog'):        '/mkt/content/',
     ('marketing', 'mkt_mat'):     '/mkt/content/',
     ('marketing', 'cont_arch'):   '/mkt/content/',
     ('marketing', 'post_mgmt'):   '/mkt/content/',
     ('marketing', 'social_cal'):  '/mkt/content/',
-    ('marketing', 'eng_rpts'):    '/mkt/',
+    ('marketing', 'eng_rpts'):    '/mkt/analytics/',
     ('marketing', 'acct_mgmt'):   '/mkt/',
     ('marketing', 'email_camp'):  '/mkt/campaigns/',
     ('marketing', 'sub_lists'):   '/mkt/leads/',
     ('marketing', 'email_tmpl'):  '/mkt/content/',
-    ('marketing', 'email_analy'): '/mkt/',
-    ('marketing', 'pend_appr'):   '/mkt/',
-    ('marketing', 'appr_camp'):   '/mkt/',
-    ('marketing', 'camp_arch'):   '/mkt/',
-    ('marketing', 'appr_hist'):   '/mkt/',
-    ('marketing', 'camp_perf'):   '/mkt/',
-    ('marketing', 'roi_rpts'):    '/mkt/',
-    ('marketing', 'month_sum'):   '/mkt/',
-    ('marketing', 'kpi_dash'):    '/mkt/',
+    ('marketing', 'email_analy'): '/mkt/analytics/',
+    ('marketing', 'pend_appr'):   '/mkt/campaigns/',
+    ('marketing', 'appr_camp'):   '/mkt/campaigns/',
+    ('marketing', 'camp_arch'):   '/mkt/campaigns/',
+    ('marketing', 'appr_hist'):   '/mkt/campaigns/',
+    ('marketing', 'camp_perf'):   '/mkt/analytics/',
+    ('marketing', 'roi_rpts'):    '/mkt/analytics/',
+    ('marketing', 'month_sum'):   '/mkt/analytics/',
+    ('marketing', 'kpi_dash'):    '/mkt/analytics/',
     ('marketing', 'budg_over'):   '/mkt/',
     ('marketing', 'budg_camp'):   '/mkt/',
     ('marketing', 'budg_act'):    '/mkt/',
@@ -8649,6 +8653,180 @@ def mkt_content_detail(request, item_id):
         content_statuses=CONTENT_STATUSES, content_types=CONTENT_TYPES,
         channels=CHANNELS, error=error, success=success,
     ))
+
+
+@dept_required('marketing')
+def mkt_ad_list(request):
+    status_f = request.GET.get('status', '').strip()
+    channel_f = request.GET.get('channel', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        ads = list_ads(conn, status=status_f or None,
+                       channel=channel_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_ad(
+                    conn,
+                    name=request.POST.get('name', ''),
+                    channel=request.POST.get('channel', ''),
+                    campaign_name=request.POST.get('campaign_name', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    spend=float(request.POST.get('spend', 0) or 0),
+                    impressions=int(request.POST.get('impressions', 0) or 0),
+                    clicks=int(request.POST.get('clicks', 0) or 0),
+                    conversions=int(request.POST.get('conversions', 0) or 0),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', 'Draft'),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_ad_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                ads = list_ads(conn, status=status_f or None,
+                               channel=channel_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_ad_list.html', _mkt_ctx(
+        request, ads=ads, status_filter=status_f, channel_filter=channel_f,
+        search=search, ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_ad_detail(request, ad_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    ad = None
+    try:
+        ad = get_ad(conn, ad_id)
+        if not ad:
+            return redirect('mkt_ad_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_ad(
+                    conn, ad_id,
+                    name=request.POST.get('name', ''),
+                    channel=request.POST.get('channel', ''),
+                    campaign_name=request.POST.get('campaign_name', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    spend=float(request.POST.get('spend', 0) or 0),
+                    impressions=int(request.POST.get('impressions', 0) or 0),
+                    clicks=int(request.POST.get('clicks', 0) or 0),
+                    conversions=int(request.POST.get('conversions', 0) or 0),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', ''),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Ad updated.'
+                ad = get_ad(conn, ad_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_ad_detail.html', _mkt_ctx(
+        request, ad=ad, can_edit=can_edit,
+        ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
+        error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_research_list(request):
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('research_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        projects = list_research(conn, status=status_f or None,
+                                 research_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_research(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    research_type=request.POST.get('research_type', ''),
+                    description=request.POST.get('description', ''),
+                    owner=request.POST.get('owner', ''),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', 'Planned'),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_research_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                projects = list_research(conn, status=status_f or None,
+                                         research_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_research_list.html', _mkt_ctx(
+        request, projects=projects, status_filter=status_f, type_filter=type_f,
+        search=search, research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_research_detail(request, project_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    project = None
+    try:
+        project = get_research_project(conn, project_id)
+        if not project:
+            return redirect('mkt_research_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_research(
+                    conn, project_id,
+                    title=request.POST.get('title', ''),
+                    research_type=request.POST.get('research_type', ''),
+                    description=request.POST.get('description', ''),
+                    owner=request.POST.get('owner', ''),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', ''),
+                    findings=request.POST.get('findings', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Project updated.'
+                project = get_research_project(conn, project_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_research_detail.html', _mkt_ctx(
+        request, project=project, can_edit=can_edit,
+        research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_analytics(request):
+    with get_db_connection() as conn:
+        data = get_analytics_data(conn)
+    return render(request, 'mkt_analytics.html', _mkt_ctx(request, **data))
 
 
 # ---------------------------------------------------------------------------
