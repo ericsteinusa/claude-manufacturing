@@ -4,10 +4,11 @@ from PyQt6 import QtCore, QtWidgets
 from ..qt_theme import BUTTON_STYLE
 
 from ..button_nav import ButtonNav
-from .IT_Tasks import ITTasksWidget, _apply_blue_palette
-from .it_calls import ITSupportWidget
+from .IT_Tasks import _apply_blue_palette
 from .it_repairs_software import ITRepairsWidget, ITSoftwareWidget, ITLicensesWidget
 from .it_asset_mgmt import ITAssetMgmtWidget
+from .it_helpdesk import ITHelpDeskWidget
+from .it_tasks_desktop import ITTasksDesktopWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -59,8 +60,8 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(ITTasksWidget(), "IT Tasks")
-        tabs.addTab(ITSupportWidget(), "IT Support Calls")
+        tabs.addTab(ITTasksDesktopWidget(), "IT Tasks")
+        tabs.addTab(ITHelpDeskWidget(), "Help Desk")
         tabs.addTab(ITRepairsWidget(), "Hardware Repairs")
         tabs.addTab(ITSoftwareWidget(), "Software Installations")
         tabs.addTab(ITLicensesWidget(), "Licenses")
