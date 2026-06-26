@@ -7,6 +7,7 @@ from ..button_nav import ButtonNav
 from .IT_Tasks import ITTasksWidget, _apply_blue_palette
 from .it_calls import ITSupportWidget
 from .it_repairs_software import ITRepairsWidget, ITSoftwareWidget, ITLicensesWidget
+from .it_asset_mgmt import ITAssetMgmtWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -63,6 +64,7 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         tabs.addTab(ITRepairsWidget(), "Hardware Repairs")
         tabs.addTab(ITSoftwareWidget(), "Software Installations")
         tabs.addTab(ITLicensesWidget(), "Licenses")
+        tabs.addTab(ITAssetMgmtWidget(), "Asset Management")
         tabs.addTab(ITTechReportsWidget(), "Reports")
         v.addWidget(tabs)
 

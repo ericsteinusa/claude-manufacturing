@@ -229,6 +229,62 @@ def update_asset(conn, asset_id: int, **fields) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Asset History
+# ---------------------------------------------------------------------------
+
+_CREATE_ASSET_HISTORY_TABLE = """
+CREATE TABLE IF NOT EXISTS it_asset_history (
+    id          SERIAL PRIMARY KEY,
+    asset_tag   TEXT DEFAULT '',
+    asset_id    INTEGER,
+    event_type  TEXT DEFAULT '',
+    description TEXT DEFAULT '',
+    changed_by  TEXT DEFAULT '',
+    changed_at  TIMESTAMP DEFAULT NOW()
+)
+"""
+
+
+def _ensure_asset_history_table(conn) -> None:
+    conn.execute(_CREATE_ASSET_HISTORY_TABLE)
+    conn.commit()
+
+
+def log_asset_event(
+    conn, asset_tag: str, asset_id: int | None,
+    event_type: str, description: str, changed_by: str,
+) -> None:
+    _ensure_asset_history_table(conn)
+    conn.execute(
+        "INSERT INTO it_asset_history "
+        "(asset_tag, asset_id, event_type, description, changed_by) "
+        "VALUES (%s,%s,%s,%s,%s)",
+        (asset_tag, asset_id, event_type, description, changed_by),
+    )
+
+
+def list_asset_history(
+    conn, asset_tag: str | None = None,
+    event_type: str | None = None, limit: int = 300,
+) -> list:
+    _ensure_asset_history_table(conn)
+    sql = (
+        "SELECT id, asset_tag, asset_id, event_type, description, "
+        "changed_by, changed_at "
+        "FROM it_asset_history WHERE TRUE"
+    )
+    params: list = []
+    if asset_tag:
+        sql += " AND asset_tag ILIKE %s"
+        params.append(f"%{asset_tag}%")
+    if event_type:
+        sql += " AND event_type = %s"
+        params.append(event_type)
+    sql += f" ORDER BY changed_at DESC, id DESC LIMIT {int(limit)}"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+# ---------------------------------------------------------------------------
 # Hardware Repairs
 # ---------------------------------------------------------------------------
 
