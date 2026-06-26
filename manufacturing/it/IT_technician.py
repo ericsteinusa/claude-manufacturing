@@ -51,7 +51,7 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         self._build_ui()
 
     def _build_ui(self):
-        from .IT_tech_reports import ITTechReportsWidget
+        from .it_reports_desktop import ITReportsDesktopWidget
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
         self.setCentralWidget(central)
@@ -66,7 +66,7 @@ class ITTechnicianMenu(QtWidgets.QMainWindow):
         tabs.addTab(ITSoftwareWidget(), "Software Installations")
         tabs.addTab(ITLicensesWidget(), "Licenses")
         tabs.addTab(ITAssetMgmtWidget(), "Asset Management")
-        tabs.addTab(ITTechReportsWidget(), "Reports")
+        tabs.addTab(ITReportsDesktopWidget(), "Reports")
         v.addWidget(tabs)
 
 
