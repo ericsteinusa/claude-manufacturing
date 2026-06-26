@@ -44,7 +44,6 @@ class ITMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("IT Manager Menu")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -72,5 +71,5 @@ class ITMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ITMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

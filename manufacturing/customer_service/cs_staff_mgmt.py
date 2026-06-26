@@ -744,7 +744,6 @@ class CSStaffMgmtWindow(QtWidgets.QMainWindow):
         title = (f"CS Staff Management — {email}" if email
                  else "CS Staff Management")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSStaffMgmtWidget())
 
@@ -753,5 +752,5 @@ if __name__ == "__main__":
     _init_db()
     app = QtWidgets.QApplication(sys.argv)
     win = CSStaffMgmtWindow()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

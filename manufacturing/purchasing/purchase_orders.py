@@ -651,7 +651,6 @@ class PurchaseOrdersWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Purchase Orders — {email}" if email else "Purchase Orders"
         self.setWindowTitle(title)
-        self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(PurchaseOrdersWidget())
 
@@ -660,7 +659,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = PurchaseOrdersWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

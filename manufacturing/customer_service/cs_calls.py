@@ -21,7 +21,6 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
         title = (f"Customer Service Calls — {email}" if email
                  else "Customer Service Calls")
         self.setWindowTitle(title)
-        self.resize(1210, 650)
         _apply_blue_palette(self)
         self.setCentralWidget(CustomerServiceCallsWidget())
 
@@ -29,7 +28,7 @@ class CustomerServiceCalls(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(sys.argv)
     win = CustomerServiceCalls()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())
 
 

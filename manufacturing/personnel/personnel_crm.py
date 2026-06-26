@@ -40,7 +40,6 @@ class PersonnelCRM(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Personnel CRM — {email}" if email else "Personnel CRM"
         self.setWindowTitle(title)
-        self.resize(1300, 720)
         _apply_blue_palette(self)
         self._selected_row_id = None
         self._row_ids = []
@@ -412,7 +411,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = PersonnelCRM()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

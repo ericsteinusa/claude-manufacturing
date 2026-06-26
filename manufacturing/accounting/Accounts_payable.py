@@ -703,7 +703,6 @@ class AccountsPayableWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Accounts Payable — {email}" if email else "Accounts Payable"
         self.setWindowTitle(title)
-        self.resize(1060, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(AccountsPayableWidget())
 
@@ -712,7 +711,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = AccountsPayableWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

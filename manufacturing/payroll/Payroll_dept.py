@@ -1940,7 +1940,6 @@ class PayrollDept(QtWidgets.QMainWindow):
             f"Payroll Department — {email}" if email else "Payroll Department"
         )
         self.setWindowTitle(title)
-        self.resize(1280, 740)
         _apply_blue_palette(self)
         self.setCentralWidget(PayrollDeptWidget(initial_tab=initial_tab))
 
@@ -1949,7 +1948,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = PayrollDept(sys.argv[1] if len(sys.argv) > 1 else None)
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

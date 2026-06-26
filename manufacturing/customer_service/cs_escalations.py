@@ -658,7 +658,6 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"CS Escalations — {email}" if email else "CS Escalations"
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSEscalationsWidget())
 
@@ -666,5 +665,5 @@ class CSEscalationsWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = CSEscalationsWindow()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

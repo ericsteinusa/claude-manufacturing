@@ -333,7 +333,6 @@ class ShippingDept(QtWidgets.QMainWindow):
         title = (f"Shipping Department — {email}" if email
                  else "Shipping Department")
         self.setWindowTitle(title)
-        self.resize(920, 640)
         _apply_blue_palette(self)
         self._ship_row_ids = []
         self._selected_ship_id = None
@@ -623,7 +622,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = ShippingDept()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 
