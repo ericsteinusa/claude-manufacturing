@@ -16,31 +16,32 @@ TAB_STYLE = (
 )
 
 
+class ITMgrWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        from .it_mgr_reports_desktop import ITMgrReportsDesktopWidget
+        _apply_blue_palette(self)
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = ButtonNav()
+        tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(ITTasksDesktopWidget(),       "IT Tasks")
+        tabs.addTab(ITHelpDeskWidget(),            "Help Desk")
+        tabs.addTab(ITRepairsWidget(),             "Hardware Repairs")
+        tabs.addTab(ITSoftwareWidget(),            "Software Installations")
+        tabs.addTab(ITLicensesWidget(),            "Licenses")
+        tabs.addTab(ITAssetMgmtWidget(),           "Asset Management")
+        tabs.addTab(ITMgrReportsDesktopWidget(),   "Reports")
+        v.addWidget(tabs)
+
+
 class ITMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("IT Manager")
         _apply_blue_palette(self)
-        self._build_ui()
-
-    def _build_ui(self):
-        from .it_mgr_reports_desktop import ITMgrReportsDesktopWidget
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8)
-        v.setSpacing(0)
-        tabs = ButtonNav()
-        tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(ITTasksDesktopWidget(),      "IT Tasks")
-        tabs.addTab(ITHelpDeskWidget(),           "Help Desk")
-        tabs.addTab(ITRepairsWidget(),            "Hardware Repairs")
-        tabs.addTab(ITSoftwareWidget(),           "Software Installations")
-        tabs.addTab(ITLicensesWidget(),           "Licenses")
-        tabs.addTab(ITAssetMgmtWidget(),          "Asset Management")
-        tabs.addTab(ITMgrReportsDesktopWidget(),  "Reports")
-        v.addWidget(tabs)
+        self.setCentralWidget(ITMgrWidget())
 
 
 if __name__ == "__main__":
