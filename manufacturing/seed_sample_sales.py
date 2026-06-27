@@ -166,6 +166,9 @@ def _ensure_tables(conn):
             created_date TEXT DEFAULT ''
         )
     """)
+    # Backfill created_by on pre-existing tables that may lack it
+    for tbl in ("sales_quote", "sales_target", "sales_commission"):
+        conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     conn.commit()
 
 

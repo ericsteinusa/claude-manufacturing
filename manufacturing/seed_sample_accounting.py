@@ -105,6 +105,8 @@ def _ensure_tables(conn):
             memo TEXT DEFAULT ''
         )
     """)
+    for tbl in ("ap_invoice", "ar_invoice"):
+        conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     conn.commit()
 
 

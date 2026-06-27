@@ -108,6 +108,8 @@ def _ensure_tables(conn):
             response_date TEXT
         )
     """)
+    for tbl in ("calls2", "cs_improvement_plan"):
+        conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     conn.commit()
 
 

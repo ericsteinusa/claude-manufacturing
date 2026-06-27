@@ -97,6 +97,7 @@ def _ensure_tables(conn):
             notes TEXT DEFAULT ''
         )
     """)
+    conn.execute("ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     conn.commit()
 
 

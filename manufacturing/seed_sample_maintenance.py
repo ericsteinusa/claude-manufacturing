@@ -89,6 +89,10 @@ def _ensure_tables(conn):
             created_by TEXT DEFAULT ''
         )
     """)
+    # Backfill created_by on pre-existing tables that may lack it
+    for tbl in ("maint_mechanic", "maint_equipment", "maint_work_order",
+                "maint_schedule", "maint_inspection", "maint_downtime", "maint_part"):
+        conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     conn.commit()
 
 

@@ -78,6 +78,8 @@ def _ensure_tables(conn):
             created_by TEXT DEFAULT ''
         )
     """)
+    for tbl in ("qa_ncr", "qa_capa", "qa_audit", "qa_supplier", "qa_inspection", "qa_defect"):
+        conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     conn.commit()
 
 
