@@ -421,7 +421,7 @@ class _TicketTableWidget(QtWidgets.QWidget):
 # ---------------------------------------------------------------------------
 
 class ITOpenTicketsWidget(_TicketTableWidget):
-    def _build_filters(self, _fr):
+    def _build_filters(self, fr):
         lbl_p = QtWidgets.QLabel("Priority:")
         lbl_p.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_p)
@@ -456,7 +456,7 @@ class ITOpenTicketsWidget(_TicketTableWidget):
         self._search.returnPressed.connect(self._refresh)
         fr.addWidget(self._search)
 
-    def _build_buttons(self, _br):
+    def _build_buttons(self, br):
         for text, slot in (
             ("New Ticket",     self._on_add),
             ("Edit",           self._on_edit),
@@ -502,7 +502,7 @@ class ITOpenTicketsWidget(_TicketTableWidget):
 # ---------------------------------------------------------------------------
 
 class ITMyTicketsWidget(_TicketTableWidget):
-    def _build_filters(self, _fr):
+    def _build_filters(self, fr):
         lbl_s = QtWidgets.QLabel("Status:")
         lbl_s.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_s)
@@ -538,7 +538,7 @@ class ITMyTicketsWidget(_TicketTableWidget):
         self._me_label.setStyleSheet("color:white;font-size:11px;")
         fr.addWidget(self._me_label)
 
-    def _build_buttons(self, _br):
+    def _build_buttons(self, br):
         for text, slot in (
             ("Edit",          self._on_edit),
             ("Mark In Progress", lambda: self._set_status("in_progress")),
@@ -587,7 +587,7 @@ class ITMyTicketsWidget(_TicketTableWidget):
 # ---------------------------------------------------------------------------
 
 class ITTicketHistoryWidget(_TicketTableWidget):
-    def _build_filters(self, _fr):
+    def _build_filters(self, fr):
         lbl_s = QtWidgets.QLabel("Status:")
         lbl_s.setStyleSheet(LABEL_STYLE)
         fr.addWidget(lbl_s)
@@ -621,7 +621,7 @@ class ITTicketHistoryWidget(_TicketTableWidget):
         self._search.returnPressed.connect(self._refresh)
         fr.addWidget(self._search)
 
-    def _build_buttons(self, _br):
+    def _build_buttons(self, br):
         for text, slot in (
             ("Reopen Ticket", lambda: self._set_status("open")),
         ):
