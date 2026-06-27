@@ -698,7 +698,7 @@ class _SLAWidget(QtWidgets.QWidget):
             res_rows = [
                 ("Total Tickets", total),
                 ("Resolved/Closed", resolved),
-                (f"Resolution Rate", rate),
+                ("Resolution Rate", rate),
                 ("Avg Age Open (days)", avg_open or "N/A"),
             ]
             self._res_rate.setRowCount(len(res_rows))
@@ -706,7 +706,7 @@ class _SLAWidget(QtWidgets.QWidget):
                 self._res_rate.setItem(r, 0, _ro(label))
                 self._res_rate.setItem(r, 1, _ro(val))
 
-            age_rows = conn.execute(f"""
+            age_rows = conn.execute("""
                 SELECT priority,
                     ROUND(AVG(CURRENT_DATE - submitted_date::date)::numeric, 1)
                 FROM it_ticket

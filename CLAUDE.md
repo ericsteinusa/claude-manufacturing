@@ -129,4 +129,24 @@ manufacturing/
   `python -m manufacturing.seed_sample_alerts` (updates `amount` on Rim,
   Tire, Inner Tube; requires `seed_sample_products` first). Supports
   `--remove` to restore original amounts.
+- IT department (help desk tickets, tasks, assets, technicians):
+  `python -m manufacturing.seed_sample_it` (tagged `SMPL-IT-`).
+- Maintenance (mechanics, equipment, work orders, PM schedules, inspections):
+  `python -m manufacturing.seed_sample_maintenance` (tagged `SMPL-MAINT-`).
+- Quality (NCRs, CAPAs, audits, supplier quality, inspections):
+  `python -m manufacturing.seed_sample_quality` (tagged `SMPL-QA-`).
+- Engineering (projects, tasks, ECRs/design reviews, standards):
+  `python -m manufacturing.seed_sample_engineering` (tagged `SMPL-ENG-`).
+- Sales (quotes, targets, leads, contracts, forecasts, territories, commissions):
+  `python -m manufacturing.seed_sample_sales` (tagged `SMPL-SALES-`).
+- Marketing (campaigns, leads, content, ads, research):
+  `python -m manufacturing.seed_sample_marketing` (tagged `SMPL-MKT-`).
+- Accounting (GL accounts/chart of accounts, AP invoices+payments, AR invoices+payments, GL journals):
+  `python -m manufacturing.seed_sample_accounting` (tagged `SMPL-ACCT-`; AR invoices linked to first customer in `customer` table).
+- Customer Service (tickets, improvement plans, returns, KB articles, surveys):
+  `python -m manufacturing.seed_sample_cs` (tagged `SMPL-CS-`).
+- Finance (budgets+lines, audit schedules+findings, bank accounts+statements, tax filings):
+  `python -m manufacturing.seed_sample_finance` (tagged `SMPL-FIN-`).
+- Legal (contracts, compliance items, litigation cases):
+  `python -m manufacturing.seed_sample_legal` (tagged `SMPL-LEGAL-`).
 - All seeds are idempotent and support `--reset` / `--remove`.
