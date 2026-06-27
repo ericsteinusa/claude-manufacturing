@@ -89,14 +89,22 @@ def _ensure_tables(conn):
 
 NCRS = [
     # (title, source, severity, product, det_ago, disposition, owner, status)
-    ("Surface finish below spec on Frame Assembly",  "In-Process", "Major",    "Frame Assembly",    -5,  "Rework",    "Maria Santos",   "Under Review"),
-    ("Dimensional deviation — Shaft Collar OD",      "Final",      "Minor",    "Shaft Collar",     -12,  "Use As-Is", "James Kim",      "Dispositioned"),
-    ("Supplier delivered wrong grade fasteners",      "Incoming",   "Critical", "M10 Hex Bolt",      -2,  "Return",    "Maria Santos",   "Open"),
-    ("Customer returned batch with paint defects",   "Customer",   "Major",    "Painted Housing",  -20,  "Scrap",     "James Kim",      "Closed"),
-    ("Weld porosity detected on bracket",            "In-Process", "Minor",    "Support Bracket",   -7,  "Rework",    "Lisa Novak",     "Under Review"),
-    ("Missing certification docs on valve lot",      "Incoming",   "Minor",    "Safety Valve",      -3,  "Pending",   "Lisa Novak",     "Open"),
-    ("Gauge reading out of calibration tolerance",   "Audit",      "Major",    "Gauge Assembly",   -15,  "Rework",    "Maria Santos",   "Closed"),
-    ("Contamination found in lubrication oil batch", "In-Process", "Critical", "Hydraulic Oil",     -1,  "Scrap",     "James Kim",      "Open"),
+    ("Surface finish below spec on Frame Assembly",
+     "In-Process", "Major", "Frame Assembly", -5, "Rework", "Maria Santos", "Under Review"),
+    ("Dimensional deviation — Shaft Collar OD",
+     "Final", "Minor", "Shaft Collar", -12, "Use As-Is", "James Kim", "Dispositioned"),
+    ("Supplier delivered wrong grade fasteners",
+     "Incoming", "Critical", "M10 Hex Bolt", -2, "Return", "Maria Santos", "Open"),
+    ("Customer returned batch with paint defects",
+     "Customer", "Major", "Painted Housing", -20, "Scrap", "James Kim", "Closed"),
+    ("Weld porosity detected on bracket",
+     "In-Process", "Minor", "Support Bracket", -7, "Rework", "Lisa Novak", "Under Review"),
+    ("Missing certification docs on valve lot",
+     "Incoming", "Minor", "Safety Valve", -3, "Pending", "Lisa Novak", "Open"),
+    ("Gauge reading out of calibration tolerance",
+     "Audit", "Major", "Gauge Assembly", -15, "Rework", "Maria Santos", "Closed"),
+    ("Contamination found in lubrication oil batch",
+     "In-Process", "Critical", "Hydraulic Oil", -1, "Scrap", "James Kim", "Open"),
 ]
 
 
@@ -128,12 +136,30 @@ def _remove_ncrs(conn):
 
 CAPAS = [
     # (title, capa_type, ncr_ref, owner, due_offset, action_plan, comp_offset, status)
-    ("Update incoming inspection for fastener grade",      "Corrective",  "NCR-003", "Maria Santos",  14,  "Revise incoming inspection checklist to verify material grade cert against PO.",  None, "In Progress"),
-    ("Re-train welding team on porosity prevention",       "Corrective",  "NCR-005", "Lisa Novak",    21,  "Schedule hands-on training session; update weld procedure WP-07.",              None, "Open"),
-    ("Implement pre-shipment paint adhesion test",         "Preventive",  "NCR-004", "James Kim",      7,  "Add adhesion pull test to pre-ship QC checklist and document results.",         -3,   "Closed"),
-    ("Calibration frequency review for all gauges",        "Preventive",  "NCR-007", "Maria Santos",  30,  "Audit all gauges; reduce calibration interval from 12 to 6 months.",            None, "In Progress"),
-    ("Supplier audit for Bolt Vendor — Grade Compliance",  "Corrective",  "NCR-003", "Lisa Novak",    45,  "Schedule on-site audit; require updated material certs with every shipment.",   None, "Open"),
-    ("Review lubrication oil receiving procedure",         "Corrective",  "NCR-008", "James Kim",      5,  "Add batch sampling to receiving; partner with lab for contamination testing.",   None, "Open"),
+    ("Update incoming inspection for fastener grade",
+     "Corrective", "NCR-003", "Maria Santos", 14,
+     "Revise incoming inspection checklist to verify material grade cert against PO.",
+     None, "In Progress"),
+    ("Re-train welding team on porosity prevention",
+     "Corrective", "NCR-005", "Lisa Novak", 21,
+     "Schedule hands-on training session; update weld procedure WP-07.",
+     None, "Open"),
+    ("Implement pre-shipment paint adhesion test",
+     "Preventive", "NCR-004", "James Kim", 7,
+     "Add adhesion pull test to pre-ship QC checklist and document results.",
+     -3, "Closed"),
+    ("Calibration frequency review for all gauges",
+     "Preventive", "NCR-007", "Maria Santos", 30,
+     "Audit all gauges; reduce calibration interval from 12 to 6 months.",
+     None, "In Progress"),
+    ("Supplier audit for Bolt Vendor — Grade Compliance",
+     "Corrective", "NCR-003", "Lisa Novak", 45,
+     "Schedule on-site audit; require updated material certs with every shipment.",
+     None, "Open"),
+    ("Review lubrication oil receiving procedure",
+     "Corrective", "NCR-008", "James Kim", 5,
+     "Add batch sampling to receiving; partner with lab for contamination testing.",
+     None, "Open"),
 ]
 
 
@@ -164,13 +190,24 @@ def _remove_capas(conn):
 
 AUDITS = [
     # (title, audit_type, auditor, sched_ago, comp_ago, result, status, findings)
-    ("ISO 9001 Surveillance Audit Q2",     "ISO 9001",  "Apex Registrar",   -60, -58, "Minor findings — 2 observations", "Closed",      "Two observation-level findings on document control; no non-conformities."),
-    ("Production Process Audit — CNC",     "Process",   "Lisa Novak",       -30, -28, "Passed",                          "Closed",      "Process adheres to work instructions; recommended updating WI-CNC-04."),
-    ("Supplier Audit — Metal Fab Co.",     "Supplier",  "Maria Santos",     -14, -12, "Conditional pass",                "Follow-up",   "3 minor findings; re-audit in 60 days."),
-    ("Internal Audit — Receiving",         "Internal",  "James Kim",         -7,  -5, "Passed with comments",            "Complete",    "Process compliant; update inspection forms recommended."),
-    ("Product Audit — Shaft Collar Lot",   "Product",   "Lisa Novak",        -3,  None, "",                             "In Progress", ""),
-    ("Q3 ISO 9001 Internal Audit",         "ISO 9001",  "Maria Santos",      10,  None, "",                             "Scheduled",   ""),
-    ("Welding Process Audit",              "Process",   "James Kim",         20,  None, "",                             "Scheduled",   ""),
+    ("ISO 9001 Surveillance Audit Q2", "ISO 9001", "Apex Registrar",
+     -60, -58, "Minor findings — 2 observations", "Closed",
+     "Two observation-level findings on document control; no non-conformities."),
+    ("Production Process Audit — CNC", "Process", "Lisa Novak",
+     -30, -28, "Passed", "Closed",
+     "Process adheres to work instructions; recommended updating WI-CNC-04."),
+    ("Supplier Audit — Metal Fab Co.", "Supplier", "Maria Santos",
+     -14, -12, "Conditional pass", "Follow-up",
+     "3 minor findings; re-audit in 60 days."),
+    ("Internal Audit — Receiving", "Internal", "James Kim",
+     -7, -5, "Passed with comments", "Complete",
+     "Process compliant; update inspection forms recommended."),
+    ("Product Audit — Shaft Collar Lot", "Product", "Lisa Novak",
+     -3, None, "", "In Progress", ""),
+    ("Q3 ISO 9001 Internal Audit", "ISO 9001", "Maria Santos",
+     10, None, "", "Scheduled", ""),
+    ("Welding Process Audit", "Process", "James Kim",
+     20, None, "", "Scheduled", ""),
 ]
 
 

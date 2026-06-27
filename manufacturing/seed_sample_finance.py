@@ -215,21 +215,25 @@ def _remove_budgets(conn):
 
 AUDITS = [
     # (audit_name, audit_type, department, auditor, sched_ago, comp_ago, status)
-    (f"{TAG}Q1 Financial Review",             "Financial",   "Finance",     "External CPA",      -90,  -80,  "Completed"),
-    (f"{TAG}IT Systems Compliance Audit",     "IT",          "IT",          "Sarah Moore CPA",   -45,  -40,  "Completed"),
-    (f"{TAG}Payroll Tax Compliance Q1",       "Tax",         "Finance",     "External CPA",      -60,  -55,  "Completed"),
-    (f"{TAG}Internal Controls Review Q2",     "Internal",    "All Depts",   "Sarah Moore CPA",   -15,  None, "In Progress"),
-    (f"{TAG}Mid-Year Operational Audit",      "Operational", "Production",  "External CPA",       15,   None, "Scheduled"),
-    (f"{TAG}Year-End Financial Audit",        "Financial",   "Finance",     "External CPA",      180,   None, "Scheduled"),
-    (f"{TAG}Tax Preparation Review H2",       "Tax",         "Finance",     "Sarah Moore CPA",   120,   None, "Scheduled"),
+    (f"{TAG}Q1 Financial Review", "Financial", "Finance", "External CPA", -90, -80, "Completed"),
+    (f"{TAG}IT Systems Compliance Audit", "IT", "IT", "Sarah Moore CPA", -45, -40, "Completed"),
+    (f"{TAG}Payroll Tax Compliance Q1", "Tax", "Finance", "External CPA", -60, -55, "Completed"),
+    (f"{TAG}Internal Controls Review Q2", "Internal", "All Depts", "Sarah Moore CPA", -15, None, "In Progress"),
+    (f"{TAG}Mid-Year Operational Audit", "Operational", "Production", "External CPA", 15, None, "Scheduled"),
+    (f"{TAG}Year-End Financial Audit", "Financial", "Finance", "External CPA", 180, None, "Scheduled"),
+    (f"{TAG}Tax Preparation Review H2", "Tax", "Finance", "Sarah Moore CPA", 120, None, "Scheduled"),
 ]
 
 FINDINGS = [
     # (audit_name_suffix, finding_ref, description, severity, dept, found_ago)
-    ("Q1 Financial Review",      f"{TAG}F-001", "Invoice approval threshold not consistently followed", "Minor",    "Finance",    -82),
-    ("Q1 Financial Review",      f"{TAG}F-002", "Two GL entries posted without dual approval",          "Moderate", "Finance",    -81),
-    ("IT Systems Compliance Audit", f"{TAG}F-003", "User access review overdue by 45 days",            "Minor",    "IT",         -42),
-    ("IT Systems Compliance Audit", f"{TAG}F-004", "Backup restoration test not completed Q1",         "Major",    "IT",         -41),
+    ("Q1 Financial Review", f"{TAG}F-001",
+     "Invoice approval threshold not consistently followed", "Minor", "Finance", -82),
+    ("Q1 Financial Review", f"{TAG}F-002",
+     "Two GL entries posted without dual approval", "Moderate", "Finance", -81),
+    ("IT Systems Compliance Audit", f"{TAG}F-003",
+     "User access review overdue by 45 days", "Minor", "IT", -42),
+    ("IT Systems Compliance Audit", f"{TAG}F-004",
+     "Backup restoration test not completed Q1", "Major", "IT", -41),
 ]
 
 
@@ -357,14 +361,14 @@ def _remove_bank(conn):
 
 TAX_FILINGS = [
     # (tax_type, jurisdiction, period, amount_due, due_ago, filed_ago, amount_paid, status, reference)
-    ("Federal Income", "IRS",              f"Q1 {YEAR}",  28500.00,  -60, -55, 28500.00, "Paid",    f"{TAG}IRS-Q1-{YEAR}"),
-    ("Payroll Tax",    "IRS",              f"Apr {YEAR}", 14200.00,  -45, -44, 14200.00, "Paid",    f"{TAG}IRS-PR-APR"),
-    ("Payroll Tax",    "IRS",              f"May {YEAR}", 14600.00,  -15, -14, 14600.00, "Paid",    f"{TAG}IRS-PR-MAY"),
-    ("Payroll Tax",    "IRS",              f"Jun {YEAR}", 14800.00,   15,  None, 0.00,   "Pending", f"{TAG}IRS-PR-JUN"),
-    ("Sales Tax",      "State of Ohio",   f"Q1 {YEAR}",   8900.00,  -60, -58,  8900.00, "Paid",    f"{TAG}OH-SALES-Q1"),
-    ("Sales Tax",      "State of Ohio",   f"Q2 {YEAR}",   9400.00,   15,  None, 0.00,   "Pending", f"{TAG}OH-SALES-Q2"),
-    ("Property Tax",   "County Assessor", f"{YEAR}",     12300.00, -365, -360,12300.00, "Paid",    f"{TAG}PROP-{YEAR}"),
-    ("Federal Income", "IRS",             f"Q2 {YEAR}",  31200.00,   15,  None, 0.00,   "Pending", f"{TAG}IRS-Q2-{YEAR}"),
+    ("Federal Income", "IRS", f"Q1 {YEAR}", 28500.00, -60, -55, 28500.00, "Paid", f"{TAG}IRS-Q1-{YEAR}"),
+    ("Payroll Tax", "IRS", f"Apr {YEAR}", 14200.00, -45, -44, 14200.00, "Paid", f"{TAG}IRS-PR-APR"),
+    ("Payroll Tax", "IRS", f"May {YEAR}", 14600.00, -15, -14, 14600.00, "Paid", f"{TAG}IRS-PR-MAY"),
+    ("Payroll Tax", "IRS", f"Jun {YEAR}", 14800.00, 15, None, 0.00, "Pending", f"{TAG}IRS-PR-JUN"),
+    ("Sales Tax", "State of Ohio", f"Q1 {YEAR}", 8900.00, -60, -58, 8900.00, "Paid", f"{TAG}OH-SALES-Q1"),
+    ("Sales Tax", "State of Ohio", f"Q2 {YEAR}", 9400.00, 15, None, 0.00, "Pending", f"{TAG}OH-SALES-Q2"),
+    ("Property Tax", "County Assessor", f"{YEAR}", 12300.00, -365, -360, 12300.00, "Paid", f"{TAG}PROP-{YEAR}"),
+    ("Federal Income", "IRS", f"Q2 {YEAR}", 31200.00, 15, None, 0.00, "Pending", f"{TAG}IRS-Q2-{YEAR}"),
 ]
 
 TAX_CALENDAR = [

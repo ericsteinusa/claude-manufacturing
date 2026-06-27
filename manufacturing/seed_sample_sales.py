@@ -178,14 +178,22 @@ def _ensure_tables(conn):
 
 QUOTES = [
     # (customer, description, amount, owner, date_ago, valid_days, status)
-    ("Apex Manufacturing Inc.",  "Annual valve assembly supply — 500 units",       48500.00,  "Karen Walsh",   -10,  30,  "Sent"),
-    ("Bridgewater Tools LLC",    "Custom fixture set for new product line",         12750.00,  "Tom Deluca",    -5,   20,  "Draft"),
-    ("Castillo Industries",      "Q3 bearing order — standard + heavy-duty mix",   31200.00,  "Karen Walsh",   -20,  10,  "Won"),
-    ("Delta Components Co.",     "Replacement shaft collar batch — 200 pcs",        8400.00,  "Tom Deluca",    -45,  -15, "Expired"),
-    ("Evergreen Systems",        "Retrofit kit supply — 12 machine installations",  67000.00,  "Karen Walsh",   -2,   45,  "Draft"),
-    ("Falcon Precision Parts",   "Emergency PO — hydraulic fittings",               5900.00,  "Tom Deluca",    -30,  -20, "Lost"),
-    ("Greenfield Assembly",      "Recurring Q4 parts kit — blanket order",         22300.00,  "Karen Walsh",   -7,   60,  "Sent"),
-    ("Harbor Engineering",       "New customer trial order — 50 units",             4100.00,  "Tom Deluca",    -3,   30,  "Draft"),
+    ("Apex Manufacturing Inc.", "Annual valve assembly supply — 500 units",
+     48500.00, "Karen Walsh", -10, 30, "Sent"),
+    ("Bridgewater Tools LLC", "Custom fixture set for new product line",
+     12750.00, "Tom Deluca", -5, 20, "Draft"),
+    ("Castillo Industries", "Q3 bearing order — standard + heavy-duty mix",
+     31200.00, "Karen Walsh", -20, 10, "Won"),
+    ("Delta Components Co.", "Replacement shaft collar batch — 200 pcs",
+     8400.00, "Tom Deluca", -45, -15, "Expired"),
+    ("Evergreen Systems", "Retrofit kit supply — 12 machine installations",
+     67000.00, "Karen Walsh", -2, 45, "Draft"),
+    ("Falcon Precision Parts", "Emergency PO — hydraulic fittings",
+     5900.00, "Tom Deluca", -30, -20, "Lost"),
+    ("Greenfield Assembly", "Recurring Q4 parts kit — blanket order",
+     22300.00, "Karen Walsh", -7, 60, "Sent"),
+    ("Harbor Engineering", "New customer trial order — 50 units",
+     4100.00, "Tom Deluca", -3, 30, "Draft"),
 ]
 
 
@@ -296,12 +304,18 @@ def _remove_leads(conn):
 
 CONTRACTS = [
     # (customer, title, value, start_ago, end_days, status, owner)
-    ("Apex Manufacturing Inc.",  "Annual Supply Agreement — Valve Assemblies",    96000,  -365,  0,    "Active",   "Karen Walsh"),
-    ("Castillo Industries",      "Preferred Vendor Agreement",                    60000,  -180,  185,  "Active",   "Karen Walsh"),
-    ("Delta Components Co.",     "One-Time Supply Contract Q4",                   16800,  -90,   -30,  "Expired",  "Tom Deluca"),
-    ("Greenfield Assembly",      "Blanket Order Agreement — Q3/Q4",               44600,  -60,   120,  "Active",   "Karen Walsh"),
-    ("BlueStar Engineering",     "Partnership Supply Contract",                  236000,  -30,   335,  "Active",   "Karen Walsh"),
-    ("Falcon Precision Parts",   "Emergency Supply Agreement",                   11800,  -120,  -90,  "Expired",  "Tom Deluca"),
+    ("Apex Manufacturing Inc.", "Annual Supply Agreement — Valve Assemblies",
+     96000, -365, 0, "Active", "Karen Walsh"),
+    ("Castillo Industries", "Preferred Vendor Agreement",
+     60000, -180, 185, "Active", "Karen Walsh"),
+    ("Delta Components Co.", "One-Time Supply Contract Q4",
+     16800, -90, -30, "Expired", "Tom Deluca"),
+    ("Greenfield Assembly", "Blanket Order Agreement — Q3/Q4",
+     44600, -60, 120, "Active", "Karen Walsh"),
+    ("BlueStar Engineering", "Partnership Supply Contract",
+     236000, -30, 335, "Active", "Karen Walsh"),
+    ("Falcon Precision Parts", "Emergency Supply Agreement",
+     11800, -120, -90, "Expired", "Tom Deluca"),
 ]
 
 

@@ -119,18 +119,30 @@ def _ensure_tables(conn):
 
 TICKETS = [
     # (call_ago, call_time, call_desc, comments, comp_ago, comp_time, completed)
-    (-18, "09:15", "Customer unable to track order — shipment delayed 5 days",           "Contacted shipping; updated customer with new ETA.", -17, "10:30", 1),
-    (-14, "14:00", "Wrong item shipped — received shaft collar instead of valve assembly","Issued return label; replacement shipped same day.",   -13, "15:45", 1),
-    (-10, "11:30", "Invoice shows incorrect unit price from quote",                       "Finance team corrected invoice; resent to customer.",   -9, "13:00", 1),
-    (-7,  "08:45", "Product arrived damaged — packaging crushed in transit",              "Filed freight claim; replacement ordered.",             -6, "09:20", 1),
-    (-5,  "16:00", "Customer requesting technical specs for valve assembly batch",        "",                                                       0,  "",     0),
-    (-3,  "10:00", "Complaint: sales rep not returning calls",                            "Escalated to Sales Manager for follow-up.",             0,  "",     0),
-    (-1,  "14:30", "Requesting early delivery for emergency production run",              "Coordinating with Production to expedite order.",        0,  "",     0),
-    (-15, "13:00", "Customer wants to modify existing blanket order quantities",          "Updated order per customer request; confirmed pricing.", -14, "14:00", 1),
-    (-20, "09:00", "Defective bearing — premature failure after 30 days",                "Sent warranty replacement; engineering notified.",       -19, "10:30", 1),
-    (-30, "10:30", "Billing dispute — charged twice for same order",                      "Accounting confirmed duplicate; credit memo issued.",   -29, "11:00", 1),
-    (-2,  "15:00", "Customer cannot find product documentation on portal",               "",                                                        0,  "",     0),
-    (-8,  "11:00", "Request for custom part modification — non-standard thread",          "Forwarded to Engineering for feasibility review.",      -7, "12:15", 1),
+    (-18, "09:15", "Customer unable to track order — shipment delayed 5 days",
+     "Contacted shipping; updated customer with new ETA.", -17, "10:30", 1),
+    (-14, "14:00", "Wrong item shipped — received shaft collar instead of valve assembly",
+     "Issued return label; replacement shipped same day.", -13, "15:45", 1),
+    (-10, "11:30", "Invoice shows incorrect unit price from quote",
+     "Finance team corrected invoice; resent to customer.", -9, "13:00", 1),
+    (-7, "08:45", "Product arrived damaged — packaging crushed in transit",
+     "Filed freight claim; replacement ordered.", -6, "09:20", 1),
+    (-5, "16:00", "Customer requesting technical specs for valve assembly batch",
+     "", 0, "", 0),
+    (-3, "10:00", "Complaint: sales rep not returning calls",
+     "Escalated to Sales Manager for follow-up.", 0, "", 0),
+    (-1, "14:30", "Requesting early delivery for emergency production run",
+     "Coordinating with Production to expedite order.", 0, "", 0),
+    (-15, "13:00", "Customer wants to modify existing blanket order quantities",
+     "Updated order per customer request; confirmed pricing.", -14, "14:00", 1),
+    (-20, "09:00", "Defective bearing — premature failure after 30 days",
+     "Sent warranty replacement; engineering notified.", -19, "10:30", 1),
+    (-30, "10:30", "Billing dispute — charged twice for same order",
+     "Accounting confirmed duplicate; credit memo issued.", -29, "11:00", 1),
+    (-2, "15:00", "Customer cannot find product documentation on portal",
+     "", 0, "", 0),
+    (-8, "11:00", "Request for custom part modification — non-standard thread",
+     "Forwarded to Engineering for feasibility review.", -7, "12:15", 1),
 ]
 
 
@@ -246,15 +258,24 @@ def _remove_returns(conn):
 
 ARTICLES = [
     # (title, category, author, pub_ago, status, tags, view_count)
-    (f"{TAG}How to Track Your Order Status",            "Shipping",  "Rachel Green",  -30, "Published", "order,tracking,shipping",          142),
-    (f"{TAG}Initiating a Return or Exchange",           "Returns",   "Rachel Green",  -25, "Published", "return,refund,exchange",            98),
-    (f"{TAG}Reading Your Invoice — Common Questions",   "Billing",   "Rachel Green",  -20, "Published", "invoice,billing,payment",           73),
-    (f"{TAG}Valve Assembly Technical Specifications",   "Product",   "Rachel Green",  -15, "Published", "valve,specs,technical,datasheet",  210),
-    (f"{TAG}Warranty Policy Overview",                  "Policy",    "Rachel Green",  -10, "Published", "warranty,defective,replacement",    88),
-    (f"{TAG}How to Set Up Your Customer Portal Account","Account",   "Rachel Green",   -5, "Published", "portal,account,login",             156),
-    (f"{TAG}Frequently Asked Questions — Shipping Times","FAQ",      "Rachel Green",   -3, "Published", "FAQ,shipping,lead time",            44),
-    (f"{TAG}Bearing Installation Best Practices",       "Technical", "Rachel Green",   -1, "In Review", "bearing,installation,technical",     0),
-    (f"{TAG}Custom Part Request Process",               "Product",   "Rachel Green",    3, "Draft",     "custom,special,engineering",         0),
+    (f"{TAG}How to Track Your Order Status", "Shipping", "Rachel Green",
+     -30, "Published", "order,tracking,shipping", 142),
+    (f"{TAG}Initiating a Return or Exchange", "Returns", "Rachel Green",
+     -25, "Published", "return,refund,exchange", 98),
+    (f"{TAG}Reading Your Invoice — Common Questions", "Billing", "Rachel Green",
+     -20, "Published", "invoice,billing,payment", 73),
+    (f"{TAG}Valve Assembly Technical Specifications", "Product", "Rachel Green",
+     -15, "Published", "valve,specs,technical,datasheet", 210),
+    (f"{TAG}Warranty Policy Overview", "Policy", "Rachel Green",
+     -10, "Published", "warranty,defective,replacement", 88),
+    (f"{TAG}How to Set Up Your Customer Portal Account", "Account", "Rachel Green",
+     -5, "Published", "portal,account,login", 156),
+    (f"{TAG}Frequently Asked Questions — Shipping Times", "FAQ", "Rachel Green",
+     -3, "Published", "FAQ,shipping,lead time", 44),
+    (f"{TAG}Bearing Installation Best Practices", "Technical", "Rachel Green",
+     -1, "In Review", "bearing,installation,technical", 0),
+    (f"{TAG}Custom Part Request Process", "Product", "Rachel Green",
+     3, "Draft", "custom,special,engineering", 0),
 ]
 
 
@@ -284,10 +305,14 @@ def _remove_kb(conn):
 
 SURVEYS = [
     # (title, description, survey_type, status, start_ago, end_offset)
-    (f"{TAG}Q1 Customer Satisfaction Survey",  "Post-purchase CSAT — Q1 closed orders",         "CSAT",         "Closed",  -90,  -60),
-    (f"{TAG}Q2 Net Promoter Score",            "NPS survey sent to all active accounts",         "NPS",          "Closed",  -45,  -15),
-    (f"{TAG}Post-Purchase Survey — June",      "Automated survey after order completion",        "Post-Purchase", "Active",  -20,   10),
-    (f"{TAG}Product Quality Feedback",         "Targeted survey for valve assembly buyers",      "Product",      "Draft",    -5,   30),
+    (f"{TAG}Q1 Customer Satisfaction Survey", "Post-purchase CSAT — Q1 closed orders",
+     "CSAT", "Closed", -90, -60),
+    (f"{TAG}Q2 Net Promoter Score", "NPS survey sent to all active accounts",
+     "NPS", "Closed", -45, -15),
+    (f"{TAG}Post-Purchase Survey — June", "Automated survey after order completion",
+     "Post-Purchase", "Active", -20, 10),
+    (f"{TAG}Product Quality Feedback", "Targeted survey for valve assembly buyers",
+     "Product", "Draft", -5, 30),
 ]
 
 SURVEY_RESPONSES = {

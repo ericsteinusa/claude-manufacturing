@@ -176,12 +176,18 @@ def _remove_tasks(conn):
 
 ECRS = [
     # (ecr_num, title, proj_suffix, requested_by, review_ago, status)
-    (f"{TAG}ECR-{YEAR}-0001", "ECR: Drive Shaft Material Change to 4340 Steel",  "0001", "Sarah Chen",  -60,  "approved"),
-    (f"{TAG}ECR-{YEAR}-0002", "ECR: Frame Wall Thickness Reduction",              "0002", "Raj Patel",   -45,  "pending"),
-    (f"{TAG}ECR-{YEAR}-0003", "ECR: Fixture Quick-Change Clamp Design",           "0003", "Sarah Chen",   -7,  "draft"),
-    (f"{TAG}ECR-{YEAR}-0004", "ECR: Hydraulic Pump Relocation",                  "0004", "Wei Zhang",   -30,  "rejected"),
-    (f"{TAG}ECR-{YEAR}-0005", "ECR: Laser Safety Interlock Wiring Revision",     "0005", "Wei Zhang",  -180,  "approved"),
-    (f"{TAG}ECR-{YEAR}-0006", "ECR: Add RFID Tracking to Compact Module",        "0006", "Raj Patel",    -2,  "draft"),
+    (f"{TAG}ECR-{YEAR}-0001", "ECR: Drive Shaft Material Change to 4340 Steel",
+     "0001", "Sarah Chen", -60, "approved"),
+    (f"{TAG}ECR-{YEAR}-0002", "ECR: Frame Wall Thickness Reduction",
+     "0002", "Raj Patel", -45, "pending"),
+    (f"{TAG}ECR-{YEAR}-0003", "ECR: Fixture Quick-Change Clamp Design",
+     "0003", "Sarah Chen", -7, "draft"),
+    (f"{TAG}ECR-{YEAR}-0004", "ECR: Hydraulic Pump Relocation",
+     "0004", "Wei Zhang", -30, "rejected"),
+    (f"{TAG}ECR-{YEAR}-0005", "ECR: Laser Safety Interlock Wiring Revision",
+     "0005", "Wei Zhang", -180, "approved"),
+    (f"{TAG}ECR-{YEAR}-0006", "ECR: Add RFID Tracking to Compact Module",
+     "0006", "Raj Patel", -2, "draft"),
 ]
 
 
@@ -214,14 +220,14 @@ def _remove_ecrs(conn):
 
 STANDARDS = [
     # (std_num, title, category, version, status, review_ago)
-    ("ISO 9001:2015",     "Quality Management Systems — Requirements",           "ISO",      "2015",   "Active",        -365),
-    ("ANSI B11.1-2009",   "Safety Requirements for Mechanical Power Presses",    "ANSI",     "2009",   "Active",        -180),
-    ("ASME Y14.5-2018",   "Dimensioning and Tolerancing (GD&T)",                 "ASME",     "2018",   "Active",        -90),
-    ("IEEE 519-2014",     "Harmonic Control in Electric Power Systems",          "IEEE",     "2014",   "Active",        -270),
-    ("OSHA 1910.147",     "Lockout/Tagout — Control of Hazardous Energy",        "OSHA",     "2019",   "Active",        -60),
-    ("INT-WI-CNC-04",     "CNC Machining Work Instruction — Setup & Operation",  "Internal", "Rev 3",  "Active",        -30),
-    ("INT-QP-INS-01",     "Incoming Inspection Procedure",                       "Internal", "Rev 7",  "Under Review",  -15),
-    ("ANSI B11.19-2019",  "Performance Requirements for Safeguarding Machinery", "ANSI",     "2019",   "Active",        -120),
+    ("ISO 9001:2015", "Quality Management Systems — Requirements", "ISO", "2015", "Active", -365),
+    ("ANSI B11.1-2009", "Safety Requirements for Mechanical Power Presses", "ANSI", "2009", "Active", -180),
+    ("ASME Y14.5-2018", "Dimensioning and Tolerancing (GD&T)", "ASME", "2018", "Active", -90),
+    ("IEEE 519-2014", "Harmonic Control in Electric Power Systems", "IEEE", "2014", "Active", -270),
+    ("OSHA 1910.147", "Lockout/Tagout — Control of Hazardous Energy", "OSHA", "2019", "Active", -60),
+    ("INT-WI-CNC-04", "CNC Machining Work Instruction — Setup & Operation", "Internal", "Rev 3", "Active", -30),
+    ("INT-QP-INS-01", "Incoming Inspection Procedure", "Internal", "Rev 7", "Under Review", -15),
+    ("ANSI B11.19-2019", "Performance Requirements for Safeguarding Machinery", "ANSI", "2019", "Active", -120),
 ]
 
 

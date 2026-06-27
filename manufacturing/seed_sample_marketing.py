@@ -143,16 +143,21 @@ def _remove_campaigns(conn):
 
 LEADS = [
     # (name, company, email, source, owner, captured_ago, status)
-    ("Daniel Park",     "Summit Fab",          "d.park@summit.example",     "Event",         "Priya Nair",   -5,  "New"),
-    ("Rachel Cho",      "Pacific Tools Inc.",   "r.cho@pactools.example",    "Web",           "Marco Reyes",  -12, "Contacted"),
-    ("Omar Hassan",     "NW Manufacturing",     "o.hassan@nwmfg.example",    "Ad",            "Priya Nair",   -3,  "New"),
-    ("Tanya Birch",     "BlueRidge Systems",    "t.birch@blueridge.example", "Referral",      "Marco Reyes",  -20, "Qualified"),
-    ("Chen Wei",        "Inova Parts",          "c.wei@inovaparts.example",  "Social",        "Priya Nair",   -8,  "Contacted"),
-    ("Fatima Al-Said",  "Gulf Industrial",      "f.alsaid@gulfindu.example", "Event",         "Marco Reyes",  -45, "Converted"),
-    ("Greg Nelson",     "Lakeside Assembly",    "g.nelson@lakeside.example", "Partner",       "Priya Nair",   -60, "Nurturing"),
-    ("Sandra Lee",      "Coastal Precision",    "s.lee@coastalprec.example", "Cold Outreach", "Marco Reyes",  -90, "Lost"),
-    ("Victor Osei",     "Accra Engineering",    "v.osei@accra-eng.example",  "Social",        "Priya Nair",   -1,  "New"),
-    ("Hannah Brandt",   "Rhine Components",     "h.brandt@rhinecomp.example","Referral",      "Marco Reyes",  -7,  "Qualified"),
+    ("Daniel Park", "Summit Fab", "d.park@summit.example", "Event", "Priya Nair", -5, "New"),
+    ("Rachel Cho", "Pacific Tools Inc.", "r.cho@pactools.example", "Web", "Marco Reyes", -12, "Contacted"),
+    ("Omar Hassan", "NW Manufacturing", "o.hassan@nwmfg.example", "Ad", "Priya Nair", -3, "New"),
+    ("Tanya Birch", "BlueRidge Systems", "t.birch@blueridge.example",
+     "Referral", "Marco Reyes", -20, "Qualified"),
+    ("Chen Wei", "Inova Parts", "c.wei@inovaparts.example", "Social", "Priya Nair", -8, "Contacted"),
+    ("Fatima Al-Said", "Gulf Industrial", "f.alsaid@gulfindu.example",
+     "Event", "Marco Reyes", -45, "Converted"),
+    ("Greg Nelson", "Lakeside Assembly", "g.nelson@lakeside.example",
+     "Partner", "Priya Nair", -60, "Nurturing"),
+    ("Sandra Lee", "Coastal Precision", "s.lee@coastalprec.example",
+     "Cold Outreach", "Marco Reyes", -90, "Lost"),
+    ("Victor Osei", "Accra Engineering", "v.osei@accra-eng.example", "Social", "Priya Nair", -1, "New"),
+    ("Hannah Brandt", "Rhine Components", "h.brandt@rhinecomp.example",
+     "Referral", "Marco Reyes", -7, "Qualified"),
 ]
 
 
@@ -180,15 +185,20 @@ def _remove_leads(conn):
 
 CONTENT = [
     # (title, content_type, channel, author, due_ago, pub_ago, status)
-    (f"{TAG}5 Ways to Extend Valve Life",               "Blog",        "Email",   "Priya Nair",   -30, -28, "Published"),
-    (f"{TAG}Precision Parts Buyer's Guide 2026",        "Whitepaper",  "Content", "Marco Reyes",  -20, -15, "Published"),
-    (f"{TAG}Summer Launch — Social Post Series",        "Social Post", "Social",  "Priya Nair",   -10,  -8, "Published"),
-    (f"{TAG}Webinar Slide Deck — Q2",                   "Video",       "Webinar", "Marco Reyes",   -5,  -3, "Published"),
-    (f"{TAG}Customer Success Story — Apex Mfg.",        "Case Study",  "Email",   "Priya Nair",    5,   None, "In Review"),
-    (f"{TAG}Q3 Email Newsletter Draft",                 "Email",       "Email",   "Marco Reyes",  10,   None, "Draft"),
-    (f"{TAG}Product Comparison Infographic",            "Infographic", "Social",  "Priya Nair",   15,   None, "Draft"),
-    (f"{TAG}Holiday Promo Landing Page",                "Landing Page","Display", "Marco Reyes",  25,   None, "Draft"),
-    (f"{TAG}Industry Expo Ad Copy",                     "Ad Copy",     "Display", "Priya Nair",   40,   None, "Draft"),
+    (f"{TAG}5 Ways to Extend Valve Life", "Blog", "Email", "Priya Nair", -30, -28, "Published"),
+    (f"{TAG}Precision Parts Buyer's Guide 2026",
+     "Whitepaper", "Content", "Marco Reyes", -20, -15, "Published"),
+    (f"{TAG}Summer Launch — Social Post Series",
+     "Social Post", "Social", "Priya Nair", -10, -8, "Published"),
+    (f"{TAG}Webinar Slide Deck — Q2", "Video", "Webinar", "Marco Reyes", -5, -3, "Published"),
+    (f"{TAG}Customer Success Story — Apex Mfg.",
+     "Case Study", "Email", "Priya Nair", 5, None, "In Review"),
+    (f"{TAG}Q3 Email Newsletter Draft", "Email", "Email", "Marco Reyes", 10, None, "Draft"),
+    (f"{TAG}Product Comparison Infographic",
+     "Infographic", "Social", "Priya Nair", 15, None, "Draft"),
+    (f"{TAG}Holiday Promo Landing Page",
+     "Landing Page", "Display", "Marco Reyes", 25, None, "Draft"),
+    (f"{TAG}Industry Expo Ad Copy", "Ad Copy", "Display", "Priya Nair", 40, None, "Draft"),
 ]
 
 
@@ -216,13 +226,26 @@ def _remove_content(conn):
 # ---------------------------------------------------------------------------
 
 ADS = [
-    # (name, channel, campaign_name, budget, spend, impressions, clicks, conv, start_ago, end_off, status, owner)
-    (f"{TAG}Google Search — Valve Q2",        "Google Ads",  f"{TAG}Google Search — Valve Parts",  5000, 3820, 128000, 640, 24, -30, 60,  "Active",    "Marco Reyes"),
-    (f"{TAG}LinkedIn Brand Q3 — Banner",      "LinkedIn",    f"{TAG}Q3 LinkedIn Brand Awareness",    3000, 1450,  92000, 320, 8,  -15, 75,  "Active",    "Priya Nair"),
-    (f"{TAG}Spring Trade Show Display Ad",    "Display",     f"{TAG}Trade Show Spring Circuit",      2500, 2500,  54000, 180, 12, -90, -30, "Completed", "Marco Reyes"),
-    (f"{TAG}Facebook Retargeting — Launch",   "Facebook",    f"{TAG}Summer Product Launch 2026",     4000, 2100,  76000, 420, 18, -45, 45,  "Active",    "Priya Nair"),
-    (f"{TAG}Email Promo — Partner Co-brand",  "Email",       f"{TAG}Partner Newsletter Co-marketing",1500, 1500,  41000, 920, 31, -60, -15, "Completed", "Priya Nair"),
-    (f"{TAG}Holiday Display Banner Set",      "Display",     f"{TAG}Holiday Promo Direct Mail",      3500, 0,     0,     0,   0,   30, 90,  "Scheduled", "Marco Reyes"),
+    # (name, channel, campaign_name, budget, spend, impressions,
+    #  clicks, conv, start_ago, end_off, status, owner)
+    (f"{TAG}Google Search — Valve Q2", "Google Ads",
+     f"{TAG}Google Search — Valve Parts",
+     5000, 3820, 128000, 640, 24, -30, 60, "Active", "Marco Reyes"),
+    (f"{TAG}LinkedIn Brand Q3 — Banner", "LinkedIn",
+     f"{TAG}Q3 LinkedIn Brand Awareness",
+     3000, 1450, 92000, 320, 8, -15, 75, "Active", "Priya Nair"),
+    (f"{TAG}Spring Trade Show Display Ad", "Display",
+     f"{TAG}Trade Show Spring Circuit",
+     2500, 2500, 54000, 180, 12, -90, -30, "Completed", "Marco Reyes"),
+    (f"{TAG}Facebook Retargeting — Launch", "Facebook",
+     f"{TAG}Summer Product Launch 2026",
+     4000, 2100, 76000, 420, 18, -45, 45, "Active", "Priya Nair"),
+    (f"{TAG}Email Promo — Partner Co-brand", "Email",
+     f"{TAG}Partner Newsletter Co-marketing",
+     1500, 1500, 41000, 920, 31, -60, -15, "Completed", "Priya Nair"),
+    (f"{TAG}Holiday Display Banner Set", "Display",
+     f"{TAG}Holiday Promo Direct Mail",
+     3500, 0, 0, 0, 0, 30, 90, "Scheduled", "Marco Reyes"),
 ]
 
 
@@ -252,12 +275,24 @@ def _remove_ads(conn):
 
 RESEARCH = [
     # (title, research_type, methodology, owner, start_ago, comp_offset, status)
-    (f"{TAG}Q2 Customer Satisfaction Survey",   "Survey",              "Online survey via email to all Q1 customers",               "Priya Nair",   -45,  -15, "Completed"),
-    (f"{TAG}Competitor Pricing Analysis 2026",  "Competitor Analysis", "Benchmark pricing against top 3 competitors",               "Marco Reyes",  -60,  -20, "Completed"),
-    (f"{TAG}New Market — Aerospace Segment",    "Market Trend",        "Secondary research + interviews with aerospace buyers",     "Priya Nair",   -30,   None, "In Progress"),
-    (f"{TAG}Trade Show Lead Quality A/B Test",  "A/B Test",            "Compare lead conversion from Spring vs Fall trade shows",   "Marco Reyes",  -90,  -60, "Completed"),
-    (f"{TAG}Product Naming Focus Group",        "Focus Group",         "3 focus groups, 7 participants each, recorded sessions",    "Priya Nair",   -10,   None, "In Progress"),
-    (f"{TAG}Q3 Market Sizing — Southeast US",   "Market Trend",        "Industry reports + CRM deal data analysis",                 "Marco Reyes",   15,   None, "Planned"),
+    (f"{TAG}Q2 Customer Satisfaction Survey", "Survey",
+     "Online survey via email to all Q1 customers",
+     "Priya Nair", -45, -15, "Completed"),
+    (f"{TAG}Competitor Pricing Analysis 2026", "Competitor Analysis",
+     "Benchmark pricing against top 3 competitors",
+     "Marco Reyes", -60, -20, "Completed"),
+    (f"{TAG}New Market — Aerospace Segment", "Market Trend",
+     "Secondary research + interviews with aerospace buyers",
+     "Priya Nair", -30, None, "In Progress"),
+    (f"{TAG}Trade Show Lead Quality A/B Test", "A/B Test",
+     "Compare lead conversion from Spring vs Fall trade shows",
+     "Marco Reyes", -90, -60, "Completed"),
+    (f"{TAG}Product Naming Focus Group", "Focus Group",
+     "3 focus groups, 7 participants each, recorded sessions",
+     "Priya Nair", -10, None, "In Progress"),
+    (f"{TAG}Q3 Market Sizing — Southeast US", "Market Trend",
+     "Industry reports + CRM deal data analysis",
+     "Marco Reyes", 15, None, "Planned"),
 ]
 
 

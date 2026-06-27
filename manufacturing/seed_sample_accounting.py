@@ -182,14 +182,14 @@ def _remove_accounts(conn):
 
 AP_INVOICES = [
     # (inv_num, vendor_desc, inv_ago, due_offset, amount, description, status)
-    (f"{TAG}AP-2026-001", "Metal Fab Co.",        -25, 5,  12400.00, "Steel sheet order — Invoice MFC-4412",          "open"),
-    (f"{TAG}AP-2026-002", "Allied Polymers",      -18, 12, 5850.00,  "ABS resin resupply — Invoice AP-8821",          "open"),
-    (f"{TAG}AP-2026-003", "FastPro Supply",       -30, 0,  3200.00,  "Fastener batch — Invoice FPS-1199",             "overdue"),
-    (f"{TAG}AP-2026-004", "Valley Hydraulics",    -40, -10,8900.00,  "Hydraulic hose order — Invoice VH-5532",        "paid"),
-    (f"{TAG}AP-2026-005", "PaintTech Solutions",  -15, 15, 2750.00,  "Epoxy primer supply — Invoice PT-0034",         "open"),
-    (f"{TAG}AP-2026-006", "Acme Electronics",     -50, -20,16500.00, "PCB assemblies Q1 — Invoice AE-2290",           "paid"),
-    (f"{TAG}AP-2026-007", "New Era Bearings",     -8,  22, 4100.00,  "Bearing restock — Invoice NEB-0778",            "open"),
-    (f"{TAG}AP-2026-008", "Apex Consulting LLC",  -60, -30,9500.00,  "Engineering consulting Q1 — Invoice AC-1100",   "paid"),
+    (f"{TAG}AP-2026-001", "Metal Fab Co.", -25, 5, 12400.00, "Steel sheet — Invoice MFC-4412", "open"),
+    (f"{TAG}AP-2026-002", "Allied Polymers", -18, 12, 5850.00, "ABS resin resupply — Invoice AP-8821", "open"),
+    (f"{TAG}AP-2026-003", "FastPro Supply", -30, 0, 3200.00, "Fastener batch — Invoice FPS-1199", "overdue"),
+    (f"{TAG}AP-2026-004", "Valley Hydraulics", -40, -10, 8900.00, "Hydraulic hose — Invoice VH-5532", "paid"),
+    (f"{TAG}AP-2026-005", "PaintTech Solutions", -15, 15, 2750.00, "Epoxy primer — Invoice PT-0034", "open"),
+    (f"{TAG}AP-2026-006", "Acme Electronics", -50, -20, 16500.00, "PCB assemblies Q1 — Invoice AE-2290", "paid"),
+    (f"{TAG}AP-2026-007", "New Era Bearings", -8, 22, 4100.00, "Bearing restock — Invoice NEB-0778", "open"),
+    (f"{TAG}AP-2026-008", "Apex Consulting LLC", -60, -30, 9500.00, "Consulting Q1 — Invoice AC-1100", "paid"),
 ]
 
 AP_PAYMENTS = [
@@ -247,13 +247,13 @@ def _remove_ap(conn):
 
 AR_INVOICES = [
     # (inv_num, customer_name, inv_ago, due_offset, amount, description, status)
-    (f"{TAG}AR-2026-001", "Apex Manufacturing Inc.", -20, 10, 48500.00, "Valve assembly order — SO-2026-0142",     "open"),
-    (f"{TAG}AR-2026-002", "Castillo Industries",     -35, -5, 31200.00, "Bearing products Q2 — SO-2026-0128",      "overdue"),
-    (f"{TAG}AR-2026-003", "Greenfield Assembly",     -50, -20,22300.00, "Parts kit blanket order — SO-2026-0115",  "paid"),
-    (f"{TAG}AR-2026-004", "BlueStar Engineering",    -10, 20, 118000.00,"Partnership supply contract — SO-2026-0155","partial"),
-    (f"{TAG}AR-2026-005", "Harbor Engineering",      -5,  25, 4100.00,  "Trial order — SO-2026-0160",              "open"),
-    (f"{TAG}AR-2026-006", "Delta Components Co.",    -45, -15,8400.00,  "Shaft collar batch — SO-2026-0108",       "paid"),
-    (f"{TAG}AR-2026-007", "Evergreen Systems",       -3,  27, 67000.00, "Retrofit kit supply — SO-2026-0162",      "open"),
+    (f"{TAG}AR-2026-001", "Apex Manufacturing Inc.", -20, 10, 48500.00, "Valve assembly — SO-2026-0142", "open"),
+    (f"{TAG}AR-2026-002", "Castillo Industries", -35, -5, 31200.00, "Bearing products Q2 — SO-2026-0128", "overdue"),
+    (f"{TAG}AR-2026-003", "Greenfield Assembly", -50, -20, 22300.00, "Parts kit blanket — SO-2026-0115", "paid"),
+    (f"{TAG}AR-2026-004", "BlueStar Engineering", -10, 20, 118000.00, "Partnership supply — SO-2026-0155", "partial"),
+    (f"{TAG}AR-2026-005", "Harbor Engineering", -5, 25, 4100.00, "Trial order — SO-2026-0160", "open"),
+    (f"{TAG}AR-2026-006", "Delta Components Co.", -45, -15, 8400.00, "Shaft collar batch — SO-2026-0108", "paid"),
+    (f"{TAG}AR-2026-007", "Evergreen Systems", -3, 27, 67000.00, "Retrofit kit supply — SO-2026-0162", "open"),
 ]
 
 AR_PAYMENTS = [

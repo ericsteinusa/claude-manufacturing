@@ -170,17 +170,28 @@ def _remove_equipment(conn):
 # ---------------------------------------------------------------------------
 
 WORK_ORDERS = [
-    # (title, equipment, work_type, priority, assigned_to, req_ago, due_offset, completed_offset, status)
-    ("Replace worn bearings on CNC Mill #1",  "CNC Mill #1",        "Replacement",  "High",     "SMPL-MAINT-Bob Harmon",    -3,  4,   None, "In Progress"),
-    ("Quarterly PM — Hydraulic Press",         "Hydraulic Press",    "Preventive",   "Medium",   "SMPL-MAINT-Carlos Vega",   -7,  0,   None, "Assigned"),
-    ("Air compressor pressure relief check",   "Air Compressor",     "Inspection",   "High",     "SMPL-MAINT-Denise Fowler", -1,  2,   None, "Open"),
-    ("Laser cutter alignment & calibration",   "Laser Cutter",       "Calibration",  "Critical", "SMPL-MAINT-Bob Harmon",    -2,  1,   None, "In Progress"),
-    ("Industrial chiller coil cleaning",       "Industrial Chiller", "Cleaning",     "Critical", "SMPL-MAINT-Tim Okafor",    -1,  1,   None, "Assigned"),
-    ("Conveyor belt tension adjustment",       "Conveyor Belt #1",   "Repair",       "Medium",   "SMPL-MAINT-Bob Harmon",   -14, -10,  -9,  "Completed"),
-    ("Paint booth filter replacement",         "Paint Booth",        "Replacement",  "Medium",   "SMPL-MAINT-Ed Paulson",    -5,  3,   None, "On Hold"),
-    ("Annual overhead crane inspection",       "Overhead Crane",     "Inspection",   "High",     "SMPL-MAINT-Lynn Marsh",   -30, -27, -26,  "Completed"),
-    ("MIG welder electrode tip replacement",   "MIG Welder",         "Replacement",  "Low",      "SMPL-MAINT-Carlos Vega",   -2,  5,   None, "Open"),
-    ("Injection molder hydraulic fluid flush", "Injection Molder",   "Preventive",   "Medium",   "SMPL-MAINT-Carlos Vega",  -10,  -5,  -4,  "Completed"),
+    # (title, equipment, work_type, priority, assigned_to,
+    #  req_ago, due_offset, completed_offset, status)
+    ("Replace worn bearings on CNC Mill #1", "CNC Mill #1", "Replacement", "High",
+     "SMPL-MAINT-Bob Harmon", -3, 4, None, "In Progress"),
+    ("Quarterly PM — Hydraulic Press", "Hydraulic Press", "Preventive", "Medium",
+     "SMPL-MAINT-Carlos Vega", -7, 0, None, "Assigned"),
+    ("Air compressor pressure relief check", "Air Compressor", "Inspection", "High",
+     "SMPL-MAINT-Denise Fowler", -1, 2, None, "Open"),
+    ("Laser cutter alignment & calibration", "Laser Cutter", "Calibration", "Critical",
+     "SMPL-MAINT-Bob Harmon", -2, 1, None, "In Progress"),
+    ("Industrial chiller coil cleaning", "Industrial Chiller", "Cleaning", "Critical",
+     "SMPL-MAINT-Tim Okafor", -1, 1, None, "Assigned"),
+    ("Conveyor belt tension adjustment", "Conveyor Belt #1", "Repair", "Medium",
+     "SMPL-MAINT-Bob Harmon", -14, -10, -9, "Completed"),
+    ("Paint booth filter replacement", "Paint Booth", "Replacement", "Medium",
+     "SMPL-MAINT-Ed Paulson", -5, 3, None, "On Hold"),
+    ("Annual overhead crane inspection", "Overhead Crane", "Inspection", "High",
+     "SMPL-MAINT-Lynn Marsh", -30, -27, -26, "Completed"),
+    ("MIG welder electrode tip replacement", "MIG Welder", "Replacement", "Low",
+     "SMPL-MAINT-Carlos Vega", -2, 5, None, "Open"),
+    ("Injection molder hydraulic fluid flush", "Injection Molder", "Preventive", "Medium",
+     "SMPL-MAINT-Carlos Vega", -10, -5, -4, "Completed"),
 ]
 
 
@@ -213,16 +224,26 @@ def _remove_work_orders(conn):
 
 SCHEDULES = [
     # (task, equipment, frequency, assigned_to, last_ago, next_offset, status)
-    ("Lubricate spindle bearings",         "CNC Mill #1",        "Monthly",     "SMPL-MAINT-Bob Harmon",    -28,  2,   "Scheduled"),
-    ("Check hydraulic fluid level",        "Hydraulic Press",    "Weekly",      "SMPL-MAINT-Carlos Vega",   -7,   0,   "Due"),
-    ("Inspect air filters",                "Air Compressor",     "Monthly",     "SMPL-MAINT-Tim Okafor",    -45,  -15, "Overdue"),
-    ("Calibrate laser optics",             "Laser Cutter",       "Quarterly",   "SMPL-MAINT-Bob Harmon",    -90,  2,   "Scheduled"),
-    ("Test crane load limit switch",       "Overhead Crane",     "Semi-Annual", "SMPL-MAINT-Lynn Marsh",   -180,  1,   "Due"),
-    ("Replace conveyor belt lacing",       "Conveyor Belt #1",   "Annual",      "SMPL-MAINT-Bob Harmon",   -365,  5,   "Scheduled"),
-    ("Clean paint booth exhaust filters",  "Paint Booth",        "Monthly",     "SMPL-MAINT-Denise Fowler", -10,  20,  "Scheduled"),
-    ("Inspect MIG welder gas lines",       "MIG Welder",         "Weekly",      "SMPL-MAINT-Carlos Vega",   -4,   3,   "Scheduled"),
-    ("Check chiller refrigerant level",    "Industrial Chiller", "Quarterly",   "SMPL-MAINT-Tim Okafor",   -20,  70,  "Scheduled"),
-    ("Inspect injection molder clamps",    "Injection Molder",   "Monthly",     "SMPL-MAINT-Carlos Vega",  -30,   0,   "Due"),
+    ("Lubricate spindle bearings", "CNC Mill #1", "Monthly",
+     "SMPL-MAINT-Bob Harmon", -28, 2, "Scheduled"),
+    ("Check hydraulic fluid level", "Hydraulic Press", "Weekly",
+     "SMPL-MAINT-Carlos Vega", -7, 0, "Due"),
+    ("Inspect air filters", "Air Compressor", "Monthly",
+     "SMPL-MAINT-Tim Okafor", -45, -15, "Overdue"),
+    ("Calibrate laser optics", "Laser Cutter", "Quarterly",
+     "SMPL-MAINT-Bob Harmon", -90, 2, "Scheduled"),
+    ("Test crane load limit switch", "Overhead Crane", "Semi-Annual",
+     "SMPL-MAINT-Lynn Marsh", -180, 1, "Due"),
+    ("Replace conveyor belt lacing", "Conveyor Belt #1", "Annual",
+     "SMPL-MAINT-Bob Harmon", -365, 5, "Scheduled"),
+    ("Clean paint booth exhaust filters", "Paint Booth", "Monthly",
+     "SMPL-MAINT-Denise Fowler", -10, 20, "Scheduled"),
+    ("Inspect MIG welder gas lines", "MIG Welder", "Weekly",
+     "SMPL-MAINT-Carlos Vega", -4, 3, "Scheduled"),
+    ("Check chiller refrigerant level", "Industrial Chiller", "Quarterly",
+     "SMPL-MAINT-Tim Okafor", -20, 70, "Scheduled"),
+    ("Inspect injection molder clamps", "Injection Molder", "Monthly",
+     "SMPL-MAINT-Carlos Vega", -30, 0, "Due"),
 ]
 
 
@@ -251,12 +272,18 @@ def _remove_schedules(conn):
 
 INSPECTIONS = [
     # (area, insp_type, inspector, sched_ago, comp_ago, result, status)
-    ("Press Area",          "Machine Guarding", "SMPL-MAINT-Denise Fowler", -30, -29, "All guards in place", "Passed"),
-    ("Electrical Panel #3", "Electrical",       "SMPL-MAINT-Denise Fowler", -14, -13, "Panel overheating", "Failed"),
-    ("Welding Station",     "Fire Safety",      "SMPL-MAINT-Tim Okafor",    -60, -59, "Passed", "Passed"),
-    ("Paint Booth",         "Environmental",    "SMPL-MAINT-Tim Okafor",     -7,  -6, "Passed with minor notes", "Follow-up"),
-    ("Crane Bay",           "Lockout/Tagout",   "SMPL-MAINT-Lynn Marsh",     -3,  None, "", "Scheduled"),
-    ("Assembly Floor",      "General",          "SMPL-MAINT-Bob Harmon",      5,  None, "", "Scheduled"),
+    ("Press Area", "Machine Guarding", "SMPL-MAINT-Denise Fowler",
+     -30, -29, "All guards in place", "Passed"),
+    ("Electrical Panel #3", "Electrical", "SMPL-MAINT-Denise Fowler",
+     -14, -13, "Panel overheating", "Failed"),
+    ("Welding Station", "Fire Safety", "SMPL-MAINT-Tim Okafor",
+     -60, -59, "Passed", "Passed"),
+    ("Paint Booth", "Environmental", "SMPL-MAINT-Tim Okafor",
+     -7, -6, "Passed with minor notes", "Follow-up"),
+    ("Crane Bay", "Lockout/Tagout", "SMPL-MAINT-Lynn Marsh",
+     -3, None, "", "Scheduled"),
+    ("Assembly Floor", "General", "SMPL-MAINT-Bob Harmon",
+     5, None, "", "Scheduled"),
 ]
 
 
@@ -287,12 +314,18 @@ def _remove_inspections(conn):
 
 DOWNTIME = [
     # (equipment, reason, category, down_ago, hours, cost, status)
-    ("Laser Cutter",       "Optics misaligned after power surge",  "Breakdown",  -2,  "6.5",  1200.00, "Investigating"),
-    ("Industrial Chiller", "Refrigerant leak detected",             "Breakdown",  -1,  "10.0", 2500.00, "Ongoing"),
-    ("CNC Mill #1",        "Bearing failure",                       "Breakdown", -30,  "8.0",  950.00,  "Resolved"),
-    ("Conveyor Belt #1",   "Scheduled changeover to new product",   "Changeover",-45,  "2.0",    0.00,  "Resolved"),
-    ("Air Compressor",     "Pressure valve failure",                "Breakdown", -15,  "4.0",  480.00,  "Resolved"),
-    ("Paint Booth",        "Exhaust fan motor overheating",         "Breakdown",  -5,  "3.0",  320.00,  "Investigating"),
+    ("Laser Cutter", "Optics misaligned after power surge", "Breakdown",
+     -2, "6.5", 1200.00, "Investigating"),
+    ("Industrial Chiller", "Refrigerant leak detected", "Breakdown",
+     -1, "10.0", 2500.00, "Ongoing"),
+    ("CNC Mill #1", "Bearing failure", "Breakdown",
+     -30, "8.0", 950.00, "Resolved"),
+    ("Conveyor Belt #1", "Scheduled changeover to new product", "Changeover",
+     -45, "2.0", 0.00, "Resolved"),
+    ("Air Compressor", "Pressure valve failure", "Breakdown",
+     -15, "4.0", 480.00, "Resolved"),
+    ("Paint Booth", "Exhaust fan motor overheating", "Breakdown",
+     -5, "3.0", 320.00, "Investigating"),
 ]
 
 
