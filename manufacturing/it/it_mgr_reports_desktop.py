@@ -597,9 +597,9 @@ class _AssetInventoryWidget(QtWidgets.QWidget):
             _fill(self._warranty_tbl, w_rows, bg=WARN_BG)
 
             all_rows = conn.execute(
-                "SELECT asset_tag, asset_name, asset_type, status,"
-                " assigned_to, department, purchase_date"
-                " FROM it_asset ORDER BY asset_type, asset_name"
+                "SELECT asset_tag, make || ' ' || COALESCE(model,'') AS asset_name,"
+                " asset_type, status, assigned_to, department, purchase_date"
+                " FROM it_asset ORDER BY asset_type, make, model"
             ).fetchall()
             _fill(self._all_tbl, all_rows)
         except Exception:
