@@ -149,4 +149,11 @@ manufacturing/
   `python -m manufacturing.seed_sample_finance` (tagged `SMPL-FIN-`).
 - Legal (contracts, compliance items, litigation cases):
   `python -m manufacturing.seed_sample_legal` (tagged `SMPL-LEGAL-`).
+- Personnel (job titles for all 46 sample employees, 4 weeks of time-clock entries for hourly staff):
+  `python -m manufacturing.seed_sample_personnel` (tagged `SMPL-PERS-`; adds `created_by` column
+  to `position` and `time_clock` via `ALTER TABLE … ADD COLUMN IF NOT EXISTS`).
+- Payroll (deduction types, pay rates, employee deductions, 3 historical bi-weekly payroll runs
+  with entries and entry-level deductions for 12 sample employees):
+  `python -m manufacturing.seed_sample_payroll` (tagged `SMPL-PAY-`; run
+  `seed_sample_personnel` first so time-clock data exists for the current period).
 - All seeds are idempotent and support `--reset` / `--remove`.
