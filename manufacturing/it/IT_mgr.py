@@ -1,11 +1,11 @@
 import sys
-from ..launch_utils import launch as _launch
-from PyQt6 import QtCore, QtWidgets
-from ..qt_theme import BUTTON_STYLE
-
+from PyQt6 import QtWidgets
 from ..button_nav import ButtonNav
-from .IT_Tasks import ITTasksWidget, _apply_blue_palette
-from .it_calls import ITSupportWidget
+from .IT_Tasks import _apply_blue_palette
+from .it_repairs_software import ITRepairsWidget, ITSoftwareWidget, ITLicensesWidget
+from .it_asset_mgmt import ITAssetMgmtWidget
+from .it_helpdesk import ITHelpDeskWidget
+from .it_tasks_desktop import ITTasksDesktopWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -16,39 +16,15 @@ TAB_STYLE = (
 )
 
 
-def _launch_tab(script, label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(label)
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addSpacing(12)
-    btn = QtWidgets.QPushButton(f"Open {label}")
-    btn.setStyleSheet(BUTTON_STYLE)
-    btn.setFixedHeight(44)
-    btn.setFixedWidth(260)
-    btn.clicked.connect(lambda: _launch(script))
-    row = QtWidgets.QHBoxLayout()
-    row.addStretch()
-    row.addWidget(btn)
-    row.addStretch()
-    v.addLayout(row)
-    v.addStretch()
-    return w
-
-
 class ITMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("IT Manager Menu")
+        self.setWindowTitle("IT Manager")
         _apply_blue_palette(self)
         self._build_ui()
 
     def _build_ui(self):
-        from .IT_mgr_reports import ITMgrReportsWidget
+        from .it_mgr_reports_desktop import ITMgrReportsDesktopWidget
         central = QtWidgets.QWidget()
         _apply_blue_palette(central)
         self.setCentralWidget(central)
@@ -57,14 +33,13 @@ class ITMgrMenu(QtWidgets.QMainWindow):
         v.setSpacing(0)
         tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(ITTasksWidget(), "IT Tasks")
-        tabs.addTab(
-    _launch_tab(
-        "IT_technician.py",
-        "IT Technician"),
-         "IT Technician")
-        tabs.addTab(ITSupportWidget(), "IT Support Calls")
-        tabs.addTab(ITMgrReportsWidget(), "Reports")
+        tabs.addTab(ITTasksDesktopWidget(),      "IT Tasks")
+        tabs.addTab(ITHelpDeskWidget(),           "Help Desk")
+        tabs.addTab(ITRepairsWidget(),            "Hardware Repairs")
+        tabs.addTab(ITSoftwareWidget(),           "Software Installations")
+        tabs.addTab(ITLicensesWidget(),           "Licenses")
+        tabs.addTab(ITAssetMgmtWidget(),          "Asset Management")
+        tabs.addTab(ITMgrReportsDesktopWidget(),  "Reports")
         v.addWidget(tabs)
 
 
