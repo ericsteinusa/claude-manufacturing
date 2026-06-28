@@ -257,6 +257,8 @@ def api_wo_list(request):
     status = request.GET.get('status') or None
     conn = get_db_connection()
     try:
+        work_orders_core.ensure_wo_tables(conn)
+        conn.commit()
         wos = work_orders_core.list_wos(conn, status=status)
     finally:
         conn.close()
@@ -328,6 +330,33 @@ def api_req(request):
     if request.method == 'GET':
         conn = get_db_connection()
         try:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS purchase_requisition (
+                    id SERIAL PRIMARY KEY,
+                    req_number TEXT NOT NULL UNIQUE,
+                    requester_id INTEGER, dept_id INTEGER, dept_sub_id INTEGER,
+                    needed_date TEXT, justification TEXT, purpose TEXT,
+                    status TEXT DEFAULT 'draft', created_date TEXT,
+                    po_id INTEGER, created_by TEXT, notes TEXT
+                )
+            """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS requisition_item (
+                    id SERIAL PRIMARY KEY,
+                    req_id INTEGER NOT NULL REFERENCES purchase_requisition(id),
+                    description TEXT NOT NULL, product_id INTEGER,
+                    qty INTEGER DEFAULT 1, est_unit_price REAL DEFAULT 0.0
+                )
+            """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS requisition_approval (
+                    id SERIAL PRIMARY KEY,
+                    req_id INTEGER NOT NULL REFERENCES purchase_requisition(id),
+                    level TEXT, approver_id INTEGER, decision TEXT,
+                    comment TEXT, decided_date TEXT
+                )
+            """)
+            conn.commit()
             sql = """
                 SELECT pr.id, pr.req_number, pr.dept_id, pr.purpose,
                        pr.status, pr.notes, pr.created_by,
