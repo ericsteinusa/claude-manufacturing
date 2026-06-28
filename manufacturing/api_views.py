@@ -356,6 +356,17 @@ def api_req(request):
                     comment TEXT, decided_date TEXT
                 )
             """)
+            for col, defn in [
+                ('purpose',    'TEXT'),
+                ('notes',      'TEXT'),
+                ('created_by', 'TEXT'),
+                ('dept_sub_id','INTEGER'),
+                ('po_id',      'INTEGER'),
+            ]:
+                conn.execute(
+                    f"ALTER TABLE purchase_requisition "
+                    f"ADD COLUMN IF NOT EXISTS {col} {defn}"
+                )
             conn.commit()
             sql = """
                 SELECT pr.id, pr.req_number, pr.dept_id, pr.purpose,
