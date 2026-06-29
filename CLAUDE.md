@@ -28,15 +28,24 @@ manufacturing/
   ├── sales/             Sales orders, quotes, targets
   ├── time_clock/        Clock in/out, time-off, TK login
   │
+  ├── seeds/             Dev-DB seeders (python -m manufacturing.seeds.seed_sample_*)
+  ├── views/             Django HTTP handlers (package split by domain)
+  │   ├── __init__.py    Core navigation + re-exports from sub-modules
+  │   ├── _quality.py    QA views
+  │   ├── _maintenance.py Maintenance views
+  │   ├── _payroll.py    Payroll views
+  │   ├── _it.py         IT views
+  │   ├── _legal.py      Legal views
+  │   └── _marketing.py  Marketing views
+  │
   ├── *_core.py          Qt-free business logic (stay at root — imported by
-  │                      views.py, seeds, and cross-dept callers)
+  │                      views/, seeds/, and cross-dept callers)
   ├── accounts.py        Cross-cutting user/session helpers
   ├── dept_menu_widget.py Shared Qt widget used by all dept main menus
   ├── purchase_requisitions.py  Used by 4+ non-purchasing departments
-  ├── menus.py / views.py / urls.py  Django routing
+  ├── menus.py / urls.py Django routing
   ├── db_pg.py / schema.py / gl_utils.py  DB & shared utilities
   ├── qt_theme.py / button_nav.py / launch_utils.py  Qt helpers
-  ├── seed_sample_*.py   Dev-DB seeders
   └── templates/         Django HTML templates
 ```
 
@@ -133,62 +142,65 @@ To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
   e.g. `mrp_core.next_sequence_number(existing, prefix)`.
 
 ## Sample data (dev DB)
-- People: `python -m manufacturing.seed_sample_data` (tagged `@example.com`).
+
+Seed scripts live in `manufacturing/seeds/`. Use `python -m manufacturing.seeds.<name>`.
+
+- People: `python -m manufacturing.seeds.seed_sample_data` (tagged `@example.com`).
 - Products + BOMs + demand for BOM/MRP:
-  `python -m manufacturing.seed_sample_products` (tagged `bin='SAMPLE'`).
+  `python -m manufacturing.seeds.seed_sample_products` (tagged `bin='SAMPLE'`).
 - Purchase orders for the web PO pages (every status + a partial receipt):
-  `python -m manufacturing.seed_sample_pos` (tagged `po_number` prefix
+  `python -m manufacturing.seeds.seed_sample_pos` (tagged `po_number` prefix
   `SMPL-PO-`; line items use the `bin='SAMPLE'` products, so run that seed
   first to link them).
 - Work orders (every status + materials):
-  `python -m manufacturing.seed_sample_wos` (tagged `wo_number` prefix
+  `python -m manufacturing.seeds.seed_sample_wos` (tagged `wo_number` prefix
   `SMPL-WO-`; materials use the `bin='SAMPLE'` products, so run that seed
   first to link them).
 - Inventory alerts (drives 3 sample products below reorder point):
-  `python -m manufacturing.seed_sample_alerts` (updates `amount` on Rim,
+  `python -m manufacturing.seeds.seed_sample_alerts` (updates `amount` on Rim,
   Tire, Inner Tube; requires `seed_sample_products` first). Supports
   `--remove` to restore original amounts.
 - IT department (help desk tickets, tasks, assets, technicians):
-  `python -m manufacturing.seed_sample_it` (tagged `SMPL-IT-`).
+  `python -m manufacturing.seeds.seed_sample_it` (tagged `SMPL-IT-`).
 - Maintenance (mechanics, equipment, work orders, PM schedules, inspections):
-  `python -m manufacturing.seed_sample_maintenance` (tagged `SMPL-MAINT-`).
+  `python -m manufacturing.seeds.seed_sample_maintenance` (tagged `SMPL-MAINT-`).
 - Quality (NCRs, CAPAs, audits, supplier quality, inspections):
-  `python -m manufacturing.seed_sample_quality` (tagged `SMPL-QA-`).
+  `python -m manufacturing.seeds.seed_sample_quality` (tagged `SMPL-QA-`).
 - Engineering (projects, tasks, ECRs/design reviews, standards):
-  `python -m manufacturing.seed_sample_engineering` (tagged `SMPL-ENG-`).
+  `python -m manufacturing.seeds.seed_sample_engineering` (tagged `SMPL-ENG-`).
 - Sales (quotes, targets, leads, contracts, forecasts, territories, commissions):
-  `python -m manufacturing.seed_sample_sales` (tagged `SMPL-SALES-`).
+  `python -m manufacturing.seeds.seed_sample_sales` (tagged `SMPL-SALES-`).
 - Marketing (campaigns, leads, content, ads, research):
-  `python -m manufacturing.seed_sample_marketing` (tagged `SMPL-MKT-`).
+  `python -m manufacturing.seeds.seed_sample_marketing` (tagged `SMPL-MKT-`).
 - Accounting (GL accounts/chart of accounts, AP invoices+payments, AR invoices+payments, GL journals):
-  `python -m manufacturing.seed_sample_accounting` (tagged `SMPL-ACCT-`; AR invoices linked to first customer in `customer` table).
+  `python -m manufacturing.seeds.seed_sample_accounting` (tagged `SMPL-ACCT-`; AR invoices linked to first customer in `customer` table).
 - Customer Service (tickets, improvement plans, returns, KB articles, surveys):
-  `python -m manufacturing.seed_sample_cs` (tagged `SMPL-CS-`).
+  `python -m manufacturing.seeds.seed_sample_cs` (tagged `SMPL-CS-`).
 - Finance (budgets+lines, audit schedules+findings, bank accounts+statements, tax filings):
-  `python -m manufacturing.seed_sample_finance` (tagged `SMPL-FIN-`).
+  `python -m manufacturing.seeds.seed_sample_finance` (tagged `SMPL-FIN-`).
 - Legal (contracts, compliance items, litigation cases):
-  `python -m manufacturing.seed_sample_legal` (tagged `SMPL-LEGAL-`).
+  `python -m manufacturing.seeds.seed_sample_legal` (tagged `SMPL-LEGAL-`).
 - Personnel (job titles for all 46 sample employees, 4 weeks of time-clock entries for hourly staff):
-  `python -m manufacturing.seed_sample_personnel` (tagged `SMPL-PERS-`; adds `created_by` column
+  `python -m manufacturing.seeds.seed_sample_personnel` (tagged `SMPL-PERS-`; adds `created_by` column
   to `position` and `time_clock` via `ALTER TABLE … ADD COLUMN IF NOT EXISTS`).
 - Payroll (deduction types, pay rates, employee deductions, 3 historical bi-weekly payroll runs
   with entries and entry-level deductions for 12 sample employees):
-  `python -m manufacturing.seed_sample_payroll` (tagged `SMPL-PAY-`; run
+  `python -m manufacturing.seeds.seed_sample_payroll` (tagged `SMPL-PAY-`; run
   `seed_sample_personnel` first so time-clock data exists for the current period).
 - Purchasing (8 supplier contacts + 7 purchase requisitions spanning every status with
   line items and approval history):
-  `python -m manufacturing.seed_sample_purchasing` (suppliers tagged `created_by='SMPL-PURCH-'`;
+  `python -m manufacturing.seeds.seed_sample_purchasing` (suppliers tagged `created_by='SMPL-PURCH-'`;
   requisitions tagged `req_number` prefix `SMPL-REQ-`; run `seed_sample_data` first so
   department/people records exist).
 - Customers and Credit (10 B2B customer records, credit accounts with varying limits and
   statuses, credit applications across pending/approved/denied, limit change history, and
   collection activities for hold/suspended accounts):
-  `python -m manufacturing.seed_sample_customers` (tagged `created_by='SMPL-CUST-'`).
+  `python -m manufacturing.seeds.seed_sample_customers` (tagged `created_by='SMPL-CUST-'`).
 - Shipping (8 shipments spanning every status — pending, shipped, delivered, returned —
   with 2–4 bicycle-part line items each; `so_id` is NULL unless sales seed has been run):
-  `python -m manufacturing.seed_sample_shipping` (tagged `created_by='SMPL-SHIP-'`;
+  `python -m manufacturing.seeds.seed_sample_shipping` (tagged `created_by='SMPL-SHIP-'`;
   `ship_number` prefix `SMPL-SH-`).
 - Receiving (8 receipts spanning every status — pending, partial, received, rejected —
   with 2–4 line items each; `po_id` is NULL with no FK constraint so no PO seed dependency):
-  `python -m manufacturing.seed_sample_receiving` (tagged `rcv_number` prefix `SMPL-RCV-`).
+  `python -m manufacturing.seeds.seed_sample_receiving` (tagged `rcv_number` prefix `SMPL-RCV-`).
 - All seeds are idempotent and support `--reset` / `--remove`.

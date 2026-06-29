@@ -6,9 +6,9 @@ All rows are tagged with created_by='seed' for safe removal.
 
 Usage::
 
-    python -m manufacturing.seed_sample_payroll            # add (idempotent)
-    python -m manufacturing.seed_sample_payroll --reset     # remove + re-add
-    python -m manufacturing.seed_sample_payroll --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_payroll            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_payroll --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_payroll --remove    # remove only
 
 Run seed_sample_personnel first so time_clock data exists for the
 current period when you use the Payroll desktop module.
@@ -17,7 +17,7 @@ current period when you use the Payroll desktop module.
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 TAG = "SMPL-PAY-"
 TODAY = date.today()
@@ -385,3 +385,5 @@ if __name__ == "__main__":
             seed(conn)
     finally:
         conn.close()
+
+

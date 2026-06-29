@@ -10,9 +10,9 @@ Requisitions are identified by the ``req_number`` prefix ``SMPL-REQ-``.
 
 Usage::
 
-    python -m manufacturing.seed_sample_purchasing            # add (idempotent)
-    python -m manufacturing.seed_sample_purchasing --reset     # remove + re-add
-    python -m manufacturing.seed_sample_purchasing --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_purchasing            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_purchasing --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_purchasing --remove    # remove only
 
 Run seed_sample_data first so department and people records exist.
 """
@@ -20,8 +20,8 @@ Run seed_sample_data first so department and people records exist.
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
-from .purchase_orders_core import ensure_po_tables
+from ..db_pg import get_db_connection
+from ..purchase_orders_core import ensure_po_tables
 
 TAG = "SMPL-PURCH-"
 REQ_PREFIX = "SMPL-REQ-"
@@ -393,3 +393,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+

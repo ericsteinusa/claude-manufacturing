@@ -5,16 +5,16 @@ can be identified and removed without touching real data.
 
 Usage::
 
-    python -m manufacturing.seed_sample_it            # add (idempotent)
-    python -m manufacturing.seed_sample_it --reset     # remove + re-add
-    python -m manufacturing.seed_sample_it --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_it            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_it --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_it --remove    # remove only
 """
 
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
-from .it_core import (
+from ..db_pg import get_db_connection
+from ..it_core import (
     _ensure_repair_table, _ensure_software_table,
     _ensure_license_table, _ensure_network_table, _ensure_task_table,
 )
@@ -509,3 +509,5 @@ if __name__ == "__main__":
             seed(conn)
         else:
             seed(conn)
+
+

@@ -40,6 +40,7 @@ from .inventory_core import (
     record_transaction, create_product as inv_create_product,
     update_product as inv_update_product,
 )
+from . import lot_core, routing_core, costing_core
 from .contacts_core import (
     list_customers, get_customer, create_customer, update_customer,
     get_customer_orders,
@@ -278,6 +279,15 @@ from .marketing_core import (
 )
 
 log = get_logger(__name__)
+
+# Domain views extracted to sub-modules for maintainability
+from ._quality import *  # noqa: F401,F403
+from ._maintenance import *  # noqa: F401,F403
+from ._payroll import *  # noqa: F401,F403
+from ._it import *  # noqa: F401,F403
+from ._legal import *  # noqa: F401,F403
+from ._marketing import *  # noqa: F401,F403
+
 
 # Menu leaves that are served as web pages rather than launched as a desktop
 # Qt subprocess via run_script. Keyed by (dept, leaf_key) -> URL. The PO
@@ -1721,6 +1731,20 @@ def wo_detail(request, wo_id):
         wo = get_wo(conn, wo_id)
         materials = get_wo_materials(conn, wo_id) if wo else []
         products = load_wo_products(conn) if (wo and can_edit) else []
+        operations, wo_labor_cost, wo_cost = [], None, None
+        if wo:
+            try:
+                routing_core.ensure_routing_tables(conn)
+                operations = routing_core.get_wo_operations(conn, wo_id)
+                if operations:
+                    wo_labor_cost = routing_core.get_wo_labor_cost(conn, wo_id)
+            except Exception:
+                pass
+            try:
+                costing_core.ensure_costing_tables(conn)
+                wo_cost = costing_core.get_wo_cost(conn, wo_id)
+            except Exception:
+                pass
     finally:
         conn.close()
 
@@ -1742,6 +1766,9 @@ def wo_detail(request, wo_id):
         can_edit=can_edit,
         status_actions=status_actions,
         back_url='/wo/',
+        operations=operations,
+        wo_labor_cost=wo_labor_cost,
+        wo_cost=wo_cost,
     ))
 
 
@@ -4288,1339 +4315,6 @@ def cs_surveys_detail(request, survey_id):
     ))
 
 
-# ---------------------------------------------------------------------------
-# Quality Assurance (web)
-# ---------------------------------------------------------------------------
-
-_QA_DEPT_KEYS = {'quality_assurance', 'production', 'purchasing'}
-
-
-def _qa_ctx(request, **extra):
-    ctx = {
-        'email': request.session.get('user_email', ''),
-        'user_role': request.session.get('user_role', ''),
-        'full_access': request.session.get('user_full_access', False),
-        'can_edit': request.session.get('user_role') not in READ_ONLY_ROLES,
-    }
-    ctx.update(extra)
-    return ctx
-
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_dashboard(request):
-    conn = get_db_connection()
-    try:
-        counts = get_dashboard_counts(conn)
-    finally:
-        conn.close()
-    return render(request, 'qa_dashboard.html', _qa_ctx(request, counts=counts))
-
-
-# --- NCR ---
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_ncr_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    ncrs = []
-    try:
-        ncrs = list_ncrs(conn, status=status_filter or None,
-                         search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_ncr(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    source=request.POST.get('source', ''),
-                    severity=request.POST.get('severity', ''),
-                    product=request.POST.get('product', ''),
-                    detected_date=request.POST.get('detected_date', ''),
-                    disposition=request.POST.get('disposition', 'Pending'),
-                    owner=request.POST.get('owner', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('qa_ncr_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                ncrs = list_ncrs(conn, status=status_filter or None,
-                                 search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'qa_ncr_list.html', _qa_ctx(
-        request, ncrs=ncrs, status_filter=status_filter, search=search,
-        ncr_statuses=NCR_STATUSES, ncr_sources=NCR_SOURCES,
-        ncr_severities=NCR_SEVERITIES, ncr_dispositions=NCR_DISPOSITIONS,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_ncr_detail(request, ncr_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    ncr = None
-    try:
-        ncr = get_ncr(conn, ncr_id)
-        if not ncr:
-            return redirect('qa_ncr_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'close':
-                    close_ncr(conn, ncr_id)
-                    success = 'NCR closed.'
-                else:
-                    update_ncr(
-                        conn, ncr_id,
-                        title=request.POST.get('title', ''),
-                        source=request.POST.get('source', ''),
-                        severity=request.POST.get('severity', ''),
-                        product=request.POST.get('product', ''),
-                        detected_date=request.POST.get('detected_date', ''),
-                        disposition=request.POST.get('disposition', ''),
-                        owner=request.POST.get('owner', ''),
-                        status=request.POST.get('status', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'NCR updated.'
-                conn.commit()
-                ncr = get_ncr(conn, ncr_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'qa_ncr_detail.html', _qa_ctx(
-        request, ncr=ncr, can_edit=can_edit,
-        ncr_statuses=NCR_STATUSES, ncr_sources=NCR_SOURCES,
-        ncr_severities=NCR_SEVERITIES, ncr_dispositions=NCR_DISPOSITIONS,
-        error=error, success=success,
-    ))
-
-
-# --- CAPA ---
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_capa_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    capas = []
-    try:
-        capas = list_capas(conn, status=status_filter or None,
-                           search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_capa(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    capa_type=request.POST.get('capa_type', 'Corrective'),
-                    ncr_ref=request.POST.get('ncr_ref', ''),
-                    owner=request.POST.get('owner', ''),
-                    due_date=request.POST.get('due_date', ''),
-                    action_plan=request.POST.get('action_plan', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('qa_capa_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                capas = list_capas(conn, status=status_filter or None,
-                                   search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'qa_capa_list.html', _qa_ctx(
-        request, capas=capas, status_filter=status_filter, search=search,
-        capa_statuses=CAPA_STATUSES, capa_types=CAPA_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_capa_detail(request, capa_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    capa = None
-    try:
-        capa = get_capa(conn, capa_id)
-        if not capa:
-            return redirect('qa_capa_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'close':
-                    close_capa(conn, capa_id)
-                    success = 'CAPA closed.'
-                else:
-                    update_capa(
-                        conn, capa_id,
-                        title=request.POST.get('title', ''),
-                        capa_type=request.POST.get('capa_type', ''),
-                        ncr_ref=request.POST.get('ncr_ref', ''),
-                        owner=request.POST.get('owner', ''),
-                        due_date=request.POST.get('due_date', ''),
-                        completed_date=request.POST.get('completed_date', ''),
-                        status=request.POST.get('status', ''),
-                        action_plan=request.POST.get('action_plan', ''),
-                    )
-                    success = 'CAPA updated.'
-                conn.commit()
-                capa = get_capa(conn, capa_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'qa_capa_detail.html', _qa_ctx(
-        request, capa=capa, can_edit=can_edit,
-        capa_statuses=CAPA_STATUSES, capa_types=CAPA_TYPES,
-        error=error, success=success,
-    ))
-
-
-# --- Audits ---
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_audit_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    audits = []
-    try:
-        audits = list_audits(conn, status=status_filter or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_audit(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    audit_type=request.POST.get('audit_type', ''),
-                    auditor=request.POST.get('auditor', ''),
-                    scheduled_date=request.POST.get('scheduled_date', ''),
-                    findings=request.POST.get('findings', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('qa_audit_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                audits = list_audits(conn, status=status_filter or None)
-    finally:
-        conn.close()
-    return render(request, 'qa_audit_list.html', _qa_ctx(
-        request, audits=audits, status_filter=status_filter,
-        audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_audit_detail(request, audit_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    audit = None
-    try:
-        audit = get_audit(conn, audit_id)
-        if not audit:
-            return redirect('qa_audit_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'complete':
-                    complete_audit(conn, audit_id,
-                                   result=request.POST.get('result', ''),
-                                   findings=request.POST.get('findings', ''))
-                    success = 'Audit marked complete.'
-                else:
-                    update_audit(
-                        conn, audit_id,
-                        title=request.POST.get('title', ''),
-                        audit_type=request.POST.get('audit_type', ''),
-                        auditor=request.POST.get('auditor', ''),
-                        scheduled_date=request.POST.get('scheduled_date', ''),
-                        completed_date=request.POST.get('completed_date', ''),
-                        result=request.POST.get('result', ''),
-                        status=request.POST.get('status', ''),
-                        findings=request.POST.get('findings', ''),
-                    )
-                    success = 'Audit updated.'
-                conn.commit()
-                audit = get_audit(conn, audit_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'qa_audit_detail.html', _qa_ctx(
-        request, audit=audit, can_edit=can_edit,
-        audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
-        error=error, success=success,
-    ))
-
-
-# --- Supplier Quality ---
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_supplier_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    suppliers = []
-    try:
-        suppliers = list_supplier_quality(conn, status=status_filter or None,
-                                          search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_supplier_quality(
-                    conn,
-                    supplier=request.POST.get('supplier', ''),
-                    material=request.POST.get('material', ''),
-                    rating=request.POST.get('rating', ''),
-                    ppm=request.POST.get('ppm', ''),
-                    last_audit=request.POST.get('last_audit', ''),
-                    status=request.POST.get('status', 'Pending'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('qa_supplier_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                suppliers = list_supplier_quality(conn, status=status_filter or None,
-                                                  search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'qa_supplier_list.html', _qa_ctx(
-        request, suppliers=suppliers, status_filter=status_filter, search=search,
-        supplier_statuses=SUPPLIER_STATUSES, supplier_ratings=SUPPLIER_RATINGS,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_supplier_detail(request, sq_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    supplier = None
-    try:
-        supplier = get_supplier_quality(conn, sq_id)
-        if not supplier:
-            return redirect('qa_supplier_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_supplier_quality(
-                    conn, sq_id,
-                    supplier=request.POST.get('supplier', ''),
-                    material=request.POST.get('material', ''),
-                    rating=request.POST.get('rating', ''),
-                    ppm=request.POST.get('ppm', ''),
-                    last_audit=request.POST.get('last_audit', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                supplier = get_supplier_quality(conn, sq_id)
-                success = 'Supplier quality record updated.'
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'qa_supplier_detail.html', _qa_ctx(
-        request, supplier=supplier, can_edit=can_edit,
-        supplier_statuses=SUPPLIER_STATUSES, supplier_ratings=SUPPLIER_RATINGS,
-        error=error, success=success,
-    ))
-
-
-# --- Inspections ---
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_inspection_list(request):
-    result_filter = request.GET.get('result', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    inspections = []
-    products = []
-    work_orders = []
-    try:
-        inspections = list_inspections(conn, result=result_filter or None,
-                                       search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            products = load_products_for_qa(conn)
-            work_orders = load_work_orders_for_qa(conn)
-            try:
-                pid_raw = request.POST.get('product_id', '')
-                wid_raw = request.POST.get('wo_id', '')
-                insp_num = next_insp_number(conn)
-                create_inspection(
-                    conn,
-                    insp_number=insp_num,
-                    product_id=int(pid_raw) if pid_raw else None,
-                    wo_id=int(wid_raw) if wid_raw else None,
-                    insp_date=request.POST.get('insp_date', ''),
-                    inspector=request.POST.get('inspector', ''),
-                    result=request.POST.get('result', 'pending'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('qa_inspection_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                inspections = list_inspections(conn, result=result_filter or None,
-                                               search=search or None)
-        else:
-            products = load_products_for_qa(conn)
-            work_orders = load_work_orders_for_qa(conn)
-    finally:
-        conn.close()
-    return render(request, 'qa_inspection_list.html', _qa_ctx(
-        request, inspections=inspections, result_filter=result_filter,
-        search=search, insp_results=INSP_RESULTS,
-        products=products, work_orders=work_orders,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_inspection_detail(request, insp_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    inspection = None
-    defects = []
-    try:
-        inspection = get_inspection(conn, insp_id)
-        if not inspection:
-            return redirect('qa_inspection_list')
-        defects = get_defects(conn, insp_id)
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', '')
-            try:
-                if action in ('passed', 'failed', 'on_hold', 'pending'):
-                    update_inspection_result(conn, insp_id, action)
-                    success = f'Inspection marked {action}.'
-                elif action == 'log_defect':
-                    log_defect(
-                        conn, insp_id,
-                        defect_type=request.POST.get('defect_type', ''),
-                        severity=request.POST.get('severity', 'minor'),
-                        description=request.POST.get('description', ''),
-                        created_by=request.session.get('user_email', ''),
-                    )
-                    success = 'Defect logged.'
-                elif action == 'resolve_defect':
-                    did = int(request.POST.get('defect_id', 0))
-                    resolve_defect(conn, did)
-                    success = 'Defect resolved.'
-                conn.commit()
-                inspection = get_inspection(conn, insp_id)
-                defects = get_defects(conn, insp_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'qa_inspection_detail.html', _qa_ctx(
-        request, inspection=inspection, defects=defects, can_edit=can_edit,
-        defect_severities=DEFECT_SEVERITIES,
-        error=error, success=success,
-    ))
-
-
-# --- QA Reports ---
-
-@dept_required(_QA_DEPT_KEYS)
-def qa_reports_view(request):
-    conn = get_db_connection()
-    try:
-        data = get_qa_reports(conn)
-    finally:
-        conn.close()
-    return render(request, 'qa_reports.html', _qa_ctx(request, **data))
-
-
-# ---------------------------------------------------------------------------
-# Maintenance (web)
-# ---------------------------------------------------------------------------
-
-_MAINT_DEPT_KEYS = {'maintenance', 'production', 'purchasing'}
-
-
-def _maint_ctx(request, **extra):
-    ctx = {
-        'email': request.session.get('user_email', ''),
-        'user_role': request.session.get('user_role', ''),
-        'full_access': request.session.get('user_full_access', False),
-        'can_edit': request.session.get('user_role') not in READ_ONLY_ROLES,
-    }
-    ctx.update(extra)
-    return ctx
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_dashboard(request):
-    conn = get_db_connection()
-    try:
-        counts = maint_get_dashboard_counts(conn)
-    finally:
-        conn.close()
-    return render(request, 'maint_dashboard.html',
-                  _maint_ctx(request, counts=counts))
-
-
-# --- Work Orders ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_wo_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    priority_filter = request.GET.get('priority', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    wos = []
-    mechanics = []
-    try:
-        wos = list_work_orders(conn, status=status_filter or None,
-                               priority=priority_filter or None,
-                               search=search or None)
-        mechanics = load_mechanics(conn)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_work_order(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    equipment=request.POST.get('equipment', ''),
-                    work_type=request.POST.get('work_type', 'Repair'),
-                    priority=request.POST.get('priority', 'Medium'),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    requested_date=request.POST.get('requested_date', ''),
-                    due_date=request.POST.get('due_date', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_wo_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                wos = list_work_orders(conn, status=status_filter or None,
-                                       priority=priority_filter or None,
-                                       search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_wo_list.html', _maint_ctx(
-        request, wos=wos, mechanics=mechanics,
-        status_filter=status_filter, priority_filter=priority_filter,
-        search=search, wo_statuses=WO_STATUSES, work_types=WORK_TYPES,
-        priorities=PRIORITIES, error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_wo_detail(request, wo_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    wo = None
-    mechanics = []
-    try:
-        wo = get_work_order(conn, wo_id)
-        if not wo:
-            return redirect('maint_wo_list')
-        mechanics = load_mechanics(conn)
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'complete':
-                    complete_work_order(conn, wo_id)
-                    success = 'Work order completed.'
-                else:
-                    update_work_order(
-                        conn, wo_id,
-                        title=request.POST.get('title', ''),
-                        equipment=request.POST.get('equipment', ''),
-                        work_type=request.POST.get('work_type', ''),
-                        priority=request.POST.get('priority', ''),
-                        assigned_to=request.POST.get('assigned_to', ''),
-                        requested_date=request.POST.get('requested_date', ''),
-                        due_date=request.POST.get('due_date', ''),
-                        completed_date=request.POST.get('completed_date', ''),
-                        status=request.POST.get('status', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Work order updated.'
-                conn.commit()
-                wo = get_work_order(conn, wo_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_wo_detail.html', _maint_ctx(
-        request, wo=wo, mechanics=mechanics, can_edit=can_edit,
-        wo_statuses=WO_STATUSES, work_types=WORK_TYPES, priorities=PRIORITIES,
-        error=error, success=success,
-    ))
-
-
-# --- Equipment ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_equipment_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    equipment = []
-    try:
-        equipment = list_equipment(conn, status=status_filter or None,
-                                   search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_equipment(
-                    conn,
-                    name=request.POST.get('name', ''),
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    location=request.POST.get('location', ''),
-                    manufacturer=request.POST.get('manufacturer', ''),
-                    install_date=request.POST.get('install_date', ''),
-                    last_service=request.POST.get('last_service', ''),
-                    status=request.POST.get('status', 'Operational'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_equipment_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                equipment = list_equipment(conn, status=status_filter or None,
-                                           search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_equipment_list.html', _maint_ctx(
-        request, equipment=equipment, status_filter=status_filter,
-        search=search, equipment_statuses=EQUIPMENT_STATUSES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_equipment_detail(request, eq_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    eq = None
-    try:
-        eq = get_equipment(conn, eq_id)
-        if not eq:
-            return redirect('maint_equipment_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_equipment(
-                    conn, eq_id,
-                    name=request.POST.get('name', ''),
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    location=request.POST.get('location', ''),
-                    manufacturer=request.POST.get('manufacturer', ''),
-                    install_date=request.POST.get('install_date', ''),
-                    last_service=request.POST.get('last_service', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                eq = get_equipment(conn, eq_id)
-                success = 'Equipment updated.'
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_equipment_detail.html', _maint_ctx(
-        request, eq=eq, can_edit=can_edit,
-        equipment_statuses=EQUIPMENT_STATUSES,
-        error=error, success=success,
-    ))
-
-
-# --- PM Schedules ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_schedule_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    schedules = []
-    mechanics = []
-    try:
-        schedules = list_schedules(conn, status=status_filter or None,
-                                   search=search or None)
-        mechanics = load_mechanics(conn)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_schedule(
-                    conn,
-                    task=request.POST.get('task', ''),
-                    equipment=request.POST.get('equipment', ''),
-                    frequency=request.POST.get('frequency', 'Monthly'),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    last_done=request.POST.get('last_done', ''),
-                    next_due=request.POST.get('next_due', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_schedule_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                schedules = list_schedules(conn, status=status_filter or None,
-                                           search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_schedule_list.html', _maint_ctx(
-        request, schedules=schedules, mechanics=mechanics,
-        status_filter=status_filter, search=search,
-        schedule_statuses=SCHEDULE_STATUSES, frequencies=FREQUENCIES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_schedule_detail(request, sched_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    schedule = None
-    mechanics = []
-    try:
-        schedule = get_schedule(conn, sched_id)
-        if not schedule:
-            return redirect('maint_schedule_list')
-        mechanics = load_mechanics(conn)
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'complete':
-                    complete_schedule(conn, sched_id)
-                    success = 'PM task marked complete.'
-                else:
-                    update_schedule(
-                        conn, sched_id,
-                        task=request.POST.get('task', ''),
-                        equipment=request.POST.get('equipment', ''),
-                        frequency=request.POST.get('frequency', ''),
-                        assigned_to=request.POST.get('assigned_to', ''),
-                        last_done=request.POST.get('last_done', ''),
-                        next_due=request.POST.get('next_due', ''),
-                        status=request.POST.get('status', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Schedule updated.'
-                conn.commit()
-                schedule = get_schedule(conn, sched_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_schedule_detail.html', _maint_ctx(
-        request, schedule=schedule, mechanics=mechanics, can_edit=can_edit,
-        schedule_statuses=SCHEDULE_STATUSES, frequencies=FREQUENCIES,
-        error=error, success=success,
-    ))
-
-
-# --- Inspections ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_inspection_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    inspections = []
-    try:
-        inspections = maint_list_inspections(conn, status=status_filter or None,
-                                             search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                maint_create_inspection(
-                    conn,
-                    area=request.POST.get('area', ''),
-                    inspection_type=request.POST.get('inspection_type', 'General'),
-                    inspector=request.POST.get('inspector', ''),
-                    scheduled_date=request.POST.get('scheduled_date', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_inspection_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                inspections = maint_list_inspections(
-                    conn, status=status_filter or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_inspection_list.html', _maint_ctx(
-        request, inspections=inspections, status_filter=status_filter,
-        search=search, inspection_statuses=INSPECTION_STATUSES,
-        inspection_types=INSPECTION_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_inspection_detail(request, insp_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    inspection = None
-    try:
-        inspection = maint_get_inspection(conn, insp_id)
-        if not inspection:
-            return redirect('maint_inspection_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'complete':
-                    complete_inspection(
-                        conn, insp_id,
-                        result=request.POST.get('result', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Inspection completed.'
-                else:
-                    maint_update_inspection(
-                        conn, insp_id,
-                        area=request.POST.get('area', ''),
-                        inspection_type=request.POST.get('inspection_type', ''),
-                        inspector=request.POST.get('inspector', ''),
-                        scheduled_date=request.POST.get('scheduled_date', ''),
-                        completed_date=request.POST.get('completed_date', ''),
-                        result=request.POST.get('result', ''),
-                        status=request.POST.get('status', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Inspection updated.'
-                conn.commit()
-                inspection = maint_get_inspection(conn, insp_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_inspection_detail.html', _maint_ctx(
-        request, inspection=inspection, can_edit=can_edit,
-        inspection_statuses=INSPECTION_STATUSES,
-        inspection_types=INSPECTION_TYPES,
-        error=error, success=success,
-    ))
-
-
-# --- Downtime ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_downtime_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    downtime_records = []
-    try:
-        downtime_records = list_downtime(conn, status=status_filter or None,
-                                         search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_downtime(
-                    conn,
-                    equipment=request.POST.get('equipment', ''),
-                    reason=request.POST.get('reason', ''),
-                    category=request.POST.get('category', 'Breakdown'),
-                    down_date=request.POST.get('down_date', ''),
-                    hours=request.POST.get('hours', ''),
-                    cost=request.POST.get('cost', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_downtime_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                downtime_records = list_downtime(conn, status=status_filter or None,
-                                                 search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_downtime_list.html', _maint_ctx(
-        request, downtime_records=downtime_records,
-        status_filter=status_filter, search=search,
-        downtime_statuses=DOWNTIME_STATUSES,
-        downtime_categories=DOWNTIME_CATEGORIES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_downtime_detail(request, dt_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    record = None
-    try:
-        record = get_downtime(conn, dt_id)
-        if not record:
-            return redirect('maint_downtime_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'resolve':
-                    resolve_downtime(conn, dt_id)
-                    success = 'Downtime marked resolved.'
-                else:
-                    update_downtime(
-                        conn, dt_id,
-                        equipment=request.POST.get('equipment', ''),
-                        reason=request.POST.get('reason', ''),
-                        category=request.POST.get('category', ''),
-                        down_date=request.POST.get('down_date', ''),
-                        hours=request.POST.get('hours', ''),
-                        cost=request.POST.get('cost', ''),
-                        status=request.POST.get('status', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Record updated.'
-                conn.commit()
-                record = get_downtime(conn, dt_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_downtime_detail.html', _maint_ctx(
-        request, record=record, can_edit=can_edit,
-        downtime_statuses=DOWNTIME_STATUSES,
-        downtime_categories=DOWNTIME_CATEGORIES,
-        error=error, success=success,
-    ))
-
-
-# --- Parts ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_parts_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    parts = []
-    try:
-        parts = list_parts(conn, status=status_filter or None,
-                           search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_part(
-                    conn,
-                    name=request.POST.get('name', ''),
-                    part_number=request.POST.get('part_number', ''),
-                    category=request.POST.get('category', 'Other'),
-                    location=request.POST.get('location', ''),
-                    quantity=request.POST.get('quantity', ''),
-                    reorder_level=request.POST.get('reorder_level', ''),
-                    unit_cost=request.POST.get('unit_cost', ''),
-                    status=request.POST.get('status', 'In Stock'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_parts_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                parts = list_parts(conn, status=status_filter or None,
-                                   search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_parts_list.html', _maint_ctx(
-        request, parts=parts, status_filter=status_filter, search=search,
-        part_statuses=PART_STATUSES, part_categories=PART_CATEGORIES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_part_detail(request, part_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    part = None
-    try:
-        part = get_part(conn, part_id)
-        if not part:
-            return redirect('maint_parts_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_part(
-                    conn, part_id,
-                    name=request.POST.get('name', ''),
-                    part_number=request.POST.get('part_number', ''),
-                    category=request.POST.get('category', ''),
-                    location=request.POST.get('location', ''),
-                    quantity=request.POST.get('quantity', ''),
-                    reorder_level=request.POST.get('reorder_level', ''),
-                    unit_cost=request.POST.get('unit_cost', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                part = get_part(conn, part_id)
-                success = 'Part updated.'
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_part_detail.html', _maint_ctx(
-        request, part=part, can_edit=can_edit,
-        part_statuses=PART_STATUSES, part_categories=PART_CATEGORIES,
-        error=error, success=success,
-    ))
-
-
-# --- Mechanics ---
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_mechanics_list(request):
-    status_filter = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    conn = get_db_connection()
-    error = success = None
-    mechanics = []
-    try:
-        mechanics = list_mechanics(conn, status=status_filter or None,
-                                   search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_mechanic(
-                    conn,
-                    name=request.POST.get('name', ''),
-                    trade=request.POST.get('trade', 'General'),
-                    shift=request.POST.get('shift', 'Day'),
-                    phone=request.POST.get('phone', ''),
-                    status=request.POST.get('status', 'Active'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('maint_mechanics_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                mechanics = list_mechanics(conn, status=status_filter or None,
-                                           search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'maint_mechanics_list.html', _maint_ctx(
-        request, mechanics=mechanics, status_filter=status_filter,
-        search=search, mechanic_statuses=MECHANIC_STATUSES,
-        mechanic_trades=MECHANIC_TRADES, mechanic_shifts=MECHANIC_SHIFTS,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_MAINT_DEPT_KEYS)
-def maint_mechanic_detail(request, mech_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    mechanic = None
-    try:
-        mechanic = get_mechanic(conn, mech_id)
-        if not mechanic:
-            return redirect('maint_mechanics_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_mechanic(
-                    conn, mech_id,
-                    name=request.POST.get('name', ''),
-                    trade=request.POST.get('trade', ''),
-                    shift=request.POST.get('shift', ''),
-                    phone=request.POST.get('phone', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                mechanic = get_mechanic(conn, mech_id)
-                success = 'Mechanic updated.'
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'maint_mechanic_detail.html', _maint_ctx(
-        request, mechanic=mechanic, can_edit=can_edit,
-        mechanic_statuses=MECHANIC_STATUSES,
-        mechanic_trades=MECHANIC_TRADES, mechanic_shifts=MECHANIC_SHIFTS,
-        error=error, success=success,
-    ))
-
-
-# ---------------------------------------------------------------------------
-# Payroll
-# ---------------------------------------------------------------------------
-
-_PAYROLL_DEPT_KEYS = {'payroll', 'accounting', 'finance'}
-
-
-def _payroll_ctx(request, **extra):
-    return {
-        'email': request.session.get('user_email', ''),
-        'user_role': request.session.get('user_role', ''),
-        'full_access': request.session.get('user_full_access', False),
-        'can_edit': (
-            request.session.get('user_full_access')
-            or request.session.get('user_dept_key') in _PAYROLL_DEPT_KEYS
-        ) and request.session.get('user_role') not in READ_ONLY_ROLES,
-        **extra,
-    }
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_dashboard(request):
-    conn = get_db_connection()
-    try:
-        counts = payroll_get_dashboard_counts(conn)
-        runs = list_payroll_runs(conn)[:5]
-    finally:
-        conn.close()
-    return render(request, 'payroll_dashboard.html', _payroll_ctx(
-        request, counts=counts, recent_runs=runs,
-    ))
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_pay_rates(request):
-    can_edit = _payroll_ctx(request)['can_edit']
-    search = request.GET.get('search', '').strip()
-    success = error = ''
-
-    if request.method == 'POST' and can_edit:
-        action = request.POST.get('action', '')
-        conn = get_db_connection()
-        try:
-            if action == 'upsert':
-                pid = int(request.POST.get('people_id', 0))
-                pay_type = request.POST.get('pay_type', 'hourly')
-                try:
-                    pay_rate = float(request.POST.get('pay_rate', '0') or '0')
-                except ValueError:
-                    pay_rate = 0.0
-                eff_date = request.POST.get('effective_date', '').strip()
-                upsert_pay_rate(conn, pid, pay_type, pay_rate, eff_date)
-                conn.commit()
-                success = 'Pay rate saved.'
-            elif action == 'delete':
-                pid = int(request.POST.get('people_id', 0))
-                delete_pay_rate(conn, pid)
-                conn.commit()
-                success = 'Pay rate removed.'
-        except Exception as e:
-            conn.rollback()
-            error = str(e)
-        finally:
-            conn.close()
-
-    conn = get_db_connection()
-    try:
-        employees = list_pay_rates(conn, search=search or None)
-        people = payroll_load_people(conn)
-    finally:
-        conn.close()
-    return render(request, 'payroll_pay_rates.html', _payroll_ctx(
-        request, employees=employees, people=people,
-        pay_types=PAY_TYPES, search=search,
-        success=success, error=error,
-    ))
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_deductions(request):
-    can_edit = _payroll_ctx(request)['can_edit']
-    people_filter = request.GET.get('people_id', '').strip()
-    success = error = ''
-
-    if request.method == 'POST' and can_edit:
-        action = request.POST.get('action', '')
-        conn = get_db_connection()
-        try:
-            if action == 'create_type':
-                name = request.POST.get('name', '').strip()
-                cat = request.POST.get('category', 'Other')
-                is_pre = request.POST.get('is_pre_tax') == '1'
-                create_deduction_type(conn, name, cat, is_pre)
-                conn.commit()
-                success = 'Deduction type added.'
-            elif action == 'update_type':
-                did = int(request.POST.get('ded_id', 0))
-                name = request.POST.get('name', '').strip()
-                cat = request.POST.get('category', 'Other')
-                is_pre = request.POST.get('is_pre_tax') == '1'
-                is_act = request.POST.get('is_active') == '1'
-                update_deduction_type(conn, did, name, cat, is_pre, is_act)
-                conn.commit()
-                success = 'Deduction type updated.'
-            elif action == 'assign':
-                pid = int(request.POST.get('people_id', 0))
-                tid = int(request.POST.get('deduction_type_id', 0))
-                method = request.POST.get('calc_method', 'flat')
-                try:
-                    amt = float(request.POST.get('amount', '0') or '0')
-                except ValueError:
-                    amt = 0.0
-                is_act = request.POST.get('is_active', '1') == '1'
-                notes = request.POST.get('notes', '')
-                create_employee_deduction(conn, pid, tid, method, amt, is_act, notes)
-                conn.commit()
-                success = 'Deduction assigned.'
-            elif action == 'remove_assign':
-                eid = int(request.POST.get('emp_ded_id', 0))
-                delete_employee_deduction(conn, eid)
-                conn.commit()
-                success = 'Assignment removed.'
-        except Exception as e:
-            conn.rollback()
-            error = str(e)
-        finally:
-            conn.close()
-
-    conn = get_db_connection()
-    try:
-        ded_types = list_deduction_types(conn)
-        active_types = list_deduction_types(conn, active_only=True)
-        pid = int(people_filter) if people_filter else None
-        emp_deds = list_employee_deductions(conn, people_id=pid)
-        people = payroll_load_people(conn)
-    finally:
-        conn.close()
-    return render(request, 'payroll_deductions.html', _payroll_ctx(
-        request, ded_types=ded_types, active_types=active_types,
-        emp_deds=emp_deds, people=people,
-        ded_categories=DED_CATEGORIES, ded_methods=DED_METHODS,
-        people_filter=people_filter,
-        success=success, error=error,
-    ))
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_history(request):
-    conn = get_db_connection()
-    try:
-        runs = list_payroll_runs(conn)
-    finally:
-        conn.close()
-    return render(request, 'payroll_history.html', _payroll_ctx(
-        request, runs=runs,
-    ))
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_run_detail(request, run_id):
-    conn = get_db_connection()
-    try:
-        run = get_payroll_run(conn, run_id)
-        if not run:
-            return redirect('/payroll/history/')
-        entries = get_run_entries(conn, run_id)
-    finally:
-        conn.close()
-    total_gross = sum(e.get('gross_pay') or 0 for e in entries)
-    total_net   = sum(e.get('net_pay') or 0 for e in entries)
-    return render(request, 'payroll_run_detail.html', _payroll_ctx(
-        request, run=run, entries=entries,
-        total_gross=total_gross, total_net=total_net,
-    ))
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_stub_detail(request, entry_id):
-    conn = get_db_connection()
-    try:
-        stub = get_pay_stub(conn, entry_id)
-        if not stub:
-            return redirect('/payroll/history/')
-        deds = get_stub_deductions(conn, entry_id)
-    finally:
-        conn.close()
-    pre_tax  = [d for d in deds if d.get('is_pre_tax')]
-    post_tax = [d for d in deds if not d.get('is_pre_tax')]
-    total_tax = (
-        (stub.get('federal_tax') or 0)
-        + (stub.get('state_tax') or 0)
-        + (stub.get('social_security') or 0)
-        + (stub.get('medicare') or 0)
-    )
-    return render(request, 'payroll_stub_detail.html', _payroll_ctx(
-        request, stub=stub, pre_tax=pre_tax, post_tax=post_tax,
-        total_tax=total_tax,
-        ss_rate=SS_RATE, medicare_rate=MEDICARE_RATE,
-    ))
-
-
-@dept_required(_PAYROLL_DEPT_KEYS)
-def payroll_ytd(request):
-    import datetime as _dt
-    cur_year = _dt.date.today().year
-    try:
-        year = int(request.GET.get('year', cur_year))
-    except ValueError:
-        year = cur_year
-    people_id_str = request.GET.get('people_id', '').strip()
-    pid = int(people_id_str) if people_id_str else None
-
-    conn = get_db_connection()
-    try:
-        rows = get_ytd(conn, year, pid)
-        people = payroll_load_people(conn)
-    finally:
-        conn.close()
-
-    totals = {k: 0.0 for k in
-              ('reg_hrs', 'ot_hrs', 'gross', 'pre_deds',
-               'fed', 'state_tax', 'ss', 'medicare', 'net')}
-    run_count_total = 0
-    for r in rows:
-        for k in totals:
-            totals[k] += r.get(k) or 0.0
-        run_count_total += r.get('run_count') or 0
-
-    years = list(range(cur_year, cur_year - 6, -1))
-    return render(request, 'payroll_ytd.html', _payroll_ctx(
-        request, rows=rows, totals=totals,
-        run_count_total=run_count_total,
-        year=year, years=years,
-        people=people, people_id=pid,
-    ))
-
-
 from .accounting_core import (  # noqa: E402
     INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors, load_customers,  # noqa: F811
     get_ap_dashboard, list_ap_invoices, get_ap_invoice,
@@ -7644,1192 +6338,6 @@ def fin_dashboard(request):
 
 
 # ---------------------------------------------------------------------------
-# IT dashboard
-# ---------------------------------------------------------------------------
-
-def _it_ctx(request, **extra):
-    return {
-        'user_email': request.session.get('user_email', ''),
-        'user_role': request.session.get('user_role', ''),
-        **extra,
-    }
-
-
-@dept_required('information_tech')
-def it_dashboard(request):
-    with get_db_connection() as conn:
-        data = get_it_dashboard(conn)
-    ctx = _it_ctx(request, **data)
-    return render(request, 'it_dashboard.html', ctx)
-
-
-@dept_required('information_tech')
-def it_ticket_list(request):
-    status_f = request.GET.get('status', '').strip()
-    priority_f = request.GET.get('priority', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        tickets = list_it_tickets(conn, status=status_f or None,
-                                  priority=priority_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                num = next_ticket_number(conn)
-                create_it_ticket(
-                    conn,
-                    ticket_number=num,
-                    requester=request.POST.get('requester', ''),
-                    department=request.POST.get('department', ''),
-                    issue_type=request.POST.get('issue_type', ''),
-                    description=request.POST.get('description', ''),
-                    priority=request.POST.get('priority', 'medium'),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    submitted_date=request.POST.get('submitted_date', '') or date.today().isoformat(),
-                    due_date=request.POST.get('due_date', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('it_ticket_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                tickets = list_it_tickets(conn, status=status_f or None,
-                                          priority=priority_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'it_ticket_list.html', _it_ctx(
-        request, tickets=tickets, status_filter=status_f, priority_filter=priority_f,
-        search=search, ticket_statuses=TICKET_STATUSES, ticket_priorities=TICKET_PRIORITIES,
-        issue_types=ISSUE_TYPES, today=date.today().isoformat(),
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_ticket_detail(request, ticket_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    ticket = None
-    try:
-        ticket = get_it_ticket(conn, ticket_id)
-        if not ticket:
-            return redirect('it_ticket_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'status':
-                    set_it_ticket_status(conn, ticket_id, request.POST.get('status', ''))
-                    success = 'Status updated.'
-                else:
-                    update_it_ticket(
-                        conn, ticket_id,
-                        requester=request.POST.get('requester', ''),
-                        department=request.POST.get('department', ''),
-                        issue_type=request.POST.get('issue_type', ''),
-                        description=request.POST.get('description', ''),
-                        priority=request.POST.get('priority', ''),
-                        assigned_to=request.POST.get('assigned_to', ''),
-                        submitted_date=request.POST.get('submitted_date', ''),
-                        due_date=request.POST.get('due_date', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Ticket updated.'
-                conn.commit()
-                ticket = get_it_ticket(conn, ticket_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'it_ticket_detail.html', _it_ctx(
-        request, ticket=ticket, can_edit=can_edit,
-        ticket_statuses=TICKET_STATUSES, ticket_priorities=TICKET_PRIORITIES,
-        issue_types=ISSUE_TYPES, error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_asset_list(request):
-    status_f = request.GET.get('status', '').strip()
-    type_f = request.GET.get('asset_type', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        assets = list_assets(conn, status=status_f or None,
-                             asset_type=type_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_asset(
-                    conn,
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    asset_type=request.POST.get('asset_type', ''),
-                    make=request.POST.get('make', ''),
-                    model=request.POST.get('model', ''),
-                    serial_number=request.POST.get('serial_number', ''),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    department=request.POST.get('department', ''),
-                    purchase_date=request.POST.get('purchase_date', ''),
-                    warranty_exp=request.POST.get('warranty_exp', ''),
-                    status=request.POST.get('status', 'active'),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('it_asset_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                assets = list_assets(conn, status=status_f or None,
-                                     asset_type=type_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'it_asset_list.html', _it_ctx(
-        request, assets=assets, status_filter=status_f, type_filter=type_f,
-        search=search, asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_asset_detail(request, asset_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    asset = None
-    try:
-        asset = get_asset(conn, asset_id)
-        if not asset:
-            return redirect('it_asset_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_asset(
-                    conn, asset_id,
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    asset_type=request.POST.get('asset_type', ''),
-                    make=request.POST.get('make', ''),
-                    model=request.POST.get('model', ''),
-                    serial_number=request.POST.get('serial_number', ''),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    department=request.POST.get('department', ''),
-                    purchase_date=request.POST.get('purchase_date', ''),
-                    warranty_exp=request.POST.get('warranty_exp', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Asset updated.'
-                asset = get_asset(conn, asset_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'it_asset_detail.html', _it_ctx(
-        request, asset=asset, can_edit=can_edit,
-        asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_repairs_list(request):
-    status_f = request.GET.get('status', '').strip()
-    priority_f = request.GET.get('priority', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        repairs = list_repairs(conn, status=status_f or None,
-                               priority=priority_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_repair(
-                    conn,
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    problem_description=request.POST.get('problem_description', ''),
-                    reported_by=request.POST.get('reported_by', ''),
-                    reported_date=request.POST.get('reported_date', '') or date.today().isoformat(),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    priority=request.POST.get('priority', 'medium'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('it_repairs_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                repairs = list_repairs(conn, status=status_f or None,
-                                       priority=priority_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'it_repairs_list.html', _it_ctx(
-        request, repairs=repairs, status_filter=status_f, priority_filter=priority_f,
-        search=search, repair_statuses=REPAIR_STATUSES, repair_priorities=REPAIR_PRIORITIES,
-        today=date.today().isoformat(), error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_repairs_detail(request, repair_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    repair = None
-    try:
-        repair = get_repair(conn, repair_id)
-        if not repair:
-            return redirect('it_repairs_list')
-        if request.method == 'POST' and can_edit:
-            action = request.POST.get('action', 'update')
-            try:
-                if action == 'status':
-                    set_repair_status(conn, repair_id, request.POST.get('status', ''))
-                    success = 'Status updated.'
-                else:
-                    update_repair(
-                        conn, repair_id,
-                        asset_tag=request.POST.get('asset_tag', ''),
-                        problem_description=request.POST.get('problem_description', ''),
-                        reported_by=request.POST.get('reported_by', ''),
-                        reported_date=request.POST.get('reported_date', ''),
-                        assigned_to=request.POST.get('assigned_to', ''),
-                        priority=request.POST.get('priority', ''),
-                        resolution=request.POST.get('resolution', ''),
-                        notes=request.POST.get('notes', ''),
-                    )
-                    success = 'Repair updated.'
-                conn.commit()
-                repair = get_repair(conn, repair_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'it_repairs_detail.html', _it_ctx(
-        request, repair=repair, can_edit=can_edit,
-        repair_statuses=REPAIR_STATUSES, repair_priorities=REPAIR_PRIORITIES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_software_list(request):
-    status_f = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        installs = list_software(conn, status=status_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_software(
-                    conn,
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    software_name=request.POST.get('software_name', ''),
-                    version=request.POST.get('version', ''),
-                    vendor=request.POST.get('vendor', ''),
-                    install_date=request.POST.get('install_date', '') or date.today().isoformat(),
-                    status=request.POST.get('status', 'installed'),
-                    installed_by=request.POST.get('installed_by', ''),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('it_software_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                installs = list_software(conn, status=status_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'it_software_list.html', _it_ctx(
-        request, installs=installs, status_filter=status_f, search=search,
-        software_statuses=SOFTWARE_STATUSES, today=date.today().isoformat(),
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_software_detail(request, sw_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    install = None
-    try:
-        install = get_software(conn, sw_id)
-        if not install:
-            return redirect('it_software_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_software(
-                    conn, sw_id,
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    software_name=request.POST.get('software_name', ''),
-                    version=request.POST.get('version', ''),
-                    vendor=request.POST.get('vendor', ''),
-                    install_date=request.POST.get('install_date', ''),
-                    status=request.POST.get('status', ''),
-                    installed_by=request.POST.get('installed_by', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Record updated.'
-                install = get_software(conn, sw_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'it_software_detail.html', _it_ctx(
-        request, install=install, can_edit=can_edit,
-        software_statuses=SOFTWARE_STATUSES, error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_license_list(request):
-    status_f = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        licenses = list_licenses(conn, status=status_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_license(
-                    conn,
-                    software_name=request.POST.get('software_name', ''),
-                    vendor=request.POST.get('vendor', ''),
-                    license_key=request.POST.get('license_key', ''),
-                    license_type=request.POST.get('license_type', 'perpetual'),
-                    seats=int(request.POST.get('seats', '1') or 1),
-                    seats_used=int(request.POST.get('seats_used', '0') or 0),
-                    purchase_date=request.POST.get('purchase_date', '') or None,
-                    expiry_date=request.POST.get('expiry_date', '') or None,
-                    cost=float(request.POST.get('cost', '0') or 0),
-                    status=request.POST.get('status', 'active'),
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('it_license_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                licenses = list_licenses(conn, status=status_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'it_license_list.html', _it_ctx(
-        request, licenses=licenses, status_filter=status_f, search=search,
-        license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_license_detail(request, license_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    lic = None
-    try:
-        lic = get_license(conn, license_id)
-        if not lic:
-            return redirect('it_license_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_license(
-                    conn, license_id,
-                    software_name=request.POST.get('software_name', ''),
-                    vendor=request.POST.get('vendor', ''),
-                    license_key=request.POST.get('license_key', ''),
-                    license_type=request.POST.get('license_type', ''),
-                    seats=int(request.POST.get('seats', '1') or 1),
-                    seats_used=int(request.POST.get('seats_used', '0') or 0),
-                    purchase_date=request.POST.get('purchase_date', '') or None,
-                    expiry_date=request.POST.get('expiry_date', '') or None,
-                    cost=float(request.POST.get('cost', '0') or 0),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'License updated.'
-                lic = get_license(conn, license_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'it_license_detail.html', _it_ctx(
-        request, lic=lic, can_edit=can_edit,
-        license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_network_list(request):
-    status_f = request.GET.get('status', '').strip()
-    type_f = request.GET.get('device_type', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        devices = list_network_devices(conn, status=status_f or None,
-                                       device_type=type_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_network_device(
-                    conn,
-                    hostname=request.POST.get('hostname', ''),
-                    ip_address=request.POST.get('ip_address', ''),
-                    mac_address=request.POST.get('mac_address', ''),
-                    device_type=request.POST.get('device_type', ''),
-                    manufacturer=request.POST.get('manufacturer', ''),
-                    model=request.POST.get('model', ''),
-                    location=request.POST.get('location', ''),
-                    status=request.POST.get('status', 'unknown'),
-                    last_seen=request.POST.get('last_seen', '') or None,
-                    notes=request.POST.get('notes', ''),
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                return redirect('it_network_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                devices = list_network_devices(conn, status=status_f or None,
-                                               device_type=type_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'it_network_list.html', _it_ctx(
-        request, devices=devices, status_filter=status_f, type_filter=type_f,
-        search=search, device_types=NETWORK_DEVICE_TYPES,
-        device_statuses=NETWORK_DEVICE_STATUSES, today=date.today().isoformat(),
-        error=error, success=success,
-    ))
-
-
-@dept_required('information_tech')
-def it_network_detail(request, device_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    device = None
-    try:
-        device = get_network_device(conn, device_id)
-        if not device:
-            return redirect('it_network_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_network_device(
-                    conn, device_id,
-                    hostname=request.POST.get('hostname', ''),
-                    ip_address=request.POST.get('ip_address', ''),
-                    mac_address=request.POST.get('mac_address', ''),
-                    device_type=request.POST.get('device_type', ''),
-                    manufacturer=request.POST.get('manufacturer', ''),
-                    model=request.POST.get('model', ''),
-                    location=request.POST.get('location', ''),
-                    status=request.POST.get('status', ''),
-                    last_seen=request.POST.get('last_seen', '') or None,
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Device updated.'
-                device = get_network_device(conn, device_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'it_network_detail.html', _it_ctx(
-        request, device=device, can_edit=can_edit,
-        device_types=NETWORK_DEVICE_TYPES, device_statuses=NETWORK_DEVICE_STATUSES,
-        error=error, success=success,
-    ))
-
-
-# ---------------------------------------------------------------------------
-# Legal dashboard
-# ---------------------------------------------------------------------------
-
-_LEGAL_DEPT_KEYS = {'legal', 'risk_management'}
-
-
-def _legal_ctx(request, **extra):
-    return {
-        'user_email': request.session.get('user_email', ''),
-        'user_role': request.session.get('user_role', ''),
-        **extra,
-    }
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_dashboard(request):
-    with get_db_connection() as conn:
-        data = get_legal_dashboard(conn)
-    ctx = _legal_ctx(request, **data)
-    return render(request, 'legal_dashboard.html', ctx)
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_contract_list(request):
-    status_f = request.GET.get('status', '').strip()
-    type_f = request.GET.get('contract_type', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        contracts = list_contracts(conn, status=status_f or None,
-                                   contract_type=type_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_contract(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    counterparty=request.POST.get('counterparty', ''),
-                    contract_type=request.POST.get('contract_type', ''),
-                    value=float(request.POST.get('value', 0) or 0),
-                    start_date=request.POST.get('start_date', ''),
-                    end_date=request.POST.get('end_date', ''),
-                    owner=request.POST.get('owner', ''),
-                    status=request.POST.get('status', 'Draft'),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('legal_contract_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                contracts = list_contracts(conn, status=status_f or None,
-                                           contract_type=type_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'legal_contract_list.html', _legal_ctx(
-        request, contracts=contracts, status_filter=status_f, type_filter=type_f,
-        search=search, contract_statuses=CONTRACT_STATUSES, contract_types=CONTRACT_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_contract_detail(request, contract_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    contract = None
-    try:
-        contract = get_contract(conn, contract_id)
-        if not contract:
-            return redirect('legal_contract_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_contract(
-                    conn, contract_id,
-                    title=request.POST.get('title', ''),
-                    counterparty=request.POST.get('counterparty', ''),
-                    contract_type=request.POST.get('contract_type', ''),
-                    value=float(request.POST.get('value', 0) or 0),
-                    start_date=request.POST.get('start_date', ''),
-                    end_date=request.POST.get('end_date', ''),
-                    owner=request.POST.get('owner', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Contract updated.'
-                contract = get_contract(conn, contract_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'legal_contract_detail.html', _legal_ctx(
-        request, contract=contract, can_edit=can_edit,
-        contract_statuses=CONTRACT_STATUSES, contract_types=CONTRACT_TYPES,
-        error=error, success=success,
-    ))
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_compliance_list(request):
-    status_f = request.GET.get('status', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        items = list_compliance(conn, status=status_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_compliance(
-                    conn,
-                    requirement=request.POST.get('requirement', ''),
-                    regulation=request.POST.get('regulation', ''),
-                    owner=request.POST.get('owner', ''),
-                    due_date=request.POST.get('due_date', ''),
-                    status=request.POST.get('status', 'Pending'),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('legal_compliance_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                items = list_compliance(conn, status=status_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'legal_compliance_list.html', _legal_ctx(
-        request, items=items, status_filter=status_f, search=search,
-        compliance_statuses=COMPLIANCE_STATUSES, error=error, success=success,
-    ))
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_compliance_detail(request, item_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    item = None
-    try:
-        item = get_compliance_item(conn, item_id)
-        if not item:
-            return redirect('legal_compliance_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_compliance(
-                    conn, item_id,
-                    requirement=request.POST.get('requirement', ''),
-                    regulation=request.POST.get('regulation', ''),
-                    owner=request.POST.get('owner', ''),
-                    due_date=request.POST.get('due_date', ''),
-                    completed_date=request.POST.get('completed_date', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Item updated.'
-                item = get_compliance_item(conn, item_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'legal_compliance_detail.html', _legal_ctx(
-        request, item=item, can_edit=can_edit,
-        compliance_statuses=COMPLIANCE_STATUSES, error=error, success=success,
-    ))
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_litigation_list(request):
-    status_f = request.GET.get('status', '').strip()
-    type_f = request.GET.get('case_type', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        cases = list_litigation(conn, status=status_f or None,
-                                case_type=type_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_litigation(
-                    conn,
-                    case_name=request.POST.get('case_name', ''),
-                    opposing_party=request.POST.get('opposing_party', ''),
-                    court=request.POST.get('court', ''),
-                    case_type=request.POST.get('case_type', ''),
-                    filed_date=request.POST.get('filed_date', ''),
-                    status=request.POST.get('status', 'Open'),
-                    outcome=request.POST.get('outcome', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('legal_litigation_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                cases = list_litigation(conn, status=status_f or None,
-                                        case_type=type_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'legal_litigation_list.html', _legal_ctx(
-        request, cases=cases, status_filter=status_f, type_filter=type_f,
-        search=search, litigation_statuses=LITIGATION_STATUSES,
-        litigation_types=LITIGATION_TYPES, error=error, success=success,
-    ))
-
-
-@dept_required(_LEGAL_DEPT_KEYS)
-def legal_litigation_detail(request, case_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    case = None
-    try:
-        case = get_litigation_case(conn, case_id)
-        if not case:
-            return redirect('legal_litigation_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_litigation(
-                    conn, case_id,
-                    case_name=request.POST.get('case_name', ''),
-                    opposing_party=request.POST.get('opposing_party', ''),
-                    court=request.POST.get('court', ''),
-                    case_type=request.POST.get('case_type', ''),
-                    filed_date=request.POST.get('filed_date', ''),
-                    status=request.POST.get('status', ''),
-                    outcome=request.POST.get('outcome', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Case updated.'
-                case = get_litigation_case(conn, case_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'legal_litigation_detail.html', _legal_ctx(
-        request, case=case, can_edit=can_edit,
-        litigation_statuses=LITIGATION_STATUSES, litigation_types=LITIGATION_TYPES,
-        error=error, success=success,
-    ))
-
-
-# ---------------------------------------------------------------------------
-# Marketing dashboard
-# ---------------------------------------------------------------------------
-
-def _mkt_ctx(request, **extra):
-    return {
-        'user_email': request.session.get('user_email', ''),
-        'user_role': request.session.get('user_role', ''),
-        **extra,
-    }
-
-
-@dept_required('marketing')
-def mkt_dashboard(request):
-    with get_db_connection() as conn:
-        data = get_marketing_dashboard(conn)
-    ctx = _mkt_ctx(request, **data)
-    return render(request, 'marketing_dashboard.html', ctx)
-
-
-@dept_required('marketing')
-def mkt_campaign_list(request):
-    status_f = request.GET.get('status', '').strip()
-    channel_f = request.GET.get('channel', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        campaigns = list_campaigns(conn, status=status_f or None,
-                                   channel=channel_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_campaign(
-                    conn,
-                    name=request.POST.get('name', ''),
-                    channel=request.POST.get('channel', ''),
-                    objective=request.POST.get('objective', ''),
-                    owner=request.POST.get('owner', ''),
-                    start_date=request.POST.get('start_date', ''),
-                    end_date=request.POST.get('end_date', ''),
-                    budget=float(request.POST.get('budget', 0) or 0),
-                    status=request.POST.get('status', 'Planned'),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('mkt_campaign_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                campaigns = list_campaigns(conn, status=status_f or None,
-                                           channel=channel_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'mkt_campaign_list.html', _mkt_ctx(
-        request, campaigns=campaigns, status_filter=status_f, channel_filter=channel_f,
-        search=search, campaign_statuses=CAMPAIGN_STATUSES, channels=CHANNELS,
-        objectives=OBJECTIVES, error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_campaign_detail(request, campaign_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    campaign = None
-    try:
-        campaign = get_campaign(conn, campaign_id)
-        if not campaign:
-            return redirect('mkt_campaign_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_campaign(
-                    conn, campaign_id,
-                    name=request.POST.get('name', ''),
-                    channel=request.POST.get('channel', ''),
-                    objective=request.POST.get('objective', ''),
-                    owner=request.POST.get('owner', ''),
-                    start_date=request.POST.get('start_date', ''),
-                    end_date=request.POST.get('end_date', ''),
-                    budget=float(request.POST.get('budget', 0) or 0),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Campaign updated.'
-                campaign = get_campaign(conn, campaign_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'mkt_campaign_detail.html', _mkt_ctx(
-        request, campaign=campaign, can_edit=can_edit,
-        campaign_statuses=CAMPAIGN_STATUSES, channels=CHANNELS, objectives=OBJECTIVES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_lead_list(request):
-    status_f = request.GET.get('status', '').strip()
-    source_f = request.GET.get('source', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        leads = list_leads(conn, status=status_f or None,
-                           source=source_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_lead(
-                    conn,
-                    name=request.POST.get('name', ''),
-                    company=request.POST.get('company', ''),
-                    email=request.POST.get('email', ''),
-                    source=request.POST.get('source', ''),
-                    owner=request.POST.get('owner', ''),
-                    captured_date=request.POST.get('captured_date', ''),
-                    status=request.POST.get('status', 'New'),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('mkt_lead_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                leads = list_leads(conn, status=status_f or None,
-                                   source=source_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'mkt_lead_list.html', _mkt_ctx(
-        request, leads=leads, status_filter=status_f, source_filter=source_f,
-        search=search, lead_statuses=LEAD_STATUSES, lead_sources=LEAD_SOURCES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_lead_detail(request, lead_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    lead = None
-    try:
-        lead = get_lead(conn, lead_id)
-        if not lead:
-            return redirect('mkt_lead_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_lead(
-                    conn, lead_id,
-                    name=request.POST.get('name', ''),
-                    company=request.POST.get('company', ''),
-                    email=request.POST.get('email', ''),
-                    source=request.POST.get('source', ''),
-                    owner=request.POST.get('owner', ''),
-                    captured_date=request.POST.get('captured_date', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Lead updated.'
-                lead = get_lead(conn, lead_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'mkt_lead_detail.html', _mkt_ctx(
-        request, lead=lead, can_edit=can_edit,
-        lead_statuses=LEAD_STATUSES, lead_sources=LEAD_SOURCES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_content_list(request):
-    status_f = request.GET.get('status', '').strip()
-    type_f = request.GET.get('content_type', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        items = list_content(conn, status=status_f or None,
-                             content_type=type_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_content(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    content_type=request.POST.get('content_type', ''),
-                    channel=request.POST.get('channel', ''),
-                    author=request.POST.get('author', ''),
-                    due_date=request.POST.get('due_date', ''),
-                    publish_date=request.POST.get('publish_date', ''),
-                    status=request.POST.get('status', 'Draft'),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('mkt_content_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                items = list_content(conn, status=status_f or None,
-                                     content_type=type_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'mkt_content_list.html', _mkt_ctx(
-        request, items=items, status_filter=status_f, type_filter=type_f,
-        search=search, content_statuses=CONTENT_STATUSES, content_types=CONTENT_TYPES,
-        channels=CHANNELS, error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_content_detail(request, item_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    item = None
-    try:
-        item = get_content_item(conn, item_id)
-        if not item:
-            return redirect('mkt_content_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_content(
-                    conn, item_id,
-                    title=request.POST.get('title', ''),
-                    content_type=request.POST.get('content_type', ''),
-                    channel=request.POST.get('channel', ''),
-                    author=request.POST.get('author', ''),
-                    due_date=request.POST.get('due_date', ''),
-                    publish_date=request.POST.get('publish_date', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Content updated.'
-                item = get_content_item(conn, item_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'mkt_content_detail.html', _mkt_ctx(
-        request, item=item, can_edit=can_edit,
-        content_statuses=CONTENT_STATUSES, content_types=CONTENT_TYPES,
-        channels=CHANNELS, error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_ad_list(request):
-    status_f = request.GET.get('status', '').strip()
-    channel_f = request.GET.get('channel', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        ads = list_ads(conn, status=status_f or None,
-                       channel=channel_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_ad(
-                    conn,
-                    name=request.POST.get('name', ''),
-                    channel=request.POST.get('channel', ''),
-                    campaign_name=request.POST.get('campaign_name', ''),
-                    budget=float(request.POST.get('budget', 0) or 0),
-                    spend=float(request.POST.get('spend', 0) or 0),
-                    impressions=int(request.POST.get('impressions', 0) or 0),
-                    clicks=int(request.POST.get('clicks', 0) or 0),
-                    conversions=int(request.POST.get('conversions', 0) or 0),
-                    start_date=request.POST.get('start_date', '') or None,
-                    end_date=request.POST.get('end_date', '') or None,
-                    status=request.POST.get('status', 'Draft'),
-                    owner=request.POST.get('owner', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('mkt_ad_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                ads = list_ads(conn, status=status_f or None,
-                               channel=channel_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'mkt_ad_list.html', _mkt_ctx(
-        request, ads=ads, status_filter=status_f, channel_filter=channel_f,
-        search=search, ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
-        today=date.today().isoformat(), error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_ad_detail(request, ad_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    ad = None
-    try:
-        ad = get_ad(conn, ad_id)
-        if not ad:
-            return redirect('mkt_ad_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_ad(
-                    conn, ad_id,
-                    name=request.POST.get('name', ''),
-                    channel=request.POST.get('channel', ''),
-                    campaign_name=request.POST.get('campaign_name', ''),
-                    budget=float(request.POST.get('budget', 0) or 0),
-                    spend=float(request.POST.get('spend', 0) or 0),
-                    impressions=int(request.POST.get('impressions', 0) or 0),
-                    clicks=int(request.POST.get('clicks', 0) or 0),
-                    conversions=int(request.POST.get('conversions', 0) or 0),
-                    start_date=request.POST.get('start_date', '') or None,
-                    end_date=request.POST.get('end_date', '') or None,
-                    status=request.POST.get('status', ''),
-                    owner=request.POST.get('owner', ''),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Ad updated.'
-                ad = get_ad(conn, ad_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'mkt_ad_detail.html', _mkt_ctx(
-        request, ad=ad, can_edit=can_edit,
-        ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
-        error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_research_list(request):
-    status_f = request.GET.get('status', '').strip()
-    type_f = request.GET.get('research_type', '').strip()
-    search = request.GET.get('search', '').strip()
-    error = success = None
-    conn = get_db_connection()
-    try:
-        projects = list_research(conn, status=status_f or None,
-                                 research_type=type_f or None, search=search or None)
-        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
-            try:
-                create_research(
-                    conn,
-                    title=request.POST.get('title', ''),
-                    research_type=request.POST.get('research_type', ''),
-                    description=request.POST.get('description', ''),
-                    owner=request.POST.get('owner', ''),
-                    start_date=request.POST.get('start_date', '') or None,
-                    end_date=request.POST.get('end_date', '') or None,
-                    status=request.POST.get('status', 'Planned'),
-                    budget=float(request.POST.get('budget', 0) or 0),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                return redirect('mkt_research_list')
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-                projects = list_research(conn, status=status_f or None,
-                                         research_type=type_f or None, search=search or None)
-    finally:
-        conn.close()
-    return render(request, 'mkt_research_list.html', _mkt_ctx(
-        request, projects=projects, status_filter=status_f, type_filter=type_f,
-        search=search, research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,
-        today=date.today().isoformat(), error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_research_detail(request, project_id):
-    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    conn = get_db_connection()
-    error = success = None
-    project = None
-    try:
-        project = get_research_project(conn, project_id)
-        if not project:
-            return redirect('mkt_research_list')
-        if request.method == 'POST' and can_edit:
-            try:
-                update_research(
-                    conn, project_id,
-                    title=request.POST.get('title', ''),
-                    research_type=request.POST.get('research_type', ''),
-                    description=request.POST.get('description', ''),
-                    owner=request.POST.get('owner', ''),
-                    start_date=request.POST.get('start_date', '') or None,
-                    end_date=request.POST.get('end_date', '') or None,
-                    status=request.POST.get('status', ''),
-                    findings=request.POST.get('findings', ''),
-                    budget=float(request.POST.get('budget', 0) or 0),
-                    notes=request.POST.get('notes', ''),
-                )
-                conn.commit()
-                success = 'Project updated.'
-                project = get_research_project(conn, project_id)
-            except Exception as e:
-                conn.rollback()
-                error = str(e)
-    finally:
-        conn.close()
-    return render(request, 'mkt_research_detail.html', _mkt_ctx(
-        request, project=project, can_edit=can_edit,
-        research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,
-        error=error, success=success,
-    ))
-
-
-@dept_required('marketing')
-def mkt_analytics(request):
-    with get_db_connection() as conn:
-        data = get_analytics_data(conn)
-    return render(request, 'mkt_analytics.html', _mkt_ctx(request, **data))
-
-
-# ---------------------------------------------------------------------------
 # Finance sub-pages — budgets, audits, bank rec, tax
 # ---------------------------------------------------------------------------
 
@@ -9566,6 +7074,343 @@ def sales_coaching(request):
         status_filter=status_f,
         COACHING_NOTE_STATUSES=COACHING_NOTE_STATUSES,
         can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+# =============================================================================
+# Lot tracking  (7A)
+# =============================================================================
+
+_LOT_DEPT_KEYS = {'production', 'quality', 'inventory', 'warehouse'}
+
+
+def _lot_ctx(request, **kw):
+    return dict(
+        user_role=request.session.get('user_role', ''),
+        user_dept_name=request.session.get('user_dept_name', ''),
+        full_access=request.session.get('user_full_access', False),
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        **kw,
+    )
+
+
+@login_required
+def lot_list(request):
+    status_filter = request.GET.get('status') or None
+    product_id = _int_or_none(request.GET.get('product_id'))
+    conn = get_db_connection()
+    try:
+        lot_core.ensure_lot_tables(conn)
+        lots = lot_core.list_lots(conn, product_id=product_id, status=status_filter)
+        expiry_alerts = lot_core.get_expiry_alerts(conn, days_ahead=30)
+        products = inv_list_products(conn)
+    finally:
+        conn.close()
+    return render(request, 'lot_list.html', _lot_ctx(
+        request,
+        lots=lots,
+        expiry_alerts=expiry_alerts,
+        products=products,
+        status_filter=status_filter,
+        product_id=product_id,
+        LOT_STATUSES=lot_core.LOT_STATUSES,
+    ))
+
+
+@login_required
+def lot_detail(request, lot_id):
+    conn = get_db_connection()
+    error = success = None
+    try:
+        lot_core.ensure_lot_tables(conn)
+        lot = lot_core.get_lot(conn, lot_id)
+        if not lot:
+            return redirect('lot_list')
+        genealogy = lot_core.get_lot_genealogy(conn, lot_id)
+        serials = lot_core.list_serials(conn, lot_id=lot_id)
+        if request.method == 'POST':
+            action = request.POST.get('action', '')
+            if action == 'status':
+                new_status = request.POST.get('status', '')
+                try:
+                    lot_core.update_lot_status(conn, lot_id, new_status,
+                                               notes=request.POST.get('notes', ''))
+                    conn.commit()
+                    lot = lot_core.get_lot(conn, lot_id)
+                    success = f'Status updated to {new_status}.'
+                except ValueError as exc:
+                    conn.rollback()
+                    error = str(exc)
+            elif action == 'add_serial':
+                sn = request.POST.get('serial_number', '').strip()
+                if sn:
+                    try:
+                        lot_core.create_serial(conn, sn, lot['product_id'],
+                                               lot_id=lot_id,
+                                               created_by=request.session.get('user_email', ''))
+                        conn.commit()
+                        serials = lot_core.list_serials(conn, lot_id=lot_id)
+                        success = f'Serial {sn} added.'
+                    except Exception as exc:
+                        conn.rollback()
+                        error = str(exc)
+    finally:
+        conn.close()
+    return render(request, 'lot_detail.html', _lot_ctx(
+        request,
+        lot=lot,
+        genealogy=genealogy,
+        serials=serials,
+        error=error,
+        success=success,
+        LOT_STATUSES=lot_core.LOT_STATUSES,
+        SERIAL_STATUSES=lot_core.SERIAL_STATUSES,
+    ))
+
+
+@login_required
+def lot_new(request):
+    conn = get_db_connection()
+    error = None
+    try:
+        lot_core.ensure_lot_tables(conn)
+        products = inv_list_products(conn)
+        if request.method == 'POST':
+            product_id = _int_or_none(request.POST.get('product_id'))
+            qty = request.POST.get('qty', '').strip()
+            if not product_id or not qty:
+                error = 'Product and quantity are required.'
+            else:
+                try:
+                    lot_id = lot_core.create_lot(
+                        conn,
+                        product_id=product_id,
+                        qty=float(qty),
+                        received_date=request.POST.get('received_date') or None,
+                        expiry_date=request.POST.get('expiry_date') or None,
+                        lot_number=request.POST.get('lot_number') or None,
+                        notes=request.POST.get('notes', ''),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    return redirect('lot_detail', lot_id=lot_id)
+                except Exception as exc:
+                    conn.rollback()
+                    error = str(exc)
+    finally:
+        conn.close()
+    return render(request, 'lot_new.html', _lot_ctx(
+        request,
+        products=products,
+        error=error,
+        form=request.POST if request.method == 'POST' else {},
+    ))
+
+
+# =============================================================================
+# Routing — workcenters & product routing  (7A)
+# =============================================================================
+
+_ROUTING_DEPT_KEYS = {'production', 'engineering'}
+
+
+def _routing_ctx(request, **kw):
+    return dict(
+        user_role=request.session.get('user_role', ''),
+        full_access=request.session.get('user_full_access', False),
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        **kw,
+    )
+
+
+@login_required
+def workcenter_list(request):
+    conn = get_db_connection()
+    error = success = None
+    try:
+        routing_core.ensure_routing_tables(conn)
+        workcenters = routing_core.list_workcenters(conn, active_only=False)
+        if request.method == 'POST':
+            action = request.POST.get('action', '')
+            if action == 'create':
+                name = request.POST.get('name', '').strip()
+                if not name:
+                    error = 'Name is required.'
+                else:
+                    try:
+                        routing_core.create_workcenter(
+                            conn,
+                            name=name,
+                            dept=request.POST.get('dept', ''),
+                            capacity_hours_per_day=float(request.POST.get('capacity', 8) or 8),
+                            labor_rate=float(request.POST.get('labor_rate', 0) or 0),
+                            notes=request.POST.get('notes', ''),
+                        )
+                        conn.commit()
+                        success = f'Work center "{name}" created.'
+                        workcenters = routing_core.list_workcenters(conn, active_only=False)
+                    except Exception as exc:
+                        conn.rollback()
+                        error = str(exc)
+            elif action == 'update':
+                wc_id = _int_or_none(request.POST.get('wc_id'))
+                if wc_id:
+                    try:
+                        routing_core.update_workcenter(
+                            conn, wc_id,
+                            name=request.POST.get('name', '').strip(),
+                            dept=request.POST.get('dept', ''),
+                            capacity_hours_per_day=float(request.POST.get('capacity', 8) or 8),
+                            labor_rate=float(request.POST.get('labor_rate', 0) or 0),
+                            notes=request.POST.get('notes', ''),
+                            is_active=request.POST.get('is_active') == '1',
+                        )
+                        conn.commit()
+                        success = 'Work center updated.'
+                        workcenters = routing_core.list_workcenters(conn, active_only=False)
+                    except Exception as exc:
+                        conn.rollback()
+                        error = str(exc)
+    finally:
+        conn.close()
+    return render(request, 'workcenter_list.html', _routing_ctx(
+        request,
+        workcenters=workcenters,
+        error=error,
+        success=success,
+    ))
+
+
+@login_required
+def routing_detail(request, product_id):
+    conn = get_db_connection()
+    error = success = None
+    try:
+        routing_core.ensure_routing_tables(conn)
+        product = inv_get_product(conn, product_id)
+        if not product:
+            return redirect('inventory_list')
+        steps = routing_core.get_routing(conn, product_id)
+        workcenters = routing_core.list_workcenters(conn, active_only=True)
+        if request.method == 'POST':
+            action = request.POST.get('action', '')
+            if action == 'add':
+                op_name = request.POST.get('operation_name', '').strip()
+                if not op_name:
+                    error = 'Operation name is required.'
+                else:
+                    try:
+                        seq = routing_core.next_routing_seq(conn, product_id)
+                        routing_core.create_routing_step(
+                            conn, product_id,
+                            operation_seq=seq,
+                            operation_name=op_name,
+                            workcenter_id=_int_or_none(request.POST.get('workcenter_id')),
+                            std_hours=float(request.POST.get('std_hours', 0) or 0),
+                            notes=request.POST.get('notes', ''),
+                        )
+                        conn.commit()
+                        success = f'Step "{op_name}" added.'
+                        steps = routing_core.get_routing(conn, product_id)
+                    except Exception as exc:
+                        conn.rollback()
+                        error = str(exc)
+            elif action == 'delete':
+                routing_id = _int_or_none(request.POST.get('routing_id'))
+                if routing_id:
+                    routing_core.delete_routing_step(conn, routing_id)
+                    conn.commit()
+                    success = 'Step removed.'
+                    steps = routing_core.get_routing(conn, product_id)
+    finally:
+        conn.close()
+    return render(request, 'routing_detail.html', _routing_ctx(
+        request,
+        product=product,
+        steps=steps,
+        workcenters=workcenters,
+        error=error,
+        success=success,
+    ))
+
+
+# =============================================================================
+# Costing  (7A)
+# =============================================================================
+
+@login_required
+def cost_detail(request, product_id):
+    conn = get_db_connection()
+    error = success = None
+    try:
+        costing_core.ensure_costing_tables(conn)
+        product = inv_get_product(conn, product_id)
+        if not product:
+            return redirect('inventory_list')
+        current_cost = costing_core.get_standard_cost(conn, product_id)
+        history = costing_core.list_cost_history(conn, product_id)
+        if request.method == 'POST' and request.POST.get('action') == 'roll':
+            can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+            if not can_edit:
+                error = 'You do not have permission to roll costs.'
+            else:
+                try:
+                    costing_core.roll_standard_cost(
+                        conn, product_id,
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    current_cost = costing_core.get_standard_cost(conn, product_id)
+                    history = costing_core.list_cost_history(conn, product_id)
+                    success = 'Standard cost rolled successfully.'
+                except Exception as exc:
+                    conn.rollback()
+                    error = str(exc)
+    finally:
+        conn.close()
+    return render(request, 'cost_detail.html', dict(
+        user_role=request.session.get('user_role', ''),
+        full_access=request.session.get('user_full_access', False),
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        product=product,
+        current_cost=current_cost,
+        history=history,
+        error=error,
+        success=success,
+    ))
+
+
+@login_required
+def wo_cost_detail(request, wo_id):
+    conn = get_db_connection()
+    error = success = None
+    try:
+        costing_core.ensure_costing_tables(conn)
+        wo = get_wo(conn, wo_id)
+        if not wo:
+            return redirect('wo_list')
+        cost = costing_core.get_wo_cost(conn, wo_id)
+        if request.method == 'POST' and request.POST.get('action') == 'compute':
+            try:
+                cost = costing_core.save_wo_actual_cost(
+                    conn, wo_id,
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'WO actual cost computed and saved.'
+            except Exception as exc:
+                conn.rollback()
+                error = str(exc)
+    finally:
+        conn.close()
+    return render(request, 'wo_cost_detail.html', dict(
+        user_role=request.session.get('user_role', ''),
+        full_access=request.session.get('user_full_access', False),
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
+        wo=wo,
+        cost=cost,
         error=error,
         success=success,
     ))

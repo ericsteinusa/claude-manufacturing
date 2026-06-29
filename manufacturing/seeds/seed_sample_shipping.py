@@ -10,15 +10,15 @@ manually.
 
 Usage::
 
-    python -m manufacturing.seed_sample_shipping            # add (idempotent)
-    python -m manufacturing.seed_sample_shipping --reset    # remove + re-add
-    python -m manufacturing.seed_sample_shipping --remove   # remove only
+    python -m manufacturing.seeds.seed_sample_shipping            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_shipping --reset    # remove + re-add
+    python -m manufacturing.seeds.seed_sample_shipping --remove   # remove only
 """
 
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 TAG = "SMPL-SHIP-"
 SHIP_PREFIX = "SMPL-SH-"
@@ -239,3 +239,5 @@ if __name__ == "__main__":
             seed(conn)
     finally:
         conn.close()
+
+

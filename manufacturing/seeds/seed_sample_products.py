@@ -25,9 +25,9 @@ has more than one parent — good for testing the level-by-level explosion):
 
 Usage::
 
-    python -m manufacturing.seed_sample_products            # add (idempotent)
-    python -m manufacturing.seed_sample_products --reset     # remove + re-add
-    python -m manufacturing.seed_sample_products --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_products            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_products --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_products --remove    # remove only
 
 Removal deletes the sample sales orders, BOM rows and then the sample
 products. If you have released MRP suggestions into requisitions/work orders
@@ -38,7 +38,7 @@ import argparse
 import sys
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 
 SAMPLE_TAG = "SAMPLE"      # stored in product.bin to mark sample rows
@@ -311,3 +311,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+

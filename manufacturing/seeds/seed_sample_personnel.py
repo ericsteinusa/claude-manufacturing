@@ -6,15 +6,15 @@ All rows are tagged so they can be removed without touching real data.
 
 Usage::
 
-    python -m manufacturing.seed_sample_personnel            # add (idempotent)
-    python -m manufacturing.seed_sample_personnel --reset     # remove + re-add
-    python -m manufacturing.seed_sample_personnel --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_personnel            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_personnel --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_personnel --remove    # remove only
 """
 
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 TAG = "SMPL-PERS-"
 TODAY = date.today()
@@ -210,3 +210,5 @@ if __name__ == "__main__":
             seed(conn)
     finally:
         conn.close()
+
+

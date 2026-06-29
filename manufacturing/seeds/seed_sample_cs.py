@@ -9,15 +9,15 @@ without a linked customer record.
 
 Usage::
 
-    python -m manufacturing.seed_sample_cs            # add (idempotent)
-    python -m manufacturing.seed_sample_cs --reset     # remove + re-add
-    python -m manufacturing.seed_sample_cs --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_cs            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_cs --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_cs --remove    # remove only
 """
 
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 TAG = "SMPL-CS-"
 TODAY = date.today()
@@ -431,3 +431,5 @@ if __name__ == "__main__":
             seed(conn)
     finally:
         conn.close()
+
+
