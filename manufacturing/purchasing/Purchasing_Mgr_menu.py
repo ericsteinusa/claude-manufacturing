@@ -70,7 +70,6 @@ class PurchasingMgrMenu(QtWidgets.QMainWindow):
         title = (f"Purchasing Manager Menu — {email}" if email
                  else "Purchasing Manager Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -100,5 +99,5 @@ class PurchasingMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = PurchasingMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

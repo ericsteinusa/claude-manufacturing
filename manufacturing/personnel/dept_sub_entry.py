@@ -254,7 +254,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = DeptSubEntry()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

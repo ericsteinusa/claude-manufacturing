@@ -55,7 +55,6 @@ class QualityAssuranceMenu(QtWidgets.QMainWindow):
         title = (f"Quality Assurance Menu — {email}" if email
                  else "Quality Assurance Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -75,5 +74,5 @@ class QualityAssuranceMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = QualityAssuranceMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

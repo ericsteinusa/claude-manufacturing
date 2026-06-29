@@ -681,7 +681,6 @@ class AccountsReceivableWindow(QtWidgets.QMainWindow):
         title = (f"Accounts Receivable — {email}" if email
                  else "Accounts Receivable")
         self.setWindowTitle(title)
-        self.resize(1060, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(AccountsReceivableWidget())
 
@@ -690,7 +689,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = AccountsReceivableWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

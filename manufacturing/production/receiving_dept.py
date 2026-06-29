@@ -645,7 +645,6 @@ class ReceivingDept(QtWidgets.QMainWindow):
         title = (f"Receiving Department — {email}" if email
                  else "Receiving Department")
         self.setWindowTitle(title)
-        self.resize(980, 660)
         _apply_blue_palette(self)
         self.setCentralWidget(ReceivingDeptWidget())
 
@@ -654,7 +653,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = ReceivingDept()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

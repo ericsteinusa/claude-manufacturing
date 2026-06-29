@@ -443,7 +443,6 @@ class EngineerMenu(QtWidgets.QMainWindow):
         super().__init__()
         email = get_current_user_email()
         self.setWindowTitle(f"Engineers — {email}" if email else "Engineers")
-        self.resize(980, 660)
         _apply_blue_palette(self)
         self._proj_row_ids = []
         self._selected_proj_id = None
@@ -1009,7 +1008,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = EngineerMenu()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

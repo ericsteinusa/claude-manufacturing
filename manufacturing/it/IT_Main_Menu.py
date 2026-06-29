@@ -1,29 +1,41 @@
 import sys
-from ..launch_utils import launch as _launch
 from PyQt6 import QtWidgets
 from ..qt_theme import apply_blue_palette as _apply_blue_palette
-from ..dept_menu_widget import DeptMenuWidget
+from ..button_nav import ButtonNav
+from .IT_mgr import ITMgrWidget
+from .IT_technician import ITTechnicianWidget
 
-_TITLE = "IT Main Menu"
-_ITEMS = [
-    ("IT Manager",    lambda: _launch("IT_mgr.py")),
-    ("IT Technician", lambda: _launch("IT_technician.py")),
-    ("Purchase Requisitions",
-     lambda: _launch("purchase_requisitions.py", "Information Technologies")),
-]
+TAB_STYLE = (
+    "QTabWidget::pane{border:1px solid black;}"
+    "QTabBar::tab{background:white;border:2px solid black;padding:6px 20px;"
+    "border-bottom:none;border-radius:4px 4px 0 0;}"
+    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
+    "QTabBar::tab:hover{background:rgb(85,255,255);}"
+)
 
 
 class ITMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(_TITLE)
-        self.resize(1100, 720)
+        self.setWindowTitle("Information Technologies")
         _apply_blue_palette(self)
-        self.setCentralWidget(DeptMenuWidget(_TITLE, _ITEMS))
+        from ..purchase_requisitions import RequisitionsWidget
+        central = QtWidgets.QWidget()
+        _apply_blue_palette(central)
+        self.setCentralWidget(central)
+        v = QtWidgets.QVBoxLayout(central)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(0)
+        tabs = ButtonNav()
+        tabs.setStyleSheet(TAB_STYLE)
+        tabs.addTab(ITMgrWidget(),                                    "IT Manager")
+        tabs.addTab(ITTechnicianWidget(),                             "IT Technician")
+        tabs.addTab(RequisitionsWidget("Information Technologies"),   "Purchase Requisitions")
+        v.addWidget(tabs)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ITMainMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

@@ -285,7 +285,6 @@ class Inventory(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Inventory — {email}" if email else "Inventory"
         self.setWindowTitle(title)
-        self.resize(1100, 680)
         _apply_blue_palette(self)
         self._prod_row_ids = []
         self._trans_row_ids = []
@@ -900,7 +899,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = Inventory()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

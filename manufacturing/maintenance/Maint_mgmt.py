@@ -924,7 +924,6 @@ class MaintMgmtWindow(QtWidgets.QMainWindow):
         title = (f"Maintenance Management — {email}" if email
                  else "Maintenance Management")
         self.setWindowTitle(title)
-        self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
@@ -941,5 +940,5 @@ class MaintMgmtWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MaintMgmtWindow()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

@@ -818,7 +818,6 @@ class ITSupportMenu(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"IT Support — {email}" if email else "IT Support"
         self.setWindowTitle(title)
-        self.resize(1020, 680)
         _apply_blue_palette(self)
         from .it_calls_reports import ITSupportReportsWidget
         central = QtWidgets.QWidget()
@@ -845,7 +844,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = ITSupportMenu()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

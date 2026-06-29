@@ -22,7 +22,6 @@ class MarketingMgrMenu(QtWidgets.QMainWindow):
         title = (f"Marketing Manager Menu — {email}" if email
                  else "Marketing Manager Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -45,5 +44,5 @@ class MarketingMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MarketingMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

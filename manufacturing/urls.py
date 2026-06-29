@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import api_views
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -274,6 +275,24 @@ urlpatterns = [
     path('cs/kb/<int:article_id>/', views.cs_kb_detail, name='cs_kb_detail'),
     path('cs/surveys/', views.cs_surveys_list, name='cs_surveys_list'),
     path('cs/surveys/<int:survey_id>/', views.cs_surveys_detail, name='cs_surveys_detail'),
+    # Mobile REST API  (/api/v1/…)
+    path('api/v1/auth/login/',    api_views.api_login,    name='api_login'),
+    path('api/v1/auth/logout/',   api_views.api_logout,   name='api_logout'),
+    path('api/v1/auth/profile/',  api_views.api_profile,  name='api_profile'),
+    path('api/v1/dashboard/',     api_views.api_dashboard, name='api_dashboard'),
+    path('api/v1/time-clock/status/',    api_views.api_tc_status,    name='api_tc_status'),
+    path('api/v1/time-clock/clock-in/',  api_views.api_tc_clock_in,  name='api_tc_clock_in'),
+    path('api/v1/time-clock/clock-out/', api_views.api_tc_clock_out, name='api_tc_clock_out'),
+    path('api/v1/time-clock/hours/',     api_views.api_tc_hours,     name='api_tc_hours'),
+    path('api/v1/time-off/',      api_views.api_time_off, name='api_time_off'),
+    path('api/v1/wo/',            api_views.api_wo_list,  name='api_wo_list'),
+    path('api/v1/wo/<int:wo_id>/',          api_views.api_wo_detail, name='api_wo_detail'),
+    path('api/v1/wo/<int:wo_id>/status/',   api_views.api_wo_status, name='api_wo_status'),
+    path('api/v1/req/',                     api_views.api_req,           name='api_req'),
+    path('api/v1/req/pending/',             api_views.api_req_pending,   name='api_req_pending'),
+    path('api/v1/req/<int:req_id>/items/',  api_views.api_req_add_item,  name='api_req_add_item'),
+    path('api/v1/req/<int:req_id>/submit/', api_views.api_req_submit,    name='api_req_submit'),
+    path('api/v1/req/<int:req_id>/decide/', api_views.api_req_decide,    name='api_req_decide'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),

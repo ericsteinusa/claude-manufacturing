@@ -9,13 +9,13 @@ must exist with ``bin = 'SAMPLE'``).
 
 Usage::
 
-    python -m manufacturing.seed_sample_alerts            # apply (idempotent)
-    python -m manufacturing.seed_sample_alerts --remove   # restore originals
+    python -m manufacturing.seeds.seed_sample_alerts            # apply (idempotent)
+    python -m manufacturing.seeds.seed_sample_alerts --remove   # restore originals
 """
 
 import argparse
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 # (product_name, alert_amount, original_amount)
 # alert_amount puts the product at or below its reorder_point.
@@ -118,3 +118,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+

@@ -29,7 +29,6 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
         title = (f"Accounting Manager — {email}" if email
                  else "Accounting Manager")
         self.setWindowTitle(title)
-        self.resize(1200, 760)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -57,5 +56,5 @@ class AccountingManagerWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = AccountingManagerWindow()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

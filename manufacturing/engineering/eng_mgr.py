@@ -50,7 +50,6 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         title = (f"Engineering Manager Menu — {email}" if email
                  else "Engineering Manager Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -104,7 +103,7 @@ class EngMgrMenu(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(sys.argv)
     window = EngMgrMenu()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

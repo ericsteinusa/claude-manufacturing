@@ -21,7 +21,6 @@ class MaintMgrMenu(QtWidgets.QMainWindow):
         title = (f"Maintenance Manager Menu — {email}" if email
                  else "Maintenance Manager Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -45,5 +44,5 @@ class MaintMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MaintMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

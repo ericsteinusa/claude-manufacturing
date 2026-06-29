@@ -20,7 +20,6 @@ class FinanceMgrMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Finance Manager Menu")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -43,5 +42,5 @@ class FinanceMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = FinanceMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

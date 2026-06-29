@@ -672,7 +672,6 @@ class SalesMgmtWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Sales Management — {email}" if email else "Sales Management"
         self.setWindowTitle(title)
-        self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
@@ -686,5 +685,5 @@ class SalesMgmtWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = SalesMgmtWindow()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())
