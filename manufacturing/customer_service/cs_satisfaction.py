@@ -836,7 +836,6 @@ class CSSatisfactionWindow(QtWidgets.QMainWindow):
         title = (f"Customer Satisfaction — {email}" if email
                  else "Customer Satisfaction")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_palette(self)
         self.setCentralWidget(CSSatisfactionWidget())
 
@@ -845,5 +844,5 @@ if __name__ == "__main__":
     _init_db()
     app = QtWidgets.QApplication(sys.argv)
     win = CSSatisfactionWindow()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

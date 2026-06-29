@@ -51,7 +51,6 @@ class CSMgrMenu(QtWidgets.QMainWindow):
         title = (f"Customer Service Manager Menu — {email}" if email
                  else "Customer Service Manager Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -80,5 +79,5 @@ class CSMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = CSMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

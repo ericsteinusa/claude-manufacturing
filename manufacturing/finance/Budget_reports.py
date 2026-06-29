@@ -400,5 +400,5 @@ if __name__ == "__main__":
     tabs.addTab(DeptSummaryWidget(), "Department Summaries")
     tabs.addTab(ApprovalWorkflowWidget(), "Approval Workflow")
     win.setCentralWidget(tabs)
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block page_title %}Ad #{{ ad.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mkt/" class="btn">Marketing</a>
+<a href="/mkt/campaigns/" class="btn">Campaigns</a>
+<a href="/mkt/ads/" class="btn">Advertising</a>
+<a href="/mkt/analytics/" class="btn">Analytics</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.mkt-wrap { width:100%; max-width:900px; }
+.mkt-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; border-bottom:1px solid #eee; padding-bottom:8px; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.detail-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.detail-item { display:flex; flex-direction:column; gap:3px; }
+.detail-item .lbl { font-size:11px; font-weight:bold; color:#888; text-transform:uppercase; }
+.detail-item .val { font-size:14px; color:#222; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.s-Draft     { background:#e2e3e5; color:#383d41; }
+.s-Scheduled { background:#d1ecf1; color:#0c5460; }
+.s-Active    { background:#d4edda; color:#0a3622; }
+.s-Paused    { background:#fff3cd; color:#856404; }
+.s-Completed { background:#cce5ff; color:#004085; }
+.s-Cancelled { background:#f8d7da; color:#721c24; }
+.metric-row { display:flex; gap:20px; flex-wrap:wrap; margin:12px 0; }
+.metric-box { background:#f8f9fa; border:1px solid #dee2e6; border-radius:6px; padding:12px 18px; min-width:110px; text-align:center; }
+.metric-box .num { font-size:22px; font-weight:bold; color:rgb(0,60,180); }
+.metric-box .lbl { font-size:11px; color:#888; text-transform:uppercase; margin-top:2px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:70px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-primary { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-primary:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="mkt-wrap">
+    <h2>{{ ad.name|default:"Ad" }} — #{{ ad.id }}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Overview</h3>
+        <div class="detail-grid three" style="margin-bottom:14px;">
+            <div class="detail-item">
+                <span class="lbl">Channel</span>
+                <span class="val">{{ ad.channel|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">Campaign</span>
+                <span class="val">{{ ad.campaign_name|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">Status</span>
+                <span class="val"><span class="badge s-{{ ad.status }}">{{ ad.status }}</span></span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">Budget</span>
+                <span class="val">${{ ad.budget|floatformat:2 }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">Spend</span>
+                <span class="val">${{ ad.spend|floatformat:2 }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">Owner</span>
+                <span class="val">{{ ad.owner|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">Start Date</span>
+                <span class="val">{{ ad.start_date|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="lbl">End Date</span>
+                <span class="val">{{ ad.end_date|default:"—" }}</span>
+            </div>
+        </div>
+        <div class="metric-row">
+            <div class="metric-box">
+                <div class="num">{{ ad.impressions|default:0 }}</div>
+                <div class="lbl">Impressions</div>
+            </div>
+            <div class="metric-box">
+                <div class="num">{{ ad.clicks|default:0 }}</div>
+                <div class="lbl">Clicks</div>
+            </div>
+            <div class="metric-box">
+                <div class="num">{{ ad.conversions|default:0 }}</div>
+                <div class="lbl">Conversions</div>
+            </div>
+            {% if ad.impressions %}
+            <div class="metric-box">
+                <div class="num">{% widthratio ad.clicks ad.impressions 100 %}%</div>
+                <div class="lbl">CTR</div>
+            </div>
+            {% endif %}
+        </div>
+        {% if ad.notes %}
+        <div style="margin-top:10px;">
+            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">Notes</span>
+            <div style="font-size:14px;margin-top:4px;">{{ ad.notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Ad</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Ad Name</label>
+                    <input type="text" name="name" value="{{ ad.name }}">
+                </div>
+                <div class="form-group">
+                    <label>Channel</label>
+                    <select name="channel">
+                        <option value="">— Select —</option>
+                        {% for c in ad_channels %}
+                        <option value="{{ c }}"{% if ad.channel == c %} selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Campaign</label>
+                    <input type="text" name="campaign_name" value="{{ ad.campaign_name }}">
+                </div>
+                <div class="form-group">
+                    <label>Budget ($)</label>
+                    <input type="number" name="budget" value="{{ ad.budget }}" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Spend ($)</label>
+                    <input type="number" name="spend" value="{{ ad.spend }}" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in ad_statuses %}
+                        <option value="{{ s }}"{% if ad.status == s %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Impressions</label>
+                    <input type="number" name="impressions" value="{{ ad.impressions }}" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Clicks</label>
+                    <input type="number" name="clicks" value="{{ ad.clicks }}" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Conversions</label>
+                    <input type="number" name="conversions" value="{{ ad.conversions }}" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ ad.start_date }}">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" value="{{ ad.end_date }}">
+                </div>
+                <div class="form-group">
+                    <label>Owner</label>
+                    <input type="text" name="owner" value="{{ ad.owner }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ ad.notes }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

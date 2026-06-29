@@ -84,8 +84,17 @@ manufacturing/
   (`/po/...`, `views.po_*`, `purchase_orders_core.py`) route all four
   Purchasing → Purchase Orders leaves this way.
 - Web views run where `import PyQt6` fails, so they must import the Qt-free
-  `*_core.py` modules only (same rule as tests — see above). Gate writes with
-  the dept/role checks used by the PO views (`_po_access`; `READ_ONLY_ROLES`).
+  `*_core.py` modules only (same rule as tests — see above).
+- **Access control** is enforced via decorators in `auth_decorators.py`:
+  - `@login_required` — redirect to `'home'` if no active session.
+  - `@dept_required(dept_keys, *, role_keys=None, write_redirect=None, deny_redirect='dashboard')`
+    — allow logged-in users whose `user_dept_key` matches (or whose role is in
+    `role_keys`); full-access roles (President, VP) always bypass. Pass
+    `write_redirect` to also block `READ_ONLY_ROLES` (Auditor) on mutating views.
+  - `@role_required(role_keys, *, deny_redirect='dashboard')` — allow only
+    users whose `user_role` is in `role_keys` (no dept check).
+  - Session keys set at login: `user_email`, `user_role`, `user_dept_key`,
+    `user_full_access`, `user_dept_name`, `user_is_manager`.
 
 ## Database gotchas
 - **Live schema can diverge from the `CREATE TABLE` DDL.** Modules use
@@ -120,4 +129,31 @@ manufacturing/
   `python -m manufacturing.seed_sample_alerts` (updates `amount` on Rim,
   Tire, Inner Tube; requires `seed_sample_products` first). Supports
   `--remove` to restore original amounts.
+- IT department (help desk tickets, tasks, assets, technicians):
+  `python -m manufacturing.seed_sample_it` (tagged `SMPL-IT-`).
+- Maintenance (mechanics, equipment, work orders, PM schedules, inspections):
+  `python -m manufacturing.seed_sample_maintenance` (tagged `SMPL-MAINT-`).
+- Quality (NCRs, CAPAs, audits, supplier quality, inspections):
+  `python -m manufacturing.seed_sample_quality` (tagged `SMPL-QA-`).
+- Engineering (projects, tasks, ECRs/design reviews, standards):
+  `python -m manufacturing.seed_sample_engineering` (tagged `SMPL-ENG-`).
+- Sales (quotes, targets, leads, contracts, forecasts, territories, commissions):
+  `python -m manufacturing.seed_sample_sales` (tagged `SMPL-SALES-`).
+- Marketing (campaigns, leads, content, ads, research):
+  `python -m manufacturing.seed_sample_marketing` (tagged `SMPL-MKT-`).
+- Accounting (GL accounts/chart of accounts, AP invoices+payments, AR invoices+payments, GL journals):
+  `python -m manufacturing.seed_sample_accounting` (tagged `SMPL-ACCT-`; AR invoices linked to first customer in `customer` table).
+- Customer Service (tickets, improvement plans, returns, KB articles, surveys):
+  `python -m manufacturing.seed_sample_cs` (tagged `SMPL-CS-`).
+- Finance (budgets+lines, audit schedules+findings, bank accounts+statements, tax filings):
+  `python -m manufacturing.seed_sample_finance` (tagged `SMPL-FIN-`).
+- Legal (contracts, compliance items, litigation cases):
+  `python -m manufacturing.seed_sample_legal` (tagged `SMPL-LEGAL-`).
+- Personnel (job titles for all 46 sample employees, 4 weeks of time-clock entries for hourly staff):
+  `python -m manufacturing.seed_sample_personnel` (tagged `SMPL-PERS-`; adds `created_by` column
+  to `position` and `time_clock` via `ALTER TABLE … ADD COLUMN IF NOT EXISTS`).
+- Payroll (deduction types, pay rates, employee deductions, 3 historical bi-weekly payroll runs
+  with entries and entry-level deductions for 12 sample employees):
+  `python -m manufacturing.seed_sample_payroll` (tagged `SMPL-PAY-`; run
+  `seed_sample_personnel` first so time-clock data exists for the current period).
 - All seeds are idempotent and support `--reset` / `--remove`.

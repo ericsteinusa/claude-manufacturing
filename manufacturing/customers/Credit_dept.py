@@ -2312,7 +2312,6 @@ class CreditDept(QtWidgets.QMainWindow):
         title = (f"Credit Department — {email}" if email
                  else "Credit Department")
         self.setWindowTitle(title)
-        self.resize(1150, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(CreditDeptWidget(initial_tab=initial_tab))
 
@@ -2321,7 +2320,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = CreditDept(sys.argv[1] if len(sys.argv) > 1 else None)
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

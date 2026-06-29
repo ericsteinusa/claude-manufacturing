@@ -863,7 +863,6 @@ class TimeClockWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Time Clock — {email}" if email else "Time Clock"
         self.setWindowTitle(title)
-        self.resize(1020, 680)
         _apply_blue_palette(self)
         self.setCentralWidget(TimeClockWidget())
 
@@ -872,7 +871,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = TimeClockWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

@@ -194,6 +194,7 @@ from .accounts import (
     _set_user_role,
     _remove_user_role,
 )
+from .auth_decorators import dept_required, login_required, role_required
 
 from .production_core import (
     get_production_dashboard,
@@ -246,6 +247,14 @@ from .it_core import (
     next_ticket_number,
     list_assets, get_asset, create_asset, update_asset,
     TICKET_STATUSES, TICKET_PRIORITIES, ISSUE_TYPES, ASSET_STATUSES, ASSET_TYPES,
+    list_repairs, get_repair, create_repair, update_repair, set_repair_status,
+    REPAIR_STATUSES, REPAIR_PRIORITIES,
+    list_software, get_software, create_software, update_software,
+    SOFTWARE_STATUSES,
+    list_licenses, get_license, create_license, update_license,
+    LICENSE_TYPES, LICENSE_STATUSES,
+    list_network_devices, get_network_device, create_network_device, update_network_device,
+    NETWORK_DEVICE_TYPES, NETWORK_DEVICE_STATUSES,
 )
 from .legal_core import (
     get_legal_dashboard,
@@ -262,6 +271,10 @@ from .marketing_core import (
     list_content, get_content_item, create_content, update_content,
     CHANNELS, OBJECTIVES, CAMPAIGN_STATUSES,
     LEAD_SOURCES, LEAD_STATUSES, CONTENT_TYPES, CONTENT_STATUSES,
+    list_ads, get_ad, create_ad, update_ad, AD_CHANNELS, AD_STATUSES,
+    list_research, get_research_project, create_research, update_research,
+    RESEARCH_TYPES, RESEARCH_STATUSES,
+    get_analytics_data,
 )
 
 log = get_logger(__name__)
@@ -308,6 +321,26 @@ WEB_LEAF_URLS = {
     ('sales', 'fore_rep'):  '/sales/forecast/',
     ('sales', 'fore_prod'): '/sales/forecast/',
     ('sales', 'fore_rpts'): '/sales/forecast/',
+    # Sales Targets (manager sub-menu)
+    ('sales', 'set_tgt'):   '/sales/targets/',
+    ('sales', 'tgt_act'):   '/sales/targets/',
+    ('sales', 'tgt_rep'):   '/sales/targets/',
+    ('sales', 'tgt_rpts'):  '/sales/targets/',
+    # Territory Management
+    ('sales', 'terr_map'):    '/sales/territories/',
+    ('sales', 'terr_assign'): '/sales/territories/',
+    ('sales', 'terr_perf'):   '/sales/territories/performance/',
+    ('sales', 'terr_rpts'):   '/sales/territories/',
+    # Commission Tracking
+    ('sales', 'comm_calc'):  '/sales/commissions/',
+    ('sales', 'comm_rpts'):  '/sales/commissions/',
+    ('sales', 'pay_hist'):   '/sales/commissions/history/',
+    ('sales', 'comm_plans'): '/sales/commissions/plans/',
+    # Staff Performance
+    ('sales', 'perf_dash'):  '/sales/performance/',
+    ('sales', 'rep_rank'):   '/sales/performance/',
+    ('sales', 'perf_revs'):  '/sales/performance/reviews/',
+    ('sales', 'coaching'):   '/sales/performance/coaching/',
     ('personnel', 'view_recs'): '/people/',
     ('personnel', 'new_emp'): '/people/new/',
     ('personnel', 'upd_rec'): '/people/',
@@ -728,38 +761,38 @@ WEB_LEAF_URLS = {
     ('marketing', 'new_camp'):    '/mkt/campaigns/',
     ('marketing', 'camp_cal'):    '/mkt/campaigns/',
     ('marketing', 'camp_res'):    '/mkt/campaigns/',
-    ('marketing', 'res_proj'):    '/mkt/',
-    ('marketing', 'comp_analy'):  '/mkt/',
-    ('marketing', 'surv_mgmt'):   '/mkt/',
-    ('marketing', 'mkt_trends'):  '/mkt/',
-    ('marketing', 'ad_mgmt'):     '/mkt/',
-    ('marketing', 'ad_budget'):   '/mkt/',
-    ('marketing', 'ad_perf'):     '/mkt/',
-    ('marketing', 'ad_cal'):      '/mkt/',
-    ('marketing', 'web_analy'):   '/mkt/',
-    ('marketing', 'camp_analy'):  '/mkt/campaigns/',
-    ('marketing', 'sales_analy'): '/mkt/',
-    ('marketing', 'cust_rpts'):   '/mkt/',
+    ('marketing', 'res_proj'):    '/mkt/research/',
+    ('marketing', 'comp_analy'):  '/mkt/research/',
+    ('marketing', 'surv_mgmt'):   '/mkt/research/',
+    ('marketing', 'mkt_trends'):  '/mkt/research/',
+    ('marketing', 'ad_mgmt'):     '/mkt/ads/',
+    ('marketing', 'ad_budget'):   '/mkt/ads/',
+    ('marketing', 'ad_perf'):     '/mkt/ads/',
+    ('marketing', 'ad_cal'):      '/mkt/ads/',
+    ('marketing', 'web_analy'):   '/mkt/analytics/',
+    ('marketing', 'camp_analy'):  '/mkt/analytics/',
+    ('marketing', 'sales_analy'): '/mkt/analytics/',
+    ('marketing', 'cust_rpts'):   '/mkt/analytics/',
     ('marketing', 'cont_cal'):    '/mkt/content/',
     ('marketing', 'blog'):        '/mkt/content/',
     ('marketing', 'mkt_mat'):     '/mkt/content/',
     ('marketing', 'cont_arch'):   '/mkt/content/',
     ('marketing', 'post_mgmt'):   '/mkt/content/',
     ('marketing', 'social_cal'):  '/mkt/content/',
-    ('marketing', 'eng_rpts'):    '/mkt/',
+    ('marketing', 'eng_rpts'):    '/mkt/analytics/',
     ('marketing', 'acct_mgmt'):   '/mkt/',
     ('marketing', 'email_camp'):  '/mkt/campaigns/',
     ('marketing', 'sub_lists'):   '/mkt/leads/',
     ('marketing', 'email_tmpl'):  '/mkt/content/',
-    ('marketing', 'email_analy'): '/mkt/',
-    ('marketing', 'pend_appr'):   '/mkt/',
-    ('marketing', 'appr_camp'):   '/mkt/',
-    ('marketing', 'camp_arch'):   '/mkt/',
-    ('marketing', 'appr_hist'):   '/mkt/',
-    ('marketing', 'camp_perf'):   '/mkt/',
-    ('marketing', 'roi_rpts'):    '/mkt/',
-    ('marketing', 'month_sum'):   '/mkt/',
-    ('marketing', 'kpi_dash'):    '/mkt/',
+    ('marketing', 'email_analy'): '/mkt/analytics/',
+    ('marketing', 'pend_appr'):   '/mkt/campaigns/',
+    ('marketing', 'appr_camp'):   '/mkt/campaigns/',
+    ('marketing', 'camp_arch'):   '/mkt/campaigns/',
+    ('marketing', 'appr_hist'):   '/mkt/campaigns/',
+    ('marketing', 'camp_perf'):   '/mkt/analytics/',
+    ('marketing', 'roi_rpts'):    '/mkt/analytics/',
+    ('marketing', 'month_sum'):   '/mkt/analytics/',
+    ('marketing', 'kpi_dash'):    '/mkt/analytics/',
     ('marketing', 'budg_over'):   '/mkt/',
     ('marketing', 'budg_camp'):   '/mkt/',
     ('marketing', 'budg_act'):    '/mkt/',
@@ -768,6 +801,7 @@ WEB_LEAF_URLS = {
     ('accounting', 'gen_ledger'):    '/gl/',
     ('accounting', 'budget_mgmt'):   '/fin/budgets/',
     ('accounting', 'budg_plan'):     '/fin/budgets/',
+    ('accounting', 'budg_act'):      '/fin/budgets/',
     ('accounting', 'budg_amend'):    '/fin/budgets/',
     ('accounting', 'budg_rpts'):     '/fin/budgets/',
     ('accounting', 'tax_mgmt'):      '/fin/tax/',
@@ -790,6 +824,17 @@ WEB_LEAF_URLS = {
     ('accounting', 'findings'):      '/fin/audits/',
     ('accounting', 'corr_act'):      '/fin/audits/',
     ('accounting', 'audit_rpts'):    '/fin/audits/',
+    # Budget Management department
+    ('budget_management', 'bud_overview'):  '/fin/budgets/',
+    ('budget_management', 'bud_detail_mgr'): '/fin/budgets/',
+    ('budget_management', 'bva_mgr'):       '/fin/budgets/',
+    ('budget_management', 'variance_mgr'):  '/fin/budgets/',
+    ('budget_management', 'dept_summary'):  '/fin/budgets/',
+    ('budget_management', 'approval_wf'):   '/fin/budgets/',
+    ('budget_management', 'budgets'):       '/fin/budgets/',
+    ('budget_management', 'bud_detail'):    '/fin/budgets/',
+    ('budget_management', 'bva'):           '/fin/budgets/',
+    ('budget_management', 'variance'):      '/fin/budgets/',
     # Finance — manager + top-level leaves
     ('finance', 'fin_mgr'):          '/fin/',
     # Legal / Risk Management dashboard
@@ -822,18 +867,18 @@ WEB_LEAF_URLS = {
     ('information_tech', 'new_asset'):   '/it/assets/',
     ('information_tech', 'asset_hist'):  '/it/assets/?status=retired',
     ('information_tech', 'disposition'): '/it/assets/',
-    ('information_tech', 'net_dash'):    '/it/',
-    ('information_tech', 'bw_monitor'):  '/it/',
-    ('information_tech', 'net_map'):     '/it/',
-    ('information_tech', 'inc_log'):     '/it/',
-    ('information_tech', 'pend_inst'):   '/it/',
-    ('information_tech', 'sw_inv'):      '/it/',
-    ('information_tech', 'lic_mgmt'):    '/it/',
-    ('information_tech', 'inst_hist'):   '/it/',
-    ('information_tech', 'new_repair'):  '/it/',
-    ('information_tech', 'inprog'):      '/it/',
-    ('information_tech', 'comp_rep'):    '/it/',
-    ('information_tech', 'rep_hist'):    '/it/',
+    ('information_tech', 'net_dash'):    '/it/network/',
+    ('information_tech', 'bw_monitor'):  '/it/network/',
+    ('information_tech', 'net_map'):     '/it/network/',
+    ('information_tech', 'inc_log'):     '/it/network/',
+    ('information_tech', 'pend_inst'):   '/it/software/?status=pending',
+    ('information_tech', 'sw_inv'):      '/it/software/',
+    ('information_tech', 'lic_mgmt'):    '/it/licenses/',
+    ('information_tech', 'inst_hist'):   '/it/software/?status=installed',
+    ('information_tech', 'new_repair'):  '/it/repairs/',
+    ('information_tech', 'inprog'):      '/it/repairs/?status=in_progress',
+    ('information_tech', 'comp_rep'):    '/it/repairs/?status=completed',
+    ('information_tech', 'rep_hist'):    '/it/repairs/',
     ('information_tech', 'create_acct'): '/it/',
     ('information_tech', 'reset_pw'):    '/it/',
     ('information_tech', 'acct_stat'):   '/it/',
@@ -1264,23 +1309,6 @@ def user_roles(request):
 # ---------------------------------------------------------------------------
 
 
-def _po_access(request, write=False):
-    """Gate PO pages: logged in, and either full access or Purchasing dept.
-
-    With ``write=True`` also blocks ``READ_ONLY_ROLES`` from mutating (they may
-    still view), mirroring the gating in :func:`run_script`. Returns a redirect
-    response to send the user to, or ``None`` if allowed.
-    """
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') != 'purchasing':
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('po_list')
-    return None
-
-
 def _po_context(request, **extra):
     """Toolbar context shared by the PO templates (matches base.html)."""
     ctx = {
@@ -1292,10 +1320,8 @@ def _po_context(request, **extra):
     return ctx
 
 
+@dept_required('purchasing')
 def po_list(request):
-    denied = _po_access(request)
-    if denied:
-        return denied
 
     status = request.GET.get('status') or None
     if status not in PO_STATUSES:
@@ -1320,10 +1346,8 @@ def po_list(request):
     ))
 
 
+@dept_required('purchasing')
 def po_detail(request, po_id):
-    denied = _po_access(request)
-    if denied:
-        return denied
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
@@ -1393,10 +1417,8 @@ def _po_header_form(request):
     return data, None
 
 
+@dept_required('purchasing', write_redirect='po_list')
 def po_new(request):
-    denied = _po_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -1440,10 +1462,8 @@ def po_new(request):
         statuses=_PO_NEW_STATUSES, back_url='/po/'))
 
 
+@dept_required('purchasing', write_redirect='po_list')
 def po_edit(request, po_id):
-    denied = _po_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -1503,10 +1523,8 @@ def po_edit(request, po_id):
         back_url='/po/%s/' % po_id))
 
 
+@dept_required('purchasing', write_redirect='po_list')
 def po_add_item(request, po_id):
-    denied = _po_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_detail', po_id=po_id)
 
@@ -1533,10 +1551,8 @@ def po_add_item(request, po_id):
     return redirect('po_detail', po_id=po_id)
 
 
+@dept_required('purchasing', write_redirect='po_list')
 def po_remove_item(request, po_id):
-    denied = _po_access(request, write=True)
-    if denied:
-        return denied
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
         if item_id:
@@ -1549,10 +1565,8 @@ def po_remove_item(request, po_id):
     return redirect('po_detail', po_id=po_id)
 
 
+@dept_required('purchasing', write_redirect='po_list')
 def po_set_status(request, po_id):
-    denied = _po_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_detail', po_id=po_id)
 
@@ -1574,10 +1588,8 @@ def po_set_status(request, po_id):
     return redirect('po_detail', po_id=po_id)
 
 
+@dept_required('purchasing', write_redirect='po_list')
 def po_receive_item(request, po_id):
-    denied = _po_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_detail', po_id=po_id)
 
@@ -1603,20 +1615,8 @@ def po_receive_item(request, po_id):
 # ---------------------------------------------------------------------------
 
 
-def _reports_access(request):
-    """Gate the reports dashboard: logged in + full access or reports dept."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') != 'reports':
-            return redirect('dashboard')
-    return None
-
-
+@dept_required('reports')
 def reports_dashboard(request):
-    denied = _reports_access(request)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -1669,22 +1669,6 @@ _WO_DEPT_KEYS = {'maintenance', 'production'}
 _WO_NEW_STATUSES = ('draft', 'open')
 
 
-def _wo_access(request, write=False):
-    """Gate WO pages: login + full_access or maintenance/production dept.
-
-    With ``write=True`` also blocks READ_ONLY_ROLES from mutating.
-    Returns a redirect or None if allowed.
-    """
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _WO_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('wo_list')
-    return None
-
-
 def _wo_context(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -1695,10 +1679,8 @@ def _wo_context(request, **extra):
     return ctx
 
 
+@dept_required(_WO_DEPT_KEYS)
 def wo_list(request):
-    denied = _wo_access(request)
-    if denied:
-        return denied
 
     status = request.GET.get('status') or None
     if status not in WO_STATUSES:
@@ -1730,10 +1712,8 @@ def wo_list(request):
     ))
 
 
+@dept_required(_WO_DEPT_KEYS)
 def wo_detail(request, wo_id):
-    denied = _wo_access(request)
-    if denied:
-        return denied
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
@@ -1789,10 +1769,8 @@ def _wo_header_form(request):
     return data, None
 
 
+@dept_required(_WO_DEPT_KEYS, write_redirect='wo_list')
 def wo_new(request):
-    denied = _wo_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -1838,10 +1816,8 @@ def wo_new(request):
         statuses=_WO_NEW_STATUSES, back_url='/wo/'))
 
 
+@dept_required(_WO_DEPT_KEYS, write_redirect='wo_list')
 def wo_edit(request, wo_id):
-    denied = _wo_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -1912,10 +1888,8 @@ def wo_edit(request, wo_id):
         back_url='/wo/%s/' % wo_id))
 
 
+@dept_required(_WO_DEPT_KEYS, write_redirect='wo_list')
 def wo_add_material(request, wo_id):
-    denied = _wo_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('wo_detail', wo_id=wo_id)
 
@@ -1940,10 +1914,8 @@ def wo_add_material(request, wo_id):
     return redirect('wo_detail', wo_id=wo_id)
 
 
+@dept_required(_WO_DEPT_KEYS, write_redirect='wo_list')
 def wo_set_status(request, wo_id):
-    denied = _wo_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('wo_detail', wo_id=wo_id)
 
@@ -1966,22 +1938,6 @@ def wo_set_status(request, wo_id):
 _SO_NEW_STATUSES = ('draft', 'confirmed')
 
 
-def _so_access(request, write=False):
-    """Gate SO pages: logged in, and either full access or Sales dept.
-
-    With ``write=True`` also blocks ``READ_ONLY_ROLES`` from mutating.
-    Returns a redirect or None if allowed.
-    """
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') != 'sales':
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('so_list')
-    return None
-
-
 def _so_context(request, **extra):
     """Toolbar context shared by the SO templates."""
     ctx = {
@@ -2001,10 +1957,8 @@ def _so_customer_name(so):
     )
 
 
+@dept_required('sales')
 def so_list(request):
-    denied = _so_access(request)
-    if denied:
-        return denied
 
     status = request.GET.get('status') or None
     if status not in SO_STATUSES:
@@ -2030,10 +1984,8 @@ def so_list(request):
     ))
 
 
+@dept_required('sales')
 def so_detail(request, so_id):
-    denied = _so_access(request)
-    if denied:
-        return denied
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
@@ -2083,10 +2035,8 @@ def _so_header_form(request):
     return data, None
 
 
+@dept_required('sales', write_redirect='so_list')
 def so_new(request):
-    denied = _so_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2130,10 +2080,8 @@ def so_new(request):
         statuses=_SO_NEW_STATUSES, back_url='/so/'))
 
 
+@dept_required('sales', write_redirect='so_list')
 def so_edit(request, so_id):
-    denied = _so_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2192,10 +2140,8 @@ def so_edit(request, so_id):
         back_url='/so/%s/' % so_id))
 
 
+@dept_required('sales', write_redirect='so_list')
 def so_add_item(request, so_id):
-    denied = _so_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('so_detail', so_id=so_id)
 
@@ -2223,10 +2169,8 @@ def so_add_item(request, so_id):
     return redirect('so_detail', so_id=so_id)
 
 
+@dept_required('sales', write_redirect='so_list')
 def so_remove_item(request, so_id):
-    denied = _so_access(request, write=True)
-    if denied:
-        return denied
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
         if item_id:
@@ -2239,10 +2183,8 @@ def so_remove_item(request, so_id):
     return redirect('so_detail', so_id=so_id)
 
 
+@dept_required('sales', write_redirect='so_list')
 def so_set_status(request, so_id):
-    denied = _so_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('so_detail', so_id=so_id)
 
@@ -2265,20 +2207,6 @@ def so_set_status(request, so_id):
 _PERSONNEL_ROLES = {'HR / Personnel'}
 
 
-def _people_access(request, write=False):
-    """Gate personnel pages: logged in + full_access, HR/Personnel role, or
-    personnel dept. With write=True also blocks READ_ONLY_ROLES.
-    """
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        role = request.session.get('user_role', '')
-        dept = request.session.get('user_dept_key', '')
-        if role not in _PERSONNEL_ROLES and dept != 'personnel':
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('people_list')
-    return None
 
 
 def _people_context(request, **extra):
@@ -2300,10 +2228,8 @@ def _is_hr(request):
     )
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def people_list(request):
-    denied = _people_access(request)
-    if denied:
-        return denied
 
     dept_id = _int_or_none(request.GET.get('dept_id'))
     search = (request.GET.get('search') or '').strip() or None
@@ -2326,10 +2252,8 @@ def people_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def people_detail(request, person_id):
-    denied = _people_access(request)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2374,10 +2298,8 @@ def _people_form(request):
     }, None
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, write_redirect='people_list')
 def people_new(request):
-    denied = _people_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2410,10 +2332,8 @@ def people_new(request):
         back_url='/people/'))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, write_redirect='people_list')
 def people_edit(request, person_id):
-    denied = _people_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -2717,17 +2637,9 @@ def time_clock_attendance(request):
 _DEV_BACK = '/time-clock/devices/'
 
 
-def _dev_access(request):
-    """Return True if the logged-in user can manage time clock devices."""
-    return _is_hr(request)
-
-
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_list(request):
     """List all registered time clock terminals."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request):
-        return redirect('time_clock_status')
 
     conn = get_db_connection()
     try:
@@ -2743,12 +2655,9 @@ def tc_device_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_new(request):
     """Add a new time clock device — asks for type, then shows config fields."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request):
-        return redirect('time_clock_status')
 
     error = ''
     form: dict = {
@@ -2802,12 +2711,9 @@ def tc_device_new(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_detail(request, device_id: int):
     """Edit a device or view its sync log."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request):
-        return redirect('time_clock_status')
 
     conn = get_db_connection()
     try:
@@ -2862,11 +2768,10 @@ def tc_device_detail(request, device_id: int):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_poll(request, device_id: int):
     """Trigger an immediate poll of a device."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request) or request.method != 'POST':
+    if request.method != 'POST':
         return redirect('tc_device_list')
 
     conn = get_db_connection()
@@ -2879,11 +2784,10 @@ def tc_device_poll(request, device_id: int):
     return redirect('tc_device_detail', device_id=device_id)
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES, deny_redirect='time_clock_status')
 def tc_device_delete(request, device_id: int):
     """Delete a device and its sync log."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _dev_access(request) or request.method != 'POST':
+    if request.method != 'POST':
         return redirect('tc_device_list')
 
     conn = get_db_connection()
@@ -2900,18 +2804,9 @@ def tc_device_delete(request, device_id: int):
 # Time clock — Overtime Report
 # ---------------------------------------------------------------------------
 
-def _tc_ot_access(request):
-    """Gate: must be logged in; non-full-access users may only view their own OT."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    return None
-
-
+@login_required
 def tc_ot_report(request):
     """Overtime report: 'mine' (default) or 'all' (managers/full-access only)."""
-    err = _tc_ot_access(request)
-    if err:
-        return err
 
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
@@ -3006,16 +2901,9 @@ def tc_schedule(request):
 _AUDIT_ROLES = FULL_ACCESS_ROLES | {'Auditor'}
 
 
-def _audit_access(request):
-    return request.session.get('user_role') in _AUDIT_ROLES
-
-
+@role_required(_AUDIT_ROLES)
 def audit_log(request):
     """Recent audit log entries, filterable by table and user."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _audit_access(request):
-        return redirect('dashboard')
 
     table_filter = request.GET.get('table', '')
     user_filter = request.GET.get('user', '')
@@ -3034,12 +2922,9 @@ def audit_log(request):
     })
 
 
+@role_required(_AUDIT_ROLES)
 def audit_record(request, table_name: str, record_id: int):
     """Full history for a single record."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not _audit_access(request):
-        return redirect('dashboard')
 
     history = get_history(table_name, record_id)
     return render(request, 'audit_record.html', {
@@ -3055,23 +2940,9 @@ def audit_record(request, table_name: str, record_id: int):
 # Period locking management
 # ---------------------------------------------------------------------------
 
-def _periods_access(request, *, write: bool = False):
-    """Return a redirect if the user may not access the periods page."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    role = request.session.get('user_role', '')
-    if write and role not in PERIOD_ADMIN_ROLES:
-        return redirect('periods')
-    if not write and role not in PERIOD_ADMIN_ROLES:
-        return redirect('dashboard')
-    return None
-
-
+@role_required(PERIOD_ADMIN_ROLES)
 def periods(request):
     """List closed periods and show close/reopen controls."""
-    denied = _periods_access(request)
-    if denied:
-        return denied
 
     error = None
     if request.method == 'POST':
@@ -3139,20 +3010,9 @@ def periods(request):
 # PO approval workflow
 # ---------------------------------------------------------------------------
 
-def _approval_access(request):
-    """Redirect if the user is not authorised to approve/reject POs."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if request.session.get('user_role') not in APPROVAL_ROLES:
-        return redirect('dashboard')
-    return None
-
-
+@role_required(APPROVAL_ROLES)
 def po_approvals(request):
     """Queue of POs waiting for approval (President / VP only)."""
-    denied = _approval_access(request)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -3168,11 +3028,9 @@ def po_approvals(request):
     })
 
 
+@role_required(APPROVAL_ROLES)
 def po_approve(request, approval_id):
     """Approve a pending PO."""
-    denied = _approval_access(request)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_approvals')
 
@@ -3190,11 +3048,9 @@ def po_approve(request, approval_id):
     return redirect('po_approvals')
 
 
+@role_required(APPROVAL_ROLES)
 def po_reject(request, approval_id):
     """Reject a pending PO, returning it to draft."""
-    denied = _approval_access(request)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('po_approvals')
 
@@ -3219,22 +3075,6 @@ def po_reject(request, approval_id):
 _BOM_DEPT_KEYS = {'engineering', 'production'}
 
 
-def _bom_access(request, write=False):
-    """Gate BOM pages: logged in + full_access or engineering/production dept.
-
-    With ``write=True`` also blocks READ_ONLY_ROLES from mutating.
-    Returns a redirect or None if allowed.
-    """
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _BOM_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('bom_list')
-    return None
-
-
 def _bom_context(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -3245,10 +3085,8 @@ def _bom_context(request, **extra):
     return ctx
 
 
+@dept_required(_BOM_DEPT_KEYS)
 def bom_list(request):
-    denied = _bom_access(request)
-    if denied:
-        return denied
 
     item_type = request.GET.get('item_type') or None
     if item_type not in ITEM_TYPES:
@@ -3276,10 +3114,8 @@ def bom_list(request):
     ))
 
 
+@dept_required(_BOM_DEPT_KEYS)
 def bom_detail(request, product_id):
-    denied = _bom_access(request)
-    if denied:
-        return denied
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
@@ -3376,10 +3212,8 @@ def bom_detail(request, product_id):
     ))
 
 
+@dept_required(_BOM_DEPT_KEYS)
 def bom_explode(request, product_id):
-    denied = _bom_access(request)
-    if denied:
-        return denied
 
     try:
         qty = float(request.GET.get('qty') or 1.0)
@@ -3412,18 +3246,6 @@ def bom_explode(request, product_id):
 _MRP_DEPT_KEYS = {'production', 'engineering'}
 
 
-def _mrp_access(request, write=False):
-    """Gate MRP pages: logged-in + full_access or production/engineering dept."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _MRP_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('mrp_home')
-    return None
-
-
 def _mrp_context(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -3435,10 +3257,8 @@ def _mrp_context(request, **extra):
     return ctx
 
 
+@dept_required(_MRP_DEPT_KEYS)
 def mrp_home(request):
-    denied = _mrp_access(request)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     try:
@@ -3460,10 +3280,8 @@ def mrp_home(request):
     ))
 
 
+@dept_required(_MRP_DEPT_KEYS, write_redirect='mrp_home')
 def mrp_run(request):
-    denied = _mrp_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('mrp_home')
 
@@ -3477,10 +3295,8 @@ def mrp_run(request):
     return redirect('mrp_plan')
 
 
+@dept_required(_MRP_DEPT_KEYS)
 def mrp_plan(request):
-    denied = _mrp_access(request)
-    if denied:
-        return denied
 
     plan = request.session.get('mrp_plan') or []
     if not plan:
@@ -3498,10 +3314,8 @@ def mrp_plan(request):
     ))
 
 
+@dept_required(_MRP_DEPT_KEYS, write_redirect='mrp_home')
 def mrp_release(request):
-    denied = _mrp_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('mrp_plan')
 
@@ -3562,18 +3376,6 @@ def mrp_release(request):
 _INV_DEPT_KEYS = {'production', 'engineering', 'maintenance', 'purchasing'}
 
 
-def _inv_access(request, write=False):
-    """Gate inventory pages: logged-in + full_access or relevant dept."""
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _INV_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('inventory_list')
-    return None
-
-
 def _inv_context(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -3586,10 +3388,8 @@ def _inv_context(request, **extra):
     return ctx
 
 
+@dept_required(_INV_DEPT_KEYS)
 def inventory_list(request):
-    denied = _inv_access(request)
-    if denied:
-        return denied
 
     search = request.GET.get('search', '').strip()
     filter_status = request.GET.get('filter') or None
@@ -3619,10 +3419,8 @@ def inventory_list(request):
     ))
 
 
+@dept_required(_INV_DEPT_KEYS, write_redirect='inventory_list')
 def inventory_new(request):
-    denied = _inv_access(request, write=True)
-    if denied:
-        return denied
 
     conn = get_db_connection()
     error = None
@@ -3659,10 +3457,8 @@ def inventory_new(request):
     ))
 
 
+@dept_required(_INV_DEPT_KEYS)
 def inventory_detail(request, product_id):
-    denied = _inv_access(request)
-    if denied:
-        return denied
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
@@ -3724,11 +3520,9 @@ def inventory_detail(request, product_id):
     ))
 
 
+@dept_required(_INV_DEPT_KEYS, write_redirect='inventory_list')
 def inventory_transaction(request, product_id):
     """POST only — record a stock movement for a product."""
-    denied = _inv_access(request, write=True)
-    if denied:
-        return denied
     if request.method != 'POST':
         return redirect('inventory_detail', product_id=product_id)
 
@@ -3772,28 +3566,6 @@ _CUSTOMER_DEPT_KEYS = {'customers', 'customer_service', 'sales'}
 _SUPPLIER_DEPT_KEYS = {'customers', 'purchasing', 'sales'}
 
 
-def _customer_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _CUSTOMER_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('customer_list')
-    return None
-
-
-def _supplier_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _SUPPLIER_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('supplier_list')
-    return None
-
-
 def _contacts_context(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -3805,10 +3577,8 @@ def _contacts_context(request, **extra):
     return ctx
 
 
+@dept_required(_CUSTOMER_DEPT_KEYS)
 def customer_list(request):
-    denied = _customer_access(request)
-    if denied:
-        return denied
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
     try:
@@ -3827,10 +3597,8 @@ def customer_list(request):
     ))
 
 
+@dept_required(_CUSTOMER_DEPT_KEYS, write_redirect='customer_list')
 def customer_new(request):
-    denied = _customer_access(request, write=True)
-    if denied:
-        return denied
     error = None
     conn = get_db_connection()
     try:
@@ -3866,10 +3634,8 @@ def customer_new(request):
     ))
 
 
+@dept_required(_CUSTOMER_DEPT_KEYS)
 def customer_detail(request, customer_id):
-    denied = _customer_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = None
@@ -3921,10 +3687,8 @@ def customer_detail(request, customer_id):
 # Suppliers (web)
 # ---------------------------------------------------------------------------
 
+@dept_required(_SUPPLIER_DEPT_KEYS)
 def supplier_list(request):
-    denied = _supplier_access(request)
-    if denied:
-        return denied
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
     try:
@@ -3943,10 +3707,8 @@ def supplier_list(request):
     ))
 
 
+@dept_required(_SUPPLIER_DEPT_KEYS, write_redirect='supplier_list')
 def supplier_new(request):
-    denied = _supplier_access(request, write=True)
-    if denied:
-        return denied
     error = None
     conn = get_db_connection()
     try:
@@ -3982,10 +3744,8 @@ def supplier_new(request):
     ))
 
 
+@dept_required(_SUPPLIER_DEPT_KEYS)
 def supplier_detail(request, supplier_id):
-    denied = _supplier_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = None
@@ -4040,17 +3800,6 @@ def supplier_detail(request, supplier_id):
 _CS_DEPT_KEYS = {'customer_service', 'sales', 'customers'}
 
 
-def _cs_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _CS_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('cs_ticket_list')
-    return None
-
-
 def _cs_context(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -4062,10 +3811,8 @@ def _cs_context(request, **extra):
     return ctx
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_ticket_list(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     search = request.GET.get('search', '').strip()
     status_filter = request.GET.get('status', '').strip()
     my_only = request.GET.get('my', '') == '1'
@@ -4094,10 +3841,8 @@ def cs_ticket_list(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS, write_redirect='cs_ticket_list')
 def cs_ticket_new(request):
-    denied = _cs_access(request, write=True)
-    if denied:
-        return denied
     conn = get_db_connection()
     error = None
     customers = []
@@ -4141,10 +3886,8 @@ def cs_ticket_new(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_ticket_detail(request, ticket_id):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = None
@@ -4199,10 +3942,8 @@ def cs_ticket_detail(request, ticket_id):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_escalations(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     conn = get_db_connection()
     try:
         tickets = get_escalations(conn)
@@ -4218,10 +3959,8 @@ def cs_escalations(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_reports(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     try:
         days = int(request.GET.get('days', 365))
     except ValueError:
@@ -4245,10 +3984,8 @@ def cs_reports(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_plans(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_filter = request.GET.get('status', '').strip()
     conn = get_db_connection()
@@ -4300,10 +4037,8 @@ def cs_plans(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_returns_list(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -4341,10 +4076,8 @@ def cs_returns_list(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_returns_detail(request, return_id):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -4381,10 +4114,8 @@ def cs_returns_detail(request, return_id):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_kb_list(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     cat_f = request.GET.get('category', '').strip()
@@ -4429,10 +4160,8 @@ def cs_kb_list(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_kb_detail(request, article_id):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -4467,10 +4196,8 @@ def cs_kb_detail(request, article_id):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_surveys_list(request):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('survey_type', '').strip()
@@ -4513,10 +4240,8 @@ def cs_surveys_list(request):
     ))
 
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_surveys_detail(request, survey_id):
-    denied = _cs_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -4570,17 +4295,6 @@ def cs_surveys_detail(request, survey_id):
 _QA_DEPT_KEYS = {'quality_assurance', 'production', 'purchasing'}
 
 
-def _qa_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _QA_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('qa_dashboard')
-    return None
-
-
 def _qa_ctx(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -4592,10 +4306,8 @@ def _qa_ctx(request, **extra):
     return ctx
 
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_dashboard(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     conn = get_db_connection()
     try:
         counts = get_dashboard_counts(conn)
@@ -4606,10 +4318,8 @@ def qa_dashboard(request):
 
 # --- NCR ---
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_ncr_list(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -4649,10 +4359,8 @@ def qa_ncr_list(request):
     ))
 
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_ncr_detail(request, ncr_id):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -4698,10 +4406,8 @@ def qa_ncr_detail(request, ncr_id):
 
 # --- CAPA ---
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_capa_list(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -4738,10 +4444,8 @@ def qa_capa_list(request):
     ))
 
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_capa_detail(request, capa_id):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -4785,10 +4489,8 @@ def qa_capa_detail(request, capa_id):
 
 # --- Audits ---
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_audit_list(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     conn = get_db_connection()
     error = success = None
@@ -4821,10 +4523,8 @@ def qa_audit_list(request):
     ))
 
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_audit_detail(request, audit_id):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -4870,10 +4570,8 @@ def qa_audit_detail(request, audit_id):
 
 # --- Supplier Quality ---
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_supplier_list(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -4911,10 +4609,8 @@ def qa_supplier_list(request):
     ))
 
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_supplier_detail(request, sq_id):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -4952,10 +4648,8 @@ def qa_supplier_detail(request, sq_id):
 
 # --- Inspections ---
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_inspection_list(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     result_filter = request.GET.get('result', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5004,10 +4698,8 @@ def qa_inspection_list(request):
     ))
 
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_inspection_detail(request, insp_id):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5054,10 +4746,8 @@ def qa_inspection_detail(request, insp_id):
 
 # --- QA Reports ---
 
+@dept_required(_QA_DEPT_KEYS)
 def qa_reports_view(request):
-    denied = _qa_access(request)
-    if denied:
-        return denied
     conn = get_db_connection()
     try:
         data = get_qa_reports(conn)
@@ -5073,17 +4763,6 @@ def qa_reports_view(request):
 _MAINT_DEPT_KEYS = {'maintenance', 'production', 'purchasing'}
 
 
-def _maint_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if not request.session.get('user_full_access'):
-        if request.session.get('user_dept_key') not in _MAINT_DEPT_KEYS:
-            return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('maint_dashboard')
-    return None
-
-
 def _maint_ctx(request, **extra):
     ctx = {
         'email': request.session.get('user_email', ''),
@@ -5095,10 +4774,8 @@ def _maint_ctx(request, **extra):
     return ctx
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_dashboard(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     conn = get_db_connection()
     try:
         counts = maint_get_dashboard_counts(conn)
@@ -5110,10 +4787,8 @@ def maint_dashboard(request):
 
 # --- Work Orders ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_wo_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     priority_filter = request.GET.get('priority', '').strip()
     search = request.GET.get('search', '').strip()
@@ -5158,10 +4833,8 @@ def maint_wo_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_wo_detail(request, wo_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5209,10 +4882,8 @@ def maint_wo_detail(request, wo_id):
 
 # --- Equipment ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_equipment_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5251,10 +4922,8 @@ def maint_equipment_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_equipment_detail(request, eq_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5293,10 +4962,8 @@ def maint_equipment_detail(request, eq_id):
 
 # --- PM Schedules ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_schedule_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5337,10 +5004,8 @@ def maint_schedule_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_schedule_detail(request, sched_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5386,10 +5051,8 @@ def maint_schedule_detail(request, sched_id):
 
 # --- Inspections ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_inspection_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5426,10 +5089,8 @@ def maint_inspection_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_inspection_detail(request, insp_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5478,10 +5139,8 @@ def maint_inspection_detail(request, insp_id):
 
 # --- Downtime ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_downtime_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5521,10 +5180,8 @@ def maint_downtime_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_downtime_detail(request, dt_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5569,10 +5226,8 @@ def maint_downtime_detail(request, dt_id):
 
 # --- Parts ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_parts_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5612,10 +5267,8 @@ def maint_parts_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_part_detail(request, part_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5655,10 +5308,8 @@ def maint_part_detail(request, part_id):
 
 # --- Mechanics ---
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_mechanics_list(request):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -5696,10 +5347,8 @@ def maint_mechanics_list(request):
     ))
 
 
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_mechanic_detail(request, mech_id):
-    denied = _maint_access(request)
-    if denied:
-        return denied
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -5742,19 +5391,6 @@ def maint_mechanic_detail(request, mech_id):
 _PAYROLL_DEPT_KEYS = {'payroll', 'accounting', 'finance'}
 
 
-def _payroll_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if request.session.get('user_full_access'):
-        return None
-    dept = request.session.get('user_dept_key', '')
-    if dept not in _PAYROLL_DEPT_KEYS:
-        return redirect('dashboard')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('dashboard')
-    return None
-
-
 def _payroll_ctx(request, **extra):
     return {
         'email': request.session.get('user_email', ''),
@@ -5768,10 +5404,8 @@ def _payroll_ctx(request, **extra):
     }
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_dashboard(request):
-    block = _payroll_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     try:
         counts = payroll_get_dashboard_counts(conn)
@@ -5783,10 +5417,8 @@ def payroll_dashboard(request):
     ))
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_pay_rates(request):
-    block = _payroll_access(request)
-    if block:
-        return block
     can_edit = _payroll_ctx(request)['can_edit']
     search = request.GET.get('search', '').strip()
     success = error = ''
@@ -5830,10 +5462,8 @@ def payroll_pay_rates(request):
     ))
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_deductions(request):
-    block = _payroll_access(request)
-    if block:
-        return block
     can_edit = _payroll_ctx(request)['can_edit']
     people_filter = request.GET.get('people_id', '').strip()
     success = error = ''
@@ -5900,10 +5530,8 @@ def payroll_deductions(request):
     ))
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_history(request):
-    block = _payroll_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     try:
         runs = list_payroll_runs(conn)
@@ -5914,10 +5542,8 @@ def payroll_history(request):
     ))
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_run_detail(request, run_id):
-    block = _payroll_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     try:
         run = get_payroll_run(conn, run_id)
@@ -5934,10 +5560,8 @@ def payroll_run_detail(request, run_id):
     ))
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_stub_detail(request, entry_id):
-    block = _payroll_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     try:
         stub = get_pay_stub(conn, entry_id)
@@ -5961,10 +5585,8 @@ def payroll_stub_detail(request, entry_id):
     ))
 
 
+@dept_required(_PAYROLL_DEPT_KEYS)
 def payroll_ytd(request):
-    block = _payroll_access(request)
-    if block:
-        return block
     import datetime as _dt
     cur_year = _dt.date.today().year
     try:
@@ -6016,21 +5638,6 @@ from .accounting_core import (  # noqa: E402
 _ACCOUNTING_DEPT_KEYS = {'accounting', 'finance'}
 
 
-def _acct_access(request, write=False):
-    email = request.session.get('user_email')
-    if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    dept = request.session.get('user_dept', '')
-    if dept not in _ACCOUNTING_DEPT_KEYS:
-        return redirect('/dashboard/')
-    if write and role in READ_ONLY_ROLES:
-        return redirect('/dashboard/')
-    return None
-
-
 def _acct_ctx(request, **extra):
     role = request.session.get('user_role', '')
     ctx = {
@@ -6045,17 +5652,14 @@ def _acct_ctx(request, **extra):
 
 # ── Accounts Payable ────────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ap_list(request):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     success = error = ''
     if request.method == 'POST':
-        block = _acct_access(request, write=True)
-        if block:
+        if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
-            return block
+            return redirect('acct_dashboard')
         action = request.POST.get('action', '')
         try:
             if action == 'new':
@@ -6097,17 +5701,14 @@ def ap_list(request):
     return render(request, 'ap_list.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ap_invoice_detail(request, inv_id=None):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     success = error = ''
     if request.method == 'POST':
-        block = _acct_access(request, write=True)
-        if block:
+        if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
-            return block
+            return redirect('acct_dashboard')
         action = request.POST.get('action', '')
         try:
             if action == 'save' and inv_id:
@@ -6156,17 +5757,14 @@ def ap_invoice_detail(request, inv_id=None):
 
 # ── Accounts Receivable ─────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ar_list(request):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     success = error = ''
     if request.method == 'POST':
-        block = _acct_access(request, write=True)
-        if block:
+        if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
-            return block
+            return redirect('acct_dashboard')
         action = request.POST.get('action', '')
         try:
             if action == 'new':
@@ -6208,17 +5806,14 @@ def ar_list(request):
     return render(request, 'ar_list.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ar_invoice_detail(request, inv_id=None):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     success = error = ''
     if request.method == 'POST':
-        block = _acct_access(request, write=True)
-        if block:
+        if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
-            return block
+            return redirect('acct_dashboard')
         action = request.POST.get('action', '')
         try:
             if action == 'save' and inv_id:
@@ -6267,10 +5862,8 @@ def ar_invoice_detail(request, inv_id=None):
 
 # ── General Ledger ───────────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_dashboard(request):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     ap_dash = get_ap_dashboard(conn)
     ar_dash = get_ar_dashboard(conn)
@@ -6285,17 +5878,14 @@ def gl_dashboard(request):
     return render(request, 'gl_dashboard.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_accounts(request):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     success = error = ''
     if request.method == 'POST':
-        block = _acct_access(request, write=True)
-        if block:
+        if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
-            return block
+            return redirect('acct_dashboard')
         action = request.POST.get('action', '')
         try:
             if action == 'create':
@@ -6341,10 +5931,8 @@ def gl_accounts(request):
     return render(request, 'gl_accounts.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_journals(request):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     posted_param = request.GET.get('posted', '')
     date_from    = request.GET.get('date_from', '')
@@ -6368,20 +5956,17 @@ def gl_journals(request):
     return render(request, 'gl_journals.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_journal_detail(request, journal_id=None):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     success = error = ''
     if request.method == 'POST':
         action = request.POST.get('action', '')
         try:
             if action == 'create':
-                block = _acct_access(request, write=True)
-                if block:
+                if request.session.get('user_role') in READ_ONLY_ROLES:
                     conn.close()
-                    return block
+                    return redirect('acct_dashboard')
                 # Parse lines from POST: account_id[], debit[], credit[], memo[]
                 acct_ids = request.POST.getlist('account_id')
                 debits   = request.POST.getlist('debit')
@@ -6405,18 +5990,16 @@ def gl_journal_detail(request, journal_id=None):
                 conn.close()
                 return redirect(f'/gl/journals/{new_id}/')
             elif action == 'post' and journal_id:
-                block = _acct_access(request, write=True)
-                if block:
+                if request.session.get('user_role') in READ_ONLY_ROLES:
                     conn.close()
-                    return block
+                    return redirect('acct_dashboard')
                 post_journal(conn, journal_id)
                 conn.commit()
                 success = 'Journal entry posted.'
             elif action == 'void' and journal_id:
-                block = _acct_access(request, write=True)
-                if block:
+                if request.session.get('user_role') in READ_ONLY_ROLES:
                     conn.close()
-                    return block
+                    return redirect('acct_dashboard')
                 void_journal(conn, journal_id)
                 conn.commit()
                 conn.close()
@@ -6436,10 +6019,8 @@ def gl_journal_detail(request, journal_id=None):
     return render(request, 'gl_journal_detail.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_trial_balance(request):
-    block = _acct_access(request)
-    if block:
-        return block
     conn = get_db_connection()
     as_of = request.GET.get('as_of', '')
     result = trial_balance(conn, as_of=as_of or None)
@@ -6448,10 +6029,8 @@ def gl_trial_balance(request):
     return render(request, 'gl_trial_balance.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_income_statement(request):
-    block = _acct_access(request)
-    if block:
-        return block
     import datetime as _dt
     today = _dt.date.today()
     date_from = request.GET.get('date_from', f'{today.year}-01-01')
@@ -6463,10 +6042,8 @@ def gl_income_statement(request):
     return render(request, 'gl_income_statement.html', ctx)
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def gl_balance_sheet(request):
-    block = _acct_access(request)
-    if block:
-        return block
     as_of = request.GET.get('as_of', '')
     conn = get_db_connection()
     result = balance_sheet(conn, as_of=as_of or None)
@@ -6491,17 +6068,6 @@ from .engineering_core import (  # noqa: E402
 _ENGINEERING_DEPT_KEYS = {'engineering'}
 
 
-def _eng_access(request, write=False):
-    if request.session.get('user_role') in FULL_ACCESS_ROLES:
-        return None
-    dept = request.session.get('user_dept', '')
-    if dept not in _ENGINEERING_DEPT_KEYS:
-        return redirect('/dashboard/')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('/dashboard/')
-    return None
-
-
 def _eng_ctx(request, **extra):
     role = request.session.get('user_role', '')
     ctx = {
@@ -6518,10 +6084,8 @@ def _eng_ctx(request, **extra):
     return ctx
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_dashboard(request):
-    block = _eng_access(request)
-    if block:
-        return block
     with get_db_connection() as conn:
         dash = get_eng_dashboard(conn)
         recent_projects = list_projects(conn)[:8]
@@ -6531,19 +6095,16 @@ def eng_dashboard(request):
     return render(request, 'eng_dashboard.html', ctx)
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_projects(request):
-    block = _eng_access(request)
-    if block:
-        return block
     status = request.GET.get('status', '')
     engineer = request.GET.get('engineer', '')
     search = request.GET.get('search', '')
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST' and request.POST.get('action') == 'new':
-            block2 = _eng_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('eng_dashboard')
             try:
                 pid = create_project(
                     conn,
@@ -6572,16 +6133,13 @@ def eng_projects(request):
     return render(request, 'eng_projects.html', ctx)
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_project_detail(request, project_id=None):
-    block = _eng_access(request)
-    if block:
-        return block
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST':
-            block2 = _eng_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('eng_dashboard')
             action = request.POST.get('action', '')
             try:
                 if action == 'save':
@@ -6638,19 +6196,16 @@ def eng_project_detail(request, project_id=None):
     return render(request, 'eng_project_detail.html', ctx)
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_ecrs(request):
-    block = _eng_access(request)
-    if block:
-        return block
     status = request.GET.get('status', '')
     proj_filter = request.GET.get('project_id', '')
     search = request.GET.get('search', '')
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST' and request.POST.get('action') == 'new':
-            block2 = _eng_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('eng_dashboard')
             try:
                 eid = create_ecr(
                     conn,
@@ -6681,16 +6236,13 @@ def eng_ecrs(request):
     return render(request, 'eng_ecrs.html', ctx)
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_ecr_detail(request, ecr_id=None):
-    block = _eng_access(request)
-    if block:
-        return block
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST':
-            block2 = _eng_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('eng_dashboard')
             action = request.POST.get('action', '')
             try:
                 if action == 'save' and ecr_id:
@@ -6738,20 +6290,16 @@ def eng_ecr_detail(request, ecr_id=None):
     return render(request, 'eng_ecr_detail.html', ctx)
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_reports_view(request):
-    block = _eng_access(request)
-    if block:
-        return block
     with get_db_connection() as conn:
         data = _eng_reports_data(conn)
     ctx = _eng_ctx(request, **data)
     return render(request, 'eng_reports.html', ctx)
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_tasks_list(request):
-    block = _eng_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     priority_f = request.GET.get('priority', '').strip()
@@ -6789,10 +6337,8 @@ def eng_tasks_list(request):
     ))
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_task_detail(request, task_id):
-    block = _eng_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     with get_db_connection() as conn:
@@ -6826,10 +6372,8 @@ def eng_task_detail(request, task_id):
     ))
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_specs_list(request):
-    block = _eng_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     cat_f = request.GET.get('category', '').strip()
@@ -6875,10 +6419,8 @@ def eng_specs_list(request):
     ))
 
 
+@dept_required(_ENGINEERING_DEPT_KEYS)
 def eng_spec_detail(request, spec_id):
-    block = _eng_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -6932,20 +6474,24 @@ from .sales_core import (  # noqa: E402
     FORECAST_PERIODS, FORECAST_STATUSES,
     list_forecasts, get_forecast, create_forecast, update_forecast,
     init_sales_forecast_table,
+    # Territories
+    TERRITORY_STATUSES,
+    init_sales_territory_table, list_territories, create_territory, update_territory, get_territory_performance,
+    # Commissions
+    COMMISSION_PLAN_TYPES, COMMISSION_STATUSES,
+    init_commission_tables,
+    list_commission_plans, create_commission_plan, update_commission_plan,
+    list_commissions, create_commission, update_commission,
+    get_commission_summary,
+    # Performance
+    get_sales_performance,
+    COACHING_NOTE_STATUSES, PERF_REVIEW_STATUSES,
+    init_sales_performance_tables,
+    list_coaching_notes, create_coaching_note,
+    list_perf_reviews, create_perf_review,
 )
 
 _SALES_DEPT_KEYS = {'sales'}
-
-
-def _sales_access(request, write=False):
-    if request.session.get('user_role') in FULL_ACCESS_ROLES:
-        return None
-    dept = request.session.get('user_dept', '')
-    if dept not in _SALES_DEPT_KEYS:
-        return redirect('/dashboard/')
-    if write and request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('/dashboard/')
-    return None
 
 
 def _sales_ctx(request, **extra):
@@ -6964,10 +6510,8 @@ def _sales_ctx(request, **extra):
     return ctx
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_dashboard(request):
-    block = _sales_access(request)
-    if block:
-        return block
     with get_db_connection() as conn:
         dash = get_sales_dashboard(conn)
         recent_orders = list_sos(conn)[:8]
@@ -6977,10 +6521,8 @@ def sales_dashboard(request):
     return render(request, 'sales_dashboard.html', ctx)
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_orders_list(request):
-    block = _sales_access(request)
-    if block:
-        return block
     status = request.GET.get('status', '')
     customer_id = request.GET.get('customer_id', '')
     date_from = request.GET.get('date_from', '')
@@ -6988,9 +6530,8 @@ def sales_orders_list(request):
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST' and request.POST.get('action') == 'new':
-            block2 = _sales_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('sales_dashboard')
             try:
                 so_num = next_so_number(conn)
                 so_id = create_so(
@@ -7020,16 +6561,13 @@ def sales_orders_list(request):
     return render(request, 'sales_orders.html', ctx)
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_order_detail(request, so_id=None):
-    block = _sales_access(request)
-    if block:
-        return block
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST':
-            block2 = _sales_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('sales_dashboard')
             action = request.POST.get('action', '')
             try:
                 if action == 'save' and so_id:
@@ -7076,18 +6614,15 @@ def sales_order_detail(request, so_id=None):
     return render(request, 'sales_order_detail.html', ctx)
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_quotes(request):
-    block = _sales_access(request)
-    if block:
-        return block
     status = request.GET.get('status', '')
     search = request.GET.get('search', '')
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST':
-            block2 = _sales_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('sales_dashboard')
             action = request.POST.get('action', '')
             try:
                 if action == 'new':
@@ -7135,18 +6670,15 @@ def sales_quotes(request):
     return render(request, 'sales_quotes.html', ctx)
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_targets(request):
-    block = _sales_access(request)
-    if block:
-        return block
     rep_filter = request.GET.get('rep', '')
     period_filter = request.GET.get('period', '')
     error = success = ''
     with get_db_connection() as conn:
         if request.method == 'POST':
-            block2 = _sales_access(request, write=True)
-            if block2:
-                return block2
+            if request.session.get('user_role') in READ_ONLY_ROLES:
+                return redirect('sales_dashboard')
             action = request.POST.get('action', '')
             try:
                 if action == 'new':
@@ -7196,10 +6728,8 @@ def sales_targets(request):
     return render(request, 'sales_targets.html', ctx)
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_leads_list(request):
-    block = _sales_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -7238,10 +6768,8 @@ def sales_leads_list(request):
     ))
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_leads_detail(request, lead_id):
-    block = _sales_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -7278,10 +6806,8 @@ def sales_leads_detail(request, lead_id):
     ))
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_contracts_list(request):
-    block = _sales_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -7320,10 +6846,8 @@ def sales_contracts_list(request):
     ))
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_contracts_detail(request, contract_id):
-    block = _sales_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -7360,10 +6884,8 @@ def sales_contracts_detail(request, contract_id):
     ))
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_forecast_list(request):
-    block = _sales_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     period_f = request.GET.get('period', '').strip()
     search = request.GET.get('search', '').strip()
@@ -7401,10 +6923,8 @@ def sales_forecast_list(request):
     ))
 
 
+@dept_required(_SALES_DEPT_KEYS)
 def sales_forecast_detail(request, forecast_id):
-    block = _sales_access(request)
-    if block:
-        return block
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -7440,20 +6960,6 @@ def sales_forecast_detail(request, forecast_id):
     ))
 
 
-def _prod_access(request, write=False):
-    if not request.session.get('user_email'):
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    dept = request.session.get('user_dept', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if dept != 'production':
-        return redirect('/dashboard/')
-    if write and role in READ_ONLY_ROLES:
-        return redirect('/prod/')
-    return None
-
-
 def _prod_ctx(request, **extra):
     role = request.session.get('user_role', '')
     return {
@@ -7465,20 +6971,16 @@ def _prod_ctx(request, **extra):
     }
 
 
+@dept_required('production')
 def prod_dashboard(request):
-    err = _prod_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_production_dashboard(conn)
     ctx = _prod_ctx(request, **data)
     return render(request, 'prod_dashboard.html', ctx)
 
 
+@dept_required('production')
 def prod_schedule(request):
-    err = _prod_access(request)
-    if err:
-        return err
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
     status_f = request.GET.get('status', '').strip()
@@ -7496,19 +6998,15 @@ def prod_schedule(request):
     ))
 
 
+@dept_required('production')
 def prod_reports_view(request):
-    err = _prod_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_prod_reports(conn)
     return render(request, 'prod_reports.html', _prod_ctx(request, **data))
 
 
+@dept_required('production')
 def prod_shipping_list(request):
-    err = _prod_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -7547,10 +7045,8 @@ def prod_shipping_list(request):
     ))
 
 
+@dept_required('production')
 def prod_shipping_detail(request, shipment_id):
-    err = _prod_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -7600,10 +7096,8 @@ def prod_shipping_detail(request, shipment_id):
     ))
 
 
+@dept_required('production')
 def prod_tracking_dashboard(request):
-    err = _prod_access(request)
-    if err:
-        return err
     conn = get_db_connection()
     try:
         init_shipment_tables(conn)
@@ -7616,10 +7110,8 @@ def prod_tracking_dashboard(request):
     ))
 
 
+@dept_required('production')
 def prod_delivery_status(request):
-    err = _prod_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     conn = get_db_connection()
@@ -7638,10 +7130,8 @@ def prod_delivery_status(request):
     ))
 
 
+@dept_required('production')
 def prod_daily_report(request):
-    err = _prod_access(request)
-    if err:
-        return err
     report_date = request.GET.get('date', '').strip() or None
     with get_db_connection() as conn:
         data = get_daily_report(conn, report_date=report_date)
@@ -7650,10 +7140,8 @@ def prod_daily_report(request):
     ))
 
 
+@dept_required('production')
 def prod_performance_report(request):
-    err = _prod_access(request)
-    if err:
-        return err
     try:
         days = int(request.GET.get('days', 30))
     except (TypeError, ValueError):
@@ -7670,10 +7158,8 @@ def prod_performance_report(request):
     ))
 
 
+@dept_required('production')
 def prod_returns_list(request):
-    err = _prod_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -7718,10 +7204,8 @@ def prod_returns_new(request):
     return redirect('/prod/returns/')
 
 
+@dept_required('production')
 def prod_returns_detail(request, rma_id):
-    err = _prod_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -7758,10 +7242,8 @@ def prod_returns_detail(request, rma_id):
     ))
 
 
+@dept_required('production')
 def prod_returns_reports(request):
-    err = _prod_access(request)
-    if err:
-        return err
     conn = get_db_connection()
     try:
         init_rma_table(conn)
@@ -7789,20 +7271,16 @@ def _purch_ctx(request, **extra):
     }
 
 
+@dept_required('purchasing')
 def purch_dashboard(request):
-    err = _po_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_purchasing_dashboard(conn)
     ctx = _purch_ctx(request, **data)
     return render(request, 'purchasing_dashboard.html', ctx)
 
 
+@dept_required('purchasing')
 def purch_contracts_list(request):
-    err = _po_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -7857,10 +7335,8 @@ def purch_contracts_list(request):
     return render(request, 'purch_contracts_list.html', ctx)
 
 
+@dept_required('purchasing')
 def purch_contract_detail(request, contract_id):
-    err = _po_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -7915,10 +7391,8 @@ def purch_contract_detail(request, contract_id):
     return render(request, 'purch_contract_detail.html', ctx)
 
 
+@dept_required('purchasing')
 def purch_reports_view(request):
-    err = _po_access(request)
-    if err:
-        return err
     conn = get_db_connection()
     try:
         init_purch_contract_table(conn)
@@ -7933,20 +7407,16 @@ def purch_reports_view(request):
 # Personnel dashboard
 # ---------------------------------------------------------------------------
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_dashboard(request):
-    err = _people_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_personnel_dashboard(conn)
     ctx = _people_context(request, **data)
     return render(request, 'personnel_dashboard.html', ctx)
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_depts(request):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     error = success = None
     conn = get_db_connection()
@@ -7989,10 +7459,8 @@ def pers_depts(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_reviews_list(request):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8032,10 +7500,8 @@ def pers_reviews_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_review_detail(request, review_id):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     error = success = None
     conn = get_db_connection()
@@ -8069,10 +7535,8 @@ def pers_review_detail(request, review_id):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_training_list(request):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('type', '').strip()
@@ -8119,10 +7583,8 @@ def pers_training_list(request):
     ))
 
 
+@dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_training_detail(request, training_id):
-    err = _people_access(request)
-    if err:
-        return err
     can_edit = _is_hr(request)
     error = success = None
     conn = get_db_connection()
@@ -8160,10 +7622,8 @@ def pers_training_detail(request, training_id):
 # Customer Service dashboard
 # ---------------------------------------------------------------------------
 
+@dept_required(_CS_DEPT_KEYS)
 def cs_dashboard_view(request):
-    err = _cs_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         stats = get_summary_stats(conn)
         recent_tickets = list_tickets(conn)[:8]
@@ -8175,10 +7635,8 @@ def cs_dashboard_view(request):
 # Finance dashboard
 # ---------------------------------------------------------------------------
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_dashboard(request):
-    err = _acct_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_finance_dashboard(conn)
     ctx = _acct_ctx(request, **data)
@@ -8189,18 +7647,6 @@ def fin_dashboard(request):
 # IT dashboard
 # ---------------------------------------------------------------------------
 
-def _it_access(request):
-    email = request.session.get('user_email')
-    if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if request.session.get('user_dept', '') != 'information_tech':
-        return redirect('/dashboard/')
-    return None
-
-
 def _it_ctx(request, **extra):
     return {
         'user_email': request.session.get('user_email', ''),
@@ -8209,20 +7655,16 @@ def _it_ctx(request, **extra):
     }
 
 
+@dept_required('information_tech')
 def it_dashboard(request):
-    err = _it_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_it_dashboard(conn)
     ctx = _it_ctx(request, **data)
     return render(request, 'it_dashboard.html', ctx)
 
 
+@dept_required('information_tech')
 def it_ticket_list(request):
-    err = _it_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     priority_f = request.GET.get('priority', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8265,10 +7707,8 @@ def it_ticket_list(request):
     ))
 
 
+@dept_required('information_tech')
 def it_ticket_detail(request, ticket_id):
-    err = _it_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8311,10 +7751,8 @@ def it_ticket_detail(request, ticket_id):
     ))
 
 
+@dept_required('information_tech')
 def it_asset_list(request):
-    err = _it_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('asset_type', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8355,10 +7793,8 @@ def it_asset_list(request):
     ))
 
 
+@dept_required('information_tech')
 def it_asset_detail(request, asset_id):
-    err = _it_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8398,23 +7834,331 @@ def it_asset_detail(request, asset_id):
     ))
 
 
+@dept_required('information_tech')
+def it_repairs_list(request):
+    status_f = request.GET.get('status', '').strip()
+    priority_f = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        repairs = list_repairs(conn, status=status_f or None,
+                               priority=priority_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_repair(
+                    conn,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    problem_description=request.POST.get('problem_description', ''),
+                    reported_by=request.POST.get('reported_by', ''),
+                    reported_date=request.POST.get('reported_date', '') or date.today().isoformat(),
+                    assigned_to=request.POST.get('assigned_to', ''),
+                    priority=request.POST.get('priority', 'medium'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_repairs_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                repairs = list_repairs(conn, status=status_f or None,
+                                       priority=priority_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_repairs_list.html', _it_ctx(
+        request, repairs=repairs, status_filter=status_f, priority_filter=priority_f,
+        search=search, repair_statuses=REPAIR_STATUSES, repair_priorities=REPAIR_PRIORITIES,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_repairs_detail(request, repair_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    repair = None
+    try:
+        repair = get_repair(conn, repair_id)
+        if not repair:
+            return redirect('it_repairs_list')
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'status':
+                    set_repair_status(conn, repair_id, request.POST.get('status', ''))
+                    success = 'Status updated.'
+                else:
+                    update_repair(
+                        conn, repair_id,
+                        asset_tag=request.POST.get('asset_tag', ''),
+                        problem_description=request.POST.get('problem_description', ''),
+                        reported_by=request.POST.get('reported_by', ''),
+                        reported_date=request.POST.get('reported_date', ''),
+                        assigned_to=request.POST.get('assigned_to', ''),
+                        priority=request.POST.get('priority', ''),
+                        resolution=request.POST.get('resolution', ''),
+                        notes=request.POST.get('notes', ''),
+                    )
+                    success = 'Repair updated.'
+                conn.commit()
+                repair = get_repair(conn, repair_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_repairs_detail.html', _it_ctx(
+        request, repair=repair, can_edit=can_edit,
+        repair_statuses=REPAIR_STATUSES, repair_priorities=REPAIR_PRIORITIES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_software_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        installs = list_software(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_software(
+                    conn,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    software_name=request.POST.get('software_name', ''),
+                    version=request.POST.get('version', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    install_date=request.POST.get('install_date', '') or date.today().isoformat(),
+                    status=request.POST.get('status', 'installed'),
+                    installed_by=request.POST.get('installed_by', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_software_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                installs = list_software(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_software_list.html', _it_ctx(
+        request, installs=installs, status_filter=status_f, search=search,
+        software_statuses=SOFTWARE_STATUSES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_software_detail(request, sw_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    install = None
+    try:
+        install = get_software(conn, sw_id)
+        if not install:
+            return redirect('it_software_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_software(
+                    conn, sw_id,
+                    asset_tag=request.POST.get('asset_tag', ''),
+                    software_name=request.POST.get('software_name', ''),
+                    version=request.POST.get('version', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    install_date=request.POST.get('install_date', ''),
+                    status=request.POST.get('status', ''),
+                    installed_by=request.POST.get('installed_by', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Record updated.'
+                install = get_software(conn, sw_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_software_detail.html', _it_ctx(
+        request, install=install, can_edit=can_edit,
+        software_statuses=SOFTWARE_STATUSES, error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_license_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        licenses = list_licenses(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_license(
+                    conn,
+                    software_name=request.POST.get('software_name', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    license_key=request.POST.get('license_key', ''),
+                    license_type=request.POST.get('license_type', 'perpetual'),
+                    seats=int(request.POST.get('seats', '1') or 1),
+                    seats_used=int(request.POST.get('seats_used', '0') or 0),
+                    purchase_date=request.POST.get('purchase_date', '') or None,
+                    expiry_date=request.POST.get('expiry_date', '') or None,
+                    cost=float(request.POST.get('cost', '0') or 0),
+                    status=request.POST.get('status', 'active'),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_license_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                licenses = list_licenses(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_license_list.html', _it_ctx(
+        request, licenses=licenses, status_filter=status_f, search=search,
+        license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_license_detail(request, license_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    lic = None
+    try:
+        lic = get_license(conn, license_id)
+        if not lic:
+            return redirect('it_license_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_license(
+                    conn, license_id,
+                    software_name=request.POST.get('software_name', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    license_key=request.POST.get('license_key', ''),
+                    license_type=request.POST.get('license_type', ''),
+                    seats=int(request.POST.get('seats', '1') or 1),
+                    seats_used=int(request.POST.get('seats_used', '0') or 0),
+                    purchase_date=request.POST.get('purchase_date', '') or None,
+                    expiry_date=request.POST.get('expiry_date', '') or None,
+                    cost=float(request.POST.get('cost', '0') or 0),
+                    status=request.POST.get('status', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'License updated.'
+                lic = get_license(conn, license_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_license_detail.html', _it_ctx(
+        request, lic=lic, can_edit=can_edit,
+        license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_network_list(request):
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('device_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        devices = list_network_devices(conn, status=status_f or None,
+                                       device_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_network_device(
+                    conn,
+                    hostname=request.POST.get('hostname', ''),
+                    ip_address=request.POST.get('ip_address', ''),
+                    mac_address=request.POST.get('mac_address', ''),
+                    device_type=request.POST.get('device_type', ''),
+                    manufacturer=request.POST.get('manufacturer', ''),
+                    model=request.POST.get('model', ''),
+                    location=request.POST.get('location', ''),
+                    status=request.POST.get('status', 'unknown'),
+                    last_seen=request.POST.get('last_seen', '') or None,
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_network_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                devices = list_network_devices(conn, status=status_f or None,
+                                               device_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_network_list.html', _it_ctx(
+        request, devices=devices, status_filter=status_f, type_filter=type_f,
+        search=search, device_types=NETWORK_DEVICE_TYPES,
+        device_statuses=NETWORK_DEVICE_STATUSES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_network_detail(request, device_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    device = None
+    try:
+        device = get_network_device(conn, device_id)
+        if not device:
+            return redirect('it_network_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_network_device(
+                    conn, device_id,
+                    hostname=request.POST.get('hostname', ''),
+                    ip_address=request.POST.get('ip_address', ''),
+                    mac_address=request.POST.get('mac_address', ''),
+                    device_type=request.POST.get('device_type', ''),
+                    manufacturer=request.POST.get('manufacturer', ''),
+                    model=request.POST.get('model', ''),
+                    location=request.POST.get('location', ''),
+                    status=request.POST.get('status', ''),
+                    last_seen=request.POST.get('last_seen', '') or None,
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Device updated.'
+                device = get_network_device(conn, device_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_network_detail.html', _it_ctx(
+        request, device=device, can_edit=can_edit,
+        device_types=NETWORK_DEVICE_TYPES, device_statuses=NETWORK_DEVICE_STATUSES,
+        error=error, success=success,
+    ))
+
+
 # ---------------------------------------------------------------------------
 # Legal dashboard
 # ---------------------------------------------------------------------------
 
 _LEGAL_DEPT_KEYS = {'legal', 'risk_management'}
-
-
-def _legal_access(request):
-    email = request.session.get('user_email')
-    if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if request.session.get('user_dept', '') not in _LEGAL_DEPT_KEYS:
-        return redirect('/dashboard/')
-    return None
 
 
 def _legal_ctx(request, **extra):
@@ -8425,20 +8169,16 @@ def _legal_ctx(request, **extra):
     }
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_dashboard(request):
-    err = _legal_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_legal_dashboard(conn)
     ctx = _legal_ctx(request, **data)
     return render(request, 'legal_dashboard.html', ctx)
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_contract_list(request):
-    err = _legal_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('contract_type', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8477,10 +8217,8 @@ def legal_contract_list(request):
     ))
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_contract_detail(request, contract_id):
-    err = _legal_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8518,10 +8256,8 @@ def legal_contract_detail(request, contract_id):
     ))
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_compliance_list(request):
-    err = _legal_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     error = success = None
@@ -8553,10 +8289,8 @@ def legal_compliance_list(request):
     ))
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_compliance_detail(request, item_id):
-    err = _legal_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8591,10 +8325,8 @@ def legal_compliance_detail(request, item_id):
     ))
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_litigation_list(request):
-    err = _legal_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('case_type', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8632,10 +8364,8 @@ def legal_litigation_list(request):
     ))
 
 
+@dept_required(_LEGAL_DEPT_KEYS)
 def legal_litigation_detail(request, case_id):
-    err = _legal_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8676,18 +8406,6 @@ def legal_litigation_detail(request, case_id):
 # Marketing dashboard
 # ---------------------------------------------------------------------------
 
-def _mkt_access(request):
-    email = request.session.get('user_email')
-    if not email:
-        return redirect('/')
-    role = request.session.get('user_role', '')
-    if role in FULL_ACCESS_ROLES:
-        return None
-    if request.session.get('user_dept', '') != 'marketing':
-        return redirect('/dashboard/')
-    return None
-
-
 def _mkt_ctx(request, **extra):
     return {
         'user_email': request.session.get('user_email', ''),
@@ -8696,20 +8414,16 @@ def _mkt_ctx(request, **extra):
     }
 
 
+@dept_required('marketing')
 def mkt_dashboard(request):
-    err = _mkt_access(request)
-    if err:
-        return err
     with get_db_connection() as conn:
         data = get_marketing_dashboard(conn)
     ctx = _mkt_ctx(request, **data)
     return render(request, 'marketing_dashboard.html', ctx)
 
 
+@dept_required('marketing')
 def mkt_campaign_list(request):
-    err = _mkt_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     channel_f = request.GET.get('channel', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8748,10 +8462,8 @@ def mkt_campaign_list(request):
     ))
 
 
+@dept_required('marketing')
 def mkt_campaign_detail(request, campaign_id):
-    err = _mkt_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8789,10 +8501,8 @@ def mkt_campaign_detail(request, campaign_id):
     ))
 
 
+@dept_required('marketing')
 def mkt_lead_list(request):
-    err = _mkt_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     source_f = request.GET.get('source', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8830,10 +8540,8 @@ def mkt_lead_list(request):
     ))
 
 
+@dept_required('marketing')
 def mkt_lead_detail(request, lead_id):
-    err = _mkt_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8870,10 +8578,8 @@ def mkt_lead_detail(request, lead_id):
     ))
 
 
+@dept_required('marketing')
 def mkt_content_list(request):
-    err = _mkt_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('content_type', '').strip()
     search = request.GET.get('search', '').strip()
@@ -8911,10 +8617,8 @@ def mkt_content_list(request):
     ))
 
 
+@dept_required('marketing')
 def mkt_content_detail(request, item_id):
-    err = _mkt_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     error = success = None
@@ -8951,6 +8655,180 @@ def mkt_content_detail(request, item_id):
     ))
 
 
+@dept_required('marketing')
+def mkt_ad_list(request):
+    status_f = request.GET.get('status', '').strip()
+    channel_f = request.GET.get('channel', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        ads = list_ads(conn, status=status_f or None,
+                       channel=channel_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_ad(
+                    conn,
+                    name=request.POST.get('name', ''),
+                    channel=request.POST.get('channel', ''),
+                    campaign_name=request.POST.get('campaign_name', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    spend=float(request.POST.get('spend', 0) or 0),
+                    impressions=int(request.POST.get('impressions', 0) or 0),
+                    clicks=int(request.POST.get('clicks', 0) or 0),
+                    conversions=int(request.POST.get('conversions', 0) or 0),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', 'Draft'),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_ad_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                ads = list_ads(conn, status=status_f or None,
+                               channel=channel_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_ad_list.html', _mkt_ctx(
+        request, ads=ads, status_filter=status_f, channel_filter=channel_f,
+        search=search, ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_ad_detail(request, ad_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    ad = None
+    try:
+        ad = get_ad(conn, ad_id)
+        if not ad:
+            return redirect('mkt_ad_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_ad(
+                    conn, ad_id,
+                    name=request.POST.get('name', ''),
+                    channel=request.POST.get('channel', ''),
+                    campaign_name=request.POST.get('campaign_name', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    spend=float(request.POST.get('spend', 0) or 0),
+                    impressions=int(request.POST.get('impressions', 0) or 0),
+                    clicks=int(request.POST.get('clicks', 0) or 0),
+                    conversions=int(request.POST.get('conversions', 0) or 0),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', ''),
+                    owner=request.POST.get('owner', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Ad updated.'
+                ad = get_ad(conn, ad_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_ad_detail.html', _mkt_ctx(
+        request, ad=ad, can_edit=can_edit,
+        ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
+        error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_research_list(request):
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('research_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        projects = list_research(conn, status=status_f or None,
+                                 research_type=type_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_research(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    research_type=request.POST.get('research_type', ''),
+                    description=request.POST.get('description', ''),
+                    owner=request.POST.get('owner', ''),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', 'Planned'),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_research_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                projects = list_research(conn, status=status_f or None,
+                                         research_type=type_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_research_list.html', _mkt_ctx(
+        request, projects=projects, status_filter=status_f, type_filter=type_f,
+        search=search, research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_research_detail(request, project_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    project = None
+    try:
+        project = get_research_project(conn, project_id)
+        if not project:
+            return redirect('mkt_research_list')
+        if request.method == 'POST' and can_edit:
+            try:
+                update_research(
+                    conn, project_id,
+                    title=request.POST.get('title', ''),
+                    research_type=request.POST.get('research_type', ''),
+                    description=request.POST.get('description', ''),
+                    owner=request.POST.get('owner', ''),
+                    start_date=request.POST.get('start_date', '') or None,
+                    end_date=request.POST.get('end_date', '') or None,
+                    status=request.POST.get('status', ''),
+                    findings=request.POST.get('findings', ''),
+                    budget=float(request.POST.get('budget', 0) or 0),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                success = 'Project updated.'
+                project = get_research_project(conn, project_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'mkt_research_detail.html', _mkt_ctx(
+        request, project=project, can_edit=can_edit,
+        research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,
+        error=error, success=success,
+    ))
+
+
+@dept_required('marketing')
+def mkt_analytics(request):
+    with get_db_connection() as conn:
+        data = get_analytics_data(conn)
+    return render(request, 'mkt_analytics.html', _mkt_ctx(request, **data))
+
+
 # ---------------------------------------------------------------------------
 # Finance sub-pages — budgets, audits, bank rec, tax
 # ---------------------------------------------------------------------------
@@ -8969,10 +8847,8 @@ def _fin_ctx(request, **extra):
 
 # ── Budgets ──────────────────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_budget_list(request):
-    err = _acct_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     year_f = request.GET.get('fiscal_year', '').strip()
     search = request.GET.get('search', '').strip()
@@ -9011,10 +8887,8 @@ def fin_budget_list(request):
     ))
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_budget_detail(request, budget_id):
-    err = _acct_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -9073,10 +8947,8 @@ def fin_budget_detail(request, budget_id):
 
 # ── Audits ───────────────────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_audit_list(request):
-    err = _acct_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('audit_type', '').strip()
     search = request.GET.get('search', '').strip()
@@ -9113,10 +8985,8 @@ def fin_audit_list(request):
     ))
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_audit_detail(request, audit_id):
-    err = _acct_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -9173,10 +9043,8 @@ def fin_audit_detail(request, audit_id):
 
 # ── Bank Reconciliation ──────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_bank_rec_list(request):
-    err = _acct_access(request)
-    if err:
-        return err
     search = request.GET.get('search', '').strip()
     error = success = None
     conn = get_db_connection()
@@ -9205,10 +9073,8 @@ def fin_bank_rec_list(request):
     ))
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_bank_rec_detail(request, account_id):
-    err = _acct_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -9264,10 +9130,8 @@ def fin_bank_rec_detail(request, account_id):
 
 # ── Tax Filings ──────────────────────────────────────────────────────────────
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_tax_list(request):
-    err = _acct_access(request)
-    if err:
-        return err
     status_f = request.GET.get('status', '').strip()
     type_f = request.GET.get('tax_type', '').strip()
     search = request.GET.get('search', '').strip()
@@ -9305,10 +9169,8 @@ def fin_tax_list(request):
     ))
 
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def fin_tax_detail(request, filing_id):
-    err = _acct_access(request)
-    if err:
-        return err
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     error = success = None
     conn = get_db_connection()
@@ -9350,11 +9212,9 @@ def fin_tax_detail(request, filing_id):
 # Accounting dashboard
 # ---------------------------------------------------------------------------
 
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def acct_dashboard(request):
     """Accounting department landing page — AP, AR, and GL summary."""
-    err = _acct_access(request)
-    if err:
-        return err
     conn = get_db_connection()
     try:
         ap = get_ap_dashboard(conn)
@@ -9373,4 +9233,339 @@ def acct_dashboard(request):
         conn.close()
     return render(request, 'acct_dashboard.html', _acct_ctx(
         request, ap=ap, ar=ar, recent_journals=recent_journals,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Sales — Territory Management
+# ---------------------------------------------------------------------------
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_territories(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_territory_table(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'new')
+            try:
+                if action == 'update':
+                    update_territory(
+                        conn,
+                        territory_id=int(request.POST.get('territory_id', 0)),
+                        name=request.POST.get('name', '').strip(),
+                        region=request.POST.get('region', '').strip(),
+                        assigned_rep=request.POST.get('assigned_rep', '').strip(),
+                        status=request.POST.get('status', 'Active'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Territory updated.'
+                else:
+                    create_territory(
+                        conn,
+                        name=request.POST.get('name', '').strip(),
+                        region=request.POST.get('region', '').strip(),
+                        assigned_rep=request.POST.get('assigned_rep', '').strip(),
+                        status=request.POST.get('status', 'Active'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Territory created.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        territories = list_territories(conn, status=status_f or None,
+                                       search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_territories.html', _sales_ctx(
+        request,
+        territories=territories,
+        status_filter=status_f,
+        search=search,
+        TERRITORY_STATUSES=TERRITORY_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_territory_performance(request):
+    conn = get_db_connection()
+    try:
+        init_sales_territory_table(conn)
+        conn.commit()
+        territories = get_territory_performance(conn)
+    finally:
+        conn.close()
+    return render(request, 'sales_territory_performance.html', _sales_ctx(
+        request, territories=territories,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Sales — Commission Tracking
+# ---------------------------------------------------------------------------
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_commissions(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    rep_f = request.GET.get('rep', '').strip()
+    period_f = request.GET.get('period', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_commission_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'new')
+            try:
+                plan_id_raw = request.POST.get('plan_id', '') or None
+                plan_id = int(plan_id_raw) if plan_id_raw else None
+                if action == 'update':
+                    update_commission(
+                        conn,
+                        commission_id=int(request.POST.get('commission_id', 0)),
+                        rep=request.POST.get('rep', '').strip(),
+                        period=request.POST.get('period', '').strip(),
+                        plan_id=plan_id,
+                        sale_amount=float(request.POST.get('sale_amount') or 0),
+                        commission=float(request.POST.get('commission') or 0),
+                        status=request.POST.get('status', 'Pending'),
+                        notes=request.POST.get('notes', '').strip(),
+                    )
+                    conn.commit()
+                    success = 'Commission record updated.'
+                else:
+                    create_commission(
+                        conn,
+                        rep=request.POST.get('rep', '').strip(),
+                        period=request.POST.get('period', '').strip(),
+                        plan_id=plan_id,
+                        sale_amount=float(request.POST.get('sale_amount') or 0),
+                        commission=float(request.POST.get('commission') or 0),
+                        status=request.POST.get('status', 'Pending'),
+                        notes=request.POST.get('notes', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Commission record added.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        commissions = list_commissions(
+            conn,
+            rep=rep_f or None,
+            period=period_f or None,
+            status=status_f or None,
+        )
+        summary = get_commission_summary(conn)
+        plans = list_commission_plans(conn, active_only=True)
+        periods = conn.execute(
+            "SELECT DISTINCT period FROM sales_commission"
+            " ORDER BY period DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    return render(request, 'sales_commissions.html', _sales_ctx(
+        request,
+        commissions=commissions,
+        summary=summary,
+        plans=plans,
+        periods=[r['period'] for r in periods],
+        rep_filter=rep_f,
+        period_filter=period_f,
+        status_filter=status_f,
+        COMMISSION_STATUSES=COMMISSION_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_commission_history(request):
+    """Payment history view — shows only Paid commissions."""
+    rep_f = request.GET.get('rep', '').strip()
+    period_f = request.GET.get('period', '').strip()
+    conn = get_db_connection()
+    try:
+        init_commission_tables(conn)
+        conn.commit()
+        paid = list_commissions(conn, rep=rep_f or None,
+                                period=period_f or None, status='Paid')
+        periods = conn.execute(
+            "SELECT DISTINCT period FROM sales_commission"
+            " WHERE status='Paid' ORDER BY period DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    return render(request, 'sales_commission_history.html', _sales_ctx(
+        request,
+        paid=paid,
+        periods=[r['period'] for r in periods],
+        rep_filter=rep_f,
+        period_filter=period_f,
+    ))
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_commission_plans(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_commission_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'new')
+            try:
+                if action == 'update':
+                    update_commission_plan(
+                        conn,
+                        plan_id=int(request.POST.get('plan_id', 0)),
+                        name=request.POST.get('name', '').strip(),
+                        plan_type=request.POST.get('plan_type', 'Flat Rate'),
+                        rate=float(request.POST.get('rate') or 0),
+                        description=request.POST.get('description', '').strip(),
+                        active=request.POST.get('active') == 'on',
+                    )
+                    conn.commit()
+                    success = 'Plan updated.'
+                else:
+                    create_commission_plan(
+                        conn,
+                        name=request.POST.get('name', '').strip(),
+                        plan_type=request.POST.get('plan_type', 'Flat Rate'),
+                        rate=float(request.POST.get('rate') or 0),
+                        description=request.POST.get('description', '').strip(),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = 'Plan created.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        plans = list_commission_plans(conn)
+    finally:
+        conn.close()
+    return render(request, 'sales_commission_plans.html', _sales_ctx(
+        request,
+        plans=plans,
+        COMMISSION_PLAN_TYPES=COMMISSION_PLAN_TYPES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Sales — Staff Performance
+# ---------------------------------------------------------------------------
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_performance(request):
+    conn = get_db_connection()
+    try:
+        data = get_sales_performance(conn)
+    finally:
+        conn.close()
+    return render(request, 'sales_performance.html', _sales_ctx(
+        request, **data,
+    ))
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_performance_reviews(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    rep_f = request.GET.get('rep', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_performance_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            try:
+                create_perf_review(
+                    conn,
+                    rep=request.POST.get('rep', '').strip(),
+                    review_date=request.POST.get('review_date', '').strip(),
+                    period=request.POST.get('period', '').strip(),
+                    rating=request.POST.get('rating', '').strip(),
+                    strengths=request.POST.get('strengths', '').strip(),
+                    improvements=request.POST.get('improvements', '').strip(),
+                    goals=request.POST.get('goals', '').strip(),
+                    status=request.POST.get('status', 'Scheduled'),
+                    reviewer=request.POST.get('reviewer', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'Review scheduled.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        reviews = list_perf_reviews(conn, rep=rep_f or None,
+                                    status=status_f or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_performance_reviews.html', _sales_ctx(
+        request,
+        reviews=reviews,
+        rep_filter=rep_f,
+        status_filter=status_f,
+        PERF_REVIEW_STATUSES=PERF_REVIEW_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
+    ))
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_coaching(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    rep_f = request.GET.get('rep', '').strip()
+    status_f = request.GET.get('status', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_sales_performance_tables(conn)
+        conn.commit()
+        if request.method == 'POST' and can_edit:
+            try:
+                create_coaching_note(
+                    conn,
+                    rep=request.POST.get('rep', '').strip(),
+                    subject=request.POST.get('subject', '').strip(),
+                    note=request.POST.get('note', '').strip(),
+                    status=request.POST.get('status', 'Open'),
+                    coach=request.POST.get('coach', '').strip(),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                success = 'Coaching note added.'
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+        notes = list_coaching_notes(conn, rep=rep_f or None,
+                                    status=status_f or None)
+    finally:
+        conn.close()
+    return render(request, 'sales_coaching.html', _sales_ctx(
+        request,
+        notes=notes,
+        rep_filter=rep_f,
+        status_filter=status_f,
+        COACHING_NOTE_STATUSES=COACHING_NOTE_STATUSES,
+        can_edit=can_edit,
+        error=error,
+        success=success,
     ))

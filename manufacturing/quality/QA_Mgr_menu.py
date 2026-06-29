@@ -20,7 +20,6 @@ class QAMgrMenu(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"QA Manager Menu — {email}" if email else "QA Manager Menu"
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -43,5 +42,5 @@ class QAMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = QAMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

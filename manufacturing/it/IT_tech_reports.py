@@ -387,5 +387,5 @@ if __name__ == "__main__":
     w.setWindowTitle("IT Technician Reports")
     w.resize(900, 600)
     w.setCentralWidget(ITTechReportsWidget())
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

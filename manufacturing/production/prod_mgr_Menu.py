@@ -55,7 +55,6 @@ class ProdMgrMenu(QtWidgets.QMainWindow):
         title = (f"Production Manager Menu — {email}" if email
                  else "Production Manager Menu")
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -80,5 +79,5 @@ class ProdMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ProdMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

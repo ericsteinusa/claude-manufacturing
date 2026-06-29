@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block page_title %}Territory Performance{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/territories/" class="btn">Territories</a>
+<a href="/sales/targets/" class="btn">Targets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sl-wrap { width:100%; max-width:1100px; }
+.sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-Active       { background:#d4edda; color:#0a3622; }
+.st-Inactive     { background:#e2e3e5; color:#383d41; }
+.st-Under-Review { background:#fff3cd; color:#856404; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sl-wrap">
+    <h2>Territory Performance</h2>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Territory</th>
+                    <th>Region</th>
+                    <th>Assigned Rep</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for t in territories %}
+            <tr>
+                <td><strong>{{ t.name }}</strong></td>
+                <td>{{ t.region|default:"—" }}</td>
+                <td>{{ t.assigned_rep|default:"Unassigned" }}</td>
+                <td><span class="badge st-{{ t.status|cut:" " }}">{{ t.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">No territories configured. <a href="/sales/territories/">Add territories</a> to track performance.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p style="color:white;font-size:12px;">
+        Performance data is sourced from sales targets. To see detailed rep attainment by territory,
+        assign reps in <a href="/sales/territories/" style="color:#aad;">Territory Management</a>
+        and set targets in <a href="/sales/targets/" style="color:#aad;">Sales Targets</a>.
+    </p>
+
+</div>
+</div>
+{% endblock %}

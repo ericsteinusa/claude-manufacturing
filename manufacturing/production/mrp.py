@@ -498,7 +498,6 @@ class MrpWindow(QtWidgets.QMainWindow):
         title = (f"Material Requirements Planning — {email}"
                  if email else "Material Requirements Planning")
         self.setWindowTitle(title)
-        self.resize(960, 640)
         _apply_blue_palette(self)
         self.setCentralWidget(MrpWidget())
 
@@ -506,7 +505,7 @@ class MrpWindow(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(sys.argv)
     window = MrpWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 
