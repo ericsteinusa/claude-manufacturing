@@ -229,6 +229,62 @@ def update_asset(conn, asset_id: int, **fields) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Asset History
+# ---------------------------------------------------------------------------
+
+_CREATE_ASSET_HISTORY_TABLE = """
+CREATE TABLE IF NOT EXISTS it_asset_history (
+    id          SERIAL PRIMARY KEY,
+    asset_tag   TEXT DEFAULT '',
+    asset_id    INTEGER,
+    event_type  TEXT DEFAULT '',
+    description TEXT DEFAULT '',
+    changed_by  TEXT DEFAULT '',
+    changed_at  TIMESTAMP DEFAULT NOW()
+)
+"""
+
+
+def _ensure_asset_history_table(conn) -> None:
+    conn.execute(_CREATE_ASSET_HISTORY_TABLE)
+    conn.commit()
+
+
+def log_asset_event(
+    conn, asset_tag: str, asset_id: int | None,
+    event_type: str, description: str, changed_by: str,
+) -> None:
+    _ensure_asset_history_table(conn)
+    conn.execute(
+        "INSERT INTO it_asset_history "
+        "(asset_tag, asset_id, event_type, description, changed_by) "
+        "VALUES (%s,%s,%s,%s,%s)",
+        (asset_tag, asset_id, event_type, description, changed_by),
+    )
+
+
+def list_asset_history(
+    conn, asset_tag: str | None = None,
+    event_type: str | None = None, limit: int = 300,
+) -> list:
+    _ensure_asset_history_table(conn)
+    sql = (
+        "SELECT id, asset_tag, asset_id, event_type, description, "
+        "changed_by, changed_at "
+        "FROM it_asset_history WHERE TRUE"
+    )
+    params: list = []
+    if asset_tag:
+        sql += " AND asset_tag ILIKE %s"
+        params.append(f"%{asset_tag}%")
+    if event_type:
+        sql += " AND event_type = %s"
+        params.append(event_type)
+    sql += f" ORDER BY changed_at DESC, id DESC LIMIT {int(limit)}"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+# ---------------------------------------------------------------------------
 # Hardware Repairs
 # ---------------------------------------------------------------------------
 
@@ -583,3 +639,143 @@ def update_network_device(conn, device_id: int, **fields) -> None:
         f"UPDATE it_network_device SET {set_clause} WHERE id = %s",
         list(cols.values()) + [device_id],
     )
+
+
+# ---------------------------------------------------------------------------
+# IT Tasks
+# ---------------------------------------------------------------------------
+
+TASK_STATUSES = ('pending', 'in_progress', 'on_hold', 'completed', 'cancelled')
+TASK_PRIORITIES = ('low', 'medium', 'high', 'critical')
+TASK_TYPES = (
+    'Maintenance', 'Upgrade', 'Installation', 'Configuration',
+    'Backup / Recovery', 'Security', 'Network', 'Hardware Setup',
+    'Software Deployment', 'User Setup', 'Other',
+)
+
+_CREATE_TASK_TABLE = """
+CREATE TABLE IF NOT EXISTS it_task (
+    id             SERIAL PRIMARY KEY,
+    task_number    TEXT NOT NULL UNIQUE,
+    task_name      TEXT NOT NULL,
+    task_type      TEXT,
+    description    TEXT,
+    assigned_to    TEXT,
+    department     TEXT,
+    priority       TEXT DEFAULT 'medium',
+    scheduled_date TEXT,
+    due_date       TEXT,
+    completed_date TEXT,
+    status         TEXT DEFAULT 'pending',
+    notes          TEXT,
+    created_by     TEXT
+)
+"""
+
+
+def _ensure_task_table(conn) -> None:
+    conn.execute(_CREATE_TASK_TABLE)
+    conn.commit()
+
+
+def next_task_number(conn) -> str:
+    _ensure_task_table(conn)
+    yr = date.today().year
+    row = conn.execute(
+        "SELECT MAX(CAST(SUBSTRING(task_number FROM 11) AS INTEGER)) "
+        "FROM it_task WHERE task_number LIKE %s",
+        (f"TASK-{yr}-%",),
+    ).fetchone()
+    last = (row[0] or 0) if row else 0
+    return f"TASK-{yr}-{last + 1:04d}"
+
+
+def list_tasks(
+    conn, status=None, priority: str | None = None,
+    task_type: str | None = None, assigned_to: str | None = None,
+    search: str | None = None,
+) -> list:
+    _ensure_task_table(conn)
+    sql = "SELECT * FROM it_task WHERE TRUE"
+    params: list = []
+    if status:
+        if isinstance(status, (list, tuple)):
+            placeholders = ",".join("%s" for _ in status)
+            sql += f" AND status IN ({placeholders})"
+            params.extend(status)
+        else:
+            sql += " AND status = %s"
+            params.append(status)
+    if priority:
+        sql += " AND priority = %s"
+        params.append(priority)
+    if task_type:
+        sql += " AND task_type = %s"
+        params.append(task_type)
+    if assigned_to:
+        sql += " AND assigned_to ILIKE %s"
+        params.append(f"%{assigned_to}%")
+    if search:
+        sql += (
+            " AND (task_number ILIKE %s OR task_name ILIKE %s "
+            "OR assigned_to ILIKE %s OR description ILIKE %s)"
+        )
+        params.extend([f"%{search}%"] * 4)
+    sql += " ORDER BY due_date NULLS LAST, task_number"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_task(conn, task_id: int) -> dict | None:
+    _ensure_task_table(conn)
+    row = conn.execute(
+        "SELECT * FROM it_task WHERE id = %s", (task_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_task(
+    conn, task_number: str, task_name: str, task_type: str,
+    description: str, assigned_to: str, department: str,
+    priority: str, scheduled_date: str, due_date: str,
+    notes: str, created_by: str,
+) -> int:
+    _ensure_task_table(conn)
+    cur = conn.execute(
+        "INSERT INTO it_task "
+        "(task_number, task_name, task_type, description, assigned_to, "
+        "department, priority, scheduled_date, due_date, notes, created_by) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (task_number, task_name, task_type, description, assigned_to,
+         department, priority, scheduled_date, due_date, notes, created_by),
+    )
+    return cur.fetchone()[0]
+
+
+def update_task(conn, task_id: int, **fields) -> None:
+    allowed = {
+        'task_name', 'task_type', 'description', 'assigned_to', 'department',
+        'priority', 'scheduled_date', 'due_date', 'completed_date',
+        'status', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE it_task SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [task_id],
+    )
+
+
+def set_task_status(conn, task_id: int, status: str) -> None:
+    completed = date.today().isoformat() if status == "completed" else None
+    if completed:
+        conn.execute(
+            "UPDATE it_task SET status = %s, completed_date = %s WHERE id = %s",
+            (status, completed, task_id),
+        )
+    else:
+        conn.execute(
+            "UPDATE it_task SET status = %s WHERE id = %s",
+            (status, task_id),
+        )

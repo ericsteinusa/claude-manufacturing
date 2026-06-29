@@ -19,7 +19,6 @@ class WarehouseMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(_TITLE)
-        self.resize(1200, 780)
         _apply_blue_palette(self)
         self.setCentralWidget(DeptMenuWidget(_TITLE, _ITEMS))
 
@@ -27,5 +26,5 @@ class WarehouseMainMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = WarehouseMainMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

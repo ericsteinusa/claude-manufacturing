@@ -508,7 +508,6 @@ class SuppliersWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Suppliers — {email}" if email else "Suppliers"
         self.setWindowTitle(title)
-        self.resize(1000, 660)
         _apply_blue_palette(self)
         self.setCentralWidget(SuppliersWidget())
 
@@ -517,7 +516,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = SuppliersWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

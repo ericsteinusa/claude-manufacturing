@@ -14,16 +14,16 @@ with its description and a NULL ``product_id`` so the PO is never empty.
 
 Usage::
 
-    python -m manufacturing.seed_sample_pos            # add (idempotent)
-    python -m manufacturing.seed_sample_pos --reset     # remove + re-add
-    python -m manufacturing.seed_sample_pos --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_pos            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_pos --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_pos --remove    # remove only
 """
 
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
-from .purchase_orders_core import ensure_po_tables
+from ..db_pg import get_db_connection
+from ..purchase_orders_core import ensure_po_tables
 
 
 SAMPLE_PO_PREFIX = "SMPL-PO-"   # po_number prefix marking sample rows
@@ -155,3 +155,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+

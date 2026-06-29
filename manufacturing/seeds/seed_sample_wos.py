@@ -10,15 +10,15 @@ UNIQUE, so the prefix is both the tag and a natural key for idempotency).
 
 Usage::
 
-    python -m manufacturing.seed_sample_wos            # add (idempotent)
-    python -m manufacturing.seed_sample_wos --reset     # remove + re-add
-    python -m manufacturing.seed_sample_wos --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_wos            # add (idempotent)
+    python -m manufacturing.seeds.seed_sample_wos --reset     # remove + re-add
+    python -m manufacturing.seeds.seed_sample_wos --remove    # remove only
 """
 
 import argparse
 from datetime import date, timedelta
 
-from .db_pg import get_db_connection
+from ..db_pg import get_db_connection
 
 SAMPLE_WO_PREFIX = "SMPL-WO-"
 
@@ -186,3 +186,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+

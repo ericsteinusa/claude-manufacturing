@@ -776,7 +776,6 @@ class BudgetManagementWindow(QtWidgets.QMainWindow):
         title = (f"Budget Management — {email}" if email
                  else "Budget Management")
         self.setWindowTitle(title)
-        self.resize(1060, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(BudgetManagementWidget())
 
@@ -785,7 +784,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = BudgetManagementWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

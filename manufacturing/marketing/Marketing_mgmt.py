@@ -826,7 +826,6 @@ class MarketingMgmtWindow(QtWidgets.QMainWindow):
             if email else "Marketing Management"
         )
         self.setWindowTitle(title)
-        self.resize(1150, 740)
         _apply_blue_palette(self)
         tabs = ButtonNav()
         tabs.setStyleSheet(TAB_STYLE)
@@ -842,5 +841,5 @@ class MarketingMgmtWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MarketingMgmtWindow()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

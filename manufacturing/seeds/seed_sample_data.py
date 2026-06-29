@@ -21,9 +21,9 @@ idempotent and fully reversible.
 
 Usage::
 
-    python -m manufacturing.seed_sample_data            # add sample data
-    python -m manufacturing.seed_sample_data --reset    # remove + re-add
-    python -m manufacturing.seed_sample_data --remove    # remove only
+    python -m manufacturing.seeds.seed_sample_data            # add sample data
+    python -m manufacturing.seeds.seed_sample_data --reset    # remove + re-add
+    python -m manufacturing.seeds.seed_sample_data --remove    # remove only
 
 Lookups are by name (not hard-coded ids), so the script tolerates
 differing primary keys; sub-departments or departments absent from the
@@ -37,8 +37,8 @@ import sys
 
 import bcrypt
 
-from .db_pg import get_db_connection
-from .schema import init_schema
+from ..db_pg import get_db_connection
+from ..schema import init_schema
 
 SAMPLE_EMAIL_DOMAIN = "@example.com"
 
@@ -360,3 +360,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+

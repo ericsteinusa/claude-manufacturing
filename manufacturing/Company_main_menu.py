@@ -112,7 +112,6 @@ class CompanyMainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Company Main Menu")
-        self.resize(1200, 760)
         _apply_blue_palette(self)
         self.setCentralWidget(CompanyMainMenuWidget())
 
@@ -120,5 +119,5 @@ class CompanyMainMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = CompanyMainMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())
