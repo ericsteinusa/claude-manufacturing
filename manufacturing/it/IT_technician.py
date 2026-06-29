@@ -6,6 +6,7 @@ from .it_repairs_software import ITRepairsWidget, ITSoftwareWidget, ITLicensesWi
 from .it_asset_mgmt import ITAssetMgmtWidget
 from .it_helpdesk import ITHelpDeskWidget
 from .it_tasks_desktop import ITTasksDesktopWidget
+from .it_network_devices import ITNetworkDevicesWidget
 
 TAB_STYLE = (
     "QTabWidget::pane{border:1px solid black;}"
@@ -32,6 +33,7 @@ class ITTechnicianWidget(QtWidgets.QWidget):
         tabs.addTab(ITSoftwareWidget(),         "Software Installations")
         tabs.addTab(ITLicensesWidget(),         "Licenses")
         tabs.addTab(ITAssetMgmtWidget(),        "Asset Management")
+        tabs.addTab(ITNetworkDevicesWidget(),   "Network Devices")
         tabs.addTab(ITReportsDesktopWidget(),   "Reports")
         v.addWidget(tabs)
 
