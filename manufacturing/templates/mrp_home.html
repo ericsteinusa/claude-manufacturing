@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block page_title %}MRP Planning{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+{% if has_plan %}
+<a href="/mrp/plan/" class="btn">View Current Plan</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.mrp-wrap { width: 100%; max-width: 1040px; }
+.mrp-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.mrp-wrap p.sub { color: #cce; font-size: 13px; margin-bottom: 18px; }
+.info-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px; padding: 12px 18px; margin-bottom: 18px; color: #cce; font-size: 13px; }
+.info-card strong { color: white; }
+.mrp-table { width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+.mrp-table th, .mrp-table td { padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid #ddd; font-size: 13px; }
+.mrp-table th { background: rgb(0,60,180); color: white; }
+.mrp-table tr:last-child td { border-bottom: none; }
+.mrp-table td.num, .mrp-table th.num { text-align: right; }
+.mrp-table tr:hover td { background: #f0f4ff; }
+.badge { display: inline-block; padding: 1px 9px; border-radius: 10px;
+    border: 1px solid; font-size: 11px; }
+.badge-make { background: #d0e8ff; border-color: #3070c0; color: #1a4080; }
+.badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
+.need-high  { color: #c00; font-weight: bold; }
+.need-zero  { color: #aaa; }
+.run-btn { display: inline-block; padding: 10px 28px; background: rgb(0,60,180);
+    color: white; border: none; border-radius: 6px; font-size: 15px;
+    font-weight: bold; cursor: pointer; margin-top: 4px; }
+.run-btn:hover { background: rgb(0,40,140); }
+.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="mrp-wrap">
+    <h2>Material Requirements Planning</h2>
+    <p class="sub">Net requirements based on confirmed Sales Orders vs on-hand stock and open Work Orders.</p>
+
+    <div class="info-card">
+        <strong>Demand source:</strong> Confirmed Sales Orders &nbsp;|&nbsp;
+        <strong>Scheduled receipts:</strong> Open / In-Progress Work Orders &nbsp;|&nbsp;
+        <strong>Safety stock:</strong> None (extend in settings)
+    </div>
+
+    {% if demand_rows %}
+    <table class="mrp-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Type</th>
+                <th class="num">Demand (SOs)</th>
+                <th class="num">On Hand</th>
+                <th class="num">Open WOs</th>
+                <th class="num">Net Need</th>
+                <th>Contributing SOs</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in demand_rows %}
+            <tr>
+                <td><a href="/bom/{{ row.id }}/" style="color:rgb(0,60,180);font-weight:bold;">
+                    {{ row.name }}</a></td>
+                <td><span class="badge badge-{{ row.item_type }}">{{ row.item_type|capfirst }}</span></td>
+                <td class="num">{{ row.demand_qty|floatformat:0 }}</td>
+                <td class="num">{{ row.on_hand|floatformat:0 }}</td>
+                <td class="num">{{ row.scheduled|floatformat:0 }}</td>
+                <td class="num">
+                    {% if row.net > 0 %}
+                    <span class="need-high">{{ row.net|floatformat:0 }}</span>
+                    {% else %}
+                    <span class="need-zero">0</span>
+                    {% endif %}
+                </td>
+                <td style="color:#666;font-size:12px;">{{ row.so_numbers }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <form method="post" action="/mrp/run/">
+        {% csrf_token %}
+        <button type="submit" class="run-btn">Run MRP Plan &rarr;</button>
+    </form>
+    <p style="color:#aac;font-size:12px;margin-top:8px;">
+        Running the plan explodes all confirmed SO demand through the BOM,
+        nets against on-hand stock and open WOs, and computes planned orders.
+    </p>
+    {% endif %}
+
+    {% else %}
+    <p class="empty-note">No confirmed Sales Orders with product lines found.
+        <a href="/so/" style="color:#99f;">Go to Sales Orders &rarr;</a>
+    </p>
+    {% endif %}
+
+    {% if has_plan %}
+    <div style="margin-top:24px; padding:14px 18px; background:rgba(0,80,0,0.25);
+                border:1px solid #4a4; border-radius:6px; color:#cfc; font-size:13px;">
+        A plan was run recently.
+        <a href="/mrp/plan/" style="color:#9f9;font-weight:bold;">Review and release it &rarr;</a>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

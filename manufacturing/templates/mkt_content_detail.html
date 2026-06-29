@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block page_title %}Content — {{ item.title }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mkt/" class="btn">Marketing Dashboard</a>
+<a href="/mkt/campaigns/" class="btn">Campaigns</a>
+<a href="/mkt/leads/" class="btn">Leads</a>
+<a href="/mkt/content/" class="btn">Content</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.mkt-wrap { width:100%; max-width:900px; }
+.mkt-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.field-group { display:flex; flex-direction:column; gap:3px; }
+.field-group label { font-size:11px; font-weight:bold; color:#666; text-transform:uppercase; }
+.field-group .val { font-size:14px; color:#222; }
+.full-span { grid-column:1/-1; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:70px; resize:vertical; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.s-draft     { background:#e2e3e5; color:#383d41; }
+.s-in-review { background:#fff3cd; color:#856404; }
+.s-approved  { background:#d1ecf1; color:#0c5460; }
+.s-published { background:#d4edda; color:#0a3622; }
+.s-archived  { background:#f8d7da; color:#721c24; }
+.btn-save { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-save:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="mkt-wrap">
+    <h2>{{ item.title }}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <div class="field-grid">
+            <div class="field-group">
+                <label>Status</label>
+                <div class="val"><span class="badge s-{{ item.status|lower|slugify }}">{{ item.status }}</span></div>
+            </div>
+            <div class="field-group">
+                <label>Type</label>
+                <div class="val">{{ item.content_type|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Channel</label>
+                <div class="val">{{ item.channel|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Author</label>
+                <div class="val">{{ item.author|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Due Date</label>
+                <div class="val">{{ item.due_date|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Publish Date</label>
+                <div class="val">{{ item.publish_date|default:"—" }}</div>
+            </div>
+            {% if item.notes %}
+            <div class="field-group full-span">
+                <label>Notes</label>
+                <div class="val">{{ item.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Content</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid three">
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" value="{{ item.title }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select name="content_type">
+                        {% for t in content_types %}
+                        <option value="{{ t }}"{% if item.content_type == t %} selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Channel</label>
+                    <select name="channel">
+                        {% for ch in channels %}
+                        <option value="{{ ch }}"{% if item.channel == ch %} selected{% endif %}>{{ ch }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in content_statuses %}
+                        <option value="{{ s }}"{% if item.status == s %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" name="author" value="{{ item.author|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" value="{{ item.due_date|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Publish Date</label>
+                    <input type="date" name="publish_date" value="{{ item.publish_date|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ item.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-save">Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

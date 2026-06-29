@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block page_title %}Hardware Repairs{% endblock %}
+
+{% block toolbar_left %}
+<a href="/it/" class="btn">IT Dashboard</a>
+<a href="/it/tickets/" class="btn">Tickets</a>
+<a href="/it/assets/" class="btn">Assets</a>
+<a href="/it/repairs/" class="btn">Repairs</a>
+<a href="/it/software/" class="btn">Software</a>
+<a href="/it/licenses/" class="btn">Licenses</a>
+<a href="/it/network/" class="btn">Network</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.it-wrap { width:100%; max-width:1200px; }
+.it-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.p-low      { background:#e2e3e5; color:#383d41; }
+.p-medium   { background:#d1ecf1; color:#0c5460; }
+.p-high     { background:#fff3cd; color:#856404; }
+.p-critical { background:#f8d7da; color:#721c24; }
+.s-open        { background:#d1ecf1; color:#0c5460; }
+.s-in_progress { background:#fff3cd; color:#856404; }
+.s-completed   { background:#d4edda; color:#0a3622; }
+.s-cancelled   { background:#e2e3e5; color:#383d41; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:70px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="it-wrap">
+    <h2>Hardware Repairs</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in repair_statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
+            {% endfor %}
+        </select>
+        <select name="priority">
+            <option value="">All Priorities</option>
+            {% for p in repair_priorities %}
+            <option value="{{ p }}"{% if priority_filter == p %} selected{% endif %}>{{ p|capfirst }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search asset / reporter…">
+        <button type="submit">Filter</button>
+        <a href="/it/repairs/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Asset Tag</th>
+                    <th>Problem</th>
+                    <th>Reported By</th>
+                    <th>Reported</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Completed</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in repairs %}
+            <tr>
+                <td><a href="/it/repairs/{{ r.id }}/">{{ r.id }}</a></td>
+                <td>{{ r.asset_tag|default:"—" }}</td>
+                <td>{{ r.problem_description|truncatechars:60 }}</td>
+                <td>{{ r.reported_by|default:"—" }}</td>
+                <td>{{ r.reported_date|default:"—" }}</td>
+                <td><span class="badge p-{{ r.priority }}">{{ r.priority|capfirst }}</span></td>
+                <td><span class="badge s-{{ r.status }}">{{ r.status|capfirst }}</span></td>
+                <td>{{ r.assigned_to|default:"—" }}</td>
+                <td>{{ r.completed_date|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" style="color:#888;text-align:center;">No repairs found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if user_role not in 'Auditor' %}
+    <div class="card">
+        <h3>New Repair Request</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Asset Tag</label>
+                    <input type="text" name="asset_tag" placeholder="e.g. LPT-042">
+                </div>
+                <div class="form-group">
+                    <label>Reported By</label>
+                    <input type="text" name="reported_by" placeholder="Name of reporter">
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select name="priority">
+                        {% for p in repair_priorities %}
+                        <option value="{{ p }}"{% if p == 'medium' %} selected{% endif %}>{{ p|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assigned To</label>
+                    <input type="text" name="assigned_to" placeholder="Technician">
+                </div>
+                <div class="form-group">
+                    <label>Reported Date</label>
+                    <input type="date" name="reported_date" value="{{ today }}">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional notes">
+                </div>
+                <div class="form-group full-span">
+                    <label>Problem Description *</label>
+                    <textarea name="problem_description" placeholder="Describe the hardware issue"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Submit Repair Request</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

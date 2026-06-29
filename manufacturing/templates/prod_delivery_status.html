@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block page_title %}Delivery Status{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/shipping/" class="btn">Shipping</a>
+<a href="/prod/tracking/" class="btn">Tracking</a>
+<a href="/prod/delivery-status/" class="btn">Delivery Status</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ds-wrap { width:100%; max-width:1100px; }
+.ds-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending    { background:#cce5ff; color:#004085; }
+.s-in_transit { background:#fff3cd; color:#856404; }
+.s-delivered  { background:#d4edda; color:#0a3622; }
+.s-cancelled  { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ds-wrap">
+    <h2>Delivery Status</h2>
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in SHIPMENT_STATUSES %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Ship # / carrier / tracking…">
+        <button type="submit">Filter</button>
+        <a href="/prod/delivery-status/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Ship #</th>
+                    <th>SO #</th>
+                    <th>Ship Date</th>
+                    <th>Carrier</th>
+                    <th>Tracking #</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in shipments %}
+            <tr>
+                <td><a href="/prod/shipping/{{ s.id }}/">{{ s.ship_number }}</a></td>
+                <td>{% if s.so_number %}<a href="/so/{{ s.so_id }}/">{{ s.so_number }}</a>{% else %}—{% endif %}</td>
+                <td>{{ s.ship_date|default:"—" }}</td>
+                <td>{{ s.carrier|default:"—" }}</td>
+                <td>{{ s.tracking_number|default:"—" }}</td>
+                <td><span class="badge s-{{ s.status }}">{{ s.status|title }}</span></td>
+                <td>{{ s.notes|default:"—"|truncatechars:40 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;text-align:center;">No shipments found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

@@ -1454,7 +1454,6 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
         title = (f"Bank Reconciliation — {email}" if email
                  else "Bank Reconciliation")
         self.setWindowTitle(title)
-        self.resize(1200, 780)
         _apply_palette(self)
         self.setCentralWidget(BankReconciliationWidget())
 
@@ -1463,5 +1462,5 @@ class BankReconciliationWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = BankReconciliationWindow()
-    win.show()
+    win.showMaximized()
     sys.exit(app.exec())

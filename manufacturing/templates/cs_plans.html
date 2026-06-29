@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block page_title %}CS Improvement Plans{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs/" class="btn">All Tickets</a>
+<a href="/cs/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:1000px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-row { display:flex; gap:8px; margin-bottom:14px; align-items:center; }
+.filter-row a { display:inline-block; padding:3px 14px; border-radius:20px;
+    font-size:12px; font-weight:bold; text-decoration:none;
+    background:#334; color:#aad; border:2px solid #556; }
+.filter-row a.active { border-color:white; color:white; }
+.plans-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.plans-table th,.plans-table td { padding:9px 14px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.plans-table th { background:rgb(0,60,180); color:white; }
+.plans-table tr:last-child td { border-bottom:none; }
+.plans-table tr:hover td { background:#f0f4ff; }
+.row-completed td { background:#efffef; }
+.row-cancelled td { background:#f5f5f5; color:#aaa; }
+.row-overdue td { background:#fff0f0; }
+.row-inprog td { background:#fffbe6; }
+.st-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+    font-size:11px; font-weight:bold; }
+.st-Open { background:#e8eaf6; color:#3949ab; }
+.st-In.Progress { background:#fff3e0; color:#e65100; }
+.st-Completed { background:#e8f5e9; color:#1a6b1a; }
+.st-Cancelled { background:#f5f5f5; color:#999; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>Improvement Plans</h2>
+
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <!-- Status filter -->
+    <div class="filter-row">
+        <a href="/cs/plans/" {% if not status_filter %}class="active"{% endif %}>All</a>
+        {% for st in plan_statuses %}
+        <a href="/cs/plans/?status={{ st }}"
+           {% if status_filter == st %}class="active"{% endif %}>{{ st }}</a>
+        {% endfor %}
+    </div>
+
+    <!-- Plans list -->
+    {% if plans %}
+    <table class="plans-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Owner</th>
+                <th>Target Date</th>
+                <th>Created</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in plans %}
+            <tr class="{% if p.status == 'Completed' %}row-completed
+                {% elif p.status == 'Cancelled' %}row-cancelled
+                {% elif p.overdue %}row-overdue
+                {% elif p.status == 'In Progress' %}row-inprog{% endif %}">
+                <td><strong>{{ p.title }}</strong>
+                    {% if p.description %}
+                    <div style="font-size:11px;color:#888;margin-top:2px;">
+                        {{ p.description|truncatechars:80 }}</div>
+                    {% endif %}
+                </td>
+                <td>{{ p.owner|default:"—" }}</td>
+                <td>
+                    {{ p.target_date|default:"—" }}
+                    {% if p.overdue %}<span style="color:#c62828;font-size:11px;"> &#9888; overdue</span>{% endif %}
+                </td>
+                <td style="color:#555;">{{ p.created_date }}</td>
+                <td><span class="st-badge st-{{ p.status }}">{{ p.status }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#cce;font-size:14px;margin-bottom:20px;">No plans found.</p>
+    {% endif %}
+
+    <!-- Create / update form -->
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Improvement Plan</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="form-grid">
+                <div class="form-row full">
+                    <label>Title *</label>
+                    <input type="text" name="title" required placeholder="Plan title">
+                </div>
+                <div class="form-row">
+                    <label>Owner</label>
+                    <input type="text" name="owner" placeholder="Responsible person">
+                </div>
+                <div class="form-row">
+                    <label>Target Date</label>
+                    <input type="date" name="target_date">
+                </div>
+                <div class="form-row full">
+                    <label>Description</label>
+                    <textarea name="description" rows="3"
+                        placeholder="What needs to be improved and how…"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="save-btn" style="margin-top:12px;">
+                Create Plan</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

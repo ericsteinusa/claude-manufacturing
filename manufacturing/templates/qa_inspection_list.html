@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block page_title %}QA Inspections{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">Dashboard</a>
+<a href="/qa/ncr/" class="btn">NCRs</a>
+<a href="/qa/suppliers/" class="btn">Suppliers</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.qa-wrap { width:100%; max-width:1100px; }
+.qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; }
+.chip { display:inline-block; padding:3px 13px; border-radius:20px; font-size:12px;
+    font-weight:bold; text-decoration:none; background:#334; color:#aad; border:2px solid #556; }
+.chip.active { border-color:white; color:white; }
+.search-input { padding:5px 10px; border-radius:4px; border:1px solid #ccc; font-size:13px; width:200px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.res-passed { background:#e8f5e9; color:#1a6b1a; }
+.res-failed { background:#ffebee; color:#c62828; }
+.res-pending { background:#e8eaf6; color:#3949ab; }
+.res-on_hold { background:#fff3e0; color:#e65100; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row textarea { resize:vertical; min-height:60px; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="qa-wrap">
+    <h2>QA Inspections</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="toolbar">
+        <div class="chip-row">
+            <a href="/qa/inspections/" class="chip {% if not result_filter %}active{% endif %}">All</a>
+            {% for r in insp_results %}
+            <a href="/qa/inspections/?result={{ r }}" class="chip {% if result_filter == r %}active{% endif %}">{{ r|title }}</a>
+            {% endfor %}
+        </div>
+        <form method="get" style="display:flex;gap:6px;align-items:center;">
+            {% if result_filter %}<input type="hidden" name="result" value="{{ result_filter }}">{% endif %}
+            <input class="search-input" type="text" name="search"
+                   value="{{ search }}" placeholder="Search…">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+            {% if search %}<a href="/qa/inspections/{% if result_filter %}?result={{ result_filter }}{% endif %}" class="chip">Clear</a>{% endif %}
+        </form>
+    </div>
+
+    {% if inspections %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Insp #</th><th>Product</th><th>Inspector</th>
+            <th>Date</th><th>Defects</th><th>Result</th>
+        </tr></thead>
+        <tbody>
+        {% for i in inspections %}
+        <tr onclick="location='/qa/inspections/{{ i.id }}/'">
+            <td><strong>{{ i.insp_number }}</strong></td>
+            <td>{{ i.product_name|default:"—" }}</td>
+            <td>{{ i.inspector|default:"—" }}</td>
+            <td>{{ i.insp_date }}</td>
+            <td>
+                {% if i.open_defects %}
+                <span style="color:#c62828;font-weight:bold;">{{ i.open_defects }} open</span>
+                {% if i.defect_count > i.open_defects %}/ {{ i.defect_count }} total{% endif %}
+                {% elif i.defect_count %}
+                {{ i.defect_count }} resolved
+                {% else %}—{% endif %}
+            </td>
+            <td><span class="badge res-{{ i.result }}">{{ i.result|title }}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#cce;font-size:14px;margin-bottom:20px;">No inspections found.</p>
+    {% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Inspection</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Product</label>
+                    <select name="product_id">
+                        <option value="">— None —</option>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Work Order</label>
+                    <select name="wo_id">
+                        <option value="">— None —</option>
+                        {% for w in work_orders %}
+                        <option value="{{ w.id }}">{{ w.wo_number }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Inspector</label>
+                    <input type="text" name="inspector">
+                </div>
+                <div class="form-row">
+                    <label>Inspection Date</label>
+                    <input type="date" name="insp_date">
+                </div>
+                <div class="form-row">
+                    <label>Initial Result</label>
+                    <select name="result">
+                        {% for r in insp_results %}<option>{{ r }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="save-btn" style="margin-top:12px;">Create Inspection</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

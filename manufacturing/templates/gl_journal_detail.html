@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block page_title %}{% if journal %}Journal Entry{% else %}New Journal Entry{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/journals/" class="btn">All Journals</a>
+<a href="/gl/accounts/" class="btn">Accounts</a>
+<a href="/gl/" class="btn">G/L</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:900px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.meta-row { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:10px; }
+.meta-item .lbl { font-size:11px; color:#555; font-weight:bold; }
+.meta-item .val { font-size:14px; color:#222; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.totals-row { background:#e8eef8; font-weight:bold; }
+.btn-act { padding:6px 16px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.btn-danger { padding:6px 16px; background:#c33; color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; }
+.badge-posted  { background:#d1e7dd; color:#0a3622; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.badge-unposted{ background:#fff3cd; color:#856404; padding:3px 10px; border-radius:4px; font-size:12px; }
+.line-add-row { display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;
+    background:#f0f4ff; border-radius:6px; padding:10px; margin-bottom:10px; }
+.bal-ok  { color:#1a6b1a; font-weight:bold; }
+.bal-err { color:#c33; font-weight:bold; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>{% if journal %}Journal Entry #{{ journal.id }}{% else %}New Journal Entry{% endif %}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if journal %}
+    <div class="card">
+        <div class="meta-row">
+            <div class="meta-item"><div class="lbl">Date</div><div class="val">{{ journal.journal_date }}</div></div>
+            <div class="meta-item"><div class="lbl">Reference</div><div class="val">{{ journal.reference|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Description</div><div class="val">{{ journal.description|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Created By</div><div class="val">{{ journal.created_by|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">Status</div>
+                <div class="val">
+                    <span class="{% if journal.posted %}badge-posted{% else %}badge-unposted{% endif %}">
+                        {% if journal.posted %}Posted{% else %}Unposted{% endif %}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if can_edit and not journal.posted %}
+        <div style="display:flex;gap:10px;margin-top:8px;">
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="post">
+                <button type="submit" class="btn-act"
+                    onclick="return confirm('Post this journal entry? This cannot be undone.')">Post Entry</button>
+            </form>
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="void">
+                <button type="submit" class="btn-danger"
+                    onclick="return confirm('Delete this unposted entry?')">Void / Delete</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Journal Lines</h3>
+        {% if lines %}
+        <table class="list-table">
+            <thead><tr>
+                <th>Account</th><th class="num">Debit</th><th class="num">Credit</th><th>Memo</th>
+            </tr></thead>
+            <tbody>
+            {% for ln in lines %}
+            <tr>
+                <td>{{ ln.account_number }} — {{ ln.account_name }}</td>
+                <td class="num">{% if ln.debit %}${{ ln.debit|floatformat:2 }}{% endif %}</td>
+                <td class="num">{% if ln.credit %}${{ ln.credit|floatformat:2 }}{% endif %}</td>
+                <td>{{ ln.memo|default:"" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <!-- New Journal Entry Form -->
+    <div class="card">
+        <h3>Journal Details</h3>
+        <form method="post" id="jform">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
+                <div class="form-row">
+                    <label>Date *</label>
+                    <input type="date" name="journal_date" required>
+                </div>
+                <div class="form-row" style="flex:1;min-width:160px;">
+                    <label>Reference</label>
+                    <input type="text" name="reference" placeholder="e.g. JE-001">
+                </div>
+                <div class="form-row" style="flex:2;min-width:240px;">
+                    <label>Description</label>
+                    <input type="text" name="description">
+                </div>
+            </div>
+
+            <h3 style="font-size:14px;color:#333;margin-bottom:8px;">Journal Lines</h3>
+            <div id="lines-container"></div>
+
+            <div class="line-add-row">
+                <div class="form-row">
+                    <label>Account</label>
+                    <select id="add-acct" style="min-width:220px;">
+                        {% for a in accounts %}
+                        <option value="{{ a.id }}">{{ a.account_number }} — {{ a.account_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Debit ($)</label>
+                    <input type="number" id="add-dr" step="0.01" min="0" value="0" style="width:100px;">
+                </div>
+                <div class="form-row">
+                    <label>Credit ($)</label>
+                    <input type="number" id="add-cr" step="0.01" min="0" value="0" style="width:100px;">
+                </div>
+                <div class="form-row">
+                    <label>Memo</label>
+                    <input type="text" id="add-memo" style="width:180px;">
+                </div>
+                <button type="button" class="btn-act" onclick="addLine()">Add Line</button>
+            </div>
+
+            <div id="totals-bar" style="font-size:13px;color:#555;margin-bottom:12px;">
+                Debits: <span id="tot-dr">$0.00</span> &nbsp;|&nbsp;
+                Credits: <span id="tot-cr">$0.00</span> &nbsp;|&nbsp;
+                Difference: <span id="tot-diff" class="bal-ok">$0.00</span>
+            </div>
+
+            <button type="submit" class="btn-act" id="submit-btn" disabled>Save Journal Entry</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+
+<script>
+var lineCount = 0;
+function addLine() {
+    var acctSel = document.getElementById('add-acct');
+    var acctId  = acctSel.value;
+    var acctLbl = acctSel.options[acctSel.selectedIndex].text;
+    var dr = parseFloat(document.getElementById('add-dr').value) || 0;
+    var cr = parseFloat(document.getElementById('add-cr').value) || 0;
+    var memo = document.getElementById('add-memo').value;
+    if (dr == 0 && cr == 0) { alert('Enter a debit or credit amount.'); return; }
+    lineCount++;
+    var container = document.getElementById('lines-container');
+    var row = document.createElement('div');
+    row.style = 'display:flex;gap:10px;align-items:center;padding:6px;background:white;border:1px solid #ccc;border-radius:4px;margin-bottom:6px;font-size:13px;';
+    row.innerHTML = '<span style="flex:2">' + acctLbl + '</span>'
+        + '<span style="flex:1;text-align:right;">' + (dr ? '$'+dr.toFixed(2) : '') + '</span>'
+        + '<span style="flex:1;text-align:right;">' + (cr ? '$'+cr.toFixed(2) : '') + '</span>'
+        + '<span style="flex:1">' + memo + '</span>'
+        + '<button type="button" onclick="this.parentNode.remove();updateTotals();" style="background:#c33;color:white;border:none;border-radius:3px;padding:2px 7px;cursor:pointer;">✕</button>'
+        + '<input type="hidden" name="account_id" value="'+acctId+'">'
+        + '<input type="hidden" name="debit" value="'+dr+'">'
+        + '<input type="hidden" name="credit" value="'+cr+'">'
+        + '<input type="hidden" name="memo" value="'+memo+'">';
+    container.appendChild(row);
+    document.getElementById('add-dr').value = 0;
+    document.getElementById('add-cr').value = 0;
+    document.getElementById('add-memo').value = '';
+    updateTotals();
+}
+function updateTotals() {
+    var drs = document.getElementsByName('debit');
+    var crs = document.getElementsByName('credit');
+    var totDr = 0, totCr = 0;
+    for (var i=0; i<drs.length; i++) totDr += parseFloat(drs[i].value)||0;
+    for (var i=0; i<crs.length; i++) totCr += parseFloat(crs[i].value)||0;
+    var diff = Math.abs(totDr - totCr);
+    document.getElementById('tot-dr').textContent = '$'+totDr.toFixed(2);
+    document.getElementById('tot-cr').textContent = '$'+totCr.toFixed(2);
+    var diffEl = document.getElementById('tot-diff');
+    diffEl.textContent = '$'+diff.toFixed(2);
+    diffEl.className = diff < 0.005 ? 'bal-ok' : 'bal-err';
+    document.getElementById('submit-btn').disabled = !(drs.length > 0 && diff < 0.005);
+}
+</script>
+{% endblock %}

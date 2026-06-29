@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block page_title %}Production{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/prod/schedule/" class="btn">Schedule</a>
+<a href="/prod/shipping/" class="btn">Shipping</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/bom/" class="btn">BOM</a>
+<a href="/mrp/" class="btn">MRP</a>
+<a href="/inventory/" class="btn">Inventory</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
+    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+    font-size:13px; text-decoration:none; }
+.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi.red { border-color:#c33; }
+.kpi.red .val { color:#c33; }
+.kpi.yellow { border-color:#b8860b; }
+.kpi.yellow .val { color:#b8860b; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft     { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-open      { background:#cce5ff; color:#004085; }
+.st-in_progress { background:#fff3cd; color:#856404; }
+.st-completed { background:#d4edda; color:#0a3622; }
+.st-cancelled { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Production Dashboard</h2>
+
+    <div class="nav-grid">
+        <a href="/wo/" class="nav-btn">Work Orders</a>
+        <a href="/wo/new/" class="nav-btn">New Work Order</a>
+        <a href="/prod/schedule/" class="nav-btn">Production Schedule</a>
+        <a href="/prod/shipping/" class="nav-btn">Shipping</a>
+        <a href="/bom/" class="nav-btn">BOM</a>
+        <a href="/mrp/" class="nav-btn">MRP Planning</a>
+        <a href="/inventory/" class="nav-btn">Inventory</a>
+        <a href="/inventory/new/" class="nav-btn">New Inventory Item</a>
+        <a href="/prod/reports/" class="nav-btn">Production Reports</a>
+        <a href="/dashboard/" class="nav-btn">Home</a>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Open WOs</div>
+            <div class="val">{{ work_orders.open }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">In Progress</div>
+            <div class="val">{{ work_orders.in_progress }}</div>
+        </div>
+        <div class="kpi{% if work_orders.overdue %} red{% endif %}">
+            <div class="lbl">Overdue</div>
+            <div class="val">{{ work_orders.overdue }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Products</div>
+            <div class="val">{{ inventory.total_products }}</div>
+        </div>
+        <div class="kpi{% if inventory.zero_stock %} red{% endif %}">
+            <div class="lbl">Zero Stock</div>
+            <div class="val">{{ inventory.zero_stock }}</div>
+        </div>
+        <div class="kpi{% if inventory.low_stock %} yellow{% endif %}">
+            <div class="lbl">Low Stock</div>
+            <div class="val">{{ inventory.low_stock }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Work Orders</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>WO #</th>
+                    <th>Description</th>
+                    <th>Product</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for wo in recent_wos %}
+            <tr>
+                <td><a href="/wo/{{ wo.id }}/">{{ wo.wo_number }}</a></td>
+                <td>{{ wo.description }}</td>
+                <td>{{ wo.product_name }}</td>
+                <td>{{ wo.due_date }}</td>
+                <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;">No work orders yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

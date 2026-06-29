@@ -206,7 +206,9 @@ class _CsvAdapter:
     """
 
     def poll(self, device: dict, conn) -> tuple[list[PunchRecord], str]:
-        import csv, json, os
+        import csv
+        import json
+        import os
         cfg = json.loads(device.get('config_json') or '{}')
         path = cfg.get('file_path', '')
         if not path or not os.path.exists(path):

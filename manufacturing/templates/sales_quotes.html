@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Quotes{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Dashboard</a>
+<a href="/sales/orders/" class="btn">Orders</a>
+<a href="/sales/targets/" class="btn">Targets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select,.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-Draft   { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-Sent    { background:#cce5ff; color:#004085; }
+.st-Won     { background:#d4edda; color:#0a3622; }
+.st-Lost    { background:#f8d7da; color:#842029; }
+.st-Expired { background:#e2e3e5; color:#383d41; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.edit-card { display:none; background:white; border:2px solid black; border-radius:8px;
+    padding:16px 20px; margin-bottom:16px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Sales Quotes</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Status:</label>
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for s in QUOTE_STATUSES %}
+            <option value="{{ s }}" {% if filter_status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Search:</label>
+        <input type="text" name="search" value="{{ filter_search }}" placeholder="Customer or description…">
+        <button type="submit" class="btn-sm">Filter</button>
+        <a href="/sales/quotes/" style="color:#aad;font-size:13px;">Clear</a>
+    </form>
+
+    <table class="list-table">
+        <thead><tr>
+            <th>Customer</th><th>Description</th><th>Owner</th>
+            <th>Date</th><th>Valid Until</th>
+            <th class="num">Amount</th><th>Status</th>
+            {% if can_edit %}<th></th>{% endif %}
+        </tr></thead>
+        <tbody>
+        {% for q in quotes %}
+        <tr>
+            <td>{{ q.customer }}</td>
+            <td>{{ q.description|default:"—" }}</td>
+            <td>{{ q.owner|default:"—" }}</td>
+            <td>{{ q.quote_date|default:"—" }}</td>
+            <td>{{ q.valid_until|default:"—" }}</td>
+            <td class="num">${{ q.amount|floatformat:2 }}</td>
+            <td><span class="badge st-{{ q.status }}">{{ q.status }}</span></td>
+            {% if can_edit %}
+            <td style="white-space:nowrap;">
+                <button type="button" class="btn-sm" style="padding:3px 10px;font-size:11px;"
+                    onclick="openEdit({{ q.id }},'{{ q.customer|escapejs }}','{{ q.description|default:''|escapejs }}',{{ q.amount }},'{{ q.owner|default:''|escapejs }}','{{ q.quote_date|default:'' }}','{{ q.valid_until|default:'' }}','{{ q.status }}','{{ q.notes|default:''|escapejs }}')">Edit</button>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="set_status">
+                    <input type="hidden" name="quote_id" value="{{ q.id }}">
+                    <select name="new_status" onchange="this.form.submit()" style="font-size:11px;padding:2px 4px;">
+                        {% for s in QUOTE_STATUSES %}
+                        <option value="{{ s }}" {% if q.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="{% if can_edit %}8{% else %}7{% endif %}" style="color:#888;text-align:center;padding:16px;">No quotes found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <!-- Edit card (hidden, revealed by JS) -->
+    <div class="edit-card" id="edit-card">
+        <h3>Edit Quote</h3>
+        <form method="post" id="edit-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="quote_id" id="edit-id">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:2;min-width:160px;"><label>Customer *</label><input type="text" name="customer" id="edit-customer" required></div>
+                <div class="form-row" style="flex:2;min-width:160px;"><label>Description</label><input type="text" name="description" id="edit-description"></div>
+                <div class="form-row"><label>Amount ($)</label><input type="number" name="amount" id="edit-amount" step="0.01" min="0" style="width:110px;"></div>
+                <div class="form-row" style="flex:1;min-width:120px;"><label>Owner</label><input type="text" name="owner" id="edit-owner"></div>
+                <div class="form-row"><label>Quote Date</label><input type="date" name="quote_date" id="edit-quote-date"></div>
+                <div class="form-row"><label>Valid Until</label><input type="date" name="valid_until" id="edit-valid-until"></div>
+                <div class="form-row"><label>Status</label>
+                    <select name="status" id="edit-status">
+                        {% for s in QUOTE_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label><textarea name="notes" id="edit-notes" rows="2"></textarea></div>
+            <button type="submit" class="btn-sm">Save Quote</button>
+            <button type="button" class="btn-sm" style="background:#888;margin-left:8px;"
+                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>New Quote</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="new">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:2;min-width:160px;"><label>Customer *</label><input type="text" name="customer" required></div>
+                <div class="form-row" style="flex:2;min-width:160px;"><label>Description</label><input type="text" name="description"></div>
+                <div class="form-row"><label>Amount ($)</label><input type="number" name="amount" step="0.01" min="0" value="0" style="width:110px;"></div>
+                <div class="form-row" style="flex:1;min-width:120px;"><label>Owner</label><input type="text" name="owner"></div>
+                <div class="form-row"><label>Quote Date</label><input type="date" name="quote_date"></div>
+                <div class="form-row"><label>Valid Until</label><input type="date" name="valid_until"></div>
+            </div>
+            <button type="submit" class="btn-sm">Create Quote</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+<script>
+function openEdit(id, customer, desc, amount, owner, qdate, vuntil, status, notes) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-customer').value = customer;
+    document.getElementById('edit-description').value = desc;
+    document.getElementById('edit-amount').value = amount;
+    document.getElementById('edit-owner').value = owner;
+    document.getElementById('edit-quote-date').value = qdate;
+    document.getElementById('edit-valid-until').value = vuntil;
+    document.getElementById('edit-status').value = status;
+    document.getElementById('edit-notes').value = notes;
+    var card = document.getElementById('edit-card');
+    card.style.display = 'block';
+    card.scrollIntoView({behavior: 'smooth'});
+}
+</script>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block page_title %}Budget — {{ budget.budget_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/fin/" class="btn">Finance Dashboard</a>
+<a href="/fin/budgets/" class="btn">Budgets</a>
+<a href="/fin/audits/" class="btn">Audits</a>
+<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
+<a href="/fin/tax/" class="btn">Tax Filings</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.fn-wrap { width:100%; max-width:1200px; }
+.fn-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.btn-sm { padding:4px 12px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-sm:hover { background:rgb(0,40,140); }
+.btn-del { padding:4px 10px; background:#c33; color:white;
+    border:none; border-radius:4px; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-del:hover { background:#a00; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft    { background:#e2e3e5; color:#383d41; }
+.s-approved { background:#d1ecf1; color:#0c5460; }
+.s-active   { background:#d4edda; color:#0a3622; }
+.s-closed   { background:#f8d7da; color:#721c24; }
+.total-row { font-weight:bold; background:#f0f4ff; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="fn-wrap">
+    <h2>{{ budget.budget_name }} <span class="badge s-{{ budget.status|lower }}" style="font-size:14px;">{{ budget.status|capfirst }}</span></h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Budget</h3>
+        <form method="post" action="?action=update">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Budget Name *</label>
+                    <input type="text" name="budget_name" value="{{ budget.budget_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Fiscal Year</label>
+                    <input type="number" name="fiscal_year" value="{{ budget.fiscal_year }}" min="2000" max="2099">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in budget_statuses %}
+                        <option value="{{ s }}"{% if budget.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ budget.notes|default:"" }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <table class="list-table">
+            <tr><th>Fiscal Year</th><td>{{ budget.fiscal_year }}</td></tr>
+            <tr><th>Status</th><td>{{ budget.status|capfirst }}</td></tr>
+            <tr><th>Created By</th><td>{{ budget.created_by|default:"—" }}</td></tr>
+            <tr><th>Notes</th><td>{{ budget.notes|default:"—" }}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Budget Lines</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th style="text-align:right;">Budgeted Amount</th>
+                    <th>Notes</th>
+                    {% if can_edit %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for line in lines %}
+            <tr>
+                <td>{{ line.category|default:"—" }}</td>
+                <td>{{ line.description }}</td>
+                <td style="text-align:right;">${{ line.budgeted_amount|floatformat:2 }}</td>
+                <td>{{ line.notes|default:"—" }}</td>
+                {% if can_edit %}
+                <td>
+                    <form method="post" action="?action=del_line" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="line_id" value="{{ line.id }}">
+                        <button type="submit" class="btn-del" onclick="return confirm('Delete this line?')">Del</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="{% if can_edit %}5{% else %}4{% endif %}" style="color:#888;text-align:center;">No line items yet.</td></tr>
+            {% endfor %}
+            </tbody>
+            {% if lines %}
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="2">Total</td>
+                    <td style="text-align:right;">${{ total_budgeted|floatformat:2 }}</td>
+                    <td></td>
+                    {% if can_edit %}<td></td>{% endif %}
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Line Item</h3>
+        <form method="post" action="?action=add_line">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category" placeholder="e.g. Salaries, Equipment">
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <input type="text" name="description" required placeholder="Line item description">
+                </div>
+                <div class="form-group">
+                    <label>Budgeted Amount ($)</label>
+                    <input type="number" name="budgeted_amount" min="0" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <input type="text" name="notes">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Add Line</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

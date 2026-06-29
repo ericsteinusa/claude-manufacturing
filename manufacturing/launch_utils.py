@@ -37,7 +37,7 @@ def launch(script, *args):
         Extra positional arguments forwarded to the module's ``sys.argv``
         (e.g. a host department name for a screen that scopes to it).
     """
-    module = "manufacturing." + os.path.splitext(script)[0]
+    module = "manufacturing." + os.path.splitext(script)[0].replace("/", ".").replace(os.sep, ".")
     log.info("Launching module %s args=%s", module, args)
     try:
         import tempfile

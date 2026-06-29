@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block page_title %}Returns Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/returns/" class="btn">Returns</a>
+<a href="/prod/returns/reports/" class="btn">Returns Reports</a>
+<a href="/prod/reports/" class="btn">Production Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rr-wrap { width:100%; max-width:1100px; }
+.rr-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.rs-pending    { background:#cce5ff; color:#004085; }
+.rs-approved   { background:#d4edda; color:#0a3622; }
+.rs-received   { background:#d1ecf1; color:#0c5460; }
+.rs-inspecting { background:#fff3cd; color:#856404; }
+.rs-resolved   { background:#d4edda; color:#0a3622; }
+.rs-rejected   { background:#f8d7da; color:#721c24; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rr-wrap">
+    <h2>Returns Reports</h2>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Returns by Status</h3>
+            <table class="list-table">
+                <thead><tr><th>Status</th><th style="text-align:right;">Count</th></tr></thead>
+                <tbody>
+                {% for row in by_status %}
+                <tr>
+                    <td><span class="badge rs-{{ row.status }}">{{ row.status|title }}</span></td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" style="color:#888;text-align:center;">No returns on record.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Returns by Reason</h3>
+            <table class="list-table">
+                <thead><tr><th>Reason</th><th style="text-align:right;">Count</th></tr></thead>
+                <tbody>
+                {% for row in by_reason %}
+                <tr>
+                    <td>{{ row.reason|default:"Unknown"|title }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" style="color:#888;text-align:center;">No data.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Returns</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>RMA #</th>
+                    <th>Customer</th>
+                    <th>SO #</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in recent %}
+            <tr>
+                <td><a href="/prod/returns/{{ r.id }}/">{{ r.rma_number }}</a></td>
+                <td>{{ r.customer|default:"—" }}</td>
+                <td>{{ r.so_number|default:"—" }}</td>
+                <td>{{ r.reason|default:"—"|title }}</td>
+                <td><span class="badge rs-{{ r.status }}">{{ r.status|title }}</span></td>
+                <td>{{ r.created_at|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No returns on record.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block page_title %}Engineering Projects{% endblock %}
+
+{% block toolbar_left %}
+<a href="/eng/" class="btn">Dashboard</a>
+<a href="/eng/ecrs/" class="btn">ECRs</a>
+<a href="/eng/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select,.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr.data-row:hover td { background:#f0f4ff; cursor:pointer; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-planning    { background:#e8f4fd; color:#0c5460; }
+.st-in_progress { background:#fff3cd; color:#856404; }
+.st-on_hold     { background:#f8d7da; color:#842029; }
+.st-completed   { background:#d4edda; color:#0a3622; }
+.st-cancelled   { background:#e2e3e5; color:#383d41; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc;
+    border-radius:4px; font-size:13px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.overdue-badge { background:#f8d7da; color:#842029; font-size:11px; padding:1px 5px; border-radius:3px; margin-left:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Engineering Projects</h2>
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Status:</label>
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for s in PROJECT_STATUSES %}
+            <option value="{{ s }}" {% if filter_status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Engineer:</label>
+        <select name="engineer" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for p in people %}
+            <option value="{{ p.email }}" {% if filter_engineer == p.email %}selected{% endif %}>{{ p.label }}</option>
+            {% endfor %}
+        </select>
+        <label>Search:</label>
+        <input type="text" name="search" value="{{ filter_search }}" placeholder="Title or number…">
+        <button type="submit" class="btn-sm">Filter</button>
+        <a href="/eng/projects/" style="color:#aad;font-size:13px;">Clear</a>
+    </form>
+
+    <table class="list-table">
+        <thead><tr>
+            <th>Number</th><th>Title</th><th>Engineer</th>
+            <th>Status</th><th>Due Date</th><th>Tasks</th>
+        </tr></thead>
+        <tbody>
+        {% for p in projects %}
+        <tr class="data-row" onclick="location.href='/eng/projects/{{ p.id }}/'">
+            <td>{{ p.project_number }}</td>
+            <td>{{ p.title }}
+                {% if p.overdue_tasks %}<span class="overdue-badge">{{ p.overdue_tasks }} overdue</span>{% endif %}
+            </td>
+            <td>{{ p.engineer|default:"—" }}</td>
+            <td><span class="badge st-{{ p.status }}">{{ p.status }}</span></td>
+            <td>{{ p.due_date|default:"—" }}</td>
+            <td>{{ p.done_count }}/{{ p.task_count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="color:#888;text-align:center;padding:16px;">No projects found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Project</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="new">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:2;min-width:200px;">
+                    <label>Title *</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in PROJECT_STATUSES %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;">
+                    <label>Engineer</label>
+                    <select name="engineer">
+                        <option value="">—</option>
+                        {% for p in people %}
+                        <option value="{{ p.email }}">{{ p.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div class="form-row">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date">
+                </div>
+            </div>
+            <button type="submit" class="btn-sm">Create Project</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

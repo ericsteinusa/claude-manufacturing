@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block page_title %}CS Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs/" class="btn">All Tickets</a>
+<a href="/cs/escalations/" class="btn">Escalations</a>
+<a href="/cs/plans/" class="btn">Improvement Plans</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:960px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.period-row { display:flex; gap:10px; align-items:center; margin-bottom:18px; }
+.period-row a { display:inline-block; padding:4px 14px; border-radius:4px;
+    font-size:13px; background:#334; color:#aad; text-decoration:none;
+    border:2px solid #556; }
+.period-row a.active { border-color:white; color:white; }
+.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+    margin-bottom:22px; }
+.stat-card { background:white; border:2px solid black; border-radius:8px;
+    padding:16px 20px; text-align:center; }
+.stat-card .num { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.stat-card .lbl { font-size:12px; color:#666; margin-top:4px; }
+.stat-card.warn .num { color:#e65100; }
+.stat-card.good .num { color:#1a6b1a; }
+.card { background:white; border:2px solid black; border-radius:8px;
+    padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.vol-table { width:100%; border-collapse:collapse; font-size:13px; }
+.vol-table th, .vol-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #eee; }
+.vol-table th { color:#555; font-size:12px; }
+.vol-table tr:last-child td { border-bottom:none; }
+.row-warn td { background:#fffbe6; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>CS Reports</h2>
+
+    <!-- Period picker -->
+    <div class="period-row">
+        <span style="color:#aad;font-size:13px;">Period:</span>
+        <a href="?days=90" {% if days == 90 %}class="active"{% endif %}>90 days</a>
+        <a href="?days=180" {% if days == 180 %}class="active"{% endif %}>6 months</a>
+        <a href="?days=365" {% if days == 365 %}class="active"{% endif %}>1 year</a>
+        <a href="?days=730" {% if days == 730 %}class="active"{% endif %}>2 years</a>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="num">{{ stats.total }}</div>
+            <div class="lbl">Total Tickets</div>
+        </div>
+        <div class="stat-card warn">
+            <div class="num">{{ stats.open_count }}</div>
+            <div class="lbl">Open</div>
+        </div>
+        <div class="stat-card good">
+            <div class="num">{{ stats.completed_count }}</div>
+            <div class="lbl">Completed</div>
+        </div>
+        <div class="stat-card {% if stats.completion_rate >= 80 %}good{% elif stats.completion_rate < 50 %}warn{% endif %}">
+            <div class="num">{{ stats.completion_rate }}%</div>
+            <div class="lbl">Completion Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">
+                {% if stats.avg_resolution %}{{ stats.avg_resolution }}d{% else %}—{% endif %}
+            </div>
+            <div class="lbl">Avg Resolution (days)</div>
+        </div>
+        <div class="stat-card {% if stats.avg_age_open and stats.avg_age_open >= 7 %}warn{% endif %}">
+            <div class="num">
+                {% if stats.avg_age_open %}{{ stats.avg_age_open }}d{% else %}—{% endif %}
+            </div>
+            <div class="lbl">Avg Age (open tickets)</div>
+        </div>
+    </div>
+
+    <!-- Monthly volume -->
+    <div class="card">
+        <h3>Monthly Call Volume</h3>
+        {% if monthly %}
+        <table class="vol-table">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Total</th>
+                    <th>Open</th>
+                    <th>Completed</th>
+                    <th>Completion Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in monthly %}
+                <tr {% if m.open_count > m.completed_count %}class="row-warn"{% endif %}>
+                    <td>{{ m.month }}</td>
+                    <td>{{ m.total }}</td>
+                    <td>{{ m.open_count }}</td>
+                    <td>{{ m.completed_count }}</td>
+                    <td>{{ m.completion_rate }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">No data for this period.</p>
+        {% endif %}
+    </div>
+
+    <!-- Open / Overdue summary -->
+    <div class="card">
+        <h3>Open Tickets Summary</h3>
+        <p style="font-size:14px;color:#333;">
+            <strong>{{ open_count }}</strong> open ticket{{ open_count|pluralize }}
+            &nbsp;—&nbsp;
+            <strong style="color:#c62828;">{{ overdue_count }}</strong>
+            overdue (&ge;7 days).
+            <a href="/cs/escalations/" style="color:rgb(0,60,180);margin-left:8px;">
+                View escalations &rarr;</a>
+        </p>
+    </div>
+</div>
+</div>
+{% endblock %}

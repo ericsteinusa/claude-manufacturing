@@ -455,7 +455,6 @@ class EngReportsMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Engineering Reports")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self.setCentralWidget(EngReportsWidget())
 
@@ -463,7 +462,7 @@ class EngReportsMenu(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(sys.argv)
     window = EngReportsMenu()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block page_title %}New {{ contact_type|capfirst }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ list_url }}" class="btn">Back to {{ contact_type_plural|capfirst }}</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.contacts-wrap { width: 100%; max-width: 700px; }
+.contacts-wrap h2 { color: white; font-size: 20px; margin-bottom: 16px; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 20px 24px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+.form-row { display: flex; flex-direction: column; gap: 4px; }
+.form-row.full { grid-column: 1 / -1; }
+.form-row label { font-size: 12px; color: #555; font-weight: bold; }
+.form-row input { padding: 6px 10px; border: 1px solid #ccc;
+    border-radius: 4px; font-size: 13px; }
+.hint { font-size: 11px; color: #999; margin-top: 2px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.save-btn { padding: 8px 24px; background: rgb(0,60,180); color: white;
+    border: none; border-radius: 5px; font-size: 14px; cursor: pointer;
+    font-weight: bold; margin-top: 16px; }
+.save-btn:hover { background: rgb(0,40,140); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="contacts-wrap">
+    <h2>New {{ contact_type|capfirst }}</h2>
+
+    {% if error %}
+    <div class="msg-err">{{ error }}</div>
+    {% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <p class="hint" style="margin-top:0;margin-bottom:14px;">
+                Fill in at least a name or company name.</p>
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>First Name</label>
+                    <input type="text" name="first_name"
+                           value="{{ form.first_name|default:'' }}" autofocus>
+                </div>
+                <div class="form-row">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name"
+                           value="{{ form.last_name|default:'' }}">
+                </div>
+                <div class="form-row full">
+                    <label>Company Name</label>
+                    <input type="text" name="company_name"
+                           value="{{ form.company_name|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Phone</label>
+                    <input type="text" name="phone_number"
+                           value="{{ form.phone_number|default:'' }}"
+                           placeholder="(555) 555-5555">
+                </div>
+                <div class="form-row">
+                    <label>Email</label>
+                    <input type="email" name="email"
+                           value="{{ form.email|default:'' }}">
+                </div>
+                <div class="form-row full">
+                    <label>Address</label>
+                    <input type="text" name="address"
+                           value="{{ form.address|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>City</label>
+                    <input type="text" name="city"
+                           value="{{ form.city|default:'' }}">
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-row">
+                        <label>State</label>
+                        <input type="text" name="state" maxlength="2"
+                               value="{{ form.state|default:'' }}" placeholder="NY">
+                    </div>
+                    <div class="form-row">
+                        <label>Zip Code</label>
+                        <input type="text" name="zip_code"
+                               value="{{ form.zip_code|default:'' }}" placeholder="10001">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="save-btn">
+                Create {{ contact_type|capfirst }}</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

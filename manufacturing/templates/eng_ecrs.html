@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block page_title %}Engineering Change Requests{% endblock %}
+
+{% block toolbar_left %}
+<a href="/eng/" class="btn">Dashboard</a>
+<a href="/eng/projects/" class="btn">Projects</a>
+<a href="/eng/reports/" class="btn">Reports</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select,.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr.data-row:hover td { background:#f0f4ff; cursor:pointer; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft     { background:#e8f4fd; color:#0c5460; }
+.st-pending   { background:#fff3cd; color:#856404; }
+.st-approved  { background:#d4edda; color:#0a3622; }
+.st-rejected  { background:#f8d7da; color:#842029; }
+.st-revision_needed { background:#ffe8c0; color:#7a4000; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Engineering Change Requests / Design Reviews</h2>
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Status:</label>
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for s in ECR_STATUSES %}
+            <option value="{{ s }}" {% if filter_status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Project:</label>
+        <select name="project_id" onchange="this.form.submit()">
+            <option value="">All Projects</option>
+            {% for p in projects %}
+            <option value="{{ p.id }}" {% if filter_project == p.id|stringformat:"s" %}selected{% endif %}>{{ p.project_number }} — {{ p.title }}</option>
+            {% endfor %}
+        </select>
+        <label>Search:</label>
+        <input type="text" name="search" value="{{ filter_search }}" placeholder="Title or ECR #…">
+        <button type="submit" class="btn-sm">Filter</button>
+        <a href="/eng/ecrs/" style="color:#aad;font-size:13px;">Clear</a>
+    </form>
+
+    <table class="list-table">
+        <thead><tr>
+            <th>ECR #</th><th>Title</th><th>Project</th>
+            <th>Requested By</th><th>Review Date</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+        {% for e in ecrs %}
+        <tr class="data-row" onclick="location.href='/eng/ecrs/{{ e.id }}/'">
+            <td>{{ e.ecr_number }}</td>
+            <td>{{ e.title }}</td>
+            <td>{{ e.project_number|default:"—" }}</td>
+            <td>{{ e.requested_by|default:"—" }}</td>
+            <td>{{ e.review_date|default:"—" }}</td>
+            <td><span class="badge st-{{ e.status }}">{{ e.status }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="color:#888;text-align:center;padding:16px;">No ECRs found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New ECR / Design Review</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="new">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row" style="flex:3;min-width:220px;">
+                    <label>Title *</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;">
+                    <label>Project</label>
+                    <select name="project_id">
+                        <option value="">—</option>
+                        {% for p in projects %}
+                        <option value="{{ p.id }}">{{ p.project_number }} — {{ p.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row" style="flex:1;min-width:140px;">
+                    <label>Requested By</label>
+                    <select name="requested_by">
+                        <option value="">—</option>
+                        {% for p in people %}
+                        <option value="{{ p.email }}">{{ p.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Review Date</label>
+                    <input type="date" name="review_date">
+                </div>
+            </div>
+            <button type="submit" class="btn-sm">Create ECR</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

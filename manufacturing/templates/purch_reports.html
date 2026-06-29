@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block page_title %}Purchasing Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/purch/" class="btn">Purchasing</a>
+<a href="/purch/reports/" class="btn">Reports</a>
+<a href="/purch/contracts/" class="btn">Contracts</a>
+<a href="/po/" class="btn">Purchase Orders</a>
+<a href="/suppliers/" class="btn">Suppliers</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.pr-wrap { width:100%; max-width:1100px; }
+.pr-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:160px; flex:1; text-align:center; }
+.kpi .val { font-size:26px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-draft            { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-pending_approval { background:#fff3cd; color:#856404; }
+.st-sent             { background:#cce5ff; color:#004085; }
+.st-partial          { background:#ffeeba; color:#856404; }
+.st-received         { background:#d4edda; color:#0a3622; }
+.st-cancelled        { background:#e2e3e5; color:#383d41; }
+.bar-wrap { display:flex; gap:6px; align-items:center; }
+.bar { height:14px; background:rgb(0,60,180); border-radius:3px; min-width:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="pr-wrap">
+    <h2>Purchasing Reports</h2>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="val">${{ open_value|floatformat:0 }}</div>
+            <div class="lbl">Open PO Value</div>
+        </div>
+        {% for row in by_status %}
+        <div class="kpi">
+            <div class="val">{{ row.cnt }}</div>
+            <div class="lbl">{{ row.status|title }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Top Suppliers by PO Count</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Supplier</th>
+                        <th style="text-align:right;">POs</th>
+                        <th style="text-align:right;">Total Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for s in top_suppliers %}
+                <tr>
+                    <td>{{ s.supplier_name }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ s.po_count }}</td>
+                    <td style="text-align:right;">${{ s.total_value|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="color:#888;text-align:center;">No data.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>POs by Month (Last 6 Months)</h3>
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th style="text-align:right;">POs</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for m in monthly %}
+                <tr>
+                    <td>{{ m.month }}</td>
+                    <td style="text-align:right;font-weight:bold;">{{ m.cnt }}</td>
+                    <td>
+                        <div class="bar-wrap">
+                            <div class="bar" style="width:{{ m.cnt }}0px;max-width:100px;"></div>
+                            <span style="font-size:11px;color:#666;">{{ m.cnt }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="color:#888;text-align:center;">No recent POs.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Contracts Expiring Within 90 Days</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Contract #</th>
+                    <th>Title</th>
+                    <th>Supplier</th>
+                    <th>End Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in expiring_contracts %}
+            <tr>
+                <td><a href="/purch/contracts/{{ c.id }}/">{{ c.contract_number }}</a></td>
+                <td><a href="/purch/contracts/{{ c.id }}/">{{ c.title }}</a></td>
+                <td>{{ c.supplier_name|default:"—" }}</td>
+                <td style="color:#b8860b;font-weight:bold;">{{ c.end_date }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">No contracts expiring within 90 days.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

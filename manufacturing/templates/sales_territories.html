@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block page_title %}Territory Management{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/targets/" class="btn">Targets</a>
+<a href="/sales/territories/" class="btn">Territories</a>
+<a href="/sales/territories/performance/" class="btn">Performance</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sl-wrap { width:100%; max-width:1200px; }
+.sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-Active       { background:#d4edda; color:#0a3622; }
+.st-Inactive     { background:#e2e3e5; color:#383d41; }
+.st-Under-Review { background:#fff3cd; color:#856404; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.btn-sm { padding:3px 10px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.edit-card { display:none; background:white; border:2px solid black;
+    border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sl-wrap">
+    <h2>Territory Management</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            {% for s in TERRITORY_STATUSES %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search name / region / rep…">
+        <button type="submit">Filter</button>
+        <a href="/sales/territories/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Territory Name</th>
+                    <th>Region</th>
+                    <th>Assigned Rep</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    {% if can_edit %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for t in territories %}
+            <tr>
+                <td>{{ t.name }}</td>
+                <td>{{ t.region|default:"—" }}</td>
+                <td>{{ t.assigned_rep|default:"—" }}</td>
+                <td><span class="badge st-{{ t.status|cut:" " }}">{{ t.status }}</span></td>
+                <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    {{ t.notes|default:"—" }}</td>
+                {% if can_edit %}
+                <td>
+                    <button type="button" class="btn-sm"
+                        onclick="openEdit({{ t.id }},'{{ t.name|escapejs }}','{{ t.region|default:''|escapejs }}','{{ t.assigned_rep|default:''|escapejs }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">Edit</button>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;">No territories found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="edit-card" id="edit-card">
+        <h3>Edit Territory</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="territory_id" id="edit-id">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Territory Name *</label>
+                    <input type="text" name="name" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Region</label>
+                    <input type="text" name="region" id="edit-region">
+                </div>
+                <div class="form-group">
+                    <label>Assigned Rep</label>
+                    <input type="text" name="assigned_rep" id="edit-rep">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" id="edit-status">
+                        {% for s in TERRITORY_STATUSES %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes" id="edit-notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="button" class="btn-submit" style="background:#888;margin-left:8px;"
+                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Add Territory</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="new">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Territory Name *</label>
+                    <input type="text" name="name" required placeholder="e.g. Northeast">
+                </div>
+                <div class="form-group">
+                    <label>Region</label>
+                    <input type="text" name="region" placeholder="e.g. New England">
+                </div>
+                <div class="form-group">
+                    <label>Assigned Rep</label>
+                    <input type="text" name="assigned_rep" placeholder="Sales rep name">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in TERRITORY_STATUSES %}
+                        <option value="{{ s }}"{% if s == 'Active' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Add Territory</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+<script>
+function openEdit(id, name, region, rep, status, notes) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-name').value = name;
+    document.getElementById('edit-region').value = region;
+    document.getElementById('edit-rep').value = rep;
+    document.getElementById('edit-status').value = status;
+    document.getElementById('edit-notes').value = notes;
+    var card = document.getElementById('edit-card');
+    card.style.display = 'block';
+    card.scrollIntoView({behavior:'smooth'});
+}
+</script>
+{% endblock %}

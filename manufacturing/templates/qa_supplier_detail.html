@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block page_title %}Supplier Quality #{{ supplier.id }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/suppliers/" class="btn">All Suppliers</a>
+<a href="/qa/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.qa-wrap { width:100%; max-width:860px; }
+.qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
+.form-row textarea { resize:vertical; min-height:70px; }
+.btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="qa-wrap">
+    <h2>{{ supplier.supplier }}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Supplier Quality Record</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Supplier Name *</label>
+                    {% if can_edit %}
+                    <input type="text" name="supplier" value="{{ supplier.supplier }}" required>
+                    {% else %}
+                    <input class="ro" readonly value="{{ supplier.supplier }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Material / Category</label>
+                    {% if can_edit %}
+                    <input type="text" name="material" value="{{ supplier.material|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ supplier.material|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Rating</label>
+                    {% if can_edit %}
+                    <select name="rating">
+                        <option value="">—</option>
+                        {% for r in supplier_ratings %}
+                        <option {% if supplier.rating == r %}selected{% endif %}>{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ supplier.rating|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>PPM</label>
+                    {% if can_edit %}
+                    <input type="text" name="ppm" value="{{ supplier.ppm|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ supplier.ppm|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Last Audit</label>
+                    {% if can_edit %}
+                    <input type="date" name="last_audit" value="{{ supplier.last_audit|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ supplier.last_audit|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    {% if can_edit %}
+                    <select name="status">
+                        {% for st in supplier_statuses %}
+                        <option {% if supplier.status == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{{ supplier.status }}">
+                    {% endif %}
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    {% if can_edit %}
+                    <textarea name="notes" rows="4">{{ supplier.notes|default:'' }}</textarea>
+                    {% else %}
+                    <textarea class="ro" readonly rows="4">{{ supplier.notes|default:'' }}</textarea>
+                    {% endif %}
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="btn-row">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/qa/suppliers/" style="color:#aad;font-size:13px;">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block page_title %}Performance Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/reports/" class="btn">Reports</a>
+<a href="/prod/daily-report/" class="btn">Daily Report</a>
+<a href="/prod/performance/" class="btn">Performance</a>
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.perf-wrap { width:100%; max-width:1100px; }
+.perf-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.period-bar { display:flex; gap:10px; align-items:center; margin-bottom:16px; }
+.period-bar label { color:white; font-size:13px; font-weight:bold; }
+.period-bar select {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.period-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.period-bar button:hover { background:rgb(0,60,180); color:white; }
+.kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px;
+    padding:14px 18px; min-width:120px; flex:1; text-align:center; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="perf-wrap">
+    <h2>Performance Report</h2>
+
+    <form method="get" class="period-bar">
+        <label for="pdays">Period:</label>
+        <select id="pdays" name="days">
+            <option value="7"{% if days == 7 %} selected{% endif %}>Last 7 days</option>
+            <option value="30"{% if days == 30 %} selected{% endif %}>Last 30 days</option>
+            <option value="90"{% if days == 90 %} selected{% endif %}>Last 90 days</option>
+        </select>
+        <button type="submit">Load</button>
+    </form>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="val">{{ wo_stats.total|default:0 }}</div>
+            <div class="lbl">WOs Scheduled</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#0a3622;">{{ wo_stats.completed|default:0 }}</div>
+            <div class="lbl">Completed</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#c33;">{{ wo_stats.overdue|default:0 }}</div>
+            <div class="lbl">Overdue</div>
+        </div>
+        <div class="kpi">
+            <div class="val">{{ shipped.total|default:0 }}</div>
+            <div class="lbl">Shipments</div>
+        </div>
+        <div class="kpi">
+            <div class="val" style="color:#0a3622;">{{ shipped.delivered|default:0 }}</div>
+            <div class="lbl">Delivered</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Work Order Summary ({{ days }} days)</h3>
+            <table class="list-table">
+                <thead><tr><th>Metric</th><th style="text-align:right;">Count</th></tr></thead>
+                <tbody>
+                <tr><td>Total Scheduled</td><td style="text-align:right;font-weight:bold;">{{ wo_stats.total|default:0 }}</td></tr>
+                <tr><td>Completed</td><td style="text-align:right;font-weight:bold;color:#0a3622;">{{ wo_stats.completed|default:0 }}</td></tr>
+                <tr><td>Cancelled</td><td style="text-align:right;font-weight:bold;">{{ wo_stats.cancelled|default:0 }}</td></tr>
+                <tr><td>Currently Overdue</td><td style="text-align:right;font-weight:bold;color:#c33;">{{ wo_stats.overdue|default:0 }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Shipping Summary ({{ days }} days)</h3>
+            <table class="list-table">
+                <thead><tr><th>Metric</th><th style="text-align:right;">Count</th></tr></thead>
+                <tbody>
+                <tr><td>Total Shipments</td><td style="text-align:right;font-weight:bold;">{{ shipped.total|default:0 }}</td></tr>
+                <tr><td>Delivered</td><td style="text-align:right;font-weight:bold;color:#0a3622;">{{ shipped.delivered|default:0 }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Top Completed Products ({{ days }} days)</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th style="text-align:right;">WOs Completed</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in top_products %}
+            <tr>
+                <td>{{ row.product_name|default:"Unknown" }}</td>
+                <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2" style="color:#888;text-align:center;">No completed work orders in this period.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

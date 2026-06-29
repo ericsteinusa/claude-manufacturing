@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block page_title %}CS Tickets{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs/new/" class="btn">+ New Ticket</a>
+<a href="/cs/escalations/" class="btn">Escalations</a>
+<a href="/cs/reports/" class="btn">Reports</a>
+<a href="/cs/plans/" class="btn">Improvement Plans</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:1100px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.chip-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+.chip { display:inline-block; padding:3px 12px; border-radius:20px; font-size:12px;
+    font-weight:bold; cursor:pointer; text-decoration:none; border:2px solid transparent; }
+.chip-all { background:#334; color:#aad; border-color:#556; }
+.chip-open { background:#fef9e7; color:#7a5400; border-color:#f4d03f; }
+.chip-done { background:#e8f5e9; color:#1a6b1a; border-color:#81c784; }
+.chip-active { border-color:white !important; }
+.chip-warn { background:#fce8e8; color:#c62828; border-color:#e57373; }
+.search-row { display:flex; gap:8px; margin-bottom:14px; align-items:center; }
+.search-box { padding:6px 12px; border:2px solid black; border-radius:6px;
+    font-size:13px; width:260px; }
+.cs-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; }
+.cs-table th, .cs-table td { padding:8px 12px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.cs-table th { background:rgb(0,60,180); color:white; }
+.cs-table tr:last-child td { border-bottom:none; }
+.cs-table tr:hover td { background:#f0f4ff; }
+.row-critical td { background:#fff0f0; }
+.row-high td { background:#fffbe6; }
+.row-completed td { background:#f5f5f5; color:#888; }
+.pri-badge { display:inline-block; padding:2px 8px; border-radius:4px;
+    font-size:11px; font-weight:bold; }
+.pri-critical { background:#fce8e8; color:#c62828; }
+.pri-high { background:#fff3e0; color:#e65100; }
+.pri-normal { background:#e8f5e9; color:#1a6b1a; }
+.pri-none { background:#f0f0f0; color:#888; }
+.empty-note { color:#cce; font-size:14px; margin-top:20px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>Customer Service Tickets</h2>
+
+    <!-- Status chips -->
+    <div class="chip-row">
+        <a href="/cs/{% if search %}?search={{ search }}{% endif %}"
+           class="chip chip-all {% if not status_filter %}chip-active{% endif %}">
+           All ({{ tickets|length }})</a>
+        <a href="/cs/?status=open{% if search %}&search={{ search }}{% endif %}"
+           class="chip chip-open {% if status_filter == 'open' %}chip-active{% endif %}">
+           Open ({{ open_count }})</a>
+        <a href="/cs/?status=completed{% if search %}&search={{ search }}{% endif %}"
+           class="chip chip-done {% if status_filter == 'completed' %}chip-active{% endif %}">
+           Completed</a>
+        {% if overdue_count %}
+        <a href="/cs/escalations/" class="chip chip-warn">
+            &#9888; {{ overdue_count }} overdue</a>
+        {% endif %}
+        {% if my_only %}
+        <a href="/cs/" class="chip" style="background:#e8eaf6;color:#3949ab;border-color:#9fa8da;">
+            My tickets ✕</a>
+        {% else %}
+        <a href="/cs/?my=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+           class="chip" style="background:#e8eaf6;color:#3949ab;border-color:#9fa8da;">
+            My tickets</a>
+        {% endif %}
+    </div>
+
+    <!-- Search -->
+    <form method="get" action="/cs/" class="search-row">
+        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+        {% if my_only %}<input type="hidden" name="my" value="1">{% endif %}
+        <input type="text" name="search" class="search-box"
+               placeholder="Search customer or description…" value="{{ search }}">
+        <button type="submit" class="btn" style="padding:6px 14px;font-size:12px;">Search</button>
+        {% if search %}<a href="/cs/{% if status_filter %}?status={{ status_filter }}{% endif %}"
+            style="color:#aac;font-size:12px;">Clear</a>{% endif %}
+    </form>
+
+    {% if tickets %}
+    <table class="cs-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Description</th>
+                <th>Opened</th>
+                <th>Days Open</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in tickets %}
+            <tr class="row-{{ t.priority }}{% if t.status == 'completed' %} row-completed{% endif %}">
+                <td>{{ t.id }}</td>
+                <td>{{ t.customer_name }}</td>
+                <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    {{ t.call|truncatechars:80 }}</td>
+                <td>{{ t.call_date }}</td>
+                <td>{% if t.status == 'open' %}{{ t.days_open }}d{% else %}—{% endif %}</td>
+                <td>
+                    <span class="pri-badge pri-{{ t.priority }}">
+                        {{ t.priority|capfirst }}</span>
+                </td>
+                <td>{% if t.status == 'completed' %}&#10003; Closed{% else %}Open{% endif %}</td>
+                <td><a href="/cs/{{ t.id }}/" class="btn"
+                       style="padding:2px 10px;font-size:12px;">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p style="color:#aac;font-size:12px;margin-top:8px;">
+        {{ tickets|length }} ticket{{ tickets|length|pluralize }}
+        {% if search %} matching "{{ search }}"{% endif %}
+    </p>
+    {% else %}
+    <p class="empty-note">
+        No tickets found{% if search %} matching "{{ search }}"{% endif %}.
+        {% if can_edit %}<a href="/cs/new/" style="color:#99f;">Create one &rarr;</a>{% endif %}
+    </p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

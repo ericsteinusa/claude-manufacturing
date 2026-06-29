@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block page_title %}Maintenance Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/wo/" class="btn">Work Orders</a>
+<a href="/maint/equipment/" class="btn">Equipment</a>
+<a href="/maint/schedule/" class="btn">PM Schedule</a>
+<a href="/maint/inspections/" class="btn">Inspections</a>
+<a href="/maint/downtime/" class="btn">Downtime</a>
+<a href="/maint/parts/" class="btn">Parts</a>
+<a href="/maint/mechanics/" class="btn">Mechanics</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:960px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:18px; }
+.kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+.kpi-card { background:white; border:2px solid black; border-radius:8px;
+    padding:18px 22px; text-align:center; text-decoration:none; display:block; }
+.kpi-card:hover { border-color:rgb(0,60,180); }
+.kpi-card .num { font-size:34px; font-weight:bold; color:rgb(0,60,180); }
+.kpi-card .lbl { font-size:12px; color:#666; margin-top:4px; }
+.kpi-card.warn .num { color:#e65100; }
+.kpi-card.danger .num { color:#c62828; }
+.section-links { display:flex; gap:14px; flex-wrap:wrap; }
+.section-link { display:block; background:white; border:2px solid black;
+    border-radius:8px; padding:16px 24px; text-decoration:none;
+    min-width:140px; text-align:center; }
+.section-link:hover { border-color:rgb(0,60,180); }
+.section-link .icon { font-size:24px; margin-bottom:6px; }
+.section-link .name { font-size:13px; font-weight:bold; color:#333; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Maintenance Dashboard</h2>
+
+    <div class="kpi-grid">
+        <a href="/maint/wo/" class="kpi-card {% if counts.critical_wos %}danger{% elif counts.open_wos %}warn{% endif %}">
+            <div class="num">{{ counts.open_wos }}</div>
+            <div class="lbl">Open Work Orders{% if counts.critical_wos %} &mdash; {{ counts.critical_wos }} critical{% endif %}</div>
+        </a>
+        <a href="/maint/wo/" class="kpi-card {% if counts.overdue_wos %}danger{% endif %}">
+            <div class="num">{{ counts.overdue_wos }}</div>
+            <div class="lbl">Overdue WOs</div>
+        </a>
+        <a href="/maint/equipment/" class="kpi-card {% if counts.equip_issues %}warn{% endif %}">
+            <div class="num">{{ counts.equip_issues }}</div>
+            <div class="lbl">Equipment Issues</div>
+        </a>
+        <a href="/maint/schedule/" class="kpi-card {% if counts.due_schedules %}warn{% endif %}">
+            <div class="num">{{ counts.due_schedules }}</div>
+            <div class="lbl">PM Tasks Due / Overdue</div>
+        </a>
+        <a href="/maint/inspections/?status=Scheduled" class="kpi-card">
+            <div class="num">{{ counts.pending_inspections }}</div>
+            <div class="lbl">Scheduled Inspections</div>
+        </a>
+        <a href="/maint/downtime/" class="kpi-card {% if counts.active_downtime %}danger{% endif %}">
+            <div class="num">{{ counts.active_downtime }}</div>
+            <div class="lbl">Active Downtime Events</div>
+        </a>
+    </div>
+
+    <div class="section-links">
+        <a href="/maint/wo/" class="section-link">
+            <div class="icon">&#128295;</div>
+            <div class="name">Work Orders</div>
+        </a>
+        <a href="/maint/equipment/" class="section-link">
+            <div class="icon">&#9881;</div>
+            <div class="name">Equipment</div>
+        </a>
+        <a href="/maint/schedule/" class="section-link">
+            <div class="icon">&#128197;</div>
+            <div class="name">PM Schedule</div>
+        </a>
+        <a href="/maint/inspections/" class="section-link">
+            <div class="icon">&#128203;</div>
+            <div class="name">Inspections</div>
+        </a>
+        <a href="/maint/downtime/" class="section-link">
+            <div class="icon">&#9889;</div>
+            <div class="name">Downtime</div>
+        </a>
+        <a href="/maint/parts/" class="section-link">
+            <div class="icon">&#128230;</div>
+            <div class="name">Parts</div>
+        </a>
+        <a href="/maint/mechanics/" class="section-link">
+            <div class="icon">&#128100;</div>
+            <div class="name">Mechanics</div>
+        </a>
+    </div>
+</div>
+</div>
+{% endblock %}

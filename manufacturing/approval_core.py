@@ -15,7 +15,6 @@ draft  -->  (total > threshold)  -->  pending_approval
                              sent   <-- decision --> draft
 """
 
-from .db_pg import get_db_connection
 from .log_utils import get_logger
 
 log = get_logger(__name__)

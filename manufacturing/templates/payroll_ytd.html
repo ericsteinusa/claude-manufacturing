@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block page_title %}YTD Payroll Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/payroll/history/" class="btn">History</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1200px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filters { display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+.filters label { color:white; font-size:13px; font-weight:bold; }
+.filters select,.filters input { padding:5px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.save-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 11px; text-align:right;
+    border-bottom:1px solid #ddd; font-size:12px; white-space:nowrap; }
+.list-table th:first-child,.list-table td:first-child { text-align:left; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.totals-row { background:rgb(220,235,255); font-weight:bold; }
+.summary { color:white; font-size:14px; margin-top:8px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Year-to-Date Payroll Report</h2>
+
+    <form method="get" class="filters">
+        <label>Year:</label>
+        <select name="year">
+            {% for y in years %}<option {% if year == y %}selected{% endif %}>{{ y }}</option>{% endfor %}
+        </select>
+        <label>Employee:</label>
+        <select name="people_id">
+            <option value="">All Employees</option>
+            {% for p in people %}
+            <option value="{{ p.id }}" {% if people_id == p.id %}selected{% endif %}>
+                {{ p.last_name }}, {{ p.first_name }}
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="save-btn">Run Report</button>
+    </form>
+
+    {% if rows %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Employee</th><th>Runs</th>
+            <th>Reg Hrs</th><th>OT Hrs</th>
+            <th>Gross Pay</th><th>Pre-Tax Deds</th>
+            <th>Fed Tax</th><th>State Tax</th>
+            <th>SS</th><th>Medicare</th><th>Net Pay</th>
+        </tr></thead>
+        <tbody>
+        {% for r in rows %}
+        <tr>
+            <td>{{ r.last_name }}, {{ r.first_name }}</td>
+            <td>{{ r.run_count }}</td>
+            <td>{{ r.reg_hrs|floatformat:2 }}</td>
+            <td>{{ r.ot_hrs|floatformat:2 }}</td>
+            <td>${{ r.gross|floatformat:2 }}</td>
+            <td>${{ r.pre_deds|floatformat:2 }}</td>
+            <td>${{ r.fed|floatformat:2 }}</td>
+            <td>${{ r.state_tax|floatformat:2 }}</td>
+            <td>${{ r.ss|floatformat:2 }}</td>
+            <td>${{ r.medicare|floatformat:2 }}</td>
+            <td><strong>${{ r.net|floatformat:2 }}</strong></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr class="totals-row">
+            <td>TOTALS</td>
+            <td>{{ run_count_total }}</td>
+            <td>{{ totals.reg_hrs|floatformat:2 }}</td>
+            <td>{{ totals.ot_hrs|floatformat:2 }}</td>
+            <td>${{ totals.gross|floatformat:2 }}</td>
+            <td>${{ totals.pre_deds|floatformat:2 }}</td>
+            <td>${{ totals.fed|floatformat:2 }}</td>
+            <td>${{ totals.state_tax|floatformat:2 }}</td>
+            <td>${{ totals.ss|floatformat:2 }}</td>
+            <td>${{ totals.medicare|floatformat:2 }}</td>
+            <td>${{ totals.net|floatformat:2 }}</td>
+        </tr>
+        </tfoot>
+    </table>
+    <div class="summary">
+        {{ rows|length }} employee(s) &nbsp;|&nbsp;
+        Total Gross: ${{ totals.gross|floatformat:2 }} &nbsp;|&nbsp;
+        Total Net: ${{ totals.net|floatformat:2 }}
+    </div>
+    {% else %}
+    <p style="color:#cce;font-size:14px;">No payroll data found for {{ year }}.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

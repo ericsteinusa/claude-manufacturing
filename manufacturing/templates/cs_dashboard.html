@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block page_title %}Customer Service{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs/" class="btn">All Tickets</a>
+<a href="/cs/new/" class="btn">New Ticket</a>
+<a href="/cs/escalations/" class="btn">Escalations</a>
+<a href="/cs/reports/" class="btn">Reports</a>
+<a href="/cs/returns/" class="btn">Returns</a>
+<a href="/cs/kb/" class="btn">Knowledge Base</a>
+<a href="/cs/surveys/" class="btn">Surveys</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
+    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+    font-size:13px; text-decoration:none; }
+.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi.red { border-color:#c33; }
+.kpi.red .val { color:#c33; }
+.kpi.yellow { border-color:#b8860b; }
+.kpi.yellow .val { color:#b8860b; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-open   { background:#f8d7da; color:#842029; }
+.st-closed { background:#d4edda; color:#0a3622; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Customer Service Dashboard</h2>
+
+    <div class="nav-grid">
+        <a href="/cs/" class="nav-btn">All Tickets</a>
+        <a href="/cs/new/" class="nav-btn">New Ticket</a>
+        <a href="/cs/escalations/" class="nav-btn">Escalations</a>
+        <a href="/cs/reports/" class="nav-btn">Reports</a>
+        <a href="/cs/plans/" class="nav-btn">Service Plans</a>
+        <a href="/cs/returns/" class="nav-btn">Returns &amp; Refunds</a>
+        <a href="/cs/kb/" class="nav-btn">Knowledge Base</a>
+        <a href="/cs/surveys/" class="nav-btn">Surveys &amp; Feedback</a>
+        <a href="/customers/" class="nav-btn">Customers</a>
+        <a href="/customers/new/" class="nav-btn">New Customer</a>
+        <a href="/dashboard/" class="nav-btn">Home</a>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi{% if stats.open_count > 0 %} red{% endif %}">
+            <div class="lbl">Open Tickets</div>
+            <div class="val">{{ stats.open_count }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Completed</div>
+            <div class="val">{{ stats.completed_count }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total (12 mo)</div>
+            <div class="val">{{ stats.total }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Completion Rate</div>
+            <div class="val">{{ stats.completion_rate }}%</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Avg Resolution</div>
+            <div class="val">{% if stats.avg_resolution is not None %}{{ stats.avg_resolution }} days{% else %}—{% endif %}</div>
+        </div>
+        <div class="kpi{% if stats.avg_age_open is not None and stats.avg_age_open > 7 %} yellow{% endif %}">
+            <div class="lbl">Avg Age Open</div>
+            <div class="val">{% if stats.avg_age_open is not None %}{{ stats.avg_age_open }} days{% else %}—{% endif %}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Tickets</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Issue</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for t in recent_tickets %}
+            <tr>
+                <td><a href="/cs/{{ t.id }}/">{{ t.id }}</a></td>
+                <td>{{ t.customer_name }}</td>
+                <td>{{ t.call_date }}</td>
+                <td>{{ t.call|truncatechars:60 }}</td>
+                <td>
+                    {% if t.completion_box == 0 %}
+                        <span class="badge st-open">Open</span>
+                    {% else %}
+                        <span class="badge st-closed">Closed</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;">No tickets found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

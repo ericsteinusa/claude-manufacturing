@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Performance{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/performance/" class="btn">Performance</a>
+<a href="/sales/performance/reviews/" class="btn">Reviews</a>
+<a href="/sales/performance/coaching/" class="btn">Coaching</a>
+<a href="/sales/targets/" class="btn">Targets</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sl-wrap { width:100%; max-width:1100px; }
+.sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.section-head { color:white; font-size:16px; font-weight:bold; margin:18px 0 10px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table th.num { text-align:right; }
+.pos { color:#0a3622; font-weight:bold; }
+.neg { color:#842029; font-weight:bold; }
+.pct-bar-wrap { display:flex; align-items:center; gap:6px; }
+.pct-bar-outer { flex:1; background:#e8e8e8; border-radius:3px; height:10px; min-width:60px; }
+.pct-bar-inner { height:10px; border-radius:3px; background:rgb(0,60,180); max-width:100%; }
+.rank-medal { font-size:16px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sl-wrap">
+    <h2>Sales Performance Dashboard</h2>
+
+    <p class="section-head">Rep Rankings — Target Attainment</p>
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">Rank</th>
+                    <th>Rep</th>
+                    <th class="num">Target</th>
+                    <th class="num">Actual</th>
+                    <th class="num">Variance</th>
+                    <th>Attainment</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rep_targets %}
+            <tr>
+                <td style="text-align:center;">
+                    {% if forloop.counter == 1 %}<span class="rank-medal">&#x1F947;</span>
+                    {% elif forloop.counter == 2 %}<span class="rank-medal">&#x1F948;</span>
+                    {% elif forloop.counter == 3 %}<span class="rank-medal">&#x1F949;</span>
+                    {% else %}{{ forloop.counter }}{% endif %}
+                </td>
+                <td><strong>{{ r.rep }}</strong></td>
+                <td class="num">${{ r.total_target|floatformat:0 }}</td>
+                <td class="num">${{ r.total_actual|floatformat:0 }}</td>
+                <td class="num {% if r.variance >= 0 %}pos{% else %}neg{% endif %}">
+                    {% if r.variance >= 0 %}+{% endif %}${{ r.variance|floatformat:0 }}
+                </td>
+                <td>
+                    {% if r.total_target %}
+                    <div class="pct-bar-wrap">
+                        <div class="pct-bar-outer">
+                            <div class="pct-bar-inner" style="width:{% if r.attainment_pct > 100 %}100{% else %}{{ r.attainment_pct }}{% endif %}%;"></div>
+                        </div>
+                        <span style="font-size:12px;white-space:nowrap;">{{ r.attainment_pct }}%</span>
+                    </div>
+                    {% else %}—{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No target data available. <a href="/sales/targets/">Add targets</a> to see rankings.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="section-head">Rep Rankings — Revenue from Orders</p>
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">Rank</th>
+                    <th>Rep</th>
+                    <th class="num">Orders</th>
+                    <th class="num">Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rep_orders %}
+            <tr>
+                <td style="text-align:center;">
+                    {% if forloop.counter == 1 %}<span class="rank-medal">&#x1F947;</span>
+                    {% elif forloop.counter == 2 %}<span class="rank-medal">&#x1F948;</span>
+                    {% elif forloop.counter == 3 %}<span class="rank-medal">&#x1F949;</span>
+                    {% else %}{{ forloop.counter }}{% endif %}
+                </td>
+                <td><strong>{{ r.sales_rep }}</strong></td>
+                <td class="num">{{ r.order_count }}</td>
+                <td class="num">${{ r.revenue|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">No order data by rep. Assign a sales rep on orders to see rankings here.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

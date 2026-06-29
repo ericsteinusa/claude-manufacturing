@@ -3,7 +3,7 @@ Tests for approval_core.py — PO approval workflow.
 """
 
 import pytest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 from manufacturing.approval_core import (
     needs_approval,

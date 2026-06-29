@@ -506,7 +506,6 @@ class CustomersWindow(QtWidgets.QMainWindow):
         email = get_current_user_email()
         title = f"Customers — {email}" if email else "Customers"
         self.setWindowTitle(title)
-        self.resize(1000, 660)
         _apply_blue_palette(self)
         self.setCentralWidget(CustomersWidget())
 
@@ -515,7 +514,7 @@ def main():
     init_db()
     app = QtWidgets.QApplication(sys.argv)
     window = CustomersWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

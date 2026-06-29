@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block page_title %}Balance Sheet{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/" class="btn">G/L Dashboard</a>
+<a href="/gl/trial-balance/" class="btn">Trial Balance</a>
+<a href="/gl/income-statement/" class="btn">Income Stmt</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:800px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.stmt { background:white; border:2px solid black; border-radius:8px; padding:24px 28px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.stmt-section { margin-bottom:20px; }
+.sect-hdr { background:#003cB4; color:white; font-weight:bold; font-size:13px;
+    padding:6px 12px; border-radius:4px; margin-bottom:6px; text-transform:uppercase; }
+.stmt-line { display:flex; justify-content:space-between; padding:4px 12px; font-size:13px; }
+.stmt-line:hover { background:#f5f5f5; }
+.sect-total { display:flex; justify-content:space-between; padding:6px 12px;
+    font-weight:bold; font-size:13px; border-top:1px solid #ccc; margin-top:4px; }
+.summary-box { background:#f0f4ff; border:1px solid #c0c8e8; border-radius:6px;
+    padding:14px 18px; margin-top:14px; }
+.summary-line { display:flex; justify-content:space-between; padding:4px 0; font-size:14px; }
+.summary-line.major { font-weight:bold; font-size:15px; border-top:2px solid #333;
+    padding-top:8px; margin-top:4px; }
+.status-ok  { background:#d1e7dd; color:#0a3622; padding:6px 14px; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block; margin-top:12px; }
+.status-err { background:#f8d7da; color:#842029; padding:6px 14px; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block; margin-top:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Balance Sheet</h2>
+
+    <form method="get" class="filter-bar">
+        <label>As of:</label>
+        <input type="date" name="as_of" value="{{ as_of }}">
+        <button type="submit" class="btn-sm">Run</button>
+        {% if as_of %}<a href="/gl/balance-sheet/" style="color:#aad;font-size:13px;">Clear</a>{% endif %}
+    </form>
+
+    <div class="stmt">
+        <div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:18px;color:#222;">
+            Balance Sheet{% if as_of %} as of {{ as_of }}{% endif %}
+        </div>
+
+        <div class="two-col">
+            <div>
+                <div class="stmt-section">
+                    <div class="sect-hdr">Assets</div>
+                    {% for r in sections.Asset %}
+                    <div class="stmt-line">
+                        <span>{{ r.account_number }} — {{ r.account_name }}</span>
+                        <span>${{ r.balance|floatformat:2 }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="sect-total">
+                        <span>Total Assets</span>
+                        <span>${{ assets|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="stmt-section">
+                    <div class="sect-hdr">Liabilities</div>
+                    {% for r in sections.Liability %}
+                    <div class="stmt-line">
+                        <span>{{ r.account_number }} — {{ r.account_name }}</span>
+                        <span>${{ r.balance|floatformat:2 }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="sect-total">
+                        <span>Total Liabilities</span>
+                        <span>${{ liabilities|floatformat:2 }}</span>
+                    </div>
+                </div>
+                <div class="stmt-section">
+                    <div class="sect-hdr">Equity</div>
+                    {% for r in sections.Equity %}
+                    <div class="stmt-line">
+                        <span>{{ r.account_number }} — {{ r.account_name }}</span>
+                        <span>${{ r.balance|floatformat:2 }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="sect-total">
+                        <span>Total Equity</span>
+                        <span>${{ equity|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-line">
+                <span>Total Assets</span>
+                <span>${{ assets|floatformat:2 }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Total Liabilities + Equity</span>
+                <span>${{ liabilities|floatformat:2 }} + ${{ equity|floatformat:2 }}</span>
+            </div>
+        </div>
+        <span class="{% if balanced %}status-ok{% else %}status-err{% endif %}">
+            {% if balanced %}BALANCED{% else %}OUT OF BALANCE{% endif %}
+        </span>
+    </div>
+</div>
+</div>
+{% endblock %}

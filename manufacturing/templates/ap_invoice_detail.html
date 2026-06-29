@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block page_title %}{% if invoice %}AP Invoice {{ invoice.invoice_number }}{% else %}New AP Invoice{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ap/" class="btn">All Invoices</a>
+<a href="/ar/" class="btn">A/R</a>
+<a href="/gl/" class="btn">G/L</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:900px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px 16px; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row.wide { grid-column: span 2; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row input[readonly] { background:#f5f5f5; color:#555; }
+.save-btn { padding:7px 18px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:10px; }
+.save-btn:hover { background:rgb(0,40,140); }
+.list-table { width:100%; border-collapse:collapse; margin-top:8px; }
+.list-table th,.list-table td { padding:7px 10px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.stat-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.stat-chip { padding:5px 12px; border-radius:20px; font-size:13px; font-weight:bold; }
+.stat-open      { background:#fff3cd; color:#856404; }
+.stat-partial   { background:#cff4fc; color:#055160; }
+.stat-paid      { background:#d1e7dd; color:#0a3622; }
+.stat-overdue   { background:#f8d7da; color:#842029; }
+.stat-cancelled { background:#e2e3e5; color:#41464b; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>{% if invoice %}Invoice: {{ invoice.invoice_number }}{% else %}New AP Invoice{% endif %}</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if invoice %}
+    <div class="stat-row">
+        <span class="stat-chip stat-{{ invoice.status }}">{{ invoice.status|capfirst }}</span>
+        <span style="color:white;font-size:14px;">
+            Amount: <strong>${{ invoice.amount|floatformat:2 }}</strong> &nbsp;|&nbsp;
+            Paid: <strong>${{ invoice.paid|floatformat:2 }}</strong> &nbsp;|&nbsp;
+            Balance: <strong>${{ invoice.balance|floatformat:2 }}</strong>
+        </span>
+        {% if can_edit %}
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="status">
+            <select name="new_status" style="padding:4px 8px;border-radius:4px;font-size:12px;border:1px solid #ccc;">
+                {% for s in statuses %}<option value="{{ s }}" {% if invoice.status == s %}selected{% endif %}>{{ s|capfirst }}</option>{% endfor %}
+            </select>
+            <button type="submit" style="padding:4px 10px;background:rgb(0,60,180);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Status</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Invoice Details</h3>
+        {% if can_edit %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Vendor</label>
+                    <select name="vendor_id">
+                        <option value="">(none)</option>
+                        {% for v in vendors %}
+                        <option value="{{ v.id }}" {% if invoice and invoice.vendor_id == v.id %}selected{% endif %}>{{ v.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Invoice # *</label>
+                    <input type="text" name="invoice_number" required
+                        value="{{ invoice.invoice_number|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in statuses %}<option value="{{ s }}" {% if invoice and invoice.status == s %}selected{% endif %}>{{ s|capfirst }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Invoice Date</label>
+                    <input type="date" name="invoice_date" value="{{ invoice.invoice_date|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" value="{{ invoice.due_date|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Amount ($)</label>
+                    <input type="number" name="amount" step="0.01" min="0"
+                        value="{{ invoice.amount|default:0|floatformat:2 }}">
+                </div>
+                <div class="form-row wide">
+                    <label>Description</label>
+                    <input type="text" name="description" value="{{ invoice.description|default:'' }}">
+                </div>
+            </div>
+            <button type="submit" class="save-btn">{% if invoice %}Save Changes{% else %}Create Invoice{% endif %}</button>
+        </form>
+        {% else %}
+        <div class="form-grid">
+            <div class="form-row"><label>Vendor</label><input readonly value="{{ invoice.vendor_label|default:'—' }}"></div>
+            <div class="form-row"><label>Invoice #</label><input readonly value="{{ invoice.invoice_number }}"></div>
+            <div class="form-row"><label>Status</label><input readonly value="{{ invoice.status|capfirst }}"></div>
+            <div class="form-row"><label>Invoice Date</label><input readonly value="{{ invoice.invoice_date|default:'—' }}"></div>
+            <div class="form-row"><label>Due Date</label><input readonly value="{{ invoice.due_date|default:'—' }}"></div>
+            <div class="form-row"><label>Amount</label><input readonly value="${{ invoice.amount|floatformat:2 }}"></div>
+            <div class="form-row wide"><label>Description</label><input readonly value="{{ invoice.description|default:'' }}"></div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if invoice %}
+    <div class="card">
+        <h3>Payment History</h3>
+        {% if payments %}
+        <table class="list-table">
+            <thead><tr>
+                <th>Date</th><th>Method</th><th>Reference</th>
+                <th class="num">Amount</th><th>Notes</th>
+            </tr></thead>
+            <tbody>
+            {% for p in payments %}
+            <tr>
+                <td>{{ p.payment_date|default:"—" }}</td>
+                <td>{{ p.payment_method }}</td>
+                <td>{{ p.reference|default:"—" }}</td>
+                <td class="num">${{ p.amount|floatformat:2 }}</td>
+                <td>{{ p.notes|default:"" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">No payments recorded.</p>
+        {% endif %}
+
+        {% if can_edit and invoice.balance > 0 %}
+        <hr style="margin:14px 0;">
+        <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">
+            Record Payment (Balance: ${{ invoice.balance|floatformat:2 }})
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="payment">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                <div class="form-row">
+                    <label>Date</label>
+                    <input type="date" name="payment_date">
+                </div>
+                <div class="form-row">
+                    <label>Amount ($)</label>
+                    <input type="number" name="amount" step="0.01" min="0.01"
+                        value="{{ invoice.balance|floatformat:2 }}" style="width:120px;">
+                </div>
+                <div class="form-row">
+                    <label>Method</label>
+                    <select name="method">
+                        {% for m in payment_methods %}<option>{{ m }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Reference</label>
+                    <input type="text" name="reference" placeholder="Check #, etc." style="width:140px;">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" style="width:160px;">
+                </div>
+                <button type="submit" class="save-btn" style="margin-top:0;">Record Payment</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

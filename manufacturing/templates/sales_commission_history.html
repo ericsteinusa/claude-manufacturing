@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block page_title %}Commission Payment History{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/commissions/" class="btn">Commissions</a>
+<a href="/sales/commissions/history/" class="btn">Payment History</a>
+<a href="/sales/commissions/plans/" class="btn">Plans</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sl-wrap { width:100%; max-width:1100px; }
+.sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table th.num { text-align:right; }
+.badge-paid { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px;
+    font-weight:bold; background:#d4edda; color:#0a3622; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sl-wrap">
+    <h2>Commission Payment History</h2>
+
+    <form method="get" class="filter-bar">
+        <input type="text" name="rep" value="{{ rep_filter }}" placeholder="Rep name…">
+        <select name="period">
+            <option value="">All Periods</option>
+            {% for p in periods %}
+            <option value="{{ p }}"{% if period_filter == p %} selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="/sales/commissions/history/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Rep</th>
+                    <th>Period</th>
+                    <th>Plan</th>
+                    <th class="num">Sale Amount</th>
+                    <th class="num">Commission Paid</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in paid %}
+            <tr>
+                <td>{{ c.rep }}</td>
+                <td>{{ c.period|default:"—" }}</td>
+                <td>{{ c.plan_name|default:"—" }}</td>
+                <td class="num">${{ c.sale_amount|floatformat:2 }}</td>
+                <td class="num"><strong>${{ c.commission|floatformat:2 }}</strong></td>
+                <td>{{ c.created_date|default:"—" }}</td>
+                <td>{{ c.notes|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;text-align:center;">No paid commissions found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

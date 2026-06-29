@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block page_title %}{{ account.account_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/fin/" class="btn">Finance Dashboard</a>
+<a href="/fin/budgets/" class="btn">Budgets</a>
+<a href="/fin/audits/" class="btn">Audits</a>
+<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
+<a href="/fin/tax/" class="btn">Tax Filings</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.fn-wrap { width:100%; max-width:1200px; }
+.fn-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-open        { background:#fff3cd; color:#856404; }
+.s-in-progress { background:#d1ecf1; color:#0c5460; }
+.s-reconciled  { background:#d4edda; color:#0a3622; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="fn-wrap">
+    <h2>{{ account.account_name }}{% if account.bank_name %} — {{ account.bank_name }}{% endif %}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Edit Account</h3>
+        <form method="post" action="?action=update">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Account Name *</label>
+                    <input type="text" name="account_name" value="{{ account.account_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Bank Name</label>
+                    <input type="text" name="bank_name" value="{{ account.bank_name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Account Number</label>
+                    <input type="text" name="account_number" value="{{ account.account_number|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Routing Number</label>
+                    <input type="text" name="routing_number" value="{{ account.routing_number|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Active</label>
+                    <select name="is_active">
+                        <option value="1"{% if account.is_active %} selected{% endif %}>Yes</option>
+                        <option value="0"{% if not account.is_active %} selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ account.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <table class="list-table">
+            <tr><th>Bank</th><td>{{ account.bank_name|default:"—" }}</td></tr>
+            <tr><th>Account #</th><td>{{ account.account_number|default:"—" }}</td></tr>
+            <tr><th>Routing #</th><td>{{ account.routing_number|default:"—" }}</td></tr>
+            <tr><th>Active</th><td>{% if account.is_active %}Yes{% else %}No{% endif %}</td></tr>
+            <tr><th>Notes</th><td>{{ account.notes|default:"—" }}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Bank Statements</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Statement Date</th>
+                    <th style="text-align:right;">Beginning Balance</th>
+                    <th style="text-align:right;">Ending Balance</th>
+                    <th>Status</th>
+                    <th>Reconciled By</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for stmt in statements %}
+            <tr>
+                <td>{{ stmt.statement_date }}</td>
+                <td style="text-align:right;">${{ stmt.beginning_balance|floatformat:2 }}</td>
+                <td style="text-align:right;">${{ stmt.ending_balance|floatformat:2 }}</td>
+                <td><span class="badge s-{{ stmt.status|lower|cut:' ' }}">{{ stmt.status }}</span></td>
+                <td>{{ stmt.reconciled_by|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No statements recorded.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Statement</h3>
+        <form method="post" action="?action=add_statement">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Statement Date *</label>
+                    <input type="date" name="statement_date" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in statement_statuses %}
+                        <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Beginning Balance ($)</label>
+                    <input type="number" name="beginning_balance" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Ending Balance ($)</label>
+                    <input type="number" name="ending_balance" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <input type="text" name="notes">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Add Statement</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -1,71 +1,27 @@
 import sys
-from ..launch_utils import launch as _launch
-from PyQt6 import QtCore, QtWidgets
-from ..qt_theme import BUTTON_STYLE
-
+from PyQt6 import QtWidgets
 from ..button_nav import ButtonNav
-from .IT_Tasks import ITTasksWidget, _apply_blue_palette
-from .it_calls import ITSupportWidget
-
-TAB_STYLE = (
-    "QTabWidget::pane{border:1px solid black;}"
-    "QTabBar::tab{background:white;border:2px solid black;padding:6px 18px;"
-    "border-bottom:none;border-radius:4px 4px 0 0;}"
-    "QTabBar::tab:selected{background:rgb(85,255,255);font-weight:bold;}"
-    "QTabBar::tab:hover{background:rgb(85,255,255);}"
-)
-
-
-def _launch_tab(script, label):
-    w = QtWidgets.QWidget()
-    _apply_blue_palette(w)
-    v = QtWidgets.QVBoxLayout(w)
-    v.addStretch()
-    lbl = QtWidgets.QLabel(label)
-    lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    lbl.setStyleSheet("color:white;font-size:20px;font-weight:bold;")
-    v.addWidget(lbl)
-    v.addSpacing(12)
-    btn = QtWidgets.QPushButton(f"Open {label}")
-    btn.setStyleSheet(BUTTON_STYLE)
-    btn.setFixedHeight(44)
-    btn.setFixedWidth(260)
-    btn.clicked.connect(lambda: _launch(script))
-    row = QtWidgets.QHBoxLayout()
-    row.addStretch()
-    row.addWidget(btn)
-    row.addStretch()
-    v.addLayout(row)
-    v.addStretch()
-    return w
+from .IT_Tasks import _apply_blue_palette
+from .it_repairs_software import ITRepairsWidget, ITSoftwareWidget, ITLicensesWidget
+from .it_asset_mgmt import ITAssetMgmtWidget
+from .it_helpdesk import ITHelpDeskWidget
+from .it_tasks_desktop import ITTasksDesktopWidget
+from .it_network_devices import ITNetworkDevicesWidget
+from .it_network_status import ITNetworkStatusWidget
+        tabs.addTab(ITReportsDesktopWidget(),   "Reports")
+        v.addWidget(tabs)
 
 
 class ITTechnicianMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("IT Technician")
-        self.resize(1100, 720)
         _apply_blue_palette(self)
-        self._build_ui()
-
-    def _build_ui(self):
-        from .IT_tech_reports import ITTechReportsWidget
-        central = QtWidgets.QWidget()
-        _apply_blue_palette(central)
-        self.setCentralWidget(central)
-        v = QtWidgets.QVBoxLayout(central)
-        v.setContentsMargins(8, 8, 8, 8)
-        v.setSpacing(0)
-        tabs = ButtonNav()
-        tabs.setStyleSheet(TAB_STYLE)
-        tabs.addTab(ITTasksWidget(), "IT Tasks")
-        tabs.addTab(ITSupportWidget(), "IT Support Calls")
-        tabs.addTab(ITTechReportsWidget(), "Reports")
-        v.addWidget(tabs)
+        self.setCentralWidget(ITTechnicianWidget())
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ITTechnicianMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

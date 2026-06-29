@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block page_title %}Leads & Opportunities{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/orders/" class="btn">Orders</a>
+<a href="/sales/quotes/" class="btn">Quotes</a>
+<a href="/sales/leads/" class="btn">Leads</a>
+<a href="/sales/contracts/" class="btn">Contracts</a>
+<a href="/sales/forecast/" class="btn">Forecast</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sl-wrap { width:100%; max-width:1200px; }
+.sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-New        { background:#e2e3e5; color:#383d41; }
+.s-Contacted  { background:#cce5ff; color:#004085; }
+.s-Qualified  { background:#fff3cd; color:#856404; }
+.s-Proposal   { background:#d1ecf1; color:#0c5460; }
+.s-Won        { background:#d4edda; color:#0a3622; }
+.s-Lost       { background:#f8d7da; color:#721c24; }
+.p-Low    { background:#f8f9fa; color:#555; border:1px solid #ccc; }
+.p-Medium { background:#fff3cd; color:#856404; }
+.p-High   { background:#f8d7da; color:#721c24; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sl-wrap">
+    <h2>Leads &amp; Opportunities</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in lead_statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search company / contact…">
+        <button type="submit">Filter</button>
+        <a href="/sales/leads/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Contact</th>
+                    <th>Source</th>
+                    <th>Owner</th>
+                    <th style="text-align:right;">Est. Value</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for l in leads %}
+            <tr>
+                <td><a href="/sales/leads/{{ l.id }}/">{{ l.company }}</a></td>
+                <td>{{ l.contact|default:"—" }}</td>
+                <td>{{ l.source|default:"—" }}</td>
+                <td>{{ l.owner|default:"—" }}</td>
+                <td style="text-align:right;">${{ l.estimated_value|floatformat:0 }}</td>
+                <td><span class="badge p-{{ l.priority }}">{{ l.priority }}</span></td>
+                <td><span class="badge s-{{ l.status }}">{{ l.status }}</span></td>
+                <td>{{ l.created_date|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="color:#888;text-align:center;">No leads found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Lead</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Company *</label>
+                    <input type="text" name="company" required placeholder="Company name">
+                </div>
+                <div class="form-group">
+                    <label>Contact</label>
+                    <input type="text" name="contact" placeholder="Contact name">
+                </div>
+                <div class="form-group">
+                    <label>Owner / Rep</label>
+                    <input type="text" name="owner" placeholder="Sales rep">
+                </div>
+                <div class="form-group">
+                    <label>Source</label>
+                    <select name="source">
+                        {% for s in lead_sources %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select name="priority">
+                        {% for p in lead_priorities %}
+                        <option value="{{ p }}"{% if p == 'Medium' %} selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in lead_statuses %}
+                        <option value="{{ s }}"{% if s == 'New' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estimated Value ($)</label>
+                    <input type="number" name="estimated_value" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Lead</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

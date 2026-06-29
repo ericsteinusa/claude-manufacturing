@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block page_title %}Knowledge Base{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cs-dash/" class="btn">CS Dashboard</a>
+<a href="/cs/" class="btn">Tickets</a>
+<a href="/cs/returns/" class="btn">Returns</a>
+<a href="/cs/kb/" class="btn">Knowledge Base</a>
+<a href="/cs/surveys/" class="btn">Surveys</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cs-wrap { width:100%; max-width:1200px; }
+.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft     { background:#e2e3e5; color:#383d41; }
+.s-published { background:#d4edda; color:#0a3622; }
+.s-archived  { background:#f8d7da; color:#721c24; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:80px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cs-wrap">
+    <h2>Knowledge Base</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in kb_statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for c in kb_categories %}
+            <option value="{{ c }}"{% if category_filter == c %} selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search title / content / tags…">
+        <button type="submit">Filter</button>
+        <a href="/cs/kb/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Author</th>
+                    <th>Published</th>
+                    <th>Views</th>
+                    <th>Tags</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for a in articles %}
+            <tr>
+                <td><a href="/cs/kb/{{ a.id }}/">{{ a.title }}</a></td>
+                <td>{{ a.category|default:"—" }}</td>
+                <td>{{ a.author|default:"—" }}</td>
+                <td>{{ a.published_date|default:"—" }}</td>
+                <td>{{ a.view_count|default:0 }}</td>
+                <td>{{ a.tags|default:"—"|truncatechars:30 }}</td>
+                <td><span class="badge s-{{ a.status|lower }}">{{ a.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;text-align:center;">No articles found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Article</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" required placeholder="Article title">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category">
+                        {% for c in kb_categories %}
+                        <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" name="author" placeholder="Author name">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in kb_statuses %}
+                        <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Published Date</label>
+                    <input type="date" name="published_date">
+                </div>
+                <div class="form-group full-span">
+                    <label>Tags</label>
+                    <input type="text" name="tags" placeholder="Comma-separated tags">
+                </div>
+                <div class="form-group full-span">
+                    <label>Content *</label>
+                    <textarea name="content" style="height:120px;" placeholder="Article content…"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Article</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

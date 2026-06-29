@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block page_title %}Network Devices{% endblock %}
+
+{% block toolbar_left %}
+<a href="/it/" class="btn">IT Dashboard</a>
+<a href="/it/tickets/" class="btn">Tickets</a>
+<a href="/it/assets/" class="btn">Assets</a>
+<a href="/it/repairs/" class="btn">Repairs</a>
+<a href="/it/software/" class="btn">Software</a>
+<a href="/it/licenses/" class="btn">Licenses</a>
+<a href="/it/network/" class="btn">Network</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.it-wrap { width:100%; max-width:1200px; }
+.it-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-online      { background:#d4edda; color:#0a3622; }
+.s-offline     { background:#f8d7da; color:#721c24; }
+.s-unknown     { background:#e2e3e5; color:#383d41; }
+.s-maintenance { background:#fff3cd; color:#856404; }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+.dot-online      { background:#28a745; }
+.dot-offline     { background:#dc3545; }
+.dot-unknown     { background:#6c757d; }
+.dot-maintenance { background:#ffc107; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="it-wrap">
+    <h2>Network Devices</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in device_statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
+            {% endfor %}
+        </select>
+        <select name="device_type">
+            <option value="">All Types</option>
+            {% for t in device_types %}
+            <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search hostname / IP / location…">
+        <button type="submit">Filter</button>
+        <a href="/it/network/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Hostname</th>
+                    <th>IP Address</th>
+                    <th>MAC Address</th>
+                    <th>Type</th>
+                    <th>Manufacturer / Model</th>
+                    <th>Location</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for d in devices %}
+            <tr>
+                <td>
+                    <span class="status-dot dot-{{ d.status }}"></span>
+                    <span class="badge s-{{ d.status }}">{{ d.status|capfirst }}</span>
+                </td>
+                <td><a href="/it/network/{{ d.id }}/">{{ d.hostname|default:"—" }}</a></td>
+                <td style="font-family:monospace;">{{ d.ip_address|default:"—" }}</td>
+                <td style="font-family:monospace;font-size:11px;">{{ d.mac_address|default:"—" }}</td>
+                <td>{{ d.device_type|default:"—" }}</td>
+                <td>{{ d.manufacturer|default:"" }}{% if d.manufacturer and d.model %} / {% endif %}{{ d.model|default:"" }}</td>
+                <td>{{ d.location|default:"—" }}</td>
+                <td>{{ d.last_seen|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="color:#888;text-align:center;">No network devices found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if user_role != 'Auditor' %}
+    <div class="card">
+        <h3>Add Network Device</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Hostname *</label>
+                    <input type="text" name="hostname" placeholder="e.g. sw-floor2-01">
+                </div>
+                <div class="form-group">
+                    <label>IP Address</label>
+                    <input type="text" name="ip_address" placeholder="e.g. 192.168.1.10">
+                </div>
+                <div class="form-group">
+                    <label>MAC Address</label>
+                    <input type="text" name="mac_address" placeholder="e.g. AA:BB:CC:DD:EE:FF">
+                </div>
+                <div class="form-group">
+                    <label>Device Type</label>
+                    <select name="device_type">
+                        <option value="">— Select —</option>
+                        {% for t in device_types %}
+                        <option value="{{ t }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Manufacturer</label>
+                    <input type="text" name="manufacturer" placeholder="e.g. Cisco">
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <input type="text" name="model" placeholder="e.g. Catalyst 2960">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" placeholder="e.g. Server Room A">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in device_statuses %}
+                        <option value="{{ s }}"{% if s == 'online' %} selected{% endif %}>{{ s|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Last Seen</label>
+                    <input type="date" name="last_seen" value="{{ today }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional notes">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Add Device</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

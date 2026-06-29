@@ -48,7 +48,15 @@ def can_transition(current, target):
 
 
 def ensure_wo_tables(conn):
-    """Create work_order / wo_material tables if absent. Does not commit."""
+    """Create work_order / wo_material / product tables if absent. Does not commit."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS product (
+            id SERIAL PRIMARY KEY,
+            supplier_id TEXT, name TEXT NOT NULL,
+            purchase_date TEXT, purchase_price REAL DEFAULT 0.0,
+            bin TEXT, amount INTEGER DEFAULT 0, reorder_point INTEGER DEFAULT 0
+        )
+    """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS work_order (
             id SERIAL PRIMARY KEY,

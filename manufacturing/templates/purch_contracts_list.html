@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block page_title %}Vendor Contracts{% endblock %}
+
+{% block toolbar_left %}
+<a href="/purch/" class="btn">Purchasing</a>
+<a href="/purch/contracts/" class="btn">Contracts</a>
+<a href="/purch/reports/" class="btn">Reports</a>
+<a href="/po/" class="btn">Purchase Orders</a>
+<a href="/suppliers/" class="btn">Suppliers</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.pc-wrap { width:100%; max-width:1200px; }
+.pc-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-Active          { background:#d4edda; color:#0a3622; }
+.s-Pending-Renewal { background:#fff3cd; color:#856404; }
+.s-Expired         { background:#e2e3e5; color:#383d41; }
+.s-Cancelled       { background:#f8d7da; color:#721c24; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="pc-wrap">
+    <h2>Vendor Contracts</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in CONTRACT_STATUSES %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search title / contract # / supplier…">
+        <button type="submit">Filter</button>
+        <a href="/purch/contracts/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Contract #</th>
+                    <th>Title</th>
+                    <th>Supplier</th>
+                    <th>Category</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in contracts %}
+            <tr>
+                <td><a href="/purch/contracts/{{ c.id }}/">{{ c.contract_number }}</a></td>
+                <td><a href="/purch/contracts/{{ c.id }}/">{{ c.title }}</a></td>
+                <td>{{ c.supplier_name|default:"—" }}</td>
+                <td>{{ c.category|default:"—" }}</td>
+                <td>{{ c.start_date|default:"—" }}</td>
+                <td>{% if c.end_date %}<span{% if c.status == 'Pending Renewal' %} style="color:#b8860b;font-weight:bold;"{% endif %}>{{ c.end_date }}</span>{% else %}—{% endif %}</td>
+                <td>{% if c.value %}${{ c.value|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td><span class="badge s-{{ c.status|cut:' ' }}">{{ c.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="color:#888;text-align:center;">No contracts found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Contract</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" required placeholder="Contract title">
+                </div>
+                <div class="form-group">
+                    <label>Supplier</label>
+                    <select name="supplier_id">
+                        <option value="">— None —</option>
+                        {% for s in suppliers %}
+                        <option value="{{ s.id }}">{{ s.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="">— Select —</option>
+                        {% for cat in CONTRACT_CATEGORIES %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in CONTRACT_STATUSES %}
+                        <option value="{{ s }}"{% if s == 'Active' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date">
+                </div>
+                <div class="form-group">
+                    <label>Value ($)</label>
+                    <input type="number" name="value" step="0.01" min="0" placeholder="0.00">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Contract</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

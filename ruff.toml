@@ -3,7 +3,7 @@
 # line-length is enforced via the E501 lint rule (see [lint]). Generated
 # Qt files and a few legacy scripts are excluded from linting, mirroring
 # pyrightconfig.json.
-line-length = 79
+line-length = 120
 
 # Excluded from all linting (generated or legacy/unmaintained).
 extend-exclude = [

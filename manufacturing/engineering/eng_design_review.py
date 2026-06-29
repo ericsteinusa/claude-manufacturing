@@ -377,7 +377,6 @@ class DesignReviewMenu(QtWidgets.QMainWindow):
         title = (f"Engineering Design Reviews — {email}" if email
                  else "Engineering Design Reviews")
         self.setWindowTitle(title)
-        self.resize(1060, 700)
         _apply_blue_palette(self)
         self.setCentralWidget(DesignReviewWidget())
 
@@ -385,7 +384,7 @@ class DesignReviewMenu(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(sys.argv)
     window = DesignReviewMenu()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
 

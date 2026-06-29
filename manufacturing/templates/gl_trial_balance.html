@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block page_title %}Trial Balance{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/" class="btn">G/L Dashboard</a>
+<a href="/gl/income-statement/" class="btn">Income Stmt</a>
+<a href="/gl/balance-sheet/" class="btn">Balance Sheet</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:900px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:14px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table th.num { text-align:right; }
+.totals-row { background:#e8eef8; font-weight:bold; }
+.status-ok  { background:#d1e7dd; color:#0a3622; padding:6px 14px; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block; }
+.status-err { background:#f8d7da; color:#842029; padding:6px 14px; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Trial Balance</h2>
+
+    <form method="get" class="filter-bar">
+        <label>As of:</label>
+        <input type="date" name="as_of" value="{{ as_of }}">
+        <button type="submit" class="btn-sm">Run</button>
+        {% if as_of %}<a href="/gl/trial-balance/" style="color:#aad;font-size:13px;">Clear</a>{% endif %}
+    </form>
+
+    {% if rows %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Acct #</th><th>Account Name</th><th>Type</th>
+            <th class="num">Debit</th><th class="num">Credit</th>
+        </tr></thead>
+        <tbody>
+        {% for r in rows %}
+        <tr>
+            <td>{{ r.account_number }}</td>
+            <td>{{ r.account_name }}</td>
+            <td>{{ r.account_type }}</td>
+            <td class="num">{% if r.debit %}${{ r.debit|floatformat:2 }}{% endif %}</td>
+            <td class="num">{% if r.credit %}${{ r.credit|floatformat:2 }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr class="totals-row">
+            <td colspan="3">TOTALS</td>
+            <td class="num">${{ total_debit|floatformat:2 }}</td>
+            <td class="num">${{ total_credit|floatformat:2 }}</td>
+        </tr>
+        </tfoot>
+    </table>
+    <span class="{% if balanced %}status-ok{% else %}status-err{% endif %}">
+        {% if balanced %}BALANCED{% else %}OUT OF BALANCE by ${{ total_debit|add:total_credit|floatformat:2 }}{% endif %}
+    </span>
+    {% else %}
+    <p style="color:#cce;font-size:14px;">No posted journal entries found. Post some journal entries to see the trial balance.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Forecast{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/orders/" class="btn">Orders</a>
+<a href="/sales/quotes/" class="btn">Quotes</a>
+<a href="/sales/leads/" class="btn">Leads</a>
+<a href="/sales/contracts/" class="btn">Contracts</a>
+<a href="/sales/forecast/" class="btn">Forecast</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sl-wrap { width:100%; max-width:1200px; }
+.sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:rgb(0,60,180); color:white; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-Draft     { background:#e2e3e5; color:#383d41; }
+.s-Submitted { background:#cce5ff; color:#004085; }
+.s-Approved  { background:#d4edda; color:#0a3622; }
+.s-Revised   { background:#fff3cd; color:#856404; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:rgb(0,40,140); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sl-wrap">
+    <h2>Sales Forecast</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="period">
+            <option value="">All Periods</option>
+            {% for p in forecast_periods %}
+            <option value="{{ p }}"{% if period_filter == p %} selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search rep / product line…">
+        <button type="submit">Filter</button>
+        <a href="/sales/forecast/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Rep</th>
+                    <th>Period</th>
+                    <th>Fiscal Year</th>
+                    <th>Product Line</th>
+                    <th style="text-align:right;">Expected ($)</th>
+                    <th style="text-align:right;">Prob %</th>
+                    <th style="text-align:right;">Weighted ($)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for f in forecasts %}
+            <tr>
+                <td><a href="/sales/forecast/{{ f.id }}/">{{ f.rep|default:"—" }}</a></td>
+                <td>{{ f.period|default:"—" }}</td>
+                <td>{{ f.fiscal_year|default:"—" }}</td>
+                <td>{{ f.product_line|default:"—" }}</td>
+                <td style="text-align:right;">${{ f.expected_value|floatformat:0 }}</td>
+                <td style="text-align:right;">{{ f.probability }}%</td>
+                <td style="text-align:right;font-weight:bold;">${{ f.weighted_value|floatformat:0 }}</td>
+                <td><span class="badge s-{{ f.status }}">{{ f.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="color:#888;text-align:center;">No forecasts found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Forecast Entry</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Rep / Owner</label>
+                    <input type="text" name="rep" placeholder="Sales rep name">
+                </div>
+                <div class="form-group">
+                    <label>Period</label>
+                    <select name="period">
+                        {% for p in forecast_periods %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fiscal Year</label>
+                    <input type="number" name="fiscal_year" value="{% now 'Y' %}" min="2000" max="2099">
+                </div>
+                <div class="form-group">
+                    <label>Product Line</label>
+                    <input type="text" name="product_line" placeholder="Product / service line">
+                </div>
+                <div class="form-group">
+                    <label>Expected Value ($)</label>
+                    <input type="number" name="expected_value" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Probability (%)</label>
+                    <input type="number" name="probability" min="0" max="100" placeholder="0–100">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in forecast_statuses %}
+                        <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Forecast</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

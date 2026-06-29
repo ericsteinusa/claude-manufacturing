@@ -23,7 +23,6 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
             f"Risk Manager Menu — {email}" if email else "Risk Manager Menu"
         )
         self.setWindowTitle(title)
-        self.resize(1100, 720)
         _apply_blue_palette(self)
         self._build_ui()
 
@@ -46,5 +45,5 @@ class RiskMgrMenu(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = RiskMgrMenu()
-    w.show()
+    w.showMaximized()
     sys.exit(app.exec())

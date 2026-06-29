@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Targets{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Dashboard</a>
+<a href="/sales/orders/" class="btn">Orders</a>
+<a href="/sales/quotes/" class="btn">Quotes</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table th.num { text-align:right; }
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.st-On-Track { background:#d4edda; color:#0a3622; }
+.st-Behind   { background:#f8d7da; color:#842029; }
+.st-Achieved { background:#cce5ff; color:#004085; }
+.pos { color:#0a3622; font-weight:bold; }
+.neg { color:#842029; font-weight:bold; }
+.pct-bar-wrap { display:flex; align-items:center; gap:6px; }
+.pct-bar-outer { flex:1; background:#e8e8e8; border-radius:3px; height:10px; min-width:60px; }
+.pct-bar-inner { height:10px; border-radius:3px; background:rgb(0,60,180); max-width:100%; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-row label { font-size:11px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.edit-card { display:none; background:white; border:2px solid black; border-radius:8px;
+    padding:16px 20px; margin-bottom:16px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Sales Targets &amp; Actuals</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Rep:</label>
+        <select name="rep" onchange="this.form.submit()">
+            <option value="">All Reps</option>
+            {% for r in reps %}
+            <option value="{{ r }}" {% if filter_rep == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+        <label>Period:</label>
+        <select name="period" onchange="this.form.submit()">
+            <option value="">All Periods</option>
+            {% for p in periods %}
+            <option value="{{ p }}" {% if filter_period == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn-sm">Filter</button>
+        <a href="/sales/targets/" style="color:#aad;font-size:13px;">Clear</a>
+    </form>
+
+    <table class="list-table">
+        <thead><tr>
+            <th>Rep</th><th>Period</th><th>Region</th>
+            <th class="num">Target</th><th class="num">Actual</th>
+            <th class="num">Variance</th><th>Attainment</th>
+            <th>Status</th>
+            {% if can_edit %}<th></th>{% endif %}
+        </tr></thead>
+        <tbody>
+        {% for t in targets %}
+        {% with pct=t.actual|default:0 %}
+        <tr>
+            <td>{{ t.rep }}</td>
+            <td>{{ t.period }}</td>
+            <td>{{ t.region|default:"—" }}</td>
+            <td class="num">${{ t.target|floatformat:0 }}</td>
+            <td class="num">${{ t.actual|floatformat:0 }}</td>
+            <td class="num {% if t.variance >= 0 %}pos{% else %}neg{% endif %}">
+                {% if t.variance >= 0 %}+{% endif %}${{ t.variance|floatformat:0 }}
+            </td>
+            <td>
+                {% if t.target %}
+                {% widthratio t.actual t.target 100 as pct_val %}
+                <div class="pct-bar-wrap">
+                    <div class="pct-bar-outer"><div class="pct-bar-inner" style="width:{% if pct_val > 100 %}100{% else %}{{ pct_val }}{% endif %}%;"></div></div>
+                    <span style="font-size:12px;white-space:nowrap;">{{ pct_val }}%</span>
+                </div>
+                {% else %}—{% endif %}
+            </td>
+            <td><span class="badge st-{{ t.status|cut:" " }}">{{ t.status }}</span></td>
+            {% if can_edit %}
+            <td>
+                <button type="button" class="btn-sm" style="padding:3px 10px;font-size:11px;"
+                    onclick="openEdit({{ t.id }},'{{ t.rep|escapejs }}','{{ t.period|escapejs }}',{{ t.target }},{{ t.actual }},'{{ t.region|default:''|escapejs }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">Edit</button>
+            </td>
+            {% endif %}
+        </tr>
+        {% endwith %}
+        {% empty %}
+        <tr><td colspan="{% if can_edit %}9{% else %}8{% endif %}" style="color:#888;text-align:center;padding:16px;">No targets found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+    <div class="edit-card" id="edit-card">
+        <h3>Edit Target</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="target_id" id="edit-id">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row"><label>Rep *</label><input type="text" name="rep" id="edit-rep" required></div>
+                <div class="form-row"><label>Period</label><input type="text" name="period" id="edit-period" placeholder="e.g. 2024-Q1"></div>
+                <div class="form-row"><label>Target ($)</label><input type="number" name="target" id="edit-target" step="0.01" min="0" style="width:110px;"></div>
+                <div class="form-row"><label>Actual ($)</label><input type="number" name="actual" id="edit-actual" step="0.01" min="0" style="width:110px;"></div>
+                <div class="form-row"><label>Region</label><input type="text" name="region" id="edit-region"></div>
+                <div class="form-row"><label>Status</label>
+                    <select name="status" id="edit-status">
+                        {% for s in TARGET_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-sm">Save</button>
+            <button type="button" class="btn-sm" style="background:#888;margin-left:8px;"
+                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Add Target</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="new">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="form-row"><label>Rep *</label><input type="text" name="rep" required></div>
+                <div class="form-row"><label>Period</label><input type="text" name="period" placeholder="e.g. 2024-Q1"></div>
+                <div class="form-row"><label>Target ($)</label><input type="number" name="target" step="0.01" min="0" value="0" style="width:110px;"></div>
+                <div class="form-row"><label>Actual ($)</label><input type="number" name="actual" step="0.01" min="0" value="0" style="width:110px;"></div>
+                <div class="form-row"><label>Region</label><input type="text" name="region"></div>
+                <div class="form-row"><label>Status</label>
+                    <select name="status">
+                        {% for s in TARGET_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-sm">Add Target</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+<script>
+function openEdit(id, rep, period, target, actual, region, status, notes) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-rep').value = rep;
+    document.getElementById('edit-period').value = period;
+    document.getElementById('edit-target').value = target;
+    document.getElementById('edit-actual').value = actual;
+    document.getElementById('edit-region').value = region;
+    document.getElementById('edit-status').value = status;
+    var card = document.getElementById('edit-card');
+    card.style.display = 'block';
+    card.scrollIntoView({behavior:'smooth'});
+}
+</script>
+{% endblock %}

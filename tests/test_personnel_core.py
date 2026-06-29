@@ -7,13 +7,11 @@ are pinned without Postgres or PyQt6.
 
 from datetime import date
 
-import pytest
 
 from manufacturing.personnel_core import (
     TIME_OFF_STATUSES, TIME_OFF_TYPES, TIME_OFF_STATUS_COLORS,
     list_people, get_person, get_person_by_email,
-    create_person, update_person, _upsert_position,
-    load_depts, load_dept_subs,
+    create_person, update_person, load_depts, load_dept_subs,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
 )

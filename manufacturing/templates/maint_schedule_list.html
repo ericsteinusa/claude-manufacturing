@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block page_title %}PM Schedule{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/" class="btn">Dashboard</a>
+<a href="/maint/wo/" class="btn">Work Orders</a>
+<a href="/maint/equipment/" class="btn">Equipment</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; }
+.chip { display:inline-block; padding:3px 13px; border-radius:20px; font-size:12px;
+    font-weight:bold; text-decoration:none; background:#334; color:#aad; border:2px solid #556; }
+.chip.active { border-color:white; color:white; }
+.search-input { padding:5px 10px; border-radius:4px; border:1px solid #ccc; font-size:13px; width:180px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:rgb(0,60,180); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
+.list-table tr.overdue td { background:#fff0f0; }
+.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.form-row textarea { resize:vertical; min-height:60px; }
+.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
+.save-btn:hover { background:rgb(0,40,140); }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Preventive Maintenance Schedule</h2>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="toolbar">
+        <div class="chip-row">
+            <a href="/maint/schedule/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            {% for st in schedule_statuses %}
+            <a href="/maint/schedule/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
+            {% endfor %}
+        </div>
+        <form method="get" style="display:flex;gap:6px;align-items:center;">
+            {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+            <input class="search-input" type="text" name="search" value="{{ search }}" placeholder="Search…">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
+        </form>
+    </div>
+
+    {% if schedules %}
+    <table class="list-table">
+        <thead><tr>
+            <th>Task</th><th>Equipment</th><th>Frequency</th>
+            <th>Assigned To</th><th>Last Done</th><th>Next Due</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+        {% for s in schedules %}
+        <tr class="{% if s.is_overdue %}overdue{% endif %}"
+            onclick="location='/maint/schedule/{{ s.id }}/'">
+            <td><strong>{{ s.task }}</strong></td>
+            <td>{{ s.equipment|default:"—" }}</td>
+            <td>{{ s.frequency|default:"—" }}</td>
+            <td>{{ s.assigned_to|default:"—" }}</td>
+            <td>{{ s.last_done|default:"—" }}</td>
+            <td>{{ s.next_due|default:"—" }}
+                {% if s.is_overdue %}<span style="color:#c62828;font-size:11px;"> &#9888;</span>{% endif %}
+            </td>
+            <td>{{ s.status }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#cce;font-size:14px;margin-bottom:20px;">No schedule items found.</p>
+    {% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add PM Task</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Task *</label>
+                    <input type="text" name="task" required placeholder="e.g. Oil change">
+                </div>
+                <div class="form-row">
+                    <label>Equipment</label>
+                    <input type="text" name="equipment">
+                </div>
+                <div class="form-row">
+                    <label>Frequency</label>
+                    <select name="frequency">
+                        {% for f in frequencies %}<option>{{ f }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Assigned To</label>
+                    <select name="assigned_to">
+                        <option value="">— Unassigned —</option>
+                        {% for m in mechanics %}<option>{{ m.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Last Done</label>
+                    <input type="date" name="last_done">
+                </div>
+                <div class="form-row">
+                    <label>Next Due</label>
+                    <input type="date" name="next_due">
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="save-btn" style="margin-top:12px;">Add PM Task</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
