@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block page_title %}Lot Tracking{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/lots/new/" class="btn">+ New Lot</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.lot-wrap { width: 100%; max-width: 1080px; }
+.lot-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.expiry-bar { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
+    padding: 8px 16px; margin-bottom: 14px; font-size: 13px; color: #856404; }
+.filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-row a { padding: 4px 14px; border: 2px solid black; border-radius: 14px;
+    font-size: 12px; text-decoration: none; color: white; background: rgba(0,0,0,0.25); }
+.filter-row a.active, .filter-row a:hover { background: white; color: rgb(0,60,180); }
+.lot-table { width: 100%; border-collapse: collapse; background: white;
+    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+.lot-table th, .lot-table td { padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid #ddd; font-size: 13px; }
+.lot-table th { background: rgb(0,60,180); color: white; }
+.lot-table tr:last-child td { border-bottom: none; }
+.lot-table tr:hover td { background: #f0f4ff; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 10px; border: 1px solid; font-size: 11px; }
+.badge-available  { background: #d0f0d0; border-color: #3a3; color: #141; }
+.badge-quarantine { background: #ffe5cc; border-color: #c80; color: #640; }
+.badge-hold       { background: #fff3cd; border-color: #ffc107; color: #856404; }
+.badge-consumed   { background: #e8e8e8; border-color: #888; color: #444; }
+.badge-rejected   { background: #fcc; border-color: #c33; color: #900; }
+.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lot-wrap">
+    <h2>Lot Tracking</h2>
+
+    {% if expiry_alerts %}
+    <div class="expiry-bar">
+        ⚠ {{ expiry_alerts|length }} lot{{ expiry_alerts|length|pluralize }} expiring within 30 days
+        — <a href="?status=available" style="color:#856404;">view available</a>
+    </div>
+    {% endif %}
+
+    <div class="filter-row">
+        <a href="/lots/" class="{% if not status_filter %}active{% endif %}">All</a>
+        {% for s in LOT_STATUSES %}
+        <a href="/lots/?status={{ s }}" class="{% if status_filter == s %}active{% endif %}">
+            {{ s|title }}</a>
+        {% endfor %}
+    </div>
+
+    {% if lots %}
+    <table class="lot-table">
+        <thead>
+            <tr>
+                <th>Lot #</th>
+                <th>Product</th>
+                <th class="num">Qty</th>
+                <th>Status</th>
+                <th>Received</th>
+                <th>Expires</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for lot in lots %}
+            <tr>
+                <td><a href="/lots/{{ lot.id }}/">{{ lot.lot_number }}</a></td>
+                <td>{{ lot.product_name|default:lot.product_id }}</td>
+                <td class="num">{{ lot.qty }}</td>
+                <td><span class="badge badge-{{ lot.status }}">{{ lot.status }}</span></td>
+                <td>{{ lot.received_date|default:'-' }}</td>
+                <td>{{ lot.expiry_date|default:'-' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-note">No lots found.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

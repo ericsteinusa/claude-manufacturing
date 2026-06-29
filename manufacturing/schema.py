@@ -178,6 +178,228 @@ _TABLES = [
             new_values JSONB
         )
     """),
+    # --- Routing & labor tracking (Phase 1A) --------------------------------
+    ("workcenter", """
+        CREATE TABLE IF NOT EXISTS workcenter (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE,
+            dept TEXT NOT NULL DEFAULT '',
+            capacity_hours_per_day REAL NOT NULL DEFAULT 8.0,
+            labor_rate REAL NOT NULL DEFAULT 0.0,
+            notes TEXT,
+            is_active BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    """),
+    ("routing", """
+        CREATE TABLE IF NOT EXISTS routing (
+            id SERIAL PRIMARY KEY,
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            operation_seq INTEGER NOT NULL DEFAULT 10,
+            operation_name TEXT NOT NULL,
+            workcenter_id INTEGER REFERENCES workcenter(id),
+            std_hours REAL NOT NULL DEFAULT 0.0,
+            notes TEXT,
+            UNIQUE(product_id, operation_seq)
+        )
+    """),
+    ("wo_operation", """
+        CREATE TABLE IF NOT EXISTS wo_operation (
+            id SERIAL PRIMARY KEY,
+            wo_id INTEGER NOT NULL REFERENCES work_order(id),
+            routing_id INTEGER REFERENCES routing(id),
+            operation_seq INTEGER NOT NULL DEFAULT 10,
+            operation_name TEXT NOT NULL,
+            workcenter_id INTEGER REFERENCES workcenter(id),
+            std_hours REAL NOT NULL DEFAULT 0.0,
+            actual_hours REAL,
+            scrap_qty REAL NOT NULL DEFAULT 0.0,
+            rework_qty REAL NOT NULL DEFAULT 0.0,
+            status TEXT NOT NULL DEFAULT 'pending',
+            started_at TIMESTAMPTZ,
+            completed_at TIMESTAMPTZ,
+            completed_by TEXT,
+            notes TEXT
+        )
+    """),
+    # --- Lot & serial number tracking (Phase 1B) ----------------------------
+    ("lot", """
+        CREATE TABLE IF NOT EXISTS lot (
+            id SERIAL PRIMARY KEY,
+            lot_number TEXT NOT NULL UNIQUE,
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            qty REAL NOT NULL DEFAULT 0.0,
+            received_date TEXT,
+            expiry_date TEXT,
+            status TEXT NOT NULL DEFAULT 'available',
+            notes TEXT,
+            created_by TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
+    ("serial_number", """
+        CREATE TABLE IF NOT EXISTS serial_number (
+            id SERIAL PRIMARY KEY,
+            serial_number TEXT NOT NULL UNIQUE,
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            lot_id INTEGER REFERENCES lot(id),
+            status TEXT NOT NULL DEFAULT 'available',
+            notes TEXT,
+            created_by TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
+    # --- SPC (Phase 6A) -------------------------------------------------------
+    ("spc_control_limit", """
+        CREATE TABLE IF NOT EXISTS spc_control_limit (
+            id             SERIAL PRIMARY KEY,
+            product_id     INTEGER REFERENCES product(id),
+            characteristic TEXT NOT NULL,
+            ucl            REAL NOT NULL,
+            lcl            REAL NOT NULL,
+            target         REAL,
+            sigma          REAL,
+            subgroup_size  INTEGER NOT NULL DEFAULT 5,
+            is_active      BOOLEAN NOT NULL DEFAULT TRUE,
+            created_by     TEXT NOT NULL DEFAULT '',
+            created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            UNIQUE(product_id, characteristic)
+        )
+    """),
+    ("spc_measurement", """
+        CREATE TABLE IF NOT EXISTS spc_measurement (
+            id             SERIAL PRIMARY KEY,
+            product_id     INTEGER REFERENCES product(id),
+            characteristic TEXT NOT NULL,
+            measured_value REAL NOT NULL,
+            measured_by    TEXT NOT NULL DEFAULT '',
+            measured_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            wo_id          INTEGER REFERENCES work_order(id),
+            lot_id         INTEGER REFERENCES lot(id),
+            in_control     BOOLEAN NOT NULL DEFAULT TRUE,
+            notes          TEXT NOT NULL DEFAULT '',
+            created_by     TEXT NOT NULL DEFAULT ''
+        )
+    """),
+    # --- Multi-level approval workflow (Phase 4C) ---------------------------
+    ("approval_rule", """
+        CREATE TABLE IF NOT EXISTS approval_rule (
+            id                   SERIAL PRIMARY KEY,
+            entity_type          TEXT NOT NULL,
+            dept_key             TEXT NOT NULL DEFAULT '',
+            threshold_amount     REAL NOT NULL DEFAULT 0.0,
+            approver_role        TEXT NOT NULL,
+            seq                  INTEGER NOT NULL DEFAULT 10,
+            escalate_after_hours REAL NOT NULL DEFAULT 24.0,
+            is_active            BOOLEAN NOT NULL DEFAULT TRUE,
+            notes                TEXT NOT NULL DEFAULT ''
+        )
+    """),
+    ("approval_step", """
+        CREATE TABLE IF NOT EXISTS approval_step (
+            id             SERIAL PRIMARY KEY,
+            rule_id        INTEGER REFERENCES approval_rule(id),
+            entity_type    TEXT NOT NULL,
+            entity_id      INTEGER NOT NULL,
+            seq            INTEGER NOT NULL DEFAULT 10,
+            status         TEXT NOT NULL DEFAULT 'pending',
+            approver_role  TEXT NOT NULL,
+            decided_by     TEXT NOT NULL DEFAULT '',
+            decided_at     TIMESTAMPTZ,
+            notes          TEXT NOT NULL DEFAULT '',
+            created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
+    # --- API token + rate limiting (Phase 4B) --------------------------------
+    ("api_token", """
+        CREATE TABLE IF NOT EXISTS api_token (
+            token      TEXT PRIMARY KEY,
+            people_id  INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            expires_at TEXT
+        )
+    """),
+    ("api_login_attempt", """
+        CREATE TABLE IF NOT EXISTS api_login_attempt (
+            id           SERIAL PRIMARY KEY,
+            identifier   TEXT NOT NULL,
+            attempted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            success      BOOLEAN NOT NULL DEFAULT FALSE
+        )
+    """),
+    ("api_totp_secret", """
+        CREATE TABLE IF NOT EXISTS api_totp_secret (
+            people_id  INTEGER PRIMARY KEY,
+            secret_b32 TEXT NOT NULL,
+            enabled    BOOLEAN NOT NULL DEFAULT TRUE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
+    # --- GL segment codes / cost centers (Phase 3D) -------------------------
+    ("cost_center", """
+        CREATE TABLE IF NOT EXISTS cost_center (
+            id SERIAL PRIMARY KEY,
+            code TEXT NOT NULL UNIQUE,
+            name TEXT NOT NULL,
+            dept_key TEXT NOT NULL DEFAULT '',
+            is_active BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    """),
+    # --- Bank reconciliation (Phase 3C) -------------------------------------
+    ("bank_transaction", """
+        CREATE TABLE IF NOT EXISTS bank_transaction (
+            id SERIAL PRIMARY KEY,
+            bank_account_id INTEGER NOT NULL REFERENCES bank_account(id),
+            statement_id INTEGER REFERENCES bank_statement(id),
+            trans_date TEXT NOT NULL,
+            amount REAL NOT NULL,
+            description TEXT NOT NULL DEFAULT '',
+            ref_number TEXT NOT NULL DEFAULT '',
+            cleared BOOLEAN NOT NULL DEFAULT FALSE,
+            matched_gl_line_id INTEGER REFERENCES gl_journal_line(id),
+            created_by TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
+    # --- Cost accounting (Phase 2) ------------------------------------------
+    ("gl_account_map", """
+        CREATE TABLE IF NOT EXISTS gl_account_map (
+            id SERIAL PRIMARY KEY,
+            category TEXT NOT NULL UNIQUE,
+            account_number TEXT NOT NULL,
+            description TEXT,
+            is_active BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    """),
+    ("cost_roll", """
+        CREATE TABLE IF NOT EXISTS cost_roll (
+            id SERIAL PRIMARY KEY,
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            effective_date TEXT NOT NULL,
+            std_material_cost REAL NOT NULL DEFAULT 0.0,
+            std_labor_cost REAL NOT NULL DEFAULT 0.0,
+            std_overhead_cost REAL NOT NULL DEFAULT 0.0,
+            total_std_cost REAL NOT NULL DEFAULT 0.0,
+            roll_notes TEXT,
+            created_by TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
+    ("wo_cost_actual", """
+        CREATE TABLE IF NOT EXISTS wo_cost_actual (
+            id SERIAL PRIMARY KEY,
+            wo_id INTEGER NOT NULL UNIQUE REFERENCES work_order(id),
+            actual_material_cost REAL NOT NULL DEFAULT 0.0,
+            actual_labor_cost REAL NOT NULL DEFAULT 0.0,
+            actual_overhead_cost REAL NOT NULL DEFAULT 0.0,
+            total_actual_cost REAL NOT NULL DEFAULT 0.0,
+            std_cost REAL NOT NULL DEFAULT 0.0,
+            material_variance REAL NOT NULL DEFAULT 0.0,
+            labor_variance REAL NOT NULL DEFAULT 0.0,
+            total_variance REAL NOT NULL DEFAULT 0.0,
+            created_by TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """),
 ]
 
 _AUDIT_INDEXES = [
@@ -187,6 +409,31 @@ _AUDIT_INDEXES = [
     "ON audit_log(changed_at DESC)",
     "CREATE INDEX IF NOT EXISTS audit_log_changed_by "
     "ON audit_log(changed_by)",
+    # Routing & lot indexes
+    "CREATE INDEX IF NOT EXISTS wo_operation_wo_id ON wo_operation(wo_id)",
+    "CREATE INDEX IF NOT EXISTS lot_product_id ON lot(product_id)",
+    "CREATE INDEX IF NOT EXISTS sn_product_id ON serial_number(product_id)",
+    # Cost accounting indexes
+    "CREATE INDEX IF NOT EXISTS cost_roll_product "
+    "ON cost_roll(product_id, effective_date DESC)",
+    # Bank reconciliation indexes
+    "CREATE INDEX IF NOT EXISTS bank_txn_statement "
+    "ON bank_transaction(statement_id)",
+    "CREATE INDEX IF NOT EXISTS bank_txn_cleared "
+    "ON bank_transaction(statement_id, cleared)",
+    # Approval workflow indexes
+    "CREATE INDEX IF NOT EXISTS approval_step_entity "
+    "ON approval_step(entity_type, entity_id)",
+    "CREATE INDEX IF NOT EXISTS approval_step_role_pending "
+    "ON approval_step(approver_role, status)",
+    # API rate limiting index
+    "CREATE INDEX IF NOT EXISTS api_login_attempt_ident "
+    "ON api_login_attempt(identifier, attempted_at DESC)",
+    # SPC indexes (Phase 6A)
+    "CREATE INDEX IF NOT EXISTS spc_meas_product_char "
+    "ON spc_measurement(product_id, characteristic, measured_at DESC)",
+    "CREATE INDEX IF NOT EXISTS spc_meas_out_of_control "
+    "ON spc_measurement(in_control, measured_at DESC)",
 ]
 
 # Columns backfilled onto pre-existing tables that may have been created from
@@ -210,6 +457,33 @@ _RECONCILE = {
     ],
     "dept_sub": [
         ("dept_id", "INTEGER"),
+    ],
+    # Backfill lot tracking FK columns onto pre-existing tables
+    "inventory_transaction": [
+        ("lot_id", "INTEGER"),
+    ],
+    "wo_material": [
+        ("lot_id", "INTEGER"),
+    ],
+    # Backfill overhead_rate onto workcenter (added in Phase 2)
+    "workcenter": [
+        ("overhead_rate", "REAL NOT NULL DEFAULT 0.0"),
+    ],
+    # Backfill asset hierarchy onto maint_equipment (Phase 6B)
+    "maint_equipment": [
+        ("parent_id", "INTEGER"),
+    ],
+    # Backfill equipment FK onto maint_part (Phase 6B)
+    "maint_part": [
+        ("equipment_id", "INTEGER"),
+    ],
+    # Backfill GL account link onto budget_line (Phase 3B)
+    "budget_line": [
+        ("gl_account_id", "INTEGER"),
+    ],
+    # Backfill cost_center_id onto gl_journal_line (Phase 3D)
+    "gl_journal_line": [
+        ("cost_center_id", "INTEGER"),
     ],
 }
 

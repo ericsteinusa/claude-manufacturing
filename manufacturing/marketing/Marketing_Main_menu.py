@@ -6,8 +6,8 @@ from ..dept_menu_widget import DeptMenuWidget
 
 _TITLE = "Marketing Main Menu"
 _ITEMS = [
-    ("Marketing Manager", lambda: _launch("marketing_mgr_menu.py")),
-    ("Marketing",         lambda: _launch("marketing_menu.py")),
+    ("Marketing Manager", lambda: _launch("marketing/marketing_mgr_menu.py")),
+    ("Marketing",         lambda: _launch("marketing/marketing_menu.py")),
     ("Purchase Requisitions",
      lambda: _launch("purchase_requisitions.py", "Marketing")),
 ]

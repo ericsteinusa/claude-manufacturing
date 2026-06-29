@@ -73,12 +73,12 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         eng_tabs.setStyleSheet(TAB_STYLE)
         eng_tabs.addTab(
     _launch_tab(
-        "engineer.py",
+        "engineering/engineer.py",
         "Engineering Projects"),
          "Engineering Projects")
         eng_tabs.addTab(
     _launch_tab(
-        "engineer.py",
+        "engineering/engineer.py",
         "Engineering Tasks"),
          "Engineering Tasks")
         eng_v.addWidget(eng_tabs)
@@ -88,12 +88,12 @@ class EngMgrMenu(QtWidgets.QMainWindow):
         tabs.addTab(EngReportsWidget(), "Eng Reports")
         tabs.addTab(
     _launch_tab(
-        "product_entry_screen.py",
+        "production/product_entry_screen.py",
         "Product Entry"),
          "Product Entry")
         tabs.addTab(
     _launch_tab(
-        "Supplier_entry.py",
+        "customers/Supplier_entry.py",
         "Supplier Entry"),
          "Supplier Entry")
 

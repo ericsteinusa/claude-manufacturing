@@ -43,9 +43,10 @@ def launch(script, *args):
         import tempfile
         import threading
         import time
+        safe_name = os.path.splitext(script)[0].replace("/", "_").replace(os.sep, "_")
         err_path = os.path.join(
             tempfile.gettempdir(),
-            f'mfg_{os.path.splitext(script)[0]}.log',
+            f'mfg_{safe_name}.log',
         )
         with open(err_path, 'w') as err_file:
             p = subprocess.Popen(

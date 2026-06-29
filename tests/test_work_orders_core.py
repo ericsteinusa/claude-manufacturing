@@ -179,9 +179,10 @@ def test_set_wo_status_updates_status():
 
 def test_set_wo_status_does_not_guard_transition():
     conn = _FakeConn()
-    set_wo_status(conn, 5, "completed")
+    set_wo_status(conn, 5, "completed")  # triggers costing SELECT (returns None → skips)
     set_wo_status(conn, 5, "draft")      # illegal reopen — no exception
-    assert len(conn.calls) == 2
+    # 'completed' does UPDATE + SELECT wo_number; 'draft' does just UPDATE
+    assert len(conn.calls) == 3
 
 
 # ── load_products ─────────────────────────────────────────────────────────

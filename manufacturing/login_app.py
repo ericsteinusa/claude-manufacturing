@@ -1125,7 +1125,7 @@ def main():
         session.logged_out.connect(on_logout)
         # Keep a reference so it isn't garbage-collected
         login._session = session
-        session.show()
+        session.showMaximized()
 
     def on_logout():
         login._session = None

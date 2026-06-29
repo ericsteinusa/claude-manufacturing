@@ -8,14 +8,14 @@ from ..payroll.Payroll_dept import PayrollDeptWidget
 
 _TITLE = "Personnel Menu"
 _ITEMS = [
-    ("Personnel CRM",      lambda: _launch("personnel_crm.py")),
+    ("Personnel CRM",      lambda: _launch("personnel/personnel_crm.py")),
     ("Time Clock",         TimeClockWidget),
     ("Payroll",            PayrollDeptWidget),
     ("Registration Form",  lambda: _launch("registration_form.py")),
-    ("Update Password",    lambda: _launch("update_users.py")),
-    ("Display Dept",       lambda: _launch("display_people_department.py")),
-    ("Dept Entry",         lambda: _launch("dept_entry.py")),
-    ("Dept Sub Entry",     lambda: _launch("dept_sub_entry.py")),
+    ("Update Password",    lambda: _launch("payroll/update_users.py")),
+    ("Display Dept",       lambda: _launch("personnel/display_people_department.py")),
+    ("Dept Entry",         lambda: _launch("personnel/dept_entry.py")),
+    ("Dept Sub Entry",     lambda: _launch("personnel/dept_sub_entry.py")),
 ]
 
 

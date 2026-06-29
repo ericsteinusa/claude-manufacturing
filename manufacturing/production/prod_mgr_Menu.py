@@ -1,8 +1,7 @@
 import sys
-import os
-import subprocess
 from PyQt6 import QtCore, QtWidgets
 from ..qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
+from ..launch_utils import launch as _launch
 
 from ..button_nav import ButtonNav
 from ..accounts import get_current_user_email
@@ -30,7 +29,7 @@ def _launch_tab(script, label):
     btn.setStyleSheet(BUTTON_STYLE)
     btn.setFixedHeight(44)
     btn.setFixedWidth(260)
-    btn.clicked.connect(lambda: _do_launch(script))
+    btn.clicked.connect(lambda: _launch(script))
     row = QtWidgets.QHBoxLayout()
     row.addStretch()
     row.addWidget(btn)
@@ -38,14 +37,6 @@ def _launch_tab(script, label):
     v.addLayout(row)
     v.addStretch()
     return w
-
-
-def _do_launch(script):
-    _dir = os.path.dirname(os.path.abspath(__file__))
-    subprocess.Popen([sys.executable,
-    "-m",
-    "manufacturing." + os.path.splitext(script)[0]],
-     cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class ProdMgrMenu(QtWidgets.QMainWindow):
@@ -69,10 +60,10 @@ class ProdMgrMenu(QtWidgets.QMainWindow):
         tabs.setStyleSheet(TAB_STYLE)
         tabs.addTab(
     _launch_tab(
-        "prod_prod_menu.py",
+        "production/prod_prod_menu.py",
         "Production"),
          "Production")
-        tabs.addTab(_launch_tab("prod_ship_dept.py", "Shipping"), "Shipping")
+        tabs.addTab(_launch_tab("production/prod_ship_dept.py", "Shipping"), "Shipping")
         v.addWidget(tabs)
 
 

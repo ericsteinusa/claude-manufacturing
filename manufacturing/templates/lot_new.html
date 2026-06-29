@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block page_title %}New Lot{% endblock %}
+
+{% block toolbar_left %}
+<a href="/lots/" class="btn">← Lots</a>
+{% endblock %}
+
+{% block extra_styles %}
+.form-wrap { max-width: 560px; }
+.form-wrap h2 { color: white; font-size: 20px; margin-bottom: 16px; }
+.form-card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 24px; margin-bottom: 16px; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+.field input, .field select, .field textarea {
+    width: 100%; padding: 7px 10px; border: 1px solid #aaa; border-radius: 4px;
+    font-size: 13px; box-sizing: border-box; }
+.field textarea { height: 80px; resize: vertical; }
+.actions { display: flex; gap: 10px; margin-top: 8px; }
+.btn-primary { background: rgb(0,60,180); color: white; border: none; border-radius: 4px;
+    padding: 8px 20px; font-size: 14px; cursor: pointer; }
+.btn-primary:hover { opacity: 0.85; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="form-wrap">
+    <h2>New Lot</h2>
+
+    {% if error %}
+    <div class="alert-err">{{ error }}</div>
+    {% endif %}
+
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label>Product *</label>
+                <select name="product_id" required>
+                    <option value="">-- select product --</option>
+                    {% for p in products %}
+                    <option value="{{ p.id }}" {% if form.product_id == p.id|stringformat:"s" %}selected{% endif %}>
+                        {{ p.name }}{% if p.sku %} ({{ p.sku }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Lot Number (auto-generated if blank)</label>
+                <input type="text" name="lot_number" value="{{ form.lot_number|default:'' }}"
+                    placeholder="e.g. LOT-2026-001">
+            </div>
+            <div class="field">
+                <label>Quantity *</label>
+                <input type="number" name="qty" value="{{ form.qty|default:'' }}"
+                    step="0.001" min="0" required>
+            </div>
+            <div class="field">
+                <label>Received Date</label>
+                <input type="date" name="received_date" value="{{ form.received_date|default:'' }}">
+            </div>
+            <div class="field">
+                <label>Expiry Date</label>
+                <input type="date" name="expiry_date" value="{{ form.expiry_date|default:'' }}">
+            </div>
+            <div class="field">
+                <label>Notes</label>
+                <textarea name="notes">{{ form.notes|default:'' }}</textarea>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary">Create Lot</button>
+                <a href="/lots/" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block page_title %}Lot {{ lot.lot_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/lots/" class="btn">← Lots</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lot-wrap { max-width: 800px; }
+.lot-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.lot-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.info-grid { display: grid; grid-template-columns: 160px 1fr; gap: 8px 20px; font-size: 13px; }
+.info-label { font-weight: bold; color: #555; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 10px; border: 1px solid; font-size: 12px; }
+.badge-available  { background: #d0f0d0; border-color: #3a3; color: #141; }
+.badge-quarantine { background: #ffe5cc; border-color: #c80; color: #640; }
+.badge-hold       { background: #fff3cd; border-color: #ffc107; color: #856404; }
+.badge-consumed   { background: #e8e8e8; border-color: #888; color: #444; }
+.badge-rejected   { background: #fcc; border-color: #c33; color: #900; }
+.status-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.status-form select { padding: 5px 8px; border: 1px solid #aaa; border-radius: 4px; font-size: 13px; }
+.status-form input[type=text] { padding: 5px 8px; border: 1px solid #aaa; border-radius: 4px;
+    font-size: 13px; width: 220px; }
+.btn-sm { padding: 5px 14px; font-size: 12px; background: rgb(0,60,180); color: white;
+    border: none; border-radius: 4px; cursor: pointer; }
+.btn-sm:hover { opacity: 0.85; }
+.serial-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.serial-table th, .serial-table td { padding: 6px 10px; border-bottom: 1px solid #eee; text-align: left; }
+.serial-table th { background: #f0f4ff; font-weight: bold; }
+.genealogy-list { font-size: 13px; color: #333; }
+.genealogy-list li { margin-bottom: 4px; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lot-wrap">
+    <h2>Lot {{ lot.lot_number }}</h2>
+    <div class="lot-meta">
+        <span class="badge badge-{{ lot.status }}">{{ lot.status }}</span>
+        &nbsp;·&nbsp; Product: {{ lot.product_name|default:lot.product_id }}
+    </div>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Lot Details</h3>
+        <div class="info-grid">
+            <span class="info-label">Lot Number</span><span>{{ lot.lot_number }}</span>
+            <span class="info-label">Quantity</span><span>{{ lot.qty }}</span>
+            <span class="info-label">Received</span><span>{{ lot.received_date|default:'-' }}</span>
+            <span class="info-label">Expires</span><span>{{ lot.expiry_date|default:'-' }}</span>
+            <span class="info-label">Notes</span><span>{{ lot.notes|default:'-' }}</span>
+            <span class="info-label">Created by</span><span>{{ lot.created_by|default:'-' }}</span>
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Update Status</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="status">
+            <div class="status-form">
+                <select name="status">
+                    {% for s in LOT_STATUSES %}
+                    <option value="{{ s }}" {% if lot.status == s %}selected{% endif %}>{{ s|title }}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="notes" placeholder="Notes (optional)">
+                <button type="submit" class="btn-sm">Update</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if genealogy.input_lots %}
+    <div class="card">
+        <h3>Genealogy — Input Lots</h3>
+        <ul class="genealogy-list">
+        {% for il in genealogy.input_lots %}
+            <li>
+                <a href="/lots/{{ il.id }}/">{{ il.lot_number }}</a>
+                — {{ il.product_name|default:'?' }} — {{ il.qty }} {{ il.unit|default:'' }}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Serial Numbers ({{ serials|length }})</h3>
+        {% if serials %}
+        <table class="serial-table">
+            <thead>
+                <tr><th>Serial #</th><th>Status</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+            {% for s in serials %}
+                <tr>
+                    <td>{{ s.serial_number }}</td>
+                    <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span></td>
+                    <td>{{ s.notes|default:'-' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">No serial numbers recorded.</p>
+        {% endif %}
+
+        {% if can_edit %}
+        <form method="post" style="margin-top:14px; display:flex; gap:8px; align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_serial">
+            <input type="text" name="serial_number" placeholder="New serial number"
+                style="padding:5px 8px; border:1px solid #aaa; border-radius:4px; font-size:13px; width:220px;">
+            <button type="submit" class="btn-sm">+ Add Serial</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

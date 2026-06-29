@@ -15,6 +15,34 @@ from datetime import date as _date
 from .db_pg import get_db_connection
 from .log_utils import get_logger
 
+_PERIOD_LOCK_FN = """
+CREATE OR REPLACE FUNCTION _period_lock_check()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    _year  INT;
+    _month INT;
+BEGIN
+    IF NEW.journal_date IS NULL THEN
+        RETURN NEW;
+    END IF;
+    BEGIN
+        _year  := EXTRACT(YEAR  FROM NEW.journal_date::date)::INT;
+        _month := EXTRACT(MONTH FROM NEW.journal_date::date)::INT;
+    EXCEPTION WHEN OTHERS THEN
+        RETURN NEW;
+    END;
+    IF EXISTS (
+        SELECT 1 FROM closed_periods
+        WHERE period_year = _year AND period_month = _month
+    ) THEN
+        RAISE EXCEPTION 'Period %/% is closed — GL entries are not permitted',
+            _year, _month;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+"""
+
 log = get_logger(__name__)
 
 # Roles permitted to close / reopen periods.
@@ -92,6 +120,32 @@ def reopen_period(conn, period_id: int, reopened_by: str) -> None:
     conn.execute(
         "DELETE FROM closed_periods WHERE id = %s", (period_id,))
     log.info("Period id=%s reopened by %s", period_id, reopened_by)
+
+
+def install_period_lock_trigger(conn=None) -> None:
+    """Install a PostgreSQL BEFORE trigger on gl_journal that blocks writes
+    to closed periods at the database layer.
+
+    Idempotent — safe to call on every startup.
+    """
+    close_after = conn is None
+    if conn is None:
+        conn = get_db_connection()
+    try:
+        conn.execute(_PERIOD_LOCK_FN)
+        conn.execute(
+            "DROP TRIGGER IF EXISTS _period_lock ON gl_journal"
+        )
+        conn.execute(
+            "CREATE TRIGGER _period_lock "
+            "BEFORE INSERT OR UPDATE ON gl_journal "
+            "FOR EACH ROW EXECUTE FUNCTION _period_lock_check()"
+        )
+        conn.commit()
+        log.debug("Period lock trigger installed on gl_journal")
+    finally:
+        if close_after:
+            conn.close()
 
 
 def recent_months(n: int = 13) -> list[tuple[int, int]]:

@@ -54,6 +54,22 @@ AUDITED_TABLES = [
     'payroll_entry',
     'inventory_transaction',
     'maint_work_order',
+    'wo_operation',
+    'lot',
+    'serial_number',
+    'routing',
+    'workcenter',
+    'cost_roll',
+    'wo_cost_actual',
+    'gl_account_map',
+    'cost_center',
+    'bank_transaction',
+    'budget_line',
+    'approval_rule',
+    'approval_step',
+    'api_totp_secret',
+    'spc_control_limit',
+    'spc_measurement',
 ]
 
 _TRIGGER_FN = """

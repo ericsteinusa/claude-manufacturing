@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block page_title %}WO Cost — {{ wo.wo_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wo/{{ wo.id }}/" class="btn">← Work Order</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cost-wrap { max-width: 760px; }
+.cost-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.cost-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+.var-box { border-radius: 8px; padding: 14px; text-align: center; }
+.var-fav  { background: #d0f0d0; border: 1px solid #3a3; }
+.var-unfav { background: #fcc; border: 1px solid #c33; }
+.var-neut  { background: #e8e8e8; border: 1px solid #aaa; }
+.var-box .label { font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; }
+.var-box .value { font-size: 20px; font-weight: bold; margin-top: 4px; }
+.info-grid { display: grid; grid-template-columns: 180px 1fr; gap: 8px 20px; font-size: 13px; }
+.info-label { font-weight: bold; color: #555; }
+.btn-compute { padding: 9px 22px; background: rgb(0,60,180); color: white; border: none;
+    border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
+.btn-compute:hover { opacity: 0.85; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cost-wrap">
+    <h2>WO Cost — {{ wo.wo_number }}</h2>
+    <div class="cost-meta">{{ wo.description|default:'' }}</div>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    {% if cost %}
+    <div class="card">
+        <h3>Actual vs Standard</h3>
+        <div class="info-grid">
+            <span class="info-label">Actual Material</span>
+            <span>${{ cost.actual_material_cost|floatformat:2 }}</span>
+            <span class="info-label">Std Material</span>
+            <span>${{ cost.std_material_cost|floatformat:2 }}</span>
+            <span class="info-label">Actual Labor</span>
+            <span>${{ cost.actual_labor_cost|floatformat:2 }}</span>
+            <span class="info-label">Std Labor</span>
+            <span>${{ cost.std_labor_cost|floatformat:2 }}</span>
+            <span class="info-label">Actual Total</span>
+            <span><strong>${{ cost.actual_total_cost|floatformat:2 }}</strong></span>
+            <span class="info-label">Std Total</span>
+            <span><strong>${{ cost.std_total_cost|floatformat:2 }}</strong></span>
+        </div>
+
+        <div class="var-grid">
+            {% with mv=cost.material_variance %}
+            <div class="var-box {% if mv <= 0 %}var-fav{% elif mv > 0 %}var-unfav{% else %}var-neut{% endif %}">
+                <div class="label">Material Variance</div>
+                <div class="value">
+                    {% if mv < 0 %}−${{ mv|floatformat:2|slice:"1:" }}{% else %}+${{ mv|floatformat:2 }}{% endif %}
+                </div>
+            </div>
+            {% endwith %}
+            {% with lv=cost.labor_variance %}
+            <div class="var-box {% if lv <= 0 %}var-fav{% elif lv > 0 %}var-unfav{% else %}var-neut{% endif %}">
+                <div class="label">Labor Variance</div>
+                <div class="value">
+                    {% if lv < 0 %}−${{ lv|floatformat:2|slice:"1:" }}{% else %}+${{ lv|floatformat:2 }}{% endif %}
+                </div>
+            </div>
+            {% endwith %}
+        </div>
+
+        <div style="margin-top:12px;font-size:12px;color:#888;">
+            Computed {{ cost.computed_at|default:'' }} by {{ cost.created_by|default:'-' }}
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <p style="color:#888;text-align:center;padding:20px;">No cost record computed yet.</p>
+    </div>
+    {% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Compute Actual Cost</h3>
+        <p style="font-size:13px;color:#555;margin-bottom:14px;">
+            Sums WO material issues and labor from completed operations, then compares to
+            the product's standard cost to compute variances.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="compute">
+            <button type="submit" class="btn-compute">Compute Cost</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
