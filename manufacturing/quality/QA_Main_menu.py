@@ -6,8 +6,8 @@ from ..dept_menu_widget import DeptMenuWidget
 
 _TITLE = "QA Main Menu"
 _ITEMS = [
-    ("QA Manager",       lambda: _launch("QA_Mgr_menu.py")),
-    ("Quality Assurance", lambda: _launch("Quality_Assurance_menu.py")),
+    ("QA Manager",       lambda: _launch("quality/QA_Mgr_menu.py")),
+    ("Quality Assurance", lambda: _launch("quality/Quality_Assurance_menu.py")),
     ("Purchase Requisitions",
      lambda: _launch("purchase_requisitions.py", "Quality Assurance")),
 ]

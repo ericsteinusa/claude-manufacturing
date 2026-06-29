@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block page_title %}Routing — {{ product.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/inventory/{{ product.id }}/" class="btn">← Product</a>
+<a href="/workcenters/" class="btn">Work Centers</a>
+{% endblock %}
+
+{% block extra_styles %}
+.route-wrap { max-width: 860px; }
+.route-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.route-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.route-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.route-table th, .route-table td { padding: 8px 12px; border-bottom: 1px solid #eee; text-align: left; }
+.route-table th { background: rgb(0,60,180); color: white; }
+.route-table tr:last-child td { border-bottom: none; }
+.route-table tr:hover td { background: #f0f4ff; }
+.seq-badge { display: inline-block; width: 28px; height: 28px; border-radius: 50%;
+    background: rgb(0,60,180); color: white; text-align: center; line-height: 28px;
+    font-size: 12px; font-weight: bold; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #555; }
+.field input, .field select { width: 100%; padding: 6px 9px; border: 1px solid #aaa; border-radius: 4px;
+    font-size: 13px; box-sizing: border-box; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+.btn-sm { padding: 7px 18px; background: rgb(0,60,180); color: white; border: none;
+    border-radius: 4px; font-size: 13px; cursor: pointer; }
+.btn-sm:hover { opacity: 0.85; }
+.btn-del { padding: 4px 10px; background: #d93025; color: white; border: none;
+    border-radius: 4px; font-size: 11px; cursor: pointer; }
+.btn-del:hover { opacity: 0.85; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="route-wrap">
+    <h2>Routing — {{ product.name }}</h2>
+    <div class="route-meta">
+        {% if product.sku %}SKU: {{ product.sku }} &nbsp;·&nbsp;{% endif %}
+        {{ steps|length }} operation{{ steps|length|pluralize }}
+        &nbsp;·&nbsp; <a href="/costs/{{ product.id }}/" style="color:#cce;">View Cost Roll</a>
+    </div>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <table class="route-table">
+            <thead>
+                <tr>
+                    <th style="width:44px">Seq</th>
+                    <th>Operation</th>
+                    <th>Work Center</th>
+                    <th class="num">Std Hours</th>
+                    <th>Notes</th>
+                    {% if can_edit %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for step in steps %}
+                <tr>
+                    <td><span class="seq-badge">{{ step.operation_seq }}</span></td>
+                    <td>{{ step.operation_name }}</td>
+                    <td>{{ step.workcenter_name|default:'-' }}</td>
+                    <td style="text-align:right">{{ step.std_hours|floatformat:2 }}</td>
+                    <td>{{ step.notes|default:'-' }}</td>
+                    {% if can_edit %}
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="routing_id" value="{{ step.id }}">
+                            <button type="submit" class="btn-del"
+                                onclick="return confirm('Remove this step?')">Remove</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" style="color:#999;text-align:center;padding:20px;">
+                    No routing steps defined yet.
+                </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Operation</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-grid">
+                <div class="field">
+                    <label>Operation Name *</label>
+                    <input type="text" name="operation_name" required placeholder="e.g. Weld Frame">
+                </div>
+                <div class="field">
+                    <label>Work Center</label>
+                    <select name="workcenter_id">
+                        <option value="">-- none --</option>
+                        {% for wc in workcenters %}
+                        <option value="{{ wc.id }}">{{ wc.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Std Hours</label>
+                    <input type="number" name="std_hours" step="0.01" value="0" min="0">
+                </div>
+                <div class="field">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn-sm">+ Add Step</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

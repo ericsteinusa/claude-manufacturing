@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block page_title %}Standard Cost — {{ product.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/inventory/{{ product.id }}/" class="btn">← Product</a>
+<a href="/routing/{{ product.id }}/" class="btn">Routing</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cost-wrap { max-width: 760px; }
+.cost-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.cost-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 2px solid black; border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.cost-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.cost-box { background: #f0f4ff; border: 1px solid #b0c0e8; border-radius: 8px;
+    padding: 14px; text-align: center; }
+.cost-box .label { font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; }
+.cost-box .value { font-size: 22px; font-weight: bold; color: rgb(0,40,140); margin-top: 4px; }
+.total-box { background: rgb(0,60,180); border-radius: 8px; padding: 14px;
+    text-align: center; color: white; }
+.total-box .label { font-size: 11px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
+.total-box .value { font-size: 26px; font-weight: bold; margin-top: 4px; }
+.hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.hist-table th, .hist-table td { padding: 6px 10px; border-bottom: 1px solid #eee; text-align: left; }
+.hist-table th { background: #f0f4ff; font-weight: bold; }
+.hist-table tr:last-child td { border-bottom: none; }
+.hist-table td.num { text-align: right; font-family: monospace; }
+.btn-roll { padding: 9px 22px; background: rgb(0,60,180); color: white; border: none;
+    border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
+.btn-roll:hover { opacity: 0.85; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cost-wrap">
+    <h2>Standard Cost — {{ product.name }}</h2>
+    <div class="cost-meta">
+        {% if product.sku %}SKU: {{ product.sku }} &nbsp;·&nbsp;{% endif %}
+        Cost type: {{ product.make_or_buy|upper }}
+    </div>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    {% if current_cost %}
+    <div class="card">
+        <h3>Current Standard Cost
+            <small style="font-weight:normal;color:#888;font-size:12px;">
+                — rolled {{ current_cost.rolled_at|default:'' }}
+            </small>
+        </h3>
+        <div class="cost-grid" style="margin-bottom:16px;">
+            <div class="cost-box">
+                <div class="label">Material</div>
+                <div class="value">${{ current_cost.std_material_cost|floatformat:2 }}</div>
+            </div>
+            <div class="cost-box">
+                <div class="label">Labor</div>
+                <div class="value">${{ current_cost.std_labor_cost|floatformat:2 }}</div>
+            </div>
+            <div class="cost-box">
+                <div class="label">Overhead</div>
+                <div class="value">${{ current_cost.std_overhead_cost|floatformat:2 }}</div>
+            </div>
+        </div>
+        <div class="total-box">
+            <div class="label">Total Standard Cost</div>
+            <div class="value">${{ current_cost.total_std_cost|floatformat:2 }}</div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <p style="color:#888;text-align:center;padding:20px;">No standard cost on record yet.</p>
+    </div>
+    {% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Roll Standard Cost</h3>
+        <p style="font-size:13px;color:#555;margin-bottom:14px;">
+            Recalculates material cost from the Bill of Materials, plus labor cost from
+            routing operations. Saves a new snapshot with timestamp.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="roll">
+            <button type="submit" class="btn-roll">Roll Cost</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if history %}
+    <div class="card">
+        <h3>Cost History</h3>
+        <table class="hist-table">
+            <thead>
+                <tr>
+                    <th>Rolled At</th>
+                    <th class="num">Material</th>
+                    <th class="num">Labor</th>
+                    <th class="num">Overhead</th>
+                    <th class="num">Total</th>
+                    <th>By</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for h in history %}
+                <tr>
+                    <td>{{ h.rolled_at }}</td>
+                    <td class="num">${{ h.std_material_cost|floatformat:2 }}</td>
+                    <td class="num">${{ h.std_labor_cost|floatformat:2 }}</td>
+                    <td class="num">${{ h.std_overhead_cost|floatformat:2 }}</td>
+                    <td class="num"><strong>${{ h.total_std_cost|floatformat:2 }}</strong></td>
+                    <td>{{ h.created_by|default:'-' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

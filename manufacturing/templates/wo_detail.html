@@ -151,6 +151,56 @@
             </form>
         </div>
         {% endif %}
+
+        {# Operations #}
+        {% if operations %}
+        <div class="wo-card" style="margin-top:18px;">
+            <h3 style="font-size:14px;color:rgb(0,40,140);margin:0 0 10px;">Operations</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <thead>
+                    <tr style="background:rgb(0,60,180);color:white;">
+                        <th style="padding:6px 10px;text-align:left;width:36px;">Seq</th>
+                        <th style="padding:6px 10px;text-align:left;">Operation</th>
+                        <th style="padding:6px 10px;text-align:left;">Work Center</th>
+                        <th style="padding:6px 10px;text-align:right;">Std hrs</th>
+                        <th style="padding:6px 10px;text-align:right;">Actual hrs</th>
+                        <th style="padding:6px 10px;text-align:left;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for op in operations %}
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:6px 10px;">{{ op.operation_seq }}</td>
+                        <td style="padding:6px 10px;">{{ op.operation_name }}</td>
+                        <td style="padding:6px 10px;">{{ op.workcenter_name|default:'-' }}</td>
+                        <td style="padding:6px 10px;text-align:right;">{{ op.std_hours|floatformat:2 }}</td>
+                        <td style="padding:6px 10px;text-align:right;">{{ op.actual_hours|floatformat:2|default:'-' }}</td>
+                        <td style="padding:6px 10px;">
+                            <span style="padding:2px 8px;border-radius:10px;font-size:11px;border:1px solid #aaa;background:#f0f0f0;">
+                                {{ op.status }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% if wo_labor_cost %}
+            <div style="margin-top:10px;font-size:12px;color:#555;text-align:right;">
+                Total std hrs: {{ wo_labor_cost.total_std_hours|floatformat:2 }}
+                &nbsp;|&nbsp; Actual hrs: {{ wo_labor_cost.total_actual_hours|floatformat:2 }}
+                &nbsp;|&nbsp; Labor cost: ${{ wo_labor_cost.labor_cost|floatformat:2 }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {# Cost summary #}
+        <div style="margin-top:14px;font-size:13px;">
+            <a href="/wo/{{ wo.id }}/cost/" style="color:rgb(0,60,180);font-weight:bold;">
+                📊 View WO Cost Detail{% if wo_cost %} — Actual ${{ wo_cost.actual_total_cost|floatformat:2 }} vs Std ${{ wo_cost.std_total_cost|floatformat:2 }}{% endif %}
+            </a>
+        </div>
+
     </div>
 </div>
 {% endblock %}

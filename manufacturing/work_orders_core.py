@@ -48,7 +48,13 @@ def can_transition(current, target):
 
 
 def ensure_wo_tables(conn):
-    """Create work_order / wo_material / product tables if absent. Does not commit."""
+    """Create work_order / wo_material / product tables if absent. Does not commit.
+
+    Also delegates to routing_core and lot_core to create their tables, so a
+    single call from startup wires up the full production data model.
+    """
+    from .routing_core import ensure_routing_tables
+    from .lot_core import ensure_lot_tables
     conn.execute("""
         CREATE TABLE IF NOT EXISTS product (
             id SERIAL PRIMARY KEY,
@@ -85,6 +91,10 @@ def ensure_wo_tables(conn):
             notes TEXT
         )
     """)
+    ensure_routing_tables(conn)
+    ensure_lot_tables(conn)
+    from .costing_core import ensure_costing_tables
+    ensure_costing_tables(conn)
 
 
 def next_wo_number(conn, today=None):
@@ -215,11 +225,63 @@ def add_wo_material(conn, wo_id, product_id, qty_required=1,
     )
 
 
-def set_wo_status(conn, wo_id, new_status):
+def set_wo_status(conn, wo_id, new_status, created_by=None):
     """Set a WO's status. Does not commit and does not check the transition —
     callers should gate with can_transition first.
+
+    Side effects:
+    - 'open'      → populate wo_operation rows from the product routing.
+    - 'completed' → capture actual cost, compute variance, post closing GL
+                    entries (if gl_account_map is configured).
     """
     conn.execute(
         "UPDATE work_order SET status=%s WHERE id=%s",
         (new_status, wo_id)
     )
+    if new_status == 'open':
+        row = conn.execute(
+            "SELECT product_id FROM work_order WHERE id=%s", (wo_id,)
+        ).fetchone()
+        if row and row['product_id']:
+            from .routing_core import populate_wo_operations
+            populate_wo_operations(conn, wo_id, row['product_id'])
+
+    elif new_status == 'completed':
+        wo_row = conn.execute(
+            "SELECT wo_number, COALESCE(quantity, 1) AS quantity "
+            "FROM work_order WHERE id=%s", (wo_id,)
+        ).fetchone()
+        if wo_row:
+            from .costing_core import save_wo_actual_cost, post_wo_close_gl
+            save_wo_actual_cost(conn, wo_id, created_by=created_by)
+            post_wo_close_gl(conn, wo_id, wo_row['wo_number'],
+                             wo_row['quantity'], created_by=created_by)
+
+
+def get_wo_cost_summary(conn, wo_id):
+    """Return a dict with material cost and labour cost for a WO.
+
+    material_cost = SUM(qty_issued × product.purchase_price) for wo_material.
+    labor_cost    = SUM(actual_hours × workcenter.labor_rate) for wo_operation.
+    """
+    mat_row = conn.execute(
+        "SELECT COALESCE(SUM(m.qty_issued * COALESCE(p.purchase_price, 0)), 0) "
+        "AS material_cost "
+        "FROM wo_material m "
+        "JOIN product p ON p.id = m.product_id "
+        "WHERE m.wo_id = %s",
+        (wo_id,),
+    ).fetchone()
+    material_cost = mat_row['material_cost'] if mat_row else 0.0
+
+    from .routing_core import get_wo_labor_cost
+    labor = get_wo_labor_cost(conn, wo_id)
+
+    total = material_cost + labor['labor_cost']
+    return {
+        'material_cost': material_cost,
+        'labor_cost': labor['labor_cost'],
+        'total_std_hours': labor['total_std_hours'],
+        'total_actual_hours': labor['total_actual_hours'],
+        'total_cost': total,
+    }

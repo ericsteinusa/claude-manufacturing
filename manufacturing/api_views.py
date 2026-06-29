@@ -10,14 +10,24 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .accounts import _verify_login, _get_user_profile
-from .api_auth import ensure_api_token_table, create_token, revoke_token
+from .api_auth import (
+    ensure_api_token_table, create_token, revoke_token, refresh_token,
+    record_login_attempt, is_rate_limited,
+)
 from .api_decorators import api_err, api_ok, api_required
 from .db_pg import get_db_connection
 from .mrp_core import next_sequence_number
 from . import (
+    approval_workflow_core,
+    costing_core,
+    inventory_core,
+    lot_core,
+    maintenance_core,
     personnel_core,
     purchase_requisitions_core,
+    quality_core,
     reports_core,
+    routing_core,
     time_clock_core,
     work_orders_core,
 )
@@ -38,14 +48,21 @@ def api_login(request):
     password = body.get('password', '')
     if not email or not password:
         return api_err('email and password are required.')
-    if not _verify_login(email, password):
-        return api_err('Invalid email or password.', 401)
-    profile = _get_user_profile(email)
-    if not profile:
-        return api_err('User profile not found.', 400)
+
     conn = get_db_connection()
     try:
         ensure_api_token_table(conn)
+        if is_rate_limited(conn, email):
+            return api_err('Too many failed attempts. Try again later.', 429)
+        if not _verify_login(email, password):
+            record_login_attempt(conn, email, success=False)
+            conn.commit()
+            return api_err('Invalid email or password.', 401)
+        record_login_attempt(conn, email, success=True)
+        profile = _get_user_profile(email)
+        if not profile:
+            conn.commit()
+            return api_err('User profile not found.', 400)
         token = create_token(conn, profile['people_id'])
         conn.commit()
     finally:
@@ -66,6 +83,23 @@ def api_login(request):
             },
         },
     })
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_refresh(request):
+    """Extend the current token's expiry by TOKEN_LIFETIME_HOURS."""
+    token = request.META.get('HTTP_AUTHORIZATION', '')[7:].strip()
+    conn = get_db_connection()
+    try:
+        ok = refresh_token(conn, token)
+        if not ok:
+            return api_err('Token not found.', 404)
+        conn.commit()
+    finally:
+        conn.close()
+    return api_ok({'message': 'Token refreshed.'})
 
 
 @csrf_exempt
@@ -492,6 +526,24 @@ def api_req_submit(request, req_id):
             "UPDATE purchase_requisition SET status = 'submitted' WHERE id = %s",
             (req_id,),
         )
+        # Create configurable approval workflow steps if any rules are configured.
+        total_row = conn.execute(
+            "SELECT COALESCE(SUM(est_unit_price * qty), 0) AS total"
+            " FROM requisition_item WHERE req_id = %s",
+            (req_id,),
+        ).fetchone()
+        total = float(total_row['total']) if total_row else 0.0
+        dept_row = conn.execute(
+            "SELECT dept_key FROM dept WHERE dept_id ="
+            " (SELECT dept_id FROM purchase_requisition WHERE id = %s)",
+            (req_id,),
+        ).fetchone()
+        dept_key = dept_row['dept_key'] if dept_row else ''
+        approval_workflow_core.ensure_approval_tables(conn)
+        approval_workflow_core.submit_for_approval(
+            conn, 'purchase_requisition', req_id, total, dept_key,
+            requested_by=u.get('email', ''),
+        )
         conn.commit()
     finally:
         conn.close()
@@ -575,3 +627,686 @@ def api_req_decide(request, req_id):
         'status': new_status,
         'message': f"Requisition {decision}d.",
     })
+
+
+# ---------------------------------------------------------------------------
+# Dashboards  (5A)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_financial_dashboard(request):
+    conn = get_db_connection()
+    try:
+        data = reports_core.financial_dashboard(conn)
+    finally:
+        conn.close()
+    return api_ok(data)
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_production_dashboard(request):
+    conn = get_db_connection()
+    try:
+        data = reports_core.production_dashboard(conn)
+    finally:
+        conn.close()
+    return api_ok(data)
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_inventory_dashboard(request):
+    conn = get_db_connection()
+    try:
+        data = reports_core.inventory_dashboard(conn)
+    finally:
+        conn.close()
+    return api_ok(data)
+
+
+# ---------------------------------------------------------------------------
+# Inventory  (5C)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_inventory_list(request):
+    search = request.GET.get('q') or None
+    status = request.GET.get('status') or None
+    conn = get_db_connection()
+    try:
+        products = inventory_core.list_products(conn, search=search,
+                                                filter_status=status)
+        alerts = inventory_core.get_alert_counts(conn)
+    finally:
+        conn.close()
+    return api_ok({'products': products, 'alerts': alerts})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_inventory_receive(request):
+    """Receive stock for a product. Optionally assigns / creates a lot."""
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return api_err('Invalid JSON.')
+    product_id = body.get('product_id')
+    qty = body.get('qty')
+    if not product_id or not qty:
+        return api_err('product_id and qty are required.')
+    try:
+        qty = float(qty)
+    except (TypeError, ValueError):
+        return api_err('qty must be a number.')
+    if qty <= 0:
+        return api_err('qty must be positive.')
+
+    conn = get_db_connection()
+    try:
+        new_qty = inventory_core.record_transaction(
+            conn, int(product_id), 'receive', qty,
+            reference=body.get('reference', ''),
+            notes=body.get('notes', ''),
+            created_by=request.api_user['email'],
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return api_ok({'new_qty': new_qty, 'message': 'Stock received.'}, status=201)
+
+
+# ---------------------------------------------------------------------------
+# Quality — NCR  (5C)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@api_required
+def api_ncr(request):
+    if request.method == 'GET':
+        status_filter = request.GET.get('status') or None
+        conn = get_db_connection()
+        try:
+            ncrs = quality_core.list_ncrs(conn, status=status_filter)
+        finally:
+            conn.close()
+        return api_ok({'ncrs': ncrs})
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except Exception:
+            return api_err('Invalid JSON.')
+        title = body.get('title', '').strip()
+        source = body.get('source', 'internal').strip()
+        severity = body.get('severity', 'minor').strip()
+        if not title:
+            return api_err('title is required.')
+        conn = get_db_connection()
+        try:
+            ncr_id = quality_core.create_ncr(
+                conn,
+                title=title,
+                source=source,
+                severity=severity,
+                product=body.get('product', ''),
+                lot_number=body.get('lot_number', ''),
+                description=body.get('description', ''),
+                created_by=request.api_user['email'],
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        return api_ok({'id': ncr_id, 'message': 'NCR created.'}, status=201)
+
+    return api_err('Method not allowed.', 405)
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_ncr_detail(request, ncr_id):
+    conn = get_db_connection()
+    try:
+        ncr = quality_core.get_ncr(conn, ncr_id)
+    finally:
+        conn.close()
+    if not ncr:
+        return api_err('NCR not found.', 404)
+    return api_ok({'ncr': ncr})
+
+
+# ---------------------------------------------------------------------------
+# Maintenance Work Orders  (5C)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_maint_wo_list(request):
+    status_filter = request.GET.get('status') or None
+    conn = get_db_connection()
+    try:
+        wos = maintenance_core.list_work_orders(conn, status=status_filter)
+    finally:
+        conn.close()
+    return api_ok({'work_orders': wos})
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_maint_wo_detail(request, wo_id):
+    conn = get_db_connection()
+    try:
+        wo = maintenance_core.get_work_order(conn, wo_id)
+    finally:
+        conn.close()
+    if not wo:
+        return api_err('Work order not found.', 404)
+    return api_ok({'work_order': wo})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_maint_wo_complete(request, wo_id):
+    conn = get_db_connection()
+    try:
+        wo = maintenance_core.get_work_order(conn, wo_id)
+        if not wo:
+            return api_err('Work order not found.', 404)
+        if wo.get('status') == 'completed':
+            return api_err('Work order is already completed.', 409)
+        maintenance_core.complete_work_order(conn, wo_id)
+        conn.commit()
+    finally:
+        conn.close()
+    return api_ok({'message': 'Work order completed.'})
+
+
+# ---------------------------------------------------------------------------
+# Production WO Operations  (5C)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_wo_operations(request, wo_id):
+    conn = get_db_connection()
+    try:
+        ops = routing_core.get_wo_operations(conn, wo_id)
+        cost = routing_core.get_wo_labor_cost(conn, wo_id)
+    finally:
+        conn.close()
+    return api_ok({'operations': ops, 'labor_cost': cost})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_wo_operation_complete(request, wo_id, seq):
+    """Log actual hours and complete a WO operation step."""
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return api_err('Invalid JSON.')
+    actual_hours = body.get('actual_hours')
+    if actual_hours is None:
+        return api_err('actual_hours is required.')
+    try:
+        actual_hours = float(actual_hours)
+    except (TypeError, ValueError):
+        return api_err('actual_hours must be a number.')
+
+    conn = get_db_connection()
+    try:
+        ops = routing_core.get_wo_operations(conn, wo_id)
+        op = next((o for o in ops if o['operation_seq'] == int(seq)), None)
+        if not op:
+            return api_err(f'Operation seq {seq} not found on WO {wo_id}.', 404)
+        if op['status'] == 'completed':
+            return api_err('Operation is already completed.', 409)
+        routing_core.complete_wo_operation(
+            conn, op['id'],
+            actual_hours=actual_hours,
+            completed_by=request.api_user['email'],
+            scrap_qty=float(body.get('scrap_qty', 0)),
+            rework_qty=float(body.get('rework_qty', 0)),
+            notes=body.get('notes', ''),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return api_ok({'message': f'Operation {seq} completed.'})
+
+
+# ---------------------------------------------------------------------------
+# Approval Workflow  (6B)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_workflow_pending(request):
+    """Return pending approval steps for the current user's role."""
+    u = request.api_user
+    conn = get_db_connection()
+    try:
+        approval_workflow_core.ensure_approval_tables(conn)
+        steps = approval_workflow_core.get_pending_steps(conn, approver_role=u['role'])
+    finally:
+        conn.close()
+    return api_ok({'steps': steps})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_workflow_decide(request, step_id):
+    """Approve or reject one approval workflow step."""
+    u = request.api_user
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return api_err('Invalid JSON.')
+    decision = body.get('decision', '').strip()
+    if decision not in ('approved', 'rejected'):
+        return api_err("decision must be 'approved' or 'rejected'.")
+    conn = get_db_connection()
+    try:
+        approval_workflow_core.ensure_approval_tables(conn)
+        overall = approval_workflow_core.decide_step(
+            conn, step_id, decision,
+            decided_by=u.get('email', str(u['id'])),
+            notes=body.get('notes', ''),
+        )
+        conn.commit()
+    except ValueError as exc:
+        conn.close()
+        return api_err(str(exc), 400)
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return api_ok({'overall': overall, 'message': f'Step {decision}.'})
+
+
+# ---------------------------------------------------------------------------
+# Lot tracking  (7A)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@api_required
+def api_lot_list(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+        status = request.GET.get('status') or None
+        conn = get_db_connection()
+        try:
+            lot_core.ensure_lot_tables(conn)
+            lots = lot_core.list_lots(
+                conn,
+                product_id=int(product_id) if product_id else None,
+                status=status,
+            )
+        finally:
+            conn.close()
+        return api_ok({'lots': lots})
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except Exception:
+            return api_err('Invalid JSON.')
+        product_id = body.get('product_id')
+        qty = body.get('qty')
+        if not product_id or qty is None:
+            return api_err('product_id and qty are required.')
+        conn = get_db_connection()
+        try:
+            lot_core.ensure_lot_tables(conn)
+            lot_id = lot_core.create_lot(
+                conn,
+                product_id=int(product_id),
+                qty=float(qty),
+                received_date=body.get('received_date'),
+                expiry_date=body.get('expiry_date'),
+                lot_number=body.get('lot_number') or None,
+                notes=body.get('notes', ''),
+                created_by=request.api_user.get('email', ''),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        return api_ok({'id': lot_id, 'message': 'Lot created.'}, status=201)
+
+    return api_err('Method not allowed.', 405)
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_lot_expiry(request):
+    days = int(request.GET.get('days', 30))
+    conn = get_db_connection()
+    try:
+        lot_core.ensure_lot_tables(conn)
+        alerts = lot_core.get_expiry_alerts(conn, days_ahead=days)
+    finally:
+        conn.close()
+    return api_ok({'alerts': alerts, 'days_ahead': days})
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_lot_detail(request, lot_id):
+    conn = get_db_connection()
+    try:
+        lot_core.ensure_lot_tables(conn)
+        lot = lot_core.get_lot(conn, lot_id)
+        if not lot:
+            return api_err('Lot not found.', 404)
+        genealogy = lot_core.get_lot_genealogy(conn, lot_id)
+        serials = lot_core.list_serials(conn, lot_id=lot_id)
+    finally:
+        conn.close()
+    return api_ok({'lot': lot, 'genealogy': genealogy, 'serials': serials})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_lot_status(request, lot_id):
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return api_err('Invalid JSON.')
+    status = body.get('status', '').strip()
+    if not status:
+        return api_err('status is required.')
+    conn = get_db_connection()
+    try:
+        lot_core.ensure_lot_tables(conn)
+        lot_core.update_lot_status(conn, lot_id, status,
+                                   notes=body.get('notes', ''))
+        conn.commit()
+    except ValueError as exc:
+        conn.close()
+        return api_err(str(exc), 400)
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return api_ok({'message': f'Lot status set to {status}.'})
+
+
+@csrf_exempt
+@api_required
+def api_serial_list(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+        lot_id = request.GET.get('lot_id')
+        status = request.GET.get('status') or None
+        conn = get_db_connection()
+        try:
+            lot_core.ensure_lot_tables(conn)
+            serials = lot_core.list_serials(
+                conn,
+                product_id=int(product_id) if product_id else None,
+                lot_id=int(lot_id) if lot_id else None,
+                status=status,
+            )
+        finally:
+            conn.close()
+        return api_ok({'serials': serials})
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except Exception:
+            return api_err('Invalid JSON.')
+        serial_number = (body.get('serial_number') or '').strip()
+        product_id = body.get('product_id')
+        if not serial_number or not product_id:
+            return api_err('serial_number and product_id are required.')
+        conn = get_db_connection()
+        try:
+            lot_core.ensure_lot_tables(conn)
+            sid = lot_core.create_serial(
+                conn,
+                serial_number=serial_number,
+                product_id=int(product_id),
+                lot_id=int(body['lot_id']) if body.get('lot_id') else None,
+                notes=body.get('notes', ''),
+                created_by=request.api_user.get('email', ''),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        return api_ok({'id': sid, 'message': 'Serial number created.'}, status=201)
+
+    return api_err('Method not allowed.', 405)
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_serial_status(request, serial_id):
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return api_err('Invalid JSON.')
+    status = body.get('status', '').strip()
+    if not status:
+        return api_err('status is required.')
+    conn = get_db_connection()
+    try:
+        lot_core.ensure_lot_tables(conn)
+        lot_core.update_serial_status(conn, serial_id, status,
+                                      notes=body.get('notes', ''))
+        conn.commit()
+    except ValueError as exc:
+        conn.close()
+        return api_err(str(exc), 400)
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return api_ok({'message': f'Serial status set to {status}.'})
+
+
+# ---------------------------------------------------------------------------
+# Routing — workcenters & product routing  (7A)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_workcenters(request):
+    conn = get_db_connection()
+    try:
+        routing_core.ensure_routing_tables(conn)
+        wcs = routing_core.list_workcenters(conn, active_only=False)
+    finally:
+        conn.close()
+    return api_ok({'workcenters': wcs})
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_product_routing(request, product_id):
+    conn = get_db_connection()
+    try:
+        routing_core.ensure_routing_tables(conn)
+        steps = routing_core.get_routing(conn, product_id)
+    finally:
+        conn.close()
+    return api_ok({'product_id': product_id, 'steps': steps})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_wo_operation_start(request, wo_id, seq):
+    conn = get_db_connection()
+    try:
+        routing_core.ensure_routing_tables(conn)
+        ops = routing_core.get_wo_operations(conn, wo_id)
+        op = next((o for o in ops if o['operation_seq'] == seq), None)
+        if not op:
+            return api_err('Operation not found.', 404)
+        if op['status'] != 'pending':
+            return api_err(f"Operation is already {op['status']}.", 400)
+        routing_core.start_wo_operation(conn, op['id'])
+        conn.commit()
+    finally:
+        conn.close()
+    return api_ok({'message': f'Operation {seq} started.'})
+
+
+# ---------------------------------------------------------------------------
+# Costing  (7A)
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_product_cost(request, product_id):
+    conn = get_db_connection()
+    try:
+        costing_core.ensure_costing_tables(conn)
+        cost = costing_core.get_standard_cost(conn, product_id)
+    finally:
+        conn.close()
+    if not cost:
+        return api_err('No standard cost on record for this product.', 404)
+    return api_ok({'cost': cost})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_cost_roll(request, product_id):
+    conn = get_db_connection()
+    try:
+        costing_core.ensure_costing_tables(conn)
+        result = costing_core.roll_standard_cost(
+            conn, product_id,
+            created_by=request.api_user.get('email', ''),
+        )
+        conn.commit()
+    except Exception as exc:
+        conn.close()
+        return api_err(str(exc), 400)
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return api_ok({'cost': result, 'message': 'Standard cost rolled.'})
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_cost_history(request, product_id):
+    conn = get_db_connection()
+    try:
+        costing_core.ensure_costing_tables(conn)
+        history = costing_core.list_cost_history(conn, product_id)
+    finally:
+        conn.close()
+    return api_ok({'history': history})
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_wo_cost(request, wo_id):
+    conn = get_db_connection()
+    try:
+        costing_core.ensure_costing_tables(conn)
+        cost = costing_core.get_wo_cost(conn, wo_id)
+    finally:
+        conn.close()
+    if not cost:
+        return api_err('No cost record for this work order yet.', 404)
+    return api_ok({'cost': cost})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_wo_cost_compute(request, wo_id):
+    conn = get_db_connection()
+    try:
+        costing_core.ensure_costing_tables(conn)
+        result = costing_core.save_wo_actual_cost(
+            conn, wo_id,
+            created_by=request.api_user.get('email', ''),
+        )
+        conn.commit()
+    except Exception as exc:
+        conn.close()
+        return api_err(str(exc), 400)
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return api_ok({'cost': result, 'message': 'WO actual cost computed.'})
+
+
+@csrf_exempt
+@api_required
+def api_gl_accounts(request):
+    if request.method == 'GET':
+        conn = get_db_connection()
+        try:
+            costing_core.ensure_costing_tables(conn)
+            accounts = costing_core.list_gl_account_map(conn)
+        finally:
+            conn.close()
+        return api_ok({'accounts': accounts})
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+        except Exception:
+            return api_err('Invalid JSON.')
+        category = (body.get('category') or '').strip()
+        account_number = (body.get('account_number') or '').strip()
+        if not category or not account_number:
+            return api_err('category and account_number are required.')
+        conn = get_db_connection()
+        try:
+            costing_core.ensure_costing_tables(conn)
+            costing_core.set_gl_account_map(
+                conn, category, account_number,
+                description=body.get('description', ''),
+            )
+            conn.commit()
+        except ValueError as exc:
+            conn.close()
+            return api_err(str(exc), 400)
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        return api_ok({'message': f'GL account {category} → {account_number} saved.'})
+
+    return api_err('Method not allowed.', 405)

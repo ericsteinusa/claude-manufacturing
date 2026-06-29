@@ -40,12 +40,15 @@ def post_gl_entry(journal_date, reference, description,
     reference    : str          e.g. "AP-2026-0001"
     description  : str          free-text description
     lines        : list of (account_number, debit, credit, memo)
+                   OR (account_number, debit, credit, memo, cost_center_id)
     created_by   : str
     """
     try:
         with _conn() as con:
             resolved = []
-            for acct_num, debit, credit, memo in lines:
+            for line in lines:
+                acct_num, debit, credit, memo = line[:4]
+                cost_center_id = line[4] if len(line) > 4 else None
                 row = con.execute(
                     "SELECT id FROM gl_account WHERE account_number=%s", (
                         acct_num,)
@@ -56,7 +59,8 @@ def post_gl_entry(journal_date, reference, description,
                         "in chart of accounts", reference, acct_num)
                     return None
                 resolved.append(
-    (row["id"], float(debit), float(credit), str(memo)))
+                    (row["id"], float(debit), float(credit),
+                     str(memo), cost_center_id))
 
             cur = con.execute(
                 "INSERT INTO gl_journal(journal_date, reference, description, "
@@ -67,9 +71,10 @@ def post_gl_entry(journal_date, reference, description,
             jid = cur.fetchone()['id']
             con.executemany(
                 "INSERT INTO gl_journal_line(journal_id, account_id, debit, "
-                "credit, memo) "
-                "VALUES(%s,%s,%s,%s,%s)",
-                [(jid, aid, dr, cr, m) for aid, dr, cr, m in resolved],
+                "credit, memo, cost_center_id) "
+                "VALUES(%s,%s,%s,%s,%s,%s)",
+                [(jid, aid, dr, cr, m, cc)
+                 for aid, dr, cr, m, cc in resolved],
             )
         log.info("Posted GL journal entry %s (reference %s)", jid, reference)
         return jid

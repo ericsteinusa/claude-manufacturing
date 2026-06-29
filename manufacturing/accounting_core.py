@@ -594,6 +594,241 @@ def income_statement(conn, date_from, date_to):
     }
 
 
+# ---------------------------------------------------------------------------
+# AR Aging & DSO  (Phase 3A)
+# ---------------------------------------------------------------------------
+
+# Bucket label → (min_days_overdue, max_days_overdue)  — None means unbounded
+AR_AGING_BUCKETS = [
+    ('current',  0,    0),
+    ('1_30',     1,   30),
+    ('31_60',   31,   60),
+    ('61_90',   61,   90),
+    ('over_90', 91, None),
+]
+
+_DUNNING_TEMPLATES = {
+    'current':  (
+        "Dear {customer},\n\n"
+        "This is a friendly reminder that invoice {invoice_number} for "
+        "${amount:.2f} is due on {due_date}.\n\n"
+        "Please arrange payment at your earliest convenience.\n\n"
+        "Thank you for your business."
+    ),
+    '1_30': (
+        "Dear {customer},\n\n"
+        "Invoice {invoice_number} for ${amount:.2f} was due on {due_date} "
+        "and is now {days_overdue} day(s) past due.\n\n"
+        "Please remit payment immediately to avoid further notices.\n\n"
+        "If payment has already been sent, please disregard this notice."
+    ),
+    '31_60': (
+        "SECOND NOTICE\n\n"
+        "Dear {customer},\n\n"
+        "Invoice {invoice_number} for ${amount:.2f} remains unpaid and is "
+        "{days_overdue} days past due.\n\n"
+        "Please contact our Accounts Receivable department immediately to "
+        "arrange payment or discuss a payment plan."
+    ),
+    '61_90': (
+        "THIRD NOTICE — URGENT\n\n"
+        "Dear {customer},\n\n"
+        "Invoice {invoice_number} for ${amount:.2f} is {days_overdue} days "
+        "past due. This account has been placed on credit hold.\n\n"
+        "Immediate payment is required to restore your account to good "
+        "standing.  Please contact us within 5 business days."
+    ),
+    'over_90': (
+        "FINAL NOTICE — COLLECTIONS\n\n"
+        "Dear {customer},\n\n"
+        "Invoice {invoice_number} for ${amount:.2f} is {days_overdue} days "
+        "past due.  This account has been referred for collection action.\n\n"
+        "To avoid further action, remit full payment immediately or contact "
+        "us to discuss resolution."
+    ),
+}
+
+
+def _aging_bucket(days_overdue: int) -> str:
+    """Return the bucket key for a given number of days overdue."""
+    for label, lo, hi in AR_AGING_BUCKETS:
+        if days_overdue <= 0 and label == 'current':
+            return label
+        if lo <= days_overdue and (hi is None or days_overdue <= hi):
+            return label
+    return 'over_90'
+
+
+def get_ar_aging(conn, as_of: str | None = None) -> dict:
+    """Return AR aging buckets for all open/partial/overdue invoices.
+
+    Returns::
+
+        {
+          'as_of': 'YYYY-MM-DD',
+          'rows':  [{invoice_number, customer_label, due_date, balance,
+                     days_overdue, bucket}, ...],
+          'totals': {'current': 0.0, '1_30': 0.0, ...},
+          'grand_total': float,
+        }
+    """
+    as_of = as_of or _today()
+    rows = conn.execute("""
+        SELECT i.id, i.invoice_number, i.due_date, i.amount, i.status,
+               c.company_name, c.first_name, c.last_name,
+               COALESCE(SUM(p.amount), 0) AS received
+        FROM ar_invoice i
+        LEFT JOIN customer c ON c.id = i.customer_id
+        LEFT JOIN ar_payment p ON p.invoice_id = i.id
+        WHERE i.status IN ('open', 'partial', 'overdue')
+        GROUP BY i.id, c.company_name, c.first_name, c.last_name
+        ORDER BY i.due_date ASC NULLS LAST
+    """).fetchall()
+
+    totals = {label: 0.0 for label, _, _ in AR_AGING_BUCKETS}
+    out = []
+    for r in rows:
+        balance = float(r['amount']) - float(r['received'])
+        if balance < 0.005:
+            continue
+        company = r['company_name'] or ''
+        name = f"{r['first_name'] or ''} {r['last_name'] or ''}".strip()
+        customer_label = company if company else name
+
+        due = r['due_date'] or as_of
+        # days_overdue: negative means not yet due
+        try:
+            import datetime as _dt
+            delta = (_dt.date.fromisoformat(as_of) -
+                     _dt.date.fromisoformat(due)).days
+        except (TypeError, ValueError):
+            delta = 0
+
+        bucket = _aging_bucket(delta)
+        totals[bucket] += balance
+        out.append({
+            'invoice_number': r['invoice_number'],
+            'customer_label': customer_label,
+            'due_date': r['due_date'],
+            'balance': balance,
+            'days_overdue': max(delta, 0),
+            'bucket': bucket,
+        })
+
+    return {
+        'as_of': as_of,
+        'rows': out,
+        'totals': totals,
+        'grand_total': sum(totals.values()),
+    }
+
+
+def get_dso(conn, days: int = 90) -> float:
+    """Days Sales Outstanding over the last ``days`` calendar days.
+
+    DSO = (AR outstanding balance / revenue invoiced in period) × days.
+    Returns 0.0 if no revenue was invoiced in the period.
+    """
+    from_date = (
+        datetime.date.today() - datetime.timedelta(days=days)
+    ).isoformat()
+
+    ar_row = conn.execute("""
+        SELECT COALESCE(SUM(i.amount) - COALESCE(SUM(p.amount), 0), 0)
+               AS ar_balance
+        FROM ar_invoice i
+        LEFT JOIN ar_payment p ON p.invoice_id = i.id
+        WHERE i.status IN ('open', 'partial', 'overdue')
+    """).fetchone()
+    ar_balance = float(ar_row['ar_balance']) if ar_row else 0.0
+
+    rev_row = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) AS revenue "
+        "FROM ar_invoice WHERE invoice_date >= %s",
+        (from_date,),
+    ).fetchone()
+    revenue = float(rev_row['revenue']) if rev_row else 0.0
+
+    if revenue <= 0:
+        return 0.0
+    return round((ar_balance / revenue) * days, 1)
+
+
+def get_dpo(conn, days: int = 90) -> float:
+    """Days Payable Outstanding over the last ``days`` calendar days.
+
+    DPO = (AP outstanding balance / purchases invoiced in period) × days.
+    Returns 0.0 if no purchases were invoiced in the period.
+    """
+    from_date = (
+        datetime.date.today() - datetime.timedelta(days=days)
+    ).isoformat()
+
+    ap_row = conn.execute("""
+        SELECT COALESCE(SUM(i.amount) - COALESCE(SUM(p.amount), 0), 0)
+               AS ap_balance
+        FROM ap_invoice i
+        LEFT JOIN ap_payment p ON p.invoice_id = i.id
+        WHERE i.status IN ('open', 'partial', 'overdue')
+    """).fetchone()
+    ap_balance = float(ap_row['ap_balance']) if ap_row else 0.0
+
+    pur_row = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) AS purchases "
+        "FROM ap_invoice WHERE invoice_date >= %s",
+        (from_date,),
+    ).fetchone()
+    purchases = float(pur_row['purchases']) if pur_row else 0.0
+
+    if purchases <= 0:
+        return 0.0
+    return round((ap_balance / purchases) * days, 1)
+
+
+def generate_dunning_letter(conn, inv_id: int, as_of: str | None = None) -> str | None:
+    """Return a dunning letter string for one AR invoice, or None if paid/missing."""
+    as_of = as_of or _today()
+    row = conn.execute("""
+        SELECT i.invoice_number, i.due_date, i.amount, i.status,
+               c.company_name, c.first_name, c.last_name,
+               COALESCE(SUM(p.amount), 0) AS received
+        FROM ar_invoice i
+        LEFT JOIN customer c ON c.id = i.customer_id
+        LEFT JOIN ar_payment p ON p.invoice_id = i.id
+        WHERE i.id = %s
+        GROUP BY i.id, c.company_name, c.first_name, c.last_name
+    """, (inv_id,)).fetchone()
+
+    if not row or row['status'] in ('paid', 'cancelled'):
+        return None
+
+    balance = float(row['amount']) - float(row['received'])
+    if balance < 0.005:
+        return None
+
+    company = row['company_name'] or ''
+    name = f"{row['first_name'] or ''} {row['last_name'] or ''}".strip()
+    customer_label = company if company else name
+
+    due = row['due_date'] or as_of
+    try:
+        import datetime as _dt
+        delta = (_dt.date.fromisoformat(as_of) -
+                 _dt.date.fromisoformat(due)).days
+    except (TypeError, ValueError):
+        delta = 0
+
+    bucket = _aging_bucket(delta)
+    template = _DUNNING_TEMPLATES[bucket]
+    return template.format(
+        customer=customer_label,
+        invoice_number=row['invoice_number'],
+        amount=balance,
+        due_date=due,
+        days_overdue=max(delta, 0),
+    )
+
+
 def balance_sheet(conn, as_of=None):
     accounts = conn.execute(
         "SELECT id, account_number, account_name, account_type FROM gl_account"
@@ -621,3 +856,91 @@ def balance_sheet(conn, as_of=None):
         'assets': assets, 'liabilities': liabilities, 'equity': equity,
         'balanced': balanced,
     }
+
+
+# ---------------------------------------------------------------------------
+# GL Segment Codes / Cost Centers  (Phase 3D)
+# ---------------------------------------------------------------------------
+
+def list_cost_centers(conn, active_only: bool = True) -> list[dict]:
+    """Return all cost centers."""
+    cond = "WHERE is_active = TRUE" if active_only else ""
+    rows = conn.execute(
+        f"SELECT id, code, name, dept_key, is_active "
+        f"FROM cost_center {cond} ORDER BY code",
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def create_cost_center(conn, code: str, name: str,
+                       dept_key: str = '') -> int:
+    """Insert a cost center and return its id. Does not commit."""
+    if not code.strip() or not name.strip():
+        raise ValueError("Cost center code and name are required")
+    row = conn.execute(
+        "INSERT INTO cost_center (code, name, dept_key) "
+        "VALUES (%s, %s, %s) RETURNING id",
+        (code.strip().upper(), name.strip(), dept_key.strip()),
+    ).fetchone()
+    return row['id']
+
+
+def update_cost_center(conn, cc_id: int, code: str, name: str,
+                       dept_key: str = '', is_active: bool = True) -> None:
+    """Update a cost center. Does not commit."""
+    if not code.strip() or not name.strip():
+        raise ValueError("Cost center code and name are required")
+    conn.execute(
+        "UPDATE cost_center SET code=%s, name=%s, dept_key=%s, is_active=%s "
+        "WHERE id=%s",
+        (code.strip().upper(), name.strip(), dept_key.strip(), is_active, cc_id),
+    )
+
+
+def get_pl_by_cost_center(conn, date_from: str, date_to: str) -> list[dict]:
+    """Return P&L (revenue minus expenses) grouped by cost center.
+
+    Lines with no cost_center_id are grouped under 'Unallocated'.
+    """
+    rows = conn.execute("""
+        SELECT
+            COALESCE(cc.code, 'UNALLOC')           AS cc_code,
+            COALESCE(cc.name, 'Unallocated')        AS cc_name,
+            a.account_type,
+            COALESCE(SUM(jl.debit),  0)             AS total_debit,
+            COALESCE(SUM(jl.credit), 0)             AS total_credit
+        FROM gl_journal_line jl
+        JOIN gl_journal  j  ON j.id  = jl.journal_id
+        JOIN gl_account  a  ON a.id  = jl.account_id
+        LEFT JOIN cost_center cc ON cc.id = jl.cost_center_id
+        WHERE j.posted = 1
+          AND j.journal_date BETWEEN %s AND %s
+          AND a.account_type IN ('Revenue', 'COGS', 'Expense')
+        GROUP BY cc.code, cc.name, a.account_type
+        ORDER BY cc_code, a.account_type
+    """, (date_from, date_to)).fetchall()
+
+    result: dict[str, dict] = {}
+    for r in rows:
+        key = r['cc_code']
+        if key not in result:
+            result[key] = {
+                'cc_code': r['cc_code'],
+                'cc_name': r['cc_name'],
+                'revenue': 0.0, 'cogs': 0.0, 'expense': 0.0,
+            }
+        d, c = float(r['total_debit']), float(r['total_credit'])
+        acct_type = r['account_type']
+        if acct_type == 'Revenue':
+            result[key]['revenue'] += c - d
+        elif acct_type == 'COGS':
+            result[key]['cogs'] += d - c
+        else:
+            result[key]['expense'] += d - c
+
+    out = []
+    for seg in result.values():
+        seg['gross_profit'] = seg['revenue'] - seg['cogs']
+        seg['net_income'] = seg['gross_profit'] - seg['expense']
+        out.append(seg)
+    return out

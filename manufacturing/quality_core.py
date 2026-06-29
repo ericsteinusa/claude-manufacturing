@@ -3,9 +3,15 @@ quality_core.py — Qt-free data layer for QA web views.
 
 Tables: qa_ncr, qa_capa, qa_audit, qa_supplier (qa_inspection, qa_defect,
 qa_spec handled at the bottom).  No PyQt6, no commit inside any function.
+
+Phase 6A adds SPC (Statistical Process Control):
+  spc_control_limit  — engineering spec limits (USL/LSL) per product+characteristic
+  spc_measurement    — individual measured values with in-control flag
 """
 
 import datetime
+import math
+import statistics
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -430,6 +436,334 @@ def resolve_defect(conn, defect_id: int) -> None:
     conn.execute(
         "UPDATE qa_defect SET resolved=1 WHERE id=%s", (defect_id,)
     )
+
+
+# ---------------------------------------------------------------------------
+# Phase 6A — Statistical Process Control (SPC)
+# ---------------------------------------------------------------------------
+
+# Control chart constants for X-bar and R charts (subgroup sizes 2–10)
+# A₂: used to compute X-bar UCL/LCL from average range
+# D₃/D₄: used to compute R-chart UCL/LCL from average range
+_A2 = {2: 1.880, 3: 1.023, 4: 0.729, 5: 0.577,
+       6: 0.483, 7: 0.419, 8: 0.373, 9: 0.337, 10: 0.308}
+_D3 = {2: 0.0,   3: 0.0,   4: 0.0,   5: 0.0,
+       6: 0.0,   7: 0.076, 8: 0.136, 9: 0.184, 10: 0.223}
+_D4 = {2: 3.267, 3: 2.574, 4: 2.282, 5: 2.114,
+       6: 2.004, 7: 1.924, 8: 1.864, 9: 1.816, 10: 1.777}
+
+SPC_SUBGROUP_SIZES = tuple(_A2.keys())   # 2 to 10
+
+
+def ensure_spc_tables(conn) -> None:
+    """Create SPC tables if they do not exist. Does not commit."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS spc_control_limit (
+            id             SERIAL PRIMARY KEY,
+            product_id     INTEGER REFERENCES product(id),
+            characteristic TEXT NOT NULL,
+            ucl            REAL NOT NULL,
+            lcl            REAL NOT NULL,
+            target         REAL,
+            sigma          REAL,
+            subgroup_size  INTEGER NOT NULL DEFAULT 5,
+            is_active      BOOLEAN NOT NULL DEFAULT TRUE,
+            created_by     TEXT NOT NULL DEFAULT '',
+            created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            UNIQUE(product_id, characteristic)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS spc_measurement (
+            id             SERIAL PRIMARY KEY,
+            product_id     INTEGER REFERENCES product(id),
+            characteristic TEXT NOT NULL,
+            measured_value REAL NOT NULL,
+            measured_by    TEXT NOT NULL DEFAULT '',
+            measured_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            wo_id          INTEGER REFERENCES work_order(id),
+            lot_id         INTEGER REFERENCES lot(id),
+            in_control     BOOLEAN NOT NULL DEFAULT TRUE,
+            notes          TEXT NOT NULL DEFAULT '',
+            created_by     TEXT NOT NULL DEFAULT ''
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS spc_meas_product_char "
+        "ON spc_measurement(product_id, characteristic, measured_at DESC)"
+    )
+
+
+def create_control_limit(
+    conn, product_id: int | None, characteristic: str,
+    ucl: float, lcl: float, target: float | None = None,
+    sigma: float | None = None, subgroup_size: int = 5,
+    created_by: str = '',
+) -> int:
+    """Upsert a spec limit record and return its id."""
+    if not characteristic.strip():
+        raise ValueError("characteristic is required")
+    if ucl <= lcl:
+        raise ValueError("ucl must be greater than lcl")
+    n = int(subgroup_size)
+    if n not in _A2:
+        raise ValueError(f"subgroup_size must be one of {SPC_SUBGROUP_SIZES}")
+    row = conn.execute("""
+        INSERT INTO spc_control_limit
+        (product_id, characteristic, ucl, lcl, target, sigma,
+         subgroup_size, created_by)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+        ON CONFLICT (product_id, characteristic) DO UPDATE
+          SET ucl=%s, lcl=%s, target=%s, sigma=%s,
+              subgroup_size=%s, is_active=TRUE
+        RETURNING id
+    """, (product_id, characteristic.strip(),
+          float(ucl), float(lcl), target, sigma, n, created_by,
+          float(ucl), float(lcl), target, sigma, n)).fetchone()
+    return row['id']
+
+
+def list_control_limits(conn, product_id: int | None = None,
+                        active_only: bool = True) -> list[dict]:
+    conds, params = [], []
+    if active_only:
+        conds.append("is_active = TRUE")
+    if product_id is not None:
+        conds.append("product_id = %s")
+        params.append(product_id)
+    where = ("WHERE " + " AND ".join(conds)) if conds else ""
+    rows = conn.execute(
+        f"SELECT cl.*, p.name AS product_name "
+        f"FROM spc_control_limit cl "
+        f"LEFT JOIN product p ON p.id = cl.product_id "
+        f"{where} "
+        f"ORDER BY p.name, cl.characteristic",
+        params,
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_control_limit(conn, product_id: int | None,
+                      characteristic: str) -> dict | None:
+    row = conn.execute(
+        "SELECT * FROM spc_control_limit "
+        "WHERE product_id IS NOT DISTINCT FROM %s AND characteristic = %s "
+        "  AND is_active = TRUE",
+        (product_id, characteristic),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def update_control_limit(
+    conn, limit_id: int, ucl: float, lcl: float,
+    target: float | None = None, sigma: float | None = None,
+    subgroup_size: int = 5, is_active: bool = True,
+) -> None:
+    if ucl <= lcl:
+        raise ValueError("ucl must be greater than lcl")
+    conn.execute(
+        "UPDATE spc_control_limit "
+        "SET ucl=%s, lcl=%s, target=%s, sigma=%s, "
+        "    subgroup_size=%s, is_active=%s "
+        "WHERE id=%s",
+        (float(ucl), float(lcl), target, sigma,
+         int(subgroup_size), is_active, limit_id),
+    )
+
+
+def log_measurement(
+    conn, product_id: int | None, characteristic: str,
+    measured_value: float, measured_by: str = '',
+    wo_id: int | None = None, lot_id: int | None = None,
+    notes: str = '', created_by: str = '',
+) -> dict:
+    """Insert one measurement and evaluate it against spec limits.
+
+    Returns a dict with 'id', 'in_control', 'ucl', 'lcl', and 'action'
+    ('OK', 'ABOVE_UCL', 'BELOW_LCL', or 'NO_LIMITS').
+    """
+    cl = get_control_limit(conn, product_id, characteristic)
+    if cl:
+        in_control = float(cl['lcl']) <= float(measured_value) <= float(cl['ucl'])
+        if float(measured_value) > float(cl['ucl']):
+            action = 'ABOVE_UCL'
+        elif float(measured_value) < float(cl['lcl']):
+            action = 'BELOW_LCL'
+        else:
+            action = 'OK'
+    else:
+        in_control = True
+        action = 'NO_LIMITS'
+
+    row = conn.execute("""
+        INSERT INTO spc_measurement
+        (product_id, characteristic, measured_value, measured_by,
+         wo_id, lot_id, in_control, notes, created_by)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+    """, (product_id, characteristic.strip(), float(measured_value),
+          measured_by, wo_id, lot_id, in_control,
+          notes, created_by)).fetchone()
+
+    return {
+        'id': row['id'],
+        'in_control': in_control,
+        'action': action,
+        'ucl': float(cl['ucl']) if cl else None,
+        'lcl': float(cl['lcl']) if cl else None,
+    }
+
+
+def get_measurements(
+    conn, product_id: int | None, characteristic: str,
+    limit: int = 100,
+) -> list[dict]:
+    """Return recent measurements, oldest first (for charting)."""
+    rows = conn.execute("""
+        SELECT m.id, m.measured_value, m.measured_by, m.measured_at,
+               m.in_control, m.wo_id, m.lot_id, m.notes
+        FROM spc_measurement m
+        WHERE m.product_id IS NOT DISTINCT FROM %s
+          AND m.characteristic = %s
+        ORDER BY m.measured_at ASC
+        LIMIT %s
+    """, (product_id, characteristic, limit)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def compute_xbar_r_chart(
+    conn, product_id: int | None, characteristic: str,
+    subgroup_size: int = 5,
+) -> dict:
+    """Compute X-bar and R chart data from stored measurements.
+
+    Returns:
+      subgroups       list of {subgroup_idx, values, mean, range, xbar_oc, r_oc}
+      grand_mean      X̄̄
+      grand_range     R̄
+      ucl_xbar        X-bar chart UCL (X̄̄ + A₂R̄)
+      lcl_xbar        X-bar chart LCL (X̄̄ - A₂R̄)
+      ucl_r           R chart UCL (D₄R̄)
+      lcl_r           R chart LCL (D₃R̄)
+      n_subgroups     number of complete subgroups
+      spec_ucl        engineering UCL from spc_control_limit (or None)
+      spec_lcl        engineering LCL (or None)
+    """
+    n = int(subgroup_size)
+    if n not in _A2:
+        raise ValueError(f"subgroup_size must be one of {SPC_SUBGROUP_SIZES}")
+
+    rows = get_measurements(conn, product_id, characteristic, limit=0)
+    values = [float(r['measured_value']) for r in rows]
+
+    cl = get_control_limit(conn, product_id, characteristic)
+
+    if len(values) < n:
+        return {
+            'subgroups': [], 'grand_mean': None, 'grand_range': None,
+            'ucl_xbar': None, 'lcl_xbar': None, 'ucl_r': None, 'lcl_r': None,
+            'n_subgroups': 0,
+            'spec_ucl': float(cl['ucl']) if cl else None,
+            'spec_lcl': float(cl['lcl']) if cl else None,
+        }
+
+    # Build complete subgroups only
+    subgroups = []
+    for i in range(len(values) // n):
+        chunk = values[i * n: (i + 1) * n]
+        sg_mean = sum(chunk) / n
+        sg_range = max(chunk) - min(chunk)
+        subgroups.append({'idx': i + 1, 'values': chunk,
+                          'mean': sg_mean, 'range': sg_range})
+
+    grand_mean = sum(s['mean'] for s in subgroups) / len(subgroups)
+    grand_range = sum(s['range'] for s in subgroups) / len(subgroups)
+
+    a2, d3, d4 = _A2[n], _D3[n], _D4[n]
+    ucl_xbar = grand_mean + a2 * grand_range
+    lcl_xbar = grand_mean - a2 * grand_range
+    ucl_r = d4 * grand_range
+    lcl_r = d3 * grand_range
+
+    for s in subgroups:
+        s['xbar_oc'] = not (lcl_xbar <= s['mean'] <= ucl_xbar)
+        s['r_oc'] = not (lcl_r <= s['range'] <= ucl_r)
+
+    return {
+        'subgroups':   subgroups,
+        'grand_mean':  round(grand_mean, 6),
+        'grand_range': round(grand_range, 6),
+        'ucl_xbar':    round(ucl_xbar, 6),
+        'lcl_xbar':    round(lcl_xbar, 6),
+        'ucl_r':       round(ucl_r, 6),
+        'lcl_r':       round(lcl_r, 6),
+        'n_subgroups': len(subgroups),
+        'spec_ucl':    float(cl['ucl']) if cl else None,
+        'spec_lcl':    float(cl['lcl']) if cl else None,
+    }
+
+
+def compute_cpk(conn, product_id: int | None,
+                characteristic: str) -> dict:
+    """Compute Cpk from stored measurements and spec limits.
+
+    Cpk = min(Cpu, Cpl)
+    Cpu = (USL - μ) / (3σ)
+    Cpl = (μ - LSL) / (3σ)
+
+    Returns dict with cpk, cpu, cpl, mean, std_dev, ucl (USL), lcl (LSL), n.
+    Returns {'cpk': None, 'error': '...'} if no measurements or limits.
+    """
+    cl = get_control_limit(conn, product_id, characteristic)
+    if not cl:
+        return {'cpk': None, 'error': 'No spec limits defined'}
+
+    rows = get_measurements(conn, product_id, characteristic, limit=0)
+    values = [float(r['measured_value']) for r in rows]
+    n = len(values)
+    if n < 2:
+        return {'cpk': None, 'error': f'Need at least 2 measurements (have {n})'}
+
+    mu = statistics.mean(values)
+    sigma = statistics.stdev(values)   # sample std dev
+    if sigma == 0:
+        return {'cpk': None, 'error': 'Zero variance — all measurements identical'}
+
+    usl = float(cl['ucl'])
+    lsl = float(cl['lcl'])
+    cpu = (usl - mu) / (3 * sigma)
+    cpl = (mu - lsl) / (3 * sigma)
+    cpk = min(cpu, cpl)
+
+    return {
+        'cpk':     round(cpk, 4),
+        'cpu':     round(cpu, 4),
+        'cpl':     round(cpl, 4),
+        'mean':    round(mu, 6),
+        'std_dev': round(sigma, 6),
+        'ucl':     usl,
+        'lcl':     lsl,
+        'n':       n,
+    }
+
+
+def get_spc_alerts(conn, limit: int = 50) -> list[dict]:
+    """Return recent out-of-control measurements for the SPC alert panel."""
+    rows = conn.execute("""
+        SELECT m.id, m.product_id, m.characteristic, m.measured_value,
+               m.measured_by, m.measured_at, m.in_control, m.wo_id, m.lot_id,
+               p.name AS product_name,
+               cl.ucl, cl.lcl
+        FROM spc_measurement m
+        LEFT JOIN product p ON p.id = m.product_id
+        LEFT JOIN spc_control_limit cl
+          ON cl.product_id IS NOT DISTINCT FROM m.product_id
+         AND cl.characteristic = m.characteristic
+         AND cl.is_active = TRUE
+        WHERE m.in_control = FALSE
+        ORDER BY m.measured_at DESC
+        LIMIT %s
+    """, (limit,)).fetchall()
+    return [dict(r) for r in rows]
 
 
 # ---------------------------------------------------------------------------

@@ -7,10 +7,10 @@ from ..payroll.Payroll_dept import PayrollDeptWidget
 
 _TITLE = "Personnel Manager Menu"
 _ITEMS = [
-    ("Personnel CRM",  lambda: _launch("personnel_crm.py")),
+    ("Personnel CRM",  lambda: _launch("personnel/personnel_crm.py")),
     ("Payroll",        PayrollDeptWidget),
-    ("Dept Entry",     lambda: _launch("dept_entry.py")),
-    ("Dept Sub Entry", lambda: _launch("dept_sub_entry.py")),
+    ("Dept Entry",     lambda: _launch("personnel/dept_entry.py")),
+    ("Dept Sub Entry", lambda: _launch("personnel/dept_sub_entry.py")),
 ]
 
 

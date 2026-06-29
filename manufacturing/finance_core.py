@@ -125,8 +125,103 @@ def create_budget_line(
     return cur.fetchone()[0]
 
 
+def update_budget_line(
+    conn, line_id: int, category: str, description: str,
+    budgeted_amount: float, gl_account_id: int | None = None,
+    notes: str = '',
+) -> None:
+    """Update a budget line, optionally linking it to a GL account. Does not commit."""
+    conn.execute(
+        "UPDATE budget_line SET category=%s, description=%s, "
+        "budgeted_amount=%s, gl_account_id=%s, notes=%s WHERE id=%s",
+        (category, description, budgeted_amount or 0,
+         gl_account_id or None, notes, line_id),
+    )
+
+
 def delete_budget_line(conn, line_id: int) -> None:
     conn.execute("DELETE FROM budget_line WHERE id = %s", (line_id,))
+
+
+# ---------------------------------------------------------------------------
+# Budget vs. Actual  (Phase 3B)
+# ---------------------------------------------------------------------------
+
+def get_budget_vs_actual(conn, budget_id: int,
+                         date_from: str, date_to: str) -> dict:
+    """Compare budget lines to actual GL activity for a date range.
+
+    Budget lines linked to a ``gl_account_id`` pull actuals from posted GL
+    journal entries in the period.  Unlinked lines show 0 actual.
+
+    Returns::
+
+        {
+          'budget': {id, budget_name, fiscal_year, ...},
+          'lines': [{category, description, budgeted_amount,
+                     actual_amount, variance, pct_used}, ...],
+          'totals': {budgeted, actual, variance},
+        }
+    """
+    budget = get_budget(conn, budget_id)
+    if not budget:
+        return {}
+
+    lines = conn.execute(
+        "SELECT bl.id, bl.category, bl.description, bl.budgeted_amount, "
+        "bl.gl_account_id, a.account_type "
+        "FROM budget_line bl "
+        "LEFT JOIN gl_account a ON a.id = bl.gl_account_id "
+        "WHERE bl.budget_id = %s ORDER BY bl.id",
+        (budget_id,),
+    ).fetchall()
+
+    result_lines = []
+    total_budgeted = total_actual = 0.0
+
+    for line in lines:
+        budgeted = float(line['budgeted_amount'] or 0)
+        actual = 0.0
+
+        if line['gl_account_id']:
+            acct_type = line['account_type'] or 'Expense'
+            gl_row = conn.execute("""
+                SELECT COALESCE(SUM(jl.debit), 0)  AS d,
+                       COALESCE(SUM(jl.credit), 0) AS c
+                FROM gl_journal_line jl
+                JOIN gl_journal j ON j.id = jl.journal_id
+                WHERE jl.account_id = %s AND j.posted = 1
+                  AND j.journal_date BETWEEN %s AND %s
+            """, (line['gl_account_id'], date_from, date_to)).fetchone()
+            if gl_row:
+                d, c = float(gl_row['d']), float(gl_row['c'])
+                from .accounting_core import DEBIT_NORMAL
+                actual = (d - c) if acct_type in DEBIT_NORMAL else (c - d)
+
+        variance = budgeted - actual
+        pct_used = round((actual / budgeted * 100), 1) if budgeted else 0.0
+        total_budgeted += budgeted
+        total_actual += actual
+
+        result_lines.append({
+            'id': line['id'],
+            'category': line['category'],
+            'description': line['description'],
+            'budgeted_amount': budgeted,
+            'actual_amount': actual,
+            'variance': variance,
+            'pct_used': pct_used,
+        })
+
+    return {
+        'budget': budget,
+        'lines': result_lines,
+        'totals': {
+            'budgeted': total_budgeted,
+            'actual': total_actual,
+            'variance': total_budgeted - total_actual,
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -272,6 +367,172 @@ def update_bank_account(conn, account_id: int, **fields) -> None:
         f"UPDATE bank_account SET {set_clause} WHERE id = %s",
         list(cols.values()) + [account_id],
     )
+
+
+def create_bank_statement(
+    conn, bank_account_id: int, statement_date: str,
+    beginning_balance: float, ending_balance: float,
+) -> int:
+    """Insert a bank statement header and return its id. Does not commit."""
+    row = conn.execute(
+        "INSERT INTO bank_statement "
+        "(bank_account_id, statement_date, beginning_balance, ending_balance, status) "
+        "VALUES (%s,%s,%s,%s,'Open') RETURNING id",
+        (bank_account_id, statement_date,
+         float(beginning_balance), float(ending_balance)),
+    ).fetchone()
+    return row['id']
+
+
+# ---------------------------------------------------------------------------
+# Bank Reconciliation Matching  (Phase 3C)
+# ---------------------------------------------------------------------------
+
+_AUTO_MATCH_DATE_WINDOW = 3  # days either side to consider a GL date match
+
+
+def import_bank_transactions(
+    conn, bank_account_id: int, statement_id: int | None,
+    transactions: list[dict],
+) -> int:
+    """Bulk-insert bank transactions from a statement download.
+
+    Each dict in ``transactions`` must have: trans_date, amount, description.
+    Optional: ref_number, created_by.
+
+    Returns the count of rows inserted.  Does not commit.
+    """
+    count = 0
+    for txn in transactions:
+        conn.execute(
+            "INSERT INTO bank_transaction "
+            "(bank_account_id, statement_id, trans_date, amount, "
+            "description, ref_number, cleared, created_by) "
+            "VALUES (%s,%s,%s,%s,%s,%s,FALSE,%s)",
+            (bank_account_id, statement_id or None,
+             txn['trans_date'], float(txn['amount']),
+             txn.get('description', ''), txn.get('ref_number', ''),
+             txn.get('created_by', '')),
+        )
+        count += 1
+    return count
+
+
+def auto_match_transactions(conn, statement_id: int) -> dict:
+    """Attempt to match uncleared bank transactions to GL journal lines.
+
+    Matching rule: same amount (within $0.01) AND gl_journal.journal_date
+    within ±3 days of the bank transaction date.  If exactly one GL line
+    matches, the transaction is auto-matched; ambiguous or missing → skipped.
+
+    Returns {'matched': int, 'skipped': int, 'ambiguous': int}.
+    """
+    unmatched = conn.execute(
+        "SELECT id, trans_date, amount FROM bank_transaction "
+        "WHERE statement_id = %s AND matched_gl_line_id IS NULL AND cleared = FALSE",
+        (statement_id,),
+    ).fetchall()
+
+    matched = skipped = ambiguous = 0
+    for txn in unmatched:
+        amt = float(txn['amount'])
+        # Bank: positive = deposit (credit to bank GL), negative = payment
+        # GL line: match absolute amounts on either debit or credit side
+        candidates = conn.execute("""
+            SELECT jl.id
+            FROM gl_journal_line jl
+            JOIN gl_journal j ON j.id = jl.journal_id
+            WHERE j.posted = 1
+              AND ABS(jl.debit - jl.credit - %s) < 0.01
+              AND j.journal_date BETWEEN
+                  (%s::date - %s)::text AND (%s::date + %s)::text
+              AND NOT EXISTS (
+                  SELECT 1 FROM bank_transaction bt
+                  WHERE bt.matched_gl_line_id = jl.id
+              )
+        """, (amt, txn['trans_date'], _AUTO_MATCH_DATE_WINDOW,
+               txn['trans_date'], _AUTO_MATCH_DATE_WINDOW)).fetchall()
+
+        if len(candidates) == 1:
+            conn.execute(
+                "UPDATE bank_transaction "
+                "SET matched_gl_line_id=%s, cleared=TRUE WHERE id=%s",
+                (candidates[0]['id'], txn['id']),
+            )
+            matched += 1
+        elif len(candidates) > 1:
+            ambiguous += 1
+        else:
+            skipped += 1
+
+    return {'matched': matched, 'skipped': skipped, 'ambiguous': ambiguous}
+
+
+def manual_match_transaction(conn, bank_txn_id: int,
+                              gl_line_id: int) -> None:
+    """Manually link a bank transaction to a GL journal line. Does not commit."""
+    conn.execute(
+        "UPDATE bank_transaction "
+        "SET matched_gl_line_id=%s, cleared=TRUE WHERE id=%s",
+        (gl_line_id, bank_txn_id),
+    )
+
+
+def unmatch_transaction(conn, bank_txn_id: int) -> None:
+    """Clear a bank transaction's GL match. Does not commit."""
+    conn.execute(
+        "UPDATE bank_transaction "
+        "SET matched_gl_line_id=NULL, cleared=FALSE WHERE id=%s",
+        (bank_txn_id,),
+    )
+
+
+def get_reconciliation_status(conn, statement_id: int) -> dict:
+    """Return matched/unmatched/total counts and amounts for a statement."""
+    row = conn.execute("""
+        SELECT
+            COUNT(*)                                            AS total,
+            COUNT(*) FILTER (WHERE cleared = TRUE)             AS cleared,
+            COUNT(*) FILTER (WHERE cleared = FALSE)            AS uncleared,
+            COALESCE(SUM(ABS(amount)), 0)                      AS total_amount,
+            COALESCE(SUM(ABS(amount)) FILTER (WHERE cleared),  0) AS cleared_amount
+        FROM bank_transaction WHERE statement_id = %s
+    """, (statement_id,)).fetchone()
+    return dict(row) if row else {
+        'total': 0, 'cleared': 0, 'uncleared': 0,
+        'total_amount': 0.0, 'cleared_amount': 0.0,
+    }
+
+
+def get_unmatched_transactions(conn, statement_id: int) -> list[dict]:
+    """Return bank transactions with no GL match (reconciliation exceptions)."""
+    rows = conn.execute(
+        "SELECT id, trans_date, amount, description, ref_number, cleared "
+        "FROM bank_transaction "
+        "WHERE statement_id=%s AND matched_gl_line_id IS NULL "
+        "ORDER BY trans_date, id",
+        (statement_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def reconcile_statement(conn, statement_id: int,
+                        reconciled_by: str) -> bool:
+    """Mark a statement as Reconciled if all transactions are cleared.
+
+    Returns True on success, False if uncleared transactions remain.
+    Does not commit.
+    """
+    status = get_reconciliation_status(conn, statement_id)
+    if status['uncleared'] > 0:
+        return False
+    conn.execute(
+        "UPDATE bank_statement "
+        "SET status='Reconciled', reconciled_by=%s, reconciled_at=NOW() "
+        "WHERE id=%s",
+        (reconciled_by, statement_id),
+    )
+    return True
 
 
 # ---------------------------------------------------------------------------

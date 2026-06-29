@@ -572,3 +572,203 @@ def update_mechanic(conn, mech_id: int, name: str, trade: str, shift: str,
         (name.strip(), trade, shift, phone.strip(),
          status, notes.strip(), mech_id),
     )
+
+
+# ---------------------------------------------------------------------------
+# Phase 6B — Asset Hierarchy
+# ---------------------------------------------------------------------------
+
+def set_equipment_parent(conn, eq_id: int,
+                         parent_id: int | None) -> None:
+    """Assign a parent to a piece of equipment (plant → line → machine).
+
+    Pass parent_id=None to make the equipment a root node.
+    Raises ValueError if eq_id == parent_id (self-reference).
+    Does not commit.
+    """
+    if parent_id is not None and int(parent_id) == int(eq_id):
+        raise ValueError("Equipment cannot be its own parent.")
+    conn.execute(
+        "UPDATE maint_equipment SET parent_id = %s WHERE id = %s",
+        (parent_id, eq_id),
+    )
+
+
+def get_equipment_children(conn, parent_id: int) -> list[dict]:
+    """Return the direct children of *parent_id*."""
+    rows = conn.execute(
+        "SELECT * FROM maint_equipment WHERE parent_id = %s ORDER BY name",
+        (parent_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_equipment_roots(conn) -> list[dict]:
+    """Return all equipment with no parent (top of hierarchy)."""
+    rows = conn.execute(
+        "SELECT * FROM maint_equipment WHERE parent_id IS NULL ORDER BY name"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _build_tree(node: dict, children_map: dict) -> dict:
+    node['children'] = [
+        _build_tree(c, children_map)
+        for c in children_map.get(node['id'], [])
+    ]
+    return node
+
+
+def get_equipment_tree(conn) -> list[dict]:
+    """Return the full equipment hierarchy as a nested list of dicts.
+
+    Each node has a 'children' key with its sub-nodes.
+    """
+    rows = conn.execute(
+        "SELECT * FROM maint_equipment ORDER BY parent_id NULLS FIRST, name"
+    ).fetchall()
+    all_eq = [dict(r) for r in rows]
+
+    children_map: dict[int, list] = {}
+    for eq in all_eq:
+        pid = eq.get('parent_id')
+        if pid is not None:
+            children_map.setdefault(pid, []).append(eq)
+
+    roots = [eq for eq in all_eq if eq.get('parent_id') is None]
+    return [_build_tree(r, children_map) for r in roots]
+
+
+def link_part_to_equipment(conn, part_id: int,
+                            equipment_id: int | None) -> None:
+    """Record which equipment a spare part fits. Does not commit."""
+    conn.execute(
+        "UPDATE maint_part SET equipment_id = %s WHERE id = %s",
+        (equipment_id, part_id),
+    )
+
+
+def get_parts_for_equipment(conn, equipment_id: int) -> list[dict]:
+    """Return spare parts associated with a piece of equipment."""
+    rows = conn.execute(
+        "SELECT * FROM maint_part WHERE equipment_id = %s ORDER BY name",
+        (equipment_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Phase 6B — MTBF / MTTR
+# ---------------------------------------------------------------------------
+
+def get_mtbf(conn, equipment: str, months: int = 12) -> dict:
+    """Compute Mean Time Between Failures and Mean Time To Repair.
+
+    Uses `maint_downtime` records where category='Breakdown'.
+
+    Returns:
+      failure_count         number of breakdown events
+      total_downtime_hours  sum of hours across all breakdown events
+      mtbf_hours            (period_hours - total_downtime_hours) / failure_count
+      mttr_hours            total_downtime_hours / failure_count
+      period_hours          months × 24 × 30 (approximation)
+      availability_pct      100 × (period_hours - total_downtime) / period_hours
+    """
+    period_hours = months * 30 * 24   # approximate
+
+    row = conn.execute("""
+        SELECT COUNT(*) AS failure_count,
+               COALESCE(SUM(
+                 CASE WHEN hours ~ E'^[0-9]+(\\.[0-9]+)?$'
+                      THEN hours::real ELSE 0 END
+               ), 0) AS total_hours
+        FROM maint_downtime
+        WHERE equipment ILIKE %s
+          AND category = 'Breakdown'
+          AND down_date >= (CURRENT_DATE - (%s * INTERVAL '1 month'))::text
+    """, (equipment, months)).fetchone()
+
+    failure_count = int(row['failure_count'] if row else 0)
+    total_hours = float(row['total_hours'] if row else 0)
+
+    mtbf = ((period_hours - total_hours) / failure_count
+            if failure_count else None)
+    mttr = total_hours / failure_count if failure_count else None
+    avail = ((period_hours - total_hours) / period_hours * 100
+             if period_hours else None)
+
+    return {
+        'equipment':            equipment,
+        'failure_count':        failure_count,
+        'total_downtime_hours': round(total_hours, 2),
+        'mtbf_hours':           round(mtbf, 2) if mtbf is not None else None,
+        'mttr_hours':           round(mttr, 2) if mttr is not None else None,
+        'period_hours':         period_hours,
+        'availability_pct':     round(avail, 1) if avail is not None else None,
+    }
+
+
+def get_equipment_reliability_report(conn, months: int = 12) -> list[dict]:
+    """Return MTBF/MTTR/availability for each distinct equipment with downtime."""
+    rows = conn.execute("""
+        SELECT equipment,
+               COUNT(*) FILTER (WHERE category = 'Breakdown') AS failure_count,
+               COALESCE(SUM(
+                 CASE WHEN hours ~ E'^[0-9]+(\\.[0-9]+)?$' THEN hours::real ELSE 0 END
+               ), 0) AS total_hours
+        FROM maint_downtime
+        WHERE down_date >= (CURRENT_DATE - (%s * INTERVAL '1 month'))::text
+        GROUP BY equipment
+        ORDER BY failure_count DESC
+    """, (months,)).fetchall()
+
+    period_hours = months * 30 * 24
+    result = []
+    for r in rows:
+        fc = int(r['failure_count'])
+        th = float(r['total_hours'])
+        result.append({
+            'equipment':            r['equipment'],
+            'failure_count':        fc,
+            'total_downtime_hours': round(th, 2),
+            'mtbf_hours':           round((period_hours - th) / fc, 2) if fc else None,
+            'mttr_hours':           round(th / fc, 2) if fc else None,
+            'availability_pct':     round((period_hours - th) / period_hours * 100, 1),
+        })
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Phase 6B — PM Alerts
+# ---------------------------------------------------------------------------
+
+def get_pm_alerts(conn, days_ahead: int = 14) -> list[dict]:
+    """Return PM schedules that are overdue or due within *days_ahead* days.
+
+    Each item includes 'urgency': 'overdue', 'due_soon', or 'due'.
+    """
+    today = _today()
+    cutoff = (datetime.date.today()
+              + datetime.timedelta(days=days_ahead)).isoformat()
+    rows = conn.execute("""
+        SELECT *
+        FROM maint_schedule
+        WHERE next_due != ''
+          AND next_due <= %s
+          AND status NOT IN ('Completed', 'Skipped')
+        ORDER BY next_due ASC
+    """, (cutoff,)).fetchall()
+
+    result = []
+    for r in rows:
+        d = dict(r)
+        next_due = d.get('next_due', '') or ''
+        if next_due < today:
+            d['urgency'] = 'overdue'
+        elif next_due <= (datetime.date.today()
+                          + datetime.timedelta(days=3)).isoformat():
+            d['urgency'] = 'due_soon'
+        else:
+            d['urgency'] = 'due'
+        result.append(d)
+    return result

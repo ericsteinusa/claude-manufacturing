@@ -13,7 +13,7 @@ from ..finance.Bank_reconciliation import BankReconciliationWidget
 
 _TITLE = "Accounting Main Menu"
 _ITEMS = [
-    ("Accounting Manager",  lambda: _launch("Accounting_manager.py")),
+    ("Accounting Manager",  lambda: _launch("accounting/Accounting_manager.py")),
     ("Accounts Payable",    AccountsPayableWidget),
     ("Accounts Receivable", AccountsReceivableWidget),
     ("Credit Dept",         CreditDeptWidget),

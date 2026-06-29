@@ -3,10 +3,10 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from ..qt_theme import BUTTON_STYLE, apply_blue_palette as _apply_blue_palette
 
 LAUNCH_ITEMS = [
-    ("Department Entry",        "dept_entry.py"),
-    ("Department Sub Entry",    "dept_sub_entry.py"),
-    ("Department and Sub List", "dept_sub.py"),
-    ("People and Dept",         "display_people_department.py"),
+    ("Department Entry",        "personnel/dept_entry.py"),
+    ("Department Sub Entry",    "personnel/dept_sub_entry.py"),
+    ("Department and Sub List", "personnel/dept_sub.py"),
+    ("People and Dept",         "personnel/display_people_department.py"),
 ]
 
 

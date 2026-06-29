@@ -62,7 +62,7 @@ class CSMenu(QtWidgets.QMainWindow):
         tabs.addTab(CustomerServiceCallsWidget(), "CS Calls")
         tabs.addTab(
     _launch_tab(
-        "customer_entry.py",
+        "customers/customer_entry.py",
         "Customer Entry"),
          "Customer Entry")
         v.addWidget(tabs)
