@@ -3,7 +3,7 @@ from datetime import date
 from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt6.QtGui import QTextDocument
 
-COMPANY_NAME = "Your Company"
+COMPANY_NAME = "Acme Manufacturing"
 
 
 def print_document(html: str, title: str, parent=None) -> None:
