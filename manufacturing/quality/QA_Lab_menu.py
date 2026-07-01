@@ -523,6 +523,7 @@ class QALab(QtWidgets.QMainWindow):
             ("Mark On Hold",    lambda: self._set_result("on_hold", "Put On "
                                                                     "Hold?")),
             ("Resolve Defect",  self._on_resolve_defect),
+            ("Print Inspection", self._on_print_inspection),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -780,11 +781,15 @@ class QALab(QtWidgets.QMainWindow):
         v.addWidget(self.defect_table, stretch=1)
 
         br = QtWidgets.QHBoxLayout()
-        b_res = QtWidgets.QPushButton("Resolve Selected")
-        b_res.setStyleSheet(BUTTON_STYLE)
-        b_res.setFixedHeight(32)
-        b_res.clicked.connect(self._on_resolve_defect_tab)
-        br.addWidget(b_res)
+        for text, slot in (
+            ("Resolve Selected", self._on_resolve_defect_tab),
+            ("Print Defects",    self._on_print_defects),
+        ):
+            b = QtWidgets.QPushButton(text)
+            b.setStyleSheet(BUTTON_STYLE)
+            b.setFixedHeight(32)
+            b.clicked.connect(slot)
+            br.addWidget(b)
         br.addStretch()
         v.addLayout(br)
         self._tabs.addTab(w, "Defects")
@@ -900,6 +905,7 @@ class QALab(QtWidgets.QMainWindow):
         for text, slot in (
             ("Add Specification", self._on_add_spec),
             ("Delete Selected",   self._on_delete_spec),
+            ("Print Specs",       self._on_print_specs),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -994,6 +1000,109 @@ class QALab(QtWidgets.QMainWindow):
             conn.commit()
             conn.close()
             self._refresh_specs()
+
+    def _on_print_inspection(self):
+        if self._selected_insp_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select an inspection first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, data_table, wrap_html
+        conn = get_db()
+        try:
+            insp = conn.execute("""
+                SELECT qi.insp_number, qi.insp_date, qi.inspector, qi.result,
+                       qi.notes, qi.created_by,
+                       p.name AS product_name, wo.wo_number
+                FROM qa_inspection qi
+                LEFT JOIN product p ON p.id = qi.product_id
+                LEFT JOIN work_order wo ON wo.id = qi.wo_id
+                WHERE qi.id = %s
+            """, (self._selected_insp_id,)).fetchone()
+            defects = conn.execute("""
+                SELECT defect_type, severity, description,
+                       CASE WHEN resolved THEN 'Yes' ELSE 'No' END AS resolved
+                FROM qa_defect WHERE insp_id = %s ORDER BY id
+            """, (self._selected_insp_id,)).fetchall()
+        except Exception:
+            conn.close()
+            return
+        conn.close()
+        if not insp:
+            return
+        fields = [
+            ("Inspection #", insp["insp_number"]),
+            ("Product",      insp.get("product_name") or ""),
+            ("Work Order",   insp.get("wo_number") or ""),
+            ("Date",         str(insp.get("insp_date") or "")),
+            ("Inspector",    insp.get("inspector") or ""),
+            ("Result",       (insp.get("result") or "").replace("_", " ").title()),
+            ("Notes",        insp.get("notes") or ""),
+            ("Created By",   insp.get("created_by") or ""),
+        ]
+        defect_rows = [
+            [d["defect_type"] or "", (d["severity"] or "").capitalize(),
+             d["description"] or "", d["resolved"]]
+            for d in defects
+        ]
+        html = wrap_html(
+            doc_header(f"QA Inspection — {insp['insp_number']}")
+            + fields_table(fields)
+            + "<p style='font-weight:bold;font-size:11pt;margin-bottom:6px;'>"
+              "Defects</p>"
+            + data_table(
+                ["Defect Type", "Severity", "Description", "Resolved"],
+                defect_rows or [["(no defects recorded)", "", "", ""]],
+            )
+        )
+        print_document(html, f"Inspection {insp['insp_number']}", self)
+
+    def _on_print_defects(self):
+        from ..print_utils import print_document, doc_header, data_table, wrap_html
+        t = self.defect_table
+        rows = []
+        for r in range(t.rowCount()):
+            rows.append([
+                t.item(r, 0).text() if t.item(r, 0) else "",
+                t.item(r, 1).text() if t.item(r, 1) else "",
+                t.item(r, 2).text() if t.item(r, 2) else "",
+                t.item(r, 3).text() if t.item(r, 3) else "",
+                t.item(r, 4).text() if t.item(r, 4) else "",
+                t.item(r, 5).text() if t.item(r, 5) else "",
+                t.item(r, 6).text() if t.item(r, 6) else "",
+            ])
+        html = wrap_html(
+            doc_header("QA Defects Report")
+            + data_table(
+                ["Inspection #", "Product", "Defect Type",
+                 "Severity", "Description", "Resolved", "Created By"],
+                rows or [["(no defects)", "", "", "", "", "", ""]],
+            )
+        )
+        print_document(html, "QA Defects Report", self)
+
+    def _on_print_specs(self):
+        from ..print_utils import print_document, doc_header, data_table, wrap_html
+        t = self.spec_table
+        rows = []
+        for r in range(t.rowCount()):
+            rows.append([
+                t.item(r, 0).text() if t.item(r, 0) else "",
+                t.item(r, 1).text() if t.item(r, 1) else "",
+                t.item(r, 2).text() if t.item(r, 2) else "",
+                t.item(r, 3).text() if t.item(r, 3) else "",
+                t.item(r, 4).text() if t.item(r, 4) else "",
+                t.item(r, 5).text() if t.item(r, 5) else "",
+                t.item(r, 6).text() if t.item(r, 6) else "",
+            ])
+        html = wrap_html(
+            doc_header("QA Specifications Report")
+            + data_table(
+                ["Product", "Spec Name", "Min Value", "Max Value",
+                 "Unit", "Notes", "Created By"],
+                rows or [["(no specifications)", "", "", "", "", "", ""]],
+            )
+        )
+        print_document(html, "QA Specifications Report", self)
 
 
 def main():
