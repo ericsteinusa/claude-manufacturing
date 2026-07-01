@@ -289,7 +289,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         self._run_people_ids = []
         self._run_deductions = {}
         self._history_run_ids = []
-        from . import personnel_crm as _pcrm
+        from ..personnel import personnel_crm as _pcrm
         _pcrm.init_db()
         init_db()
         self._build_ui()
