@@ -13,27 +13,27 @@ import psycopg2
 
 from django.shortcuts import render, redirect
 
-from .log_utils import get_logger
-from .schema import init_schema
-from .db_pg import get_db_connection
-from .audit_core import get_recent, get_history, AUDITED_TABLES
-from .approval_core import (
+from ..log_utils import get_logger
+from ..schema import init_schema
+from ..db_pg import get_db_connection
+from ..audit_core import get_recent, get_history, AUDITED_TABLES
+from ..approval_core import (
     needs_approval, request_approval, approve_po, reject_po,
     get_pending_approvals, count_pending, get_po_approval,
     get_approval_by_id,
     APPROVAL_THRESHOLD, APPROVAL_ROLES,
 )
-from .notify_core import notify_approval_requested, notify_approval_decided
-from .bom_web_core import (
+from ..notify_core import notify_approval_requested, notify_approval_decided
+from ..bom_web_core import (
     list_products, get_product, get_bom, explode_bom,
     add_bom_line, update_bom_line, delete_bom_line,
     update_item_master, ITEM_TYPES,
 )
-from .mrp_web_core import (
+from ..mrp_web_core import (
     get_demand_details, get_scheduled_receipts_detail,
     run_mrp, release_plan as mrp_release_plan,
 )
-from .inventory_core import (
+from ..inventory_core import (
     TRANS_TYPES,
     list_products as inv_list_products,
     get_product as inv_get_product,
@@ -42,15 +42,15 @@ from .inventory_core import (
     record_transaction, create_product as inv_create_product,
     update_product as inv_update_product,
 )
-from . import lot_core, routing_core, costing_core
-from .contacts_core import (
+from .. import lot_core, routing_core, costing_core
+from ..contacts_core import (
     list_customers, get_customer, create_customer, update_customer,
     get_customer_orders,
     list_suppliers as contacts_list_suppliers,
     get_supplier, create_supplier, update_supplier,
     get_supplier_orders,
 )
-from .cs_calls_core import (
+from ..cs_calls_core import (
     validate_call, PLAN_STATUSES,
     load_customers_for_cs,
     list_tickets, get_ticket, create_ticket, update_ticket, close_ticket,
@@ -65,7 +65,7 @@ from .cs_calls_core import (
     create_survey, update_survey, add_survey_response,
     init_return_table, init_kb_table, init_survey_tables,
 )
-from .maintenance_core import (
+from ..maintenance_core import (
     WO_STATUSES, WORK_TYPES, PRIORITIES,
     EQUIPMENT_STATUSES,
     SCHEDULE_STATUSES, FREQUENCIES,
@@ -90,7 +90,7 @@ from .maintenance_core import (
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
 )
-from .payroll_core import (
+from ..payroll_core import (
     SS_RATE, MEDICARE_RATE,
     PAY_TYPES, DED_CATEGORIES, DED_METHODS,
     get_dashboard_counts as payroll_get_dashboard_counts,
@@ -101,7 +101,7 @@ from .payroll_core import (
     list_payroll_runs, get_payroll_run, get_run_entries,
     get_pay_stub, get_stub_deductions, get_ytd,
 )
-from .quality_core import (
+from ..quality_core import (
     NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
     CAPA_STATUSES, CAPA_TYPES,
     AUDIT_STATUSES, AUDIT_TYPES,
@@ -118,31 +118,31 @@ from .quality_core import (
     load_products_for_qa, load_work_orders_for_qa,
     get_qa_reports,
 )
-from .period_locking_core import (
+from ..period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
 )
-from .purchase_orders_core import (
+from ..purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS, PO_STATUS_ACTION_LABELS,
     list_pos, get_po, get_po_items,
     next_po_number, load_suppliers, load_products,
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
-from .time_clock_core import (
+from ..time_clock_core import (
     get_current_entry, clock_in as tc_clock_in, clock_out_entry,
     list_entries, total_hours as tc_total_hours,
     get_period_dates, get_attendance,
 )
-from .time_clock_web_core import (
+from ..time_clock_web_core import (
     get_ot_report, get_ot_report_all, get_schedule_summary,
 )
-from .time_clock_poller_core import (
+from ..time_clock_poller_core import (
     DEVICE_TYPES, DEVICE_TYPE_LABELS,
     list_devices, get_device, create_device, update_device, delete_device,
     list_sync_log, poll_device,
 )
-from .personnel_core import (
+from ..personnel_core import (
     TIME_OFF_STATUSES, TIME_OFF_TYPES,
     list_people, get_person, get_person_by_email,
     create_person, update_person,
@@ -157,7 +157,7 @@ from .personnel_core import (
     list_trainings, get_training, create_training, update_training, init_training_table,
     get_personnel_dashboard,
 )
-from .sales_orders_core import (
+from ..sales_orders_core import (
     SO_STATUSES, SO_STATUS_COLORS, SO_STATUS_ACTION_LABELS,
     list_sos, get_so, get_so_items,
     next_so_number, load_customers, load_products as load_so_products,
@@ -166,7 +166,7 @@ from .sales_orders_core import (
     can_transition as so_can_transition,
     set_so_status,
 )
-from .work_orders_core import (
+from ..work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
     next_wo_number, load_products as load_wo_products,
@@ -174,15 +174,15 @@ from .work_orders_core import (
     can_transition as wo_can_transition,
     allowed_transitions as wo_allowed_transitions,
 )
-from .reports_core import (
+from ..reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary,
 )
-from .menus import (
+from ..menus import (
     DASHBOARD_DEPARTMENTS,
     MANAGER_MENU_KEYS,
     _walk_tree,
 )
-from .accounts import (
+from ..accounts import (
     FULL_ACCESS_ROLES,
     READ_ONLY_ROLES,
     _ROLE_ADMIN_ROLES,
@@ -197,9 +197,9 @@ from .accounts import (
     _set_user_role,
     _remove_user_role,
 )
-from .auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import dept_required, login_required, role_required
 
-from .production_core import (
+from ..production_core import (
     get_production_dashboard,
     list_scheduled_wos,
     get_prod_reports,
@@ -216,7 +216,7 @@ from .production_core import (
     list_rmas, get_rma, create_rma, update_rma,
     get_rma_reports,
 )
-from .purchasing_core import (
+from ..purchasing_core import (
     get_purchasing_dashboard,
     CONTRACT_STATUSES as PURCH_CONTRACT_STATUSES,
     CONTRACT_CATEGORIES as PURCH_CONTRACT_CATEGORIES,
@@ -227,7 +227,7 @@ from .purchasing_core import (
     init_purch_contract_table,
     get_purch_reports,
 )
-from .finance_core import (
+from ..finance_core import (
     get_finance_dashboard,
     BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
@@ -240,7 +240,7 @@ from .finance_core import (
     list_tax_filings, get_tax_filing,
     create_tax_filing, update_tax_filing,
 )
-from .it_core import (
+from ..it_core import (
     get_it_dashboard,
     list_tickets as list_it_tickets,
     get_ticket as get_it_ticket,
@@ -259,7 +259,7 @@ from .it_core import (
     list_network_devices, get_network_device, create_network_device, update_network_device,
     NETWORK_DEVICE_TYPES, NETWORK_DEVICE_STATUSES,
 )
-from .legal_core import (
+from ..legal_core import (
     get_legal_dashboard,
     list_contracts, get_contract, create_contract, update_contract,
     list_compliance, get_compliance_item, create_compliance, update_compliance,
@@ -267,7 +267,7 @@ from .legal_core import (
     CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
     LITIGATION_TYPES, LITIGATION_STATUSES,
 )
-from .marketing_core import (
+from ..marketing_core import (
     get_marketing_dashboard,
     list_campaigns, get_campaign, create_campaign, update_campaign,
     list_leads, get_lead, create_lead, update_lead,
@@ -4345,7 +4345,7 @@ def cs_surveys_detail(request, survey_id):
     ))
 
 
-from .accounting_core import (  # noqa: E402
+from ..accounting_core import (  # noqa: E402
     INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors, load_customers,  # noqa: F811
     get_ap_dashboard, list_ap_invoices, get_ap_invoice,
     create_ap_invoice, update_ap_invoice, set_ap_status,
@@ -4776,7 +4776,7 @@ def gl_balance_sheet(request):
     return render(request, 'gl_balance_sheet.html', ctx)
 
 
-from .engineering_core import (  # noqa: E402
+from ..engineering_core import (  # noqa: E402
     PROJECT_STATUSES, TASK_STATUSES, ECR_STATUSES, PRIORITIES,  # noqa: F811
     load_products, load_people,  # noqa: F811
     get_eng_dashboard, next_project_number, next_ecr_number,
@@ -5180,7 +5180,7 @@ def eng_spec_detail(request, spec_id):
     ))
 
 
-from .sales_core import (  # noqa: E402
+from ..sales_core import (  # noqa: E402
     SO_STATUSES, SO_STATUS_ACTION_LABELS,  # noqa: F811
     allowed_transitions, can_transition, next_so_number, list_sos, get_so, get_so_items,  # noqa: F811
     load_customers, load_products,  # noqa: F811

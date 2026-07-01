@@ -69,7 +69,7 @@ def _conn():
 
 
 def init_db():
-    from . import Supplier_entry as _se
+    from ..customers import Supplier_entry as _se
     _se.init_db()
     with _conn() as con:
         con.execute("""
