@@ -1461,9 +1461,13 @@ class PayrollDeptWidget(QtWidgets.QWidget):
         conn = get_db()
         cur = conn.execute("""
             INSERT INTO payroll_run (pay_period_start, pay_period_end,
-                run_date, status, created_by)
-            VALUES (%s, %s, %s, 'processed', %s) RETURNING id
+                run_date, pay_frequency, federal_tax_rate, state_tax_rate,
+                status, created_by)
+            VALUES (%s, %s, %s, %s, %s, %s, 'processed', %s) RETURNING id
         """, (start_str, end_str, datetime.now().strftime(DT_FMT),
+              freq,
+              self.run_fed_spin.value() / 100,
+              self.run_state_spin.value() / 100,
               get_current_user_email() or None))
         run_id = cur.fetchone()['id']
 
@@ -1576,7 +1580,7 @@ class PayrollDeptWidget(QtWidgets.QWidget):
             return
         conn = get_db()
         entry = conn.execute("""
-            SELECT pe.*, p.first_name, p.last_name, p.emp_id,
+            SELECT pe.*, p.first_name, p.last_name, p.employee_id,
                    pr.pay_period_start, pr.pay_period_end, pr.run_date,
                    ep.pay_type, ep.pay_rate
             FROM payroll_entry pe
