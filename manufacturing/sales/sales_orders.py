@@ -4,7 +4,7 @@ from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
 from ..sales_orders_core import (
     next_so_number, SO_STATUS_COLORS, customer_label as _customer_label,
-    ensure_so_tables, list_sos, get_so_items,
+    ensure_so_tables, list_sos, get_so, get_so_items,
     load_customers, load_products,
     create_so, update_so, add_so_item, set_so_status,
 )
@@ -464,6 +464,7 @@ class SalesOrdersWidget(QtWidgets.QWidget):
                 "invoiced",   "Mark as Invoiced?")),
             ("Cancel",         lambda: self._set_status(
                 "cancelled",  "Cancel this order?")),
+            ("Print SO",       self._on_print_so),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -591,6 +592,50 @@ class SalesOrdersWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh_orders()
+
+    def _on_print_so(self):
+        if self._selected_so_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select a sales order first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, data_table, wrap_html
+        conn = get_db()
+        try:
+            so = get_so(conn, self._selected_so_id)
+            items = get_so_items(conn, self._selected_so_id)
+        finally:
+            conn.close()
+        if not so:
+            return
+        fields = [
+            ("SO Number",   so["so_number"]),
+            ("Customer",    _customer_label(so)),
+            ("Order Date",  str(so.get("order_date") or "")),
+            ("Ship Date",   str(so.get("ship_date") or "")),
+            ("Status",      (so.get("status") or "").replace("_", " ").title()),
+            ("Total",       f"${so.get('total', 0):,.2f}"),
+            ("Notes",       so.get("notes") or ""),
+            ("Created By",  so.get("created_by") or ""),
+        ]
+        item_rows = [
+            [r.get("description") or "",
+             r.get("product_name") or "",
+             str(r.get("qty") or ""),
+             f"${r.get('unit_price') or 0:.2f}",
+             f"${r.get('line_total') or 0:.2f}"]
+            for r in items
+        ]
+        html = wrap_html(
+            doc_header(f"Sales Order — {so['so_number']}")
+            + fields_table(fields)
+            + "<p style='font-weight:bold;font-size:11pt;margin-bottom:6px;'>"
+              "Line Items</p>"
+            + data_table(
+                ["Description", "Product", "Qty", "Unit Price", "Line Total"],
+                item_rows or [["(no items)", "", "", "", ""]],
+            )
+        )
+        print_document(html, f"Sales Order {so['so_number']}", self)
 
 
 class SalesOrdersWindow(QtWidgets.QMainWindow):
