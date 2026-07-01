@@ -487,6 +487,7 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
             ("Record Payment",  self._on_record_payment),
             ("Mark Overdue",    lambda: self._set_status("overdue")),
             ("Cancel Invoice",  lambda: self._set_status("cancelled")),
+            ("Print Invoice",   self._on_print_invoice),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -672,6 +673,66 @@ class AccountsReceivableWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh_invoices()
+
+    def _on_print_invoice(self):
+        if self._selected_inv_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select an invoice first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, data_table, wrap_html
+        conn = get_db()
+        try:
+            inv = conn.execute("""
+                SELECT i.*, c.company_name, c.first_name, c.last_name
+                FROM ar_invoice i
+                LEFT JOIN customer c ON c.id = i.customer_id
+                WHERE i.id = %s
+            """, (self._selected_inv_id,)).fetchone()
+            payments = conn.execute("""
+                SELECT payment_date, amount, payment_method, reference, notes
+                FROM ar_payment WHERE invoice_id = %s ORDER BY payment_date
+            """, (self._selected_inv_id,)).fetchall()
+        finally:
+            conn.close()
+        if not inv:
+            return
+        inv = dict(inv)
+        company = inv.get("company_name") or ""
+        name = f"{inv.get('first_name') or ''} {inv.get('last_name') or ''}".strip()
+        customer = company if company else name
+        received = sum(float(p["amount"] or 0) for p in payments)
+        balance = float(inv.get("amount") or 0) - received
+        fields = [
+            ("Invoice #",    inv.get("invoice_number") or ""),
+            ("Customer",     customer),
+            ("Invoice Date", str(inv.get("invoice_date") or "")),
+            ("Due Date",     str(inv.get("due_date") or "")),
+            ("Amount",       f"${float(inv.get('amount') or 0):,.2f}"),
+            ("Received",     f"${received:,.2f}"),
+            ("Balance",      f"${balance:,.2f}"),
+            ("Status",       (inv.get("status") or "").replace("_", " ").title()),
+            ("Description",  inv.get("description") or ""),
+            ("Created By",   inv.get("created_by") or ""),
+        ]
+        pay_rows = [
+            [str(p.get("payment_date") or ""),
+             f"${float(p.get('amount') or 0):,.2f}",
+             p.get("payment_method") or "",
+             p.get("reference") or "",
+             p.get("notes") or ""]
+            for p in payments
+        ]
+        html = wrap_html(
+            doc_header(f"AR Invoice — {inv.get('invoice_number', '')}")
+            + fields_table(fields)
+            + "<p style='font-weight:bold;font-size:11pt;margin-bottom:6px;'>"
+              "Payment History</p>"
+            + data_table(
+                ["Date", "Amount", "Method", "Reference", "Notes"],
+                pay_rows or [["(no payments recorded)", "", "", "", ""]],
+            )
+        )
+        print_document(html, f"AR Invoice {inv.get('invoice_number', '')}", self)
 
 
 class AccountsReceivableWindow(QtWidgets.QMainWindow):
