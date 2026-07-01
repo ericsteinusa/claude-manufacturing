@@ -12,6 +12,16 @@
 {% endblock %}
 
 {% block extra_styles %}
+.print-btn {
+    padding: 6px 16px; background: rgb(0,60,180); color: white;
+    border: none; border-radius: 5px; font-size: 13px;
+    cursor: pointer; font-weight: bold; margin-bottom: 14px;
+}
+@media print {
+    .print-btn, .btn, .wo-status-actions, .add-mat { display: none !important; }
+    body { background: white !important; }
+    .wo-wrap { max-width: none; }
+}
 .wo-wrap { width: 100%; max-width: 900px; }
 .wo-card {
     background: white; border: 2px solid black; border-radius: 6px;
@@ -62,6 +72,7 @@
 
 {% block body %}
 <div class="content">
+    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
     <div class="wo-wrap">
         <div class="wo-card">
             <div class="wo-head">

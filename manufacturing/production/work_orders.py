@@ -4,7 +4,7 @@ from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
 from ..work_orders_core import (
     next_wo_number, WO_STATUS_COLORS,
-    ensure_wo_tables, list_wos, get_wo_materials, load_products,
+    ensure_wo_tables, list_wos, get_wo, get_wo_materials, load_products,
     create_wo, update_wo, add_wo_material, set_wo_status,
 )
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -469,6 +469,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
                 "completed",   "Mark as Completed?")),
             ("Cancel",          lambda: self._set_status(
                 "cancelled",   "Cancel this work order?")),
+            ("Print WO",        self._on_print_wo),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -598,6 +599,48 @@ class WorkOrdersWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh_orders()
+
+    def _on_print_wo(self):
+        if self._selected_wo_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select a work order first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, data_table, wrap_html
+        conn = get_db()
+        try:
+            wo = get_wo(conn, self._selected_wo_id)
+            mats = get_wo_materials(conn, self._selected_wo_id)
+        finally:
+            conn.close()
+        if not wo:
+            return
+        fields = [
+            ("WO Number",   wo["wo_number"]),
+            ("Product",     wo.get("product_name") or ""),
+            ("Description", wo.get("description") or ""),
+            ("Quantity",    str(wo.get("quantity") or "")),
+            ("Start Date",  str(wo.get("start_date") or "")),
+            ("Due Date",    str(wo.get("due_date") or "")),
+            ("Status",      (wo.get("status") or "").replace("_", " ").title()),
+            ("Notes",       wo.get("notes") or ""),
+            ("Created By",  wo.get("created_by") or ""),
+        ]
+        mat_rows = [
+            [r.get("product_name") or "", str(r.get("qty_required") or ""),
+             str(r.get("qty_issued") or ""), r.get("notes") or ""]
+            for r in mats
+        ]
+        html = wrap_html(
+            doc_header(f"Work Order — {wo['wo_number']}")
+            + fields_table(fields)
+            + "<p style='font-weight:bold;font-size:11pt;margin-bottom:6px;'>"
+              "Materials</p>"
+            + data_table(
+                ["Material / Product", "Qty Required", "Qty Issued", "Notes"],
+                mat_rows or [["(no materials)", "", "", ""]],
+            )
+        )
+        print_document(html, f"Work Order {wo['wo_number']}", self)
 
 
 class WorkOrdersWindow(QtWidgets.QMainWindow):

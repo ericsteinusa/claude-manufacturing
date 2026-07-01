@@ -483,6 +483,7 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
                 "received",  "Mark as Fully Received?")),
             ("Cancel PO",     lambda: self._set_status(
                 "cancelled", "Cancel this PO?")),
+            ("Print PO",      self._on_print_po),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -643,6 +644,49 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh_pos()
+
+    def _on_print_po(self):
+        if self._selected_po_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select a purchase order first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, data_table, wrap_html
+        conn = get_db()
+        try:
+            po = get_po(conn, self._selected_po_id)
+            items = get_po_items(conn, self._selected_po_id)
+        finally:
+            conn.close()
+        if not po:
+            return
+        fields = [
+            ("PO Number",      po["po_number"]),
+            ("Supplier",       po.get("company_name") or ""),
+            ("Order Date",     str(po.get("order_date") or "")),
+            ("Expected Date",  str(po.get("expected_date") or "")),
+            ("Status",         (po.get("status") or "").replace("_", " ").title()),
+            ("Notes",          po.get("notes") or ""),
+            ("Created By",     po.get("created_by") or ""),
+        ]
+        item_rows = [
+            [r.get("description") or "",
+             r.get("product_name") or "",
+             str(r.get("qty_ordered") or ""),
+             f"${r.get('unit_price') or 0:.2f}",
+             str(r.get("qty_received") or "")]
+            for r in items
+        ]
+        html = wrap_html(
+            doc_header(f"Purchase Order — {po['po_number']}")
+            + fields_table(fields)
+            + "<p style='font-weight:bold;font-size:11pt;margin-bottom:6px;'>"
+              "Line Items</p>"
+            + data_table(
+                ["Description", "Product", "Qty Ordered", "Unit Price", "Qty Received"],
+                item_rows or [["(no items)", "", "", "", ""]],
+            )
+        )
+        print_document(html, f"Purchase Order {po['po_number']}", self)
 
 
 class PurchaseOrdersWindow(QtWidgets.QMainWindow):
