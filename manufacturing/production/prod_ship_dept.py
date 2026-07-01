@@ -465,6 +465,7 @@ class ShippingDept(QtWidgets.QMainWindow):
                 "delivered", "Mark as Delivered?")),
             ("Mark Returned",   lambda: self._set_status(
                 "returned",  "Mark as Returned?")),
+            ("Print Shipment",  self._on_print_shipment),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -616,6 +617,58 @@ class ShippingDept(QtWidgets.QMainWindow):
             conn.commit()
             conn.close()
             self._refresh_shipments()
+
+    def _on_print_shipment(self):
+        if self._selected_ship_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select a shipment first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, data_table, wrap_html
+        conn = get_db()
+        try:
+            ship = conn.execute("""
+                SELECT s.*, so.so_number
+                FROM shipment s
+                LEFT JOIN sales_order so ON so.id = s.so_id
+                WHERE s.id = ?
+            """, (self._selected_ship_id,)).fetchone()
+            items = conn.execute("""
+                SELECT si.description, p.name AS product_name, si.qty
+                FROM shipment_item si
+                LEFT JOIN product p ON p.id = si.product_id
+                WHERE si.shipment_id = ?
+                ORDER BY si.id
+            """, (self._selected_ship_id,)).fetchall()
+        finally:
+            conn.close()
+        if not ship:
+            return
+        ship = dict(ship)
+        fields = [
+            ("Ship #",          ship.get("ship_number") or ""),
+            ("Sales Order",     ship.get("so_number") or ""),
+            ("Ship Date",       str(ship.get("ship_date") or "")),
+            ("Carrier",         ship.get("carrier") or ""),
+            ("Tracking #",      ship.get("tracking_number") or ""),
+            ("Status",          (ship.get("status") or "").replace("_", " ").title()),
+            ("Notes",           ship.get("notes") or ""),
+            ("Created By",      ship.get("created_by") or ""),
+        ]
+        item_rows = [
+            [r.get("description") or "", r.get("product_name") or "", str(r.get("qty") or "")]
+            for r in items
+        ]
+        html = wrap_html(
+            doc_header(f"Shipment — {ship.get('ship_number', '')}")
+            + fields_table(fields)
+            + "<p style='font-weight:bold;font-size:11pt;margin-bottom:6px;'>"
+              "Items</p>"
+            + data_table(
+                ["Description", "Product", "Qty"],
+                item_rows or [["(no items)", "", ""]],
+            )
+        )
+        print_document(html, f"Shipment {ship.get('ship_number', '')}", self)
 
 
 def main():
