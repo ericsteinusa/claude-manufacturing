@@ -10,7 +10,6 @@ Phase 6A adds SPC (Statistical Process Control):
 """
 
 import datetime
-import math
 import statistics
 
 # ---------------------------------------------------------------------------

@@ -171,7 +171,6 @@ def test_get_lot_genealogy_with_no_wo_returns_empty_inputs():
 # ── create_lot ─────────────────────────────────────────────────────────────
 
 def test_create_lot_inserts_and_returns_id():
-    from datetime import date
     conn = _Conn(rows=[{'id': 11}])
     lot_id = create_lot(conn, product_id=3, qty=50.0,
                         lot_number='SUPPLIED-001',

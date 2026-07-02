@@ -348,7 +348,6 @@ def test_compute_cpk_returns_error_when_zero_variance():
 def test_compute_cpk_centered_process():
     # μ=10, σ=0.333, UCL=11, LCL=9
     # Cpu = (11-10)/(3×0.333) ≈ 1.0, Cpl = (10-9)/(3×0.333) ≈ 1.0 → Cpk ≈ 1.0
-    import statistics as _stat
     vals = [9.7, 9.9, 10.0, 10.1, 10.3]
     cl = [_cl_row(ucl=11.0, lcl=9.0)]
     meas = _meas_rows(vals)
@@ -549,7 +548,6 @@ def test_get_pm_alerts_returns_list():
 
 
 def test_get_pm_alerts_queries_correct_cutoff():
-    import datetime
     conn = _Conn(rows=[])
     get_pm_alerts(conn, days_ahead=7)
     assert "next_due != ''" in conn.last_sql

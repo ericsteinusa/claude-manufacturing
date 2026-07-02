@@ -1,14 +1,16 @@
 """Launched as subprocess: python test_one_window.py <module> <class>"""
-import sys, os, traceback
+import importlib
+import os
+import sys
+import traceback
+
+from PyQt6 import QtWidgets
 
 _DIR = r"C:\tester\manufacture\manufacturing"
 os.chdir(_DIR)
 sys.path.insert(0, _DIR)
 
 mod_name, cls_name = sys.argv[1], sys.argv[2]
-
-import importlib
-from PyQt6 import QtWidgets, QtCore
 
 app = QtWidgets.QApplication(sys.argv[:1])
 
@@ -37,5 +39,4 @@ tabs = sum(tw.count() for tw in tab_widgets)
 if not errors:
     print(f"OK: {tabs} tabs", flush=True)
 
-import os
 os._exit(1 if errors else 0)

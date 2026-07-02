@@ -65,59 +65,7 @@ from ..cs_calls_core import (
     create_survey, update_survey, add_survey_response,
     init_return_table, init_kb_table, init_survey_tables,
 )
-from ..maintenance_core import (
-    WO_STATUSES, WORK_TYPES, PRIORITIES,
-    EQUIPMENT_STATUSES,
-    SCHEDULE_STATUSES, FREQUENCIES,
-    INSPECTION_STATUSES, INSPECTION_TYPES,
-    DOWNTIME_STATUSES, DOWNTIME_CATEGORIES,
-    PART_STATUSES, PART_CATEGORIES,
-    MECHANIC_STATUSES, MECHANIC_TRADES, MECHANIC_SHIFTS,
-    get_dashboard_counts as maint_get_dashboard_counts,
-    load_mechanics,
-    list_work_orders, get_work_order, create_work_order,
-    update_work_order, complete_work_order,
-    list_equipment, get_equipment, create_equipment, update_equipment,
-    list_schedules, get_schedule, create_schedule,
-    update_schedule, complete_schedule,
-    list_inspections as maint_list_inspections,
-    get_inspection as maint_get_inspection,
-    create_inspection as maint_create_inspection,
-    update_inspection as maint_update_inspection,
-    complete_inspection,
-    list_downtime, get_downtime, create_downtime, update_downtime,
-    resolve_downtime,
-    list_parts, get_part, create_part, update_part,
-    list_mechanics, get_mechanic, create_mechanic, update_mechanic,
-)
-from ..payroll_core import (
-    SS_RATE, MEDICARE_RATE,
-    PAY_TYPES, DED_CATEGORIES, DED_METHODS,
-    get_dashboard_counts as payroll_get_dashboard_counts,
-    load_people as payroll_load_people,
-    list_pay_rates, upsert_pay_rate, delete_pay_rate,
-    list_deduction_types, create_deduction_type, update_deduction_type,
-    list_employee_deductions, create_employee_deduction, delete_employee_deduction,
-    list_payroll_runs, get_payroll_run, get_run_entries,
-    get_pay_stub, get_stub_deductions, get_ytd,
-)
-from ..quality_core import (
-    NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
-    CAPA_STATUSES, CAPA_TYPES,
-    AUDIT_STATUSES, AUDIT_TYPES,
-    SUPPLIER_STATUSES, SUPPLIER_RATINGS,
-    INSP_RESULTS, DEFECT_SEVERITIES,
-    get_dashboard_counts,
-    list_ncrs, get_ncr, create_ncr, update_ncr, close_ncr,
-    list_capas, get_capa, create_capa, update_capa, close_capa,
-    list_audits, get_audit, create_audit, update_audit, complete_audit,
-    list_supplier_quality, get_supplier_quality,
-    create_supplier_quality, update_supplier_quality,
-    next_insp_number, list_inspections, get_inspection, create_inspection,
-    update_inspection_result, get_defects, log_defect, resolve_defect,
-    load_products_for_qa, load_work_orders_for_qa,
-    get_qa_reports,
-)
+from ..maintenance_core import WO_STATUSES, PRIORITIES
 from ..period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
@@ -240,47 +188,6 @@ from ..finance_core import (
     list_tax_filings, get_tax_filing,
     create_tax_filing, update_tax_filing,
 )
-from ..it_core import (
-    get_it_dashboard,
-    list_tickets as list_it_tickets,
-    get_ticket as get_it_ticket,
-    create_ticket as create_it_ticket,
-    update_ticket as update_it_ticket,
-    set_ticket_status as set_it_ticket_status,
-    next_ticket_number,
-    list_assets, get_asset, create_asset, update_asset,
-    TICKET_STATUSES, TICKET_PRIORITIES, ISSUE_TYPES, ASSET_STATUSES, ASSET_TYPES,
-    list_repairs, get_repair, create_repair, update_repair, set_repair_status,
-    REPAIR_STATUSES, REPAIR_PRIORITIES,
-    list_software, get_software, create_software, update_software,
-    SOFTWARE_STATUSES,
-    list_licenses, get_license, create_license, update_license,
-    LICENSE_TYPES, LICENSE_STATUSES,
-    list_network_devices, get_network_device, create_network_device, update_network_device,
-    NETWORK_DEVICE_TYPES, NETWORK_DEVICE_STATUSES,
-)
-from ..legal_core import (
-    get_legal_dashboard,
-    list_contracts, get_contract, create_contract, update_contract,
-    list_compliance, get_compliance_item, create_compliance, update_compliance,
-    list_litigation, get_litigation_case, create_litigation, update_litigation,
-    CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
-    LITIGATION_TYPES, LITIGATION_STATUSES,
-)
-from ..marketing_core import (
-    get_marketing_dashboard,
-    list_campaigns, get_campaign, create_campaign, update_campaign,
-    list_leads, get_lead, create_lead, update_lead,
-    list_content, get_content_item, create_content, update_content,
-    CHANNELS, OBJECTIVES, CAMPAIGN_STATUSES,
-    LEAD_SOURCES, LEAD_STATUSES, CONTENT_TYPES, CONTENT_STATUSES,
-    list_ads, get_ad, create_ad, update_ad, AD_CHANNELS, AD_STATUSES,
-    list_research, get_research_project, create_research, update_research,
-    RESEARCH_TYPES, RESEARCH_STATUSES,
-    get_analytics_data,
-)
-
-log = get_logger(__name__)
 
 # Domain views extracted to sub-modules for maintainability
 from ._quality import *  # noqa: F401,F403
@@ -289,6 +196,8 @@ from ._payroll import *  # noqa: F401,F403
 from ._it import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
+
+log = get_logger(__name__)
 
 
 # Menu leaves that are served as web pages rather than launched as a desktop

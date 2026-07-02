@@ -2,11 +2,9 @@
 
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES, FULL_ACCESS_ROLES
-
-log = get_logger(__name__)
+from ..accounts import READ_ONLY_ROLES
 
 from ..payroll_core import (
     SS_RATE, MEDICARE_RATE,
@@ -19,6 +17,8 @@ from ..payroll_core import (
     list_payroll_runs, get_payroll_run, get_run_entries,
     get_pay_stub, get_stub_deductions, get_ytd,
 )
+
+log = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Payroll
