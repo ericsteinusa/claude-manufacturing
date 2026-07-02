@@ -29,10 +29,10 @@ def _conn(campaign_stats=None, lead_stats=None, content_stats=None, recent=None)
     ct = content_stats if content_stats is not None else _CONTENT_STATS
     rec = recent if recent is not None else []
     c.execute.side_effect = [
-        MagicMock(**{'fetchone.return_value': cs}),
-        MagicMock(**{'fetchone.return_value': ls}),
-        MagicMock(**{'fetchone.return_value': ct}),
-        MagicMock(**{'fetchall.return_value': rec}),
+        MagicMock(fetchone=MagicMock(return_value=cs)),
+        MagicMock(fetchone=MagicMock(return_value=ls)),
+        MagicMock(fetchone=MagicMock(return_value=ct)),
+        MagicMock(fetchall=MagicMock(return_value=rec)),
     ]
     return c
 

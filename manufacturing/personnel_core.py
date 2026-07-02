@@ -77,7 +77,7 @@ def get_person_by_email(conn, email):
     return dict(row) if row else None
 
 
-def create_person(conn, first_name, last_name, employee_id=0, email='',
+def create_person(conn, first_name, last_name, employee_id: int | None = 0, email='',
                   address='', city='', state='', zip_code='',
                   dept_id=None, dept_sub_id=None, job_title='',
                   created_by=None):
@@ -96,7 +96,7 @@ def create_person(conn, first_name, last_name, employee_id=0, email='',
     return person_id
 
 
-def update_person(conn, person_id, first_name, last_name, employee_id=0,
+def update_person(conn, person_id, first_name, last_name, employee_id: int | None = 0,
                   email='', address='', city='', state='', zip_code='',
                   dept_id=None, dept_sub_id=None, job_title=''):
     """Update a person's fields and upsert their job title. Does not commit."""

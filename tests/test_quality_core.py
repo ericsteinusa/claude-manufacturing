@@ -146,6 +146,7 @@ def test_get_ncr_returns_dict():
                            'owner': '', 'status': 'Open', 'notes': '',
                            'created_by': '', 'closed_date': None})
     result = get_ncr(conn, 1)
+    assert result is not None
     assert result['id'] == 1
 
 
@@ -263,6 +264,7 @@ def test_list_capas_status_filter():
 def test_get_capa_returns_dict():
     conn = _conn(fetchone=_capa_row())
     result = get_capa(conn, 1)
+    assert result is not None
     assert result['id'] == 1
 
 
@@ -371,6 +373,7 @@ def test_list_audits_status_filter():
 def test_get_audit_returns_dict():
     conn = _conn(fetchone=_audit_row())
     result = get_audit(conn, 1)
+    assert result is not None
     assert result['id'] == 1
 
 
@@ -468,6 +471,7 @@ def test_list_supplier_quality_search():
 def test_get_supplier_quality_returns_dict():
     conn = _conn(fetchone=_sq_row())
     result = get_supplier_quality(conn, 1)
+    assert result is not None
     assert result['id'] == 1
 
 
@@ -584,6 +588,7 @@ def test_get_inspection_returns_dict():
                            'notes': '', 'product_id': 1, 'wo_id': None,
                            'created_by': 'u@e.com'})
     result = get_inspection(conn, 1)
+    assert result is not None
     assert result['id'] == 1
 
 

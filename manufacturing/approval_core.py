@@ -26,7 +26,7 @@ APPROVAL_THRESHOLD = 500.0
 APPROVAL_ROLES = {'President', 'Vice President'}
 
 
-def needs_approval(total: float) -> bool:
+def needs_approval(total: float | None) -> bool:
     """Return True if a PO with *total* requires VP/President sign-off."""
     return (total or 0) > APPROVAL_THRESHOLD
 

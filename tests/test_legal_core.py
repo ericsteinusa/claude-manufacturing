@@ -30,10 +30,10 @@ def _conn(contract_stats=None, compliance_stats=None, litigation_stats=None,
     lit = litigation_stats if litigation_stats is not None else _LITIGATION_STATS
     rec = recent if recent is not None else []
     c.execute.side_effect = [
-        MagicMock(**{'fetchone.return_value': cs}),
-        MagicMock(**{'fetchone.return_value': comp}),
-        MagicMock(**{'fetchone.return_value': lit}),
-        MagicMock(**{'fetchall.return_value': rec}),
+        MagicMock(fetchone=MagicMock(return_value=cs)),
+        MagicMock(fetchone=MagicMock(return_value=comp)),
+        MagicMock(fetchone=MagicMock(return_value=lit)),
+        MagicMock(fetchall=MagicMock(return_value=rec)),
     ]
     return c
 

@@ -125,6 +125,7 @@ def test_get_lot_returns_dict():
                         'status': 'available', 'notes': None,
                         'created_by': None, 'created_at': None}])
     lot = get_lot(conn, lot_id=1)
+    assert lot is not None
     assert lot['lot_number'] == 'LOT-001'
     assert lot['qty'] == 100.0
 

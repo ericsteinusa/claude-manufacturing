@@ -323,7 +323,7 @@ def get_ad(conn, ad_id: int) -> dict | None:
 def create_ad(
     conn, name: str, channel: str, campaign_name: str, budget: float, spend: float,
     impressions: int, clicks: int, conversions: int,
-    start_date: str, end_date: str, status: str, owner: str, notes: str,
+    start_date: str | None, end_date: str | None, status: str, owner: str, notes: str,
 ) -> int:
     _ensure_ad_table(conn)
     cur = conn.execute(
@@ -410,7 +410,7 @@ def get_research_project(conn, project_id: int) -> dict | None:
 
 def create_research(
     conn, title: str, research_type: str, description: str, owner: str,
-    start_date: str, end_date: str, status: str, budget: float, notes: str,
+    start_date: str | None, end_date: str | None, status: str, budget: float, notes: str,
 ) -> int:
     _ensure_research_table(conn)
     cur = conn.execute(

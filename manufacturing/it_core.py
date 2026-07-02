@@ -521,7 +521,7 @@ def get_license(conn, license_id: int) -> dict | None:
 
 def create_license(
     conn, software_name: str, vendor: str, license_key: str, license_type: str,
-    seats: int, seats_used: int, purchase_date: str, expiry_date: str,
+    seats: int, seats_used: int, purchase_date: str | None, expiry_date: str | None,
     cost: float, status: str, notes: str, created_by: str,
 ) -> int:
     _ensure_license_table(conn)
@@ -612,7 +612,7 @@ def get_network_device(conn, device_id: int) -> dict | None:
 def create_network_device(
     conn, hostname: str, ip_address: str, mac_address: str, device_type: str,
     manufacturer: str, model: str, location: str, status: str,
-    last_seen: str, notes: str, created_by: str,
+    last_seen: str | None, notes: str, created_by: str,
 ) -> int:
     _ensure_network_table(conn)
     cur = conn.execute(

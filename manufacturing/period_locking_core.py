@@ -49,7 +49,7 @@ log = get_logger(__name__)
 PERIOD_ADMIN_ROLES = {'President', 'Vice President'}
 
 
-def is_period_locked(conn, date_str: str) -> bool:
+def is_period_locked(conn, date_str: str | None) -> bool:
     """Return True if the period containing *date_str* is closed.
 
     *date_str* is an ISO-8601 date string (``YYYY-MM-DD``).  Returns False

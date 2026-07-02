@@ -4,8 +4,9 @@ import os
 import traceback
 import importlib
 _DIR = os.path.dirname(os.path.abspath(__file__))
-os.chdir(_DIR)
-sys.path.insert(0, _DIR)
+_MFG_DIR = os.path.join(os.path.dirname(_DIR), 'manufacturing')
+os.chdir(_MFG_DIR)
+sys.path.insert(0, _MFG_DIR)
 
 from PyQt6 import QtWidgets  # noqa: E402
 from button_nav import ButtonNav  # noqa: E402

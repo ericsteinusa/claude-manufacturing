@@ -1,5 +1,7 @@
 """Views: it domain."""
 
+from datetime import date
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required, login_required, role_required

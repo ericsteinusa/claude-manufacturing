@@ -175,6 +175,7 @@ def test_list_tickets_empty():
 def test_get_ticket_returns_dict():
     conn = _conn(fetchone=_ticket())
     result = get_ticket(conn, 1)
+    assert result is not None
     assert result['id'] == 1
     assert 'status' in result
 

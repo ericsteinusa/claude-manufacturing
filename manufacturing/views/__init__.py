@@ -2344,7 +2344,12 @@ def people_new(request):
             data, error = _people_form(request)
             if not error:
                 person_id = create_person(
-                    conn, **data,
+                    conn,
+                    first_name=data['first_name'], last_name=data['last_name'],
+                    employee_id=int(data['employee_id'] or 0), email=data['email'],
+                    address=data['address'], city=data['city'], state=data['state'],
+                    zip_code=data['zip_code'], dept_id=data['dept_id'],
+                    dept_sub_id=data['dept_sub_id'], job_title=data['job_title'],
                     created_by=request.session.get('user_email'))
                 conn.commit()
                 return redirect('people_detail', person_id=person_id)
@@ -2381,7 +2386,13 @@ def people_edit(request, person_id):
         if request.method == 'POST':
             data, error = _people_form(request)
             if not error:
-                update_person(conn, person_id, **data)
+                update_person(
+                    conn, person_id,
+                    first_name=data['first_name'], last_name=data['last_name'],
+                    employee_id=int(data['employee_id'] or 0), email=data['email'],
+                    address=data['address'], city=data['city'], state=data['state'],
+                    zip_code=data['zip_code'], dept_id=data['dept_id'],
+                    dept_sub_id=data['dept_sub_id'], job_title=data['job_title'])
                 conn.commit()
                 return redirect('people_detail', person_id=person_id)
             depts = load_depts(conn)
@@ -2860,7 +2871,6 @@ def tc_ot_report(request):
     try:
         if mode == 'mine':
             email = request.session.get('user_email', '')
-            from .personnel_core import get_person_by_email
             person = get_person_by_email(conn, email)
             if person:
                 my_ot = get_ot_report(conn, person['id'],
@@ -3545,7 +3555,7 @@ def inventory_detail(request, product_id):
                         uom=request.POST.get('uom', 'ea'),
                     )
                     conn.commit()
-                    product = inv_get_product(conn, product_id)
+                    product = inv_get_product(conn, product_id) or product
                     success = 'Product updated.'
                 except (ValueError, Exception) as e:
                     conn.rollback()
@@ -3916,6 +3926,7 @@ def cs_ticket_new(request):
             if errors:
                 error = '; '.join(errors)
             else:
+                assert customer_id is not None
                 import datetime as _dt
                 today = _dt.date.today().isoformat()
                 now_time = _dt.datetime.now().strftime('%H:%M')

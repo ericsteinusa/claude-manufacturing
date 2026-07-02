@@ -167,6 +167,7 @@ def test_list_work_orders_no_filter_no_where():
 def test_get_work_order_returns_dict():
     conn = _conn(fetchone=_wo())
     result = get_work_order(conn, 1)
+    assert result is not None
     assert result['id'] == 1
     assert 'is_overdue' in result
 
@@ -283,7 +284,9 @@ def test_list_equipment_search():
 
 def test_get_equipment_returns_dict():
     conn = _conn(fetchone=_eq())
-    assert get_equipment(conn, 1)['id'] == 1
+    result = get_equipment(conn, 1)
+    assert result is not None
+    assert result['id'] == 1
 
 
 def test_get_equipment_returns_none():
@@ -373,7 +376,9 @@ def test_list_schedules_status_filter():
 
 def test_get_schedule_returns_dict():
     conn = _conn(fetchone=_sched())
-    assert get_schedule(conn, 1)['task'] == 'Oil change'
+    result = get_schedule(conn, 1)
+    assert result is not None
+    assert result['task'] == 'Oil change'
 
 
 def test_get_schedule_returns_none():
@@ -473,7 +478,9 @@ def test_list_inspections_status_filter():
 
 def test_get_inspection_returns_dict():
     conn = _conn(fetchone=_insp())
-    assert get_inspection(conn, 1)['area'] == 'Welding Bay'
+    result = get_inspection(conn, 1)
+    assert result is not None
+    assert result['area'] == 'Welding Bay'
 
 
 def test_get_inspection_returns_none():
@@ -572,7 +579,9 @@ def test_list_downtime_search():
 
 def test_get_downtime_returns_dict():
     conn = _conn(fetchone=_dt())
-    assert get_downtime(conn, 1)['equipment'] == 'Pump A'
+    result = get_downtime(conn, 1)
+    assert result is not None
+    assert result['equipment'] == 'Pump A'
 
 
 def test_get_downtime_returns_none():
@@ -671,7 +680,9 @@ def test_list_parts_search():
 
 def test_get_part_returns_dict():
     conn = _conn(fetchone=_part())
-    assert get_part(conn, 1)['name'] == 'Bearing 6205'
+    result = get_part(conn, 1)
+    assert result is not None
+    assert result['name'] == 'Bearing 6205'
 
 
 def test_get_part_returns_none():
@@ -776,7 +787,9 @@ def test_list_mechanics_search():
 
 def test_get_mechanic_returns_dict():
     conn = _conn(fetchone=_mech())
-    assert get_mechanic(conn, 1)['name'] == 'Bob Smith'
+    result = get_mechanic(conn, 1)
+    assert result is not None
+    assert result['name'] == 'Bob Smith'
 
 
 def test_get_mechanic_returns_none():

@@ -215,6 +215,7 @@ def test_get_standard_cost_returns_latest():
          'created_by': 'test', 'created_at': None},
     ])
     row = get_standard_cost(conn, product_id=1)
+    assert row is not None
     assert row['total_std_cost'] == 27.0
     assert 'ORDER BY effective_date DESC' in conn.last_sql
 
@@ -300,6 +301,7 @@ def test_get_wo_cost_returns_dict():
                         'actual_overhead_cost': 10.0, 'created_by': None,
                         'created_at': None}])
     result = get_wo_cost(conn, wo_id=5)
+    assert result is not None
     assert result['total_variance'] == 30.0
 
 

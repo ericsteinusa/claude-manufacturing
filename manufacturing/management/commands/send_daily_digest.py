@@ -67,7 +67,8 @@ class Command(BaseCommand):
                 fail_silently=False,
             )
             self.stdout.write(
-                self.style.SUCCESS(f'Digest emailed to {recipient}.'))
+                self.style.SUCCESS(  # pyright: ignore[reportAttributeAccessIssue]
+                    f'Digest emailed to {recipient}.'))
         except Exception as exc:
             self.stderr.write(f'Email failed: {exc}\n')
             self.stdout.write(body)

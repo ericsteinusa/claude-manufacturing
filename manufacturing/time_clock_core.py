@@ -36,7 +36,7 @@ def compute_hours(clock_in: str, clock_out: str | None = None) -> float:
     t_in = _parse(clock_in)
     if t_in is None:
         return 0.0
-    t_out = _parse(clock_out) if clock_out else datetime.now()
+    t_out = (_parse(clock_out) if clock_out else None) or datetime.now()
     return max(0.0, (t_out - t_in).total_seconds() / 3600)
 
 
