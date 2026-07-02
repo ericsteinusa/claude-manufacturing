@@ -31,9 +31,9 @@ def _conn(ticket_stats=None, asset_stats=None, recent=None):
     ast = asset_stats if asset_stats is not None else _ASSET_STATS
     rec = recent if recent is not None else []
     c.execute.side_effect = [
-        MagicMock(**{'fetchone.return_value': ts}),
-        MagicMock(**{'fetchone.return_value': ast}),
-        MagicMock(**{'fetchall.return_value': rec}),
+        MagicMock(fetchone=MagicMock(return_value=ts)),
+        MagicMock(fetchone=MagicMock(return_value=ast)),
+        MagicMock(fetchall=MagicMock(return_value=rec)),
     ]
     return c
 

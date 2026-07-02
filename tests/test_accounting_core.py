@@ -173,6 +173,7 @@ def test_list_ap_invoices_vendor_label_from_company():
 def test_get_ap_invoice_returns_dict():
     conn = _conn(fetchone=_ap_inv())
     r = get_ap_invoice(conn, 1)
+    assert r is not None
     assert r['invoice_number'] == 'INV-001'
     assert r['balance'] == 1000.0
 
@@ -350,6 +351,7 @@ def test_list_ar_invoices_computes_balance():
 def test_get_ar_invoice_returns_dict():
     conn = _conn(fetchone=_ar_inv())
     r = get_ar_invoice(conn, 1)
+    assert r is not None
     assert r['invoice_number'] == 'AR-001'
 
 

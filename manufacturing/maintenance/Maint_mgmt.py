@@ -682,6 +682,43 @@ class WorkOrdersWidget(_MaintCrudWidget):
         ],
     }
 
+    def _extra_buttons(self):
+        return [("Print Work Order", self._on_print_wo)]
+
+    def _on_print_wo(self, *_):
+        rid = self._selected_id()
+        if rid is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print", "Select a work order first.")
+            return
+        from ..print_utils import print_document, doc_header, fields_table, wrap_html
+        with _conn() as con:
+            row = con.execute(
+                "SELECT * FROM maint_work_order WHERE id = %s", (rid,)
+            ).fetchone()
+        if not row:
+            return
+        wo = dict(row)
+        fields = [
+            ("ID",             str(wo.get("id") or "")),
+            ("Work Order",     wo.get("title") or ""),
+            ("Equipment",      wo.get("equipment") or ""),
+            ("Type",           wo.get("work_type") or ""),
+            ("Priority",       wo.get("priority") or ""),
+            ("Assigned To",    wo.get("assigned_to") or ""),
+            ("Requested Date", str(wo.get("requested_date") or "")),
+            ("Due Date",       str(wo.get("due_date") or "")),
+            ("Completed Date", str(wo.get("completed_date") or "")),
+            ("Status",         wo.get("status") or ""),
+            ("Notes",          wo.get("notes") or ""),
+            ("Created By",     wo.get("created_by") or ""),
+        ]
+        html = wrap_html(
+            doc_header(f"Maintenance Work Order — {wo.get('title', '')}")
+            + fields_table(fields)
+        )
+        print_document(html, f"Maint WO {rid}", self)
+
 
 class WorkOrderMgmtWidget(WorkOrdersWidget):
     """Manager view of work orders: adds the ability to assign a mechanic.
@@ -691,7 +728,7 @@ class WorkOrderMgmtWidget(WorkOrdersWidget):
     """
 
     def _extra_buttons(self):
-        return [("Assign to Mechanic", self._assign)]
+        return super()._extra_buttons() + [("Assign to Mechanic", self._assign)]
 
     def _assign(self, *_):
         rid = self._selected_id()

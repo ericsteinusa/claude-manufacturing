@@ -146,6 +146,7 @@ def test_list_pay_rates_no_search_no_where():
 def test_get_pay_rate_returns_dict():
     conn = _conn(fetchone={'people_id': 1, 'pay_type': 'hourly', 'pay_rate': 20.0})
     r = get_pay_rate(conn, 1)
+    assert r is not None
     assert r['pay_type'] == 'hourly'
 
 
@@ -221,7 +222,9 @@ def test_list_deduction_types_no_filter():
 
 def test_get_deduction_type_returns_dict():
     conn = _conn(fetchone={'id': 1, 'name': 'Health'})
-    assert get_deduction_type(conn, 1)['name'] == 'Health'
+    result = get_deduction_type(conn, 1)
+    assert result is not None
+    assert result['name'] == 'Health'
 
 
 def test_get_deduction_type_returns_none():
@@ -312,7 +315,9 @@ def test_get_employee_deduction_returns_dict():
                            'end_date': None, 'ded_name': 'Health',
                            'category': 'Benefits', 'ded_is_pre_tax': 1,
                            'first_name': 'Bob', 'last_name': 'S'})
-    assert get_employee_deduction(conn, 1)['id'] == 1
+    result = get_employee_deduction(conn, 1)
+    assert result is not None
+    assert result['id'] == 1
 
 
 def test_get_employee_deduction_returns_none():
@@ -403,7 +408,9 @@ def test_list_payroll_runs_orders_desc():
 
 def test_get_payroll_run_returns_dict():
     conn = _conn(fetchone=_run())
-    assert get_payroll_run(conn, 1)['id'] == 1
+    result = get_payroll_run(conn, 1)
+    assert result is not None
+    assert result['id'] == 1
 
 
 def test_get_payroll_run_returns_none():
@@ -453,6 +460,7 @@ def _stub(**kw):
 def test_get_pay_stub_returns_dict():
     conn = _conn(fetchone=_stub())
     s = get_pay_stub(conn, 1)
+    assert s is not None
     assert s['gross_pay'] == 2000.0
 
 

@@ -15,7 +15,7 @@ def print_document(html: str, title: str, parent=None) -> None:
         return
     doc = QTextDocument()
     doc.setHtml(html)
-    doc.print_(printer)
+    doc.print(printer)
 
 
 def doc_header(subtitle: str) -> str:

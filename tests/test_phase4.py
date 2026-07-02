@@ -5,7 +5,6 @@ import time
 import pytest
 
 from manufacturing.api_auth import (
-    TOKEN_LIFETIME_HOURS,
     create_token,
     verify_token,
     refresh_token,
@@ -24,7 +23,6 @@ from manufacturing.api_auth import (
 from manufacturing.approval_workflow_core import (
     ENTITY_TYPES,
     STEP_STATUSES,
-    ensure_approval_tables,
     create_approval_rule,
     list_approval_rules,
     update_approval_rule,
@@ -236,7 +234,10 @@ def test_generate_totp_secret_is_base32():
 
 def test_verify_totp_code_correct():
     # Generate a secret and verify the current code matches itself
-    import base64, hmac, hashlib, struct
+    import base64
+    import hmac
+    import hashlib
+    import struct
     secret = generate_totp_secret()
     key = base64.b32decode(secret.upper())
     t = int(time.time()) // 30

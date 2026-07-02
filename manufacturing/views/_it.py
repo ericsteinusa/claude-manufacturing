@@ -1,12 +1,12 @@
 """Views: it domain."""
 
+from datetime import date
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES, FULL_ACCESS_ROLES
-
-log = get_logger(__name__)
+from ..accounts import READ_ONLY_ROLES
 
 from ..it_core import (
     get_it_dashboard,
@@ -27,6 +27,8 @@ from ..it_core import (
     list_network_devices, get_network_device, create_network_device, update_network_device,
     NETWORK_DEVICE_TYPES, NETWORK_DEVICE_STATUSES,
 )
+
+log = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # IT dashboard

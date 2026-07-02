@@ -410,9 +410,10 @@ class ITNetworkDevicesWidget(QtWidgets.QWidget):
         row = index.row()
         if row < 0 or row >= len(self._row_ids):
             return
-        self._selected_id = self._row_ids[row]
+        selected_id = self._row_ids[row]
+        self._selected_id = selected_id
         conn = _get_db()
-        rec = get_network_device(conn, self._selected_id)
+        rec = get_network_device(conn, selected_id)
         conn.close()
         if not rec:
             return

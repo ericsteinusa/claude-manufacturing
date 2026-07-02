@@ -96,6 +96,7 @@ def test_get_product_returns_dict():
                            'uom': 'ea', 'lead_time_days': 3,
                            'amount': 0, 'reorder_point': 0})
     result = get_product(conn, 5)
+    assert result is not None
     assert result['name'] == 'Widget'
 
 

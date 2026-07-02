@@ -4,13 +4,14 @@
   "extraPaths": ["../virt/Lib/python3.12/site-packages"],
   "exclude": [
     "manufacturing/*_ui.py",
-    "manufacturing/*_old.py",
+    "manufacturing/**/*_old.py",
     "manufacturing/Accounting_rc.py",
     "manufacturing/taxes.py",
     "manufacturing/cs_calls.py",
     "manufacturing/customer_entry.py",
     "manufacturing/TK_Login_system.py",
-    "manufacturing/TK_name_check_in_SQL.py"
+    "manufacturing/TK_name_check_in_SQL.py",
+    "tests/qt_tabs.py"
   ],
   "reportOptionalMemberAccess": "none",
   "reportCallIssue": "none",

@@ -1,6 +1,5 @@
 """Tests for Phase 5A — Financial / Production / Inventory dashboards and exports."""
 
-import pytest
 
 from manufacturing.reports_core import (
     financial_dashboard,

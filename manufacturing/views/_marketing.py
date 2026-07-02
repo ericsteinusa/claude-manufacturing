@@ -1,12 +1,12 @@
 """Views: marketing domain."""
 
+from datetime import date
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES, FULL_ACCESS_ROLES
-
-log = get_logger(__name__)
+from ..accounts import READ_ONLY_ROLES
 
 from ..marketing_core import (
     get_marketing_dashboard,
@@ -20,6 +20,8 @@ from ..marketing_core import (
     RESEARCH_TYPES, RESEARCH_STATUSES,
     get_analytics_data,
 )
+
+log = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Marketing dashboard

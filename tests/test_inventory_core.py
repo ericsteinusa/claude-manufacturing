@@ -139,6 +139,7 @@ def test_get_product_returns_dict():
     row['created_by'] = 'test@example.com'
     conn = _conn(fetchone=row)
     result = get_product(conn, 1)
+    assert result is not None
     assert result['name'] == 'Widget'
 
 

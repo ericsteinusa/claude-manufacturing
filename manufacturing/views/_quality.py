@@ -2,11 +2,9 @@
 
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES, FULL_ACCESS_ROLES
-
-log = get_logger(__name__)
+from ..accounts import READ_ONLY_ROLES
 
 from ..quality_core import (
     NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
@@ -25,6 +23,8 @@ from ..quality_core import (
     load_products_for_qa, load_work_orders_for_qa,
     get_qa_reports,
 )
+
+log = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Quality Assurance (web)

@@ -114,6 +114,7 @@ def test_list_customers_queries_customer_table():
 def test_get_customer_returns_dict():
     conn = _conn(fetchone=_row())
     result = get_customer(conn, 1)
+    assert result is not None
     assert result['id'] == 1
     assert 'label' in result
 
@@ -260,6 +261,7 @@ def test_list_suppliers_search_works():
 def test_get_supplier_returns_dict():
     conn = _conn(fetchone=_row(company_name='Parts Co'))
     result = get_supplier(conn, 1)
+    assert result is not None
     assert result['company_name'] == 'Parts Co'
     assert 'label' in result
 

@@ -2,8 +2,7 @@
 Tests for notify_core.py — PO approval email notifications.
 """
 
-import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 
 def _conn_rows(rows):
@@ -52,7 +51,6 @@ def test_notify_requested_sends_to_approvers():
             site_url='http://localhost:8000/'
         )
     mock_send.assert_called_once()
-    _, kwargs_or_args = mock_send.call_args[0], mock_send.call_args
     recipients = mock_send.call_args[0][3]
     assert 'vp@example.com' in recipients
 

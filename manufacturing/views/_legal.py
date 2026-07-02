@@ -2,11 +2,9 @@
 
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES, FULL_ACCESS_ROLES
-
-log = get_logger(__name__)
+from ..accounts import READ_ONLY_ROLES
 
 from ..legal_core import (
     get_legal_dashboard,
@@ -16,6 +14,8 @@ from ..legal_core import (
     CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
     LITIGATION_TYPES, LITIGATION_STATUSES,
 )
+
+log = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Legal dashboard
