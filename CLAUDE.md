@@ -28,6 +28,10 @@ manufacturing/
   ├── sales/             Sales orders, quotes, targets
   ├── time_clock/        Clock in/out, time-off, TK login
   │
+  ├── management/        Django management commands (e.g. send_daily_digest)
+  ├── migrations/        Django migrations (empty besides __init__.py — this
+  │                      app manages its schema via CREATE TABLE IF NOT EXISTS
+  │                      in *_core.py, not the Django ORM)
   ├── seeds/             Dev-DB seeders (python -m manufacturing.seeds.seed_sample_*)
   ├── views/             Django HTTP handlers (package split by domain)
   │   ├── __init__.py    Core navigation + re-exports from sub-modules
