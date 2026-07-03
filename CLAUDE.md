@@ -203,4 +203,16 @@ Seed scripts live in `manufacturing/seeds/`. Use `python -m manufacturing.seeds.
 - Receiving (8 receipts spanning every status — pending, partial, received, rejected —
   with 2–4 line items each; `po_id` is NULL with no FK constraint so no PO seed dependency):
   `python -m manufacturing.seeds.seed_sample_receiving` (tagged `rcv_number` prefix `SMPL-RCV-`).
+- Operations — routing/costing/lot/approval-workflow data covering the routing_core,
+  lot_core, costing_core and approval_workflow_core modules (workcenters, product
+  routings + WO operations with shop-floor progress, raw-material/finished-good lots
+  and serial numbers across every status, a GL account map + standard cost rolls +
+  one WO actual-cost/variance record, and approval rules with real approval_step
+  workflows against the sample requisitions — pending/escalated/dept-approved/
+  rejected/fully-approved):
+  `python -m manufacturing.seeds.seed_sample_operations` (tagged `created_by='SMPL-OPS-'`
+  on workcenter/routing/lot/serial_number/cost_roll/wo_cost_actual, `notes='SMPL-OPS-'`
+  on approval_rule; run `seed_sample_products` and `seed_sample_wos` first so products/
+  WOs exist to attach routings and operations to, and `seed_sample_purchasing` first for
+  approval_step demo data — otherwise only the approval rule config is seeded).
 - All seeds are idempotent and support `--reset` / `--remove`.
