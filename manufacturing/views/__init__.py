@@ -65,7 +65,6 @@ from ..cs_calls_core import (
     create_survey, update_survey, add_survey_response,
     init_return_table, init_kb_table, init_survey_tables,
 )
-from ..maintenance_core import WO_STATUSES, PRIORITIES
 from ..period_locking_core import (
     is_period_locked, close_period, reopen_period,
     list_periods, recent_months, period_label, PERIOD_ADMIN_ROLES,
