@@ -117,7 +117,7 @@ def _seed_mechanics(conn):
             continue
         conn.execute(
             "INSERT INTO maint_mechanic (name, trade, shift, phone, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (name, trade, shift, phone, status),
         )
     conn.commit()
@@ -154,7 +154,7 @@ def _seed_equipment(conn):
         conn.execute(
             "INSERT INTO maint_equipment "
             "(name, asset_tag, location, manufacturer, install_date, last_service, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (name, tag, loc, mfr, _d(inst_ago), _d(svc_ago), status),
         )
     conn.commit()
@@ -198,7 +198,7 @@ WORK_ORDERS = [
 def _seed_work_orders(conn):
     for (title, equip, wtype, priority, assigned, req_ago, due_off,
          comp_off, status) in WORK_ORDERS:
-        if conn.execute("SELECT 1 FROM maint_work_order WHERE title=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM maint_work_order WHERE title=%s AND created_by='{TAG}'",
                         (title,)).fetchone():
             continue
         completed_date = _d(req_ago + comp_off) if comp_off is not None else ''
@@ -206,7 +206,7 @@ def _seed_work_orders(conn):
             "INSERT INTO maint_work_order "
             "(title, equipment, work_type, priority, assigned_to, requested_date,"
             " due_date, completed_date, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (title, equip, wtype, priority, assigned, _d(req_ago),
              _d(req_ago + due_off), completed_date, status),
         )
@@ -214,7 +214,7 @@ def _seed_work_orders(conn):
 
 
 def _remove_work_orders(conn):
-    conn.execute("DELETE FROM maint_work_order WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM maint_work_order WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -249,20 +249,20 @@ SCHEDULES = [
 
 def _seed_schedules(conn):
     for task, equip, freq, assigned, last_ago, next_off, status in SCHEDULES:
-        if conn.execute("SELECT 1 FROM maint_schedule WHERE task=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM maint_schedule WHERE task=%s AND created_by='{TAG}'",
                         (task,)).fetchone():
             continue
         conn.execute(
             "INSERT INTO maint_schedule"
             " (task, equipment, frequency, assigned_to, last_done, next_due, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (task, equip, freq, assigned, _d(last_ago), _d(last_ago + next_off), status),
         )
     conn.commit()
 
 
 def _remove_schedules(conn):
-    conn.execute("DELETE FROM maint_schedule WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM maint_schedule WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -289,7 +289,7 @@ INSPECTIONS = [
 
 def _seed_inspections(conn):
     for area, itype, inspector, sched_ago, comp_ago, result, status in INSPECTIONS:
-        if conn.execute("SELECT 1 FROM maint_inspection WHERE area=%s AND inspection_type=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM maint_inspection WHERE area=%s AND inspection_type=%s AND created_by='{TAG}'",
                         (area, itype)).fetchone():
             continue
         comp = _d(comp_ago) if comp_ago is not None else ''
@@ -297,14 +297,14 @@ def _seed_inspections(conn):
             "INSERT INTO maint_inspection"
             " (area, inspection_type, inspector, scheduled_date, completed_date,"
             "  result, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (area, itype, inspector, _d(sched_ago), comp, result, status),
         )
     conn.commit()
 
 
 def _remove_inspections(conn):
-    conn.execute("DELETE FROM maint_inspection WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM maint_inspection WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -331,20 +331,20 @@ DOWNTIME = [
 
 def _seed_downtime(conn):
     for equip, reason, category, down_ago, hours, cost, status in DOWNTIME:
-        if conn.execute("SELECT 1 FROM maint_downtime WHERE equipment=%s AND reason=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM maint_downtime WHERE equipment=%s AND reason=%s AND created_by='{TAG}'",
                         (equip, reason)).fetchone():
             continue
         conn.execute(
             "INSERT INTO maint_downtime"
             " (equipment, reason, category, down_date, hours, cost, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (equip, reason, category, _d(down_ago), hours, cost, status),
         )
     conn.commit()
 
 
 def _remove_downtime(conn):
-    conn.execute("DELETE FROM maint_downtime WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM maint_downtime WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -375,7 +375,7 @@ def _seed_parts(conn):
             "INSERT INTO maint_part"
             " (name, part_number, category, location, quantity, reorder_level,"
             "  unit_cost, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (name, pnum, cat, loc, qty, reorder, cost, status),
         )
     conn.commit()

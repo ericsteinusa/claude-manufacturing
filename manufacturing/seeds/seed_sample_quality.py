@@ -110,7 +110,7 @@ NCRS = [
 
 def _seed_ncrs(conn):
     for title, source, severity, product, det_ago, disposition, owner, status in NCRS:
-        if conn.execute("SELECT 1 FROM qa_ncr WHERE title=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM qa_ncr WHERE title=%s AND created_by='{TAG}'",
                         (title,)).fetchone():
             continue
         closed = _d(det_ago + 7) if status == 'Closed' else ''
@@ -118,7 +118,7 @@ def _seed_ncrs(conn):
             "INSERT INTO qa_ncr"
             " (title, source, severity, product, detected_date, disposition,"
             "  owner, status, notes, created_by, closed_date)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','seed',%s)",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}',%s)",
             (title, source, severity, product, _d(det_ago),
              disposition, owner, status, closed),
         )
@@ -126,7 +126,7 @@ def _seed_ncrs(conn):
 
 
 def _remove_ncrs(conn):
-    conn.execute("DELETE FROM qa_ncr WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM qa_ncr WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -165,7 +165,7 @@ CAPAS = [
 
 def _seed_capas(conn):
     for title, ctype, ncr_ref, owner, due_off, plan, comp_off, status in CAPAS:
-        if conn.execute("SELECT 1 FROM qa_capa WHERE title=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM qa_capa WHERE title=%s AND created_by='{TAG}'",
                         (title,)).fetchone():
             continue
         completed = _d(comp_off) if comp_off is not None else ''
@@ -173,14 +173,14 @@ def _seed_capas(conn):
             "INSERT INTO qa_capa"
             " (title, capa_type, ncr_ref, owner, due_date, completed_date,"
             "  status, action_plan, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'{TAG}')",
             (title, ctype, ncr_ref, owner, _d(due_off), completed, status, plan),
         )
     conn.commit()
 
 
 def _remove_capas(conn):
-    conn.execute("DELETE FROM qa_capa WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM qa_capa WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -213,7 +213,7 @@ AUDITS = [
 
 def _seed_audits(conn):
     for title, atype, auditor, sched_ago, comp_ago, result, status, findings in AUDITS:
-        if conn.execute("SELECT 1 FROM qa_audit WHERE title=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM qa_audit WHERE title=%s AND created_by='{TAG}'",
                         (title,)).fetchone():
             continue
         comp = _d(comp_ago) if comp_ago is not None else ''
@@ -221,14 +221,14 @@ def _seed_audits(conn):
             "INSERT INTO qa_audit"
             " (title, audit_type, auditor, scheduled_date, completed_date,"
             "  result, status, findings, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'{TAG}')",
             (title, atype, auditor, _d(sched_ago), comp, result, status, findings),
         )
     conn.commit()
 
 
 def _remove_audits(conn):
-    conn.execute("DELETE FROM qa_audit WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM qa_audit WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -251,20 +251,20 @@ SUPPLIERS = [
 
 def _seed_suppliers(conn):
     for supplier, material, rating, ppm, audit_ago, status in SUPPLIERS:
-        if conn.execute("SELECT 1 FROM qa_supplier WHERE supplier=%s AND material=%s AND created_by='seed'",
+        if conn.execute(f"SELECT 1 FROM qa_supplier WHERE supplier=%s AND material=%s AND created_by='{TAG}'",
                         (supplier, material)).fetchone():
             continue
         conn.execute(
             "INSERT INTO qa_supplier"
             " (supplier, material, rating, ppm, last_audit, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (supplier, material, rating, ppm, _d(audit_ago), status),
         )
     conn.commit()
 
 
 def _remove_suppliers(conn):
-    conn.execute("DELETE FROM qa_supplier WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM qa_supplier WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -297,7 +297,7 @@ def _seed_inspections(conn):
         conn.execute(
             "INSERT INTO qa_inspection"
             " (insp_number, product_id, wo_id, insp_date, inspector, result, notes, created_by)"
-            " VALUES (%s,NULL,NULL,%s,%s,%s,%s,'seed')",
+            f" VALUES (%s,NULL,NULL,%s,%s,%s,%s,'{TAG}')",
             (insp_num, _d(date_ago), inspector, result, notes),
         )
     conn.commit()
@@ -313,7 +313,7 @@ def _seed_inspections(conn):
             continue
         conn.execute(
             "INSERT INTO qa_defect (insp_id, defect_type, severity, description, resolved, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,'seed')",
+            f" VALUES (%s,%s,%s,%s,%s,'{TAG}')",
             (insp_id, dtype, severity, description, resolved),
         )
     conn.commit()

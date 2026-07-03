@@ -304,14 +304,14 @@ def _seed_research(conn):
         conn.execute(
             "INSERT INTO marketing_research"
             " (title, research_type, methodology, owner, start_date, completed_date, status, findings, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'','{TAG}')",
             (title, rtype, methodology, owner, _d(start_ago), comp, status),
         )
     conn.commit()
 
 
 def _remove_research(conn):
-    conn.execute("DELETE FROM marketing_research WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM marketing_research WHERE created_by='{TAG}'")
     conn.commit()
 
 

@@ -106,14 +106,14 @@ def _seed_positions(conn):
         if existing:
             continue
         conn.execute(
-            "INSERT INTO position (people_id, job_title, created_by) VALUES (%s,%s,'seed')",
+            f"INSERT INTO position (people_id, job_title, created_by) VALUES (%s,%s,'{TAG}')",
             (pid, title),
         )
     conn.commit()
 
 
 def _remove_positions(conn):
-    conn.execute("DELETE FROM position WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM position WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -162,7 +162,7 @@ def _seed_timeclock(conn):
             conn.execute(
                 "INSERT INTO time_clock"
                 " (people_id, clock_in, clock_out, hours_worked, notes, created_by)"
-                " VALUES (%s,%s,%s,%s,'Sample data','seed')",
+                f" VALUES (%s,%s,%s,%s,'Sample data','{TAG}')",
                 (pid, ci_str, co_str, hours),
             )
     conn.commit()
@@ -170,7 +170,7 @@ def _seed_timeclock(conn):
 
 def _remove_timeclock(conn):
     conn.execute(
-        "DELETE FROM time_clock WHERE created_by='seed' AND notes='Sample data'"
+        f"DELETE FROM time_clock WHERE created_by='{TAG}' AND notes='Sample data'"
     )
     conn.commit()
 

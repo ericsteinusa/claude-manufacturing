@@ -210,7 +210,7 @@ def _seed_ap(conn):
         row = conn.execute(
             "INSERT INTO ap_invoice (vendor_id, invoice_number, invoice_date, due_date,"
             " amount, description, status, created_by)"
-            " VALUES (NULL,%s,%s,%s,%s,%s,%s,'seed') RETURNING id",
+            f" VALUES (NULL,%s,%s,%s,%s,%s,%s,'{TAG}') RETURNING id",
             (inv_num, _d(inv_ago), _d(inv_ago + due_off), amount, desc, status),
         ).fetchone()
         inv_ids[inv_num.split("-")[-1]] = row["id"]
@@ -277,7 +277,7 @@ def _seed_ar(conn):
         row = conn.execute(
             "INSERT INTO ar_invoice (customer_id, invoice_number, invoice_date, due_date,"
             " amount, description, status, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'seed') RETURNING id",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'{TAG}') RETURNING id",
             (cust_id, inv_num, _d(inv_ago), _d(inv_ago + due_off), amount, desc, status),
         ).fetchone()
         inv_ids[inv_num.split("-")[-1]] = row["id"]
@@ -367,7 +367,7 @@ def _seed_journals(conn, acct_ids: dict):
 
         row = conn.execute(
             "INSERT INTO gl_journal (journal_date, reference, description, posted, created_by, created_at)"
-            " VALUES (%s,%s,%s,1,'seed',%s) RETURNING id",
+            f" VALUES (%s,%s,%s,1,'{TAG}',%s) RETURNING id",
             (_d(date_ago), ref, desc, datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
         ).fetchone()
         journal_id = row["id"]
