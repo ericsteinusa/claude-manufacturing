@@ -3,6 +3,7 @@
   "venv": "virt",
   "extraPaths": ["../virt/Lib/python3.12/site-packages"],
   "exclude": [
+    ".claude/worktrees",
     "manufacturing/*_ui.py",
     "manufacturing/**/*_old.py",
     "manufacturing/Accounting_rc.py",
