@@ -9,7 +9,7 @@ description: Run the pytest test suite. Use when asked to run tests, check if te
 /c/tester/virt/Scripts/python.exe -m pytest tests/ -v
 ```
 
-All 221 tests should pass in under a second.
+All 1606 tests should pass in under a second.
 
 ## What the tests cover
 
@@ -36,7 +36,7 @@ fake DB connections, so no display or live database is needed.
 
 ## Interpreting results
 
-- All tests should pass (`221 passed`).
+- All tests should pass (`1606 passed`).
 - A failure in a `*_core.py` test means broken pure logic — fix before merging.
 - `ImportError` on a test file usually means a Qt module leaked into a
   `*_core.py` import chain (violates the Qt-free contract).
