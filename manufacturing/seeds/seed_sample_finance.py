@@ -174,7 +174,7 @@ def _seed_budgets(conn):
             continue
         row = conn.execute(
             "INSERT INTO budget (budget_name, fiscal_year, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,'seed') RETURNING id",
+            f" VALUES (%s,%s,%s,%s,'{TAG}') RETURNING id",
             (budget_name, fiscal_year, status, notes),
         ).fetchone()
         budget_ids[budget_name] = row["id"]
