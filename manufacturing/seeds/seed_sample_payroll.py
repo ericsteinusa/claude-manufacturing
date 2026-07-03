@@ -2,7 +2,7 @@
 
 Covers: deduction types, pay rates, employee deductions, and three
 historical bi-weekly payroll runs (with entries and entry-level deductions).
-All rows are tagged with created_by='seed' for safe removal.
+All rows are tagged with created_by='SMPL-PAY-' for safe removal.
 
 Usage::
 
@@ -57,20 +57,20 @@ DEDUCTION_TYPES = [
 def _seed_deduction_types(conn):
     for name, category, is_pre_tax in DEDUCTION_TYPES:
         if conn.execute(
-            "SELECT 1 FROM payroll_deduction_type WHERE name=%s AND created_by='seed'",
+            f"SELECT 1 FROM payroll_deduction_type WHERE name=%s AND created_by='{TAG}'",
             (name,)
         ).fetchone():
             continue
         conn.execute(
             "INSERT INTO payroll_deduction_type (name, category, is_pre_tax, is_active, created_by)"
-            " VALUES (%s,%s,%s,1,'seed')",
+            f" VALUES (%s,%s,%s,1,'{TAG}')",
             (name, category, is_pre_tax),
         )
     conn.commit()
 
 
 def _remove_deduction_types(conn):
-    conn.execute("DELETE FROM payroll_deduction_type WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM payroll_deduction_type WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -107,14 +107,14 @@ def _seed_pay_rates(conn):
             continue
         conn.execute(
             "INSERT INTO employee_pay (people_id, pay_type, pay_rate, effective_date, created_by)"
-            " VALUES (%s,%s,%s,%s,'seed')",
+            f" VALUES (%s,%s,%s,%s,'{TAG}')",
             (pid, pay_type, pay_rate, _d(eff_off)),
         )
     conn.commit()
 
 
 def _remove_pay_rates(conn):
-    conn.execute("DELETE FROM employee_pay WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM employee_pay WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -172,7 +172,7 @@ def _seed_employee_deductions(conn):
             continue
         pid = p_row["id"]
         dt_row = conn.execute(
-            "SELECT id FROM payroll_deduction_type WHERE name=%s AND created_by='seed'",
+            f"SELECT id FROM payroll_deduction_type WHERE name=%s AND created_by='{TAG}'",
             (ded_name,)
         ).fetchone()
         if not dt_row:
@@ -180,21 +180,21 @@ def _seed_employee_deductions(conn):
         dtid = dt_row["id"]
         if conn.execute(
             "SELECT 1 FROM employee_deduction"
-            " WHERE people_id=%s AND deduction_type_id=%s AND created_by='seed'",
+            f" WHERE people_id=%s AND deduction_type_id=%s AND created_by='{TAG}'",
             (pid, dtid)
         ).fetchone():
             continue
         conn.execute(
             "INSERT INTO employee_deduction"
             " (people_id, deduction_type_id, calc_method, amount, is_active, created_by)"
-            " VALUES (%s,%s,%s,%s,1,'seed')",
+            f" VALUES (%s,%s,%s,%s,1,'{TAG}')",
             (pid, dtid, calc_method, amount),
         )
     conn.commit()
 
 
 def _remove_employee_deductions(conn):
-    conn.execute("DELETE FROM employee_deduction WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM employee_deduction WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -267,7 +267,7 @@ def _seed_payroll_runs(conn):
         pid = p_row["id"]
         dt_row = conn.execute(
             "SELECT id, is_pre_tax FROM payroll_deduction_type"
-            " WHERE name=%s AND created_by='seed'",
+            f" WHERE name=%s AND created_by='{TAG}'",
             (ded_name,)
         ).fetchone()
         if not dt_row:
@@ -281,7 +281,7 @@ def _seed_payroll_runs(conn):
         end = _d(end_off)
         if conn.execute(
             "SELECT 1 FROM payroll_run"
-            " WHERE pay_period_start=%s AND pay_period_end=%s AND created_by='seed'",
+            f" WHERE pay_period_start=%s AND pay_period_end=%s AND created_by='{TAG}'",
             (start, end)
         ).fetchone():
             continue
@@ -290,7 +290,7 @@ def _seed_payroll_runs(conn):
             "INSERT INTO payroll_run"
             " (pay_period_start, pay_period_end, run_date, pay_frequency,"
             "  federal_tax_rate, state_tax_rate, status, created_by)"
-            " VALUES (%s,%s,%s,'Bi-Weekly',%s,%s,'processed','seed') RETURNING id",
+            f" VALUES (%s,%s,%s,'Bi-Weekly',%s,%s,'processed','{TAG}') RETURNING id",
             (start, end, end, FED_RATE, STATE_RATE),
         ).fetchone()
         run_id = run_row["id"]
@@ -336,7 +336,7 @@ def _seed_payroll_runs(conn):
 def _remove_payroll_runs(conn):
     run_ids = [
         r["id"] for r in conn.execute(
-            "SELECT id FROM payroll_run WHERE created_by='seed'"
+            f"SELECT id FROM payroll_run WHERE created_by='{TAG}'"
         ).fetchall()
     ]
     if run_ids:

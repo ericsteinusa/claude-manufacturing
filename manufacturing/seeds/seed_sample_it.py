@@ -101,7 +101,7 @@ def _seed_tickets(conn):
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (ticket_number, requester, dept, issue_type, description,
              priority, assigned_to, submitted, due, resolved,
-             status, "", "seed"),
+             status, "", TAG),
         )
     conn.commit()
 
@@ -217,7 +217,7 @@ def _seed_repairs(conn):
             "assigned_to, priority, status, completed_date, notes, created_by) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (asset_tag, problem, reported_by, reported_date,
-             assigned_to, priority, status, completed_date, "Sample data", "seed"),
+             assigned_to, priority, status, completed_date, "Sample data", TAG),
         )
     conn.commit()
 
@@ -269,7 +269,7 @@ def _seed_software(conn):
             "status, installed_by, notes, created_by) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (asset_tag, name, version, vendor, _d(inst_ago),
-             status, installed_by, "Sample data", "seed"),
+             status, installed_by, "Sample data", TAG),
         )
     conn.commit()
 
@@ -328,14 +328,14 @@ def _seed_licenses(conn):
             "purchase_date, expiry_date, cost, status, notes, created_by) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (name, vendor, key, ltype, seats, used,
-             purchase_date, expiry_date, cost, status, "Sample data", "seed"),
+             purchase_date, expiry_date, cost, status, "Sample data", TAG),
         )
     conn.commit()
 
 
 def _remove_licenses(conn):
     conn.execute(
-        "DELETE FROM it_license WHERE created_by = 'seed' AND notes = 'Sample data'"
+        f"DELETE FROM it_license WHERE created_by = '{TAG}' AND notes = 'Sample data'"
     )
     conn.commit()
 
@@ -384,14 +384,14 @@ def _seed_network(conn):
             "model, location, status, last_seen, notes, created_by) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (hostname, ip, mac, dtype, mfr, model,
-             location, status, _d(last_ago), "Sample data", "seed"),
+             location, status, _d(last_ago), "Sample data", TAG),
         )
     conn.commit()
 
 
 def _remove_network(conn):
     conn.execute(
-        "DELETE FROM it_network_device WHERE created_by = 'seed' AND notes = 'Sample data'"
+        f"DELETE FROM it_network_device WHERE created_by = '{TAG}' AND notes = 'Sample data'"
     )
     conn.commit()
 
@@ -456,7 +456,7 @@ def _seed_tasks(conn):
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (task_number, name, ttype, description, assigned_to, dept,
              priority, scheduled_date, due_date, completed_date,
-             status, "Sample data", "seed"),
+             status, "Sample data", TAG),
         )
     conn.commit()
 

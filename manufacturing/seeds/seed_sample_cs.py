@@ -149,7 +149,7 @@ TICKETS = [
 def _seed_tickets(conn):
     for call_ago, call_time, call_desc, comments, comp_ago, comp_time, completed in TICKETS:
         if conn.execute(
-            "SELECT 1 FROM calls2 WHERE call=%s AND created_by='seed'",
+            f"SELECT 1 FROM calls2 WHERE call=%s AND created_by='{TAG}'",
             (call_desc,)
         ).fetchone():
             continue
@@ -158,7 +158,7 @@ def _seed_tickets(conn):
             "INSERT INTO calls2"
             " (customer_id, call, call_date, call_time,"
             "  completion_date, completion_time, comments_box, completion_box, created_by)"
-            " VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,'seed')",
+            f" VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,'{TAG}')",
             (call_desc, _d(call_ago), call_time, comp_date, comp_time,
              comments, 1 if completed else 0),
         )
@@ -166,7 +166,7 @@ def _seed_tickets(conn):
 
 
 def _remove_tickets(conn):
-    conn.execute("DELETE FROM calls2 WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM calls2 WHERE created_by='{TAG}'")
     conn.commit()
 
 
@@ -203,7 +203,7 @@ def _seed_plans(conn):
         conn.execute(
             "INSERT INTO cs_improvement_plan"
             " (title, description, owner, target_date, status, created_date, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,'seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,'{TAG}')",
             (title, desc, owner, _d(due_off), status, TODAY.isoformat()),
         )
     conn.commit()
@@ -233,7 +233,7 @@ RETURNS = [
 def _seed_returns(conn):
     for ret_ago, reason, items, amount, status in RETURNS:
         if conn.execute(
-            "SELECT 1 FROM cs_return WHERE reason=%s AND items_returned=%s AND created_by='seed'",
+            f"SELECT 1 FROM cs_return WHERE reason=%s AND items_returned=%s AND created_by='{TAG}'",
             (reason, items)
         ).fetchone():
             continue
@@ -241,14 +241,14 @@ def _seed_returns(conn):
             "INSERT INTO cs_return"
             " (customer_id, return_date, reason, items_returned, refund_amount,"
             "  status, notes, created_by, created_date)"
-            " VALUES (NULL,%s,%s,%s,%s,%s,'Sample data','seed',CURRENT_DATE)",
+            f" VALUES (NULL,%s,%s,%s,%s,%s,'Sample data','{TAG}',CURRENT_DATE)",
             (_d(ret_ago), reason, items, amount, status),
         )
     conn.commit()
 
 
 def _remove_returns(conn):
-    conn.execute("DELETE FROM cs_return WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM cs_return WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -288,7 +288,7 @@ def _seed_kb(conn):
             "INSERT INTO cs_kb_article"
             " (title, category, content, author, published_date, status,"
             "  tags, view_count, created_by, created_date)"
-            " VALUES (%s,%s,'',%s,%s,%s,%s,%s,'seed',CURRENT_DATE)",
+            f" VALUES (%s,%s,'',%s,%s,%s,%s,%s,'{TAG}',CURRENT_DATE)",
             (title, cat, author, pub, status, tags, views),
         )
     conn.commit()
@@ -348,7 +348,7 @@ def _seed_surveys(conn):
             "INSERT INTO cs_survey"
             " (title, description, survey_type, status, start_date, end_date,"
             "  response_count, avg_score, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,%s,%s,0,NULL,'seed',CURRENT_DATE) RETURNING id",
+            f" VALUES (%s,%s,%s,%s,%s,%s,0,NULL,'{TAG}',CURRENT_DATE) RETURNING id",
             (title, desc, stype, status, _d(start_ago), _d(start_ago + end_off)),
         ).fetchone()
         survey_ids[title] = row["id"]

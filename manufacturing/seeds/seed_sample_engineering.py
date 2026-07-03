@@ -234,7 +234,7 @@ STANDARDS = [
 def _seed_standards(conn):
     for std_num, title, cat, version, status, review_ago in STANDARDS:
         if conn.execute(
-            "SELECT 1 FROM eng_standard WHERE standard_number=%s AND created_by='seed'",
+            f"SELECT 1 FROM eng_standard WHERE standard_number=%s AND created_by='{TAG}'",
             (std_num,)
         ).fetchone():
             continue
@@ -242,14 +242,14 @@ def _seed_standards(conn):
             "INSERT INTO eng_standard"
             " (standard_number, title, category, version, status,"
             "  review_date, description, notes, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,%s,%s,'',' Sample data','seed',%s)",
+            f" VALUES (%s,%s,%s,%s,%s,%s,'',' Sample data','{TAG}',%s)",
             (std_num, title, cat, version, status, _d(review_ago), TODAY.isoformat()),
         )
     conn.commit()
 
 
 def _remove_standards(conn):
-    conn.execute("DELETE FROM eng_standard WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM eng_standard WHERE created_by='{TAG}'")
     conn.commit()
 
 

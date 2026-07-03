@@ -200,14 +200,14 @@ QUOTES = [
 def _seed_quotes(conn):
     for customer, desc, amount, owner, date_ago, valid_days, status in QUOTES:
         if conn.execute(
-            "SELECT 1 FROM sales_quote WHERE customer=%s AND description=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_quote WHERE customer=%s AND description=%s AND created_by='{TAG}'",
             (customer, desc)
         ).fetchone():
             continue
         conn.execute(
             "INSERT INTO sales_quote"
             " (customer, description, amount, owner, quote_date, valid_until, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (customer, desc, amount, owner, _d(date_ago),
              _d(date_ago + valid_days), status),
         )
@@ -215,7 +215,7 @@ def _seed_quotes(conn):
 
 
 def _remove_quotes(conn):
-    conn.execute("DELETE FROM sales_quote WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_quote WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -239,20 +239,20 @@ TARGETS = [
 def _seed_targets(conn):
     for rep, period, target, actual, region, status in TARGETS:
         if conn.execute(
-            "SELECT 1 FROM sales_target WHERE rep=%s AND period=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_target WHERE rep=%s AND period=%s AND created_by='{TAG}'",
             (rep, period)
         ).fetchone():
             continue
         conn.execute(
             "INSERT INTO sales_target (rep, period, target, actual, region, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (rep, period, target, actual, region, status),
         )
     conn.commit()
 
 
 def _remove_targets(conn):
-    conn.execute("DELETE FROM sales_target WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_target WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -278,7 +278,7 @@ LEADS = [
 def _seed_leads(conn):
     for company, contact, source, status, priority, est_value, owner in LEADS:
         if conn.execute(
-            "SELECT 1 FROM sales_lead WHERE company=%s AND contact=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_lead WHERE company=%s AND contact=%s AND created_by='{TAG}'",
             (company, contact)
         ).fetchone():
             continue
@@ -286,7 +286,7 @@ def _seed_leads(conn):
             "INSERT INTO sales_lead"
             " (company, contact, source, status, priority, estimated_value,"
             "  owner, notes, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','seed',%s)",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}',%s)",
             (company, contact, source, status, priority, est_value, owner,
              TODAY.isoformat()),
         )
@@ -294,7 +294,7 @@ def _seed_leads(conn):
 
 
 def _remove_leads(conn):
-    conn.execute("DELETE FROM sales_lead WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_lead WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -322,7 +322,7 @@ CONTRACTS = [
 def _seed_contracts(conn):
     for customer, title, value, start_ago, end_off, status, owner in CONTRACTS:
         if conn.execute(
-            "SELECT 1 FROM sales_contract WHERE customer=%s AND title=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_contract WHERE customer=%s AND title=%s AND created_by='{TAG}'",
             (customer, title)
         ).fetchone():
             continue
@@ -330,7 +330,7 @@ def _seed_contracts(conn):
             "INSERT INTO sales_contract"
             " (customer, title, value, start_date, end_date, renewal_date,"
             "  status, owner, notes, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,%s,NULL,%s,%s,'Sample data','seed',%s)",
+            f" VALUES (%s,%s,%s,%s,%s,NULL,%s,%s,'Sample data','{TAG}',%s)",
             (customer, title, value, _d(start_ago), _d(start_ago + end_off),
              status, owner, TODAY.isoformat()),
         )
@@ -338,7 +338,7 @@ def _seed_contracts(conn):
 
 
 def _remove_contracts(conn):
-    conn.execute("DELETE FROM sales_contract WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_contract WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -361,7 +361,7 @@ FORECASTS = [
 def _seed_forecasts(conn):
     for rep, period, product_line, expected, probability, status in FORECASTS:
         if conn.execute(
-            "SELECT 1 FROM sales_forecast WHERE rep=%s AND period=%s AND product_line=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_forecast WHERE rep=%s AND period=%s AND product_line=%s AND created_by='{TAG}'",
             (rep, period, product_line)
         ).fetchone():
             continue
@@ -370,7 +370,7 @@ def _seed_forecasts(conn):
             "INSERT INTO sales_forecast"
             " (rep, period, fiscal_year, product_line, expected_value,"
             "  probability, weighted_value, status, notes, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','seed',%s)",
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}',%s)",
             (rep, period, YEAR, product_line, expected, probability, weighted,
              status, TODAY.isoformat()),
         )
@@ -378,7 +378,7 @@ def _seed_forecasts(conn):
 
 
 def _remove_forecasts(conn):
-    conn.execute("DELETE FROM sales_forecast WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_forecast WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -402,21 +402,21 @@ TERRITORIES = [
 def _seed_territories(conn):
     for name, region, rep, status in TERRITORIES:
         if conn.execute(
-            "SELECT 1 FROM sales_territory WHERE name=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_territory WHERE name=%s AND created_by='{TAG}'",
             (name,)
         ).fetchone():
             continue
         conn.execute(
             "INSERT INTO sales_territory"
             " (name, region, assigned_rep, status, notes, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,'Sample data','seed',%s)",
+            f" VALUES (%s,%s,%s,%s,'Sample data','{TAG}',%s)",
             (name, region, rep, status, TODAY.isoformat()),
         )
     conn.commit()
 
 
 def _remove_territories(conn):
-    conn.execute("DELETE FROM sales_territory WHERE created_by='seed' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_territory WHERE created_by='{TAG}' AND notes='Sample data'")
     conn.commit()
 
 
@@ -456,7 +456,7 @@ def _seed_commissions(conn):
             continue
         conn.execute(
             "INSERT INTO sales_commission_plan (name, plan_type, rate, description, active, created_by, created_date)"
-            " VALUES (%s,%s,%s,%s,TRUE,'seed',%s)",
+            f" VALUES (%s,%s,%s,%s,TRUE,'{TAG}',%s)",
             (name, plan_type, rate, desc, TODAY.isoformat()),
         )
         plan_rates[name] = rate
@@ -464,7 +464,7 @@ def _seed_commissions(conn):
 
     for rep, period, plan_name, sale_amount, status in COMMISSIONS:
         if conn.execute(
-            "SELECT 1 FROM sales_commission WHERE rep=%s AND period=%s AND created_by='seed'",
+            f"SELECT 1 FROM sales_commission WHERE rep=%s AND period=%s AND created_by='{TAG}'",
             (rep, period)
         ).fetchone():
             continue
@@ -473,15 +473,15 @@ def _seed_commissions(conn):
         conn.execute(
             "INSERT INTO sales_commission"
             " (rep, period, sales_amount, rate, commission, status, notes, created_by)"
-            " VALUES (%s,%s,%s,%s,%s,%s,'Sample data','seed')",
+            f" VALUES (%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (rep, period, sale_amount, rate, commission, status),
         )
     conn.commit()
 
 
 def _remove_commissions(conn):
-    conn.execute("DELETE FROM sales_commission WHERE created_by='seed' AND notes='Sample data'")
-    conn.execute("DELETE FROM sales_commission_plan WHERE created_by='seed'")
+    conn.execute(f"DELETE FROM sales_commission WHERE created_by='{TAG}' AND notes='Sample data'")
+    conn.execute(f"DELETE FROM sales_commission_plan WHERE created_by='{TAG}'")
     conn.commit()
 
 
