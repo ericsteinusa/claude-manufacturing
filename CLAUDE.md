@@ -82,22 +82,52 @@ manufacturing/
   PyQt6 Qt6 fonts dir). Linux uses system fontconfig and needs no fix.
 
 ## Mobile REST API (`/api/v1/`)
-Three new files add a stateless JSON API consumed by the React Native app in `mobile/`:
-- `manufacturing/api_auth.py` — `api_token` table DDL; `create_token`, `verify_token`,
-  `revoke_token`. Tokens are UUID hex strings stored in `api_token(token, people_id, created_at)`.
+A stateless JSON API consumed by the React Native app in `mobile/`. Has grown
+substantially since it was first added (esp. in the "Phase 5–7" work) — keep
+this section in sync when adding endpoints, it has gone stale before.
+- `manufacturing/api_auth.py` — `api_token` table DDL, plus:
+  - Tokens: `create_token`, `verify_token`, `refresh_token`, `revoke_token`,
+    `revoke_all_tokens`. Tokens are UUID hex strings stored in
+    `api_token(token, people_id, created_at)`.
+  - Login rate limiting: `record_login_attempt`, `is_rate_limited`,
+    `purge_old_attempts`.
+  - TOTP two-factor auth: `generate_totp_secret`, `verify_totp_code`,
+    `set_totp_secret`, `get_totp_secret`, `disable_totp`, `verify_totp_for_user`.
 - `manufacturing/api_decorators.py` — `api_ok(data)`, `api_err(msg, status)`, `@api_required`
   decorator (checks `Authorization: Bearer <token>`, injects `request.api_user` dict).
 - `manufacturing/api_views.py` — all view functions; `@csrf_exempt` throughout; reuses
   `reports_core`, `time_clock_core`, `work_orders_core`, `personnel_core`,
-  `purchase_requisitions_core` — no PyQt6, safe in web context.
-- Routes wired at `/api/v1/` in `manufacturing/urls.py` (auth, dashboard, time-clock, WOs, reqs).
+  `purchase_requisitions_core`, `approval_workflow_core`, `costing_core`,
+  `inventory_core`, `lot_core`, `maintenance_core`, `quality_core`, `routing_core`
+  — no PyQt6, safe in web context. No test coverage yet despite being Qt-free.
+- Routes wired at `/api/v1/` in `manufacturing/urls.py`:
+  - Auth: login/logout/refresh/profile.
+  - Dashboards: main (4 KPIs) + financial/production/inventory.
+  - Time clock (status/clock-in/clock-out/hours) + time-off.
+  - Work orders: list/detail/status, operations (list/start/complete), cost (get/compute).
+  - Requisitions: list/pending, add item, submit, decide.
+  - Inventory: list, receive.
+  - Quality: NCR list/detail.
+  - Maintenance: work order list/detail/complete.
+  - Approval workflow: pending steps, decide.
+  - Lots/serials: list, detail, status, expiry alerts.
+  - Workcenters/routing: list, product routing.
+  - Costing: product cost/roll/history, GL accounts.
 - **Auth**: `POST /api/v1/auth/login/` verifies against existing `passwd` table (bcrypt);
   returns a token. All other endpoints require `Authorization: Bearer <token>`.
 
 ## Mobile app (`mobile/`)
-React Native (Expo 56, expo-router) companion app. Set `EXPO_PUBLIC_API_URL` in `.env.local`.
-Screens: Login, Dashboard (4 KPI cards), Time Clock (clock in/out + hours), Work Orders
-(list + detail + status transitions), Requisitions (submit + manager approve/deny).
+React Native (expo-router) companion app. Set `EXPO_PUBLIC_API_URL` in `.env.local`.
+Installed Expo SDK is `~54.0.0` (`mobile/package.json`) — `mobile/AGENTS.md` says
+to read the v56 docs before writing code, which reads like a planned-but-not-yet-
+done upgrade; check `mobile/package.json` for the actual installed version before
+assuming either way.
+Screens under `mobile/app/(tabs)/`: Dashboard (4 KPI cards: active WOs, open POs,
+inventory alerts, CS open tickets), Time Clock (clock in/out + hours), Work Orders
+(list + detail + status transitions), Requisitions (submit + manager approve/deny),
+Approvals (pending approval-workflow steps, approve/reject), Inventory (stock levels
++ reorder alerts), Lots (lot list with qty/expiry), Maintenance (work order list +
+detail + complete), Quality (NCR list + create + detail). Plus `(auth)/login`.
 To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
 
 ## Web UI (Django) & menu routing
