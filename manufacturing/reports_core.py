@@ -110,19 +110,32 @@ def financial_dashboard(conn, as_of: str | None = None) -> dict:
     week_end = (datetime.date.fromisoformat(today)
                 + datetime.timedelta(days=7)).isoformat()
 
-    # Cash across all active bank accounts
+    # Cash across all active bank accounts (latest statement's ending balance)
     cash_row = conn.execute(
-        "SELECT COALESCE(SUM(current_balance), 0) AS cash "
-        "FROM bank_account WHERE is_active = TRUE"
+        "SELECT COALESCE(SUM(latest.ending_balance), 0) AS cash "
+        "FROM bank_account ba "
+        "JOIN LATERAL ( "
+        "    SELECT ending_balance FROM bank_statement bs "
+        "    WHERE bs.bank_account_id = ba.id "
+        "    ORDER BY bs.statement_date DESC, bs.id DESC LIMIT 1 "
+        ") latest ON TRUE "
+        "WHERE ba.is_active = 1"
     ).fetchone()
     cash_position = float(cash_row['cash'] if cash_row else 0)
 
-    # DSO / DPO (reuse accounting_core helpers via raw SQL to stay import-free)
-    ar_bal_row = conn.execute(
-        "SELECT COALESCE(SUM(amount - COALESCE(received, 0)), 0) AS b "
-        "FROM ar_invoice "
-        "WHERE status NOT IN ('paid', 'cancelled') AND amount > COALESCE(received, 0)"
-    ).fetchone()
+    # DSO / DPO. AR/AP invoices don't carry a received/paid column directly —
+    # amounts collected/disbursed live in ar_payment/ap_payment, one row per
+    # payment, so balances need a join against a per-invoice payment total.
+    ar_bal_row = conn.execute("""
+        SELECT COALESCE(SUM(i.amount - COALESCE(pay.received, 0)), 0) AS b
+        FROM ar_invoice i
+        LEFT JOIN (
+            SELECT invoice_id, SUM(amount) AS received
+            FROM ar_payment GROUP BY invoice_id
+        ) pay ON pay.invoice_id = i.id
+        WHERE i.status NOT IN ('paid', 'cancelled')
+          AND i.amount > COALESCE(pay.received, 0)
+    """).fetchone()
     rev_row = conn.execute(
         "SELECT COALESCE(SUM(amount), 0) AS r FROM ar_invoice "
         "WHERE invoice_date >= %s AND status != 'cancelled'", (year_start,)
@@ -131,11 +144,16 @@ def financial_dashboard(conn, as_of: str | None = None) -> dict:
     revenue = float(rev_row['r'] if rev_row else 0)
     dso = round(ar_bal / revenue * 365, 1) if revenue else 0.0
 
-    ap_bal_row = conn.execute(
-        "SELECT COALESCE(SUM(amount - COALESCE(paid, 0)), 0) AS b "
-        "FROM ap_invoice "
-        "WHERE status NOT IN ('paid', 'cancelled') AND amount > COALESCE(paid, 0)"
-    ).fetchone()
+    ap_bal_row = conn.execute("""
+        SELECT COALESCE(SUM(i.amount - COALESCE(pay.paid, 0)), 0) AS b
+        FROM ap_invoice i
+        LEFT JOIN (
+            SELECT invoice_id, SUM(amount) AS paid
+            FROM ap_payment GROUP BY invoice_id
+        ) pay ON pay.invoice_id = i.id
+        WHERE i.status NOT IN ('paid', 'cancelled')
+          AND i.amount > COALESCE(pay.paid, 0)
+    """).fetchone()
     purch_row = conn.execute(
         "SELECT COALESCE(SUM(amount), 0) AS p FROM ap_invoice "
         "WHERE invoice_date >= %s AND status != 'cancelled'", (year_start,)
@@ -146,10 +164,14 @@ def financial_dashboard(conn, as_of: str | None = None) -> dict:
 
     # AR aging bucket totals
     ar_aging_rows = conn.execute("""
-        SELECT amount - COALESCE(received, 0) AS balance, due_date
-        FROM ar_invoice
-        WHERE status NOT IN ('paid', 'cancelled')
-          AND amount > COALESCE(received, 0)
+        SELECT i.amount - COALESCE(pay.received, 0) AS balance, i.due_date
+        FROM ar_invoice i
+        LEFT JOIN (
+            SELECT invoice_id, SUM(amount) AS received
+            FROM ar_payment GROUP BY invoice_id
+        ) pay ON pay.invoice_id = i.id
+        WHERE i.status NOT IN ('paid', 'cancelled')
+          AND i.amount > COALESCE(pay.received, 0)
     """).fetchall()
     aging_totals = {b: 0.0 for b in
                     ('current', '1_30', '31_60', '61_90', 'over_90')}
@@ -175,13 +197,16 @@ def financial_dashboard(conn, as_of: str | None = None) -> dict:
         aging_totals[bucket] += float(r['balance'])
 
     # AP due this week
-    ap_week_row = conn.execute(
-        "SELECT COALESCE(SUM(amount - COALESCE(paid, 0)), 0) AS due "
-        "FROM ap_invoice "
-        "WHERE status NOT IN ('paid', 'cancelled') "
-        "  AND due_date BETWEEN %s AND %s",
-        (today, week_end),
-    ).fetchone()
+    ap_week_row = conn.execute("""
+        SELECT COALESCE(SUM(i.amount - COALESCE(pay.paid, 0)), 0) AS due
+        FROM ap_invoice i
+        LEFT JOIN (
+            SELECT invoice_id, SUM(amount) AS paid
+            FROM ap_payment GROUP BY invoice_id
+        ) pay ON pay.invoice_id = i.id
+        WHERE i.status NOT IN ('paid', 'cancelled')
+          AND i.due_date BETWEEN %s AND %s
+    """, (today, week_end)).fetchone()
     ap_due_week = float(ap_week_row['due'] if ap_week_row else 0)
 
     # Gross margin YTD from GL
