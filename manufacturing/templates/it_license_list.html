@@ -9,73 +9,49 @@
 <a href="/it/software/" class="btn">Software</a>
 <a href="/it/licenses/" class="btn">Licenses</a>
 <a href="/it/network/" class="btn">Network</a>
+<a href="/it/tasks/" class="btn">Tasks</a>
+<a href="/it/incidents/" class="btn">Incidents</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
 {% block extra_styles %}
-.it-wrap { width:100%; max-width:1200px; }
-.it-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
-.filter-bar select, .filter-bar input[type=text] {
-    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
-.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
-    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
-.filter-bar button:hover { background:rgb(0,60,180); color:white; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
-.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
-.list-table { width:100%; border-collapse:collapse; }
-.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
-.list-table tr:last-child td { border-bottom:none; }
-.list-table tbody tr:hover { background:#f0f4ff; }
-.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
-.list-table a:hover { text-decoration:underline; }
-.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
-.s-active    { background:#d4edda; color:#0a3622; }
-.s-expired   { background:#f8d7da; color:#721c24; }
-.s-cancelled { background:#e2e3e5; color:#383d41; }
-.seats-bar { display:flex; align-items:center; gap:6px; }
-.seats-progress { height:8px; background:#e9ecef; border-radius:4px; flex:1; min-width:60px; overflow:hidden; }
-.seats-fill { height:100%; background:rgb(0,60,180); border-radius:4px; }
-.seats-fill.warn { background:#dc3545; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .form-grid.three { grid-template-columns:1fr 1fr 1fr; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
-.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-muted); }
 .form-group input, .form-group select, .form-group textarea {
-    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
-.form-group textarea { height:60px; resize:vertical; }
+    padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; color:var(--text); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(29,111,232,.1); }
 .full-span { grid-column:1/-1; }
-.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
-    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
-.btn-submit:hover { background:rgb(0,40,140); }
-.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
-.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
-.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.seats-bar { display:flex; align-items:center; gap:6px; }
+.seats-progress { height:8px; background:#e9ecef; border-radius:4px; flex:1; min-width:60px; overflow:hidden; }
+.seats-fill { height:100%; background:var(--accent); border-radius:4px; }
+.seats-fill.warn { background:var(--danger-fg); }
 {% endblock %}
 
 {% block body %}
 <div class="content">
-<div class="it-wrap">
-    <h2>Software License Management</h2>
+    <div class="menu-title">Software License Management</div>
 
-    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
-    <form method="get" class="filter-bar">
-        <select name="status">
+    <form method="get" class="filter-bar" style="flex-wrap:wrap;">
+        <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
             <option value="">All Statuses</option>
             {% for s in license_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search software / vendor…">
-        <button type="submit">Filter</button>
-        <a href="/it/licenses/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search software / vendor…"
+               style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:200px;">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="/it/licenses/" class="btn">Clear</a>
     </form>
 
-    <div class="card">
-        <table class="list-table">
+    <div class="erp-table-wrap" style="margin-bottom:24px;">
+        <table class="erp-table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -85,7 +61,7 @@
                     <th>Seats Used / Total</th>
                     <th>Purchase Date</th>
                     <th>Expiry Date</th>
-                    <th>Cost</th>
+                    <th class="num">Cost</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -109,19 +85,23 @@
                 </td>
                 <td>{{ lic.purchase_date|default:"—" }}</td>
                 <td>{{ lic.expiry_date|default:"—" }}</td>
-                <td>${{ lic.cost|floatformat:2 }}</td>
-                <td><span class="badge s-{{ lic.status }}">{{ lic.status|capfirst }}</span></td>
+                <td class="num">${{ lic.cost|floatformat:2 }}</td>
+                <td>
+                    {% if lic.status == 'active' %}<span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{{ lic.status|capfirst }}</span>
+                    {% elif lic.status == 'expired' %}<span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{{ lic.status|capfirst }}</span>
+                    {% else %}<span class="pill" style="font-size:11px;padding:2px 8px;">{{ lic.status|capfirst }}</span>{% endif %}
+                </td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" style="color:#888;text-align:center;">No licenses found.</td></tr>
+            <tr><td colspan="9" style="color:var(--text-muted);text-align:center;padding:20px;">No licenses found.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     {% if user_role != 'Auditor' %}
-    <div class="card">
-        <h3>Add License</h3>
+    <div class="card" style="max-width:900px;">
+        <div class="card-title">Add License</div>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
@@ -178,11 +158,11 @@
                     <input type="text" name="notes" placeholder="Optional notes">
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add License</button>
+            <div style="margin-top:12px;">
+                <button type="submit" class="btn btn-primary">Add License</button>
+            </div>
         </form>
     </div>
     {% endif %}
-
-</div>
 </div>
 {% endblock %}

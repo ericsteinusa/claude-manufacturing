@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block page_title %}Incident: {{ incident.title }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/it/" class="btn">IT Dashboard</a>
+<a href="/it/incidents/" class="btn">Incidents</a>
+<a href="/it/tasks/" class="btn">Tasks</a>
+<a href="/it/network/" class="btn">Network</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-muted); }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; color:var(--text); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(29,111,232,.1); }
+.form-group textarea { height:80px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">{{ incident.title }}</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div style="margin-bottom:16px;">
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="status">
+            <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+                {% for s in incident_statuses %}
+                <option value="{{ s }}"{% if incident.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary" style="margin-left:6px;">Update Status</button>
+        </form>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update">
+        <div class="card" style="max-width:720px;">
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Title</label>
+                    <input type="text" name="title" value="{{ incident.title }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Severity</label>
+                    <select name="severity">
+                        {% for sv in incident_severities %}
+                        <option value="{{ sv }}"{% if incident.severity == sv %} selected{% endif %}>{{ sv|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reported Date</label>
+                    <input type="date" name="reported_date" value="{{ incident.reported_date|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Affected Systems</label>
+                    <input type="text" name="affected_systems" value="{{ incident.affected_systems|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Description</label>
+                    <textarea name="description">{{ incident.description|default:'' }}</textarea>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ incident.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <div class="form-actions" style="margin-top:12px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/it/incidents/" class="btn btn-cancel">Cancel</a>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="card" style="max-width:720px;">
+        <dl style="display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:13px;">
+            <dt style="color:var(--text-muted);font-weight:600;">Title</dt><dd>{{ incident.title }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Severity</dt><dd>{{ incident.severity|capfirst }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Status</dt><dd>{{ incident.status|capfirst }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Affected Systems</dt><dd>{{ incident.affected_systems|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Reported</dt><dd>{{ incident.reported_date|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Resolved</dt><dd>{{ incident.resolved_date|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Description</dt><dd style="white-space:pre-wrap;">{{ incident.description|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">Notes</dt><dd style="white-space:pre-wrap;">{{ incident.notes|default:"—" }}</dd>
+        </dl>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
