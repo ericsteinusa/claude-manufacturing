@@ -30,10 +30,64 @@ NETWORK_DEVICE_STATUSES = ('online', 'offline', 'unknown', 'maintenance')
 
 
 # ---------------------------------------------------------------------------
+# Schema bootstrapping
+# ---------------------------------------------------------------------------
+
+_CREATE_TICKET_TABLE = """
+CREATE TABLE IF NOT EXISTS it_ticket (
+    id             SERIAL PRIMARY KEY,
+    ticket_number  TEXT NOT NULL UNIQUE,
+    requester      TEXT DEFAULT '',
+    department     TEXT DEFAULT '',
+    issue_type     TEXT DEFAULT '',
+    description    TEXT DEFAULT '',
+    priority       TEXT DEFAULT 'medium',
+    assigned_to    TEXT DEFAULT '',
+    submitted_date TEXT,
+    due_date       TEXT,
+    resolved_date  TEXT,
+    status         TEXT DEFAULT 'open',
+    notes          TEXT DEFAULT '',
+    created_by     TEXT DEFAULT ''
+)
+"""
+
+_CREATE_ASSET_TABLE = """
+CREATE TABLE IF NOT EXISTS it_asset (
+    id            SERIAL PRIMARY KEY,
+    asset_tag     TEXT NOT NULL UNIQUE,
+    asset_type    TEXT DEFAULT '',
+    make          TEXT DEFAULT '',
+    model         TEXT DEFAULT '',
+    serial_number TEXT DEFAULT '',
+    assigned_to   TEXT DEFAULT '',
+    department    TEXT DEFAULT '',
+    purchase_date TEXT,
+    warranty_exp  TEXT,
+    status        TEXT DEFAULT 'active',
+    notes         TEXT DEFAULT '',
+    created_by    TEXT DEFAULT ''
+)
+"""
+
+
+def _ensure_ticket_table(conn) -> None:
+    conn.execute(_CREATE_TICKET_TABLE)
+    conn.commit()
+
+
+def _ensure_asset_table(conn) -> None:
+    conn.execute(_CREATE_ASSET_TABLE)
+    conn.commit()
+
+
+# ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
 
 def get_it_dashboard(conn) -> dict:
+    _ensure_ticket_table(conn)
+    _ensure_asset_table(conn)
     """Return dict with keys: tickets, assets, recent_tickets.
 
     tickets: {open_count, in_progress_count, critical_count, total_count}
@@ -81,6 +135,7 @@ def get_it_dashboard(conn) -> dict:
 # ---------------------------------------------------------------------------
 
 def next_ticket_number(conn) -> str:
+    _ensure_ticket_table(conn)
     yr = date.today().year
     row = conn.execute(
         "SELECT MAX(CAST(SUBSTRING(ticket_number FROM 10) AS INTEGER)) "
@@ -92,6 +147,7 @@ def next_ticket_number(conn) -> str:
 
 
 def list_tickets(conn, status=None, priority=None, search=None) -> list:
+    _ensure_ticket_table(conn)
     sql = (
         "SELECT id, ticket_number, requester, department, issue_type, "
         "priority, status, submitted_date, due_date, assigned_to "
@@ -112,6 +168,7 @@ def list_tickets(conn, status=None, priority=None, search=None) -> list:
 
 
 def get_ticket(conn, ticket_id: int) -> dict | None:
+    _ensure_ticket_table(conn)
     row = conn.execute(
         "SELECT * FROM it_ticket WHERE id = %s", (ticket_id,)
     ).fetchone()
@@ -124,6 +181,7 @@ def create_ticket(
     assigned_to: str, submitted_date: str, due_date: str,
     notes: str, created_by: str,
 ) -> int:
+    _ensure_ticket_table(conn)
     cur = conn.execute(
         "INSERT INTO it_ticket "
         "(ticket_number, requester, department, issue_type, description, "
@@ -136,6 +194,7 @@ def create_ticket(
 
 
 def update_ticket(conn, ticket_id: int, **fields) -> None:
+    _ensure_ticket_table(conn)
     allowed = {
         'requester', 'department', 'issue_type', 'description', 'priority',
         'assigned_to', 'submitted_date', 'due_date', 'resolved_date',
@@ -152,6 +211,7 @@ def update_ticket(conn, ticket_id: int, **fields) -> None:
 
 
 def set_ticket_status(conn, ticket_id: int, status: str) -> None:
+    _ensure_ticket_table(conn)
     resolved = date.today().isoformat() if status in ('resolved', 'closed') else None
     if resolved:
         conn.execute(
@@ -170,6 +230,7 @@ def set_ticket_status(conn, ticket_id: int, status: str) -> None:
 # ---------------------------------------------------------------------------
 
 def list_assets(conn, status=None, asset_type=None, search=None) -> list:
+    _ensure_asset_table(conn)
     sql = (
         "SELECT id, asset_tag, asset_type, make, model, serial_number, "
         "assigned_to, department, purchase_date, warranty_exp, status "
@@ -190,6 +251,7 @@ def list_assets(conn, status=None, asset_type=None, search=None) -> list:
 
 
 def get_asset(conn, asset_id: int) -> dict | None:
+    _ensure_asset_table(conn)
     row = conn.execute(
         "SELECT * FROM it_asset WHERE id = %s", (asset_id,)
     ).fetchone()
@@ -201,6 +263,7 @@ def create_asset(
     serial_number: str, assigned_to: str, department: str,
     purchase_date: str, warranty_exp: str, status: str, notes: str,
 ) -> int:
+    _ensure_asset_table(conn)
     cur = conn.execute(
         "INSERT INTO it_asset "
         "(asset_tag, asset_type, make, model, serial_number, assigned_to, "
@@ -213,6 +276,7 @@ def create_asset(
 
 
 def update_asset(conn, asset_id: int, **fields) -> None:
+    _ensure_asset_table(conn)
     allowed = {
         'asset_tag', 'asset_type', 'make', 'model', 'serial_number',
         'assigned_to', 'department', 'purchase_date', 'warranty_exp',
