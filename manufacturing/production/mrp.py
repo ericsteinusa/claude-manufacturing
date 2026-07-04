@@ -1,31 +1,14 @@
-"""mrp.py — Material Requirements Planning engine (read-only suggestions).
+"""mrp.py — Material Requirements Planning engine (time-phased, lead-time offsetting).
 
-PR 3 of the BOM/MRP track. Given demand, on-hand and in-flight supply, this
-nets requirements and explodes BOMs level by level to suggest **planned
-orders** — purchase suggestions for bought items, work-order suggestions for
-made items. This PR only *computes and displays* them; releasing a planned
-order into a requisition / work order is PR 4.
+Given demand from confirmed Sales Orders (bucketed by ship_date), on-hand stock,
+open POs, and open WOs, this module:
+  - Nets requirements level-by-level through the BOM
+  - Offsets each component's need date by the parent's lead time
+  - Persists planned orders with both start_date and due_date
+  - Releases buy suggestions as draft purchase requisitions, make suggestions
+    as planned work orders with BOM-exploded material lists
 
-Design notes / v1 scope (deliberate, documented boundaries):
-
-* **Quantity planning, not time-phased buckets.** Requirements are netted on
-  totals and a single ``need_date`` is recorded; weekly bucketing and
-  lead-time offset scheduling are a later refinement. ``lead_time_days`` is
-  carried on each planned order so PR 4 can derive a start date.
-* **Demand** = firm sales orders (``sales_order.status='confirmed'``). Draft
-  orders aren't firm; shipped/invoiced/cancelled are done. A forecast/MPS
-  source can be added later.
-* **Scheduled receipts** = open purchase orders (``status='sent'``, remaining
-  ``qty_ordered - qty_received``) and open work orders (``status`` in
-  planned/open/in_progress). On-hand is ``product.amount``; safety stock is
-  ``product.reorder_point``.
-* **Dependent demand** comes from the make orders this run plans (the BOM
-  explosion). Components already committed to existing open work orders are
-  assumed reflected in on-hand, not separately netted.
-
-The planning math (:func:`compute_levels`, :func:`plan_orders`) is pure so it
-can be unit tested without a database; the DB layer just gathers inputs and
-persists the result.
+Safety stock = product.reorder_point (set per product in Inventory).
 """
 
 import math
@@ -46,21 +29,19 @@ from ..qt_theme import (
 from ..accounts import get_current_user_email
 from .bom import explode_bom_to_wo
 from ..db_pg import get_db_connection
-from ..mrp_core import compute_levels, plan_orders, next_sequence_number
+from ..mrp_core import compute_levels, plan_orders, plan_orders_dated, next_sequence_number
 from ..purchase_requisitions import _next_req_num
 
-# Re-exported so callers/tests can reach the pure planning core; the
-# implementations live in mrp_core (importable without Qt).
+# Re-exported so callers/tests can reach the pure planning core.
 __all__ = ["compute_levels", "plan_orders"]
 
 
-COLOR_MAKE = "#d4edda"  # green tint
-COLOR_BUY = "#fff3cd"   # amber tint
+COLOR_MAKE = "#d4edda"
+COLOR_BUY  = "#fff3cd"
 
-# Status sets that count as live demand / in-flight supply.
 DEMAND_SO_STATUSES = ("confirmed",)
-OPEN_PO_STATUS = "sent"
-OPEN_WO_STATUSES = ("planned", "open", "in_progress")
+OPEN_PO_STATUS     = "sent"
+OPEN_WO_STATUSES   = ("planned", "open", "in_progress")
 
 
 def get_db():
@@ -70,7 +51,7 @@ def get_db():
 # ── Schema ──────────────────────────────────────────────────────────────
 
 def init_mrp_tables(conn):
-    """Create the planned-order tables (idempotent)."""
+    """Create / migrate the planned-order tables (idempotent)."""
     conn.execute("""
         CREATE TABLE IF NOT EXISTS mrp_run (
             id SERIAL PRIMARY KEY,
@@ -90,22 +71,33 @@ def init_mrp_tables(conn):
             order_type TEXT,
             qty REAL,
             need_date TEXT,
+            start_date TEXT,
             lead_time_days INTEGER DEFAULT 0,
             status TEXT DEFAULT 'suggested',
             released_ref TEXT
         )
     """)
-    # released_ref records the requisition / work-order number a suggestion
-    # was released into (added to pre-existing tables too).
     conn.execute(
         "ALTER TABLE mrp_planned_order "
         "ADD COLUMN IF NOT EXISTS released_ref TEXT")
+    conn.execute(
+        "ALTER TABLE mrp_planned_order "
+        "ADD COLUMN IF NOT EXISTS start_date TEXT")
 
 
 # ── DB input gathering ──────────────────────────────────────────────────
 
 def _gather_inputs(conn, horizon_days=None):
-    """Collect demand/supply lookups from the live tables."""
+    """Collect demand/supply lookups from the live tables.
+
+    Returns
+    -------
+    products, bom_lines, demand_dated, on_hand, scheduled, safety
+
+    ``demand_dated`` is ``{pid: [(qty, date), ...]}`` keyed by SO ship_date
+    (falls back to today + 30 when NULL). The time-phased planner uses this
+    to back-schedule component need dates via lead-time offsetting.
+    """
     products = {}
     for r in conn.execute(
         "SELECT id, COALESCE(item_type, 'buy') AS item_type, "
@@ -124,24 +116,33 @@ def _gather_inputs(conn, horizon_days=None):
         bom_lines[r["product_id"]].append(
             (r["component_id"], r["qty_required"], r["scrap_pct"]))
 
-    # Firm sales-order demand, optionally limited to the horizon by ship date.
+    # Demand bucketed by SO ship_date for time-phased planning.
+    fallback = (date.today() + timedelta(days=30)).isoformat()
     placeholders = ",".join(["%s"] * len(DEMAND_SO_STATUSES))
     demand_sql = (
-        "SELECT si.product_id AS pid, SUM(si.qty) AS qty "
+        "SELECT si.product_id AS pid, SUM(si.qty) AS qty, "
+        f"COALESCE(so.ship_date, %s) AS need_date "
         "FROM so_item si JOIN sales_order so ON so.id = si.so_id "
         f"WHERE so.status IN ({placeholders}) AND si.product_id IS NOT NULL"
     )
-    params: list[str] = list(DEMAND_SO_STATUSES)
+    params: list = [fallback] + list(DEMAND_SO_STATUSES)
     if horizon_days is not None:
         cutoff = (date.today() + timedelta(days=horizon_days)).isoformat()
         demand_sql += " AND (so.ship_date IS NULL OR so.ship_date <= %s)"
         params.append(cutoff)
-    demand_sql += " GROUP BY si.product_id"
-    demand = {r["pid"]: float(r["qty"] or 0)
-              for r in conn.execute(demand_sql, params).fetchall()}
+    demand_sql += " GROUP BY si.product_id, need_date"
+
+    demand_dated: dict = {}
+    for r in conn.execute(demand_sql, params).fetchall():
+        nd = r["need_date"]
+        if isinstance(nd, str):
+            nd = date.fromisoformat(nd)
+        demand_dated.setdefault(r["pid"], []).append(
+            (float(r["qty"] or 0), nd))
 
     on_hand = {r["id"]: float(r["amount"] or 0) for r in conn.execute(
         "SELECT id, COALESCE(amount, 0) AS amount FROM product").fetchall()}
+
     safety = {r["id"]: float(r["reorder_point"] or 0) for r in conn.execute(
         "SELECT id, COALESCE(reorder_point, 0) AS reorder_point "
         "FROM product").fetchall()}
@@ -163,38 +164,40 @@ def _gather_inputs(conn, horizon_days=None):
     ).fetchall():
         scheduled[r["pid"]] += float(r["q"] or 0)
 
-    return products, bom_lines, demand, on_hand, dict(scheduled), safety
+    return products, bom_lines, demand_dated, on_hand, dict(scheduled), safety
 
 
 def run_mrp(horizon_days=None, notes="", created_by=None):
-    """Run MRP against the live tables and persist a planned-order set.
+    """Run time-phased MRP against the live tables and persist a planned-order set.
 
     Returns ``(run_id, planned_count)``.
+    Each planned order stores both ``start_date`` (when to begin) and
+    ``need_date`` (due date = when the parent needs it).
     """
     conn = get_db()
     try:
         init_mrp_tables(conn)
-        products, bom_lines, demand, on_hand, scheduled, safety = \
+        products, bom_lines, demand_dated, on_hand, scheduled, safety = \
             _gather_inputs(conn, horizon_days)
-        planned = plan_orders(products, bom_lines, demand, on_hand,
-                              scheduled, safety)
+        planned = plan_orders_dated(
+            products, bom_lines, demand_dated, on_hand, scheduled, safety)
+
         run_date = date.today().isoformat()
         cur = conn.execute(
             "INSERT INTO mrp_run (run_date, horizon_days, notes, created_by) "
             "VALUES (%s, %s, %s, %s) RETURNING id",
             (run_date, horizon_days, notes, created_by))
         run_id = cur.fetchone()["id"]
-        # v1: a single need date (today). Time-phasing is a later refinement;
-        # lead_time_days is carried so PR 4 can derive a start date.
-        need = run_date
+
         for po in planned:
             conn.execute(
                 "INSERT INTO mrp_planned_order "
                 "(run_id, product_id, order_type, qty, need_date, "
-                "lead_time_days, status) "
-                "VALUES (%s,%s,%s,%s,%s,%s,'suggested')",
+                "start_date, lead_time_days, status) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,'suggested')",
                 (run_id, po["product_id"], po["order_type"],
-                 po["qty"], need, po["lead_time_days"]))
+                 po["qty"], po["due_date"], po["start_date"],
+                 po["lead_time_days"]))
         conn.commit()
         return run_id, len(planned)
     finally:
@@ -209,10 +212,11 @@ def get_latest_run(conn):
 def get_planned_orders(conn, run_id):
     return conn.execute(
         "SELECT po.id, po.product_id, p.name AS product_name, "
-        "p.uom, po.order_type, po.qty, po.need_date, po.lead_time_days, "
-        "po.status, po.released_ref FROM mrp_planned_order po "
+        "p.uom, po.order_type, po.qty, po.need_date, po.start_date, "
+        "po.lead_time_days, po.status, po.released_ref "
+        "FROM mrp_planned_order po "
         "JOIN product p ON p.id = po.product_id "
-        "WHERE po.run_id = %s ORDER BY po.order_type, p.name",
+        "WHERE po.run_id = %s ORDER BY po.start_date ASC NULLS LAST, p.name",
         (run_id,)).fetchall()
 
 
@@ -221,18 +225,10 @@ def get_planned_orders(conn, run_id):
 def release_planned_orders(order_ids):
     """Turn suggested planned orders into real requisitions / work orders.
 
-    Buy suggestions are collected into a single draft purchase requisition
-    (which then flows through the existing department → purchasing approval →
-    PO chain). Each make suggestion becomes its own work order, whose material
-    list is auto-exploded from the BOM (see :func:`bom.explode_bom_to_wo`).
-
-    Only orders still in 'suggested' status are acted on; already-released
-    ones are skipped. Returns a summary dict::
-
-        {'requisition': req_number|None, 'work_orders': [wo_number, ...],
-         'released': n, 'skipped': n}
-
-    Integer order systems: fractional planned quantities are rounded up.
+    Buy suggestions → single draft purchase requisition.
+    Make suggestions → individual planned work orders (BOM-exploded).
+    Returns ``{'requisition': req_number|None, 'work_orders': [...],
+               'released': n, 'skipped': n}``.
     """
     if not order_ids:
         return {"requisition": None, "work_orders": [], "released": 0,
@@ -241,19 +237,18 @@ def release_planned_orders(order_ids):
     try:
         rows = conn.execute(
             "SELECT po.id, po.product_id, po.order_type, po.qty, po.status, "
-            "po.lead_time_days, p.name AS product_name, "
+            "po.lead_time_days, po.start_date, po.need_date, "
+            "p.name AS product_name, "
             "COALESCE(p.purchase_price, 0) AS price "
             "FROM mrp_planned_order po JOIN product p ON p.id = po.product_id "
             "WHERE po.id = ANY(%s)", (list(order_ids),)
         ).fetchall()
         actionable = [r for r in rows if r["status"] == "suggested"]
         skipped = len(rows) - len(actionable)
-        buys = [r for r in actionable if r["order_type"] == "buy"]
+        buys  = [r for r in actionable if r["order_type"] == "buy"]
         makes = [r for r in actionable if r["order_type"] == "make"]
 
-        req_number = None
-        if buys:
-            req_number = _create_requisition(conn, buys)
+        req_number  = _create_requisition(conn, buys) if buys else None
         work_orders = [_create_work_order(conn, r) for r in makes]
 
         conn.commit()
@@ -264,7 +259,6 @@ def release_planned_orders(order_ids):
 
 
 def _create_requisition(conn, buys):
-    """Create one draft requisition holding all the buy lines."""
     req_number = _next_req_num(conn)
     today = date.today().isoformat()
     dept = conn.execute(
@@ -292,13 +286,6 @@ def _create_requisition(conn, buys):
 
 
 def _next_wo_number(conn):
-    """Next WO number, computed on the *transaction's* connection.
-
-    Reusing the release connection means WOs inserted earlier in the same
-    (uncommitted) transaction are visible, so releasing several make
-    suggestions at once yields distinct numbers instead of colliding on the
-    first — which a fresh-connection COUNT(*) would.
-    """
     prefix = f"WO-{date.today().year}-"
     rows = conn.execute(
         "SELECT wo_number FROM work_order WHERE wo_number LIKE %s",
@@ -307,17 +294,22 @@ def _next_wo_number(conn):
 
 
 def _create_work_order(conn, row):
-    """Create one planned work order for a make suggestion and explode it."""
+    """Create a planned work order using the MRP-computed start and due dates."""
     wo_number = _next_wo_number(conn)
-    today = date.today()
-    due = (today + timedelta(days=row["lead_time_days"] or 0)).isoformat()
+    today = date.today().isoformat()
+
+    # Use planned dates when available; fall back to today + lead time.
+    start = row["start_date"] or today
+    due   = row["need_date"] or (
+        date.today() + timedelta(days=row["lead_time_days"] or 0)).isoformat()
+
     qty = int(math.ceil(row["qty"]))
     cur = conn.execute(
         "INSERT INTO work_order (wo_number, product_id, description, "
         "quantity, start_date, due_date, status, notes, created_by) "
         "VALUES (%s,%s,%s,%s,%s,%s,'planned',%s,%s) RETURNING id",
         (wo_number, row["product_id"], row["product_name"], qty,
-         today.isoformat(), due, "Generated by MRP",
+         start, due, "Generated by MRP",
          get_current_user_email() or None))
     wo_id = cur.fetchone()["id"]
     explode_bom_to_wo(conn, wo_id, row["product_id"], qty)
@@ -327,8 +319,7 @@ def _create_work_order(conn, row):
     return wo_number
 
 
-# ── Read-only results view ──────────────────────────────────────────────
-
+# ── Qt widget ───────────────────────────────────────────────────────────
 
 class MrpWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -354,7 +345,7 @@ class MrpWidget(QtWidgets.QWidget):
         top.addWidget(lbl_h)
         self.horizon = QtWidgets.QSpinBox()
         self.horizon.setRange(1, 3650)
-        self.horizon.setValue(30)
+        self.horizon.setValue(90)
         self.horizon.setSuffix(" days")
         self.horizon.setStyleSheet(INPUT_STYLE)
         top.addWidget(self.horizon)
@@ -378,14 +369,15 @@ class MrpWidget(QtWidgets.QWidget):
         v.addLayout(top)
 
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(7)
-        self.table.setHorizontalHeaderLabels(
-            ["Product", "Order Type", "Suggested Qty", "UoM",
-             "Lead Time", "Status", "Released As"])
+        self.table.setColumnCount(8)
+        self.table.setHorizontalHeaderLabels([
+            "Product", "Order Type", "Qty", "UoM",
+            "Lead Time", "Start Date", "Due Date", "Status",
+        ])
         hh = self.table.horizontalHeader()
         hh.setStyleSheet("color: black; font-weight: bold;")
         hh.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        for c in range(1, 7):
+        for c in range(1, 8):
             hh.setSectionResizeMode(
                 c, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.table.setEditTriggers(
@@ -399,10 +391,11 @@ class MrpWidget(QtWidgets.QWidget):
         v.addWidget(self.table, stretch=1)
 
         hint = QtWidgets.QLabel(
-            "Select one or more suggested rows and click Release Selected: "
-            "buy lines become a draft purchase requisition, make lines "
-            "become planned work orders (materials auto-exploded from the "
-            "BOM). Already-released rows are skipped.")
+            "Rows are sorted by Start Date — earliest actions first. "
+            "Select rows and click Release Selected: buy lines become a "
+            "draft purchase requisition; make lines become planned work "
+            "orders with BOM-exploded materials. Already-released rows "
+            "are skipped.")
         hint.setStyleSheet("color: white; font-style: italic;")
         hint.setWordWrap(True)
         v.addWidget(hint)
@@ -412,7 +405,7 @@ class MrpWidget(QtWidgets.QWidget):
         try:
             run_id, count = run_mrp(self.horizon.value(),
                                     created_by=email or None)
-        except Exception as exc:  # surface DB/query errors to the user
+        except Exception as exc:
             QtWidgets.QMessageBox.critical(self, "MRP Error", str(exc))
             return
         by = f" by {email}" if email else ""
@@ -444,19 +437,19 @@ class MrpWidget(QtWidgets.QWidget):
             r = self.table.rowCount()
             self.table.insertRow(r)
             self._row_ids.append((row["id"], row["status"]))
-            order_type = (row["order_type"] or "").capitalize()
             status = (row["status"] or "").capitalize()
+            lt = row["lead_time_days"] or 0
             self.table.setItem(r, 0, _ro(row["product_name"] or ""))
-            self.table.setItem(r, 1, _ro(order_type))
+            self.table.setItem(r, 1, _ro((row["order_type"] or "").capitalize()))
             self.table.setItem(r, 2, _ro(f"{row['qty']:g}"))
             self.table.setItem(r, 3, _ro(row["uom"] or "ea"))
-            self.table.setItem(
-                r, 4, _ro(f"{row['lead_time_days'] or 0} d"))
-            self.table.setItem(r, 5, _ro(status))
-            self.table.setItem(r, 6, _ro(row["released_ref"] or ""))
+            self.table.setItem(r, 4, _ro(f"{lt} d" if lt else "—"))
+            self.table.setItem(r, 5, _ro(row["start_date"] or "—"))
+            self.table.setItem(r, 6, _ro(row["need_date"] or "—"))
+            self.table.setItem(r, 7, _ro(status))
             bg = QtGui.QColor(
                 COLOR_MAKE if row["order_type"] == "make" else COLOR_BUY)
-            for c in range(7):
+            for c in range(8):
                 self.table.item(r, c).setBackground(bg)
 
     def _on_release(self):
@@ -481,8 +474,7 @@ class MrpWidget(QtWidgets.QWidget):
         if summary["requisition"]:
             parts.append(f"Requisition {summary['requisition']}")
         if summary["work_orders"]:
-            parts.append("Work orders: "
-                         + ", ".join(summary["work_orders"]))
+            parts.append("Work orders: " + ", ".join(summary["work_orders"]))
         if summary["skipped"]:
             parts.append(f"{summary['skipped']} already-released skipped")
         QtWidgets.QMessageBox.information(

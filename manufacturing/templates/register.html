@@ -3,55 +3,29 @@
 {% block page_title %}Register New User{% endblock %}
 
 {% block extra_styles %}
-        body { padding: 30px 0; }
-        .card { width: 540px; padding: 36px 48px; }
-        .form-row { margin-bottom: 14px; }
-        .form-row label { width: 110px; }
-        .btn-row { margin-top: 18px; }
-        .name-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-        .name-row .field {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-        .name-row .field label {
-            color: white;
-            font-size: 13px;
-            width: 80px;
-            flex-shrink: 0;
-        }
-        .name-row .field input {
-            flex: 1;
-            background-color: white;
-            border: 2px solid black;
-            border-radius: 4px;
-            padding: 6px 10px;
-            font-size: 13px;
-        }
-        .name-row .field input:focus {
-            outline: none;
-            border-color: rgb(85, 255, 255);
-        }
-        .csz-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 14px;
-            align-items: center;
-        }
-        .csz-row label { color: white; font-size: 13px; flex-shrink: 0; }
-        .csz-row input { background-color: white; border: 2px solid black; border-radius: 4px; padding: 6px 10px; font-size: 13px; }
-        .csz-row input:focus { outline: none; border-color: rgb(85, 255, 255); }
-        .csz-row .city  { flex: 1; }
-        .csz-row .state { width: 44px; }
-        .csz-row .zip   { width: 88px; }
+.card { width: min(540px, 100%); padding: 36px 48px; }
+@media (max-width: 600px) {
+    .card { padding: 24px 18px; }
+    .name-row { flex-direction: column; }
+    .csz-row { flex-wrap: wrap; }
+    .csz-row .state, .csz-row .zip { width: auto; flex: 1; }
+}
+.name-row { display: flex; gap: 12px; margin-bottom: 14px; }
+.name-row .field { display: flex; flex-direction: column; flex: 1; gap: 4px; }
+.csz-row { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-end; }
+.csz-row .city  { flex: 1; }
+.csz-row .state { width: 56px; }
+.csz-row .zip   { width: 96px; }
+.csz-label { font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .4px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+.csz-input { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
+    border-radius: 6px; font-size: 14px; }
+.csz-input:focus { outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(29,111,232,.12); }
 {% endblock %}
 
 {% block card_content %}
-<h1>Register New Employee</h1>
+<h2 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:20px;">Register New Employee</h2>
 
 {% if error %}
 <div class="error-msg">{{ error }}</div>
@@ -62,59 +36,65 @@
 
     <div class="name-row">
         <div class="field">
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name"
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);">First Name</label>
+            <input type="text" name="first_name" class="csz-input"
                    placeholder="First name" value="{{ form.first_name }}" required autofocus>
         </div>
         <div class="field">
-            <label for="last_name" style="width:90px;">Last Name:</label>
-            <input type="text" id="last_name" name="last_name"
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);">Last Name</label>
+            <input type="text" name="last_name" class="csz-input"
                    placeholder="Last name" value="{{ form.last_name }}" required>
         </div>
     </div>
 
     <div class="form-row">
-        <label for="employee_id">Employee ID:</label>
-        <input type="text" id="employee_id" name="employee_id"
+        <label>Employee ID</label>
+        <input type="text" name="employee_id"
                placeholder="Numbers only (optional)" value="{{ form.employee_id }}">
     </div>
 
     <div class="form-row">
-        <label for="address">Address:</label>
-        <input type="text" id="address" name="address"
+        <label>Address</label>
+        <input type="text" name="address"
                placeholder="Street address" value="{{ form.address }}">
     </div>
 
     <div class="csz-row">
-        <label>City:</label>
-        <input class="city" type="text" name="city" placeholder="City" value="{{ form.city }}">
-        <label>State:</label>
-        <input class="state" type="text" name="state" placeholder="ST" maxlength="2" value="{{ form.state }}">
-        <label>Zip:</label>
-        <input class="zip" type="text" name="zip_code" placeholder="Zip" maxlength="10" value="{{ form.zip_code }}">
+        <div class="city">
+            <span class="csz-label">City</span>
+            <input type="text" name="city" class="csz-input" placeholder="City" value="{{ form.city }}">
+        </div>
+        <div class="state">
+            <span class="csz-label">State</span>
+            <input type="text" name="state" class="csz-input" placeholder="ST" maxlength="2" value="{{ form.state }}">
+        </div>
+        <div class="zip">
+            <span class="csz-label">Zip</span>
+            <input type="text" name="zip_code" class="csz-input" placeholder="Zip" maxlength="10" value="{{ form.zip_code }}">
+        </div>
     </div>
 
     <div class="form-row">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email"
+        <label>Email</label>
+        <input type="email" name="email"
                placeholder="Email address" value="{{ form.email }}" required>
     </div>
 
     <div class="form-row">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"
+        <label>Password</label>
+        <input type="password" name="password"
                placeholder="Minimum 8 characters" required>
     </div>
 
     <div class="form-row">
-        <label for="confirm">Confirm:</label>
-        <input type="password" id="confirm" name="confirm"
+        <label>Confirm</label>
+        <input type="password" name="confirm"
                placeholder="Re-enter password" required>
     </div>
 
     <div class="btn-row">
         <button type="submit" class="btn">Register</button>
-        <a href="{% url 'home' %}" style="flex:1; text-decoration:none;">
+        <a href="{% url 'home' %}" style="flex:1;text-decoration:none;">
             <button type="button" class="btn btn-cancel" style="width:100%;">Cancel</button>
         </a>
     </div>

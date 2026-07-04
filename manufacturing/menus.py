@@ -575,7 +575,6 @@ _PERS_MENU = {
 _CS_MENU = {
     'title': 'Customer Service Menu',
     'items': [
-        ('cs_calls', 'Customer Service Calls', 'customer_service/cs_calls.py'),
         ('cust_entry', 'Customer Entry Screen', 'customers/customer_entry.py'),
         ('open_tickets', 'Open Tickets', {
             'title': 'Open Tickets',
@@ -637,7 +636,6 @@ _CS_MENU = {
 _IT_TECH = {
     'title': 'IT Technician',
     'items': [
-        ('it_calls', 'IT Support Calls', 'it/it_calls.py'),
         ('it_tasks', 'IT Tasks', 'it/IT_Tasks.py'),
         ('help_desk', 'Help Desk Tickets', {
             'title': 'Help Desk Tickets',
@@ -918,7 +916,6 @@ MENU_TREE = {
                 ],
             }),
             ('cs_menu', 'Customer Service Menu', _CS_MENU),
-            ('cs_calls', 'Customer Service Calls', 'customer_service/cs_calls.py'),
         ],
     },
     'engineering': {

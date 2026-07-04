@@ -31,7 +31,7 @@ from ..bom_web_core import (
 )
 from ..mrp_web_core import (
     get_demand_details, get_scheduled_receipts_detail,
-    run_mrp, release_plan as mrp_release_plan,
+    run_mrp, run_mrp_dated, release_plan as mrp_release_plan,
 )
 from ..inventory_core import (
     TRANS_TYPES,
@@ -3245,7 +3245,10 @@ def mrp_home(request):
     # Annotate each demand row with scheduled receipts and net requirement.
     for row in demand_rows:
         row['scheduled'] = scheduled.get(row['id'], 0.0)
-        row['net'] = max(0.0, row['demand_qty'] - row['on_hand'] - row['scheduled'])
+        row['net'] = max(0.0,
+            row['demand_qty'] + row['safety_stock']
+            - row['on_hand'] - row['scheduled']
+        )
 
     has_plan = 'mrp_plan' in request.session and bool(request.session['mrp_plan'])
     return render(request, 'mrp_home.html', _mrp_context(
@@ -3262,7 +3265,7 @@ def mrp_run(request):
 
     conn = get_db_connection()
     try:
-        plan = run_mrp(conn)
+        plan = run_mrp_dated(conn)
     finally:
         conn.close()
 
@@ -3341,6 +3344,57 @@ def mrp_release(request):
         request,
         created_wos=created_wos,
         created_pos=created_pos,
+    ))
+
+
+@dept_required(_MRP_DEPT_KEYS, write_redirect='mrp_safety_stock')
+def mrp_safety_stock(request):
+    """GET: show all products with their safety stock (reorder_point).
+    POST: bulk-save the submitted values.
+    """
+    conn = get_db_connection()
+    saved = False
+    error = None
+
+    try:
+        if request.method == 'POST':
+            rows = conn.execute(
+                "SELECT id FROM product ORDER BY name"
+            ).fetchall()
+            for r in rows:
+                pid = r['id']
+                raw = request.POST.get(f'ss_{pid}', '').strip()
+                try:
+                    val = max(0.0, float(raw)) if raw else 0.0
+                except ValueError:
+                    continue
+                conn.execute(
+                    "UPDATE product SET reorder_point=%s WHERE id=%s",
+                    (val, pid),
+                )
+            conn.commit()
+            saved = True
+
+        products = conn.execute(
+            "SELECT id, name, "
+            "COALESCE(item_type, 'buy') AS item_type, "
+            "COALESCE(lead_time_days, 0) AS lead_time_days, "
+            "COALESCE(amount, 0) AS on_hand, "
+            "COALESCE(reorder_point, 0) AS safety_stock "
+            "FROM product ORDER BY name"
+        ).fetchall()
+    except Exception as exc:
+        conn.rollback()
+        error = str(exc)
+        products = []
+    finally:
+        conn.close()
+
+    return render(request, 'mrp_safety_stock.html', _mrp_context(
+        request,
+        products=products,
+        saved=saved,
+        error=error,
     ))
 
 

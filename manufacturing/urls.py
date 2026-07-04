@@ -84,6 +84,7 @@ urlpatterns = [
     path('mrp/run/', views.mrp_run, name='mrp_run'),
     path('mrp/plan/', views.mrp_plan, name='mrp_plan'),
     path('mrp/release/', views.mrp_release, name='mrp_release'),
+    path('mrp/safety-stock/', views.mrp_safety_stock, name='mrp_safety_stock'),
     path('inventory/', views.inventory_list, name='inventory_list'),
     path('inventory/new/', views.inventory_new, name='inventory_new'),
     path('inventory/<int:product_id>/', views.inventory_detail,

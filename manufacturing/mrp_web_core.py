@@ -12,7 +12,7 @@ Workflow
 
 from datetime import date, timedelta
 
-from .mrp_core import plan_orders
+from .mrp_core import plan_orders, plan_orders_dated
 from .bom_core import explode_quantity
 from .work_orders_core import next_wo_number, create_wo
 from .purchase_orders_core import next_po_number, create_po, add_po_item
@@ -41,12 +41,13 @@ def load_mrp_inputs(conn):
         "SELECT id, name, "
         "COALESCE(item_type, 'buy') AS item_type, "
         "COALESCE(lead_time_days, 0) AS lead_time_days, "
-        "COALESCE(amount, 0) AS amount "
+        "COALESCE(amount, 0) AS amount, "
+        "COALESCE(reorder_point, 0) AS safety_stock "
         "FROM product"
     ).fetchall()
     products = {r['id']: dict(r) for r in rows}
     on_hand = {pid: p['amount'] for pid, p in products.items()}
-    safety = {pid: 0.0 for pid in products}
+    safety = {pid: float(p['safety_stock']) for pid, p in products.items()}
 
     bom_rows = conn.execute(
         "SELECT product_id, component_id, "
@@ -93,6 +94,7 @@ def get_demand_details(conn) -> list[dict]:
         "SELECT p.id, p.name, "
         "COALESCE(p.item_type, 'buy') AS item_type, "
         "COALESCE(p.amount, 0) AS on_hand, "
+        "COALESCE(p.reorder_point, 0) AS safety_stock, "
         "SUM(si.qty) AS demand_qty, "
         "STRING_AGG(so.so_number, ', ' ORDER BY so.so_number) AS so_numbers "
         "FROM so_item si "
@@ -119,6 +121,59 @@ def get_scheduled_receipts_detail(conn) -> dict:
 # ---------------------------------------------------------------------------
 # MRP run
 # ---------------------------------------------------------------------------
+
+def get_demand_dated(conn) -> dict:
+    """Gross demand from confirmed SOs keyed by (product_id, ship_date).
+
+    Returns ``{pid: [(qty, date), ...]}`` where date is the SO ship_date
+    (falls back to 30 days from today when ship_date is NULL).
+    """
+    fallback = (date.today() + timedelta(days=30)).isoformat()
+    rows = conn.execute(
+        "SELECT si.product_id, SUM(si.qty) AS total, "
+        "COALESCE(so.ship_date, %s) AS need_date "
+        "FROM so_item si "
+        "JOIN sales_order so ON so.id = si.so_id "
+        "WHERE so.status = 'confirmed' AND si.product_id IS NOT NULL "
+        "GROUP BY si.product_id, need_date",
+        (fallback,),
+    ).fetchall()
+    result: dict = {}
+    for r in rows:
+        need_date = date.fromisoformat(r['need_date']) if isinstance(r['need_date'], str) else r['need_date']
+        result.setdefault(r['product_id'], []).append((float(r['total']), need_date))
+    return result
+
+
+def run_mrp_dated(conn) -> list[dict]:
+    """Time-phased MRP run — returns planned orders with start_date and due_date.
+
+    Each row has:
+        product_id, product_name, order_type ('make'|'buy'),
+        qty, lead_time_days, start_date (ISO), due_date (ISO)
+    Sorted by start_date ascending so the earliest actions appear first.
+    """
+    products_raw, bom_lines, on_hand, scheduled, safety = load_mrp_inputs(conn)
+    demand_dated = get_demand_dated(conn)
+
+    products_slim = {
+        pid: {'item_type': p['item_type'], 'lead_time_days': p['lead_time_days']}
+        for pid, p in products_raw.items()
+    }
+
+    planned = plan_orders_dated(
+        products_slim, bom_lines, demand_dated, on_hand, scheduled, safety
+    )
+
+    name_map = {pid: p['name'] for pid, p in products_raw.items()}
+    for item in planned:
+        item['product_name'] = name_map.get(item['product_id'],
+                                            f"Product {item['product_id']}")
+
+    log.info("MRP dated run: %d planned orders (demand products: %d)",
+             len(planned), len(demand_dated))
+    return planned
+
 
 def run_mrp(conn) -> list[dict]:
     """Execute a full MRP planning run and return enriched planned orders.

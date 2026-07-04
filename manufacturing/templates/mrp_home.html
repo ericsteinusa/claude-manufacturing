@@ -3,6 +3,7 @@
 
 {% block toolbar_left %}
 <a href="/dashboard/" class="btn">Home</a>
+<a href="/mrp/safety-stock/" class="btn">Safety Stock</a>
 {% if has_plan %}
 <a href="/mrp/plan/" class="btn">View Current Plan</a>
 {% endif %}
@@ -11,15 +12,15 @@
 {% block extra_styles %}
 .mrp-wrap { width: 100%; max-width: 1040px; }
 .mrp-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
-.mrp-wrap p.sub { color: #cce; font-size: 13px; margin-bottom: 18px; }
+.mrp-wrap p.sub { color: var(--text-muted); font-size: 13px; margin-bottom: 18px; }
 .info-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 6px; padding: 12px 18px; margin-bottom: 18px; color: #cce; font-size: 13px; }
+    border-radius: 6px; padding: 12px 18px; margin-bottom: 18px; color: var(--text-muted); font-size: 13px; }
 .info-card strong { color: white; }
 .mrp-table { width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
 .mrp-table th, .mrp-table td { padding: 8px 12px; text-align: left;
     border-bottom: 1px solid #ddd; font-size: 13px; }
-.mrp-table th { background: rgb(0,60,180); color: white; }
+.mrp-table th { background: var(--accent); color: white; }
 .mrp-table tr:last-child td { border-bottom: none; }
 .mrp-table td.num, .mrp-table th.num { text-align: right; }
 .mrp-table tr:hover td { background: #f0f4ff; }
@@ -29,11 +30,11 @@
 .badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
 .need-high  { color: #c00; font-weight: bold; }
 .need-zero  { color: #aaa; }
-.run-btn { display: inline-block; padding: 10px 28px; background: rgb(0,60,180);
+.run-btn { display: inline-block; padding: 10px 28px; background: var(--accent);
     color: white; border: none; border-radius: 6px; font-size: 15px;
     font-weight: bold; cursor: pointer; margin-top: 4px; }
-.run-btn:hover { background: rgb(0,40,140); }
-.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+.run-btn:hover { background: var(--accent-hover); }
+.empty-note { color: var(--text-muted); font-size: 14px; margin-top: 20px; }
 {% endblock %}
 
 {% block body %}
@@ -45,7 +46,10 @@
     <div class="info-card">
         <strong>Demand source:</strong> Confirmed Sales Orders &nbsp;|&nbsp;
         <strong>Scheduled receipts:</strong> Open / In-Progress Work Orders &nbsp;|&nbsp;
-        <strong>Safety stock:</strong> None (extend in settings)
+        <strong>Safety stock:</strong> Reorder Point per product
+        <span style="color:rgba(255,255,255,.45);font-size:11px;margin-left:8px;">
+            (set on each product's inventory record)
+        </span>
     </div>
 
     {% if demand_rows %}
@@ -55,6 +59,7 @@
                 <th>Product</th>
                 <th>Type</th>
                 <th class="num">Demand (SOs)</th>
+                <th class="num">Safety Stock</th>
                 <th class="num">On Hand</th>
                 <th class="num">Open WOs</th>
                 <th class="num">Net Need</th>
@@ -64,10 +69,11 @@
         <tbody>
             {% for row in demand_rows %}
             <tr>
-                <td><a href="/bom/{{ row.id }}/" style="color:rgb(0,60,180);font-weight:bold;">
+                <td><a href="/bom/{{ row.id }}/" style="color:var(--accent);font-weight:bold;">
                     {{ row.name }}</a></td>
                 <td><span class="badge badge-{{ row.item_type }}">{{ row.item_type|capfirst }}</span></td>
                 <td class="num">{{ row.demand_qty|floatformat:0 }}</td>
+                <td class="num">{{ row.safety_stock|floatformat:0 }}</td>
                 <td class="num">{{ row.on_hand|floatformat:0 }}</td>
                 <td class="num">{{ row.scheduled|floatformat:0 }}</td>
                 <td class="num">
@@ -88,7 +94,7 @@
         {% csrf_token %}
         <button type="submit" class="run-btn">Run MRP Plan &rarr;</button>
     </form>
-    <p style="color:#aac;font-size:12px;margin-top:8px;">
+    <p style="color: var(--text-muted);font-size:12px;margin-top:8px;">
         Running the plan explodes all confirmed SO demand through the BOM,
         nets against on-hand stock and open WOs, and computes planned orders.
     </p>

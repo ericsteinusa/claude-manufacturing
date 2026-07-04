@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block page_title %}Safety Stock Settings{% endblock %}
+
+{% block toolbar_left %}
+<a href="/mrp/" class="btn">MRP Home</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ss-wrap { max-width: 860px; }
+.ss-input {
+    width: 90px; padding: 5px 8px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; color: var(--text); text-align: right;
+    background: var(--card-bg);
+    transition: border-color .15s, box-shadow .15s;
+}
+.ss-input:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(29,111,232,.12);
+}
+.ss-input::-webkit-inner-spin-button { opacity: 1; }
+.lt-badge {
+    display: inline-block; padding: 1px 8px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+    background: var(--info-bg); color: var(--info-fg); border: 1px solid #bfdbfe;
+}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ss-wrap">
+    <div class="menu-title">Safety Stock Settings</div>
+    <p class="page-subtitle">
+        Set the minimum on-hand buffer MRP must maintain after fulfilling demand.
+        Uses each product's <strong>Reorder Point</strong> value.
+    </p>
+
+    {% if saved %}
+    <div class="alert alert-success" style="max-width:860px;">Safety stock values saved successfully.</div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger" style="max-width:860px;">{{ error }}</div>
+    {% endif %}
+
+    {% if can_edit %}
+    <form method="post" action="/mrp/safety-stock/">
+        {% csrf_token %}
+    {% endif %}
+
+        <div class="erp-table-wrap ss-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th class="num">Lead Time</th>
+                        <th class="num">On Hand</th>
+                        <th class="num">Safety Stock</th>
+                        {% if can_edit %}<th></th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for p in products %}
+                <tr>
+                    <td><a href="/inventory/{{ p.id }}/">{{ p.name }}</a></td>
+                    <td><span class="pill pill-info" style="font-size:11px;">{{ p.item_type|capfirst }}</span></td>
+                    <td class="num">
+                        {% if p.lead_time_days %}
+                        <span class="lt-badge">{{ p.lead_time_days }} d</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="num">{{ p.on_hand|floatformat:0 }}</td>
+                    <td class="num">
+                        {% if can_edit %}
+                        <input type="number" name="ss_{{ p.id }}" class="ss-input"
+                               value="{{ p.safety_stock|floatformat:0 }}"
+                               min="0" step="1" placeholder="0">
+                        {% else %}
+                        {{ p.safety_stock|floatformat:0 }}
+                        {% endif %}
+                    </td>
+                    {% if can_edit %}<td></td>{% endif %}
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="empty-state">No products found.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% if can_edit %}
+        <div class="form-actions" style="max-width:860px;margin-top:16px;">
+            <button type="submit" class="btn btn-primary" style="padding:8px 24px;font-size:13px;">
+                Save All
+            </button>
+            <a href="/mrp/" class="btn btn-cancel">Cancel</a>
+        </div>
+    </form>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
