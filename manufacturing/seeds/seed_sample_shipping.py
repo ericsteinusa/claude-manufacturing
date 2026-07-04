@@ -210,7 +210,7 @@ def _remove_shipments(conn):
 def seed(conn):
     _ensure_tables(conn)
     if _shipments_present(conn):
-        print("Shipping sample data already present — skipping.")
+        print("Shipping sample data already present - skipping.")
         return
     _seed_shipments(conn)
     print("Shipping sample data seeded.")

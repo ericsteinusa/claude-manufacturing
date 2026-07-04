@@ -149,7 +149,7 @@ def _receipts_present(conn) -> bool:
 
 def _seed_receipts(conn):
     if _receipts_present(conn):
-        print("Receiving sample data already present — skipping.")
+        print("Receiving sample data already present - skipping.")
         return
     for rcv_number, date_offset, supplier, carrier, tracking, status, notes \
             in RECEIPTS:
