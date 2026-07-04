@@ -174,6 +174,16 @@ To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
   `...-0001`. For sequential ids in a multi-row transaction, generate on the
   **transaction's own connection** using **max numeric suffix + 1** (gap-safe),
   e.g. `mrp_core.next_sequence_number(existing, prefix)`.
+- **AR/AP invoices and bank accounts carry no balance column.** `ar_invoice`
+  and `ap_invoice` have no `received`/`paid` column — amounts collected/paid
+  live in separate `ar_payment`/`ap_payment` tables (one row per payment,
+  `invoice_id` FK), so outstanding balance requires
+  `i.amount - COALESCE(SUM(p.amount), 0)` via a `LEFT JOIN`. Likewise
+  `bank_account` has no balance column at all; the balance is
+  `bank_statement.ending_balance` on that account's most recent statement.
+  `accounting_core.get_dso`/`get_dpo` already do this join correctly — reuse
+  that pattern rather than assuming a direct balance column (a past bug in
+  `reports_core.financial_dashboard` did, and 500'd; fixed in PR #336).
 
 ## Sample data (dev DB)
 
