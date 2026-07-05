@@ -35,6 +35,7 @@ PREFIXES = {
     "SUP-":   ("sup",    "Supplier"),
     "EQ-":    ("eq",     "Equipment"),
     "PMS-":   ("pms",    "PM Schedule"),
+    "MIN-":   ("min",    "Maint Inspection"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -97,6 +98,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_eq_url(key)
     if rtype == "pms":
         return _lookup_pms_url(key)
+    if rtype == "min":
+        return _lookup_min_url(key)
     return None
 
 
@@ -146,6 +149,12 @@ def _lookup_po_url(po_number: str) -> str | None:
             return f"/po/{row['id']}/"
     except Exception:
         pass
+    return None
+
+
+def _lookup_min_url(key: str) -> str | None:
+    if key.isdigit():
+        return f"/maint/inspections/{key}/"
     return None
 
 
