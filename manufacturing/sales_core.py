@@ -438,12 +438,98 @@ def init_sales_forecast_table(conn) -> None:
             expected_value  REAL DEFAULT 0,
             probability     INTEGER DEFAULT 0,
             weighted_value  REAL DEFAULT 0,
+            actual_value    REAL DEFAULT 0,
             status          TEXT DEFAULT 'Draft',
             notes           TEXT DEFAULT '',
             created_by      TEXT DEFAULT '',
             created_date    TEXT DEFAULT ''
         )
     """)
+    conn.execute(
+        "ALTER TABLE sales_forecast ADD COLUMN IF NOT EXISTS actual_value REAL DEFAULT 0"
+    )
+
+
+def get_forecast_kpis(conn, period=None, search=None) -> dict:
+    sql = (
+        "SELECT COUNT(*) AS cnt,"
+        " COALESCE(SUM(expected_value),0) AS total_expected,"
+        " COALESCE(SUM(weighted_value),0) AS total_weighted,"
+        " COALESCE(AVG(probability),0) AS avg_prob,"
+        " COALESCE(SUM(actual_value),0) AS total_actual"
+        " FROM sales_forecast WHERE TRUE"
+    )
+    params: list = []
+    if period:
+        sql += " AND period = %s"; params.append(period)
+    if search:
+        sql += " AND (rep ILIKE %s OR product_line ILIKE %s OR notes ILIKE %s)"
+        params.extend([f"%{search}%"] * 3)
+    row = conn.execute(sql, params).fetchone()
+    if not row:
+        return {}
+    d = dict(row)
+    d['total_variance'] = float(d['total_actual']) - float(d['total_weighted'])
+    return d
+
+
+def get_period_actuals(conn, fiscal_year: int) -> dict:
+    """Return {period: revenue} for closed/shipped SOs in fiscal_year."""
+    try:
+        rows = conn.execute("""
+            SELECT EXTRACT(MONTH FROM order_date::date)::int AS mo,
+                   COALESCE(SUM(si.qty * si.unit_price), 0) AS rev
+            FROM sales_order so
+            JOIN so_item si ON si.so_id = so.id
+            WHERE order_date IS NOT NULL AND order_date != ''
+              AND LOWER(so.status) IN ('closed','shipped','delivered','complete','completed')
+              AND EXTRACT(YEAR FROM order_date::date)::int = %s
+            GROUP BY 1
+        """, [fiscal_year]).fetchall()
+    except Exception:
+        return {}
+    by_month = {r['mo']: float(r['rev']) for r in rows}
+
+    def _sum(*months):
+        return sum(by_month.get(m, 0.0) for m in months)
+
+    return {
+        'Q1':     _sum(1, 2, 3),
+        'Q2':     _sum(4, 5, 6),
+        'Q3':     _sum(7, 8, 9),
+        'Q4':     _sum(10, 11, 12),
+        'H1':     _sum(*range(1, 7)),
+        'H2':     _sum(*range(7, 13)),
+        'Annual': _sum(*range(1, 13)),
+    }
+
+
+def get_demand_by_product(conn, fiscal_year: int) -> list:
+    """Demand by product × quarter for fiscal_year, from actual SOs."""
+    try:
+        rows = conn.execute("""
+            SELECT COALESCE(p.name, si.description, 'Unknown') AS product,
+                   EXTRACT(QUARTER FROM order_date::date)::int AS qtr,
+                   COALESCE(SUM(si.qty * si.unit_price), 0)    AS revenue,
+                   COALESCE(SUM(si.qty), 0)                    AS units
+            FROM sales_order so
+            JOIN so_item si ON si.so_id = so.id
+            LEFT JOIN product p ON p.id = si.product_id
+            WHERE order_date IS NOT NULL AND order_date != ''
+              AND EXTRACT(YEAR FROM order_date::date)::int = %s
+            GROUP BY 1, 2
+            ORDER BY 1, 2
+        """, [fiscal_year]).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
+
+
+def update_forecast_actual(conn, forecast_id: int, actual_value: float) -> None:
+    conn.execute(
+        "UPDATE sales_forecast SET actual_value = %s WHERE id = %s",
+        [actual_value, forecast_id],
+    )
 
 
 # ---------------------------------------------------------------------------

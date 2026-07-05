@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block page_title %}Demand Forecast{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Sales Dashboard</a>
+<a href="/sales/forecast/" class="btn">Sales Forecast</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.dm-wrap { width:100%; max-width:1200px; }
+.dm-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=number] {
+    padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border:1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:11px; color:#666; font-weight:bold; text-transform:uppercase; margin-bottom:4px; }
+.kpi .val { font-size:20px; font-weight:bold; color:var(--accent); }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tfoot td { background:#f0f4ff; font-weight:bold; border-top:2px solid var(--accent); }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table tr:last-child td { border-bottom:none; }
+.bar-cell { position:relative; padding-right:0 !important; }
+.bar-inner { height:10px; border-radius:3px; background:var(--accent); opacity:.7; display:inline-block; min-width:2px; }
+.compare-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.qtr-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold;
+    background:#e0eaff; color:#003cb4; }
+.empty-note { color:#888; font-size:13px; text-align:center; padding:24px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="dm-wrap">
+    <h2>Demand Forecast — {{ fiscal_year }}</h2>
+
+    <form method="get" class="filter-bar">
+        <label style="color:white;font-size:13px;">Fiscal Year:</label>
+        <select name="fiscal_year">
+            {% for y in years %}
+            <option value="{{ y }}"{% if y == fiscal_year %} selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">View</button>
+        <a href="/sales/forecast/?fiscal_year={{ fiscal_year }}" class="btn"
+           style="background:rgba(255,255,255,.15);color:white;margin-left:auto;">
+           📋 Forecast Entries
+        </a>
+    </form>
+
+    <!-- Quarter KPIs -->
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Q1 Revenue</div>
+            <div class="val">${{ quarter_totals.Q1|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Q2 Revenue</div>
+            <div class="val">${{ quarter_totals.Q2|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Q3 Revenue</div>
+            <div class="val">${{ quarter_totals.Q3|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Q4 Revenue</div>
+            <div class="val">${{ quarter_totals.Q4|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Annual Total</div>
+            <div class="val">${{ quarter_totals.total|floatformat:0 }}</div>
+        </div>
+    </div>
+
+    <!-- Forecast vs Actual comparison by period -->
+    {% if forecast_by_period %}
+    <div class="card">
+        <h3>Weighted Forecast vs Actual SO Revenue</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th style="text-align:right;">Weighted Forecast ($)</th>
+                    <th style="text-align:right;">Actual Revenue ($)</th>
+                    <th style="text-align:right;">Variance</th>
+                    <th style="text-align:right;">Attainment</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for period, wt in forecast_by_period.items %}
+            {% with act=quarter_totals|default:0 %}
+            <tr>
+                <td><span class="qtr-badge">{{ period }}</span></td>
+                <td style="text-align:right;">${{ wt|floatformat:0 }}</td>
+                <td style="text-align:right;">
+                    {% if period == 'Q1' %}${{ quarter_totals.Q1|floatformat:0 }}
+                    {% elif period == 'Q2' %}${{ quarter_totals.Q2|floatformat:0 }}
+                    {% elif period == 'Q3' %}${{ quarter_totals.Q3|floatformat:0 }}
+                    {% elif period == 'Q4' %}${{ quarter_totals.Q4|floatformat:0 }}
+                    {% else %}—{% endif %}
+                </td>
+                <td style="text-align:right;">
+                    {% if period == 'Q1' %}{% with v=quarter_totals.Q1|default:0 %}
+                        <span style="color:{% if v >= wt %}#1a6b1a{% else %}#c62828{% endif %};font-weight:bold;">
+                            {% if v >= wt %}+{% endif %}${{ v|floatformat:0 }}
+                        </span>{% endwith %}
+                    {% elif period == 'Q2' %}{% with v=quarter_totals.Q2|default:0 %}
+                        <span style="color:{% if v >= wt %}#1a6b1a{% else %}#c62828{% endif %};font-weight:bold;">
+                            {% if v >= wt %}+{% endif %}${{ v|floatformat:0 }}
+                        </span>{% endwith %}
+                    {% elif period == 'Q3' %}{% with v=quarter_totals.Q3|default:0 %}
+                        <span style="color:{% if v >= wt %}#1a6b1a{% else %}#c62828{% endif %};font-weight:bold;">
+                            {% if v >= wt %}+{% endif %}${{ v|floatformat:0 }}
+                        </span>{% endwith %}
+                    {% elif period == 'Q4' %}{% with v=quarter_totals.Q4|default:0 %}
+                        <span style="color:{% if v >= wt %}#1a6b1a{% else %}#c62828{% endif %};font-weight:bold;">
+                            {% if v >= wt %}+{% endif %}${{ v|floatformat:0 }}
+                        </span>{% endwith %}
+                    {% else %}—{% endif %}
+                </td>
+                <td style="text-align:right;">
+                    {% if wt and period == 'Q1' %}{{ quarter_totals.Q1|floatformat:0|default:0 }}%
+                    {% else %}—{% endif %}
+                </td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Demand by Product -->
+    <div class="card">
+        <h3>Demand by Product — {{ fiscal_year }} Actual SO Revenue</h3>
+        {% if product_rows %}
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th style="text-align:right;">Q1 ($)</th>
+                    <th style="text-align:right;">Q2 ($)</th>
+                    <th style="text-align:right;">Q3 ($)</th>
+                    <th style="text-align:right;">Q4 ($)</th>
+                    <th style="text-align:right;">Annual ($)</th>
+                    <th style="text-align:right;">Units</th>
+                    <th style="width:120px;">Share</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in product_rows %}
+            <tr>
+                <td style="font-weight:bold;">{{ row.product }}</td>
+                <td style="text-align:right;">{% if row.Q1 %}<span style="color:var(--accent);">${{ row.Q1|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q2 %}<span style="color:var(--accent);">${{ row.Q2|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q3 %}<span style="color:var(--accent);">${{ row.Q3|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
+                <td style="text-align:right;">{% if row.Q4 %}<span style="color:var(--accent);">${{ row.Q4|floatformat:0 }}</span>{% else %}<span style="color:#ddd;">—</span>{% endif %}</td>
+                <td style="text-align:right;font-weight:bold;">${{ row.total_revenue|floatformat:0 }}</td>
+                <td style="text-align:right;">{{ row.total_units }}</td>
+                <td>
+                    {% if quarter_totals.total %}
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <div style="flex:1;background:#e8e8e8;border-radius:3px;height:10px;overflow:hidden;">
+                            <div style="height:10px;border-radius:3px;background:var(--accent);opacity:.7;width:{{ row.total_revenue|floatformat:0 }}px;"
+                                 data-pct="{{ row.total_revenue }}" data-total="{{ quarter_totals.total }}"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Totals</td>
+                    <td style="text-align:right;">${{ quarter_totals.Q1|floatformat:0 }}</td>
+                    <td style="text-align:right;">${{ quarter_totals.Q2|floatformat:0 }}</td>
+                    <td style="text-align:right;">${{ quarter_totals.Q3|floatformat:0 }}</td>
+                    <td style="text-align:right;">${{ quarter_totals.Q4|floatformat:0 }}</td>
+                    <td style="text-align:right;">${{ quarter_totals.total|floatformat:0 }}</td>
+                    <td></td><td></td>
+                </tr>
+            </tfoot>
+        </table>
+        {% else %}
+        <div class="empty-note">
+            No sales order data found for {{ fiscal_year }}.<br>
+            <span style="font-size:12px;">Revenue is pulled from closed/shipped sales orders with line items.</span>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+</div>
+
+<script>
+// Scale the share bars based on actual percentage of total
+document.querySelectorAll('[data-pct]').forEach(function(el) {
+    var pct = parseFloat(el.dataset.pct);
+    var total = parseFloat(el.dataset.total);
+    if (total > 0) {
+        el.style.width = Math.round(pct / total * 100) + '%';
+    }
+});
+</script>
+{% endblock %}

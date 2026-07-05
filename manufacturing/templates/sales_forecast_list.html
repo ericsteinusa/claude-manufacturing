@@ -3,11 +3,8 @@
 
 {% block toolbar_left %}
 <a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/quotes/" class="btn">Quotes</a>
-<a href="/sales/leads/" class="btn">Leads</a>
-<a href="/sales/contracts/" class="btn">Contracts</a>
 <a href="/sales/forecast/" class="btn">Forecast</a>
+<a href="/sales/demand/" class="btn">Demand</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
@@ -15,25 +12,34 @@
 .sl-wrap { width:100%; max-width:1200px; }
 .sl-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
 .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
-.filter-bar select, .filter-bar input[type=text] {
-    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
-.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+.filter-bar select, .filter-bar input[type=text], .filter-bar input[type=number] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
     border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
-.filter-bar button:hover { background:rgb(0,60,180); color:white; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:11px; color:#666; font-weight:bold; text-transform:uppercase; margin-bottom:4px; }
+.kpi .val { font-size:20px; font-weight:bold; color:var(--accent); }
+.kpi.pos .val { color:#1a6b1a; }
+.kpi.neg .val { color:#c62828; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tfoot td { background:#f0f4ff; font-weight:bold; border-top:2px solid var(--accent); }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tbody tr:hover { background:#f0f4ff; }
-.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
 .list-table a:hover { text-decoration:underline; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
 .s-Draft     { background:#e2e3e5; color:#383d41; }
 .s-Submitted { background:#cce5ff; color:#004085; }
 .s-Approved  { background:#d4edda; color:#0a3622; }
 .s-Revised   { background:#fff3cd; color:#856404; }
+.var-pos { color:#1a6b1a; font-weight:bold; }
+.var-neg { color:#c62828; font-weight:bold; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
 .form-group label { font-size:12px; font-weight:bold; color:#444; }
@@ -41,12 +47,13 @@
     padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
 .form-group textarea { height:60px; resize:vertical; }
 .full-span { grid-column:1/-1; }
-.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
     border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
-.btn-submit:hover { background:rgb(0,40,140); }
+.btn-submit:hover { background:var(--accent-hover); }
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.sec-lbl { font-size:11px; color:#aaa; display:block; }
 {% endblock %}
 
 {% block body %}
@@ -64,10 +71,64 @@
             <option value="{{ p }}"{% if period_filter == p %} selected{% endif %}>{{ p }}</option>
             {% endfor %}
         </select>
+        <input type="number" name="fiscal_year" value="{{ fiscal_year }}" min="2000" max="2099" style="width:90px;" title="Fiscal year for actuals">
         <input type="text" name="search" value="{{ search }}" placeholder="Search rep / product line…">
         <button type="submit">Filter</button>
         <a href="/sales/forecast/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <a href="/sales/demand/" class="btn" style="margin-left:auto;background:rgba(255,255,255,.15);color:white;">📊 Demand by Product</a>
     </form>
+
+    <!-- KPI Cards -->
+    {% if kpis %}
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Forecasts</div>
+            <div class="val">{{ kpis.cnt }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Expected</div>
+            <div class="val">${{ kpis.total_expected|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Weighted</div>
+            <div class="val">${{ kpis.total_weighted|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Avg Probability</div>
+            <div class="val">{{ kpis.avg_prob|floatformat:0 }}%</div>
+        </div>
+        <div class="kpi {% if kpis.total_variance >= 0 %}pos{% else %}neg{% endif %}">
+            <div class="lbl">Actual vs Weighted</div>
+            <div class="val">{% if kpis.total_variance >= 0 %}+{% endif %}${{ kpis.total_variance|floatformat:0 }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Period Actuals Banner -->
+    {% if period_actuals %}
+    <div class="card" style="padding:12px 20px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:bold;color:#555;margin-bottom:8px;text-transform:uppercase;">{{ fiscal_year }} Actual SO Revenue (Closed/Shipped)</div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            {% for p in forecast_periods %}
+            {% with val=period_actuals|default:'' %}
+            <div style="text-align:center;">
+                <div style="font-size:11px;color:#888;">{{ p }}</div>
+                <div style="font-size:15px;font-weight:bold;color:var(--accent);">
+                    {% if p == 'Q1' %}${{ period_actuals.Q1|floatformat:0 }}
+                    {% elif p == 'Q2' %}${{ period_actuals.Q2|floatformat:0 }}
+                    {% elif p == 'Q3' %}${{ period_actuals.Q3|floatformat:0 }}
+                    {% elif p == 'Q4' %}${{ period_actuals.Q4|floatformat:0 }}
+                    {% elif p == 'H1' %}${{ period_actuals.H1|floatformat:0 }}
+                    {% elif p == 'H2' %}${{ period_actuals.H2|floatformat:0 }}
+                    {% elif p == 'Annual' %}${{ period_actuals.Annual|floatformat:0 }}
+                    {% endif %}
+                </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <div class="card">
         <table class="list-table">
@@ -80,11 +141,14 @@
                     <th style="text-align:right;">Expected ($)</th>
                     <th style="text-align:right;">Prob %</th>
                     <th style="text-align:right;">Weighted ($)</th>
+                    <th style="text-align:right;">Actual ($)</th>
+                    <th style="text-align:right;">Variance</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
             {% for f in forecasts %}
+            {% with act=f.actual_value|default:0 wt=f.weighted_value|default:0 %}
             <tr>
                 <td><a href="/sales/forecast/{{ f.id }}/">{{ f.rep|default:"—" }}</a></td>
                 <td>{{ f.period|default:"—" }}</td>
@@ -93,12 +157,35 @@
                 <td style="text-align:right;">${{ f.expected_value|floatformat:0 }}</td>
                 <td style="text-align:right;">{{ f.probability }}%</td>
                 <td style="text-align:right;font-weight:bold;">${{ f.weighted_value|floatformat:0 }}</td>
+                <td style="text-align:right;">{% if act %}<span style="color:#1a6b1a;font-weight:bold;">${{ act|floatformat:0 }}</span>{% else %}<span style="color:#bbb;">—</span>{% endif %}</td>
+                <td style="text-align:right;">
+                    {% if act %}
+                        {% if act >= wt %}<span class="var-pos">+${{ act|floatformat:0 }}</span>
+                        {% else %}<span class="var-neg">-${{ wt|floatformat:0 }}</span>{% endif %}
+                    {% else %}<span style="color:#ccc;">—</span>{% endif %}
+                </td>
                 <td><span class="badge s-{{ f.status }}">{{ f.status }}</span></td>
             </tr>
+            {% endwith %}
             {% empty %}
-            <tr><td colspan="8" style="color:#888;text-align:center;">No forecasts found.</td></tr>
+            <tr><td colspan="10" style="color:#888;text-align:center;">No forecasts found.</td></tr>
             {% endfor %}
             </tbody>
+            {% if forecasts and kpis %}
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="font-weight:bold;">Totals</td>
+                    <td style="text-align:right;">${{ kpis.total_expected|floatformat:0 }}</td>
+                    <td style="text-align:right;">{{ kpis.avg_prob|floatformat:0 }}%</td>
+                    <td style="text-align:right;">${{ kpis.total_weighted|floatformat:0 }}</td>
+                    <td style="text-align:right;">${{ kpis.total_actual|floatformat:0 }}</td>
+                    <td style="text-align:right;" class="{% if kpis.total_variance >= 0 %}var-pos{% else %}var-neg{% endif %}">
+                        {% if kpis.total_variance >= 0 %}+{% endif %}${{ kpis.total_variance|floatformat:0 }}
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            {% endif %}
         </table>
     </div>
 
