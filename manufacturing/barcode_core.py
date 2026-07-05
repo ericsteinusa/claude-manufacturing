@@ -25,6 +25,7 @@ PREFIXES = {
     "WO-":    ("wo",        "Work Order"),
     "MWO-":   ("mwo",       "Maintenance WO"),
     "SO-":    ("so",        "Sales Order"),
+    "SHIP-":  ("ship",     "Shipment"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -67,6 +68,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_mwo_url(key)
     if rtype == "so":
         return _lookup_so_url(key)
+    if rtype == "ship":
+        return _lookup_ship_url(key)
     return None
 
 
@@ -114,6 +117,20 @@ def _lookup_po_url(po_number: str) -> str | None:
         ).fetchone()
         if row:
             return f"/po/{row['id']}/"
+    except Exception:
+        pass
+    return None
+
+
+def _lookup_ship_url(ship_number: str) -> str | None:
+    try:
+        from .db_pg import get_db_connection
+        conn = get_db_connection()
+        row = conn.execute(
+            "SELECT id FROM shipment WHERE ship_number = %s", [ship_number]
+        ).fetchone()
+        if row:
+            return f"/prod/shipping/{row['id']}/"
     except Exception:
         pass
     return None

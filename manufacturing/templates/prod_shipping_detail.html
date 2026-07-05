@@ -12,7 +12,7 @@
 {% block extra_styles %}
 .sh-wrap { width:100%; max-width:1000px; }
 .sh-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
@@ -21,19 +21,19 @@
     padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
 .form-group textarea { height:70px; resize:vertical; }
 .full-span { grid-column:1/-1; }
-.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
     border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
-.btn-submit:hover { background:rgb(0,40,140); }
-.btn-sm { padding:5px 12px; background:rgb(0,60,180); color:white;
+.btn-submit:hover { background:var(--accent-hover); }
+.btn-sm { padding:5px 12px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:12px; cursor:pointer; }
-.btn-sm:hover { background:rgb(0,40,140); }
+.btn-sm:hover { background:var(--accent-hover); }
 .ro-table { width:100%; border-collapse:collapse; }
 .ro-table th, .ro-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
 .ro-table th { width:160px; background:#f5f5f5; font-weight:bold; }
 .ro-table tr:last-child td, .ro-table tr:last-child th { border-bottom:none; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
 .s-pending    { background:#cce5ff; color:#004085; }
@@ -45,20 +45,31 @@
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
-.print-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+.print-btn { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer;
     font-weight:bold; margin-bottom:14px; }
 @media print {
     .print-btn, .btn, form, .add-row { display: none !important; }
     body { background: white !important; }
     .sh-wrap { max-width: none; }
+    .sh-barcode img { max-width: 300px; }
 }
+.sh-barcode {
+    display: flex; flex-direction: column; align-items: flex-end;
+    margin-bottom: 10px;
+}
+.sh-barcode img { max-width: 260px; height: auto; }
+.sh-barcode small { font-size: 10px; color: #aaa; letter-spacing: 1px; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="sh-wrap">
+    <div class="sh-barcode">
+        <img src="/barcode/img/SHIP-{{ shipment.ship_number }}/" alt="Barcode SHIP-{{ shipment.ship_number }}">
+        <small>SHIP-{{ shipment.ship_number }}</small>
+    </div>
     <h2>
         {{ shipment.ship_number }}
         <span class="badge s-{{ shipment.status }}" style="font-size:14px;">{{ shipment.status|title }}</span>
