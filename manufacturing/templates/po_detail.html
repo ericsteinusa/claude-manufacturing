@@ -23,7 +23,14 @@
     .print-btn, .btn, .po-status-actions, .add-item { display: none !important; }
     body { background: white !important; }
     .po-wrap { max-width: none; }
+    .po-barcode img { max-width: 300px; }
 }
+.po-barcode {
+    display: flex; flex-direction: column; align-items: flex-end;
+    margin-bottom: 10px;
+}
+.po-barcode img { max-width: 260px; height: auto; }
+.po-barcode small { font-size: 10px; color: #555; letter-spacing: 1px; }
 .po-wrap { width: 100%; max-width: 900px; }
 .po-card {
     background: white; border: 1.5px solid var(--border); border-radius: 6px;
@@ -82,6 +89,10 @@
     <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
     <div class="po-wrap">
         <div class="po-card">
+            <div class="po-barcode">
+                <img src="/barcode/img/PO-{{ po.po_number }}/" alt="Barcode PO-{{ po.po_number }}">
+                <small>PO-{{ po.po_number }}</small>
+            </div>
             <div class="po-head">
                 <h2>{{ po.po_number }}</h2>
                 <span class="pill" style="background: {{ po.status_color }};">
