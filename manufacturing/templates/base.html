@@ -529,6 +529,12 @@
         <a href="{% url 'audit_log' %}" class="sb-link{% if '/audit/' in request.path %} active{% endif %}">
             <span class="sb-icon">📜</span> Audit Log
         </a>
+        <a href="{% url 'fixed_asset_list' %}" class="sb-link{% if '/assets/fixed/' in request.path %} active{% endif %}">
+            <span class="sb-icon">🏭</span> Fixed Assets
+        </a>
+        <a href="{% url 'currency_list' %}" class="sb-link{% if '/admin/currencies/' in request.path %} active{% endif %}">
+            <span class="sb-icon">💱</span> Currencies
+        </a>
         <a href="{% url 'reports_dashboard' %}" class="sb-link{% if '/reports/' in request.path %} active{% endif %}">
             <span class="sb-icon">📈</span> Reports
         </a>

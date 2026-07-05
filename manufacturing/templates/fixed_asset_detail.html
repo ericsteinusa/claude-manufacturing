@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block page_title %}{{ asset.asset_number }} — {{ asset.asset_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+<a href="/assets/fixed/" class="btn">Fixed Assets</a>
+<a href="/assets/fixed/{{ asset.id }}/" class="btn">{{ asset.asset_number }}</a>
+{% endblock %}
+
+{% block extra_styles %}
+.fa-wrap { width:100%; max-width:1000px; }
+.fa-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+.fa-header h2 { color:white; font-size:20px; margin:0 0 4px; }
+.fa-header .sub { color:rgba(255,255,255,.7); font-size:13px; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:11px; color:#666; font-weight:bold; text-transform:uppercase; margin-bottom:4px; }
+.kpi .val { font-size:20px; font-weight:bold; color:var(--accent); }
+.kpi .sub { font-size:11px; color:#888; margin-top:2px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; border-bottom:1px solid #eee; padding-bottom:8px; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; }
+.detail-row { display:flex; flex-direction:column; gap:2px; }
+.detail-row label { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:.4px; }
+.detail-row .dval { font-size:14px; color:#333; }
+.edit-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:.4px; }
+.form-group input, .form-group select, .form-group textarea { padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.btn-submit { padding:8px 18px; background:var(--accent); color:white; border:none; border-radius:6px;
+    font-size:13px; font-weight:bold; cursor:pointer; }
+.dep-table { width:100%; border-collapse:collapse; font-size:13px; }
+.dep-table th, .dep-table td { padding:7px 10px; border-bottom:1px solid #eee; }
+.dep-table th { background:#f5f7fa; color:#444; font-weight:700; font-size:12px; text-transform:uppercase; }
+.dep-table tr:last-child td { border-bottom:none; }
+.dep-table .cur-year { background:#e8f0fd; }
+.bar-track { background:#e9ecef; border-radius:4px; height:8px; overflow:hidden; margin-top:6px; }
+.bar-fill { height:8px; border-radius:4px; background:var(--accent); }
+.badge { padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.badge-active { background:#d4edda; color:#0a3622; }
+.badge-inactive { background:#e2e3e5; color:#383d41; }
+.badge-disposed { background:#f8d7da; color:#721c24; }
+.badge-repair { background:#fff3cd; color:#856404; }
+.badge-sold { background:#cce5ff; color:#004085; }
+.event-table { width:100%; border-collapse:collapse; font-size:13px; }
+.event-table th, .event-table td { padding:7px 10px; border-bottom:1px solid #eee; }
+.event-table th { background:#f5f7fa; color:#444; font-weight:700; font-size:12px; text-transform:uppercase; }
+.event-table tr:last-child td { border-bottom:none; }
+.evt-type { font-weight:bold; color:var(--accent); }
+.evt-log { display:flex; gap:10px; align-items:center; }
+.evt-log select, .evt-log input, .evt-log textarea { padding:6px 9px; border:1.5px solid var(--border); border-radius:5px; font-size:12px; }
+.evt-log button { padding:6px 14px; background:var(--accent); color:white; border:none; border-radius:5px; font-size:12px; cursor:pointer; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="fa-wrap">
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="fa-header">
+        <div>
+            <h2>{{ asset.asset_number }} — {{ asset.asset_name }}</h2>
+            <div class="sub">{{ asset.asset_type }} &nbsp;·&nbsp;
+                <span class="badge badge-{{ asset.status|lower|cut:' ' }}">{{ asset.status }}</span>
+                {% if asset.location %}&nbsp;·&nbsp; {{ asset.location }}{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Purchase Cost</div>
+            <div class="val">${{ asset.purchase_price|floatformat:2 }}</div>
+            <div class="sub">{{ asset.in_service_date|default:"No date" }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Accumulated Dep.</div>
+            <div class="val">${{ asset.accumulated_depreciation|floatformat:2 }}</div>
+            <div class="sub">{{ dep_pct }}% depreciated</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Book Value</div>
+            <div class="val">${{ asset.book_value|floatformat:2 }}</div>
+            <div class="sub">Net carrying value</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Annual Dep.</div>
+            <div class="val">${{ asset.annual_depreciation|floatformat:2 }}</div>
+            <div class="sub">{{ asset.depreciation_method|default:"None" }}</div>
+        </div>
+    </div>
+
+    {% if asset.purchase_price %}
+    <div class="card" style="padding:14px 20px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
+            <span style="color:#888;">Depreciation Progress</span>
+            <span><strong>${{ asset.book_value|floatformat:0 }}</strong> remaining of ${{ asset.purchase_price|floatformat:0 }}</span>
+        </div>
+        <div class="bar-track">
+            <div class="bar-fill" style="width:{{ dep_pct }}%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:#aaa;">
+            <span>0%</span><span>{{ dep_pct }}% depreciated</span><span>100%</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Asset Details</h3>
+        <div class="detail-grid">
+            <div class="detail-row"><label>Asset Number</label><div class="dval">{{ asset.asset_number }}</div></div>
+            <div class="detail-row"><label>Name</label><div class="dval">{{ asset.asset_name }}</div></div>
+            <div class="detail-row"><label>Type</label><div class="dval">{{ asset.asset_type|default:"—" }}</div></div>
+            <div class="detail-row"><label>Status</label><div class="dval">{{ asset.status }}</div></div>
+            <div class="detail-row"><label>Vendor / Supplier</label><div class="dval">{{ asset.vendor|default:"—" }}</div></div>
+            <div class="detail-row"><label>Location</label><div class="dval">{{ asset.location|default:"—" }}</div></div>
+            <div class="detail-row"><label>Cost Center</label><div class="dval">{{ asset.cost_center|default:"—" }}</div></div>
+            <div class="detail-row"><label>Assigned To</label><div class="dval">{{ asset.assigned_to|default:"—" }}</div></div>
+            <div class="detail-row"><label>Serial Number</label><div class="dval">{{ asset.serial_number|default:"—" }}</div></div>
+            <div class="detail-row"><label>In-Service Date</label><div class="dval">{{ asset.in_service_date|default:"—" }}</div></div>
+            <div class="detail-row"><label>Purchase Price</label><div class="dval">${{ asset.purchase_price|floatformat:2 }}</div></div>
+            <div class="detail-row"><label>Salvage Value</label><div class="dval">${{ asset.salvage_value|floatformat:2 }}</div></div>
+            <div class="detail-row"><label>Useful Life</label><div class="dval">{{ asset.useful_life_years|default:"—" }} years</div></div>
+            <div class="detail-row"><label>Depreciation Method</label><div class="dval">{{ asset.depreciation_method|default:"None" }}</div></div>
+            {% if asset.notes %}
+            <div class="detail-row" style="grid-column:span 2;"><label>Notes</label><div class="dval" style="white-space:pre-wrap;">{{ asset.notes }}</div></div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if dep_schedule %}
+    <div class="card">
+        <h3>Depreciation Schedule</h3>
+        <table class="dep-table">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th style="text-align:right;">Annual Dep.</th>
+                    <th style="text-align:right;">Accumulated</th>
+                    <th style="text-align:right;">Book Value</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in dep_schedule %}
+            <tr {% if row.is_current %}class="cur-year"{% endif %}>
+                <td>{{ row.year }}{% if row.is_current %} <span style="font-size:10px;color:var(--accent);">(current)</span>{% endif %}</td>
+                <td style="text-align:right;font-family:monospace;">${{ row.annual_dep|floatformat:2 }}</td>
+                <td style="text-align:right;font-family:monospace;">${{ row.accumulated|floatformat:2 }}</td>
+                <td style="text-align:right;font-family:monospace;">${{ row.book_value|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Event History</h3>
+        {% if events %}
+        <table class="event-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Details</th>
+                    <th>By</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for e in events %}
+            <tr>
+                <td style="color:#555;font-size:12px;">{{ e.changed_at }}</td>
+                <td class="evt-type">{{ e.event_type }}</td>
+                <td>{{ e.description|default:"—" }}</td>
+                <td style="color:#888;font-size:12px;">{{ e.changed_by|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;margin:0;">No events logged.</p>
+        {% endif %}
+
+        <form method="post" action="" style="margin-top:14px;border-top:1px solid #eee;padding-top:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="event">
+            <div class="evt-log">
+                <select name="event_type">
+                    <option>purchased</option>
+                    <option>deployed</option>
+                    <option>assigned</option>
+                    <option>reassigned</option>
+                    <option>relocated</option>
+                    <option>repaired</option>
+                    <option>disposed</option>
+                    <option>sold</option>
+                    <option>maintenance</option>
+                    <option>inspection</option>
+                    <option>note</option>
+                </select>
+                <input type="text" name="event_note" placeholder="Details..." style="flex:1;">
+                <input type="date" name="event_date">
+                <button type="submit">Log Event</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Edit Asset</h3>
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="edit-grid">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="asset_name" value="{{ asset.asset_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Asset Type</label>
+                    <select name="asset_type">
+                        {% for t in asset_types %}
+                        <option value="{{ t }}" {% if asset.asset_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in asset_statuses %}
+                        <option value="{{ s }}" {% if asset.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Purchase Price ($)</label>
+                    <input type="number" name="purchase_price" step="0.01" value="{{ asset.purchase_price }}">
+                </div>
+                <div class="form-group">
+                    <label>Salvage Value ($)</label>
+                    <input type="number" name="salvage_value" step="0.01" value="{{ asset.salvage_value }}">
+                </div>
+                <div class="form-group">
+                    <label>Useful Life (years)</label>
+                    <input type="number" name="useful_life_years" step="1" value="{{ asset.useful_life_years }}">
+                </div>
+                <div class="form-group">
+                    <label>Depreciation Method</label>
+                    <select name="depreciation_method">
+                        {% for m in depreciation_methods %}
+                        <option value="{{ m }}" {% if asset.depreciation_method == m %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Vendor</label>
+                    <input type="text" name="vendor" value="{{ asset.vendor|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" value="{{ asset.location|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Cost Center</label>
+                    <input type="text" name="cost_center" value="{{ asset.cost_center|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Serial Number</label>
+                    <input type="text" name="serial_number" value="{{ asset.serial_number|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Assigned To</label>
+                    <input type="text" name="assigned_to" value="{{ asset.assigned_to|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>In-Service Date</label>
+                    <input type="date" name="in_service_date" value="{{ asset.in_service_date|default:'' }}">
+                </div>
+                <div class="form-group" style="grid-column:span 3;">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2">{{ asset.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+
+</div>
+</div>
+{% endblock %}

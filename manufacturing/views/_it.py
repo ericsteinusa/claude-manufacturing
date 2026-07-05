@@ -8,6 +8,11 @@ from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
 
+from ..fixed_asset_core import (
+    init_fixed_asset_tables as _init_fixed_asset_tables,
+    DEPRECIATION_METHODS,
+    calc_book_value, calc_annual_depreciation, calc_accumulated_depreciation,
+)
 from ..it_core import (
     get_it_dashboard,
     list_tickets as list_it_tickets,
@@ -17,6 +22,7 @@ from ..it_core import (
     set_ticket_status as set_it_ticket_status,
     next_ticket_number,
     list_assets, get_asset, create_asset, update_asset,
+    log_asset_event, list_asset_history,
     TICKET_STATUSES, TICKET_PRIORITIES, ISSUE_TYPES, ASSET_STATUSES, ASSET_TYPES,
     list_repairs, get_repair, create_repair, update_repair, set_repair_status,
     REPAIR_STATUSES, REPAIR_PRIORITIES,
@@ -190,37 +196,68 @@ def it_asset_detail(request, asset_id):
     conn = get_db_connection()
     error = success = None
     asset = None
+    history = []
     try:
+        _init_fixed_asset_tables(conn)
         asset = get_asset(conn, asset_id)
         if not asset:
             return redirect('it_asset_list')
+        history = list_asset_history(conn, asset_tag=asset.get('asset_tag'), limit=50)
         if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
             try:
-                update_asset(
-                    conn, asset_id,
-                    asset_tag=request.POST.get('asset_tag', ''),
-                    asset_type=request.POST.get('asset_type', ''),
-                    make=request.POST.get('make', ''),
-                    model=request.POST.get('model', ''),
-                    serial_number=request.POST.get('serial_number', ''),
-                    assigned_to=request.POST.get('assigned_to', ''),
-                    department=request.POST.get('department', ''),
-                    purchase_date=request.POST.get('purchase_date', ''),
-                    warranty_exp=request.POST.get('warranty_exp', ''),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
+                if action == 'update':
+                    old_assigned = asset.get('assigned_to', '')
+                    new_assigned = request.POST.get('assigned_to', '')
+                    update_asset(
+                        conn, asset_id,
+                        asset_tag=request.POST.get('asset_tag', ''),
+                        asset_type=request.POST.get('asset_type', ''),
+                        make=request.POST.get('make', ''),
+                        model=request.POST.get('model', ''),
+                        serial_number=request.POST.get('serial_number', ''),
+                        assigned_to=new_assigned,
+                        department=request.POST.get('department', ''),
+                        purchase_date=request.POST.get('purchase_date', ''),
+                        warranty_exp=request.POST.get('warranty_exp', ''),
+                        status=request.POST.get('status', ''),
+                        notes=request.POST.get('notes', ''),
+                        purchase_price=float(request.POST.get('purchase_price') or 0),
+                        salvage_value=float(request.POST.get('salvage_value') or 0),
+                        useful_life_years=int(request.POST.get('useful_life_years') or 5),
+                        depreciation_method=request.POST.get('depreciation_method', ''),
+                        vendor=request.POST.get('vendor', ''),
+                        location=request.POST.get('location', ''),
+                        cost_center=request.POST.get('cost_center', ''),
+                    )
+                    if old_assigned != new_assigned:
+                        log_asset_event(conn, asset['asset_tag'], asset_id,
+                                        'reassigned',
+                                        f"Reassigned from '{old_assigned}' to '{new_assigned}'",
+                                        request.session.get('user_email', ''))
+                    else:
+                        log_asset_event(conn, asset['asset_tag'], asset_id,
+                                        'updated', 'Record updated.',
+                                        request.session.get('user_email', ''))
                 conn.commit()
                 success = 'Asset updated.'
                 asset = get_asset(conn, asset_id)
+                history = list_asset_history(conn, asset_tag=asset.get('asset_tag'), limit=50)
             except Exception as e:
                 conn.rollback()
                 error = str(e)
     finally:
         conn.close()
+    # Compute depreciation on the asset dict
+    if asset:
+        asset['book_value'] = calc_book_value(asset)
+        asset['annual_depreciation'] = calc_annual_depreciation(asset)
+        asset['accumulated_depreciation'] = calc_accumulated_depreciation(asset)
     return render(request, 'it_asset_detail.html', _it_ctx(
         request, asset=asset, can_edit=can_edit,
         asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
+        depreciation_methods=DEPRECIATION_METHODS,
+        history=history,
         error=error, success=success,
     ))
 

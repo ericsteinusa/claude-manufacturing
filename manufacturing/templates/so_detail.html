@@ -95,12 +95,35 @@
             </div>
             <div class="so-meta">
                 <div><b>Customer:</b> {{ so.customer_name }}</div>
-                <div><b>Total:</b> ${{ so.total|floatformat:2 }}</div>
+                <div><b>Total:</b> {{ so.currency|default:"USD" }} {{ so.total|floatformat:2 }}
+                    {% if currencies and so.currency and so.currency != base_currency %}
+                    <span style="font-size:12px;color:#888;">(≈ ${{ so.total_base|floatformat:2 }} {{ base_currency }})</span>
+                    {% endif %}
+                </div>
                 <div><b>Order Date:</b> {{ so.order_date|default:"—" }}</div>
                 <div><b>Ship Date:</b> {{ so.ship_date|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
                     <b>Notes:</b> {{ so.notes|default:"—" }}</div>
             </div>
+            {% if currencies and can_edit %}
+            <div style="margin-top:10px;">
+                <form method="post" action="" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="currency">
+                    <label style="font-size:12px;font-weight:bold;color:#555;">Currency:</label>
+                    <select name="currency" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
+                        {% for cur in currencies %}
+                        <option value="{{ cur.code }}" {% if so.currency == cur.code %}selected{% elif not so.currency and cur.code == base_currency %}selected{% endif %}>{{ cur.code }} — {{ cur.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="exchange_rate" step="0.000001" min="0"
+                        value="{{ so.exchange_rate|default:'1.0' }}"
+                        style="width:90px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;"
+                        placeholder="Rate">
+                    <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Currency</button>
+                </form>
+            </div>
+            {% endif %}
             {% if status_actions %}
             <div class="so-status-actions">
                 {% for target, label in status_actions %}

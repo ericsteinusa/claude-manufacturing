@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block page_title %}Currency Management{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+<a href="/admin/currencies/" class="btn">Currencies</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cur-wrap { width:100%; max-width:1000px; }
+.cur-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:11px; color:#666; font-weight:bold; text-transform:uppercase; margin-bottom:4px; }
+.kpi .val { font-size:20px; font-weight:bold; color:var(--accent); }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:8px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.badge-base { background:#d4edda; color:#0a3622; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.badge-inactive { background:#e2e3e5; color:#383d41; padding:2px 8px; border-radius:4px; font-size:11px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; align-items:end; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:.4px; }
+.form-group input, .form-group select { padding:7px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.btn-submit { padding:8px 18px; background:var(--accent); color:white; border:none; border-radius:6px;
+    font-size:13px; font-weight:bold; cursor:pointer; }
+.btn-submit:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.quick-add { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.quick-btn { padding:4px 10px; background:#e8f0fd; color:var(--accent); border:1px solid var(--accent);
+    border-radius:4px; font-size:12px; cursor:pointer; }
+.quick-btn:hover { background:var(--accent); color:white; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cur-wrap">
+    <h2>Currency Management</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Base Currency</div>
+            <div class="val">{{ base.symbol }} {{ base.code }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Active Currencies</div>
+            <div class="val">{{ currencies|length }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Usage</div>
+            <div class="val" style="font-size:14px;color:#555;">POs · SOs · AP · AR</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Active Currencies</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Symbol</th>
+                    <th style="text-align:right;">Rate to Base</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in currencies %}
+            <tr>
+                <td><strong>{{ c.code }}</strong></td>
+                <td>{{ c.name }}</td>
+                <td style="font-size:16px;">{{ c.symbol }}</td>
+                <td style="text-align:right;font-family:monospace;">
+                    {% if c.is_base %}—{% else %}{{ c.exchange_rate }}{% endif %}
+                </td>
+                <td>
+                    {% if c.is_base %}<span class="badge-base">Base</span>
+                    {% elif not c.is_active %}<span class="badge-inactive">Inactive</span>
+                    {% endif %}
+                </td>
+                <td style="color:#888;font-size:12px;">{{ c.updated_at|default:"—" }}</td>
+                {% if can_edit %}
+                <td>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="code" value="{{ c.code }}">
+                        <input type="hidden" name="name" value="{{ c.name }}">
+                        <input type="hidden" name="symbol" value="{{ c.symbol }}">
+                        <input type="hidden" name="exchange_rate" value="{{ c.exchange_rate }}">
+                        <input type="hidden" name="is_base" value="{% if c.is_base %}1{% else %}0{% endif %}">
+                        <input type="hidden" name="is_active" value="{% if c.is_active %}0{% else %}1{% endif %}">
+                        <button type="submit" style="font-size:11px;padding:2px 8px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;cursor:pointer;">
+                            {% if c.is_active %}Deactivate{% else %}Activate{% endif %}
+                        </button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align:center;color:#888;">No currencies configured.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add / Update Currency</h3>
+        <form method="post" id="cur-form">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Code (e.g. EUR)</label>
+                    <input type="text" name="code" id="f-code" maxlength="10" placeholder="USD" required>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" id="f-name" placeholder="US Dollar" required>
+                </div>
+                <div class="form-group">
+                    <label>Symbol</label>
+                    <input type="text" name="symbol" id="f-symbol" maxlength="5" placeholder="$" required>
+                </div>
+                <div class="form-group">
+                    <label>Rate to Base</label>
+                    <input type="number" name="exchange_rate" id="f-rate" step="0.000001" min="0" placeholder="1.0" required>
+                </div>
+                <div class="form-group">
+                    <label>Set as Base?</label>
+                    <select name="is_base">
+                        <option value="0">No</option>
+                        <option value="1">Yes (make base)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Active?</label>
+                    <select name="is_active">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:span 2;align-self:end;">
+                    <button type="submit" class="btn-submit">Save Currency</button>
+                </div>
+            </div>
+        </form>
+        <div class="quick-add">
+            <strong style="font-size:12px;color:#555;align-self:center;">Quick-add:</strong>
+            {% for code, name, symbol, rate in common %}
+            <button type="button" class="quick-btn"
+                onclick="document.getElementById('f-code').value='{{ code }}';
+                         document.getElementById('f-name').value='{{ name }}';
+                         document.getElementById('f-symbol').value='{{ symbol }}';
+                         document.getElementById('f-rate').value='{{ rate }}';">
+                {{ code }} {{ symbol }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

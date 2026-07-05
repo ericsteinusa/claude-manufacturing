@@ -255,6 +255,11 @@ urlpatterns = [
     path('it/tasks/<int:task_id>/', views.it_task_detail, name='it_task_detail'),
     path('it/incidents/', views.it_incident_list, name='it_incident_list'),
     path('it/incidents/<int:incident_id>/', views.it_incident_detail, name='it_incident_detail'),
+    # Fixed Asset Management
+    path('assets/fixed/', views.fixed_asset_list, name='fixed_asset_list'),
+    path('assets/fixed/<int:asset_id>/', views.fixed_asset_detail, name='fixed_asset_detail'),
+    # Currency Management
+    path('admin/currencies/', views.currency_list, name='currency_list'),
     path('legal/', views.legal_dashboard, name='legal_dashboard'),
     path('legal/contracts/', views.legal_contract_list, name='legal_contract_list'),
     path('legal/contracts/<int:contract_id>/', views.legal_contract_detail, name='legal_contract_detail'),

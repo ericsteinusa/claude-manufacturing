@@ -281,6 +281,8 @@ def update_asset(conn, asset_id: int, **fields) -> None:
         'asset_tag', 'asset_type', 'make', 'model', 'serial_number',
         'assigned_to', 'department', 'purchase_date', 'warranty_exp',
         'status', 'notes',
+        'purchase_price', 'salvage_value', 'useful_life_years',
+        'depreciation_method', 'vendor', 'location', 'cost_center',
     }
     cols = {k: v for k, v in fields.items() if k in allowed}
     if not cols:
