@@ -105,6 +105,18 @@ def label_asset(request, asset_id):
     return resp
 
 
+# ── Inline barcode image ─────────────────────────────────────────────────────
+
+def barcode_img(request, code):
+    """GET /barcode/img/<code>/ — return a Code 39 barcode as PNG."""
+    from ..barcode_core import _barcode_image_bytes
+    try:
+        png = _barcode_image_bytes(code)
+        return HttpResponse(png, content_type="image/png")
+    except Exception as e:
+        return HttpResponse(str(e), status=500)
+
+
 # ── Receiving scan session ────────────────────────────────────────────────────
 
 def receive_scan(request):
