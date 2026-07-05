@@ -1,7 +1,6 @@
 """Barcode scan routing, label printing, and receiving scan session views."""
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_POST
+from django.http import HttpResponse
 
 from ..db_pg import get_db_connection
 from ..barcode_core import (
