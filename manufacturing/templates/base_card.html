@@ -4,125 +4,258 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block page_title %}Manufacturing ERP{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --hdr-bg: #0f1d3a;
-            --accent: #1d6fe8;
-            --accent-hover: #155ec7;
-            --border: #d1dae8;
-            --text: #0f1d3a;
-            --text-muted: #5a6a84;
-            --radius: 8px;
+            --hdr-bg:        #0f1d3a;
+            --accent:        #1d6fe8;
+            --accent-hover:  #155ec7;
+            --accent-light:  #e8f0fd;
+            --border:        #d1dae8;
+            --text:          #0f1d3a;
+            --text-muted:    #5a6a84;
+            --radius:        10px;
         }
+
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
             font-size: 14px;
-            background: linear-gradient(135deg, #0f1d3a 0%, #1a3a6b 60%, #0f1d3a 100%);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: #0f1d3a;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(29,111,232,.18) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(29,111,232,.12) 0%, transparent 50%);
             min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 24px;
         }
+
+        /* ── Card shell ───────────────────────────────────────── */
+        .card-shell {
+            width: min(440px, 100%);
+        }
+
         .card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 40px rgba(0,0,0,.35);
-            width: min(420px, 100%);
-            padding: 40px 44px;
+            border-radius: 16px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,.06),
+                0 20px 60px rgba(0,0,0,.45);
+            padding: 44px 48px;
         }
+
         @media (max-width: 480px) {
-            body { padding: 16px; align-items: flex-start; padding-top: 32px; }
-            .card { padding: 28px 22px; border-radius: 10px; }
+            body { padding: 16px; align-items: flex-start; padding-top: 28px; }
+            .card { padding: 28px 22px; border-radius: 12px; }
         }
+
+        /* ── Logo ─────────────────────────────────────────────── */
         .card-logo {
-            text-align: center; margin-bottom: 28px;
+            text-align: center;
+            margin-bottom: 32px;
         }
-        .card-logo .logo-mark {
-            font-size: 28px; display: inline-block; margin-bottom: 8px;
+
+        .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #1d6fe8 0%, #0e4cad 100%);
+            box-shadow: 0 4px 16px rgba(29,111,232,.35);
+            margin-bottom: 14px;
         }
+
+        .logo-icon svg {
+            width: 30px; height: 30px;
+            fill: white;
+        }
+
         .card-logo h1 {
-            font-size: 18px; font-weight: 800; color: var(--text);
-            letter-spacing: -.3px;
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -.4px;
+            line-height: 1.2;
         }
+
         .card-logo .sub {
-            font-size: 12px; color: var(--text-muted); margin-top: 2px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-weight: 500;
         }
+
+        /* ── Form elements ────────────────────────────────────── */
         .form-row {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
+
         .form-row label {
-            display: block; font-size: 11.5px; font-weight: 700;
-            color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: .5px; margin-bottom: 5px;
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 6px;
         }
-        .form-row input {
-            width: 100%; padding: 9px 12px;
-            border: 1.5px solid var(--border); border-radius: 6px;
-            font-size: 14px; color: var(--text);
-            transition: border-color .15s, box-shadow .15s;
+
+        .form-row input[type=email],
+        .form-row input[type=password],
+        .form-row input[type=text] {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: #fafbfd;
+            transition: border-color .15s, box-shadow .15s, background .15s;
         }
+
         .form-row input:focus {
-            outline: none; border-color: var(--accent);
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
             box-shadow: 0 0 0 3px rgba(29,111,232,.12);
         }
+
+        /* ── Primary button ───────────────────────────────────── */
         .btn-submit {
-            display: block; width: 100%;
-            background: var(--accent); color: white;
-            border: none; border-radius: 6px;
-            padding: 10px; font-size: 14px; font-weight: 700;
-            cursor: pointer; margin-top: 8px;
-            transition: background .15s;
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #1d6fe8 0%, #155ec7 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 11px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 6px;
+            letter-spacing: .1px;
+            box-shadow: 0 2px 8px rgba(29,111,232,.3);
+            transition: opacity .15s, box-shadow .15s;
         }
-        .btn-submit:hover { background: var(--accent-hover); }
+
+        .btn-submit:hover {
+            opacity: .92;
+            box-shadow: 0 4px 14px rgba(29,111,232,.4);
+        }
+
+        .btn-submit:active { opacity: .85; }
+
+        /* ── Secondary/cancel button ──────────────────────────── */
         .btn-row {
             display: flex; gap: 10px; margin-top: 16px;
         }
+
         .btn {
-            flex: 1; text-align: center;
-            background: var(--accent); color: white;
-            border: none; border-radius: 6px;
-            padding: 9px; font-size: 13px; font-weight: 600;
-            cursor: pointer; text-decoration: none;
-            transition: background .15s;
+            flex: 1;
+            text-align: center;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity .15s;
         }
-        .btn:hover { background: var(--accent-hover); }
+
+        .btn:hover { opacity: .88; }
+
         .btn-cancel {
-            background: #f1f5fb; color: var(--text);
+            background: #f1f5fb;
+            color: var(--text);
             border: 1.5px solid var(--border);
         }
-        .btn-cancel:hover { background: #e4eaf5; }
+
+        .btn-cancel:hover { background: #e4eaf5; opacity: 1; }
+
+        /* ── Alerts ───────────────────────────────────────────── */
         .error-msg {
-            background: #fee2e2; border: 1px solid #fecaca;
-            border-radius: 6px; color: #991b1b;
-            font-size: 13px; padding: 9px 12px;
-            margin-bottom: 16px; text-align: center;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: #991b1b;
+            font-size: 13px;
+            padding: 10px 13px;
+            margin-bottom: 18px;
+            text-align: center;
         }
+
         .success-msg {
-            background: #dcfce7; border: 1px solid #bbf7d0;
-            border-radius: 6px; color: #166534;
-            font-size: 13px; padding: 9px 12px;
-            margin-bottom: 16px; text-align: center;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            color: #166534;
+            font-size: 13px;
+            padding: 10px 13px;
+            margin-bottom: 18px;
+            text-align: center;
         }
+
+        /* ── Footer links ─────────────────────────────────────── */
         .links {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 8px; margin-top: 20px; padding-top: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 9px;
+            margin-top: 22px;
+            padding-top: 18px;
             border-top: 1px solid var(--border);
         }
+
         .links a {
-            color: var(--accent); font-size: 13px; text-decoration: none;
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
         }
+
         .links a:hover { text-decoration: underline; }
+
+        /* ── Footer below card ────────────────────────────────── */
+        .card-foot {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 11px;
+            color: rgba(255,255,255,.35);
+        }
+
         {% block extra_styles %}{% endblock %}
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-logo">
-            <div class="logo-mark">⚙</div>
-            <h1>Manufacturing ERP</h1>
-            <div class="sub">Enterprise Resource Planning</div>
+    <div class="card-shell">
+        <div class="card">
+            <div class="card-logo">
+                <div class="logo-icon">
+                    <!-- Factory / gear SVG -->
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.92c.04-.3.07-.62.07-.94s-.03-.64-.07-1l2.08-1.63c.19-.14.24-.41.12-.62l-2-3.46c-.12-.21-.39-.28-.6-.21l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.58-1.69.98l-2.49-1c-.23-.09-.49 0-.61.21l-2 3.46c-.13.21-.07.48.12.62L4.57 11c-.04.34-.07.67-.07 1s.03.65.07 1l-2.11 1.66c-.19.14-.24.41-.12.62l2 3.46c.12.21.39.28.6.21l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.23.09.49 0 .61-.21l2-3.46c.12-.21.07-.48-.12-.62l-2.11-1.66z"/>
+                    </svg>
+                </div>
+                <h1>Manufacturing ERP</h1>
+                <div class="sub">Enterprise Resource Planning</div>
+            </div>
+            {% block card_content %}{% endblock %}
         </div>
-        {% block card_content %}{% endblock %}
+        <div class="card-foot">© {% now "Y" %} Manufacturing ERP</div>
     </div>
 </body>
 </html>
