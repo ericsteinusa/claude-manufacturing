@@ -33,6 +33,7 @@ PREFIXES = {
     "CON-":   ("con",    "Contact"),
     "EMP-":   ("emp",    "Employee / Person"),
     "SUP-":   ("sup",    "Supplier"),
+    "EQ-":    ("eq",     "Equipment"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -91,6 +92,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_emp_url(key)
     if rtype == "sup":
         return _lookup_sup_url(key)
+    if rtype == "eq":
+        return _lookup_eq_url(key)
     return None
 
 
@@ -140,6 +143,12 @@ def _lookup_po_url(po_number: str) -> str | None:
             return f"/po/{row['id']}/"
     except Exception:
         pass
+    return None
+
+
+def _lookup_eq_url(key: str) -> str | None:
+    if key.isdigit():
+        return f"/maint/equipment/{key}/"
     return None
 
 
