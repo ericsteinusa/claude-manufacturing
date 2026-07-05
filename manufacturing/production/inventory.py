@@ -7,9 +7,11 @@ from ..qt_theme import (
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,
+    ScanBar,
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,
 )
+from ..qt_barcode import open_label
 
 from ..accounts import get_current_user_email
 
@@ -505,6 +507,10 @@ class InventoryWidget(QtWidgets.QWidget):
         splitter.setSizes([400, 200])
         v.addWidget(splitter, stretch=1)
 
+        self.scan_bar = ScanBar(self, on_scan=self._on_scan,
+                                placeholder="Scan PART- barcode…")
+        v.addWidget(self.scan_bar)
+
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("Add Product",        self._on_add_product),
@@ -512,6 +518,7 @@ class InventoryWidget(QtWidgets.QWidget):
             ("Receive Stock",      lambda: self._quick_trans("receive")),
             ("Issue Stock",        lambda: self._quick_trans("issue")),
             ("Record Transaction", self._on_record_transaction),
+            ("Print Label",        self._on_print_label),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -689,6 +696,27 @@ class InventoryWidget(QtWidgets.QWidget):
                     self._on_product_clicked(
                         self.inv_table.model().index(i, 0))
                     break
+
+    def _on_scan(self, raw: str):
+        raw = raw.strip().upper()
+        key = raw[5:] if raw.startswith("PART-") else raw
+        for i, pid in enumerate(self._prod_row_ids):
+            item = self.inv_table.item(i, 0)
+            if item and (item.text().upper() == key or str(pid) == key):
+                self.inv_table.selectRow(i)
+                self.inv_table.scrollToItem(item)
+                self._on_product_clicked(self.inv_table.model().index(i, 0))
+                self.scan_bar.set_status(f"Found: {item.text()}", ok=True)
+                return
+        self.scan_bar.set_status(f"Not found: {key}", ok=False)
+
+    def _on_print_label(self):
+        if self._selected_product_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print Label", "Select a product first.")
+            return
+        ok, msg = open_label(f"PART-{self._selected_product_id}")
+        self.scan_bar.set_status(msg, ok=ok)
 
 
 class InventoryWindow(QtWidgets.QMainWindow):
