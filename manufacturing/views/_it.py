@@ -26,6 +26,10 @@ from ..it_core import (
     LICENSE_TYPES, LICENSE_STATUSES,
     list_network_devices, get_network_device, create_network_device, update_network_device,
     NETWORK_DEVICE_TYPES, NETWORK_DEVICE_STATUSES,
+    list_tasks, get_task, create_task, update_task, set_task_status, next_task_number,
+    TASK_STATUSES, TASK_PRIORITIES, TASK_TYPES,
+    list_incidents, get_incident, create_incident, update_incident, set_incident_status,
+    INCIDENT_SEVERITIES, INCIDENT_STATUSES,
 )
 
 log = get_logger(__name__)
@@ -497,6 +501,173 @@ def it_network_list(request):
         request, devices=devices, status_filter=status_f, type_filter=type_f,
         search=search, device_types=NETWORK_DEVICE_TYPES,
         device_statuses=NETWORK_DEVICE_STATUSES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_task_list(request):
+    status_f = request.GET.get('status', '').strip()
+    priority_f = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        tasks = list_tasks(conn, status=status_f or None,
+                           priority=priority_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                num = next_task_number(conn)
+                create_task(
+                    conn,
+                    task_number=num,
+                    task_name=request.POST.get('task_name', ''),
+                    task_type=request.POST.get('task_type', ''),
+                    description=request.POST.get('description', ''),
+                    assigned_to=request.POST.get('assigned_to', ''),
+                    department=request.POST.get('department', ''),
+                    priority=request.POST.get('priority', 'medium'),
+                    scheduled_date=request.POST.get('scheduled_date', ''),
+                    due_date=request.POST.get('due_date', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_task_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                tasks = list_tasks(conn, status=status_f or None,
+                                   priority=priority_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_task_list.html', _it_ctx(
+        request, tasks=tasks, status_filter=status_f, priority_filter=priority_f,
+        search=search, task_statuses=TASK_STATUSES, task_priorities=TASK_PRIORITIES,
+        task_types=TASK_TYPES, today=date.today().isoformat(),
+        error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_task_detail(request, task_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    task = None
+    try:
+        task = get_task(conn, task_id)
+        if not task:
+            return redirect('it_task_list')
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'status':
+                    set_task_status(conn, task_id, request.POST.get('status', ''))
+                    success = 'Status updated.'
+                else:
+                    update_task(
+                        conn, task_id,
+                        task_name=request.POST.get('task_name', ''),
+                        task_type=request.POST.get('task_type', ''),
+                        description=request.POST.get('description', ''),
+                        assigned_to=request.POST.get('assigned_to', ''),
+                        department=request.POST.get('department', ''),
+                        priority=request.POST.get('priority', ''),
+                        scheduled_date=request.POST.get('scheduled_date', ''),
+                        due_date=request.POST.get('due_date', ''),
+                        notes=request.POST.get('notes', ''),
+                    )
+                    success = 'Task updated.'
+                conn.commit()
+                task = get_task(conn, task_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_task_detail.html', _it_ctx(
+        request, task=task, can_edit=can_edit,
+        task_statuses=TASK_STATUSES, task_priorities=TASK_PRIORITIES,
+        task_types=TASK_TYPES, error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_incident_list(request):
+    status_f = request.GET.get('status', '').strip()
+    severity_f = request.GET.get('severity', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        incidents = list_incidents(conn, status=status_f or None,
+                                   severity=severity_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_incident(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    severity=request.POST.get('severity', 'info'),
+                    description=request.POST.get('description', ''),
+                    affected_systems=request.POST.get('affected_systems', ''),
+                    reported_date=request.POST.get('reported_date', '') or date.today().isoformat(),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('it_incident_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                incidents = list_incidents(conn, status=status_f or None,
+                                           severity=severity_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'it_incident_list.html', _it_ctx(
+        request, incidents=incidents, status_filter=status_f, severity_filter=severity_f,
+        search=search, incident_statuses=INCIDENT_STATUSES, incident_severities=INCIDENT_SEVERITIES,
+        today=date.today().isoformat(), error=error, success=success,
+    ))
+
+
+@dept_required('information_tech')
+def it_incident_detail(request, incident_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    conn = get_db_connection()
+    error = success = None
+    incident = None
+    try:
+        incident = get_incident(conn, incident_id)
+        if not incident:
+            return redirect('it_incident_list')
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'status':
+                    set_incident_status(conn, incident_id, request.POST.get('status', ''))
+                    success = 'Status updated.'
+                else:
+                    update_incident(
+                        conn, incident_id,
+                        title=request.POST.get('title', ''),
+                        severity=request.POST.get('severity', ''),
+                        description=request.POST.get('description', ''),
+                        affected_systems=request.POST.get('affected_systems', ''),
+                        reported_date=request.POST.get('reported_date', ''),
+                        notes=request.POST.get('notes', ''),
+                    )
+                    success = 'Incident updated.'
+                conn.commit()
+                incident = get_incident(conn, incident_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'it_incident_detail.html', _it_ctx(
+        request, incident=incident, can_edit=can_edit,
+        incident_statuses=INCIDENT_STATUSES, incident_severities=INCIDENT_SEVERITIES,
         error=error, success=success,
     ))
 

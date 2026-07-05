@@ -9,128 +9,98 @@
 <a href="/it/software/" class="btn">Software</a>
 <a href="/it/licenses/" class="btn">Licenses</a>
 <a href="/it/network/" class="btn">Network</a>
+<a href="/it/tasks/" class="btn">Tasks</a>
+<a href="/it/incidents/" class="btn">Incidents</a>
 <a href="/dashboard/" class="btn">Home</a>
-{% endblock %}
-
-{% block extra_styles %}
-.m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
-    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
-    font-size:13px; text-decoration:none; }
-.nav-btn:hover { background:rgb(0,60,180); color:white; }
-.section-label { color:white; font-size:14px; font-weight:bold; margin-bottom:8px; margin-top:4px; }
-.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
-.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
-.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
-.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
-.kpi.red { border-color:#c33; }
-.kpi.red .val { color:#c33; }
-.kpi.yellow { border-color:#b8860b; }
-.kpi.yellow .val { color:#b8860b; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
-.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
-.list-table { width:100%; border-collapse:collapse; }
-.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
-.list-table tr:last-child td { border-bottom:none; }
-.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
-.p-critical { background:#f8d7da; color:#842029; }
-.p-high     { background:#fff3cd; color:#856404; }
-.p-medium   { background:#d1ecf1; color:#0c5460; }
-.p-low      { background:#e2e3e5; color:#383d41; }
-.s-open        { background:#f8d7da; color:#842029; }
-.s-in_progress { background:#fff3cd; color:#856404; }
-.s-resolved    { background:#d4edda; color:#0a3622; }
-.s-closed      { background:#e2e3e5; color:#383d41; }
-.s-on_hold     { background:#f5c6cb; color:#721c24; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
-<div class="m-wrap">
-    <h2>Information Technology Dashboard</h2>
+    <div class="menu-title">Information Technology Dashboard</div>
 
-    <div class="nav-grid">
-        <a href="/dept/information_tech/" class="nav-btn">IT Menu</a>
-        <a href="/dept/information_tech/it_tech/" class="nav-btn">IT Technician</a>
-        <a href="/dept/information_tech/it_mgr/" class="nav-btn">IT Manager</a>
-        <a href="/dashboard/" class="nav-btn">Home</a>
+    <div class="dept-grid" style="max-width:700px;margin-bottom:24px;">
+        <a href="/dept/information_tech/" class="dept-btn">IT Menu</a>
+        <a href="/dept/information_tech/it_tech/" class="dept-btn">IT Technician</a>
+        <a href="/dept/information_tech/it_mgr/" class="dept-btn">IT Manager</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
     </div>
 
-    <div class="section-label">Help Desk Tickets</div>
-    <div class="kpi-row">
-        <div class="kpi{% if tickets.open_count %} red{% endif %}">
-            <div class="lbl">Open</div>
-            <div class="val">{{ tickets.open_count|default:0 }}</div>
+    <p style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Help Desk Tickets</p>
+    <div class="kpi-grid" style="max-width:900px;margin-bottom:24px;">
+        <div class="kpi-card{% if tickets.open_count %}" style="border-left:4px solid var(--danger-fg);{% endif %}">
+            <div class="kpi-label">Open</div>
+            <div class="kpi-value{% if tickets.open_count %} warn{% endif %}">{{ tickets.open_count|default:0 }}</div>
         </div>
-        <div class="kpi{% if tickets.in_progress_count %} yellow{% endif %}">
-            <div class="lbl">In Progress</div>
-            <div class="val">{{ tickets.in_progress_count|default:0 }}</div>
+        <div class="kpi-card">
+            <div class="kpi-label">In Progress</div>
+            <div class="kpi-value">{{ tickets.in_progress_count|default:0 }}</div>
         </div>
-        <div class="kpi{% if tickets.critical_count %} red{% endif %}">
-            <div class="lbl">Critical (Open)</div>
-            <div class="val">{{ tickets.critical_count|default:0 }}</div>
+        <div class="kpi-card{% if tickets.critical_count %}" style="border-left:4px solid var(--danger-fg);{% endif %}">
+            <div class="kpi-label">Critical (Open)</div>
+            <div class="kpi-value{% if tickets.critical_count %} warn{% endif %}">{{ tickets.critical_count|default:0 }}</div>
         </div>
-        <div class="kpi">
-            <div class="lbl">Total Tickets</div>
-            <div class="val">{{ tickets.total_count|default:0 }}</div>
-        </div>
-    </div>
-
-    <div class="section-label">Asset Inventory</div>
-    <div class="kpi-row">
-        <div class="kpi">
-            <div class="lbl">Total Assets</div>
-            <div class="val">{{ assets.total|default:0 }}</div>
-        </div>
-        <div class="kpi">
-            <div class="lbl">Active</div>
-            <div class="val">{{ assets.active|default:0 }}</div>
-        </div>
-        <div class="kpi{% if assets.repair %} yellow{% endif %}">
-            <div class="lbl">In Repair</div>
-            <div class="val">{{ assets.repair|default:0 }}</div>
-        </div>
-        <div class="kpi">
-            <div class="lbl">&nbsp;</div>
-            <div class="val">&nbsp;</div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Tickets</div>
+            <div class="kpi-value">{{ tickets.total_count|default:0 }}</div>
         </div>
     </div>
 
-    <div class="card">
-        <h3>Recent Support Tickets</h3>
-        <table class="list-table">
-            <thead>
+    <p style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Asset Inventory</p>
+    <div class="kpi-grid" style="max-width:900px;margin-bottom:24px;">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Assets</div>
+            <div class="kpi-value">{{ assets.total|default:0 }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Active</div>
+            <div class="kpi-value">{{ assets.active|default:0 }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">In Repair</div>
+            <div class="kpi-value">{{ assets.repair|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:1000px;">
+        <div class="card-title">Recent Support Tickets</div>
+        <div class="erp-table-wrap" style="margin-top:12px;">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Requester</th>
+                        <th>Department</th>
+                        <th>Issue Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for t in recent_tickets %}
                 <tr>
-                    <th>Ticket #</th>
-                    <th>Requester</th>
-                    <th>Department</th>
-                    <th>Issue Type</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                    <td>{{ t.ticket_number }}</td>
+                    <td>{{ t.requester|default:"—" }}</td>
+                    <td>{{ t.department|default:"—" }}</td>
+                    <td>{{ t.issue_type|default:"—" }}</td>
+                    <td>
+                        {% if t.priority == 'critical' %}<span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{{ t.priority|title }}</span>
+                        {% elif t.priority == 'high' %}<span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{{ t.priority|title }}</span>
+                        {% else %}<span class="pill" style="font-size:11px;padding:2px 8px;">{{ t.priority|title }}</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if t.status == 'resolved' or t.status == 'closed' %}<span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{{ t.status|title }}</span>
+                        {% elif t.status == 'in_progress' %}<span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{{ t.status|title }}</span>
+                        {% else %}<span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{{ t.status|title }}</span>{% endif %}
+                    </td>
+                    <td>{{ t.submitted_date|default:"—" }}</td>
                 </tr>
-            </thead>
-            <tbody>
-            {% for t in recent_tickets %}
-            <tr>
-                <td>{{ t.ticket_number }}</td>
-                <td>{{ t.requester|default:"—" }}</td>
-                <td>{{ t.department|default:"—" }}</td>
-                <td>{{ t.issue_type|default:"—" }}</td>
-                <td><span class="badge p-{{ t.priority }}">{{ t.priority|title }}</span></td>
-                <td><span class="badge s-{{ t.status }}">{{ t.status|title }}</span></td>
-                <td>{{ t.submitted_date|default:"—" }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="7" style="color:#888;">No tickets found.</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                {% empty %}
+                <tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No tickets found.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
-</div>
 </div>
 {% endblock %}

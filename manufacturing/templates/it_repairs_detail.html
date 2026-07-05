@@ -5,13 +5,15 @@
 <a href="/it/" class="btn">IT Dashboard</a>
 <a href="/it/repairs/" class="btn">Repairs</a>
 <a href="/it/assets/" class="btn">Assets</a>
+<a href="/it/tasks/" class="btn">Tasks</a>
+<a href="/it/incidents/" class="btn">Incidents</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
 {% block extra_styles %}
 .it-wrap { width:100%; max-width:900px; }
-.it-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; border-bottom:1px solid #eee; padding-bottom:8px; }
 .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .detail-grid.three { grid-template-columns:1fr 1fr 1fr; }
@@ -38,8 +40,8 @@
 .status-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
 .status-row select { padding:6px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
 .btn-action { padding:7px 16px; border:none; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
-.btn-primary { background:rgb(0,60,180); color:white; }
-.btn-primary:hover { background:rgb(0,40,140); }
+.btn-primary { background:var(--accent); color:white; }
+.btn-primary:hover { background:var(--accent-hover); }
 .btn-sm { padding:5px 12px; font-size:12px; }
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }

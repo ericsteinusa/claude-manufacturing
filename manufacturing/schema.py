@@ -360,6 +360,183 @@ _TABLES = [
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     """),
+    # --- IT module tables ---------------------------------------------------
+    ("it_ticket", """
+        CREATE TABLE IF NOT EXISTS it_ticket (
+            id             SERIAL PRIMARY KEY,
+            ticket_number  TEXT NOT NULL UNIQUE,
+            requester      TEXT DEFAULT '',
+            department     TEXT DEFAULT '',
+            issue_type     TEXT DEFAULT '',
+            description    TEXT DEFAULT '',
+            priority       TEXT DEFAULT 'medium',
+            assigned_to    TEXT DEFAULT '',
+            submitted_date TEXT,
+            due_date       TEXT,
+            resolved_date  TEXT,
+            status         TEXT DEFAULT 'open',
+            notes          TEXT DEFAULT '',
+            created_by     TEXT DEFAULT ''
+        )
+    """),
+    ("it_asset", """
+        CREATE TABLE IF NOT EXISTS it_asset (
+            id            SERIAL PRIMARY KEY,
+            asset_tag     TEXT NOT NULL UNIQUE,
+            asset_type    TEXT DEFAULT '',
+            make          TEXT DEFAULT '',
+            model         TEXT DEFAULT '',
+            serial_number TEXT DEFAULT '',
+            assigned_to   TEXT DEFAULT '',
+            department    TEXT DEFAULT '',
+            purchase_date TEXT,
+            warranty_exp  TEXT,
+            status        TEXT DEFAULT 'active',
+            notes         TEXT DEFAULT '',
+            created_by    TEXT DEFAULT ''
+        )
+    """),
+    ("it_asset_history", """
+        CREATE TABLE IF NOT EXISTS it_asset_history (
+            id          SERIAL PRIMARY KEY,
+            asset_tag   TEXT DEFAULT '',
+            asset_id    INTEGER,
+            event_type  TEXT DEFAULT '',
+            description TEXT DEFAULT '',
+            changed_by  TEXT DEFAULT '',
+            changed_at  TIMESTAMP DEFAULT NOW()
+        )
+    """),
+    ("it_repair", """
+        CREATE TABLE IF NOT EXISTS it_repair (
+            id               SERIAL PRIMARY KEY,
+            asset_tag        TEXT DEFAULT '',
+            problem_description TEXT DEFAULT '',
+            reported_by      TEXT DEFAULT '',
+            reported_date    DATE,
+            assigned_to      TEXT DEFAULT '',
+            priority         TEXT DEFAULT 'medium',
+            status           TEXT DEFAULT 'open',
+            resolution       TEXT DEFAULT '',
+            completed_date   DATE,
+            notes            TEXT DEFAULT '',
+            created_by       TEXT DEFAULT ''
+        )
+    """),
+    ("it_software_install", """
+        CREATE TABLE IF NOT EXISTS it_software_install (
+            id            SERIAL PRIMARY KEY,
+            asset_tag     TEXT DEFAULT '',
+            software_name TEXT DEFAULT '',
+            version       TEXT DEFAULT '',
+            vendor        TEXT DEFAULT '',
+            install_date  DATE,
+            status        TEXT DEFAULT 'installed',
+            installed_by  TEXT DEFAULT '',
+            notes         TEXT DEFAULT '',
+            created_by    TEXT DEFAULT ''
+        )
+    """),
+    ("it_license", """
+        CREATE TABLE IF NOT EXISTS it_license (
+            id            SERIAL PRIMARY KEY,
+            software_name TEXT DEFAULT '',
+            vendor        TEXT DEFAULT '',
+            license_key   TEXT DEFAULT '',
+            license_type  TEXT DEFAULT 'perpetual',
+            seats         INTEGER DEFAULT 1,
+            seats_used    INTEGER DEFAULT 0,
+            purchase_date DATE,
+            expiry_date   DATE,
+            cost          REAL DEFAULT 0,
+            status        TEXT DEFAULT 'active',
+            notes         TEXT DEFAULT '',
+            created_by    TEXT DEFAULT ''
+        )
+    """),
+    ("it_network_device", """
+        CREATE TABLE IF NOT EXISTS it_network_device (
+            id           SERIAL PRIMARY KEY,
+            hostname     TEXT DEFAULT '',
+            ip_address   TEXT DEFAULT '',
+            mac_address  TEXT DEFAULT '',
+            device_type  TEXT DEFAULT '',
+            manufacturer TEXT DEFAULT '',
+            model        TEXT DEFAULT '',
+            location     TEXT DEFAULT '',
+            status       TEXT DEFAULT 'unknown',
+            last_seen    DATE,
+            notes        TEXT DEFAULT '',
+            created_by   TEXT DEFAULT ''
+        )
+    """),
+    ("it_network_incident", """
+        CREATE TABLE IF NOT EXISTS it_network_incident (
+            id               SERIAL PRIMARY KEY,
+            title            TEXT DEFAULT '',
+            severity         TEXT DEFAULT 'info',
+            status           TEXT DEFAULT 'open',
+            description      TEXT DEFAULT '',
+            affected_systems TEXT DEFAULT '',
+            reported_date    DATE,
+            resolved_date    DATE,
+            notes            TEXT DEFAULT '',
+            created_by       TEXT DEFAULT ''
+        )
+    """),
+    ("it_bandwidth_log", """
+        CREATE TABLE IF NOT EXISTS it_bandwidth_log (
+            id             SERIAL PRIMARY KEY,
+            interface_name TEXT DEFAULT '',
+            recorded_at    TIMESTAMP DEFAULT NOW(),
+            mbps_in        REAL DEFAULT 0,
+            mbps_out       REAL DEFAULT 0,
+            notes          TEXT DEFAULT '',
+            created_by     TEXT DEFAULT ''
+        )
+    """),
+    ("it_task", """
+        CREATE TABLE IF NOT EXISTS it_task (
+            id             SERIAL PRIMARY KEY,
+            task_number    TEXT NOT NULL UNIQUE,
+            task_name      TEXT NOT NULL,
+            task_type      TEXT,
+            description    TEXT,
+            assigned_to    TEXT,
+            department     TEXT,
+            priority       TEXT DEFAULT 'medium',
+            scheduled_date TEXT,
+            due_date       TEXT,
+            completed_date TEXT,
+            status         TEXT DEFAULT 'pending',
+            notes          TEXT,
+            created_by     TEXT
+        )
+    """),
+    # --- MRP tables ---------------------------------------------------------
+    ("mrp_run", """
+        CREATE TABLE IF NOT EXISTS mrp_run (
+            id SERIAL PRIMARY KEY,
+            run_date TEXT,
+            horizon_days INTEGER,
+            notes TEXT,
+            created_by TEXT
+        )
+    """),
+    ("mrp_planned_order", """
+        CREATE TABLE IF NOT EXISTS mrp_planned_order (
+            id SERIAL PRIMARY KEY,
+            run_id INTEGER NOT NULL REFERENCES mrp_run(id),
+            product_id INTEGER NOT NULL,
+            order_type TEXT,
+            qty REAL,
+            need_date TEXT,
+            start_date TEXT,
+            lead_time_days INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'suggested',
+            released_ref TEXT
+        )
+    """),
     # --- Cost accounting (Phase 2) ------------------------------------------
     ("gl_account_map", """
         CREATE TABLE IF NOT EXISTS gl_account_map (
@@ -476,6 +653,21 @@ _RECONCILE = {
     # Backfill equipment FK onto maint_part (Phase 6B)
     "maint_part": [
         ("equipment_id", "INTEGER"),
+    ],
+    # Backfill columns added to it_ticket after initial release
+    "it_ticket": [
+        ("created_by", "TEXT DEFAULT ''"),
+        ("resolved_date", "TEXT"),
+    ],
+    # Backfill created_by onto it_asset
+    "it_asset": [
+        ("created_by", "TEXT DEFAULT ''"),
+    ],
+    # Backfill start_date / released_ref onto mrp_planned_order
+    "mrp_planned_order": [
+        ("start_date", "TEXT"),
+        ("released_ref", "TEXT"),
+        ("lead_time_days", "INTEGER DEFAULT 0"),
     ],
     # Backfill GL account link onto budget_line (Phase 3B)
     "budget_line": [
