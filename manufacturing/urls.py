@@ -355,6 +355,7 @@ urlpatterns = [
     path('label/po/<int:po_id>/', views.label_po, name='label_po'),
     path('label/receiving/<int:po_id>/', views.label_receiving, name='label_receiving'),
     path('label/asset/<int:asset_id>/', views.label_asset, name='label_asset'),
+    path('barcode/img/<path:code>/', views.barcode_img, name='barcode_img'),
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),
