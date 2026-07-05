@@ -8,10 +8,10 @@
 {% block extra_styles %}
 .lot-wrap { max-width: 800px; }
 .lot-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
-.lot-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
-.card { background: white; border: 2px solid black; border-radius: 8px;
+.lot-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 20px; margin-bottom: 16px; }
-.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
 .info-grid { display: grid; grid-template-columns: 160px 1fr; gap: 8px 20px; font-size: 13px; }
 .info-label { font-weight: bold; color: #555; }
 .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; border: 1px solid; font-size: 12px; }
@@ -24,7 +24,7 @@
 .status-form select { padding: 5px 8px; border: 1px solid #aaa; border-radius: 4px; font-size: 13px; }
 .status-form input[type=text] { padding: 5px 8px; border: 1px solid #aaa; border-radius: 4px;
     font-size: 13px; width: 220px; }
-.btn-sm { padding: 5px 14px; font-size: 12px; background: rgb(0,60,180); color: white;
+.btn-sm { padding: 5px 14px; font-size: 12px; background: var(--accent); color: white;
     border: none; border-radius: 4px; cursor: pointer; }
 .btn-sm:hover { opacity: 0.85; }
 .serial-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -36,11 +36,26 @@
     padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
 .alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
     padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.lot-barcode {
+    display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
+}
+.lot-barcode img { max-width:260px; height:auto; }
+.lot-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+@media print {
+    .btn, .btn-sm, form { display:none !important; }
+    body { background:white !important; }
+    .lot-wrap { max-width:none; }
+    .lot-barcode img { max-width:300px; }
+}
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <div class="lot-wrap">
+    <div class="lot-barcode">
+        <img src="/barcode/img/LOT-{{ lot.lot_number }}/" alt="Barcode LOT-{{ lot.lot_number }}">
+        <small>LOT-{{ lot.lot_number }}</small>
+    </div>
     <h2>Lot {{ lot.lot_number }}</h2>
     <div class="lot-meta">
         <span class="badge badge-{{ lot.status }}">{{ lot.status }}</span>
