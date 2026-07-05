@@ -28,6 +28,7 @@ PREFIXES = {
     "SHIP-":  ("ship",     "Shipment"),
     "CS-":    ("cs",      "CS Ticket"),
     "INSP-":  ("insp",   "QA Inspection"),
+    "ENGP-":  ("engp",   "Engineering Project"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -76,6 +77,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_cs_url(key)
     if rtype == "insp":
         return _lookup_insp_url(key)
+    if rtype == "engp":
+        return _lookup_engp_url(key)
     return None
 
 
@@ -123,6 +126,20 @@ def _lookup_po_url(po_number: str) -> str | None:
         ).fetchone()
         if row:
             return f"/po/{row['id']}/"
+    except Exception:
+        pass
+    return None
+
+
+def _lookup_engp_url(project_number: str) -> str | None:
+    try:
+        from .db_pg import get_db_connection
+        conn = get_db_connection()
+        row = conn.execute(
+            "SELECT id FROM eng_project WHERE project_number = %s", [project_number]
+        ).fetchone()
+        if row:
+            return f"/eng/projects/{row['id']}/"
     except Exception:
         pass
     return None
