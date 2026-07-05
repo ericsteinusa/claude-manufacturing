@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block page_title %}Barcode Scanner{% endblock %}
+
+{% block toolbar_left %}
+<a href="/scan/" class="btn">Scanner</a>
+<a href="/scan/receive/" class="btn">Receive Goods</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.scan-card {
+    max-width: 560px;
+    margin: 48px auto;
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 36px 40px;
+}
+.scan-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.scan-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 28px; }
+.scan-input-row { display: flex; gap: 8px; }
+.scan-input {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    outline: none;
+    color: var(--text);
+    background: var(--card-bg);
+}
+.scan-input:focus { box-shadow: 0 0 0 3px rgba(29,111,232,.15); }
+.scan-legend {
+    margin-top: 28px;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+}
+.scan-legend table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.scan-legend td { padding: 5px 8px; }
+.scan-legend tr:nth-child(even) td { background: var(--content-bg); }
+.prefix { font-family: monospace; font-weight: 700; color: var(--accent); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="scan-card">
+        <div class="scan-title">Barcode Lookup</div>
+        <div class="scan-sub">Scan any barcode or type a code to jump to the record.</div>
+
+        {% if error %}<div class="alert alert-danger" style="margin-bottom:16px;">{{ error }}</div>{% endif %}
+
+        <form method="get" action="/scan/lookup/">
+            <div class="scan-input-row">
+                <input class="scan-input" type="text" name="q"
+                       value="{{ last_scan|default:'' }}"
+                       placeholder="Scan or type barcode…"
+                       autofocus autocomplete="off" spellcheck="false">
+                <button type="submit" class="btn btn-primary">Go</button>
+            </div>
+        </form>
+
+        <div class="scan-legend">
+            <table>
+                <tr><td class="prefix">WO-</td><td>Work Order</td><td>e.g. WO-2024-001</td></tr>
+                <tr><td class="prefix">PART-</td><td>Part / Inventory</td><td>e.g. PART-SKU123</td></tr>
+                <tr><td class="prefix">PO-</td><td>Purchase Order</td><td>e.g. PO-2024-001</td></tr>
+                <tr><td class="prefix">RCV-</td><td>Receiving</td><td>e.g. RCV-2024-001</td></tr>
+                <tr><td class="prefix">ASSET-</td><td>IT Asset</td><td>e.g. ASSET-TAG001</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+/* Auto-submit when scanner sends Enter after the barcode */
+document.querySelector('.scan-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); this.closest('form').submit(); }
+});
+</script>
+{% endblock %}

@@ -4,12 +4,13 @@
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">Back</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="/label/part/{{ product.id }}/" target="_blank" class="btn">Print Label</a>
 {% endblock %}
 
 {% block extra_styles %}
 .inv-wrap { width: 100%; max-width: 1020px; }
 .inv-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
-.card { background: white; border: 2px solid black; border-radius: 8px;
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 18px 22px; margin-bottom: 20px; }
 .card h3 { font-size: 14px; color: #444; margin-bottom: 14px;
     border-bottom: 1px solid #ddd; padding-bottom: 6px; font-weight: bold; }
@@ -49,9 +50,9 @@
     padding:8px 14px;color:#1a5a20;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
     padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
-.save-btn { padding: 7px 22px; background: rgb(0,60,180); color: white;
+.save-btn { padding: 7px 22px; background: var(--accent); color: white;
     border: none; border-radius: 5px; font-size: 13px; cursor: pointer; font-weight: bold; }
-.save-btn:hover { background: rgb(0,40,140); }
+.save-btn:hover { background: var(--accent-hover); }
 .txn-btn { padding: 6px 16px; background: #1a7a30; color: white;
     border: none; border-radius: 5px; font-size: 13px; cursor: pointer; font-weight: bold; }
 .txn-btn:hover { background: #0e5520; }
@@ -177,7 +178,7 @@
             <div style="margin-top:14px;">
                 <button type="submit" class="save-btn">Save Changes</button>
                 <a href="/bom/{{ product.id }}/" style="margin-left:14px;
-                   color:rgb(0,60,180);font-size:13px;">View BOM &rarr;</a>
+                   color:var(--accent);font-size:13px;">View BOM &rarr;</a>
             </div>
         </form>
     </div>

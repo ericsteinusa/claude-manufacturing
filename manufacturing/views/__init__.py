@@ -193,6 +193,7 @@ from ._quality import *  # noqa: F401,F403
 from ._maintenance import *  # noqa: F401,F403
 from ._payroll import *  # noqa: F401,F403
 from ._it import *  # noqa: F401,F403
+from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
 
