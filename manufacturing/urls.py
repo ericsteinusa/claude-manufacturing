@@ -203,6 +203,7 @@ urlpatterns = [
     path('sales/contracts/<int:contract_id>/', views.sales_contracts_detail, name='sales_contracts_detail'),
     path('sales/forecast/', views.sales_forecast_list, name='sales_forecast_list'),
     path('sales/forecast/<int:forecast_id>/', views.sales_forecast_detail, name='sales_forecast_detail'),
+    path('sales/demand/', views.sales_demand, name='sales_demand'),
     path('sales/territories/', views.sales_territories, name='sales_territories'),
     path('sales/territories/performance/', views.sales_territory_performance,
          name='sales_territory_performance'),

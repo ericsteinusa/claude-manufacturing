@@ -5171,7 +5171,8 @@ from ..sales_core import (  # noqa: E402
     create_sales_contract, update_sales_contract, init_sales_contract_table,
     FORECAST_PERIODS, FORECAST_STATUSES,
     list_forecasts, get_forecast, create_forecast, update_forecast,
-    init_sales_forecast_table,
+    init_sales_forecast_table, get_forecast_kpis, get_period_actuals,
+    get_demand_by_product, update_forecast_actual,
     # Territories
     TERRITORY_STATUSES,
     init_sales_territory_table, list_territories, create_territory, update_territory, get_territory_performance,
@@ -5587,11 +5588,14 @@ def sales_forecast_list(request):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     period_f = request.GET.get('period', '').strip()
     search = request.GET.get('search', '').strip()
+    fiscal_year = int(request.GET.get('fiscal_year') or 0) or date.today().year
     error = success = None
     conn = get_db_connection()
     try:
         init_sales_forecast_table(conn)
         forecasts = list_forecasts(conn, period=period_f or None, search=search or None)
+        kpis = get_forecast_kpis(conn, period=period_f or None, search=search or None)
+        period_actuals = get_period_actuals(conn, fiscal_year)
         if request.method == 'POST' and can_edit:
             try:
                 create_forecast(
@@ -5616,6 +5620,7 @@ def sales_forecast_list(request):
         conn.close()
     return render(request, 'sales_forecast_list.html', _sales_ctx(
         request, forecasts=forecasts, period_filter=period_f, search=search,
+        fiscal_year=fiscal_year, kpis=kpis, period_actuals=period_actuals,
         forecast_periods=FORECAST_PERIODS, forecast_statuses=FORECAST_STATUSES,
         error=error, success=success, can_edit=can_edit,
     ))
@@ -5627,34 +5632,98 @@ def sales_forecast_detail(request, forecast_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_sales_forecast_table(conn)
         forecast = get_forecast(conn, forecast_id)
         if not forecast:
             return redirect('sales_forecast_list')
         if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
             try:
-                update_forecast(
-                    conn, forecast_id,
-                    rep=request.POST.get('rep', ''),
-                    period=request.POST.get('period', ''),
-                    fiscal_year=int(request.POST.get('fiscal_year') or 0),
-                    product_line=request.POST.get('product_line', ''),
-                    expected_value=float(request.POST.get('expected_value') or 0),
-                    probability=int(request.POST.get('probability') or 0),
-                    status=request.POST.get('status', ''),
-                    notes=request.POST.get('notes', ''),
-                )
+                if action == 'actual':
+                    update_forecast_actual(
+                        conn, forecast_id,
+                        actual_value=float(request.POST.get('actual_value') or 0),
+                    )
+                else:
+                    update_forecast(
+                        conn, forecast_id,
+                        rep=request.POST.get('rep', ''),
+                        period=request.POST.get('period', ''),
+                        fiscal_year=int(request.POST.get('fiscal_year') or 0),
+                        product_line=request.POST.get('product_line', ''),
+                        expected_value=float(request.POST.get('expected_value') or 0),
+                        probability=int(request.POST.get('probability') or 0),
+                        status=request.POST.get('status', ''),
+                        notes=request.POST.get('notes', ''),
+                    )
                 conn.commit()
                 success = 'Forecast updated.'
                 forecast = get_forecast(conn, forecast_id)
             except Exception as e:
                 conn.rollback()
                 error = str(e)
+        actual = float(forecast.get('actual_value') or 0)
+        weighted = float(forecast.get('weighted_value') or 0)
+        variance = actual - weighted
+        attainment = round(actual / weighted * 100, 1) if weighted else None
     finally:
         conn.close()
     return render(request, 'sales_forecast_detail.html', _sales_ctx(
         request, forecast=forecast, can_edit=can_edit,
         forecast_periods=FORECAST_PERIODS, forecast_statuses=FORECAST_STATUSES,
         error=error, success=success,
+        actual=actual, variance=variance, attainment=attainment,
+    ))
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_demand(request):
+    fiscal_year = int(request.GET.get('fiscal_year') or 0) or date.today().year
+    conn = get_db_connection()
+    try:
+        init_sales_forecast_table(conn)
+        demand_rows = get_demand_by_product(conn, fiscal_year)
+        forecasts = list_forecasts(conn)
+    finally:
+        conn.close()
+
+    # Pivot: product → {Q1, Q2, Q3, Q4, total_revenue, total_units}
+    products: dict = {}
+    for r in demand_rows:
+        prod = r['product']
+        if prod not in products:
+            products[prod] = {'product': prod, 'Q1': 0, 'Q2': 0, 'Q3': 0, 'Q4': 0,
+                              'total_revenue': 0, 'total_units': 0}
+        qkey = f"Q{int(r['qtr'])}"
+        products[prod][qkey] = float(r['revenue'])
+        products[prod]['total_revenue'] += float(r['revenue'])
+        products[prod]['total_units'] += int(r['units'])
+
+    product_rows = sorted(products.values(), key=lambda x: -x['total_revenue'])
+
+    # Quarter totals
+    quarter_totals = {
+        'Q1': sum(p['Q1'] for p in product_rows),
+        'Q2': sum(p['Q2'] for p in product_rows),
+        'Q3': sum(p['Q3'] for p in product_rows),
+        'Q4': sum(p['Q4'] for p in product_rows),
+    }
+    quarter_totals['total'] = sum(quarter_totals.values())
+
+    # Forecast summary by period for comparison
+    forecast_by_period: dict = {}
+    for f in forecasts:
+        if f.get('fiscal_year') == fiscal_year:
+            p = f.get('period', '')
+            forecast_by_period[p] = forecast_by_period.get(p, 0) + float(f.get('weighted_value') or 0)
+
+    years = list(range(date.today().year - 3, date.today().year + 2))
+
+    return render(request, 'sales_demand.html', _sales_ctx(
+        request, fiscal_year=fiscal_year, years=years,
+        product_rows=product_rows, quarter_totals=quarter_totals,
+        forecast_by_period=forecast_by_period,
+        can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
     ))
 
 
