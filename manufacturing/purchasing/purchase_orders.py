@@ -11,9 +11,11 @@ from ..qt_theme import (
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,
+    ScanBar,
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,
 )
+from ..qt_barcode import open_label
 
 
 def get_db():
@@ -470,6 +472,10 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
         splitter.setSizes([400, 180])
         v.addWidget(splitter, stretch=1)
 
+        self.scan_bar = ScanBar(self, on_scan=self._on_scan,
+                                placeholder="Scan PO- barcode…")
+        v.addWidget(self.scan_bar)
+
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New PO",        self._on_new_po),
@@ -484,6 +490,7 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
             ("Cancel PO",     lambda: self._set_status(
                 "cancelled", "Cancel this PO?")),
             ("Print PO",      self._on_print_po),
+            ("Print Label",   self._on_print_label),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -687,6 +694,26 @@ class PurchaseOrdersWidget(QtWidgets.QWidget):
             )
         )
         print_document(html, f"Purchase Order {po['po_number']}", self)
+
+    def _on_scan(self, raw: str):
+        raw = raw.strip().upper()
+        po_number = raw[3:] if raw.startswith("PO-") else raw
+        for i, row_id in enumerate(self._po_row_ids):
+            item = self.po_table.item(i, 0)
+            if item and item.text() == po_number:
+                self.po_table.selectRow(i)
+                self.po_table.scrollToItem(item)
+                self.scan_bar.set_status(f"Found: {po_number}", ok=True)
+                return
+        self.scan_bar.set_status(f"Not found: {po_number}", ok=False)
+
+    def _on_print_label(self):
+        if self._selected_po_number is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print Label", "Select a purchase order first.")
+            return
+        ok, msg = open_label(f"PO-{self._selected_po_number}")
+        self.scan_bar.set_status(msg, ok=ok)
 
 
 class PurchaseOrdersWindow(QtWidgets.QMainWindow):

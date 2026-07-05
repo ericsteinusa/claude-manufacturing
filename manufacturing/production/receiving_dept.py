@@ -8,9 +8,11 @@ from ..qt_theme import (
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,
+    ScanBar,
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,
 )
+from ..qt_barcode import open_label
 
 
 def get_db():
@@ -472,6 +474,10 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
         splitter.setSizes([380, 180])
         v.addWidget(splitter, stretch=1)
 
+        self.scan_bar = ScanBar(self, on_scan=self._on_scan,
+                                placeholder="Scan RCV- or PO- barcode…")
+        v.addWidget(self.scan_bar)
+
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Receipt", self._on_new_receipt),
@@ -483,6 +489,7 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
                 "received", "Mark as Fully Received?")),
             ("Mark Rejected", lambda: self._set_status(
                 "rejected", "Mark as Rejected?")),
+            ("Print Label",  self._on_print_label),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -636,6 +643,31 @@ class ReceivingDeptWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh_receipts()
+
+    def _on_scan(self, raw: str):
+        raw = raw.strip().upper()
+        # RCV- and PO- both map to receiving records by po_number
+        key = raw
+        for prefix in ("RCV-", "PO-"):
+            if raw.startswith(prefix):
+                key = raw[len(prefix):]
+                break
+        for i, row_id in enumerate(self._rcv_row_ids):
+            item = self.rcv_table.item(i, 0)
+            if item and item.text().upper() == key:
+                self.rcv_table.selectRow(i)
+                self.rcv_table.scrollToItem(item)
+                self.scan_bar.set_status(f"Found: {item.text()}", ok=True)
+                return
+        self.scan_bar.set_status(f"Not found: {key}", ok=False)
+
+    def _on_print_label(self):
+        if self._selected_rcv_number is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print Label", "Select a receipt first.")
+            return
+        ok, msg = open_label(f"RCV-{self._selected_rcv_number}")
+        self.scan_bar.set_status(msg, ok=ok)
 
 
 class ReceivingDept(QtWidgets.QMainWindow):

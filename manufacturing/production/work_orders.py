@@ -13,9 +13,11 @@ from ..qt_theme import (
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,
+    ScanBar,
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,
 )
+from ..qt_barcode import lookup_record, open_label
 
 WO_COLORS = WO_STATUS_COLORS
 
@@ -456,6 +458,11 @@ class WorkOrdersWidget(QtWidgets.QWidget):
         splitter.setSizes([400, 180])
         v.addWidget(splitter, stretch=1)
 
+        # Scan bar
+        self.scan_bar = ScanBar(self, on_scan=self._on_scan,
+                                placeholder="Scan WO- barcode…")
+        v.addWidget(self.scan_bar)
+
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New WO",          self._on_new_wo),
@@ -470,6 +477,7 @@ class WorkOrdersWidget(QtWidgets.QWidget):
             ("Cancel",          lambda: self._set_status(
                 "cancelled",   "Cancel this work order?")),
             ("Print WO",        self._on_print_wo),
+            ("Print Label",     self._on_print_label),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -641,6 +649,29 @@ class WorkOrdersWidget(QtWidgets.QWidget):
             )
         )
         print_document(html, f"Work Order {wo['wo_number']}", self)
+
+    def _on_scan(self, raw: str):
+        """Handle a scan from the ScanBar — select matching WO row."""
+        raw = raw.strip().upper()
+        # Strip prefix if present
+        wo_number = raw[3:] if raw.startswith("WO-") else raw
+        for i, row_id in enumerate(self._wo_row_ids):
+            item = self.wo_table.item(i, 0)
+            if item and item.text() == wo_number:
+                self.wo_table.selectRow(i)
+                self.wo_table.scrollToItem(item)
+                self.scan_bar.set_status(f"Found: {wo_number}", ok=True)
+                return
+        self.scan_bar.set_status(f"Not found: {wo_number}", ok=False)
+
+    def _on_print_label(self):
+        """Print a Code 39 barcode label for the selected WO."""
+        if self._selected_wo_number is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print Label", "Select a work order first.")
+            return
+        ok, msg = open_label(f"WO-{self._selected_wo_number}")
+        self.scan_bar.set_status(msg, ok=ok)
 
 
 class WorkOrdersWindow(QtWidgets.QMainWindow):

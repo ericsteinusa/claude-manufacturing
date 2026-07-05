@@ -1,4 +1,5 @@
 import sys
+import csv
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -8,9 +9,11 @@ from ..qt_theme import (
     INPUT_STYLE,
     COMBO_STYLE,
     LABEL_STYLE,
+    ScanBar,
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,
 )
+from ..qt_barcode import open_label
 from ..button_nav import ButtonNav
 from ..it_core import (
     list_assets, get_asset, create_asset, update_asset,
@@ -375,6 +378,10 @@ class ITAssetInventoryWidget(QtWidgets.QWidget):
         splitter.setSizes([420, 150])
         v.addWidget(splitter, stretch=1)
 
+        self.scan_bar = ScanBar(self, on_scan=self._on_scan,
+                                placeholder="Scan ASSET- barcode…")
+        v.addWidget(self.scan_bar)
+
         br = QtWidgets.QHBoxLayout()
         for text, slot in (
             ("New Asset",      self._on_add),
@@ -384,6 +391,8 @@ class ITAssetInventoryWidget(QtWidgets.QWidget):
             ("Send to Repair", lambda: self._set_status("repair")),
             ("Retire",         lambda: self._set_status("retired")),
             ("Mark Lost",      lambda: self._set_status("lost")),
+            ("Export CSV",     self._on_export),
+            ("Print Label",    self._on_print_label),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -510,6 +519,75 @@ class ITAssetInventoryWidget(QtWidgets.QWidget):
             conn.commit()
             self._refresh()
         conn.close()
+
+    def _on_export(self):
+        status = self._status_filter.currentData()
+        asset_type = self._type_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            rows = list_assets(conn, status=status, asset_type=asset_type,
+                               search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No assets to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Assets", "assets.csv", "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Asset Tag", "Type", "Make", "Model", "Serial #",
+                   "Assigned To", "Department", "Purchase Date",
+                   "Warranty Exp", "Status", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Asset Tag":     r.get("asset_tag") or "",
+                    "Type":          r.get("asset_type") or "",
+                    "Make":          r.get("make") or "",
+                    "Model":         r.get("model") or "",
+                    "Serial #":      r.get("serial_number") or "",
+                    "Assigned To":   r.get("assigned_to") or "",
+                    "Department":    r.get("department") or "",
+                    "Purchase Date": str(r.get("purchase_date") or ""),
+                    "Warranty Exp":  str(r.get("warranty_exp") or ""),
+                    "Status":        (r.get("status") or "").capitalize(),
+                    "Notes":         r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} asset(s) to:\n{path}")
+
+    def _on_scan(self, raw: str):
+        raw = raw.strip().upper()
+        tag = raw[6:] if raw.startswith("ASSET-") else raw
+        for i, aid in enumerate(self._row_ids):
+            item = self._table.item(i, 0)
+            if item and item.text().upper() == tag:
+                self._table.selectRow(i)
+                self._table.scrollToItem(item)
+                self._on_row_clicked(self._table.model().index(i, 0))
+                self.scan_bar.set_status(f"Found: {item.text()}", ok=True)
+                return
+        self.scan_bar.set_status(f"Not found: {tag}", ok=False)
+
+    def _on_print_label(self):
+        if self._selected_id is None:
+            QtWidgets.QMessageBox.information(
+                self, "Print Label", "Select an asset first.")
+            return
+        conn = _get_db()
+        try:
+            asset = get_asset(conn, self._selected_id)
+        finally:
+            conn.close()
+        if asset:
+            ok, msg = open_label(f"ASSET-{asset['asset_tag']}")
+            self.scan_bar.set_status(msg, ok=ok)
 
 
 # ---------------------------------------------------------------------------
