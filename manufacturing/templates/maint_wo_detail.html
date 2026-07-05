@@ -9,8 +9,8 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:900px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
 .form-row { display:flex; flex-direction:column; gap:4px; }
@@ -24,9 +24,9 @@
 .overdue-notice { background:#fff0f0; border:1px solid #c62828; border-radius:5px;
     padding:8px 14px; color:#c62828; font-size:13px; margin-bottom:12px; }
 .btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
-.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .ok-btn { padding:7px 20px; background:#1a6b1a; color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .ok-btn:hover { background:#145214; }
@@ -34,20 +34,31 @@
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
     padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
-.print-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+.print-btn { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer;
     font-weight:bold; margin-bottom:14px; }
 @media print {
     .print-btn, .btn, form { display: none !important; }
     body { background: white !important; }
     .m-wrap { max-width: none; }
+    .mwo-barcode img { max-width: 300px; }
 }
+.mwo-barcode {
+    display: flex; flex-direction: column; align-items: flex-end;
+    margin-bottom: 10px;
+}
+.mwo-barcode img { max-width: 260px; height: auto; }
+.mwo-barcode small { font-size: 10px; color: #555; letter-spacing: 1px; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="m-wrap">
+    <div class="mwo-barcode">
+        <img src="/barcode/img/MWO-{{ wo.id }}/" alt="Barcode MWO-{{ wo.id }}">
+        <small>MWO-{{ wo.id }}</small>
+    </div>
     <h2>WO #{{ wo.id }} &mdash; {{ wo.title }}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
