@@ -10,8 +10,8 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1000px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .meta-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:12px; }
 .meta-item .lbl { font-size:11px; color:#555; font-weight:bold; }
@@ -20,12 +20,12 @@
 .form-row label { font-size:11px; color:#555; font-weight:bold; }
 .form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc;
     border-radius:4px; font-size:13px; }
-.btn-act { padding:6px 16px; background:rgb(0,60,180); color:white;
+.btn-act { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
 .st-planning    { background:#e8f4fd; color:#0c5460; }
@@ -41,11 +41,28 @@
 .msg-ok  { background:#efffef;border:1px solid #3a3;border-radius:5px;padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
 .edit-row { display:none; background:#f8f9ff; }
+.engp-barcode {
+    display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
+}
+.engp-barcode img { max-width:260px; height:auto; }
+.engp-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+@media print {
+    .btn, .btn-act, form { display:none !important; }
+    body { background:white !important; }
+    .m-wrap { max-width:none; }
+    .engp-barcode img { max-width:300px; }
+}
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <div class="m-wrap">
+    {% if project %}
+    <div class="engp-barcode">
+        <img src="/barcode/img/ENGP-{{ project.project_number }}/" alt="Barcode ENGP-{{ project.project_number }}">
+        <small>ENGP-{{ project.project_number }}</small>
+    </div>
+    {% endif %}
     <h2>{% if project %}Project: {{ project.project_number }} — {{ project.title }}{% else %}New Project{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
