@@ -3,45 +3,24 @@
 {% block page_title %}{% if mode == 'edit' %}Edit {{ form.wo_number }}{% else %}New Work Order{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
+<a href="{{ back_url }}" class="btn">← Back</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-{% endblock %}
-
-{% block extra_styles %}
-.wo-form-wrap { width: 100%; max-width: 520px; }
-.wo-form {
-    background: white; border: 2px solid black; border-radius: 6px;
-    padding: 20px 24px;
-}
-.wo-form .row { margin-bottom: 14px; }
-.wo-form label { display: block; font-size: 13px; font-weight: bold;
-                 color: #003cb4; margin-bottom: 4px; }
-.wo-form input, .wo-form select {
-    width: 100%; padding: 6px 8px; border: 2px solid black;
-    border-radius: 4px; font-size: 13px;
-}
-.wo-form input[readonly] { background: #eee; }
-.wo-actions { display: flex; gap: 10px; margin-top: 18px; }
-.wo-error {
-    background: #f8d7da; border: 1px solid #c33; border-radius: 4px;
-    padding: 8px 12px; margin-bottom: 14px; font-size: 13px; color: #900;
-}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="wo-form-wrap">
-        <div class="menu-title">
-            {% if mode == 'edit' %}Edit {{ form.wo_number }}{% else %}New Work Order{% endif %}
-        </div>
+    <div class="menu-title">
+        {% if mode == 'edit' %}Edit {{ form.wo_number }}{% else %}New Work Order{% endif %}
+    </div>
 
-        {% if error %}<div class="wo-error">{{ error }}</div>{% endif %}
+    <div class="card" style="max-width:520px;">
+        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
-        <form class="wo-form" method="post"
+        <form method="post"
               action="{% if mode == 'edit' %}/wo/{{ wo.id }}/edit/{% else %}/wo/new/{% endif %}">
             {% csrf_token %}
 
-            <div class="row">
+            <div class="form-row">
                 <label>WO Number</label>
                 {% if mode == 'edit' %}
                 <input type="text" value="{{ form.wo_number }}" readonly>
@@ -50,7 +29,7 @@
                 {% endif %}
             </div>
 
-            <div class="row">
+            <div class="form-row">
                 <label>Product (optional)</label>
                 <select name="product_id">
                     <option value="">(none)</option>
@@ -62,36 +41,33 @@
                 </select>
             </div>
 
-            <div class="row">
+            <div class="form-row">
                 <label>Description</label>
-                <input type="text" name="description"
-                       value="{{ form.description }}">
+                <input type="text" name="description" value="{{ form.description }}">
             </div>
 
-            <div class="row">
+            <div class="form-row">
                 <label>Quantity</label>
-                <input type="number" name="quantity" min="1"
-                       value="{{ form.quantity }}">
+                <input type="number" name="quantity" min="1" value="{{ form.quantity }}">
             </div>
 
-            <div class="row">
+            <div class="form-row">
                 <label>Start Date</label>
-                <input type="date" name="start_date"
-                       value="{{ form.start_date }}">
+                <input type="date" name="start_date" value="{{ form.start_date }}">
             </div>
 
-            <div class="row">
+            <div class="form-row">
                 <label>Due Date</label>
                 <input type="date" name="due_date" value="{{ form.due_date }}">
             </div>
 
             {% if mode == 'edit' %}
-            <div class="row">
+            <div class="form-row">
                 <label>Status</label>
                 <input type="text" value="{{ form.status|capfirst }}" readonly>
             </div>
             {% else %}
-            <div class="row">
+            <div class="form-row">
                 <label>Status</label>
                 <select name="status">
                     {% for s in statuses %}
@@ -103,13 +79,13 @@
             </div>
             {% endif %}
 
-            <div class="row">
+            <div class="form-row">
                 <label>Notes</label>
                 <input type="text" name="notes" value="{{ form.notes }}">
             </div>
 
-            <div class="wo-actions">
-                <button type="submit" class="btn">
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
                     {% if mode == 'edit' %}Save{% else %}Create WO{% endif %}
                 </button>
                 <a href="{{ back_url }}" class="btn">Cancel</a>

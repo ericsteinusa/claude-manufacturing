@@ -13,23 +13,23 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
-    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+.nav-btn { display:block; background:white; border: 1.5px solid var(--border); border-radius:8px;
+    padding:14px 10px; text-align:center; color:var(--accent); font-weight:bold;
     font-size:13px; text-decoration:none; }
-.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.nav-btn:hover { background:var(--accent); color:white; }
 .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
-.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
-.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi .val { font-size:28px; font-weight:bold; color:var(--accent); }
 .kpi.yellow { border-color:#b8860b; }
 .kpi.yellow .val { color:#b8860b; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
 .st-draft            { background:#f8f9fa; color:#333; border:1px solid #ccc; }
@@ -45,16 +45,16 @@
 <div class="m-wrap">
     <h2>Purchasing Dashboard</h2>
 
-    <div class="nav-grid">
-        <a href="/po/" class="nav-btn">Purchase Orders</a>
-        <a href="/po/new/" class="nav-btn">New PO</a>
-        <a href="/po/approvals/" class="nav-btn">Pending Approval</a>
-        <a href="/purch/contracts/" class="nav-btn">Vendor Contracts</a>
-        <a href="/purch/reports/" class="nav-btn">Purchasing Reports</a>
-        <a href="/suppliers/" class="nav-btn">Suppliers</a>
-        <a href="/inventory/" class="nav-btn">Inventory</a>
-        <a href="/inventory/new/" class="nav-btn">New Product</a>
-        <a href="/dashboard/" class="nav-btn">Home</a>
+    <div class="dept-grid">
+        <a href="/po/" class="dept-btn">Purchase Orders</a>
+        <a href="/po/new/" class="dept-btn">New PO</a>
+        <a href="/po/approvals/" class="dept-btn">Pending Approval</a>
+        <a href="/purch/contracts/" class="dept-btn">Vendor Contracts</a>
+        <a href="/purch/reports/" class="dept-btn">Purchasing Reports</a>
+        <a href="/suppliers/" class="dept-btn">Suppliers</a>
+        <a href="/inventory/" class="dept-btn">Inventory</a>
+        <a href="/inventory/new/" class="dept-btn">New Product</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
     </div>
 
     <div class="kpi-row">

@@ -14,14 +14,14 @@
 .expiry-bar { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
     padding: 8px 16px; margin-bottom: 14px; font-size: 13px; color: #856404; }
 .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
-.filter-row a { padding: 4px 14px; border: 2px solid black; border-radius: 14px;
+.filter-row a { padding: 4px 14px; border: 1.5px solid var(--border); border-radius: 14px;
     font-size: 12px; text-decoration: none; color: white; background: rgba(0,0,0,0.25); }
-.filter-row a.active, .filter-row a:hover { background: white; color: rgb(0,60,180); }
+.filter-row a.active, .filter-row a:hover { background: white; color: var(--accent); }
 .lot-table { width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
 .lot-table th, .lot-table td { padding: 8px 12px; text-align: left;
     border-bottom: 1px solid #ddd; font-size: 13px; }
-.lot-table th { background: rgb(0,60,180); color: white; }
+.lot-table th { background: var(--accent); color: white; }
 .lot-table tr:last-child td { border-bottom: none; }
 .lot-table tr:hover td { background: #f0f4ff; }
 .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; border: 1px solid; font-size: 11px; }
@@ -30,7 +30,7 @@
 .badge-hold       { background: #fff3cd; border-color: #ffc107; color: #856404; }
 .badge-consumed   { background: #e8e8e8; border-color: #888; color: #444; }
 .badge-rejected   { background: #fcc; border-color: #c33; color: #900; }
-.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+.empty-note { color: var(--text-muted); font-size: 14px; margin-top: 20px; }
 {% endblock %}
 
 {% block body %}

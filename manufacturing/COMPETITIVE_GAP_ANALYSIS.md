@@ -281,11 +281,17 @@ Every competitor has visual dashboards. All KPI data already exists — just nee
 - **Finance dashboard:** revenue vs. expense bar chart, AR aging pie
 - **Maintenance dashboard:** downtime by equipment, PM completion rate
 
-#### P1-B: CSV / Excel Export on Every List Page
+#### P1-B: CSV / Excel Export on Every List Page ✅ Done
 All 10 competitors have this. Users need it for analysis in Excel.
 - Add Export button to: WO list, PO list, SO list, AP/AR lists, inventory, QA, maintenance, payroll
 - Django: `csv.DictWriter` with `Content-Disposition: attachment` response
 - Optional: `openpyxl` for formatted Excel with headers
+- **Shipped:** `manufacturing/csv_export.py` (`csv_response`, built on the
+  existing Qt-free `reports_core.to_csv_bytes`) + an `<page>_export` view/URL
+  for each of the 9 list pages above (WO, PO, SO, AP, AR, inventory, QA NCR,
+  maintenance WO, payroll history), each reusing the list view's existing
+  filters. Excel (`openpyxl`) export was left for a follow-up — CSV covers
+  the "open in Excel" use case competitors are scored against.
 
 #### P1-C: OEE (Overall Equipment Effectiveness)
 Data already exists (downtime records, production schedule, WO qty). Just apply the formula:

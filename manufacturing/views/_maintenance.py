@@ -5,6 +5,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import csv_response
 
 from ..maintenance_core import (
     WO_STATUSES, WORK_TYPES, PRIORITIES,
@@ -109,6 +110,28 @@ def maint_wo_list(request):
         search=search, wo_statuses=WO_STATUSES, work_types=WORK_TYPES,
         priorities=PRIORITIES, error=error, success=success,
     ))
+
+
+@dept_required(_MAINT_DEPT_KEYS)
+def maint_wo_export(request):
+    status_filter = request.GET.get('status', '').strip()
+    priority_filter = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        wos = list_work_orders(conn, status=status_filter or None,
+                               priority=priority_filter or None,
+                               search=search or None)
+    finally:
+        conn.close()
+
+    return csv_response('maintenance_work_orders.csv', [
+        ('title', 'Title'), ('equipment', 'Equipment'),
+        ('work_type', 'Work Type'), ('priority', 'Priority'),
+        ('assigned_to', 'Assigned To'), ('requested_date', 'Requested Date'),
+        ('due_date', 'Due Date'), ('completed_date', 'Completed Date'),
+        ('status', 'Status'),
+    ], wos)
 
 
 @dept_required(_MAINT_DEPT_KEYS)

@@ -4,129 +4,117 @@
 {% block toolbar_left %}
 <a href="/ar/" class="btn">Accounts Receivable</a>
 <a href="/gl/" class="btn">General Ledger</a>
+<a href="/ap/export/?status={{ status }}&vendor_id={{ vendor_id }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Export CSV</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
 {% block extra_styles %}
-.m-wrap { width:100%; max-width:1200px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.kpi-row { display:flex; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
-.kpi { background:white; border:2px solid black; border-radius:8px;
-    padding:12px 20px; flex:1; min-width:150px; }
-.kpi .lbl { font-size:11px; color:#555; font-weight:bold; }
-.kpi .val { font-size:18px; font-weight:bold; color:rgb(0,60,180); }
-.kpi .val.warn { color:#c33; }
-.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
-.filter-bar label { color:white; font-size:12px; font-weight:bold; }
-.filter-bar select,.filter-bar input {
-    padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
-.btn-sm { padding:5px 14px; background:rgb(0,60,180); color:white;
-    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
-.list-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
-.list-table th,.list-table td { padding:8px 12px; text-align:left;
-    border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
-.list-table tr:last-child td { border-bottom:none; }
-.list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
-.list-table td.num { text-align:right; font-family:monospace; }
-.st-open     { background:#fff3cd; color:#856404; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
-.st-partial  { background:#cff4fc; color:#055160; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
-.st-paid     { background:#d1e7dd; color:#0a3622; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
-.st-overdue  { background:#f8d7da; color:#842029; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
-.st-cancelled{ background:#e2e3e5; color:#41464b; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; margin-top:16px; }
-.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px 16px; }
-.form-row { display:flex; flex-direction:column; gap:3px; }
-.form-row label { font-size:11px; color:#555; font-weight:bold; }
-.form-row input,.form-row select,.form-row textarea {
-    padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
-.form-row.wide { grid-column: span 2; }
-.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
-    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
-.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
-    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.inv-form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px 16px; }
+.inv-form-row { display:flex; flex-direction:column; gap:3px; }
+.inv-form-row label { font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+.inv-form-row input, .inv-form-row select {
+    padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; color:var(--text); }
+.inv-form-row input:focus, .inv-form-row select:focus {
+    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(29,111,232,.1); }
+.inv-form-row.wide { grid-column: span 2; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
-<div class="m-wrap">
-    <h2>Accounts Payable</h2>
-    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
-    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+    <div class="menu-title">Accounts Payable</div>
 
-    <div class="kpi-row">
-        <div class="kpi"><div class="lbl">Open Invoices</div>
-            <div class="val">{{ dashboard.open_count }}</div></div>
-        <div class="kpi"><div class="lbl">Overdue</div>
-            <div class="val warn">{{ dashboard.overdue_count }}</div></div>
-        <div class="kpi"><div class="lbl">Outstanding</div>
-            <div class="val">${{ dashboard.total_outstanding|floatformat:2 }}</div></div>
-        <div class="kpi"><div class="lbl">Total Invoiced</div>
-            <div class="val">${{ dashboard.total_invoiced|floatformat:2 }}</div></div>
-        <div class="kpi"><div class="lbl">Total Invoices</div>
-            <div class="val">{{ dashboard.total_invoices }}</div></div>
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="kpi-grid" style="max-width:900px;margin-bottom:20px;">
+        <div class="kpi-card">
+            <div class="kpi-label">Open Invoices</div>
+            <div class="kpi-value">{{ dashboard.open_count }}</div>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid var(--danger-fg);">
+            <div class="kpi-label">Overdue</div>
+            <div class="kpi-value warn">{{ dashboard.overdue_count }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Outstanding</div>
+            <div class="kpi-value">${{ dashboard.total_outstanding|floatformat:2 }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Invoiced</div>
+            <div class="kpi-value">${{ dashboard.total_invoiced|floatformat:2 }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Invoices</div>
+            <div class="kpi-value">{{ dashboard.total_invoices }}</div>
+        </div>
     </div>
 
-    <form method="get" class="filter-bar">
+    <form method="get" class="filter-bar" style="flex-wrap:wrap;margin-bottom:16px;">
         <label>Status:</label>
-        <select name="status" onchange="this.form.submit()">
+        <select name="status" onchange="this.form.submit()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
             <option value="">(all)</option>
             {% for s in statuses %}
             <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <label>Vendor:</label>
-        <select name="vendor_id" onchange="this.form.submit()">
+        <select name="vendor_id" onchange="this.form.submit()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
             <option value="">(all)</option>
             {% for v in vendors %}
             <option value="{{ v.id }}" {% if vendor_id == v.id|stringformat:"s" %}selected{% endif %}>{{ v.label }}</option>
             {% endfor %}
         </select>
         <label>Due From:</label>
-        <input type="date" name="date_from" value="{{ date_from }}">
+        <input type="date" name="date_from" value="{{ date_from }}" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
         <label>To:</label>
-        <input type="date" name="date_to" value="{{ date_to }}">
-        <button type="submit" class="btn-sm">Filter</button>
+        <input type="date" name="date_to" value="{{ date_to }}" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+        <button type="submit" class="btn btn-primary">Filter</button>
         {% if status or vendor_id or date_from or date_to %}
-        <a href="/ap/" style="color:#aad;font-size:13px;">Clear</a>
+        <a href="/ap/" class="btn">Clear</a>
         {% endif %}
     </form>
 
     {% if invoices %}
-    <table class="list-table">
-        <thead><tr>
-            <th>Invoice #</th><th>Vendor</th><th>Invoice Date</th><th>Due Date</th>
-            <th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th>
-        </tr></thead>
-        <tbody>
-        {% for inv in invoices %}
-        <tr onclick="location='/ap/{{ inv.id }}/'">
-            <td><strong>{{ inv.invoice_number }}</strong></td>
-            <td>{{ inv.vendor_label|default:"—" }}</td>
-            <td>{{ inv.invoice_date|default:"—" }}</td>
-            <td>{{ inv.due_date|default:"—" }}</td>
-            <td class="num">${{ inv.amount|floatformat:2 }}</td>
-            <td class="num">${{ inv.paid|floatformat:2 }}</td>
-            <td class="num"><strong>${{ inv.balance|floatformat:2 }}</strong></td>
-            <td><span class="st-{{ inv.status }}">{{ inv.status|capfirst }}</span></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="erp-table-wrap" style="margin-bottom:20px;">
+        <table class="erp-table">
+            <thead><tr>
+                <th>Invoice #</th><th>Vendor</th><th>Invoice Date</th><th>Due Date</th>
+                <th class="num">Amount</th><th class="num">Paid</th><th class="num">Balance</th><th>Status</th>
+            </tr></thead>
+            <tbody>
+            {% for inv in invoices %}
+            <tr onclick="location='/ap/{{ inv.id }}/'" style="cursor:pointer;">
+                <td><strong>{{ inv.invoice_number }}</strong></td>
+                <td>{{ inv.vendor_label|default:"—" }}</td>
+                <td>{{ inv.invoice_date|default:"—" }}</td>
+                <td>{{ inv.due_date|default:"—" }}</td>
+                <td class="num">${{ inv.amount|floatformat:2 }}</td>
+                <td class="num">${{ inv.paid|floatformat:2 }}</td>
+                <td class="num"><strong>${{ inv.balance|floatformat:2 }}</strong></td>
+                <td>
+                    {% if inv.status == 'overdue' %}<span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{{ inv.status|capfirst }}</span>
+                    {% elif inv.status == 'open' %}<span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">{{ inv.status|capfirst }}</span>
+                    {% elif inv.status == 'paid' %}<span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{{ inv.status|capfirst }}</span>
+                    {% elif inv.status == 'partial' %}<span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{{ inv.status|capfirst }}</span>
+                    {% else %}<span class="pill" style="font-size:11px;padding:2px 8px;">{{ inv.status|capfirst }}</span>{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-    <p style="color:#cce;font-size:14px;">No invoices found.</p>
+    <div class="empty-state">No invoices found.</div>
     {% endif %}
 
     {% if can_edit %}
-    <div class="card">
-        <h3>New Invoice</h3>
+    <div class="card" style="max-width:900px;">
+        <div class="card-title">New Invoice</div>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
-            <div class="form-grid">
-                <div class="form-row">
+            <div class="inv-form-grid">
+                <div class="inv-form-row">
                     <label>Vendor</label>
                     <select name="vendor_id">
                         <option value="">(none)</option>
@@ -135,33 +123,32 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-row">
+                <div class="inv-form-row">
                     <label>Invoice # *</label>
                     <input type="text" name="invoice_number" required>
                 </div>
-                <div class="form-row">
+                <div class="inv-form-row">
                     <label>Invoice Date</label>
                     <input type="date" name="invoice_date">
                 </div>
-                <div class="form-row">
+                <div class="inv-form-row">
                     <label>Due Date</label>
                     <input type="date" name="due_date">
                 </div>
-                <div class="form-row">
+                <div class="inv-form-row">
                     <label>Amount ($)</label>
                     <input type="number" name="amount" step="0.01" min="0" value="0">
                 </div>
-                <div class="form-row wide">
+                <div class="inv-form-row wide">
                     <label>Description</label>
                     <input type="text" name="description">
                 </div>
             </div>
-            <div style="margin-top:10px;">
-                <button type="submit" class="btn-sm">Create Invoice</button>
+            <div style="margin-top:12px;">
+                <button type="submit" class="btn btn-primary">Create Invoice</button>
             </div>
         </form>
     </div>
     {% endif %}
-</div>
 </div>
 {% endblock %}

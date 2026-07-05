@@ -13,25 +13,25 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1000px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .kpi-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
-.kpi { background:white; border:2px solid black; border-radius:8px;
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:14px 18px; min-width:120px; flex:1; text-align:center; }
-.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .val { font-size:28px; font-weight:bold; color:var(--accent); }
 .kpi .lbl { font-size:11px; color:#555; margin-top:2px; text-transform:uppercase; }
 .section-hdr { color:white; font-size:15px; font-weight:bold; margin:16px 0 8px; }
 .list-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:16px; }
 .list-table th,.list-table td { padding:7px 12px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { background:white; border:2px solid black; border-radius:7px;
+.nav-btn { background:white; border: 1.5px solid var(--border); border-radius:7px;
     padding:16px 10px; text-align:center; font-weight:bold; font-size:13px;
-    color:rgb(0,60,180); text-decoration:none; display:block; }
-.nav-btn:hover { background:rgb(0,60,180); color:white; }
+    color:var(--accent); text-decoration:none; display:block; }
+.nav-btn:hover { background:var(--accent); color:white; }
 .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
 .st-planning    { background:#e8f4fd; color:#0c5460; }
 .st-in_progress { background:#fff3cd; color:#856404; }
@@ -50,17 +50,17 @@
 <div class="m-wrap">
     <h2>Engineering Dashboard</h2>
 
-    <div class="nav-grid">
-        <a href="/eng/projects/" class="nav-btn">Projects</a>
-        <a href="/eng/tasks/" class="nav-btn">Tasks</a>
-        <a href="/eng/ecrs/" class="nav-btn">ECRs / Design Reviews</a>
-        <a href="/eng/specs/" class="nav-btn">Standards &amp; Compliance</a>
-        <a href="/eng/ecrs/?status=pending" class="nav-btn">Pending Reviews</a>
-        <a href="/bom/" class="nav-btn">Bill of Materials</a>
-        <a href="/eng/projects/?status=in_progress" class="nav-btn">Active Projects</a>
-        <a href="/eng/ecrs/new/" class="nav-btn">New ECR</a>
-        <a href="/eng/projects/new/" class="nav-btn">New Project</a>
-        <a href="/eng/reports/" class="nav-btn">Reports</a>
+    <div class="dept-grid">
+        <a href="/eng/projects/" class="dept-btn">Projects</a>
+        <a href="/eng/tasks/" class="dept-btn">Tasks</a>
+        <a href="/eng/ecrs/" class="dept-btn">ECRs / Design Reviews</a>
+        <a href="/eng/specs/" class="dept-btn">Standards &amp; Compliance</a>
+        <a href="/eng/ecrs/?status=pending" class="dept-btn">Pending Reviews</a>
+        <a href="/bom/" class="dept-btn">Bill of Materials</a>
+        <a href="/eng/projects/?status=in_progress" class="dept-btn">Active Projects</a>
+        <a href="/eng/ecrs/new/" class="dept-btn">New ECR</a>
+        <a href="/eng/projects/new/" class="dept-btn">New Project</a>
+        <a href="/eng/reports/" class="dept-btn">Reports</a>
     </div>
 
     <div class="kpi-row">

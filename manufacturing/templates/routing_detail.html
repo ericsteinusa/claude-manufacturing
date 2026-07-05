@@ -9,24 +9,24 @@
 {% block extra_styles %}
 .route-wrap { max-width: 860px; }
 .route-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
-.route-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
-.card { background: white; border: 2px solid black; border-radius: 8px;
+.route-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 20px; margin-bottom: 16px; }
-.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
 .route-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .route-table th, .route-table td { padding: 8px 12px; border-bottom: 1px solid #eee; text-align: left; }
-.route-table th { background: rgb(0,60,180); color: white; }
+.route-table th { background: var(--accent); color: white; }
 .route-table tr:last-child td { border-bottom: none; }
 .route-table tr:hover td { background: #f0f4ff; }
 .seq-badge { display: inline-block; width: 28px; height: 28px; border-radius: 50%;
-    background: rgb(0,60,180); color: white; text-align: center; line-height: 28px;
+    background: var(--accent); color: white; text-align: center; line-height: 28px;
     font-size: 12px; font-weight: bold; }
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #555; }
 .field input, .field select { width: 100%; padding: 6px 9px; border: 1px solid #aaa; border-radius: 4px;
     font-size: 13px; box-sizing: border-box; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
-.btn-sm { padding: 7px 18px; background: rgb(0,60,180); color: white; border: none;
+.btn-sm { padding: 7px 18px; background: var(--accent); color: white; border: none;
     border-radius: 4px; font-size: 13px; cursor: pointer; }
 .btn-sm:hover { opacity: 0.85; }
 .btn-del { padding: 4px 10px; background: #d93025; color: white; border: none;
@@ -45,7 +45,7 @@
     <div class="route-meta">
         {% if product.sku %}SKU: {{ product.sku }} &nbsp;·&nbsp;{% endif %}
         {{ steps|length }} operation{{ steps|length|pluralize }}
-        &nbsp;·&nbsp; <a href="/costs/{{ product.id }}/" style="color:#cce;">View Cost Roll</a>
+        &nbsp;·&nbsp; <a href="/costs/{{ product.id }}/" style="color: var(--text-muted);">View Cost Roll</a>
     </div>
 
     {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}

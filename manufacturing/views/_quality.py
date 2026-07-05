@@ -5,6 +5,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import csv_response
 
 from ..quality_core import (
     NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
@@ -95,6 +96,25 @@ def qa_ncr_list(request):
         ncr_severities=NCR_SEVERITIES, ncr_dispositions=NCR_DISPOSITIONS,
         error=error, success=success,
     ))
+
+
+@dept_required(_QA_DEPT_KEYS)
+def qa_ncr_export(request):
+    status_filter = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        ncrs = list_ncrs(conn, status=status_filter or None,
+                         search=search or None)
+    finally:
+        conn.close()
+
+    return csv_response('ncrs.csv', [
+        ('title', 'Title'), ('source', 'Source'), ('severity', 'Severity'),
+        ('product', 'Product'), ('detected_date', 'Detected Date'),
+        ('disposition', 'Disposition'), ('owner', 'Owner'),
+        ('status', 'Status'), ('closed_date', 'Closed Date'),
+    ], ncrs)
 
 
 @dept_required(_QA_DEPT_KEYS)

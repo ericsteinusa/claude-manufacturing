@@ -10,8 +10,8 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:800px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .meta-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:10px; }
 .meta-item .lbl { font-size:11px; color:#555; font-weight:bold; }
@@ -19,7 +19,7 @@
 .form-row { display:flex; flex-direction:column; gap:3px; }
 .form-row label { font-size:11px; color:#555; font-weight:bold; }
 .form-row input,.form-row select,.form-row textarea { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
-.btn-act { padding:6px 16px; background:rgb(0,60,180); color:white;
+.btn-act { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
 .st-draft     { background:#e8f4fd; color:#0c5460; }

@@ -3,52 +3,27 @@
 {% block page_title %}Time-Off Requests{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-<a href="/time-off/new/" class="btn">+ New Request</a>
+<a href="{{ back_url }}" class="btn">← Back</a>
+<a href="/time-off/new/" class="btn btn-primary">+ New Request</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-{% endblock %}
-
-{% block extra_styles %}
-.tol-wrap { width: 100%; max-width: 1000px; }
-.tol-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.tol-pill {
-    padding: 4px 14px; border: 2px solid black; border-radius: 20px;
-    font-size: 12px; font-weight: bold; text-decoration: none;
-    color: black; background: white; text-transform: capitalize;
-}
-.tol-pill.active { background: rgb(0, 60, 180); color: white; border-color: rgb(0, 60, 180); }
-.tol-table {
-    width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
-}
-.tol-table th, .tol-table td {
-    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
-    font-size: 13px;
-}
-.tol-table th { background: rgb(0, 60, 180); color: white; }
-.tol-table tr:hover td { background: #eef6ff; }
-.tol-table a { color: #003cb4; font-weight: bold; text-decoration: none; }
-.tol-badge {
-    padding: 2px 10px; border-radius: 10px; font-size: 11px;
-    font-weight: bold; border: 1px solid #999; text-transform: capitalize;
-}
-.tol-empty { color: white; margin-top: 16px; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="menu-title">Time-Off Requests</div>
-    <div class="tol-wrap">
-        <div class="tol-pills">
-            <a href="/time-off/" class="tol-pill {% if not status %}active{% endif %}">All</a>
-            {% for s in statuses %}
-            <a href="/time-off/?status={{ s }}"
-               class="tol-pill {% if s == status %}active{% endif %}">{{ s }}</a>
-            {% endfor %}
-        </div>
 
-        {% if requests %}
-        <table class="tol-table">
+    <div class="filter-bar">
+        <label>Status:</label>
+        <a href="/time-off/" class="{% if not status %}active{% endif %}">All</a>
+        {% for s in statuses %}
+        <a href="/time-off/?status={{ s }}"
+           class="{% if s == status %}active{% endif %}">{{ s }}</a>
+        {% endfor %}
+    </div>
+
+    {% if requests %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -70,7 +45,7 @@
                     <td>{{ r.request_type }}</td>
                     <td>{{ r.request_date|default:"" }}</td>
                     <td>
-                        <span class="tol-badge" style="background:{{ r.status_color }};">
+                        <span class="pill" style="background:{{ r.status_color }}20;color:{{ r.status_color }};border-color:{{ r.status_color }}40;font-size:11px;padding:2px 8px;">
                             {{ r.status }}
                         </span>
                     </td>
@@ -78,9 +53,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-        <div class="tol-empty">No time-off requests found.</div>
-        {% endif %}
     </div>
+    {% else %}
+    <div class="empty-state">No time-off requests found.</div>
+    {% endif %}
 </div>
 {% endblock %}

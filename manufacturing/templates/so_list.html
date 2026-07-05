@@ -3,52 +3,28 @@
 {% block page_title %}Sales Orders{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if can_edit %}<a href="/so/new/" class="btn">+ New SO</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← Back</a>
+{% if can_edit %}<a href="/so/new/" class="btn btn-primary">+ New SO</a>{% endif %}
+<a href="/so/export/{% if status %}?status={{ status }}{% endif %}" class="btn">⬇ Export CSV</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-{% endblock %}
-
-{% block extra_styles %}
-.so-wrap { width: 100%; max-width: 1000px; }
-.so-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.so-filters a {
-    background: white; border: 2px solid black; border-radius: 10px;
-    padding: 4px 12px; font-size: 13px; text-decoration: none; color: black;
-}
-.so-filters a.active { background: rgb(85, 255, 255); }
-.so-table {
-    width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
-}
-.so-table th, .so-table td {
-    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
-    font-size: 13px;
-}
-.so-table th { background: rgb(0, 60, 180); color: white; }
-.so-table td.num, .so-table th.num { text-align: right; }
-.so-table tr:hover td { background: #eef6ff; }
-.so-table a { color: #003cb4; font-weight: bold; text-decoration: none; }
-.pill {
-    display: inline-block; padding: 2px 10px; border-radius: 10px;
-    border: 1px solid #999; font-size: 12px;
-}
-.so-empty { color: white; margin-top: 16px; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="menu-title">Sales Orders</div>
-    <div class="so-wrap">
-        <div class="so-filters">
-            <a href="/so/" class="{% if not status %}active{% endif %}">All</a>
-            {% for s in statuses %}
-            <a href="/so/?status={{ s }}"
-               class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
-            {% endfor %}
-        </div>
 
-        {% if sos %}
-        <table class="so-table">
+    <div class="filter-bar">
+        <label>Status:</label>
+        <a href="/so/" class="{% if not status %}active{% endif %}">All</a>
+        {% for s in statuses %}
+        <a href="/so/?status={{ s }}"
+           class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
+        {% endfor %}
+    </div>
+
+    {% if sos %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
             <thead>
                 <tr>
                     <th>SO #</th>
@@ -70,7 +46,7 @@
                     <td class="num">{{ so.item_count }}</td>
                     <td class="num">${{ so.total|floatformat:2 }}</td>
                     <td>
-                        <span class="pill" style="background: {{ so.status_color }};">
+                        <span class="pill" style="background:{{ so.status_color }}20;color:{{ so.status_color }};border-color:{{ so.status_color }}40;">
                             {{ so.status|capfirst }}
                         </span>
                     </td>
@@ -78,10 +54,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-        <div class="so-empty">No sales orders
-            {% if status %}with status &ldquo;{{ status|capfirst }}&rdquo;{% endif %}.</div>
-        {% endif %}
     </div>
+    {% else %}
+    <div class="empty-state">No sales orders{% if status %} with status "{{ status|capfirst }}"{% endif %}.</div>
+    {% endif %}
 </div>
 {% endblock %}

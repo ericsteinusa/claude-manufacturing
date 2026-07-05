@@ -1,16 +1,57 @@
 {% extends "base.html" %}
 
+{% block page_title %}Dashboard — Manufacturing ERP{% endblock %}
+
 {% block toolbar_left %}
-<a href="{% url 'user_roles' %}" class="btn">User Roles</a>
+<a href="{% url 'user_roles' %}" class="btn">🔑 User Roles</a>
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
-<a href="{% url 'audit_log' %}" class="btn">Audit Log</a>
+<a href="{% url 'audit_log' %}" class="btn">📜 Audit Log</a>
 {% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' %}
-<a href="{% url 'periods' %}" class="btn">Periods</a>
-<a href="{% url 'po_approvals' %}" class="btn">
-    PO Approvals{% if pending_approvals %} ({{ pending_approvals }}){% endif %}
+<a href="{% url 'periods' %}" class="btn">📅 Periods</a>
+<a href="{% url 'po_approvals' %}" class="btn {% if pending_approvals %}btn-primary{% endif %}">
+    ✅ PO Approvals{% if pending_approvals %} <strong>({{ pending_approvals }})</strong>{% endif %}
 </a>
 {% endif %}
 {% endblock %}
 
-{% block menu_title %}Company Main Menu{% endblock %}
+{% block body %}
+<div class="content">
+
+    <div class="menu-title">Company Main Menu</div>
+
+    {% if pending_approvals %}
+    <div class="alert alert-warning" style="max-width:640px; margin-bottom:20px;">
+        ⚠ You have <strong>{{ pending_approvals }}</strong> purchase order{{ pending_approvals|pluralize }} awaiting approval.
+        <a href="{% url 'po_approvals' %}" style="color:inherit;font-weight:700;"> Review now →</a>
+    </div>
+    {% endif %}
+
+    <!-- KPI row -->
+    <div class="kpi-grid" style="max-width:900px; margin-bottom:28px;">
+        <div class="kpi-card">
+            <div class="kpi-label">Role</div>
+            <div class="kpi-value" style="font-size:16px;margin-top:4px;">{{ user_role|default:"—" }}</div>
+            <div class="kpi-sub">{{ email }}</div>
+        </div>
+        {% if pending_approvals %}
+        <div class="kpi-card" style="border-left:4px solid #d97706;">
+            <div class="kpi-label">Pending Approvals</div>
+            <div class="kpi-value warn">{{ pending_approvals }}</div>
+            <div class="kpi-sub"><a href="{% url 'po_approvals' %}" style="color:#d97706;">Review POs →</a></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Department grid -->
+    <div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">
+        Departments
+    </div>
+    <div class="dept-grid" style="max-width:900px;">
+        {% for url, label in menu_items %}
+        <a href="{{ url }}" class="dept-btn">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

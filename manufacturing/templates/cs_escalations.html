@@ -10,9 +10,9 @@
 
 {% block extra_styles %}
 .cs-wrap { width:100%; max-width:1100px; }
-.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .summary-bar { display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
-.stat-card { background:white; border:2px solid black; border-radius:8px;
+.stat-card { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:14px 22px; text-align:center; min-width:140px; }
 .stat-card .num { font-size:28px; font-weight:bold; }
 .stat-card .lbl { font-size:12px; color:#666; margin-top:2px; }
@@ -21,10 +21,10 @@
 .high-card { border-color:#e65100; }
 .high-card .num { color:#e65100; }
 .cs-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; }
 .cs-table th, .cs-table td { padding:8px 12px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.cs-table th { background:rgb(0,60,180); color:white; }
+.cs-table th { background:var(--accent); color:white; }
 .cs-table tr:last-child td { border-bottom:none; }
 .row-critical td { background:#fff0f0; }
 .row-high td { background:#fffbe6; }
@@ -32,7 +32,7 @@
     font-size:11px; font-weight:bold; }
 .pri-critical { background:#fce8e8; color:#c62828; }
 .pri-high { background:#fff3e0; color:#e65100; }
-.empty-note { color:#cce; font-size:14px; margin-top:20px; }
+.empty-note { color: var(--text-muted); font-size:14px; margin-top:20px; }
 .legend { display:flex; gap:16px; margin-top:12px; font-size:12px; color:#aaa; }
 .legend span { display:flex; align-items:center; gap:4px; }
 {% endblock %}

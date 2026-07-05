@@ -11,21 +11,21 @@
 .tch-wrap { width: 100%; max-width: 700px; }
 .tch-pills { display: flex; gap: 8px; margin-bottom: 16px; }
 .tch-pill {
-    padding: 5px 18px; border: 2px solid black; border-radius: 20px;
+    padding: 5px 18px; border: 1.5px solid var(--border); border-radius: 20px;
     font-size: 13px; font-weight: bold; text-decoration: none; color: black;
     background: white;
 }
-.tch-pill.active { background: rgb(0,60,180); color: white; border-color: rgb(0,60,180); }
-.tch-range { font-size: 12px; color: #cce; margin-bottom: 14px; }
+.tch-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+.tch-range { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
 .tch-table {
     width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
 }
 .tch-table th, .tch-table td {
     padding: 8px 10px; font-size: 13px; text-align: left;
     border-bottom: 1px solid #ccc;
 }
-.tch-table th { background: rgb(0,60,180); color: white; }
+.tch-table th { background: var(--accent); color: white; }
 .tch-table tfoot td { background: #f0f4ff; font-weight: bold; }
 .tch-empty { color: white; margin-top: 12px; }
 .badge-prog { background: #fff3cd; border: 1px solid #999;

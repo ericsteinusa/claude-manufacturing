@@ -9,16 +9,16 @@
 {% block extra_styles %}
 .cost-wrap { max-width: 760px; }
 .cost-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
-.cost-meta { color: #cce; font-size: 13px; margin-bottom: 16px; }
-.card { background: white; border: 2px solid black; border-radius: 8px;
+.cost-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 20px; margin-bottom: 16px; }
-.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
 .cost-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 .cost-box { background: #f0f4ff; border: 1px solid #b0c0e8; border-radius: 8px;
     padding: 14px; text-align: center; }
 .cost-box .label { font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; }
-.cost-box .value { font-size: 22px; font-weight: bold; color: rgb(0,40,140); margin-top: 4px; }
-.total-box { background: rgb(0,60,180); border-radius: 8px; padding: 14px;
+.cost-box .value { font-size: 22px; font-weight: bold; color: var(--accent-hover); margin-top: 4px; }
+.total-box { background: var(--accent); border-radius: 8px; padding: 14px;
     text-align: center; color: white; }
 .total-box .label { font-size: 11px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
 .total-box .value { font-size: 26px; font-weight: bold; margin-top: 4px; }
@@ -27,7 +27,7 @@
 .hist-table th { background: #f0f4ff; font-weight: bold; }
 .hist-table tr:last-child td { border-bottom: none; }
 .hist-table td.num { text-align: right; font-family: monospace; }
-.btn-roll { padding: 9px 22px; background: rgb(0,60,180); color: white; border: none;
+.btn-roll { padding: 9px 22px; background: var(--accent); color: white; border: none;
     border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
 .btn-roll:hover { opacity: 0.85; }
 .alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;

@@ -9,18 +9,18 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.meta { background:white; border:2px solid black; border-radius:8px;
+
+.meta { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:14px 20px; margin-bottom:16px; display:flex; gap:30px; flex-wrap:wrap; }
 .meta-item { display:flex; flex-direction:column; }
 .meta-item .lbl { font-size:11px; color:#666; font-weight:bold; }
 .meta-item .val { font-size:14px; color:#222; font-weight:bold; }
 .list-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:16px; }
 .list-table th,.list-table td { padding:8px 12px; text-align:right;
     border-bottom:1px solid #ddd; font-size:13px; }
 .list-table th:first-child,.list-table td:first-child { text-align:left; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
 .totals-row { background:rgb(220,235,255); font-weight:bold; }
@@ -96,9 +96,9 @@
         </tr>
         </tfoot>
     </table>
-    <p style="color:#aac;font-size:12px;">Click a row to view that employee's pay stub.</p>
+    <p style="color: var(--text-muted);font-size:12px;">Click a row to view that employee's pay stub.</p>
     {% else %}
-    <p style="color:#cce;font-size:14px;">No entries for this run.</p>
+    <p style="color: var(--text-muted);font-size:14px;">No entries for this run.</p>
     {% endif %}
 </div>
 </div>

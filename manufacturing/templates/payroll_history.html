@@ -5,17 +5,18 @@
 <a href="/payroll/" class="btn">Dashboard</a>
 <a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
 <a href="/payroll/ytd/" class="btn">YTD Report</a>
+<a href="/payroll/history/export/" class="btn">⬇ Export CSV</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1000px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .list-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:20px; }
 .list-table th,.list-table td { padding:9px 13px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
 {% endblock %}
@@ -47,7 +48,7 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color:#cce;font-size:14px;">No payroll runs found. Payroll runs are created from the desktop application.</p>
+    <p style="color: var(--text-muted);font-size:14px;">No payroll runs found. Payroll runs are created from the desktop application.</p>
     {% endif %}
 </div>
 </div>

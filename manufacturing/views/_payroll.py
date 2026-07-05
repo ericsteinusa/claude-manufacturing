@@ -5,6 +5,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import csv_response
 
 from ..payroll_core import (
     SS_RATE, MEDICARE_RATE,
@@ -176,6 +177,22 @@ def payroll_history(request):
     return render(request, 'payroll_history.html', _payroll_ctx(
         request, runs=runs,
     ))
+
+
+@dept_required(_PAYROLL_DEPT_KEYS)
+def payroll_history_export(request):
+    conn = get_db_connection()
+    try:
+        runs = list_payroll_runs(conn)
+    finally:
+        conn.close()
+
+    return csv_response('payroll_runs.csv', [
+        ('run_date', 'Run Date'), ('pay_period_start', 'Period Start'),
+        ('pay_period_end', 'Period End'), ('emp_count', 'Employees'),
+        ('total_gross', 'Total Gross'), ('total_net', 'Total Net'),
+        ('status', 'Status'),
+    ], runs)
 
 
 @dept_required(_PAYROLL_DEPT_KEYS)

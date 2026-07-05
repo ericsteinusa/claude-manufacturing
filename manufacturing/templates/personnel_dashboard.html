@@ -14,24 +14,24 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
-    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+.nav-btn { display:block; background:white; border: 1.5px solid var(--border); border-radius:8px;
+    padding:14px 10px; text-align:center; color:var(--accent); font-weight:bold;
     font-size:13px; text-decoration:none; }
-.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.nav-btn:hover { background:var(--accent); color:white; }
 .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
-.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
-.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi .val { font-size:28px; font-weight:bold; color:var(--accent); }
 .kpi.yellow { border-color:#b8860b; }
 .kpi.yellow .val { color:#b8860b; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 {% endblock %}
 
@@ -40,17 +40,17 @@
 <div class="m-wrap">
     <h2>Personnel Dashboard</h2>
 
-    <div class="nav-grid">
-        <a href="/people/" class="nav-btn">Employees</a>
-        <a href="/people/new/" class="nav-btn">New Employee</a>
-        <a href="/pers/depts/" class="nav-btn">Departments</a>
-        <a href="/pers/reviews/" class="nav-btn">Performance Reviews</a>
-        <a href="/pers/training/" class="nav-btn">Training &amp; Development</a>
-        <a href="/time-off/" class="nav-btn">Time Off</a>
-        <a href="/time-clock/" class="nav-btn">Time Clock</a>
-        <a href="/time-clock/attendance/" class="nav-btn">Attendance</a>
-        <a href="/payroll/" class="nav-btn">Payroll</a>
-        <a href="/dashboard/" class="nav-btn">Home</a>
+    <div class="dept-grid">
+        <a href="/people/" class="dept-btn">Employees</a>
+        <a href="/people/new/" class="dept-btn">New Employee</a>
+        <a href="/pers/depts/" class="dept-btn">Departments</a>
+        <a href="/pers/reviews/" class="dept-btn">Performance Reviews</a>
+        <a href="/pers/training/" class="dept-btn">Training &amp; Development</a>
+        <a href="/time-off/" class="dept-btn">Time Off</a>
+        <a href="/time-clock/" class="dept-btn">Time Clock</a>
+        <a href="/time-clock/attendance/" class="dept-btn">Attendance</a>
+        <a href="/payroll/" class="dept-btn">Payroll</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
     </div>
 
     <div class="kpi-row">
@@ -99,7 +99,7 @@
                 <tbody>
                 {% for p in recent_employees %}
                 <tr>
-                    <td><a href="/people/{{ p.id }}/" style="color:rgb(0,40,160);">{{ p.last_name }}, {{ p.first_name }}</a></td>
+                    <td><a href="/people/{{ p.id }}/" style="color:var(--accent);">{{ p.last_name }}, {{ p.first_name }}</a></td>
                     <td>{{ p.email }}</td>
                     <td>{{ p.dept_name }}</td>
                     <td>{{ p.job_title }}</td>

@@ -9,8 +9,8 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:860px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
 .form-row { display:flex; flex-direction:column; gap:4px; }
@@ -21,9 +21,9 @@
 .form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
 .form-row textarea { resize:vertical; min-height:70px; }
 .btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
-.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .ok-btn { padding:7px 20px; background:#1a6b1a; color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .ok-btn:hover { background:#145214; }

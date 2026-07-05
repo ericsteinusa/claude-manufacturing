@@ -16,6 +16,7 @@ from django.shortcuts import render, redirect
 from ..log_utils import get_logger
 from ..schema import init_schema
 from ..db_pg import get_db_connection
+from ..csv_export import csv_response
 from ..audit_core import get_recent, get_history, AUDITED_TABLES
 from ..approval_core import (
     needs_approval, request_approval, approve_po, reject_po,
@@ -1278,6 +1279,25 @@ def po_list(request):
 
 
 @dept_required('purchasing')
+def po_export(request):
+    status = request.GET.get('status') or None
+    if status not in PO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        pos = list_pos(conn, status=status)
+    finally:
+        conn.close()
+
+    return csv_response('purchase_orders.csv', [
+        ('po_number', 'PO #'), ('company_name', 'Supplier'),
+        ('order_date', 'Order Date'), ('expected_date', 'Expected Date'),
+        ('item_count', 'Items'), ('total', 'Total'), ('status', 'Status'),
+    ], pos)
+
+
+@dept_required('purchasing')
 def po_detail(request, po_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
@@ -1672,6 +1692,26 @@ def wo_list(request):
 
 
 @dept_required(_WO_DEPT_KEYS)
+def wo_export(request):
+    status = request.GET.get('status') or None
+    if status not in WO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        wos = list_wos(conn, status=status)
+    finally:
+        conn.close()
+
+    return csv_response('work_orders.csv', [
+        ('wo_number', 'WO #'), ('product_name', 'Product'),
+        ('description', 'Description'), ('quantity', 'Qty'),
+        ('start_date', 'Start Date'), ('due_date', 'Due Date'),
+        ('status', 'Status'), ('mat_count', 'Materials'),
+    ], wos)
+
+
+@dept_required(_WO_DEPT_KEYS)
 def wo_detail(request, wo_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
@@ -1958,6 +1998,28 @@ def so_list(request):
         can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
         back_url='/dept/sales/sales/sales_orders/',
     ))
+
+
+@dept_required('sales')
+def so_export(request):
+    status = request.GET.get('status') or None
+    if status not in SO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        sos = list_sos(conn, status=status)
+    finally:
+        conn.close()
+
+    for so in sos:
+        so['customer_name'] = _so_customer_name(so)
+
+    return csv_response('sales_orders.csv', [
+        ('so_number', 'SO #'), ('customer_name', 'Customer'),
+        ('order_date', 'Order Date'), ('ship_date', 'Ship Date'),
+        ('item_count', 'Items'), ('total', 'Total'), ('status', 'Status'),
+    ], sos)
 
 
 @dept_required('sales')
@@ -3496,6 +3558,32 @@ def inventory_list(request):
     ))
 
 
+@dept_required(_INV_DEPT_KEYS)
+def inventory_export(request):
+    search = request.GET.get('search', '').strip()
+    filter_status = request.GET.get('filter') or None
+    if filter_status not in ('low', 'zero'):
+        filter_status = None
+    item_type = request.GET.get('item_type') or None
+    if item_type not in ('make', 'buy'):
+        item_type = None
+
+    conn = get_db_connection()
+    try:
+        products = inv_list_products(conn, search=search,
+                                     filter_status=filter_status,
+                                     item_type=item_type)
+    finally:
+        conn.close()
+
+    return csv_response('inventory.csv', [
+        ('name', 'Product'), ('item_type', 'Type'), ('uom', 'UOM'),
+        ('bin', 'Bin'), ('amount', 'On Hand'), ('reorder_point', 'Reorder Point'),
+        ('purchase_price', 'Purchase Price'), ('lead_time_days', 'Lead Time (days)'),
+        ('supplier_name', 'Supplier'),
+    ], products)
+
+
 @dept_required(_INV_DEPT_KEYS, write_redirect='inventory_list')
 def inventory_new(request):
 
@@ -4447,6 +4535,32 @@ def ap_list(request):
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)
+def ap_export(request):
+    status = request.GET.get('status', '')
+    vendor_id = request.GET.get('vendor_id', '')
+    date_from = request.GET.get('date_from', '')
+    date_to   = request.GET.get('date_to', '')
+    conn = get_db_connection()
+    try:
+        invoices = list_ap_invoices(
+            conn,
+            status=status or None,
+            vendor_id=int(vendor_id) if vendor_id else None,
+            date_from=date_from or None,
+            date_to=date_to or None,
+        )
+    finally:
+        conn.close()
+
+    return csv_response('ap_invoices.csv', [
+        ('invoice_number', 'Invoice #'), ('vendor_label', 'Vendor'),
+        ('invoice_date', 'Invoice Date'), ('due_date', 'Due Date'),
+        ('amount', 'Amount'), ('paid', 'Paid'), ('balance', 'Balance'),
+        ('status', 'Status'),
+    ], invoices)
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
 def ap_invoice_detail(request, inv_id=None):
     conn = get_db_connection()
     success = error = ''
@@ -4560,6 +4674,32 @@ def ar_list(request):
         success=success, error=error,
     )
     return render(request, 'ar_list.html', ctx)
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def ar_export(request):
+    status = request.GET.get('status', '')
+    customer_id = request.GET.get('customer_id', '')
+    date_from = request.GET.get('date_from', '')
+    date_to   = request.GET.get('date_to', '')
+    conn = get_db_connection()
+    try:
+        invoices = list_ar_invoices(
+            conn,
+            status=status or None,
+            customer_id=int(customer_id) if customer_id else None,
+            date_from=date_from or None,
+            date_to=date_to or None,
+        )
+    finally:
+        conn.close()
+
+    return csv_response('ar_invoices.csv', [
+        ('invoice_number', 'Invoice #'), ('customer_label', 'Customer'),
+        ('invoice_date', 'Invoice Date'), ('due_date', 'Due Date'),
+        ('amount', 'Amount'), ('received', 'Received'), ('balance', 'Balance'),
+        ('status', 'Status'),
+    ], invoices)
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)

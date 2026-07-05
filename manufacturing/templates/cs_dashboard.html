@@ -14,25 +14,25 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
-    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+.nav-btn { display:block; background:white; border: 1.5px solid var(--border); border-radius:8px;
+    padding:14px 10px; text-align:center; color:var(--accent); font-weight:bold;
     font-size:13px; text-decoration:none; }
-.nav-btn:hover { background:rgb(0,60,180); color:white; }
+.nav-btn:hover { background:var(--accent); color:white; }
 .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
-.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
-.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi .val { font-size:28px; font-weight:bold; color:var(--accent); }
 .kpi.red { border-color:#c33; }
 .kpi.red .val { color:#c33; }
 .kpi.yellow { border-color:#b8860b; }
 .kpi.yellow .val { color:#b8860b; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
 .st-open   { background:#f8d7da; color:#842029; }
@@ -44,18 +44,18 @@
 <div class="m-wrap">
     <h2>Customer Service Dashboard</h2>
 
-    <div class="nav-grid">
-        <a href="/cs/" class="nav-btn">All Tickets</a>
-        <a href="/cs/new/" class="nav-btn">New Ticket</a>
-        <a href="/cs/escalations/" class="nav-btn">Escalations</a>
-        <a href="/cs/reports/" class="nav-btn">Reports</a>
-        <a href="/cs/plans/" class="nav-btn">Service Plans</a>
-        <a href="/cs/returns/" class="nav-btn">Returns &amp; Refunds</a>
-        <a href="/cs/kb/" class="nav-btn">Knowledge Base</a>
-        <a href="/cs/surveys/" class="nav-btn">Surveys &amp; Feedback</a>
-        <a href="/customers/" class="nav-btn">Customers</a>
-        <a href="/customers/new/" class="nav-btn">New Customer</a>
-        <a href="/dashboard/" class="nav-btn">Home</a>
+    <div class="dept-grid">
+        <a href="/cs/" class="dept-btn">All Tickets</a>
+        <a href="/cs/new/" class="dept-btn">New Ticket</a>
+        <a href="/cs/escalations/" class="dept-btn">Escalations</a>
+        <a href="/cs/reports/" class="dept-btn">Reports</a>
+        <a href="/cs/plans/" class="dept-btn">Service Plans</a>
+        <a href="/cs/returns/" class="dept-btn">Returns &amp; Refunds</a>
+        <a href="/cs/kb/" class="dept-btn">Knowledge Base</a>
+        <a href="/cs/surveys/" class="dept-btn">Surveys &amp; Feedback</a>
+        <a href="/customers/" class="dept-btn">Customers</a>
+        <a href="/customers/new/" class="dept-btn">New Customer</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
     </div>
 
     <div class="kpi-row">
