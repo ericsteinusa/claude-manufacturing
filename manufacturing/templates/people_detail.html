@@ -14,7 +14,7 @@
 {% block extra_styles %}
 .pd-wrap { width: 100%; max-width: 700px; }
 .pd-card {
-    background: white; border: 2px solid black; border-radius: 6px;
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
     padding: 20px 24px; margin-bottom: 16px;
 }
 .pd-name { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
@@ -25,11 +25,26 @@
 }
 .pd-grid b { color: #003cb4; }
 .pd-full { grid-column: 1 / -1; }
+.emp-barcode {
+    display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
+}
+.emp-barcode img { max-width:260px; height:auto; }
+.emp-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+@media print {
+    .btn { display:none !important; }
+    body { background:white !important; }
+    .pd-wrap { max-width:none; }
+    .emp-barcode img { max-width:300px; }
+}
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="pd-wrap">
+        <div class="emp-barcode">
+            <img src="/barcode/img/EMP-{{ person.id }}/" alt="Barcode EMP-{{ person.id }}">
+            <small>EMP-{{ person.id }}</small>
+        </div>
         <div class="pd-card">
             <div class="pd-name">{{ person.first_name }} {{ person.last_name }}</div>
             <div class="pd-title">{{ person.job_title|default:"No title on record" }}</div>
