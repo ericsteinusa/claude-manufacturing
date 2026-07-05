@@ -9,6 +9,7 @@
 <a href="/maint/downtime/" class="btn">Downtime</a>
 <a href="/maint/parts/" class="btn">Parts</a>
 <a href="/maint/mechanics/" class="btn">Mechanics</a>
+<a href="/maint/oee/" class="btn">OEE</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
@@ -30,6 +31,16 @@
 .section-link:hover { border-color:var(--accent); }
 .section-link .icon { font-size:24px; margin-bottom:6px; }
 .section-link .name { font-size:13px; font-weight:bold; color:#333; }
+.kpi-card.good .num { color:#2e7d32; }
+.oee-trend { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:16px 20px; margin-bottom:24px; }
+.oee-trend-title { font-size:12px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.4px; color:var(--text-muted); margin-bottom:12px; }
+.oee-bars { display:flex; align-items:flex-end; gap:10px; height:80px; }
+.oee-bar-col { flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:flex-end; height:100%; }
+.oee-bar { width:100%; max-width:28px; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; }
+.oee-bar-label { font-size:10px; color:var(--text-muted); margin-top:4px; }
 {% endblock %}
 
 {% block body %}
@@ -62,6 +73,22 @@
             <div class="num">{{ counts.active_downtime }}</div>
             <div class="lbl">Active Downtime Events</div>
         </a>
+        <a href="/maint/oee/" class="kpi-card {% if oee.oee_pct >= 85 %}good{% elif oee.oee_pct < 60 %}danger{% else %}warn{% endif %}">
+            <div class="num">{{ oee.oee_pct }}%</div>
+            <div class="lbl">OEE (month to date)</div>
+        </a>
+    </div>
+
+    <div class="oee-trend">
+        <div class="oee-trend-title">Weekly OEE Trend (last 8 weeks)</div>
+        <div class="oee-bars">
+            {% for point in oee_trend %}
+            <div class="oee-bar-col" title="{{ point.week_start }} to {{ point.week_end }}: {{ point.oee_pct }}%">
+                <div class="oee-bar" style="height:{{ point.oee_pct }}%;"></div>
+                <div class="oee-bar-label">{{ point.oee_pct|floatformat:0 }}%</div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
     <div class="section-links">
@@ -92,6 +119,10 @@
         <a href="/maint/mechanics/" class="section-link">
             <div class="icon">&#128100;</div>
             <div class="name">Mechanics</div>
+        </a>
+        <a href="/maint/oee/" class="section-link">
+            <div class="icon">&#128202;</div>
+            <div class="name">OEE Report</div>
         </a>
     </div>
 </div>

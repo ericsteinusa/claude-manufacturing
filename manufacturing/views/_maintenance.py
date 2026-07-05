@@ -1,11 +1,14 @@
 """Views: maintenance domain."""
 
+import datetime
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
 from ..csv_export import csv_response
+from ..oee_core import get_overall_oee, get_oee_trend, list_workcenter_oee
 
 from ..maintenance_core import (
     WO_STATUSES, WORK_TYPES, PRIORITIES,
@@ -55,13 +58,43 @@ def _maint_ctx(request, **extra):
 
 @dept_required(_MAINT_DEPT_KEYS)
 def maint_dashboard(request):
+    today = datetime.date.today()
+    month_start = today.replace(day=1)
     conn = get_db_connection()
     try:
         counts = maint_get_dashboard_counts(conn)
+        oee = get_overall_oee(conn, month_start.isoformat(), today.isoformat())
+        oee_trend = get_oee_trend(conn, end_date=today.isoformat(), weeks=8)
     finally:
         conn.close()
-    return render(request, 'maint_dashboard.html',
-                  _maint_ctx(request, counts=counts))
+    return render(request, 'maint_dashboard.html', _maint_ctx(
+        request, counts=counts, oee=oee, oee_trend=oee_trend,
+    ))
+
+
+@dept_required(_MAINT_DEPT_KEYS)
+def maint_oee_report(request):
+    period = request.GET.get('period', 'month')
+    if period not in ('week', 'month'):
+        period = 'month'
+
+    today = datetime.date.today()
+    if period == 'week':
+        start = today - datetime.timedelta(days=today.weekday())
+    else:
+        start = today.replace(day=1)
+
+    conn = get_db_connection()
+    try:
+        breakdown = list_workcenter_oee(conn, start.isoformat(), today.isoformat())
+        overall = get_overall_oee(conn, start.isoformat(), today.isoformat())
+    finally:
+        conn.close()
+
+    return render(request, 'maint_oee_report.html', _maint_ctx(
+        request, breakdown=breakdown, overall=overall,
+        period=period, start=start.isoformat(), end=today.isoformat(),
+    ))
 
 
 # --- Work Orders ---

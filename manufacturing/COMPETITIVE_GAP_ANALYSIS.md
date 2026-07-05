@@ -293,7 +293,7 @@ All 10 competitors have this. Users need it for analysis in Excel.
   filters. Excel (`openpyxl`) export was left for a follow-up — CSV covers
   the "open in Excel" use case competitors are scored against.
 
-#### P1-C: OEE (Overall Equipment Effectiveness)
+#### P1-C: OEE (Overall Equipment Effectiveness) ✅ Done
 Data already exists (downtime records, production schedule, WO qty). Just apply the formula:
 **OEE = Availability × Performance × Quality**
 - Availability = (scheduled time − downtime) / scheduled time
@@ -301,6 +301,15 @@ Data already exists (downtime records, production schedule, WO qty). Just apply 
 - Quality = (total output − scrap) / total output
 - OEE card + trend chart on maintenance dashboard
 - OEE report by equipment by week/month
+- **Shipped:** `manufacturing/oee_core.py` computes OEE per **workcenter**
+  (not per `maint_equipment` — the two tables have no FK, only free-text
+  names, so downtime is folded in via a best-effort name match).
+  Availability uses `workcenter.capacity_hours_per_day`; Performance/Quality
+  use `wo_operation.std_hours/actual_hours/scrap_qty` joined to the parent
+  WO's `quantity`. Maintenance dashboard now shows a month-to-date OEE card
+  plus an 8-week trend (plain CSS bars, no charting lib yet — see P1-A), and
+  `/maint/oee/` is a full report with a week/month toggle and a per-workcenter
+  breakdown table.
 
 #### P1-D: Cycle Count Workflow
 Inventory on-hand data exists. Need the structured count process.

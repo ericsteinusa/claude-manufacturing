@@ -111,6 +111,7 @@ urlpatterns = [
     path('cs/reports/', views.cs_reports, name='cs_reports'),
     path('cs/plans/', views.cs_plans, name='cs_plans'),
     path('maint/', views.maint_dashboard, name='maint_dashboard'),
+    path('maint/oee/', views.maint_oee_report, name='maint_oee_report'),
     path('maint/wo/', views.maint_wo_list, name='maint_wo_list'),
     path('maint/wo/export/', views.maint_wo_export, name='maint_wo_export'),
     path('maint/wo/<int:wo_id>/', views.maint_wo_detail, name='maint_wo_detail'),
