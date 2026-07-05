@@ -311,12 +311,26 @@ Data already exists (downtime records, production schedule, WO qty). Just apply 
   `/maint/oee/` is a full report with a week/month toggle and a per-workcenter
   breakdown table.
 
-#### P1-D: Cycle Count Workflow
+#### P1-D: Cycle Count Workflow ✅ Done
 Inventory on-hand data exists. Need the structured count process.
 - Generate cycle count sheet (by bin, by ABC class, by product category)
 - Count entry screen (scan or enter counted qty per item)
 - Variance identification (counted vs. system qty)
 - Variance approval → auto-post inventory adjustment
+- **Shipped:** `manufacturing/cycle_count_core.py` + `/inventory/cycle-counts/`.
+  Sheets group by `product.bin` or `item_type` (real columns) or an
+  **on-the-fly ABC class** (there's no persisted category/ABC column, so it's
+  ranked by extended value — on-hand × unit cost — top 20%/next 30%/rest each
+  time a sheet is generated, not cached). Variance approval reuses the
+  generic `approval_workflow_core` engine (added `'cycle_count'` to
+  `ENTITY_TYPES`) rather than the PO-specific one, since approval should
+  gate on variance magnitude, not a flat entity total. **If no
+  `approval_rule` is configured for `cycle_count`, submission fails open and
+  posts immediately** — this doesn't reduce existing control (adjustments
+  could always be posted directly before this feature existed), but an org
+  wanting an approval gate needs to add an `approval_rule` row themselves;
+  there's no admin UI for that yet. Posting reuses `inventory_core
+  .record_transaction(..., 'adjust', ...)` per variant line.
 
 #### P1-E: Price List Module
 Required before ATP can be meaningful. Sales currently has no pricing engine.

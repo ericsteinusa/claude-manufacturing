@@ -207,6 +207,7 @@ from ._it import *  # noqa: F401,F403
 from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
+from ._cycle_count import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
