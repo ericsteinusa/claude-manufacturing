@@ -30,6 +30,7 @@ PREFIXES = {
     "INSP-":  ("insp",   "QA Inspection"),
     "ENGP-":  ("engp",   "Engineering Project"),
     "LOT-":   ("lot",    "Lot"),
+    "CON-":   ("con",    "Contact"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -82,6 +83,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_engp_url(key)
     if rtype == "lot":
         return _lookup_lot_url(key)
+    if rtype == "con":
+        return _lookup_con_url(key)
     return None
 
 
@@ -131,6 +134,12 @@ def _lookup_po_url(po_number: str) -> str | None:
             return f"/po/{row['id']}/"
     except Exception:
         pass
+    return None
+
+
+def _lookup_con_url(key: str) -> str | None:
+    if key.isdigit():
+        return f"/contacts/{key}/"
     return None
 
 
