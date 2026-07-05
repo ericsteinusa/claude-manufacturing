@@ -29,6 +29,7 @@ PREFIXES = {
     "CS-":    ("cs",      "CS Ticket"),
     "INSP-":  ("insp",   "QA Inspection"),
     "ENGP-":  ("engp",   "Engineering Project"),
+    "LOT-":   ("lot",    "Lot"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -79,6 +80,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_insp_url(key)
     if rtype == "engp":
         return _lookup_engp_url(key)
+    if rtype == "lot":
+        return _lookup_lot_url(key)
     return None
 
 
@@ -126,6 +129,20 @@ def _lookup_po_url(po_number: str) -> str | None:
         ).fetchone()
         if row:
             return f"/po/{row['id']}/"
+    except Exception:
+        pass
+    return None
+
+
+def _lookup_lot_url(lot_number: str) -> str | None:
+    try:
+        from .db_pg import get_db_connection
+        conn = get_db_connection()
+        row = conn.execute(
+            "SELECT id FROM lot WHERE lot_number = %s", [lot_number]
+        ).fetchone()
+        if row:
+            return f"/lots/{row['id']}/"
     except Exception:
         pass
     return None
