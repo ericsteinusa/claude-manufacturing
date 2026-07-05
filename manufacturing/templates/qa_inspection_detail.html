@@ -9,7 +9,7 @@
 
 {% block extra_styles %}
 .print-btn {
-    padding: 6px 16px; background: rgb(0,60,180); color: white;
+    padding: 6px 16px; background: var(--accent); color: white;
     border: none; border-radius: 5px; font-size: 13px;
     cursor: pointer; font-weight: bold; margin-bottom: 14px;
 }
@@ -17,10 +17,16 @@
     .print-btn, .btn, .result-btns, form { display: none !important; }
     body { background: white !important; }
     .qa-wrap { max-width: none; }
+    .qa-barcode img { max-width: 300px; }
 }
+.qa-barcode {
+    display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
+}
+.qa-barcode img { max-width:260px; height:auto; }
+.qa-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
 .qa-wrap { width:100%; max-width:900px; }
 .qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; margin-bottom:14px; }
 .info-item label { display:block; font-size:11px; color:#888; font-weight:bold; text-transform:uppercase; margin-bottom:2px; }
@@ -33,7 +39,7 @@
 .result-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
 .rbtn { padding:6px 16px; border:2px solid #aaa; border-radius:5px;
     font-size:13px; font-weight:bold; cursor:pointer; background:white; }
-.rbtn:hover { border-color:rgb(0,60,180); color:rgb(0,60,180); }
+.rbtn:hover { border-color:var(--accent); color:var(--accent); }
 .rbtn.active-passed { background:#e8f5e9; border-color:#1a6b1a; color:#1a6b1a; }
 .rbtn.active-failed { background:#ffebee; border-color:#c62828; color:#c62828; }
 .rbtn.active-pending { background:#e8eaf6; border-color:#3949ab; color:#3949ab; }
@@ -52,9 +58,9 @@
     padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
 .form-row textarea { resize:vertical; min-height:60px; }
 .form-grid2 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .resolve-btn { padding:4px 12px; background:#fff3e0; border:1px solid #e65100;
     border-radius:4px; font-size:12px; cursor:pointer; color:#e65100; }
 .resolve-btn:hover { background:#e65100; color:white; }
@@ -69,6 +75,10 @@
 <div class="content">
 <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
 <div class="qa-wrap">
+    <div class="qa-barcode">
+        <img src="/barcode/img/INSP-{{ inspection.insp_number }}/" alt="Barcode INSP-{{ inspection.insp_number }}">
+        <small>INSP-{{ inspection.insp_number }}</small>
+    </div>
     <h2>{{ inspection.insp_number }}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
