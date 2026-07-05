@@ -5,6 +5,7 @@
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">← Back</a>
 {% if can_edit %}<a href="/so/new/" class="btn btn-primary">+ New SO</a>{% endif %}
+<a href="/price-lists/" class="btn">Price Lists</a>
 <a href="/so/export/{% if status %}?status={{ status }}{% endif %}" class="btn">⬇ Export CSV</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}

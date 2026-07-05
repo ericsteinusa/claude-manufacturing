@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block page_title %}{{ price_list.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/price-lists/" class="btn">Price Lists</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.pl-wrap { width:100%; max-width:900px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; margin-bottom:14px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="pl-wrap">
+    <div class="menu-title">{{ price_list.name }}
+        {% if price_list.is_active %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        {% else %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        {% endif %}
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Price List Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_header">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ price_list.name }}" required>
+                </div>
+                <div class="form-row">
+                    <label>Currency</label>
+                    <select name="currency">
+                        {% for c in currencies %}
+                        <option value="{{ c.code }}" {% if c.code == price_list.currency %}selected{% endif %}>{{ c.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Active</label>
+                    <select name="is_active">
+                        <option value="1" {% if price_list.is_active %}selected{% endif %}>Yes</option>
+                        <option value="0" {% if not price_list.is_active %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Effective Date</label>
+                    <input type="date" name="effective_date" value="{{ price_list.effective_date|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Expiry Date</label>
+                    <input type="date" name="expiry_date" value="{{ price_list.expiry_date|default:'' }}">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" value="{{ price_list.notes|default:'' }}">
+                </div>
+            </div>
+            <button type="submit" class="btn">Save Details</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Price Lines</h3>
+        {% if lines %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th class="num">Min Qty</th>
+                        <th class="num">Unit Price</th>
+                        {% if can_edit %}<th></th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                    <tr>
+                        <td>{{ line.product_name }}</td>
+                        {% if can_edit %}
+                        <td class="num" colspan="2">
+                            <form method="post" style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_line">
+                                <input type="hidden" name="line_id" value="{{ line.id }}">
+                                <label style="font-size:11px;color:var(--text-muted);">Min Qty</label>
+                                <input type="number" name="min_qty" step="any" min="0" value="{{ line.min_qty|floatformat:'g' }}" style="width:70px;padding:3px 6px;border:1.5px solid var(--border);border-radius:4px;">
+                                <label style="font-size:11px;color:var(--text-muted);">Price</label>
+                                <input type="number" name="unit_price" step="0.01" min="0" value="{{ line.unit_price|floatformat:2 }}" style="width:80px;padding:3px 6px;border:1.5px solid var(--border);border-radius:4px;">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Save</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_line">
+                                <input type="hidden" name="line_id" value="{{ line.id }}">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                            </form>
+                        </td>
+                        {% else %}
+                        <td class="num">{{ line.min_qty|floatformat:"g" }}</td>
+                        <td class="num">${{ line.unit_price|floatformat:2 }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No price lines yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Price Line</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_line">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Product</label>
+                    <select name="product_id" required>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.product_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Min Qty (for tiered pricing)</label>
+                    <input type="number" name="min_qty" step="any" min="0" value="1">
+                </div>
+                <div class="form-row">
+                    <label>Unit Price</label>
+                    <input type="number" name="unit_price" step="0.01" min="0" value="0.00" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Line</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

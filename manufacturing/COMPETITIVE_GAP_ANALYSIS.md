@@ -332,12 +332,28 @@ Inventory on-hand data exists. Need the structured count process.
   there's no admin UI for that yet. Posting reuses `inventory_core
   .record_transaction(..., 'adjust', ...)` per variant line.
 
-#### P1-E: Price List Module
+#### P1-E: Price List Module ✅ Done
 Required before ATP can be meaningful. Sales currently has no pricing engine.
 - Price list master (name, currency, effective/expiry dates)
 - Price list lines (product → unit price, min qty for tiered pricing)
 - Customer-to-price-list assignment on customer master
 - Auto-populate unit price when adding SO line item
+- **Shipped:** `manufacturing/price_list_core.py` + `/price-lists/` admin
+  pages, reusing `currency_core` for the currency field. There was no
+  sale/list price concept anywhere before this (only `product.purchase_price`,
+  which is a cost) — fully new. Customer assignment adds
+  `customer.price_list_id` (a new column; the customer/supplier CRUD in
+  `contacts_core.py` is shared between both tables, so assignment is a
+  separate `assign_customer_price_list()` write path rather than threaded
+  through the generic update). SO auto-populate is **client-side**: the SO
+  detail view embeds the assigned customer's price tiers as JSON, and a
+  small vanilla-JS handler on the product/qty fields fills in the unit
+  price for the correct tier — no AJAX round-trip, matching this app's
+  existing no-JS-framework convention. Also fixed a pre-existing crash in
+  `contacts_detail.html` (order history row used `{{ o.so_number|default:
+  o.po_number }}`, which 500s when `po_number` doesn't exist on a customer's
+  SO row at all) — found while verifying this feature since it blocked the
+  customer detail page for any customer with order history.
 
 #### P1-F: Request for Quote (RFQ)
 Missing from purchasing. All 10 competitors have it.

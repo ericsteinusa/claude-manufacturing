@@ -6,6 +6,7 @@ persistence live in :mod:`manufacturing.accounts`.
 
 import os
 import sys
+import json
 import subprocess
 from datetime import date, timedelta
 
@@ -50,6 +51,10 @@ from ..contacts_core import (
     list_suppliers as contacts_list_suppliers,
     get_supplier, create_supplier, update_supplier,
     get_supplier_orders,
+)
+from ..price_list_core import (
+    ensure_price_list_tables, list_price_lists, assign_customer_price_list,
+    get_customer_price_tiers,
 )
 from ..cs_calls_core import (
     validate_call, PLAN_STATUSES,
@@ -208,6 +213,7 @@ from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
 from ._cycle_count import *  # noqa: F401,F403
+from ._price_list import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -2035,6 +2041,10 @@ def so_detail(request, so_id):
         products = load_so_products(conn) if (so and can_edit) else []
         currencies = list_currencies(conn)
         base_currency = get_base_currency(conn).get("code", "USD")
+        price_tiers = (
+            get_customer_price_tiers(conn, so['customer_id'])
+            if (so and can_edit and so.get('customer_id')) else {}
+        )
 
         if request.method == 'POST' and request.POST.get('action') == 'currency' and can_edit and so:
             cur_code = request.POST.get('currency', 'USD')
@@ -2070,6 +2080,7 @@ def so_detail(request, so_id):
         status_actions=status_actions,
         currencies=currencies,
         base_currency=base_currency,
+        price_tiers_json=json.dumps(price_tiers),
         back_url='/so/',
     ))
 
@@ -3807,30 +3818,41 @@ def customer_detail(request, customer_id):
     error = None
     success = None
     try:
+        ensure_price_list_tables(conn)
         contact = get_customer(conn, customer_id)
         if not contact:
             return redirect('customer_list')
         if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
             try:
-                update_customer(
-                    conn, customer_id,
-                    first_name=request.POST.get('first_name', ''),
-                    last_name=request.POST.get('last_name', ''),
-                    company_name=request.POST.get('company_name', ''),
-                    phone_number=request.POST.get('phone_number', ''),
-                    address=request.POST.get('address', ''),
-                    city=request.POST.get('city', ''),
-                    state=request.POST.get('state', ''),
-                    zip_code=request.POST.get('zip_code', ''),
-                    email=request.POST.get('email', ''),
-                )
-                conn.commit()
-                contact = get_customer(conn, customer_id)
-                success = 'Customer updated.'
+                if action == 'assign_price_list':
+                    pl_id = request.POST.get('price_list_id') or None
+                    assign_customer_price_list(
+                        conn, customer_id, int(pl_id) if pl_id else None)
+                    conn.commit()
+                    contact = get_customer(conn, customer_id)
+                    success = 'Price list assigned.'
+                else:
+                    update_customer(
+                        conn, customer_id,
+                        first_name=request.POST.get('first_name', ''),
+                        last_name=request.POST.get('last_name', ''),
+                        company_name=request.POST.get('company_name', ''),
+                        phone_number=request.POST.get('phone_number', ''),
+                        address=request.POST.get('address', ''),
+                        city=request.POST.get('city', ''),
+                        state=request.POST.get('state', ''),
+                        zip_code=request.POST.get('zip_code', ''),
+                        email=request.POST.get('email', ''),
+                    )
+                    conn.commit()
+                    contact = get_customer(conn, customer_id)
+                    success = 'Customer updated.'
             except Exception as e:
                 conn.rollback()
                 error = str(e)
         orders = get_customer_orders(conn, customer_id)
+        price_lists = list_price_lists(conn, active_only=True)
     finally:
         conn.close()
     return render(request, 'contacts_detail.html', _contacts_context(
@@ -3843,6 +3865,7 @@ def customer_detail(request, customer_id):
         new_url='/customers/new/',
         order_label='Sales Order',
         order_url_prefix='/so/',
+        price_lists=price_lists,
         error=error,
         success=success,
         can_edit=can_edit,

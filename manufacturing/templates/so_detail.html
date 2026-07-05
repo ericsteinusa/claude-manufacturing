@@ -193,7 +193,7 @@
                 <div class="grid">
                     <div>
                         <label>Product (optional)</label>
-                        <select name="product_id">
+                        <select name="product_id" id="so-add-product">
                             <option value="">(none)</option>
                             {% for p in products %}
                             <option value="{{ p.id }}">{{ p.product_name }}</option>
@@ -206,12 +206,12 @@
                     </div>
                     <div>
                         <label>Qty</label>
-                        <input type="number" name="qty" min="1" value="1">
+                        <input type="number" name="qty" min="1" value="1" id="so-add-qty">
                     </div>
                     <div>
                         <label>Unit Price</label>
                         <input type="number" name="unit_price" min="0"
-                               step="0.01" value="0.00">
+                               step="0.01" value="0.00" id="so-add-unit-price">
                     </div>
                     <div>
                         <button type="submit" class="btn">Add</button>
@@ -219,6 +219,29 @@
                 </div>
             </form>
         </div>
+        <script>
+        (function () {
+            var priceTiers = {{ price_tiers_json|safe }};
+            var productSel = document.getElementById('so-add-product');
+            var qtyInput = document.getElementById('so-add-qty');
+            var priceInput = document.getElementById('so-add-unit-price');
+            if (!productSel || !qtyInput || !priceInput) return;
+
+            function applyPrice() {
+                var tiers = priceTiers[productSel.value];
+                if (!tiers || !tiers.length) return;
+                var qty = parseFloat(qtyInput.value) || 0;
+                for (var i = 0; i < tiers.length; i++) {
+                    if (qty >= tiers[i][0]) {
+                        priceInput.value = tiers[i][1].toFixed(2);
+                        return;
+                    }
+                }
+            }
+            productSel.addEventListener('change', applyPrice);
+            qtyInput.addEventListener('input', applyPrice);
+        })();
+        </script>
         {% endif %}
     </div>
 </div>
