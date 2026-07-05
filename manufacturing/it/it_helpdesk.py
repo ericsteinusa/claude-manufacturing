@@ -1,4 +1,6 @@
 import sys
+import csv
+from abc import abstractmethod
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -166,8 +168,8 @@ class _TicketDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddTicketDialog(_TicketDialog):
@@ -463,12 +465,47 @@ class ITOpenTicketsWidget(_TicketTableWidget):
             ("Assign / Start", lambda: self._set_status("in_progress")),
             ("Mark Resolved",  lambda: self._set_status("resolved")),
             ("Close Ticket",   lambda: self._set_status("closed")),
+            ("Export CSV",     self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(32)
             b.clicked.connect(slot)
             br.addWidget(b)
+
+    def _on_export(self):
+        rows = self._load_rows()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No tickets to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Tickets", "tickets.csv",
+            "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Ticket #", "Requester", "Department", "Issue Type",
+                   "Priority", "Assigned To", "Submitted", "Due Date", "Status",
+                   "Description", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Ticket #":    r.get("ticket_number") or "",
+                    "Requester":   r.get("requester") or "",
+                    "Department":  r.get("department") or "",
+                    "Issue Type":  r.get("issue_type") or "",
+                    "Priority":    (r.get("priority") or "").capitalize(),
+                    "Assigned To": r.get("assigned_to") or "",
+                    "Submitted":   str(r.get("submitted_date") or ""),
+                    "Due Date":    str(r.get("due_date") or ""),
+                    "Status":      (r.get("status") or "").replace("_", " ").capitalize(),
+                    "Description": r.get("description") or "",
+                    "Notes":       r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} ticket(s) to:\n{path}")
 
     def _load_rows(self) -> list:
         pri = self._pri_filter.currentData()
@@ -624,12 +661,47 @@ class ITTicketHistoryWidget(_TicketTableWidget):
     def _build_buttons(self, br):
         for text, slot in (
             ("Reopen Ticket", lambda: self._set_status("open")),
+            ("Export CSV",    self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
             b.setFixedHeight(32)
             b.clicked.connect(slot)
             br.addWidget(b)
+
+    def _on_export(self):
+        rows = self._load_rows()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No tickets to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Ticket History", "ticket_history.csv",
+            "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Ticket #", "Requester", "Department", "Issue Type",
+                   "Priority", "Assigned To", "Submitted", "Due Date", "Status",
+                   "Description", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Ticket #":    r.get("ticket_number") or "",
+                    "Requester":   r.get("requester") or "",
+                    "Department":  r.get("department") or "",
+                    "Issue Type":  r.get("issue_type") or "",
+                    "Priority":    (r.get("priority") or "").capitalize(),
+                    "Assigned To": r.get("assigned_to") or "",
+                    "Submitted":   str(r.get("submitted_date") or ""),
+                    "Due Date":    str(r.get("due_date") or ""),
+                    "Status":      (r.get("status") or "").replace("_", " ").capitalize(),
+                    "Description": r.get("description") or "",
+                    "Notes":       r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} ticket(s) to:\n{path}")
 
     def _load_rows(self) -> list:
         val = self._status_filter.currentData()

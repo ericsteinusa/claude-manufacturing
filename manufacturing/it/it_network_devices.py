@@ -1,4 +1,6 @@
 import sys
+import csv
+from abc import abstractmethod
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -149,8 +151,8 @@ class _DeviceDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddDeviceDialog(_DeviceDialog):
@@ -349,6 +351,7 @@ class ITNetworkDevicesWidget(QtWidgets.QWidget):
             ("Mark Online",      lambda: self._set_status("online")),
             ("Mark Offline",     lambda: self._set_status("offline")),
             ("Maintenance",      lambda: self._set_status("maintenance")),
+            ("Export CSV",       self._on_export),
             ("Refresh",          self._refresh),
         ):
             b = QtWidgets.QPushButton(text)
@@ -464,6 +467,49 @@ class ITNetworkDevicesWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh()
+
+    def _on_export(self):
+        status = self._status_filter.currentData()
+        device_type = self._type_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            rows = list_network_devices(
+                conn, status=status, device_type=device_type,
+                search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No devices to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Network Devices", "network_devices.csv",
+            "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Hostname", "IP Address", "MAC Address", "Type",
+                   "Manufacturer", "Model", "Location", "Status",
+                   "Last Seen", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Hostname":     r.get("hostname") or "",
+                    "IP Address":   r.get("ip_address") or "",
+                    "MAC Address":  r.get("mac_address") or "",
+                    "Type":         r.get("device_type") or "",
+                    "Manufacturer": r.get("manufacturer") or "",
+                    "Model":        r.get("model") or "",
+                    "Location":     r.get("location") or "",
+                    "Status":       (r.get("status") or "").capitalize(),
+                    "Last Seen":    str(r.get("last_seen") or ""),
+                    "Notes":        r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} device(s) to:\n{path}")
 
 
 # ---------------------------------------------------------------------------

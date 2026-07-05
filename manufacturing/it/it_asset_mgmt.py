@@ -1,5 +1,6 @@
 import sys
 import csv
+from abc import abstractmethod
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -175,8 +176,8 @@ class _AssetDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddAssetDialog(_AssetDialog):

@@ -1,4 +1,6 @@
 import sys
+import csv
+from abc import abstractmethod
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -668,8 +670,8 @@ class _IncidentDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddIncidentDialog(_IncidentDialog):
@@ -844,6 +846,7 @@ class ITIncidentLogWidget(QtWidgets.QWidget):
              lambda: self._set_status("resolved")),
             ("Reopen",
              lambda: self._set_status("open")),
+            ("Export CSV",           self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -977,6 +980,51 @@ class ITIncidentLogWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh()
+
+    def _on_export(self):
+        status_val = self._status_filter.currentData()
+        severity = self._sev_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            if status_val == "_active":
+                rows = list_incidents(conn, status='open', severity=severity,
+                                      search=term)
+                rows += list_incidents(conn, status='investigating',
+                                       severity=severity, search=term)
+            else:
+                rows = list_incidents(conn, status=status_val,
+                                      severity=severity, search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No incidents to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Incidents", "network_incidents.csv",
+            "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Title", "Severity", "Status", "Affected Systems",
+                   "Reported Date", "Resolved Date", "Description", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Title":            r.get("title") or "",
+                    "Severity":         (r.get("severity") or "").capitalize(),
+                    "Status":           (r.get("status") or "").replace("_", " ").capitalize(),
+                    "Affected Systems":  r.get("affected_systems") or "",
+                    "Reported Date":    str(r.get("reported_date") or ""),
+                    "Resolved Date":    str(r.get("resolved_date") or ""),
+                    "Description":      r.get("description") or "",
+                    "Notes":            r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} incident(s) to:\n{path}")
 
 
 # ---------------------------------------------------------------------------

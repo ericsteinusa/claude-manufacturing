@@ -1,4 +1,6 @@
 import sys
+import csv
+from abc import abstractmethod
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -140,8 +142,8 @@ class _RepairDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddRepairDialog(_RepairDialog):
@@ -310,6 +312,7 @@ class ITRepairsWidget(QtWidgets.QWidget):
             ("Start Repair",     lambda: self._set_status("in_progress")),
             ("Mark Completed",   lambda: self._set_status("completed")),
             ("Cancel",           lambda: self._set_status("cancelled")),
+            ("Export CSV",       self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -445,6 +448,51 @@ class ITRepairsWidget(QtWidgets.QWidget):
             conn.close()
             self._refresh()
 
+    def _on_export(self):
+        status_val = self._status_filter.currentData()
+        priority = self._pri_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            if status_val == "_active":
+                rows = list_repairs(conn, status="open", priority=priority,
+                                    search=term)
+                rows += list_repairs(conn, status="in_progress",
+                                     priority=priority, search=term)
+            else:
+                rows = list_repairs(conn, status=status_val,
+                                    priority=priority, search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No repairs to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Repairs", "repairs.csv", "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Asset Tag", "Problem", "Reported By", "Reported Date",
+                   "Assigned To", "Priority", "Status", "Resolution", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Asset Tag":    r.get("asset_tag") or "",
+                    "Problem":      r.get("problem_description") or "",
+                    "Reported By":  r.get("reported_by") or "",
+                    "Reported Date": str(r.get("reported_date") or ""),
+                    "Assigned To":  r.get("assigned_to") or "",
+                    "Priority":     (r.get("priority") or "").capitalize(),
+                    "Status":       (r.get("status") or "").replace("_", " ").capitalize(),
+                    "Resolution":   r.get("resolution") or "",
+                    "Notes":        r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} repair(s) to:\n{path}")
+
 
 # ===========================================================================
 # Software Installations
@@ -539,8 +587,8 @@ class _SoftwareDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddSoftwareDialog(_SoftwareDialog):
@@ -701,6 +749,7 @@ class ITSoftwareWidget(QtWidgets.QWidget):
             ("Mark Installed",    lambda: self._set_status("installed")),
             ("Mark Pending",      lambda: self._set_status("pending")),
             ("Mark Removed",      lambda: self._set_status("removed")),
+            ("Export CSV",        self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -804,6 +853,43 @@ class ITSoftwareWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh()
+
+    def _on_export(self):
+        status = self._status_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            rows = list_software(conn, status=status, search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No software records to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Software", "software_installations.csv",
+            "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Asset Tag", "Software Name", "Version", "Vendor",
+                   "Install Date", "Installed By", "Status", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Asset Tag":     r.get("asset_tag") or "",
+                    "Software Name": r.get("software_name") or "",
+                    "Version":       r.get("version") or "",
+                    "Vendor":        r.get("vendor") or "",
+                    "Install Date":  str(r.get("install_date") or ""),
+                    "Installed By":  r.get("installed_by") or "",
+                    "Status":        (r.get("status") or "").capitalize(),
+                    "Notes":         r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} installation(s) to:\n{path}")
 
 
 # ===========================================================================
@@ -930,8 +1016,8 @@ class _LicenseDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddLicenseDialog(_LicenseDialog):
@@ -1096,6 +1182,7 @@ class ITLicensesWidget(QtWidgets.QWidget):
             ("Mark Active",     lambda: self._set_status("active")),
             ("Mark Expired",    lambda: self._set_status("expired")),
             ("Cancel License",  lambda: self._set_status("cancelled")),
+            ("Export CSV",      self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -1207,6 +1294,46 @@ class ITLicensesWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh()
+
+    def _on_export(self):
+        status = self._status_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            rows = list_licenses(conn, status=status, search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No licenses to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Licenses", "licenses.csv", "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Software Name", "Vendor", "License Type", "License Key",
+                   "Seats", "Seats Used", "Purchase Date", "Expiry Date",
+                   "Cost", "Status", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Software Name": r.get("software_name") or "",
+                    "Vendor":        r.get("vendor") or "",
+                    "License Type":  (r.get("license_type") or "").replace("_", " ").capitalize(),
+                    "License Key":   r.get("license_key") or "",
+                    "Seats":         r.get("seats") or 1,
+                    "Seats Used":    r.get("seats_used") or 0,
+                    "Purchase Date": str(r.get("purchase_date") or ""),
+                    "Expiry Date":   str(r.get("expiry_date") or ""),
+                    "Cost":          f"{float(r.get('cost') or 0):.2f}",
+                    "Status":        (r.get("status") or "").capitalize(),
+                    "Notes":         r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} license(s) to:\n{path}")
 
 
 # ===========================================================================
