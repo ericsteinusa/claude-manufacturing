@@ -1,4 +1,6 @@
 import sys
+import csv
+from abc import abstractmethod
 from datetime import date as _date
 from ..db_pg import get_db_connection
 from ..accounts import get_current_user_email
@@ -157,8 +159,8 @@ class _TaskDialog(QtWidgets.QDialog):
             return
         self._save()
 
-    def _save(self):
-        raise NotImplementedError
+    @abstractmethod
+    def _save(self) -> None: ...
 
 
 class AddTaskDialog(_TaskDialog):
@@ -361,6 +363,7 @@ class ITTasksDesktopWidget(QtWidgets.QWidget):
             ("Put On Hold",   lambda: self._set_status("on_hold")),
             ("Mark Complete", lambda: self._set_status("completed")),
             ("Cancel Task",   lambda: self._set_status("cancelled")),
+            ("Export CSV",    self._on_export),
         ):
             b = QtWidgets.QPushButton(text)
             b.setStyleSheet(BUTTON_STYLE)
@@ -492,6 +495,55 @@ class ITTasksDesktopWidget(QtWidgets.QWidget):
             conn.commit()
             conn.close()
             self._refresh()
+
+    def _on_export(self):
+        val = self._status_filter.currentData()
+        priority = self._pri_filter.currentData()
+        task_type = self._type_filter.currentData()
+        term = self._search.text().strip() or None
+        conn = _get_db()
+        try:
+            if val == "_active":
+                rows = list_tasks(conn, status=("pending", "in_progress"),
+                                  priority=priority, task_type=task_type,
+                                  search=term)
+            else:
+                rows = list_tasks(conn, status=val, priority=priority,
+                                  task_type=task_type, search=term)
+        except Exception:
+            rows = []
+        conn.close()
+        if not rows:
+            QtWidgets.QMessageBox.information(
+                self, "Export", "No tasks to export.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Export Tasks", "it_tasks.csv", "CSV Files (*.csv)")
+        if not path:
+            return
+        headers = ["Task #", "Task Name", "Type", "Priority", "Assigned To",
+                   "Department", "Scheduled Date", "Due Date", "Status",
+                   "Completed Date", "Description", "Notes"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "Task #":         r.get("task_number") or "",
+                    "Task Name":      r.get("task_name") or "",
+                    "Type":           r.get("task_type") or "",
+                    "Priority":       (r.get("priority") or "").capitalize(),
+                    "Assigned To":    r.get("assigned_to") or "",
+                    "Department":     r.get("department") or "",
+                    "Scheduled Date": str(r.get("scheduled_date") or ""),
+                    "Due Date":       str(r.get("due_date") or ""),
+                    "Status":         (r.get("status") or "").replace("_", " ").capitalize(),
+                    "Completed Date": str(r.get("completed_date") or ""),
+                    "Description":    r.get("description") or "",
+                    "Notes":          r.get("notes") or "",
+                })
+        QtWidgets.QMessageBox.information(
+            self, "Export", f"Exported {len(rows)} task(s) to:\n{path}")
 
 
 # ---------------------------------------------------------------------------
