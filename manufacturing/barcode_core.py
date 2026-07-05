@@ -26,6 +26,7 @@ PREFIXES = {
     "MWO-":   ("mwo",       "Maintenance WO"),
     "SO-":    ("so",        "Sales Order"),
     "SHIP-":  ("ship",     "Shipment"),
+    "CS-":    ("cs",      "CS Ticket"),
     "PART-":  ("inventory", "Part / Product"),
     "PO-":    ("po",        "Purchase Order"),
     "RCV-":   ("receiving", "Receiving"),
@@ -70,6 +71,8 @@ def resolve_scan_url(raw: str) -> str | None:
         return _lookup_so_url(key)
     if rtype == "ship":
         return _lookup_ship_url(key)
+    if rtype == "cs":
+        return _lookup_cs_url(key)
     return None
 
 
@@ -119,6 +122,12 @@ def _lookup_po_url(po_number: str) -> str | None:
             return f"/po/{row['id']}/"
     except Exception:
         pass
+    return None
+
+
+def _lookup_cs_url(key: str) -> str | None:
+    if key.isdigit():
+        return f"/cs/{key}/"
     return None
 
 

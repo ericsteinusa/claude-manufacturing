@@ -9,8 +9,8 @@
 
 {% block extra_styles %}
 .cs-wrap { width:100%; max-width:860px; }
-.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px;
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:20px 24px; margin-bottom:20px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
@@ -29,9 +29,9 @@
 .btn-close { padding:8px 20px; background:#c62828; color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .btn-close:hover { background:#b71c1c; }
-.save-btn { padding:8px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:8px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .status-bar { display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
 .badge { display:inline-block; padding:4px 14px; border-radius:20px;
     font-size:13px; font-weight:bold; }
@@ -39,11 +39,26 @@
 .badge-closed { background:#e8f5e9; color:#1a6b1a; border:1px solid #81c784; }
 .badge-critical { background:#fce8e8; color:#c62828; border:1px solid #e57373; }
 .badge-high { background:#fff3e0; color:#e65100; border:1px solid #ffb74d; }
+.cs-barcode {
+    display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
+}
+.cs-barcode img { max-width:260px; height:auto; }
+.cs-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+@media print {
+    .btn, .save-btn, .btn-close, form { display:none !important; }
+    body { background:white !important; }
+    .cs-wrap { max-width:none; }
+    .cs-barcode img { max-width:300px; }
+}
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <div class="cs-wrap">
+    <div class="cs-barcode">
+        <img src="/barcode/img/CS-{{ ticket.id }}/" alt="Barcode CS-{{ ticket.id }}">
+        <small>CS-{{ ticket.id }}</small>
+    </div>
     <h2>Ticket #{{ ticket.id }} — {{ ticket.customer_name }}</h2>
 
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
@@ -152,7 +167,7 @@
         </form>
     </div>
 
-    <p style="color:#aac;font-size:11px;">
+    <p style="color: var(--text-muted);font-size:11px;">
         Created by {{ ticket.created_by|default:"unknown" }} &nbsp;|&nbsp; ID: {{ ticket.id }}
     </p>
 </div>
