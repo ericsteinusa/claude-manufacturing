@@ -355,12 +355,28 @@ Required before ATP can be meaningful. Sales currently has no pricing engine.
   SO row at all) — found while verifying this feature since it blocked the
   customer detail page for any customer with order history.
 
-#### P1-F: Request for Quote (RFQ)
+#### P1-F: Request for Quote (RFQ) ✅ Done
 Missing from purchasing. All 10 competitors have it.
 - RFQ creation: select vendors, add line items with qty & target price
 - Vendor quote entry: each vendor records their price per line
 - Side-by-side quote comparison table
 - Select winning vendor → one-click convert to Purchase Order
+- **Shipped:** `manufacturing/rfq_core.py` + `/rfq/`. New tables (`rfq`,
+  `rfq_item`, `rfq_vendor`, `rfq_quote_line` — no existing multi-vendor
+  concept anywhere to reuse; requisitions are single-implicit-vendor).
+  Comparison table flags the lowest quote per line and defaults the winner
+  dropdown to it. **Award is per line item, not per RFQ** — different
+  lines can go to different vendors; `award_items()` groups awarded lines
+  by vendor and creates one draft PO per vendor via the existing
+  `purchase_orders_core.create_po`/`add_po_item`, using each line's
+  *quoted* price (falling back to target price if unquoted). The existing
+  PO approval flow (`approval_core`, triggered on draft→sent) picks up the
+  new PO automatically — no RFQ-specific approval integration needed.
+  **Bug found and fixed while verifying:** `purchase_order.order_date` has
+  a live NOT NULL constraint not reflected in `create_po`'s DDL/signature
+  (both allow `None`) — every existing caller happens to always supply a
+  real date, but `award_items()` initially didn't, causing every
+  award-to-PO conversion to 500. Fixed by passing today's date explicitly.
 
 ---
 

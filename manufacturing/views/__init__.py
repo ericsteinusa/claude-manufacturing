@@ -214,6 +214,7 @@ from ._legal import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
 from ._cycle_count import *  # noqa: F401,F403
 from ._price_list import *  # noqa: F401,F403
+from ._rfq import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

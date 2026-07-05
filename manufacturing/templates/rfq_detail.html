@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block page_title %}{{ rfq.rfq_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/rfq/" class="btn">RFQs</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rfq-wrap { width:100%; max-width:1100px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.qty-input, .lead-input { width:64px; padding:3px 6px; border:1.5px solid var(--border); border-radius:4px; font-size:12px; }
+.price-input { width:80px; padding:3px 6px; border:1.5px solid var(--border); border-radius:4px; font-size:12px; }
+.vendor-tag { display:inline-flex; align-items:center; gap:6px; background:#f0f4ff; border:1px solid var(--border); border-radius:16px; padding:4px 10px 4px 14px; font-size:13px; margin:0 8px 8px 0; }
+.vendor-tag button { border:none; background:none; color:#c62828; cursor:pointer; font-size:14px; line-height:1; }
+.variance-pos { color:#2e7d32; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rfq-wrap">
+    <div class="menu-title">{{ rfq.rfq_number }}
+        {% if rfq.status == 'awarded' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Awarded</span>
+        {% elif rfq.status == 'closed' %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Closed</span>
+        {% else %}
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+        {% endif %}
+    </div>
+    {% if rfq.notes %}<p style="font-size:13px;color:var(--text-muted);margin-top:-8px;">{{ rfq.notes }}</p>{% endif %}
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Invited Vendors</h3>
+        <div>
+            {% for v in comparison.vendors %}
+            <span class="vendor-tag">
+                {{ v.label }}
+                {% if can_edit and rfq.status == 'open' %}
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_vendor">
+                    <input type="hidden" name="rfq_vendor_id" value="{{ v.rfq_vendor_id }}">
+                    <button type="submit" title="Remove">×</button>
+                </form>
+                {% endif %}
+            </span>
+            {% empty %}
+            <span style="color:var(--text-muted);font-size:13px;">No vendors invited yet.</span>
+            {% endfor %}
+        </div>
+        {% if can_edit and rfq.status == 'open' %}
+        <form method="post" style="display:flex;gap:10px;align-items:center;margin-top:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_vendor">
+            <select name="supplier_id" required>
+                {% for s in suppliers %}
+                <option value="{{ s.id }}">{{ s.company_name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Invite Vendor</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if can_edit and rfq.status == 'open' %}
+    <div class="card">
+        <h3>Add Line Item</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_item">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Description</label>
+                    <input type="text" name="description" required>
+                </div>
+                <div class="form-row">
+                    <label>Product (optional)</label>
+                    <select name="product_id">
+                        <option value="">(none)</option>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.product_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Qty</label>
+                    <input type="number" name="qty" min="1" value="1">
+                </div>
+                <div class="form-row">
+                    <label>Target Price</label>
+                    <input type="number" name="target_price" step="0.01" min="0" value="0.00">
+                </div>
+            </div>
+            <button type="submit" class="btn">Add Item</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Quote Comparison</h3>
+        {% if comparison.rows %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="erp-table-wrap">
+                <table class="erp-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="num">Qty</th>
+                            <th class="num">Target</th>
+                            {% for v in comparison.vendors %}
+                            <th>{{ v.label }}</th>
+                            {% endfor %}
+                            {% if rfq.status == 'open' %}<th>Winner</th>{% else %}<th>Awarded To</th>{% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item, vendor_cells in comparison.rows %}
+                        <tr>
+                            <td>{{ item.description }}{% if item.product_name %} <span style="color:var(--text-muted);">({{ item.product_name }})</span>{% endif %}</td>
+                            <td class="num">{{ item.qty }}</td>
+                            <td class="num">${{ item.target_price|floatformat:2 }}</td>
+                            {% for vendor, cell in vendor_cells %}
+                            <td class="num">
+                                {% if rfq.status == 'open' and can_edit %}
+                                <input class="price-input" type="number" step="0.01" min="0"
+                                       name="quote_{{ item.id }}_{{ vendor.id }}"
+                                       value="{% if cell %}{{ cell.quoted_price|floatformat:2 }}{% endif %}"
+                                       placeholder="price">
+                                <input class="lead-input" type="number" min="0"
+                                       name="lead_{{ item.id }}_{{ vendor.id }}"
+                                       value="{% if cell %}{{ cell.lead_time_days|default_if_none:'' }}{% endif %}"
+                                       placeholder="days">
+                                {% else %}
+                                {% if cell and cell.quoted_price is not None %}
+                                <span {% if cell.is_lowest %}class="variance-pos"{% endif %}>${{ cell.quoted_price|floatformat:2 }}</span>
+                                {% if cell.lead_time_days %} ({{ cell.lead_time_days }}d){% endif %}
+                                {% else %}—{% endif %}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                            <td>
+                                {% if rfq.status == 'open' and can_edit %}
+                                <select name="winner_{{ item.id }}">
+                                    <option value="">—</option>
+                                    {% for vendor, cell in vendor_cells %}
+                                    <option value="{{ vendor.id }}" {% if cell.is_lowest %}selected{% endif %}>{{ vendor.label }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% elif item.awarded_vendor_id %}
+                                {% for vendor, cell in vendor_cells %}{% if vendor.id == item.awarded_vendor_id %}{{ vendor.label }}{% endif %}{% endfor %}
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if can_edit and rfq.status == 'open' %}
+            <div style="display:flex;gap:10px;margin-top:14px;">
+                <button type="submit" name="action" value="enter_quotes" class="btn">Save Quotes</button>
+                <button type="submit" name="action" value="award" class="btn btn-primary">Award Selected Winners</button>
+            </div>
+            {% endif %}
+        </form>
+        {% else %}
+        <div class="empty-state">Add line items to start collecting quotes.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
