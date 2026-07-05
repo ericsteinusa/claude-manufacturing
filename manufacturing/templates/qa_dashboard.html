@@ -30,6 +30,9 @@
 .section-link:hover { border-color:var(--accent); }
 .section-link .icon { font-size:24px; margin-bottom:6px; }
 .section-link .name { font-size:13px; font-weight:bold; color:#333; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 {% endblock %}
 
 {% block body %}
@@ -64,6 +67,17 @@
         </a>
     </div>
 
+    <div class="two-col">
+        <div class="card">
+            <h3>Defect Pareto</h3>
+            <canvas id="chart-defect-pareto" height="220"></canvas>
+        </div>
+        <div class="card">
+            <h3>NCRs by Severity</h3>
+            <canvas id="chart-ncr-trend" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="section-links">
         <a href="/qa/ncr/" class="section-link">
             <div class="icon">&#9888;</div>
@@ -92,4 +106,58 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var pareto = {{ defect_pareto_json|safe }};
+    var ncrTrend = {{ ncr_trend_json|safe }};
+
+    var total = pareto.reduce(function (sum, r) { return sum + r.cnt; }, 0);
+    var running = 0;
+    var cumulativePct = pareto.map(function (r) {
+        running += r.cnt;
+        return total ? Math.round((running / total) * 1000) / 10 : 0;
+    });
+
+    new Chart(document.getElementById('chart-defect-pareto'), {
+        data: {
+            labels: pareto.map(function (r) { return r.defect_type || '(unspecified)'; }),
+            datasets: [
+                { type: 'bar', label: 'Count', data: pareto.map(function (r) { return r.cnt; }),
+                  backgroundColor: '#1d6fe8', yAxisID: 'y' },
+                { type: 'line', label: 'Cumulative %', data: cumulativePct,
+                  borderColor: '#f59e0b', yAxisID: 'y1', tension: 0.2 },
+            ],
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, position: 'left' },
+                y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } },
+            },
+        },
+    });
+
+    var severityColors = { Critical: '#ef4444', Major: '#f59e0b', Moderate: '#eab308', Minor: '#94a3b8' };
+    new Chart(document.getElementById('chart-ncr-trend'), {
+        type: 'bar',
+        data: {
+            labels: ncrTrend.months,
+            datasets: Object.keys(ncrTrend.series).map(function (severity) {
+                return {
+                    label: severity, data: ncrTrend.series[severity],
+                    backgroundColor: severityColors[severity] || '#64748b',
+                };
+            }),
+        },
+        options: {
+            responsive: true,
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+        },
+    });
+})();
+</script>
 {% endblock %}

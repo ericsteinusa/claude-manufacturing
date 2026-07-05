@@ -59,6 +59,33 @@ def get_production_dashboard(conn) -> dict:
     }
 
 
+def get_daily_output_trend(conn, days: int = 14) -> list[dict]:
+    """Return [{date, qty}] — units completed per day over the last
+    ``days`` days, using due_date as the completion-date proxy (work_order
+    has no separate completed-date column; get_production_dashboard's
+    'completed_today' filter above uses the same convention).
+    """
+    start = (date.today() - timedelta(days=days - 1)).isoformat()
+    rows = conn.execute(
+        "SELECT due_date AS day, COALESCE(SUM(quantity), 0) AS qty "
+        "FROM work_order "
+        "WHERE status = 'completed' AND due_date >= %s "
+        "GROUP BY due_date ORDER BY due_date",
+        (start,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_wo_status_breakdown(conn) -> list[dict]:
+    """Return [{status, cnt}] — work order count by status, for a
+    completion-rate chart on the production dashboard."""
+    rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM work_order "
+        "GROUP BY status ORDER BY status"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ---------------------------------------------------------------------------
 # Production Schedule
 # ---------------------------------------------------------------------------

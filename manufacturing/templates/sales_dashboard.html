@@ -44,6 +44,8 @@
 .st-Won     { background:#d4edda; color:#0a3622; }
 .st-Lost    { background:#f8d7da; color:#842029; }
 .st-Expired { background:#e2e3e5; color:#383d41; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 {% endblock %}
 
 {% block body %}
@@ -71,6 +73,17 @@
         <div class="kpi"><div class="val money">${{ dash.orders.total_value|floatformat:0|default:0 }}</div><div class="lbl">Total Order Value</div></div>
         <div class="kpi"><div class="val">{{ dash.quotes.sent|default:0 }}</div><div class="lbl">Open Quotes</div></div>
         <div class="kpi"><div class="val money">${{ dash.quotes.won_value|floatformat:0|default:0 }}</div><div class="lbl">Won Quote Value</div></div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:16px;">
+        <div class="card">
+            <h3>Quote Pipeline</h3>
+            <canvas id="chart-quote-funnel" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h3>Revenue by Month</h3>
+            <canvas id="chart-revenue-month" height="200"></canvas>
+        </div>
     </div>
 
     <div class="two-col">
@@ -110,4 +123,36 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var funnel = {{ quote_funnel_json|safe }};
+    var revenue = {{ revenue_by_month_json|safe }};
+
+    new Chart(document.getElementById('chart-quote-funnel'), {
+        type: 'bar',
+        data: {
+            labels: ['Draft', 'Sent', 'Won'],
+            datasets: [{ label: 'Quotes', data: [funnel.draft || 0, funnel.sent || 0, funnel.won || 0],
+                         backgroundColor: ['#94a3b8', '#f59e0b', '#22c55e'] }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+                   scales: { x: { beginAtZero: true } } },
+    });
+
+    new Chart(document.getElementById('chart-revenue-month'), {
+        type: 'line',
+        data: {
+            labels: revenue.map(function (r) { return r.month; }),
+            datasets: [{ label: 'Revenue', data: revenue.map(function (r) { return r.revenue; }),
+                         borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.15)', fill: true, tension: 0.3 }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+                   scales: { y: { beginAtZero: true } } },
+    });
+})();
+</script>
 {% endblock %}

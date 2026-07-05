@@ -92,6 +92,17 @@
         </div>
     </div>
 
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Revenue vs. Expense</h3>
+            <canvas id="chart-rev-expense" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>AR Aging</h3>
+            <canvas id="chart-ar-aging" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Journal Entries</h3>
         <table class="list-table">
@@ -130,4 +141,39 @@
 
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var revExpense = {{ rev_expense_json|safe }};
+    var arAging = {{ ar_aging_json|safe }};
+
+    new Chart(document.getElementById('chart-rev-expense'), {
+        type: 'bar',
+        data: {
+            labels: revExpense.map(function (r) { return r.month; }),
+            datasets: [
+                { label: 'Revenue', data: revExpense.map(function (r) { return r.revenue; }), backgroundColor: '#22c55e' },
+                { label: 'Expense', data: revExpense.map(function (r) { return r.expenses; }), backgroundColor: '#ef4444' },
+            ],
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } },
+    });
+
+    var agingLabels = { current: 'Current', '1_30': '1-30 days', '31_60': '31-60 days',
+                         '61_90': '61-90 days', over_90: '90+ days' };
+    var agingKeys = Object.keys(agingLabels).filter(function (k) { return arAging[k]; });
+    new Chart(document.getElementById('chart-ar-aging'), {
+        type: 'pie',
+        data: {
+            labels: agingKeys.map(function (k) { return agingLabels[k]; }),
+            datasets: [{ data: agingKeys.map(function (k) { return arAging[k]; }),
+                         backgroundColor: ['#22c55e', '#84cc16', '#f59e0b', '#f97316', '#ef4444'] }],
+        },
+        options: { responsive: true },
+    });
+})();
+</script>
 {% endblock %}

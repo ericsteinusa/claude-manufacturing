@@ -21,6 +21,7 @@ from manufacturing.maintenance_core import (
     resolve_downtime,
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
+    get_schedule_status_breakdown,
 )
 
 
@@ -837,3 +838,25 @@ def test_update_mechanic_does_not_commit():
     conn = _conn()
     update_mechanic(conn, 1, 'Bob', 'General', 'Day', '', 'Active', '')
     conn.commit.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# get_schedule_status_breakdown
+# ---------------------------------------------------------------------------
+
+def test_schedule_status_breakdown_returns_rows():
+    rows = [{'status': 'Due', 'cnt': 2}, {'status': 'Completed', 'cnt': 8}]
+    conn = _conn(fetchall=rows)
+    assert get_schedule_status_breakdown(conn) == rows
+
+
+def test_schedule_status_breakdown_empty():
+    conn = _conn(fetchall=[])
+    assert get_schedule_status_breakdown(conn) == []
+
+
+def test_schedule_status_breakdown_queries_maint_schedule():
+    conn = _conn(fetchall=[])
+    get_schedule_status_breakdown(conn)
+    sql = conn.execute.call_args[0][0]
+    assert 'maint_schedule' in sql

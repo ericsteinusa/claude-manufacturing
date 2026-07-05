@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
 
-from manufacturing.production_core import get_production_dashboard
+from manufacturing.production_core import (
+    get_production_dashboard, get_daily_output_trend, get_wo_status_breakdown,
+)
 
 
 def _wo_row(draft=0, open=0, in_progress=0, completed_today=0, overdue=0, total=0):
@@ -201,3 +203,44 @@ def test_dashboard_recent_query_uses_limit_8():
     calls = c.execute.call_args_list
     recent_sql = calls[2][0][0]
     assert 'LIMIT 8' in recent_sql
+
+
+# ── get_daily_output_trend ────────────────────────────────────────────────
+
+def _trend_conn(rows):
+    c = MagicMock()
+    m = MagicMock()
+    m.fetchall.return_value = rows
+    c.execute.return_value = m
+    return c
+
+
+def test_daily_output_trend_returns_list():
+    c = _trend_conn([{'day': '2026-06-01', 'qty': 10}])
+    result = get_daily_output_trend(c)
+    assert result == [{'day': '2026-06-01', 'qty': 10}]
+
+
+def test_daily_output_trend_empty():
+    c = _trend_conn([])
+    assert get_daily_output_trend(c) == []
+
+
+def test_daily_output_trend_filters_completed_status():
+    c = _trend_conn([])
+    get_daily_output_trend(c, days=7)
+    sql = c.execute.call_args_list[0][0][0]
+    assert "status = 'completed'" in sql
+
+
+# ── get_wo_status_breakdown ──────────────────────────────────────────────
+
+def test_wo_status_breakdown_returns_list():
+    c = _trend_conn([{'status': 'open', 'cnt': 3}, {'status': 'completed', 'cnt': 5}])
+    result = get_wo_status_breakdown(c)
+    assert result == [{'status': 'open', 'cnt': 3}, {'status': 'completed', 'cnt': 5}]
+
+
+def test_wo_status_breakdown_empty():
+    c = _trend_conn([])
+    assert get_wo_status_breakdown(c) == []

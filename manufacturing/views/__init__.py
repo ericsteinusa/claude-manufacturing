@@ -154,6 +154,8 @@ from ..auth_decorators import dept_required, login_required, role_required
 
 from ..production_core import (
     get_production_dashboard,
+    get_daily_output_trend,
+    get_wo_status_breakdown,
     list_scheduled_wos,
     get_prod_reports,
     SHIPMENT_STATUSES,
@@ -191,7 +193,7 @@ from ..purchasing_core import (
     get_purch_reports,
 )
 from ..finance_core import (
-    get_finance_dashboard,
+    get_finance_dashboard, get_revenue_expense_by_month,
     BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
     list_budgets, get_budget, get_budget_lines,
@@ -4490,7 +4492,7 @@ from ..accounting_core import (  # noqa: E402
     list_accounts, create_account, update_account, account_balance,
     list_journals, get_journal, get_journal_lines,
     create_journal, post_journal, void_journal,
-    trial_balance, income_statement, balance_sheet,
+    trial_balance, income_statement, balance_sheet, get_ar_aging,
 )
 
 _ACCOUNTING_DEPT_KEYS = {'accounting', 'finance'}
@@ -5394,7 +5396,7 @@ from ..sales_core import (  # noqa: E402
     load_customers, load_products,  # noqa: F811
     create_so, update_so, add_so_item, delete_so_item, set_so_status,  # noqa: F811
     QUOTE_STATUSES, TARGET_STATUSES,
-    get_sales_dashboard,
+    get_sales_dashboard, get_revenue_by_month,
     list_quotes, create_quote, update_quote, set_quote_status,
     list_targets, create_target, update_target,
     SALES_LEAD_STATUSES, SALES_LEAD_SOURCES, SALES_LEAD_PRIORITIES,
@@ -5449,8 +5451,13 @@ def sales_dashboard(request):
         dash = get_sales_dashboard(conn)
         recent_orders = list_sos(conn)[:8]
         recent_quotes = list_quotes(conn)[:8]
-    ctx = _sales_ctx(request, dash=dash,
-                     recent_orders=recent_orders, recent_quotes=recent_quotes)
+        revenue_by_month = get_revenue_by_month(conn)
+    ctx = _sales_ctx(
+        request, dash=dash,
+        recent_orders=recent_orders, recent_quotes=recent_quotes,
+        quote_funnel_json=json.dumps(dash.get('quotes', {})),
+        revenue_by_month_json=json.dumps(revenue_by_month),
+    )
     return render(request, 'sales_dashboard.html', ctx)
 
 
@@ -5976,7 +5983,13 @@ def _prod_ctx(request, **extra):
 def prod_dashboard(request):
     with get_db_connection() as conn:
         data = get_production_dashboard(conn)
-    ctx = _prod_ctx(request, **data)
+        daily_output = get_daily_output_trend(conn)
+        wo_status_breakdown = get_wo_status_breakdown(conn)
+    ctx = _prod_ctx(
+        request, **data,
+        daily_output_json=json.dumps(daily_output),
+        wo_status_json=json.dumps(wo_status_breakdown),
+    )
     return render(request, 'prod_dashboard.html', ctx)
 
 
@@ -6640,7 +6653,13 @@ def cs_dashboard_view(request):
 def fin_dashboard(request):
     with get_db_connection() as conn:
         data = get_finance_dashboard(conn)
-    ctx = _acct_ctx(request, **data)
+        ar_aging = get_ar_aging(conn)
+        rev_expense = get_revenue_expense_by_month(conn)
+    ctx = _acct_ctx(
+        request, **data,
+        ar_aging_json=json.dumps(ar_aging['totals']),
+        rev_expense_json=json.dumps(rev_expense),
+    )
     return render(request, 'finance_dashboard.html', ctx)
 
 

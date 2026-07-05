@@ -1,6 +1,7 @@
 """Views: maintenance domain."""
 
 import datetime
+import json
 
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
@@ -34,6 +35,7 @@ from ..maintenance_core import (
     resolve_downtime,
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
+    get_equipment_reliability_report, get_schedule_status_breakdown,
 )
 
 log = get_logger(__name__)
@@ -65,10 +67,14 @@ def maint_dashboard(request):
         counts = maint_get_dashboard_counts(conn)
         oee = get_overall_oee(conn, month_start.isoformat(), today.isoformat())
         oee_trend = get_oee_trend(conn, end_date=today.isoformat(), weeks=8)
+        downtime_by_equipment = get_equipment_reliability_report(conn, months=3)
+        schedule_breakdown = get_schedule_status_breakdown(conn)
     finally:
         conn.close()
     return render(request, 'maint_dashboard.html', _maint_ctx(
         request, counts=counts, oee=oee, oee_trend=oee_trend,
+        downtime_by_equipment_json=json.dumps(downtime_by_equipment),
+        schedule_breakdown_json=json.dumps(schedule_breakdown),
     ))
 
 

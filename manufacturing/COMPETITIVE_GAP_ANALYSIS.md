@@ -273,13 +273,29 @@ Ranked by business impact vs. build effort.
 
 ### 🔴 Priority 1 — High Impact, Low Effort (0–3 months)
 
-#### P1-A: Charts & Graphs on All Dashboards
+#### P1-A: Charts & Graphs on All Dashboards ✅ Done
 Every competitor has visual dashboards. All KPI data already exists — just needs Chart.js wired in.
 - **Production dashboard:** daily output trend, WO completion rate
 - **Sales dashboard:** pipeline funnel, revenue by period
 - **Quality dashboard:** defect Pareto chart, NCR by severity trend
 - **Finance dashboard:** revenue vs. expense bar chart, AR aging pie
 - **Maintenance dashboard:** downtime by equipment, PM completion rate
+- **Shipped:** Chart.js loaded via CDN (`<script src="cdn.jsdelivr.net/npm/chart.js">`)
+  only on these 5 dashboard templates, through a new `{% block extra_scripts %}`
+  in `base.html` — no global include, no vendoring/build step. Of the 10
+  charts, 3 reuse data that already existed but wasn't wired into the
+  dashboard view (sales pipeline funnel from `get_sales_dashboard`'s
+  `quotes` dict, finance AR aging from `accounting_core.get_ar_aging`,
+  maintenance downtime-by-equipment from
+  `maintenance_core.get_equipment_reliability_report`); the other 7 needed
+  new aggregate queries (`production_core.get_daily_output_trend`/
+  `get_wo_status_breakdown`, `sales_core.get_revenue_by_month`,
+  `quality_core.get_defect_pareto`/`get_ncr_severity_trend`,
+  `finance_core.get_revenue_expense_by_month`,
+  `maintenance_core.get_schedule_status_breakdown`). Production's daily
+  output trend uses `work_order.due_date` as a completion-date proxy (no
+  completed-date column exists) — the same convention
+  `get_production_dashboard`'s own `completed_today` filter already uses.
 
 #### P1-B: CSV / Excel Export on Every List Page ✅ Done
 All 10 competitors have this. Users need it for analysis in Excel.

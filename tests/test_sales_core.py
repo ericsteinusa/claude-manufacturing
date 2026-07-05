@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 from manufacturing.sales_core import (
     QUOTE_STATUSES, TARGET_STATUSES,
-    get_sales_dashboard,
+    get_sales_dashboard, get_revenue_by_month,
     list_quotes, get_quote, create_quote, update_quote, set_quote_status,
     list_targets, create_target, update_target,
 )
@@ -297,3 +297,26 @@ def test_update_target_does_not_commit():
     conn = _conn()
     update_target(conn, 1, 'Alice', '', 0, 0, '', 'On Track', '')
     conn.commit.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Revenue by month
+# ---------------------------------------------------------------------------
+
+def test_get_revenue_by_month_returns_rows():
+    rows = [{'month': '2026-05', 'revenue': 1000.0}, {'month': '2026-06', 'revenue': 2000.0}]
+    conn = _conn(fetchall=rows)
+    result = get_revenue_by_month(conn)
+    assert result == rows
+
+
+def test_get_revenue_by_month_empty():
+    conn = _conn(fetchall=[])
+    assert get_revenue_by_month(conn) == []
+
+
+def test_get_revenue_by_month_queries_sales_order():
+    conn = _conn(fetchall=[])
+    get_revenue_by_month(conn, months=3)
+    sql = conn.execute.call_args[0][0]
+    assert 'sales_order' in sql and 'so_item' in sql

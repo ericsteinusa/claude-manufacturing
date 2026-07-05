@@ -87,6 +87,17 @@
         </div>
     </div>
 
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card">
+            <h3>Daily Output Trend</h3>
+            <canvas id="chart-daily-output" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h3>Work Order Status</h3>
+            <canvas id="chart-wo-status" height="200"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Work Orders</h3>
         <table class="list-table">
@@ -117,4 +128,35 @@
 
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var dailyOutput = {{ daily_output_json|safe }};
+    var woStatus = {{ wo_status_json|safe }};
+
+    new Chart(document.getElementById('chart-daily-output'), {
+        type: 'bar',
+        data: {
+            labels: dailyOutput.map(function (r) { return r.day; }),
+            datasets: [{ label: 'Units Completed', data: dailyOutput.map(function (r) { return r.qty; }),
+                         backgroundColor: '#1d6fe8' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+                   scales: { y: { beginAtZero: true } } },
+    });
+
+    new Chart(document.getElementById('chart-wo-status'), {
+        type: 'doughnut',
+        data: {
+            labels: woStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: woStatus.map(function (r) { return r.cnt; }),
+                         backgroundColor: ['#94a3b8', '#1d6fe8', '#f59e0b', '#22c55e', '#ef4444'] }],
+        },
+        options: { responsive: true },
+    });
+})();
+</script>
 {% endblock %}

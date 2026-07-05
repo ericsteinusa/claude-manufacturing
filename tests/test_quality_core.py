@@ -18,6 +18,7 @@ from manufacturing.quality_core import (
     next_insp_number, list_inspections, get_inspection, create_inspection,
     update_inspection_result, get_defects, log_defect, resolve_defect,
     load_products_for_qa, load_work_orders_for_qa,
+    get_defect_pareto, get_ncr_severity_trend,
 )
 
 
@@ -730,3 +731,43 @@ def test_load_work_orders_for_qa_returns_list():
 def test_load_work_orders_for_qa_empty():
     conn = _conn(fetchall=[])
     assert load_work_orders_for_qa(conn) == []
+
+
+# ---------------------------------------------------------------------------
+# Defect Pareto / NCR severity trend
+# ---------------------------------------------------------------------------
+
+def test_get_defect_pareto_returns_rows():
+    rows = [{'defect_type': 'Scratch', 'cnt': 5}, {'defect_type': 'Dent', 'cnt': 2}]
+    conn = _conn(fetchall=rows)
+    assert get_defect_pareto(conn) == rows
+
+
+def test_get_defect_pareto_empty():
+    conn = _conn(fetchall=[])
+    assert get_defect_pareto(conn) == []
+
+
+def test_get_defect_pareto_queries_qa_defect():
+    conn = _conn(fetchall=[])
+    get_defect_pareto(conn)
+    sql = conn.execute.call_args[0][0]
+    assert 'qa_defect' in sql and 'ORDER BY cnt DESC' in sql
+
+
+def test_get_ncr_severity_trend_zero_fills_missing_combos():
+    rows = [
+        {'month': '2026-05', 'severity': 'Critical', 'cnt': 2},
+        {'month': '2026-06', 'severity': 'Minor', 'cnt': 3},
+    ]
+    conn = _conn(fetchall=rows)
+    result = get_ncr_severity_trend(conn)
+    assert result['months'] == ['2026-05', '2026-06']
+    assert result['series']['Critical'] == [2, 0]
+    assert result['series']['Minor'] == [0, 3]
+
+
+def test_get_ncr_severity_trend_empty():
+    conn = _conn(fetchall=[])
+    result = get_ncr_severity_trend(conn)
+    assert result == {'months': [], 'series': {}}

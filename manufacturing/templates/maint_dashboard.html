@@ -41,6 +41,9 @@
     justify-content:flex-end; height:100%; }
 .oee-bar { width:100%; max-width:28px; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; }
 .oee-bar-label { font-size:10px; color:var(--text-muted); margin-top:4px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 {% endblock %}
 
 {% block body %}
@@ -91,6 +94,17 @@
         </div>
     </div>
 
+    <div class="two-col">
+        <div class="card">
+            <h3>Downtime by Equipment (last 3 months)</h3>
+            <canvas id="chart-downtime-equipment" height="220"></canvas>
+        </div>
+        <div class="card">
+            <h3>PM Schedule Status</h3>
+            <canvas id="chart-pm-status" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="section-links">
         <a href="/maint/wo/" class="section-link">
             <div class="icon">&#128295;</div>
@@ -127,4 +141,37 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var downtime = {{ downtime_by_equipment_json|safe }};
+    var pmStatus = {{ schedule_breakdown_json|safe }};
+
+    new Chart(document.getElementById('chart-downtime-equipment'), {
+        type: 'bar',
+        data: {
+            labels: downtime.map(function (r) { return r.equipment; }),
+            datasets: [{ label: 'Downtime Hours', data: downtime.map(function (r) { return r.total_downtime_hours; }),
+                         backgroundColor: '#ef4444' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+                   scales: { x: { beginAtZero: true } } },
+    });
+
+    var statusColors = { Scheduled: '#94a3b8', Due: '#f59e0b', Overdue: '#ef4444',
+                          Completed: '#22c55e', Skipped: '#64748b' };
+    new Chart(document.getElementById('chart-pm-status'), {
+        type: 'doughnut',
+        data: {
+            labels: pmStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: pmStatus.map(function (r) { return r.cnt; }),
+                         backgroundColor: pmStatus.map(function (r) { return statusColors[r.status] || '#94a3b8'; }) }],
+        },
+        options: { responsive: true },
+    });
+})();
+</script>
 {% endblock %}

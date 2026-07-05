@@ -1,5 +1,7 @@
 """Views: quality domain."""
 
+import json
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
@@ -23,6 +25,7 @@ from ..quality_core import (
     update_inspection_result, get_defects, log_defect, resolve_defect,
     load_products_for_qa, load_work_orders_for_qa,
     get_qa_reports,
+    get_defect_pareto, get_ncr_severity_trend,
 )
 
 log = get_logger(__name__)
@@ -50,9 +53,15 @@ def qa_dashboard(request):
     conn = get_db_connection()
     try:
         counts = get_dashboard_counts(conn)
+        defect_pareto = get_defect_pareto(conn)
+        ncr_trend = get_ncr_severity_trend(conn)
     finally:
         conn.close()
-    return render(request, 'qa_dashboard.html', _qa_ctx(request, counts=counts))
+    return render(request, 'qa_dashboard.html', _qa_ctx(
+        request, counts=counts,
+        defect_pareto_json=json.dumps(defect_pareto),
+        ncr_trend_json=json.dumps(ncr_trend),
+    ))
 
 
 # --- NCR ---
