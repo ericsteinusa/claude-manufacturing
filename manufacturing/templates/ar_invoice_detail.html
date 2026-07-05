@@ -10,8 +10,8 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:900px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; margin-bottom:16px; }
+
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:18px 22px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px 16px; }
 .form-row { display:flex; flex-direction:column; gap:3px; }
@@ -19,12 +19,12 @@
 .form-row label { font-size:11px; color:#555; font-weight:bold; }
 .form-row input,.form-row select { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
 .form-row input[readonly] { background:#f5f5f5; color:#555; }
-.save-btn { padding:7px 18px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 18px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:10px; }
 .list-table { width:100%; border-collapse:collapse; margin-top:8px; }
 .list-table th,.list-table td { padding:7px 10px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table td.num { text-align:right; font-family:monospace; }
 .stat-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
 .stat-chip { padding:5px 12px; border-radius:20px; font-size:13px; font-weight:bold; }
@@ -37,7 +37,7 @@
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
     padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
-.print-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+.print-btn { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer;
     font-weight:bold; margin-bottom:14px; }
 @media print {
@@ -59,7 +59,11 @@
     <div class="stat-row">
         <span class="stat-chip stat-{{ invoice.status }}">{{ invoice.status|capfirst }}</span>
         <span style="color:white;font-size:14px;">
-            Amount: <strong>${{ invoice.amount|floatformat:2 }}</strong> &nbsp;|&nbsp;
+            Amount: <strong>{{ invoice.currency|default:"USD" }} {{ invoice.amount|floatformat:2 }}</strong>
+            {% if currencies and invoice.currency and invoice.currency != base_currency %}
+                <span style="font-size:12px;color:rgba(255,255,255,.7);">(≈ ${{ invoice.amount_base|floatformat:2 }} {{ base_currency }})</span>
+            {% endif %}
+            &nbsp;|&nbsp;
             Received: <strong>${{ invoice.received|floatformat:2 }}</strong> &nbsp;|&nbsp;
             Balance: <strong>${{ invoice.balance|floatformat:2 }}</strong>
         </span>
@@ -70,7 +74,7 @@
             <select name="new_status" style="padding:4px 8px;border-radius:4px;font-size:12px;border:1px solid #ccc;">
                 {% for s in statuses %}<option value="{{ s }}" {% if invoice.status == s %}selected{% endif %}>{{ s|capfirst }}</option>{% endfor %}
             </select>
-            <button type="submit" style="padding:4px 10px;background:rgb(0,60,180);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Status</button>
+            <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Status</button>
         </form>
         {% endif %}
     </div>
@@ -112,10 +116,25 @@
                     <input type="date" name="due_date" value="{{ invoice.due_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Amount ($)</label>
+                    <label>Amount</label>
                     <input type="number" name="amount" step="0.01" min="0"
                         value="{{ invoice.amount|default:0|floatformat:2 }}">
                 </div>
+                {% if currencies %}
+                <div class="form-row">
+                    <label>Currency</label>
+                    <select name="currency">
+                        {% for cur in currencies %}
+                        <option value="{{ cur.code }}" {% if invoice.currency == cur.code %}selected{% elif not invoice.currency and cur.code == base_currency %}selected{% endif %}>{{ cur.code }} — {{ cur.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Exchange Rate</label>
+                    <input type="number" name="exchange_rate" step="0.000001" min="0"
+                        value="{{ invoice.exchange_rate|default:'1.0' }}" placeholder="1.0">
+                </div>
+                {% endif %}
                 <div class="form-row wide">
                     <label>Description</label>
                     <input type="text" name="description" value="{{ invoice.description|default:'' }}">

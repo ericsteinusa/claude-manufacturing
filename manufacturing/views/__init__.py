@@ -163,6 +163,16 @@ from ..production_core import (
     list_rmas, get_rma, create_rma, update_rma,
     get_rma_reports,
 )
+from ..currency_core import (
+    init_currency_schema, list_currencies, get_currency, upsert_currency,
+    get_base_currency, convert_to_base, COMMON_CURRENCIES,
+)
+from ..fixed_asset_core import (
+    init_fixed_asset_tables, list_fixed_assets, get_fixed_asset,
+    create_fixed_asset, update_fixed_asset, next_asset_number,
+    log_fixed_asset_event, list_fixed_asset_events, get_fixed_asset_summary,
+    FIXED_ASSET_TYPES, FIXED_ASSET_STATUSES, DEPRECIATION_METHODS,
+)
 from ..purchasing_core import (
     get_purchasing_dashboard,
     CONTRACT_STATUSES as PURCH_CONTRACT_STATUSES,
@@ -1273,10 +1283,26 @@ def po_detail(request, po_id):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     try:
+        init_currency_schema(conn)
         po = get_po(conn, po_id)
         items = get_po_items(conn, po_id) if po else []
         products = load_products(conn) if (po and can_edit) else []
         approval = get_po_approval(conn, po_id) if po else None
+        currencies = list_currencies(conn, active_only=True)
+        base_currency = get_base_currency(conn).get("code", "USD")
+        if request.method == 'POST' and can_edit and po:
+            cur_code = request.POST.get('currency', '').strip()
+            cur_rate = request.POST.get('exchange_rate', '').strip()
+            if cur_code:
+                try:
+                    conn.execute(
+                        "UPDATE purchase_order SET currency=%s, exchange_rate=%s WHERE id=%s",
+                        [cur_code, float(cur_rate or 1.0), po_id]
+                    )
+                    conn.commit()
+                    po = get_po(conn, po_id)
+                except Exception:
+                    conn.rollback()
     finally:
         conn.close()
 
@@ -1284,6 +1310,8 @@ def po_detail(request, po_id):
         return redirect('po_list')
 
     po['status_color'] = PO_STATUS_COLORS.get(po['status'], '#ffffff')
+    if po.get('currency') and po.get('exchange_rate') and po.get('total'):
+        po['total_base'] = round(float(po['total']) * float(po['exchange_rate']), 2)
 
     status_actions = [
         (target, PO_STATUS_ACTION_LABELS.get(target, target))
@@ -1303,6 +1331,8 @@ def po_detail(request, po_id):
         approval=approval,
         approval_threshold=APPROVAL_THRESHOLD,
         back_url='/po/',
+        currencies=currencies,
+        base_currency=base_currency,
     ))
 
 
@@ -1936,9 +1966,22 @@ def so_detail(request, so_id):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
     conn = get_db_connection()
     try:
+        init_currency_schema(conn)
         so = get_so(conn, so_id)
         items = get_so_items(conn, so_id) if so else []
         products = load_so_products(conn) if (so and can_edit) else []
+        currencies = list_currencies(conn)
+        base_currency = get_base_currency(conn).get("code", "USD")
+
+        if request.method == 'POST' and request.POST.get('action') == 'currency' and can_edit and so:
+            cur_code = request.POST.get('currency', 'USD')
+            exc_rate = float(request.POST.get('exchange_rate', 1.0) or 1.0)
+            conn.execute(
+                "UPDATE sales_order SET currency=%s, exchange_rate=%s WHERE id=%s",
+                [cur_code, exc_rate, so_id]
+            )
+            conn.commit()
+            return redirect('so_detail', so_id=so_id)
     finally:
         conn.close()
 
@@ -1947,6 +1990,8 @@ def so_detail(request, so_id):
 
     so['status_color'] = SO_STATUS_COLORS.get(so['status'], '#ffffff')
     so['customer_name'] = _so_customer_name(so)
+    if so.get('currency') and so.get('exchange_rate') and so.get('total'):
+        so['total_base'] = round(float(so['total']) * float(so['exchange_rate']), 2)
 
     status_actions = [
         (target, SO_STATUS_ACTION_LABELS.get(target, target))
@@ -1960,6 +2005,8 @@ def so_detail(request, so_id):
         products=products,
         can_edit=can_edit,
         status_actions=status_actions,
+        currencies=currencies,
+        base_currency=base_currency,
         back_url='/so/',
     ))
 
@@ -4403,6 +4450,7 @@ def ap_list(request):
 def ap_invoice_detail(request, inv_id=None):
     conn = get_db_connection()
     success = error = ''
+    init_currency_schema(conn)
     if request.method == 'POST':
         if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
@@ -4419,6 +4467,11 @@ def ap_invoice_detail(request, inv_id=None):
                     request.POST.get('amount', 0),
                     request.POST.get('description', '').strip(),
                     request.POST.get('status', 'open'),
+                )
+                conn.execute(
+                    "UPDATE ap_invoice SET currency=%s, exchange_rate=%s WHERE id=%s",
+                    [request.POST.get('currency', 'USD'),
+                     float(request.POST.get('exchange_rate') or 1.0), inv_id]
                 )
                 conn.commit()
                 success = 'Invoice updated.'
@@ -4442,11 +4495,16 @@ def ap_invoice_detail(request, inv_id=None):
     invoice  = get_ap_invoice(conn, inv_id) if inv_id else None
     payments = list_ap_payments(conn, inv_id) if inv_id else []
     vendors  = load_vendors(conn)
+    currencies = list_currencies(conn, active_only=True)
+    base_currency = get_base_currency(conn).get("code", "USD")
     conn.close()
     if inv_id and not invoice:
         return redirect('/ap/')
+    if invoice and invoice.get('exchange_rate') and invoice.get('amount'):
+        invoice['amount_base'] = round(float(invoice['amount']) * float(invoice['exchange_rate']), 2)
     ctx = _acct_ctx(request,
         invoice=invoice, payments=payments, vendors=vendors,
+        currencies=currencies, base_currency=base_currency,
         statuses=INVOICE_STATUSES, payment_methods=PAYMENT_METHODS,
         inv_id=inv_id, success=success, error=error,
     )
@@ -4508,6 +4566,7 @@ def ar_list(request):
 def ar_invoice_detail(request, inv_id=None):
     conn = get_db_connection()
     success = error = ''
+    init_currency_schema(conn)
     if request.method == 'POST':
         if request.session.get('user_role') in READ_ONLY_ROLES:
             conn.close()
@@ -4524,6 +4583,11 @@ def ar_invoice_detail(request, inv_id=None):
                     request.POST.get('amount', 0),
                     request.POST.get('description', '').strip(),
                     request.POST.get('status', 'open'),
+                )
+                conn.execute(
+                    "UPDATE ar_invoice SET currency=%s, exchange_rate=%s WHERE id=%s",
+                    [request.POST.get('currency', 'USD'),
+                     float(request.POST.get('exchange_rate') or 1.0), inv_id]
                 )
                 conn.commit()
                 success = 'Invoice updated.'
@@ -4547,11 +4611,16 @@ def ar_invoice_detail(request, inv_id=None):
     invoice   = get_ar_invoice(conn, inv_id) if inv_id else None
     payments  = list_ar_payments(conn, inv_id) if inv_id else []
     customers = load_customers(conn)
+    currencies = list_currencies(conn, active_only=True)
+    base_currency = get_base_currency(conn).get("code", "USD")
     conn.close()
     if inv_id and not invoice:
         return redirect('/ar/')
+    if invoice and invoice.get('exchange_rate') and invoice.get('amount'):
+        invoice['amount_base'] = round(float(invoice['amount']) * float(invoice['exchange_rate']), 2)
     ctx = _acct_ctx(request,
         invoice=invoice, payments=payments, customers=customers,
+        currencies=currencies, base_currency=base_currency,
         statuses=INVOICE_STATUSES, payment_methods=PAYMENT_METHODS,
         inv_id=inv_id, success=success, error=error,
     )
@@ -7487,3 +7556,215 @@ def wo_cost_detail(request, wo_id):
         error=error,
         success=success,
     ))
+
+
+# ---------------------------------------------------------------------------
+# Currency Management
+# ---------------------------------------------------------------------------
+
+def currency_list(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_currency_schema(conn)
+        currencies = list_currencies(conn)
+        base = get_base_currency(conn)
+        if request.method == 'POST' and can_edit:
+            try:
+                code = request.POST.get('code', '').strip().upper()
+                name = request.POST.get('name', '').strip()
+                symbol = request.POST.get('symbol', '').strip()
+                rate = float(request.POST.get('exchange_rate') or 1.0)
+                is_base = request.POST.get('is_base') == '1'
+                is_active = request.POST.get('is_active', '1') == '1'
+                upsert_currency(conn, code, name, symbol, rate, is_base, is_active)
+                conn.commit()
+                success = f'{code} saved.'
+                currencies = list_currencies(conn)
+                base = get_base_currency(conn)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+    return render(request, 'currency_list.html', {
+        'currencies': currencies,
+        'base': base,
+        'common': COMMON_CURRENCIES,
+        'can_edit': can_edit,
+        'error': error,
+        'success': success,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })
+
+
+# ---------------------------------------------------------------------------
+# Fixed Asset Management
+# ---------------------------------------------------------------------------
+
+def fixed_asset_list(request):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    status_f = request.GET.get('status', '').strip()
+    type_f = request.GET.get('asset_type', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_fixed_asset_tables(conn)
+        assets = list_fixed_assets(conn, status=status_f or None,
+                                   asset_type=type_f or None,
+                                   search=search or None)
+        summary = get_fixed_asset_summary(conn)
+        if request.method == 'POST' and can_edit:
+            try:
+                asset_number = request.POST.get('asset_number', '').strip() or next_asset_number(conn)
+                asset_id = create_fixed_asset(
+                    conn,
+                    asset_number=asset_number,
+                    asset_name=request.POST.get('asset_name', ''),
+                    asset_type=request.POST.get('asset_type', 'Equipment'),
+                    category=request.POST.get('category', ''),
+                    location=request.POST.get('location', ''),
+                    department=request.POST.get('department', ''),
+                    vendor=request.POST.get('vendor', ''),
+                    purchase_date=request.POST.get('purchase_date', ''),
+                    purchase_price=float(request.POST.get('purchase_price') or 0),
+                    salvage_value=float(request.POST.get('salvage_value') or 0),
+                    useful_life_years=int(request.POST.get('useful_life_years') or 5),
+                    depreciation_method=request.POST.get('depreciation_method', 'Straight-Line'),
+                    status=request.POST.get('status', 'Active'),
+                    serial_number=request.POST.get('serial_number', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                log_fixed_asset_event(conn, asset_id, 'created',
+                                      f"Asset {asset_number} created.", request.session.get('user_email', ''))
+                conn.commit()
+                return redirect('fixed_asset_detail', asset_id=asset_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                assets = list_fixed_assets(conn)
+                summary = get_fixed_asset_summary(conn)
+    finally:
+        conn.close()
+    return render(request, 'fixed_asset_list.html', {
+        'assets': assets,
+        'summary': summary,
+        'status_filter': status_f,
+        'type_filter': type_f,
+        'search': search,
+        'asset_statuses': FIXED_ASSET_STATUSES,
+        'asset_types': FIXED_ASSET_TYPES,
+        'depreciation_methods': DEPRECIATION_METHODS,
+        'can_edit': can_edit,
+        'error': error,
+        'success': success,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })
+
+
+def fixed_asset_detail(request, asset_id):
+    can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    error = success = None
+    conn = get_db_connection()
+    try:
+        init_fixed_asset_tables(conn)
+        asset = get_fixed_asset(conn, asset_id)
+        if not asset:
+            return redirect('fixed_asset_list')
+        events = list_fixed_asset_events(conn, asset_id)
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
+            try:
+                if action == 'update':
+                    update_fixed_asset(
+                        conn, asset_id,
+                        asset_name=request.POST.get('asset_name', ''),
+                        asset_type=request.POST.get('asset_type', ''),
+                        category=request.POST.get('category', ''),
+                        location=request.POST.get('location', ''),
+                        department=request.POST.get('department', ''),
+                        vendor=request.POST.get('vendor', ''),
+                        purchase_date=request.POST.get('purchase_date', ''),
+                        purchase_price=float(request.POST.get('purchase_price') or 0),
+                        salvage_value=float(request.POST.get('salvage_value') or 0),
+                        useful_life_years=int(request.POST.get('useful_life_years') or 5),
+                        depreciation_method=request.POST.get('depreciation_method', ''),
+                        status=request.POST.get('status', ''),
+                        serial_number=request.POST.get('serial_number', ''),
+                        notes=request.POST.get('notes', ''),
+                        cost_center=request.POST.get('cost_center', ''),
+                        assigned_to=request.POST.get('assigned_to', ''),
+                        in_service_date=request.POST.get('in_service_date', ''),
+                    )
+                    log_fixed_asset_event(conn, asset_id, 'updated', 'Record updated.',
+                                          request.session.get('user_email', ''))
+                elif action == 'event':
+                    note = request.POST.get('event_note', '').strip()
+                    etype = request.POST.get('event_type', 'note')
+                    if note:
+                        log_fixed_asset_event(conn, asset_id, etype, note,
+                                              request.session.get('user_email', ''))
+                conn.commit()
+                success = 'Saved.'
+                asset = get_fixed_asset(conn, asset_id)
+                events = list_fixed_asset_events(conn, asset_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+    finally:
+        conn.close()
+
+    import datetime as _dt
+    dep_schedule = []
+    dep_pct = 0
+    if asset and asset.get('purchase_price') and asset.get('useful_life_years'):
+        price = float(asset['purchase_price'])
+        salvage = float(asset.get('salvage_value') or 0)
+        life = int(asset['useful_life_years'])
+        method = asset.get('depreciation_method', 'Straight-Line')
+        in_service = asset.get('in_service_date') or asset.get('purchase_date')
+        try:
+            start_year = int(str(in_service)[:4]) if in_service else _dt.date.today().year
+        except Exception:
+            start_year = _dt.date.today().year
+        cur_year = _dt.date.today().year
+        acc = 0.0
+        book = price
+        for i in range(life):
+            yr = start_year + i
+            if method == 'Declining Balance':
+                annual = book * (2.0 / life)
+            else:
+                annual = (price - salvage) / life
+            annual = min(annual, max(0, book - salvage))
+            acc += annual
+            book = max(salvage, price - acc)
+            dep_schedule.append({
+                'year': yr,
+                'annual_dep': round(annual, 2),
+                'accumulated': round(acc, 2),
+                'book_value': round(book, 2),
+                'is_current': yr == cur_year,
+            })
+        if price > 0:
+            dep_pct = round(min(100, float(asset.get('accumulated_depreciation', 0)) / price * 100), 1)
+
+    return render(request, 'fixed_asset_detail.html', {
+        'asset': asset,
+        'events': events,
+        'dep_schedule': dep_schedule,
+        'dep_pct': dep_pct,
+        'asset_statuses': FIXED_ASSET_STATUSES,
+        'asset_types': FIXED_ASSET_TYPES,
+        'depreciation_methods': DEPRECIATION_METHODS,
+        'can_edit': can_edit,
+        'error': error,
+        'success': success,
+        'user_role': request.session.get('user_role', ''),
+        'full_access': request.session.get('user_full_access', False),
+    })
