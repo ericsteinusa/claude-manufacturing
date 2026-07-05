@@ -1,55 +1,8 @@
 {% extends "base_card.html" %}
 
-{% block page_title %}Manufacturing System Login{% endblock %}
-
-{% block extra_styles %}
-        .card { width: 480px; padding: 40px 60px; }
-        h1 { margin-bottom: 28px; }
-        .form-row label { width: 100px; }
-        .success-msg {
-            background-color: rgba(0, 200, 80, 0.25);
-            border: 1px solid rgba(0, 220, 100, 0.6);
-            border-radius: 6px;
-            color: white;
-            font-size: 13px;
-            padding: 8px 12px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .btn-login {
-            display: block;
-            width: 100%;
-            background-color: white;
-            border: 2px solid black;
-            border-radius: 10px;
-            padding: 9px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            margin-bottom: 18px;
-        }
-        .btn-login:hover {
-            background-color: rgb(85, 255, 255);
-            border-color: rgb(85, 255, 255);
-        }
-        .links {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        .links a {
-            color: white;
-            font-size: 13px;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .links a:hover { color: rgb(85, 255, 255); }
-{% endblock %}
+{% block page_title %}Login — Manufacturing ERP{% endblock %}
 
 {% block card_content %}
-<h1>Manufacturing System Login</h1>
 
 {% if success %}
 <div class="success-msg">{{ success }}</div>
@@ -61,20 +14,22 @@
 <form method="post" action="">
     {% csrf_token %}
     <div class="form-row">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email"
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email"
+               placeholder="you@company.com"
                value="{{ email_value }}" required autofocus>
     </div>
     <div class="form-row">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="Enter your password" required>
     </div>
-    <button type="submit" class="btn-login">Login</button>
+    <button type="submit" class="btn-submit">Sign In</button>
 </form>
 
 <div class="links">
-    <a href="{% url 'forgot_password' %}">Forgot Password?</a>
-    <a href="{% url 'change_password' %}">Change Password</a>
-    <a href="{% url 'register' %}">Register New User</a>
+    <a href="{% url 'forgot_password' %}">Forgot password?</a>
+    <a href="{% url 'register' %}">Register new user</a>
 </div>
+
 {% endblock %}
