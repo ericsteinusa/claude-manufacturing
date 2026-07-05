@@ -399,6 +399,17 @@
     <button class="sb-toggle" id="sbToggle" aria-label="Toggle menu">☰</button>
     <a href="{% url 'dashboard' %}" class="app-brand">⚙ <span>MFG</span> ERP</a>
     <div class="spacer"></div>
+    <!-- Global scan bar -->
+    <form method="get" action="/scan/lookup/" style="display:flex;align-items:center;gap:6px;">
+        <input type="text" name="q" placeholder="Scan barcode…"
+               autocomplete="off" spellcheck="false"
+               style="padding:4px 10px;font-size:12px;border:1.5px solid rgba(255,255,255,.25);
+                      border-radius:5px;background:rgba(255,255,255,.1);color:#fff;
+                      width:170px;outline:none;"
+               onfocus="this.style.borderColor='rgba(255,255,255,.6)'"
+               onblur="this.style.borderColor='rgba(255,255,255,.25)'">
+        <a href="/scan/" class="btn btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3);">&#x2399;</a>
+    </form>
     {% block toolbar_right %}
     <span class="hdr-user">
         {% if user_role %}<strong>{{ user_role }}</strong> · {% endif %}{{ email }}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block page_title %}Receive Goods — Scan Session{% endblock %}
+
+{% block toolbar_left %}
+<a href="/scan/" class="btn">Scanner</a>
+<a href="/scan/receive/" class="btn">Receive Goods</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.scan-card { max-width: 760px; margin: 32px auto; }
+.scan-input-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.scan-input {
+    flex: 1; padding: 10px 14px; font-size: 15px;
+    border: 2px solid var(--accent); border-radius: 6px;
+    outline: none; color: var(--text); background: var(--card-bg);
+}
+.scan-input:focus { box-shadow: 0 0 0 3px rgba(29,111,232,.15); }
+.rcv-done { color: var(--success-fg); font-weight: 700; }
+.rcv-partial { color: var(--warn-fg); font-weight: 600; }
+.rcv-open { color: var(--text-muted); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+  <div class="scan-card">
+    <div class="menu-title" style="margin-bottom:8px;">Receive Goods</div>
+
+    {% if error %}<div class="alert alert-danger" style="margin-bottom:12px;">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success" style="margin-bottom:12px;">{{ success }}</div>{% endif %}
+    {% if info %}<div class="alert alert-info" style="margin-bottom:12px;">{{ info }}</div>{% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="scan">
+      <div class="scan-input-row">
+        <input class="scan-input" type="text" name="q"
+               placeholder="{% if po %}Scan PART- barcode…{% else %}Scan PO- or RCV- barcode to begin…{% endif %}"
+               autofocus autocomplete="off" spellcheck="false">
+        <button type="submit" class="btn btn-primary">Scan</button>
+      </div>
+    </form>
+
+    {% if po %}
+    <div class="card" style="margin-bottom:20px;padding:14px 18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <strong>PO {{ po.po_number }}</strong>
+          <span style="color:var(--text-muted);margin-left:12px;">{{ po.status|capfirst }}</span>
+        </div>
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="clear">
+          <button type="submit" class="btn btn-cancel" style="font-size:11px;padding:3px 10px;">Clear Session</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="erp-table-wrap">
+      <table class="erp-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>SKU</th>
+            <th style="text-align:right;">Ordered</th>
+            <th style="text-align:right;">Received</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          {% with remaining=item.qty_ordered|add:0 %}
+          <tr>
+            <td>{{ item.description|default:"—" }}</td>
+            <td style="font-family:monospace;">{{ item.sku|default:"—" }}</td>
+            <td style="text-align:right;">{{ item.qty_ordered|default:0 }}</td>
+            <td style="text-align:right;">{{ item.qty_received|default:0 }}</td>
+            <td>
+              {% if item.qty_received >= item.qty_ordered and item.qty_ordered %}
+                <span class="pill pill-ok rcv-done">Complete</span>
+              {% elif item.qty_received > 0 %}
+                <span class="pill pill-warn rcv-partial">Partial</span>
+              {% else %}
+                <span class="pill rcv-open">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endwith %}
+          {% empty %}
+          <tr><td colspan="5" class="empty-state">No items on this PO.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:14px;">
+      <a href="/po/{{ po.id }}/" class="btn">View Full PO</a>
+      <a href="/label/receiving/{{ po.id }}/" target="_blank" class="btn">Print Receiving Label</a>
+    </div>
+
+    {% else %}
+    <div style="color:var(--text-muted);font-size:13px;margin-top:8px;">
+      Scan a <strong>PO-</strong> or <strong>RCV-</strong> barcode to load a purchase order, then scan each part to mark it received.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.querySelector('.scan-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); this.closest('form').submit(); }
+});
+</script>
+{% endblock %}

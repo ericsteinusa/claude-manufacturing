@@ -9,11 +9,12 @@
 <a href="{% url 'audit_record' 'work_order' wo.id %}" class="btn">History</a>
 {% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/label/wo/{{ wo.id }}/" target="_blank" class="btn">Print Label</a>
 {% endblock %}
 
 {% block extra_styles %}
 .print-btn {
-    padding: 6px 16px; background: rgb(0,60,180); color: white;
+    padding: 6px 16px; background: var(--accent); color: white;
     border: none; border-radius: 5px; font-size: 13px;
     cursor: pointer; font-weight: bold; margin-bottom: 14px;
 }
@@ -24,7 +25,7 @@
 }
 .wo-wrap { width: 100%; max-width: 900px; }
 .wo-card {
-    background: white; border: 2px solid black; border-radius: 6px;
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
     padding: 16px 20px; margin-bottom: 20px;
 }
 .wo-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
@@ -38,13 +39,13 @@
 .wo-meta b { color: #003cb4; }
 .wo-table {
     width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
 }
 .wo-table th, .wo-table td {
     padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
     font-size: 13px;
 }
-.wo-table th { background: rgb(0, 60, 180); color: white; }
+.wo-table th { background: var(--accent); color: white; }
 .wo-table td.num, .wo-table th.num { text-align: right; }
 .wo-empty { color: #555; padding: 8px 0; }
 .btn-sm { padding: 2px 10px; font-size: 12px; }
@@ -65,7 +66,7 @@
 .add-mat label { display: block; font-size: 12px; font-weight: bold;
                  color: #003cb4; margin-bottom: 3px; }
 .add-mat input, .add-mat select {
-    width: 100%; padding: 5px 7px; border: 2px solid black;
+    width: 100%; padding: 5px 7px; border: 1.5px solid var(--border);
     border-radius: 4px; font-size: 13px;
 }
 {% endblock %}
@@ -166,10 +167,10 @@
         {# Operations #}
         {% if operations %}
         <div class="wo-card" style="margin-top:18px;">
-            <h3 style="font-size:14px;color:rgb(0,40,140);margin:0 0 10px;">Operations</h3>
+            <h3 style="font-size:14px;color:var(--accent-hover);margin:0 0 10px;">Operations</h3>
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
                 <thead>
-                    <tr style="background:rgb(0,60,180);color:white;">
+                    <tr style="background:var(--accent);color:white;">
                         <th style="padding:6px 10px;text-align:left;width:36px;">Seq</th>
                         <th style="padding:6px 10px;text-align:left;">Operation</th>
                         <th style="padding:6px 10px;text-align:left;">Work Center</th>
@@ -207,7 +208,7 @@
 
         {# Cost summary #}
         <div style="margin-top:14px;font-size:13px;">
-            <a href="/wo/{{ wo.id }}/cost/" style="color:rgb(0,60,180);font-weight:bold;">
+            <a href="/wo/{{ wo.id }}/cost/" style="color:var(--accent);font-weight:bold;">
                 📊 View WO Cost Detail{% if wo_cost %} — Actual ${{ wo_cost.actual_total_cost|floatformat:2 }} vs Std ${{ wo_cost.std_total_cost|floatformat:2 }}{% endif %}
             </a>
         </div>

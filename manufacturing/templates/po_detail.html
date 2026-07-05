@@ -9,11 +9,13 @@
 <a href="{% url 'audit_record' 'purchase_order' po.id %}" class="btn">History</a>
 {% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/label/po/{{ po.id }}/" target="_blank" class="btn">Print Label</a>
+<a href="/label/receiving/{{ po.id }}/" target="_blank" class="btn">Print Receiving Label</a>
 {% endblock %}
 
 {% block extra_styles %}
 .print-btn {
-    padding: 6px 16px; background: rgb(0,60,180); color: white;
+    padding: 6px 16px; background: var(--accent); color: white;
     border: none; border-radius: 5px; font-size: 13px;
     cursor: pointer; font-weight: bold; margin-bottom: 14px;
 }
@@ -24,7 +26,7 @@
 }
 .po-wrap { width: 100%; max-width: 900px; }
 .po-card {
-    background: white; border: 2px solid black; border-radius: 6px;
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
     padding: 16px 20px; margin-bottom: 20px;
 }
 .po-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
@@ -38,13 +40,13 @@
 .po-meta b { color: #003cb4; }
 .po-table {
     width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
 }
 .po-table th, .po-table td {
     padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
     font-size: 13px;
 }
-.po-table th { background: rgb(0, 60, 180); color: white; }
+.po-table th { background: var(--accent); color: white; }
 .po-table td.num, .po-table th.num { text-align: right; }
 .po-table tfoot td { font-weight: bold; background: #eef6ff; }
 .po-empty { color: #555; padding: 8px 0; }
@@ -58,7 +60,7 @@
 .po-status-actions form { margin: 0; }
 .receive-form { display: flex; gap: 4px; justify-content: flex-end; }
 .receive-form input[type=number] {
-    width: 64px; padding: 2px 4px; border: 2px solid black; border-radius: 4px;
+    width: 64px; padding: 2px 4px; border: 1.5px solid var(--border); border-radius: 4px;
 }
 .add-item { margin-top: 16px; }
 .add-item .grid {
@@ -69,7 +71,7 @@
 .add-item label { display: block; font-size: 12px; font-weight: bold;
                   color: #003cb4; margin-bottom: 3px; }
 .add-item input, .add-item select {
-    width: 100%; padding: 5px 7px; border: 2px solid black;
+    width: 100%; padding: 5px 7px; border: 1.5px solid var(--border);
     border-radius: 4px; font-size: 13px;
 }
 .add-item h3 { color: white; font-size: 15px; margin-bottom: 8px; }
