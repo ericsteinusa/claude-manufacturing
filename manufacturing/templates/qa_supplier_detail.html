@@ -10,7 +10,7 @@
 {% block extra_styles %}
 .qa-wrap { width:100%; max-width:860px; }
 .qa-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
 .form-row { display:flex; flex-direction:column; gap:4px; }
@@ -21,18 +21,33 @@
 .form-row .ro { background:#f7f7f7; border-color:#ddd; color:#555; }
 .form-row textarea { resize:vertical; min-height:70px; }
 .btn-row { display:flex; gap:10px; margin-top:14px; align-items:center; }
-.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
     padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.sup-barcode {
+    display:flex; flex-direction:column; align-items:flex-end; margin-bottom:10px;
+}
+.sup-barcode img { max-width:260px; height:auto; }
+.sup-barcode small { font-size:10px; color:#aaa; letter-spacing:1px; }
+@media print {
+    .btn, .save-btn, form { display:none !important; }
+    body { background:white !important; }
+    .qa-wrap { max-width:none; }
+    .sup-barcode img { max-width:300px; }
+}
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
+    <div class="sup-barcode">
+        <img src="/barcode/img/SUP-{{ supplier.id }}/" alt="Barcode SUP-{{ supplier.id }}">
+        <small>SUP-{{ supplier.id }}</small>
+    </div>
     <h2>{{ supplier.supplier }}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
