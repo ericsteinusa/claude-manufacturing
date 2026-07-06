@@ -350,12 +350,15 @@ def get_gantt_operations(conn, date_from=None, date_to=None, workcenter_id=None)
     are an optional coarse pre-filter — SQL can't express the fallback
     math, so rows are re-checked against the exact window in Python after
     derivation.
+
+    workcenter_id filters the *result*, applied after the fallback fractions
+    are computed — each operation's share of its WO's span depends on the
+    std_hours of every operation on that WO, so filtering at the SQL level
+    would shrink the WO's own op set and skew every other operation's
+    fraction depending solely on which workcenter is selected.
     """
-    conds = ["op.status != 'skipped'"]
+    conds = ["op.status != 'skipped'", "wo.status != 'cancelled'"]
     params = []
-    if workcenter_id:
-        conds.append("op.workcenter_id = %s")
-        params.append(workcenter_id)
     if date_from and date_to:
         conds.append("""(
             (op.scheduled_start IS NOT NULL AND op.scheduled_end IS NOT NULL
@@ -404,6 +407,8 @@ def get_gantt_operations(conn, date_from=None, date_to=None, workcenter_id=None)
             o['bar_start'] = bar_start
             o['bar_end'] = bar_end
             o['is_fallback'] = is_fallback
+            if workcenter_id and o['workcenter_id'] != workcenter_id:
+                continue
             if bar_start and bar_end and date_from and date_to:
                 if bar_end < date_from or bar_start > date_to:
                     continue
@@ -414,7 +419,7 @@ def get_gantt_operations(conn, date_from=None, date_to=None, workcenter_id=None)
     return result
 
 
-def get_planned_workcenter_load(conn, date_from, date_to):
+def get_planned_workcenter_load(conn, date_from, date_to, ops=None):
     """Return planned load per active workcenter for the visible Gantt window.
 
     Sums std_hours for pending/in_progress wo_operation rows whose bar
@@ -424,8 +429,14 @@ def get_planned_workcenter_load(conn, date_from, date_to):
     over_capacity}, where window_capacity_hours = capacity_hours_per_day
     times the number of calendar days in the window (a simplification that
     does not account for weekends/holidays).
+
+    ops: optional pre-fetched result of get_gantt_operations(conn,
+    date_from=date_from, date_to=date_to) (unfiltered by workcenter) — pass
+    it in when the caller already fetched it, to avoid re-running the same
+    query.
     """
-    ops = get_gantt_operations(conn, date_from=date_from, date_to=date_to)
+    if ops is None:
+        ops = get_gantt_operations(conn, date_from=date_from, date_to=date_to)
     planned = {}
     for o in ops:
         if o['status'] not in ('pending', 'in_progress'):
@@ -463,13 +474,18 @@ def reschedule_operation(conn, op_id, scheduled_start, scheduled_end):
     """Persist a drag-and-drop reschedule for one wo_operation. Does not commit.
 
     scheduled_start/scheduled_end: ISO datetime strings (Postgres casts).
-    Returns True if a row was updated, False if op_id does not exist.
+    Returns True if a row was updated, False if op_id does not exist, the
+    operation is already completed/skipped, or its work order is cancelled.
     Raises ValueError if scheduled_end <= scheduled_start.
     """
     if scheduled_end <= scheduled_start:
         raise ValueError('scheduled_end must be after scheduled_start')
     cur = conn.execute(
-        "UPDATE wo_operation SET scheduled_start=%s, scheduled_end=%s WHERE id=%s",
+        "UPDATE wo_operation AS op SET scheduled_start=%s, scheduled_end=%s "
+        "FROM work_order AS wo "
+        "WHERE op.id=%s AND op.wo_id = wo.id "
+        "AND op.status NOT IN ('completed', 'skipped') "
+        "AND wo.status != 'cancelled'",
         (scheduled_start, scheduled_end, op_id),
     )
     return cur.rowcount > 0

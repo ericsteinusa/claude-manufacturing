@@ -17,6 +17,33 @@ def login_required(view_func):
     return wrapper
 
 
+def _normalize_keys(keys):
+    if keys is None:
+        return None
+    return frozenset({keys}) if isinstance(keys, str) else frozenset(keys)
+
+
+def dept_access_denied_reason(request, dept_keys, role_keys=None, check_write=False):
+    """Return None if allowed, else 'unauthenticated' / 'forbidden' / 'read_only'.
+
+    Same rule set as dept_required, exposed as a plain function so views
+    that can't use a redirecting decorator (e.g. JSON AJAX endpoints) share
+    this check instead of hand-copying it.
+    """
+    dept_keys = _normalize_keys(dept_keys)
+    role_keys = _normalize_keys(role_keys)
+    if not request.session.get('user_email'):
+        return 'unauthenticated'
+    if not request.session.get('user_full_access'):
+        dept_ok = request.session.get('user_dept_key') in dept_keys
+        role_ok = role_keys and request.session.get('user_role') in role_keys
+        if not dept_ok and not role_ok:
+            return 'forbidden'
+    if check_write and request.session.get('user_role') in READ_ONLY_ROLES:
+        return 'read_only'
+    return None
+
+
 def dept_required(dept_keys, *, role_keys=None, write_redirect=None,
                   deny_redirect='dashboard'):
     """Gate a view to logged-in users in the given department(s) or role(s).
@@ -38,27 +65,16 @@ def dept_required(dept_keys, *, role_keys=None, write_redirect=None,
         Named URL to redirect when the dept/role check fails. Defaults to
         ``'dashboard'``.
     """
-    if isinstance(dept_keys, str):
-        dept_keys = frozenset({dept_keys})
-    else:
-        dept_keys = frozenset(dept_keys)
-    if role_keys is not None:
-        if isinstance(role_keys, str):
-            role_keys = frozenset({role_keys})
-        else:
-            role_keys = frozenset(role_keys)
-
     def decorator(view_func):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
-            if not request.session.get('user_email'):
+            reason = dept_access_denied_reason(
+                request, dept_keys, role_keys, check_write=bool(write_redirect))
+            if reason == 'unauthenticated':
                 return redirect('home')
-            if not request.session.get('user_full_access'):
-                dept_ok = request.session.get('user_dept_key') in dept_keys
-                role_ok = role_keys and request.session.get('user_role') in role_keys
-                if not dept_ok and not role_ok:
-                    return redirect(deny_redirect)
-            if write_redirect and request.session.get('user_role') in READ_ONLY_ROLES:
+            if reason == 'forbidden':
+                return redirect(deny_redirect)
+            if reason == 'read_only':
                 return redirect(write_redirect)
             return view_func(request, *args, **kwargs)
         return wrapper

@@ -342,11 +342,52 @@ def test_get_gantt_operations_excludes_skipped_status():
     assert "op.status != 'skipped'" in conn.last_sql
 
 
-def test_get_gantt_operations_filters_by_workcenter_id():
+def test_get_gantt_operations_excludes_cancelled_work_orders():
+    conn = _Conn(rows=[])
+    get_gantt_operations(conn)
+    assert "wo.status != 'cancelled'" in conn.last_sql
+
+
+def test_get_gantt_operations_filters_by_workcenter_id_after_fraction_calc():
+    """workcenter_id must not be a SQL-level filter: it's applied in Python
+    after fallback fractions are computed from the WO's full op set, or a
+    filtered fetch would skew every other operation's fraction (see
+    _derive_operation_window docstring in routing_core.py)."""
     conn = _Conn(rows=[])
     get_gantt_operations(conn, workcenter_id=4)
-    assert "op.workcenter_id = %s" in conn.last_sql
-    assert 4 in conn.last_params
+    assert "op.workcenter_id = %s" not in conn.last_sql
+    assert 4 not in conn.last_params
+
+
+def test_get_gantt_operations_workcenter_filter_does_not_skew_other_ops_fractions():
+    rows = [
+        {'id': 1, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-11', 'product_name': 'Widget',
+         'operation_seq': 10, 'operation_name': 'Cut', 'workcenter_id': 1,
+         'workcenter_name': 'Saw', 'std_hours': 2.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+        {'id': 2, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-11', 'product_name': 'Widget',
+         'operation_seq': 20, 'operation_name': 'Weld', 'workcenter_id': 2,
+         'workcenter_name': 'Weld Cell', 'std_hours': 6.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+        {'id': 3, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-11', 'product_name': 'Widget',
+         'operation_seq': 30, 'operation_name': 'Paint', 'workcenter_id': 1,
+         'workcenter_name': 'Saw', 'std_hours': 2.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+    ]
+    conn_unfiltered = _Conn(rows=rows)
+    unfiltered = get_gantt_operations(conn_unfiltered)
+    op3_unfiltered = next(o for o in unfiltered if o['id'] == 3)
+
+    conn_filtered = _Conn(rows=rows)
+    filtered = get_gantt_operations(conn_filtered, workcenter_id=1)
+    op3_filtered = next(o for o in filtered if o['id'] == 3)
+
+    assert {o['id'] for o in filtered} == {1, 3}
+    assert op3_filtered['bar_start'] == op3_unfiltered['bar_start']
+    assert op3_filtered['bar_end'] == op3_unfiltered['bar_end']
 
 
 def test_get_gantt_operations_applies_date_filter_only_when_both_bounds_given():
@@ -472,14 +513,39 @@ def test_get_planned_workcenter_load_zero_capacity_does_not_divide_by_zero():
     assert result[0]['over_capacity'] is False
 
 
+def test_get_planned_workcenter_load_reuses_prefetched_ops_without_requerying():
+    """Passing ops= must skip the wo_operation query entirely — the caller
+    already ran it, and re-running it on every page load was wasted work."""
+    wc_rows = [{'id': 1, 'name': 'Cell 1', 'capacity_hours_per_day': 8.0}]
+    prefetched_ops = [
+        {'workcenter_id': 1, 'std_hours': 4.0, 'status': 'pending'},
+    ]
+
+    class _LoadConn:
+        def execute(self, sql, params=None):
+            assert 'wo_operation' not in sql, "should not re-query wo_operation"
+            return _Cursor(wc_rows)
+
+    conn = _LoadConn()
+    result = get_planned_workcenter_load(conn, '2026-07-01', '2026-07-01', ops=prefetched_ops)
+    assert result[0]['planned_hours'] == 4.0
+
+
 # -- reschedule_operation --
 
 def test_reschedule_operation_updates_and_returns_true():
     conn = _Conn(rows=[{'id': 1}])
     updated = reschedule_operation(conn, 1, '2026-07-01T08:00:00', '2026-07-01T17:00:00')
     assert updated is True
-    assert "UPDATE wo_operation SET scheduled_start=%s, scheduled_end=%s WHERE id=%s" in conn.last_sql
+    assert "UPDATE wo_operation AS op SET scheduled_start=%s, scheduled_end=%s" in conn.last_sql
     assert conn.last_params == ['2026-07-01T08:00:00', '2026-07-01T17:00:00', 1]
+
+
+def test_reschedule_operation_guards_against_completed_skipped_and_cancelled_wo():
+    conn = _Conn(rows=[{'id': 1}])
+    reschedule_operation(conn, 1, '2026-07-01T08:00:00', '2026-07-01T17:00:00')
+    assert "op.status NOT IN ('completed', 'skipped')" in conn.last_sql
+    assert "wo.status != 'cancelled'" in conn.last_sql
 
 
 def test_reschedule_operation_returns_false_when_not_found():
