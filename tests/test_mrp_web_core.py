@@ -47,7 +47,7 @@ def test_load_mrp_inputs_product_keyed_by_id():
     responses = [
         MagicMock(fetchall=lambda: [
             {'id': 1, 'name': 'Widget', 'item_type': 'make',
-             'lead_time_days': 5, 'amount': 10.0}
+             'lead_time_days': 5, 'amount': 10.0, 'safety_stock': 0.0}
         ]),
         MagicMock(fetchall=lambda: []),  # bom rows
         MagicMock(fetchall=lambda: []),  # wo rows
@@ -64,8 +64,8 @@ def test_load_mrp_inputs_bom_lines_grouped_by_parent():
     conn = MagicMock()
     responses = [
         MagicMock(fetchall=lambda: [
-            {'id': 1, 'name': 'A', 'item_type': 'make', 'lead_time_days': 0, 'amount': 0.0},
-            {'id': 2, 'name': 'B', 'item_type': 'buy', 'lead_time_days': 0, 'amount': 0.0},
+            {'id': 1, 'name': 'A', 'item_type': 'make', 'lead_time_days': 0, 'amount': 0.0, 'safety_stock': 0.0},
+            {'id': 2, 'name': 'B', 'item_type': 'buy', 'lead_time_days': 0, 'amount': 0.0, 'safety_stock': 0.0},
         ]),
         MagicMock(fetchall=lambda: [
             {'product_id': 1, 'component_id': 2, 'qty_required': 3.0, 'scrap_pct': 0.0},
@@ -82,7 +82,7 @@ def test_load_mrp_inputs_scheduled_receipts_aggregated():
     conn = MagicMock()
     responses = [
         MagicMock(fetchall=lambda: [
-            {'id': 5, 'name': 'X', 'item_type': 'make', 'lead_time_days': 2, 'amount': 0.0}
+            {'id': 5, 'name': 'X', 'item_type': 'make', 'lead_time_days': 2, 'amount': 0.0, 'safety_stock': 0.0}
         ]),
         MagicMock(fetchall=lambda: []),
         MagicMock(fetchall=lambda: [

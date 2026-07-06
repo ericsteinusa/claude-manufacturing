@@ -477,7 +477,8 @@ def get_forecast_kpis(conn, period=None, search=None) -> dict:
     )
     params: list = []
     if period:
-        sql += " AND period = %s"; params.append(period)
+        sql += " AND period = %s"
+        params.append(period)
     if search:
         sql += " AND (rep ILIKE %s OR product_line ILIKE %s OR notes ILIKE %s)"
         params.extend([f"%{search}%"] * 3)

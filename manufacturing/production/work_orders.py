@@ -17,7 +17,7 @@ from ..qt_theme import (
     apply_blue_palette as _apply_blue_palette,
     ro as _ro,
 )
-from ..qt_barcode import lookup_record, open_label
+from ..qt_barcode import open_label
 
 WO_COLORS = WO_STATUS_COLORS
 

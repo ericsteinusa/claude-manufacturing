@@ -99,9 +99,11 @@ def list_fixed_assets(conn, status=None, asset_type=None, search=None) -> list:
     )
     params: list = []
     if status:
-        sql += " AND status = %s"; params.append(status)
+        sql += " AND status = %s"
+        params.append(status)
     if asset_type:
-        sql += " AND asset_type = %s"; params.append(asset_type)
+        sql += " AND asset_type = %s"
+        params.append(asset_type)
     if search:
         sql += " AND (asset_name ILIKE %s OR asset_number ILIKE %s OR vendor ILIKE %s)"
         params.extend([f"%{search}%"] * 3)
@@ -207,7 +209,6 @@ def calc_accumulated_depreciation(asset: dict) -> float:
         years_owned = max(0, _date.today().year - purchase_year)
     except (ValueError, TypeError):
         return 0.0
-    life = int(asset.get('useful_life_years') or 5) or 5
     annual = calc_annual_depreciation(asset)
     price = float(asset.get('purchase_price') or 0)
     salvage = float(asset.get('salvage_value') or 0)

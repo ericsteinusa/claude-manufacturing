@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 import tempfile
 
-from .barcode_core import resolve_scan_url, parse_scan
+from .barcode_core import parse_scan
 from .db_pg import get_db_connection
 
 
@@ -79,8 +79,7 @@ def print_label(raw: str) -> tuple[bool, str]:
     Returns (success, message).
     """
     from .barcode_core import (
-        wo_label_pdf, part_label_pdf, po_label_pdf,
-        receiving_label_pdf, asset_label_pdf,
+        wo_label_pdf, part_label_pdf, po_label_pdf, asset_label_pdf,
     )
     result = lookup_record(raw)
     if result is None:
