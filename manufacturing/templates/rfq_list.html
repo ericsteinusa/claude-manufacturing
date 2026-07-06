@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block page_title %}Requests for Quote{% endblock %}
+
+{% block toolbar_left %}
+<a href="/po/" class="btn">Purchase Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/rfq/new/" class="btn btn-primary">+ New RFQ</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Requests for Quote</div>
+
+    <div class="filter-bar">
+        <label>Status:</label>
+        <a href="/rfq/" class="{% if not status %}active{% endif %}">All</a>
+        <a href="/rfq/?status=open" class="{% if status == 'open' %}active{% endif %}">Open</a>
+        <a href="/rfq/?status=awarded" class="{% if status == 'awarded' %}active{% endif %}">Awarded</a>
+        <a href="/rfq/?status=closed" class="{% if status == 'closed' %}active{% endif %}">Closed</a>
+    </div>
+
+    {% if rfqs %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>RFQ #</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rfqs %}
+                <tr>
+                    <td><a href="/rfq/{{ r.id }}/">{{ r.rfq_number }}</a></td>
+                    <td>
+                        {% if r.status == 'awarded' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Awarded</span>
+                        {% elif r.status == 'closed' %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">Closed</span>
+                        {% else %}
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+                    <td><a href="/rfq/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No RFQs found{% if status %} with status "{{ status }}"{% endif %}.</div>
+    {% endif %}
+</div>
+{% endblock %}

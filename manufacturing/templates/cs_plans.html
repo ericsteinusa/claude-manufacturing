@@ -9,17 +9,17 @@
 
 {% block extra_styles %}
 .cs-wrap { width:100%; max-width:1000px; }
-.cs-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .filter-row { display:flex; gap:8px; margin-bottom:14px; align-items:center; }
 .filter-row a { display:inline-block; padding:3px 14px; border-radius:20px;
     font-size:12px; font-weight:bold; text-decoration:none;
     background:#334; color:#aad; border:2px solid #556; }
 .filter-row a.active { border-color:white; color:white; }
 .plans-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:20px; }
 .plans-table th,.plans-table td { padding:9px 14px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.plans-table th { background:rgb(0,60,180); color:white; }
+.plans-table th { background:var(--accent); color:white; }
 .plans-table tr:last-child td { border-bottom:none; }
 .plans-table tr:hover td { background:#f0f4ff; }
 .row-completed td { background:#efffef; }
@@ -32,7 +32,7 @@
 .st-In.Progress { background:#fff3e0; color:#e65100; }
 .st-Completed { background:#e8f5e9; color:#1a6b1a; }
 .st-Cancelled { background:#f5f5f5; color:#999; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
 .form-row { display:flex; flex-direction:column; gap:4px; }
@@ -45,9 +45,9 @@
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
     padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
-.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 {% endblock %}
 
 {% block body %}
@@ -103,7 +103,7 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color:#cce;font-size:14px;margin-bottom:20px;">No plans found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No plans found.</p>
     {% endif %}
 
     <!-- Create / update form -->

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block page_title %}Production Gantt{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production</a>
+<a href="/prod/schedule/" class="btn">List View</a>
+<a href="/prod/schedule/gantt/" class="btn">Gantt</a>
+<a href="/wo/" class="btn">Work Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ps-wrap { width:100%; max-width:1200px; }
+.ps-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=date] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.filter-bar label { color:white; font-size:13px; font-weight:bold; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+#gantt-container { overflow-x:auto; }
+/* frappe-gantt's own stylesheet sets .gantt .bar-wrapper .bar { fill: var(--g-bar-color) }
+   (3 classes of specificity) — these overrides must match that structure
+   (bar-wrapper + our status class on the same node) to actually win. */
+.gantt .bar-wrapper.gantt-st-pending .bar { fill:#94a3b8; }
+.gantt .bar-wrapper.gantt-st-in_progress .bar { fill:#f59e0b; }
+.gantt .bar-wrapper.gantt-st-completed .bar { fill:#22c55e; }
+.load-table { width:100%; border-collapse:collapse; }
+.load-table td { padding:7px 10px; font-size:13px; vertical-align:middle; }
+.bar-track { width:200px; height:10px; background:#eee; border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; margin-right:8px; }
+.bar-fill { height:100%; background:var(--accent); }
+.bar-fill.over { background:#c62828; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ps-wrap">
+    <h2>Production Gantt Chart</h2>
+
+    <form method="get" class="filter-bar">
+        <label>From:</label>
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <label>To:</label>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <select name="workcenter_id">
+            <option value="">All Workcenters</option>
+            {% for wc in workcenters %}
+            <option value="{{ wc.id }}"{% if workcenter_id == wc.id %} selected{% endif %}>{{ wc.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="/prod/schedule/gantt/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <div id="gantt-container"><svg id="gantt"></svg></div>
+        {% if ops_count == 0 %}
+        <p style="color:#888;text-align:center;">No scheduled operations in this window.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Workcenter Load</h3>
+        <table class="load-table">
+            {% for wc in load_data %}
+            <tr>
+                <td style="width:160px;">{{ wc.workcenter_name }}</td>
+                <td>
+                    <span class="bar-track">
+                        <span class="bar-fill{% if wc.over_capacity %} over{% endif %}"
+                              style="width:{{ wc.pct }}%; max-width:100%;"></span>
+                    </span>
+                    {{ wc.planned_hours|floatformat:1 }}h / {{ wc.window_capacity_hours|floatformat:1 }}h
+                    ({{ wc.pct|floatformat:0 }}%)
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td style="color:#888;">No active workcenters.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@1.2.2/dist/frappe-gantt.min.css">
+<script src="https://cdn.jsdelivr.net/npm/frappe-gantt@1.2.2/dist/frappe-gantt.umd.min.js"></script>
+<script>
+(function () {
+    function getCookie(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    var tasks = {{ gantt_tasks_json|safe }};
+    var csrftoken = getCookie('csrftoken');
+
+    if (tasks.length === 0) {
+        document.getElementById('gantt-container').innerHTML = '';
+        return;
+    }
+
+    new Gantt('#gantt', tasks, {
+        view_mode: 'Day',
+        on_date_change: function (task, start, end) {
+            fetch('/prod/schedule/gantt/reschedule/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({
+                    op_id: task.id.replace('op-', ''),
+                    scheduled_start: start.toISOString(),
+                    scheduled_end: end.toISOString(),
+                }),
+            }).then(function (resp) {
+                if (!resp.ok) { throw new Error('reschedule failed'); }
+                return resp.json();
+            }).then(function (data) {
+                if (!data.ok) {
+                    alert('Reschedule failed: ' + data.error);
+                    location.reload();
+                }
+            }).catch(function () {
+                alert('Reschedule failed — reloading.');
+                location.reload();
+            });
+        },
+    });
+})();
+</script>
+{% endblock %}

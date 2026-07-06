@@ -11,9 +11,9 @@
 
 {% block extra_styles %}
 .bom-wrap { width: 100%; max-width: 960px; }
-.card { background: white; border: 2px solid black; border-radius: 6px;
+.card { background: white; border: 1.5px solid var(--border); border-radius: 6px;
     padding: 16px 20px; margin-bottom: 20px; }
-.card h3 { font-size: 15px; color: rgb(0,60,180); margin-bottom: 12px;
+.card h3 { font-size: 15px; color: var(--accent); margin-bottom: 12px;
     padding-bottom: 6px; border-bottom: 1px solid #ddd; }
 .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px;
     font-size: 13px; }
@@ -27,11 +27,11 @@
 .im-form label { display: block; font-size: 12px; font-weight: bold;
     color: #003cb4; margin-bottom: 3px; }
 .im-form select, .im-form input { width: 100%; padding: 5px 7px;
-    border: 2px solid black; border-radius: 4px; font-size: 13px; }
+    border: 1.5px solid var(--border); border-radius: 4px; font-size: 13px; }
 .bom-table { width: 100%; border-collapse: collapse; }
 .bom-table th, .bom-table td { padding: 8px 10px; text-align: left;
     border-bottom: 1px solid #ddd; font-size: 13px; }
-.bom-table th { background: rgb(0,60,180); color: white; }
+.bom-table th { background: var(--accent); color: white; }
 .bom-table td.num, .bom-table th.num { text-align: right; }
 .bom-table tr:last-child td { border-bottom: none; }
 .bom-table tr:hover td { background: #f5f8ff; }
@@ -46,7 +46,7 @@
 .add-form label { display: block; font-size: 11px; font-weight: bold;
     color: #003cb4; margin-bottom: 3px; }
 .add-form select, .add-form input { width: 100%; padding: 5px 7px;
-    border: 2px solid black; border-radius: 4px; font-size: 12px; }
+    border: 1.5px solid var(--border); border-radius: 4px; font-size: 12px; }
 .error-box { background: #ffeaea; border: 1px solid #c33; border-radius: 4px;
     padding: 8px 12px; font-size: 13px; color: #900; margin-bottom: 12px; }
 .empty-note { color: #888; font-size: 13px; font-style: italic; }
@@ -126,7 +126,7 @@
                 <tr id="row-{{ line.id }}">
                     <td>
                         <a href="/bom/{{ line.component_id }}/"
-                           style="color:rgb(0,60,180);">{{ line.component_name }}</a>
+                           style="color:var(--accent);">{{ line.component_name }}</a>
                     </td>
                     <td><span class="badge badge-{{ line.item_type }}">
                         {{ line.item_type|capfirst }}</span></td>

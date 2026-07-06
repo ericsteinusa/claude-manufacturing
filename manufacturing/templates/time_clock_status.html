@@ -12,7 +12,7 @@
 {% block extra_styles %}
 .tc-wrap { width: 100%; max-width: 620px; }
 .tc-card {
-    background: white; border: 2px solid black; border-radius: 8px;
+    background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 28px 32px; margin-bottom: 20px; text-align: center;
 }
 .tc-status-label {
@@ -24,7 +24,7 @@
 }
 .tc-since { font-size: 13px; color: #555; margin-bottom: 20px; }
 .tc-btn {
-    display: inline-block; padding: 14px 40px; border: 2px solid black;
+    display: inline-block; padding: 14px 40px; border: 1.5px solid var(--border);
     border-radius: 6px; font-size: 16px; font-weight: bold;
     cursor: pointer; text-decoration: none; transition: opacity .15s;
 }
@@ -32,18 +32,18 @@
 .tc-btn-in  { background: #28a745; color: white; border-color: #28a745; }
 .tc-btn-out { background: #dc3545; color: white; border-color: #dc3545; }
 .tc-log-title {
-    font-size: 13px; font-weight: bold; color: #cce; text-transform: uppercase;
+    font-size: 13px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;
     letter-spacing: 1px; margin-bottom: 8px;
 }
 .tc-table {
     width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
 }
 .tc-table th, .tc-table td {
     padding: 7px 10px; font-size: 13px; text-align: left;
     border-bottom: 1px solid #ccc;
 }
-.tc-table th { background: rgb(0,60,180); color: white; }
+.tc-table th { background: var(--accent); color: white; }
 .tc-total { text-align: right; font-size: 13px; color: white;
             margin-top: 6px; font-weight: bold; }
 .tc-error { background: #f8d7da; border: 1px solid #c33; border-radius: 4px;

@@ -3,65 +3,42 @@
 {% block page_title %}Employee Directory{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if can_edit %}<a href="/people/new/" class="btn">+ New Employee</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← Back</a>
+{% if can_edit %}<a href="/people/new/" class="btn btn-primary">+ New Employee</a>{% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-{% endblock %}
-
-{% block extra_styles %}
-.pl-wrap { width: 100%; max-width: 1100px; }
-.pl-filters {
-    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
-    align-items: flex-end;
-}
-.pl-filters select, .pl-filters input[type=text] {
-    padding: 5px 8px; border: 2px solid black; border-radius: 4px;
-    font-size: 13px;
-}
-.pl-filters label { font-size: 12px; font-weight: bold; color: #cce; display: block; margin-bottom: 3px; }
-.pl-table {
-    width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
-}
-.pl-table th, .pl-table td {
-    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
-    font-size: 13px;
-}
-.pl-table th { background: rgb(0, 60, 180); color: white; }
-.pl-table tr:hover td { background: #eef6ff; }
-.pl-table a { color: #003cb4; font-weight: bold; text-decoration: none; }
-.pl-empty { color: white; margin-top: 16px; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="menu-title">Employee Directory</div>
-    <div class="pl-wrap">
-        <form method="get" action="/people/" class="pl-filters">
-            <div>
-                <label>Department</label>
-                <select name="dept_id" onchange="this.form.submit()">
-                    <option value="">All Departments</option>
-                    {% for d in depts %}
-                    <option value="{{ d.dept_id }}"
-                        {% if d.dept_id == dept_id %}selected{% endif %}>
-                        {{ d.dept_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Search</label>
-                <input type="text" name="search" value="{{ search }}"
-                       placeholder="Name or email">
-            </div>
-            <div style="padding-top:18px;">
-                <button type="submit" class="btn">Filter</button>
-                <a href="/people/" class="btn">Clear</a>
-            </div>
-        </form>
 
-        {% if people %}
-        <table class="pl-table">
+    <form method="get" action="/people/" class="filter-bar" style="flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);">Department</label>
+            <select name="dept_id" onchange="this.form.submit()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+                <option value="">All Departments</option>
+                {% for d in depts %}
+                <option value="{{ d.dept_id }}"
+                    {% if d.dept_id == dept_id %}selected{% endif %}>
+                    {{ d.dept_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);">Search</label>
+            <input type="text" name="search" value="{{ search }}"
+                   placeholder="Name or email"
+                   style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:200px;">
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-end;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="/people/" class="btn">Clear</a>
+        </div>
+    </form>
+
+    {% if people %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -85,11 +62,12 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-        <div class="pl-empty">No employees found
-            {% if search %}matching &ldquo;{{ search }}&rdquo;{% endif %}
-            {% if dept_id %}in the selected department{% endif %}.</div>
-        {% endif %}
     </div>
+    {% else %}
+    <div class="empty-state">No employees found
+        {% if search %}matching "{{ search }}"{% endif %}
+        {% if dept_id %}in the selected department{% endif %}.
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block page_title %}{{ cc.count_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/inventory/cycle-counts/" class="btn">Cycle Counts</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cc-wrap { width:100%; max-width:900px; }
+.counted-input { width:90px; padding:4px 7px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.variance-pos { color:#2e7d32; font-weight:bold; }
+.variance-neg { color:#c62828; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cc-wrap">
+    <div class="menu-title">{{ cc.count_number }}
+        {% if cc.status == 'posted' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Posted</span>
+        {% elif cc.status == 'rejected' %}
+        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Rejected</span>
+        {% elif cc.status == 'submitted' %}
+        <span class="pill pill-warn" style="font-size:11px;padding:2px 8px;">Pending Approval</span>
+        {% else %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Open</span>
+        {% endif %}
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
+        Grouped by {{ cc.group_by|capfirst }}: {{ cc.group_value }} — created {{ cc.created_at|date:"Y-m-d H:i" }} by {{ cc.created_by }}
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if cc.status == 'submitted' %}
+        {% if pending_step %}
+        <div class="alert alert-warning" style="margin-bottom:16px;">
+            Awaiting your approval as <strong>{{ pending_step.approver_role }}</strong>.
+            <form method="post" style="display:inline;margin-left:10px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="decide">
+                <input type="hidden" name="step_id" value="{{ pending_step.id }}">
+                <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">Approve</button>
+                <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">Reject</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="alert alert-warning" style="margin-bottom:16px;">
+            Variance found — awaiting approval
+            {% if approval.steps %} from <strong>{{ approval.steps.0.approver_role }}</strong>{% endif %}.
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="enter_counts">
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Bin</th>
+                        <th class="num">System Qty</th>
+                        <th class="num">Counted Qty</th>
+                        <th class="num">Variance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                    <tr>
+                        <td>{{ line.product_name }}</td>
+                        <td>{{ line.bin|default:"—" }}</td>
+                        <td class="num">{{ line.system_qty|floatformat:"g" }} {{ line.uom }}</td>
+                        <td class="num">
+                            {% if cc.status == 'open' %}
+                            <input class="counted-input" type="number" step="any"
+                                   name="counted_{{ line.id }}"
+                                   placeholder="{{ line.system_qty|floatformat:'g' }}">
+                            {% else %}
+                            {{ line.counted_qty|default:"—" }}
+                            {% endif %}
+                        </td>
+                        <td class="num">
+                            {% if line.variance_qty > 0 %}
+                            <span class="variance-pos">+{{ line.variance_qty|floatformat:"g" }}</span>
+                            {% elif line.variance_qty < 0 %}
+                            <span class="variance-neg">{{ line.variance_qty|floatformat:"g" }}</span>
+                            {% elif line.counted_qty is not None %}
+                            0
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if cc.status == 'open' and can_edit %}
+        <button type="submit" class="btn btn-primary" style="margin-top:14px;">Submit Counts</button>
+        {% endif %}
+    </form>
+</div>
+</div>
+{% endblock %}

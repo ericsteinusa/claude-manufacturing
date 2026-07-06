@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from manufacturing.finance_core import get_finance_dashboard
+from manufacturing.finance_core import get_finance_dashboard, get_revenue_expense_by_month
 
 _AP = {
     'open_count': 3, 'overdue_count': 1,
@@ -146,3 +146,39 @@ def test_sql_uses_limit_8():
         get_finance_dashboard(c)
     sql = c.execute.call_args[0][0]
     assert 'LIMIT 8' in sql
+
+
+# ---------------------------------------------------------------------------
+# get_revenue_expense_by_month
+# ---------------------------------------------------------------------------
+
+_STMT = {'revenue': 1000.0, 'expenses': 400.0, 'cogs': 0.0,
+         'gross_profit': 1000.0, 'net_income': 600.0,
+         'sections': {}, 'totals': {}}
+
+
+def test_revenue_expense_returns_requested_number_of_months():
+    with patch('manufacturing.finance_core.income_statement', return_value=_STMT):
+        result = get_revenue_expense_by_month(_conn(), months=4)
+    assert len(result) == 4
+
+
+def test_revenue_expense_months_ascending():
+    with patch('manufacturing.finance_core.income_statement', return_value=_STMT):
+        result = get_revenue_expense_by_month(_conn(), months=3)
+    months = [r['month'] for r in result]
+    assert months == sorted(months)
+
+
+def test_revenue_expense_passes_through_values():
+    with patch('manufacturing.finance_core.income_statement', return_value=_STMT):
+        result = get_revenue_expense_by_month(_conn(), months=1)
+    assert result[0]['revenue'] == 1000.0
+    assert result[0]['expenses'] == 400.0
+
+
+def test_revenue_expense_calls_income_statement_once_per_month():
+    with patch('manufacturing.finance_core.income_statement',
+               return_value=_STMT) as mock_stmt:
+        get_revenue_expense_by_month(_conn(), months=5)
+    assert mock_stmt.call_count == 5

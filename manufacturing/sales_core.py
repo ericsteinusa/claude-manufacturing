@@ -15,7 +15,7 @@ from .sales_orders_core import (       # noqa: F401 — re-exported for views
     create_so, update_so, add_so_item, delete_so_item, set_so_status,
 )
 
-from datetime import date
+from datetime import date, timedelta
 
 QUOTE_STATUSES  = ('Draft', 'Sent', 'Won', 'Lost', 'Expired')
 TARGET_STATUSES = ('On Track', 'Behind', 'Achieved')
@@ -62,6 +62,22 @@ def get_sales_dashboard(conn):
         'quotes':  dict(quote_row) if quote_row else {},
         'targets': dict(target_row) if target_row else {},
     }
+
+
+def get_revenue_by_month(conn, months: int = 6) -> list[dict]:
+    """Return [{month, revenue}] — SO revenue by month over the last
+    ``months`` months, for a revenue-by-period chart."""
+    start = (date.today().replace(day=1) - timedelta(days=31 * (months - 1))).isoformat()
+    rows = conn.execute("""
+        SELECT to_char(date_trunc('month', so.order_date::date), 'YYYY-MM') AS month,
+               COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
+        FROM sales_order so
+        LEFT JOIN so_item si ON si.so_id = so.id
+        WHERE so.order_date IS NOT NULL AND so.order_date >= %s
+        GROUP BY date_trunc('month', so.order_date::date)
+        ORDER BY date_trunc('month', so.order_date::date)
+    """, (start,)).fetchall()
+    return [dict(r) for r in rows]
 
 
 # ---------------------------------------------------------------------------
@@ -461,7 +477,8 @@ def get_forecast_kpis(conn, period=None, search=None) -> dict:
     )
     params: list = []
     if period:
-        sql += " AND period = %s"; params.append(period)
+        sql += " AND period = %s"
+        params.append(period)
     if search:
         sql += " AND (rep ILIKE %s OR product_line ILIKE %s OR notes ILIKE %s)"
         params.extend([f"%{search}%"] * 3)

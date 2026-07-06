@@ -16,14 +16,15 @@ When ``submit_for_approval`` is called, it finds all rules that apply
 ordered by seq, and returns the list of step ids.  Steps must be approved
 in seq order — a step is only actionable once all lower-seq steps are done.
 
-Supported entity types: 'purchase_order', 'purchase_requisition', 'gl_journal'
+Supported entity types: 'purchase_order', 'purchase_requisition', 'gl_journal',
+'cycle_count'
 """
 
 from .log_utils import get_logger
 
 log = get_logger(__name__)
 
-ENTITY_TYPES = ('purchase_order', 'purchase_requisition', 'gl_journal')
+ENTITY_TYPES = ('purchase_order', 'purchase_requisition', 'gl_journal', 'cycle_count')
 STEP_STATUSES = ('pending', 'approved', 'rejected', 'escalated', 'skipped')
 
 

@@ -1,10 +1,15 @@
 """Views: maintenance domain."""
 
+import datetime
+import json
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import csv_response
+from ..oee_core import get_overall_oee, get_oee_trend, list_workcenter_oee
 
 from ..maintenance_core import (
     WO_STATUSES, WORK_TYPES, PRIORITIES,
@@ -30,6 +35,7 @@ from ..maintenance_core import (
     resolve_downtime,
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
+    get_equipment_reliability_report, get_schedule_status_breakdown,
 )
 
 log = get_logger(__name__)
@@ -54,13 +60,47 @@ def _maint_ctx(request, **extra):
 
 @dept_required(_MAINT_DEPT_KEYS)
 def maint_dashboard(request):
+    today = datetime.date.today()
+    month_start = today.replace(day=1)
     conn = get_db_connection()
     try:
         counts = maint_get_dashboard_counts(conn)
+        oee = get_overall_oee(conn, month_start.isoformat(), today.isoformat())
+        oee_trend = get_oee_trend(conn, end_date=today.isoformat(), weeks=8)
+        downtime_by_equipment = get_equipment_reliability_report(conn, months=3)
+        schedule_breakdown = get_schedule_status_breakdown(conn)
     finally:
         conn.close()
-    return render(request, 'maint_dashboard.html',
-                  _maint_ctx(request, counts=counts))
+    return render(request, 'maint_dashboard.html', _maint_ctx(
+        request, counts=counts, oee=oee, oee_trend=oee_trend,
+        downtime_by_equipment_json=json.dumps(downtime_by_equipment),
+        schedule_breakdown_json=json.dumps(schedule_breakdown),
+    ))
+
+
+@dept_required(_MAINT_DEPT_KEYS)
+def maint_oee_report(request):
+    period = request.GET.get('period', 'month')
+    if period not in ('week', 'month'):
+        period = 'month'
+
+    today = datetime.date.today()
+    if period == 'week':
+        start = today - datetime.timedelta(days=today.weekday())
+    else:
+        start = today.replace(day=1)
+
+    conn = get_db_connection()
+    try:
+        breakdown = list_workcenter_oee(conn, start.isoformat(), today.isoformat())
+        overall = get_overall_oee(conn, start.isoformat(), today.isoformat())
+    finally:
+        conn.close()
+
+    return render(request, 'maint_oee_report.html', _maint_ctx(
+        request, breakdown=breakdown, overall=overall,
+        period=period, start=start.isoformat(), end=today.isoformat(),
+    ))
 
 
 # --- Work Orders ---
@@ -109,6 +149,28 @@ def maint_wo_list(request):
         search=search, wo_statuses=WO_STATUSES, work_types=WORK_TYPES,
         priorities=PRIORITIES, error=error, success=success,
     ))
+
+
+@dept_required(_MAINT_DEPT_KEYS)
+def maint_wo_export(request):
+    status_filter = request.GET.get('status', '').strip()
+    priority_filter = request.GET.get('priority', '').strip()
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        wos = list_work_orders(conn, status=status_filter or None,
+                               priority=priority_filter or None,
+                               search=search or None)
+    finally:
+        conn.close()
+
+    return csv_response('maintenance_work_orders.csv', [
+        ('title', 'Title'), ('equipment', 'Equipment'),
+        ('work_type', 'Work Type'), ('priority', 'Priority'),
+        ('assigned_to', 'Assigned To'), ('requested_date', 'Requested Date'),
+        ('due_date', 'Due Date'), ('completed_date', 'Completed Date'),
+        ('status', 'Status'),
+    ], wos)
 
 
 @dept_required(_MAINT_DEPT_KEYS)

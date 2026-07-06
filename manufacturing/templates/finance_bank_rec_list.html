@@ -15,18 +15,18 @@
 .fn-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
 .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
 .filter-bar input[type=text] {
-    padding:6px 10px; border:2px solid black; border-radius:6px; font-size:13px; }
-.filter-bar button { padding:6px 14px; background:white; border:2px solid black;
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
     border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
-.filter-bar button:hover { background:rgb(0,60,180); color:white; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tbody tr:hover { background:#f0f4ff; }
-.list-table a { color:rgb(0,40,160); text-decoration:none; font-weight:bold; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
 .list-table a:hover { text-decoration:underline; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
 .active-yes { background:#d4edda; color:#0a3622; }
@@ -38,9 +38,9 @@
     padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
 .form-group textarea { height:60px; resize:vertical; }
 .full-span { grid-column:1/-1; }
-.btn-submit { padding:8px 20px; background:rgb(0,60,180); color:white;
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
     border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
-.btn-submit:hover { background:rgb(0,40,140); }
+.btn-submit:hover { background:var(--accent-hover); }
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error   { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }

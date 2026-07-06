@@ -1,10 +1,13 @@
 """Views: quality domain."""
 
+import json
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import csv_response
 
 from ..quality_core import (
     NCR_STATUSES, NCR_SOURCES, NCR_SEVERITIES, NCR_DISPOSITIONS,
@@ -22,6 +25,7 @@ from ..quality_core import (
     update_inspection_result, get_defects, log_defect, resolve_defect,
     load_products_for_qa, load_work_orders_for_qa,
     get_qa_reports,
+    get_defect_pareto, get_ncr_severity_trend,
 )
 
 log = get_logger(__name__)
@@ -49,9 +53,15 @@ def qa_dashboard(request):
     conn = get_db_connection()
     try:
         counts = get_dashboard_counts(conn)
+        defect_pareto = get_defect_pareto(conn)
+        ncr_trend = get_ncr_severity_trend(conn)
     finally:
         conn.close()
-    return render(request, 'qa_dashboard.html', _qa_ctx(request, counts=counts))
+    return render(request, 'qa_dashboard.html', _qa_ctx(
+        request, counts=counts,
+        defect_pareto_json=json.dumps(defect_pareto),
+        ncr_trend_json=json.dumps(ncr_trend),
+    ))
 
 
 # --- NCR ---
@@ -95,6 +105,25 @@ def qa_ncr_list(request):
         ncr_severities=NCR_SEVERITIES, ncr_dispositions=NCR_DISPOSITIONS,
         error=error, success=success,
     ))
+
+
+@dept_required(_QA_DEPT_KEYS)
+def qa_ncr_export(request):
+    status_filter = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    conn = get_db_connection()
+    try:
+        ncrs = list_ncrs(conn, status=status_filter or None,
+                         search=search or None)
+    finally:
+        conn.close()
+
+    return csv_response('ncrs.csv', [
+        ('title', 'Title'), ('source', 'Source'), ('severity', 'Severity'),
+        ('product', 'Product'), ('detected_date', 'Detected Date'),
+        ('disposition', 'Disposition'), ('owner', 'Owner'),
+        ('status', 'Status'), ('closed_date', 'Closed Date'),
+    ], ncrs)
 
 
 @dept_required(_QA_DEPT_KEYS)

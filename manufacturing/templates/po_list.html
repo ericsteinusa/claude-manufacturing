@@ -3,52 +3,30 @@
 {% block page_title %}Purchase Orders{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if can_edit %}<a href="/po/new/" class="btn">+ New PO</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← Back</a>
+{% if can_edit %}<a href="/po/new/" class="btn btn-primary">+ New PO</a>{% endif %}
+<a href="/rfq/" class="btn">RFQs</a>
+<a href="/po/export/{% if status %}?status={{ status }}{% endif %}" class="btn">⬇ Export CSV</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-{% endblock %}
-
-{% block extra_styles %}
-.po-wrap { width: 100%; max-width: 1000px; }
-.po-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.po-filters a {
-    background: white; border: 2px solid black; border-radius: 10px;
-    padding: 4px 12px; font-size: 13px; text-decoration: none; color: black;
-}
-.po-filters a.active { background: rgb(85, 255, 255); }
-.po-table {
-    width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
-}
-.po-table th, .po-table td {
-    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
-    font-size: 13px;
-}
-.po-table th { background: rgb(0, 60, 180); color: white; }
-.po-table td.num, .po-table th.num { text-align: right; }
-.po-table tr:hover td { background: #eef6ff; }
-.po-table a { color: #003cb4; font-weight: bold; text-decoration: none; }
-.pill {
-    display: inline-block; padding: 2px 10px; border-radius: 10px;
-    border: 1px solid #999; font-size: 12px;
-}
-.po-empty { color: white; margin-top: 16px; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="menu-title">Purchase Orders</div>
-    <div class="po-wrap">
-        <div class="po-filters">
-            <a href="/po/" class="{% if not status %}active{% endif %}">All</a>
-            {% for s in statuses %}
-            <a href="/po/?status={{ s }}"
-               class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
-            {% endfor %}
-        </div>
 
-        {% if pos %}
-        <table class="po-table">
+    <!-- Status filters -->
+    <div class="filter-bar">
+        <label>Status:</label>
+        <a href="/po/" class="{% if not status %}active{% endif %}">All</a>
+        {% for s in statuses %}
+        <a href="/po/?status={{ s }}"
+           class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
+        {% endfor %}
+    </div>
+
+    {% if pos %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
             <thead>
                 <tr>
                     <th>PO #</th>
@@ -64,13 +42,13 @@
                 {% for po in pos %}
                 <tr>
                     <td><a href="/po/{{ po.id }}/">{{ po.po_number }}</a></td>
-                    <td>{{ po.company_name|default:"" }}</td>
-                    <td>{{ po.order_date|default:"" }}</td>
-                    <td>{{ po.expected_date|default:"" }}</td>
+                    <td>{{ po.company_name|default:"—" }}</td>
+                    <td>{{ po.order_date|default:"—" }}</td>
+                    <td>{{ po.expected_date|default:"—" }}</td>
                     <td class="num">{{ po.item_count }}</td>
                     <td class="num">${{ po.total|floatformat:2 }}</td>
                     <td>
-                        <span class="pill" style="background: {{ po.status_color }};">
+                        <span class="pill" style="background:{{ po.status_color }}20;color:{{ po.status_color }};border-color:{{ po.status_color }}40;">
                             {{ po.status|capfirst }}
                         </span>
                     </td>
@@ -78,10 +56,11 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-        <div class="po-empty">No purchase orders
-            {% if status %}with status &ldquo;{{ status|capfirst }}&rdquo;{% endif %}.</div>
-        {% endif %}
     </div>
+    {% else %}
+    <div class="empty-state">
+        No purchase orders{% if status %} with status "{{ status|capfirst }}"{% endif %}.
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

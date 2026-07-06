@@ -1,13 +1,16 @@
 """Tests for routing_core — workcenter, product routing, and WO operations."""
 
 from manufacturing.routing_core import (
-    OP_STATUSES,
+    OP_STATUSES, OP_STATUS_COLORS,
     list_workcenters, create_workcenter, update_workcenter,
     get_routing, create_routing_step, update_routing_step,
     delete_routing_step, next_routing_seq,
     populate_wo_operations, get_wo_operations,
     start_wo_operation, complete_wo_operation, skip_wo_operation,
     get_wo_labor_cost, get_workcenter_load,
+    _derive_operation_window, get_gantt_operations,
+    get_planned_workcenter_load, reschedule_operation,
+    ensure_routing_tables,
 )
 
 
@@ -16,6 +19,7 @@ from manufacturing.routing_core import (
 class _Cursor:
     def __init__(self, rows):
         self._rows = rows
+        self.rowcount = len(rows)
 
     def fetchall(self):
         return self._rows
@@ -258,3 +262,237 @@ def test_get_workcenter_load_queries_date_range():
     conn = _Conn(rows=[])
     get_workcenter_load(conn, '2026-06-01', '2026-06-30')
     assert conn.last_params == ['2026-06-01', '2026-06-30']
+
+
+# ── Gantt scheduler (P2-A) ───────────────────────────────────────────────────
+
+def test_op_status_colors_complete():
+    assert set(OP_STATUS_COLORS.keys()) == set(OP_STATUSES)
+
+
+def test_ensure_routing_tables_adds_scheduled_columns():
+    conn = _Conn(rows=[])
+    ensure_routing_tables(conn)
+    sqls = [s for s, _ in conn.calls]
+    assert any('scheduled_start' in s for s in sqls)
+    assert any('scheduled_end' in s for s in sqls)
+
+
+# -- _derive_operation_window --
+
+def test_derive_operation_window_uses_scheduled_dates_when_present():
+    bar_start, bar_end, is_fallback = _derive_operation_window(
+        '2026-07-01T08:00:00', '2026-07-02T17:00:00',
+        '2026-06-01', '2026-06-30', 0.0, 1.0,
+    )
+    assert bar_start == '2026-07-01'
+    assert bar_end == '2026-07-02'
+    assert is_fallback is False
+
+
+def test_derive_operation_window_falls_back_when_scheduled_null():
+    bar_start, bar_end, is_fallback = _derive_operation_window(
+        None, None, '2026-07-01', '2026-07-11', 0.0, 0.5,
+    )
+    assert is_fallback is True
+    assert bar_start is not None
+
+
+def test_derive_operation_window_splits_proportionally():
+    bar_start, bar_end, is_fallback = _derive_operation_window(
+        None, None, '2026-07-01', '2026-07-11', 0.0, 0.5,
+    )
+    assert bar_start == '2026-07-01'
+    assert bar_end == '2026-07-06'
+    assert is_fallback is True
+
+
+def test_derive_operation_window_handles_zero_span():
+    bar_start, bar_end, is_fallback = _derive_operation_window(
+        None, None, '2026-07-01', '2026-07-01', 0.0, 1.0,
+    )
+    assert bar_start == '2026-07-01'
+    assert bar_end == '2026-07-01'
+    assert is_fallback is True
+
+
+def test_derive_operation_window_returns_none_when_wo_dates_missing():
+    result = _derive_operation_window(None, None, None, '2026-07-11', 0.0, 0.5)
+    assert result == (None, None, True)
+
+
+def test_derive_operation_window_returns_none_on_unparseable_dates():
+    result = _derive_operation_window(None, None, 'not-a-date', '2026-07-11', 0.0, 0.5)
+    assert result == (None, None, True)
+
+
+def test_derive_operation_window_forces_min_one_day_bar():
+    bar_start, bar_end, is_fallback = _derive_operation_window(
+        None, None, '2026-07-01', '2026-07-11', 0.1, 0.1,
+    )
+    from datetime import date as _date
+    assert _date.fromisoformat(bar_end) > _date.fromisoformat(bar_start)
+
+
+# -- get_gantt_operations --
+
+def test_get_gantt_operations_excludes_skipped_status():
+    conn = _Conn(rows=[])
+    get_gantt_operations(conn)
+    assert "op.status != 'skipped'" in conn.last_sql
+
+
+def test_get_gantt_operations_filters_by_workcenter_id():
+    conn = _Conn(rows=[])
+    get_gantt_operations(conn, workcenter_id=4)
+    assert "op.workcenter_id = %s" in conn.last_sql
+    assert 4 in conn.last_params
+
+
+def test_get_gantt_operations_applies_date_filter_only_when_both_bounds_given():
+    conn = _Conn(rows=[])
+    get_gantt_operations(conn, date_from='2026-07-01')
+    assert 'scheduled_start::date' not in conn.last_sql
+
+    conn2 = _Conn(rows=[])
+    get_gantt_operations(conn2, date_from='2026-07-01', date_to='2026-07-14')
+    assert 'scheduled_start::date' in conn2.last_sql
+    assert conn2.last_params == ['2026-07-14', '2026-07-01', '2026-07-01', '2026-07-14']
+
+
+def test_get_gantt_operations_computes_fallback_and_filters_by_bar_window():
+    rows = [
+        {'id': 1, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-11', 'product_name': 'Widget',
+         'operation_seq': 10, 'operation_name': 'Cut', 'workcenter_id': 1,
+         'workcenter_name': 'Saw', 'std_hours': 5.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+        {'id': 2, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-11', 'product_name': 'Widget',
+         'operation_seq': 20, 'operation_name': 'Weld', 'workcenter_id': 2,
+         'workcenter_name': 'Weld Cell', 'std_hours': 5.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+    ]
+    conn = _Conn(rows=rows)
+    result = get_gantt_operations(conn, date_from='2026-07-01', date_to='2026-07-11')
+    assert len(result) == 2
+    assert result[0]['bar_start'] == '2026-07-01'
+    assert result[1]['bar_end'] == '2026-07-11'
+
+    # Op entirely outside the visible window is dropped
+    conn2 = _Conn(rows=rows)
+    result2 = get_gantt_operations(conn2, date_from='2026-08-01', date_to='2026-08-14')
+    assert result2 == []
+
+
+def test_get_gantt_operations_sorts_by_workcenter_then_wo_then_seq():
+    rows = [
+        {'id': 1, 'wo_id': 10, 'wo_number': 'WO-2', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-02', 'product_name': 'A',
+         'operation_seq': 10, 'operation_name': 'Op', 'workcenter_id': 2,
+         'workcenter_name': 'B-Cell', 'std_hours': 1.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+        {'id': 2, 'wo_id': 11, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-02', 'product_name': 'A',
+         'operation_seq': 10, 'operation_name': 'Op', 'workcenter_id': 1,
+         'workcenter_name': 'A-Cell', 'std_hours': 1.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+    ]
+    conn = _Conn(rows=rows)
+    result = get_gantt_operations(conn)
+    assert [r['workcenter_name'] for r in result] == ['A-Cell', 'B-Cell']
+
+
+# -- get_planned_workcenter_load --
+
+def test_get_planned_workcenter_load_sums_pending_and_in_progress_only():
+    ops_rows = [
+        {'id': 1, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-02', 'product_name': 'A',
+         'operation_seq': 10, 'operation_name': 'Op', 'workcenter_id': 1,
+         'workcenter_name': 'Cell 1', 'std_hours': 4.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+        {'id': 2, 'wo_id': 11, 'wo_number': 'WO-2', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-02', 'product_name': 'A',
+         'operation_seq': 10, 'operation_name': 'Op', 'workcenter_id': 1,
+         'workcenter_name': 'Cell 1', 'std_hours': 100.0, 'status': 'completed',
+         'scheduled_start': None, 'scheduled_end': None},
+    ]
+    wc_rows = [{'id': 1, 'name': 'Cell 1', 'capacity_hours_per_day': 8.0}]
+
+    calls = {'n': 0}
+
+    class _LoadConn:
+        def execute(self, sql, params=None):
+            calls['n'] += 1
+            if 'wo_operation' in sql:
+                return _Cursor(ops_rows)
+            return _Cursor(wc_rows)
+
+    conn = _LoadConn()
+    result = get_planned_workcenter_load(conn, '2026-07-01', '2026-07-02')
+    assert len(result) == 1
+    assert result[0]['planned_hours'] == 4.0  # completed op's 100h excluded
+
+
+def test_get_planned_workcenter_load_flags_over_capacity():
+    ops_rows = [
+        {'id': 1, 'wo_id': 10, 'wo_number': 'WO-1', 'wo_start_date': '2026-07-01',
+         'wo_due_date': '2026-07-01', 'product_name': 'A',
+         'operation_seq': 10, 'operation_name': 'Op', 'workcenter_id': 1,
+         'workcenter_name': 'Cell 1', 'std_hours': 50.0, 'status': 'pending',
+         'scheduled_start': None, 'scheduled_end': None},
+    ]
+    wc_rows = [{'id': 1, 'name': 'Cell 1', 'capacity_hours_per_day': 8.0}]
+
+    class _LoadConn:
+        def execute(self, sql, params=None):
+            if 'wo_operation' in sql:
+                return _Cursor(ops_rows)
+            return _Cursor(wc_rows)
+
+    conn = _LoadConn()
+    result = get_planned_workcenter_load(conn, '2026-07-01', '2026-07-01')
+    assert result[0]['over_capacity'] is True
+    assert result[0]['pct'] > 100.0
+
+
+def test_get_planned_workcenter_load_zero_capacity_does_not_divide_by_zero():
+    wc_rows = [{'id': 1, 'name': 'Cell 1', 'capacity_hours_per_day': 0.0}]
+
+    class _LoadConn:
+        def execute(self, sql, params=None):
+            if 'wo_operation' in sql:
+                return _Cursor([])
+            return _Cursor(wc_rows)
+
+    conn = _LoadConn()
+    result = get_planned_workcenter_load(conn, '2026-07-01', '2026-07-01')
+    assert result[0]['pct'] == 0.0
+    assert result[0]['over_capacity'] is False
+
+
+# -- reschedule_operation --
+
+def test_reschedule_operation_updates_and_returns_true():
+    conn = _Conn(rows=[{'id': 1}])
+    updated = reschedule_operation(conn, 1, '2026-07-01T08:00:00', '2026-07-01T17:00:00')
+    assert updated is True
+    assert "UPDATE wo_operation SET scheduled_start=%s, scheduled_end=%s WHERE id=%s" in conn.last_sql
+    assert conn.last_params == ['2026-07-01T08:00:00', '2026-07-01T17:00:00', 1]
+
+
+def test_reschedule_operation_returns_false_when_not_found():
+    conn = _Conn(rows=[])
+    updated = reschedule_operation(conn, 999, '2026-07-01T08:00:00', '2026-07-01T17:00:00')
+    assert updated is False
+
+
+def test_reschedule_operation_rejects_end_before_start():
+    conn = _Conn(rows=[])
+    try:
+        reschedule_operation(conn, 1, '2026-07-01T17:00:00', '2026-07-01T08:00:00')
+        assert False, 'expected ValueError'
+    except ValueError:
+        pass
+    assert conn.calls == []

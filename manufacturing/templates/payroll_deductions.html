@@ -10,14 +10,14 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:18px 22px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:18px 22px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .badge { display:inline-block; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:bold; }
 .yes { background:#e8f5e9; color:#1a6b1a; }
@@ -28,9 +28,9 @@
 .form-row label { font-size:11px; color:#555; font-weight:bold; }
 .form-row input,.form-row select,.form-row textarea {
     padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
-.save-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+.save-btn { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:8px; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;

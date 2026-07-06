@@ -68,6 +68,50 @@ def get_dashboard_counts(conn) -> dict:
     }
 
 
+def get_defect_pareto(conn) -> list[dict]:
+    """Return [{defect_type, cnt}] ranked descending, for a defect Pareto
+    chart on the QA dashboard."""
+    rows = conn.execute(
+        "SELECT defect_type, COUNT(*) AS cnt FROM qa_defect "
+        "GROUP BY defect_type ORDER BY cnt DESC"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_ncr_severity_trend(conn, months: int = 6) -> dict:
+    """Return {months: [...], series: {severity: [cnt, ...]}} — NCR count
+    by severity over the last ``months`` months, zero-filled so every
+    severity series aligns to the same month axis."""
+    start = (datetime.date.today().replace(day=1)
+             - datetime.timedelta(days=31 * (months - 1))).isoformat()
+    rows = conn.execute("""
+        SELECT to_char(date_trunc('month', detected_date::date), 'YYYY-MM') AS month,
+               severity, COUNT(*) AS cnt
+        FROM qa_ncr
+        WHERE detected_date IS NOT NULL AND detected_date != '' AND detected_date >= %s
+        GROUP BY date_trunc('month', detected_date::date), severity
+        ORDER BY date_trunc('month', detected_date::date)
+    """, (start,)).fetchall()
+
+    month_list: list[str] = []
+    severities: set[str] = set()
+    counts: dict[tuple[str, str], int] = {}
+    for r in rows:
+        month, severity, cnt = r['month'], r['severity'], r['cnt']
+        if month not in month_list:
+            month_list.append(month)
+        severities.add(severity)
+        counts[(month, severity)] = cnt
+
+    return {
+        'months': month_list,
+        'series': {
+            sev: [counts.get((m, sev), 0) for m in month_list]
+            for sev in sorted(severities)
+        },
+    }
+
+
 # ---------------------------------------------------------------------------
 # Non-Conformance Reports (qa_ncr)
 # ---------------------------------------------------------------------------

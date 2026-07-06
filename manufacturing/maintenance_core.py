@@ -69,6 +69,16 @@ def get_dashboard_counts(conn) -> dict:
     }
 
 
+def get_schedule_status_breakdown(conn) -> list[dict]:
+    """Return [{status, cnt}] — PM schedule task count by status
+    (Scheduled/Due/Overdue/Completed/Skipped), for a PM completion chart."""
+    rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM maint_schedule "
+        "GROUP BY status ORDER BY status"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ---------------------------------------------------------------------------
 # Mechanic loader (for dropdowns)
 # ---------------------------------------------------------------------------

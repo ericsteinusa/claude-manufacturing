@@ -11,25 +11,25 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1000px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .kpi-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px; }
-.kpi { background:white; border:2px solid black; border-radius:8px;
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:14px 20px; min-width:150px; flex:1; }
-.kpi .num { font-size:28px; font-weight:bold; color:rgb(0,60,180); }
+.kpi .num { font-size:28px; font-weight:bold; color:var(--accent); }
 .kpi .lbl { font-size:12px; color:#666; margin-top:3px; }
-.card { background:white; border:2px solid black; border-radius:8px;
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:18px 22px; margin-bottom:18px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:8px 12px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
-.nav-btn { display:inline-block; padding:8px 16px; background:rgb(0,60,180);
+.nav-btn { display:inline-block; padding:8px 16px; background:var(--accent);
     color:white; border-radius:5px; font-size:13px; font-weight:bold;
     text-decoration:none; margin:4px; }
-.nav-btn:hover { background:rgb(0,40,140); }
+.nav-btn:hover { background:var(--accent-hover); }
 {% endblock %}
 
 {% block body %}
@@ -61,10 +61,10 @@
     </div>
 
     <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
-        <a href="/payroll/pay-rates/" class="nav-btn">Pay Rates</a>
-        <a href="/payroll/deductions/" class="nav-btn">Deductions &amp; Benefits</a>
-        <a href="/payroll/history/" class="nav-btn">Payroll History</a>
-        <a href="/payroll/ytd/" class="nav-btn">YTD Report</a>
+        <a href="/payroll/pay-rates/" class="dept-btn">Pay Rates</a>
+        <a href="/payroll/deductions/" class="dept-btn">Deductions &amp; Benefits</a>
+        <a href="/payroll/history/" class="dept-btn">Payroll History</a>
+        <a href="/payroll/ytd/" class="dept-btn">YTD Report</a>
     </div>
 
     {% if recent_runs %}

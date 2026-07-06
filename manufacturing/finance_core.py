@@ -1,6 +1,9 @@
 """Qt-free Finance data layer — dashboard, budgets, audits, bank-rec, tax."""
 
-from .accounting_core import get_ap_dashboard, get_ar_dashboard
+import calendar
+import datetime
+
+from .accounting_core import get_ap_dashboard, get_ar_dashboard, income_statement
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -49,6 +52,27 @@ def get_finance_dashboard(conn) -> dict:
         'ar': ar,
         'recent_journals': [dict(r) for r in rows],
     }
+
+
+def get_revenue_expense_by_month(conn, months: int = 6) -> list[dict]:
+    """Return [{month, revenue, expenses}] for the last ``months`` months,
+    for a revenue-vs-expense chart. Loops accounting_core.income_statement
+    per month — there is no existing monthly-grouped GL aggregate."""
+    today = datetime.date.today()
+    result = []
+    for i in range(months - 1, -1, -1):
+        year = today.year + (today.month - 1 - i) // 12
+        month = (today.month - 1 - i) % 12 + 1
+        last_day = calendar.monthrange(year, month)[1]
+        date_from = datetime.date(year, month, 1).isoformat()
+        date_to = datetime.date(year, month, last_day).isoformat()
+        stmt = income_statement(conn, date_from, date_to)
+        result.append({
+            'month': f"{year:04d}-{month:02d}",
+            'revenue': stmt['revenue'],
+            'expenses': stmt['expenses'],
+        })
+    return result
 
 
 # ---------------------------------------------------------------------------

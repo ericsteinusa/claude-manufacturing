@@ -6,6 +6,7 @@
 <a href="/qa/capa/" class="btn">CAPAs</a>
 <a href="/qa/audits/" class="btn">Audits</a>
 <a href="/qa/inspections/" class="btn">Inspections</a>
+<a href="/qa/ncr/export/?status={{ status_filter }}&search={{ search }}" class="btn">⬇ Export CSV</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
@@ -20,10 +21,10 @@
 .search-input { padding:5px 10px; border-radius:4px; border:1px solid #ccc;
     font-size:13px; width:200px; }
 .list-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:20px; }
 .list-table th,.list-table td { padding:9px 13px; text-align:left;
     border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tr:hover td { background:#f0f4ff; cursor:pointer; }
 .badge { display:inline-block; padding:2px 8px; border-radius:4px;
@@ -35,7 +36,7 @@
 .st-Under.Review { background:#fff9c4; color:#827717; }
 .st-Dispositioned { background:#ffe0b2; color:#bf360c; }
 .st-Closed { background:#f5f5f5; color:#999; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:20px 24px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
 .card h3 { margin:0 0 14px; font-size:15px; color:#333; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; }
 .form-row { display:flex; flex-direction:column; gap:4px; }
@@ -45,9 +46,9 @@
 .form-row input,.form-row select,.form-row textarea {
     padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
 .form-row textarea { resize:vertical; min-height:60px; }
-.save-btn { padding:7px 20px; background:rgb(0,60,180); color:white;
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
-.save-btn:hover { background:rgb(0,40,140); }
+.save-btn:hover { background:var(--accent-hover); }
 .msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
     padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
 .msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
@@ -98,7 +99,7 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color:#cce;font-size:14px;margin-bottom:20px;">No NCRs found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No NCRs found.</p>
     {% endif %}
 
     {% if can_edit %}

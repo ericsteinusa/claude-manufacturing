@@ -9,27 +9,41 @@
 <a href="/maint/downtime/" class="btn">Downtime</a>
 <a href="/maint/parts/" class="btn">Parts</a>
 <a href="/maint/mechanics/" class="btn">Mechanics</a>
+<a href="/maint/oee/" class="btn">OEE</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:960px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:18px; }
+
 .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
-.kpi-card { background:white; border:2px solid black; border-radius:8px;
+.kpi-card { background:white; border: 1.5px solid var(--border); border-radius:8px;
     padding:18px 22px; text-align:center; text-decoration:none; display:block; }
-.kpi-card:hover { border-color:rgb(0,60,180); }
-.kpi-card .num { font-size:34px; font-weight:bold; color:rgb(0,60,180); }
+.kpi-card:hover { border-color:var(--accent); }
+.kpi-card .num { font-size:34px; font-weight:bold; color:var(--accent); }
 .kpi-card .lbl { font-size:12px; color:#666; margin-top:4px; }
 .kpi-card.warn .num { color:#e65100; }
 .kpi-card.danger .num { color:#c62828; }
 .section-links { display:flex; gap:14px; flex-wrap:wrap; }
-.section-link { display:block; background:white; border:2px solid black;
+.section-link { display:block; background:white; border: 1.5px solid var(--border);
     border-radius:8px; padding:16px 24px; text-decoration:none;
     min-width:140px; text-align:center; }
-.section-link:hover { border-color:rgb(0,60,180); }
+.section-link:hover { border-color:var(--accent); }
 .section-link .icon { font-size:24px; margin-bottom:6px; }
 .section-link .name { font-size:13px; font-weight:bold; color:#333; }
+.kpi-card.good .num { color:#2e7d32; }
+.oee-trend { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:16px 20px; margin-bottom:24px; }
+.oee-trend-title { font-size:12px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.4px; color:var(--text-muted); margin-bottom:12px; }
+.oee-bars { display:flex; align-items:flex-end; gap:10px; height:80px; }
+.oee-bar-col { flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:flex-end; height:100%; }
+.oee-bar { width:100%; max-width:28px; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; }
+.oee-bar-label { font-size:10px; color:var(--text-muted); margin-top:4px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 {% endblock %}
 
 {% block body %}
@@ -62,6 +76,33 @@
             <div class="num">{{ counts.active_downtime }}</div>
             <div class="lbl">Active Downtime Events</div>
         </a>
+        <a href="/maint/oee/" class="kpi-card {% if oee.oee_pct >= 85 %}good{% elif oee.oee_pct < 60 %}danger{% else %}warn{% endif %}">
+            <div class="num">{{ oee.oee_pct }}%</div>
+            <div class="lbl">OEE (month to date)</div>
+        </a>
+    </div>
+
+    <div class="oee-trend">
+        <div class="oee-trend-title">Weekly OEE Trend (last 8 weeks)</div>
+        <div class="oee-bars">
+            {% for point in oee_trend %}
+            <div class="oee-bar-col" title="{{ point.week_start }} to {{ point.week_end }}: {{ point.oee_pct }}%">
+                <div class="oee-bar" style="height:{{ point.oee_pct }}%;"></div>
+                <div class="oee-bar-label">{{ point.oee_pct|floatformat:0 }}%</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Downtime by Equipment (last 3 months)</h3>
+            <canvas id="chart-downtime-equipment" height="220"></canvas>
+        </div>
+        <div class="card">
+            <h3>PM Schedule Status</h3>
+            <canvas id="chart-pm-status" height="220"></canvas>
+        </div>
     </div>
 
     <div class="section-links">
@@ -93,7 +134,44 @@
             <div class="icon">&#128100;</div>
             <div class="name">Mechanics</div>
         </a>
+        <a href="/maint/oee/" class="section-link">
+            <div class="icon">&#128202;</div>
+            <div class="name">OEE Report</div>
+        </a>
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var downtime = {{ downtime_by_equipment_json|safe }};
+    var pmStatus = {{ schedule_breakdown_json|safe }};
+
+    new Chart(document.getElementById('chart-downtime-equipment'), {
+        type: 'bar',
+        data: {
+            labels: downtime.map(function (r) { return r.equipment; }),
+            datasets: [{ label: 'Downtime Hours', data: downtime.map(function (r) { return r.total_downtime_hours; }),
+                         backgroundColor: '#ef4444' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+                   scales: { x: { beginAtZero: true } } },
+    });
+
+    var statusColors = { Scheduled: '#94a3b8', Due: '#f59e0b', Overdue: '#ef4444',
+                          Completed: '#22c55e', Skipped: '#64748b' };
+    new Chart(document.getElementById('chart-pm-status'), {
+        type: 'doughnut',
+        data: {
+            labels: pmStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: pmStatus.map(function (r) { return r.cnt; }),
+                         backgroundColor: pmStatus.map(function (r) { return statusColors[r.status] || '#94a3b8'; }) }],
+        },
+        options: { responsive: true },
+    });
+})();
+</script>
 {% endblock %}

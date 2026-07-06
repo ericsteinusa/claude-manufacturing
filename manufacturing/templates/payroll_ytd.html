@@ -9,18 +9,18 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1200px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .filters { display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
 .filters label { color:white; font-size:13px; font-weight:bold; }
 .filters select,.filters input { padding:5px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
-.save-btn { padding:6px 16px; background:rgb(0,60,180); color:white;
+.save-btn { padding:6px 16px; background:var(--accent); color:white;
     border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; }
 .list-table { width:100%; border-collapse:collapse; background:white;
-    border:2px solid black; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:16px; }
 .list-table th,.list-table td { padding:8px 11px; text-align:right;
     border-bottom:1px solid #ddd; font-size:12px; white-space:nowrap; }
 .list-table th:first-child,.list-table td:first-child { text-align:left; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .totals-row { background:rgb(220,235,255); font-weight:bold; }
 .summary { color:white; font-size:14px; margin-top:8px; }
@@ -96,7 +96,7 @@
         Total Net: ${{ totals.net|floatformat:2 }}
     </div>
     {% else %}
-    <p style="color:#cce;font-size:14px;">No payroll data found for {{ year }}.</p>
+    <p style="color: var(--text-muted);font-size:14px;">No payroll data found for {{ year }}.</p>
     {% endif %}
 </div>
 </div>

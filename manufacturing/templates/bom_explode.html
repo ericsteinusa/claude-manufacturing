@@ -10,16 +10,16 @@
 {% block extra_styles %}
 .explode-wrap { width: 100%; max-width: 960px; }
 .explode-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
-.explode-wrap p.sub { color: #cce; font-size: 13px; margin-bottom: 16px; }
+.explode-wrap p.sub { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
 .qty-form { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; }
 .qty-form label { color: white; font-size: 13px; }
-.qty-form input { padding: 4px 8px; border: 2px solid black; border-radius: 4px;
+.qty-form input { padding: 4px 8px; border: 1.5px solid var(--border); border-radius: 4px;
     font-size: 13px; width: 80px; }
 .explode-table { width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
 .explode-table th, .explode-table td { padding: 7px 10px; text-align: left;
     border-bottom: 1px solid #ddd; font-size: 13px; }
-.explode-table th { background: rgb(0,60,180); color: white; }
+.explode-table th { background: var(--accent); color: white; }
 .explode-table tr:last-child td { border-bottom: none; }
 .explode-table td.num, .explode-table th.num { text-align: right; }
 .badge { display: inline-block; padding: 1px 8px; border-radius: 10px;
@@ -28,7 +28,7 @@
 .badge-buy  { background: #e8e8e8; border-color: #888; color: #444; }
 .depth-indent { display: inline-block; }
 .level-label { font-size: 10px; color: #999; font-weight: normal; margin-left: 4px; }
-.empty-note { color: #cce; font-size: 14px; margin-top: 20px; }
+.empty-note { color: var(--text-muted); font-size: 14px; margin-top: 20px; }
 .total-row td { font-weight: bold; background: #eef6ff; border-top: 2px solid #ccc; }
 {% endblock %}
 
@@ -70,7 +70,7 @@
                         <span style="color:#aaa;">{% for i in row.depth|rjust:row.depth %}└─{% endfor %}</span>
                         {% endif %}
                         <a href="/bom/{{ row.component_id }}/"
-                           style="color:rgb(0,60,180);">{{ row.component_name }}</a>
+                           style="color:var(--accent);">{{ row.component_name }}</a>
                         <span class="level-label">L{{ row.depth }}</span>
                     </span>
                 </td>
@@ -93,7 +93,7 @@
         </tbody>
     </table>
 
-    <p style="color:#cce;font-size:12px;">
+    <p style="color: var(--text-muted);font-size:12px;">
         {{ explosion|length }} component line{{ explosion|length|pluralize }} across all levels.
         {% with max_depth=explosion|last %}
         {% endwith %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block page_title %}OEE Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+.chip { display:inline-block; padding:4px 15px; border-radius:20px; font-size:13px;
+    font-weight:bold; text-decoration:none; background:white; color:#555; border:1.5px solid var(--border); }
+.chip.active { background:var(--accent); color:white; border-color:var(--accent); }
+.oee-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.oee-summary .card { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:16px 20px; text-align:center; }
+.oee-summary .num { font-size:28px; font-weight:bold; color:var(--accent); }
+.oee-summary .num.oee { color:#2e7d32; }
+.oee-summary .lbl { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; }
+.bar-track { width:80px; height:8px; background:#eee; border-radius:4px; overflow:hidden; display:inline-block; vertical-align:middle; margin-right:8px; }
+.bar-fill { height:100%; background:var(--accent); }
+.bar-fill.good { background:#2e7d32; }
+.bar-fill.danger { background:#c62828; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>OEE Report</h2>
+
+    <div class="chip-row">
+        <a href="/maint/oee/?period=week" class="chip {% if period == 'week' %}active{% endif %}">This Week</a>
+        <a href="/maint/oee/?period=month" class="chip {% if period == 'month' %}active{% endif %}">This Month</a>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin:-8px 0 16px;">{{ start }} to {{ end }}</p>
+
+    <div class="oee-summary">
+        <div class="card"><div class="num oee">{{ overall.oee_pct }}%</div><div class="lbl">Overall OEE</div></div>
+        <div class="card"><div class="num">{{ overall.availability_pct }}%</div><div class="lbl">Availability</div></div>
+        <div class="card"><div class="num">{{ overall.performance_pct }}%</div><div class="lbl">Performance</div></div>
+        <div class="card"><div class="num">{{ overall.quality_pct }}%</div><div class="lbl">Quality</div></div>
+    </div>
+
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>Workcenter</th>
+                <th>Availability</th>
+                <th>Performance</th>
+                <th>Quality</th>
+                <th>OEE</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for wc in breakdown %}
+            <tr>
+                <td><strong>{{ wc.workcenter_name }}</strong></td>
+                <td>{{ wc.availability_pct }}%</td>
+                <td>{{ wc.performance_pct }}%</td>
+                <td>{{ wc.quality_pct }}%</td>
+                <td>
+                    <span class="bar-track"><span class="bar-fill {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct < 60 %}danger{% endif %}" style="width:{{ wc.oee_pct }}%;"></span></span>
+                    {{ wc.oee_pct }}%
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No active workcenters found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}

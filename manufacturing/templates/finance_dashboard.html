@@ -14,26 +14,26 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { display:block; background:white; border:2px solid black; border-radius:8px;
-    padding:14px 10px; text-align:center; color:rgb(0,40,160); font-weight:bold;
+.nav-btn { display:block; background:white; border: 1.5px solid var(--border); border-radius:8px;
+    padding:14px 10px; text-align:center; color:var(--accent); font-weight:bold;
     font-size:13px; text-decoration:none; }
-.nav-btn:hover { background:rgb(0,60,180); color:white; }
-.section-label { color:white; font-size:14px; font-weight:bold; margin-bottom:8px; margin-top:4px; }
+.nav-btn:hover { background:var(--accent); color:white; }
+.section-label { color: var(--text-muted); font-size:12px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; margin-bottom:10px; margin-top:4px; }
 .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
-.kpi { background:white; border:2px solid black; border-radius:8px; padding:14px 18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
-.kpi .val { font-size:28px; font-weight:bold; color:rgb(0,40,160); }
+.kpi .val { font-size:28px; font-weight:bold; color:var(--accent); }
 .kpi.red { border-color:#c33; }
 .kpi.red .val { color:#c33; }
 .kpi.yellow { border-color:#b8860b; }
 .kpi.yellow .val { color:#b8860b; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
 .posted   { background:#d4edda; color:#0a3622; }
@@ -45,19 +45,19 @@
 <div class="m-wrap">
     <h2>Finance Dashboard</h2>
 
-    <div class="nav-grid">
-        <a href="/gl/" class="nav-btn">GL Dashboard</a>
-        <a href="/gl/accounts/" class="nav-btn">Chart of Accounts</a>
-        <a href="/gl/journals/" class="nav-btn">Journal Entries</a>
-        <a href="/gl/trial-balance/" class="nav-btn">Trial Balance</a>
-        <a href="/gl/income-statement/" class="nav-btn">Income Statement</a>
-        <a href="/gl/balance-sheet/" class="nav-btn">Balance Sheet</a>
-        <a href="/ap/" class="nav-btn">Accounts Payable</a>
-        <a href="/ar/" class="nav-btn">Accounts Receivable</a>
-        <a href="/fin/budgets/" class="nav-btn">Budgets</a>
-        <a href="/fin/audits/" class="nav-btn">Audits</a>
-        <a href="/fin/bank-rec/" class="nav-btn">Bank Reconciliation</a>
-        <a href="/fin/tax/" class="nav-btn">Tax Filings</a>
+    <div class="dept-grid">
+        <a href="/gl/" class="dept-btn">GL Dashboard</a>
+        <a href="/gl/accounts/" class="dept-btn">Chart of Accounts</a>
+        <a href="/gl/journals/" class="dept-btn">Journal Entries</a>
+        <a href="/gl/trial-balance/" class="dept-btn">Trial Balance</a>
+        <a href="/gl/income-statement/" class="dept-btn">Income Statement</a>
+        <a href="/gl/balance-sheet/" class="dept-btn">Balance Sheet</a>
+        <a href="/ap/" class="dept-btn">Accounts Payable</a>
+        <a href="/ar/" class="dept-btn">Accounts Receivable</a>
+        <a href="/fin/budgets/" class="dept-btn">Budgets</a>
+        <a href="/fin/audits/" class="dept-btn">Audits</a>
+        <a href="/fin/bank-rec/" class="dept-btn">Bank Reconciliation</a>
+        <a href="/fin/tax/" class="dept-btn">Tax Filings</a>
     </div>
 
     <div class="section-label">Accounts Payable</div>
@@ -92,6 +92,17 @@
         </div>
     </div>
 
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Revenue vs. Expense</h3>
+            <canvas id="chart-rev-expense" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>AR Aging</h3>
+            <canvas id="chart-ar-aging" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Journal Entries</h3>
         <table class="list-table">
@@ -108,7 +119,7 @@
             <tbody>
             {% for j in recent_journals %}
             <tr>
-                <td><a href="/gl/journals/{{ j.id }}/" style="color:rgb(0,40,160);">{{ j.journal_date }}</a></td>
+                <td><a href="/gl/journals/{{ j.id }}/" style="color:var(--accent);">{{ j.journal_date }}</a></td>
                 <td>{{ j.reference|default:"—" }}</td>
                 <td>{{ j.description|default:"—"|truncatechars:60 }}</td>
                 <td>{{ j.line_count }}</td>
@@ -130,4 +141,39 @@
 
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var revExpense = {{ rev_expense_json|safe }};
+    var arAging = {{ ar_aging_json|safe }};
+
+    new Chart(document.getElementById('chart-rev-expense'), {
+        type: 'bar',
+        data: {
+            labels: revExpense.map(function (r) { return r.month; }),
+            datasets: [
+                { label: 'Revenue', data: revExpense.map(function (r) { return r.revenue; }), backgroundColor: '#22c55e' },
+                { label: 'Expense', data: revExpense.map(function (r) { return r.expenses; }), backgroundColor: '#ef4444' },
+            ],
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } },
+    });
+
+    var agingLabels = { current: 'Current', '1_30': '1-30 days', '31_60': '31-60 days',
+                         '61_90': '61-90 days', over_90: '90+ days' };
+    var agingKeys = Object.keys(agingLabels).filter(function (k) { return arAging[k]; });
+    new Chart(document.getElementById('chart-ar-aging'), {
+        type: 'pie',
+        data: {
+            labels: agingKeys.map(function (k) { return agingLabels[k]; }),
+            datasets: [{ data: agingKeys.map(function (k) { return arAging[k]; }),
+                         backgroundColor: ['#22c55e', '#84cc16', '#f59e0b', '#f97316', '#ef4444'] }],
+        },
+        options: { responsive: true },
+    });
+})();
+</script>
 {% endblock %}

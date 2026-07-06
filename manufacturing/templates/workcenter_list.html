@@ -8,12 +8,12 @@
 {% block extra_styles %}
 .wc-wrap { max-width: 900px; }
 .wc-wrap h2 { color: white; font-size: 20px; margin-bottom: 16px; }
-.card { background: white; border: 2px solid black; border-radius: 8px;
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 20px; margin-bottom: 16px; }
-.card h3 { margin: 0 0 14px; font-size: 15px; color: rgb(0,40,140); }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
 .wc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .wc-table th, .wc-table td { padding: 8px 12px; border-bottom: 1px solid #eee; text-align: left; }
-.wc-table th { background: rgb(0,60,180); color: white; }
+.wc-table th { background: var(--accent); color: white; }
 .wc-table tr:last-child td { border-bottom: none; }
 .wc-table tr:hover td { background: #f0f4ff; }
 .badge-active   { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px;
@@ -26,7 +26,7 @@
     width: 100%; padding: 6px 9px; border: 1px solid #aaa; border-radius: 4px;
     font-size: 13px; box-sizing: border-box; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
-.btn-sm { padding: 7px 18px; background: rgb(0,60,180); color: white; border: none;
+.btn-sm { padding: 7px 18px; background: var(--accent); color: white; border: none;
     border-radius: 4px; font-size: 13px; cursor: pointer; }
 .btn-sm:hover { opacity: 0.85; }
 .alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;

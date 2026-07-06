@@ -6,16 +6,19 @@ persistence live in :mod:`manufacturing.accounts`.
 
 import os
 import sys
+import json
 import subprocess
 from datetime import date, timedelta
 
 import psycopg2
 
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from ..log_utils import get_logger
 from ..schema import init_schema
 from ..db_pg import get_db_connection
+from ..csv_export import csv_response
 from ..audit_core import get_recent, get_history, AUDITED_TABLES
 from ..approval_core import (
     needs_approval, request_approval, approve_po, reject_po,
@@ -31,7 +34,7 @@ from ..bom_web_core import (
 )
 from ..mrp_web_core import (
     get_demand_details, get_scheduled_receipts_detail,
-    run_mrp, run_mrp_dated, release_plan as mrp_release_plan,
+    run_mrp_dated, release_plan as mrp_release_plan,
 )
 from ..inventory_core import (
     TRANS_TYPES,
@@ -49,6 +52,10 @@ from ..contacts_core import (
     list_suppliers as contacts_list_suppliers,
     get_supplier, create_supplier, update_supplier,
     get_supplier_orders,
+)
+from ..price_list_core import (
+    ensure_price_list_tables, list_price_lists, assign_customer_price_list,
+    get_customer_price_tiers,
 )
 from ..cs_calls_core import (
     validate_call, PLAN_STATUSES,
@@ -113,6 +120,7 @@ from ..sales_orders_core import (
     can_transition as so_can_transition,
     set_so_status,
 )
+from ..atp_core import get_atp_qty_for_products, check_so_atp
 from ..work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
@@ -148,6 +156,8 @@ from ..auth_decorators import dept_required, login_required, role_required
 
 from ..production_core import (
     get_production_dashboard,
+    get_daily_output_trend,
+    get_wo_status_breakdown,
     list_scheduled_wos,
     get_prod_reports,
     SHIPMENT_STATUSES,
@@ -164,8 +174,8 @@ from ..production_core import (
     get_rma_reports,
 )
 from ..currency_core import (
-    init_currency_schema, list_currencies, get_currency, upsert_currency,
-    get_base_currency, convert_to_base, COMMON_CURRENCIES,
+    init_currency_schema, list_currencies, upsert_currency,
+    get_base_currency, COMMON_CURRENCIES,
 )
 from ..fixed_asset_core import (
     init_fixed_asset_tables, list_fixed_assets, get_fixed_asset,
@@ -185,7 +195,7 @@ from ..purchasing_core import (
     get_purch_reports,
 )
 from ..finance_core import (
-    get_finance_dashboard,
+    get_finance_dashboard, get_revenue_expense_by_month,
     BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
     list_budgets, get_budget, get_budget_lines,
@@ -206,6 +216,11 @@ from ._it import *  # noqa: F401,F403
 from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
+from ._cycle_count import *  # noqa: F401,F403
+from ._price_list import *  # noqa: F401,F403
+from ._rfq import *  # noqa: F401,F403
+from ._gantt import *  # noqa: F401,F403
+from ._atp import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -385,6 +400,7 @@ WEB_LEAF_URLS = {
     ('production', 'week_sched'):   '/prod/schedule/',
     ('production', 'month_sched'):  '/prod/schedule/',
     ('production', 'sched_cal'):    '/prod/schedule/',
+    ('production', 'gantt_sched'):  '/prod/schedule/gantt/',
     # Equipment Status → Maintenance
     ('production', 'equip_list'):   '/maint/equipment/',
     ('production', 'stat_dash'):    '/maint/',
@@ -1278,6 +1294,25 @@ def po_list(request):
 
 
 @dept_required('purchasing')
+def po_export(request):
+    status = request.GET.get('status') or None
+    if status not in PO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        pos = list_pos(conn, status=status)
+    finally:
+        conn.close()
+
+    return csv_response('purchase_orders.csv', [
+        ('po_number', 'PO #'), ('company_name', 'Supplier'),
+        ('order_date', 'Order Date'), ('expected_date', 'Expected Date'),
+        ('item_count', 'Items'), ('total', 'Total'), ('status', 'Status'),
+    ], pos)
+
+
+@dept_required('purchasing')
 def po_detail(request, po_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
@@ -1672,6 +1707,26 @@ def wo_list(request):
 
 
 @dept_required(_WO_DEPT_KEYS)
+def wo_export(request):
+    status = request.GET.get('status') or None
+    if status not in WO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        wos = list_wos(conn, status=status)
+    finally:
+        conn.close()
+
+    return csv_response('work_orders.csv', [
+        ('wo_number', 'WO #'), ('product_name', 'Product'),
+        ('description', 'Description'), ('quantity', 'Qty'),
+        ('start_date', 'Start Date'), ('due_date', 'Due Date'),
+        ('status', 'Status'), ('mat_count', 'Materials'),
+    ], wos)
+
+
+@dept_required(_WO_DEPT_KEYS)
 def wo_detail(request, wo_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
@@ -1961,6 +2016,28 @@ def so_list(request):
 
 
 @dept_required('sales')
+def so_export(request):
+    status = request.GET.get('status') or None
+    if status not in SO_STATUSES:
+        status = None
+
+    conn = get_db_connection()
+    try:
+        sos = list_sos(conn, status=status)
+    finally:
+        conn.close()
+
+    for so in sos:
+        so['customer_name'] = _so_customer_name(so)
+
+    return csv_response('sales_orders.csv', [
+        ('so_number', 'SO #'), ('customer_name', 'Customer'),
+        ('order_date', 'Order Date'), ('ship_date', 'Ship Date'),
+        ('item_count', 'Items'), ('total', 'Total'), ('status', 'Status'),
+    ], sos)
+
+
+@dept_required('sales')
 def so_detail(request, so_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
@@ -1972,6 +2049,17 @@ def so_detail(request, so_id):
         products = load_so_products(conn) if (so and can_edit) else []
         currencies = list_currencies(conn)
         base_currency = get_base_currency(conn).get("code", "USD")
+        price_tiers = (
+            get_customer_price_tiers(conn, so['customer_id'])
+            if (so and can_edit and so.get('customer_id')) else {}
+        )
+        atp_by_product = (
+            get_atp_qty_for_products(conn, so.get('ship_date') or date.today().isoformat())
+            if (so and can_edit) else {}
+        )
+        atp_warning = None
+        if so and can_edit and request.GET.get('atp_pending'):
+            atp_warning = check_so_atp(conn, so_id) or None
 
         if request.method == 'POST' and request.POST.get('action') == 'currency' and can_edit and so:
             cur_code = request.POST.get('currency', 'USD')
@@ -2007,6 +2095,10 @@ def so_detail(request, so_id):
         status_actions=status_actions,
         currencies=currencies,
         base_currency=base_currency,
+        price_tiers_json=json.dumps(price_tiers),
+        atp_json=json.dumps(atp_by_product),
+        atp_warning=atp_warning,
+        pending_status=request.GET.get('atp_pending'),
         back_url='/so/',
     ))
 
@@ -2182,10 +2274,13 @@ def so_set_status(request, so_id):
         return redirect('so_detail', so_id=so_id)
 
     target = request.POST.get('status')
+    override = request.POST.get('override') == '1'
     conn = get_db_connection()
     try:
         so = get_so(conn, so_id)
         if so and so_can_transition(so['status'], target):
+            if target == 'confirmed' and not override and check_so_atp(conn, so_id):
+                return redirect(reverse('so_detail', args=[so_id]) + '?atp_pending=confirmed')
             set_so_status(conn, so_id, target)
             conn.commit()
     finally:
@@ -3496,6 +3591,32 @@ def inventory_list(request):
     ))
 
 
+@dept_required(_INV_DEPT_KEYS)
+def inventory_export(request):
+    search = request.GET.get('search', '').strip()
+    filter_status = request.GET.get('filter') or None
+    if filter_status not in ('low', 'zero'):
+        filter_status = None
+    item_type = request.GET.get('item_type') or None
+    if item_type not in ('make', 'buy'):
+        item_type = None
+
+    conn = get_db_connection()
+    try:
+        products = inv_list_products(conn, search=search,
+                                     filter_status=filter_status,
+                                     item_type=item_type)
+    finally:
+        conn.close()
+
+    return csv_response('inventory.csv', [
+        ('name', 'Product'), ('item_type', 'Type'), ('uom', 'UOM'),
+        ('bin', 'Bin'), ('amount', 'On Hand'), ('reorder_point', 'Reorder Point'),
+        ('purchase_price', 'Purchase Price'), ('lead_time_days', 'Lead Time (days)'),
+        ('supplier_name', 'Supplier'),
+    ], products)
+
+
 @dept_required(_INV_DEPT_KEYS, write_redirect='inventory_list')
 def inventory_new(request):
 
@@ -3718,30 +3839,41 @@ def customer_detail(request, customer_id):
     error = None
     success = None
     try:
+        ensure_price_list_tables(conn)
         contact = get_customer(conn, customer_id)
         if not contact:
             return redirect('customer_list')
         if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', 'update')
             try:
-                update_customer(
-                    conn, customer_id,
-                    first_name=request.POST.get('first_name', ''),
-                    last_name=request.POST.get('last_name', ''),
-                    company_name=request.POST.get('company_name', ''),
-                    phone_number=request.POST.get('phone_number', ''),
-                    address=request.POST.get('address', ''),
-                    city=request.POST.get('city', ''),
-                    state=request.POST.get('state', ''),
-                    zip_code=request.POST.get('zip_code', ''),
-                    email=request.POST.get('email', ''),
-                )
-                conn.commit()
-                contact = get_customer(conn, customer_id)
-                success = 'Customer updated.'
+                if action == 'assign_price_list':
+                    pl_id = request.POST.get('price_list_id') or None
+                    assign_customer_price_list(
+                        conn, customer_id, int(pl_id) if pl_id else None)
+                    conn.commit()
+                    contact = get_customer(conn, customer_id)
+                    success = 'Price list assigned.'
+                else:
+                    update_customer(
+                        conn, customer_id,
+                        first_name=request.POST.get('first_name', ''),
+                        last_name=request.POST.get('last_name', ''),
+                        company_name=request.POST.get('company_name', ''),
+                        phone_number=request.POST.get('phone_number', ''),
+                        address=request.POST.get('address', ''),
+                        city=request.POST.get('city', ''),
+                        state=request.POST.get('state', ''),
+                        zip_code=request.POST.get('zip_code', ''),
+                        email=request.POST.get('email', ''),
+                    )
+                    conn.commit()
+                    contact = get_customer(conn, customer_id)
+                    success = 'Customer updated.'
             except Exception as e:
                 conn.rollback()
                 error = str(e)
         orders = get_customer_orders(conn, customer_id)
+        price_lists = list_price_lists(conn, active_only=True)
     finally:
         conn.close()
     return render(request, 'contacts_detail.html', _contacts_context(
@@ -3754,6 +3886,7 @@ def customer_detail(request, customer_id):
         new_url='/customers/new/',
         order_label='Sales Order',
         order_url_prefix='/so/',
+        price_lists=price_lists,
         error=error,
         success=success,
         can_edit=can_edit,
@@ -4377,7 +4510,7 @@ from ..accounting_core import (  # noqa: E402
     list_accounts, create_account, update_account, account_balance,
     list_journals, get_journal, get_journal_lines,
     create_journal, post_journal, void_journal,
-    trial_balance, income_statement, balance_sheet,
+    trial_balance, income_statement, balance_sheet, get_ar_aging,
 )
 
 _ACCOUNTING_DEPT_KEYS = {'accounting', 'finance'}
@@ -4444,6 +4577,32 @@ def ap_list(request):
         success=success, error=error,
     )
     return render(request, 'ap_list.html', ctx)
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def ap_export(request):
+    status = request.GET.get('status', '')
+    vendor_id = request.GET.get('vendor_id', '')
+    date_from = request.GET.get('date_from', '')
+    date_to   = request.GET.get('date_to', '')
+    conn = get_db_connection()
+    try:
+        invoices = list_ap_invoices(
+            conn,
+            status=status or None,
+            vendor_id=int(vendor_id) if vendor_id else None,
+            date_from=date_from or None,
+            date_to=date_to or None,
+        )
+    finally:
+        conn.close()
+
+    return csv_response('ap_invoices.csv', [
+        ('invoice_number', 'Invoice #'), ('vendor_label', 'Vendor'),
+        ('invoice_date', 'Invoice Date'), ('due_date', 'Due Date'),
+        ('amount', 'Amount'), ('paid', 'Paid'), ('balance', 'Balance'),
+        ('status', 'Status'),
+    ], invoices)
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)
@@ -4560,6 +4719,32 @@ def ar_list(request):
         success=success, error=error,
     )
     return render(request, 'ar_list.html', ctx)
+
+
+@dept_required(_ACCOUNTING_DEPT_KEYS)
+def ar_export(request):
+    status = request.GET.get('status', '')
+    customer_id = request.GET.get('customer_id', '')
+    date_from = request.GET.get('date_from', '')
+    date_to   = request.GET.get('date_to', '')
+    conn = get_db_connection()
+    try:
+        invoices = list_ar_invoices(
+            conn,
+            status=status or None,
+            customer_id=int(customer_id) if customer_id else None,
+            date_from=date_from or None,
+            date_to=date_to or None,
+        )
+    finally:
+        conn.close()
+
+    return csv_response('ar_invoices.csv', [
+        ('invoice_number', 'Invoice #'), ('customer_label', 'Customer'),
+        ('invoice_date', 'Invoice Date'), ('due_date', 'Due Date'),
+        ('amount', 'Amount'), ('received', 'Received'), ('balance', 'Balance'),
+        ('status', 'Status'),
+    ], invoices)
 
 
 @dept_required(_ACCOUNTING_DEPT_KEYS)
@@ -5229,7 +5414,7 @@ from ..sales_core import (  # noqa: E402
     load_customers, load_products,  # noqa: F811
     create_so, update_so, add_so_item, delete_so_item, set_so_status,  # noqa: F811
     QUOTE_STATUSES, TARGET_STATUSES,
-    get_sales_dashboard,
+    get_sales_dashboard, get_revenue_by_month,
     list_quotes, create_quote, update_quote, set_quote_status,
     list_targets, create_target, update_target,
     SALES_LEAD_STATUSES, SALES_LEAD_SOURCES, SALES_LEAD_PRIORITIES,
@@ -5284,8 +5469,13 @@ def sales_dashboard(request):
         dash = get_sales_dashboard(conn)
         recent_orders = list_sos(conn)[:8]
         recent_quotes = list_quotes(conn)[:8]
-    ctx = _sales_ctx(request, dash=dash,
-                     recent_orders=recent_orders, recent_quotes=recent_quotes)
+        revenue_by_month = get_revenue_by_month(conn)
+    ctx = _sales_ctx(
+        request, dash=dash,
+        recent_orders=recent_orders, recent_quotes=recent_quotes,
+        quote_funnel_json=json.dumps(dash.get('quotes', {})),
+        revenue_by_month_json=json.dumps(revenue_by_month),
+    )
     return render(request, 'sales_dashboard.html', ctx)
 
 
@@ -5811,7 +6001,13 @@ def _prod_ctx(request, **extra):
 def prod_dashboard(request):
     with get_db_connection() as conn:
         data = get_production_dashboard(conn)
-    ctx = _prod_ctx(request, **data)
+        daily_output = get_daily_output_trend(conn)
+        wo_status_breakdown = get_wo_status_breakdown(conn)
+    ctx = _prod_ctx(
+        request, **data,
+        daily_output_json=json.dumps(daily_output),
+        wo_status_json=json.dumps(wo_status_breakdown),
+    )
     return render(request, 'prod_dashboard.html', ctx)
 
 
@@ -6475,7 +6671,13 @@ def cs_dashboard_view(request):
 def fin_dashboard(request):
     with get_db_connection() as conn:
         data = get_finance_dashboard(conn)
-    ctx = _acct_ctx(request, **data)
+        ar_aging = get_ar_aging(conn)
+        rev_expense = get_revenue_expense_by_month(conn)
+    ctx = _acct_ctx(
+        request, **data,
+        ar_aging_json=json.dumps(ar_aging['totals']),
+        rev_expense_json=json.dumps(rev_expense),
+    )
     return render(request, 'finance_dashboard.html', ctx)
 
 

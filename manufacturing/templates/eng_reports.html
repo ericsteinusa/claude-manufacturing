@@ -10,14 +10,14 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1000px; }
-.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+
 .section-hdr { color:white; font-size:15px; font-weight:bold; margin:16px 0 8px; }
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
-.card { background:white; border:2px solid black; border-radius:8px; padding:16px 20px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
 .card h3 { margin:0 0 12px; font-size:14px; color:#333; }
 .list-table { width:100%; border-collapse:collapse; }
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
-.list-table th { background:rgb(0,60,180); color:white; }
+.list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
 .list-table tr.clickable:hover td { background:#f0f4ff; cursor:pointer; }
 .list-table td.num { text-align:right; font-family:monospace; }
@@ -39,7 +39,7 @@
 .bar-wrap { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
 .bar-lbl { width:120px; font-size:12px; color:#444; text-align:right; flex-shrink:0; }
 .bar-outer { flex:1; background:#e8e8e8; border-radius:4px; height:14px; }
-.bar-inner { height:14px; border-radius:4px; background:rgb(0,60,180); min-width:4px; }
+.bar-inner { height:14px; border-radius:4px; background:var(--accent); min-width:4px; }
 .bar-val { width:36px; text-align:right; font-size:12px; color:#444; flex-shrink:0; }
 {% endblock %}
 

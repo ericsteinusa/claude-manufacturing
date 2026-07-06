@@ -142,6 +142,39 @@
         </form>
     </div>
 
+    {% if contact_type == 'customer' %}
+    <!-- Price list assignment -->
+    <div class="card">
+        <h3>Price List</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 12px;">
+            Assigns which price list auto-populates unit prices when adding
+            line items to this customer's sales orders.
+            <a href="/price-lists/">Manage price lists →</a>
+        </p>
+        {% if can_edit %}
+        <form method="post" style="display:flex;gap:10px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign_price_list">
+            <select name="price_list_id" style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+                <option value="">(none)</option>
+                {% for pl in price_lists %}
+                <option value="{{ pl.id }}" {% if contact.price_list_id == pl.id %}selected{% endif %}>{{ pl.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Save</button>
+        </form>
+        {% else %}
+        <p style="font-size:13px;">
+            {% if contact.price_list_id %}
+                {% for pl in price_lists %}{% if pl.id == contact.price_list_id %}{{ pl.name }}{% endif %}{% endfor %}
+            {% else %}
+                (none)
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <!-- Order history -->
     <div class="card">
         <h3>Recent {{ order_label }}s</h3>
@@ -161,7 +194,7 @@
                 <tr>
                     <td>
                         <a href="{{ order_url_prefix }}{{ o.id }}/"
-                           style="color:var(--accent);">{{ o.so_number|default:o.po_number }}</a>
+                           style="color:var(--accent);">{% if contact_type == 'customer' %}{{ o.so_number }}{% else %}{{ o.po_number }}{% endif %}</a>
                     </td>
                     <td style="color:#555;">{{ o.order_date|default:"—" }}</td>
                     <td>

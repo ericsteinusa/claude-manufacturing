@@ -12,7 +12,7 @@
 {% block extra_styles %}
 .tcf-wrap { width: 100%; max-width: 680px; }
 .tcf-card {
-    background: white; border: 2px solid black; border-radius: 8px;
+    background: white; border: 1.5px solid var(--border); border-radius: 8px;
     padding: 22px 28px; margin-bottom: 24px;
 }
 .tcf-row { margin-bottom: 14px; }
@@ -21,7 +21,7 @@
 .tcf-row input[type=text], .tcf-row input[type=number],
 .tcf-row select, .tcf-row textarea {
     width: 100%; box-sizing: border-box;
-    padding: 7px 10px; border: 2px solid black; border-radius: 4px;
+    padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 4px;
     font-size: 13px; font-family: inherit;
 }
 .tcf-row textarea { height: 80px; font-family: monospace; font-size: 12px; }
@@ -48,11 +48,11 @@
 /* Sync log */
 .tcl-table {
     width: 100%; border-collapse: collapse; background: white;
-    border: 2px solid black; border-radius: 6px; overflow: hidden;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
     font-size: 12px;
 }
 .tcl-table th, .tcl-table td { padding: 6px 10px; border-bottom: 1px solid #eee; }
-.tcl-table th { background: rgb(0,60,180); color: white; }
+.tcl-table th { background: var(--accent); color: white; }
 .badge-ok  { background:#d4edda; border:1px solid #999; border-radius:10px;
              padding:1px 8px; font-size:11px; font-weight:bold; }
 .badge-err { background:#f8d7da; border:1px solid #999; border-radius:10px;

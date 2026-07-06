@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block page_title %}New RFQ{% endblock %}
+
+{% block toolbar_left %}
+<a href="/rfq/" class="btn">RFQs</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rfq-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row textarea { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rfq-wrap">
+    <div class="menu-title">New Request for Quote</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Notes (optional)</label>
+                <input type="text" name="notes" placeholder="e.g. Q3 raw material sourcing">
+            </div>
+            <button type="submit" class="btn btn-primary">Create RFQ</button>
+        </form>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">
+        After creating the RFQ, add line items and invite vendors to quote.
+    </p>
+</div>
+</div>
+{% endblock %}
