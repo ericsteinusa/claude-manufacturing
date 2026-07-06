@@ -220,6 +220,7 @@ from ._cycle_count import *  # noqa: F401,F403
 from ._price_list import *  # noqa: F401,F403
 from ._rfq import *  # noqa: F401,F403
 from ._gantt import *  # noqa: F401,F403
+from ._supplier_scorecard import *  # noqa: F401,F403
 from ._atp import *  # noqa: F401,F403
 
 log = get_logger(__name__)
@@ -534,7 +535,7 @@ WEB_LEAF_URLS = {
     ('quality_assurance', 'week_sum'): '/qa/',
     ('quality_assurance', 'month_rpt'): '/qa/',
     ('quality_assurance', 'kpi_dash'): '/qa/',
-    ('quality_assurance', 'supp_score'): '/qa/suppliers/',
+    ('quality_assurance', 'supp_score'): '/suppliers/scorecard/',
     ('quality_assurance', 'inc_insp'): '/qa/inspections/',
     ('quality_assurance', 'supp_audit'): '/qa/suppliers/',
     ('quality_assurance', 'supp_rpts'): '/qa/suppliers/',
@@ -631,7 +632,7 @@ WEB_LEAF_URLS = {
     # Purchasing dashboard
     ('purchasing', 'prod_entry'):  '/inventory/new/',
     ('purchasing', 'vend_eval'):   '/suppliers/',
-    ('purchasing', 'vend_perf'):   '/suppliers/',
+    ('purchasing', 'vend_perf'):   '/suppliers/scorecard/',
     ('purchasing', 'vend_cont'):   '/suppliers/',
     ('purchasing', 'spend_sum'):   '/purch/reports/',
     ('purchasing', 'po_rpts'):     '/purch/reports/',

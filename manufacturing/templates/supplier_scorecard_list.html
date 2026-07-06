@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block page_title %}Supplier Scorecards{% endblock %}
+
+{% block toolbar_left %}
+<a href="/suppliers/" class="btn">Suppliers</a>
+<a href="/qa/suppliers/" class="btn">Supplier Quality Ratings</a>
+<a href="/po/" class="btn">Purchase Orders</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ssc-wrap { width:100%; max-width:1100px; }
+.ssc-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.filter-bar select, .filter-bar input[type=date] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; }
+.bar-track { width:90px; height:8px; background:#eee; border-radius:4px; overflow:hidden;
+    display:inline-block; vertical-align:middle; margin-right:8px; }
+.bar-fill { height:100%; background:var(--accent); }
+.bar-fill.good { background:#2e7d32; }
+.bar-fill.warn { background:#c9820a; }
+.bar-fill.danger { background:#c62828; }
+.no-data { color:var(--text-muted); font-size:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ssc-wrap">
+    <h2>Supplier Scorecards</h2>
+
+    <form method="get" class="filter-bar">
+        <label>From:</label>
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <label>To:</label>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <button type="submit" class="btn">Filter</button>
+        <a href="/suppliers/scorecard/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>Supplier</th>
+                <th>On-Time Delivery</th>
+                <th>Fill Rate</th>
+                <th>Quality Reject Rate</th>
+                <th>Composite Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in scorecards %}
+            <tr>
+                <td><a href="/suppliers/scorecard/{{ s.supplier_id }}/">{{ s.supplier_name }}</a></td>
+                <td>
+                    {% if s.on_time_pct is not None %}
+                        {{ s.on_time_pct }}% <span class="no-data">({{ s.on_time_sample }} PO{{ s.on_time_sample|pluralize }})</span>
+                    {% else %}
+                        <span class="no-data">no data</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if s.fill_rate_pct is not None %}{{ s.fill_rate_pct }}%
+                    {% else %}<span class="no-data">no data</span>{% endif %}
+                </td>
+                <td>
+                    {% if s.quality_reject_pct is not None %}
+                        {{ s.quality_reject_pct }}% <span class="no-data">({{ s.quality_sample }} rated material{{ s.quality_sample|pluralize }})</span>
+                    {% else %}
+                        <span class="no-data">no data</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if s.composite_score is not None %}
+                    <span class="bar-track"><span class="bar-fill {% if s.composite_score >= 85 %}good{% elif s.composite_score < 60 %}danger{% else %}warn{% endif %}"
+                        style="width:{{ s.composite_score }}%;"></span></span>
+                    {{ s.composite_score }}
+                    {% else %}
+                        <span class="no-data">no data</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No suppliers found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="no-data">
+        Composite score = 40% on-time delivery + 35% quantity fill rate + 25% quality
+        (100 − reject rate), renormalised over whichever of the three a supplier has
+        data for. On-time delivery only counts fully-received POs with both an expected
+        and an actual receipt date; fill rate covers POs that have been sent.
+    </p>
+</div>
+</div>
+{% endblock %}
