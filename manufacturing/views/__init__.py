@@ -206,7 +206,9 @@ from ..finance_core import (
     create_bank_account, update_bank_account,
     list_tax_filings, get_tax_filing,
     create_tax_filing, update_tax_filing,
+    get_cash_position,
 )
+from ..cash_flow_core import get_cash_forecast_13wk
 
 # Domain views extracted to sub-modules for maintainability
 from ._quality import *  # noqa: F401,F403
@@ -221,6 +223,7 @@ from ._price_list import *  # noqa: F401,F403
 from ._rfq import *  # noqa: F401,F403
 from ._gantt import *  # noqa: F401,F403
 from ._supplier_scorecard import *  # noqa: F401,F403
+from ._cash_flow import *  # noqa: F401,F403
 from ._atp import *  # noqa: F401,F403
 
 log = get_logger(__name__)
@@ -615,7 +618,7 @@ WEB_LEAF_URLS = {
     # General Ledger / Financial Reports
     ('accounting', 'inc_stmt'):   '/gl/income-statement/',
     ('accounting', 'bal_sheet'):  '/gl/balance-sheet/',
-    ('accounting', 'cash_flow'):  '/gl/',
+    ('accounting', 'cash_flow'):  '/gl/cash-flow/',
     ('accounting', 'cust_rpts'):  '/gl/',
     ('accounting', 'fin_reports'): '/gl/',
     ('accounting', 'credit'):     '/gl/',
@@ -6674,10 +6677,16 @@ def fin_dashboard(request):
         data = get_finance_dashboard(conn)
         ar_aging = get_ar_aging(conn)
         rev_expense = get_revenue_expense_by_month(conn)
+        cash_forecast = get_cash_forecast_13wk(conn)
+        cash_position = get_cash_position(conn)
     ctx = _acct_ctx(
         request, **data,
         ar_aging_json=json.dumps(ar_aging['totals']),
         rev_expense_json=json.dumps(rev_expense),
+        cash_forecast_json=json.dumps(cash_forecast),
+        cash_position=cash_position,
+        cash_forecast_end=cash_forecast[-1]['projected_balance'],
+        cash_forecast_net_change=cash_forecast[-1]['projected_balance'] - cash_position,
     )
     return render(request, 'finance_dashboard.html', ctx)
 

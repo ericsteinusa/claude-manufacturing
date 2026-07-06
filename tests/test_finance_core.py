@@ -2,7 +2,9 @@
 
 from unittest.mock import MagicMock, patch
 
-from manufacturing.finance_core import get_finance_dashboard, get_revenue_expense_by_month
+from manufacturing.finance_core import (
+    get_finance_dashboard, get_revenue_expense_by_month, get_cash_position,
+)
 
 _AP = {
     'open_count': 3, 'overdue_count': 1,
@@ -182,3 +184,57 @@ def test_revenue_expense_calls_income_statement_once_per_month():
                return_value=_STMT) as mock_stmt:
         get_revenue_expense_by_month(_conn(), months=5)
     assert mock_stmt.call_count == 5
+
+
+# ---------------------------------------------------------------------------
+# get_cash_position
+# ---------------------------------------------------------------------------
+
+class _RecordingConn:
+    def __init__(self, cash=0.0):
+        self.cash = cash
+        self.calls = []
+
+    def execute(self, sql, params=None):
+        self.calls.append((sql, list(params or [])))
+        q = MagicMock()
+        q.fetchone.return_value = {'cash': self.cash}
+        return q
+
+    @property
+    def last_sql(self):
+        return self.calls[-1][0]
+
+    @property
+    def last_params(self):
+        return self.calls[-1][1]
+
+
+def test_cash_position_sums_latest_statement_per_active_account():
+    conn = _RecordingConn(cash=12500.0)
+    result = get_cash_position(conn)
+    assert result == 12500.0
+    assert "WHERE ba.is_active = 1" in conn.last_sql
+    assert "ORDER BY bs.statement_date DESC, bs.id DESC LIMIT 1" in conn.last_sql
+
+
+def test_cash_position_no_as_of_omits_date_filter():
+    conn = _RecordingConn()
+    get_cash_position(conn)
+    assert "bs.statement_date <= %s" not in conn.last_sql
+    assert conn.last_params == []
+
+
+def test_cash_position_as_of_adds_date_filter():
+    conn = _RecordingConn()
+    get_cash_position(conn, as_of='2026-06-30')
+    assert "bs.statement_date <= %s" in conn.last_sql
+    assert conn.last_params == ['2026-06-30']
+
+
+def test_cash_position_defaults_to_zero_when_no_row():
+    conn = MagicMock()
+    q = MagicMock()
+    q.fetchone.return_value = None
+    conn.execute.return_value = q
+    assert get_cash_position(conn) == 0.0
