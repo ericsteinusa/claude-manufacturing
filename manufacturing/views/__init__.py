@@ -6677,8 +6677,8 @@ def fin_dashboard(request):
         data = get_finance_dashboard(conn)
         ar_aging = get_ar_aging(conn)
         rev_expense = get_revenue_expense_by_month(conn)
-        cash_forecast = get_cash_forecast_13wk(conn)
         cash_position = get_cash_position(conn)
+        cash_forecast = get_cash_forecast_13wk(conn, starting_balance=cash_position)
     ctx = _acct_ctx(
         request, **data,
         ar_aging_json=json.dumps(ar_aging['totals']),
