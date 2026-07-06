@@ -226,6 +226,7 @@ from ._supplier_scorecard import *  # noqa: F401,F403
 from ._cash_flow import *  # noqa: F401,F403
 from ._sampling_plan import *  # noqa: F401,F403
 from ._atp import *  # noqa: F401,F403
+from ._document_control import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -344,11 +345,11 @@ WEB_LEAF_URLS = {
     ('engineering', 'new_proj'):   '/eng/projects/',
     ('engineering', 'proj_time'):  '/eng/projects/',
     ('engineering', 'proj_rpts'):  '/eng/projects/',
-    # Design Documents / ECRs
-    ('engineering', 'doc_lib'):    '/eng/ecrs/',
-    ('engineering', 'new_doc'):    '/eng/ecrs/',
-    ('engineering', 'doc_review'): '/eng/ecrs/',
-    ('engineering', 'archive'):    '/eng/ecrs/',
+    # Design Documents (Document Control, P2-F)
+    ('engineering', 'doc_lib'):    '/documents/',
+    ('engineering', 'new_doc'):    '/documents/new/',
+    ('engineering', 'doc_review'): '/documents/?status=in_review',
+    ('engineering', 'archive'):    '/documents/?status=obsolete',
     ('engineering', 'new_co'):     '/eng/ecrs/',
     ('engineering', 'appr_chg'):   '/eng/ecrs/',
     ('engineering', 'chg_hist'):   '/eng/ecrs/',
@@ -568,10 +569,10 @@ WEB_LEAF_URLS = {
     ('quality_assurance', 'comp_rpts'):   '/qa/reports/',
     ('quality_assurance', 'non_comp'):    '/qa/ncr/',
     ('quality_assurance', 'res_track'):   '/qa/capa/',
-    ('quality_assurance', 'doc_lib'):     '/qa/audits/',
-    ('quality_assurance', 'new_doc'):     '/qa/audits/',
-    ('quality_assurance', 'doc_review'):  '/qa/audits/',
-    ('quality_assurance', 'rev_hist'):    '/qa/audits/',
+    ('quality_assurance', 'doc_lib'):     '/documents/',
+    ('quality_assurance', 'new_doc'):     '/documents/new/',
+    ('quality_assurance', 'doc_review'):  '/documents/?status=in_review',
+    ('quality_assurance', 'rev_hist'):    '/documents/',
     # Customer Service tickets
     ('customer_service', 'all_tickets'): '/cs/',
     ('customer_service', 'my_tickets'): '/cs/?my=1',

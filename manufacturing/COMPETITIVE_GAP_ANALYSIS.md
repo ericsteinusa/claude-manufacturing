@@ -398,7 +398,7 @@ Missing from purchasing. All 10 competitors have it.
 
 ### 🟠 Priority 2 — High Impact, Medium Effort (3–6 months)
 
-#### P2-A: Gantt Chart Production Scheduler
+#### P2-A: Gantt Chart Production Scheduler ✅ Done
 No visual scheduling is the biggest gap vs. Epicor, Infor, SYSPRO.
 - Work order Gantt view grouped by workcenter
 - Visual bars showing WO start/end, color-coded by status
@@ -406,13 +406,32 @@ No visual scheduling is the biggest gap vs. Epicor, Infor, SYSPRO.
 - Workcenter load bar below Gantt (used hrs vs. capacity hrs)
 - Red highlight when workcenter is over-capacity
 - **Library:** DHTMLX Gantt (JS) or frappe/gantt (open source)
+- **Shipped:** New scheduling logic lives in `routing_core.py` (bars are
+  per-`wo_operation`, not per-WO, since operations can span multiple
+  workcenters). New `scheduled_start`/`scheduled_end` columns on
+  `wo_operation` persist real schedule data; when unset, bars fall back to
+  a proportional split of the parent WO's start/due dates. Drag-and-drop
+  reschedule persists via a `fetch()`-based AJAX endpoint (`views/_gantt.py`)
+  — the app's first, since `dept_required`'s redirect-on-deny doesn't fit a
+  JSON consumer, so it's guarded by manual auth/dept/read-only checks that
+  always return JSON instead. Web page: `/schedule/gantt/`
+  (`prod_schedule_gantt.html`), wired from Production → Schedule.
 
-#### P2-B: Available-to-Promise (ATP)
+#### P2-B: Available-to-Promise (ATP) ✅ Done
 Required for customer-facing delivery date commitments.
 - ATP qty = on-hand + open PO receipts scheduled before requested date − already committed SO qty
 - Display ATP qty and earliest available date on SO line item entry
 - Warn on SO confirm if ATP is insufficient
 - ATP inquiry screen: enter product + qty + date → get yes/no + alternatives
+- **Shipped:** `manufacturing/atp_core.py` — ATP qty = on-hand + open PO
+  receipts (sent/partial, expected before the requested date) − committed
+  demand (confirmed SOs), mirroring `mrp_web_core.get_demand_dated`'s
+  NULL-ship_date fallback exactly so ATP and MRP never disagree on what
+  counts as committed. Ships a dedicated `/atp/` inquiry screen (product/
+  qty/date → yes/no + earliest available date within a 90-day search), a
+  live ATP badge on the SO line-item entry form (green/red against the
+  typed qty), and a soft confirm-gate on SO confirmation — a shortfall
+  banner with a "Confirm Anyway" override rather than a hard block.
 
 #### P2-C: Supplier Performance Scorecard ✅ Done
 Data already exists (POs, receiving, QA supplier scores). Just needs aggregation.
@@ -488,7 +507,7 @@ Required for formal incoming inspection programs.
   exist in Django) discovered while testing this feature — the inspection
   detail page 500'd on every load before this fix.
 
-#### P2-F: Document Control Module
+#### P2-F: Document Control Module ✅ Done
 Needed for ISO 9001 compliance and engineering document management.
 - Document master: number, title, type (SOP, WI, Drawing, Spec), revision, status
 - Status workflow: draft → in review → approved → superseded → obsolete
@@ -497,6 +516,36 @@ Needed for ISO 9001 compliance and engineering document management.
 - Approval workflow (same approval engine as POs/PRs)
 - Link documents to: BOM, routing, inspection template, equipment
 - Document search and filter
+- **Shipped:** `manufacturing/document_control_core.py` — `document` +
+  `document_revision` + `document_link` tables. Reused `approval_workflow_core`
+  by adding `'document'` to its `ENTITY_TYPES` allow-list, but with one
+  important wrinkle: `submit_for_approval` is idempotent on
+  `(entity_type, entity_id)`, and a document's own row id is stable across
+  every revision and every review round, so reusing it as `entity_id` would
+  make a second review round silently hand back the *first* round's
+  already-decided steps. Each review round is instead submitted against that
+  revision's own `document_revision.id` (tracked as `document.
+  current_revision_id`), and a rejection explicitly deletes that round's
+  `approval_step` rows so resubmitting the same revision starts a clean
+  round rather than getting permanently stuck 'in_review' with a stale
+  rejected step and nothing pending to decide — caught by hand-testing the
+  reject → resubmit path in a real browser session, not by the unit tests
+  alone. Fails open like `cycle_count_core` when no `approval_rule` exists
+  for `'document'` yet — a submitted document is approved immediately
+  rather than blocked on an unconfigured workflow. This is also the app's
+  first feature to accept file uploads (`MEDIA_ROOT`/`MEDIA_URL` added to
+  settings.py); uploaded files are only ever served back through the
+  authenticated `document_download` view, not exposed under a static
+  `MEDIA_URL` route, so access control matches every other page. Links to
+  BOM/sampling-plan/equipment/workcenter resolve a display label via a
+  small per-type lookup (a BOM link points at the governed `product`, since
+  the `bom` table has no header row of its own to link to instead); a
+  routing link is entered by ID since no "list all routing steps" picker
+  existed yet. Web pages: `/documents/` (list + search/filter), `/documents/
+  new/`, `/documents/<id>/` (info, file upload/download, submit-for-review,
+  inline approve/reject, revise, supersede/obsolete, linked records) — wired
+  from both QA → Document Control and Engineering → Design Documents, whose
+  menu leaves previously pointed at unrelated placeholder pages.
 
 #### P2-G: Employee Self-Service (ESS) Portal
 Reduces HR workload for routine employee requests.

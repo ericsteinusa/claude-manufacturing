@@ -14,6 +14,9 @@ venv/
 # Databases (the app uses PostgreSQL; no SQLite file should be committed)
 *.sqlite3
 
+# Uploaded document files (Document Control module, P2-F)
+/media/
+
 # Qt
 *.qmlc
 *.jsc

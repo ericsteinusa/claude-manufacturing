@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block page_title %}{{ doc.doc_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/documents/" class="btn">Document Control</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.doc-wrap { width:100%; max-width:900px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:18px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; margin-bottom:14px; }
+.info-item label { display:block; font-size:11px; color:#888; font-weight:bold; text-transform:uppercase; margin-bottom:2px; }
+.info-item .val { font-size:14px; color:#222; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select, .form-row textarea { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.form-row textarea { resize:vertical; min-height:50px; }
+.link-row { display:flex; gap:8px; align-items:flex-end; margin-bottom:10px; flex-wrap:wrap; }
+.link-row .form-row { margin-bottom:0; min-width:220px; }
+.actions-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="doc-wrap">
+    <div class="menu-title">{{ doc.doc_number }} — {{ doc.title }}
+        {% if doc.status == 'draft' %}
+        <span class="pill pill-draft" style="font-size:11px;padding:2px 8px;">Draft</span>
+        {% elif doc.status == 'in_review' %}
+        <span class="pill pill-pending" style="font-size:11px;padding:2px 8px;">In Review</span>
+        {% elif doc.status == 'approved' %}
+        <span class="pill pill-approved" style="font-size:11px;padding:2px 8px;">Approved</span>
+        {% elif doc.status == 'superseded' %}
+        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Superseded</span>
+        {% else %}
+        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Obsolete</span>
+        {% endif %}
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
+        {{ doc.doc_type }} · Revision {{ doc.current_revision }} · created {{ doc.created_at|date:"Y-m-d" }} by {{ doc.created_by|default:"—" }}
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if doc.status == 'in_review' %}
+        {% if pending_step %}
+        <div class="alert alert-warning">
+            Awaiting your approval as <strong>{{ pending_step.approver_role }}</strong>.
+            <form method="post" style="display:inline;margin-left:10px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="decide">
+                <input type="hidden" name="step_id" value="{{ pending_step.id }}">
+                <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">Approve</button>
+                <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">Reject</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            In review{% if approval.steps %} — awaiting <strong>{{ approval.steps.0.approver_role }}</strong>{% endif %}.
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="card">
+        <h3>Document Info</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Owner</label>
+                <div class="val">{{ doc.owner|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Department</label>
+                <div class="val">{{ doc.dept_key|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Current File</label>
+                <div class="val">
+                    {% if doc.file_name %}
+                    <a href="/documents/{{ doc.id }}/download/">{{ doc.file_name }}</a>
+                    {% else %}
+                    no file attached
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <label>Notes</label>
+                <div class="val">{{ doc.notes|default:"—" }}</div>
+            </div>
+        </div>
+
+        {% if can_edit %}
+        <div class="actions-row">
+            {% if doc.status == 'draft' %}
+            <form method="post" enctype="multipart/form-data" style="display:flex;gap:8px;align-items:center;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload">
+                <input type="file" name="file" required>
+                <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">Attach File</button>
+            </form>
+            <form method="post" onsubmit="return confirm('Submit this revision for review?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="submit_review">
+                <button type="submit" class="btn btn-primary" style="padding:5px 12px;font-size:12px;">Submit for Review</button>
+            </form>
+            {% endif %}
+            {% if doc.status == 'approved' %}
+            <form method="post" onsubmit="return confirm('Mark this document superseded?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="supersede">
+                <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">Mark Superseded</button>
+            </form>
+            {% endif %}
+            {% if doc.status != 'obsolete' %}
+            <form method="post" onsubmit="return confirm('Mark this document obsolete? This cannot be undone.');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="obsolete">
+                <button type="submit" class="btn btn-danger" style="padding:5px 12px;font-size:12px;">Mark Obsolete</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if can_edit and doc.status == 'approved' %}
+    <div class="card">
+        <h3>Create New Revision</h3>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">
+            Bumps to revision {{ doc.current_revision }} + 1 and resets status to 'draft' so it
+            can go through review again.
+        </p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="revise">
+            <div class="form-row">
+                <label>Change Description *</label>
+                <textarea name="change_description" required placeholder="What changed and why"></textarea>
+            </div>
+            <div class="form-row">
+                <label>Replacement File (optional)</label>
+                <input type="file" name="file">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Revision</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Revision History</h3>
+        {% if revisions %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Rev</th><th>Change Description</th><th>Changed By</th><th>Date</th><th>File</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in revisions %}
+                    <tr>
+                        <td>{{ r.revision }}</td>
+                        <td>{{ r.change_description|default:"—" }}</td>
+                        <td>{{ r.changed_by|default:"—" }}</td>
+                        <td>{{ r.changed_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ r.file_name|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color:var(--text-muted);font-size:13px;">No revisions recorded.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Linked Records</h3>
+        {% if links %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Type</th><th>Linked Record</th><th></th></tr></thead>
+                <tbody>
+                    {% for l in links %}
+                    <tr>
+                        <td>{{ l.linked_type }}</td>
+                        <td>{{ l.label }}</td>
+                        <td>
+                            {% if can_edit %}
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove_link">
+                                <input type="hidden" name="link_id" value="{{ l.id }}">
+                                <button type="submit" class="btn" style="padding:2px 8px;font-size:11px;">Remove</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">No linked records yet.</p>
+        {% endif %}
+
+        {% if can_edit %}
+        <div class="link-row">
+            <form method="post" class="form-row">
+                {% csrf_token %}
+                <label>Link to BOM (product)</label>
+                <input type="hidden" name="action" value="add_link">
+                <input type="hidden" name="linked_type" value="bom">
+                <div style="display:flex;gap:6px;">
+                    <select name="linked_id">
+                        {% for p in link_products %}
+                        <option value="{{ p.id }}">{{ p.product_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="link-row">
+            <form method="post" class="form-row">
+                {% csrf_token %}
+                <label>Link to Sampling Plan</label>
+                <input type="hidden" name="action" value="add_link">
+                <input type="hidden" name="linked_type" value="sampling_plan">
+                <div style="display:flex;gap:6px;">
+                    <select name="linked_id">
+                        {% for sp in link_plans %}
+                        <option value="{{ sp.id }}">{{ sp.plan_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="link-row">
+            <form method="post" class="form-row">
+                {% csrf_token %}
+                <label>Link to Equipment</label>
+                <input type="hidden" name="action" value="add_link">
+                <input type="hidden" name="linked_type" value="maint_equipment">
+                <div style="display:flex;gap:6px;">
+                    <select name="linked_id">
+                        {% for eq in link_equipment %}
+                        <option value="{{ eq.id }}">{{ eq.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="link-row">
+            <form method="post" class="form-row">
+                {% csrf_token %}
+                <label>Link to Workcenter</label>
+                <input type="hidden" name="action" value="add_link">
+                <input type="hidden" name="linked_type" value="workcenter">
+                <div style="display:flex;gap:6px;">
+                    <select name="linked_id">
+                        {% for wc in link_workcenters %}
+                        <option value="{{ wc.id }}">{{ wc.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="link-row">
+            <form method="post" class="form-row">
+                {% csrf_token %}
+                <label>Link to Routing (by ID)</label>
+                <input type="hidden" name="action" value="add_link">
+                <input type="hidden" name="linked_type" value="routing">
+                <div style="display:flex;gap:6px;">
+                    <input type="number" name="linked_id" min="1" placeholder="Routing step ID" style="width:140px;">
+                    <button type="submit" class="btn" style="padding:5px 10px;font-size:12px;">Add</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

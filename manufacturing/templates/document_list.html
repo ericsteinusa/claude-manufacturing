@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block page_title %}Document Control{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">QA Dashboard</a>
+<a href="/eng/" class="btn">Engineering</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/documents/new/" class="btn btn-primary">+ New Document</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.doc-wrap { width:100%; max-width:1100px; }
+.toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; }
+.chip { display:inline-block; padding:3px 13px; border-radius:20px; font-size:12px;
+    font-weight:bold; text-decoration:none; background:#334; color:#aad; border:2px solid #556; }
+.chip.active { border-color:white; color:white; }
+.search-input { padding:5px 10px; border-radius:4px; border:1px solid #ccc; font-size:13px; width:200px; }
+.type-select { padding:5px 10px; border-radius:4px; border:1px solid #ccc; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="doc-wrap">
+    <div class="menu-title">Document Control</div>
+    <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
+        SOPs, work instructions, drawings, and specs — with revision history, an
+        approval workflow, and links to the BOMs, routings, sampling plans, and
+        equipment they govern.
+    </p>
+
+    <div class="toolbar">
+        <div class="chip-row">
+            <a href="/documents/{% if doc_type %}?doc_type={{ doc_type }}{% endif %}"
+               class="chip {% if not status %}active{% endif %}">All</a>
+            {% for s in statuses %}
+            <a href="/documents/?status={{ s }}{% if doc_type %}&doc_type={{ doc_type }}{% endif %}"
+               class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
+            {% endfor %}
+        </div>
+        <form method="get" style="display:flex;gap:6px;align-items:center;">
+            {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+            <select name="doc_type" class="type-select" onchange="this.form.submit()">
+                <option value="">All Types</option>
+                {% for t in doc_types %}
+                <option value="{{ t }}" {% if doc_type == t %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+            <input class="search-input" type="text" name="q" value="{{ search }}" placeholder="Search title or #…">
+            <button type="submit" class="btn btn-primary" style="padding:5px 14px;">Go</button>
+        </form>
+    </div>
+
+    {% if documents %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Doc #</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Rev</th>
+                    <th>Status</th>
+                    <th>Owner</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in documents %}
+                <tr>
+                    <td><a href="/documents/{{ d.id }}/">{{ d.doc_number }}</a></td>
+                    <td>{{ d.title }}</td>
+                    <td>{{ d.doc_type }}</td>
+                    <td>{{ d.current_revision }}</td>
+                    <td>
+                        {% if d.status == 'draft' %}
+                        <span class="pill pill-draft" style="font-size:11px;padding:2px 8px;">Draft</span>
+                        {% elif d.status == 'in_review' %}
+                        <span class="pill pill-pending" style="font-size:11px;padding:2px 8px;">In Review</span>
+                        {% elif d.status == 'approved' %}
+                        <span class="pill pill-approved" style="font-size:11px;padding:2px 8px;">Approved</span>
+                        {% elif d.status == 'superseded' %}
+                        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Superseded</span>
+                        {% else %}
+                        <span class="pill pill-cancelled" style="font-size:11px;padding:2px 8px;">Obsolete</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ d.owner|default:"—" }}</td>
+                    <td><a href="/documents/{{ d.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No documents found.</div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

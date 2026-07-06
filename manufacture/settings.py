@@ -123,6 +123,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Uploaded files (Document Control module, P2-F) — the first feature in this
+# app to accept file uploads. Deliberately not wired up for direct static
+# serving under MEDIA_URL — files are only ever served through the
+# authenticated manufacturing.views.document_download view, so access
+# control matches every other page in the app.
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Logging
 # Mirrors manufacturing/log_utils.py: honours the LOG_LEVEL and LOG_FILE
