@@ -13,6 +13,7 @@ from datetime import date, timedelta
 import psycopg2
 
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from ..log_utils import get_logger
 from ..schema import init_schema
@@ -119,6 +120,7 @@ from ..sales_orders_core import (
     can_transition as so_can_transition,
     set_so_status,
 )
+from ..atp_core import get_atp_qty_for_products, check_so_atp
 from ..work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
@@ -218,6 +220,7 @@ from ._cycle_count import *  # noqa: F401,F403
 from ._price_list import *  # noqa: F401,F403
 from ._rfq import *  # noqa: F401,F403
 from ._gantt import *  # noqa: F401,F403
+from ._atp import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -2050,6 +2053,13 @@ def so_detail(request, so_id):
             get_customer_price_tiers(conn, so['customer_id'])
             if (so and can_edit and so.get('customer_id')) else {}
         )
+        atp_by_product = (
+            get_atp_qty_for_products(conn, so.get('ship_date') or date.today().isoformat())
+            if (so and can_edit) else {}
+        )
+        atp_warning = None
+        if so and can_edit and request.GET.get('atp_pending'):
+            atp_warning = check_so_atp(conn, so_id) or None
 
         if request.method == 'POST' and request.POST.get('action') == 'currency' and can_edit and so:
             cur_code = request.POST.get('currency', 'USD')
@@ -2086,6 +2096,9 @@ def so_detail(request, so_id):
         currencies=currencies,
         base_currency=base_currency,
         price_tiers_json=json.dumps(price_tiers),
+        atp_json=json.dumps(atp_by_product),
+        atp_warning=atp_warning,
+        pending_status=request.GET.get('atp_pending'),
         back_url='/so/',
     ))
 
@@ -2261,10 +2274,13 @@ def so_set_status(request, so_id):
         return redirect('so_detail', so_id=so_id)
 
     target = request.POST.get('status')
+    override = request.POST.get('override') == '1'
     conn = get_db_connection()
     try:
         so = get_so(conn, so_id)
         if so and so_can_transition(so['status'], target):
+            if target == 'confirmed' and not override and check_so_atp(conn, so_id):
+                return redirect(reverse('so_detail', args=[so_id]) + '?atp_pending=confirmed')
             set_so_status(conn, so_id, target)
             conn.commit()
     finally:
