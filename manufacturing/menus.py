@@ -310,6 +310,7 @@ _PROD_MENU = {
                 ('week_sched', 'Weekly Schedule', 'production/prod_prod_menu.py'),
                 ('month_sched', 'Monthly Schedule', 'production/prod_prod_menu.py'),
                 ('sched_cal', 'Schedule Calendar', 'production/prod_prod_menu.py'),
+                ('gantt_sched', 'Gantt Chart', 'production/prod_prod_menu.py'),
             ],
         }),
         ('inventory', 'Inventory', {

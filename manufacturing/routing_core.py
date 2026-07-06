@@ -15,7 +15,16 @@ Typical flow:
   4. On WO close, get_wo_labor_cost() returns the actual labour spend.
 """
 
+from datetime import date, timedelta
+
 OP_STATUSES = ('pending', 'in_progress', 'completed', 'skipped')
+
+OP_STATUS_COLORS = {
+    'pending':     '#94a3b8',
+    'in_progress': '#f59e0b',
+    'completed':   '#22c55e',
+    'skipped':     '#dcdcdc',
+}
 
 
 def ensure_routing_tables(conn):
@@ -64,6 +73,16 @@ def ensure_routing_tables(conn):
     """)
     conn.execute(
         "CREATE INDEX IF NOT EXISTS wo_operation_wo_id ON wo_operation(wo_id)"
+    )
+    conn.execute(
+        "ALTER TABLE wo_operation ADD COLUMN IF NOT EXISTS scheduled_start TIMESTAMPTZ"
+    )
+    conn.execute(
+        "ALTER TABLE wo_operation ADD COLUMN IF NOT EXISTS scheduled_end TIMESTAMPTZ"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS wo_operation_workcenter_status "
+        "ON wo_operation(workcenter_id, status)"
     )
 
 
@@ -280,3 +299,177 @@ def get_workcenter_load(conn, start_date, end_date):
         (start_date, end_date),
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Gantt scheduler (P2-A)
+# ---------------------------------------------------------------------------
+
+def _derive_operation_window(scheduled_start, scheduled_end,
+                              wo_start_date, wo_due_date,
+                              start_frac, end_frac):
+    """Return (bar_start, bar_end, is_fallback) as ISO 'YYYY-MM-DD' strings.
+
+    Uses scheduled_start/scheduled_end verbatim when both are set. Otherwise
+    splits [wo_start_date, wo_due_date] proportionally using start_frac/
+    end_frac (this operation's cumulative share of the WO's total std_hours,
+    in operation_seq order). Returns (None, None, True) if the operation has
+    no placeable bar (missing or unparseable WO dates).
+    """
+    if scheduled_start and scheduled_end:
+        return (str(scheduled_start)[:10], str(scheduled_end)[:10], False)
+    if not wo_start_date or not wo_due_date:
+        return (None, None, True)
+    try:
+        start = date.fromisoformat(str(wo_start_date)[:10])
+        due = date.fromisoformat(str(wo_due_date)[:10])
+    except ValueError:
+        return (None, None, True)
+    span_days = (due - start).days
+    if span_days <= 0:
+        return (start.isoformat(), start.isoformat(), True)
+    bar_start = start + timedelta(days=round(span_days * start_frac))
+    bar_end = start + timedelta(days=round(span_days * end_frac))
+    if bar_end <= bar_start:
+        bar_end = bar_start + timedelta(days=1)
+    return (bar_start.isoformat(), bar_end.isoformat(), True)
+
+
+def get_gantt_operations(conn, date_from=None, date_to=None, workcenter_id=None):
+    """Return one row per non-skipped wo_operation for the Gantt view.
+
+    Each row: {id, wo_id, wo_number, product_name, operation_seq,
+               operation_name, workcenter_id, workcenter_name, std_hours,
+               status, scheduled_start, scheduled_end, bar_start, bar_end,
+               is_fallback}.
+
+    bar_start/bar_end are what the Gantt actually renders: the real
+    scheduled_start/scheduled_end when both are set, otherwise a fallback
+    derived from the parent WO's start_date/due_date (see
+    _derive_operation_window). date_from/date_to (ISO 'YYYY-MM-DD' strings)
+    are an optional coarse pre-filter — SQL can't express the fallback
+    math, so rows are re-checked against the exact window in Python after
+    derivation.
+    """
+    conds = ["op.status != 'skipped'"]
+    params = []
+    if workcenter_id:
+        conds.append("op.workcenter_id = %s")
+        params.append(workcenter_id)
+    if date_from and date_to:
+        conds.append("""(
+            (op.scheduled_start IS NOT NULL AND op.scheduled_end IS NOT NULL
+             AND op.scheduled_start::date <= %s AND op.scheduled_end::date >= %s)
+            OR
+            (op.scheduled_start IS NULL
+             AND (wo.due_date IS NULL OR wo.due_date >= %s)
+             AND (wo.start_date IS NULL OR wo.start_date <= %s))
+        )""")
+        params.extend([date_to, date_from, date_from, date_to])
+    where = "WHERE " + " AND ".join(conds)
+
+    rows = conn.execute(
+        "SELECT op.id, op.wo_id, wo.wo_number, wo.start_date AS wo_start_date, "
+        "wo.due_date AS wo_due_date, p.name AS product_name, "
+        "op.operation_seq, op.operation_name, op.workcenter_id, "
+        "wc.name AS workcenter_name, op.std_hours, op.status, "
+        "op.scheduled_start, op.scheduled_end "
+        "FROM wo_operation op "
+        "JOIN work_order wo ON wo.id = op.wo_id "
+        "LEFT JOIN product p ON p.id = wo.product_id "
+        "LEFT JOIN workcenter wc ON wc.id = op.workcenter_id "
+        f"{where} "
+        "ORDER BY wo.wo_number, op.operation_seq",
+        params,
+    ).fetchall()
+    rows = [dict(r) for r in rows]
+
+    by_wo = {}
+    for r in rows:
+        by_wo.setdefault(r['wo_id'], []).append(r)
+
+    result = []
+    for ops in by_wo.values():
+        total_std = sum(o['std_hours'] or 0.0 for o in ops) or 1.0
+        cum = 0.0
+        for o in ops:
+            start_frac = cum / total_std
+            cum += (o['std_hours'] or 0.0)
+            end_frac = cum / total_std
+            bar_start, bar_end, is_fallback = _derive_operation_window(
+                o['scheduled_start'], o['scheduled_end'],
+                o['wo_start_date'], o['wo_due_date'],
+                start_frac, end_frac,
+            )
+            o['bar_start'] = bar_start
+            o['bar_end'] = bar_end
+            o['is_fallback'] = is_fallback
+            if bar_start and bar_end and date_from and date_to:
+                if bar_end < date_from or bar_start > date_to:
+                    continue
+            result.append(o)
+
+    result.sort(key=lambda o: (
+        o['workcenter_name'] or '~', o['wo_number'], o['operation_seq']))
+    return result
+
+
+def get_planned_workcenter_load(conn, date_from, date_to):
+    """Return planned load per active workcenter for the visible Gantt window.
+
+    Sums std_hours for pending/in_progress wo_operation rows whose bar
+    window (real scheduled_* or derived fallback) overlaps [date_from,
+    date_to]. Returns a list of {workcenter_id, workcenter_name,
+    capacity_hours_per_day, window_capacity_hours, planned_hours, pct,
+    over_capacity}, where window_capacity_hours = capacity_hours_per_day
+    times the number of calendar days in the window (a simplification that
+    does not account for weekends/holidays).
+    """
+    ops = get_gantt_operations(conn, date_from=date_from, date_to=date_to)
+    planned = {}
+    for o in ops:
+        if o['status'] not in ('pending', 'in_progress'):
+            continue
+        wc_id = o['workcenter_id']
+        if wc_id is None:
+            continue
+        planned[wc_id] = planned.get(wc_id, 0.0) + (o['std_hours'] or 0.0)
+
+    workcenters = conn.execute(
+        "SELECT id, name, capacity_hours_per_day FROM workcenter "
+        "WHERE is_active = TRUE ORDER BY name"
+    ).fetchall()
+
+    days = max(1, (date.fromisoformat(date_to) - date.fromisoformat(date_from)).days + 1)
+    result = []
+    for wc in workcenters:
+        wc = dict(wc)
+        window_capacity = wc['capacity_hours_per_day'] * days
+        planned_hours = planned.get(wc['id'], 0.0)
+        pct = (planned_hours / window_capacity * 100.0) if window_capacity > 0 else 0.0
+        result.append({
+            'workcenter_id': wc['id'],
+            'workcenter_name': wc['name'],
+            'capacity_hours_per_day': wc['capacity_hours_per_day'],
+            'window_capacity_hours': window_capacity,
+            'planned_hours': planned_hours,
+            'pct': pct,
+            'over_capacity': pct > 100.0,
+        })
+    return result
+
+
+def reschedule_operation(conn, op_id, scheduled_start, scheduled_end):
+    """Persist a drag-and-drop reschedule for one wo_operation. Does not commit.
+
+    scheduled_start/scheduled_end: ISO datetime strings (Postgres casts).
+    Returns True if a row was updated, False if op_id does not exist.
+    Raises ValueError if scheduled_end <= scheduled_start.
+    """
+    if scheduled_end <= scheduled_start:
+        raise ValueError('scheduled_end must be after scheduled_start')
+    cur = conn.execute(
+        "UPDATE wo_operation SET scheduled_start=%s, scheduled_end=%s WHERE id=%s",
+        (scheduled_start, scheduled_end, op_id),
+    )
+    return cur.rowcount > 0

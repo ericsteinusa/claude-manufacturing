@@ -217,6 +217,7 @@ from ._marketing import *  # noqa: F401,F403
 from ._cycle_count import *  # noqa: F401,F403
 from ._price_list import *  # noqa: F401,F403
 from ._rfq import *  # noqa: F401,F403
+from ._gantt import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -396,6 +397,7 @@ WEB_LEAF_URLS = {
     ('production', 'week_sched'):   '/prod/schedule/',
     ('production', 'month_sched'):  '/prod/schedule/',
     ('production', 'sched_cal'):    '/prod/schedule/',
+    ('production', 'gantt_sched'):  '/prod/schedule/gantt/',
     # Equipment Status → Maintenance
     ('production', 'equip_list'):   '/maint/equipment/',
     ('production', 'stat_dash'):    '/maint/',
