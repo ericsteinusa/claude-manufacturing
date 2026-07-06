@@ -1,7 +1,6 @@
 """Views: Supplier Performance Scorecard (P2-C)."""
 
 import json
-from datetime import date
 
 from django.shortcuts import render
 
@@ -14,6 +13,7 @@ from ..purchase_orders_core import ensure_po_tables
 from ..supplier_scorecard_core import (
     get_supplier_scorecards, get_supplier_scorecard_detail,
 )
+from ._common import parse_date_param as _parse_date_param
 
 log = get_logger(__name__)
 
@@ -29,17 +29,6 @@ def _scorecard_ctx(request, **extra):
     }
     ctx.update(extra)
     return ctx
-
-
-def _parse_date_param(raw, default=None):
-    raw = (raw or '').strip()
-    if not raw:
-        return default
-    try:
-        date.fromisoformat(raw)
-    except ValueError:
-        return default
-    return raw
 
 
 @dept_required(_SCORECARD_DEPT_KEYS)

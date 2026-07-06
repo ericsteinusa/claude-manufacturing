@@ -11,6 +11,7 @@ from ..accounts import READ_ONLY_ROLES
 from ..fixed_asset_core import init_fixed_asset_tables
 
 from ..cash_flow_core import get_cash_flow_statement, get_cash_forecast_13wk
+from ._common import parse_date_param as _parse_date_param
 
 _CASH_FLOW_DEPT_KEYS = {'accounting', 'finance'}
 
@@ -24,17 +25,6 @@ def _cash_flow_ctx(request, **extra):
     }
     ctx.update(extra)
     return ctx
-
-
-def _parse_date_param(raw, default=None):
-    raw = (raw or '').strip()
-    if not raw:
-        return default
-    try:
-        date.fromisoformat(raw)
-    except ValueError:
-        return default
-    return raw
 
 
 @dept_required(_CASH_FLOW_DEPT_KEYS)

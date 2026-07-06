@@ -6,6 +6,8 @@ import datetime
 import io
 import textwrap
 
+from .finance_core import get_cash_position
+
 
 def po_summary(conn) -> dict:
     """Return PO counts by status, total active spend, and overdue count."""
@@ -110,18 +112,10 @@ def financial_dashboard(conn, as_of: str | None = None) -> dict:
     week_end = (datetime.date.fromisoformat(today)
                 + datetime.timedelta(days=7)).isoformat()
 
-    # Cash across all active bank accounts (latest statement's ending balance)
-    cash_row = conn.execute(
-        "SELECT COALESCE(SUM(latest.ending_balance), 0) AS cash "
-        "FROM bank_account ba "
-        "JOIN LATERAL ( "
-        "    SELECT ending_balance FROM bank_statement bs "
-        "    WHERE bs.bank_account_id = ba.id "
-        "    ORDER BY bs.statement_date DESC, bs.id DESC LIMIT 1 "
-        ") latest ON TRUE "
-        "WHERE ba.is_active = 1"
-    ).fetchone()
-    cash_position = float(cash_row['cash'] if cash_row else 0)
+    # Cash across all active bank accounts (latest statement's ending
+    # balance) — shared with cash_flow_core via finance_core.get_cash_position
+    # rather than a second copy of the same LATERAL-join query.
+    cash_position = get_cash_position(conn)
 
     # DSO / DPO. AR/AP invoices don't carry a received/paid column directly —
     # amounts collected/disbursed live in ar_payment/ap_payment, one row per

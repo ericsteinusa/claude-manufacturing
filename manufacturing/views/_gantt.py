@@ -16,6 +16,7 @@ from ..routing_core import (
     ensure_routing_tables, get_gantt_operations,
     get_planned_workcenter_load, reschedule_operation, list_workcenters,
 )
+from ._common import parse_date_param
 
 log = get_logger(__name__)
 
@@ -32,22 +33,14 @@ def _gantt_ctx(request, **extra):
     return ctx
 
 
-def _parse_date_param(raw, default):
-    raw = (raw or '').strip()
-    if not raw:
-        return default
-    try:
-        return date.fromisoformat(raw)
-    except ValueError:
-        return default
-
-
 @ensure_csrf_cookie
 @dept_required('production')
 def prod_schedule_gantt(request):
     today = date.today()
-    date_from_d = _parse_date_param(request.GET.get('date_from'), today)
-    date_to_d = _parse_date_param(request.GET.get('date_to'), today + timedelta(days=13))
+    raw_from = parse_date_param(request.GET.get('date_from'))
+    raw_to = parse_date_param(request.GET.get('date_to'))
+    date_from_d = date.fromisoformat(raw_from) if raw_from else today
+    date_to_d = date.fromisoformat(raw_to) if raw_to else today + timedelta(days=13)
     if date_to_d < date_from_d:
         date_from_d, date_to_d = date_to_d, date_from_d
     date_from = date_from_d.isoformat()

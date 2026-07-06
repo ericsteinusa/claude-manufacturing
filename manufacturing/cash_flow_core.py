@@ -46,46 +46,49 @@ FINANCING_NOTE = (
 )
 
 
-def _ar_balance_as_of(conn, as_of):
-    """Total AR outstanding as of a specific date: invoices dated on or
-    before as_of, minus payments made on or before as_of.
+def _balance_snapshot(conn, invoice_table, payment_table, date_from, date_to):
+    """(balance_at_date_from, balance_at_date_to) for one AR/AP table: each a
+    true historical point-in-time snapshot — invoices dated on or before the
+    boundary, minus payments made on or before that same boundary. One query
+    computes both boundaries via conditional aggregation (FILTER) instead of
+    calling this twice per boundary (four full-table scans for AR+AP instead
+    of two).
 
     Deliberately not accounting_core.get_ar_aging, which filters by an
     invoice's *current* status — a since-paid invoice would be wrongly
-    excluded from a balance computed as of a date before it was paid. The
+    excluded from a balance computed as of a date before it was paid. Each
     payment subquery pre-aggregates per invoice_id before the join so an
     invoice with several partial payments can't fan out and double-count
     i.amount (the same join-fan-out trap noted in routing_core /
     supplier_scorecard_core).
     """
-    row = conn.execute("""
-        SELECT COALESCE(SUM(i.amount), 0) AS invoiced,
-               COALESCE(SUM(paid.total), 0) AS paid
-        FROM ar_invoice i
+    row = conn.execute(f"""
+        SELECT
+            COALESCE(SUM(i.amount) FILTER (WHERE i.invoice_date <= %s), 0)
+                - COALESCE(SUM(paid_from.total)
+                    FILTER (WHERE i.invoice_date <= %s), 0) AS balance_from,
+            COALESCE(SUM(i.amount) FILTER (WHERE i.invoice_date <= %s), 0)
+                - COALESCE(SUM(paid_to.total)
+                    FILTER (WHERE i.invoice_date <= %s), 0) AS balance_to
+        FROM {invoice_table} i
         LEFT JOIN (
             SELECT invoice_id, SUM(amount) AS total
-            FROM ar_payment WHERE payment_date <= %s
+            FROM {payment_table} WHERE payment_date <= %s
             GROUP BY invoice_id
-        ) paid ON paid.invoice_id = i.id
-        WHERE i.invoice_date <= %s AND i.status != 'cancelled'
-    """, (as_of, as_of)).fetchone()
-    return float(row['invoiced'] or 0) - float(row['paid'] or 0) if row else 0.0
-
-
-def _ap_balance_as_of(conn, as_of):
-    """AP mirror of _ar_balance_as_of — see its docstring."""
-    row = conn.execute("""
-        SELECT COALESCE(SUM(i.amount), 0) AS invoiced,
-               COALESCE(SUM(paid.total), 0) AS paid
-        FROM ap_invoice i
+        ) paid_from ON paid_from.invoice_id = i.id
         LEFT JOIN (
             SELECT invoice_id, SUM(amount) AS total
-            FROM ap_payment WHERE payment_date <= %s
+            FROM {payment_table} WHERE payment_date <= %s
             GROUP BY invoice_id
-        ) paid ON paid.invoice_id = i.id
-        WHERE i.invoice_date <= %s AND i.status != 'cancelled'
-    """, (as_of, as_of)).fetchone()
-    return float(row['invoiced'] or 0) - float(row['paid'] or 0) if row else 0.0
+        ) paid_to ON paid_to.invoice_id = i.id
+        WHERE i.status != 'cancelled'
+    """, (date_from, date_from, date_to, date_to, date_from, date_to)).fetchone()
+    if not row:
+        return 0.0, 0.0
+    return (
+        float(row['balance_from'] or 0),
+        float(row['balance_to'] or 0),
+    )
 
 
 def _depreciation_for_period(conn, date_from, date_to):
@@ -140,14 +143,23 @@ def get_cash_flow_statement(conn, date_from, date_to):
     computed net_change_in_cash as a sanity check, not forced to reconcile
     with it (see INVENTORY_NOTE/FINANCING_NOTE for why they may not tie
     exactly).
+
+    Raises ValueError if date_to is before date_from (the web view normalizes
+    this before calling, but any other caller gets a clear error instead of
+    a silently-empty/backwards statement).
     """
+    if date_to < date_from:
+        raise ValueError('date_to must not be before date_from')
+
     income = income_statement(conn, date_from, date_to)
     net_income = income['net_income']
 
     depreciation = _depreciation_for_period(conn, date_from, date_to)
 
-    ar_change = _ar_balance_as_of(conn, date_to) - _ar_balance_as_of(conn, date_from)
-    ap_change = _ap_balance_as_of(conn, date_to) - _ap_balance_as_of(conn, date_from)
+    ar_start, ar_end = _balance_snapshot(conn, 'ar_invoice', 'ar_payment', date_from, date_to)
+    ap_start, ap_end = _balance_snapshot(conn, 'ap_invoice', 'ap_payment', date_from, date_to)
+    ar_change = ar_end - ar_start
+    ap_change = ap_end - ap_start
 
     operating_total = net_income + depreciation - ar_change + ap_change
 
@@ -184,26 +196,25 @@ def get_cash_flow_statement(conn, date_from, date_to):
 
 
 def _week_index(due_date, start, total_weeks):
-    """Which forecast week (0-based) a due_date falls into, or None if it's
-    beyond the horizon. A due_date before `start` (already overdue) is
-    folded into week 0 — expected "now", not dropped."""
-    if not due_date:
-        return None
-    try:
-        d = date.fromisoformat(str(due_date)[:10])
-    except ValueError:
-        return None
-    if d < start:
-        return 0
-    idx = (d - start).days // 7
-    return idx if idx < total_weeks else None
+    """Which forecast week (0-based) a due_date falls into. A due_date
+    before `start` (already overdue) — or missing/unparseable entirely — is
+    folded into week 0: expected "now", not silently dropped from the
+    forecast (an unknown due date is not evidence the cash isn't owed)."""
+    if due_date:
+        try:
+            d = date.fromisoformat(str(due_date)[:10])
+        except ValueError:
+            return 0
+        if d >= start:
+            idx = (d - start).days // 7
+            return idx if idx < total_weeks else None
+    return 0
 
 
-def _outstanding_by_week(conn, table, start, total_weeks):
-    payment_table = f"{table[:-len('_invoice')]}_payment"
+def _outstanding_by_week(conn, invoice_table, payment_table, start, total_weeks):
     rows = conn.execute(f"""
         SELECT i.due_date, i.amount - COALESCE(SUM(p.amount), 0) AS balance
-        FROM {table} i
+        FROM {invoice_table} i
         LEFT JOIN {payment_table} p ON p.invoice_id = i.id
         WHERE i.status IN ('open', 'partial', 'overdue')
         GROUP BY i.id
@@ -220,11 +231,10 @@ def _outstanding_by_week(conn, table, start, total_weeks):
     return by_week
 
 
-def get_cash_forecast_13wk(conn, start_date=None):
+def get_cash_forecast_13wk(conn, start_date=None, starting_balance=None):
     """13 weekly buckets of expected AR collections / AP disbursements,
     from currently-outstanding invoices' due_date, walked forward into a
-    running projected cash balance that starts from the current actual
-    cash position (finance_core.get_cash_position).
+    running projected cash balance.
 
     Each entry: {week_start, week_end, ar_collections, ap_disbursements,
     net_cash_flow, projected_balance}, oldest first.
@@ -233,13 +243,24 @@ def get_cash_forecast_13wk(conn, start_date=None):
     overdue), not the historical as-of snapshot get_cash_flow_statement
     uses — this is a forward-looking projection of what's on the books
     right now, not a historical reconstruction.
+
+    starting_balance: optional pre-fetched cash position to start from
+    (finance_core.get_cash_position(conn)) — pass it in when the caller
+    already fetched it (see fin_dashboard in views/__init__.py), to avoid
+    re-running the same query. When omitted, it's fetched here as of
+    start_date — a past start_date correctly gets that date's actual
+    historical balance rather than today's, which a bare get_cash_position(
+    conn) (no as_of) would otherwise silently substitute.
     """
     start = date.fromisoformat(start_date) if start_date else date.today()
 
-    ar_by_week = _outstanding_by_week(conn, 'ar_invoice', start, FORECAST_WEEKS)
-    ap_by_week = _outstanding_by_week(conn, 'ap_invoice', start, FORECAST_WEEKS)
+    ar_by_week = _outstanding_by_week(conn, 'ar_invoice', 'ar_payment', start, FORECAST_WEEKS)
+    ap_by_week = _outstanding_by_week(conn, 'ap_invoice', 'ap_payment', start, FORECAST_WEEKS)
 
-    balance = get_cash_position(conn)
+    balance = (
+        starting_balance if starting_balance is not None
+        else get_cash_position(conn, as_of=start_date)
+    )
     weeks = []
     for w in range(FORECAST_WEEKS):
         week_start = start + timedelta(days=7 * w)
