@@ -222,6 +222,17 @@ def test_set_po_status_updates_status():
     assert conn.last_params == ["sent", 5]
 
 
+def test_set_po_status_stamps_received_date_only_when_received():
+    conn = _FakeConn()
+    set_po_status(conn, 5, "received")
+    assert "received_date = COALESCE(received_date, CURRENT_DATE::TEXT)" in conn.last_sql
+    assert conn.last_params == ["received", 5]
+
+    conn2 = _FakeConn()
+    set_po_status(conn2, 5, "partial")
+    assert "received_date" not in conn2.last_sql
+
+
 # ── receiving ──────────────────────────────────────────────────────────────
 
 def test_receive_po_item_scopes_to_po_when_given():

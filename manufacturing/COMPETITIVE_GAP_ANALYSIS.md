@@ -414,7 +414,7 @@ Required for customer-facing delivery date commitments.
 - Warn on SO confirm if ATP is insufficient
 - ATP inquiry screen: enter product + qty + date → get yes/no + alternatives
 
-#### P2-C: Supplier Performance Scorecard
+#### P2-C: Supplier Performance Scorecard ✅ Done
 Data already exists (POs, receiving, QA supplier scores). Just needs aggregation.
 - On-time delivery % (PO expected date vs. actual receipt date)
 - Quantity fill rate % (qty received / qty ordered)
@@ -422,6 +422,20 @@ Data already exists (POs, receiving, QA supplier scores). Just needs aggregation
 - Composite score (weighted average of the three)
 - Supplier scorecard page with trend charts
 - Supplier ranking report (sort by score)
+- **Shipped:** `manufacturing/supplier_scorecard_core.py` — a pure computed
+  view (no new tables) over `purchase_order`/`po_item` and `qa_supplier`.
+  On-time % is measured against a new `purchase_order.received_date`
+  column, stamped by `set_po_status` the first time a PO reaches
+  `'received'` (there was previously no receipt-date tracking anywhere in
+  the PO domain). Fill rate is `qty_received`/`qty_ordered` over placed POs.
+  Quality reject % comes from `qa_supplier.ppm`, matched to a supplier by
+  name (that table has no `supplier_id` FK). The composite score
+  renormalises over whichever of the three metrics a supplier actually has
+  data for, so missing QA ratings don't drag a supplier's score to zero.
+  Web pages: `/suppliers/scorecard/` (ranking list) and
+  `/suppliers/scorecard/<id>/` (per-supplier breakdown + Chart.js monthly
+  on-time/fill-rate trend), wired from Purchasing → Vendor Performance and
+  QA → Supplier Scorecards.
 
 #### P2-D: Cash Flow Statement & 13-Week Forecast
 GL data + AR/AP due dates exist. Need the statement and rolling forecast.

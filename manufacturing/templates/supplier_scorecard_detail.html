@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block page_title %}Supplier Scorecard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/suppliers/scorecard/" class="btn">All Scorecards</a>
+{% if scorecard %}
+<a href="/suppliers/{{ scorecard.supplier_id }}/" class="btn">Supplier Detail</a>
+{% endif %}
+<a href="/qa/suppliers/" class="btn">Supplier Quality Ratings</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ssc-wrap { width:100%; max-width:900px; }
+.ssc-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.ssc-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px; }
+.ssc-summary .card { text-align:center; }
+.ssc-summary .num { font-size:26px; font-weight:bold; color:var(--accent); }
+.ssc-summary .num.composite { color:#2e7d32; }
+.ssc-summary .lbl { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.no-data { color:var(--text-muted); font-size:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ssc-wrap">
+    {% if not scorecard %}
+    <h2>Supplier Scorecard</h2>
+    <div class="card">Supplier not found.</div>
+    {% else %}
+    <h2>{{ scorecard.supplier_name }} — Scorecard</h2>
+    <p class="no-data">{{ scorecard.date_from }} to {{ scorecard.date_to }}</p>
+
+    <div class="ssc-summary">
+        <div class="card">
+            <div class="num composite">{% if scorecard.composite_score is not None %}{{ scorecard.composite_score }}{% else %}—{% endif %}</div>
+            <div class="lbl">Composite Score</div>
+        </div>
+        <div class="card">
+            <div class="num">{% if scorecard.on_time_pct is not None %}{{ scorecard.on_time_pct }}%{% else %}—{% endif %}</div>
+            <div class="lbl">On-Time Delivery ({{ scorecard.on_time_sample }} PO{{ scorecard.on_time_sample|pluralize }})</div>
+        </div>
+        <div class="card">
+            <div class="num">{% if scorecard.fill_rate_pct is not None %}{{ scorecard.fill_rate_pct }}%{% else %}—{% endif %}</div>
+            <div class="lbl">Quantity Fill Rate</div>
+        </div>
+        <div class="card">
+            <div class="num">{% if scorecard.quality_reject_pct is not None %}{{ scorecard.quality_reject_pct }}%{% else %}—{% endif %}</div>
+            <div class="lbl">Quality Reject Rate ({{ scorecard.quality_sample }} material{{ scorecard.quality_sample|pluralize }})</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Monthly Trend</h3>
+        {% if scorecard.trend %}
+        <canvas id="chart-trend" height="90"></canvas>
+        {% else %}
+        <p class="no-data">No purchase order activity in this window.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if scorecard and scorecard.trend %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var trend = {{ trend_json|safe }};
+    new Chart(document.getElementById('chart-trend'), {
+        type: 'line',
+        data: {
+            labels: trend.map(function (r) { return r.month; }),
+            datasets: [
+                { label: 'On-Time %', data: trend.map(function (r) { return r.on_time_pct; }),
+                  borderColor: '#1d6fe8', tension: 0.2, spanGaps: true },
+                { label: 'Fill Rate %', data: trend.map(function (r) { return r.fill_rate_pct; }),
+                  borderColor: '#2e7d32', tension: 0.2, spanGaps: true },
+            ],
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: 100 } },
+        },
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}

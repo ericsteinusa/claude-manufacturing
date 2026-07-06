@@ -29,27 +29,30 @@ from ..purchase_orders_core import ensure_po_tables
 SAMPLE_PO_PREFIX = "SMPL-PO-"   # po_number prefix marking sample rows
 
 # suffix, status, order_date offset (days ago), expected offset (days from
-# order), notes, [(product_name, qty_ordered, unit_price, qty_received)].
-# Quantities received are consistent with the status (partial = some lines
-# short, received = all full).
+# order), received offset (days ago, or None if not yet received), notes,
+# [(product_name, qty_ordered, unit_price, qty_received)]. Quantities
+# received are consistent with the status (partial = some lines short,
+# received = all full). received offset is only set for status='received'
+# (matches set_po_status: received_date is only stamped on that transition,
+# so it's what the supplier-scorecard's on-time % is computed from).
 PURCHASE_ORDERS = [
-    ("1", "draft", 0, 14, "Restock frame raw material", [
+    ("1", "draft", 0, 14, None, "Restock frame raw material", [
         ("Steel Tube", 100, 3.50, 0),
         ("Paint Can",   20, 12.00, 0),
     ]),
-    ("2", "sent", 3, 14, "Wheel components — awaiting delivery", [
+    ("2", "sent", 3, 14, None, "Wheel components — awaiting delivery", [
         ("Rim",  30, 18.00, 0),
         ("Tire", 25, 22.00, 0),
     ]),
-    ("3", "partial", 10, 14, "Spokes partially received", [
+    ("3", "partial", 10, 14, None, "Spokes partially received", [
         ("Spoke",      500, 0.40, 200),
         ("Inner Tube",  25, 6.50, 25),
     ]),
-    ("4", "received", 20, 14, "Cockpit parts — fully received", [
+    ("4", "received", 20, 14, 7, "Cockpit parts — fully received", [
         ("Handlebar", 15, 14.00, 15),
         ("Seat",      15,  9.50, 15),
     ]),
-    ("5", "cancelled", 8, 14, "Duplicate order — cancelled", [
+    ("5", "cancelled", 8, 14, None, "Duplicate order — cancelled", [
         ("Tire", 10, 22.00, 0),
     ]),
 ]
@@ -97,7 +100,7 @@ def seed_pos(conn):
     supplier_id = _first_supplier_id(conn)
     products = _sample_product_ids(conn)
     pos = items = 0
-    for suffix, status, ago, exp, notes, lines in PURCHASE_ORDERS:
+    for suffix, status, ago, exp, received_ago, notes, lines in PURCHASE_ORDERS:
         po_number = SAMPLE_PO_PREFIX + suffix
         if conn.execute(
                 "SELECT 1 FROM purchase_order WHERE po_number = %s",
@@ -106,11 +109,17 @@ def seed_pos(conn):
         order_date = (date.today() - timedelta(days=ago)).isoformat()
         expected = (date.today() - timedelta(days=ago)
                     + timedelta(days=exp)).isoformat()
+        received = (
+            (date.today() - timedelta(days=received_ago)).isoformat()
+            if received_ago is not None else None
+        )
         po_id = conn.execute(
             "INSERT INTO purchase_order (po_number, supplier_id, order_date,"
-            " expected_date, status, notes) VALUES (%s,%s,%s,%s,%s,%s)"
+            " expected_date, status, notes, received_date)"
+            " VALUES (%s,%s,%s,%s,%s,%s,%s)"
             " RETURNING id",
-            (po_number, supplier_id, order_date, expected, status, notes)
+            (po_number, supplier_id, order_date, expected, status, notes,
+             received)
         ).fetchone()["id"]
         pos += 1
         for name, qty, price, received in lines:

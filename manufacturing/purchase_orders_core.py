@@ -85,6 +85,10 @@ def ensure_po_tables(conn):
         ADD COLUMN IF NOT EXISTS created_by TEXT
     """)
     conn.execute("""
+        ALTER TABLE purchase_order
+        ADD COLUMN IF NOT EXISTS received_date TEXT
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS po_item (
             id SERIAL PRIMARY KEY,
             po_id INTEGER NOT NULL REFERENCES purchase_order(id),
@@ -270,10 +274,22 @@ def delete_po_item(conn, item_id, po_id=None):
 
 def set_po_status(conn, po_id, new_status):
     """Set a PO's status. Does not commit and does not check the transition —
-    callers should gate with :func:`can_transition` first."""
-    conn.execute(
-        "UPDATE purchase_order SET status=%s WHERE id=%s",
-        (new_status, po_id))
+    callers should gate with :func:`can_transition` first.
+
+    Stamps received_date the first time a PO reaches 'received' (kept if
+    already set, e.g. a repeated call), so on-time delivery can later be
+    measured against expected_date — see supplier_scorecard_core.py.
+    """
+    if new_status == 'received':
+        conn.execute(
+            "UPDATE purchase_order SET status=%s, "
+            "received_date = COALESCE(received_date, CURRENT_DATE::TEXT) "
+            "WHERE id=%s",
+            (new_status, po_id))
+    else:
+        conn.execute(
+            "UPDATE purchase_order SET status=%s WHERE id=%s",
+            (new_status, po_id))
 
 
 def receive_po_item(conn, item_id, qty_received, po_id=None):
