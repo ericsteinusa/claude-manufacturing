@@ -21,9 +21,12 @@
 .filter-bar label { color:white; font-size:13px; font-weight:bold; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
 #gantt-container { overflow-x:auto; }
-.gantt-st-pending .bar { fill:#94a3b8; }
-.gantt-st-in_progress .bar { fill:#f59e0b; }
-.gantt-st-completed .bar { fill:#22c55e; }
+/* frappe-gantt's own stylesheet sets .gantt .bar-wrapper .bar { fill: var(--g-bar-color) }
+   (3 classes of specificity) — these overrides must match that structure
+   (bar-wrapper + our status class on the same node) to actually win. */
+.gantt .bar-wrapper.gantt-st-pending .bar { fill:#94a3b8; }
+.gantt .bar-wrapper.gantt-st-in_progress .bar { fill:#f59e0b; }
+.gantt .bar-wrapper.gantt-st-completed .bar { fill:#22c55e; }
 .load-table { width:100%; border-collapse:collapse; }
 .load-table td { padding:7px 10px; font-size:13px; vertical-align:middle; }
 .bar-track { width:200px; height:10px; background:#eee; border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; margin-right:8px; }
@@ -84,8 +87,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css">
-<script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@1.2.2/dist/frappe-gantt.min.css">
+<script src="https://cdn.jsdelivr.net/npm/frappe-gantt@1.2.2/dist/frappe-gantt.umd.min.js"></script>
 <script>
 (function () {
     function getCookie(name) {
