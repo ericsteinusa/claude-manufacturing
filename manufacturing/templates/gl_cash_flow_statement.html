@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block page_title %}Cash Flow Statement{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/" class="btn">G/L Dashboard</a>
+<a href="/gl/income-statement/" class="btn">Income Statement</a>
+<a href="/gl/balance-sheet/" class="btn">Balance Sheet</a>
+<a href="/fin/forecast/" class="btn">13-Week Forecast</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:800px; }
+
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:var(--accent); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.stmt { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:24px 28px; }
+.stmt-section { margin-bottom:20px; }
+.sect-hdr { background:#003cB4; color:white; font-weight:bold; font-size:13px;
+    padding:6px 12px; border-radius:4px; margin-bottom:6px; text-transform:uppercase; }
+.stmt-line { display:flex; justify-content:space-between; padding:4px 12px; font-size:13px; }
+.stmt-line:hover { background:#f5f5f5; }
+.sect-total { display:flex; justify-content:space-between; padding:6px 12px;
+    font-weight:bold; font-size:13px; border-top:1px solid #ccc; margin-top:4px; }
+.summary-box { background:#f0f4ff; border:1px solid #c0c8e8; border-radius:6px;
+    padding:14px 18px; margin-top:14px; }
+.summary-line { display:flex; justify-content:space-between; padding:4px 0; font-size:14px; }
+.summary-line.major { font-weight:bold; font-size:15px; border-top:2px solid #333;
+    padding-top:8px; margin-top:4px; }
+.pos { color:#0a3622; }
+.neg { color:#842029; }
+.note { font-size:12px; color:#777; margin-top:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Cash Flow Statement</h2>
+
+    <form method="get" class="filter-bar">
+        <label>From:</label>
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <label>To:</label>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <button type="submit" class="btn-sm">Run</button>
+    </form>
+
+    <div class="stmt">
+        <div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:18px;color:#222;">
+            Cash Flow Statement (Indirect Method)<br>
+            <span style="font-size:12px;color:#555;font-weight:normal;">{{ date_from }} to {{ date_to }}</span>
+        </div>
+
+        <div class="stmt-section">
+            <div class="sect-hdr">Operating Activities</div>
+            <div class="stmt-line"><span>Net Income</span><span>${{ operating.net_income|floatformat:2 }}</span></div>
+            <div class="stmt-line"><span>Depreciation &amp; Amortization</span><span>${{ operating.depreciation|floatformat:2 }}</span></div>
+            <div class="stmt-line"><span>(Increase)/Decrease in Accounts Receivable</span><span>${{ operating.ar_change|floatformat:2 }}</span></div>
+            <div class="stmt-line"><span>Increase/(Decrease) in Accounts Payable</span><span>${{ operating.ap_change|floatformat:2 }}</span></div>
+            <div class="sect-total"><span>Net Cash from Operating Activities</span><span>${{ operating.total|floatformat:2 }}</span></div>
+            <div class="note">{{ inventory_note }}</div>
+        </div>
+
+        <div class="stmt-section">
+            <div class="sect-hdr">Investing Activities</div>
+            <div class="stmt-line"><span>Purchases of Fixed Assets</span><span>${{ investing.capex|floatformat:2 }}</span></div>
+            <div class="sect-total"><span>Net Cash from Investing Activities</span><span>${{ investing.total|floatformat:2 }}</span></div>
+        </div>
+
+        <div class="stmt-section">
+            <div class="sect-hdr">Financing Activities</div>
+            <div class="sect-total"><span>Net Cash from Financing Activities</span><span>${{ financing.total|floatformat:2 }}</span></div>
+            <div class="note">{{ financing.note }}</div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-line major">
+                <span>Net Change in Cash</span>
+                <span class="{% if net_change_in_cash >= 0 %}pos{% else %}neg{% endif %}">
+                    ${{ net_change_in_cash|floatformat:2 }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Cash — Start of Period (actual bank balance)</span>
+                <span>${{ cash_start|floatformat:2 }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Cash — End of Period (actual bank balance)</span>
+                <span>${{ cash_end|floatformat:2 }}</span>
+            </div>
+            <div class="note">
+                The start/end figures above are the actual recorded bank balance, shown
+                alongside the computed net change rather than forced to reconcile with it —
+                see the notes on inventory and financing above for why they may not tie exactly.
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

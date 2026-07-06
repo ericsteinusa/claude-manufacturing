@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block page_title %}13-Week Cash Forecast{% endblock %}
+
+{% block toolbar_left %}
+<a href="/fin/" class="btn">Finance Dashboard</a>
+<a href="/gl/cash-flow/" class="btn">Cash Flow Statement</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.m-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:var(--accent); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; }
+.list-table th,.list-table td { padding:8px 12px; text-align:right; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th:first-child, .list-table td:first-child { text-align:left; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.neg { color:#842029; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>13-Week Cash Forecast</h2>
+
+    <form method="get" class="filter-bar">
+        <label>Start Date:</label>
+        <input type="date" name="start_date" value="{{ start_date }}">
+        <button type="submit" class="btn-sm">Run</button>
+    </form>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Projected Cash Balance</h3>
+        <canvas id="chart-forecast" height="80"></canvas>
+    </div>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Week Of</th>
+                    <th>AR Collections</th>
+                    <th>AP Disbursements</th>
+                    <th>Net Cash Flow</th>
+                    <th>Projected Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in weeks %}
+                <tr>
+                    <td>{{ w.week_start }} – {{ w.week_end }}</td>
+                    <td>${{ w.ar_collections|floatformat:2 }}</td>
+                    <td>${{ w.ap_disbursements|floatformat:2 }}</td>
+                    <td class="{% if w.net_cash_flow < 0 %}neg{% endif %}">${{ w.net_cash_flow|floatformat:2 }}</td>
+                    <td class="{% if w.projected_balance < 0 %}neg{% endif %}"><strong>${{ w.projected_balance|floatformat:2 }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);">
+        Based on currently open/partial/overdue AR and AP invoices, bucketed by due date
+        (already-overdue amounts are folded into the first week). Starts from the current
+        actual bank balance across active accounts.
+    </p>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var weeks = {{ weeks_json|safe }};
+    new Chart(document.getElementById('chart-forecast'), {
+        type: 'line',
+        data: {
+            labels: weeks.map(function (w) { return w.week_start; }),
+            datasets: [
+                { label: 'Projected Balance', data: weeks.map(function (w) { return w.projected_balance; }),
+                  borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.1)', fill: true, tension: 0.2 },
+            ],
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: false } } },
+    });
+})();
+</script>
+{% endblock %}

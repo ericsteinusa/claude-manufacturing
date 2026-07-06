@@ -9,6 +9,8 @@
 <a href="/fin/audits/" class="btn">Audits</a>
 <a href="/fin/bank-rec/" class="btn">Bank Rec</a>
 <a href="/fin/tax/" class="btn">Tax Filings</a>
+<a href="/gl/cash-flow/" class="btn">Cash Flow</a>
+<a href="/fin/forecast/" class="btn">13-Week Forecast</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
@@ -58,6 +60,8 @@
         <a href="/fin/audits/" class="dept-btn">Audits</a>
         <a href="/fin/bank-rec/" class="dept-btn">Bank Reconciliation</a>
         <a href="/fin/tax/" class="dept-btn">Tax Filings</a>
+        <a href="/gl/cash-flow/" class="dept-btn">Cash Flow Statement</a>
+        <a href="/fin/forecast/" class="dept-btn">13-Week Forecast</a>
     </div>
 
     <div class="section-label">Accounts Payable</div>
@@ -90,6 +94,31 @@
             <div class="lbl">Total Outstanding</div>
             <div class="val">${{ ar.total_outstanding|floatformat:2 }}</div>
         </div>
+    </div>
+
+    <div class="section-label">Cash Flow</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Cash Position</div>
+            <div class="val">${{ cash_position|floatformat:2 }}</div>
+        </div>
+        <div class="kpi{% if cash_forecast_end < 0 %} red{% endif %}">
+            <div class="lbl">Projected Balance (13 wks)</div>
+            <div class="val">${{ cash_forecast_end|floatformat:2 }}</div>
+        </div>
+        <div class="kpi{% if cash_forecast_net_change < 0 %} red{% endif %}">
+            <div class="lbl">Net Change (13 wks)</div>
+            <div class="val">${{ cash_forecast_net_change|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>13-Week Cash Balance Projection</h3>
+        <canvas id="chart-cash-forecast" height="90"></canvas>
+        <p style="font-size:12px;color:var(--text-muted);margin:8px 0 0;">
+            <a href="/fin/forecast/" style="color:var(--accent);">View full forecast</a> ·
+            <a href="/gl/cash-flow/" style="color:var(--accent);">Cash flow statement</a>
+        </p>
     </div>
 
     <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -149,6 +178,19 @@
 (function () {
     var revExpense = {{ rev_expense_json|safe }};
     var arAging = {{ ar_aging_json|safe }};
+    var cashForecast = {{ cash_forecast_json|safe }};
+
+    new Chart(document.getElementById('chart-cash-forecast'), {
+        type: 'line',
+        data: {
+            labels: cashForecast.map(function (w) { return w.week_start; }),
+            datasets: [
+                { label: 'Projected Balance', data: cashForecast.map(function (w) { return w.projected_balance; }),
+                  borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.1)', fill: true, tension: 0.2 },
+            ],
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: false } } },
+    });
 
     new Chart(document.getElementById('chart-rev-expense'), {
         type: 'bar',

@@ -368,6 +368,39 @@ def list_bank_statements(conn, account_id: int, status=None) -> list:
     return [dict(r) for r in conn.execute(sql, params).fetchall()]
 
 
+def get_cash_position(conn, as_of=None):
+    """Total balance across active bank accounts: the latest bank_statement
+    ending_balance per account (bank_account itself carries no balance
+    column). Mirrors reports_core.financial_dashboard's inline cash query;
+    exposed here as a standalone function since finance_core already owns
+    bank-account CRUD and cash_flow_core.py needs it as its own value
+    (calling the full financial_dashboard() for one field would run several
+    unrelated DSO/DPO/aging queries just to discard them).
+
+    as_of optionally restricts each account to its latest statement dated
+    on or before that date (a historical snapshot); omit for the current
+    balance (latest statement regardless of date).
+    """
+    sql = (
+        "SELECT COALESCE(SUM(latest.ending_balance), 0) AS cash "
+        "FROM bank_account ba "
+        "JOIN LATERAL ( "
+        "    SELECT ending_balance FROM bank_statement bs "
+        "    WHERE bs.bank_account_id = ba.id "
+    )
+    params: list = []
+    if as_of:
+        sql += " AND bs.statement_date <= %s "
+        params.append(as_of)
+    sql += (
+        "    ORDER BY bs.statement_date DESC, bs.id DESC LIMIT 1 "
+        ") latest ON TRUE "
+        "WHERE ba.is_active = 1"
+    )
+    row = conn.execute(sql, params).fetchone()
+    return float(row['cash']) if row else 0.0
+
+
 def create_bank_account(
     conn, account_name: str, bank_name: str, account_number: str,
     routing_number: str, notes: str,

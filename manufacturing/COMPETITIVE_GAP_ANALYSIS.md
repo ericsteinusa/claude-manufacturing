@@ -437,12 +437,27 @@ Data already exists (POs, receiving, QA supplier scores). Just needs aggregation
   on-time/fill-rate trend), wired from Purchasing → Vendor Performance and
   QA → Supplier Scorecards.
 
-#### P2-D: Cash Flow Statement & 13-Week Forecast
+#### P2-D: Cash Flow Statement & 13-Week Forecast ✅ Done
 GL data + AR/AP due dates exist. Need the statement and rolling forecast.
 - Cash flow statement (operating: net income ± AR/AP/inventory changes; investing: fixed asset purchases; financing: loans)
 - 13-week forecast: pull AR invoices due + AP invoices due by week
 - Cash balance projection graph
 - Add to finance dashboard
+- **Shipped:** `manufacturing/cash_flow_core.py` — a pure computed view (no
+  new tables) building an indirect-method statement from
+  `accounting_core.income_statement` (net income), a new
+  `finance_core.get_cash_position` (actual bank balance, also reused by the
+  13-week forecast's starting point), period-over-period AR/AP balance
+  snapshots, and a depreciation addback via
+  `fixed_asset_core.calc_annual_depreciation`. Two gaps are called out
+  explicitly rather than faked: inventory value change (no point-in-time
+  inventory valuation exists anywhere in this schema) and financing
+  activities (no loan/debt table exists in the codebase at all, so that
+  section is always zero). The forecast buckets currently-outstanding AR/AP
+  by due date into 13 weekly buckets, folding already-overdue amounts into
+  week 1. Web pages: `/gl/cash-flow/` (statement) and `/fin/forecast/`
+  (forecast + Chart.js balance projection), plus a new Cash Flow section
+  on `/fin/` (finance dashboard).
 
 #### P2-E: Sampling Plans & AQL
 Required for formal incoming inspection programs.
