@@ -18,6 +18,7 @@ from manufacturing.payroll_core import (
     delete_employee_deduction,
     list_payroll_runs, get_payroll_run, get_run_entries,
     get_pay_stub, get_stub_deductions, list_run_employees,
+    list_pay_stubs_for_employee,
     get_ytd,
 )
 
@@ -501,6 +502,31 @@ def test_list_run_employees_filters_by_run():
     list_run_employees(conn, 3)
     params = conn.execute.call_args[0][1]
     assert 3 in params
+
+
+# ---------------------------------------------------------------------------
+# list_pay_stubs_for_employee (Employee Self-Service, P2-G)
+# ---------------------------------------------------------------------------
+
+def test_list_pay_stubs_for_employee_returns_rows():
+    conn = _conn(fetchall=[{'entry_id': 7, 'run_id': 2, 'gross_pay': 2000.0}])
+    result = list_pay_stubs_for_employee(conn, 5)
+    assert result[0]['entry_id'] == 7
+
+
+def test_list_pay_stubs_for_employee_filters_by_people_id():
+    conn = _conn(fetchall=[])
+    list_pay_stubs_for_employee(conn, 5)
+    sql, params = conn.execute.call_args[0]
+    assert 'payroll_run' in sql
+    assert list(params) == [5]
+
+
+def test_list_pay_stubs_for_employee_orders_most_recent_first():
+    conn = _conn(fetchall=[])
+    list_pay_stubs_for_employee(conn, 5)
+    sql = conn.execute.call_args[0][0]
+    assert 'ORDER BY pr.run_date DESC' in sql
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block page_title %}Pay Stub{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ess/pay-stubs/" class="btn">My Pay Stubs</a>
+<a href="/ess/" class="btn">My Info</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:700px; }
+
+.stub { background:white; border: 1.5px solid var(--border); border-radius:8px;
+    padding:24px 28px; font-family:monospace; font-size:13px; }
+.stub-header { text-align:center; font-size:16px; font-weight:bold;
+    border-bottom:2px solid #333; padding-bottom:10px; margin-bottom:14px; }
+.stub-section { border-bottom:1px solid #ccc; margin-bottom:12px; padding-bottom:10px; }
+.stub-section h4 { font-size:13px; color:#333; margin:0 0 6px; text-transform:uppercase;
+    letter-spacing:1px; }
+.stub-line { display:flex; justify-content:space-between; margin-bottom:3px; }
+.stub-line .lbl { color:#444; }
+.stub-line .val { font-weight:bold; color:#111; }
+.stub-line .debit { color:#c33; }
+.stub-total { display:flex; justify-content:space-between; font-weight:bold;
+    font-size:15px; border-top:2px solid #333; padding-top:10px; margin-top:10px; }
+.stub-total .net-val { color:var(--accent); }
+.print-btn { padding:7px 18px; background:var(--accent); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-bottom:14px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>My Pay Stub</h2>
+    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+
+    <div class="stub">
+        <div class="stub-header">PAY STUB</div>
+
+        <div class="stub-section">
+            <div class="stub-line"><span class="lbl">Employee:</span>
+                <span class="val">{{ stub.last_name }}, {{ stub.first_name }}</span></div>
+            <div class="stub-line"><span class="lbl">Employee ID:</span>
+                <span class="val">{{ stub.employee_id|default:"—" }}</span></div>
+            <div class="stub-line"><span class="lbl">Pay Period:</span>
+                <span class="val">{{ stub.pay_period_start }} to {{ stub.pay_period_end }}</span></div>
+            <div class="stub-line"><span class="lbl">Payment Date:</span>
+                <span class="val">{{ stub.run_date|slice:":10" }}</span></div>
+            <div class="stub-line"><span class="lbl">Pay Type:</span>
+                <span class="val">{{ stub.pay_type|default:"—" }}</span></div>
+            {% if stub.pay_type == "hourly" %}
+            <div class="stub-line"><span class="lbl">Pay Rate:</span>
+                <span class="val">${{ stub.pay_rate|floatformat:2 }}/hr</span></div>
+            {% elif stub.pay_type == "salary" %}
+            <div class="stub-line"><span class="lbl">Annual Salary:</span>
+                <span class="val">${{ stub.pay_rate|floatformat:0 }}/yr</span></div>
+            {% endif %}
+        </div>
+
+        <div class="stub-section">
+            <h4>Earnings</h4>
+            <div class="stub-line"><span class="lbl">Regular Hours:</span>
+                <span class="val">{{ stub.regular_hours|floatformat:2 }} hrs</span></div>
+            <div class="stub-line"><span class="lbl">Overtime Hours:</span>
+                <span class="val">{{ stub.overtime_hours|floatformat:2 }} hrs</span></div>
+            <div class="stub-line" style="margin-top:6px;">
+                <span class="lbl" style="font-weight:bold;">Gross Pay:</span>
+                <span class="val">${{ stub.gross_pay|floatformat:2 }}</span></div>
+        </div>
+
+        {% if pre_tax %}
+        <div class="stub-section">
+            <h4>Pre-Tax Deductions</h4>
+            {% for d in pre_tax %}
+            <div class="stub-line"><span class="lbl">{{ d.deduction_name }}:</span>
+                <span class="debit">-${{ d.amount|floatformat:2 }}</span></div>
+            {% endfor %}
+            <div class="stub-line" style="margin-top:4px;">
+                <span class="lbl" style="font-weight:bold;">Total Pre-Tax Deductions:</span>
+                <span class="debit">-${{ stub.pre_tax_deductions|floatformat:2 }}</span></div>
+        </div>
+        {% endif %}
+
+        <div class="stub-section">
+            <h4>Taxes</h4>
+            <div class="stub-line"><span class="lbl">Federal Income Tax:</span>
+                <span class="debit">-${{ stub.federal_tax|floatformat:2 }}</span></div>
+            <div class="stub-line"><span class="lbl">State Income Tax:</span>
+                <span class="debit">-${{ stub.state_tax|floatformat:2 }}</span></div>
+            <div class="stub-line">
+                <span class="lbl">Social Security ({{ ss_rate|floatformat:1 }}%):</span>
+                <span class="debit">-${{ stub.social_security|floatformat:2 }}</span></div>
+            <div class="stub-line">
+                <span class="lbl">Medicare ({{ medicare_rate|floatformat:2 }}%):</span>
+                <span class="debit">-${{ stub.medicare|floatformat:2 }}</span></div>
+            <div class="stub-line" style="margin-top:4px;">
+                <span class="lbl" style="font-weight:bold;">Total Taxes:</span>
+                <span class="debit">-${{ total_tax|floatformat:2 }}</span></div>
+        </div>
+
+        {% if post_tax %}
+        <div class="stub-section">
+            <h4>Post-Tax Deductions</h4>
+            {% for d in post_tax %}
+            <div class="stub-line"><span class="lbl">{{ d.deduction_name }}:</span>
+                <span class="debit">-${{ d.amount|floatformat:2 }}</span></div>
+            {% endfor %}
+            <div class="stub-line" style="margin-top:4px;">
+                <span class="lbl" style="font-weight:bold;">Total Post-Tax Deductions:</span>
+                <span class="debit">-${{ stub.post_tax_deductions|floatformat:2 }}</span></div>
+        </div>
+        {% endif %}
+
+        <div class="stub-total">
+            <span>NET PAY:</span>
+            <span class="net-val">${{ stub.net_pay|floatformat:2 }}</span>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

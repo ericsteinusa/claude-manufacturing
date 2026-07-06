@@ -14,6 +14,9 @@ from manufacturing.personnel_core import (
     create_person, update_person, load_depts, load_dept_subs,
     list_time_off_requests, get_time_off_request,
     create_time_off_request, set_time_off_status,
+    DEFAULT_ANNUAL_ALLOTMENT_DAYS,
+    ensure_time_off_balance_table, get_time_off_balance, set_time_off_allotment,
+    ensure_contact_columns, get_own_contact_info, update_own_contact_info,
 )
 
 
@@ -296,3 +299,132 @@ def test_set_time_off_status():
     assert 'UPDATE time_off_request' in sql
     assert 'approved' in params
     assert 4 in params
+
+
+# ── time-off balance (Employee Self-Service, P2-G) ──────────────────────
+
+class _DispatchConn:
+    """Returns canned rows based on a substring match against the SQL."""
+    def __init__(self, routes):
+        self.routes = routes
+        self.calls = []
+
+    def execute(self, sql, params=None):
+        self.calls.append((sql, list(params or [])))
+        for substring, rows in self.routes:
+            if substring in sql:
+                return _FakeCursor(rows)
+        return _FakeCursor([])
+
+    @property
+    def last_sql(self):
+        return self.calls[-1][0]
+
+    @property
+    def last_params(self):
+        return self.calls[-1][1]
+
+
+def test_ensure_time_off_balance_table_creates_table():
+    conn = _FakeConn()
+    ensure_time_off_balance_table(conn)
+    assert 'CREATE TABLE IF NOT EXISTS time_off_balance' in conn.last_sql
+
+
+def test_get_time_off_balance_uses_default_allotment_when_no_row():
+    conn = _DispatchConn([
+        ("FROM time_off_balance", []),
+        ("FROM time_off_request", []),
+    ])
+    balance = get_time_off_balance(conn, people_id=5, year=2026)
+    assert balance['allotted_days'] == DEFAULT_ANNUAL_ALLOTMENT_DAYS
+    assert balance['used_days'] == 0.0
+    assert balance['remaining_days'] == DEFAULT_ANNUAL_ALLOTMENT_DAYS
+
+
+def test_get_time_off_balance_uses_configured_allotment():
+    conn = _DispatchConn([
+        ("FROM time_off_balance", [{'allotted_days': 20.0}]),
+        ("FROM time_off_request", []),
+    ])
+    balance = get_time_off_balance(conn, people_id=5, year=2026)
+    assert balance['allotted_days'] == 20.0
+
+
+def test_get_time_off_balance_subtracts_approved_vacation_days():
+    conn = _DispatchConn([
+        ("FROM time_off_balance", []),
+        ("FROM time_off_request", [
+            {'start_date': '2026-03-01', 'end_date': '2026-03-03'},  # 3 days
+            {'start_date': '2026-06-10', 'end_date': '2026-06-10'},  # 1 day
+        ]),
+    ])
+    balance = get_time_off_balance(conn, people_id=5, year=2026)
+    assert balance['used_days'] == 4.0
+    assert balance['remaining_days'] == DEFAULT_ANNUAL_ALLOTMENT_DAYS - 4.0
+
+
+def test_get_time_off_balance_ignores_malformed_dates():
+    conn = _DispatchConn([
+        ("FROM time_off_balance", []),
+        ("FROM time_off_request", [{'start_date': None, 'end_date': None}]),
+    ])
+    balance = get_time_off_balance(conn, people_id=5, year=2026)
+    assert balance['used_days'] == 0.0
+
+
+def test_get_time_off_balance_defaults_to_current_year():
+    conn = _DispatchConn([
+        ("FROM time_off_balance", []),
+        ("FROM time_off_request", []),
+    ])
+    balance = get_time_off_balance(conn, people_id=5)
+    assert balance['year'] == date.today().year
+
+
+def test_set_time_off_allotment_upserts():
+    conn = _FakeConn()
+    set_time_off_allotment(conn, people_id=5, year=2026, allotted_days=18.0)
+    sql, params = conn.calls[0]
+    assert 'ON CONFLICT (people_id, year)' in sql
+    assert params == [5, 2026, 18.0]
+
+
+# ── own contact info (Employee Self-Service, P2-G) ──────────────────────
+
+def test_ensure_contact_columns_alters_people_table():
+    conn = _FakeConn()
+    ensure_contact_columns(conn)
+    sqls = [s for s, _ in conn.calls]
+    assert any('phone' in s for s in sqls)
+    assert any('emergency_contact_name' in s for s in sqls)
+    assert any('emergency_contact_phone' in s for s in sqls)
+    assert any('emergency_contact_relationship' in s for s in sqls)
+
+
+def test_get_own_contact_info_returns_dict():
+    conn = _FakeConn(rows=[{'id': 5, 'phone': '555-1234'}])
+    info = get_own_contact_info(conn, 5)
+    assert info['phone'] == '555-1234'
+
+
+def test_get_own_contact_info_returns_none_when_missing():
+    conn = _FakeConn(rows=[])
+    assert get_own_contact_info(conn, 999) is None
+
+
+def test_update_own_contact_info_does_not_touch_dept_or_employee_id():
+    conn = _FakeConn()
+    update_own_contact_info(
+        conn, 5, address='1 Main St', city='Springfield', state='IL',
+        zip_code='62704', phone='555-1234',
+        emergency_contact_name='Jane Doe', emergency_contact_phone='555-5678',
+        emergency_contact_relationship='Spouse',
+    )
+    sql, params = conn.calls[0]
+    assert 'dept_id' not in sql
+    assert 'employee_id' not in sql
+    assert params == [
+        '1 Main St', 'Springfield', 'IL', '62704', '555-1234',
+        'Jane Doe', '555-5678', 'Spouse', 5,
+    ]

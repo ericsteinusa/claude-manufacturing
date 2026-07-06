@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block page_title %}My Pay Stubs{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ess/ytd/" class="btn">YTD Summary</a>
+<a href="/ess/" class="btn">My Info</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ess-wrap { width:100%; max-width:900px; }
+.ess-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table th.num, .list-table td.num { text-align:right; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ess-wrap">
+    <h2>My Pay Stubs</h2>
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Pay Period</th>
+                    <th>Payment Date</th>
+                    <th class="num">Gross</th>
+                    <th class="num">Net</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in stubs %}
+            <tr>
+                <td>{{ s.pay_period_start }} to {{ s.pay_period_end }}</td>
+                <td>{{ s.run_date|slice:":10" }}</td>
+                <td class="num">${{ s.gross_pay|floatformat:2 }}</td>
+                <td class="num">${{ s.net_pay|floatformat:2 }}</td>
+                <td>{{ s.status|title }}</td>
+                <td><a href="/ess/pay-stubs/{{ s.entry_id }}/">View Stub</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No pay stubs yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

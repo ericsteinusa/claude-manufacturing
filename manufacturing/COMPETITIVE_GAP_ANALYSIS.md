@@ -547,7 +547,7 @@ Needed for ISO 9001 compliance and engineering document management.
   from both QA → Document Control and Engineering → Design Documents, whose
   menu leaves previously pointed at unrelated placeholder pages.
 
-#### P2-G: Employee Self-Service (ESS) Portal
+#### P2-G: Employee Self-Service (ESS) Portal ✅ Done
 Reduces HR workload for routine employee requests.
 - Employee login (separate session context or role-filtered view)
 - View own: pay stubs, YTD earnings, deductions
@@ -556,6 +556,37 @@ Reduces HR workload for routine employee requests.
 - Clock in/out from portal (web-based time clock)
 - View own performance reviews and training records
 - Update own contact info / emergency contact
+- **Shipped:** New `/ess/` pages (`views/_ess.py`), gated by plain
+  `login_required` rather than a dept/role check — employees belong to
+  every department, so nothing here can be gated the way most of this app
+  is. Every detail view (`ess_pay_stub_detail`, `ess_review_detail`,
+  `ess_training_detail`) does an explicit ownership check (the record's
+  `people_id` against the caller's own, looked up from `user_email` per
+  request — `people_id` was never in the session) rather than relying on
+  a decorator. Two of the six requirements were **already fully
+  self-service before this PR** and needed no new code: time-off request/
+  history (`/time-off/`) and clock in/out (`/time-clock/`) — ESS just
+  links to them. Pay stubs needed one new query
+  (`payroll_core.list_pay_stubs_for_employee`, since the existing
+  `get_pay_stub`/`list_run_employees` only look up by entry id or run id,
+  never "all of one employee's stubs"); reviews/training needed new
+  self-scoped views only, since `personnel_core.list_reviews`/
+  `list_trainings` already supported a `people_id` filter — the existing
+  web views for both were HR-only (`dept_required('personnel', ...)`).
+  **Time-off balance was fully greenfield** — no accrual concept existed
+  anywhere in the schema. Kept deliberately simple: a new
+  `time_off_balance(people_id, year, allotted_days)` table (defaulting to
+  15 days/year when no row exists) minus days actually taken from
+  *approved* `'Vacation'`-type requests that year, computed from
+  `time_off_request` on every read rather than stored, so there's one
+  source of truth. Contact info also needed new `people` columns (`phone`,
+  `emergency_contact_*`) plus a narrow `update_own_contact_info` that
+  deliberately does *not* expose `dept_id`/`employee_id`/name, unlike the
+  HR-facing `update_person` — an employee shouldn't be able to reassign
+  their own department through their own profile page. Wired into
+  navigation via a new "My Info" link in the global sidebar (`base.html`)
+  rather than through `menus.py`/`WEB_LEAF_URLS`, since that system is
+  keyed per-department and ESS needs to be reachable from all of them.
 
 #### P2-H: MRP → Auto-Release Purchase Orders
 Critical for MRP to be actionable. Currently MRP generates suggestions but POs must be created manually.

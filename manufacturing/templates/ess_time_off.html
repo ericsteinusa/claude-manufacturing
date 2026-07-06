@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block page_title %}My Time Off{% endblock %}
+
+{% block toolbar_left %}
+<a href="/time-off/new/" class="btn btn-primary">Request Time Off</a>
+<a href="/ess/" class="btn">My Info</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ess-wrap { width:100%; max-width:900px; }
+.ess-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.tile-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px; }
+.tile { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.tile label { display:block; font-size:11px; color:#888; font-weight:bold; text-transform:uppercase; margin-bottom:6px; }
+.tile .big { font-size:20px; font-weight:bold; color:#222; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.b-pending  { background:#fff3cd; color:#856404; }
+.b-approved { background:#d4edda; color:#0a3622; }
+.b-denied   { background:#f8d7da; color:#721c24; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ess-wrap">
+    <h2>My Time Off</h2>
+
+    <div class="tile-grid">
+        <div class="tile">
+            <label>Allotted ({{ balance.year }})</label>
+            <div class="big">{{ balance.allotted_days|floatformat:1 }} days</div>
+        </div>
+        <div class="tile">
+            <label>Used</label>
+            <div class="big">{{ balance.used_days|floatformat:1 }} days</div>
+        </div>
+        <div class="tile">
+            <label>Remaining</label>
+            <div class="big">{{ balance.remaining_days|floatformat:1 }} days</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr><th>Type</th><th>Start</th><th>End</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for r in requests %}
+            <tr>
+                <td>{{ r.request_type }}</td>
+                <td>{{ r.start_date }}</td>
+                <td>{{ r.end_date }}</td>
+                <td><span class="badge b-{{ r.status }}">{{ r.status|title }}</span></td>
+                <td><a href="/time-off/{{ r.id }}/">Detail</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No time-off requests yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

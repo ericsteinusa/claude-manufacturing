@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block page_title %}My Info{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ess/pay-stubs/" class="btn">Pay Stubs</a>
+<a href="/ess/time-off/" class="btn">Time Off</a>
+<a href="/ess/reviews/" class="btn">Reviews</a>
+<a href="/ess/training/" class="btn">Training</a>
+<a href="/ess/profile/" class="btn">My Profile</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ess-wrap { width:100%; max-width:1000px; }
+.ess-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.tile-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:20px; }
+.tile { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.tile label { display:block; font-size:11px; color:#888; font-weight:bold; text-transform:uppercase; margin-bottom:6px; }
+.tile .big { font-size:22px; font-weight:bold; color:#222; }
+.tile a { color:var(--accent); font-size:12px; font-weight:bold; text-decoration:none; }
+.tile a:hover { text-decoration:underline; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 10px; font-size:15px; color:#333; }
+.card ul { margin:0; padding-left:18px; font-size:13px; }
+.card li { margin-bottom:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ess-wrap">
+    <h2>Welcome, {{ person.first_name }} {{ person.last_name }}</h2>
+
+    <div class="tile-grid">
+        <div class="tile">
+            <label>Vacation Balance ({{ balance.year }})</label>
+            <div class="big">{{ balance.remaining_days|floatformat:1 }} days left</div>
+            <div style="font-size:12px;color:#888;margin-top:2px;">
+                {{ balance.used_days|floatformat:1 }} of {{ balance.allotted_days|floatformat:1 }} used
+            </div>
+            <a href="/ess/time-off/">View / Request Time Off &rarr;</a>
+        </div>
+        <div class="tile">
+            <label>Latest Pay Stub</label>
+            {% if latest_stub %}
+            <div class="big">${{ latest_stub.net_pay|floatformat:2 }}</div>
+            <div style="font-size:12px;color:#888;margin-top:2px;">
+                {{ latest_stub.pay_period_start }} to {{ latest_stub.pay_period_end }}
+            </div>
+            {% else %}
+            <div class="big" style="font-size:14px;color:#888;">No pay stubs yet</div>
+            {% endif %}
+            <a href="/ess/pay-stubs/">View Pay Stubs &rarr;</a>
+        </div>
+        <div class="tile">
+            <label>Pending Reviews</label>
+            <div class="big">{{ pending_reviews|length }}</div>
+            <a href="/ess/reviews/">View Reviews &rarr;</a>
+        </div>
+        <div class="tile">
+            <label>Upcoming Training</label>
+            <div class="big">{{ upcoming_trainings|length }}</div>
+            <a href="/ess/training/">View Training &rarr;</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Quick Links</h3>
+        <ul>
+            <li><a href="/time-clock/">Clock In / Out</a></li>
+            <li><a href="/time-clock/hours/">My Hours</a></li>
+            <li><a href="/ess/time-off/">Request Time Off</a></li>
+            <li><a href="/ess/profile/">Update My Contact Info</a></li>
+        </ul>
+    </div>
+
+    {% if open_time_off %}
+    <div class="card">
+        <h3>Pending Time-Off Requests</h3>
+        <ul>
+            {% for r in open_time_off %}
+            <li><a href="/time-off/{{ r.id }}/">{{ r.request_type }}: {{ r.start_date }} to {{ r.end_date }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

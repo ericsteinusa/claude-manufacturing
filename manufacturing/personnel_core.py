@@ -216,6 +216,122 @@ def set_time_off_status(conn, req_id, status):
 
 
 # ---------------------------------------------------------------------------
+# Time-off balance (Employee Self-Service, P2-G)
+#
+# There is no accrual engine anywhere in this app — no rate-per-pay-period,
+# no carryover rules. This is deliberately the simplest model that answers
+# "how many vacation days do I have left": an admin-settable annual
+# allotment (time_off_balance, defaulting to DEFAULT_ANNUAL_ALLOTMENT_DAYS
+# when unset) minus days actually taken from *approved* 'Vacation' requests
+# that year. Used days are computed from time_off_request on every call
+# rather than stored, so there is exactly one source of truth (the request
+# table) and nothing to keep in sync.
+# ---------------------------------------------------------------------------
+
+DEFAULT_ANNUAL_ALLOTMENT_DAYS = 15.0
+
+
+def ensure_time_off_balance_table(conn):
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS time_off_balance (
+            id             SERIAL PRIMARY KEY,
+            people_id      INTEGER NOT NULL REFERENCES people(id),
+            year           INTEGER NOT NULL,
+            allotted_days  REAL NOT NULL DEFAULT 15.0,
+            UNIQUE (people_id, year)
+        )
+    """)
+
+
+def get_time_off_balance(conn, people_id, year=None):
+    """{'year', 'allotted_days', 'used_days', 'remaining_days'} for one
+    employee. Caller must have already run ensure_time_off_balance_table."""
+    year = year or date.today().year
+    row = conn.execute(
+        "SELECT allotted_days FROM time_off_balance "
+        "WHERE people_id = %s AND year = %s",
+        (people_id, year),
+    ).fetchone()
+    allotted = row['allotted_days'] if row else DEFAULT_ANNUAL_ALLOTMENT_DAYS
+    taken = conn.execute(
+        "SELECT start_date, end_date FROM time_off_request "
+        "WHERE people_id = %s AND status = 'approved' AND request_type = 'Vacation' "
+        "AND LEFT(start_date, 4) = %s",
+        (people_id, str(year)),
+    ).fetchall()
+    used = 0.0
+    for r in taken:
+        try:
+            sd = date.fromisoformat(r['start_date'])
+            ed = date.fromisoformat(r['end_date'])
+            used += (ed - sd).days + 1
+        except (TypeError, ValueError):
+            continue
+    return {
+        'year': year, 'allotted_days': allotted, 'used_days': used,
+        'remaining_days': allotted - used,
+    }
+
+
+def set_time_off_allotment(conn, people_id, year, allotted_days):
+    """Admin action: set an employee's annual allotment. Does not commit."""
+    conn.execute(
+        "INSERT INTO time_off_balance (people_id, year, allotted_days) "
+        "VALUES (%s,%s,%s) "
+        "ON CONFLICT (people_id, year) DO UPDATE SET allotted_days = EXCLUDED.allotted_days",
+        (people_id, year, allotted_days),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Own contact info (Employee Self-Service, P2-G)
+#
+# Deliberately separate from update_person: that HR-facing function also
+# lets a caller change dept_id/dept_sub_id/employee_id, none of which a
+# plain employee should be able to touch on their own record.
+# ---------------------------------------------------------------------------
+
+def ensure_contact_columns(conn):
+    for col_sql in [
+        "ALTER TABLE people ADD COLUMN IF NOT EXISTS phone TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE people ADD COLUMN IF NOT EXISTS "
+        "emergency_contact_name TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE people ADD COLUMN IF NOT EXISTS "
+        "emergency_contact_phone TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE people ADD COLUMN IF NOT EXISTS "
+        "emergency_contact_relationship TEXT NOT NULL DEFAULT ''",
+    ]:
+        conn.execute(col_sql)
+
+
+def get_own_contact_info(conn, people_id):
+    """Caller must have already run ensure_contact_columns."""
+    row = conn.execute(
+        "SELECT id, first_name, last_name, email, address, city, state, zip_code, "
+        "phone, emergency_contact_name, emergency_contact_phone, "
+        "emergency_contact_relationship "
+        "FROM people WHERE id = %s",
+        (people_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def update_own_contact_info(conn, people_id, address='', city='', state='',
+                            zip_code='', phone='', emergency_contact_name='',
+                            emergency_contact_phone='',
+                            emergency_contact_relationship=''):
+    """Caller must have already run ensure_contact_columns. Does not commit."""
+    conn.execute(
+        "UPDATE people SET address=%s, city=%s, state=%s, zip_code=%s, phone=%s, "
+        "emergency_contact_name=%s, emergency_contact_phone=%s, "
+        "emergency_contact_relationship=%s WHERE id=%s",
+        (address or '', city or '', state or '', zip_code or '', phone or '',
+         emergency_contact_name or '', emergency_contact_phone or '',
+         emergency_contact_relationship or '', people_id),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Department CRUD
 # ---------------------------------------------------------------------------
 

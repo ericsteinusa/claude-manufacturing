@@ -280,6 +280,23 @@ def get_run_entries(conn, run_id: int) -> list[dict]:
 # Pay Stubs
 # ---------------------------------------------------------------------------
 
+def list_pay_stubs_for_employee(conn, people_id: int) -> list[dict]:
+    """One employee's own stub history across every run (Employee
+    Self-Service, P2-G) — list_run_employees is scoped the other way
+    (all employees in one run), so this is the missing per-employee view."""
+    rows = conn.execute(
+        "SELECT pe.id AS entry_id, pe.run_id, pe.gross_pay, pe.net_pay, "
+        "pe.regular_hours, pe.overtime_hours, "
+        "pr.pay_period_start, pr.pay_period_end, pr.run_date, pr.status "
+        "FROM payroll_entry pe "
+        "JOIN payroll_run pr ON pr.id = pe.run_id "
+        "WHERE pe.people_id = %s "
+        "ORDER BY pr.run_date DESC",
+        (people_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def get_pay_stub(conn, entry_id: int) -> dict | None:
     row = conn.execute(
         "SELECT pe.*, p.first_name, p.last_name, p.employee_id, "

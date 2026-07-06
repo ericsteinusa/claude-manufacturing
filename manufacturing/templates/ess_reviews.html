@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block page_title %}My Reviews{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ess/" class="btn">My Info</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ess-wrap { width:100%; max-width:800px; }
+.ess-wrap h2 { color:white; font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-Scheduled   { background:#cce5ff; color:#004085; }
+.s-InProgress  { background:#fff3cd; color:#856404; }
+.s-Completed   { background:#d4edda; color:#0a3622; }
+.s-Cancelled   { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ess-wrap">
+    <h2>My Performance Reviews</h2>
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr><th>Type</th><th>Reviewer</th><th>Date</th><th>Rating</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+            {% for r in reviews %}
+            <tr onclick="location='/ess/reviews/{{ r.id }}/'" style="cursor:pointer;">
+                <td>{{ r.review_type|default:"—" }}</td>
+                <td>{{ r.reviewer|default:"—" }}</td>
+                <td>{{ r.review_date|default:"—" }}</td>
+                <td>{{ r.rating|default:"—" }}</td>
+                <td><span class="badge s-{{ r.status|cut:' ' }}">{{ r.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No reviews yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

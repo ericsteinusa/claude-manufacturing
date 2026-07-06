@@ -494,6 +494,9 @@
         <a href="{% url 'time_off_list' %}" class="sb-link{% if '/time-off/' in request.path %} active{% endif %}">
             <span class="sb-icon">🏖</span> Time Off
         </a>
+        <a href="{% url 'ess_home' %}" class="sb-link{% if '/ess/' in request.path %} active{% endif %}">
+            <span class="sb-icon">🙋</span> My Info
+        </a>
 
         <div class="sb-section">Engineering</div>
         <a href="{% url 'eng_dashboard' %}" class="sb-link{% if '/eng/' in request.path %} active{% endif %}">
