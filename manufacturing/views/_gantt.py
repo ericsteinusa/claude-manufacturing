@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required
+from ..auth_decorators import dept_required, dept_access_denied_reason
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
 
@@ -32,21 +32,37 @@ def _gantt_ctx(request, **extra):
     return ctx
 
 
+def _parse_date_param(raw, default):
+    raw = (raw or '').strip()
+    if not raw:
+        return default
+    try:
+        return date.fromisoformat(raw)
+    except ValueError:
+        return default
+
+
 @ensure_csrf_cookie
 @dept_required('production')
 def prod_schedule_gantt(request):
     today = date.today()
-    date_from = request.GET.get('date_from', '').strip() or today.isoformat()
-    date_to = request.GET.get('date_to', '').strip() or (today + timedelta(days=13)).isoformat()
+    date_from_d = _parse_date_param(request.GET.get('date_from'), today)
+    date_to_d = _parse_date_param(request.GET.get('date_to'), today + timedelta(days=13))
+    if date_to_d < date_from_d:
+        date_from_d, date_to_d = date_to_d, date_from_d
+    date_from = date_from_d.isoformat()
+    date_to = date_to_d.isoformat()
+
     wc_raw = request.GET.get('workcenter_id', '').strip()
     workcenter_id = int(wc_raw) if wc_raw.isdigit() else None
 
     with get_db_connection() as conn:
         ensure_routing_tables(conn)
-        ops = get_gantt_operations(conn, date_from=date_from, date_to=date_to,
-                                    workcenter_id=workcenter_id)
-        load_data = get_planned_workcenter_load(conn, date_from, date_to)
+        all_ops = get_gantt_operations(conn, date_from=date_from, date_to=date_to)
+        load_data = get_planned_workcenter_load(conn, date_from, date_to, ops=all_ops)
         workcenters = list_workcenters(conn, active_only=True)
+
+    ops = [o for o in all_ops if not workcenter_id or o['workcenter_id'] == workcenter_id]
 
     tasks = [{
         'id': f"op-{o['id']}",
@@ -72,17 +88,18 @@ def prod_schedule_gantt_reschedule(request):
 
     Not gated with @dept_required(..., write_redirect=...) — that decorator
     issues an HTML redirect on denial, which fetch() would follow and hand
-    back an HTML body where the JS expects JSON. Auth/dept/read-only checks
-    are done manually below, each returning JsonResponse.
+    back an HTML body where the JS expects JSON. dept_access_denied_reason
+    runs the same check as the decorator but lets us return JsonResponse.
     """
     if request.method != 'POST':
         return JsonResponse({'ok': False, 'error': 'POST required'}, status=405)
-    if not request.session.get('user_email'):
+
+    reason = dept_access_denied_reason(request, 'production', check_write=True)
+    if reason == 'unauthenticated':
         return JsonResponse({'ok': False, 'error': 'not authenticated'}, status=401)
-    if not request.session.get('user_full_access') and \
-            request.session.get('user_dept_key') != 'production':
+    if reason == 'forbidden':
         return JsonResponse({'ok': False, 'error': 'forbidden'}, status=403)
-    if request.session.get('user_role') in READ_ONLY_ROLES:
+    if reason == 'read_only':
         return JsonResponse({'ok': False, 'error': 'read-only role'}, status=403)
 
     try:
@@ -105,9 +122,9 @@ def prod_schedule_gantt_reschedule(request):
     except ValueError as exc:
         conn.rollback()
         return JsonResponse({'ok': False, 'error': str(exc)}, status=400)
-    except Exception as exc:
+    except Exception:
         conn.rollback()
         log.exception("reschedule_operation failed for op_id=%s", op_id)
-        return JsonResponse({'ok': False, 'error': str(exc)}, status=400)
+        return JsonResponse({'ok': False, 'error': 'internal error'}, status=500)
     finally:
         conn.close()
