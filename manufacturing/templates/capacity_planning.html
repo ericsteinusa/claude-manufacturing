@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block page_title %}Capacity Planning{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/schedule/gantt/" class="btn">Gantt</a>
+<a href="/workcenters/" class="btn">Work Centers</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cap-wrap { width: 100%; max-width: 1200px; }
+.cap-wrap h2 { color: white; font-size: 20px; margin-bottom: 4px; }
+.cap-wrap p.sub { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 18px 22px; margin-bottom: 20px; overflow-x: auto; }
+.card h3 { margin: 0 0 12px; font-size: 15px; color: #333; }
+.date-form { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.date-form input { padding: 5px 9px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; }
+.rank-table, .heatmap-table, .sugg-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rank-table th, .rank-table td, .sugg-table th, .sugg-table td { padding: 7px 10px;
+    text-align: left; border-bottom: 1px solid #eee; }
+.rank-table th, .sugg-table th { background: var(--accent); color: white; }
+.rank-table td.num, .sugg-table td.num { text-align: right; }
+.heatmap-table th, .heatmap-table td { padding: 5px 7px; text-align: center;
+    border: 1px solid #eee; white-space: nowrap; }
+.heatmap-table th.wc-name, .heatmap-table td.wc-name { text-align: left; white-space: normal; }
+.heatmap-table th { background: var(--accent); color: white; font-weight: normal; font-size: 11px; }
+.cell-ok   { background: #e8f5e9; color: #1a6b1a; }
+.cell-warn { background: #fff3cd; color: #856404; }
+.cell-over { background: #f8d7da; color: #721c24; font-weight: bold; }
+.cell-off  { background: #f5f5f5; color: #aaa; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+.badge-over { background: #f8d7da; color: #721c24; }
+.badge-ok   { background: #e8f5e9; color: #1a6b1a; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cap-wrap">
+    <h2>Capacity Planning</h2>
+    <p class="sub">Booked vs. available hours per work center per day, bottleneck ranking,
+        and load-leveling suggestions for over-capacity days.</p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <form method="get" class="date-form">
+        <label style="font-size:12px;color:var(--text-muted);">From</label>
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <label style="font-size:12px;color:var(--text-muted);">To</label>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <button type="submit" class="btn btn-primary" style="padding:5px 14px;">Go</button>
+    </form>
+
+    <div class="card">
+        <h3>Bottleneck Ranking</h3>
+        <table class="rank-table">
+            <thead>
+                <tr>
+                    <th>Work Center</th>
+                    <th class="num">Utilization</th>
+                    <th class="num">Booked hrs</th>
+                    <th class="num">Available hrs</th>
+                    <th class="num">Over-Capacity Days</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bottlenecks %}
+                <tr>
+                    <td>{{ b.workcenter_name }}</td>
+                    <td class="num">
+                        <span class="badge {% if b.utilization_pct > 100 %}badge-over{% else %}badge-ok{% endif %}">
+                            {{ b.utilization_pct|floatformat:0 }}%
+                        </span>
+                    </td>
+                    <td class="num">{{ b.total_booked|floatformat:1 }}</td>
+                    <td class="num">{{ b.total_available|floatformat:1 }}</td>
+                    <td class="num">{{ b.over_capacity_days }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center;color:#888;">No active work centers.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Daily Capacity — Booked / Available Hours</h3>
+        <table class="heatmap-table">
+            <thead>
+                <tr>
+                    <th class="wc-name">Work Center</th>
+                    {% for d in day_range %}
+                    <th>{{ d|slice:"5:" }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in capacity %}
+                <tr>
+                    <td class="wc-name">{{ c.workcenter_name }}</td>
+                    {% for day in c.days %}
+                    <td class="{% if day.available == 0 %}cell-off{% elif day.over_capacity %}cell-over{% elif day.pct >= 80 %}cell-warn{% else %}cell-ok{% endif %}">
+                        {% if day.available == 0 and day.booked == 0 %}
+                        off
+                        {% else %}
+                        {{ day.booked|floatformat:1 }}/{{ day.available|floatformat:0 }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% empty %}
+                <tr><td style="text-align:center;color:#888;">No active work centers.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Load-Leveling Suggestions</h3>
+        {% if suggestions %}
+        <table class="sugg-table">
+            <thead>
+                <tr>
+                    <th>Work Center</th>
+                    <th>Over-Capacity Date</th>
+                    <th class="num">Over By (hrs)</th>
+                    <th>Operation</th>
+                    <th>WO</th>
+                    <th>Suggestion</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in suggestions %}
+                <tr>
+                    <td>{{ s.workcenter_name }}</td>
+                    <td>{{ s.date }}</td>
+                    <td class="num">{{ s.over_by_hours|floatformat:1 }}</td>
+                    <td>{{ s.operation_name }}</td>
+                    <td>{{ s.wo_number }}</td>
+                    <td>
+                        {% if s.delay_to_date %}
+                        Delay to {{ s.delay_to_date }} ({{ s.delay_days }} day{{ s.delay_days|pluralize }})
+                        {% else %}
+                        <span style="color:#888;">no slack found nearby</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if can_edit and s.delay_to_date %}
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="op_id" value="{{ s.op_id }}">
+                            <input type="hidden" name="delay_days" value="{{ s.delay_days }}">
+                            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Apply</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:var(--text-muted);font-size:13px;">No over-capacity days in this window.</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

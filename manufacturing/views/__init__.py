@@ -45,7 +45,7 @@ from ..inventory_core import (
     record_transaction, create_product as inv_create_product,
     update_product as inv_update_product,
 )
-from .. import lot_core, routing_core, costing_core
+from .. import lot_core, routing_core, costing_core, capacity_planning_core
 from ..contacts_core import (
     list_customers, get_customer, create_customer, update_customer,
     get_customer_orders,
@@ -228,6 +228,7 @@ from ._sampling_plan import *  # noqa: F401,F403
 from ._atp import *  # noqa: F401,F403
 from ._document_control import *  # noqa: F401,F403
 from ._ess import *  # noqa: F401,F403
+from ._capacity_planning import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -432,7 +433,7 @@ WEB_LEAF_URLS = {
     ('production', 'labor_rpts'):   '/prod/reports/',
     # Resource Management
     ('production', 'res_alloc'):    '/prod/',
-    ('production', 'cap_plan'):     '/prod/',
+    ('production', 'cap_plan'):     '/prod/schedule/capacity/',
     ('production', 'res_rpts'):     '/prod/reports/',
     ('production', 'wf_plan'):      '/prod/',
     # Budget → Finance
@@ -1738,30 +1739,56 @@ def wo_export(request):
 def wo_detail(request, wo_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    schedule_error = schedule_success = None
     conn = get_db_connection()
     try:
         wo = get_wo(conn, wo_id)
-        materials = get_wo_materials(conn, wo_id) if wo else []
-        products = load_wo_products(conn) if (wo and can_edit) else []
+        if not wo:
+            return redirect('wo_list')
+
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+            try:
+                capacity_planning_core.ensure_capacity_tables(conn)
+                if action == 'forward_schedule':
+                    result = capacity_planning_core.forward_schedule_wo(conn, wo_id)
+                    conn.commit()
+                    schedule_success = (
+                        f"Scheduled {len(result['operations'])} operation(s) forward — "
+                        f"finishes {result['computed_end_date']}."
+                    )
+                elif action == 'backward_schedule':
+                    result = capacity_planning_core.backward_schedule_wo(conn, wo_id)
+                    conn.commit()
+                    schedule_success = (
+                        f"Scheduled {len(result['operations'])} operation(s) backward from "
+                        f"the due date — must start {result['computed_start_date']}."
+                    )
+                    if result['at_risk']:
+                        schedule_success += (
+                            " This is before today — the due date is at risk."
+                        )
+            except ValueError as exc:
+                conn.rollback()
+                schedule_error = str(exc)
+
+        materials = get_wo_materials(conn, wo_id)
+        products = load_wo_products(conn) if can_edit else []
         operations, wo_labor_cost, wo_cost = [], None, None
-        if wo:
-            try:
-                routing_core.ensure_routing_tables(conn)
-                operations = routing_core.get_wo_operations(conn, wo_id)
-                if operations:
-                    wo_labor_cost = routing_core.get_wo_labor_cost(conn, wo_id)
-            except Exception:
-                pass
-            try:
-                costing_core.ensure_costing_tables(conn)
-                wo_cost = costing_core.get_wo_cost(conn, wo_id)
-            except Exception:
-                pass
+        try:
+            routing_core.ensure_routing_tables(conn)
+            operations = routing_core.get_wo_operations(conn, wo_id)
+            if operations:
+                wo_labor_cost = routing_core.get_wo_labor_cost(conn, wo_id)
+        except Exception:
+            pass
+        try:
+            costing_core.ensure_costing_tables(conn)
+            wo_cost = costing_core.get_wo_cost(conn, wo_id)
+        except Exception:
+            pass
     finally:
         conn.close()
-
-    if not wo:
-        return redirect('wo_list')
 
     wo['status_color'] = WO_STATUS_COLORS.get(wo['status'], '#ffffff')
     wo['status_label'] = wo['status'].replace('_', ' ').title()
@@ -1781,6 +1808,8 @@ def wo_detail(request, wo_id):
         operations=operations,
         wo_labor_cost=wo_labor_cost,
         wo_cost=wo_cost,
+        schedule_error=schedule_error,
+        schedule_success=schedule_success,
     ))
 
 
@@ -7584,13 +7613,21 @@ def _routing_ctx(request, **kw):
     )
 
 
+def _workcenter_day_flags(post):
+    return {
+        col: post.get(col) == '1'
+        for col in ('works_mon', 'works_tue', 'works_wed', 'works_thu',
+                    'works_fri', 'works_sat', 'works_sun')
+    }
+
+
 @login_required
 def workcenter_list(request):
     conn = get_db_connection()
     error = success = None
     try:
-        routing_core.ensure_routing_tables(conn)
-        workcenters = routing_core.list_workcenters(conn, active_only=False)
+        capacity_planning_core.ensure_capacity_tables(conn)
+        workcenters = capacity_planning_core.list_workcenters_with_calendar(conn)
         if request.method == 'POST':
             action = request.POST.get('action', '')
             if action == 'create':
@@ -7599,7 +7636,7 @@ def workcenter_list(request):
                     error = 'Name is required.'
                 else:
                     try:
-                        routing_core.create_workcenter(
+                        wc_id = routing_core.create_workcenter(
                             conn,
                             name=name,
                             dept=request.POST.get('dept', ''),
@@ -7607,9 +7644,11 @@ def workcenter_list(request):
                             labor_rate=float(request.POST.get('labor_rate', 0) or 0),
                             notes=request.POST.get('notes', ''),
                         )
+                        capacity_planning_core.set_workcenter_calendar(
+                            conn, wc_id, **_workcenter_day_flags(request.POST))
                         conn.commit()
                         success = f'Work center "{name}" created.'
-                        workcenters = routing_core.list_workcenters(conn, active_only=False)
+                        workcenters = capacity_planning_core.list_workcenters_with_calendar(conn)
                     except Exception as exc:
                         conn.rollback()
                         error = str(exc)
@@ -7626,9 +7665,11 @@ def workcenter_list(request):
                             notes=request.POST.get('notes', ''),
                             is_active=request.POST.get('is_active') == '1',
                         )
+                        capacity_planning_core.set_workcenter_calendar(
+                            conn, wc_id, **_workcenter_day_flags(request.POST))
                         conn.commit()
                         success = 'Work center updated.'
-                        workcenters = routing_core.list_workcenters(conn, active_only=False)
+                        workcenters = capacity_planning_core.list_workcenters_with_calendar(conn)
                     except Exception as exc:
                         conn.rollback()
                         error = str(exc)
@@ -7637,6 +7678,61 @@ def workcenter_list(request):
     return render(request, 'workcenter_list.html', _routing_ctx(
         request,
         workcenters=workcenters,
+        error=error,
+        success=success,
+    ))
+
+
+@login_required
+def workcenter_calendar(request, wc_id):
+    conn = get_db_connection()
+    error = success = None
+    try:
+        capacity_planning_core.ensure_capacity_tables(conn)
+        workcenters = capacity_planning_core.list_workcenters_with_calendar(conn)
+        wc = next((w for w in workcenters if w['id'] == wc_id), None)
+        if not wc:
+            return redirect('workcenter_list')
+
+        can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+        if request.method == 'POST' and can_edit:
+            action = request.POST.get('action', '')
+            try:
+                if action == 'set_days':
+                    capacity_planning_core.set_workcenter_calendar(
+                        conn, wc_id, **_workcenter_day_flags(request.POST))
+                    conn.commit()
+                    success = 'Working days updated.'
+                elif action == 'add_exception':
+                    exc_date = request.POST.get('exception_date', '').strip()
+                    hours = float(request.POST.get('hours_available', 0) or 0)
+                    notes = request.POST.get('notes', '').strip()
+                    if not exc_date:
+                        raise ValueError('Date is required.')
+                    capacity_planning_core.set_calendar_exception(
+                        conn, wc_id, exc_date, hours, notes=notes)
+                    conn.commit()
+                    success = 'Calendar exception saved.'
+                elif action == 'remove_exception':
+                    exc_id = _int_or_none(request.POST.get('exception_id'))
+                    if exc_id:
+                        capacity_planning_core.remove_calendar_exception(conn, exc_id)
+                        conn.commit()
+                        success = 'Calendar exception removed.'
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+            workcenters = capacity_planning_core.list_workcenters_with_calendar(conn)
+            wc = next((w for w in workcenters if w['id'] == wc_id), None)
+
+        exceptions = capacity_planning_core.list_calendar_exceptions(conn, wc_id)
+    finally:
+        conn.close()
+
+    return render(request, 'workcenter_calendar.html', _routing_ctx(
+        request,
+        wc=wc,
+        exceptions=exceptions,
         error=error,
         success=success,
     ))

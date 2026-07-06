@@ -102,6 +102,7 @@ urlpatterns = [
     path('lots/<int:lot_id>/', views.lot_detail, name='lot_detail'),
     # Routing / workcenters (7A)
     path('workcenters/', views.workcenter_list, name='workcenter_list'),
+    path('workcenters/<int:wc_id>/calendar/', views.workcenter_calendar, name='workcenter_calendar'),
     path('routing/<int:product_id>/', views.routing_detail, name='routing_detail'),
     # Costing (7A)
     path('costs/<int:product_id>/', views.cost_detail, name='cost_detail'),
@@ -267,6 +268,7 @@ urlpatterns = [
     path('prod/schedule/gantt/', views.prod_schedule_gantt, name='prod_schedule_gantt'),
     path('prod/schedule/gantt/reschedule/', views.prod_schedule_gantt_reschedule,
          name='prod_schedule_gantt_reschedule'),
+    path('prod/schedule/capacity/', views.capacity_planning, name='capacity_planning'),
     path('prod/reports/', views.prod_reports_view, name='prod_reports_view'),
     path('prod/shipping/', views.prod_shipping_list, name='prod_shipping_list'),
     path('prod/shipping/<int:shipment_id>/', views.prod_shipping_detail, name='prod_shipping_detail'),

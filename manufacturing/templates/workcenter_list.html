@@ -2,6 +2,8 @@
 {% block page_title %}Work Centers{% endblock %}
 
 {% block toolbar_left %}
+<a href="/prod/schedule/gantt/" class="btn">Gantt</a>
+<a href="/prod/schedule/capacity/" class="btn">Capacity Planning</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
@@ -52,6 +54,8 @@
                     <th class="num">Capacity (hrs/day)</th>
                     <th class="num">Labor Rate ($/hr)</th>
                     <th>Status</th>
+                    <th>Calendar</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -68,9 +72,13 @@
                         <span class="badge-inactive">Inactive</span>
                         {% endif %}
                     </td>
+                    <td style="font-size:12px;color:#555;">
+                        {% if wc.works_mon %}Mo {% endif %}{% if wc.works_tue %}Tu {% endif %}{% if wc.works_wed %}We {% endif %}{% if wc.works_thu %}Th {% endif %}{% if wc.works_fri %}Fr {% endif %}{% if wc.works_sat %}Sa {% endif %}{% if wc.works_sun %}Su{% endif %}
+                    </td>
+                    <td><a href="/workcenters/{{ wc.id }}/calendar/" class="btn" style="padding:3px 10px;font-size:12px;">Calendar</a></td>
                 </tr>
             {% empty %}
-                <tr><td colspan="5" style="color:#999;text-align:center;padding:20px;">No work centers yet.</td></tr>
+                <tr><td colspan="7" style="color:#999;text-align:center;padding:20px;">No work centers yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -103,6 +111,16 @@
             <div class="field">
                 <label>Notes</label>
                 <input type="text" name="notes" placeholder="Optional notes">
+            </div>
+            <div class="field">
+                <label>Working Days</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_mon" value="1" checked style="width:auto;"> Mon</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_tue" value="1" checked style="width:auto;"> Tue</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_wed" value="1" checked style="width:auto;"> Wed</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_thu" value="1" checked style="width:auto;"> Thu</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_fri" value="1" checked style="width:auto;"> Fri</label>
+                <label style="display:inline;font-weight:normal;margin-right:10px;"><input type="checkbox" name="works_sat" value="1" style="width:auto;"> Sat</label>
+                <label style="display:inline;font-weight:normal;"><input type="checkbox" name="works_sun" value="1" style="width:auto;"> Sun</label>
             </div>
             <button type="submit" class="btn-sm">+ Add Work Center</button>
         </form>

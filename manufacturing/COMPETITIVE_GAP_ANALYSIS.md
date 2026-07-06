@@ -625,7 +625,7 @@ Critical for MRP to be actionable. Currently MRP generates suggestions but POs m
 
 ### 🟡 Priority 3 — Strategic Value, Higher Effort (6–12 months)
 
-#### P3-A: Finite Capacity Scheduling (APS)
+#### P3-A: Finite Capacity Scheduling (APS) ✅ Done
 Full constraint-aware scheduler — significant effort but core mid-market differentiator.
 - Workcenter capacity calendar (hours available per day/shift)
 - Forward scheduling: from today + operation sequence → calculate start/end per workcenter
@@ -633,6 +633,52 @@ Full constraint-aware scheduler — significant effort but core mid-market diffe
 - Capacity check: sum scheduled hrs per workcenter per day vs. available hrs
 - Load leveling: auto-suggest splitting or delaying WOs to resolve overload
 - Bottleneck identification: which workcenter is constraining overall throughput
+- **Shipped:** `manufacturing/capacity_planning_core.py`, building on top of
+  the P2-A Gantt scheduler's `wo_operation.scheduled_start/scheduled_end`
+  columns rather than duplicating them. **Calendar:** `works_mon`…`works_sun`
+  boolean columns on `workcenter` (default Mon–Fri) plus a sparse
+  `workcenter_calendar_exception(workcenter_id, exception_date,
+  hours_available)` table for one-off holiday closures or overtime days —
+  deliberately not a full shift-table model, since a single daily-hours
+  scalar plus day-of-week + exception overrides covers the stated
+  requirement without over-building. **Forward/backward scheduling:**
+  `forward_schedule_wo`/`backward_schedule_wo` pack each operation's
+  `std_hours` into whichever days have free capacity on its workcenter
+  (a day-granular model — no shift-start-time concept beyond a flat
+  `DEFAULT_WORKDAY_START_HOUR`), enforcing that operation N+1 never starts
+  before operation N's actual finish even across *different* workcenters
+  (a `not_before`/`not_after` constraint was needed for this — same-
+  workcenter sequencing falls out for free from a shared per-workcenter
+  booked-hours ledger, but cross-workcenter handoffs have no other link
+  between the two operations' schedules). Backward schedules from the
+  **work order's own due date**, not a sales order's — there is no SO↔WO
+  link anywhere in the schema (confirmed via research before building
+  this), so "backward from SO due date" is satisfied one level removed:
+  set the WO's due date (manually, or however it gets set today) and
+  backward-schedule from that; a `result['at_risk']` flag fires if the
+  computed start falls before today. **Capacity check:** `get_capacity_check`
+  buckets booked-vs-available hours per workcenter *per day* (the existing
+  P2-A `get_planned_workcenter_load` only summed over the whole visible
+  window, not per-day — kept as-is for the Gantt view's aggregate load bar,
+  since changing it risked that feature's pinned test suite). **Bottleneck
+  identification:** `identify_bottlenecks` ranks workcenters by utilization
+  % over a horizon. **Load leveling:** `suggest_load_leveling` is a greedy
+  heuristic (probe forward for the first day with enough slack for one
+  over-capacity operation), not a constraint solver — one suggestion per
+  overloaded day, applied via `apply_load_leveling_suggestion`. Web pages:
+  `/prod/schedule/capacity/` (heatmap + bottleneck ranking + suggestions
+  with an Apply button, wired from the `cap_plan` menu leaf which
+  previously just redirected to the production dashboard), a per-workcenter
+  `/workcenters/<id>/calendar/` page (working days + exceptions), and two
+  new buttons on the WO detail page ("Auto-Schedule Forward" / "Schedule
+  to Due Date"). **Found and fixed two bugs while verifying live:**
+  `routing_core.get_wo_operations` never selected `scheduled_start`/
+  `scheduled_end` at all (P2-A's Gantt view reads schedule data through a
+  different function, `get_gantt_operations`, so this never surfaced until
+  something else needed `get_wo_operations` to show scheduled dates); and
+  the cross-workcenter sequencing gap described above, caught by watching
+  a real two-operation, two-workcenter work order schedule with the second
+  operation starting before the first one finished.
 
 #### P3-B: Warehouse Management System (WMS)
 Full pick/pack/ship with bin-level tracking.

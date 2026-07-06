@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block page_title %}{{ wc.name }} — Calendar{% endblock %}
+
+{% block toolbar_left %}
+<a href="/workcenters/" class="btn">Work Centers</a>
+<a href="/prod/schedule/capacity/" class="btn">Capacity Planning</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.wc-wrap { max-width: 700px; }
+.wc-wrap h2 { color: white; font-size: 20px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
+.exc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.exc-table th, .exc-table td { padding: 7px 10px; border-bottom: 1px solid #eee; text-align: left; }
+.exc-table th { background: var(--accent); color: white; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #555; }
+.field input { padding: 6px 9px; border: 1px solid #aaa; border-radius: 4px; font-size: 13px; }
+.day-row label { display: inline-flex; align-items: center; gap: 4px; font-weight: normal;
+    margin-right: 12px; font-size: 13px; }
+.btn-sm { padding: 7px 18px; background: var(--accent); color: white; border: none;
+    border-radius: 4px; font-size: 13px; cursor: pointer; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="wc-wrap">
+    <h2>{{ wc.name }} — Calendar</h2>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Working Days</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_days">
+            <div class="day-row" style="margin-bottom:14px;">
+                <label><input type="checkbox" name="works_mon" value="1" {% if wc.works_mon %}checked{% endif %}> Mon</label>
+                <label><input type="checkbox" name="works_tue" value="1" {% if wc.works_tue %}checked{% endif %}> Tue</label>
+                <label><input type="checkbox" name="works_wed" value="1" {% if wc.works_wed %}checked{% endif %}> Wed</label>
+                <label><input type="checkbox" name="works_thu" value="1" {% if wc.works_thu %}checked{% endif %}> Thu</label>
+                <label><input type="checkbox" name="works_fri" value="1" {% if wc.works_fri %}checked{% endif %}> Fri</label>
+                <label><input type="checkbox" name="works_sat" value="1" {% if wc.works_sat %}checked{% endif %}> Sat</label>
+                <label><input type="checkbox" name="works_sun" value="1" {% if wc.works_sun %}checked{% endif %}> Sun</label>
+            </div>
+            <button type="submit" class="btn-sm">Save Working Days</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Calendar Exceptions</h3>
+        <p style="font-size:12px;color:#888;margin-top:-8px;">
+            One-off overrides for a specific date — a holiday closure (0 hours) or an
+            overtime day (a custom hour value), regardless of the working-days pattern above.
+        </p>
+        {% if exceptions %}
+        <table class="exc-table">
+            <thead>
+                <tr><th>Date</th><th class="num">Hours Available</th><th>Notes</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for exc in exceptions %}
+                <tr>
+                    <td>{{ exc.exception_date }}</td>
+                    <td style="text-align:right;">{{ exc.hours_available|floatformat:1 }}</td>
+                    <td>{{ exc.notes|default:"—" }}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_exception">
+                            <input type="hidden" name="exception_id" value="{{ exc.id }}">
+                            <button type="submit" class="btn" style="padding:2px 8px;font-size:11px;">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">No exceptions on file.</p>
+        {% endif %}
+
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_exception">
+            <div class="field">
+                <label>Date *</label>
+                <input type="date" name="exception_date" required>
+            </div>
+            <div class="field">
+                <label>Hours Available (0 = closed)</label>
+                <input type="number" name="hours_available" step="0.5" min="0" value="0">
+            </div>
+            <div class="field">
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="e.g. Christmas Day">
+            </div>
+            <button type="submit" class="btn-sm">+ Add Exception</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

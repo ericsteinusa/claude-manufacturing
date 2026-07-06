@@ -205,6 +205,17 @@ def test_get_wo_operations_filters_by_wo_id():
     assert conn.last_params == [7]
 
 
+def test_get_wo_operations_includes_scheduled_dates():
+    """Regression test: the P3-A Auto-Schedule buttons on wo_detail.html
+    display op.scheduled_start/scheduled_end, so this function must select
+    them — they were missing here even though the Gantt scheduler (P2-A)
+    added the columns, since Gantt reads via get_gantt_operations instead."""
+    conn = _Conn(rows=[])
+    get_wo_operations(conn, wo_id=7)
+    assert "op.scheduled_start" in conn.last_sql
+    assert "op.scheduled_end" in conn.last_sql
+
+
 def test_start_wo_operation_sets_in_progress():
     conn = _Conn()
     start_wo_operation(conn, op_id=3)
