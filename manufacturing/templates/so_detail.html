@@ -76,6 +76,12 @@
     border-radius: 4px; font-size: 13px;
 }
 .add-item h3 { color: white; font-size: 15px; margin-bottom: 8px; }
+.atp-warning {
+    background: #fff3cd; border: 1px solid #e0a800; border-radius: 6px;
+    padding: 10px 14px; margin-top: 10px;
+}
+.atp-warning ul { margin: 6px 0 10px 18px; font-size: 13px; }
+.atp-warning form { margin: 0; }
 {% endblock %}
 
 {% block body %}
@@ -136,6 +142,24 @@
                         {{ label }}</button>
                 </form>
                 {% endfor %}
+            </div>
+            {% endif %}
+            {% if atp_warning %}
+            <div class="atp-warning">
+                <b>Insufficient stock to confirm this order:</b>
+                <ul>
+                    {% for s in atp_warning %}
+                    <li>{{ s.product_name }}: need {{ s.requested_qty }}, ATP {{ s.atp_qty|floatformat:0 }}
+                        (short {{ s.shortfall|floatformat:0 }}){% if s.earliest_available_date %},
+                        earliest available {{ s.earliest_available_date }}{% else %} — not available within 90 days{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <form method="post" action="/so/{{ so.id }}/status/">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="{{ pending_status }}">
+                    <input type="hidden" name="override" value="1">
+                    <button type="submit" class="btn btn-sm btn-danger">Confirm Anyway</button>
+                </form>
             </div>
             {% endif %}
         </div>
@@ -207,6 +231,7 @@
                     <div>
                         <label>Qty</label>
                         <input type="number" name="qty" min="1" value="1" id="so-add-qty">
+                        <span id="so-add-atp" style="font-size:11px;"></span>
                     </div>
                     <div>
                         <label>Unit Price</label>
@@ -222,9 +247,11 @@
         <script>
         (function () {
             var priceTiers = {{ price_tiers_json|safe }};
+            var atpData = {{ atp_json|safe }};
             var productSel = document.getElementById('so-add-product');
             var qtyInput = document.getElementById('so-add-qty');
             var priceInput = document.getElementById('so-add-unit-price');
+            var atpSpan = document.getElementById('so-add-atp');
             if (!productSel || !qtyInput || !priceInput) return;
 
             function applyPrice() {
@@ -238,8 +265,21 @@
                     }
                 }
             }
-            productSel.addEventListener('change', applyPrice);
-            qtyInput.addEventListener('input', applyPrice);
+
+            function showAtp() {
+                if (!atpSpan) return;
+                var info = atpData[productSel.value];
+                if (!info) { atpSpan.textContent = ''; return; }
+                var qty = parseFloat(qtyInput.value) || 0;
+                var ok = info.atp_qty >= qty;
+                atpSpan.style.color = ok ? '#1a7f37' : '#c33';
+                atpSpan.textContent = 'ATP: ' + info.atp_qty +
+                    (ok ? '' : ' (short ' + (qty - info.atp_qty) + ')');
+            }
+
+            productSel.addEventListener('change', function () { applyPrice(); showAtp(); });
+            qtyInput.addEventListener('input', function () { applyPrice(); showAtp(); });
+            showAtp();
         })();
         </script>
         {% endif %}

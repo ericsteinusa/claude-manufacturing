@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block page_title %}ATP Inquiry{% endblock %}
+
+{% block toolbar_left %}
+<a href="/so/" class="btn">← Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.atp-wrap { width:100%; max-width:560px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:16px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.atp-result h3 { margin-top:0; }
+.atp-result .verdict { font-size:16px; font-weight:bold; margin-bottom:10px; }
+.atp-result .verdict.yes { color:#1a7f37; }
+.atp-result .verdict.no { color:#c33; }
+.atp-meta { display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; font-size:13px; }
+.atp-meta b { color:#003cb4; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="atp-wrap">
+    <div class="menu-title">Available-to-Promise Inquiry</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post" action="/atp/">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Product</label>
+                <select name="product_id">
+                    <option value="">(select)</option>
+                    {% for p in products %}
+                    <option value="{{ p.id }}"{% if form.product_id == p.id|stringformat:"s" %} selected{% endif %}>{{ p.product_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Qty</label>
+                <input type="number" name="qty" min="1" value="{{ form.qty }}">
+            </div>
+            <div class="form-row">
+                <label>Requested Date</label>
+                <input type="date" name="requested_date" value="{{ form.requested_date }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Check ATP</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="card atp-result">
+        <h3>{{ result.product_name }}</h3>
+        <div class="verdict {% if result.sufficient %}yes{% else %}no{% endif %}">
+            {% if result.sufficient %}Yes — sufficient{% else %}No — insufficient{% endif %}
+        </div>
+        <div class="atp-meta">
+            <div><b>On hand:</b> {{ result.on_hand|floatformat:0 }}</div>
+            <div><b>Committed (confirmed SOs):</b> {{ result.committed_qty|floatformat:0 }}</div>
+            <div><b>Open PO receipts by {{ result.requested_date }}:</b> {{ result.open_po_qty|floatformat:0 }}</div>
+            <div><b>ATP qty:</b> {{ result.atp_qty|floatformat:0 }}</div>
+            {% if not result.sufficient %}
+            <div style="grid-column:1/-1;"><b>Earliest available:</b>
+                {% if result.earliest_available_date %}{{ result.earliest_available_date }}
+                {% else %}Not available within 90 days{% endif %}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

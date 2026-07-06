@@ -46,6 +46,7 @@ urlpatterns = [
     path('so/<int:so_id>/items/remove/', views.so_remove_item,
          name='so_remove_item'),
     path('so/<int:so_id>/status/', views.so_set_status, name='so_set_status'),
+    path('atp/', views.atp_inquiry, name='atp_inquiry'),
     path('price-lists/', views.pl_list, name='pl_list'),
     path('price-lists/new/', views.pl_new, name='pl_new'),
     path('price-lists/<int:pl_id>/', views.pl_detail, name='pl_detail'),
