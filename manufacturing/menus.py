@@ -1424,6 +1424,8 @@ MENU_TREE = {
                              'quality/QA_Mgr_menu.py'),
                             ('inc_insp', 'Incoming Inspection',
                              'quality/QA_Mgr_menu.py'),
+                            ('sampling_plans', 'Sampling Plans',
+                             'quality/QA_Mgr_menu.py'),
                             ('supp_audit', 'Supplier Audits',
                              'quality/QA_Mgr_menu.py'),
                             ('supp_rpts', 'Supplier Reports',

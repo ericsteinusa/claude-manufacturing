@@ -22,11 +22,13 @@ from ..quality_core import (
     list_supplier_quality, get_supplier_quality,
     create_supplier_quality, update_supplier_quality,
     next_insp_number, list_inspections, get_inspection, create_inspection,
-    update_inspection_result, get_defects, log_defect, resolve_defect,
+    update_inspection_result, record_sample_defects,
+    get_defects, log_defect, resolve_defect,
     load_products_for_qa, load_work_orders_for_qa,
     get_qa_reports,
     get_defect_pareto, get_ncr_severity_trend,
 )
+from ..sampling_plan_core import ensure_sampling_plan_tables, find_applicable_plans
 
 log = get_logger(__name__)
 
@@ -424,15 +426,20 @@ def qa_inspection_list(request):
     inspections = []
     products = []
     work_orders = []
+    sampling_plans = []
     try:
+        ensure_sampling_plan_tables(conn)
         inspections = list_inspections(conn, result=result_filter or None,
                                        search=search or None)
         if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
             products = load_products_for_qa(conn)
             work_orders = load_work_orders_for_qa(conn)
+            sampling_plans = find_applicable_plans(conn)
             try:
                 pid_raw = request.POST.get('product_id', '')
                 wid_raw = request.POST.get('wo_id', '')
+                plan_raw = request.POST.get('sampling_plan_id', '')
+                lot_qty_raw = request.POST.get('lot_qty', '')
                 insp_num = next_insp_number(conn)
                 create_inspection(
                     conn,
@@ -444,6 +451,8 @@ def qa_inspection_list(request):
                     result=request.POST.get('result', 'pending'),
                     notes=request.POST.get('notes', ''),
                     created_by=request.session.get('user_email', ''),
+                    sampling_plan_id=int(plan_raw) if plan_raw else None,
+                    lot_qty=float(lot_qty_raw) if lot_qty_raw else None,
                 )
                 conn.commit()
                 return redirect('qa_inspection_list')
@@ -455,12 +464,14 @@ def qa_inspection_list(request):
         else:
             products = load_products_for_qa(conn)
             work_orders = load_work_orders_for_qa(conn)
+            sampling_plans = find_applicable_plans(conn)
     finally:
         conn.close()
     return render(request, 'qa_inspection_list.html', _qa_ctx(
         request, inspections=inspections, result_filter=result_filter,
         search=search, insp_results=INSP_RESULTS,
         products=products, work_orders=work_orders,
+        sampling_plans=sampling_plans,
         error=error, success=success,
     ))
 
@@ -496,6 +507,10 @@ def qa_inspection_detail(request, insp_id):
                     did = int(request.POST.get('defect_id', 0))
                     resolve_defect(conn, did)
                     success = 'Defect resolved.'
+                elif action == 'record_sample_defects':
+                    qty_defective = int(request.POST.get('qty_defective', 0) or 0)
+                    record_sample_defects(conn, insp_id, qty_defective)
+                    success = 'Sample defect count recorded.'
                 conn.commit()
                 inspection = get_inspection(conn, insp_id)
                 defects = get_defects(conn, insp_id)
@@ -507,6 +522,7 @@ def qa_inspection_detail(request, insp_id):
     return render(request, 'qa_inspection_detail.html', _qa_ctx(
         request, inspection=inspection, defects=defects, can_edit=can_edit,
         defect_severities=DEFECT_SEVERITIES,
+        result_order=('passed', 'failed', 'on_hold', 'pending'),
         error=error, success=success,
     ))
 

@@ -224,6 +224,7 @@ from ._rfq import *  # noqa: F401,F403
 from ._gantt import *  # noqa: F401,F403
 from ._supplier_scorecard import *  # noqa: F401,F403
 from ._cash_flow import *  # noqa: F401,F403
+from ._sampling_plan import *  # noqa: F401,F403
 from ._atp import *  # noqa: F401,F403
 
 log = get_logger(__name__)
@@ -540,6 +541,7 @@ WEB_LEAF_URLS = {
     ('quality_assurance', 'kpi_dash'): '/qa/',
     ('quality_assurance', 'supp_score'): '/suppliers/scorecard/',
     ('quality_assurance', 'inc_insp'): '/qa/inspections/',
+    ('quality_assurance', 'sampling_plans'): '/sampling-plans/',
     ('quality_assurance', 'supp_audit'): '/qa/suppliers/',
     ('quality_assurance', 'supp_rpts'): '/qa/suppliers/',
     ('quality_assurance', 'new_comp'): '/qa/ncr/',

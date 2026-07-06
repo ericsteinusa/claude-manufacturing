@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block page_title %}Sampling Plans{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/inspections/" class="btn">Incoming Inspection</a>
+<a href="/qa/" class="btn">QA Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/sampling-plans/new/" class="btn btn-primary">+ New Sampling Plan</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Sampling Plans (ISO 2859-1 AQL)</div>
+    <p style="font-size:12px;color:var(--text-muted);max-width:700px;">
+        Attach a plan to a product or supplier so incoming inspection can auto-calculate
+        sample size and accept/reject numbers from the lot quantity. A plan with neither
+        set is a general-purpose plan usable for any inspection.
+    </p>
+
+    {% if plans %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Plan Name</th>
+                    <th>AQL %</th>
+                    <th>Inspection Level</th>
+                    <th>Product</th>
+                    <th>Supplier</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in plans %}
+                <tr>
+                    <td><a href="/sampling-plans/{{ p.id }}/">{{ p.plan_name }}</a></td>
+                    <td>{{ p.aql_value }}%</td>
+                    <td>{{ p.inspection_level }}</td>
+                    <td>{{ p.product_name|default:"—" }}</td>
+                    <td>{{ p.supplier_name|default:"—" }}</td>
+                    <td>
+                        {% if p.is_active %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        {% else %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/sampling-plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No sampling plans yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

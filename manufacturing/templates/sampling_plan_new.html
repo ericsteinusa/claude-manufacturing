@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block page_title %}New Sampling Plan{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sampling-plans/" class="btn">Sampling Plans</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.sp-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="sp-wrap">
+    <div class="menu-title">New Sampling Plan</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Plan Name *</label>
+                <input type="text" name="plan_name" required placeholder="e.g. Standard Incoming — Fasteners">
+            </div>
+            <div class="form-row">
+                <label>AQL % *</label>
+                <input type="number" name="aql_value" step="0.01" min="0" required
+                       list="common-aql-values" placeholder="e.g. 2.5">
+                <datalist id="common-aql-values">
+                    {% for v in common_aql_values %}
+                    <option value="{{ v }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+            <div class="form-row">
+                <label>Inspection Level</label>
+                <select name="inspection_level">
+                    {% for lvl in inspection_levels %}
+                    <option value="{{ lvl }}"{% if lvl == 'II' %} selected{% endif %}>{{ lvl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Product (optional)</label>
+                <select name="product_id">
+                    <option value="">— Any product —</option>
+                    {% for p in products %}
+                    <option value="{{ p.id }}">{{ p.product_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Supplier (optional)</label>
+                <select name="supplier_id">
+                    <option value="">— Any supplier —</option>
+                    {% for s in suppliers %}
+                    <option value="{{ s.id }}">{{ s.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="Optional notes">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Sampling Plan</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

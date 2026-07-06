@@ -459,7 +459,7 @@ GL data + AR/AP due dates exist. Need the statement and rolling forecast.
   (forecast + Chart.js balance projection), plus a new Cash Flow section
   on `/fin/` (finance dashboard).
 
-#### P2-E: Sampling Plans & AQL
+#### P2-E: Sampling Plans & AQL ✅ Done
 Required for formal incoming inspection programs.
 - AQL table (ISO 2859-1): lot size range → sample size code → sample size
 - Sampling plan master: AQL level (0.65, 1.0, 2.5, 4.0, etc.), inspection level (I, II, III)
@@ -467,6 +467,26 @@ Required for formal incoming inspection programs.
 - Attach sampling plan to product or supplier
 - On inspection creation: auto-calculate sample size from lot qty + plan
 - Pass/fail result based on defects found vs. accept number
+- **Shipped:** `manufacturing/sampling_plan_core.py` — lot-size-range →
+  code-letter and code-letter → sample-size are fixed ISO 2859-1 values, so
+  they're Python constants (`LOT_SIZE_RANGES`/`SAMPLE_SIZE_BY_CODE`), not DB
+  tables. `aql_accept_reject` (code letter + AQL% → Ac/Re numbers) and the
+  `sampling_plan` master (AQL level, inspection level, optional product/
+  supplier attachment) are DB tables. **The seeded accept/reject data
+  covers only AQL 0.65/1.0/1.5/2.5/4.0 for code letters C-N and is built
+  from the standard's known diagonal structure — verify against your
+  organization's official ISO 2859-1 / ANSI-ASQ Z1.4 tables before relying
+  on this for regulated/compliance decisions.** `quality_core.
+  create_inspection` now accepts an optional `sampling_plan_id` + `lot_qty`
+  and auto-stamps the resolved code letter/sample size/accept/reject onto
+  the new inspection; a new `record_sample_defects` auto-sets
+  passed/failed once the inspector enters how many sampled units were
+  defective. Web pages: `/sampling-plans/` (CRUD) plus the existing
+  `/qa/inspections/` flow extended with the sampling-plan picker and AQL
+  results card. Also fixed a pre-existing crash in
+  `qa_inspection_detail.html` (a `|split:','` template filter that doesn't
+  exist in Django) discovered while testing this feature — the inspection
+  detail page 500'd on every load before this fix.
 
 #### P2-F: Document Control Module
 Needed for ISO 9001 compliance and engineering document management.

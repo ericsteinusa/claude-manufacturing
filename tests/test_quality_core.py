@@ -6,7 +6,7 @@ Pure unit tests — no Qt, no live DB.  All DB calls go to a MagicMock.
 
 import datetime
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from manufacturing.quality_core import (
     NCR_STATUSES, CAPA_STATUSES, AUDIT_STATUSES, SUPPLIER_STATUSES, INSP_RESULTS, get_dashboard_counts,
@@ -16,7 +16,8 @@ from manufacturing.quality_core import (
     list_supplier_quality, get_supplier_quality,
     create_supplier_quality, update_supplier_quality,
     next_insp_number, list_inspections, get_inspection, create_inspection,
-    update_inspection_result, get_defects, log_defect, resolve_defect,
+    update_inspection_result, record_sample_defects,
+    get_defects, log_defect, resolve_defect,
     load_products_for_qa, load_work_orders_for_qa,
     get_defect_pareto, get_ncr_severity_trend,
 )
@@ -618,6 +619,61 @@ def test_create_inspection_defaults_pending_on_unknown_result():
                       _today(), '', 'bogus', '', 'u@e.com')
     params = conn.execute.call_args[0][1]
     assert 'pending' in params
+
+
+def test_create_inspection_with_sampling_plan_stamps_resolved_values():
+    conn = _conn(fetchone={'id': 9})
+    resolved = {'code_letter': 'H', 'sample_size': 50,
+                'accept_number': 3, 'reject_number': 4}
+    with patch('manufacturing.quality_core.resolve_sampling_plan',
+               return_value=resolved) as mock_resolve:
+        create_inspection(conn, 'QA-2026-0001', 1, None, _today(), 'Bob',
+                          'pending', '', 'u@e.com',
+                          sampling_plan_id=2, lot_qty=300)
+    mock_resolve.assert_called_once_with(conn, 2, 300)
+    params = conn.execute.call_args[0][1]
+    assert 2 in params and 300 in params
+    assert 'H' in params and 50 in params and 3 in params and 4 in params
+
+
+def test_create_inspection_without_lot_qty_skips_resolution():
+    conn = _conn(fetchone={'id': 9})
+    with patch('manufacturing.quality_core.resolve_sampling_plan') as mock_resolve:
+        create_inspection(conn, 'QA-2026-0001', 1, None, _today(), 'Bob',
+                          'pending', '', 'u@e.com', sampling_plan_id=2, lot_qty=None)
+    mock_resolve.assert_not_called()
+
+
+def test_record_sample_defects_sets_passed_when_within_accept_number():
+    conn = _conn(fetchone={'id': 1, 'accept_number': 3, 'reject_number': 4})
+    record_sample_defects(conn, 1, qty_defective=2)
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'UPDATE qa_inspection' in sql
+    assert 'passed' in params
+    assert 2 in params
+
+
+def test_record_sample_defects_sets_failed_at_reject_number():
+    conn = _conn(fetchone={'id': 1, 'accept_number': 3, 'reject_number': 4})
+    record_sample_defects(conn, 1, qty_defective=4)
+    params = conn.execute.call_args[0][1]
+    assert 'failed' in params
+
+
+def test_record_sample_defects_leaves_result_untouched_when_accept_reject_unknown():
+    conn = _conn(fetchone={'id': 1, 'accept_number': None, 'reject_number': None})
+    record_sample_defects(conn, 1, qty_defective=2)
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'result' not in sql
+    assert tuple(params) == (2, 1)
+
+
+def test_record_sample_defects_raises_for_missing_inspection():
+    conn = _conn(fetchone=None)
+    with pytest.raises(ValueError):
+        record_sample_defects(conn, 999, qty_defective=1)
 
 
 def test_update_inspection_result_valid():

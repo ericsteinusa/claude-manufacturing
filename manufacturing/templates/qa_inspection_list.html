@@ -5,6 +5,7 @@
 <a href="/qa/" class="btn">Dashboard</a>
 <a href="/qa/ncr/" class="btn">NCRs</a>
 <a href="/qa/suppliers/" class="btn">Suppliers</a>
+<a href="/sampling-plans/" class="btn">Sampling Plans</a>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 
@@ -138,6 +139,19 @@
                         {% for r in insp_results %}<option>{{ r }}</option>{% endfor %}
                     </select>
                 </div>
+                <div class="form-row">
+                    <label>Sampling Plan (optional, AQL)</label>
+                    <select name="sampling_plan_id">
+                        <option value="">— None —</option>
+                        {% for sp in sampling_plans %}
+                        <option value="{{ sp.id }}">{{ sp.plan_name }} (AQL {{ sp.aql_value }}%)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Lot Quantity (required with a sampling plan)</label>
+                    <input type="number" name="lot_qty" min="1">
+                </div>
                 <div class="form-row full">
                     <label>Notes</label>
                     <textarea name="notes" rows="2"></textarea>
@@ -145,6 +159,11 @@
             </div>
             <button type="submit" class="save-btn" style="margin-top:12px;">Create Inspection</button>
         </form>
+        <p style="font-size:12px;color:#888;margin-top:10px;">
+            Attaching a sampling plan auto-calculates the sample size and accept/reject
+            numbers from the lot quantity (ISO 2859-1). Manage plans on the
+            <a href="/sampling-plans/">Sampling Plans</a> page.
+        </p>
     </div>
     {% endif %}
 </div>

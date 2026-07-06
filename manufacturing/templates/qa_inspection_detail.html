@@ -115,7 +115,7 @@
         <div style="margin-top:10px;">
             <div style="font-size:12px;color:#555;font-weight:bold;margin-bottom:6px;">Update Result</div>
             <div class="result-btns">
-                {% for r in 'passed,failed,on_hold,pending'|split:',' %}
+                {% for r in result_order %}
                 <form method="post" style="margin:0;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="{{ r }}">
@@ -129,6 +129,59 @@
         </div>
         {% endif %}
     </div>
+
+    {% if inspection.sampling_plan_id %}
+    <!-- AQL sampling card -->
+    <div class="card">
+        <h3>AQL Sampling (ISO 2859-1)</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Lot Quantity</label>
+                <div class="val">{{ inspection.lot_qty|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Code Letter</label>
+                <div class="val">{{ inspection.code_letter|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Sample Size</label>
+                <div class="val">{{ inspection.sample_size|default:"—" }}</div>
+            </div>
+            <div class="info-item">
+                <label>Accept / Reject</label>
+                <div class="val">
+                    {% if inspection.accept_number is not None %}
+                        Ac {{ inspection.accept_number }} / Re {{ inspection.reject_number }}
+                    {% else %}
+                        <span style="color:#e65100;">no accept/reject data for this plan/lot size — see Sampling Plans</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <label>Defective Units Found</label>
+                <div class="val">{{ inspection.qty_defective|default:"not yet recorded" }}</div>
+            </div>
+        </div>
+
+        {% if can_edit and inspection.accept_number is not None %}
+        <div style="margin-top:10px;padding-top:14px;border-top:1px solid #eee;">
+            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:10px;">
+                Record Sample Result
+            </div>
+            <form method="post" style="display:flex;gap:10px;align-items:flex-end;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="record_sample_defects">
+                <div class="form-row" style="margin-bottom:0;">
+                    <label>Defective Units Found (of {{ inspection.sample_size }} sampled)</label>
+                    <input type="number" name="qty_defective" min="0"
+                           value="{{ inspection.qty_defective|default_if_none:'' }}" required>
+                </div>
+                <button type="submit" class="save-btn">Save &amp; Auto-Evaluate</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
 
     <!-- Defects card -->
     <div class="card">

@@ -12,6 +12,8 @@ Phase 6A adds SPC (Statistical Process Control):
 import datetime
 import statistics
 
+from .sampling_plan_core import resolve_sampling_plan, evaluate_sampling_result
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -432,15 +434,28 @@ def get_inspection(conn, insp_id: int) -> dict | None:
 
 def create_inspection(conn, insp_number: str, product_id: int | None,
                       wo_id: int | None, insp_date: str, inspector: str,
-                      result: str, notes: str, created_by: str) -> int:
+                      result: str, notes: str, created_by: str,
+                      sampling_plan_id: int | None = None,
+                      lot_qty: float | None = None) -> int:
+    """sampling_plan_id + lot_qty: optional — when both given, the
+    inspection is stamped with the resolved code_letter/sample_size/
+    accept_number/reject_number from that plan (see
+    sampling_plan_core.resolve_sampling_plan)."""
+    resolved: dict = {}
+    if sampling_plan_id and lot_qty:
+        resolved = resolve_sampling_plan(conn, sampling_plan_id, lot_qty)
     row = conn.execute(
         "INSERT INTO qa_inspection "
-        "(insp_number, product_id, wo_id, insp_date, inspector, result, notes, created_by) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        "(insp_number, product_id, wo_id, insp_date, inspector, result, notes, "
+        " created_by, sampling_plan_id, lot_qty, code_letter, sample_size, "
+        " accept_number, reject_number) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
         (insp_number, product_id or None, wo_id or None,
          insp_date or _today(), inspector.strip(),
          result if result in INSP_RESULTS else 'pending',
-         notes.strip(), created_by),
+         notes.strip(), created_by, sampling_plan_id or None, lot_qty,
+         resolved.get('code_letter'), resolved.get('sample_size'),
+         resolved.get('accept_number'), resolved.get('reject_number')),
     ).fetchone()
     return row['id']
 
@@ -451,6 +466,29 @@ def update_inspection_result(conn, insp_id: int, result: str) -> None:
     conn.execute(
         "UPDATE qa_inspection SET result=%s WHERE id=%s", (result, insp_id)
     )
+
+
+def record_sample_defects(conn, insp_id: int, qty_defective: int) -> None:
+    """Record how many sampled units were found defective and, if the
+    inspection has a resolved accept/reject number (from an attached
+    sampling plan), auto-set result to 'passed'/'failed' accordingly (see
+    sampling_plan_core.evaluate_sampling_result). Does not commit."""
+    inspection = get_inspection(conn, insp_id)
+    if not inspection:
+        raise ValueError(f'No inspection with id {insp_id}')
+    outcome = evaluate_sampling_result(
+        inspection.get('accept_number'), inspection.get('reject_number'),
+        qty_defective)
+    if outcome:
+        conn.execute(
+            "UPDATE qa_inspection SET qty_defective=%s, result=%s WHERE id=%s",
+            (qty_defective, outcome, insp_id),
+        )
+    else:
+        conn.execute(
+            "UPDATE qa_inspection SET qty_defective=%s WHERE id=%s",
+            (qty_defective, insp_id),
+        )
 
 
 def get_defects(conn, insp_id: int) -> list[dict]:
