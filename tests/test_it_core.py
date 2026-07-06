@@ -31,6 +31,8 @@ def _conn(ticket_stats=None, asset_stats=None, recent=None):
     ast = asset_stats if asset_stats is not None else _ASSET_STATS
     rec = recent if recent is not None else []
     c.execute.side_effect = [
+        MagicMock(),  # _ensure_ticket_table DDL
+        MagicMock(),  # _ensure_asset_table DDL
         MagicMock(fetchone=MagicMock(return_value=ts)),
         MagicMock(fetchone=MagicMock(return_value=ast)),
         MagicMock(fetchall=MagicMock(return_value=rec)),
@@ -142,35 +144,37 @@ def test_recent_tickets_empty_when_no_rows():
 def test_sql_queries_it_ticket_first():
     c = _conn()
     get_it_dashboard(c)
-    first_sql = c.execute.call_args_list[0][0][0]
+    # index 0-1 are the _ensure_*_table schema DDL calls; the real dashboard
+    # queries start at index 2.
+    first_sql = c.execute.call_args_list[2][0][0]
     assert 'it_ticket' in first_sql
 
 
 def test_sql_queries_it_asset_second():
     c = _conn()
     get_it_dashboard(c)
-    second_sql = c.execute.call_args_list[1][0][0]
+    second_sql = c.execute.call_args_list[3][0][0]
     assert 'it_asset' in second_sql
 
 
 def test_sql_recent_uses_limit_8():
     c = _conn()
     get_it_dashboard(c)
-    third_sql = c.execute.call_args_list[2][0][0]
+    third_sql = c.execute.call_args_list[4][0][0]
     assert 'LIMIT 8' in third_sql
 
 
 def test_sql_tickets_counts_open():
     c = _conn()
     get_it_dashboard(c)
-    sql = c.execute.call_args_list[0][0][0]
+    sql = c.execute.call_args_list[2][0][0]
     assert 'open' in sql
 
 
 def test_sql_tickets_counts_critical():
     c = _conn()
     get_it_dashboard(c)
-    sql = c.execute.call_args_list[0][0][0]
+    sql = c.execute.call_args_list[2][0][0]
     assert 'critical' in sql
 
 
@@ -347,13 +351,13 @@ def test_update_ticket_builds_set_clause():
 def test_update_ticket_ignores_unknown_fields():
     c = MagicMock()
     update_ticket(c, 1, bogus_field='x')
-    c.execute.assert_not_called()
+    assert not any('UPDATE it_ticket' in call.args[0] for call in c.execute.call_args_list)
 
 
 def test_update_ticket_noop_when_no_fields():
     c = MagicMock()
     update_ticket(c, 1)
-    c.execute.assert_not_called()
+    assert not any('UPDATE it_ticket' in call.args[0] for call in c.execute.call_args_list)
 
 
 # ---------------------------------------------------------------------------
@@ -463,10 +467,10 @@ def test_update_asset_builds_set_clause():
 def test_update_asset_ignores_unknown_fields():
     c = MagicMock()
     update_asset(c, 5, nonexistent='x')
-    c.execute.assert_not_called()
+    assert not any('UPDATE it_asset' in call.args[0] for call in c.execute.call_args_list)
 
 
 def test_update_asset_noop_when_no_fields():
     c = MagicMock()
     update_asset(c, 5)
-    c.execute.assert_not_called()
+    assert not any('UPDATE it_asset' in call.args[0] for call in c.execute.call_args_list)

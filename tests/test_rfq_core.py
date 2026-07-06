@@ -102,8 +102,6 @@ def test_award_items_missing_rfq_raises():
 
 
 def test_award_items_single_vendor_creates_one_po_with_quoted_price():
-    import datetime
-    yr = datetime.date.today().year
     conn = _MultiConn([
         [{'id': 5, 'rfq_number': 'RFQ-2026-0001', 'status': 'open'}],  # get_rfq
         [],                                    # next_po_number: existing numbers

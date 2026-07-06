@@ -34,7 +34,7 @@ from ..bom_web_core import (
 )
 from ..mrp_web_core import (
     get_demand_details, get_scheduled_receipts_detail,
-    run_mrp, run_mrp_dated, release_plan as mrp_release_plan,
+    run_mrp_dated, release_plan as mrp_release_plan,
 )
 from ..inventory_core import (
     TRANS_TYPES,
@@ -174,8 +174,8 @@ from ..production_core import (
     get_rma_reports,
 )
 from ..currency_core import (
-    init_currency_schema, list_currencies, get_currency, upsert_currency,
-    get_base_currency, convert_to_base, COMMON_CURRENCIES,
+    init_currency_schema, list_currencies, upsert_currency,
+    get_base_currency, COMMON_CURRENCIES,
 )
 from ..fixed_asset_core import (
     init_fixed_asset_tables, list_fixed_assets, get_fixed_asset,
