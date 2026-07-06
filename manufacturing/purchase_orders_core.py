@@ -88,6 +88,15 @@ def ensure_po_tables(conn):
         ALTER TABLE purchase_order
         ADD COLUMN IF NOT EXISTS received_date TEXT
     """)
+    # Some environments' live schema has supplier_id NOT NULL despite it
+    # being nullable here — a PO legitimately starts supplier-less (see
+    # po_new's default form and mrp_web_core.release_plan, which creates a
+    # draft buy PO before a supplier is necessarily on file for the
+    # product). DROP NOT NULL is a no-op if it's already nullable.
+    conn.execute("""
+        ALTER TABLE purchase_order
+        ALTER COLUMN supplier_id DROP NOT NULL
+    """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS po_item (
             id SERIAL PRIMARY KEY,

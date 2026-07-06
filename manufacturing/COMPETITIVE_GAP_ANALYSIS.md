@@ -588,12 +588,38 @@ Reduces HR workload for routine employee requests.
   rather than through `menus.py`/`WEB_LEAF_URLS`, since that system is
   keyed per-department and ESS needs to be reachable from all of them.
 
-#### P2-H: MRP → Auto-Release Purchase Orders
+#### P2-H: MRP → Auto-Release Purchase Orders ✅ Done
 Critical for MRP to be actionable. Currently MRP generates suggestions but POs must be created manually.
 - From MRP plan screen: "Release Selected" button
 - For each selected planned order (buy type): auto-create PO with preferred supplier + lead time date
 - For each selected planned order (make type): auto-create Work Order
 - Show count of POs/WOs created on release
+- **Shipped:** This was mostly already built — `mrp_web_core.release_plan`,
+  the `mrp_plan.html` selection UI, and the `mrp_release.html` results page
+  all existed before this change and are covered by an existing test suite.
+  The one missing piece was the preferred-supplier lookup: `release_plan`'s
+  buy branch always called `create_po(..., supplier_id=None, ...)`, and
+  `load_mrp_inputs` didn't even select `product.supplier_id`. Fixed by
+  joining `supplier` in `load_mrp_inputs`, threading `supplier_id`/
+  `supplier_name` through `run_mrp`/`run_mrp_dated` onto each planned
+  order, and passing it into `create_po` when present (falls back to
+  `None` with a "no preferred supplier on file" note otherwise, same as
+  before). `mrp_plan.html` now shows a Supplier column per buy row;
+  `mrp_release.html` shows the assigned supplier (or a "none on file"
+  warning) per created PO. **Found and fixed a real, pre-existing crash
+  while manually verifying this end-to-end**: on this dev DB,
+  `purchase_order.supplier_id` had somehow ended up `NOT NULL` at the
+  Postgres level despite the DDL in `purchase_orders_core.py` declaring it
+  plain `INTEGER` (nullable) — the "Live schema can diverge from the
+  `CREATE TABLE` DDL" gotcha this doc already warns about elsewhere. That
+  meant *every* buy-type MRP release without a resolvable supplier would
+  have 500'd (confirmed manual PO creation without a supplier does too) —
+  this was never exercised by the unit tests since they mock `create_po`
+  entirely. Fixed by adding an `ALTER COLUMN supplier_id DROP NOT NULL`
+  migration to `ensure_po_tables` (a no-op if already nullable) and calling
+  `ensure_wo_tables`/`ensure_po_tables` at the top of `release_plan` so any
+  environment with the same divergence self-heals on the next release —
+  neither was called anywhere in that code path before.
 
 ---
 

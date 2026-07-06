@@ -14,8 +14,8 @@ from datetime import date, timedelta
 
 from .mrp_core import plan_orders, plan_orders_dated
 from .bom_core import explode_quantity
-from .work_orders_core import next_wo_number, create_wo
-from .purchase_orders_core import next_po_number, create_po, add_po_item
+from .work_orders_core import ensure_wo_tables, next_wo_number, create_wo
+from .purchase_orders_core import ensure_po_tables, next_po_number, create_po, add_po_item
 from .log_utils import get_logger
 
 log = get_logger(__name__)
@@ -38,12 +38,14 @@ def load_mrp_inputs(conn):
         safety            : {pid: float}  (zeros — extend to reorder_point if needed)
     """
     rows = conn.execute(
-        "SELECT id, name, "
-        "COALESCE(item_type, 'buy') AS item_type, "
-        "COALESCE(lead_time_days, 0) AS lead_time_days, "
-        "COALESCE(amount, 0) AS amount, "
-        "COALESCE(reorder_point, 0) AS safety_stock "
-        "FROM product"
+        "SELECT p.id, p.name, "
+        "COALESCE(p.item_type, 'buy') AS item_type, "
+        "COALESCE(p.lead_time_days, 0) AS lead_time_days, "
+        "COALESCE(p.amount, 0) AS amount, "
+        "COALESCE(p.reorder_point, 0) AS safety_stock, "
+        "p.supplier_id, s.company_name AS supplier_name "
+        "FROM product p "
+        "LEFT JOIN supplier s ON s.id = p.supplier_id"
     ).fetchall()
     products = {r['id']: dict(r) for r in rows}
     on_hand = {pid: p['amount'] for pid, p in products.items()}
@@ -167,8 +169,10 @@ def run_mrp_dated(conn) -> list[dict]:
 
     name_map = {pid: p['name'] for pid, p in products_raw.items()}
     for item in planned:
-        item['product_name'] = name_map.get(item['product_id'],
-                                            f"Product {item['product_id']}")
+        pid = item['product_id']
+        item['product_name'] = name_map.get(pid, f"Product {pid}")
+        item['supplier_id'] = products_raw.get(pid, {}).get('supplier_id')
+        item['supplier_name'] = products_raw.get(pid, {}).get('supplier_name')
 
     log.info("MRP dated run: %d planned orders (demand products: %d)",
              len(planned), len(demand_dated))
@@ -196,8 +200,10 @@ def run_mrp(conn) -> list[dict]:
     name_map = {pid: p['name'] for pid, p in products_raw.items()}
     today = date.today()
     for item in planned:
-        item['product_name'] = name_map.get(item['product_id'],
-                                            f"Product {item['product_id']}")
+        pid = item['product_id']
+        item['product_name'] = name_map.get(pid, f"Product {pid}")
+        item['supplier_id'] = products_raw.get(pid, {}).get('supplier_id')
+        item['supplier_name'] = products_raw.get(pid, {}).get('supplier_name')
         lt = item.get('lead_time_days') or 0
         item['due_date'] = (today + timedelta(days=lt)).isoformat()
         item['qty'] = round(item['qty'], 4)
@@ -244,6 +250,8 @@ def release_plan(conn, items: list[dict],
     All inserts share one connection and are NOT committed here; the caller
     commits after a successful return so the whole release is atomic.
     """
+    ensure_wo_tables(conn)
+    ensure_po_tables(conn)
     today = date.today().isoformat()
     created_wos: list[dict] = []
     created_pos: list[dict] = []
@@ -279,15 +287,21 @@ def release_plan(conn, items: list[dict],
                      wo_num, name, qty)
 
         else:  # buy
+            supplier_id = item.get('supplier_id')
+            supplier_name = item.get('supplier_name')
+            notes = (
+                f'MRP: {name}' if supplier_id
+                else f'MRP: {name} — no preferred supplier on file, assign one before sending'
+            )
             po_num = next_po_number(conn)
             po_id = create_po(
                 conn,
                 po_number=po_num,
-                supplier_id=None,
+                supplier_id=supplier_id,
                 order_date=today,
                 expected_date=due,
                 status='draft',
-                notes=f'MRP: {name} — assign supplier before sending',
+                notes=notes,
                 created_by=released_by,
             )
             add_po_item(
@@ -303,8 +317,10 @@ def release_plan(conn, items: list[dict],
                 'po_id': po_id,
                 'product_name': name,
                 'qty': qty,
+                'supplier_id': supplier_id,
+                'supplier_name': supplier_name,
             })
-            log.info("MRP release: PO %s created for %s qty=%.2f",
-                     po_num, name, qty)
+            log.info("MRP release: PO %s created for %s qty=%.2f supplier=%s",
+                     po_num, name, qty, supplier_name or '(none)')
 
     return created_wos, created_pos

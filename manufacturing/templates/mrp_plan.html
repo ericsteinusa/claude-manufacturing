@@ -47,7 +47,8 @@
     <h2>MRP Plan — Review &amp; Release</h2>
     <p class="sub">
         Select the planned orders you want to release.
-        Make orders create Work Orders; Buy orders create draft Purchase Orders (assign supplier after).
+        Make orders create Work Orders; Buy orders create draft Purchase Orders,
+        pre-assigned to the product's preferred supplier when one is on file.
     </p>
 
     <div class="summary-bar">
@@ -75,6 +76,7 @@
                     <th>Product</th>
                     <th>Type</th>
                     <th>Action</th>
+                    <th>Supplier</th>
                     <th class="num">Qty</th>
                     <th class="num">Lead Time</th>
                     <th class="num">Start Date</th>
@@ -99,6 +101,17 @@
                         <span class="badge badge-wo">&#10003; Work Order</span>
                         {% else %}
                         <span class="badge badge-po">&#10003; Draft PO</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.order_type == 'buy' %}
+                            {% if item.supplier_name %}
+                            {{ item.supplier_name }}
+                            {% else %}
+                            <span style="color:#c33;font-size:12px;">none on file</span>
+                            {% endif %}
+                        {% else %}
+                        —
                         {% endif %}
                     </td>
                     <td class="num">

@@ -3495,6 +3495,7 @@ def mrp_release(request):
         request,
         created_wos=created_wos,
         created_pos=created_pos,
+        pos_missing_supplier=sum(1 for po in created_pos if not po.get('supplier_id')),
     ))
 
 

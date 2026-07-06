@@ -94,6 +94,31 @@ def test_load_mrp_inputs_scheduled_receipts_aggregated():
     assert scheduled[5] == 20.0
 
 
+def test_load_mrp_inputs_selects_preferred_supplier():
+    conn = _conn(fetchall=[])
+    load_mrp_inputs(conn)
+    sql = conn.execute.call_args_list[0][0][0]
+    assert 'supplier_id' in sql
+    assert 'LEFT JOIN supplier' in sql
+
+
+def test_load_mrp_inputs_carries_supplier_fields():
+    conn = MagicMock()
+    responses = [
+        MagicMock(fetchall=lambda: [
+            {'id': 1, 'name': 'Widget', 'item_type': 'buy', 'lead_time_days': 5,
+             'amount': 10.0, 'safety_stock': 0.0, 'supplier_id': 7,
+             'supplier_name': 'Acme Corp'}
+        ]),
+        MagicMock(fetchall=lambda: []),  # bom rows
+        MagicMock(fetchall=lambda: []),  # wo rows
+    ]
+    conn.execute.side_effect = responses
+    products, *_ = load_mrp_inputs(conn)
+    assert products[1]['supplier_id'] == 7
+    assert products[1]['supplier_name'] == 'Acme Corp'
+
+
 def test_load_mrp_inputs_empty_db():
     conn = MagicMock()
     responses = [
@@ -235,6 +260,43 @@ def test_run_mrp_empty_demand_returns_empty():
     assert result == []
 
 
+def test_run_mrp_carries_preferred_supplier_onto_buy_item():
+    with patch('manufacturing.mrp_web_core.load_mrp_inputs') as mock_inputs, \
+         patch('manufacturing.mrp_web_core.get_demand') as mock_demand, \
+         patch('manufacturing.mrp_web_core.plan_orders') as mock_plan:
+        mock_inputs.return_value = (
+            {1: {'name': 'Steel Tube', 'item_type': 'buy', 'lead_time_days': 7,
+                 'amount': 0.0, 'supplier_id': 4, 'supplier_name': 'Acme Steel'}},
+            {}, {1: 0.0}, {}, {1: 0.0},
+        )
+        mock_demand.return_value = {1: 20.0}
+        mock_plan.return_value = [
+            {'product_id': 1, 'order_type': 'buy', 'qty': 20.0, 'lead_time_days': 7}
+        ]
+        conn = MagicMock()
+        result = run_mrp(conn)
+    assert result[0]['supplier_id'] == 4
+    assert result[0]['supplier_name'] == 'Acme Steel'
+
+
+def test_run_mrp_no_supplier_on_file_is_none():
+    with patch('manufacturing.mrp_web_core.load_mrp_inputs') as mock_inputs, \
+         patch('manufacturing.mrp_web_core.get_demand') as mock_demand, \
+         patch('manufacturing.mrp_web_core.plan_orders') as mock_plan:
+        mock_inputs.return_value = (
+            {1: {'name': 'Widget', 'item_type': 'buy', 'lead_time_days': 0,
+                 'amount': 0.0, 'supplier_id': None, 'supplier_name': None}},
+            {}, {1: 0.0}, {}, {1: 0.0},
+        )
+        mock_demand.return_value = {1: 1.0}
+        mock_plan.return_value = [
+            {'product_id': 1, 'order_type': 'buy', 'qty': 1.0, 'lead_time_days': 0}
+        ]
+        conn = MagicMock()
+        result = run_mrp(conn)
+    assert result[0]['supplier_id'] is None
+
+
 def test_run_mrp_unknown_product_id_uses_fallback_name():
     with patch('manufacturing.mrp_web_core.load_mrp_inputs') as mock_inputs, \
          patch('manufacturing.mrp_web_core.get_demand') as mock_demand, \
@@ -349,6 +411,70 @@ def test_release_plan_buy_item_creates_po():
     assert pos[0]['product_name'] == 'Steel Tube'
     assert wos == []
     mock_add.assert_called_once()
+
+
+def test_release_plan_buy_item_uses_preferred_supplier():
+    conn = MagicMock()
+    items = [{
+        'product_id': 2,
+        'product_name': 'Steel Tube',
+        'order_type': 'buy',
+        'qty': 20.0,
+        'lead_time_days': 7,
+        'due_date': '2026-07-07',
+        'supplier_id': 4,
+        'supplier_name': 'Acme Steel',
+    }]
+
+    with patch('manufacturing.mrp_web_core.next_po_number', return_value='PO-2026-0001'), \
+         patch('manufacturing.mrp_web_core.create_po', return_value=99) as mock_create, \
+         patch('manufacturing.mrp_web_core.add_po_item'):
+        wos, pos = release_plan(conn, items, released_by='test@example.com')
+
+    _, kwargs = mock_create.call_args
+    assert kwargs['supplier_id'] == 4
+    assert 'no preferred supplier' not in kwargs['notes']
+    assert pos[0]['supplier_id'] == 4
+    assert pos[0]['supplier_name'] == 'Acme Steel'
+
+
+def test_release_plan_buy_item_without_supplier_notes_it():
+    conn = MagicMock()
+    items = [{
+        'product_id': 2,
+        'product_name': 'Steel Tube',
+        'order_type': 'buy',
+        'qty': 20.0,
+        'lead_time_days': 7,
+        'due_date': '2026-07-07',
+        'supplier_id': None,
+        'supplier_name': None,
+    }]
+
+    with patch('manufacturing.mrp_web_core.next_po_number', return_value='PO-2026-0002'), \
+         patch('manufacturing.mrp_web_core.create_po', return_value=100) as mock_create, \
+         patch('manufacturing.mrp_web_core.add_po_item'):
+        wos, pos = release_plan(conn, items, released_by='test@example.com')
+
+    _, kwargs = mock_create.call_args
+    assert kwargs['supplier_id'] is None
+    assert 'no preferred supplier' in kwargs['notes']
+    assert pos[0]['supplier_id'] is None
+
+
+def test_release_plan_buy_item_missing_supplier_keys_defaults_none():
+    """Items from older/partial call sites without supplier_id/name at all
+    (e.g. hand-built test fixtures) must not KeyError."""
+    conn = MagicMock()
+    items = [{
+        'product_id': 2, 'product_name': 'Steel Tube', 'order_type': 'buy',
+        'qty': 5.0, 'lead_time_days': 3, 'due_date': '2026-07-03',
+    }]
+    with patch('manufacturing.mrp_web_core.next_po_number', return_value='PO-X'), \
+         patch('manufacturing.mrp_web_core.create_po', return_value=1) as mock_create, \
+         patch('manufacturing.mrp_web_core.add_po_item'):
+        release_plan(conn, items, released_by='u@e.com')
+    assert mock_create.call_args.kwargs['supplier_id'] is None
 
 
 def test_release_plan_mixed_creates_both():

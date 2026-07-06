@@ -68,14 +68,19 @@
     {% if created_pos %}
     <div class="result-section">
         <h3>Draft Purchase Orders Created</h3>
+        {% if pos_missing_supplier %}
         <p style="color:#fc9;font-size:12px;margin-bottom:8px;">
-            These POs have no supplier assigned. Open each one to add a supplier before sending.
+            {{ pos_missing_supplier }} PO{{ pos_missing_supplier|pluralize }} below
+            {{ pos_missing_supplier|pluralize:"has,have" }} no preferred supplier on
+            file — open and assign one before sending.
         </p>
+        {% endif %}
         <table class="result-table">
             <thead>
                 <tr>
                     <th>PO Number</th>
                     <th>Product</th>
+                    <th>Supplier</th>
                     <th class="num" style="text-align:right;">Qty</th>
                     <th></th>
                 </tr>
@@ -85,6 +90,13 @@
                 <tr>
                     <td><strong>{{ po.po_number }}</strong></td>
                     <td>{{ po.product_name }}</td>
+                    <td>
+                        {% if po.supplier_name %}
+                        {{ po.supplier_name }}
+                        {% else %}
+                        <span style="color:#c33;">none on file</span>
+                        {% endif %}
+                    </td>
                     <td style="text-align:right;">{{ po.qty|floatformat:0 }}</td>
                     <td><a href="/po/{{ po.po_id }}/" class="btn"
                            style="padding:2px 10px;font-size:12px;">View PO</a></td>
