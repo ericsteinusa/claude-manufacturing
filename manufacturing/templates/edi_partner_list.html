@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block page_title %}EDI Trading Partners{% endblock %}
+
+{% block toolbar_left %}
+<a href="/so/" class="btn">← Back</a>
+{% if can_edit %}<a href="/edi/partners/new/" class="btn btn-primary">+ New Trading Partner</a>{% endif %}
+<a href="/edi/850/upload/" class="btn">Import EDI 850</a>
+<a href="/edi/log/" class="btn">Transaction Log</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">EDI Trading Partners</div>
+
+    {% if partners %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Partner Name</th>
+                    <th>ISA Sender ID</th>
+                    <th>ISA Receiver ID</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in partners %}
+                <tr>
+                    <td>{{ p.company_name|default:p.first_name }} {{ p.last_name|default:"" }}</td>
+                    <td>{{ p.partner_name|default:"—" }}</td>
+                    <td>{{ p.isa_sender_id|default:"—" }}</td>
+                    <td>{{ p.isa_receiver_id|default:"—" }}</td>
+                    <td><span class="pill">{% if p.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+                    <td><a href="/edi/partners/{{ p.customer_id }}/" class="btn btn-sm">Manage</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No EDI trading partners configured yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

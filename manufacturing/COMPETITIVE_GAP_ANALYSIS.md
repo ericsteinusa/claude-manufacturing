@@ -1189,12 +1189,56 @@ Real-time production visibility — Plex's core differentiator.
   and confirmed "Confirm Anyway" successfully overrode both checks;
   cleaned up all test data afterward.
 
-#### P4-D: EDI Integration
+#### P4-D: EDI Integration ✅ Done
 - EDI 850 inbound: customer PO → auto-create Sales Order
 - EDI 855 outbound: SO acknowledgment to customer
 - EDI 856 outbound: Advance Ship Notice on shipment
 - EDI 810 outbound: invoice to customer
 - Map via configurable field mappings per trading partner
+- **Shipped:** `manufacturing/edi_core.py`. No AS2/VAN/SFTP network
+  connectivity is available in this environment, so the trading-partner
+  *connection* is honestly scoped as a file upload/download stub (a
+  technician receives/sends the `.edi` file some other way). But the
+  **X12 document format itself is real, parsed/generated text**
+  (segment-delimited `~`, `*`-separated elements) — unlike a payment
+  processor or IoT sensor, this isn't a fake integration, just a common-
+  subset implementation of the standard (not every optional segment/
+  qualifier code). `product` has no SKU/code column anywhere in this
+  codebase, so a trading partner's own part numbers (carried in the
+  850's PO1 segments) have nothing to match against — a new
+  `edi_partner_item_xref(customer_id, partner_item_number, product_id)`
+  table is the actual field-mapping mechanism the spec's "configurable...
+  per trading partner" bullet asks for, not a generic abstraction. An
+  inbound line with no mapping still imports as a valid `so_item`
+  (`product_id=None`, using the partner's raw item number as the
+  description) — not an error, mirroring how `so_item` already supports
+  text-only lines. **Reuses existing, unmodified functions for every real
+  side effect**: `sales_orders_core.next_so_number`/`create_so`/
+  `add_so_item` (850 inbound — both exact-SQL-pinned in `tests/test_
+  sales_orders_core.py`, called as-is rather than duplicated),
+  `production_core.get_shipment`/`get_shipment_items` (856), `accounting_
+  core.get_ar_invoice` (810). `ar_invoice` has no line-item table in this
+  codebase, so the 810 emits one summary line (amount + description) —
+  an honest reflection of the existing invoice model, not fabricated
+  detail. Every parse/generate action is logged to `edi_transaction_log`
+  with its raw content, giving a real audit trail. New pages at
+  `/edi/partners/...` (trading partner + item xref setup), `/edi/850/
+  upload/`, `/edi/855|856|810/<id>/download/`, and `/edi/log/`, reusing
+  this codebase's existing file-upload (`document_control`'s pattern) and
+  file-download (`_barcode.py`'s `Content-Disposition` pattern)
+  conventions; cross-linked from `so_list.html`, `so_detail.html`, the
+  shipment detail page, and `ar_invoice_detail.html`. Verified end-to-end
+  against a running dev server + local Postgres through the actual web
+  views: configured a real trading partner + item mapping, hand-built a
+  realistic 850 referencing both a mapped and an intentionally-unmapped
+  partner item number, uploaded it and confirmed a real SO was created
+  with the mapped line correctly resolving to the right `product_id` and
+  the unmapped line correctly staying text-only; downloaded the 855 and
+  confirmed it reflected the same lines; downloaded the 856 for a real
+  shipment and confirmed real carrier/tracking/item data appeared;
+  downloaded the 810 for a real AR invoice and confirmed the real amount/
+  description appeared; confirmed the transaction log showed all four
+  actions; cleaned up all test data afterward.
 
 #### P4-E: e-Commerce Integration
 - Shopify / WooCommerce webhook: new order → auto-create SO

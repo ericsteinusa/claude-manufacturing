@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block page_title %}Import EDI 850{% endblock %}
+
+{% block toolbar_left %}
+<a href="/edi/partners/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Import EDI 850 (Purchase Order)</div>
+    <p style="font-size:12px;color:#666;margin-bottom:14px;">
+        Upload a customer's EDI 850 file (segment-delimited X12 text) to auto-create
+        a Sales Order. Lines whose partner item number has no mapping still import,
+        using the partner's raw item number as a text description.</p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    {% if result %}
+    <div class="alert alert-success">
+        Created <a href="/so/{{ result.so_id }}/">{{ result.so_number }}</a> with
+        {{ result.line_count }} line(s){% if result.unmapped_count %}, {{ result.unmapped_count }}
+        unmapped{% endif %}.
+    </div>
+    {% endif %}
+
+    <div class="erp-form">
+        <div class="card">
+            <form method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Customer</label>
+                    <select name="customer_id" required>
+                        <option value="">(select)</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}">{{ c.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>EDI 850 File</label>
+                    <input type="file" name="file" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
