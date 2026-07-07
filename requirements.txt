@@ -15,3 +15,5 @@ psycopg2-binary==2.9.12
 bcrypt==5.0.0
 python-dotenv==1.2.2
 openpyxl==3.1.5
+python-barcode==0.16.1
+reportlab==5.0.0
