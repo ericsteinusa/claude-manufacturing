@@ -12,6 +12,7 @@ from manufacturing.mrp_web_core import (
     get_demand_details,
     get_scheduled_receipts_detail,
     run_mrp,
+    run_mrp_dated,
     release_plan,
     _explode_to_wo,
 )
@@ -540,3 +541,47 @@ def test_release_plan_does_not_commit():
              'qty': 1.0, 'lead_time_days': 0, 'due_date': '2026-07-01'}
         ], released_by='u@e.com')
     conn.commit.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# run_mrp_dated — include_forecast (P4-A)
+# ---------------------------------------------------------------------------
+
+def test_run_mrp_dated_default_ignores_forecast():
+    """include_forecast defaults to False -- behavior must be unchanged
+    from before P4-A, and demand_forecast_core must not even be touched."""
+    with patch('manufacturing.mrp_web_core.load_mrp_inputs') as mock_inputs, \
+         patch('manufacturing.mrp_web_core.get_demand_dated') as mock_demand, \
+         patch('manufacturing.mrp_web_core.plan_orders_dated') as mock_plan, \
+         patch('manufacturing.demand_forecast_core.get_forecast_demand_dated') as mock_forecast:
+        mock_inputs.return_value = (
+            {1: {'name': 'Widget', 'item_type': 'make', 'lead_time_days': 2}},
+            {}, {1: 0.0}, {}, {1: 0.0},
+        )
+        mock_demand.return_value = {1: [(5.0, date(2026, 8, 1))]}
+        mock_plan.return_value = []
+        conn = MagicMock()
+        run_mrp_dated(conn)
+
+    mock_forecast.assert_not_called()
+    assert mock_plan.call_args[0][2] == {1: [(5.0, date(2026, 8, 1))]}
+
+
+def test_run_mrp_dated_merges_forecast_when_enabled():
+    with patch('manufacturing.mrp_web_core.load_mrp_inputs') as mock_inputs, \
+         patch('manufacturing.mrp_web_core.get_demand_dated') as mock_demand, \
+         patch('manufacturing.mrp_web_core.plan_orders_dated') as mock_plan, \
+         patch('manufacturing.demand_forecast_core.get_forecast_demand_dated') as mock_forecast:
+        mock_inputs.return_value = (
+            {1: {'name': 'Widget', 'item_type': 'make', 'lead_time_days': 2}},
+            {}, {1: 0.0}, {}, {1: 0.0},
+        )
+        mock_demand.return_value = {1: [(5.0, date(2026, 8, 1))]}
+        mock_forecast.return_value = {1: [(20.0, date(2026, 9, 1))], 2: [(7.0, date(2026, 9, 1))]}
+        mock_plan.return_value = []
+        conn = MagicMock()
+        run_mrp_dated(conn, include_forecast=True)
+
+    merged_demand = mock_plan.call_args[0][2]
+    assert merged_demand[1] == [(5.0, date(2026, 8, 1)), (20.0, date(2026, 9, 1))]
+    assert merged_demand[2] == [(7.0, date(2026, 9, 1))]

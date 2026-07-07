@@ -234,6 +234,7 @@ from ._blanket_po import *  # noqa: F401,F403
 from ._portal import *  # noqa: F401,F403
 from ._multi_entity import *  # noqa: F401,F403
 from ._shop_floor import *  # noqa: F401,F403
+from ._demand_forecast import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -257,6 +258,7 @@ WEB_LEAF_URLS = {
     ('production', 'open_wo'): '/wo/?status=open',
     ('production', 'inprog_wo'): '/wo/?status=in_progress',
     ('production', 'comp_wo'): '/wo/?status=completed',
+    ('sales', 'demand_forecast'): '/demand-forecast/',
     ('sales', 'new_order'): '/so/new/',
     ('sales', 'open_orders'): '/so/?status=confirmed',
     ('sales', 'order_hist'): '/so/',
@@ -3427,9 +3429,10 @@ def mrp_run(request):
     if request.method != 'POST':
         return redirect('mrp_home')
 
+    include_forecast = request.POST.get('include_forecast') == 'on'
     conn = get_db_connection()
     try:
-        plan = run_mrp_dated(conn)
+        plan = run_mrp_dated(conn, include_forecast=include_forecast)
     finally:
         conn.close()
 

@@ -1051,12 +1051,51 @@ Real-time production visibility — Plex's core differentiator.
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
 
-#### P4-A: AI Demand Forecasting
+#### P4-A: AI Demand Forecasting ✅ Done
 - Pull 24+ months of SO history
 - Apply time-series model (seasonal decomposition, Holt-Winters, or Prophet)
 - Generate forecast by product by month for next 12 months
 - Display as overlay on actual orders in demand dashboard
 - Feed forecast into MRP as additional demand
+- **Shipped:** `manufacturing/demand_forecast_core.py`. Not the same thing
+  as the existing "Sales forecasting with actuals & variance" — that's
+  `sales_core.py`'s `sales_forecast` table, a rep/product-line/quarter
+  **quota** a person types in (`expected_value` × `probability` =
+  `weighted_value`), with no time-series computation and no product/month
+  grain. This is a genuinely new, computed forecast, generated from
+  historical shipped/closed Sales Order lines. **No data-science library
+  exists anywhere** in `requirements.txt` (no pandas/numpy/statsmodels/
+  prophet), so — consistent with this codebase's pattern of not adding a
+  new dependency for one feature — the time-series model is a hand-rolled
+  **classical seasonal decomposition** in pure Python, one of the three
+  methods the spec names and far more tractable to implement correctly
+  without a library than Holt-Winters' parameter optimization: a
+  closed-form least-squares trend line, plus a per-calendar-month seasonal
+  index (average actual/trend ratio for that month across however many
+  years of history exist, normalized to mean 1.0). With under 12 months of
+  history there's no full seasonal cycle to measure, so it falls back to a
+  flat, trend-only projection rather than fabricating seasonality from
+  partial data. The existing "demand dashboard" (`views.sales_demand`,
+  `/sales/demand/`) is revenue-based and quarterly, grouped by product
+  name — mixing that grain/unit with a qty/month forecast would be a
+  confusing hybrid, so this ships as its own `/demand-forecast/` page
+  (product × month, in units, actual history overlaid with projected
+  future months via a bar-per-row table, mirroring `sales_demand.html`'s
+  existing convention rather than adding a charting library), cross-linked
+  from both pages. **MRP integration is fully additive**:
+  `mrp_web_core.run_mrp_dated` gained one optional parameter,
+  `include_forecast: bool = False` — the default and every existing
+  caller's behavior is byte-for-byte unchanged; when `True` (a checkbox on
+  the MRP run form), `demand_forecast_core.get_forecast_demand_dated`
+  returns forecast rows in exactly the `{product_id: [(qty, date), ...]}`
+  shape `get_demand_dated` already produces, so it's a plain per-product
+  list-extend, not a rewrite of `plan_orders_dated`/`get_demand_dated`
+  themselves. Verified end-to-end against a running dev server + local
+  Postgres through the actual web views: generated forecasts from real SO
+  history, confirmed the dashboard overlay renders actual vs. forecast
+  correctly, ran MRP once with the checkbox off (unchanged plan) and once
+  on (forecast-driven demand visibly added more planned orders — 9 → 18 in
+  the verification run), and cleaned up all test data afterward.
 
 #### P4-B: Predictive Maintenance
 - Track rolling MTBF per equipment from historical downtime
