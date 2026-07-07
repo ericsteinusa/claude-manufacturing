@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block page_title %}Production / Downtime Entry{% endblock %}
+
+{% block toolbar_left %}
+<a href="/shop-floor/" class="btn">Live Dashboard</a>
+<a href="/shop-floor/plan/" class="btn">Shift Plan</a>
+<a href="/shop-floor/tv/" class="btn" target="_blank">TV Display</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select, .filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:14px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Production / Downtime Entry</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <label>Shift:</label>
+        <select name="shift">
+            {% for s in shifts %}
+            <option value="{{ s }}" {% if s == shift %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Date:</label>
+        <input type="date" name="date" value="{{ entry_date }}">
+        <button type="submit" class="btn btn-sm">Go</button>
+    </form>
+
+    <div class="two-col">
+        <div class="card">
+            <div class="card-title">Log Production</div>
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="production">
+                <input type="hidden" name="shift" value="{{ shift }}">
+                <input type="hidden" name="entry_date" value="{{ entry_date }}">
+                <div class="form-row">
+                    <label>Workcenter</label>
+                    <select name="workcenter_id" required>
+                        {% for wc in workcenters %}
+                        <option value="{{ wc.id }}">{{ wc.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Units Produced</label>
+                    <input type="number" name="qty_produced" min="0" step="1" value="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Units Scrapped</label>
+                    <input type="number" name="qty_scrapped" min="0" step="1" value="0">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Log Production</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Log Downtime</div>
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="downtime">
+                <input type="hidden" name="shift" value="{{ shift }}">
+                <input type="hidden" name="entry_date" value="{{ entry_date }}">
+                <div class="form-row">
+                    <label>Workcenter</label>
+                    <select name="workcenter_id" required>
+                        {% for wc in workcenters %}
+                        <option value="{{ wc.id }}">{{ wc.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Reason</label>
+                    <select name="reason_category" required>
+                        {% for r in reason_categories %}
+                        <option value="{{ r }}">{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Minutes</label>
+                    <input type="number" name="minutes" min="1" step="1" value="" required>
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Log Downtime</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card-title">{{ shift }} Shift — {{ entry_date }}</div>
+    <table class="list-table">
+        <thead><tr>
+            <th>Workcenter</th><th class="num">Produced</th><th class="num">Scrapped</th>
+            <th class="num">Downtime (min)</th><th class="num">OEE</th>
+        </tr></thead>
+        <tbody>
+        {% for wc in live %}
+        <tr>
+            <td>{{ wc.workcenter_name }}</td>
+            <td class="num">{{ wc.qty_produced|floatformat:0 }}</td>
+            <td class="num">{{ wc.qty_scrapped|floatformat:0 }}</td>
+            <td class="num">{{ wc.downtime_minutes|floatformat:0 }}</td>
+            <td class="num">{{ wc.oee_pct }}%</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No active workcenters.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

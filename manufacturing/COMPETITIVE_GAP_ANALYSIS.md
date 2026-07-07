@@ -997,13 +997,56 @@ Required for companies with multiple legal entities.
   the company immediately after assignment, and lost access immediately
   after revocation — then cleaned up all test data.
 
-#### P3-G: OEE Live Shop Floor Dashboard
+#### P3-G: OEE Live Shop Floor Dashboard ✅ Done
 Real-time production visibility — Plex's core differentiator.
 - Operator production entry: shift + workcenter + units produced + units scrapped
 - Downtime entry from shop floor (reason code)
 - Live OEE calculation per workcenter per shift
 - Shop floor TV display mode (large format, auto-refresh)
 - Shift summary: planned vs. actual output
+- **Shipped:** `manufacturing/shop_floor_core.py`. An earlier feature
+  (P1-C, `oee_core.py`) already computes OEE, but only as a **date-range
+  report** derived from completed `wo_operation` rows and `maint_downtime`
+  — there was no shift concept anywhere in this codebase and no data-entry
+  screen at all (its only UI is a read-only report under Maintenance). This
+  is the first operator-facing data-entry layer and the first live/TV
+  view, not a rebuild of P1-C — the two calculations run in parallel at
+  different granularities (period vs. shift) over different source data
+  (WO-operation actuals vs. manual shift tallies). `oee_core._oee_from_
+  totals` isn't reused because its Performance formula (`std_hours /
+  actual_hours`) assumes a linked work-order operation, which a shift's
+  manual qty/scrap entry doesn't have (the spec's "shift + workcenter +
+  units produced + units scrapped" has no WO field) — Performance here is
+  `qty_produced / planned_qty` instead, which doubles as the "planned vs.
+  actual output" shift-summary bullet so one calculation serves both.
+  **Two documented simplifying assumptions**, made because no shift-window
+  or shift-length concept exists anywhere else to derive them from: every
+  shift is a fixed 8-hour scheduled window regardless of `workcenter.
+  capacity_hours_per_day`, and `SHIFT_WINDOWS` fixes wall-clock hours per
+  shift name (Day/Swing/Night, matching `maintenance_core.MECHANIC_
+  SHIFTS`' naming) purely to default the dashboard/TV display to "right
+  now's" shift with zero operator input. **Deliberately diverges from
+  `oee_core`'s convention** in one place: Performance defaults to 100% (not
+  0%) when no shift plan has been set — an unset plan means "no target to
+  compare against," not "nothing happened," so treating it as a failure
+  would misrepresent real output. Reuses `routing_core.workcenter`/
+  `list_workcenters` for the workcenter dimension and `maintenance_core.
+  DOWNTIME_CATEGORIES` as the downtime reason-code taxonomy, rather than
+  duplicating either. Web pages at `/shop-floor/entry/` (production +
+  downtime logging), `/shop-floor/plan/` (supervisor sets planned qty per
+  workcenter/shift/date), `/shop-floor/` (live dashboard with
+  shift/date pickers), and `/shop-floor/tv/` (a standalone, high-contrast,
+  large-format page with no toolbar/nav chrome, auto-refreshing via a
+  30-second `<meta http-equiv="refresh">` — the simplest possible
+  auto-refresh mechanism, avoiding new JS/polling machinery for a
+  report-style page), wired into a new "Shop Floor" submenu under the
+  Production main menu. Verified end-to-end against a running dev server +
+  local Postgres through the actual web views: logged production and
+  downtime entries for a real workcenter, set a shift plan, confirmed the
+  dashboard's summed totals and OEE breakdown were exactly right
+  (Availability/Performance/Quality/OEE all hand-checked against the raw
+  entries), confirmed the TV page renders standalone with no app chrome,
+  and cleaned up all test data afterward.
 
 ---
 

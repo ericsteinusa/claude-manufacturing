@@ -1309,6 +1309,17 @@ MENU_TREE = {
             }),
             ('prod', 'Production', _PROD_MENU),
             ('shipping', 'Shipping', _SHIP_MENU),
+            ('shop_floor', 'Shop Floor', {
+                'title': 'Shop Floor',
+                'items': [
+                    ('sf_entry', 'Production/Downtime Entry',
+                     'production/prod_mgr_Menu.py'),
+                    ('sf_shift_plan', 'Shift Plan', 'production/prod_mgr_Menu.py'),
+                    ('sf_dashboard', 'Live OEE Dashboard',
+                     'production/prod_mgr_Menu.py'),
+                    ('sf_tv', 'Shop Floor TV Display', 'production/prod_mgr_Menu.py'),
+                ],
+            }),
         ],
     },
     'purchasing': {

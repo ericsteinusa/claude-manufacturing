@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block page_title %}Live OEE Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/shop-floor/entry/" class="btn">Entry</a>
+<a href="/shop-floor/plan/" class="btn">Shift Plan</a>
+<a href="/shop-floor/tv/" class="btn" target="_blank">TV Display</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1000px; }
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.filter-bar label { color:white; font-size:12px; font-weight:bold; }
+.filter-bar select, .filter-bar input { padding:5px 9px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.btn-sm { padding:5px 14px; background:var(--accent); color:white;
+    border:none; border-radius:4px; font-size:13px; cursor:pointer; font-weight:bold; }
+.oee-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px; margin-bottom:24px; }
+.oee-card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.oee-card h3 { margin:0 0 8px; font-size:14px; color:#333; }
+.oee-card .big { font-size:32px; font-weight:bold; }
+.oee-card .big.good { color:#2e7d32; }
+.oee-card .big.warn { color:#e65100; }
+.oee-card .big.danger { color:#c62828; }
+.oee-card .sub { font-size:12px; color:var(--text-muted); margin-top:6px; }
+.bar-track { width:100%; height:8px; background:#eee; border-radius:4px; overflow:hidden; margin-top:8px; }
+.bar-fill { height:100%; background:var(--accent); }
+.bar-fill.good { background:#2e7d32; }
+.bar-fill.warn { background:#e65100; }
+.bar-fill.danger { background:#c62828; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:14px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <div class="menu-title">Live OEE Dashboard</div>
+
+    <form method="get" class="filter-bar">
+        <label>Shift:</label>
+        <select name="shift">
+            {% for s in shifts %}
+            <option value="{{ s }}" {% if s == shift %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Date:</label>
+        <input type="date" name="date" value="{{ entry_date }}">
+        <button type="submit" class="btn-sm">Go</button>
+    </form>
+
+    <div class="oee-grid">
+        {% for wc in live %}
+        <div class="oee-card">
+            <h3>{{ wc.workcenter_name }}</h3>
+            <div class="big {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}">
+                {{ wc.oee_pct }}%</div>
+            <div class="bar-track"><div class="bar-fill {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}" style="width:{{ wc.oee_pct }}%;"></div></div>
+            <div class="sub">
+                A {{ wc.availability_pct }}% &middot; P {{ wc.performance_pct }}% &middot; Q {{ wc.quality_pct }}%<br>
+                {{ wc.qty_produced|floatformat:0 }} produced, {{ wc.qty_scrapped|floatformat:0 }} scrapped
+                {% if not wc.has_plan %}<br><em>no plan set</em>{% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p style="color:var(--text-muted);">No active workcenters found.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card-title">Recent Downtime — {{ shift }} Shift, {{ entry_date }}</div>
+    <table class="list-table">
+        <thead><tr><th>Workcenter</th><th>Reason</th><th>Notes</th><th class="num">Minutes</th></tr></thead>
+        <tbody>
+        {% for d in downtime %}
+        <tr>
+            <td>{{ d.workcenter_name }}</td>
+            <td>{{ d.reason_category }}</td>
+            <td>{{ d.notes|default:"" }}</td>
+            <td class="num">{{ d.minutes|floatformat:0 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No downtime logged for this shift.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}

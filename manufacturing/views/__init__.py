@@ -233,6 +233,7 @@ from ._landed_cost import *  # noqa: F401,F403
 from ._blanket_po import *  # noqa: F401,F403
 from ._portal import *  # noqa: F401,F403
 from ._multi_entity import *  # noqa: F401,F403
+from ._shop_floor import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -248,6 +249,10 @@ WEB_LEAF_URLS = {
     ('accounting', 'companies'): '/companies/',
     ('accounting', 'intercompany'): '/intercompany/',
     ('accounting', 'consol_fin'): '/consolidated-financials/',
+    ('production', 'sf_entry'): '/shop-floor/entry/',
+    ('production', 'sf_shift_plan'): '/shop-floor/plan/',
+    ('production', 'sf_dashboard'): '/shop-floor/',
+    ('production', 'sf_tv'): '/shop-floor/tv/',
     ('production', 'create_wo'): '/wo/new/',
     ('production', 'open_wo'): '/wo/?status=open',
     ('production', 'inprog_wo'): '/wo/?status=in_progress',
