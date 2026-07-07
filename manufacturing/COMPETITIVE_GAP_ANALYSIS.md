@@ -781,13 +781,52 @@ Full pick/pack/ship with bin-level tracking.
   column is deliberately untouched and coexists with the new bin tables —
   not the same concept, not migrated in this PR.
 
-#### P3-C: Customer Self-Service Portal
+#### P3-C: Customer Self-Service Portal ✅ Done
 - Separate customer login (not employee account)
 - View own orders, invoices, shipment status
 - Download invoice PDF and packing slip
 - Submit RMA request online
 - Track shipment (carrier API lookup by tracking number)
 - Pay invoice online (Stripe payment intent)
+- **Shipped:** `manufacturing/customer_portal_core.py` +
+  `manufacturing/views/_portal.py`, under `/portal/...`. **Login is additive,
+  not a fresh signup system:** customers already exist as staff-created
+  `customer` rows (Sales/CS); portal access is a new `customer_login` table
+  (`customer_id` FK unique, bcrypt hash) layered on top, matched at
+  registration time against that customer's own `email` (case-insensitive) —
+  no blind account creation. Session lives in its own namespace
+  (`portal_customer_id`/`portal_email`/`portal_company`), deliberately
+  separate from the employee `user_*` keys, with a new
+  `auth_decorators.customer_login_required` (redirects to `portal_login`, no
+  dept/role concept applies to a customer). Every detail view does an
+  explicit ownership check — the record's `customer_id`, or
+  `sales_order.customer_id` via join for shipments/RMAs (neither carries a
+  direct `customer_id` column) — against the caller's own, same pattern as
+  ESS's per-row `people_id` check. **No forked data model:** orders/invoices
+  reuse `sales_orders_core.list_sos`/`get_so` and
+  `accounting_core.list_ar_invoices`/`get_ar_invoice` as-is (customer_id
+  filtering and balance computation already existed); paying an invoice calls
+  the existing `accounting_core.record_ar_payment`, which already recomputes
+  invoice status from total received — nothing new there either. **Stubbed,
+  not wired to a real network call:** no Stripe/carrier-API/outbound-HTTP
+  precedent exists anywhere in this codebase (checked repo-wide, including
+  both requirements files and settings.py) — the closest analog is
+  `EMAIL_BACKEND`'s env-driven, safe-default-in-dev shape. `get_tracking_events`
+  returns a deterministic synthetic timeline derived from the shipment's own
+  carrier/status/ship_date (no randomness, unit-testable); `create_payment_intent`/
+  `confirm_payment_intent` (new `portal_payment_intent` table) model the
+  Stripe PaymentIntent create→confirm shape without a network call or added
+  `stripe` dependency — swapping in a real integration means replacing those
+  two function bodies only. **PDFs** via `reportlab` (already an
+  undeclared dependency through `barcode_core.py`; now pinned in
+  `requirements.txt`), mirroring its existing `SimpleDocTemplate` usage.
+  Verified end-to-end against a running dev server + local Postgres: registered
+  portal access for a seeded customer, logged in, confirmed the dashboard/orders/
+  invoices/RMAs shown are scoped to that customer only (spot-checked a second
+  customer's SO/shipment returns 404), downloaded an invoice PDF and a packing-
+  slip PDF, submitted an RMA against an owned SO (and confirmed one against an
+  unowned SO is rejected), paid an open invoice and confirmed the `ar_payment`
+  row + invoice status update, and viewed a shipment's tracking timeline.
 
 #### P3-D: Landed Cost Allocation ✅ Done
 Required for accurate COGM when importing goods.

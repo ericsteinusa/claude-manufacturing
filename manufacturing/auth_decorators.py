@@ -17,6 +17,19 @@ def login_required(view_func):
     return wrapper
 
 
+def customer_login_required(view_func):
+    """Redirect to 'portal_login' if there's no active customer-portal
+    session. Separate from login_required/dept_required: portal sessions
+    key off 'portal_customer_id', not the employee 'user_*' keys, since
+    customers have no dept/role."""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('portal_customer_id'):
+            return redirect('portal_login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
 def _normalize_keys(keys):
     if keys is None:
         return None

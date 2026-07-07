@@ -1,0 +1,89 @@
+{% extends "base_portal.html" %}
+{% block page_title %}Dashboard — Customer Portal{% endblock %}
+{% block menu_title %}Welcome, {{ portal_company }}{% endblock %}
+
+{% block body %}
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Open Orders</div>
+        <div class="kpi-value">{{ open_orders|length }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Open Invoices</div>
+        <div class="kpi-value">{{ open_invoices|length }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Open Returns</div>
+        <div class="kpi-value">{{ open_rmas|length }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Recent Orders</div>
+    {% if orders %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Order #</th><th>Order Date</th><th class="num">Total</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for so in orders %}
+                <tr>
+                    <td><a href="{% url 'portal_order_detail' so.id %}">{{ so.so_number }}</a></td>
+                    <td>{{ so.order_date|default:"" }}</td>
+                    <td class="num">${{ so.total|floatformat:2 }}</td>
+                    <td><span class="pill pill-{{ so.status }}">{{ so.status|capfirst }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No orders yet.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-title">Open Invoices</div>
+    {% if open_invoices %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Invoice #</th><th>Due Date</th><th class="num">Balance</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for inv in open_invoices %}
+                <tr>
+                    <td><a href="{% url 'portal_invoice_detail' inv.id %}">{{ inv.invoice_number }}</a></td>
+                    <td>{{ inv.due_date|default:"" }}</td>
+                    <td class="num">${{ inv.balance|floatformat:2 }}</td>
+                    <td><span class="pill pill-{{ inv.status }}">{{ inv.status|capfirst }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No open invoices.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-title">Open Returns <a href="{% url 'portal_rma_new' %}" class="btn" style="float:right;">+ New Return</a></div>
+    {% if open_rmas %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>RMA #</th><th>Order</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for r in open_rmas %}
+                <tr>
+                    <td><a href="{% url 'portal_rma_detail' r.id %}">{{ r.rma_number }}</a></td>
+                    <td>{{ r.so_number|default:"" }}</td>
+                    <td>{{ r.reason|capfirst }}</td>
+                    <td><span class="pill pill-{{ r.status }}">{{ r.status|capfirst }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No open returns.</div>
+    {% endif %}
+</div>
+{% endblock %}

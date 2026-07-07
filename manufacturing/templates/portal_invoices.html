@@ -1,0 +1,29 @@
+{% extends "base_portal.html" %}
+{% block page_title %}My Invoices — Customer Portal{% endblock %}
+{% block menu_title %}My Invoices{% endblock %}
+
+{% block body %}
+{% if invoices %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>Invoice #</th><th>Invoice Date</th><th>Due Date</th><th class="num">Amount</th><th class="num">Balance</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for inv in invoices %}
+            <tr>
+                <td><a href="{% url 'portal_invoice_detail' inv.id %}">{{ inv.invoice_number }}</a></td>
+                <td>{{ inv.invoice_date|default:"" }}</td>
+                <td>{{ inv.due_date|default:"" }}</td>
+                <td class="num">${{ inv.amount|floatformat:2 }}</td>
+                <td class="num">${{ inv.balance|floatformat:2 }}</td>
+                <td><span class="pill pill-{{ inv.status }}">{{ inv.status|capfirst }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">You have no invoices yet.</div>
+{% endif %}
+{% endblock %}

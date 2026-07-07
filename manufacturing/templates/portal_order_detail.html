@@ -1,0 +1,59 @@
+{% extends "base_portal.html" %}
+{% block page_title %}Order {{ so.so_number }} — Customer Portal{% endblock %}
+{% block menu_title %}Order {{ so.so_number }}{% endblock %}
+
+{% block body %}
+<div class="card">
+    <div class="card-title">Order Summary</div>
+    <p><strong>Status:</strong> <span class="pill pill-{{ so.status }}">{{ so.status|capfirst }}</span></p>
+    <p><strong>Order Date:</strong> {{ so.order_date|default:"—" }}</p>
+    <p><strong>Ship Date:</strong> {{ so.ship_date|default:"—" }}</p>
+</div>
+
+<div class="card">
+    <div class="card-title">Items</div>
+    {% if items %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit Price</th><th class="num">Line Total</th></tr></thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.description }}</td>
+                    <td class="num">{{ it.qty }}</td>
+                    <td class="num">${{ it.unit_price|floatformat:2 }}</td>
+                    <td class="num">${{ it.line_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No line items.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-title">Shipments</div>
+    {% if shipments %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Shipment #</th><th>Ship Date</th><th>Carrier</th><th>Tracking #</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for s in shipments %}
+                <tr>
+                    <td><a href="{% url 'portal_shipment_detail' s.id %}">{{ s.ship_number }}</a></td>
+                    <td>{{ s.ship_date|default:"" }}</td>
+                    <td>{{ s.carrier|default:"" }}</td>
+                    <td>{{ s.tracking_number|default:"" }}</td>
+                    <td><span class="pill pill-{{ s.status }}">{{ s.status|capfirst }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No shipments yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

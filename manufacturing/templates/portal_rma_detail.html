@@ -1,0 +1,15 @@
+{% extends "base_portal.html" %}
+{% block page_title %}Return {{ rma.rma_number }} — Customer Portal{% endblock %}
+{% block menu_title %}Return {{ rma.rma_number }}{% endblock %}
+
+{% block body %}
+<div class="card">
+    <div class="card-title">Return Details</div>
+    <p><strong>Order:</strong> {{ rma.so_number|default:"—" }}</p>
+    <p><strong>Status:</strong> <span class="pill pill-{{ rma.status }}">{{ rma.status|capfirst }}</span></p>
+    <p><strong>Reason:</strong> {{ rma.reason|capfirst }}</p>
+    <p><strong>Submitted:</strong> {{ rma.created_at|default:"" }}</p>
+    {% if rma.description %}<p><strong>Description:</strong> {{ rma.description }}</p>{% endif %}
+    {% if rma.resolution %}<p><strong>Resolution:</strong> {{ rma.resolution }}</p>{% endif %}
+</div>
+{% endblock %}
