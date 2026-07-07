@@ -38,6 +38,11 @@ def _conn(fetchone_results=None, fetchall_results=None):
 
 # ── setup ────────────────────────────────────────────────────────────────
 
+def test_ic_gl_categories_includes_all_expected():
+    assert set(IC_GL_CATEGORIES) == {
+        'ic_receivable', 'ic_payable', 'ic_revenue', 'ic_expense'}
+
+
 def test_ensure_multi_entity_tables_creates_everything():
     conn = MagicMock()
     ensure_multi_entity_tables(conn)
