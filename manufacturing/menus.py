@@ -427,6 +427,15 @@ _SHIP_MENU = {
                 ('ret_rpts', 'Return Reports', 'production/prod_ship_dept.py'),
             ],
         }),
+        ('wms', 'Warehouse Management', {
+            'title': 'Warehouse Management',
+            'items': [
+                ('bin_master', 'Bin Master', 'production/prod_ship_dept.py'),
+                ('putaway_rules', 'Put-Away Rules', 'production/prod_ship_dept.py'),
+                ('pick_lists', 'Pick Lists', 'production/prod_ship_dept.py'),
+                ('pack_station', 'Pack Station', 'production/prod_ship_dept.py'),
+            ],
+        }),
     ],
 }
 

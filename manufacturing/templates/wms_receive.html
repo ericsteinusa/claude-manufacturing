@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block page_title %}Receive &amp; Put-Away{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Bin Master</a>
+<a href="/wms/putaway-rules/" class="btn">Put-Away Rules</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Receive &amp; Put-Away</div>
+<p style="font-size:12px;color:var(--text-muted);max-width:700px;">
+    Open lines on sent/partial POs with a linked product. Receiving here
+    updates both the PO's received quantity and the bin's tracked stock in
+    one step. Free-text PO lines (no linked product) aren't shown — receive
+    those from the PO's own detail page.
+</p>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+{% if items %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>PO #</th><th>Product</th><th>Ordered</th><th>Received</th><th>Owed</th><th>Qty to Receive</th><th>Bin</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for i in items %}
+            <tr>
+                <td><a href="/po/{{ i.po_id }}/">{{ i.po_number }}</a></td>
+                <td>{{ i.product_name }}</td>
+                <td>{{ i.qty_ordered }}</td>
+                <td>{{ i.qty_received }}</td>
+                <td>{{ i.qty_owed }}</td>
+                <td>
+                {% if can_edit %}
+                <form method="post" style="display:flex;gap:6px;align-items:center;">
+                    {% csrf_token %}
+                    <input type="hidden" name="po_item_id" value="{{ i.id }}">
+                    <input type="hidden" name="po_id" value="{{ i.po_id }}">
+                    <input type="hidden" name="product_id" value="{{ i.product_id }}">
+                    <input type="number" step="any" name="qty" style="width:80px;" required>
+                    <select name="bin_id">
+                        <option value="">Suggested: {{ i.suggested_bin.full_code }}</option>
+                        {% for b in bins %}
+                        <option value="{{ b.id }}">{{ b.full_code }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Receive</button>
+                </form>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No open PO lines awaiting receipt.</div>
+{% endif %}
+</div>
+{% endblock %}

@@ -83,6 +83,7 @@ from ..purchase_orders_core import (
     create_po, update_po, add_po_item, delete_po_item,
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
+from ..wms_core import ensure_wms_tables, credit_unassigned_receipt
 from ..time_clock_core import (
     get_current_entry, clock_in as tc_clock_in, clock_out_entry,
     list_entries, total_hours as tc_total_hours,
@@ -229,6 +230,7 @@ from ._atp import *  # noqa: F401,F403
 from ._document_control import *  # noqa: F401,F403
 from ._ess import *  # noqa: F401,F403
 from ._capacity_planning import *  # noqa: F401,F403
+from ._wms import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -454,7 +456,7 @@ WEB_LEAF_URLS = {
     ('production', 'carr_cont'):    '/prod/shipping/',
     # Receiving → PO receipts
     ('production', 'inbound'):      '/po/',
-    ('production', 'recv_items'):   '/po/',
+    ('production', 'recv_items'):   '/wms/receive/',
     ('production', 'recv_rpts'):    '/po/',
     ('production', 'disc_rpts'):    '/po/',
     # Tracking
@@ -473,6 +475,11 @@ WEB_LEAF_URLS = {
     ('production', 'pend_ret'):     '/prod/returns/?status=pending',
     ('production', 'ret_hist'):     '/prod/returns/',
     ('production', 'ret_rpts'):     '/prod/returns/reports/',
+
+    ('production', 'bin_master'):    '/wms/bins/',
+    ('production', 'putaway_rules'): '/wms/putaway-rules/',
+    ('production', 'pick_lists'):    '/wms/picks/',
+    ('production', 'pack_station'):  '/wms/picks/?status=picked',
     # Maintenance
     ('maintenance', 'maint'): '/maint/',
     ('maintenance', 'maint_mgr'): '/maint/',
@@ -1607,6 +1614,16 @@ def po_receive_item(request, po_id):
             if item is not None:
                 qty = min(qty, item['qty_ordered'])
                 receive_po_item(conn, item_id, qty, po_id=po_id)
+                # Also credit inventory (into the unassigned bin) so this
+                # legacy screen doesn't leave product.amount un-adjusted for
+                # anyone not using the newer /wms/receive/ put-away flow.
+                ensure_wms_tables(conn)
+                delta = qty - (item['qty_received'] or 0)
+                credit_unassigned_receipt(
+                    conn, item['product_id'], delta,
+                    reference=f'PO item {item_id}',
+                    created_by=request.session.get('user_email', ''),
+                )
                 conn.commit()
         finally:
             conn.close()

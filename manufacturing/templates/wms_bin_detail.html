@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_title %}Bin {{ bin.full_code }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Back to Bins</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">{{ bin.full_code }}</div>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+<table class="kv-table" style="margin-bottom:20px;">
+    <tr><th>Zone</th><td>{{ bin.zone_code }}</td></tr>
+    <tr><th>Aisle</th><td>{{ bin.aisle|default:"—" }}</td></tr>
+    <tr><th>Rack</th><td>{{ bin.rack|default:"—" }}</td></tr>
+    <tr><th>Shelf</th><td>{{ bin.shelf|default:"—" }}</td></tr>
+    <tr><th>Status</th><td>{% if bin.is_active %}Active{% else %}Inactive{% endif %}</td></tr>
+</table>
+
+<h3>Current Stock</h3>
+{% if stock %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>Product</th><th>Qty</th></tr></thead>
+        <tbody>
+            {% for s in stock %}
+            <tr><td>{{ s.product_name }}</td><td>{{ s.qty }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No stock tracked in this bin.</div>
+{% endif %}
+
+{% if can_edit and bin.is_active %}
+<form method="post" style="margin-top:16px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="deactivate">
+    <button type="submit" class="btn">Deactivate Bin</button>
+</form>
+{% endif %}
+</div>
+{% endblock %}

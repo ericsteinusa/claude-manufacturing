@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block page_title %}Pack Station — {{ pick_list.pick_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/picks/{{ pick_list.id }}/" class="btn">Back to Pick List</a>
+{% if pick_list.status == 'packed' %}
+<a href="/wms/ship/{{ pick_list.id }}/" class="btn btn-primary">Confirm Shipment</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Pack Station — {{ pick_list.pick_number }}</div>
+<p>Status: <span class="pill pill-{{ pick_list.status }}">{{ pick_list.status|title }}</span></p>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+<h3>Picked Lines</h3>
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>Line</th><th>Product</th><th>Picked Qty</th><th>Status</th></tr></thead>
+        <tbody>
+            {% for l in lines %}
+            <tr>
+                <td>{{ l.id }}</td>
+                <td>{{ l.product_name|default:l.description }}</td>
+                <td>{{ l.qty_picked }}</td>
+                <td><span class="pill pill-{{ l.status }}">{{ l.status|title }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if can_edit %}
+<form method="post" style="margin-top:16px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create_carton">
+    <button type="submit" class="btn btn-primary">+ New Carton</button>
+</form>
+{% endif %}
+
+<h3 style="margin-top:24px;">Cartons</h3>
+{% for c in cartons %}
+<div class="card" style="padding:14px;margin-bottom:14px;">
+    <strong>{{ c.carton_number }}</strong> — <span class="pill pill-{{ c.status }}">{{ c.status|title }}</span>
+    <div style="font-size:12px;color:var(--text-muted);margin:6px 0;">
+        Weight: {{ c.weight|default:"—" }} {{ c.weight_uom }} &nbsp;|&nbsp;
+        Dims: {{ c.length|default:"—" }} x {{ c.width|default:"—" }} x {{ c.height|default:"—" }} {{ c.dim_uom }}
+    </div>
+
+    <table class="erp-table" style="margin-bottom:10px;">
+        <thead><tr><th>Product</th><th>Qty</th></tr></thead>
+        <tbody>
+            {% for ci in c.items %}
+            <tr><td>{{ ci.product_name|default:ci.description }}</td><td>{{ ci.qty }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit and c.status == 'open' %}
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <form method="post" style="display:flex;gap:6px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_item">
+            <input type="hidden" name="carton_id" value="{{ c.id }}">
+            <select name="line_id">
+                {% for l in lines %}{% if l.status == 'picked' %}<option value="{{ l.id }}">Line {{ l.id }} — {{ l.product_name|default:l.description }}</option>{% endif %}{% endfor %}
+            </select>
+            <input type="number" step="any" name="qty" style="width:70px;" required>
+            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Add Item</button>
+        </form>
+
+        <form method="post" style="display:flex;gap:6px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_dims">
+            <input type="hidden" name="carton_id" value="{{ c.id }}">
+            <input type="number" step="any" name="weight" placeholder="Weight" style="width:70px;">
+            <input type="number" step="any" name="length" placeholder="L" style="width:60px;">
+            <input type="number" step="any" name="width" placeholder="W" style="width:60px;">
+            <input type="number" step="any" name="height" placeholder="H" style="width:60px;">
+            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Set Dims</button>
+        </form>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="close_carton">
+            <input type="hidden" name="carton_id" value="{{ c.id }}">
+            <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Close Carton</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% empty %}
+<div class="empty-state">No cartons yet.</div>
+{% endfor %}
+
+{% if can_edit and pick_list.status == 'picked' %}
+<form method="post" style="margin-top:10px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="mark_packed">
+    <button type="submit" class="btn btn-primary">Mark Pick List Packed</button>
+</form>
+{% endif %}
+</div>
+{% endblock %}

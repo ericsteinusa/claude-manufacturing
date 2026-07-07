@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block page_title %}Put-Away Rules{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Bin Master</a>
+<a href="/wms/receive/" class="btn">Receive &amp; Put-Away</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Put-Away Rules</div>
+<p style="font-size:12px;color:var(--text-muted);max-width:700px;">
+    Match a product's category or ABC class to a target zone. Rules are
+    evaluated by priority (highest first); the first match wins. Products
+    matching no active rule fall back to the unassigned bin at receipt time.
+</p>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+{% if can_edit %}
+<form method="post" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create">
+    <select name="match_type" required>
+        {% for t in match_types %}
+        <option value="{{ t }}">{{ t|title }}</option>
+        {% endfor %}
+    </select>
+    <input type="text" name="match_value" placeholder="e.g. 'raw material' or 'A'" required>
+    <select name="zone_id" required>
+        {% for z in zones %}
+        <option value="{{ z.id }}">{{ z.code }} — {{ z.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="number" name="priority" placeholder="Priority" value="0" style="width:90px;">
+    <button type="submit" class="btn btn-primary">Add Rule</button>
+</form>
+{% endif %}
+
+{% if rules %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>Priority</th><th>Match Type</th><th>Match Value</th><th>Target Zone</th><th>Active</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for r in rules %}
+            <tr>
+                <td>{{ r.priority }}</td>
+                <td>{{ r.match_type|title }}</td>
+                <td>{{ r.match_value }}</td>
+                <td>{{ r.zone_code }}</td>
+                <td>{% if r.is_active %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    {% if can_edit %}
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="rule_id" value="{{ r.id }}">
+                        <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Delete</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No put-away rules configured — everything receives into the unassigned bin.</div>
+{% endif %}
+</div>
+{% endblock %}

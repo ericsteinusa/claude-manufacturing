@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_title %}New Bin{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Back to Bins</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">New Zone / Bin</div>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+<div style="display:flex;gap:24px;flex-wrap:wrap;">
+    <form method="post" class="card" style="padding:16px;min-width:280px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_zone">
+        <h3 style="margin-top:0;">New Zone</h3>
+        <label>Code<br><input type="text" name="code" required></label><br><br>
+        <label>Name<br><input type="text" name="name"></label><br><br>
+        <label>Pick Sequence<br><input type="number" name="pick_sequence" value="0"></label><br><br>
+        <button type="submit" class="btn btn-primary">Create Zone</button>
+    </form>
+
+    <form method="post" class="card" style="padding:16px;min-width:280px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_bin">
+        <h3 style="margin-top:0;">New Bin</h3>
+        <label>Zone<br>
+            <select name="zone_id" required>
+                {% for z in zones %}
+                <option value="{{ z.id }}">{{ z.code }} — {{ z.name }}</option>
+                {% endfor %}
+            </select>
+        </label><br><br>
+        <label>Aisle<br><input type="text" name="aisle"></label><br><br>
+        <label>Rack<br><input type="text" name="rack"></label><br><br>
+        <label>Shelf<br><input type="text" name="shelf"></label><br><br>
+        <label>Bin Code<br><input type="text" name="bin_code" required></label><br><br>
+        <button type="submit" class="btn btn-primary">Create Bin</button>
+    </form>
+</div>
+</div>
+{% endblock %}
