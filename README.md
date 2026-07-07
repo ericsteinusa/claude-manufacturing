@@ -111,14 +111,14 @@ The report widgets (`BudgetDetailWidget`, `BudgetVsActualWidget`, `VarianceRepor
 ## Requirements
 
 - Python 3.x
-- PyQt6
 - PostgreSQL
-- psycopg2, python-dotenv
 
-Install dependencies:
+Install dependencies from `requirements.txt` (includes PyQt6, Django, psycopg2,
+bcrypt, python-dotenv, openpyxl, python-barcode, and reportlab — the last two
+are needed for the WO/PART/PO barcode label feature):
 
 ```bash
-pip install PyQt6 psycopg2-binary python-dotenv
+pip install -r requirements.txt
 ```
 
 ## Running the Application
