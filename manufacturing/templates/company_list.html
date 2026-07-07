@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_title %}Companies{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/" class="btn">G/L Dashboard</a>
+{% if is_admin %}<a href="/companies/new/" class="btn btn-primary">+ New Company</a>{% endif %}
+<a href="/intercompany/" class="btn">Intercompany</a>
+<a href="/consolidated-financials/" class="btn">Consolidated Financials</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Companies</div>
+
+    {% if companies %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Legal Name</th>
+                    <th>Tax ID</th>
+                    <th>Currency</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in companies %}
+                <tr>
+                    <td>
+                        <a href="/companies/{{ c.id }}/">{{ c.name }}</a>
+                        {% if c.is_base_entity %}<span class="pill">Home Entity</span>{% endif %}
+                    </td>
+                    <td>{{ c.legal_name|default:"—" }}</td>
+                    <td>{{ c.tax_id|default:"—" }}</td>
+                    <td>{{ c.currency_code }}</td>
+                    <td><a href="/companies/{{ c.id }}/" class="btn btn-sm">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No companies yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

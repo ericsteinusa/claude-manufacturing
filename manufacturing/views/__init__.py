@@ -232,6 +232,7 @@ from ._wms import *  # noqa: F401,F403
 from ._landed_cost import *  # noqa: F401,F403
 from ._blanket_po import *  # noqa: F401,F403
 from ._portal import *  # noqa: F401,F403
+from ._multi_entity import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -244,6 +245,9 @@ WEB_LEAF_URLS = {
     ('purchasing', 'po_status'): '/po/',
     ('purchasing', 'po_hist'): '/po/',
     ('reports', 'rpt_dashboard'): '/reports/',
+    ('accounting', 'companies'): '/companies/',
+    ('accounting', 'intercompany'): '/intercompany/',
+    ('accounting', 'consol_fin'): '/consolidated-financials/',
     ('production', 'create_wo'): '/wo/new/',
     ('production', 'open_wo'): '/wo/?status=open',
     ('production', 'inprog_wo'): '/wo/?status=in_progress',

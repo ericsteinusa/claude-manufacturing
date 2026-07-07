@@ -819,6 +819,16 @@ MENU_TREE = {
             ('credit', 'Credit Department', 'customers/Credit_dept.py'),
             ('payroll', 'Payroll Department', 'payroll/Payroll_dept.py'),
             ('gen_ledger', 'General Ledger', 'accounting/General_ledger.py'),
+            ('multi_entity', 'Multi-Entity', {
+                'title': 'Multi-Entity',
+                'items': [
+                    ('companies', 'Companies', 'accounting/General_ledger.py'),
+                    ('intercompany', 'Intercompany Transactions',
+                     'accounting/General_ledger.py'),
+                    ('consol_fin', 'Consolidated Financials',
+                     'accounting/General_ledger.py'),
+                ],
+            }),
             ('budget_mgmt', 'Budget Management', {
                 'title': 'Budget Management',
                 'items': [

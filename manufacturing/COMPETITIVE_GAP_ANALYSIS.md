@@ -921,7 +921,7 @@ Standard for long-term supplier agreements.
   confirmed it read back as `expired`; cancelled an open blanket PO and
   confirmed further call-offs against it were rejected.
 
-#### P3-F: Multi-Company / Multi-Entity
+#### P3-F: Multi-Company / Multi-Entity ✅ Done
 Required for companies with multiple legal entities.
 - Company master: separate legal entities with own GL, currency, tax ID
 - User-to-company assignment (user can access one or more entities)
@@ -929,6 +929,74 @@ Required for companies with multiple legal entities.
 - Consolidated P&L and balance sheet across entities
 - Elimination entries for intercompany balances
 - Separate chart of accounts per entity (or shared with overrides)
+- **Shipped:** `manufacturing/multi_entity_core.py`. There was no legal-
+  entity concept anywhere in this codebase — the GL is one flat, global
+  ledger (`gl_account`/`gl_journal`/`gl_journal_line`), duplicated across
+  three separate posting code paths. Rather than re-architecting the GL
+  into per-entity ledgers, this follows the scope discipline the P2-D
+  multi-currency feature set: a new `company` master, plus a nullable
+  `company_id` tag added additively (`ALTER TABLE ... ADD COLUMN IF NOT
+  EXISTS`) to `gl_account` (NULL = shared account usable by every entity —
+  the spec's "shared chart of accounts with overrides" option, chosen over
+  duplicating the whole chart) and to `gl_journal` (NULL = a pre-existing/
+  legacy journal). **No backfill:** historical journals don't "turn over"
+  the way inventory does, so there's no safe migration — instead one
+  lazily-created `company` row (`is_base_entity=True`, via
+  `get_or_create_base_company`, same sentinel spirit as `wms_core.
+  get_or_create_unassigned_bin`) stands in for all pre-existing data, and
+  that entity's own reports ask `accounting_core` to also include
+  `company_id IS NULL` rows via a new `include_null_company` flag.
+  **`accounting_core.account_balance`/`_period_balance`/`trial_balance`/
+  `income_statement`/`balance_sheet`** gained optional `company_id=None`/
+  `include_null_company=False` kwargs — when `None` (every pre-existing
+  caller) the SQL and behavior are byte-for-byte unchanged, which is what
+  kept this change safe against the full existing test suite with zero
+  regressions. **Consolidated statements** are just those same functions
+  called with `company_id=None` (already "all entities combined," since
+  there's only one ledger) — `multi_entity_core.consolidated_income_
+  statement`/`consolidated_balance_sheet` then subtract the known
+  intercompany amount as the elimination. **Intercompany transactions**
+  need four GL accounts, not two: the billing entity's own book records
+  `ic_receivable` (Asset) against `ic_revenue` (Revenue); the billed
+  entity's own book records `ic_expense` (Expense) against `ic_payable`
+  (Liability) — two independently-balanced journals, each tagged to one
+  company via `gl_journal.company_id`, posted through the existing,
+  unmodified `accounting_core.create_journal`/`post_journal`. Summed
+  together they net to zero, which is exactly the elimination property:
+  consolidated revenue and expense both drop by the same amount (net
+  income unaffected — correct for a pure internal recharge with no
+  external profit), and consolidated assets/liabilities both drop by the
+  same amount (balance sheet stays balanced). If any of the four accounts
+  aren't mapped yet, the transaction is still recorded but left unposted —
+  mirrors `costing_core.post_po_receipt_gl`'s "skip with a warning rather
+  than failing" precedent. Account mapping reuses the existing
+  `gl_account_map` table but not `costing_core.set_gl_account_map` — that
+  setter validates against `costing_core.GL_CATEGORIES`, which
+  `tests/test_costing_core.py` asserts as an exact set and can't be
+  extended — so `multi_entity_core.set_ic_account_map` is its own small
+  upsert against the same table using its own `IC_GL_CATEGORIES`, in the
+  same category namespace without touching `costing_core` at all.
+  **User-to-company assignment**: a `company_user` join table; full-access
+  roles (President, VP) bypass it and see every company, everyone else
+  only sees companies they're explicitly assigned to — enforced in both
+  `company_list` and `company_detail` (an unassigned company_id redirects
+  away, same as an ownership-check 404 elsewhere in this codebase). Web
+  pages at `/companies/...`, `/intercompany/...`, and `/consolidated-
+  financials/`, surfaced from a new "Multi-Entity" submenu under the
+  Accounting main menu (`menus.py`) via `views.WEB_LEAF_URLS` — company/
+  user-assignment CRUD is gated `@role_required` to President/VP only,
+  viewing and posting intercompany transactions is `@dept_required`
+  ('accounting', 'finance'). Verified end-to-end against a running dev
+  server + local Postgres (through the actual web views with simulated
+  sessions, not just unit tests): created two companies, mapped all four
+  IC accounts, posted an intercompany transaction and confirmed each
+  company's own trial balance showed exactly the two accounts it should
+  (and nothing from the other entity), confirmed the consolidated income
+  statement/balance sheet eliminated the exact transaction amount from
+  both revenue/expense and assets/liabilities with net income unchanged,
+  confirmed a non-full-access user saw zero companies until assigned, saw
+  the company immediately after assignment, and lost access immediately
+  after revocation — then cleaned up all test data.
 
 #### P3-G: OEE Live Shop Floor Dashboard
 Real-time production visibility — Plex's core differentiator.
