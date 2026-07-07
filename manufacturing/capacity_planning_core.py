@@ -495,6 +495,34 @@ def get_capacity_check(conn, date_from, date_to):
     return result
 
 
+def earliest_capacity_date(conn, workcenter_id, hours_needed, from_date=None,
+                           horizon_days=90):
+    """First date by which a workcenter will have accumulated at least
+    ``hours_needed`` of free (available - booked) capacity, starting from
+    ``from_date`` (inclusive, default today). Used by CTP (P4-C) to answer
+    "when is capacity available for N hours of work" — treats free hours
+    as fungible across days rather than modeling exact within-day
+    scheduling, the same simplification ``get_booked_hours_by_day``
+    already makes for an operation's own span. Returns an ISO date
+    string, or None if not reached within ``horizon_days``."""
+    start = _to_date(from_date) if from_date else date.today()
+    if hours_needed <= 0:
+        return start.isoformat()
+
+    end = start + timedelta(days=horizon_days)
+    cal = _load_workcenter_calendar(conn, workcenter_id, start, end)
+    booked = get_booked_hours_by_day(conn, workcenter_id, start, end)
+
+    cumulative = 0.0
+    d = start
+    while d <= end:
+        cumulative += max(cal.get(d, 0.0) - booked.get(d, 0.0), 0.0)
+        if cumulative >= hours_needed - 1e-9:
+            return d.isoformat()
+        d += timedelta(days=1)
+    return None
+
+
 def identify_bottlenecks(conn, date_from, date_to):
     """Active workcenters ranked by utilization % over the horizon
     (total booked / total available), descending — the workcenter(s) at

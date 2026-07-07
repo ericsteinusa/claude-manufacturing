@@ -1143,11 +1143,51 @@ Real-time production visibility — Plex's core differentiator.
   confirmed `tests/test_phase6.py`'s existing MTBF tests still pass
   unchanged; cleaned up all test data afterward.
 
-#### P4-C: Capable-to-Promise (CTP)
+#### P4-C: Capable-to-Promise (CTP) ✅ Done
 - Extends ATP with routing capacity check
 - Before confirming SO: check material available (ATP) AND workcenter capacity on required dates
 - If insufficient: suggest earliest date when both material AND capacity are available
 - Show breakdown: "material ready in 5 days, capacity available in 8 days → CTP date: [date]"
+- **Shipped:** `manufacturing/capable_to_promise_core.py`, a thin
+  combination layer over two existing features rather than a rewrite of
+  either. **ATP (P2-B, `atp_core.get_atp`/`check_so_atp`)** already
+  answers "date when qty will be available," reused as-is for the
+  material half. **Finite capacity scheduling (P3-A,
+  `capacity_planning_core.py`)** had the building blocks
+  (`_load_workcenter_calendar`/`get_booked_hours_by_day`) but no "earliest
+  date N hours are free" function — that module gained exactly one
+  additive function, `earliest_capacity_date(conn, workcenter_id,
+  hours_needed, from_date, horizon_days)`, walking forward and
+  accumulating free (available − booked) hours per day until the running
+  total covers the requirement (documented simplification: treats free
+  hours as fungible across days, matching this module's existing
+  "no separate allocation ledger" approximation). CTP combines both:
+  `get_workcenter_hours_required` scales a product's routing `std_hours`
+  by quantity and groups by workcenter; `get_capacity_availability` finds
+  the latest earliest-date across all workcenters a routing touches (all
+  must have room); `get_ctp` returns the full breakdown — material date,
+  capacity date per workcenter, and the combined `ctp_date` (their max).
+  A product with no routing at all has nothing to schedule, so capacity
+  isn't a constraint for it (treated as immediately available, not
+  "unavailable"). **SO confirm-flow integration touches nothing pinned**:
+  `views.so_set_status`'s existing ATP confirm-gate (`if target ==
+  'confirmed' and not override and check_so_atp(...)`) now also ORs in
+  a new `check_so_capacity(conn, so_id)` — same shortfall-list
+  convention as `check_so_atp` (empty = covered), same redirect, same
+  single "Confirm Anyway" override; `sales_orders_core.set_so_status`/
+  `so_can_transition` are untouched. `so_detail.html` shows both ATP and
+  capacity shortfalls in one combined warning banner. A new standalone
+  `/ctp/` inquiry page mirrors `/atp/`'s exact GET-form/POST-compute
+  convention (linked from `so_list.html`'s toolbar, next to "ATP
+  Inquiry" — ATP itself has no menu entry either, so CTP follows that
+  same precedent). Verified end-to-end against a running dev server +
+  local Postgres: ran a real product's CTP breakdown and confirmed
+  distinct material/capacity dates with the combined date as their max;
+  created and attempted to confirm a real SO whose demand (100 units)
+  exceeded workcenter capacity, confirmed the confirm action was blocked
+  with a capacity-shortfall banner distinct from a pure ATP shortfall,
+  and confirmed "Confirm Anyway" successfully overrode both checks;
+  cleaned up all test data afterward.
 
 #### P4-D: EDI Integration
 - EDI 850 inbound: customer PO → auto-create Sales Order

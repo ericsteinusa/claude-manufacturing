@@ -22,6 +22,7 @@ from manufacturing.capacity_planning_core import (
     forward_schedule_wo, backward_schedule_wo,
     get_capacity_check, identify_bottlenecks,
     suggest_load_leveling, apply_load_leveling_suggestion,
+    earliest_capacity_date,
 )
 
 
@@ -457,6 +458,75 @@ def test_get_capacity_check_zero_available_zero_booked_not_over():
     assert day['booked'] == 0.0
     assert day['over_capacity'] is False
     assert day['pct'] == 0.0
+
+
+# ── earliest_capacity_date (P4-C) ───────────────────────────────────────────
+
+def test_earliest_capacity_date_zero_hours_needed_returns_start_with_no_query():
+    conn = _DispatchConn([])
+    result = earliest_capacity_date(conn, 1, 0, from_date='2026-07-06')
+    assert result == '2026-07-06'
+    assert conn.calls == []
+
+
+def test_earliest_capacity_date_available_same_day():
+    conn = _DispatchConn([
+        ("FROM workcenter WHERE id", [_wc_row()]),  # 8h/day, Mon-Fri
+        ("FROM workcenter_calendar_exception", []),
+        ("FROM wo_operation", []),  # nothing booked
+    ])
+    # 2026-07-06 is a Monday
+    result = earliest_capacity_date(conn, 1, 5.0, from_date='2026-07-06')
+    assert result == '2026-07-06'
+
+
+def test_earliest_capacity_date_accumulates_across_days():
+    conn = _DispatchConn([
+        ("FROM workcenter WHERE id", [_wc_row()]),  # 8h/day, Mon-Fri
+        ("FROM workcenter_calendar_exception", []),
+        ("FROM wo_operation", []),  # nothing booked
+    ])
+    # Needs 20h: 8 (Mon) + 8 (Tue) + 8 (Wed) = 24 >= 20, crossing on Wed.
+    result = earliest_capacity_date(conn, 1, 20.0, from_date='2026-07-06')
+    assert result == '2026-07-08'
+
+
+def test_earliest_capacity_date_skips_non_working_days():
+    conn = _DispatchConn([
+        ("FROM workcenter WHERE id", [_wc_row(sat=False, sun=False)]),
+        ("FROM workcenter_calendar_exception", []),
+        ("FROM wo_operation", []),
+    ])
+    # 2026-07-10 is a Friday; weekend (11th/12th) contributes 0, so 20h
+    # needs Fri(8) + Mon(8) + Tue(8) = 24, crossing on Tue the 14th.
+    result = earliest_capacity_date(conn, 1, 20.0, from_date='2026-07-10')
+    assert result == '2026-07-14'
+
+
+def test_earliest_capacity_date_accounts_for_existing_booked_hours():
+    conn = _DispatchConn([
+        ("FROM workcenter WHERE id", [_wc_row()]),
+        ("FROM workcenter_calendar_exception", []),
+        ("FROM wo_operation", [
+            {'std_hours': 8.0, 'scheduled_start': datetime(2026, 7, 6, 8, 0),
+             'scheduled_end': datetime(2026, 7, 6, 18, 0)},
+        ]),
+    ])
+    # Monday is fully booked (8 booked / 8 available -> 0 free); need 8h,
+    # so it isn't met until Tuesday.
+    result = earliest_capacity_date(conn, 1, 8.0, from_date='2026-07-06')
+    assert result == '2026-07-07'
+
+
+def test_earliest_capacity_date_returns_none_beyond_horizon():
+    conn = _DispatchConn([
+        ("FROM workcenter WHERE id", [_wc_row(mon=False, tue=False, wed=False,
+                                              thu=False, fri=False, sat=False, sun=False)]),
+        ("FROM workcenter_calendar_exception", []),
+        ("FROM wo_operation", []),
+    ])
+    result = earliest_capacity_date(conn, 1, 10.0, from_date='2026-07-06', horizon_days=5)
+    assert result is None
 
 
 # ── identify_bottlenecks ─────────────────────────────────────────────────────
