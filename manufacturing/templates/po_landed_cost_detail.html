@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block page_title %}Landed Cost — PO {{ po.po_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/po/{{ po.id }}/" class="btn">← Back to PO</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Landed Cost — PO {{ po.po_number }}</div>
+
+    <div class="card">
+        <div class="card-title">Summary</div>
+        <p><strong>Allocation Method:</strong> {{ lc.allocation_method|capfirst }}</p>
+        <p><strong>Freight:</strong> ${{ lc.freight|floatformat:2 }}</p>
+        <p><strong>Duty:</strong> ${{ lc.duty|floatformat:2 }}</p>
+        <p><strong>Broker Fee:</strong> ${{ lc.broker_fee|floatformat:2 }}</p>
+        <p><strong>Insurance:</strong> ${{ lc.insurance|floatformat:2 }}</p>
+        <p><strong>Total:</strong> ${{ lc.total|floatformat:2 }}</p>
+        <p><strong>Entered:</strong> {{ lc.created_at|default:"" }} by {{ lc.created_by|default:"" }}</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Allocation Detail</div>
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="num">Qty Received</th>
+                        <th class="num">Weight Used</th>
+                        <th class="num">Allocated Amount</th>
+                        <th class="num">Per-Unit Cost Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in lc.lines %}
+                    <tr>
+                        <td>{{ l.description }} {% if l.product_name %}({{ l.product_name }}){% endif %}</td>
+                        <td class="num">{{ l.qty_received }}</td>
+                        <td class="num">{{ l.weight|floatformat:2 }}</td>
+                        <td class="num">${{ l.allocated_amount|floatformat:2 }}</td>
+                        <td class="num">${{ l.per_unit_cost|floatformat:4 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
