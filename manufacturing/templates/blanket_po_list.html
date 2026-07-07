@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block page_title %}Blanket Purchase Orders{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">← Back</a>
+{% if can_edit %}<a href="/blanket-po/new/" class="btn btn-primary">+ New Blanket PO</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Blanket Purchase Orders</div>
+
+    <div class="filter-bar">
+        <label>Status:</label>
+        <a href="/blanket-po/" class="{% if not status %}active{% endif %}">All</a>
+        {% for s in statuses %}
+        <a href="/blanket-po/?status={{ s }}"
+           class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
+        {% endfor %}
+    </div>
+
+    {% if blankets %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Blanket #</th>
+                    <th>Supplier</th>
+                    <th>Validity</th>
+                    <th class="num">Total</th>
+                    <th class="num">Released</th>
+                    <th class="num">Remaining</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bp in blankets %}
+                <tr>
+                    <td><a href="/blanket-po/{{ bp.id }}/">{{ bp.blanket_number }}</a></td>
+                    <td>{{ bp.supplier_name|default:"—" }}</td>
+                    <td>{{ bp.start_date|default:"—" }} – {{ bp.end_date|default:"—" }}</td>
+                    <td class="num">
+                        {% if bp.total_value %}${{ bp.total_value|floatformat:2 }}
+                        {% elif bp.total_qty %}{{ bp.total_qty|floatformat:0 }} units
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="num">
+                        {% if bp.total_value %}${{ bp.released_value|floatformat:2 }}
+                        {% elif bp.total_qty %}{{ bp.released_qty|floatformat:0 }} units
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="num">
+                        {% if bp.total_value %}${{ bp.remaining_value|floatformat:2 }}
+                        {% elif bp.total_qty %}{{ bp.remaining_qty|floatformat:0 }} units
+                        {% else %}—{% endif %}
+                    </td>
+                    <td><span class="pill">{{ bp.status|capfirst }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        No blanket purchase orders{% if status %} with status "{{ status|capfirst }}"{% endif %}.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

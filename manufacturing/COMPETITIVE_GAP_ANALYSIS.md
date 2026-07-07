@@ -832,12 +832,45 @@ Required for accurate COGM when importing goods.
   confirmed the "zero weight" and "no received items yet" validation errors
   surface correctly.
 
-#### P3-E: Blanket Purchase Orders & Call-offs
+#### P3-E: Blanket Purchase Orders & Call-offs ✅ Done
 Standard for long-term supplier agreements.
 - Blanket PO: vendor, total value or qty, validity start/end dates
 - Call-off (release): child of blanket, specific qty + delivery date
 - Remaining balance calculation (total − sum of call-offs)
 - Auto-close blanket when fully released or expired
+- **Shipped:** `manufacturing/blanket_po_core.py`. A blanket PO is a
+  standalone standing-agreement record, not an extension of the existing
+  one-shot `purchase_order`/`po_item` model — it tracks a single running
+  ceiling (either `total_value` or `total_qty`, whichever the agreement is
+  denominated in; the other stays 0 and is ignored in the balance math) and
+  call-offs (`blanket_po_release`) draw down against it. This is
+  deliberately **not** wired into PO receiving at all: `purchase_orders_
+  core.receive_po_item` is pinned by exact-SQL-asserting tests, and a
+  blanket PO has no line items of its own to receive against, so the two
+  systems don't touch. **Auto-close/auto-expire is computed lazily**, not
+  via a scheduled job — this codebase's only periodic-job precedent
+  (`management.send_daily_digest`) is manually invoked, not a running cron,
+  so instead every read (`list_blanket_pos`/`get_blanket_po`) and every
+  `create_release` call re-derives the effective status (fully released →
+  `closed`; past `end_date` and still open → `expired`) and persists it only
+  if it changed. Over-allocation (a call-off that would exceed the
+  remaining balance) and call-offs against a non-`open` blanket are both
+  rejected with a `ValueError` surfaced to the form. Web pages added at
+  `/blanket-po/...` (list, new, detail with a "Call-offs" card, add
+  call-off, cancel), gated `@dept_required('purchasing')` matching the
+  existing PO views; the purchasing menu's pre-existing "Contract
+  Management" submenu leaves (`new_cont`/`act_cont`/`cont_arch`, previously
+  pointing at the desktop-only `Purchasing_menu.py` stub) now route to
+  these pages via `views.WEB_LEAF_URLS`, so no `menus.py` tree changes were
+  needed. Verified end-to-end against a running dev server + local
+  Postgres (both via direct core calls and through the actual web views
+  with a simulated session): created a value-tracked blanket PO and added
+  call-offs, confirming remaining balance decreased correctly and an
+  over-limit call-off was rejected; fully released it and confirmed it
+  auto-closed; created a qty-tracked blanket PO and confirmed its balance
+  tracks quantity instead of value; backdated a blanket PO's `end_date` and
+  confirmed it read back as `expired`; cancelled an open blanket PO and
+  confirmed further call-offs against it were rejected.
 
 #### P3-F: Multi-Company / Multi-Entity
 Required for companies with multiple legal entities.

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ bp.blanket_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="{{ back_url }}" class="btn">← Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.po-wrap { width: 100%; max-width: 900px; }
+.po-card {
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 20px;
+}
+.po-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.po-head h2 { font-size: 20px; }
+.pill {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    border: 1px solid #999; font-size: 12px;
+}
+.po-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px;
+           font-size: 13px; }
+.po-meta b { color: #003cb4; }
+.po-table {
+    width: 100%; border-collapse: collapse; background: white;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
+}
+.po-table th, .po-table td {
+    padding: 8px 10px; text-align: left; border-bottom: 1px solid #ccc;
+    font-size: 13px;
+}
+.po-table th { background: var(--accent); color: white; }
+.po-table td.num, .po-table th.num { text-align: right; }
+.po-empty { color: #555; padding: 8px 0; }
+.btn-sm { padding: 2px 10px; font-size: 12px; }
+.btn-danger { background: #f8d7da; border-color: #c33; }
+.btn-danger:hover { background: #f1aeb5; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="po-wrap">
+        <div class="po-card">
+            <div class="po-head">
+                <h2>{{ bp.blanket_number }}</h2>
+                <span class="pill">{{ bp.status|capfirst }}</span>
+            </div>
+            <div class="po-meta">
+                <div><b>Supplier:</b> {{ bp.supplier_name|default:"—" }}</div>
+                <div><b>Description:</b> {{ bp.description|default:"—" }}</div>
+                <div><b>Validity:</b> {{ bp.start_date|default:"—" }} – {{ bp.end_date|default:"—" }}</div>
+                <div>
+                    {% if bp.total_value %}
+                    <b>Total Value:</b> ${{ bp.total_value|floatformat:2 }}
+                    (Released: ${{ bp.released_value|floatformat:2 }}, Remaining: ${{ bp.remaining_value|floatformat:2 }})
+                    {% elif bp.total_qty %}
+                    <b>Total Qty:</b> {{ bp.total_qty|floatformat:0 }}
+                    (Released: {{ bp.released_qty|floatformat:0 }}, Remaining: {{ bp.remaining_qty|floatformat:0 }})
+                    {% endif %}
+                </div>
+                <div style="grid-column: 1 / -1;"><b>Notes:</b> {{ bp.notes|default:"—" }}</div>
+            </div>
+            {% if can_edit and bp.status == 'open' %}
+            <form method="post" action="/blanket-po/{{ bp.id }}/cancel/"
+                  onsubmit="return confirm('Cancel this blanket PO?');" style="margin-top:12px;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger">Cancel Blanket PO</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="po-card">
+            <div class="po-head">
+                <h3 style="margin:0;">Call-offs</h3>
+                {% if can_edit and bp.status == 'open' %}
+                <a href="/blanket-po/{{ bp.id }}/release/new/" class="btn btn-sm">+ Add Call-off</a>
+                {% endif %}
+            </div>
+            {% if releases %}
+            <table class="po-table">
+                <thead>
+                    <tr>
+                        <th>Release #</th>
+                        <th class="num">Qty</th>
+                        <th class="num">Value</th>
+                        <th>Delivery Date</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in releases %}
+                    <tr>
+                        <td>{{ r.release_number }}</td>
+                        <td class="num">{{ r.qty|floatformat:0 }}</td>
+                        <td class="num">${{ r.value|floatformat:2 }}</td>
+                        <td>{{ r.delivery_date|default:"—" }}</td>
+                        <td>{{ r.notes|default:"" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="po-empty">No call-offs recorded yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
