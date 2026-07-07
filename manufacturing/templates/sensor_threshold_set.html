@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block page_title %}Set Sensor Thresholds{% endblock %}
+
+{% block toolbar_left %}
+<a href="/predictive-maintenance/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Set Sensor Thresholds</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="erp-form">
+        <div class="card">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Equipment</label>
+                    <select name="equipment" required>
+                        {% for eq in equipment %}
+                        <option value="{{ eq.name }}">{{ eq.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Reading Type</label>
+                    <select name="reading_type" required>
+                        {% for rt in reading_types %}
+                        <option value="{{ rt }}">{{ rt|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Warning Threshold (≥)</label>
+                    <input type="number" name="warning_max" step="0.01" required>
+                </div>
+                <div class="form-row">
+                    <label>Critical Threshold (≥)</label>
+                    <input type="number" name="critical_max" step="0.01" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Save Thresholds</button>
+                    <a href="/predictive-maintenance/" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
