@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block page_title %}Confirm Shipment — {{ pick_list.pick_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/picks/{{ pick_list.id }}/" class="btn">Back to Pick List</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Confirm Shipment — {{ pick_list.pick_number }} (SO {{ pick_list.so_number }})</div>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+<h3>Lines to Ship</h3>
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>Product</th><th>Qty Picked</th></tr></thead>
+        <tbody>
+            {% for l in lines %}
+            {% if l.status == 'picked' %}
+            <tr><td>{{ l.product_name|default:l.description }}</td><td>{{ l.qty_picked }}</td></tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if can_edit %}
+<form method="post" class="card" style="padding:16px;max-width:400px;margin-top:16px;">
+    {% csrf_token %}
+    <label>Carrier<br><input type="text" name="carrier" required></label><br><br>
+    <label>Tracking Number<br><input type="text" name="tracking_number" required></label><br><br>
+    <label>Ship Date<br><input type="date" name="ship_date" required></label><br><br>
+    <button type="submit" class="btn btn-primary">Confirm Shipment</button>
+</form>
+{% endif %}
+</div>
+{% endblock %}

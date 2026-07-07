@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block page_title %}Pick Lists{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Bin Master</a>
+<a href="/wms/receive/" class="btn">Receive &amp; Put-Away</a>
+{% endblock %}
+
+{% block extra_styles %}
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; }
+.chip { display:inline-block; padding:3px 13px; border-radius:20px; font-size:12px;
+    font-weight:bold; text-decoration:none; background:#334; color:#aad; border:2px solid #556; }
+.chip.active { border-color:white; color:white; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Pick Lists</div>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+<h3>Confirmed SOs Awaiting a Pick List</h3>
+{% if awaiting %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>SO #</th><th>Order Date</th><th>Ship Date</th><th></th></tr></thead>
+        <tbody>
+            {% for so in awaiting %}
+            <tr>
+                <td>{{ so.so_number }}</td>
+                <td>{{ so.order_date|default:"—" }}</td>
+                <td>{{ so.ship_date|default:"—" }}</td>
+                <td>
+                    {% if can_edit %}
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="generate">
+                        <input type="hidden" name="so_id" value="{{ so.id }}">
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Generate Pick List</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No confirmed SOs waiting on a pick list.</div>
+{% endif %}
+
+<h3 style="margin-top:28px;">Pick Lists</h3>
+<div class="chip-row" style="display:flex;gap:7px;margin-bottom:12px;">
+    <a href="/wms/picks/" class="chip {% if not status %}active{% endif %}">All</a>
+    {% for s in pick_statuses %}
+    <a href="/wms/picks/?status={{ s }}" class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
+    {% endfor %}
+</div>
+{% if pick_lists %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>Pick #</th><th>SO #</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <tbody>
+            {% for p in pick_lists %}
+            <tr>
+                <td><a href="/wms/picks/{{ p.id }}/">{{ p.pick_number }}</a></td>
+                <td>{{ p.so_number }}</td>
+                <td><span class="pill pill-{{ p.status }}">{{ p.status|title }}</span></td>
+                <td>{{ p.created_at }}</td>
+                <td><a href="/wms/picks/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No pick lists yet.</div>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block page_title %}Pick List {{ pick_list.pick_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/picks/" class="btn">Back to Pick Lists</a>
+{% if pick_list.status == 'picked' %}
+<a href="/wms/pack/{{ pick_list.id }}/" class="btn btn-primary">Pack Station</a>
+{% elif pick_list.status == 'packed' %}
+<a href="/wms/ship/{{ pick_list.id }}/" class="btn btn-primary">Confirm Shipment</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">{{ pick_list.pick_number }} — SO {{ pick_list.so_number }}</div>
+<p>Status: <span class="pill pill-{{ pick_list.status }}">{{ pick_list.status|title }}</span></p>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>Seq</th><th>Product</th><th>Bin</th><th>Ordered</th><th>Picked</th><th>Status</th>{% if can_edit %}<th></th>{% endif %}</tr>
+        </thead>
+        <tbody>
+            {% for l in lines %}
+            <tr>
+                <td>{{ l.pick_sequence }}</td>
+                <td>{{ l.product_name|default:l.description }}</td>
+                <td>{{ l.bin_full_code }}</td>
+                <td>{{ l.qty_ordered }}</td>
+                <td>{{ l.qty_picked }}</td>
+                <td><span class="pill pill-{{ l.status }}">{{ l.status|title }}</span></td>
+                {% if can_edit %}
+                <td>
+                    {% if l.status == 'pending' %}
+                    <form method="post" style="display:flex;gap:6px;align-items:center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="record_pick">
+                        <input type="hidden" name="line_id" value="{{ l.id }}">
+                        <input type="number" step="any" name="qty_picked" value="{{ l.qty_ordered }}" style="width:80px;" required>
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Pick</button>
+                    </form>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}

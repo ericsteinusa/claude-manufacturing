@@ -680,7 +680,7 @@ Full constraint-aware scheduler — significant effort but core mid-market diffe
   a real two-operation, two-workcenter work order schedule with the second
   operation starting before the first one finished.
 
-#### P3-B: Warehouse Management System (WMS)
+#### P3-B: Warehouse Management System (WMS) ✅ Done
 Full pick/pack/ship with bin-level tracking.
 - Bin master: warehouse → zone → aisle → rack → shelf → bin
 - Put-away rules: by product category or ABC class → bin zone assignment
@@ -688,6 +688,64 @@ Full pick/pack/ship with bin-level tracking.
 - Pack station: create cartons, scan items in, record carton weight/dimensions
 - Ship confirmation: carrier + tracking number + actual ship date
 - Receiving put-away: scan PO receipt → assign to bin → update inventory
+- **Shipped:** `manufacturing/wms_core.py`. Today, stock is tracked only as
+  a single aggregate `product.amount` plus a free-text `product.bin`
+  string — and, more importantly, **neither PO receiving nor shipment
+  creation ever adjusted `product.amount`** before this PR; only manual
+  adjustment forms, cycle-count posting, and one mobile-only endpoint did.
+  This closes that gap in both directions, funneling every new
+  inventory-affecting action through the existing
+  `inventory_core.record_transaction`. **Bin hierarchy:** a flat model —
+  `wms_warehouse`/`wms_zone` are real parent tables, but aisle/rack/shelf
+  are plain text columns on `wms_bin` itself rather than their own tables
+  (far less schema/CRUD surface for the same functional coverage, matching
+  this codebase's generally denormalized style). **Bin quantity** lives in
+  a new `wms_bin_stock(bin_id, product_id, qty)`, always adjusted in the
+  same transaction as the `product.amount` aggregate via one internal
+  helper, `_adjust_bin_stock` — never independently. **No big-bang
+  migration:** a lazily-created sentinel "unassigned" bin
+  (`get_or_create_unassigned_bin`) stands in for all pre-existing
+  `product.amount` that predates this feature; assigning/picking from it
+  still adjusts the aggregate but skips bin-level tracking, so the system
+  self-heals as inventory turns over and gets received into real bins
+  through the new flow. **Put-away rules:** match a product's `category`
+  (new column — grepped the whole schema first, confirmed no prior
+  category concept existed) or ABC class (reusing
+  `cycle_count_core.compute_abc_classes`, which already documents ABC as
+  deliberately unpersisted/computed-on-the-fly — not duplicating that
+  decision with a new persisted column) to a target zone; first-match-by-
+  priority, not a scoring model. **Pick lists:** one per confirmed SO in
+  v1 (no partial/backorder splitting across multiple pick lists); lines
+  ordered by a greedy `(zone.pick_sequence, bin.full_code)` sort — an
+  "optimized path" in the sense of a simple zone-aware sort, not a real
+  routing/TSP solver, matching the precedent set by P3-A's load-leveling
+  heuristic. **Receiving integration:** the pinned, already-in-use
+  `purchase_orders_core.receive_po_item` is wrapped, not modified (it has
+  exact-SQL-asserting tests) — a new `receive_and_putaway` computes the
+  delta against the item's current `qty_received` (the existing function
+  takes an absolute total, not a delta) and credits both the aggregate and
+  the chosen bin. The *legacy* `/po/<id>/` receive view (not the pinned
+  core function) was also additively patched to credit the received delta
+  into the unassigned bin, so inventory correctness doesn't depend on
+  which of the two receiving screens someone uses. **Ship confirmation**
+  reuses `production_core.create_shipment`/`add_shipment_item` and only
+  ever exercises the already-legal `confirmed → shipped` SO transition
+  once, at the end — `SO_STATUS_TRANSITIONS` itself is untouched. Web
+  pages added under `/wms/...` (bins, put-away rules, receive, pick lists,
+  pack station, ship confirm), wired from a new "Warehouse Management"
+  submenu under Production → Shipping, and the existing (previously
+  placeholder) "Receive Items" leaf now points at the new receiving
+  screen. Verified end-to-end against a running dev server + local
+  Postgres: created a zone/bin and a put-away rule, received a real PO
+  line into it (confirmed `product.amount`, `wms_bin_stock`, and
+  `po_item.qty_received` all moved together), generated a pick list from a
+  confirmed sample SO, picked → packed (carton with weight/dimensions) →
+  confirmed shipment (confirmed the SO and pick list both transitioned to
+  `shipped`, and a real `shipment`/`shipment_item` row was created), and
+  confirmed the legacy PO receive screen now also credits inventory.
+  `cycle_count_core`'s legacy grouping by the free-text `product.bin`
+  column is deliberately untouched and coexists with the new bin tables —
+  not the same concept, not migrated in this PR.
 
 #### P3-C: Customer Self-Service Portal
 - Separate customer login (not employee account)

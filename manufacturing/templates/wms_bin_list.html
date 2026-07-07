@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block page_title %}Bin Master{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/picks/" class="btn">Pick Lists</a>
+<a href="/wms/putaway-rules/" class="btn">Put-Away Rules</a>
+<a href="/prod/" class="btn">Production</a>
+{% if can_edit %}
+<a href="/wms/bins/new/" class="btn btn-primary">+ New Bin</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Bin Master</div>
+<p style="font-size:12px;color:var(--text-muted);max-width:700px;">
+    Warehouse &rarr; zone &rarr; bin locations. Aisle/rack/shelf are recorded
+    on each bin rather than as their own hierarchy levels.
+</p>
+
+<form method="get" style="display:flex;gap:6px;align-items:center;margin-bottom:14px;">
+    <select name="zone_id" onchange="this.form.submit()">
+        <option value="">All Zones</option>
+        {% for z in zones %}
+        <option value="{{ z.id }}" {% if zone_id == z.id %}selected{% endif %}>{{ z.code }} — {{ z.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="text" name="q" value="{{ search }}" placeholder="Search bin code…">
+    <button type="submit" class="btn btn-primary">Go</button>
+</form>
+
+{% if bins %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr>
+                <th>Bin Code</th>
+                <th>Zone</th>
+                <th>Aisle</th>
+                <th>Rack</th>
+                <th>Shelf</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bins %}
+            <tr>
+                <td><a href="/wms/bins/{{ b.id }}/">{{ b.full_code }}</a></td>
+                <td>{{ b.zone_code }}</td>
+                <td>{{ b.aisle|default:"—" }}</td>
+                <td>{{ b.rack|default:"—" }}</td>
+                <td>{{ b.shelf|default:"—" }}</td>
+                <td>{% if b.is_active %}<span class="pill pill-active">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}</td>
+                <td><a href="/wms/bins/{{ b.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No bins found.</div>
+{% endif %}
+</div>
+{% endblock %}
