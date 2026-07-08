@@ -13,10 +13,11 @@ credited before), and re-ranks the remaining roadmap.
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
 (Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), P4-A (AI Demand
-Forecasting), P4-B (Predictive Maintenance), and P4-C (Capable-to-Promise), merged from nine
-separate PRs (#398, #382, #386, #381, #387, #388, #389, #390, #391) that a prior session had
-built and left open. The remaining roadmap (P4-D through P4-G) still has open PRs (#392–#395)
-from that same prior session — working through them one at a time. 25 features shipped total.
+Forecasting), P4-B (Predictive Maintenance), P4-C (Capable-to-Promise), and P4-D (EDI
+Integration), merged from ten separate PRs (#398, #382, #386, #381, #387, #388, #389, #390,
+#391, #392) that a prior session had built and left open. The remaining roadmap (P4-E through
+P4-G) still has open PRs (#393–#395) from that same prior session — working through them one at
+a time. 26 features shipped total.
 
 ---
 
@@ -30,7 +31,7 @@ export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
 The primary gaps now fall into three areas:
 1. **AI / Predictive Analytics** — ML demand forecasting (P4-A) and MTBF-based predictive maintenance risk scoring (P4-B) now exist; no broader embedded-AI analytics platform, and no real IoT/sensor hardware connectivity (P4-B's sensor readings are logged manually, not device-fed)
-2. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
+2. **Trading-Partner Integration** — EDI now exists (P4-D); no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
 3. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
@@ -131,10 +132,10 @@ The primary gaps now fall into three areas:
 | **Supplier collaboration / self-service portal** | ❌ | ✅ 6/10 |
 | **Blanket orders & call-offs** | ✅ Full (P3-E) — value- or qty-tracked balance, auto-close/auto-expire | ✅ 9/10 |
 | **Freight & landed cost allocation** | ✅ Full (P3-D) — by value/weight/qty, rolls into `product.purchase_price` | ✅ 7/10 |
-| **EDI (850/856/810)** | ❌ | ✅ 8/10 |
+| **EDI (850/856/810)** | ✅ Full (P4-D) — real X12 parsing/generation with per-partner item-number field mappings; 850 inbound auto-creates SOs, 855/856/810 generated on demand; trading-partner connectivity is a file upload/download stub, not a real AS2/VAN/SFTP transport | ✅ 8/10 |
 | **Auto-generated POs from MRP** | ✅ Full (P2-H) — preferred-supplier lookup wired into MRP release | ✅ All |
 
-**Priority gaps:** supplier self-service portal, EDI.
+**Priority gaps:** supplier self-service portal.
 
 ---
 
@@ -1308,6 +1309,7 @@ Real-time production visibility — Plex's core differentiator.
 | No AI/ML demand forecasting | P4-A |
 | No predictive maintenance / failure-risk scoring | P4-B |
 | No Capable-to-Promise (CTP) | P4-C |
+| No EDI (850/855/856/810) | P4-D |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1323,10 +1325,10 @@ Real-time production visibility — Plex's core differentiator.
 | Gap | Effort to Close |
 |---|---|
 | No broader embedded-AI analytics platform | Very High |
-| No EDI | High (P4-D) |
 | No real IoT / sensor hardware integration | Very High |
 | No supplier self-service portal | High |
 | No carrier API / e-commerce integration | Medium–High (P4-E) |
+| No real AS2/VAN/SFTP EDI transport (file upload/download stub only) | Medium |
 
 ---
 
@@ -1338,7 +1340,7 @@ Real-time production visibility — Plex's core differentiator.
 | MRP | 8/10 | 7/10 | — |
 | Inventory | 7/10 | 6/10 | ▲ (cycle count + WMS bins; still no FIFO/LIFO or transfers) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
-| Purchasing | 9/10 | 9/10 | ▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs) |
+| Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲ (ATP + price lists + customer portal + CTP) |
 | Finance / GL | 9/10 | 9/10 | ▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated) |
 | Fixed Assets | 9/10 | 8/10 | — |
@@ -1349,7 +1351,7 @@ Real-time production visibility — Plex's core differentiator.
 | Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.7/10** | **7.8/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.7/10** | **7.9/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1358,8 +1360,8 @@ Real-time production visibility — Plex's core differentiator.
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-D through P4-G — turned out to already
-have open PRs from a prior session (#392–#395), discovered while working through this list. Being
+**Status update (2026-07-08):** the remaining roadmap — P4-E through P4-G — turned out to already
+have open PRs from a prior session (#393–#395), discovered while working through this list. Being
 merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
 before merging) rather than re-built. Once that pass completes, only these will remain genuinely
 unbuilt:
