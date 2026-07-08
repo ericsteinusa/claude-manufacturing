@@ -12,10 +12,11 @@ credited before), and re-ranks the remaining roadmap.
 
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
-(Multi-Company / Multi-Entity), and P3-G (OEE Live Shop Floor Dashboard), merged from six separate
-PRs (#398, #382, #386, #381, #387, #388) that a prior session had built and left open. The
-remaining roadmap (P4-A through P4-G) still has open PRs (#389–#395) from that same prior
-session — working through them one at a time. 22 features shipped total.
+(Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), and P4-A (AI Demand
+Forecasting), merged from seven separate PRs (#398, #382, #386, #381, #387, #388, #389) that a
+prior session had built and left open. The remaining roadmap (P4-B through P4-G) still has open
+PRs (#390–#395) from that same prior session — working through them one at a time.
+23 features shipped total.
 
 ---
 
@@ -28,7 +29,7 @@ HR, payroll, accounting, and IT management, and has closed most of the "visible 
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
 The primary gaps now fall into three areas:
-1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched); no IoT/sensor connectivity for either predictive maintenance or shop-floor data capture
+1. **AI / Predictive Analytics** — ML demand forecasting now exists (P4-A); no predictive maintenance, no broader embedded-AI analytics platform, no IoT/sensor connectivity for either predictive maintenance or shop-floor data capture
 2. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
 3. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
@@ -274,11 +275,11 @@ The primary gaps now fall into three areas:
 | **Custom / self-service report builder** | ❌ | ✅ 7/10 |
 | **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
 | **Live shop floor performance (real-time)** | ✅ Full (P3-G) — live per-shift OEE dashboard + standalone auto-refreshing TV display | ✅ 7/10 |
-| **Predictive / AI analytics** | ❌ | ✅ 7/10 |
+| **Predictive / AI analytics** | ✅ Partial (P4-A) — hand-rolled seasonal-decomposition demand forecast (product × month) feeding into MRP; no broader embedded-AI analytics platform, no predictive maintenance | ✅ 7/10 |
 | **Batch record generation** | ❌ | ✅ 6/10 |
 | **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
 
-**Priority gaps:** self-service report builder, live shop-floor performance, predictive/AI analytics.
+**Priority gaps:** self-service report builder, predictive maintenance, broader embedded-AI analytics.
 
 ---
 
@@ -1051,12 +1052,51 @@ Real-time production visibility — Plex's core differentiator.
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
 
-#### P4-A: AI Demand Forecasting
+#### P4-A: AI Demand Forecasting ✅ Done
 - Pull 24+ months of SO history
 - Apply time-series model (seasonal decomposition, Holt-Winters, or Prophet)
 - Generate forecast by product by month for next 12 months
 - Display as overlay on actual orders in demand dashboard
 - Feed forecast into MRP as additional demand
+- **Shipped:** `manufacturing/demand_forecast_core.py`. Not the same thing
+  as the existing "Sales forecasting with actuals & variance" — that's
+  `sales_core.py`'s `sales_forecast` table, a rep/product-line/quarter
+  **quota** a person types in (`expected_value` × `probability` =
+  `weighted_value`), with no time-series computation and no product/month
+  grain. This is a genuinely new, computed forecast, generated from
+  historical shipped/closed Sales Order lines. **No data-science library
+  exists anywhere** in `requirements.txt` (no pandas/numpy/statsmodels/
+  prophet), so — consistent with this codebase's pattern of not adding a
+  new dependency for one feature — the time-series model is a hand-rolled
+  **classical seasonal decomposition** in pure Python, one of the three
+  methods the spec names and far more tractable to implement correctly
+  without a library than Holt-Winters' parameter optimization: a
+  closed-form least-squares trend line, plus a per-calendar-month seasonal
+  index (average actual/trend ratio for that month across however many
+  years of history exist, normalized to mean 1.0). With under 12 months of
+  history there's no full seasonal cycle to measure, so it falls back to a
+  flat, trend-only projection rather than fabricating seasonality from
+  partial data. The existing "demand dashboard" (`views.sales_demand`,
+  `/sales/demand/`) is revenue-based and quarterly, grouped by product
+  name — mixing that grain/unit with a qty/month forecast would be a
+  confusing hybrid, so this ships as its own `/demand-forecast/` page
+  (product × month, in units, actual history overlaid with projected
+  future months via a bar-per-row table, mirroring `sales_demand.html`'s
+  existing convention rather than adding a charting library), cross-linked
+  from both pages. **MRP integration is fully additive**:
+  `mrp_web_core.run_mrp_dated` gained one optional parameter,
+  `include_forecast: bool = False` — the default and every existing
+  caller's behavior is byte-for-byte unchanged; when `True` (a checkbox on
+  the MRP run form), `demand_forecast_core.get_forecast_demand_dated`
+  returns forecast rows in exactly the `{product_id: [(qty, date), ...]}`
+  shape `get_demand_dated` already produces, so it's a plain per-product
+  list-extend, not a rewrite of `plan_orders_dated`/`get_demand_dated`
+  themselves. Verified end-to-end against a running dev server + local
+  Postgres through the actual web views: generated forecasts from real SO
+  history, confirmed the dashboard overlay renders actual vs. forecast
+  correctly, ran MRP once with the checkbox off (unchanged plan) and once
+  on (forecast-driven demand visibly added more planned orders — 9 → 18 in
+  the verification run), and cleaned up all test data afterward.
 
 #### P4-B: Predictive Maintenance
 - Track rolling MTBF per equipment from historical downtime
@@ -1142,6 +1182,7 @@ Real-time production visibility — Plex's core differentiator.
 | No customer self-service portal | P3-C |
 | No multi-entity / intercompany / consolidated reporting | P3-F |
 | No live/real-time shop-floor OEE dashboard or TV display | P3-G |
+| No AI/ML demand forecasting | P4-A |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1157,7 +1198,7 @@ Real-time production visibility — Plex's core differentiator.
 
 | Gap | Effort to Close |
 |---|---|
-| No AI / predictive analytics | Very High (P4-A, P4-B) |
+| No predictive maintenance / broader embedded-AI analytics | Very High (P4-B) |
 | No EDI | High (P4-D) |
 | No IoT / sensor integration (shop-floor or predictive maintenance) | Very High (P4-B) |
 | No supplier self-service portal | High |
@@ -1182,10 +1223,10 @@ Real-time production visibility — Plex's core differentiator.
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
 | Maintenance (CMMS) | 9/10 | 8/10 | ▲▲ (OEE + live shop-floor dashboard/TV via P3-G; mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
-| Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), digest now credited) |
+| Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.6/10** | **7.5/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.6/10** | **7.6/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1194,8 +1235,8 @@ Real-time production visibility — Plex's core differentiator.
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-A through P4-G — turned out to already
-have open PRs from a prior session (#389–#395), discovered while working through this list. Being
+**Status update (2026-07-08):** the remaining roadmap — P4-B through P4-G — turned out to already
+have open PRs from a prior session (#390–#395), discovered while working through this list. Being
 merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
 before merging) rather than re-built. Once that pass completes, only these will remain genuinely
 unbuilt:

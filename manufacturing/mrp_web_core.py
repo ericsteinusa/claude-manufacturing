@@ -147,16 +147,27 @@ def get_demand_dated(conn) -> dict:
     return result
 
 
-def run_mrp_dated(conn) -> list[dict]:
+def run_mrp_dated(conn, include_forecast: bool = False) -> list[dict]:
     """Time-phased MRP run — returns planned orders with start_date and due_date.
 
     Each row has:
         product_id, product_name, order_type ('make'|'buy'),
         qty, lead_time_days, start_date (ISO), due_date (ISO)
     Sorted by start_date ascending so the earliest actions appear first.
+
+    ``include_forecast`` (P4-A, additive/opt-in — default False leaves
+    every existing caller's behavior unchanged) merges in AI-generated
+    demand from ``demand_forecast_core.get_forecast_demand_dated``, which
+    returns the same ``{pid: [(qty, date), ...]}`` shape as
+    ``get_demand_dated`` below, so it's a plain per-product list-extend.
     """
     products_raw, bom_lines, on_hand, scheduled, safety = load_mrp_inputs(conn)
     demand_dated = get_demand_dated(conn)
+
+    if include_forecast:
+        from .demand_forecast_core import get_forecast_demand_dated
+        for pid, entries in get_forecast_demand_dated(conn).items():
+            demand_dated.setdefault(pid, []).extend(entries)
 
     products_slim = {
         pid: {'item_type': p['item_type'], 'lead_time_days': p['lead_time_days']}

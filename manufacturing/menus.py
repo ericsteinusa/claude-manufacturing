@@ -1546,6 +1546,7 @@ MENU_TREE = {
                 ],
             }),
             ('sales', 'Sales Menu', _SALES_MENU),
+            ('demand_forecast', 'AI Demand Forecast', 'sales/Sales_mgr_menu.py'),
         ],
     },
     'budget_management': {

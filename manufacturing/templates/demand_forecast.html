@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block page_title %}AI Demand Forecast{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/demand/" class="btn">Sales Demand</a>
+<a href="/mrp/" class="btn">MRP</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.dm-wrap { width:100%; max-width:1100px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select { padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; border:1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; }
+.bar-row { display:flex; align-items:center; gap:8px; }
+.bar-track { flex:1; background:#e8e8e8; border-radius:3px; height:12px; overflow:hidden; }
+.bar-fill { height:12px; border-radius:3px; }
+.bar-fill.actual { background:var(--accent); opacity:.8; }
+.bar-fill.forecast { background:#f5a623; opacity:.85; }
+.legend { display:flex; gap:18px; font-size:12px; color:#555; margin-bottom:12px; }
+.legend span::before { content:''; display:inline-block; width:10px; height:10px;
+    border-radius:2px; margin-right:5px; vertical-align:middle; }
+.legend .actual::before { background:var(--accent); }
+.legend .forecast::before { background:#f5a623; }
+.empty-note { color:#888; font-size:13px; text-align:center; padding:24px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="dm-wrap">
+    <h2>AI Demand Forecast</h2>
+    <p style="font-size:12px;color:#666;margin-bottom:14px;">
+        Computed from 24 months of shipped/closed Sales Order history via seasonal
+        decomposition (trend + calendar-month seasonality) — not the manual rep quota
+        on the <a href="/sales/forecast/">Sales Forecast</a> page.
+    </p>
+
+    <form method="get" class="filter-bar">
+        <select name="product_id" onchange="this.form.submit()">
+            {% for s in summary %}
+            <option value="{{ s.product_id }}" {% if s.product_id == product_id %}selected{% endif %}>
+                {{ s.product_name|default:"Unknown Product" }} ({{ s.total_forecast_qty|floatformat:0 }} forecasted)
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if can_edit %}
+    <form method="post" action="/demand-forecast/generate/" style="margin-bottom:16px;">
+        {% csrf_token %}
+        <button type="submit" class="btn">Regenerate All Forecasts</button>
+    </form>
+    {% endif %}
+
+    <div class="card">
+        <h3>Actual vs. Forecast — Monthly Units</h3>
+        {% if series %}
+        <div class="legend">
+            <span class="actual">Actual (history)</span>
+            <span class="forecast">Forecast (projected)</span>
+        </div>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th class="num">Qty</th>
+                    <th style="width:280px;">Overlay</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in series %}
+            <tr>
+                <td>{{ row.month }}{% if row.is_forecast %} <em style="color:#f5a623;">(forecast)</em>{% endif %}</td>
+                <td class="num">
+                    {% if row.is_forecast %}{{ row.forecast_qty|floatformat:0 }}
+                    {% else %}{{ row.actual_qty|floatformat:0 }}{% endif %}
+                </td>
+                <td>
+                    <div class="bar-row">
+                        <div class="bar-track">
+                            <div class="bar-fill {% if row.is_forecast %}forecast{% else %}actual{% endif %}"
+                                 data-qty="{% if row.is_forecast %}{{ row.forecast_qty }}{% else %}{{ row.actual_qty }}{% endif %}"
+                                 data-max="{{ max_qty }}"></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-note">
+            No forecast generated yet.
+            {% if can_edit %}Click "Regenerate All Forecasts" above to build one from SO history.{% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<script>
+document.querySelectorAll('[data-qty]').forEach(function(el) {
+    var qty = parseFloat(el.dataset.qty) || 0;
+    var max = parseFloat(el.dataset.max) || 0;
+    el.style.width = max > 0 ? Math.round(qty / max * 100) + '%' : '0%';
+});
+</script>
+{% endblock %}

@@ -92,11 +92,18 @@
     {% if can_edit %}
     <form method="post" action="/mrp/run/">
         {% csrf_token %}
+        <label style="font-size:13px;display:block;margin-bottom:8px;">
+            <input type="checkbox" name="include_forecast">
+            Include forecasted demand
+            (<a href="/demand-forecast/" style="color:var(--accent);">AI Demand Forecast</a>)
+        </label>
         <button type="submit" class="run-btn">Run MRP Plan &rarr;</button>
     </form>
     <p style="color: var(--text-muted);font-size:12px;margin-top:8px;">
         Running the plan explodes all confirmed SO demand through the BOM,
         nets against on-hand stock and open WOs, and computes planned orders.
+        Checking "Include forecasted demand" also adds AI-generated future
+        demand from the Demand Forecast page.
     </p>
     {% endif %}
 
