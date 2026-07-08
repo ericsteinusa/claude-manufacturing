@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block page_title %}CTP Inquiry{% endblock %}
+
+{% block toolbar_left %}
+<a href="/so/" class="btn">← Back</a>
+<a href="/atp/" class="btn">ATP Inquiry</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.atp-wrap { width:100%; max-width:640px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:16px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.atp-result h3 { margin-top:0; }
+.atp-result .verdict { font-size:16px; font-weight:bold; margin-bottom:10px; }
+.atp-result .verdict.yes { color:#1a7f37; }
+.atp-result .verdict.no { color:#c33; }
+.atp-meta { display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; font-size:13px; margin-bottom:14px; }
+.atp-meta b { color:#003cb4; }
+.list-table { width:100%; border-collapse:collapse; margin-top:6px; }
+.list-table th,.list-table td { padding:6px 10px; border-bottom:1px solid #ddd; font-size:12px; text-align:left; }
+.list-table th { background:var(--accent); color:white; }
+.list-table td.num { text-align:right; }
+.ctp-section-title { font-size:12px; font-weight:bold; color:#555; text-transform:uppercase; margin:14px 0 4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="atp-wrap">
+    <div class="menu-title">Capable-to-Promise Inquiry</div>
+    <p style="font-size:12px;color:#666;margin-bottom:14px;">
+        Extends ATP with a routing capacity check — the CTP date is the later of
+        when material is available and when workcenter capacity is free.</p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post" action="/ctp/">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Product</label>
+                <select name="product_id">
+                    <option value="">(select)</option>
+                    {% for p in products %}
+                    <option value="{{ p.id }}"{% if form.product_id == p.id|stringformat:"s" %} selected{% endif %}>{{ p.product_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Qty</label>
+                <input type="number" name="qty" min="1" value="{{ form.qty }}">
+            </div>
+            <div class="form-row">
+                <label>Requested Date</label>
+                <input type="date" name="requested_date" value="{{ form.requested_date }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Check CTP</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="card atp-result">
+        <h3>{{ result.product_name }}</h3>
+        <div class="verdict {% if result.ctp_sufficient %}yes{% else %}no{% endif %}">
+            {% if result.ctp_sufficient %}Yes — capable of promising by {{ result.requested_date }}
+            {% else %}No — cannot meet {{ result.requested_date }}{% endif %}
+        </div>
+
+        <div class="ctp-section-title">Material (ATP)</div>
+        <div class="atp-meta">
+            <div><b>Sufficient by requested date:</b> {{ result.material_sufficient|yesno:"Yes,No" }}</div>
+            <div><b>Material ready:</b>
+                {% if result.material_ready_date %}{{ result.material_ready_date }}
+                {% else %}Not available within 90 days{% endif %}</div>
+        </div>
+
+        <div class="ctp-section-title">Capacity (Routing)</div>
+        {% if result.capacity_workcenters %}
+        <table class="list-table">
+            <thead><tr><th>Workcenter</th><th class="num">Hours Required</th><th>Earliest Available</th></tr></thead>
+            <tbody>
+            {% for wc in result.capacity_workcenters %}
+            <tr>
+                <td>{{ wc.workcenter_name }}</td>
+                <td class="num">{{ wc.hours_required|floatformat:1 }}</td>
+                <td>{{ wc.earliest_date|default:"Not available within 90 days" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="font-size:13px;color:#666;">No routing defined for this product — capacity isn't a constraint.</p>
+        {% endif %}
+
+        <div class="ctp-section-title">Combined</div>
+        <div class="atp-meta">
+            <div style="grid-column:1/-1;"><b>CTP Date:</b>
+                {% if result.ctp_date %}{{ result.ctp_date }}
+                {% else %}Not achievable within 90 days{% endif %}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

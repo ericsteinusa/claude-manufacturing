@@ -120,6 +120,7 @@ from ..sales_orders_core import (
     set_so_status,
 )
 from ..atp_core import get_atp_qty_for_products, check_so_atp
+from ..capable_to_promise_core import check_so_capacity
 from ..work_orders_core import (
     WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
@@ -225,6 +226,7 @@ from ._supplier_scorecard import *  # noqa: F401,F403
 from ._cash_flow import *  # noqa: F401,F403
 from ._sampling_plan import *  # noqa: F401,F403
 from ._atp import *  # noqa: F401,F403
+from ._ctp import *  # noqa: F401,F403
 from ._document_control import *  # noqa: F401,F403
 from ._ess import *  # noqa: F401,F403
 from ._capacity_planning import *  # noqa: F401,F403
@@ -2083,8 +2085,10 @@ def so_detail(request, so_id):
             if (so and can_edit) else {}
         )
         atp_warning = None
+        capacity_warning = None
         if so and can_edit and request.GET.get('atp_pending'):
             atp_warning = check_so_atp(conn, so_id) or None
+            capacity_warning = check_so_capacity(conn, so_id) or None
 
         if request.method == 'POST' and request.POST.get('action') == 'currency' and can_edit and so:
             cur_code = request.POST.get('currency', 'USD')
@@ -2123,6 +2127,7 @@ def so_detail(request, so_id):
         price_tiers_json=json.dumps(price_tiers),
         atp_json=json.dumps(atp_by_product),
         atp_warning=atp_warning,
+        capacity_warning=capacity_warning,
         pending_status=request.GET.get('atp_pending'),
         back_url='/so/',
     ))
@@ -2304,7 +2309,8 @@ def so_set_status(request, so_id):
     try:
         so = get_so(conn, so_id)
         if so and so_can_transition(so['status'], target):
-            if target == 'confirmed' and not override and check_so_atp(conn, so_id):
+            if (target == 'confirmed' and not override
+                    and (check_so_atp(conn, so_id) or check_so_capacity(conn, so_id))):
                 return redirect(reverse('so_detail', args=[so_id]) + '?atp_pending=confirmed')
             set_so_status(conn, so_id, target)
             conn.commit()

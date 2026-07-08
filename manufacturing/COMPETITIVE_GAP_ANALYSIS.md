@@ -13,10 +13,10 @@ credited before), and re-ranks the remaining roadmap.
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
 (Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), P4-A (AI Demand
-Forecasting), and P4-B (Predictive Maintenance), merged from eight separate PRs (#398, #382,
-#386, #381, #387, #388, #389, #390) that a prior session had built and left open. The remaining
-roadmap (P4-C through P4-G) still has open PRs (#391–#395) from that same prior session —
-working through them one at a time. 24 features shipped total.
+Forecasting), P4-B (Predictive Maintenance), and P4-C (Capable-to-Promise), merged from nine
+separate PRs (#398, #382, #386, #381, #387, #388, #389, #390, #391) that a prior session had
+built and left open. The remaining roadmap (P4-D through P4-G) still has open PRs (#392–#395)
+from that same prior session — working through them one at a time. 25 features shipped total.
 
 ---
 
@@ -153,14 +153,14 @@ The primary gaps now fall into three areas:
 | RMA / returns management | ✅ | ✅ All |
 | Demand by product analytics | ✅ | ✅ 8/10 |
 | **Available-to-Promise (ATP)** | ✅ Full (P2-B) — inquiry screen, live SO-line badge, soft confirm-gate | ✅ 9/10 |
-| **Capable-to-Promise (CTP)** | ❌ | ✅ 6/10 |
+| **Capable-to-Promise (CTP)** | ✅ Full (P4-C) — combines ATP material availability with finite-capacity workcenter dates into one `ctp_date`; second independent shortfall check on SO confirm | ✅ 6/10 |
 | **Price list management & tiered pricing** | ✅ Full (P1-E) — client-side SO auto-populate by tier | ✅ All |
 | **Discount & promotion management** | ❌ | ✅ All |
 | **Customer self-service portal** | ✅ Full (P3-C) — own orders/invoices/shipments/RMAs, invoice + packing-slip PDF, online payment; carrier tracking and Stripe payment are documented stubs (no real integration existed anywhere to build on) | ✅ 7/10 |
 | **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ — WMS (P3-B) records carrier + tracking number manually at ship confirm; the portal's tracking view (P3-C) is a deterministic stub, not a real carrier API | ✅ 9/10 |
 | **Multi-channel order integration (e-commerce)** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** CTP, discount/promotion management, carrier API integration, e-commerce sync.
+**Priority gaps:** discount/promotion management, carrier API integration, e-commerce sync.
 
 ---
 
@@ -1143,11 +1143,51 @@ Real-time production visibility — Plex's core differentiator.
   confirmed `tests/test_phase6.py`'s existing MTBF tests still pass
   unchanged; cleaned up all test data afterward.
 
-#### P4-C: Capable-to-Promise (CTP)
+#### P4-C: Capable-to-Promise (CTP) ✅ Done
 - Extends ATP with routing capacity check
 - Before confirming SO: check material available (ATP) AND workcenter capacity on required dates
 - If insufficient: suggest earliest date when both material AND capacity are available
 - Show breakdown: "material ready in 5 days, capacity available in 8 days → CTP date: [date]"
+- **Shipped:** `manufacturing/capable_to_promise_core.py`, a thin
+  combination layer over two existing features rather than a rewrite of
+  either. **ATP (P2-B, `atp_core.get_atp`/`check_so_atp`)** already
+  answers "date when qty will be available," reused as-is for the
+  material half. **Finite capacity scheduling (P3-A,
+  `capacity_planning_core.py`)** had the building blocks
+  (`_load_workcenter_calendar`/`get_booked_hours_by_day`) but no "earliest
+  date N hours are free" function — that module gained exactly one
+  additive function, `earliest_capacity_date(conn, workcenter_id,
+  hours_needed, from_date, horizon_days)`, walking forward and
+  accumulating free (available − booked) hours per day until the running
+  total covers the requirement (documented simplification: treats free
+  hours as fungible across days, matching this module's existing
+  "no separate allocation ledger" approximation). CTP combines both:
+  `get_workcenter_hours_required` scales a product's routing `std_hours`
+  by quantity and groups by workcenter; `get_capacity_availability` finds
+  the latest earliest-date across all workcenters a routing touches (all
+  must have room); `get_ctp` returns the full breakdown — material date,
+  capacity date per workcenter, and the combined `ctp_date` (their max).
+  A product with no routing at all has nothing to schedule, so capacity
+  isn't a constraint for it (treated as immediately available, not
+  "unavailable"). **SO confirm-flow integration touches nothing pinned**:
+  `views.so_set_status`'s existing ATP confirm-gate (`if target ==
+  'confirmed' and not override and check_so_atp(...)`) now also ORs in
+  a new `check_so_capacity(conn, so_id)` — same shortfall-list
+  convention as `check_so_atp` (empty = covered), same redirect, same
+  single "Confirm Anyway" override; `sales_orders_core.set_so_status`/
+  `so_can_transition` are untouched. `so_detail.html` shows both ATP and
+  capacity shortfalls in one combined warning banner. A new standalone
+  `/ctp/` inquiry page mirrors `/atp/`'s exact GET-form/POST-compute
+  convention (linked from `so_list.html`'s toolbar, next to "ATP
+  Inquiry" — ATP itself has no menu entry either, so CTP follows that
+  same precedent). Verified end-to-end against a running dev server +
+  local Postgres: ran a real product's CTP breakdown and confirmed
+  distinct material/capacity dates with the combined date as their max;
+  created and attempted to confirm a real SO whose demand (100 units)
+  exceeded workcenter capacity, confirmed the confirm action was blocked
+  with a capacity-shortfall banner distinct from a pure ATP shortfall,
+  and confirmed "Confirm Anyway" successfully overrode both checks;
+  cleaned up all test data afterward.
 
 #### P4-D: EDI Integration
 - EDI 850 inbound: customer PO → auto-create Sales Order
@@ -1223,6 +1263,7 @@ Real-time production visibility — Plex's core differentiator.
 | No live/real-time shop-floor OEE dashboard or TV display | P3-G |
 | No AI/ML demand forecasting | P4-A |
 | No predictive maintenance / failure-risk scoring | P4-B |
+| No Capable-to-Promise (CTP) | P4-C |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1232,7 +1273,6 @@ Real-time production visibility — Plex's core differentiator.
 | No true inter-warehouse transfers | Low–Medium |
 | No consignment / cross-docking / wave picking / RFID | Medium |
 | No self-service report builder | Medium (P4-F) |
-| No CTP | High (P4-C) |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
@@ -1243,7 +1283,6 @@ Real-time production visibility — Plex's core differentiator.
 | No real IoT / sensor hardware integration | Very High |
 | No supplier self-service portal | High |
 | No carrier API / e-commerce integration | Medium–High (P4-E) |
-| No CTP | High (P4-C) |
 
 ---
 
@@ -1256,7 +1295,7 @@ Real-time production visibility — Plex's core differentiator.
 | Inventory | 7/10 | 6/10 | ▲ (cycle count + WMS bins; still no FIFO/LIFO or transfers) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs) |
-| Sales / CRM | 9/10 | 7/10 | ▲▲ (ATP + price lists + customer portal) |
+| Sales / CRM | 9/10 | 8/10 | ▲▲▲ (ATP + price lists + customer portal + CTP) |
 | Finance / GL | 9/10 | 9/10 | ▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
@@ -1266,7 +1305,7 @@ Real-time production visibility — Plex's core differentiator.
 | Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.6/10** | **7.7/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.7/10** | **7.8/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1275,8 +1314,8 @@ Real-time production visibility — Plex's core differentiator.
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-C through P4-G — turned out to already
-have open PRs from a prior session (#391–#395), discovered while working through this list. Being
+**Status update (2026-07-08):** the remaining roadmap — P4-D through P4-G — turned out to already
+have open PRs from a prior session (#392–#395), discovered while working through this list. Being
 merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
 before merging) rather than re-built. Once that pass completes, only these will remain genuinely
 unbuilt:
