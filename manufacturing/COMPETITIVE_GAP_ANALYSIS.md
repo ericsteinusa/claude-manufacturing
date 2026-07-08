@@ -10,9 +10,12 @@ app already has a Maintenance screen — `mobile/app/(tabs)/maintenance.tsx` —
 digest already exists — `manufacturing/management/commands/send_daily_digest.py` — neither was
 credited before), and re-ranks the remaining roadmap.
 
-**2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation), and
-P3-E (Blanket Purchase Orders & Call-offs), merged from three separate PRs (#398, #382, #386).
-19 features shipped total.
+**2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
+P3-E (Blanket Purchase Orders & Call-offs), and P3-C (Customer Self-Service Portal), merged from
+four separate PRs (#398, #382, #386, #381) that a prior session had built and left open. Discovered
+that essentially the entire remaining roadmap (P3-F/G, P4-A through P4-G) already has open PRs
+(#387–#395) from the same prior session — working through them one at a time. 20 features shipped
+total.
 
 ---
 
@@ -28,7 +31,7 @@ The primary gaps now fall into five areas:
 1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched)
 2. **Live Shop-Floor / MES** — OEE now exists but is report/batch-based, not real-time; no IoT/sensor connectivity, no shop-floor TV mode, no operator data entry terminal
 3. **Multi-Company / Multi-Site** — still a single-entity model; no intercompany, no legal entity separation
-4. **Trading-Partner & Customer-Facing Integration** — no EDI, no customer/supplier self-service portals, no carrier-API shipment tracking, no e-commerce sync
+4. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
 5. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
@@ -154,11 +157,11 @@ The primary gaps now fall into five areas:
 | **Capable-to-Promise (CTP)** | ❌ | ✅ 6/10 |
 | **Price list management & tiered pricing** | ✅ Full (P1-E) — client-side SO auto-populate by tier | ✅ All |
 | **Discount & promotion management** | ❌ | ✅ All |
-| **Customer self-service portal** | ❌ | ✅ 7/10 |
-| **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ — WMS (P3-B) records carrier + tracking number manually at ship confirm; no carrier API lookup | ✅ 9/10 |
+| **Customer self-service portal** | ✅ Full (P3-C) — own orders/invoices/shipments/RMAs, invoice + packing-slip PDF, online payment; carrier tracking and Stripe payment are documented stubs (no real integration existed anywhere to build on) | ✅ 7/10 |
+| **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ — WMS (P3-B) records carrier + tracking number manually at ship confirm; the portal's tracking view (P3-C) is a deterministic stub, not a real carrier API | ✅ 9/10 |
 | **Multi-channel order integration (e-commerce)** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** CTP, discount/promotion management, customer portal, carrier API integration, e-commerce sync.
+**Priority gaps:** CTP, discount/promotion management, carrier API integration, e-commerce sync.
 
 ---
 
@@ -1027,6 +1030,7 @@ Real-time production visibility — Plex's core differentiator.
 | No Excel export (CSV only) | P1-G |
 | No landed cost allocation | P3-D |
 | No blanket orders & call-offs | P3-E |
+| No customer self-service portal | P3-C |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1046,7 +1050,7 @@ Real-time production visibility — Plex's core differentiator.
 | No AI / predictive analytics | Very High (P4-A, P4-B) |
 | No EDI | High (P4-D) |
 | No live shop-floor / IoT integration | Very High (P3-G, P4-B) |
-| No customer or supplier portals | High (P3-C) |
+| No supplier self-service portal | High |
 | No carrier API / e-commerce integration | Medium–High (P4-E) |
 | No CTP | High (P4-C) |
 
@@ -1061,7 +1065,7 @@ Real-time production visibility — Plex's core differentiator.
 | Inventory | 7/10 | 6/10 | ▲ (cycle count + WMS bins; still no FIFO/LIFO or transfers) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs) |
-| Sales / CRM | 8/10 | 7/10 | ▲ (ATP + price lists) |
+| Sales / CRM | 9/10 | 7/10 | ▲▲ (ATP + price lists + customer portal) |
 | Finance / GL | 9/10 | 8/10 | ▲ (cash flow statement/forecast) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
@@ -1071,34 +1075,27 @@ Real-time production visibility — Plex's core differentiator.
 | Reporting / Analytics | 8/10 | 7/10 | ▲▲▲ (charts, CSV+Excel export, OEE reports, digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.4/10** | **7.3/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.5/10** | **7.3/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
 ## Section 5: Next 10 Features to Build (Ordered by ROI)
 
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
-cost allocation (P3-D), and blanket POs/call-offs (P3-E). Ranked from what's left on the roadmap
-(P3-C, P3-F, P3-G, P4-A through P4-G), by business impact vs. build effort:
+cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
+
+**Status update (2026-07-08):** the remaining roadmap — P3-F, P3-G, and all of P4-A through P4-G —
+turned out to already have open PRs from a prior session (#387–#395), discovered while working
+through this list. Being merged one at a time (rebase onto current `main`, verify, fix any
+cross-PR conflicts, confirm before merging) rather than re-built. Once that pass completes, only
+these will remain genuinely unbuilt:
 
 1. **True inter-warehouse transfers** (extends P3-B) — `wms_core.py` already has multiple
    warehouses/zones/bins; a transfer is "ship from bin A, receive into bin B" reusing
-   `_adjust_bin_stock`, no new subsystem needed.
-2. **Predictive maintenance trend alerts** (P4-B, narrow slice) — MTBF/MTTR already computed by
-   `maintenance_core`; alerting when time-since-last-failure crosses 0.8× MTBF is a query + a
-   dashboard badge, not a new ML system.
-3. **OEE Live Shop Floor Dashboard** (P3-G) — extends the P1-C/P3-A OEE work from
-   report/batch-based to a real-time operator entry + shift summary; biggest remaining visible gap
-   vs. Plex specifically.
-4. **Customer Self-Service Portal** (P3-C) — mirrors the ESS portal (P2-G) pattern already proven
-   in this codebase, applied to `customer`/`ar_invoice`/`shipment` instead of `people`.
-5. **FIFO / LIFO / Weighted Average costing** (extends Inventory) — every top-10 competitor has
+   `_adjust_bin_stock`, no new subsystem needed. No PR found for this one.
+2. **FIFO / LIFO / Weighted Average costing** (extends Inventory) — every top-10 competitor has
    this; currently `product` has no cost-layer concept at all, so this is a real schema addition,
-   not a query.
-6. **Multi-Company / Multi-Entity** (P3-F) — highest strategic value for reaching enterprise
-   parity, but touches GL/AP/AR/tax pervasively; sequence after the smaller finance items above.
-7. **Capable-to-Promise (CTP)** (P4-C) — natural extension of ATP (P2-B) + capacity check
-   (P3-A), now that both prerequisites exist.
+   not a query. No PR found for this one.
 
 ---
 
