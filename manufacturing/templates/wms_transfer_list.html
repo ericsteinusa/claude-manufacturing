@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block page_title %}Warehouse Transfers{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Bin Master</a>
+<a href="/wms/warehouses/" class="btn">Warehouses</a>
+{% if can_edit %}<a href="/wms/transfers/new/" class="btn btn-primary">+ New Transfer</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; }
+.chip { display:inline-block; padding:3px 13px; border-radius:20px; font-size:12px;
+    font-weight:bold; text-decoration:none; background:#334; color:#aad; border:2px solid #556; }
+.chip.active { border-color:white; color:white; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Warehouse Transfers</div>
+
+<div class="chip-row" style="margin-bottom:14px;">
+    <a href="/wms/transfers/" class="chip {% if not status %}active{% endif %}">All</a>
+    {% for s in transfer_statuses %}
+    <a href="/wms/transfers/?status={{ s }}" class="chip {% if status == s %}active{% endif %}">{{ s|title }}</a>
+    {% endfor %}
+</div>
+
+{% if transfers %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>Transfer #</th><th>From</th><th>To</th><th>Status</th><th>Created</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for t in transfers %}
+            <tr>
+                <td><a href="/wms/transfers/{{ t.id }}/">{{ t.transfer_number }}</a></td>
+                <td>{{ t.from_warehouse_code }}</td>
+                <td>{{ t.to_warehouse_code }}</td>
+                <td><span class="pill pill-{{ t.status }}">{{ t.status|title }}</span></td>
+                <td>{{ t.created_at }}</td>
+                <td><a href="/wms/transfers/{{ t.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No transfers{% if status %} with status "{{ status|title }}"{% endif %}.</div>
+{% endif %}
+</div>
+{% endblock %}

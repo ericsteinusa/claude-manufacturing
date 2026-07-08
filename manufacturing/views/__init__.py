@@ -494,10 +494,12 @@ WEB_LEAF_URLS = {
     ('production', 'ret_hist'):     '/prod/returns/',
     ('production', 'ret_rpts'):     '/prod/returns/reports/',
 
+    ('production', 'warehouses'):    '/wms/warehouses/',
     ('production', 'bin_master'):    '/wms/bins/',
     ('production', 'putaway_rules'): '/wms/putaway-rules/',
     ('production', 'pick_lists'):    '/wms/picks/',
     ('production', 'pack_station'):  '/wms/picks/?status=picked',
+    ('production', 'transfers'):     '/wms/transfers/',
     # Maintenance
     ('maintenance', 'predictive_maint'): '/predictive-maintenance/',
     ('maintenance', 'maint'): '/maint/',

@@ -17,6 +17,8 @@ from manufacturing.wms_core import (
     suggest_putaway_bin, receive_and_putaway, credit_unassigned_receipt,
     generate_pick_list, _resequence_pick_list, record_pick,
     add_carton_item, mark_pick_list_packed, confirm_shipment,
+    create_transfer, add_transfer_line, remove_transfer_line,
+    ship_transfer, receive_transfer_line, cancel_transfer,
 )
 
 
@@ -467,3 +469,244 @@ def test_next_sequence_carton_prefix():
         mock_date.today.return_value.year = 2026
         result = _next_sequence(conn, 'CTN-')
     assert result == 'CTN-2026-0010'
+
+
+def test_next_sequence_transfer_prefix():
+    conn = _conn(fetchall_results=[[{'num': 'TRF-2026-0002'}]])
+    with patch('manufacturing.wms_core.date') as mock_date:
+        mock_date.today.return_value.year = 2026
+        result = _next_sequence(conn, 'TRF-')
+    assert result == 'TRF-2026-0003'
+
+
+# ── inter-warehouse transfers ────────────────────────────────────────────────
+
+def test_create_transfer_raises_for_same_warehouse():
+    conn = _conn()
+    with pytest.raises(ValueError):
+        create_transfer(conn, from_warehouse_id=1, to_warehouse_id=1, created_by='eric')
+
+
+def test_create_transfer_raises_for_missing_warehouse():
+    conn = _conn(fetchone_results=[None])  # from_warehouse_id lookup fails
+    with pytest.raises(ValueError):
+        create_transfer(conn, from_warehouse_id=1, to_warehouse_id=2, created_by='eric')
+
+
+@patch('manufacturing.wms_core._next_sequence')
+def test_create_transfer_happy_path(mock_seq):
+    mock_seq.return_value = 'TRF-2026-0001'
+    conn = _conn(fetchone_results=[
+        {'id': 1},   # from_warehouse exists
+        {'id': 2},   # to_warehouse exists
+        {'id': 55},  # inserted transfer id
+    ])
+    transfer_id = create_transfer(conn, from_warehouse_id=1, to_warehouse_id=2, created_by='eric')
+    assert transfer_id == 55
+    insert_sql = conn.execute.call_args_list[-1][0][0]
+    assert 'INSERT INTO wms_transfer' in insert_sql
+
+
+def test_add_transfer_line_raises_for_nonpositive_qty():
+    conn = _conn()
+    with pytest.raises(ValueError):
+        add_transfer_line(conn, transfer_id=1, product_id=1, from_bin_id=1, qty=0)
+
+
+def test_add_transfer_line_raises_when_transfer_not_found():
+    conn = _conn(fetchone_results=[None])
+    with pytest.raises(ValueError):
+        add_transfer_line(conn, transfer_id=1, product_id=1, from_bin_id=1, qty=5)
+
+
+def test_add_transfer_line_raises_when_transfer_not_draft():
+    conn = _conn(fetchone_results=[{'status': 'in_transit', 'from_warehouse_id': 1}])
+    with pytest.raises(ValueError):
+        add_transfer_line(conn, transfer_id=1, product_id=1, from_bin_id=1, qty=5)
+
+
+def test_add_transfer_line_raises_when_bin_in_wrong_warehouse():
+    conn = _conn(fetchone_results=[
+        {'status': 'draft', 'from_warehouse_id': 1},
+        {'warehouse_id': 2},  # bin belongs to a different warehouse
+    ])
+    with pytest.raises(ValueError):
+        add_transfer_line(conn, transfer_id=1, product_id=1, from_bin_id=9, qty=5)
+
+
+def test_add_transfer_line_happy_path():
+    conn = _conn(fetchone_results=[
+        {'status': 'draft', 'from_warehouse_id': 1},
+        {'warehouse_id': 1},
+        {'id': 77},
+    ])
+    line_id = add_transfer_line(conn, transfer_id=1, product_id=3, from_bin_id=9, qty=5)
+    assert line_id == 77
+
+
+def test_remove_transfer_line_raises_when_not_found():
+    conn = _conn(fetchone_results=[None])
+    with pytest.raises(ValueError):
+        remove_transfer_line(conn, line_id=1)
+
+
+def test_remove_transfer_line_raises_once_shipped():
+    conn = _conn(fetchone_results=[{'transfer_status': 'in_transit'}])
+    with pytest.raises(ValueError):
+        remove_transfer_line(conn, line_id=1)
+
+
+def test_remove_transfer_line_happy_path():
+    conn = _conn(fetchone_results=[{'transfer_status': 'draft'}])
+    remove_transfer_line(conn, line_id=1)
+    delete_sql = conn.execute.call_args_list[-1][0][0]
+    assert 'DELETE FROM wms_transfer_line' in delete_sql
+
+
+@patch('manufacturing.wms_core.get_transfer_lines')
+@patch('manufacturing.wms_core.get_transfer')
+def test_ship_transfer_raises_when_not_found(mock_get_transfer, mock_get_lines):
+    mock_get_transfer.return_value = None
+    conn = _conn()
+    with pytest.raises(ValueError):
+        ship_transfer(conn, transfer_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_transfer_lines')
+@patch('manufacturing.wms_core.get_transfer')
+def test_ship_transfer_raises_when_not_draft(mock_get_transfer, mock_get_lines):
+    mock_get_transfer.return_value = {'id': 1, 'status': 'in_transit'}
+    conn = _conn()
+    with pytest.raises(ValueError):
+        ship_transfer(conn, transfer_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_transfer_lines')
+@patch('manufacturing.wms_core.get_transfer')
+def test_ship_transfer_raises_when_no_lines(mock_get_transfer, mock_get_lines):
+    mock_get_transfer.return_value = {'id': 1, 'status': 'draft'}
+    mock_get_lines.return_value = []
+    conn = _conn()
+    with pytest.raises(ValueError):
+        ship_transfer(conn, transfer_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+@patch('manufacturing.wms_core.get_transfer_lines')
+@patch('manufacturing.wms_core.get_transfer')
+def test_ship_transfer_happy_path(mock_get_transfer, mock_get_lines, mock_adjust):
+    mock_get_transfer.return_value = {'id': 1, 'status': 'draft'}
+    mock_get_lines.return_value = [
+        {'id': 10, 'from_bin_id': 3, 'product_id': 7, 'qty': 5},
+        {'id': 11, 'from_bin_id': 4, 'product_id': 8, 'qty': 2},
+    ]
+    conn = _conn()
+    ship_transfer(conn, transfer_id=1, created_by='eric')
+
+    assert mock_adjust.call_args_list == [
+        ((conn, 3, 7, -5),), ((conn, 4, 8, -2),),
+    ]
+    line_updates = [c for c in conn.execute.call_args_list
+                    if 'wms_transfer_line SET status' in c[0][0]]
+    assert len(line_updates) == 2
+    transfer_updates = [c for c in conn.execute.call_args_list
+                       if "wms_transfer SET status = 'in_transit'" in c[0][0]]
+    assert len(transfer_updates) == 1
+    assert transfer_updates[0][0][1] == ('eric', 1)
+
+
+def test_ship_transfer_propagates_insufficient_stock():
+    """_adjust_bin_stock's own negative-qty guard is the authoritative
+    check — ship_transfer doesn't re-validate qty itself, it just lets
+    that ValueError propagate."""
+    with patch('manufacturing.wms_core.get_transfer') as mock_get_transfer, \
+         patch('manufacturing.wms_core.get_transfer_lines') as mock_get_lines:
+        mock_get_transfer.return_value = {'id': 1, 'status': 'draft'}
+        mock_get_lines.return_value = [
+            {'id': 10, 'from_bin_id': 3, 'product_id': 7, 'qty': 500},
+        ]
+        conn = _conn(fetchone_results=[{'qty': 2}])  # only 2 tracked in the bin
+        with pytest.raises(ValueError):
+            ship_transfer(conn, transfer_id=1, created_by='eric')
+
+
+def test_receive_transfer_line_raises_when_not_found():
+    conn = _conn(fetchone_results=[None])
+    with pytest.raises(ValueError):
+        receive_transfer_line(conn, line_id=1, to_bin_id=5, created_by='eric')
+
+
+def test_receive_transfer_line_raises_when_not_in_transit():
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'transfer_id': 1, 'product_id': 7, 'qty': 5,
+         'status': 'pending', 'to_warehouse_id': 2},
+    ])
+    with pytest.raises(ValueError):
+        receive_transfer_line(conn, line_id=1, to_bin_id=5, created_by='eric')
+
+
+def test_receive_transfer_line_raises_when_bin_in_wrong_warehouse():
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'transfer_id': 1, 'product_id': 7, 'qty': 5,
+         'status': 'in_transit', 'to_warehouse_id': 2},
+        {'warehouse_id': 3},  # bin belongs to a different warehouse
+    ])
+    with pytest.raises(ValueError):
+        receive_transfer_line(conn, line_id=1, to_bin_id=5, created_by='eric')
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+def test_receive_transfer_line_completes_transfer_when_last_line(mock_adjust):
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'transfer_id': 9, 'product_id': 7, 'qty': 5,
+         'status': 'in_transit', 'to_warehouse_id': 2},
+        {'warehouse_id': 2},
+        {'n': 0},  # no lines left unreceived
+    ])
+    receive_transfer_line(conn, line_id=1, to_bin_id=5, created_by='eric')
+
+    mock_adjust.assert_called_once_with(conn, 5, 7, 5)
+    transfer_updates = [c for c in conn.execute.call_args_list
+                       if "wms_transfer SET status = 'completed'" in c[0][0]]
+    assert len(transfer_updates) == 1
+    assert transfer_updates[0][0][1] == ('eric', 9)
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+def test_receive_transfer_line_leaves_transfer_in_transit_when_lines_remain(mock_adjust):
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'transfer_id': 9, 'product_id': 7, 'qty': 5,
+         'status': 'in_transit', 'to_warehouse_id': 2},
+        {'warehouse_id': 2},
+        {'n': 1},  # one line still unreceived
+    ])
+    receive_transfer_line(conn, line_id=1, to_bin_id=5, created_by='eric')
+
+    transfer_updates = [c for c in conn.execute.call_args_list
+                       if "wms_transfer SET status = 'completed'" in c[0][0]]
+    assert len(transfer_updates) == 0
+
+
+def test_cancel_transfer_raises_when_not_found():
+    with patch('manufacturing.wms_core.get_transfer') as mock_get_transfer:
+        mock_get_transfer.return_value = None
+        conn = _conn()
+        with pytest.raises(ValueError):
+            cancel_transfer(conn, transfer_id=1)
+
+
+def test_cancel_transfer_raises_once_shipped():
+    with patch('manufacturing.wms_core.get_transfer') as mock_get_transfer:
+        mock_get_transfer.return_value = {'id': 1, 'status': 'in_transit'}
+        conn = _conn()
+        with pytest.raises(ValueError):
+            cancel_transfer(conn, transfer_id=1)
+
+
+def test_cancel_transfer_happy_path():
+    with patch('manufacturing.wms_core.get_transfer') as mock_get_transfer:
+        mock_get_transfer.return_value = {'id': 1, 'status': 'draft'}
+        conn = _conn()
+        cancel_transfer(conn, transfer_id=1)
+        update_sql = conn.execute.call_args_list[-1][0][0]
+        assert "wms_transfer SET status = 'cancelled'" in update_sql

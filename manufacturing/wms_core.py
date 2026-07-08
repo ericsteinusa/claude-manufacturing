@@ -28,6 +28,14 @@ independently. This is enforced by routing all bin-qty writes through
 ``_adjust_bin_stock``, which is only ever called back-to-back with
 ``record_transaction`` inside ``receive_and_putaway`` / ``record_pick``.
 
+**Deliberate exception — inter-warehouse transfers** (``ship_transfer`` /
+``receive_transfer_line``): a transfer relocates stock from one bin to
+another without changing the company-wide total, so it calls
+``_adjust_bin_stock`` on both ends but never ``record_transaction`` — there
+is nothing to post to ``inventory_transaction``/``product.amount`` for a
+move that nets to zero. This is the one place the invariant above doesn't
+apply, by design.
+
 No big-bang migration for pre-existing stock: a lazily-created sentinel
 "unassigned" zone/bin (``get_or_create_unassigned_bin``) stands in for all
 ``product.amount`` that predates this feature or was never put away through
@@ -68,6 +76,8 @@ PUTAWAY_MATCH_TYPES = ('category', 'abc')
 PICK_LIST_STATUSES = ('open', 'picked', 'packed', 'shipped', 'cancelled')
 PICK_LINE_STATUSES = ('pending', 'picked', 'short')
 CARTON_STATUSES = ('open', 'closed', 'shipped')
+TRANSFER_STATUSES = ('draft', 'in_transit', 'completed', 'cancelled')
+TRANSFER_LINE_STATUSES = ('pending', 'in_transit', 'received')
 
 UNASSIGNED_WAREHOUSE_CODE = 'DEFAULT'
 UNASSIGNED_ZONE_CODE = 'UNASSIGNED'
@@ -194,6 +204,37 @@ def ensure_wms_tables(conn):
             qty REAL NOT NULL
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS wms_transfer (
+            id SERIAL PRIMARY KEY,
+            transfer_number TEXT NOT NULL UNIQUE,
+            from_warehouse_id INTEGER NOT NULL REFERENCES wms_warehouse(id),
+            to_warehouse_id INTEGER NOT NULL REFERENCES wms_warehouse(id),
+            status TEXT NOT NULL DEFAULT 'draft',
+            created_by TEXT DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            shipped_by TEXT DEFAULT '',
+            shipped_at TIMESTAMPTZ,
+            received_by TEXT DEFAULT '',
+            received_at TIMESTAMPTZ,
+            notes TEXT DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS wms_transfer_line (
+            id SERIAL PRIMARY KEY,
+            transfer_id INTEGER NOT NULL REFERENCES wms_transfer(id),
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            from_bin_id INTEGER NOT NULL REFERENCES wms_bin(id),
+            to_bin_id INTEGER REFERENCES wms_bin(id),
+            qty REAL NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending'
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS wms_transfer_line_transfer "
+        "ON wms_transfer_line(transfer_id)"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -376,6 +417,24 @@ def get_product_bin_stock(conn, product_id):
         "FROM wms_bin_stock s JOIN wms_bin b ON b.id = s.bin_id "
         "WHERE s.product_id = %s AND s.qty > 0 ORDER BY s.qty DESC",
         (product_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_warehouse_stock(conn, warehouse_id):
+    """[{bin_id, full_code, product_id, product_name, qty}] for every
+    tracked (bin, product) with qty > 0 anywhere in a warehouse — what's
+    actually available to move out of it, used to populate the transfer
+    "add line" picker."""
+    rows = conn.execute(
+        "SELECT s.bin_id, b.full_code, s.product_id, p.name AS product_name, s.qty "
+        "FROM wms_bin_stock s "
+        "JOIN wms_bin b ON b.id = s.bin_id "
+        "JOIN wms_zone z ON z.id = b.zone_id "
+        "JOIN product p ON p.id = s.product_id "
+        "WHERE z.warehouse_id = %s AND s.qty > 0 "
+        "ORDER BY p.name, b.full_code",
+        (warehouse_id,),
     ).fetchall()
     return [dict(r) for r in rows]
 
@@ -586,6 +645,7 @@ def list_confirmed_sos_awaiting_pick(conn):
 _SEQUENCE_TABLES = {
     'PICK-': ('wms_pick_list', 'pick_number'),
     'CTN-': ('wms_carton', 'carton_number'),
+    'TRF-': ('wms_transfer', 'transfer_number'),
 }
 
 
@@ -915,3 +975,221 @@ def confirm_shipment(conn, pick_list_id, carrier, tracking_number, ship_date, cr
         set_so_status(conn, pick_list['so_id'], 'shipped')
 
     return shipment_id
+
+
+# ---------------------------------------------------------------------------
+# Inter-warehouse transfers
+# ---------------------------------------------------------------------------
+#
+# A transfer relocates stock from a bin in one warehouse to a bin in another
+# — draft (being built) -> in_transit (shipped, stock left the source bin
+# but hasn't landed anywhere yet) -> completed (every line received). The
+# destination bin per line is chosen at receive time, not when the line is
+# added, since the receiving warehouse may reorganize bins in the time it
+# takes goods to actually arrive. See the module docstring's "Deliberate
+# exception" note for why this never touches product.amount.
+
+def list_transfers(conn, status=None):
+    conds, params = [], []
+    if status:
+        conds.append("t.status = %s")
+        params.append(status)
+    sql = (
+        "SELECT t.*, wf.code AS from_warehouse_code, wt.code AS to_warehouse_code "
+        "FROM wms_transfer t "
+        "JOIN wms_warehouse wf ON wf.id = t.from_warehouse_id "
+        "JOIN wms_warehouse wt ON wt.id = t.to_warehouse_id"
+    )
+    if conds:
+        sql += " WHERE " + " AND ".join(conds)
+    sql += " ORDER BY t.created_at DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_transfer(conn, transfer_id):
+    row = conn.execute(
+        "SELECT t.*, wf.code AS from_warehouse_code, wt.code AS to_warehouse_code "
+        "FROM wms_transfer t "
+        "JOIN wms_warehouse wf ON wf.id = t.from_warehouse_id "
+        "JOIN wms_warehouse wt ON wt.id = t.to_warehouse_id "
+        "WHERE t.id = %s",
+        (transfer_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def get_transfer_lines(conn, transfer_id):
+    rows = conn.execute(
+        "SELECT l.*, p.name AS product_name, "
+        "fb.full_code AS from_bin_full_code, tb.full_code AS to_bin_full_code "
+        "FROM wms_transfer_line l "
+        "JOIN product p ON p.id = l.product_id "
+        "JOIN wms_bin fb ON fb.id = l.from_bin_id "
+        "LEFT JOIN wms_bin tb ON tb.id = l.to_bin_id "
+        "WHERE l.transfer_id = %s ORDER BY l.id",
+        (transfer_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def create_transfer(conn, from_warehouse_id, to_warehouse_id, created_by, notes=''):
+    """Create a draft transfer between two distinct warehouses. Does not
+    commit. Raises ValueError if the warehouses are the same or either
+    doesn't exist."""
+    if from_warehouse_id == to_warehouse_id:
+        raise ValueError("Source and destination warehouses must differ")
+    for wh_id, label in ((from_warehouse_id, 'from'), (to_warehouse_id, 'to')):
+        row = conn.execute(
+            "SELECT id FROM wms_warehouse WHERE id = %s", (wh_id,),
+        ).fetchone()
+        if not row:
+            raise ValueError(f"{label}_warehouse_id {wh_id} not found")
+    transfer_number = _next_sequence(conn, 'TRF-')
+    row = conn.execute(
+        "INSERT INTO wms_transfer "
+        "(transfer_number, from_warehouse_id, to_warehouse_id, created_by, notes) "
+        "VALUES (%s,%s,%s,%s,%s) RETURNING id",
+        (transfer_number, from_warehouse_id, to_warehouse_id, created_by, notes.strip()),
+    ).fetchone()
+    return row['id']
+
+
+def add_transfer_line(conn, transfer_id, product_id, from_bin_id, qty):
+    """Add a line to a draft transfer: qty of product_id to move out of
+    from_bin_id, which must belong to the transfer's source warehouse.
+    Does not validate qty against the bin's tracked stock here — that's
+    enforced authoritatively by _adjust_bin_stock at ship time, since stock
+    in the bin can still change between adding a line and shipping. Does
+    not commit. Raises ValueError if the transfer isn't a draft, qty isn't
+    positive, or from_bin_id isn't in the source warehouse."""
+    if qty <= 0:
+        raise ValueError("qty must be positive")
+    transfer = conn.execute(
+        "SELECT status, from_warehouse_id FROM wms_transfer WHERE id = %s",
+        (transfer_id,),
+    ).fetchone()
+    if not transfer:
+        raise ValueError(f"Transfer {transfer_id} not found")
+    if transfer['status'] != 'draft':
+        raise ValueError(f"Transfer {transfer_id} is not draft (status={transfer['status']})")
+    bin_row = conn.execute(
+        "SELECT z.warehouse_id FROM wms_bin b JOIN wms_zone z ON z.id = b.zone_id WHERE b.id = %s",
+        (from_bin_id,),
+    ).fetchone()
+    if not bin_row:
+        raise ValueError(f"Bin {from_bin_id} not found")
+    if bin_row['warehouse_id'] != transfer['from_warehouse_id']:
+        raise ValueError("from_bin_id does not belong to the transfer's source warehouse")
+    row = conn.execute(
+        "INSERT INTO wms_transfer_line (transfer_id, product_id, from_bin_id, qty) "
+        "VALUES (%s,%s,%s,%s) RETURNING id",
+        (transfer_id, product_id, from_bin_id, qty),
+    ).fetchone()
+    return row['id']
+
+
+def remove_transfer_line(conn, line_id):
+    """Remove a line from a transfer that hasn't shipped yet. Does not
+    commit. Raises ValueError if the line doesn't exist or its transfer has
+    already shipped."""
+    line = conn.execute(
+        "SELECT t.status AS transfer_status FROM wms_transfer_line l "
+        "JOIN wms_transfer t ON t.id = l.transfer_id WHERE l.id = %s",
+        (line_id,),
+    ).fetchone()
+    if not line:
+        raise ValueError(f"Transfer line {line_id} not found")
+    if line['transfer_status'] != 'draft':
+        raise ValueError("Cannot remove a line once the transfer has shipped")
+    conn.execute("DELETE FROM wms_transfer_line WHERE id = %s", (line_id,))
+
+
+def ship_transfer(conn, transfer_id, created_by):
+    """Ship a draft transfer: decrements each line's source bin (raising
+    ValueError via _adjust_bin_stock if that bin doesn't have enough
+    tracked stock) and advances every line and the transfer itself to
+    'in_transit'. Deliberately does not touch product.amount — see the
+    module docstring's "Deliberate exception" note; a transfer's net effect
+    on the company-wide total is zero. Does not commit. Raises ValueError
+    if the transfer isn't a draft or has no lines."""
+    transfer = get_transfer(conn, transfer_id)
+    if not transfer:
+        raise ValueError(f"Transfer {transfer_id} not found")
+    if transfer['status'] != 'draft':
+        raise ValueError(f"Transfer {transfer_id} is not draft (status={transfer['status']})")
+    lines = get_transfer_lines(conn, transfer_id)
+    if not lines:
+        raise ValueError(f"Transfer {transfer_id} has no lines to ship")
+    for line in lines:
+        _adjust_bin_stock(conn, line['from_bin_id'], line['product_id'], -line['qty'])
+        conn.execute(
+            "UPDATE wms_transfer_line SET status = 'in_transit' WHERE id = %s",
+            (line['id'],),
+        )
+    conn.execute(
+        "UPDATE wms_transfer SET status = 'in_transit', shipped_by = %s, shipped_at = NOW() "
+        "WHERE id = %s",
+        (created_by, transfer_id),
+    )
+
+
+def receive_transfer_line(conn, line_id, to_bin_id, created_by):
+    """Receive one in-transit transfer line into to_bin_id, which must
+    belong to the transfer's destination warehouse. Credits the
+    destination bin via _adjust_bin_stock (again, never product.amount —
+    see module docstring). Once every line on the transfer is received,
+    advances the transfer itself to 'completed'. Does not commit. Raises
+    ValueError if the line isn't in_transit or to_bin_id is in the wrong
+    warehouse."""
+    line = conn.execute(
+        "SELECT l.*, t.to_warehouse_id FROM wms_transfer_line l "
+        "JOIN wms_transfer t ON t.id = l.transfer_id WHERE l.id = %s",
+        (line_id,),
+    ).fetchone()
+    if not line:
+        raise ValueError(f"Transfer line {line_id} not found")
+    if line['status'] != 'in_transit':
+        raise ValueError(f"Transfer line {line_id} is not in transit (status={line['status']})")
+    bin_row = conn.execute(
+        "SELECT z.warehouse_id FROM wms_bin b JOIN wms_zone z ON z.id = b.zone_id WHERE b.id = %s",
+        (to_bin_id,),
+    ).fetchone()
+    if not bin_row:
+        raise ValueError(f"Bin {to_bin_id} not found")
+    if bin_row['warehouse_id'] != line['to_warehouse_id']:
+        raise ValueError("to_bin_id does not belong to the transfer's destination warehouse")
+
+    _adjust_bin_stock(conn, to_bin_id, line['product_id'], line['qty'])
+    conn.execute(
+        "UPDATE wms_transfer_line SET to_bin_id = %s, status = 'received' WHERE id = %s",
+        (to_bin_id, line_id),
+    )
+
+    remaining = conn.execute(
+        "SELECT COUNT(*) AS n FROM wms_transfer_line "
+        "WHERE transfer_id = %s AND status != 'received'",
+        (line['transfer_id'],),
+    ).fetchone()['n']
+    if remaining == 0:
+        conn.execute(
+            "UPDATE wms_transfer SET status = 'completed', received_by = %s, received_at = NOW() "
+            "WHERE id = %s",
+            (created_by, line['transfer_id']),
+        )
+
+
+def cancel_transfer(conn, transfer_id):
+    """Cancel a transfer that hasn't shipped yet. Does not commit. Raises
+    ValueError if the transfer doesn't exist or has already shipped —
+    reversing an in-transit transfer would itself be a transfer back to
+    the source, which is out of scope here; create one separately once the
+    original is received."""
+    transfer = get_transfer(conn, transfer_id)
+    if not transfer:
+        raise ValueError(f"Transfer {transfer_id} not found")
+    if transfer['status'] != 'draft':
+        raise ValueError(
+            f"Cannot cancel transfer {transfer_id} — status is "
+            f"{transfer['status']}, not draft"
+        )
+    conn.execute("UPDATE wms_transfer SET status = 'cancelled' WHERE id = %s", (transfer_id,))

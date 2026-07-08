@@ -430,10 +430,12 @@ _SHIP_MENU = {
         ('wms', 'Warehouse Management', {
             'title': 'Warehouse Management',
             'items': [
+                ('warehouses', 'Warehouses', 'production/prod_ship_dept.py'),
                 ('bin_master', 'Bin Master', 'production/prod_ship_dept.py'),
                 ('putaway_rules', 'Put-Away Rules', 'production/prod_ship_dept.py'),
                 ('pick_lists', 'Pick Lists', 'production/prod_ship_dept.py'),
                 ('pack_station', 'Pack Station', 'production/prod_ship_dept.py'),
+                ('transfers', 'Warehouse Transfers', 'production/prod_ship_dept.py'),
             ],
         }),
     ],

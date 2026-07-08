@@ -17,9 +17,12 @@ Forecasting), P4-B (Predictive Maintenance), P4-C (Capable-to-Promise), P4-D (ED
 P4-E (e-Commerce Integration), P4-F (Custom Report Builder), and P4-G (Sustainability / Carbon
 Cost Tracking), merged from thirteen separate PRs (#398, #382, #386, #381, #387, #388, #389,
 #390, #391, #392, #393, #394, #395) that a prior session had built and left open. **This closes
-out every numbered item (P1–P4) in this roadmap.** 29 features shipped total. Only two gaps
-discovered along the way (true inter-warehouse transfers, FIFO/LIFO/weighted-average costing —
-see Section 5) remain genuinely unbuilt, with no open PR found for either.
+out every numbered item (P1–P4) in this roadmap.** 29 features shipped total.
+
+**2026-07-08, still later:** Shipped P3-H (True Inter-Warehouse Transfers), the first of the two
+gaps discovered while working the list above that had no prior PR — built fresh this session
+rather than merged from an existing branch. 30 features shipped total. Only one gap remains
+genuinely unbuilt: FIFO/LIFO/weighted-average costing (see Section 5).
 
 ---
 
@@ -33,14 +36,15 @@ export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
 The remaining gaps are now narrow and mostly either connectivity-to-a-real-external-system items
 (no live AS2/VAN/SFTP EDI transport, no live storefront, no real carrier API, no supplier portal)
-or two supply-chain costing items with no PR ever built for them:
+or a single supply-chain costing item with no PR ever built for it:
 1. **Real external connectivity** — EDI (P4-D), e-commerce sync (P4-E), and predictive maintenance
    (P4-B) all ship with real logic but honestly-scoped stubs where this environment has no live
    external system to connect to (file upload/download instead of AS2/VAN/SFTP, config-gated HTTP
    POST instead of a live Shopify/WooCommerce store, manual sensor entry instead of IoT hardware);
    no supplier self-service portal, no real carrier-API shipment tracking, no broader embedded-AI
    analytics platform beyond demand forecasting and predictive maintenance
-2. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
+2. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation (true inter-warehouse
+   transfers shipped as P3-H)
 
 ---
 
@@ -84,7 +88,7 @@ or two supply-chain costing items with no PR ever built for them:
 | Low stock alerts | ✅ | ✅ All |
 | ABC analysis | ✅ Partial | ✅ 9/10 |
 | **FIFO / LIFO / Weighted Average Cost valuation** | ❌ | ✅ All |
-| **True multi-warehouse with transfers** | ✅ Partial (P3-B) — multiple warehouses/zones/bins now exist, but nothing moves stock *between* warehouses | ✅ All |
+| **True multi-warehouse with transfers** | ✅ Full (P3-B, P3-H) — multiple warehouses/zones/bins (P3-B) plus a draft→in_transit→completed transfer workflow that actually relocates stock between them (P3-H) | ✅ All |
 | **Warehouse Management System (WMS)** | ✅ Full (P3-B) | ✅ 9/10 |
 | **Pick / Pack / Ship automation** | ✅ Full (P3-B) | ✅ 9/10 |
 | **Cycle count structured workflow** | ✅ Full (P1-D) | ✅ All |
@@ -94,7 +98,7 @@ or two supply-chain costing items with no PR ever built for them:
 | **RFID integration** | ❌ | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** FIFO/LIFO/weighted-average costing, true inter-warehouse transfers, consignment inventory, cross-docking, wave picking, RFID.
+**Priority gaps:** FIFO/LIFO/weighted-average costing, consignment inventory, cross-docking, wave picking, RFID.
 
 ---
 
@@ -1057,6 +1061,48 @@ Real-time production visibility — Plex's core differentiator.
   entries), confirmed the TV page renders standalone with no app chrome,
   and cleaned up all test data afterward.
 
+#### P3-H: True Inter-Warehouse Transfers ✅ Done
+Extends P3-B (WMS): multiple warehouses/zones/bins already existed, but nothing moved stock
+*between* warehouses — this closes that gap.
+- Draft a transfer between two distinct warehouses, add line items (product + source bin + qty)
+- Ship: decrements each line's source bin
+- Receive: credits a chosen destination bin per line; transfer completes once every line lands
+- Cancel a transfer before it ships
+- **Shipped:** New functions directly in `wms_core.py` (`wms_transfer`/`wms_transfer_line` tables)
+  rather than a separate module — a transfer reuses the same `_adjust_bin_stock` primitive that
+  every other bin-quantity change in this file goes through, so it belongs alongside it, not
+  behind an import boundary. **The one deliberate break from this file's own central invariant**
+  (every `_adjust_bin_stock` call is normally paired with `inventory_core.record_transaction`):
+  a transfer relocates stock, it doesn't change the company-wide total, so `ship_transfer`/
+  `receive_transfer_line` call `_adjust_bin_stock` on each end and *never* `record_transaction` —
+  there's nothing to post to `inventory_transaction`/`product.amount` for a move that nets to
+  zero. Verified this exact property end-to-end (see below). Status flow is
+  `draft → in_transit → completed` at the transfer level and `pending → in_transit → received`
+  per line; the destination bin is chosen at receive time, not when the line is added, since the
+  receiving warehouse may reorganize bins in however long the goods take to actually arrive.
+  Shipping decrements every line's source bin via the existing `_adjust_bin_stock` negative-qty
+  guard as the sole authoritative availability check — no separate qty validation is duplicated
+  in `add_transfer_line`. Cancellation is only legal while `draft`; reversing an already-shipped
+  transfer is explicitly out of scope (that's a transfer back to the source, created separately
+  once the original lands). **Found and fixed a real, pre-existing gap while building this**:
+  there was no web UI anywhere to create a second warehouse or assign a zone to one — every zone
+  creation call was hardcoded to `get_or_create_default_warehouse`, so the "multiple warehouses"
+  P3-B credited itself with had no path to actually exist in practice. Added a `/wms/warehouses/`
+  list+create page and a warehouse picker on the zone-creation form (`wms_bin_new.html`) as a
+  prerequisite for this feature to be testable at all. New pages at `/wms/transfers/` (list +
+  status filter), `/wms/transfers/new/`, and `/wms/transfers/<id>/` (line management, ship,
+  per-line receive, cancel), wired into a new "Warehouses" + "Warehouse Transfers" pair of leaves
+  on the existing WMS submenu. Verified end-to-end against a running dev server + local Postgres
+  through the actual web views (not just unit tests): created two real warehouses and a bin in
+  each, seeded 20 tracked units of a real product into the source bin, created a transfer and
+  added an 8-unit line, shipped it and confirmed the source bin dropped to 12 while
+  `product.amount` was **exactly unchanged** (the invariant this feature deliberately breaks from
+  the module's default), received the line into the destination bin and confirmed it landed at 8
+  with `product.amount` still unchanged and the transfer auto-completing with `received_by`
+  stamped, confirmed a second transfer cancels correctly while still a draft, and confirmed
+  attempting to ship more than a bin actually holds surfaces a real "only N tracked there" error
+  banner through the web view rather than silently succeeding.
+
 ---
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
@@ -1447,13 +1493,13 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No e-commerce (Shopify/WooCommerce) integration | P4-E |
 | No self-service report builder | P4-F |
 | No sustainability / carbon cost tracking | P4-G |
+| No true inter-warehouse transfers | P3-H |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
 | Gap | Effort to Close |
 |---|---|
 | No FIFO/LIFO/weighted-average valuation | Medium |
-| No true inter-warehouse transfers | Low–Medium |
 | No consignment / cross-docking / wave picking / RFID | Medium |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
@@ -1475,7 +1521,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 |---|---|---|---|
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
-| Inventory | 7/10 | 6/10 | ▲ (cycle count + WMS bins; still no FIFO/LIFO or transfers) |
+| Inventory | 8/10 | 7/10 | ▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H); still no FIFO/LIFO) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
@@ -1488,7 +1534,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.8/10** | **8.2/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.9/10** | **8.3/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1501,13 +1547,11 @@ cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-serv
 the last batch (P3-F through P4-G) turned out to already have open PRs from a prior session
 (#387–#395), discovered while working through this list, and were merged one at a time (rebase
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
-re-built. Only these two remain genuinely unbuilt, discovered along the way with no PR ever
-opened for either:
+re-built. True inter-warehouse transfers (P3-H) — one of the two gaps discovered along the way
+with no PR ever opened for it — has since been built fresh and shipped. Only one item remains
+genuinely unbuilt:
 
-1. **True inter-warehouse transfers** (extends P3-B) — `wms_core.py` already has multiple
-   warehouses/zones/bins; a transfer is "ship from bin A, receive into bin B" reusing
-   `_adjust_bin_stock`, no new subsystem needed. No PR found for this one.
-2. **FIFO / LIFO / Weighted Average costing** (extends Inventory) — every top-10 competitor has
+1. **FIFO / LIFO / Weighted Average costing** (extends Inventory) — every top-10 competitor has
    this; currently `product` has no cost-layer concept at all, so this is a real schema addition,
    not a query. No PR found for this one.
 

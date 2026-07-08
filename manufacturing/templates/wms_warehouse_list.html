@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_title %}Warehouses{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/bins/" class="btn">Bin Master</a>
+<a href="/wms/transfers/" class="btn">Transfers</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">Warehouses</div>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+{% if can_edit %}
+<form method="post" class="card" style="padding:16px;max-width:420px;margin-bottom:20px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create">
+    <h3 style="margin-top:0;">New Warehouse</h3>
+    <label>Code<br><input type="text" name="code" required></label><br><br>
+    <label>Name<br><input type="text" name="name"></label><br><br>
+    <button type="submit" class="btn btn-primary">Create Warehouse</button>
+</form>
+{% endif %}
+
+{% if warehouses %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>Code</th><th>Name</th><th>Zones</th><th>Status</th></tr></thead>
+        <tbody>
+            {% for wh in warehouses %}
+            <tr>
+                <td>{{ wh.code }}</td>
+                <td>{{ wh.name|default:"—" }}</td>
+                <td>{{ wh.zone_count }}</td>
+                <td>{% if wh.is_active %}<span class="pill pill-active">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No warehouses yet.</div>
+{% endif %}
+</div>
+{% endblock %}
