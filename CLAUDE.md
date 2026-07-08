@@ -149,8 +149,13 @@ To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
   live columns may differ from the DDL string. Seen in practice:
   `product.supplier_id` is **integer** (not the TEXT the DDL declares) and
   `amount`/`reorder_point` are **real**; the `bom` table pre-existed as a flat
-  `bom(product_id, component_id, qty_required, unit, notes)`. **Check
-  `information_schema.columns` before assuming a column's type.**
+  `bom(product_id, component_id, qty_required, unit, notes)`; `ap_invoice.due_date`
+  is **NOT NULL** live even though `accounting_core.create_ap_invoice`'s own
+  signature treats it as optional (`due_date or None`) — every pre-existing
+  caller happens to always supply a real date from a form field, so this only
+  surfaced when `consignment_core.py` tried passing `None` for an
+  auto-generated invoice. **Check `information_schema.columns` before assuming
+  a column's type or nullability.**
 - **Batch number generation.** The `_next_wo_num()` / `_next_req_num()` helpers
   compute the next `WO-<yr>-NNNN` / `REQ-<yr>-NNNN` via `COUNT(*)` on **their
   own fresh connection**. That collides when creating **several rows in one

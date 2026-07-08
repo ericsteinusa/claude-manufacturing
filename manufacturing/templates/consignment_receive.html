@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block page_title %}Receive Stock — {{ agreement.agreement_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consignment/{{ agreement.id }}/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Receive Stock — {{ agreement.agreement_number }}</div>
+    <p style="font-size:12px;color:var(--text-muted);max-width:600px;">
+        Vendor-owned stock arriving. This does not touch product.amount —
+        it isn't ours until it's used (see "Record Usage").
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="erp-form">
+        <div class="card">
+            <p style="font-size:13px;color:#555;margin-bottom:14px;">
+                Currently on hand (vendor-owned): <b>{{ agreement.on_hand_qty|floatformat:2 }}</b>
+                {{ agreement.product_name }}
+            </p>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Qty Received</label>
+                    <input type="number" name="qty" min="0" step="any" value="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Reference</label>
+                    <input type="text" name="reference" placeholder="Vendor shipment #, packing slip, etc.">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Receive Stock</button>
+                    <a href="/consignment/{{ agreement.id }}/" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

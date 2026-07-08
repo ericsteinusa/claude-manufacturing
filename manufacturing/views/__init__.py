@@ -243,6 +243,7 @@ from ._ecommerce import *  # noqa: F401,F403
 from ._report_builder import *  # noqa: F401,F403
 from ._carbon import *  # noqa: F401,F403
 from ._costing_layers import *  # noqa: F401,F403
+from ._consignment import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block page_title %}New Consignment Agreement{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consignment/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">New Consignment Agreement</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="erp-form">
+        <div class="card">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Supplier</label>
+                    <select name="supplier_id">
+                        <option value="">(none)</option>
+                        {% for s in suppliers %}
+                        <option value="{{ s.id }}">{{ s.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Product</label>
+                    <select name="product_id" required>
+                        <option value="">(select a product)</option>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Unit Cost (owed to vendor per unit used)</label>
+                    <input type="number" name="unit_cost" min="0" step="0.01" value="0.00" required>
+                </div>
+                <div class="form-row">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div class="form-row">
+                    <label>End Date</label>
+                    <input type="date" name="end_date">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Create Agreement</button>
+                    <a href="/consignment/" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
