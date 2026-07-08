@@ -1147,6 +1147,7 @@ MENU_TREE = {
                 ],
             }),
             ('maint', 'Maintenance', _MAINT_MENU),
+            ('predictive_maint', 'Predictive Maintenance', 'maintenance/Maint_mgr_menu.py'),
         ],
     },
     'marketing': {

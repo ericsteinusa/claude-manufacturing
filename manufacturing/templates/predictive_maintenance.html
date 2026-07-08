@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block page_title %}Predictive Maintenance{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/" class="btn">Maintenance Dashboard</a>
+{% if can_edit %}
+<a href="/predictive-maintenance/sensor-reading/new/" class="btn">Log Sensor Reading</a>
+<a href="/predictive-maintenance/sensor-threshold/" class="btn">Set Thresholds</a>
+{% endif %}
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:20px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; }
+.pill-risk { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; font-weight:bold; }
+.pill-risk.low { background:#d1e7dd; color:#0a3622; }
+.pill-risk.medium { background:#fff3cd; color:#7a5b00; }
+.pill-risk.high { background:#f8d7da; color:#842029; }
+.pill-risk.unknown { background:#f3f4f6; color:#6b7280; }
+.pill-sensor { display:inline-block; padding:1px 8px; border-radius:8px; font-size:11px; font-weight:bold; margin-right:4px; }
+.pill-sensor.ok { background:#d1e7dd; color:#0a3622; }
+.pill-sensor.warning { background:#fff3cd; color:#7a5b00; }
+.pill-sensor.critical { background:#f8d7da; color:#842029; }
+.pill-sensor.no_threshold, .pill-sensor.no_reading { background:#f3f4f6; color:#6b7280; }
+.approach-flag { color:#c62828; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Predictive Maintenance</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
+        Rolling MTBF is computed from the actual gaps between 'Breakdown' downtime events
+        (not the period-aggregate MTBF on the <a href="/maint/oee/">OEE report</a>).
+        Failure probability uses an exponential/Poisson-process approximation from the mean interval.
+    </p>
+
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>Equipment</th>
+                <th class="num">Failures</th>
+                <th class="num">MTBF (days)</th>
+                <th>Last Failure</th>
+                <th class="num">Days Since</th>
+                <th class="num">Alert Threshold</th>
+                <th class="num">30-Day Risk</th>
+                <th>Risk Level</th>
+                <th>Sensor Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in report %}
+        <tr>
+            <td><strong>{{ row.equipment }}</strong></td>
+            <td class="num">{{ row.failure_count }}</td>
+            <td class="num">{% if row.mtbf_days %}{{ row.mtbf_days }}{% else %}<span style="color:#999;">insufficient data</span>{% endif %}</td>
+            <td>{{ row.last_failure_date|default:"—" }}</td>
+            <td class="num">
+                {% if row.days_since_last_failure is not None %}
+                    {% if row.approaching_threshold %}<span class="approach-flag">{{ row.days_since_last_failure }}</span>
+                    {% else %}{{ row.days_since_last_failure }}{% endif %}
+                {% else %}—{% endif %}
+            </td>
+            <td class="num">{% if row.threshold_days %}{{ row.threshold_days }}{% else %}—{% endif %}</td>
+            <td class="num">{% if row.failure_probability_30d is not None %}{{ row.failure_probability_30d|floatformat:1 }}%{% else %}—{% endif %}</td>
+            <td><span class="pill-risk {{ row.risk_level }}">{{ row.risk_level|capfirst }}</span></td>
+            <td>
+                {% for s in row.sensor_statuses %}
+                <span class="pill-sensor {{ s }}">{{ s }}</span>
+                {% empty %}<span style="color:#999;">—</span>{% endfor %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No operational equipment found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 style="font-size:15px;margin-bottom:10px;">Sensor Readings</h3>
+    <table class="list-table">
+        <thead>
+            <tr>
+                <th>Equipment</th>
+                <th>Reading Type</th>
+                <th class="num">Latest Value</th>
+                <th class="num">Warning ≥</th>
+                <th class="num">Critical ≥</th>
+                <th>Recorded</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for a in sensor_alerts %}
+        <tr>
+            <td>{{ a.equipment }}</td>
+            <td>{{ a.reading_type|capfirst }}</td>
+            <td class="num">{% if a.value is not None %}{{ a.value }}{% else %}—{% endif %}</td>
+            <td class="num">{{ a.warning_max|default:"—" }}</td>
+            <td class="num">{{ a.critical_max|default:"—" }}</td>
+            <td>{{ a.recorded_at|default:"—" }}</td>
+            <td><span class="pill-sensor {{ a.status }}">{{ a.status }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No sensor readings logged yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}

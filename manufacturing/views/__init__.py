@@ -235,6 +235,7 @@ from ._portal import *  # noqa: F401,F403
 from ._multi_entity import *  # noqa: F401,F403
 from ._shop_floor import *  # noqa: F401,F403
 from ._demand_forecast import *  # noqa: F401,F403
+from ._predictive_maintenance import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -492,6 +493,7 @@ WEB_LEAF_URLS = {
     ('production', 'pick_lists'):    '/wms/picks/',
     ('production', 'pack_station'):  '/wms/picks/?status=picked',
     # Maintenance
+    ('maintenance', 'predictive_maint'): '/predictive-maintenance/',
     ('maintenance', 'maint'): '/maint/',
     ('maintenance', 'maint_mgr'): '/maint/',
     ('maintenance', 'create_wo'): '/maint/wo/',

@@ -1098,11 +1098,50 @@ Real-time production visibility — Plex's core differentiator.
   on (forecast-driven demand visibly added more planned orders — 9 → 18 in
   the verification run), and cleaned up all test data afterward.
 
-#### P4-B: Predictive Maintenance
+#### P4-B: Predictive Maintenance ✅ Done
 - Track rolling MTBF per equipment from historical downtime
 - Alert when actual interval since last failure approaches MTBF × 0.8
 - Vibration/temperature threshold alerts (requires IoT sensor hook)
 - Maintenance risk score per equipment (probability of failure in next 30 days)
+- **Shipped:** `manufacturing/predictive_maintenance_core.py`. MTBF/MTTR
+  already existed ("Phase 6B", `maintenance_core.get_mtbf`/
+  `get_equipment_reliability_report`), but only as a **period aggregate**
+  (`(period_hours - total_downtime_hours) / failure_count`) with no
+  concept of individual failure dates — it can't say "time since last
+  failure" or trend per equipment. This adds **rolling, interval-based
+  MTBF**: the mean gap between consecutive `'Breakdown'`-category
+  `maint_downtime` records for that equipment, using the same
+  `equipment ILIKE %s AND category = 'Breakdown'` predicate as the
+  existing (exact-SQL-pinned, untouched) `get_mtbf`. Needs >= 2 breakdown
+  events to compute an interval; equipment with 0-1 shows "insufficient
+  data" rather than a misleading number. The 30-day failure probability
+  uses the standard exponential/Poisson-process approximation from a mean
+  interval (`1 - exp(-30/mtbf_days)`, `math.exp` — stdlib, no new
+  dependency), bucketed into low/medium/high risk. **No sensor/IoT
+  concept existed anywhere** in this codebase, so the vibration/
+  temperature bullet is an explicitly documented manual/simulated
+  data-entry stub (a technician — or a future real integration — logs
+  readings against a per-equipment/reading-type warning/critical
+  threshold), the same honest scoping choice used for P3-C's Stripe
+  integration; there is no real sensor hardware connectivity. Alerts are
+  computed live on every read, matching every other alert function in
+  this codebase (`lot_core.get_expiry_alerts`, `maintenance_core.
+  get_pm_alerts`) — no new persisted alerts table. New page at
+  `/predictive-maintenance/` (one row per active equipment: MTBF, days
+  since last failure, alert threshold, 30-day risk %, risk level, latest
+  sensor status) plus `/predictive-maintenance/sensor-reading/new/` and
+  `/predictive-maintenance/sensor-threshold/`, wired into a new
+  "Predictive Maintenance" leaf under the Maintenance main menu and
+  cross-linked from the Maintenance dashboard. Verified end-to-end
+  against a running dev server + local Postgres through the actual web
+  views: inserted real breakdown records 30 and 26 days apart for a real
+  piece of equipment and confirmed rolling MTBF (28.0 days), days-since-
+  last-failure (41), approaching-threshold flag, and 30-day risk
+  (65.7%, "high") all hand-checked correct; logged a sensor reading and a
+  threshold and confirmed the alert status correctly transitioned
+  ok → warning → critical as the logged value crossed each threshold;
+  confirmed `tests/test_phase6.py`'s existing MTBF tests still pass
+  unchanged; cleaned up all test data afterward.
 
 #### P4-C: Capable-to-Promise (CTP)
 - Extends ATP with routing capacity check

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}Log Sensor Reading{% endblock %}
+
+{% block toolbar_left %}
+<a href="/predictive-maintenance/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Log Sensor Reading</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="erp-form">
+        <div class="card">
+            <p style="font-size:12px;color:#555;margin-bottom:14px;">
+                Manual entry — this codebase has no real IoT/sensor hardware connectivity;
+                use this to simulate or log readings taken by a technician.
+            </p>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Equipment</label>
+                    <select name="equipment" required>
+                        {% for eq in equipment %}
+                        <option value="{{ eq.name }}">{{ eq.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Reading Type</label>
+                    <select name="reading_type" required>
+                        {% for rt in reading_types %}
+                        <option value="{{ rt }}">{{ rt|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Value</label>
+                    <input type="number" name="value" step="0.01" required>
+                </div>
+                <div class="form-row">
+                    <label>Unit</label>
+                    <input type="text" name="unit" placeholder="e.g. mm/s, °F">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Log Reading</button>
+                    <a href="/predictive-maintenance/" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
