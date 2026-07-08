@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block page_title %}Customer Portal{% endblock %}</title>
+    <style>
+        :root {
+            --hdr-bg: #0f1d3a;
+            --accent: #1d6fe8;
+            --accent-hover: #155ec7;
+            --content-bg: #f0f4fa;
+            --card-bg: #ffffff;
+            --border: #d1dae8;
+            --text: #0f1d3a;
+            --text-muted: #5a6a84;
+            --success-bg: #dcfce7; --success-fg: #166534;
+            --warn-bg: #fef9c3;    --warn-fg: #854d0e;
+            --danger-bg: #fee2e2;  --danger-fg: #991b1b;
+            --info-bg: #dbeafe;    --info-fg: #1e40af;
+            --radius: 6px;
+            --shadow: 0 1px 4px rgba(15,29,58,.12);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+            font-size: 13px; color: var(--text); background: var(--content-bg);
+        }
+        .portal-header {
+            background: var(--hdr-bg); color: white;
+            display: flex; align-items: center; gap: 20px;
+            padding: 0 24px; height: 54px;
+        }
+        .portal-brand { font-size: 15px; font-weight: 700; color: white; text-decoration: none; }
+        .portal-brand span { color: #60a5fa; }
+        .portal-nav { display: flex; gap: 4px; flex: 1; }
+        .portal-nav a {
+            color: rgba(255,255,255,.78); text-decoration: none;
+            font-size: 12.5px; font-weight: 500; padding: 8px 12px; border-radius: 5px;
+        }
+        .portal-nav a:hover { background: rgba(255,255,255,.1); color: white; }
+        .portal-nav a.active { background: rgba(255,255,255,.15); color: white; }
+        .portal-user { font-size: 12px; color: rgba(255,255,255,.75); white-space: nowrap; }
+        .portal-user strong { color: white; }
+        .btn-sm-nav {
+            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3);
+            border-radius: 5px; padding: 5px 13px; font-size: 12.5px; color: white;
+            text-decoration: none;
+        }
+        .btn-sm-nav:hover { background: rgba(255,255,255,.22); }
+
+        .content { padding: 28px 32px 40px; max-width: 1100px; margin: 0 auto; }
+        .menu-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+        .card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            padding: 20px 24px; margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 14px; font-weight: 700; color: var(--text);
+            margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+        }
+
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px; margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px;
+        }
+        .kpi-label {
+            font-size: 11px; font-weight: 600; letter-spacing: .4px;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+        }
+        .kpi-value { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; }
+
+        .erp-table-wrap {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow); overflow-x: auto;
+        }
+        .erp-table { width: 100%; border-collapse: collapse; }
+        .erp-table thead th {
+            background: #e8edf7; color: var(--text); font-size: 11.5px; font-weight: 700;
+            padding: 9px 12px; text-align: left; border-bottom: 2px solid var(--border);
+        }
+        .erp-table thead th.num { text-align: right; }
+        .erp-table tbody td {
+            padding: 9px 12px; border-bottom: 1px solid #edf0f7; font-size: 13px; vertical-align: middle;
+        }
+        .erp-table tbody td.num { text-align: right; }
+        .erp-table tbody tr:last-child td { border-bottom: none; }
+        .erp-table tbody tr:hover td { background: #f5f8ff; }
+        .erp-table a { color: var(--accent); font-weight: 600; text-decoration: none; }
+        .erp-table a:hover { text-decoration: underline; }
+
+        .pill {
+            display: inline-block; padding: 2px 9px; border-radius: 20px;
+            font-size: 11.5px; font-weight: 600; border: 1px solid transparent; white-space: nowrap;
+        }
+        .pill-draft, .pill-open, .pill-pending, .pill-requires_confirmation { background: var(--info-bg); color: var(--info-fg); border-color: #bfdbfe; }
+        .pill-confirmed, .pill-approved, .pill-received, .pill-delivered, .pill-paid, .pill-succeeded, .pill-resolved, .pill-invoiced { background: var(--success-bg); color: var(--success-fg); border-color: #bbf7d0; }
+        .pill-cancelled, .pill-rejected, .pill-closed { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
+        .pill-shipped, .pill-in_transit, .pill-partial, .pill-inspecting { background: var(--warn-bg); color: var(--warn-fg); border-color: #fde68a; }
+        .pill-overdue { background: var(--danger-bg); color: var(--danger-fg); border-color: #fecaca; }
+
+        .erp-form { max-width: 560px; }
+        .form-row { margin-bottom: 14px; }
+        .form-row label {
+            display: block; font-size: 12px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px;
+        }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%; padding: 7px 10px; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 13px; color: var(--text); background: var(--card-bg);
+        }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+        .btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--accent); border: 1px solid var(--accent-hover); border-radius: 5px;
+            padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+            text-decoration: none; color: white; white-space: nowrap;
+        }
+        .btn:hover { background: var(--accent-hover); }
+        .btn-cancel { background: var(--card-bg); border-color: var(--border); color: var(--text); }
+
+        .alert { border-radius: var(--radius); padding: 10px 14px; margin-bottom: 16px; font-size: 13px; border: 1px solid transparent; }
+        .alert-danger  { background: var(--danger-bg); color: var(--danger-fg); border-color: #fecaca; }
+        .alert-success { background: var(--success-bg); color: var(--success-fg); border-color: #bbf7d0; }
+
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); font-size: 14px; }
+
+        .timeline { list-style: none; padding: 0; }
+        .timeline li {
+            display: flex; align-items: center; gap: 10px; padding: 8px 0;
+            border-bottom: 1px solid #edf0f7; font-size: 13px;
+        }
+        .timeline li:last-child { border-bottom: none; }
+        .timeline .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+        .timeline li.done .dot { background: #16a34a; }
+        .timeline li.done { color: var(--text); font-weight: 600; }
+        .timeline .tdate { margin-left: auto; color: var(--text-muted); font-size: 12px; }
+
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body>
+
+<header class="portal-header">
+    <a href="{% url 'portal_home' %}" class="portal-brand">⚙ <span>MFG</span> Customer Portal</a>
+    <nav class="portal-nav">
+        <a href="{% url 'portal_home' %}" class="{% if request.path == '/portal/' %}active{% endif %}">Dashboard</a>
+        <a href="{% url 'portal_orders' %}" class="{% if '/portal/orders/' in request.path %}active{% endif %}">Orders</a>
+        <a href="{% url 'portal_invoices' %}" class="{% if '/portal/invoices/' in request.path %}active{% endif %}">Invoices</a>
+        <a href="{% url 'portal_rma_list' %}" class="{% if '/portal/rma/' in request.path %}active{% endif %}">Returns</a>
+    </nav>
+    <span class="portal-user"><strong>{{ portal_company }}</strong> · {{ portal_email }}</span>
+    <a href="{% url 'portal_logout' %}" class="btn-sm-nav">Logout</a>
+</header>
+
+<div class="content">
+    <div class="menu-title">{% block menu_title %}{% endblock %}</div>
+    {% block body %}{% endblock %}
+</div>
+
+</body>
+</html>

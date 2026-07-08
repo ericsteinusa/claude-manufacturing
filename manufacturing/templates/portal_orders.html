@@ -1,0 +1,29 @@
+{% extends "base_portal.html" %}
+{% block page_title %}My Orders — Customer Portal{% endblock %}
+{% block menu_title %}My Orders{% endblock %}
+
+{% block body %}
+{% if orders %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>Order #</th><th>Order Date</th><th>Ship Date</th><th class="num">Items</th><th class="num">Total</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for so in orders %}
+            <tr>
+                <td><a href="{% url 'portal_order_detail' so.id %}">{{ so.so_number }}</a></td>
+                <td>{{ so.order_date|default:"" }}</td>
+                <td>{{ so.ship_date|default:"" }}</td>
+                <td class="num">{{ so.item_count }}</td>
+                <td class="num">${{ so.total|floatformat:2 }}</td>
+                <td><span class="pill pill-{{ so.status }}">{{ so.status|capfirst }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">You have no orders yet.</div>
+{% endif %}
+{% endblock %}

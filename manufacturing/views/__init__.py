@@ -231,6 +231,7 @@ from ._capacity_planning import *  # noqa: F401,F403
 from ._wms import *  # noqa: F401,F403
 from ._landed_cost import *  # noqa: F401,F403
 from ._blanket_po import *  # noqa: F401,F403
+from ._portal import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

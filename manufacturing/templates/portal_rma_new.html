@@ -1,0 +1,38 @@
+{% extends "base_portal.html" %}
+{% block page_title %}New Return Request — Customer Portal{% endblock %}
+{% block menu_title %}New Return Request{% endblock %}
+
+{% block body %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+<div class="card erp-form">
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="form-row">
+            <label for="so_id">Sales Order</label>
+            <select id="so_id" name="so_id" required>
+                <option value="">Select an order…</option>
+                {% for so in orders %}
+                <option value="{{ so.id }}">{{ so.so_number }} — {{ so.order_date|default:"" }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="reason">Reason</label>
+            <select id="reason" name="reason" required>
+                {% for r in reasons %}
+                <option value="{{ r }}">{{ r|capfirst }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" placeholder="Tell us what happened…"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn">Submit Return Request</button>
+            <a href="{% url 'portal_rma_list' %}" class="btn btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

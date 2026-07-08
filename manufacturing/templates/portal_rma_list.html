@@ -1,0 +1,30 @@
+{% extends "base_portal.html" %}
+{% block page_title %}My Returns — Customer Portal{% endblock %}
+{% block menu_title %}My Returns{% endblock %}
+
+{% block body %}
+<a href="{% url 'portal_rma_new' %}" class="btn" style="margin-bottom:16px;display:inline-block;">+ New Return Request</a>
+
+{% if rmas %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>RMA #</th><th>Order</th><th>Reason</th><th>Submitted</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for r in rmas %}
+            <tr>
+                <td><a href="{% url 'portal_rma_detail' r.id %}">{{ r.rma_number }}</a></td>
+                <td>{{ r.so_number|default:"" }}</td>
+                <td>{{ r.reason|capfirst }}</td>
+                <td>{{ r.created_at|default:"" }}</td>
+                <td><span class="pill pill-{{ r.status }}">{{ r.status|capfirst }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">You have no return requests yet.</div>
+{% endif %}
+{% endblock %}

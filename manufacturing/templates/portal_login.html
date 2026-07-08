@@ -1,6 +1,6 @@
 {% extends "base_card.html" %}
 
-{% block page_title %}Login — Manufacturing ERP{% endblock %}
+{% block page_title %}Customer Portal Login — Manufacturing ERP{% endblock %}
 
 {% block card_content %}
 
@@ -28,9 +28,8 @@
 </form>
 
 <div class="links">
-    <a href="{% url 'forgot_password' %}">Forgot password?</a>
-    <a href="{% url 'register' %}">Register new user</a>
-    <a href="{% url 'portal_login' %}">Are you a customer? Log in to the Customer Portal</a>
+    <a href="{% url 'portal_register' %}">Set up portal access</a>
+    <a href="{% url 'home' %}">Employee login</a>
 </div>
 
 {% endblock %}
