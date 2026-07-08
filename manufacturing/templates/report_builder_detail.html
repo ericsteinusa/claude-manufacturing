@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block page_title %}{{ report.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/reports/builder/" class="btn">← Back</a>
+<a href="/reports/builder/{{ report.id }}/edit/" class="btn">Edit</a>
+<a href="/reports/builder/{{ report.id }}/csv/" class="btn">Export CSV</a>
+<a href="/reports/builder/{{ report.id }}/pdf/" class="btn">Export PDF</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rb-wrap { width: 100%; max-width: 1100px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 18px; }
+.card h3 { margin: 0 0 10px; font-size: 15px; color: #333; }
+.list-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.list-table th, .list-table td { padding: 6px 9px; border-bottom: 1px solid #ddd; font-size: 12px; text-align: left; }
+.list-table th { background: var(--accent); color: white; }
+.form-row { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; max-width: 320px; }
+.form-row label { font-size: 12px; font-weight: bold; color: #003cb4; }
+.form-row select, .form-row input { padding: 6px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+.btn-submit { padding: 7px 16px; background: var(--accent); color: white; border: none;
+    border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rb-wrap">
+    <h2>{{ report.name }}</h2>
+    <p style="font-size:12px;color:#666;">
+        Table: {{ report.table_name }} &nbsp;|&nbsp; Access: {{ report.access_level|capfirst }}
+        &nbsp;|&nbsp; Owner: {{ report.owner_email|default:"—" }}</p>
+
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Results ({{ result.rows|length }} row(s), max 200 shown)</h3>
+        <div class="erp-table-wrap">
+            <table class="list-table">
+                <thead><tr>{% for field, header in result.output_fields %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+                <tbody>
+                    {% for row in result.row_lists %}
+                    <tr>{% for val in row %}<td>{{ val }}</td>{% endfor %}</tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Scheduled Delivery</h3>
+        <p style="font-size:12px;color:#666;">
+            Runs via <code>python manage.py run_scheduled_reports</code> (scheduled externally
+            via cron/Task Scheduler). Emails require the server's EMAIL_HOST to be configured;
+            without it, runs are logged but not sent.</p>
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-row">
+                <label><input type="checkbox" name="schedule_enabled"
+                    {% if report.schedule_enabled %}checked{% endif %}> Enabled</label>
+            </div>
+            <div class="form-row">
+                <label>Frequency</label>
+                <select name="schedule_frequency">
+                    {% for f in schedule_frequencies %}
+                    <option value="{{ f }}" {% if report.schedule_frequency == f %}selected{% endif %}>{{ f|capfirst }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Recipients (comma-separated emails)</label>
+                <input type="text" name="schedule_recipients" value="{{ report.schedule_recipients|default:'' }}">
+            </div>
+            <div class="form-row">
+                <label>Format</label>
+                <select name="schedule_format">
+                    {% for f in schedule_formats %}
+                    <option value="{{ f }}" {% if report.schedule_format == f %}selected{% endif %}>{{ f|upper }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">Save Schedule</button>
+        </form>
+        {% if report.last_run_at %}
+        <p style="font-size:12px;color:#666;margin-top:8px;">Last run: {{ report.last_run_at|slice:":19" }}</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

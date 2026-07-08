@@ -1306,13 +1306,48 @@ webhook-created SO and confirmed the right `external_order_id` appeared
 in the payload; ran `manage.py sync_ecommerce` and confirmed its summary
 output; cleaned up all test data afterward.
 
-#### P4-F: Custom Report Builder
+#### P4-F: Custom Report Builder ✅ Done
 - Field selector: pick any table/column to include
 - Filter builder: add conditions (field, operator, value)
 - Group-by and aggregate (sum, count, avg)
 - Sort order configuration
 - Save report with name and access level
 - Schedule delivery: run on schedule → email CSV/PDF to recipients
+
+**Implementation notes:** `report_builder_core.py` — a generic ad-hoc
+query tool over a hardcoded allowlist of 11 tables (`sales_order`,
+`so_item`, `work_order`, `product`, `purchase_order`, `po_item`,
+`customer`, `supplier`, `ar_invoice`, `ap_invoice`, `shipment`), whose
+columns were verified directly against the live dev DB's
+`information_schema.columns` rather than trusted from `CREATE TABLE`
+strings (this codebase's live schema is known to diverge from its DDL —
+see the DB gotchas section above). v1 scope is deliberately
+**single-table** (no cross-table joins), which still covers every
+roadmap bullet without the much larger design surface of a join-graph
+UI. SQL injection is the central risk of any report builder — this
+codebase has no `psycopg2.sql.Identifier`/runtime-identifier-safety
+infrastructure to build on, so `validate_definition` is the actual
+security boundary: every table and column name is checked against
+`REPORTABLE_TABLES` before it can reach a SQL string, and is safe to
+string-format afterward *specifically because* it is then guaranteed to
+be the literal allowlist dict key, never raw user text. Filter *values*
+are always sent as `%s` parameters. Aggregate output aliases are
+computed server-side (`f"{func}_{column}"`) rather than accepted from
+the client, removing a free-text-alias injection surface entirely.
+Verified end-to-end via the real web UI and a deliberately
+malicious-looking filter value (`'; DROP TABLE product; --`), which was
+correctly treated as an inert literal filter value with zero effect on
+the schema; also verified aggregate math (`SUM`/`AVG` grouped by
+product) against a manual SQL query, byte-for-byte-correct CSV/PDF
+export, and `access_level` visibility (`private`/`department`/
+`company`) filtering correctly between two different users. Scheduled
+delivery (`manage.py run_scheduled_reports`) reuses the exact
+`EMAIL_HOST`-gated send-or-print fallback already established by
+`send_daily_digest.py`, using `django.core.mail.EmailMessage` instead of
+`send_mail` since only the former supports attachments; a report's
+`last_run_at` plus its `daily`/`weekly`/`monthly` frequency determines
+whether it's due, verified end-to-end (a report ran once, then a second
+immediate run correctly skipped it as not yet due).
 
 #### P4-G: Sustainability / Carbon Cost Tracking
 - CO₂ emission factor per material (kg CO₂e per unit)
