@@ -11,11 +11,11 @@ digest already exists — `manufacturing/management/commands/send_daily_digest.p
 credited before), and re-ranks the remaining roadmap.
 
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
-P3-E (Blanket Purchase Orders & Call-offs), and P3-C (Customer Self-Service Portal), merged from
-four separate PRs (#398, #382, #386, #381) that a prior session had built and left open. Discovered
-that essentially the entire remaining roadmap (P3-F/G, P4-A through P4-G) already has open PRs
-(#387–#395) from the same prior session — working through them one at a time. 20 features shipped
-total.
+P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), and P3-F
+(Multi-Company / Multi-Entity), merged from five separate PRs (#398, #382, #386, #381, #387) that
+a prior session had built and left open. The remaining roadmap (P3-G, P4-A through P4-G) still has
+open PRs (#388–#395) from that same prior session — working through them one at a time.
+21 features shipped total.
 
 ---
 
@@ -27,12 +27,11 @@ or beats Infor CloudSuite, SYSPRO, and Epicor on day-to-day production, quality,
 HR, payroll, accounting, and IT management, and has closed most of the "visible gap" items (charts,
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
-The primary gaps now fall into five areas:
+The primary gaps now fall into four areas:
 1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched)
 2. **Live Shop-Floor / MES** — OEE now exists but is report/batch-based, not real-time; no IoT/sensor connectivity, no shop-floor TV mode, no operator data entry terminal
-3. **Multi-Company / Multi-Site** — still a single-entity model; no intercompany, no legal entity separation
-4. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
-5. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
+3. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
+4. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
 
@@ -187,12 +186,12 @@ The primary gaps now fall into five areas:
 | Cost of Goods Manufactured (COGM) | ✅ | ✅ All |
 | **Cash flow statement & 13-week forecast** | ✅ Full (P2-D) — indirect method; inventory-value change and financing activities explicitly called out as always-zero (no point-in-time inventory valuation or debt table exists) | ✅ 7/10 |
 | **Activity-Based Costing (ABC)** | ❌ | ✅ 6/10 |
-| **Multi-entity / legal entity separation** | ❌ | ✅ 8/10 |
-| **Intercompany transactions** | ❌ | ✅ 7/10 |
-| **Consolidated financial reporting** | ❌ | ✅ 7/10 |
+| **Multi-entity / legal entity separation** | ✅ Full (P3-F) — company master + user-to-company assignment, additive `company_id` on GL | ✅ 8/10 |
+| **Intercompany transactions** | ✅ Full (P3-F) — two independently-balanced journals per IC transaction, tagged per entity | ✅ 7/10 |
+| **Consolidated financial reporting** | ✅ Full (P3-F) — reuses the existing unscoped income statement/balance sheet, subtracts the known IC amount as elimination | ✅ 7/10 |
 | **Sustainability / carbon cost tracking** | ❌ | ✅ 5/10 |
 
-**Priority gaps:** multi-entity/intercompany, consolidated reporting, Activity-Based Costing.
+**Priority gaps:** Activity-Based Costing, sustainability/carbon tracking.
 
 ---
 
@@ -1099,6 +1098,7 @@ Real-time production visibility — Plex's core differentiator.
 | No landed cost allocation | P3-D |
 | No blanket orders & call-offs | P3-E |
 | No customer self-service portal | P3-C |
+| No multi-entity / intercompany / consolidated reporting | P3-F |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1114,7 +1114,6 @@ Real-time production visibility — Plex's core differentiator.
 
 | Gap | Effort to Close |
 |---|---|
-| No multi-entity / intercompany | High (P3-F) |
 | No AI / predictive analytics | Very High (P4-A, P4-B) |
 | No EDI | High (P4-D) |
 | No live shop-floor / IoT integration | Very High (P3-G, P4-B) |
@@ -1134,7 +1133,7 @@ Real-time production visibility — Plex's core differentiator.
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs) |
 | Sales / CRM | 9/10 | 7/10 | ▲▲ (ATP + price lists + customer portal) |
-| Finance / GL | 9/10 | 8/10 | ▲ (cash flow statement/forecast) |
+| Finance / GL | 9/10 | 9/10 | ▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
@@ -1143,7 +1142,7 @@ Real-time production visibility — Plex's core differentiator.
 | Reporting / Analytics | 8/10 | 7/10 | ▲▲▲ (charts, CSV+Excel export, OEE reports, digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.5/10** | **7.3/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.5/10** | **7.4/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
