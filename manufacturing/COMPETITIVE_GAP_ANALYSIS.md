@@ -788,12 +788,49 @@ Full pick/pack/ship with bin-level tracking.
 - Track shipment (carrier API lookup by tracking number)
 - Pay invoice online (Stripe payment intent)
 
-#### P3-D: Landed Cost Allocation
+#### P3-D: Landed Cost Allocation ✅ Done
 Required for accurate COGM when importing goods.
 - Landed cost record per PO receipt: freight, duty, broker fee, insurance
 - Allocation methods: by value (% of line total), by weight, by quantity
 - Allocated cost added to item receipt value → updates inventory cost
 - Impacts COGM and cost variance reporting
+- **Shipped:** `manufacturing/landed_cost_core.py` + `manufacturing/views/_landed_cost.py`,
+  nested under the PO (`po/<id>/landed-cost/new/`, `po/<id>/landed-cost/<lc_id>/`),
+  with a new "Landed Costs" card on `po_detail.html`. **A separate, explicit
+  action, not auto-triggered by receiving:** freight/duty/broker/insurance
+  bills typically arrive *after* goods are received, as a follow-up AP step,
+  so this operates on whatever `po_item` rows already have `qty_received > 0`
+  at the moment staff enter it — `purchase_orders_core.receive_po_item` (pinned
+  by exact-SQL-asserting tests, same as P3-B's `receive_po_item` wrap) is
+  neither modified nor hooked into. **No forked cost model:** this codebase
+  has no lot-level or receipt-level costing anywhere — `product.purchase_price`
+  is the single per-unit cost field, read directly by
+  `costing_core.roll_standard_cost` (buy-item standard cost) and
+  `compute_wo_actual_cost` (material actuals). So allocation increases
+  `product.purchase_price` by the per-unit allocated amount (largest-remainder
+  rounding so the lines sum exactly to the entered total) — the next standard-
+  cost roll or WO actual-cost computation picks up the new cost automatically,
+  with no separate report to change. This is average-cost-style: it raises the
+  product's cost going forward for *all* consumption, not just the units from
+  this specific receipt, since there's no per-lot cost attribution anywhere
+  in this codebase to do better than that. **`product.weight` added
+  additively** (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`, same pattern as
+  P3-B's `product.category`) since no weight/dimension concept existed
+  anywhere for buy items — genuinely a product attribute, so it's reusable
+  across future landed-cost entries rather than re-entered every time (a
+  per-line override is still accepted for one-off use); the weight method
+  errors clearly if every line resolves to zero weight. **No GL posting:**
+  `costing_core.post_po_receipt_gl` exists but has zero callers anywhere in
+  this codebase (PO-receipt GL posting was defined but never wired up) —
+  this feature follows that same precedent rather than inventing new GL
+  machinery. Verified end-to-end against a running dev server + local
+  Postgres: allocated a landed cost by value across a PO's two received
+  lines (confirmed the allocated amounts sum exactly to the entered total
+  and `product.purchase_price` increased by precisely `allocated/qty_received`
+  on each), confirmed a subsequent `costing_core.roll_standard_cost` picks up
+  the new cost, allocated again by weight with a per-line override, and
+  confirmed the "zero weight" and "no received items yet" validation errors
+  surface correctly.
 
 #### P3-E: Blanket Purchase Orders & Call-offs
 Standard for long-term supplier agreements.

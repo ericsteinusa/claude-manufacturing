@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block page_title %}Add Landed Cost — PO {{ po.po_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/po/{{ po.id }}/" class="btn">← Back to PO</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Add Landed Cost — PO {{ po.po_number }}</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    {% if items %}
+    <div class="erp-form">
+        <div class="card">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Freight</label>
+                    <input type="number" name="freight" min="0" step="0.01" value="0.00">
+                </div>
+                <div class="form-row">
+                    <label>Duty</label>
+                    <input type="number" name="duty" min="0" step="0.01" value="0.00">
+                </div>
+                <div class="form-row">
+                    <label>Broker Fee</label>
+                    <input type="number" name="broker_fee" min="0" step="0.01" value="0.00">
+                </div>
+                <div class="form-row">
+                    <label>Insurance</label>
+                    <input type="number" name="insurance" min="0" step="0.01" value="0.00">
+                </div>
+                <div class="form-row">
+                    <label>Allocation Method</label>
+                    <select name="method">
+                        {% for m in methods %}
+                        <option value="{{ m }}">{{ m|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="card-title" style="margin-top:20px;">Received Line Items</div>
+                <div class="erp-table-wrap">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="num">Qty Received</th>
+                                <th class="num">Unit Price</th>
+                                <th class="num">Received Value</th>
+                                <th class="num">Weight (for weight method)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it in items %}
+                            <tr>
+                                <td>{{ it.description }} {% if it.product_name %}({{ it.product_name }}){% endif %}</td>
+                                <td class="num">{{ it.qty_received }}</td>
+                                <td class="num">${{ it.unit_price|floatformat:2 }}</td>
+                                <td class="num">${{ it.received_value|floatformat:2 }}</td>
+                                <td class="num">
+                                    <input type="number" name="weight_{{ it.id }}" min="0" step="0.01"
+                                           value="{{ it.product_weight }}" style="width:90px;">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn">Allocate Landed Cost</button>
+                    <a href="/po/{{ po.id }}/" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">This PO has no received line items yet — receive at least one item before adding a landed cost.</div>
+    {% endif %}
+</div>
+{% endblock %}
