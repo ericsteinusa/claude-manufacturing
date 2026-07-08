@@ -29,6 +29,18 @@ layers with FIFO/LIFO/weighted-average consumption, its own COGS ledger, deliber
 to and non-invasive of the existing standard-cost roll). 31 features shipped total. **Every item
 in this roadmap — all of P1 through P4, plus both gaps found along the way — is now shipped.**
 
+**2026-07-08, re-verified:** Re-checked this document against the actual codebase at commit
+`97f763f` (post-P3-I merge): confirmed no open PRs and no stray unmerged branches exist beyond
+what's already tracked here; confirmed all 24 `*_core.py` modules this document credits as
+"Shipped" are present on disk; grepped the codebase for every item this document still marks
+❌ (consignment, cross-docking, wave picking, RFID, what-if scenario planning,
+Configure-to-Order, recipe/formula management, repetitive manufacturing, Activity-Based Costing,
+supplier self-service portal, real carrier-API tracking, benefits management, skills matrix,
+workforce analytics, ATS, technician routing, APM, batch record generation, control plans/FMEA,
+CoA generation, regulatory compliance templates, discount/promotion management) and confirmed
+none of them have any implementation anywhere — every ❌ in Sections 1.1–1.10 is still accurate.
+No corrections were needed; this pass is a clean bill of health, not a new round of shipped work.
+
 ---
 
 ## Executive Summary
