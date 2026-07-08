@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block page_title %}Intercompany Transactions{% endblock %}
+
+{% block toolbar_left %}
+<a href="/companies/" class="btn">Companies</a>
+{% if can_edit %}<a href="/intercompany/new/" class="btn btn-primary">+ New Transaction</a>{% endif %}
+<a href="/consolidated-financials/" class="btn">Consolidated Financials</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.po-card {
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 20px; max-width: 900px;
+}
+.btn-sm { padding: 2px 10px; font-size: 12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Intercompany Transactions</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="po-card">
+        <div class="card-title">IC Account Mapping</div>
+        <p style="font-size:12px;color:#555;">
+            Transactions post only once all four accounts are mapped; until then
+            they're recorded but left unposted.</p>
+        <form method="post" action="" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="map_accounts">
+            {% for m in ic_mapping %}
+            <div>
+                <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">{{ m.category }}</label>
+                <select name="{{ m.category }}">
+                    <option value="">(unmapped)</option>
+                    {% for a in accounts %}
+                    <option value="{{ a.account_number }}"
+                        {% if m.account_number == a.account_number %}selected{% endif %}>
+                        {{ a.account_number }} — {{ a.account_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-sm">Save Mapping</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if transactions %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Description</th>
+                    <th class="num">Amount</th>
+                    <th>Status</th>
+                    {% if can_edit %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.transaction_date }}</td>
+                    <td>{{ t.from_company_name }}</td>
+                    <td>{{ t.to_company_name }}</td>
+                    <td>{{ t.description }}</td>
+                    <td class="num">${{ t.amount|floatformat:2 }}</td>
+                    <td><span class="pill">{{ t.status|capfirst }}</span></td>
+                    {% if can_edit %}
+                    <td>
+                        {% if t.status == 'posted' %}
+                        <form method="post" action="" onsubmit="return confirm('Void this transaction?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="void">
+                            <input type="hidden" name="ic_id" value="{{ t.id }}">
+                            <button type="submit" class="btn btn-sm">Void</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No intercompany transactions yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

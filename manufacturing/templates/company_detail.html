@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block page_title %}{{ company.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/companies/" class="btn">← Back</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.po-wrap { width: 100%; max-width: 900px; }
+.po-card {
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 20px;
+}
+.po-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.po-head h2 { font-size: 20px; }
+.po-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; font-size: 13px; }
+.po-meta b { color: #003cb4; }
+.list-table { width:100%; border-collapse:collapse; background:white;
+    border: 1.5px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:14px; }
+.list-table th,.list-table td { padding:8px 12px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; font-family:monospace; }
+.list-table th.num { text-align:right; }
+.totals-row { background:#e8eef8; font-weight:bold; }
+.status-ok  { background:#d1e7dd; color:#0a3622; padding:6px 14px; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block; }
+.status-err { background:#f8d7da; color:#842029; padding:6px 14px; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block; }
+.btn-sm { padding: 2px 10px; font-size: 12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="po-wrap">
+        <div class="po-card">
+            <div class="po-head">
+                <h2>{{ company.name }}</h2>
+                {% if is_base %}<span class="pill">Home Entity</span>{% endif %}
+            </div>
+            <div class="po-meta">
+                <div><b>Legal Name:</b> {{ company.legal_name|default:"—" }}</div>
+                <div><b>Tax ID:</b> {{ company.tax_id|default:"—" }}</div>
+                <div><b>Currency:</b> {{ company.currency_code }}</div>
+                <div><b>Address:</b> {{ company.address|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;"><b>Notes:</b> {{ company.notes|default:"—" }}</div>
+            </div>
+        </div>
+
+        <div class="po-card">
+            <div class="po-head"><h3 style="margin:0;">Trial Balance</h3></div>
+            {% if is_base %}
+            <p style="font-size:12px;color:#555;margin-bottom:10px;">
+                Includes journal entries recorded before Multi-Entity was set up.</p>
+            {% endif %}
+            {% if tb.rows %}
+            <table class="list-table">
+                <thead><tr>
+                    <th>Acct #</th><th>Account Name</th><th>Type</th>
+                    <th class="num">Debit</th><th class="num">Credit</th>
+                </tr></thead>
+                <tbody>
+                {% for r in tb.rows %}
+                <tr>
+                    <td>{{ r.account_number }}</td>
+                    <td>{{ r.account_name }}</td>
+                    <td>{{ r.account_type }}</td>
+                    <td class="num">{% if r.debit %}${{ r.debit|floatformat:2 }}{% endif %}</td>
+                    <td class="num">{% if r.credit %}${{ r.credit|floatformat:2 }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr class="totals-row">
+                    <td colspan="3">TOTALS</td>
+                    <td class="num">${{ tb.total_debit|floatformat:2 }}</td>
+                    <td class="num">${{ tb.total_credit|floatformat:2 }}</td>
+                </tr>
+                </tfoot>
+            </table>
+            <span class="{% if tb.balanced %}status-ok{% else %}status-err{% endif %}">
+                {% if tb.balanced %}BALANCED{% else %}OUT OF BALANCE{% endif %}
+            </span>
+            {% else %}
+            <div class="empty-state">No posted journal entries for this entity yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="po-card">
+            <div class="po-head"><h3 style="margin:0;">Assigned Users</h3></div>
+            <p style="font-size:12px;color:#555;margin-bottom:10px;">
+                President/Vice President roles always have access to every company.</p>
+            {% if users %}
+            <table class="list-table">
+                <thead><tr><th>Name</th><th>Email</th>{% if is_admin %}<th></th>{% endif %}</tr></thead>
+                <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.first_name }} {{ u.last_name }}</td>
+                    <td>{{ u.email }}</td>
+                    {% if is_admin %}
+                    <td>
+                        <form method="post" action="/companies/{{ company.id }}/revoke-user/{{ u.people_id }}/"
+                              onsubmit="return confirm('Revoke access for this user?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm">Revoke</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No users individually assigned yet.</div>
+            {% endif %}
+
+            {% if is_admin %}
+            <form method="post" action="/companies/{{ company.id }}/assign-user/"
+                  style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+                {% csrf_token %}
+                <select name="people_id" required>
+                    <option value="">Select a person…</option>
+                    {% for p in people %}
+                    <option value="{{ p.id }}">{{ p.label }} ({{ p.email }})</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm">Grant Access</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

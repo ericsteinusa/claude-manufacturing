@@ -403,7 +403,12 @@ def update_account(conn, acct_id, account_number, account_name, account_type,
     )
 
 
-def account_balance(conn, acct_id, acct_type, as_of=None):
+def account_balance(conn, acct_id, acct_type, as_of=None,
+                     company_id=None, include_null_company=False):
+    """``company_id``/``include_null_company`` are additive (P3-F): when
+    ``company_id`` is None (every pre-existing caller) the SQL/behavior is
+    unchanged. ``include_null_company`` lets the base/legacy entity's
+    reports also pick up pre-P3-F journals, which have no company_id."""
     q = """
         SELECT COALESCE(SUM(jl.debit),0)  AS total_debit,
                COALESCE(SUM(jl.credit),0) AS total_credit
@@ -415,6 +420,12 @@ def account_balance(conn, acct_id, acct_type, as_of=None):
     if as_of:
         q += " AND j.journal_date <= %s"
         params.append(as_of)
+    if company_id is not None:
+        if include_null_company:
+            q += " AND (j.company_id = %s OR j.company_id IS NULL)"
+        else:
+            q += " AND j.company_id = %s"
+        params.append(company_id)
     row = conn.execute(q, params).fetchone()
     d, c = row['total_debit'], row['total_credit']
     if acct_type in DEBIT_NORMAL:
@@ -515,15 +526,24 @@ def void_journal(conn, journal_id):
 # General Ledger — Financial Reports
 # ---------------------------------------------------------------------------
 
-def trial_balance(conn, as_of=None):
-    accounts = conn.execute(
-        "SELECT id, account_number, account_name, account_type"
-        " FROM gl_account WHERE is_active = 1 ORDER BY account_number"
-    ).fetchall()
+def trial_balance(conn, as_of=None, company_id=None, include_null_company=False):
+    """``company_id``/``include_null_company`` are additive (P3-F) — see
+    ``account_balance``. ``None`` (the default) is identical to pre-P3-F
+    behavior: every account, no entity filter."""
+    q = ("SELECT id, account_number, account_name, account_type"
+         " FROM gl_account WHERE is_active = 1")
+    params = []
+    if company_id is not None:
+        q += " AND (company_id IS NULL OR company_id = %s)"
+        params.append(company_id)
+    q += " ORDER BY account_number"
+    accounts = conn.execute(q, params).fetchall()
     rows = []
     total_dr = total_cr = 0.0
     for a in accounts:
-        bal = account_balance(conn, a['id'], a['account_type'], as_of)
+        bal = account_balance(conn, a['id'], a['account_type'], as_of,
+                               company_id=company_id,
+                               include_null_company=include_null_company)
         if abs(bal) < 0.005:
             continue
         if a['account_type'] in DEBIT_NORMAL:
@@ -549,31 +569,49 @@ def trial_balance(conn, as_of=None):
     }
 
 
-def _period_balance(conn, acct_id, acct_type, date_from, date_to):
-    row = conn.execute("""
+def _period_balance(conn, acct_id, acct_type, date_from, date_to,
+                     company_id=None, include_null_company=False):
+    q = """
         SELECT COALESCE(SUM(jl.debit),0)  AS d,
                COALESCE(SUM(jl.credit),0) AS c
         FROM gl_journal_line jl
         JOIN gl_journal j ON j.id = jl.journal_id
         WHERE jl.account_id = %s AND j.posted = 1
           AND j.journal_date BETWEEN %s AND %s
-    """, (acct_id, date_from, date_to)).fetchone()
+    """
+    params = [acct_id, date_from, date_to]
+    if company_id is not None:
+        if include_null_company:
+            q += " AND (j.company_id = %s OR j.company_id IS NULL)"
+        else:
+            q += " AND j.company_id = %s"
+        params.append(company_id)
+    row = conn.execute(q, params).fetchone()
     d, c = row['d'], row['c']
     if acct_type in DEBIT_NORMAL:
         return d - c
     return c - d
 
 
-def income_statement(conn, date_from, date_to):
-    accounts = conn.execute(
-        "SELECT id, account_number, account_name, account_type FROM gl_account"
-        " WHERE is_active = 1 AND account_type IN ('Revenue','COGS','Expense')"
-        " ORDER BY account_type, account_number"
-    ).fetchall()
+def income_statement(conn, date_from, date_to, company_id=None,
+                      include_null_company=False):
+    """``company_id``/``include_null_company`` are additive (P3-F) — see
+    ``account_balance``. ``None`` (the default) is identical to pre-P3-F
+    behavior."""
+    q = ("SELECT id, account_number, account_name, account_type FROM gl_account"
+         " WHERE is_active = 1 AND account_type IN ('Revenue','COGS','Expense')")
+    params = []
+    if company_id is not None:
+        q += " AND (company_id IS NULL OR company_id = %s)"
+        params.append(company_id)
+    q += " ORDER BY account_type, account_number"
+    accounts = conn.execute(q, params).fetchall()
     sections = {'Revenue': [], 'COGS': [], 'Expense': []}
     totals   = {'Revenue': 0.0, 'COGS': 0.0, 'Expense': 0.0}
     for a in accounts:
-        bal = _period_balance(conn, a['id'], a['account_type'], date_from, date_to)
+        bal = _period_balance(conn, a['id'], a['account_type'], date_from, date_to,
+                               company_id=company_id,
+                               include_null_company=include_null_company)
         if abs(bal) < 0.005:
             continue
         totals[a['account_type']] += bal
@@ -829,16 +867,24 @@ def generate_dunning_letter(conn, inv_id: int, as_of: str | None = None) -> str 
     )
 
 
-def balance_sheet(conn, as_of=None):
-    accounts = conn.execute(
-        "SELECT id, account_number, account_name, account_type FROM gl_account"
-        " WHERE is_active = 1 AND account_type IN ('Asset','Liability','Equity')"
-        " ORDER BY account_type, account_number"
-    ).fetchall()
+def balance_sheet(conn, as_of=None, company_id=None, include_null_company=False):
+    """``company_id``/``include_null_company`` are additive (P3-F) — see
+    ``account_balance``. ``None`` (the default) is identical to pre-P3-F
+    behavior."""
+    q = ("SELECT id, account_number, account_name, account_type FROM gl_account"
+         " WHERE is_active = 1 AND account_type IN ('Asset','Liability','Equity')")
+    params = []
+    if company_id is not None:
+        q += " AND (company_id IS NULL OR company_id = %s)"
+        params.append(company_id)
+    q += " ORDER BY account_type, account_number"
+    accounts = conn.execute(q, params).fetchall()
     sections = {'Asset': [], 'Liability': [], 'Equity': []}
     totals   = {'Asset': 0.0, 'Liability': 0.0, 'Equity': 0.0}
     for a in accounts:
-        bal = account_balance(conn, a['id'], a['account_type'], as_of)
+        bal = account_balance(conn, a['id'], a['account_type'], as_of,
+                               company_id=company_id,
+                               include_null_company=include_null_company)
         if abs(bal) < 0.005:
             continue
         totals[a['account_type']] += bal

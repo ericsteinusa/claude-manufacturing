@@ -11,11 +11,11 @@ digest already exists — `manufacturing/management/commands/send_daily_digest.p
 credited before), and re-ranks the remaining roadmap.
 
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
-P3-E (Blanket Purchase Orders & Call-offs), and P3-C (Customer Self-Service Portal), merged from
-four separate PRs (#398, #382, #386, #381) that a prior session had built and left open. Discovered
-that essentially the entire remaining roadmap (P3-F/G, P4-A through P4-G) already has open PRs
-(#387–#395) from the same prior session — working through them one at a time. 20 features shipped
-total.
+P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), and P3-F
+(Multi-Company / Multi-Entity), merged from five separate PRs (#398, #382, #386, #381, #387) that
+a prior session had built and left open. The remaining roadmap (P3-G, P4-A through P4-G) still has
+open PRs (#388–#395) from that same prior session — working through them one at a time.
+21 features shipped total.
 
 ---
 
@@ -27,12 +27,11 @@ or beats Infor CloudSuite, SYSPRO, and Epicor on day-to-day production, quality,
 HR, payroll, accounting, and IT management, and has closed most of the "visible gap" items (charts,
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
-The primary gaps now fall into five areas:
+The primary gaps now fall into four areas:
 1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched)
 2. **Live Shop-Floor / MES** — OEE now exists but is report/batch-based, not real-time; no IoT/sensor connectivity, no shop-floor TV mode, no operator data entry terminal
-3. **Multi-Company / Multi-Site** — still a single-entity model; no intercompany, no legal entity separation
-4. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
-5. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
+3. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
+4. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
 
@@ -187,12 +186,12 @@ The primary gaps now fall into five areas:
 | Cost of Goods Manufactured (COGM) | ✅ | ✅ All |
 | **Cash flow statement & 13-week forecast** | ✅ Full (P2-D) — indirect method; inventory-value change and financing activities explicitly called out as always-zero (no point-in-time inventory valuation or debt table exists) | ✅ 7/10 |
 | **Activity-Based Costing (ABC)** | ❌ | ✅ 6/10 |
-| **Multi-entity / legal entity separation** | ❌ | ✅ 8/10 |
-| **Intercompany transactions** | ❌ | ✅ 7/10 |
-| **Consolidated financial reporting** | ❌ | ✅ 7/10 |
+| **Multi-entity / legal entity separation** | ✅ Full (P3-F) — company master + user-to-company assignment, additive `company_id` on GL | ✅ 8/10 |
+| **Intercompany transactions** | ✅ Full (P3-F) — two independently-balanced journals per IC transaction, tagged per entity | ✅ 7/10 |
+| **Consolidated financial reporting** | ✅ Full (P3-F) — reuses the existing unscoped income statement/balance sheet, subtracts the known IC amount as elimination | ✅ 7/10 |
 | **Sustainability / carbon cost tracking** | ❌ | ✅ 5/10 |
 
-**Priority gaps:** multi-entity/intercompany, consolidated reporting, Activity-Based Costing.
+**Priority gaps:** Activity-Based Costing, sustainability/carbon tracking.
 
 ---
 
@@ -921,7 +920,7 @@ Standard for long-term supplier agreements.
   confirmed it read back as `expired`; cancelled an open blanket PO and
   confirmed further call-offs against it were rejected.
 
-#### P3-F: Multi-Company / Multi-Entity
+#### P3-F: Multi-Company / Multi-Entity ✅ Done
 Required for companies with multiple legal entities.
 - Company master: separate legal entities with own GL, currency, tax ID
 - User-to-company assignment (user can access one or more entities)
@@ -929,6 +928,74 @@ Required for companies with multiple legal entities.
 - Consolidated P&L and balance sheet across entities
 - Elimination entries for intercompany balances
 - Separate chart of accounts per entity (or shared with overrides)
+- **Shipped:** `manufacturing/multi_entity_core.py`. There was no legal-
+  entity concept anywhere in this codebase — the GL is one flat, global
+  ledger (`gl_account`/`gl_journal`/`gl_journal_line`), duplicated across
+  three separate posting code paths. Rather than re-architecting the GL
+  into per-entity ledgers, this follows the scope discipline the P2-D
+  multi-currency feature set: a new `company` master, plus a nullable
+  `company_id` tag added additively (`ALTER TABLE ... ADD COLUMN IF NOT
+  EXISTS`) to `gl_account` (NULL = shared account usable by every entity —
+  the spec's "shared chart of accounts with overrides" option, chosen over
+  duplicating the whole chart) and to `gl_journal` (NULL = a pre-existing/
+  legacy journal). **No backfill:** historical journals don't "turn over"
+  the way inventory does, so there's no safe migration — instead one
+  lazily-created `company` row (`is_base_entity=True`, via
+  `get_or_create_base_company`, same sentinel spirit as `wms_core.
+  get_or_create_unassigned_bin`) stands in for all pre-existing data, and
+  that entity's own reports ask `accounting_core` to also include
+  `company_id IS NULL` rows via a new `include_null_company` flag.
+  **`accounting_core.account_balance`/`_period_balance`/`trial_balance`/
+  `income_statement`/`balance_sheet`** gained optional `company_id=None`/
+  `include_null_company=False` kwargs — when `None` (every pre-existing
+  caller) the SQL and behavior are byte-for-byte unchanged, which is what
+  kept this change safe against the full existing test suite with zero
+  regressions. **Consolidated statements** are just those same functions
+  called with `company_id=None` (already "all entities combined," since
+  there's only one ledger) — `multi_entity_core.consolidated_income_
+  statement`/`consolidated_balance_sheet` then subtract the known
+  intercompany amount as the elimination. **Intercompany transactions**
+  need four GL accounts, not two: the billing entity's own book records
+  `ic_receivable` (Asset) against `ic_revenue` (Revenue); the billed
+  entity's own book records `ic_expense` (Expense) against `ic_payable`
+  (Liability) — two independently-balanced journals, each tagged to one
+  company via `gl_journal.company_id`, posted through the existing,
+  unmodified `accounting_core.create_journal`/`post_journal`. Summed
+  together they net to zero, which is exactly the elimination property:
+  consolidated revenue and expense both drop by the same amount (net
+  income unaffected — correct for a pure internal recharge with no
+  external profit), and consolidated assets/liabilities both drop by the
+  same amount (balance sheet stays balanced). If any of the four accounts
+  aren't mapped yet, the transaction is still recorded but left unposted —
+  mirrors `costing_core.post_po_receipt_gl`'s "skip with a warning rather
+  than failing" precedent. Account mapping reuses the existing
+  `gl_account_map` table but not `costing_core.set_gl_account_map` — that
+  setter validates against `costing_core.GL_CATEGORIES`, which
+  `tests/test_costing_core.py` asserts as an exact set and can't be
+  extended — so `multi_entity_core.set_ic_account_map` is its own small
+  upsert against the same table using its own `IC_GL_CATEGORIES`, in the
+  same category namespace without touching `costing_core` at all.
+  **User-to-company assignment**: a `company_user` join table; full-access
+  roles (President, VP) bypass it and see every company, everyone else
+  only sees companies they're explicitly assigned to — enforced in both
+  `company_list` and `company_detail` (an unassigned company_id redirects
+  away, same as an ownership-check 404 elsewhere in this codebase). Web
+  pages at `/companies/...`, `/intercompany/...`, and `/consolidated-
+  financials/`, surfaced from a new "Multi-Entity" submenu under the
+  Accounting main menu (`menus.py`) via `views.WEB_LEAF_URLS` — company/
+  user-assignment CRUD is gated `@role_required` to President/VP only,
+  viewing and posting intercompany transactions is `@dept_required`
+  ('accounting', 'finance'). Verified end-to-end against a running dev
+  server + local Postgres (through the actual web views with simulated
+  sessions, not just unit tests): created two companies, mapped all four
+  IC accounts, posted an intercompany transaction and confirmed each
+  company's own trial balance showed exactly the two accounts it should
+  (and nothing from the other entity), confirmed the consolidated income
+  statement/balance sheet eliminated the exact transaction amount from
+  both revenue/expense and assets/liabilities with net income unchanged,
+  confirmed a non-full-access user saw zero companies until assigned, saw
+  the company immediately after assignment, and lost access immediately
+  after revocation — then cleaned up all test data.
 
 #### P3-G: OEE Live Shop Floor Dashboard
 Real-time production visibility — Plex's core differentiator.
@@ -1031,6 +1098,7 @@ Real-time production visibility — Plex's core differentiator.
 | No landed cost allocation | P3-D |
 | No blanket orders & call-offs | P3-E |
 | No customer self-service portal | P3-C |
+| No multi-entity / intercompany / consolidated reporting | P3-F |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1046,7 +1114,6 @@ Real-time production visibility — Plex's core differentiator.
 
 | Gap | Effort to Close |
 |---|---|
-| No multi-entity / intercompany | High (P3-F) |
 | No AI / predictive analytics | Very High (P4-A, P4-B) |
 | No EDI | High (P4-D) |
 | No live shop-floor / IoT integration | Very High (P3-G, P4-B) |
@@ -1066,7 +1133,7 @@ Real-time production visibility — Plex's core differentiator.
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs) |
 | Sales / CRM | 9/10 | 7/10 | ▲▲ (ATP + price lists + customer portal) |
-| Finance / GL | 9/10 | 8/10 | ▲ (cash flow statement/forecast) |
+| Finance / GL | 9/10 | 9/10 | ▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
@@ -1075,7 +1142,7 @@ Real-time production visibility — Plex's core differentiator.
 | Reporting / Analytics | 8/10 | 7/10 | ▲▲▲ (charts, CSV+Excel export, OEE reports, digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.5/10** | **7.3/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.5/10** | **7.4/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
