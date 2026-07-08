@@ -12,11 +12,11 @@ credited before), and re-ranks the remaining roadmap.
 
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
-(Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), and P4-A (AI Demand
-Forecasting), merged from seven separate PRs (#398, #382, #386, #381, #387, #388, #389) that a
-prior session had built and left open. The remaining roadmap (P4-B through P4-G) still has open
-PRs (#390–#395) from that same prior session — working through them one at a time.
-23 features shipped total.
+(Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), P4-A (AI Demand
+Forecasting), and P4-B (Predictive Maintenance), merged from eight separate PRs (#398, #382,
+#386, #381, #387, #388, #389, #390) that a prior session had built and left open. The remaining
+roadmap (P4-C through P4-G) still has open PRs (#391–#395) from that same prior session —
+working through them one at a time. 24 features shipped total.
 
 ---
 
@@ -29,7 +29,7 @@ HR, payroll, accounting, and IT management, and has closed most of the "visible 
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
 The primary gaps now fall into three areas:
-1. **AI / Predictive Analytics** — ML demand forecasting now exists (P4-A); no predictive maintenance, no broader embedded-AI analytics platform, no IoT/sensor connectivity for either predictive maintenance or shop-floor data capture
+1. **AI / Predictive Analytics** — ML demand forecasting (P4-A) and MTBF-based predictive maintenance risk scoring (P4-B) now exist; no broader embedded-AI analytics platform, and no real IoT/sensor hardware connectivity (P4-B's sensor readings are logged manually, not device-fed)
 2. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
 3. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
@@ -232,13 +232,13 @@ The primary gaps now fall into three areas:
 | MTBF / MTTR / equipment availability metrics | ✅ Full | ✅ 7/10 |
 | Barcode scanning for equipment | ✅ | ✅ 8/10 |
 | **OEE (Overall Equipment Effectiveness)** | ✅ Full (P1-C, P3-G) — per-workcenter MTD card/trend/report (P1-C) plus a live per-shift dashboard and shop-floor TV display (P3-G) | ✅ 7/10 |
-| **Predictive maintenance (trend-based alerts)** | ❌ — MTBF/MTTR exist but no rolling-interval alerting | ✅ 7/10 |
+| **Predictive maintenance (trend-based alerts)** | ✅ Full (P4-B) — rolling interval-based MTBF, days-since-last-failure vs. threshold, 30-day failure-probability risk score | ✅ 7/10 |
 | **Mobile maintenance app** | ✅ (already existed, not credited in original pass) — `mobile/app/(tabs)/maintenance.tsx`: work order list + detail + complete | ✅ 8/10 |
 | **Technician routing & scheduling** | ❌ | ✅ 6/10 |
 | **Asset Performance Management (APM)** | ❌ | ✅ 6/10 |
-| **IoT / sensor integration** | ❌ | ✅ 6/10 |
+| **IoT / sensor integration** | ✅ Partial (P4-B) — manual/simulated sensor-reading entry against per-equipment warning/critical thresholds; no real device connectivity | ✅ 6/10 |
 
-**Priority gaps:** predictive maintenance alerts, IoT/sensor integration.
+**Priority gaps:** technician routing/scheduling, Asset Performance Management, real IoT/sensor hardware connectivity.
 
 ---
 
@@ -275,11 +275,11 @@ The primary gaps now fall into three areas:
 | **Custom / self-service report builder** | ❌ | ✅ 7/10 |
 | **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
 | **Live shop floor performance (real-time)** | ✅ Full (P3-G) — live per-shift OEE dashboard + standalone auto-refreshing TV display | ✅ 7/10 |
-| **Predictive / AI analytics** | ✅ Partial (P4-A) — hand-rolled seasonal-decomposition demand forecast (product × month) feeding into MRP; no broader embedded-AI analytics platform, no predictive maintenance | ✅ 7/10 |
+| **Predictive / AI analytics** | ✅ Partial (P4-A, P4-B) — seasonal-decomposition demand forecast (product × month) feeding into MRP, plus MTBF-based equipment failure-risk scoring; no broader embedded-AI analytics platform | ✅ 7/10 |
 | **Batch record generation** | ❌ | ✅ 6/10 |
 | **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
 
-**Priority gaps:** self-service report builder, predictive maintenance, broader embedded-AI analytics.
+**Priority gaps:** self-service report builder, broader embedded-AI analytics.
 
 ---
 
@@ -1222,6 +1222,7 @@ Real-time production visibility — Plex's core differentiator.
 | No multi-entity / intercompany / consolidated reporting | P3-F |
 | No live/real-time shop-floor OEE dashboard or TV display | P3-G |
 | No AI/ML demand forecasting | P4-A |
+| No predictive maintenance / failure-risk scoring | P4-B |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1237,9 +1238,9 @@ Real-time production visibility — Plex's core differentiator.
 
 | Gap | Effort to Close |
 |---|---|
-| No predictive maintenance / broader embedded-AI analytics | Very High (P4-B) |
+| No broader embedded-AI analytics platform | Very High |
 | No EDI | High (P4-D) |
-| No IoT / sensor integration (shop-floor or predictive maintenance) | Very High (P4-B) |
+| No real IoT / sensor hardware integration | Very High |
 | No supplier self-service portal | High |
 | No carrier API / e-commerce integration | Medium–High (P4-E) |
 | No CTP | High (P4-C) |
@@ -1260,12 +1261,12 @@ Real-time production visibility — Plex's core differentiator.
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
-| Maintenance (CMMS) | 9/10 | 8/10 | ▲▲ (OEE + live shop-floor dashboard/TV via P3-G; mobile app now credited) |
+| Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.6/10** | **7.6/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.6/10** | **7.7/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1274,8 +1275,8 @@ Real-time production visibility — Plex's core differentiator.
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-B through P4-G — turned out to already
-have open PRs from a prior session (#390–#395), discovered while working through this list. Being
+**Status update (2026-07-08):** the remaining roadmap — P4-C through P4-G — turned out to already
+have open PRs from a prior session (#391–#395), discovered while working through this list. Being
 merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
 before merging) rather than re-built. Once that pass completes, only these will remain genuinely
 unbuilt:
