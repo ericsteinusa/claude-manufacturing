@@ -15,6 +15,13 @@
         {% csrf_token %}
         <input type="hidden" name="action" value="create_zone">
         <h3 style="margin-top:0;">New Zone</h3>
+        <label>Warehouse<br>
+            <select name="warehouse_id" required>
+                {% for wh in warehouses %}
+                <option value="{{ wh.id }}">{{ wh.code }} — {{ wh.name }}</option>
+                {% endfor %}
+            </select>
+        </label><br><br>
         <label>Code<br><input type="text" name="code" required></label><br><br>
         <label>Name<br><input type="text" name="name"></label><br><br>
         <label>Pick Sequence<br><input type="number" name="pick_sequence" value="0"></label><br><br>
@@ -28,7 +35,7 @@
         <label>Zone<br>
             <select name="zone_id" required>
                 {% for z in zones %}
-                <option value="{{ z.id }}">{{ z.code }} — {{ z.name }}</option>
+                <option value="{{ z.id }}">{{ z.warehouse_code }} / {{ z.code }} — {{ z.name }}</option>
                 {% endfor %}
             </select>
         </label><br><br>

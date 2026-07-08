@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block page_title %}Transfer {{ transfer.transfer_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/transfers/" class="btn">Back to Transfers</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">{{ transfer.transfer_number }}</div>
+<p>
+    {{ transfer.from_warehouse_code }} &rarr; {{ transfer.to_warehouse_code }}
+    &middot; Status: <span class="pill pill-{{ transfer.status }}">{{ transfer.status|title }}</span>
+</p>
+{% if transfer.notes %}<p style="color:var(--text-muted);">{{ transfer.notes }}</p>{% endif %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead>
+            <tr><th>Product</th><th>From Bin</th><th>To Bin</th><th>Qty</th><th>Status</th>{% if can_edit %}<th></th>{% endif %}</tr>
+        </thead>
+        <tbody>
+            {% for l in lines %}
+            <tr>
+                <td>{{ l.product_name }}</td>
+                <td>{{ l.from_bin_full_code }}</td>
+                <td>{{ l.to_bin_full_code|default:"—" }}</td>
+                <td>{{ l.qty }}</td>
+                <td><span class="pill pill-{{ l.status }}">{{ l.status|title }}</span></td>
+                {% if can_edit %}
+                <td>
+                    {% if l.status == 'pending' and transfer.status == 'draft' %}
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_line">
+                        <input type="hidden" name="line_id" value="{{ l.id }}">
+                        <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Remove</button>
+                    </form>
+                    {% elif l.status == 'in_transit' and transfer.status == 'in_transit' %}
+                    <form method="post" style="display:flex;gap:6px;align-items:center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="receive_line">
+                        <input type="hidden" name="line_id" value="{{ l.id }}">
+                        <select name="to_bin_id" required>
+                            {% for b in to_bins %}
+                            <option value="{{ b.id }}">{{ b.full_code }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Receive</button>
+                    </form>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            {% if not lines %}
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" class="empty-state">No lines yet.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+{% if can_edit and transfer.status == 'draft' %}
+<h3 style="margin-top:24px;">Add Line</h3>
+{% if available_stock %}
+<form method="post" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_line">
+    <label>Product / Bin<br>
+        <select name="from_bin_id" id="from_bin_id" required onchange="document.getElementById('product_id').value = this.selectedOptions[0].dataset.product;">
+            {% for s in available_stock %}
+            <option value="{{ s.bin_id }}" data-product="{{ s.product_id }}">{{ s.product_name }} — {{ s.full_code }} ({{ s.qty }} available)</option>
+            {% endfor %}
+        </select>
+    </label>
+    <input type="hidden" name="product_id" id="product_id" value="{{ available_stock.0.product_id }}">
+    <label>Qty<br><input type="number" step="any" name="qty" required style="width:100px;"></label>
+    <button type="submit" class="btn btn-primary">Add Line</button>
+</form>
+{% else %}
+<div class="empty-state">No tracked stock available in {{ transfer.from_warehouse_code }} to transfer.</div>
+{% endif %}
+
+<div style="margin-top:20px;">
+    <form method="post" onsubmit="return confirm('Ship this transfer? Source bins will be decremented immediately.');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="ship">
+        <button type="submit" class="btn btn-primary" {% if not lines %}disabled{% endif %}>Ship Transfer</button>
+    </form>
+    <form method="post" style="margin-top:8px;" onsubmit="return confirm('Cancel this transfer?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="cancel">
+        <button type="submit" class="btn">Cancel Transfer</button>
+    </form>
+</div>
+{% endif %}
+</div>
+{% endblock %}

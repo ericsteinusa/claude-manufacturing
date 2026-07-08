@@ -10,7 +10,8 @@ from ..accounts import READ_ONLY_ROLES
 
 from ..wms_core import (
     ensure_wms_tables, PUTAWAY_MATCH_TYPES, PICK_LIST_STATUSES,
-    get_or_create_default_warehouse,
+    TRANSFER_STATUSES,
+    get_or_create_default_warehouse, list_warehouses, create_warehouse,
     list_zones, create_zone,
     list_bins, get_bin, create_bin, deactivate_bin, get_bin_stock,
     list_putaway_rules, create_putaway_rule, delete_putaway_rule,
@@ -20,6 +21,9 @@ from ..wms_core import (
     create_carton, add_carton_item, set_carton_dimensions, close_carton,
     get_cartons_for_pick_list, get_carton_items, mark_pick_list_packed,
     confirm_shipment,
+    list_transfers, get_transfer, get_transfer_lines, create_transfer,
+    add_transfer_line, remove_transfer_line, ship_transfer,
+    receive_transfer_line, cancel_transfer, get_warehouse_stock,
 )
 from ..purchase_orders_core import list_pos, get_po_items
 
@@ -54,6 +58,37 @@ def _float_or_none(value):
 
 
 # ---------------------------------------------------------------------------
+# Warehouses
+# ---------------------------------------------------------------------------
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_warehouse_list')
+def wms_warehouse_list(request):
+    error = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        get_or_create_default_warehouse(conn)  # so the list is never empty
+        if request.method == 'POST' and request.POST.get('action') == 'create':
+            try:
+                create_warehouse(
+                    conn, request.POST.get('code', ''), request.POST.get('name', ''),
+                )
+                conn.commit()
+                return redirect('wms_warehouse_list')
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+        warehouses = list_warehouses(conn, active_only=False)
+        for wh in warehouses:
+            wh['zone_count'] = len(list_zones(conn, warehouse_id=wh['id'], active_only=False))
+    finally:
+        conn.close()
+    return render(request, 'wms_warehouse_list.html', _wms_ctx(
+        request, warehouses=warehouses, error=error,
+    ))
+
+
+# ---------------------------------------------------------------------------
 # Bin master
 # ---------------------------------------------------------------------------
 
@@ -79,11 +114,12 @@ def wms_bin_new(request):
     conn = get_db_connection()
     try:
         ensure_wms_tables(conn)
+        default_wh_id = get_or_create_default_warehouse(conn)
         if request.method == 'POST':
             action = request.POST.get('action', '')
             try:
                 if action == 'create_zone':
-                    wh_id = get_or_create_default_warehouse(conn)
+                    wh_id = _int_or_none(request.POST.get('warehouse_id')) or default_wh_id
                     create_zone(
                         conn, wh_id,
                         request.POST.get('code', ''),
@@ -103,10 +139,16 @@ def wms_bin_new(request):
             except (ValueError, TypeError) as exc:
                 conn.rollback()
                 error = str(exc)
+        warehouses = list_warehouses(conn, active_only=False)
+        wh_codes = {wh['id']: wh['code'] for wh in warehouses}
         zones = list_zones(conn)
+        for z in zones:
+            z['warehouse_code'] = wh_codes.get(z['warehouse_id'], '')
     finally:
         conn.close()
-    return render(request, 'wms_bin_new.html', _wms_ctx(request, zones=zones, error=error))
+    return render(request, 'wms_bin_new.html', _wms_ctx(
+        request, warehouses=warehouses, zones=zones, error=error,
+    ))
 
 
 @dept_required(_WMS_DEPT_KEYS, write_redirect='wms_bin_list')
@@ -371,4 +413,106 @@ def wms_ship_confirm(request, pick_list_id):
         conn.close()
     return render(request, 'wms_ship_confirm.html', _wms_ctx(
         request, pick_list=pick_list, lines=lines, error=error,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Inter-warehouse transfers
+# ---------------------------------------------------------------------------
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_transfer_list')
+def wms_transfer_list(request):
+    status = request.GET.get('status') or None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        transfers = list_transfers(conn, status=status)
+    finally:
+        conn.close()
+    return render(request, 'wms_transfer_list.html', _wms_ctx(
+        request, transfers=transfers, status=status, transfer_statuses=TRANSFER_STATUSES,
+    ))
+
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_transfer_list')
+def wms_transfer_new(request):
+    error = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        if request.method == 'POST':
+            try:
+                transfer_id = create_transfer(
+                    conn,
+                    int(request.POST.get('from_warehouse_id')),
+                    int(request.POST.get('to_warehouse_id')),
+                    created_by=request.session.get('user_email', ''),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('wms_transfer_detail', transfer_id=transfer_id)
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+        warehouses = list_warehouses(conn)
+    finally:
+        conn.close()
+    return render(request, 'wms_transfer_new.html', _wms_ctx(
+        request, warehouses=warehouses, error=error,
+    ))
+
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_transfer_list')
+def wms_transfer_detail(request, transfer_id):
+    error = success = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        transfer = get_transfer(conn, transfer_id)
+        if not transfer:
+            return redirect('wms_transfer_list')
+        by = request.session.get('user_email', '')
+
+        if request.method == 'POST':
+            action = request.POST.get('action', '')
+            try:
+                if action == 'add_line':
+                    add_transfer_line(
+                        conn, transfer_id,
+                        int(request.POST.get('product_id')),
+                        int(request.POST.get('from_bin_id')),
+                        float(request.POST.get('qty')),
+                    )
+                    success = 'Line added.'
+                elif action == 'remove_line':
+                    remove_transfer_line(conn, int(request.POST.get('line_id')))
+                    success = 'Line removed.'
+                elif action == 'ship':
+                    ship_transfer(conn, transfer_id, created_by=by)
+                    success = 'Transfer shipped.'
+                elif action == 'receive_line':
+                    receive_transfer_line(
+                        conn, int(request.POST.get('line_id')),
+                        int(request.POST.get('to_bin_id')),
+                        created_by=by,
+                    )
+                    success = 'Line received.'
+                elif action == 'cancel':
+                    cancel_transfer(conn, transfer_id)
+                    success = 'Transfer cancelled.'
+                conn.commit()
+                transfer = get_transfer(conn, transfer_id)
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+
+        lines = get_transfer_lines(conn, transfer_id)
+        available_stock = get_warehouse_stock(conn, transfer['from_warehouse_id'])
+        to_bins = [b for b in list_bins(conn, active_only=True)
+                   if b['warehouse_id'] == transfer['to_warehouse_id']]
+    finally:
+        conn.close()
+    return render(request, 'wms_transfer_detail.html', _wms_ctx(
+        request, transfer=transfer, lines=lines, available_stock=available_stock,
+        to_bins=to_bins, error=error, success=success,
     ))
