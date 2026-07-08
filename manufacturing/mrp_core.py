@@ -1,10 +1,4 @@
-"""mrp_core.py — pure MRP planning math, free of any GUI/DB dependency.
-
-Kept separate from :mod:`mrp` (which imports PyQt6 and talks to the database)
-so the planning logic can be imported and unit tested without the Qt shared
-libraries. :mod:`mrp` imports :func:`compute_levels` and :func:`plan_orders`
-from here.
-"""
+"""mrp_core.py — pure MRP planning math, free of any GUI/DB dependency."""
 
 from collections import defaultdict
 from datetime import date, timedelta

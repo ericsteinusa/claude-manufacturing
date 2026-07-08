@@ -1,10 +1,6 @@
 """purchase_orders_core.py — Qt-free data layer for purchase orders.
 
-Kept separate from :mod:`purchase_orders` (which imports PyQt6) so the SQL can
-be imported by the Django web views and unit tested without the Qt shared
-libraries — CI runners lack ``libEGL`` and cannot ``import PyQt6``. The Qt
-module imports/re-exports the pieces it shares from here (same pattern as
-``bom_core`` / ``mrp_core``).
+Imported by the Django web views and unit tested independently.
 
 Every function takes an open connection so the caller controls the transaction
 and lifetime; pass a :func:`manufacturing.db_pg.get_db_connection` connection

@@ -1,8 +1,7 @@
 """Qt-free sales-order data layer.
 
-Kept separate from sales_orders.py (which imports PyQt6) so the SQL can be
-imported by Django web views and unit-tested without the Qt shared libraries.
-Every function takes an open connection; the caller controls the transaction
+Imported by Django web views and unit-tested independently. Every function
+takes an open connection; the caller controls the transaction
 and lifetime (pass a db_pg.get_db_connection() connection, %s placeholders).
 """
 from datetime import date

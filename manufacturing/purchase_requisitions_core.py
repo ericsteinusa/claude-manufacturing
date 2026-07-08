@@ -1,8 +1,4 @@
-"""Qt-free purchase-requisition authorization logic.
-
-Kept separate from purchase_requisitions.py (which imports PyQt6) so the
-authorization rules can be unit-tested without Qt.
-"""
+"""Qt-free purchase-requisition authorization logic."""
 
 COMPANY_WIDE_ROLES = (
     "President",

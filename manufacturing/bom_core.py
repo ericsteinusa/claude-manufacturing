@@ -1,8 +1,6 @@
 """bom_core.py — pure BOM logic, free of any GUI/DB dependency.
 
-Kept separate from :mod:`bom` (which imports PyQt6) so the planning math can
-be imported and unit tested in environments without the Qt shared libraries
-(e.g. CI runners). :mod:`bom` and :mod:`mrp_core` re-use these functions.
+:mod:`mrp_core` re-uses these functions.
 """
 
 

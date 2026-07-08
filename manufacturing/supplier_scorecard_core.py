@@ -48,10 +48,9 @@ def _supplier_display_name(row):
 
 
 def _qa_supplier_table_exists(conn):
-    """True if qa_supplier exists. It's owned by the QA module (created by
-    QA_mgmt.py, a PyQt6 module), not here, so it may not exist yet on a
-    fresh DB — checked via to_regclass rather than try/except so a missing
-    table can't abort the caller's transaction."""
+    """True if qa_supplier exists. It's owned by the QA module, not here, so
+    it may not exist yet on a fresh DB — checked via to_regclass rather than
+    try/except so a missing table can't abort the caller's transaction."""
     row = conn.execute(
         "SELECT to_regclass('qa_supplier') IS NOT NULL AS tbl_exists"
     ).fetchone()

@@ -425,8 +425,4 @@ urlpatterns = [
     path('dept/<str:dept>/', views.generic_menu, name='dept_menu'),
     path('dept/<str:dept>/<path:subpath>/',
          views.generic_menu, name='submenu'),
-    path(
-    'run/<str:dept>/<path:subpath>/',
-    views.run_script,
-     name='run_script'),
 ]

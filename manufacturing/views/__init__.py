@@ -4,10 +4,7 @@ Menu data lives in :mod:`manufacturing.menus`; authentication and role
 persistence live in :mod:`manufacturing.accounts`.
 """
 
-import os
-import sys
 import json
-import subprocess
 from datetime import date, timedelta
 
 import psycopg2
@@ -235,8 +232,7 @@ from ._wms import *  # noqa: F401,F403
 log = get_logger(__name__)
 
 
-# Menu leaves that are served as web pages rather than launched as a desktop
-# Qt subprocess via run_script. Keyed by (dept, leaf_key) -> URL. The PO
+# Every menu leaf's web page. Keyed by (dept, leaf_key) -> URL. The PO
 # viewer (open/status/history) all land on the filterable list.
 WEB_LEAF_URLS = {
     ('purchasing', 'new_po'): '/po/new/',
@@ -1014,11 +1010,8 @@ def generic_menu(request, dept, subpath=''):
         new_parts = parts + [key]
         if isinstance(target, dict):
             url = '/dept/{}/{}/'.format(dept, '/'.join(new_parts))
-        elif (dept, key) in WEB_LEAF_URLS:
-            # Served as a real web page instead of launching a desktop window.
-            url = WEB_LEAF_URLS[(dept, key)]
         else:
-            url = '/run/{}/{}/'.format(dept, '/'.join(new_parts))
+            url = WEB_LEAF_URLS[(dept, key)]
         items.append((url, label))
 
     if parts:
@@ -1038,49 +1031,6 @@ def generic_menu(request, dept, subpath=''):
         'menu_items': items,
         'back_url': back_url,
     })
-
-
-def run_script(request, dept, subpath):
-    if not request.session.get('user_email'):
-        return redirect('home')
-    if request.session.get('user_role') in READ_ONLY_ROLES:
-        return redirect('dept_menu', dept=dept)
-    if not request.session.get('user_full_access'):
-        user_dept = request.session.get('user_dept_key', '')
-        if not user_dept:
-            return redirect('dashboard')
-        if dept != user_dept:
-            return redirect('dept_menu', dept=user_dept)
-    parts = [p for p in subpath.split('/') if p]
-    if not parts:
-        return redirect('dashboard')
-    parent_parts, leaf_key = parts[:-1], parts[-1]
-    node = _walk_tree(dept, parent_parts)
-    if node:
-        for key, _label, target in node['items']:
-            if key == leaf_key and isinstance(target, str):
-                mfg_dir = os.path.dirname(__file__)
-                module_name = os.path.splitext(target)[0].replace('/', '.').replace(os.sep, '.')
-                project_dir = os.path.dirname(mfg_dir)
-                log.info(
-                    "User %s launching manufacturing.%s (%s/%s)",
-                    request.session.get('user_email'), module_name,
-                    dept, subpath)
-                try:
-                    subprocess.Popen(
-                        [sys.executable, '-m',
-                            f'manufacturing.{module_name}', leaf_key],
-                        cwd=project_dir,
-                    )
-                except Exception:
-                    log.error(
-                        "Failed to launch manufacturing.%s", module_name,
-                        exc_info=True)
-                    raise
-                break
-    if parent_parts:
-        return redirect('/dept/{}/{}/'.format(dept, '/'.join(parent_parts)))
-    return redirect('/dept/{}/'.format(dept))
 
 
 # ---------------------------------------------------------------------------

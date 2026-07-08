@@ -1664,45 +1664,6 @@ DASHBOARD_DEPARTMENTS = [
     ('reports', 'Reports'),
 ]
 
-# Department main-menu scripts, keyed by dept_key. Used to scope a non-admin
-# user to their own department after login (see login_app.SessionWindow). The
-# company dashboard keeps its own parallel ordered list of the same scripts in
-# Company_main_menu.DEPARTMENTS — keep the two in sync when adding a dept.
-DEPT_MAIN_MENU = {
-    'accounting':        'accounting/Accounting_Main_menu.py',
-    'customer_service':  'customer_service/cs_main_menu.py',
-    'engineering':       'engineering/engineering_Main_menu.py',
-    'finance':           'finance/Finance_Main_menu.py',
-    'information_tech':  'it/IT_Main_Menu.py',
-    'legal':             'legal/Legal_Main_menu.py',
-    'maintenance':       'maintenance/Maint_Main_menu.py',
-    'marketing':         'marketing/Marketing_Main_menu.py',
-    'personnel':         'personnel/Personnel_Main_menu.py',
-    'production':        'production/Production_Main_menu.py',
-    'purchasing':        'purchasing/Purchasing_Main_menu.py',
-    'quality_assurance': 'quality/QA_Main_menu.py',
-    'risk_management':   'legal/Risk_mgmt_Main_menu.py',
-    'sales':             'sales/Sales_Main_menu.py',
-    'warehouse':         'production/Warehouse_Main_menu.py',
-    'budget_management': 'finance/Budget_mgmt.py',
-    'reports':           'reports/Reports_Main_menu.py',
-}
-
-
-def main_menu_script_for_dept(dept_name):
-    """Return the department main-menu script for a DB ``dept_name``, or None.
-
-    Maps the department name to its menu key (:data:`DEPT_MENU_KEY`) and then
-    to the main-menu script (:data:`DEPT_MAIN_MENU`). Returns ``None`` when
-    the department is unknown or has no dedicated menu (e.g. ``Company`` or
-    ``Labs``), so callers can fall back to the full company menu.
-    """
-    key = DEPT_MENU_KEY.get(dept_name or '')
-    if key is None:
-        return None
-    return DEPT_MAIN_MENU.get(key)
-
-
 # Menu node keys that are only shown to managers.
 MANAGER_MENU_KEYS = {
     'acct_mgr', 'cs_mgr', 'eng_mgr', 'it_mgr', 'maint_mgr', 'mkt_mgr',

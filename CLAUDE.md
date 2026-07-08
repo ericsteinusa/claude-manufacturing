@@ -1,8 +1,8 @@
 # Working in this repo
 
-PyQt6 desktop app over a Django/Postgres backend (`db_pg.get_db_connection`),
-plus a Django web UI that renders the same menus (see *Web UI* below).
-Notes below are the non-obvious things that have bitten past changes.
+Django app over a Postgres backend (`db_pg.get_db_connection`). `python
+manage.py runserver` is the only way to run it (see *Web UI* below). Notes
+below are the non-obvious things that have bitten past changes.
 
 ## Directory structure
 
@@ -42,14 +42,12 @@ manufacturing/
   │   ├── _legal.py      Legal views
   │   └── _marketing.py  Marketing views
   │
-  ├── *_core.py          Qt-free business logic (stay at root — imported by
-  │                      views/, seeds/, and cross-dept callers)
+  ├── *_core.py          Business logic (stay at root — imported by
+  │                      views/, seeds/, and cross-dept callers, e.g.
+  │                      purchase_requisitions_core.py by 4+ departments)
   ├── accounts.py        Cross-cutting user/session helpers
-  ├── dept_menu_widget.py Shared Qt widget used by all dept main menus
-  ├── purchase_requisitions.py  Used by 4+ non-purchasing departments
   ├── menus.py / urls.py Django routing
   ├── db_pg.py / schema.py / gl_utils.py  DB & shared utilities
-  ├── qt_theme.py / button_nav.py / launch_utils.py  Qt helpers
   └── templates/         Django HTML templates
 ```
 
@@ -64,22 +62,13 @@ manufacturing/
   Activate it once per clone: `git config core.hooksPath .githooks`
 
 ## Testing & CI
-- CI runners **lack `libEGL`**, so `import PyQt6` fails there. Any module that
-  imports PyQt6 therefore **cannot be imported in tests**.
-- Keep unit-testable logic in **Qt-free `*_core.py` modules**, and have the GUI
-  modules import/re-export from them. Examples: `bom_core.py` (cycle guard,
+- Keep unit-testable logic in **Qt-free `*_core.py` modules**, and have
+  `views/` import/re-export from them. Examples: `bom_core.py` (cycle guard,
   `explode_quantity`) and `mrp_core.py` (`compute_levels`, `plan_orders`,
   `next_sequence_number`). Tests import the `*_core` modules only.
 - All `*_core.py` files live at the **package root** (`manufacturing/`), not
-  inside subpackages, because `views.py` and seeds import them directly and
+  inside subpackages, because `views/` and seeds import them directly and
   several are shared across departments.
-- Run the GUI/integration checks locally headless with
-  `QT_QPA_PLATFORM=offscreen`; widgets can be driven and captured via
-  `QWidget.grab().save(path)`.
-- **Windows offscreen fonts:** pip-installed PyQt6 ships no fonts, so
-  offscreen text renders as boxes. Fix once with `python setup_qt_fonts.py`
-  (copies Arial/Verdana/Tahoma/Courier from `C:\Windows\Fonts` into the
-  PyQt6 Qt6 fonts dir). Linux uses system fontconfig and needs no fix.
 
 ## Mobile REST API (`/api/v1/`)
 A stateless JSON API consumed by the React Native app in `mobile/`. Has grown
@@ -131,22 +120,18 @@ detail + complete), Quality (NCR list + create + detail). Plus `(auth)/login`.
 To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
 
 ## Web UI (Django) & menu routing
-- The same department menu tree (`menus.MENU_TREE`) is also served as a web app
-  (`python manage.py runserver`). A menu leaf whose target is a **subdir-prefixed
-  filename string** (e.g. `'production/work_orders.py'`) is, by default,
-  **launched as a desktop Qt subprocess on the server** by `views.run_script`
-  (the `/run/<dept>/<path>/` links) — so clicking it in a browser renders
-  **nothing** (and fails headless: no `libEGL`). Most leaves are still
-  desktop-only. `run_script` converts the path to a dotted module name
-  (`production/work_orders.py` → `manufacturing.production.work_orders`).
-- To serve a leaf as a **real web page** instead, add
-  `(dept, leaf_key) -> url` to **`views.WEB_LEAF_URLS`**; `generic_menu` then
-  emits that URL in place of the `/run/...` launcher link. No change to the
-  `menus.py` tree is needed. Worked example: the purchase-order pages
-  (`/po/...`, `views.po_*`, `purchase_orders_core.py`) route all four
-  Purchasing → Purchase Orders leaves this way.
-- Web views run where `import PyQt6` fails, so they must import the Qt-free
-  `*_core.py` modules only (same rule as tests — see above).
+- The department menu tree (`menus.MENU_TREE`) is served entirely as web
+  pages via `python manage.py runserver`. Every `(dept, leaf_key)` leaf
+  resolves to a URL in `views.WEB_LEAF_URLS`; `generic_menu`
+  (`views/__init__.py`) looks up that URL when rendering a menu — there is no
+  other resolution path.
+- To add a new leaf's web page, add its `(dept, leaf_key) -> url` mapping to
+  `views.WEB_LEAF_URLS`. No change to the `menus.py` tree is needed. Worked
+  example: the purchase-order pages (`/po/...`, `views.po_*`,
+  `purchase_orders_core.py`) route all four Purchasing → Purchase Orders
+  leaves this way.
+- Views must import the Qt-free `*_core.py` modules only (same rule as
+  tests — see above).
 - **Access control** is enforced via decorators in `auth_decorators.py`:
   - `@login_required` — redirect to `'home'` if no active session.
   - `@dept_required(dept_keys, *, role_keys=None, write_redirect=None, deny_redirect='dashboard')`

@@ -3,14 +3,10 @@
 #
 # Install with:  pip install -r requirements.txt
 #
-# Note: the desktop GUI uses PyQt6. A number of generated *_ui.py / *_rc.py
-# files import PySide6, but those are unused Qt Designer exports (no
-# hand-written module imports them), so PySide6 is intentionally not listed
-# here. The legacy tkinter screens rely on the standard-library tkinter,
-# which on Linux requires the system package python3-tk (not a pip dependency).
+# Note: legacy tkinter screens rely on the standard-library tkinter, which on
+# Linux requires the system package python3-tk (not a pip dependency).
 
 Django==6.0.5
-PyQt6==6.11.0
 psycopg2-binary==2.9.12
 bcrypt==5.0.0
 python-dotenv==1.2.2
