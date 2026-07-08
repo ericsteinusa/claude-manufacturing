@@ -14,10 +14,10 @@ credited before), and re-ranks the remaining roadmap.
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
 (Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), P4-A (AI Demand
 Forecasting), P4-B (Predictive Maintenance), P4-C (Capable-to-Promise), P4-D (EDI Integration),
-and P4-E (e-Commerce Integration), merged from eleven separate PRs (#398, #382, #386, #381,
-#387, #388, #389, #390, #391, #392, #393) that a prior session had built and left open. The
-remaining roadmap (P4-F, P4-G) still has open PRs (#394–#395) from that same prior session —
-working through them one at a time. 27 features shipped total.
+P4-E (e-Commerce Integration), and P4-F (Custom Report Builder), merged from twelve separate PRs
+(#398, #382, #386, #381, #387, #388, #389, #390, #391, #392, #393, #394) that a prior session had
+built and left open. The remaining roadmap (P4-G) still has an open PR (#395) from that same
+prior session. 28 features shipped total.
 
 ---
 
@@ -273,14 +273,14 @@ The primary gaps now fall into three areas:
 | REST API for custom integrations | ✅ | ✅ All |
 | **Embedded charts & graphs on dashboards** | ✅ Full (P1-A) — Chart.js on production/sales/quality/finance/maintenance dashboards, 10 charts | ✅ All |
 | **Excel / CSV export from any list** | ✅ Full (P1-B, P1-G) — both formats on all 9 list pages | ✅ All |
-| **Custom / self-service report builder** | ❌ | ✅ 7/10 |
+| **Custom / self-service report builder** | ✅ Full (P4-F) — allowlist-based field/filter/group-by/aggregate builder over 11 tables (single-table, no cross-table joins in v1), CSV/PDF export, scheduled email delivery | ✅ 7/10 |
 | **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
 | **Live shop floor performance (real-time)** | ✅ Full (P3-G) — live per-shift OEE dashboard + standalone auto-refreshing TV display | ✅ 7/10 |
 | **Predictive / AI analytics** | ✅ Partial (P4-A, P4-B) — seasonal-decomposition demand forecast (product × month) feeding into MRP, plus MTBF-based equipment failure-risk scoring; no broader embedded-AI analytics platform | ✅ 7/10 |
 | **Batch record generation** | ❌ | ✅ 6/10 |
 | **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
 
-**Priority gaps:** self-service report builder, broader embedded-AI analytics.
+**Priority gaps:** broader embedded-AI analytics, batch record generation.
 
 ---
 
@@ -1405,6 +1405,7 @@ immediate run correctly skipped it as not yet due).
 | No Capable-to-Promise (CTP) | P4-C |
 | No EDI (850/855/856/810) | P4-D |
 | No e-commerce (Shopify/WooCommerce) integration | P4-E |
+| No self-service report builder | P4-F |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1413,7 +1414,6 @@ immediate run correctly skipped it as not yet due).
 | No FIFO/LIFO/weighted-average valuation | Medium |
 | No true inter-warehouse transfers | Low–Medium |
 | No consignment / cross-docking / wave picking / RFID | Medium |
-| No self-service report builder | Medium (P4-F) |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
@@ -1444,10 +1444,10 @@ immediate run correctly skipped it as not yet due).
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
 | Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
-| Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), digest now credited) |
+| Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.7/10** | **8.0/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.8/10** | **8.1/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1456,11 +1456,10 @@ immediate run correctly skipped it as not yet due).
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-F, P4-G — turned out to already
-have open PRs from a prior session (#394–#395), discovered while working through this list. Being
-merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
-before merging) rather than re-built. Once that pass completes, only these will remain genuinely
-unbuilt:
+**Status update (2026-07-08):** the remaining roadmap — P4-G — turned out to already have an open
+PR from a prior session (#395), discovered while working through this list. Being merged (rebase
+onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
+re-built. Once that merges, only these will remain genuinely unbuilt:
 
 1. **True inter-warehouse transfers** (extends P3-B) — `wms_core.py` already has multiple
    warehouses/zones/bins; a transfer is "ship from bin A, receive into bin B" reusing
