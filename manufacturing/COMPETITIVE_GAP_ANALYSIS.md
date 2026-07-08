@@ -41,6 +41,12 @@ CoA generation, regulatory compliance templates, discount/promotion management) 
 none of them have any implementation anywhere — every ❌ in Sections 1.1–1.10 is still accurate.
 No corrections were needed; this pass is a clean bill of health, not a new round of shipped work.
 
+**2026-07-08, one more:** Shipped P3-J (Consignment Inventory), the highest-ROI item remaining
+from the "Where We Trail Mid-Market" list once the P1–P4 roadmap and both P3-H/P3-I gaps closed.
+`consignment_core.py` — vendor-owned stock received into the warehouse without touching
+`product.amount` until a separate "usage" action transfers ownership (credits inventory) and
+opens an AP invoice for the vendor in one step. 32 features shipped total.
+
 ---
 
 ## Executive Summary
@@ -107,13 +113,13 @@ forecasting and predictive maintenance.
 | **Warehouse Management System (WMS)** | ✅ Full (P3-B) | ✅ 9/10 |
 | **Pick / Pack / Ship automation** | ✅ Full (P3-B) | ✅ 9/10 |
 | **Cycle count structured workflow** | ✅ Full (P1-D) | ✅ All |
-| **Consignment inventory** | ❌ | ✅ 7/10 |
+| **Consignment inventory** | ✅ Full (P3-J) — vendor-owned stock, usage-triggered ownership transfer + AP billing | ✅ 7/10 |
 | **Cross-docking** | ❌ | ✅ 6/10 |
 | **Wave picking management** | ❌ — pick lists are one-per-SO with a zone-aware sort, not multi-order wave batching | ✅ 6/10 |
 | **RFID integration** | ❌ | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** consignment inventory, cross-docking, wave picking, RFID.
+**Priority gaps:** cross-docking, wave picking, RFID.
 
 ---
 
@@ -1118,6 +1124,77 @@ Extends P3-B (WMS): multiple warehouses/zones/bins already existed, but nothing 
   attempting to ship more than a bin actually holds surfaces a real "only N tracked there" error
   banner through the web view rather than silently succeeding.
 
+#### P3-I: FIFO / LIFO / Weighted-Average Costing ✅ Done
+The second gap discovered with no prior PR — every top-10 competitor offers this; `product` had
+no cost-layer concept at all before this feature.
+- Per-product opt-in costing method (defaults to `standard`, today's single-purchase-price
+  behavior, unchanged)
+- Discrete cost layers created per costed receipt; issues consumed per the chosen method
+- FIFO: oldest layer first. LIFO: newest layer first. Average: pooled weighted-average cost
+- COGS ledger and a valuation report showing layer-tracked qty alongside `product.amount`
+- **Shipped:** `manufacturing/costing_layers_core.py` — a parallel, opt-in valuation subsystem,
+  not a replacement for standard costing. `receive_with_costing`/`issue_with_costing` wrap the
+  existing, unmodified `inventory_core.record_transaction` (so `product.amount` stays the single
+  source of truth for on-hand qty) and additionally create/consume `inventory_cost_layer` rows.
+  **Deliberately never modifies `record_transaction` itself** — this is its own explicit front
+  door, mirroring `wms_core.receive_and_putaway`'s precedent of wrapping pinned functions rather
+  than editing them. If a costed product's inventory moves through any of the *other* existing
+  paths (WMS, cycle count, manual adjustment, mobile API), `product.amount` still updates
+  correctly but no cost layer is created/consumed for that movement — the valuation report
+  surfaces both figures side by side so any drift is visible, not hidden, rather than silently
+  papered over. An issue that exceeds tracked layers falls back to costing the shortfall at the
+  product's current `purchase_price`, the same graceful no-big-bang-migration pattern
+  `wms_core`'s unassigned-bin sentinel uses. New pages at `/inventory/valuation/` (all costed
+  products) and `/inventory/<id>/valuation/` (method switch, costed receive/issue forms, cost
+  layers, COGS history), cross-linked from the existing Standard Cost and Inventory Detail pages.
+  Verified end-to-end against a running dev server + local Postgres: set a real product to FIFO,
+  recorded two costed receipts at different unit costs ($4 and $6/unit), issued 12 units and
+  confirmed FIFO consumption order (COGS $52.00 = 10 units @ $4 + 2 units @ $6, exactly matching
+  a hand calculation), confirmed the remaining layer/valuation figures ($48.00 for 8 units @ $6),
+  and confirmed both cross-links render correctly; cleaned up all test data afterward.
+
+#### P3-J: Consignment Inventory ✅ Done
+The highest-ROI item remaining in the "Where We Trail Mid-Market" list once the numbered roadmap
+and both P3-H/P3-I gaps closed — vendor-owned stock held in our warehouse, not paid for until used.
+- Consignment agreement: vendor, product, per-unit cost, validity window
+- Receive vendor-owned stock (doesn't touch our own inventory count)
+- Record usage: transfers ownership, credits our inventory, bills the vendor
+- On-hand (vendor-owned) balance visible alongside used-to-date
+- **Shipped:** `manufacturing/consignment_core.py` — single-product, open-ended replenishment
+  agreements (not a fixed-ceiling model like `blanket_po_core.py`, since a VMI relationship has no
+  natural "total" to track against), with two running ledgers: `consignment_receipt` (vendor ships
+  stock in — deliberately does **not** touch `product.amount`/`record_transaction`, since the
+  goods aren't company-owned yet, the same "don't blend two ownership concepts into one column"
+  discipline as `wms_core.py`'s bin-stock-vs-aggregate split, one ownership level earlier) and
+  `consignment_usage` (the single moment ownership transfers: decrements the vendor-owned balance,
+  credits `product.amount` via the existing, unmodified `inventory_core.record_transaction`, and
+  opens an AP invoice via the existing, unmodified `accounting_core.create_ap_invoice` — usage
+  *is* the billing trigger in a consignment arrangement, unlike a normal PO where the invoice
+  follows receipt). **Deliberately simplified**: in a real warehouse, consigned stock can be
+  picked straight out of its bin for production without a separate "we now own this"
+  administrative step — modeling that exactly would mean hooking into WO material-pick and SO-ship
+  (both already-pinned call sites elsewhere); instead, recording usage is the one explicit action
+  standing in for "this qty left vendor ownership and entered ours," the same honest scoping
+  choice `landed_cost_core.py` documents for why its own allocation is a separate action rather
+  than auto-triggered by receiving. **Found and fixed a real, pre-existing gap while verifying
+  live**: `create_ap_invoice`'s own signature treats `due_date` as optional (`due_date or None`),
+  but the live `ap_invoice` table has a NOT NULL constraint on that column not reflected in the
+  DDL string — exactly the "live schema can diverge from the `CREATE TABLE` DDL" gotcha this
+  document's own Database Gotchas section already warns about elsewhere. Every other existing
+  caller of `create_ap_invoice` happens to always supply a real due date from a form field, so
+  this had never surfaced before; fixed by defaulting the consignment usage invoice to a net-30
+  due date rather than `None`. Web pages at `/consignment/` (list), `/consignment/new/`,
+  `/consignment/<id>/` (balances, receipts, usage history), `/consignment/<id>/receive/`, and
+  `/consignment/<id>/use/`, linked from a new "Consignment" toolbar button on `po_list.html`
+  (matching the Blanket PO/RFQ/Landed Cost precedent of a direct link rather than a `menus.py`
+  leaf). Verified end-to-end against a running dev server + local Postgres through the actual web
+  views: created a real agreement, received 40 units of vendor-owned stock and confirmed
+  `product.amount` stayed exactly unchanged, recorded a 15-unit usage and confirmed
+  `product.amount` increased by exactly 15, a real AP invoice was opened for the vendor at the
+  correct amount ($232.50) with a 30-day due date, and the on-hand/used-to-date balances updated
+  correctly (25.00 remaining, 15.00 used); confirmed attempting to use more than the on-hand
+  balance is rejected with a clear error; cleaned up all test data afterward.
+
 ---
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
@@ -1510,12 +1587,13 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No sustainability / carbon cost tracking | P4-G |
 | No true inter-warehouse transfers | P3-H |
 | No FIFO/LIFO/weighted-average valuation | P3-I |
+| No consignment inventory | P3-J |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
 | Gap | Effort to Close |
 |---|---|
-| No consignment / cross-docking / wave picking / RFID | Medium |
+| No cross-docking / wave picking / RFID | Medium |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
@@ -1536,7 +1614,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 |---|---|---|---|
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
-| Inventory | 9/10 | 8/10 | ▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I)) |
+| Inventory | 9/10 | 8/10 | ▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J); only cross-docking/wave-picking/RFID remain) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
@@ -1549,7 +1627,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **9.0/10** | **8.4/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **9.1/10** | **8.5/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1564,12 +1642,12 @@ the last batch (P3-F through P4-G) turned out to already have open PRs from a pr
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
 re-built. The two gaps discovered along the way with no PR ever opened for them — true
 inter-warehouse transfers (P3-H) and FIFO/LIFO/weighted-average costing (P3-I) — have since both
-been built fresh and shipped. **No further items remain on this roadmap.** Everything tracked in
-Sections 1–4 above that shows a ✅ or a closed-gap entry is real, verified, shipped code; the
-only gaps left (Section 3's "Where We Trail Enterprise" table, and the narrow WMS items —
-consignment/cross-docking/wave-picking/RFID — in Section 1.2) are either real
-external-connectivity dependencies this dev environment has no live counterpart for, or
-lower-ROI items not yet scheduled.
+been built fresh and shipped. Consignment inventory (P3-J), the next-highest-ROI item once those
+closed, has since also shipped. Everything tracked in Sections 1–4 above that shows a ✅ or a
+closed-gap entry is real, verified, shipped code; the only gaps left (Section 3's "Where We Trail
+Enterprise" table, and the narrower WMS items — cross-docking/wave-picking/RFID — in Section 1.2)
+are either real external-connectivity dependencies this dev environment has no live counterpart
+for, or lower-ROI items not yet scheduled.
 
 ---
 
