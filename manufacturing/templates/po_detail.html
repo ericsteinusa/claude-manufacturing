@@ -218,6 +218,38 @@
         <div class="po-card po-empty">This purchase order has no line items.</div>
         {% endif %}
 
+        <div class="po-card" style="margin-top:20px;">
+            <h3>Landed Costs
+                {% if can_edit %}
+                <a href="/po/{{ po.id }}/landed-cost/new/" class="btn btn-sm" style="float:right;">+ Add Landed Cost</a>
+                {% endif %}
+            </h3>
+            {% if landed_costs %}
+            <table class="po-table">
+                <thead>
+                    <tr><th>Method</th><th class="num">Freight</th><th class="num">Duty</th>
+                        <th class="num">Broker Fee</th><th class="num">Insurance</th>
+                        <th class="num">Total</th><th>Entered</th></tr>
+                </thead>
+                <tbody>
+                    {% for lc in landed_costs %}
+                    <tr>
+                        <td><a href="/po/{{ po.id }}/landed-cost/{{ lc.id }}/">{{ lc.allocation_method|capfirst }}</a></td>
+                        <td class="num">${{ lc.freight|floatformat:2 }}</td>
+                        <td class="num">${{ lc.duty|floatformat:2 }}</td>
+                        <td class="num">${{ lc.broker_fee|floatformat:2 }}</td>
+                        <td class="num">${{ lc.insurance|floatformat:2 }}</td>
+                        <td class="num">${{ lc.total|floatformat:2 }}</td>
+                        <td>{{ lc.created_at|default:"" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:#888;font-size:13px;">No landed costs recorded yet.</p>
+            {% endif %}
+        </div>
+
         {% if can_edit %}
         <div class="add-item">
             <h3>Add Line Item</h3>

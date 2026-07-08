@@ -81,6 +81,7 @@ from ..purchase_orders_core import (
     allowed_transitions, can_transition, set_po_status, receive_po_item,
 )
 from ..wms_core import ensure_wms_tables, credit_unassigned_receipt
+from ..landed_cost_core import ensure_landed_cost_tables, list_landed_costs
 from ..time_clock_core import (
     get_current_entry, clock_in as tc_clock_in, clock_out_entry,
     list_entries, total_hours as tc_total_hours,
@@ -228,6 +229,7 @@ from ._document_control import *  # noqa: F401,F403
 from ._ess import *  # noqa: F401,F403
 from ._capacity_planning import *  # noqa: F401,F403
 from ._wms import *  # noqa: F401,F403
+from ._landed_cost import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -1291,6 +1293,9 @@ def po_detail(request, po_id):
         approval = get_po_approval(conn, po_id) if po else None
         currencies = list_currencies(conn, active_only=True)
         base_currency = get_base_currency(conn).get("code", "USD")
+        ensure_landed_cost_tables(conn)
+        conn.commit()
+        landed_costs = list_landed_costs(conn, po_id) if po else []
         if request.method == 'POST' and can_edit and po:
             cur_code = request.POST.get('currency', '').strip()
             cur_rate = request.POST.get('exchange_rate', '').strip()
@@ -1334,6 +1339,7 @@ def po_detail(request, po_id):
         back_url='/po/',
         currencies=currencies,
         base_currency=base_currency,
+        landed_costs=landed_costs,
     ))
 
 
