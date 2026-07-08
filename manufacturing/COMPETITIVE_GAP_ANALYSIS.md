@@ -21,8 +21,13 @@ out every numbered item (P1–P4) in this roadmap.** 29 features shipped total.
 
 **2026-07-08, still later:** Shipped P3-H (True Inter-Warehouse Transfers), the first of the two
 gaps discovered while working the list above that had no prior PR — built fresh this session
-rather than merged from an existing branch. 30 features shipped total. Only one gap remains
-genuinely unbuilt: FIFO/LIFO/weighted-average costing (see Section 5).
+rather than merged from an existing branch. 30 features shipped total.
+
+**2026-07-08, final:** Shipped P3-I (FIFO / LIFO / Weighted-Average Costing), the second and
+last gap with no prior PR — also built fresh (`costing_layers_core.py`, opt-in per-product cost
+layers with FIFO/LIFO/weighted-average consumption, its own COGS ledger, deliberately parallel
+to and non-invasive of the existing standard-cost roll). 31 features shipped total. **Every item
+in this roadmap — all of P1 through P4, plus both gaps found along the way — is now shipped.**
 
 ---
 
@@ -34,17 +39,15 @@ or beats Infor CloudSuite, SYSPRO, and Epicor on day-to-day production, quality,
 HR, payroll, accounting, and IT management, and has closed most of the "visible gap" items (charts,
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
-The remaining gaps are now narrow and mostly either connectivity-to-a-real-external-system items
-(no live AS2/VAN/SFTP EDI transport, no live storefront, no real carrier API, no supplier portal)
-or a single supply-chain costing item with no PR ever built for it:
-1. **Real external connectivity** — EDI (P4-D), e-commerce sync (P4-E), and predictive maintenance
-   (P4-B) all ship with real logic but honestly-scoped stubs where this environment has no live
-   external system to connect to (file upload/download instead of AS2/VAN/SFTP, config-gated HTTP
-   POST instead of a live Shopify/WooCommerce store, manual sensor entry instead of IoT hardware);
-   no supplier self-service portal, no real carrier-API shipment tracking, no broader embedded-AI
-   analytics platform beyond demand forecasting and predictive maintenance
-2. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation (true inter-warehouse
-   transfers shipped as P3-H)
+Every roadmap item that could be built without a live external system to connect to has now
+shipped, including the last remaining supply-chain costing gap (FIFO/LIFO/weighted-average, P3-I).
+What remains is narrowly **real external connectivity**: EDI (P4-D), e-commerce sync (P4-E), and
+predictive maintenance (P4-B) all ship with real logic but honestly-scoped stubs where this
+environment has no live external system to connect to (file upload/download instead of
+AS2/VAN/SFTP, config-gated HTTP POST instead of a live Shopify/WooCommerce store, manual sensor
+entry instead of IoT hardware); there is also no supplier self-service portal, no real
+carrier-API shipment tracking, and no broader embedded-AI analytics platform beyond demand
+forecasting and predictive maintenance.
 
 ---
 
@@ -87,7 +90,7 @@ or a single supply-chain costing item with no PR ever built for it:
 | Expiry date tracking & alerts | ✅ | ✅ All |
 | Low stock alerts | ✅ | ✅ All |
 | ABC analysis | ✅ Partial | ✅ 9/10 |
-| **FIFO / LIFO / Weighted Average Cost valuation** | ❌ | ✅ All |
+| **FIFO / LIFO / Weighted Average Cost valuation** | ✅ Full (P3-I) — opt-in per product; standard costing unchanged as the default | ✅ All |
 | **True multi-warehouse with transfers** | ✅ Full (P3-B, P3-H) — multiple warehouses/zones/bins (P3-B) plus a draft→in_transit→completed transfer workflow that actually relocates stock between them (P3-H) | ✅ All |
 | **Warehouse Management System (WMS)** | ✅ Full (P3-B) | ✅ 9/10 |
 | **Pick / Pack / Ship automation** | ✅ Full (P3-B) | ✅ 9/10 |
@@ -98,7 +101,7 @@ or a single supply-chain costing item with no PR ever built for it:
 | **RFID integration** | ❌ | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** FIFO/LIFO/weighted-average costing, consignment inventory, cross-docking, wave picking, RFID.
+**Priority gaps:** consignment inventory, cross-docking, wave picking, RFID.
 
 ---
 
@@ -1494,12 +1497,12 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No self-service report builder | P4-F |
 | No sustainability / carbon cost tracking | P4-G |
 | No true inter-warehouse transfers | P3-H |
+| No FIFO/LIFO/weighted-average valuation | P3-I |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
 | Gap | Effort to Close |
 |---|---|
-| No FIFO/LIFO/weighted-average valuation | Medium |
 | No consignment / cross-docking / wave picking / RFID | Medium |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
@@ -1521,7 +1524,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 |---|---|---|---|
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
-| Inventory | 8/10 | 7/10 | ▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H); still no FIFO/LIFO) |
+| Inventory | 9/10 | 8/10 | ▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I)) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
@@ -1534,7 +1537,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.9/10** | **8.3/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **9.0/10** | **8.4/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1547,13 +1550,14 @@ cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-serv
 the last batch (P3-F through P4-G) turned out to already have open PRs from a prior session
 (#387–#395), discovered while working through this list, and were merged one at a time (rebase
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
-re-built. True inter-warehouse transfers (P3-H) — one of the two gaps discovered along the way
-with no PR ever opened for it — has since been built fresh and shipped. Only one item remains
-genuinely unbuilt:
-
-1. **FIFO / LIFO / Weighted Average costing** (extends Inventory) — every top-10 competitor has
-   this; currently `product` has no cost-layer concept at all, so this is a real schema addition,
-   not a query. No PR found for this one.
+re-built. The two gaps discovered along the way with no PR ever opened for them — true
+inter-warehouse transfers (P3-H) and FIFO/LIFO/weighted-average costing (P3-I) — have since both
+been built fresh and shipped. **No further items remain on this roadmap.** Everything tracked in
+Sections 1–4 above that shows a ✅ or a closed-gap entry is real, verified, shipped code; the
+only gaps left (Section 3's "Where We Trail Enterprise" table, and the narrow WMS items —
+consignment/cross-docking/wave-picking/RFID — in Section 1.2) are either real
+external-connectivity dependencies this dev environment has no live counterpart for, or
+lower-ROI items not yet scheduled.
 
 ---
 

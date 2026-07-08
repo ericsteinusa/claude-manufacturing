@@ -320,6 +320,7 @@ _PROD_MENU = {
                 ('fin_goods', 'Finished Goods', 'production/inventory.py'),
                 ('wip_inv', 'WIP Inventory', 'production/inventory.py'),
                 ('inv_rpts', 'Inventory Reports', 'production/inventory.py'),
+                ('cost_valuation', 'FIFO/LIFO/Avg Valuation', 'production/inventory.py'),
             ],
         }),
         ('equip_status', 'Equipment Status', {

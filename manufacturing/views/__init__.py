@@ -242,6 +242,7 @@ from ._edi import *  # noqa: F401,F403
 from ._ecommerce import *  # noqa: F401,F403
 from ._report_builder import *  # noqa: F401,F403
 from ._carbon import *  # noqa: F401,F403
+from ._costing_layers import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -423,6 +424,7 @@ WEB_LEAF_URLS = {
     ('production', 'fin_goods'): '/inventory/?item_type=make',
     ('production', 'wip_inv'): '/inventory/',
     ('production', 'inv_rpts'): '/inventory/',
+    ('production', 'cost_valuation'): '/inventory/valuation/',
     # Production Schedule
     ('production', 'daily_sched'):  '/prod/schedule/',
     ('production', 'week_sched'):   '/prod/schedule/',

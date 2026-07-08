@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block page_title %}Cost Valuation — {{ product.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/inventory/{{ product.id }}/" class="btn">← Product</a>
+<a href="/costs/{{ product.id }}/" class="btn">Standard Cost</a>
+<a href="/inventory/valuation/" class="btn">All Valuations</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cost-wrap { max-width: 820px; }
+.cost-wrap h2 { color: var(--text); font-size: 20px; margin-bottom: 4px; }
+.cost-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
+.cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cost-box { background: #eef4fb; border: 1px solid #a9c6e8; border-radius: 8px;
+    padding: 14px; text-align: center; }
+.cost-box .label { font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; }
+.cost-box .value { font-size: 22px; font-weight: bold; color: #1a4f8a; margin-top: 4px; }
+.hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.hist-table th, .hist-table td { padding: 6px 10px; border-bottom: 1px solid #eee; text-align: left; }
+.hist-table th { background: #eef4fb; font-weight: bold; }
+.hist-table tr:last-child td { border-bottom: none; }
+.hist-table td.num { text-align: right; font-family: monospace; }
+.btn-save { padding: 9px 22px; background: #1a4f8a; color: white; border: none;
+    border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
+.btn-save:hover { opacity: 0.85; }
+.form-row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+.form-row input, .form-row select { padding: 6px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.drift { color: #a05a00; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cost-wrap">
+    <h2>Cost Valuation — {{ product.name }}</h2>
+    <div class="cost-meta">Item type: {{ product.item_type|default:"buy"|upper }} · On-hand (product.amount): {{ product.amount|floatformat:2 }}</div>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Costing Method</h3>
+        <p style="font-size:13px;color:#555;margin-bottom:14px;">
+            Defaults to <strong>standard</strong> (today's single purchase-price
+            behavior, unchanged). Switching to fifo / lifo / average starts
+            tracking discrete cost layers per receipt below — it never touches
+            the standard-cost roll on the "Standard Cost" page, the two are
+            independent, alternative valuation methods.
+        </p>
+        <form method="post" class="form-row">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_method">
+            <select name="method">
+                {% for m in methods %}
+                <option value="{{ m }}" {% if m == method %}selected{% endif %}>{{ m|upper }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-save">Save Method</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Current Valuation</h3>
+        <div class="cost-grid" style="margin-bottom:16px;">
+            <div class="cost-box">
+                <div class="label">Layer Qty Remaining</div>
+                <div class="value">{{ valuation.layer_qty_remaining|floatformat:2 }}</div>
+            </div>
+            <div class="cost-box">
+                <div class="label">Avg Unit Cost</div>
+                <div class="value">${{ valuation.avg_unit_cost|floatformat:4 }}</div>
+            </div>
+        </div>
+        <div class="cost-box" style="width:100%;">
+            <div class="label">Total Layer Value</div>
+            <div class="value">${{ valuation.total_value|floatformat:2 }}</div>
+        </div>
+        {% if valuation.layer_qty_remaining != product.amount %}
+        <p class="drift" style="font-size:12px;margin-top:12px;">
+            ⚠ Layer-tracked qty ({{ valuation.layer_qty_remaining|floatformat:2 }}) differs from
+            product.amount ({{ product.amount|floatformat:2 }}) — some receipts/issues for this
+            product were recorded through a path that doesn't create/consume cost layers
+            (WMS, cycle count, manual adjustment, etc.). Use the forms below going forward to
+            keep the two in sync.
+        </p>
+        {% endif %}
+    </div>
+
+    {% if can_edit and method != 'standard' %}
+    <div class="card">
+        <h3>Record Costed Receipt</h3>
+        <form method="post" class="form-row">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="receive">
+            <label>Qty<br><input type="number" step="any" name="qty" required style="width:100px;"></label>
+            <label>Unit Cost<br><input type="number" step="any" name="unit_cost" required style="width:100px;"></label>
+            <label>Reference<br><input type="text" name="reference" style="width:160px;"></label>
+            <button type="submit" class="btn-save">Receive</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Record Costed Issue</h3>
+        <form method="post" class="form-row">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="issue">
+            <label>Qty<br><input type="number" step="any" name="qty" required style="width:100px;"></label>
+            <label>Reference<br><input type="text" name="reference" style="width:160px;"></label>
+            <button type="submit" class="btn-save">Issue</button>
+        </form>
+    </div>
+    {% elif method == 'standard' %}
+    <div class="card">
+        <p style="color:#888;text-align:center;padding:10px;">
+            Set a FIFO/LIFO/Average costing method above to record costed receipts and issues.
+        </p>
+    </div>
+    {% endif %}
+
+    {% if layers %}
+    <div class="card">
+        <h3>Cost Layers (remaining qty > 0)</h3>
+        <table class="hist-table">
+            <thead>
+                <tr><th>Received</th><th class="num">Unit Cost</th><th class="num">Qty Received</th>
+                    <th class="num">Qty Remaining</th><th>Reference</th></tr>
+            </thead>
+            <tbody>
+            {% for l in layers %}
+                <tr>
+                    <td>{{ l.created_at }}</td>
+                    <td class="num">${{ l.unit_cost|floatformat:4 }}</td>
+                    <td class="num">{{ l.qty_received|floatformat:2 }}</td>
+                    <td class="num">{{ l.qty_remaining|floatformat:2 }}</td>
+                    <td>{{ l.reference|default:'-' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if cogs_history %}
+    <div class="card">
+        <h3>COGS History</h3>
+        <table class="hist-table">
+            <thead>
+                <tr><th>Date</th><th>Method</th><th class="num">Qty</th>
+                    <th class="num">Total Cost</th><th class="num">Shortfall</th><th>Reference</th></tr>
+            </thead>
+            <tbody>
+            {% for c in cogs_history %}
+                <tr>
+                    <td>{{ c.created_at }}</td>
+                    <td>{{ c.method|upper }}</td>
+                    <td class="num">{{ c.qty|floatformat:2 }}</td>
+                    <td class="num"><strong>${{ c.total_cost|floatformat:2 }}</strong></td>
+                    <td class="num">{% if c.shortfall_qty %}<span class="drift">{{ c.shortfall_qty|floatformat:2 }}</span>{% else %}—{% endif %}</td>
+                    <td>{{ c.reference|default:'-' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
