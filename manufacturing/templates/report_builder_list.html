@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block page_title %}Custom Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/reports/" class="btn">← Back</a>
+<a href="/reports/builder/new/" class="btn btn-primary">+ New Report</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Custom Reports</div>
+
+    {% if reports %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Table</th>
+                    <th>Access Level</th>
+                    <th>Schedule</th>
+                    <th>Owner</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                <tr>
+                    <td><a href="/reports/builder/{{ r.id }}/">{{ r.name }}</a></td>
+                    <td>{{ r.table_name }}</td>
+                    <td><span class="pill">{{ r.access_level|capfirst }}</span></td>
+                    <td>{% if r.schedule_enabled %}{{ r.schedule_frequency|capfirst }} ({{ r.schedule_format|upper }}){% else %}—{% endif %}</td>
+                    <td>{{ r.owner_email|default:"—" }}</td>
+                    <td>
+                        <a href="/reports/builder/{{ r.id }}/edit/" class="btn btn-sm">Edit</a>
+                        <form method="post" action="/reports/builder/{{ r.id }}/delete/" style="display:inline;"
+                              onsubmit="return confirm('Delete this report?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No custom reports yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

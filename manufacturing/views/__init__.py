@@ -240,6 +240,7 @@ from ._demand_forecast import *  # noqa: F401,F403
 from ._predictive_maintenance import *  # noqa: F401,F403
 from ._edi import *  # noqa: F401,F403
 from ._ecommerce import *  # noqa: F401,F403
+from ._report_builder import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

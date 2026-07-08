@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block page_title %}{% if report %}Edit Report{% else %}New Report{% endif %}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/reports/builder/" class="btn">← Back</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rb-wrap { width: 100%; max-width: 1100px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 18px; }
+.card h3 { margin: 0 0 10px; font-size: 15px; color: #333; }
+.form-row { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
+.form-row label { font-size: 12px; font-weight: bold; color: #003cb4; }
+.form-row select, .form-row input { padding: 6px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+.cols-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 14px; }
+.cols-grid label { font-weight: normal; color: #333; font-size: 13px; display: flex; gap: 6px; align-items: center; }
+.rule-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; align-items: end; }
+.agg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; align-items: end; }
+.btn-submit { padding: 8px 20px; background: var(--accent); color: white; border: none;
+    border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 6px; }
+.btn-submit:hover { background: var(--accent-hover); }
+.list-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.list-table th, .list-table td { padding: 6px 9px; border-bottom: 1px solid #ddd; font-size: 12px; text-align: left; }
+.list-table th { background: var(--accent); color: white; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rb-wrap">
+    <h2>{% if report %}Edit Report: {{ report.name }}{% else %}New Custom Report{% endif %}</h2>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>1. Choose a Table</h3>
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="choose_table">
+            <div class="form-row" style="max-width:320px;">
+                <label>Table</label>
+                <select name="table_name" onchange="this.form.submit()">
+                    <option value="">(select a table)</option>
+                    {% for name, table in tables_json_parsed.items %}
+                    <option value="{{ name }}" {% if table_name == name %}selected{% endif %}>{{ table.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <noscript><button type="submit" class="btn btn-sm">Choose</button></noscript>
+        </form>
+    </div>
+
+    {% if table_name %}
+    <form method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="table_name" value="{{ table_name }}">
+
+        <div class="card">
+            <h3>2. Columns (used when no aggregate is selected below)</h3>
+            <div class="cols-grid">
+                {% for col, meta in current_columns.items %}
+                <label><input type="checkbox" name="columns" value="{{ col }}"
+                    {% if col in definition.columns %}checked{% endif %}> {{ meta.label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>3. Filters</h3>
+            {% for i in "012" %}
+            <div class="rule-row">
+                <select name="filter_column">
+                    <option value="">(no filter)</option>
+                    {% for col, meta in current_columns.items %}
+                    <option value="{{ col }}">{{ meta.label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="filter_operator">
+                    <option value="=">=</option>
+                    <option value="!=">!=</option>
+                    <option value=">">&gt;</option>
+                    <option value="<">&lt;</option>
+                    <option value=">=">&gt;=</option>
+                    <option value="<=">&lt;=</option>
+                    <option value="contains">contains</option>
+                    <option value="starts_with">starts with</option>
+                    <option value="in">in (comma-separated)</option>
+                    <option value="is_null">is empty</option>
+                    <option value="is_not_null">is not empty</option>
+                </select>
+                <input type="text" name="filter_value" placeholder="Value">
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h3>4. Group By &amp; Aggregate (leave blank for a flat list report)</h3>
+            <div class="form-row">
+                <label>Group By</label>
+                <div class="cols-grid">
+                    {% for col, meta in current_columns.items %}
+                    <label><input type="checkbox" name="group_by" value="{{ col }}"
+                        {% if col in definition.group_by %}checked{% endif %}> {{ meta.label }}</label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% for i in "01" %}
+            <div class="agg-row">
+                <select name="agg_column">
+                    <option value="">(no aggregate)</option>
+                    {% for col, meta in current_columns.items %}
+                    <option value="{{ col }}">{{ meta.label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="agg_func">
+                    <option value="count">Count</option>
+                    <option value="sum">Sum</option>
+                    <option value="avg">Average</option>
+                    <option value="min">Min</option>
+                    <option value="max">Max</option>
+                </select>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h3>5. Sort</h3>
+            <div class="rule-row">
+                <select name="sort_column">
+                    <option value="">(no sort)</option>
+                    {% for col, meta in current_columns.items %}
+                    <option value="{{ col }}">{{ meta.label }}</option>
+                    {% endfor %}
+                    {% for a in definition.aggregates %}
+                    <option value="{{ a.func }}_{{ a.column }}">{{ a.func|upper }}({{ a.column }})</option>
+                    {% endfor %}
+                </select>
+                <select name="sort_direction">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+                <div></div>
+            </div>
+            <button type="submit" name="action" value="preview" class="btn-submit">Run Preview</button>
+        </div>
+
+        {% if result %}
+        <div class="card">
+            <h3>Preview ({{ result.rows|length }} row(s), max 200 shown)</h3>
+            <div class="erp-table-wrap">
+                <table class="list-table">
+                    <thead><tr>{% for field, header in result.output_fields %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for row in result.row_lists %}
+                        <tr>{% for val in row %}<td>{{ val }}</td>{% endfor %}</tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h3>6. Save</h3>
+            <div class="form-row" style="max-width:320px;">
+                <label>Report Name</label>
+                <input type="text" name="name" value="{{ report.name|default:'' }}" required>
+            </div>
+            <div class="form-row" style="max-width:320px;">
+                <label>Access Level</label>
+                <select name="access_level" {% if not can_share %}disabled{% endif %}>
+                    {% for level in access_levels %}
+                    <option value="{{ level }}" {% if report.access_level == level or level == 'private' and not report %}selected{% endif %}>{{ level|capfirst }}</option>
+                    {% endfor %}
+                </select>
+                {% if not can_share %}<small style="color:#888;">Only managers can share reports beyond Private.</small>{% endif %}
+            </div>
+            <button type="submit" name="action" value="save" class="btn-submit">Save Report</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
