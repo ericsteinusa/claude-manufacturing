@@ -5,6 +5,7 @@
 <a href="{{ back_url }}" class="btn">Back</a>
 <a href="/dashboard/" class="btn">Home</a>
 <a href="/label/part/{{ product.id }}/" target="_blank" class="btn">Print Label</a>
+<a href="/inventory/{{ product.id }}/valuation/" class="btn">FIFO/LIFO/Avg Valuation</a>
 {% endblock %}
 
 {% block extra_styles %}
