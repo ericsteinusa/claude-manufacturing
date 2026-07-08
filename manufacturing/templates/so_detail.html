@@ -8,6 +8,7 @@
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
 <a href="{% url 'audit_record' 'sales_order' so.id %}" class="btn">History</a>
 {% endif %}
+<a href="/edi/855/{{ so.id }}/download/" class="btn">Download 855 (EDI)</a>
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}
 

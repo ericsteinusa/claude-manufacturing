@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_title %}EDI Transaction Log{% endblock %}
+
+{% block toolbar_left %}
+<a href="/edi/partners/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">EDI Transaction Log</div>
+
+    {% if log_rows %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Doc Type</th>
+                    <th>Direction</th>
+                    <th>Customer</th>
+                    <th>Reference #</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in log_rows %}
+                <tr>
+                    <td>{{ l.created_at|slice:":19" }}</td>
+                    <td><span class="pill">EDI {{ l.doc_type }}</span></td>
+                    <td>{{ l.direction|capfirst }}</td>
+                    <td>{{ l.company_name|default:l.first_name }} {{ l.last_name|default:"" }}</td>
+                    <td>{{ l.reference_number|default:"—" }}</td>
+                    <td>{{ l.created_by|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No EDI transactions logged yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

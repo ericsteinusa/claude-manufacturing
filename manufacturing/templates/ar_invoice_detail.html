@@ -3,6 +3,7 @@
 
 {% block toolbar_left %}
 <a href="/ar/" class="btn">All Invoices</a>
+{% if invoice %}<a href="/edi/810/{{ invoice.id }}/download/" class="btn">Download 810 (EDI)</a>{% endif %}
 <a href="/ap/" class="btn">A/P</a>
 <a href="/gl/" class="btn">G/L</a>
 <a href="/dashboard/" class="btn">Home</a>
