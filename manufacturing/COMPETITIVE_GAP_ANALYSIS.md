@@ -1241,11 +1241,70 @@ Real-time production visibility — Plex's core differentiator.
   description appeared; confirmed the transaction log showed all four
   actions; cleaned up all test data afterward.
 
-#### P4-E: e-Commerce Integration
+#### P4-E: e-Commerce Integration ✅ Done
 - Shopify / WooCommerce webhook: new order → auto-create SO
 - Inventory level sync: push on-hand qty to storefront on every transaction
 - Product catalog sync: push price list changes to storefront
 - Shipment confirmation: push tracking number back to storefront order
+
+**Implementation notes:** `ecommerce_core.py` — real, platform-agnostic
+inbound webhook handling: Shopify (`X-Shopify-Hmac-Sha256`) and
+WooCommerce (`X-WC-Webhook-Signature`) both sign as
+`base64(HMAC-SHA256(secret, raw_body))`, so `verify_webhook_signature`
+covers both with one function; `parse_order_webhook` normalizes both
+platforms' near-identical order JSON (`line_items: [{sku, quantity,
+price, name}]`) into a common shape. `receive_order_webhook` verifies
+the signature, dedupes against `ecommerce_order_log`
+(`UNIQUE(connection_id, external_order_id)`) so retried/replayed
+webhooks don't create duplicate orders — unlike EDI's one-shot manual
+file upload (P4-D), a storefront webhook can legitimately fire more than
+once for the same order — then creates a real Sales Order via the
+existing, unmodified `sales_orders_core.next_so_number`/`create_so`/
+`add_so_item`. Unmapped line items (no matching `storefront_item_xref`
+row) still import as valid `so_item`s with `product_id=None`, mirroring
+how `so_item` already supports text-only lines. `product` has no
+SKU/code column anywhere in this codebase, so `storefront_item_xref`
+(storefront SKU ↔ our `product_id`) is the actual field-mapping
+mechanism, exactly as `edi_partner_item_xref` is for EDI.
+
+There is no live Shopify/WooCommerce store reachable from this
+environment, so outbound sync (inventory level, price, shipment
+confirmation) is real, config-gated HTTP POST code (stdlib
+`urllib.request` — no new dependency): if a connection has a
+`sync_endpoint_url` configured, it is actually called and the real
+success/failure is logged; with no endpoint configured the attempt is
+logged as `queued` rather than faked as delivered — the exact precedent
+already set by `send_daily_digest.py`'s `EMAIL_HOST`-gated email/print
+fallback. Price push reads from this codebase's existing tiered pricing
+(`price_list_core.get_price_for_product`) rather than
+`product.purchase_price` (cost, not a sell price). "Push on every
+transaction" is implemented as on-demand sync buttons (connection detail
+page) plus a schedulable batch command (`manage.py sync_ecommerce`,
+doc-commented with cron/Task Scheduler wiring like
+`send_daily_digest.py`) rather than intrusive hooks into `product`'s 5+
+duplicated `CREATE TABLE`/mutation call sites. New pages at
+`/ecommerce/connections/...` (storefront connection + item xref setup,
+shows the webhook URL to configure in the storefront's admin),
+`/ecommerce/webhook/<id>/order/` (the machine-facing, non-session-gated
+webhook receiver — HMAC *is* the auth here), and `/ecommerce/log/`;
+cross-linked from `so_list.html` ("e-Commerce") and
+`prod_shipping_detail.html` ("Push Shipment Confirmation"). Verified
+end-to-end against a running dev server + local Postgres through the
+actual web views and a real local HTTP listener: configured a real
+storefront connection + item mapping, signed a realistic Shopify-shaped
+order payload and POSTed it to the webhook, confirming a real SO was
+created with the mapped line resolving to the right `product_id` and the
+unmapped line staying text-only; replayed the identical payload and
+confirmed it was detected as a duplicate (no second SO); POSTed with a
+bad signature and confirmed a 401 rejection; pointed a connection's
+`sync_endpoint_url` at a real local HTTP server and confirmed the actual
+POST body arrived and was logged `success`, then at an unreachable port
+and confirmed a real `failed` status with the real connection error;
+used the "Sync Now" buttons with no endpoint configured and confirmed a
+`queued` log entry; pushed a shipment confirmation for a shipment on the
+webhook-created SO and confirmed the right `external_order_id` appeared
+in the payload; ran `manage.py sync_ecommerce` and confirmed its summary
+output; cleaned up all test data afterward.
 
 #### P4-F: Custom Report Builder
 - Field selector: pick any table/column to include
