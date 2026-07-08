@@ -15,7 +15,7 @@ from django.urls import reverse
 from ..log_utils import get_logger
 from ..schema import init_schema
 from ..db_pg import get_db_connection
-from ..csv_export import csv_response
+from ..csv_export import export_response
 from ..audit_core import get_recent, get_history, AUDITED_TABLES
 from ..approval_core import (
     needs_approval, request_approval, approve_po, reject_po,
@@ -1271,7 +1271,7 @@ def po_export(request):
     finally:
         conn.close()
 
-    return csv_response('purchase_orders.csv', [
+    return export_response(request, 'purchase_orders', [
         ('po_number', 'PO #'), ('company_name', 'Supplier'),
         ('order_date', 'Order Date'), ('expected_date', 'Expected Date'),
         ('item_count', 'Items'), ('total', 'Total'), ('status', 'Status'),
@@ -1694,7 +1694,7 @@ def wo_export(request):
     finally:
         conn.close()
 
-    return csv_response('work_orders.csv', [
+    return export_response(request, 'work_orders', [
         ('wo_number', 'WO #'), ('product_name', 'Product'),
         ('description', 'Description'), ('quantity', 'Qty'),
         ('start_date', 'Start Date'), ('due_date', 'Due Date'),
@@ -2034,7 +2034,7 @@ def so_export(request):
     for so in sos:
         so['customer_name'] = _so_customer_name(so)
 
-    return csv_response('sales_orders.csv', [
+    return export_response(request, 'sales_orders', [
         ('so_number', 'SO #'), ('customer_name', 'Customer'),
         ('order_date', 'Order Date'), ('ship_date', 'Ship Date'),
         ('item_count', 'Items'), ('total', 'Total'), ('status', 'Status'),
@@ -3614,7 +3614,7 @@ def inventory_export(request):
     finally:
         conn.close()
 
-    return csv_response('inventory.csv', [
+    return export_response(request, 'inventory', [
         ('name', 'Product'), ('item_type', 'Type'), ('uom', 'UOM'),
         ('bin', 'Bin'), ('amount', 'On Hand'), ('reorder_point', 'Reorder Point'),
         ('purchase_price', 'Purchase Price'), ('lead_time_days', 'Lead Time (days)'),
@@ -4602,7 +4602,7 @@ def ap_export(request):
     finally:
         conn.close()
 
-    return csv_response('ap_invoices.csv', [
+    return export_response(request, 'ap_invoices', [
         ('invoice_number', 'Invoice #'), ('vendor_label', 'Vendor'),
         ('invoice_date', 'Invoice Date'), ('due_date', 'Due Date'),
         ('amount', 'Amount'), ('paid', 'Paid'), ('balance', 'Balance'),
@@ -4744,7 +4744,7 @@ def ar_export(request):
     finally:
         conn.close()
 
-    return csv_response('ar_invoices.csv', [
+    return export_response(request, 'ar_invoices', [
         ('invoice_number', 'Invoice #'), ('customer_label', 'Customer'),
         ('invoice_date', 'Invoice Date'), ('due_date', 'Due Date'),
         ('amount', 'Amount'), ('received', 'Received'), ('balance', 'Balance'),

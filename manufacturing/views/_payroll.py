@@ -5,7 +5,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
-from ..csv_export import csv_response
+from ..csv_export import export_response
 
 from ..payroll_core import (
     SS_RATE, MEDICARE_RATE,
@@ -187,7 +187,7 @@ def payroll_history_export(request):
     finally:
         conn.close()
 
-    return csv_response('payroll_runs.csv', [
+    return export_response(request, 'payroll_runs', [
         ('run_date', 'Run Date'), ('pay_period_start', 'Period Start'),
         ('pay_period_end', 'Period End'), ('emp_count', 'Employees'),
         ('total_gross', 'Total Gross'), ('total_net', 'Total Net'),

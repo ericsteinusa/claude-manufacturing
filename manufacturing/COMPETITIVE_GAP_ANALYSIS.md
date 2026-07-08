@@ -1,19 +1,34 @@
 # Manufacturing ERP — Competitive Gap Analysis
-**Generated:** 2026-07-05  
+**Generated:** 2026-07-05 · **Refreshed:** 2026-07-08
 **Compared Against:** SAP S/4HANA, Oracle Cloud Manufacturing, Microsoft Dynamics 365 SCM, Epicor Kinetic, Infor CloudSuite Industrial, Plex Manufacturing Cloud, SYSPRO, Fishbowl, JobBOSS², MRPeasy
+
+**What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
+Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
+16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
+domain table below against that reality, corrects two items the original pass got wrong (the mobile
+app already has a Maintenance screen — `mobile/app/(tabs)/maintenance.tsx` — and a scheduled email
+digest already exists — `manufacturing/management/commands/send_daily_digest.py` — neither was
+credited before), and re-ranks the remaining roadmap.
+
+**2026-07-08, later same day:** Shipped P1-G (Excel export), closing the one item the refresh
+identified as lowest-effort. 17 features shipped total.
 
 ---
 
 ## Executive Summary
 
-This ERP is a **fully-featured mid-market system** with strong parity in core manufacturing, quality, maintenance, purchasing, sales, HR, payroll, accounting, and IT management. It holds its own against platforms like Infor CloudSuite, SYSPRO, and Epicor for the majority of day-to-day operations.
+This ERP is now a **strong mid-market system with several upper-mid-market capabilities** — finite
+capacity scheduling, a full WMS, ATP, and OEE all shipped since the last pass. It comfortably matches
+or beats Infor CloudSuite, SYSPRO, and Epicor on day-to-day production, quality, purchasing, sales,
+HR, payroll, accounting, and IT management, and has closed most of the "visible gap" items (charts,
+export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
-The primary gaps fall into five areas:
-1. **Advanced Planning & Scheduling (APS)** — no finite scheduling, Gantt, or constraint-based sequencing
-2. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting
-3. **Shop Floor / MES** — no OEE, no IoT/sensor connectivity, no real-time machine data
-4. **Supply Chain Depth** — no Available-to-Promise, no Capable-to-Promise, no landed cost, no EDI
-5. **Multi-Company / Multi-Site** — single-entity model; no intercompany, no legal entity separation
+The primary gaps now fall into five areas:
+1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched)
+2. **Live Shop-Floor / MES** — OEE now exists but is report/batch-based, not real-time; no IoT/sensor connectivity, no shop-floor TV mode, no operator data entry terminal
+3. **Multi-Company / Multi-Site** — still a single-entity model; no intercompany, no legal entity separation
+4. **Trading-Partner & Customer-Facing Integration** — no EDI, no customer/supplier self-service portals, no carrier-API shipment tracking, no e-commerce sync
+5. **Supply-Chain Costing Depth** — no landed cost allocation, no blanket POs/call-offs, no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
 
@@ -31,17 +46,17 @@ The primary gaps fall into five areas:
 | Production schedule views (day/week/month) | ✅ | ✅ All |
 | Work order cost tracking (material/labor/overhead/variance) | ✅ Full | ✅ All |
 | Make-to-Order / Make-to-Stock / Engineer-to-Order | ✅ | ✅ All |
-| **Advanced Planning & Scheduling (APS)** | ❌ | ✅ 8/10 |
-| **Finite capacity scheduling** | ❌ | ✅ 8/10 |
-| **Gantt chart drag-and-drop scheduler** | ❌ | ✅ 8/10 |
-| **Constraint-based sequencing** | ❌ | ✅ 7/10 (Infor core) |
-| **Bottleneck analysis** | ❌ | ✅ 7/10 |
+| **Advanced Planning & Scheduling (APS)** | ✅ (P3-A) | ✅ 8/10 |
+| **Finite capacity scheduling** | ✅ Full (P3-A) | ✅ 8/10 |
+| **Gantt chart drag-and-drop scheduler** | ✅ Full (P2-A) | ✅ 8/10 |
+| **Constraint-based sequencing** | ✅ Partial — cross-workcenter operation ordering enforced; load leveling is a greedy heuristic, not a true solver | ✅ 7/10 (Infor core) |
+| **Bottleneck analysis** | ✅ Full (P3-A) — utilization-% ranking | ✅ 7/10 |
 | **What-if scenario planning** | ❌ | ✅ 8/10 |
 | **Configure-to-Order (CTO)** | ❌ | ✅ 7/10 |
 | **Recipe / formula management (process mfg)** | ❌ | ✅ 7/10 |
 | **Repetitive manufacturing** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** APS + Gantt scheduler, finite capacity, what-if scenarios.
+**Priority gaps:** what-if scenario planning, Configure-to-Order, recipe/formula management (process mfg), repetitive manufacturing.
 
 ---
 
@@ -57,17 +72,17 @@ The primary gaps fall into five areas:
 | Low stock alerts | ✅ | ✅ All |
 | ABC analysis | ✅ Partial | ✅ 9/10 |
 | **FIFO / LIFO / Weighted Average Cost valuation** | ❌ | ✅ All |
-| **True multi-warehouse with transfers** | ❌ | ✅ All |
-| **Warehouse Management System (WMS)** | ❌ | ✅ 9/10 |
-| **Pick / Pack / Ship automation** | ❌ | ✅ 9/10 |
-| **Cycle count structured workflow** | ❌ | ✅ All |
+| **True multi-warehouse with transfers** | ✅ Partial (P3-B) — multiple warehouses/zones/bins now exist, but nothing moves stock *between* warehouses | ✅ All |
+| **Warehouse Management System (WMS)** | ✅ Full (P3-B) | ✅ 9/10 |
+| **Pick / Pack / Ship automation** | ✅ Full (P3-B) | ✅ 9/10 |
+| **Cycle count structured workflow** | ✅ Full (P1-D) | ✅ All |
 | **Consignment inventory** | ❌ | ✅ 7/10 |
 | **Cross-docking** | ❌ | ✅ 6/10 |
-| **Wave picking management** | ❌ | ✅ 6/10 |
+| **Wave picking management** | ❌ — pick lists are one-per-SO with a zone-aware sort, not multi-order wave batching | ✅ 6/10 |
 | **RFID integration** | ❌ | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** True WMS with pick/pack/ship, cycle count workflow, FIFO/LIFO costing, multi-warehouse transfers.
+**Priority gaps:** FIFO/LIFO/weighted-average costing, true inter-warehouse transfers, consignment inventory, cross-docking, wave picking, RFID.
 
 ---
 
@@ -86,13 +101,13 @@ The primary gaps fall into five areas:
 | Customer complaint tracking | ✅ | ✅ 8/10 |
 | Sample management | ✅ | ✅ 7/10 |
 | Audit trail & full traceability | ✅ Full | ✅ All |
-| **Sampling plans & AQL (acceptance quality limit)** | ❌ | ✅ 8/10 |
+| **Sampling plans & AQL (acceptance quality limit)** | ✅ Full (P2-E) — ISO 2859-1; seeded accept/reject table covers AQL 0.65–4.0, code letters C-N only | ✅ 8/10 |
 | **Control plans & FMEA** | ❌ | ✅ 7/10 |
 | **Certificate of Analysis (CoA) generation** | ❌ | ✅ 7/10 |
-| **Document control & version management** | ❌ | ✅ 8/10 |
+| **Document control & version management** | ✅ Full (P2-F) — draft→review→approved→superseded→obsolete, revision history, file upload/download | ✅ 8/10 |
 | **Regulatory compliance templates (FDA, ISO)** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** Sampling plans/AQL, CoA generation, document control module, FMEA.
+**Priority gaps:** CoA generation, FMEA/control plans, regulatory compliance templates.
 
 ---
 
@@ -107,16 +122,16 @@ The primary gaps fall into five areas:
 | Three-way match (PO/receipt/invoice) | ✅ Partial | ✅ All |
 | Vendor/supplier master | ✅ | ✅ All |
 | Purchasing contracts | ✅ | ✅ 7/10 |
-| **Request for Quote (RFQ) module** | ❌ | ✅ All |
-| **Vendor quote comparison & scoring** | ❌ | ✅ All |
-| **Supplier performance scorecard** | ❌ | ✅ 7/10 |
+| **Request for Quote (RFQ) module** | ✅ Full (P1-F) — per-line award, one draft PO per winning vendor | ✅ All |
+| **Vendor quote comparison & scoring** | ✅ Full (P1-F) — side-by-side table, lowest-quote flagging | ✅ All |
+| **Supplier performance scorecard** | ✅ Full (P2-C) — on-time %, fill rate %, quality reject %, composite score | ✅ 7/10 |
 | **Supplier collaboration / self-service portal** | ❌ | ✅ 6/10 |
 | **Blanket orders & call-offs** | ❌ | ✅ 9/10 |
 | **Freight & landed cost allocation** | ❌ | ✅ 7/10 |
 | **EDI (850/856/810)** | ❌ | ✅ 8/10 |
-| **Auto-generated POs from MRP** | ❌ | ✅ All |
+| **Auto-generated POs from MRP** | ✅ Full (P2-H) — preferred-supplier lookup wired into MRP release | ✅ All |
 
-**Priority gaps:** RFQ with quote comparison, supplier scorecards, blanket orders, landed cost, MRP→PO auto-release.
+**Priority gaps:** supplier self-service portal, blanket orders/call-offs, landed cost, EDI.
 
 ---
 
@@ -134,15 +149,15 @@ The primary gaps fall into five areas:
 | Accounts Receivable with aging & DSO | ✅ Full | ✅ All |
 | RMA / returns management | ✅ | ✅ All |
 | Demand by product analytics | ✅ | ✅ 8/10 |
-| **Available-to-Promise (ATP)** | ❌ | ✅ 9/10 |
+| **Available-to-Promise (ATP)** | ✅ Full (P2-B) — inquiry screen, live SO-line badge, soft confirm-gate | ✅ 9/10 |
 | **Capable-to-Promise (CTP)** | ❌ | ✅ 6/10 |
-| **Price list management & tiered pricing** | ❌ | ✅ All |
+| **Price list management & tiered pricing** | ✅ Full (P1-E) — client-side SO auto-populate by tier | ✅ All |
 | **Discount & promotion management** | ❌ | ✅ All |
 | **Customer self-service portal** | ❌ | ✅ 7/10 |
-| **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ | ✅ 9/10 |
+| **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ — WMS (P3-B) records carrier + tracking number manually at ship confirm; no carrier API lookup | ✅ 9/10 |
 | **Multi-channel order integration (e-commerce)** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** ATP/CTP, price lists, carrier integration, customer portal.
+**Priority gaps:** CTP, discount/promotion management, customer portal, carrier API integration, e-commerce sync.
 
 ---
 
@@ -166,14 +181,14 @@ The primary gaps fall into five areas:
 | WIP tracking | ✅ | ✅ All |
 | Job costing | ✅ | ✅ All |
 | Cost of Goods Manufactured (COGM) | ✅ | ✅ All |
-| **Cash flow statement & 13-week forecast** | ❌ | ✅ 7/10 |
+| **Cash flow statement & 13-week forecast** | ✅ Full (P2-D) — indirect method; inventory-value change and financing activities explicitly called out as always-zero (no point-in-time inventory valuation or debt table exists) | ✅ 7/10 |
 | **Activity-Based Costing (ABC)** | ❌ | ✅ 6/10 |
 | **Multi-entity / legal entity separation** | ❌ | ✅ 8/10 |
 | **Intercompany transactions** | ❌ | ✅ 7/10 |
 | **Consolidated financial reporting** | ❌ | ✅ 7/10 |
 | **Sustainability / carbon cost tracking** | ❌ | ✅ 5/10 |
 
-**Priority gaps:** Cash flow forecasting, multi-entity/intercompany, consolidated reporting.
+**Priority gaps:** multi-entity/intercompany, consolidated reporting, Activity-Based Costing.
 
 ---
 
@@ -189,13 +204,13 @@ The primary gaps fall into five areas:
 | Performance reviews | ✅ | ✅ 7/10 |
 | Training & certification tracking | ✅ | ✅ 7/10 |
 | Overtime approval workflow | ✅ | ✅ 8/10 |
-| **Employee self-service (ESS) portal** | ❌ | ✅ 7/10 |
+| **Employee self-service (ESS) portal** | ✅ Full (P2-G) — pay stubs, time-off balance/request, clock in/out, reviews/training, contact info | ✅ 7/10 |
 | **Benefits management** | ❌ | ✅ 7/10 |
 | **Skills matrix & competency gap analysis** | ❌ | ✅ 6/10 |
 | **Workforce analytics & headcount planning** | ❌ | ✅ 7/10 |
 | **Applicant Tracking / Recruiting (ATS)** | ❌ | ✅ 5/10 |
 
-**Priority gaps:** Employee self-service portal, skills matrix, benefits management.
+**Priority gaps:** skills matrix, benefits management, workforce analytics.
 
 ---
 
@@ -213,14 +228,14 @@ The primary gaps fall into five areas:
 | Maintenance mechanics management | ✅ | ✅ 7/10 |
 | MTBF / MTTR / equipment availability metrics | ✅ Full | ✅ 7/10 |
 | Barcode scanning for equipment | ✅ | ✅ 8/10 |
-| **OEE (Overall Equipment Effectiveness)** | ❌ | ✅ 7/10 |
-| **Predictive maintenance (trend-based alerts)** | ❌ | ✅ 7/10 |
-| **Mobile maintenance app** | ❌ | ✅ 8/10 |
+| **OEE (Overall Equipment Effectiveness)** | ✅ Partial (P1-C) — per-workcenter, MTD card + 8-week trend + report; report/batch-based, not live real-time shop-floor | ✅ 7/10 |
+| **Predictive maintenance (trend-based alerts)** | ❌ — MTBF/MTTR exist but no rolling-interval alerting | ✅ 7/10 |
+| **Mobile maintenance app** | ✅ (already existed, not credited in original pass) — `mobile/app/(tabs)/maintenance.tsx`: work order list + detail + complete | ✅ 8/10 |
 | **Technician routing & scheduling** | ❌ | ✅ 6/10 |
 | **Asset Performance Management (APM)** | ❌ | ✅ 6/10 |
 | **IoT / sensor integration** | ❌ | ✅ 6/10 |
 
-**Priority gaps:** OEE tracking, mobile app, predictive maintenance trend alerts.
+**Priority gaps:** predictive maintenance alerts, live/real-time OEE (P3-G), IoT/sensor integration.
 
 ---
 
@@ -252,16 +267,16 @@ The primary gaps fall into five areas:
 | Quality KPI reports | ✅ | ✅ 9/10 |
 | Maintenance reliability metrics (MTBF/MTTR) | ✅ | ✅ 7/10 |
 | REST API for custom integrations | ✅ | ✅ All |
-| **Embedded charts & graphs on dashboards** | ❌ | ✅ All |
-| **Excel / CSV export from any list** | ❌ | ✅ All |
+| **Embedded charts & graphs on dashboards** | ✅ Full (P1-A) — Chart.js on production/sales/quality/finance/maintenance dashboards, 10 charts | ✅ All |
+| **Excel / CSV export from any list** | ✅ Full (P1-B, P1-G) — both formats on all 9 list pages | ✅ All |
 | **Custom / self-service report builder** | ❌ | ✅ 7/10 |
-| **OEE reporting** | ❌ | ✅ 7/10 |
-| **Live shop floor performance (real-time)** | ❌ | ✅ 7/10 |
+| **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
+| **Live shop floor performance (real-time)** | ❌ (P3-G not yet built) | ✅ 7/10 |
 | **Predictive / AI analytics** | ❌ | ✅ 7/10 |
 | **Batch record generation** | ❌ | ✅ 6/10 |
-| **Scheduled report delivery (email)** | ❌ | ✅ 7/10 |
+| **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
 
-**Priority gaps:** Charts/graphs everywhere, CSV/Excel export, OEE, report builder.
+**Priority gaps:** self-service report builder, live shop-floor performance, predictive/AI analytics.
 
 ---
 
@@ -393,6 +408,24 @@ Missing from purchasing. All 10 competitors have it.
   (both allow `None`) — every existing caller happens to always supply a
   real date, but `award_items()` initially didn't, causing every
   award-to-PO conversion to 500. Fixed by passing today's date explicitly.
+
+#### P1-G: Excel Export on Every List Page ✅ Done
+Closes the "CSV only" gap called out in the 2026-07-08 refresh — every top-10 competitor offers
+native Excel export, not just CSV.
+- **Shipped:** Extended `manufacturing/csv_export.py` with `excel_response()` and a format-dispatch
+  `export_response(request, base_filename, columns, rows)` that picks CSV or XLSX from `?format=xlsx`,
+  sharing the exact same `columns`/`rows` assembly each of the 9 `_export` views already built for
+  P1-B — no view logic duplicated, only the final serialization step branches. `excel_response()`
+  itself is a thin wrapper around `reports_core.export_to_excel()`, a Qt-free XLSX builder that
+  **already existed with full test coverage in `test_phase5_reports.py` but had never been wired
+  into any view** — found while implementing this, so this feature is mostly a wiring exercise, not
+  new serialization code. All 9 list pages (WO, PO, SO, AP, AR, inventory, QA NCR, maintenance WO,
+  payroll history) now show both "⬇ Export CSV" and "⬇ Export Excel" buttons side by side, each
+  preserving that page's existing filters in the querystring. Verified end-to-end against a running
+  dev server: logged in, hit all 9 `?format=xlsx` endpoints (200 + correct
+  `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` content type + `.xlsx`
+  filename), and loaded one of the downloaded files back with `openpyxl` to confirm real headers,
+  bold header row, and correct row data — not just a non-empty byte stream.
 
 ---
 
@@ -855,70 +888,104 @@ Real-time production visibility — Plex's core differentiator.
 | **Fixed Assets with depreciation schedule** | Matches all platforms (just added) |
 | **Multi-currency on PO/SO/AP/AR** | Matches all platforms (just added) |
 
+### Newly Closed Since the Original Pass (2026-07-05 → 2026-07-08)
+
+| Former Gap | Shipped As |
+|---|---|
+| No visual Gantt / production board | P2-A |
+| No charts/graphs on dashboards | P1-A |
+| No CSV export | P1-B |
+| No OEE tracking | P1-C |
+| No cycle count workflow | P1-D |
+| No price lists | P1-E |
+| No RFQ module | P1-F |
+| No finite APS / constraint scheduling | P3-A |
+| No ATP | P2-B |
+| No supplier scorecards | P2-C |
+| No cash flow statement / forecast | P2-D |
+| No sampling plans / AQL | P2-E |
+| No document control | P2-F |
+| No ESS portal | P2-G |
+| No MRP → auto-release POs | P2-H |
+| No WMS (pick/pack/ship) | P3-B |
+
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
 | Gap | Effort to Close |
 |---|---|
-| No visual Gantt / production board | Medium (P2-A) |
-| No charts/graphs on dashboards | Low (P1-A) |
-| No CSV/Excel export | Low (P1-B) |
-| No OEE tracking | Low (P1-C) |
-| No RFQ module | Low (P1-F) |
-| No price lists | Low (P1-E) |
-| No ATP | Medium (P2-B) |
-| No cycle count workflow | Low (P1-D) |
-| No supplier scorecards | Medium (P2-C) |
-| No WMS (pick/pack/ship) | High (P3-B) |
+| No blanket orders & call-offs | Medium (P3-E) |
+| No landed cost allocation | Medium (P3-D) |
+| No FIFO/LIFO/weighted-average valuation | Medium |
+| No true inter-warehouse transfers | Low–Medium |
+| No consignment / cross-docking / wave picking / RFID | Medium |
+| No self-service report builder | Medium (P4-F) |
+| No CTP | High (P4-C) |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
 | Gap | Effort to Close |
 |---|---|
-| No finite APS / constraint scheduling | High (P3-A) |
 | No multi-entity / intercompany | High (P3-F) |
 | No AI / predictive analytics | Very High (P4-A, P4-B) |
 | No EDI | High (P4-D) |
-| No IoT / shop floor integration | Very High |
+| No live shop-floor / IoT integration | Very High (P3-G, P4-B) |
 | No customer or supplier portals | High (P3-C) |
+| No carrier API / e-commerce integration | Medium–High (P4-E) |
 | No CTP | High (P4-C) |
 
 ---
 
 ## Section 4: Feature Gap Score Card
 
-| Domain | Score vs. Mid-Market | Score vs. Enterprise |
-|---|---|---|
-| Work Orders & BOM | 9/10 | 8/10 |
-| MRP | 8/10 | 7/10 |
-| Inventory | 6/10 | 5/10 |
-| Quality (QA) | 8/10 | 7/10 |
-| Purchasing | 7/10 | 6/10 |
-| Sales / CRM | 7/10 | 6/10 |
-| Finance / GL | 8/10 | 7/10 |
-| Fixed Assets | 9/10 | 8/10 |
-| Multi-Currency | 8/10 | 7/10 |
-| HR / Payroll | 7/10 | 6/10 |
-| Maintenance (CMMS) | 8/10 | 6/10 |
-| IT Management | 10/10 | 9/10 |
-| Reporting / Analytics | 5/10 | 4/10 |
-| Scheduling / APS | 2/10 | 1/10 |
-| WMS / Shipping | 2/10 | 1/10 |
-| **Overall** | **7.1/10** | **5.9/10** |
+| Domain | Score vs. Mid-Market | Score vs. Enterprise | Change |
+|---|---|---|---|
+| Work Orders & BOM | 9/10 | 8/10 | — |
+| MRP | 8/10 | 7/10 | — |
+| Inventory | 7/10 | 6/10 | ▲ (cycle count + WMS bins; still no FIFO/LIFO or transfers) |
+| Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
+| Purchasing | 9/10 | 8/10 | ▲▲ (RFQ + scorecards + MRP auto-release) |
+| Sales / CRM | 8/10 | 7/10 | ▲ (ATP + price lists) |
+| Finance / GL | 9/10 | 8/10 | ▲ (cash flow statement/forecast) |
+| Fixed Assets | 9/10 | 8/10 | — |
+| Multi-Currency | 8/10 | 7/10 | — |
+| HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
+| Maintenance (CMMS) | 9/10 | 7/10 | ▲ (OEE; mobile app now credited) |
+| IT Management | 10/10 | 9/10 | — |
+| Reporting / Analytics | 8/10 | 7/10 | ▲▲▲ (charts, CSV+Excel export, OEE reports, digest now credited) |
+| Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
+| WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
+| **Overall** | **8.4/10** | **7.3/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
 ## Section 5: Next 10 Features to Build (Ordered by ROI)
 
-1. **Charts & graphs on dashboards** (P1-A) — highest visibility, low effort
-2. **CSV/Excel export** (P1-B) — users ask for this constantly
-3. **OEE tracking** (P1-C) — data exists, just needs formula + display
-4. **RFQ module** (P1-F) — closes a full purchasing workflow gap
-5. **Price list module** (P1-E) — enables ATP and proper quoting
-6. **Cycle count workflow** (P1-D) — completes inventory accuracy loop
-7. **Gantt chart scheduler** (P2-A) — biggest visible gap vs. mid-market
-8. **Available-to-Promise (ATP)** (P2-B) — improves SO delivery accuracy
-9. **Supplier performance scorecard** (P2-C) — data-driven procurement
-10. **MRP → auto-release POs/WOs** (P2-H) — makes MRP actionable
+All 16 of the original "next 10 + P3-A/B" items are shipped. Ranked from what's left on the roadmap
+(P3-C through P4-G), by business impact vs. build effort:
+
+1. ~~**Excel export**~~ ✅ Done — see P1-G below.
+2. **Landed cost allocation** (P3-D) — data (PO receipts, freight/duty entry) is straightforward to
+   add and directly impacts COGM accuracy, a recurring theme in this codebase's finance work.
+3. **Blanket Purchase Orders & call-offs** (P3-E) — standard mid-market expectation; builds cleanly
+   on the existing `purchase_orders_core.py` without touching approval/PO-status logic.
+4. **True inter-warehouse transfers** (extends P3-B) — `wms_core.py` already has multiple
+   warehouses/zones/bins; a transfer is "ship from bin A, receive into bin B" reusing
+   `_adjust_bin_stock`, no new subsystem needed.
+5. **Predictive maintenance trend alerts** (P4-B, narrow slice) — MTBF/MTTR already computed by
+   `maintenance_core`; alerting when time-since-last-failure crosses 0.8× MTBF is a query + a
+   dashboard badge, not a new ML system.
+6. **OEE Live Shop Floor Dashboard** (P3-G) — extends the P1-C/P3-A OEE work from
+   report/batch-based to a real-time operator entry + shift summary; biggest remaining visible gap
+   vs. Plex specifically.
+7. **Customer Self-Service Portal** (P3-C) — mirrors the ESS portal (P2-G) pattern already proven
+   in this codebase, applied to `customer`/`ar_invoice`/`shipment` instead of `people`.
+8. **FIFO / LIFO / Weighted Average costing** (extends Inventory) — every top-10 competitor has
+   this; currently `product` has no cost-layer concept at all, so this is a real schema addition,
+   not a query.
+9. **Multi-Company / Multi-Entity** (P3-F) — highest strategic value for reaching enterprise
+   parity, but touches GL/AP/AR/tax pervasively; sequence after the smaller finance items above.
+10. **Capable-to-Promise (CTP)** (P4-C) — natural extension of ATP (P2-B) + capacity check
+    (P3-A), now that both prerequisites exist.
 
 ---
 
