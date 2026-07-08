@@ -1349,12 +1349,44 @@ delivery (`manage.py run_scheduled_reports`) reuses the exact
 whether it's due, verified end-to-end (a report ran once, then a second
 immediate run correctly skipped it as not yet due).
 
-#### P4-G: Sustainability / Carbon Cost Tracking
+#### P4-G: Sustainability / Carbon Cost Tracking ✅ Done
 - CO₂ emission factor per material (kg CO₂e per unit)
 - CO₂ emission factor per process/operation (kg CO₂e per hour)
 - Carbon cost rollup on BOM → product carbon footprint
 - Carbon intensity metric: kg CO₂e per unit produced
 - ESG dashboard: scope 1 (direct), scope 2 (energy), scope 3 (supply chain)
+
+**Implementation notes:** `carbon_core.py` — a direct structural mirror
+of the existing standard-cost rollup (`costing_core.roll_standard_cost`):
+same BOM-explosion recursion, same `'buy'` (direct per-unit factor) vs
+`'make'` (recursive children + own routing process emissions) split,
+same `_MAX_DEPTH`/`_visited` cycle guard, same roll-then-snapshot
+(`carbon_roll`) pattern, same per-WO-actual-quantity multiplication
+(`wo_carbon_actual`) for a carbon-intensity-per-unit metric — kg CO₂e
+instead of dollars. Material factor (`kg_co2e_per_unit`) lives directly
+on `product`, parallel to `purchase_price`; process factor
+(`kg_co2e_per_hour`) lives on `workcenter`, parallel to
+`overhead_rate` — both added additively via `ALTER TABLE ... ADD COLUMN
+IF NOT EXISTS`, the same technique `costing_core.ensure_costing_tables`
+already uses. Scope framework is a simplified, GHG-Protocol-*inspired*
+model (explicitly not full compliance tooling): Scope 1 (direct
+operations) and Scope 3 (purchased goods / supply chain) are computed
+from real production data (`wo_carbon_actual`'s process/material split);
+Scope 2 (purchased energy) is honestly manual monthly kWh × grid-factor
+entry, since no energy/kWh telemetry exists anywhere in this codebase
+(no power field on equipment, no utility-bill import) to automate it —
+the default grid factor is a documented illustrative placeholder, not an
+authoritative regional figure. ESG dashboard at `/esg/` reuses this
+codebase's existing Chart.js wiring (P1-A) for a scope 1/2/3 doughnut and
+a monthly trend bar chart. Verified end-to-end against a running dev
+server + local Postgres through the actual web views: set a material
+factor on a real leaf ("buy") component and a process factor on a real
+workcenter, rolled a real product's carbon footprint and confirmed
+material/process/total matched a manual hand calculation from the BOM +
+routing exactly; computed WO carbon actuals for a real work order and
+confirmed the quantity multiplication was exact; added a Scope 2 manual
+entry and confirmed the ESG dashboard's scope totals, top-products list,
+and charts reflected it correctly; cleaned up all test data afterward.
 
 ---
 
