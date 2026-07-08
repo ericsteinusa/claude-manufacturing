@@ -41,6 +41,11 @@ urlpatterns = [
     path('rfq/new/', views.rfq_new, name='rfq_new'),
     path('rfq/<int:rfq_id>/', views.rfq_detail, name='rfq_detail'),
     path('reports/', views.reports_dashboard, name='reports_dashboard'),
+    # Shop Floor / OEE (P3-G)
+    path('shop-floor/', views.sf_dashboard, name='sf_dashboard'),
+    path('shop-floor/entry/', views.sf_entry, name='sf_entry'),
+    path('shop-floor/plan/', views.sf_shift_plan, name='sf_shift_plan'),
+    path('shop-floor/tv/', views.sf_tv, name='sf_tv'),
     path('wo/', views.wo_list, name='wo_list'),
     path('wo/export/', views.wo_export, name='wo_export'),
     path('wo/new/', views.wo_new, name='wo_new'),

@@ -11,11 +11,11 @@ digest already exists — `manufacturing/management/commands/send_daily_digest.p
 credited before), and re-ranks the remaining roadmap.
 
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
-P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), and P3-F
-(Multi-Company / Multi-Entity), merged from five separate PRs (#398, #382, #386, #381, #387) that
-a prior session had built and left open. The remaining roadmap (P3-G, P4-A through P4-G) still has
-open PRs (#388–#395) from that same prior session — working through them one at a time.
-21 features shipped total.
+P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
+(Multi-Company / Multi-Entity), and P3-G (OEE Live Shop Floor Dashboard), merged from six separate
+PRs (#398, #382, #386, #381, #387, #388) that a prior session had built and left open. The
+remaining roadmap (P4-A through P4-G) still has open PRs (#389–#395) from that same prior
+session — working through them one at a time. 22 features shipped total.
 
 ---
 
@@ -27,11 +27,10 @@ or beats Infor CloudSuite, SYSPRO, and Epicor on day-to-day production, quality,
 HR, payroll, accounting, and IT management, and has closed most of the "visible gap" items (charts,
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
-The primary gaps now fall into four areas:
-1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched)
-2. **Live Shop-Floor / MES** — OEE now exists but is report/batch-based, not real-time; no IoT/sensor connectivity, no shop-floor TV mode, no operator data entry terminal
-3. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
-4. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
+The primary gaps now fall into three areas:
+1. **AI / Predictive Analytics** — no embedded AI, no predictive maintenance, no ML demand forecasting (untouched); no IoT/sensor connectivity for either predictive maintenance or shop-floor data capture
+2. **Trading-Partner Integration** — no EDI, no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
+3. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
 
@@ -231,14 +230,14 @@ The primary gaps now fall into four areas:
 | Maintenance mechanics management | ✅ | ✅ 7/10 |
 | MTBF / MTTR / equipment availability metrics | ✅ Full | ✅ 7/10 |
 | Barcode scanning for equipment | ✅ | ✅ 8/10 |
-| **OEE (Overall Equipment Effectiveness)** | ✅ Partial (P1-C) — per-workcenter, MTD card + 8-week trend + report; report/batch-based, not live real-time shop-floor | ✅ 7/10 |
+| **OEE (Overall Equipment Effectiveness)** | ✅ Full (P1-C, P3-G) — per-workcenter MTD card/trend/report (P1-C) plus a live per-shift dashboard and shop-floor TV display (P3-G) | ✅ 7/10 |
 | **Predictive maintenance (trend-based alerts)** | ❌ — MTBF/MTTR exist but no rolling-interval alerting | ✅ 7/10 |
 | **Mobile maintenance app** | ✅ (already existed, not credited in original pass) — `mobile/app/(tabs)/maintenance.tsx`: work order list + detail + complete | ✅ 8/10 |
 | **Technician routing & scheduling** | ❌ | ✅ 6/10 |
 | **Asset Performance Management (APM)** | ❌ | ✅ 6/10 |
 | **IoT / sensor integration** | ❌ | ✅ 6/10 |
 
-**Priority gaps:** predictive maintenance alerts, live/real-time OEE (P3-G), IoT/sensor integration.
+**Priority gaps:** predictive maintenance alerts, IoT/sensor integration.
 
 ---
 
@@ -274,7 +273,7 @@ The primary gaps now fall into four areas:
 | **Excel / CSV export from any list** | ✅ Full (P1-B, P1-G) — both formats on all 9 list pages | ✅ All |
 | **Custom / self-service report builder** | ❌ | ✅ 7/10 |
 | **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
-| **Live shop floor performance (real-time)** | ❌ (P3-G not yet built) | ✅ 7/10 |
+| **Live shop floor performance (real-time)** | ✅ Full (P3-G) — live per-shift OEE dashboard + standalone auto-refreshing TV display | ✅ 7/10 |
 | **Predictive / AI analytics** | ❌ | ✅ 7/10 |
 | **Batch record generation** | ❌ | ✅ 6/10 |
 | **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
@@ -997,13 +996,56 @@ Required for companies with multiple legal entities.
   the company immediately after assignment, and lost access immediately
   after revocation — then cleaned up all test data.
 
-#### P3-G: OEE Live Shop Floor Dashboard
+#### P3-G: OEE Live Shop Floor Dashboard ✅ Done
 Real-time production visibility — Plex's core differentiator.
 - Operator production entry: shift + workcenter + units produced + units scrapped
 - Downtime entry from shop floor (reason code)
 - Live OEE calculation per workcenter per shift
 - Shop floor TV display mode (large format, auto-refresh)
 - Shift summary: planned vs. actual output
+- **Shipped:** `manufacturing/shop_floor_core.py`. An earlier feature
+  (P1-C, `oee_core.py`) already computes OEE, but only as a **date-range
+  report** derived from completed `wo_operation` rows and `maint_downtime`
+  — there was no shift concept anywhere in this codebase and no data-entry
+  screen at all (its only UI is a read-only report under Maintenance). This
+  is the first operator-facing data-entry layer and the first live/TV
+  view, not a rebuild of P1-C — the two calculations run in parallel at
+  different granularities (period vs. shift) over different source data
+  (WO-operation actuals vs. manual shift tallies). `oee_core._oee_from_
+  totals` isn't reused because its Performance formula (`std_hours /
+  actual_hours`) assumes a linked work-order operation, which a shift's
+  manual qty/scrap entry doesn't have (the spec's "shift + workcenter +
+  units produced + units scrapped" has no WO field) — Performance here is
+  `qty_produced / planned_qty` instead, which doubles as the "planned vs.
+  actual output" shift-summary bullet so one calculation serves both.
+  **Two documented simplifying assumptions**, made because no shift-window
+  or shift-length concept exists anywhere else to derive them from: every
+  shift is a fixed 8-hour scheduled window regardless of `workcenter.
+  capacity_hours_per_day`, and `SHIFT_WINDOWS` fixes wall-clock hours per
+  shift name (Day/Swing/Night, matching `maintenance_core.MECHANIC_
+  SHIFTS`' naming) purely to default the dashboard/TV display to "right
+  now's" shift with zero operator input. **Deliberately diverges from
+  `oee_core`'s convention** in one place: Performance defaults to 100% (not
+  0%) when no shift plan has been set — an unset plan means "no target to
+  compare against," not "nothing happened," so treating it as a failure
+  would misrepresent real output. Reuses `routing_core.workcenter`/
+  `list_workcenters` for the workcenter dimension and `maintenance_core.
+  DOWNTIME_CATEGORIES` as the downtime reason-code taxonomy, rather than
+  duplicating either. Web pages at `/shop-floor/entry/` (production +
+  downtime logging), `/shop-floor/plan/` (supervisor sets planned qty per
+  workcenter/shift/date), `/shop-floor/` (live dashboard with
+  shift/date pickers), and `/shop-floor/tv/` (a standalone, high-contrast,
+  large-format page with no toolbar/nav chrome, auto-refreshing via a
+  30-second `<meta http-equiv="refresh">` — the simplest possible
+  auto-refresh mechanism, avoiding new JS/polling machinery for a
+  report-style page), wired into a new "Shop Floor" submenu under the
+  Production main menu. Verified end-to-end against a running dev server +
+  local Postgres through the actual web views: logged production and
+  downtime entries for a real workcenter, set a shift plan, confirmed the
+  dashboard's summed totals and OEE breakdown were exactly right
+  (Availability/Performance/Quality/OEE all hand-checked against the raw
+  entries), confirmed the TV page renders standalone with no app chrome,
+  and cleaned up all test data afterward.
 
 ---
 
@@ -1099,6 +1141,7 @@ Real-time production visibility — Plex's core differentiator.
 | No blanket orders & call-offs | P3-E |
 | No customer self-service portal | P3-C |
 | No multi-entity / intercompany / consolidated reporting | P3-F |
+| No live/real-time shop-floor OEE dashboard or TV display | P3-G |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1116,7 +1159,7 @@ Real-time production visibility — Plex's core differentiator.
 |---|---|
 | No AI / predictive analytics | Very High (P4-A, P4-B) |
 | No EDI | High (P4-D) |
-| No live shop-floor / IoT integration | Very High (P3-G, P4-B) |
+| No IoT / sensor integration (shop-floor or predictive maintenance) | Very High (P4-B) |
 | No supplier self-service portal | High |
 | No carrier API / e-commerce integration | Medium–High (P4-E) |
 | No CTP | High (P4-C) |
@@ -1137,12 +1180,12 @@ Real-time production visibility — Plex's core differentiator.
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
-| Maintenance (CMMS) | 9/10 | 7/10 | ▲ (OEE; mobile app now credited) |
+| Maintenance (CMMS) | 9/10 | 8/10 | ▲▲ (OEE + live shop-floor dashboard/TV via P3-G; mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
-| Reporting / Analytics | 8/10 | 7/10 | ▲▲▲ (charts, CSV+Excel export, OEE reports, digest now credited) |
+| Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.5/10** | **7.4/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.6/10** | **7.5/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1151,11 +1194,11 @@ Real-time production visibility — Plex's core differentiator.
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P3-F, P3-G, and all of P4-A through P4-G —
-turned out to already have open PRs from a prior session (#387–#395), discovered while working
-through this list. Being merged one at a time (rebase onto current `main`, verify, fix any
-cross-PR conflicts, confirm before merging) rather than re-built. Once that pass completes, only
-these will remain genuinely unbuilt:
+**Status update (2026-07-08):** the remaining roadmap — P4-A through P4-G — turned out to already
+have open PRs from a prior session (#389–#395), discovered while working through this list. Being
+merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
+before merging) rather than re-built. Once that pass completes, only these will remain genuinely
+unbuilt:
 
 1. **True inter-warehouse transfers** (extends P3-B) — `wms_core.py` already has multiple
    warehouses/zones/bins; a transfer is "ship from bin A, receive into bin B" reusing
