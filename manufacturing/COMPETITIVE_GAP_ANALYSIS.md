@@ -13,11 +13,11 @@ credited before), and re-ranks the remaining roadmap.
 **2026-07-08, later same day:** Shipped P1-G (Excel export), P3-D (Landed Cost Allocation),
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
 (Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), P4-A (AI Demand
-Forecasting), P4-B (Predictive Maintenance), P4-C (Capable-to-Promise), and P4-D (EDI
-Integration), merged from ten separate PRs (#398, #382, #386, #381, #387, #388, #389, #390,
-#391, #392) that a prior session had built and left open. The remaining roadmap (P4-E through
-P4-G) still has open PRs (#393–#395) from that same prior session — working through them one at
-a time. 26 features shipped total.
+Forecasting), P4-B (Predictive Maintenance), P4-C (Capable-to-Promise), P4-D (EDI Integration),
+and P4-E (e-Commerce Integration), merged from eleven separate PRs (#398, #382, #386, #381,
+#387, #388, #389, #390, #391, #392, #393) that a prior session had built and left open. The
+remaining roadmap (P4-F, P4-G) still has open PRs (#394–#395) from that same prior session —
+working through them one at a time. 27 features shipped total.
 
 ---
 
@@ -31,7 +31,7 @@ export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
 The primary gaps now fall into three areas:
 1. **AI / Predictive Analytics** — ML demand forecasting (P4-A) and MTBF-based predictive maintenance risk scoring (P4-B) now exist; no broader embedded-AI analytics platform, and no real IoT/sensor hardware connectivity (P4-B's sensor readings are logged manually, not device-fed)
-2. **Trading-Partner Integration** — EDI now exists (P4-D); no supplier self-service portal, no real carrier-API shipment tracking, no e-commerce sync
+2. **Trading-Partner Integration** — EDI (P4-D) and e-commerce sync (P4-E) now exist; no supplier self-service portal, no real carrier-API shipment tracking
 3. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
@@ -159,9 +159,9 @@ The primary gaps now fall into three areas:
 | **Discount & promotion management** | ❌ | ✅ All |
 | **Customer self-service portal** | ✅ Full (P3-C) — own orders/invoices/shipments/RMAs, invoice + packing-slip PDF, online payment; carrier tracking and Stripe payment are documented stubs (no real integration existed anywhere to build on) | ✅ 7/10 |
 | **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ — WMS (P3-B) records carrier + tracking number manually at ship confirm; the portal's tracking view (P3-C) is a deterministic stub, not a real carrier API | ✅ 9/10 |
-| **Multi-channel order integration (e-commerce)** | ❌ | ✅ 7/10 |
+| **Multi-channel order integration (e-commerce)** | ✅ Full (P4-E) — real, verified Shopify/WooCommerce webhook order intake with dedupe and SKU field mapping; outbound inventory/price/shipment sync is real config-gated HTTP POST code with no live storefront in this environment to call | ✅ 7/10 |
 
-**Priority gaps:** discount/promotion management, carrier API integration, e-commerce sync.
+**Priority gaps:** discount/promotion management, carrier API integration.
 
 ---
 
@@ -1241,11 +1241,70 @@ Real-time production visibility — Plex's core differentiator.
   description appeared; confirmed the transaction log showed all four
   actions; cleaned up all test data afterward.
 
-#### P4-E: e-Commerce Integration
+#### P4-E: e-Commerce Integration ✅ Done
 - Shopify / WooCommerce webhook: new order → auto-create SO
 - Inventory level sync: push on-hand qty to storefront on every transaction
 - Product catalog sync: push price list changes to storefront
 - Shipment confirmation: push tracking number back to storefront order
+
+**Implementation notes:** `ecommerce_core.py` — real, platform-agnostic
+inbound webhook handling: Shopify (`X-Shopify-Hmac-Sha256`) and
+WooCommerce (`X-WC-Webhook-Signature`) both sign as
+`base64(HMAC-SHA256(secret, raw_body))`, so `verify_webhook_signature`
+covers both with one function; `parse_order_webhook` normalizes both
+platforms' near-identical order JSON (`line_items: [{sku, quantity,
+price, name}]`) into a common shape. `receive_order_webhook` verifies
+the signature, dedupes against `ecommerce_order_log`
+(`UNIQUE(connection_id, external_order_id)`) so retried/replayed
+webhooks don't create duplicate orders — unlike EDI's one-shot manual
+file upload (P4-D), a storefront webhook can legitimately fire more than
+once for the same order — then creates a real Sales Order via the
+existing, unmodified `sales_orders_core.next_so_number`/`create_so`/
+`add_so_item`. Unmapped line items (no matching `storefront_item_xref`
+row) still import as valid `so_item`s with `product_id=None`, mirroring
+how `so_item` already supports text-only lines. `product` has no
+SKU/code column anywhere in this codebase, so `storefront_item_xref`
+(storefront SKU ↔ our `product_id`) is the actual field-mapping
+mechanism, exactly as `edi_partner_item_xref` is for EDI.
+
+There is no live Shopify/WooCommerce store reachable from this
+environment, so outbound sync (inventory level, price, shipment
+confirmation) is real, config-gated HTTP POST code (stdlib
+`urllib.request` — no new dependency): if a connection has a
+`sync_endpoint_url` configured, it is actually called and the real
+success/failure is logged; with no endpoint configured the attempt is
+logged as `queued` rather than faked as delivered — the exact precedent
+already set by `send_daily_digest.py`'s `EMAIL_HOST`-gated email/print
+fallback. Price push reads from this codebase's existing tiered pricing
+(`price_list_core.get_price_for_product`) rather than
+`product.purchase_price` (cost, not a sell price). "Push on every
+transaction" is implemented as on-demand sync buttons (connection detail
+page) plus a schedulable batch command (`manage.py sync_ecommerce`,
+doc-commented with cron/Task Scheduler wiring like
+`send_daily_digest.py`) rather than intrusive hooks into `product`'s 5+
+duplicated `CREATE TABLE`/mutation call sites. New pages at
+`/ecommerce/connections/...` (storefront connection + item xref setup,
+shows the webhook URL to configure in the storefront's admin),
+`/ecommerce/webhook/<id>/order/` (the machine-facing, non-session-gated
+webhook receiver — HMAC *is* the auth here), and `/ecommerce/log/`;
+cross-linked from `so_list.html` ("e-Commerce") and
+`prod_shipping_detail.html` ("Push Shipment Confirmation"). Verified
+end-to-end against a running dev server + local Postgres through the
+actual web views and a real local HTTP listener: configured a real
+storefront connection + item mapping, signed a realistic Shopify-shaped
+order payload and POSTed it to the webhook, confirming a real SO was
+created with the mapped line resolving to the right `product_id` and the
+unmapped line staying text-only; replayed the identical payload and
+confirmed it was detected as a duplicate (no second SO); POSTed with a
+bad signature and confirmed a 401 rejection; pointed a connection's
+`sync_endpoint_url` at a real local HTTP server and confirmed the actual
+POST body arrived and was logged `success`, then at an unreachable port
+and confirmed a real `failed` status with the real connection error;
+used the "Sync Now" buttons with no endpoint configured and confirmed a
+`queued` log entry; pushed a shipment confirmation for a shipment on the
+webhook-created SO and confirmed the right `external_order_id` appeared
+in the payload; ran `manage.py sync_ecommerce` and confirmed its summary
+output; cleaned up all test data afterward.
 
 #### P4-F: Custom Report Builder
 - Field selector: pick any table/column to include
@@ -1310,6 +1369,7 @@ Real-time production visibility — Plex's core differentiator.
 | No predictive maintenance / failure-risk scoring | P4-B |
 | No Capable-to-Promise (CTP) | P4-C |
 | No EDI (850/855/856/810) | P4-D |
+| No e-commerce (Shopify/WooCommerce) integration | P4-E |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1327,8 +1387,9 @@ Real-time production visibility — Plex's core differentiator.
 | No broader embedded-AI analytics platform | Very High |
 | No real IoT / sensor hardware integration | Very High |
 | No supplier self-service portal | High |
-| No carrier API / e-commerce integration | Medium–High (P4-E) |
+| No real carrier-API shipment tracking (FedEx/UPS/USPS) | Medium–High |
 | No real AS2/VAN/SFTP EDI transport (file upload/download stub only) | Medium |
+| No live storefront to verify outbound e-commerce sync against (config-gated HTTP code only) | Low–Medium |
 
 ---
 
@@ -1341,7 +1402,7 @@ Real-time production visibility — Plex's core differentiator.
 | Inventory | 7/10 | 6/10 | ▲ (cycle count + WMS bins; still no FIFO/LIFO or transfers) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
-| Sales / CRM | 9/10 | 8/10 | ▲▲▲ (ATP + price lists + customer portal + CTP) |
+| Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
 | Finance / GL | 9/10 | 9/10 | ▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
@@ -1351,7 +1412,7 @@ Real-time production visibility — Plex's core differentiator.
 | Reporting / Analytics | 8/10 | 8/10 | ▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.7/10** | **7.9/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.7/10** | **8.0/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1360,8 +1421,8 @@ Real-time production visibility — Plex's core differentiator.
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-E through P4-G — turned out to already
-have open PRs from a prior session (#393–#395), discovered while working through this list. Being
+**Status update (2026-07-08):** the remaining roadmap — P4-F, P4-G — turned out to already
+have open PRs from a prior session (#394–#395), discovered while working through this list. Being
 merged one at a time (rebase onto current `main`, verify, fix any cross-PR conflicts, confirm
 before merging) rather than re-built. Once that pass completes, only these will remain genuinely
 unbuilt:

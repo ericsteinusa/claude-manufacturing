@@ -239,6 +239,7 @@ from ._shop_floor import *  # noqa: F401,F403
 from ._demand_forecast import *  # noqa: F401,F403
 from ._predictive_maintenance import *  # noqa: F401,F403
 from ._edi import *  # noqa: F401,F403
+from ._ecommerce import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -6114,7 +6115,8 @@ def prod_shipping_list(request):
 @dept_required('production')
 def prod_shipping_detail(request, shipment_id):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    error = success = None
+    error = None
+    success = request.session.pop('_ec_flash', None)
     conn = get_db_connection()
     try:
         shipment = get_shipment(conn, shipment_id)

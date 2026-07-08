@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block page_title %}New e-Commerce Connection{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ecommerce/connections/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">New e-Commerce Connection</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="erp-form">
+        <div class="card">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label>Platform</label>
+                    <select name="platform" required>
+                        <option value="">(select)</option>
+                        {% for p in platforms %}
+                        <option value="{{ p }}">{{ p|capfirst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Store Name</label>
+                    <input type="text" name="store_name" required>
+                </div>
+                <div class="form-row">
+                    <label>Webhook Secret</label>
+                    <input type="text" name="webhook_secret">
+                </div>
+                <div class="form-row">
+                    <label>Default Customer (for orders from this store)</label>
+                    <select name="default_customer_id">
+                        <option value="">(none)</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}">
+                            {{ c.company_name|default:"" }}{% if not c.company_name %}{{ c.first_name }} {{ c.last_name }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Price List (for outbound price sync)</label>
+                    <select name="default_price_list_id">
+                        <option value="">(none)</option>
+                        {% for pl in price_lists %}
+                        <option value="{{ pl.id }}">{{ pl.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Sync Endpoint URL (optional)</label>
+                    <input type="text" name="sync_endpoint_url" placeholder="https://...">
+                </div>
+                <p style="font-size:12px;color:#666;">
+                    If no sync endpoint is configured, inventory/price/shipment pushes are
+                    still logged (status "queued") but no HTTP call is made — there is no live
+                    storefront reachable from this environment by default.</p>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Create Connection</button>
+                    <a href="/ecommerce/connections/" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

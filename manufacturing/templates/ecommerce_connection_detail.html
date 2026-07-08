@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block page_title %}{{ connection.store_name|default:"Storefront Connection" }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ecommerce/connections/" class="btn">← Back</a>
+{% endblock %}
+
+{% block extra_styles %}
+.po-wrap { width: 100%; max-width: 900px; }
+.po-card {
+    background: white; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 20px;
+}
+.po-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; font-size: 13px; }
+.po-meta b { color: #003cb4; }
+.list-table { width:100%; border-collapse:collapse; margin-top:6px; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; text-align:left; }
+.list-table th { background:var(--accent); color:white; }
+code.webhook-url { display:block; background:#f5f5f5; border:1px solid #ddd; border-radius:4px;
+    padding:8px 10px; font-size:12px; word-break:break-all; margin-top:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="po-wrap">
+        <div class="po-card">
+            <h2 style="margin-top:0;">{{ connection.store_name|default:"Storefront Connection" }}</h2>
+            <div class="po-meta">
+                <div><b>Platform:</b> {{ connection.platform|capfirst }}</div>
+                <div><b>Status:</b> {% if connection.is_active %}Active{% else %}Inactive{% endif %}</div>
+                <div><b>Default Customer:</b> {{ connection.company_name|default:connection.first_name }} {{ connection.last_name|default:"" }}</div>
+                <div><b>Price List:</b> {{ connection.price_list_name|default:"—" }}</div>
+            </div>
+            <div style="margin-top:10px;">
+                <b style="color:#003cb4;font-size:13px;">Order Webhook URL</b>
+                <p style="font-size:12px;color:#666;margin:2px 0 0;">
+                    Configure this URL as the "order created" webhook in {{ connection.platform|capfirst }}'s
+                    admin, signed with the webhook secret above (HMAC-SHA256, base64-encoded).</p>
+                <code class="webhook-url">{{ webhook_url }}</code>
+            </div>
+
+            {% if success %}<div class="alert alert-success" style="margin-top:12px;">{{ success }}</div>{% endif %}
+
+            {% if can_edit %}
+            <form method="post" action="" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin-top:14px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="endpoint">
+                <div style="flex:1;min-width:260px;">
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Sync Endpoint URL</label>
+                    <input type="text" name="sync_endpoint_url" style="width:100%;"
+                        value="{{ connection.sync_endpoint_url|default:'' }}" placeholder="https://...">
+                </div>
+                <button type="submit" class="btn btn-sm">Save Endpoint</button>
+            </form>
+            <p style="font-size:12px;color:#666;">
+                Inventory/price/shipment pushes POST here when set; with no endpoint they're
+                logged as "queued" instead of sent.</p>
+            {% endif %}
+        </div>
+
+        <div class="po-card">
+            <div class="card-title">Item Cross-Reference (storefront SKU → our product)</div>
+            <p style="font-size:12px;color:#555;">
+                Our products have no SKU/code field, so this mapping is what lets an inbound
+                order webhook's line item (carrying the storefront's own SKU) resolve to one of
+                our products, and lets outbound inventory/price pushes report our product back
+                under the storefront's own SKU. Unmapped lines still import — just without a
+                linked product.</p>
+
+            {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+            {% if can_edit %}
+            <form method="post" action="" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin-bottom:14px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="xref">
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Storefront SKU</label>
+                    <input type="text" name="external_sku" required>
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:bold;color:#003cb4;">Our Product</label>
+                    <select name="product_id" required>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.product_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-sm">Add Mapping</button>
+            </form>
+            {% endif %}
+
+            {% if xrefs %}
+            <table class="list-table">
+                <thead><tr><th>Storefront SKU</th><th>Our Product</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
+                <tbody>
+                {% for x in xrefs %}
+                <tr>
+                    <td>{{ x.external_sku }}</td>
+                    <td>{{ x.product_name|default:"—" }}</td>
+                    {% if can_edit %}
+                    <td style="display:flex;gap:6px;">
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="sync_inventory">
+                            <input type="hidden" name="product_id" value="{{ x.product_id }}">
+                            <button type="submit" class="btn btn-sm">Sync Inventory</button>
+                        </form>
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="sync_price">
+                            <input type="hidden" name="product_id" value="{{ x.product_id }}">
+                            <button type="submit" class="btn btn-sm">Sync Price</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="font-size:13px;color:#666;">No item mappings yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -7,6 +7,10 @@
 <a href="/prod/schedule/" class="btn">Schedule</a>
 <a href="/prod/reports/" class="btn">Reports</a>
 <a href="/edi/856/{{ shipment.id }}/download/" class="btn">Download 856 (EDI)</a>
+<form method="post" action="/ecommerce/shipment/{{ shipment.id }}/push/" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn">Push Shipment Confirmation</button>
+</form>
 <a href="/dashboard/" class="btn">Home</a>
 {% endblock %}
 

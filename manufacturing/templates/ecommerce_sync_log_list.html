@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_title %}e-Commerce Sync Log{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ecommerce/connections/" class="btn">← Back</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">e-Commerce Sync Log</div>
+
+    {% if log_rows %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Store</th>
+                    <th>Event</th>
+                    <th>Direction</th>
+                    <th>Status</th>
+                    <th>Detail</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in log_rows %}
+                <tr>
+                    <td>{{ l.created_at|slice:":19" }}</td>
+                    <td>{{ l.store_name|default:"—" }}</td>
+                    <td><span class="pill">{{ l.event_type }}</span></td>
+                    <td>{{ l.direction|capfirst }}</td>
+                    <td>{{ l.status|capfirst }}</td>
+                    <td>{{ l.detail|default:"—" }}</td>
+                    <td>{{ l.created_by|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No e-commerce sync activity logged yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
