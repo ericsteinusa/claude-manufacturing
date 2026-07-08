@@ -8,7 +8,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
-from ..csv_export import csv_response
+from ..csv_export import export_response
 from ..oee_core import get_overall_oee, get_oee_trend, list_workcenter_oee
 
 from ..maintenance_core import (
@@ -164,7 +164,7 @@ def maint_wo_export(request):
     finally:
         conn.close()
 
-    return csv_response('maintenance_work_orders.csv', [
+    return export_response(request, 'maintenance_work_orders', [
         ('title', 'Title'), ('equipment', 'Equipment'),
         ('work_type', 'Work Type'), ('priority', 'Priority'),
         ('assigned_to', 'Assigned To'), ('requested_date', 'Requested Date'),
