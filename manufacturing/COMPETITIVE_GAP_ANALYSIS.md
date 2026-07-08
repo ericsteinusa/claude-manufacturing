@@ -14,10 +14,12 @@ credited before), and re-ranks the remaining roadmap.
 P3-E (Blanket Purchase Orders & Call-offs), P3-C (Customer Self-Service Portal), P3-F
 (Multi-Company / Multi-Entity), P3-G (OEE Live Shop Floor Dashboard), P4-A (AI Demand
 Forecasting), P4-B (Predictive Maintenance), P4-C (Capable-to-Promise), P4-D (EDI Integration),
-P4-E (e-Commerce Integration), and P4-F (Custom Report Builder), merged from twelve separate PRs
-(#398, #382, #386, #381, #387, #388, #389, #390, #391, #392, #393, #394) that a prior session had
-built and left open. The remaining roadmap (P4-G) still has an open PR (#395) from that same
-prior session. 28 features shipped total.
+P4-E (e-Commerce Integration), P4-F (Custom Report Builder), and P4-G (Sustainability / Carbon
+Cost Tracking), merged from thirteen separate PRs (#398, #382, #386, #381, #387, #388, #389,
+#390, #391, #392, #393, #394, #395) that a prior session had built and left open. **This closes
+out every numbered item (P1–P4) in this roadmap.** 29 features shipped total. Only two gaps
+discovered along the way (true inter-warehouse transfers, FIFO/LIFO/weighted-average costing —
+see Section 5) remain genuinely unbuilt, with no open PR found for either.
 
 ---
 
@@ -29,10 +31,16 @@ or beats Infor CloudSuite, SYSPRO, and Epicor on day-to-day production, quality,
 HR, payroll, accounting, and IT management, and has closed most of the "visible gap" items (charts,
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
-The primary gaps now fall into three areas:
-1. **AI / Predictive Analytics** — ML demand forecasting (P4-A) and MTBF-based predictive maintenance risk scoring (P4-B) now exist; no broader embedded-AI analytics platform, and no real IoT/sensor hardware connectivity (P4-B's sensor readings are logged manually, not device-fed)
-2. **Trading-Partner Integration** — EDI (P4-D) and e-commerce sync (P4-E) now exist; no supplier self-service portal, no real carrier-API shipment tracking
-3. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
+The remaining gaps are now narrow and mostly either connectivity-to-a-real-external-system items
+(no live AS2/VAN/SFTP EDI transport, no live storefront, no real carrier API, no supplier portal)
+or two supply-chain costing items with no PR ever built for them:
+1. **Real external connectivity** — EDI (P4-D), e-commerce sync (P4-E), and predictive maintenance
+   (P4-B) all ship with real logic but honestly-scoped stubs where this environment has no live
+   external system to connect to (file upload/download instead of AS2/VAN/SFTP, config-gated HTTP
+   POST instead of a live Shopify/WooCommerce store, manual sensor entry instead of IoT hardware);
+   no supplier self-service portal, no real carrier-API shipment tracking, no broader embedded-AI
+   analytics platform beyond demand forecasting and predictive maintenance
+2. **Supply-Chain Costing Depth** — no FIFO/LIFO/weighted-average valuation, no true inter-warehouse transfers (WMS now has multiple warehouses/bins, but nothing moves stock *between* them)
 
 ---
 
@@ -190,9 +198,9 @@ The primary gaps now fall into three areas:
 | **Multi-entity / legal entity separation** | ✅ Full (P3-F) — company master + user-to-company assignment, additive `company_id` on GL | ✅ 8/10 |
 | **Intercompany transactions** | ✅ Full (P3-F) — two independently-balanced journals per IC transaction, tagged per entity | ✅ 7/10 |
 | **Consolidated financial reporting** | ✅ Full (P3-F) — reuses the existing unscoped income statement/balance sheet, subtracts the known IC amount as elimination | ✅ 7/10 |
-| **Sustainability / carbon cost tracking** | ❌ | ✅ 5/10 |
+| **Sustainability / carbon cost tracking** | ✅ Full (P4-G) — BOM carbon rollup mirroring standard costing, per-WO carbon-intensity actuals, ESG dashboard (scope 1/3 from real production data; scope 2 is manual kWh × illustrative grid-factor entry, not full GHG Protocol compliance tooling) | ✅ 5/10 |
 
-**Priority gaps:** Activity-Based Costing, sustainability/carbon tracking.
+**Priority gaps:** Activity-Based Costing.
 
 ---
 
@@ -1349,12 +1357,44 @@ delivery (`manage.py run_scheduled_reports`) reuses the exact
 whether it's due, verified end-to-end (a report ran once, then a second
 immediate run correctly skipped it as not yet due).
 
-#### P4-G: Sustainability / Carbon Cost Tracking
+#### P4-G: Sustainability / Carbon Cost Tracking ✅ Done
 - CO₂ emission factor per material (kg CO₂e per unit)
 - CO₂ emission factor per process/operation (kg CO₂e per hour)
 - Carbon cost rollup on BOM → product carbon footprint
 - Carbon intensity metric: kg CO₂e per unit produced
 - ESG dashboard: scope 1 (direct), scope 2 (energy), scope 3 (supply chain)
+
+**Implementation notes:** `carbon_core.py` — a direct structural mirror
+of the existing standard-cost rollup (`costing_core.roll_standard_cost`):
+same BOM-explosion recursion, same `'buy'` (direct per-unit factor) vs
+`'make'` (recursive children + own routing process emissions) split,
+same `_MAX_DEPTH`/`_visited` cycle guard, same roll-then-snapshot
+(`carbon_roll`) pattern, same per-WO-actual-quantity multiplication
+(`wo_carbon_actual`) for a carbon-intensity-per-unit metric — kg CO₂e
+instead of dollars. Material factor (`kg_co2e_per_unit`) lives directly
+on `product`, parallel to `purchase_price`; process factor
+(`kg_co2e_per_hour`) lives on `workcenter`, parallel to
+`overhead_rate` — both added additively via `ALTER TABLE ... ADD COLUMN
+IF NOT EXISTS`, the same technique `costing_core.ensure_costing_tables`
+already uses. Scope framework is a simplified, GHG-Protocol-*inspired*
+model (explicitly not full compliance tooling): Scope 1 (direct
+operations) and Scope 3 (purchased goods / supply chain) are computed
+from real production data (`wo_carbon_actual`'s process/material split);
+Scope 2 (purchased energy) is honestly manual monthly kWh × grid-factor
+entry, since no energy/kWh telemetry exists anywhere in this codebase
+(no power field on equipment, no utility-bill import) to automate it —
+the default grid factor is a documented illustrative placeholder, not an
+authoritative regional figure. ESG dashboard at `/esg/` reuses this
+codebase's existing Chart.js wiring (P1-A) for a scope 1/2/3 doughnut and
+a monthly trend bar chart. Verified end-to-end against a running dev
+server + local Postgres through the actual web views: set a material
+factor on a real leaf ("buy") component and a process factor on a real
+workcenter, rolled a real product's carbon footprint and confirmed
+material/process/total matched a manual hand calculation from the BOM +
+routing exactly; computed WO carbon actuals for a real work order and
+confirmed the quantity multiplication was exact; added a Scope 2 manual
+entry and confirmed the ESG dashboard's scope totals, top-products list,
+and charts reflected it correctly; cleaned up all test data afterward.
 
 ---
 
@@ -1406,6 +1446,7 @@ immediate run correctly skipped it as not yet due).
 | No EDI (850/855/856/810) | P4-D |
 | No e-commerce (Shopify/WooCommerce) integration | P4-E |
 | No self-service report builder | P4-F |
+| No sustainability / carbon cost tracking | P4-G |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1438,7 +1479,7 @@ immediate run correctly skipped it as not yet due).
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
-| Finance / GL | 9/10 | 9/10 | ▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated) |
+| Finance / GL | 9/10 | 9/10 | ▲▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated + carbon/ESG tracking) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
@@ -1447,7 +1488,7 @@ immediate run correctly skipped it as not yet due).
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
 | WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **8.8/10** | **8.1/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **8.8/10** | **8.2/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1456,10 +1497,12 @@ immediate run correctly skipped it as not yet due).
 All 16 of the original "next 10 + P3-A/B" items are shipped, plus Excel export (P1-G), landed
 cost allocation (P3-D), blanket POs/call-offs (P3-E), and the customer self-service portal (P3-C).
 
-**Status update (2026-07-08):** the remaining roadmap — P4-G — turned out to already have an open
-PR from a prior session (#395), discovered while working through this list. Being merged (rebase
+**Status update (2026-07-08):** every numbered roadmap item from P1 through P4 has now shipped —
+the last batch (P3-F through P4-G) turned out to already have open PRs from a prior session
+(#387–#395), discovered while working through this list, and were merged one at a time (rebase
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
-re-built. Once that merges, only these will remain genuinely unbuilt:
+re-built. Only these two remain genuinely unbuilt, discovered along the way with no PR ever
+opened for either:
 
 1. **True inter-warehouse transfers** (extends P3-B) — `wms_core.py` already has multiple
    warehouses/zones/bins; a transfer is "ship from bin A, receive into bin B" reusing

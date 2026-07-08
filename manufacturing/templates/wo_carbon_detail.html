@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block page_title %}WO Carbon — {{ wo.wo_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wo/{{ wo.id }}/" class="btn">← Work Order</a>
+<a href="/esg/" class="btn">ESG Dashboard</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cost-wrap { max-width: 760px; }
+.cost-wrap h2 { color: var(--text); font-size: 20px; margin-bottom: 4px; }
+.cost-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.card { background: white; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; font-size: 15px; color: var(--accent-hover); }
+.info-grid { display: grid; grid-template-columns: 180px 1fr; gap: 8px 20px; font-size: 13px; }
+.info-label { font-weight: bold; color: #555; }
+.btn-compute { padding: 9px 22px; background: #1a7a1a; color: white; border: none;
+    border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
+.btn-compute:hover { opacity: 0.85; }
+.alert-ok  { background: #d0f0d0; border: 1px solid #3a3; color: #141; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+.alert-err { background: #fcc; border: 1px solid #c33; color: #900; border-radius: 4px;
+    padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cost-wrap">
+    <h2>WO Carbon — {{ wo.wo_number }}</h2>
+    <div class="cost-meta">{{ wo.description|default:'' }}</div>
+
+    {% if success %}<div class="alert-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert-err">{{ error }}</div>{% endif %}
+
+    {% if carbon %}
+    <div class="card">
+        <h3>Carbon for This Production Run</h3>
+        <div class="info-grid">
+            <span class="info-label">Quantity Produced</span>
+            <span>{{ carbon.quantity|floatformat:0 }}</span>
+            <span class="info-label">Material (Scope 3)</span>
+            <span>{{ carbon.material_carbon_kg|floatformat:3 }} kg CO2e</span>
+            <span class="info-label">Process (Scope 1)</span>
+            <span>{{ carbon.process_carbon_kg|floatformat:3 }} kg CO2e</span>
+            <span class="info-label">Total for Run</span>
+            <span><strong>{{ carbon.total_carbon_kg|floatformat:3 }} kg CO2e</strong></span>
+            <span class="info-label">Carbon Intensity</span>
+            <span><strong>{{ carbon.carbon_per_unit_kg|floatformat:3 }} kg CO2e / unit</strong></span>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:#888;">
+            Computed by {{ carbon.created_by|default:'-' }}
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <p style="color:#888;text-align:center;padding:20px;">No carbon record computed yet.</p>
+    </div>
+    {% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Compute Carbon Actual</h3>
+        <p style="font-size:13px;color:#555;margin-bottom:14px;">
+            Multiplies this product's latest rolled carbon footprint (per unit) by this
+            work order's actual quantity produced. Roll the product's carbon footprint
+            first if it hasn't been rolled yet.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="compute">
+            <button type="submit" class="btn-compute">Compute Carbon</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
