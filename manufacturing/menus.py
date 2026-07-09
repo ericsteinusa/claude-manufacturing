@@ -438,6 +438,8 @@ _SHIP_MENU = {
                 ('wave_picking', 'Wave Picking', 'production/prod_ship_dept.py'),
                 ('pack_station', 'Pack Station', 'production/prod_ship_dept.py'),
                 ('transfers', 'Warehouse Transfers', 'production/prod_ship_dept.py'),
+                ('rfid_readers', 'RFID Readers', 'production/prod_ship_dept.py'),
+                ('rfid_tags', 'RFID Tags', 'production/prod_ship_dept.py'),
             ],
         }),
     ],

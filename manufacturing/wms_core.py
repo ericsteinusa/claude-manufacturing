@@ -81,6 +81,27 @@ correct: cross-docked goods never spend any time as available on-hand
 inventory. Both legs still post a real, separately auditable
 ``inventory_transaction`` row.
 
+RFID tracking (``simulate_tag_read``) is an honestly-simulated hardware
+integration — there is no real RFID reader anywhere in this environment, so
+a "reader" is a virtual antenna tied to one ``wms_zone``, and a "read" is a
+manual "Simulate Read" action standing in for what a real antenna would
+capture automatically (the same honest scoping choice
+``predictive_maintenance_core.py`` uses for manual sensor-reading entry, and
+``ecommerce_core.py`` uses for config-gated outbound HTTP with no live
+storefront to call). A tag is a label wrapping a qty of one product already
+tracked in a bin — not a new quantity ledger — and reading it at a
+*different* reader relocates that qty to a bin in the new reader's zone via
+``_adjust_bin_stock`` on both ends, the same real-time, one-step,
+net-zero-to-``product.amount`` movement as the cross-docking/transfer
+exception above (reused directly, not duplicated), except automatic rather
+than a deliberate multi-step business process — that immediacy is the whole
+point of RFID versus a manual transfer. Reading the same reader twice in a
+row is a no-op "still here" heartbeat, logged but not moved. Tag/bin
+quantities can drift from reality if the underlying stock moves through
+another path (pick, transfer, cycle count) without also re-reading the tag —
+documented plainly rather than hidden, the same drift already accepted for
+FIFO/LIFO cost layers and consignment balances.
+
 Every function takes an open connection; the caller owns the transaction
 (same convention as routing_core / capacity_planning_core / mrp_web_core).
 """
@@ -106,6 +127,7 @@ CARTON_STATUSES = ('open', 'closed', 'shipped')
 TRANSFER_STATUSES = ('draft', 'in_transit', 'completed', 'cancelled')
 TRANSFER_LINE_STATUSES = ('pending', 'in_transit', 'received')
 WAVE_STATUSES = ('open', 'picking', 'completed', 'cancelled')
+RFID_TAG_STATUSES = ('active', 'retired')
 
 UNASSIGNED_WAREHOUSE_CODE = 'DEFAULT'
 UNASSIGNED_ZONE_CODE = 'UNASSIGNED'
@@ -279,6 +301,46 @@ def ensure_wms_tables(conn):
     conn.execute(
         "CREATE INDEX IF NOT EXISTS wms_transfer_line_transfer "
         "ON wms_transfer_line(transfer_id)"
+    )
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS wms_rfid_reader (
+            id SERIAL PRIMARY KEY,
+            reader_code TEXT NOT NULL UNIQUE,
+            zone_id INTEGER NOT NULL REFERENCES wms_zone(id),
+            description TEXT DEFAULT '',
+            is_active BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS wms_rfid_tag (
+            id SERIAL PRIMARY KEY,
+            tag_code TEXT NOT NULL UNIQUE,
+            product_id INTEGER NOT NULL REFERENCES product(id),
+            qty REAL NOT NULL,
+            bin_id INTEGER REFERENCES wms_bin(id),
+            status TEXT NOT NULL DEFAULT 'active',
+            created_by TEXT DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS wms_rfid_tag_bin ON wms_rfid_tag(bin_id)"
+    )
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS wms_rfid_read_event (
+            id SERIAL PRIMARY KEY,
+            tag_id INTEGER NOT NULL REFERENCES wms_rfid_tag(id),
+            reader_id INTEGER NOT NULL REFERENCES wms_rfid_reader(id),
+            from_bin_id INTEGER REFERENCES wms_bin(id),
+            to_bin_id INTEGER REFERENCES wms_bin(id),
+            moved BOOLEAN NOT NULL DEFAULT FALSE,
+            read_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            created_by TEXT DEFAULT ''
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS wms_rfid_read_event_tag "
+        "ON wms_rfid_read_event(tag_id, id)"
     )
 
 
@@ -1549,3 +1611,180 @@ def cancel_wave(conn, wave_id):
         "UPDATE wms_pick_list SET status = 'cancelled' WHERE wave_id = %s",
         (wave_id,),
     )
+
+
+# ---------------------------------------------------------------------------
+# RFID tracking (simulated)
+# ---------------------------------------------------------------------------
+#
+# There is no real RFID reader anywhere in this environment — see the
+# module docstring's "RFID tracking" paragraph. A reader is a virtual
+# antenna tied to one zone (realistic: zone-level RFID resolution, not
+# bin-level — an antenna can tell you a tagged pallet entered a zone, not
+# which exact bin within it). A tag labels a qty of one product already
+# tracked in a bin. Movement is detected at the zone level: reading a tag
+# at a reader whose zone differs from the tag's current zone relocates it
+# to the least-full active bin in the new zone (same greedy heuristic
+# put-away rules already use) via _adjust_bin_stock on both ends — net
+# zero to product.amount, the same exception as transfers/cross-docking.
+# A re-read within the same zone is just a "still here" heartbeat.
+
+def list_readers(conn, active_only=True):
+    sql = (
+        "SELECT r.*, z.code AS zone_code, z.warehouse_id "
+        "FROM wms_rfid_reader r JOIN wms_zone z ON z.id = r.zone_id"
+    )
+    if active_only:
+        sql += " WHERE r.is_active"
+    sql += " ORDER BY r.reader_code"
+    return [dict(r) for r in conn.execute(sql).fetchall()]
+
+
+def create_reader(conn, zone_id, reader_code, description=''):
+    if not reader_code.strip():
+        raise ValueError("Reader code is required")
+    row = conn.execute(
+        "INSERT INTO wms_rfid_reader (reader_code, zone_id, description) "
+        "VALUES (%s,%s,%s) RETURNING id",
+        (reader_code.strip(), zone_id, description.strip()),
+    ).fetchone()
+    return row['id']
+
+
+def list_tags(conn, status='active'):
+    conds, params = [], []
+    if status:
+        conds.append("t.status = %s")
+        params.append(status)
+    sql = (
+        "SELECT t.*, p.name AS product_name, b.full_code AS bin_full_code "
+        "FROM wms_rfid_tag t "
+        "JOIN product p ON p.id = t.product_id "
+        "LEFT JOIN wms_bin b ON b.id = t.bin_id"
+    )
+    if conds:
+        sql += " WHERE " + " AND ".join(conds)
+    sql += " ORDER BY t.id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_tag(conn, tag_id):
+    row = conn.execute(
+        "SELECT t.*, p.name AS product_name, b.full_code AS bin_full_code "
+        "FROM wms_rfid_tag t "
+        "JOIN product p ON p.id = t.product_id "
+        "LEFT JOIN wms_bin b ON b.id = t.bin_id "
+        "WHERE t.id = %s",
+        (tag_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_tag(conn, tag_code, product_id, qty, bin_id, created_by):
+    """Register a new RFID tag labelling qty of product_id already tracked
+    in bin_id. Does not create new stock — the tag is a label on top of
+    existing tracked bin stock, sanity-checked (not reserved) at creation
+    time, so it can drift from reality if the underlying stock later moves
+    through a path that never re-reads the tag (documented plainly in the
+    module docstring, same drift already accepted for cost layers /
+    consignment balances). Does not commit. Raises ValueError for a
+    non-positive qty, a missing tag code, or a bin with less than qty of
+    that product currently tracked.
+    """
+    if qty <= 0:
+        raise ValueError("qty must be positive")
+    if not tag_code.strip():
+        raise ValueError("Tag code is required")
+    stock = conn.execute(
+        "SELECT qty FROM wms_bin_stock WHERE bin_id = %s AND product_id = %s",
+        (bin_id, product_id),
+    ).fetchone()
+    tracked = stock['qty'] if stock else 0.0
+    if tracked < qty:
+        raise ValueError(
+            f"Bin only has {tracked:g} of this product tracked — cannot tag {qty:g}")
+    row = conn.execute(
+        "INSERT INTO wms_rfid_tag (tag_code, product_id, qty, bin_id, created_by) "
+        "VALUES (%s,%s,%s,%s,%s) RETURNING id",
+        (tag_code.strip(), product_id, qty, bin_id, created_by),
+    ).fetchone()
+    return row['id']
+
+
+def get_tag_history(conn, tag_id):
+    rows = conn.execute(
+        "SELECT e.*, r.reader_code, "
+        "fb.full_code AS from_bin_full_code, tb.full_code AS to_bin_full_code "
+        "FROM wms_rfid_read_event e "
+        "JOIN wms_rfid_reader r ON r.id = e.reader_id "
+        "LEFT JOIN wms_bin fb ON fb.id = e.from_bin_id "
+        "LEFT JOIN wms_bin tb ON tb.id = e.to_bin_id "
+        "WHERE e.tag_id = %s ORDER BY e.id DESC",
+        (tag_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def simulate_tag_read(conn, tag_id, reader_id, created_by):
+    """Simulate an RFID antenna reading a tag — the manual stand-in for
+    real hardware (see module docstring). Logs a read event; if the
+    reader's zone differs from the tag's current zone, relocates the
+    tag's qty to the least-full active bin in the new zone via
+    _adjust_bin_stock on both ends. Does not commit. Raises ValueError for
+    a missing or retired tag, a missing reader, or a target zone with no
+    active bin to land in.
+    """
+    tag = get_tag(conn, tag_id)
+    if not tag:
+        raise ValueError(f"Tag {tag_id} not found")
+    if tag['status'] != 'active':
+        raise ValueError(f"Tag {tag_id} is not active (status={tag['status']})")
+    reader = conn.execute(
+        "SELECT id, zone_id FROM wms_rfid_reader WHERE id = %s", (reader_id,),
+    ).fetchone()
+    if not reader:
+        raise ValueError(f"Reader {reader_id} not found")
+
+    current_zone_id = None
+    if tag['bin_id']:
+        current_bin = conn.execute(
+            "SELECT zone_id FROM wms_bin WHERE id = %s", (tag['bin_id'],),
+        ).fetchone()
+        current_zone_id = current_bin['zone_id'] if current_bin else None
+
+    moved = reader['zone_id'] != current_zone_id
+    if moved:
+        target_bin = _least_full_active_bin_in_zone(conn, reader['zone_id'])
+        if not target_bin:
+            raise ValueError("Reader's zone has no active bin to land the tag in")
+        target_bin_id = target_bin['id']
+        if tag['bin_id']:
+            _adjust_bin_stock(conn, tag['bin_id'], tag['product_id'], -tag['qty'])
+        _adjust_bin_stock(conn, target_bin_id, tag['product_id'], tag['qty'])
+        conn.execute(
+            "UPDATE wms_rfid_tag SET bin_id = %s WHERE id = %s",
+            (target_bin_id, tag_id),
+        )
+    else:
+        target_bin_id = tag['bin_id']
+
+    conn.execute(
+        "INSERT INTO wms_rfid_read_event "
+        "(tag_id, reader_id, from_bin_id, to_bin_id, moved, created_by) "
+        "VALUES (%s,%s,%s,%s,%s,%s)",
+        (tag_id, reader_id, tag['bin_id'], target_bin_id, moved, created_by),
+    )
+    return {'moved': moved, 'bin_id': target_bin_id}
+
+
+def retire_tag(conn, tag_id):
+    """Retire a tag (pallet consumed/broken down) — does not touch bin
+    stock, since normal issue/pick/transfer flows already handle that;
+    this only removes the label. Does not commit. Raises ValueError if
+    the tag doesn't exist or is already retired."""
+    tag = get_tag(conn, tag_id)
+    if not tag:
+        raise ValueError(f"Tag {tag_id} not found")
+    if tag['status'] != 'active':
+        raise ValueError(f"Tag {tag_id} is already {tag['status']}")
+    conn.execute("UPDATE wms_rfid_tag SET status = 'retired' WHERE id = %s", (tag_id,))

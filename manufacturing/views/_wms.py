@@ -10,7 +10,7 @@ from ..accounts import READ_ONLY_ROLES
 
 from ..wms_core import (
     ensure_wms_tables, PUTAWAY_MATCH_TYPES, PICK_LIST_STATUSES,
-    TRANSFER_STATUSES, WAVE_STATUSES,
+    TRANSFER_STATUSES, WAVE_STATUSES, RFID_TAG_STATUSES,
     get_or_create_default_warehouse, list_warehouses, create_warehouse,
     list_zones, create_zone,
     list_bins, get_bin, create_bin, deactivate_bin, get_bin_stock,
@@ -27,6 +27,8 @@ from ..wms_core import (
     list_waves, get_wave, get_wave_pick_lists, create_wave,
     get_consolidated_pick_lines, record_wave_pick, cancel_wave,
     find_cross_dock_candidates, receive_cross_dock,
+    list_readers, create_reader, list_tags, get_tag, create_tag,
+    get_tag_history, simulate_tag_read, retire_tag,
 )
 from ..purchase_orders_core import list_pos, get_po_items
 
@@ -607,4 +609,116 @@ def wms_wave_detail(request, wave_id):
     return render(request, 'wms_wave_detail.html', _wms_ctx(
         request, wave=wave, consolidated=consolidated, member_pick_lists=member_pick_lists,
         error=error, success=success,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# RFID tracking (simulated)
+# ---------------------------------------------------------------------------
+
+def _all_warehouse_stock(conn):
+    """Tracked stock across every warehouse, for the "tag this" picker —
+    only real, on-hand (product, bin) combinations are offered, matching
+    create_tag's own validation."""
+    result = []
+    for wh in list_warehouses(conn):
+        result.extend(get_warehouse_stock(conn, wh['id']))
+    return result
+
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_rfid_reader_list')
+def wms_rfid_reader_list(request):
+    error = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        if request.method == 'POST':
+            try:
+                create_reader(
+                    conn, int(request.POST.get('zone_id')),
+                    request.POST.get('reader_code', ''),
+                    request.POST.get('description', ''),
+                )
+                conn.commit()
+                return redirect('wms_rfid_reader_list')
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+        readers = list_readers(conn, active_only=False)
+        zones = list_zones(conn)
+    finally:
+        conn.close()
+    return render(request, 'wms_rfid_reader_list.html', _wms_ctx(
+        request, readers=readers, zones=zones, error=error,
+    ))
+
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_rfid_tag_list')
+def wms_rfid_tag_list(request):
+    status = request.GET.get('status', 'active')
+    error = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        if request.method == 'POST':
+            try:
+                tag_id = create_tag(
+                    conn, request.POST.get('tag_code', ''),
+                    int(request.POST.get('product_id')),
+                    float(request.POST.get('qty')),
+                    int(request.POST.get('bin_id')),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('wms_rfid_tag_detail', tag_id=tag_id)
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+        tags = list_tags(conn, status=status or None)
+        available_stock = _all_warehouse_stock(conn)
+    finally:
+        conn.close()
+    return render(request, 'wms_rfid_tag_list.html', _wms_ctx(
+        request, tags=tags, status=status, statuses=RFID_TAG_STATUSES,
+        available_stock=available_stock, error=error,
+    ))
+
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_rfid_tag_list')
+def wms_rfid_tag_detail(request, tag_id):
+    error = success = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        tag = get_tag(conn, tag_id)
+        if not tag:
+            return redirect('wms_rfid_tag_list')
+
+        if request.method == 'POST':
+            action = request.POST.get('action', '')
+            by = request.session.get('user_email', '')
+            try:
+                if action == 'simulate_read':
+                    result = simulate_tag_read(
+                        conn, tag_id, int(request.POST.get('reader_id')), created_by=by,
+                    )
+                    success = (
+                        'Tag relocated to a new zone.' if result['moved']
+                        else 'Tag read — still in the same zone (heartbeat only).'
+                    )
+                elif action == 'retire':
+                    retire_tag(conn, tag_id)
+                    success = 'Tag retired.'
+                conn.commit()
+                tag = get_tag(conn, tag_id)
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+
+        history = get_tag_history(conn, tag_id)
+        readers = list_readers(conn)
+    finally:
+        conn.close()
+    return render(request, 'wms_rfid_tag_detail.html', _wms_ctx(
+        request, tag=tag, history=history, readers=readers, error=error, success=success,
     ))

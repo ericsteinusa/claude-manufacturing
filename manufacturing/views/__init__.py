@@ -504,6 +504,8 @@ WEB_LEAF_URLS = {
     ('production', 'wave_picking'):  '/wms/waves/',
     ('production', 'pack_station'):  '/wms/picks/?status=picked',
     ('production', 'transfers'):     '/wms/transfers/',
+    ('production', 'rfid_readers'):  '/wms/rfid/readers/',
+    ('production', 'rfid_tags'):     '/wms/rfid/tags/',
     # Maintenance
     ('maintenance', 'predictive_maint'): '/predictive-maintenance/',
     ('maintenance', 'maint'): '/maint/',
