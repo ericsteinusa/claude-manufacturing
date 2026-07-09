@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block page_title %}{{ report.first_name }} {{ report.last_name }} — Skills{% endblock %}
+
+{% block toolbar_left %}
+<a href="/skills/matrix/" class="btn">Skills Matrix</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.skill-wrap { width:100%; max-width:720px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="skill-wrap">
+    <div class="menu-title">{{ report.first_name }} {{ report.last_name }} — {{ report.job_title|default:"No job title on file" }}</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Competency Gap Report</h3>
+        {% if report.gaps %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Skill</th>
+                        <th class="num">Required</th>
+                        <th class="num">Actual</th>
+                        <th class="num">Gap</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in report.gaps %}
+                    <tr>
+                        <td>{{ g.skill_name }}</td>
+                        <td class="num">{{ g.required_level }}</td>
+                        <td class="num">{{ g.actual_level }}</td>
+                        <td class="num">{{ g.gap }}</td>
+                        <td>
+                            {% if g.status == 'met' %}
+                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Met</span>
+                            {% elif g.status == 'not_assessed' %}
+                            <span class="pill" style="font-size:11px;padding:2px 8px;">Not Assessed</span>
+                            {% else %}
+                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Gap</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No skill requirements defined for this job title yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Record Skill Level</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Skill</label>
+                    <select name="skill_id" required>
+                        {% for s in skills %}
+                        <option value="{{ s.id }}">{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Level</label>
+                    <select name="level">
+                        {% for lvl, label in skill_level_choices %}
+                        <option value="{{ lvl }}">{{ lvl }} — {{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Certified Date</label>
+                    <input type="date" name="certified_date">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

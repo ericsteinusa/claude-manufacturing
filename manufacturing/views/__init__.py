@@ -54,6 +54,7 @@ from ..price_list_core import (
     ensure_price_list_tables, list_price_lists, assign_customer_price_list,
     get_customer_price_tiers,
 )
+from ..discount_core import ensure_discount_tables, get_promotion_tiers_for_customer
 from ..cs_calls_core import (
     validate_call, PLAN_STATUSES,
     load_customers_for_cs,
@@ -247,6 +248,9 @@ from ._consignment import *  # noqa: F401,F403
 from ._scenario_planning import *  # noqa: F401,F403
 from ._fmea import *  # noqa: F401,F403
 from ._abc_costing import *  # noqa: F401,F403
+from ._discount import *  # noqa: F401,F403
+from ._coa import *  # noqa: F401,F403
+from ._skills_matrix import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
@@ -2095,6 +2099,11 @@ def so_detail(request, so_id):
             get_customer_price_tiers(conn, so['customer_id'])
             if (so and can_edit and so.get('customer_id')) else {}
         )
+        ensure_discount_tables(conn)
+        promo_tiers = (
+            get_promotion_tiers_for_customer(conn, so['customer_id'])
+            if (so and can_edit and so.get('customer_id')) else {}
+        )
         atp_by_product = (
             get_atp_qty_for_products(conn, so.get('ship_date') or date.today().isoformat())
             if (so and can_edit) else {}
@@ -2140,6 +2149,7 @@ def so_detail(request, so_id):
         currencies=currencies,
         base_currency=base_currency,
         price_tiers_json=json.dumps(price_tiers),
+        promo_tiers_json=json.dumps(promo_tiers),
         atp_json=json.dumps(atp_by_product),
         atp_warning=atp_warning,
         capacity_warning=capacity_warning,

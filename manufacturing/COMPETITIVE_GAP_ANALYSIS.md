@@ -21,6 +21,20 @@ already normalizes against for the same reason; fixed by normalizing the same wa
 each domain table below and in the three modules' own docstrings (`scenario_planning_core.py`,
 `fmea_core.py`, `abc_costing_core.py`), and in Priority 5 of Section 2. 38 features shipped total.
 
+**2026-07-09, later same day:** Shipped the next 3 highest-ROI items from the "buildable now"
+list this document's own Sections 1.1–1.10 still marked ❌ (narrower, vertical-specific gaps that
+don't require a live external system or hardware, as opposed to Section 3's "Where We Trail
+Enterprise" items, which do): **Discount & Promotion Management** (10/10 of the top-10 have it —
+the single most universally-adopted item still missing), **Certificate of Analysis (CoA)
+Generation** (7/10), and **Skills Matrix & Competency Gap Analysis** (6/10). All three were picked
+because they extend infrastructure that already existed rather than requiring a new subsystem —
+discounts build on `price_list_core.py`, CoA reuses the SPC measurements `quality_core.py`
+already records per lot, and the skills matrix reuses `personnel_core.py`'s existing
+training/certification data and the `position` table's free-text job title. Built on a parallel
+branch and merged in after a rebase onto the What-If/FMEA/ABC work above. Details in each domain
+table below and in the three modules' own docstrings (`discount_core.py`, `coa_core.py`,
+`skills_matrix_core.py`). 41 features shipped total.
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -189,11 +203,11 @@ platform beyond demand forecasting and predictive maintenance.
 | Audit trail & full traceability | ✅ Full | ✅ All |
 | **Sampling plans & AQL (acceptance quality limit)** | ✅ Full (P2-E) — ISO 2859-1; seeded accept/reject table covers AQL 0.65–4.0, code letters C-N only | ✅ 8/10 |
 | **Control plans & FMEA** | ✅ Full (2026-07-09) — per-product control plans with Severity x Occurrence x Detection RPN scoring per characteristic, plus a cross-plan risk register | ✅ 7/10 |
-| **Certificate of Analysis (CoA) generation** | ❌ | ✅ 7/10 |
+| **Certificate of Analysis (CoA) generation** | ✅ Full (2026-07-09) — generated per lot from that lot's existing SPC measurements (`spc_measurement`/`spc_control_limit`), snapshotted at generation time into `coa_document`/`coa_result` so a later measurement edit can't retroactively alter an issued certificate; reportlab PDF matching the customer-portal invoice/packing-slip pattern | ✅ 7/10 |
 | **Document control & version management** | ✅ Full (P2-F) — draft→review→approved→superseded→obsolete, revision history, file upload/download | ✅ 8/10 |
 | **Regulatory compliance templates (FDA, ISO)** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** CoA generation, regulatory compliance templates.
+**Priority gaps:** regulatory compliance templates.
 
 ---
 
@@ -238,12 +252,12 @@ platform beyond demand forecasting and predictive maintenance.
 | **Available-to-Promise (ATP)** | ✅ Full (P2-B) — inquiry screen, live SO-line badge, soft confirm-gate | ✅ 9/10 |
 | **Capable-to-Promise (CTP)** | ✅ Full (P4-C) — combines ATP material availability with finite-capacity workcenter dates into one `ctp_date`; second independent shortfall check on SO confirm | ✅ 6/10 |
 | **Price list management & tiered pricing** | ✅ Full (P1-E) — client-side SO auto-populate by tier | ✅ All |
-| **Discount & promotion management** | ❌ | ✅ All |
+| **Discount & promotion management** | ✅ Full (2026-07-09) — percent/fixed-amount rules scoped to a product and/or customer with a min-qty threshold and effective window; resolution picks whichever applicable rule yields the lowest final price rather than ranking discount types directly; auto-applies client-side on the SO line-entry form, the same JSON-embed pattern `price_list_core`'s tiered pricing already uses | ✅ All |
 | **Customer self-service portal** | ✅ Full (P3-C) — own orders/invoices/shipments/RMAs, invoice + packing-slip PDF, online payment; carrier tracking and Stripe payment are documented stubs (no real integration existed anywhere to build on) | ✅ 7/10 |
 | **Shipping & carrier API integration (FedEx/UPS/USPS)** | ❌ — WMS (P3-B) records carrier + tracking number manually at ship confirm; the portal's tracking view (P3-C) is a deterministic stub, not a real carrier API | ✅ 9/10 |
 | **Multi-channel order integration (e-commerce)** | ✅ Full (P4-E) — real, verified Shopify/WooCommerce webhook order intake with dedupe and SKU field mapping; outbound inventory/price/shipment sync is real config-gated HTTP POST code with no live storefront in this environment to call | ✅ 7/10 |
 
-**Priority gaps:** discount/promotion management, carrier API integration.
+**Priority gaps:** carrier API integration.
 
 ---
 
@@ -292,11 +306,11 @@ platform beyond demand forecasting and predictive maintenance.
 | Overtime approval workflow | ✅ | ✅ 8/10 |
 | **Employee self-service (ESS) portal** | ✅ Full (P2-G) — pay stubs, time-off balance/request, clock in/out, reviews/training, contact info | ✅ 7/10 |
 | **Benefits management** | ❌ | ✅ 7/10 |
-| **Skills matrix & competency gap analysis** | ❌ | ✅ 6/10 |
+| **Skills matrix & competency gap analysis** | ✅ Full (2026-07-09) — a skill master, required-proficiency-level requirements keyed by `position.job_title` (free text, matched case-insensitively — no job-title master table exists to key on instead), and per-employee assessed levels; a per-employee gap report and an org-wide gap-ranked summary | ✅ 6/10 |
 | **Workforce analytics & headcount planning** | ❌ | ✅ 7/10 |
 | **Applicant Tracking / Recruiting (ATS)** | ❌ | ✅ 5/10 |
 
-**Priority gaps:** skills matrix, benefits management, workforce analytics.
+**Priority gaps:** benefits management, workforce analytics.
 
 ---
 

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}Generate Certificate of Analysis{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/coa/" class="btn">Certificates of Analysis</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.coa-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="coa-wrap">
+    <div class="menu-title">Generate Certificate of Analysis</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <p style="font-size:12.5px;color:var(--text-muted);margin-top:0;">
+            Generates a CoA from whatever SPC measurements (Quality → SPC) are currently
+            recorded against the selected lot. A lot with no SPC measurements has nothing
+            to certify yet.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Lot *</label>
+                <select name="lot_id" required>
+                    <option value="">— Select a lot —</option>
+                    {% for lot in lots %}
+                    <option value="{{ lot.id }}" {% if lot.id == preselect_lot_id %}selected{% endif %}>{{ lot.lot_number }} — {{ lot.product_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Issued By</label>
+                <input type="text" name="issued_by" placeholder="Inspector / QA signatory">
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="Optional notes">
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Certificate</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
