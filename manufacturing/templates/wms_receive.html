@@ -6,6 +6,11 @@
 <a href="/wms/putaway-rules/" class="btn">Put-Away Rules</a>
 {% endblock %}
 
+{% block extra_styles %}
+.xdock-row td { background: #fff8e6; }
+.xdock-note { font-size: 11px; color: #a05a00; margin-top: 4px; }
+{% endblock %}
+
 {% block body %}
 <div class="content">
 <div class="menu-title">Receive &amp; Put-Away</div>
@@ -13,7 +18,9 @@
     Open lines on sent/partial POs with a linked product. Receiving here
     updates both the PO's received quantity and the bin's tracked stock in
     one step. Free-text PO lines (no linked product) aren't shown — receive
-    those from the PO's own detail page.
+    those from the PO's own detail page. When an item has orders waiting on
+    it with nothing in stock, a cross-dock option appears below it to route
+    the receipt straight to that order instead of putting it away first.
 </p>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -36,6 +43,7 @@
                 {% if can_edit %}
                 <form method="post" style="display:flex;gap:6px;align-items:center;">
                     {% csrf_token %}
+                    <input type="hidden" name="action" value="putaway">
                     <input type="hidden" name="po_item_id" value="{{ i.id }}">
                     <input type="hidden" name="po_id" value="{{ i.po_id }}">
                     <input type="hidden" name="product_id" value="{{ i.product_id }}">
@@ -51,6 +59,31 @@
                 {% endif %}
                 </td>
             </tr>
+            {% if i.cross_dock_candidates %}
+            <tr class="xdock-row">
+                <td colspan="7">
+                    <strong>⚡ Cross-dock opportunity</strong> — {{ i.cross_dock_candidates|length }}
+                    order line(s) waiting on this product with nothing in stock:
+                    {% if can_edit %}
+                    <form method="post" style="display:flex;gap:6px;align-items:center;margin-top:6px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="cross_dock">
+                        <input type="hidden" name="po_item_id" value="{{ i.id }}">
+                        <input type="hidden" name="po_id" value="{{ i.po_id }}">
+                        <input type="hidden" name="product_id" value="{{ i.product_id }}">
+                        <select name="pick_list_line_id">
+                            {% for c in i.cross_dock_candidates %}
+                            <option value="{{ c.id }}">{{ c.so_number }} ({{ c.pick_number }}) — needs {{ c.qty_ordered }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" step="any" name="qty" style="width:80px;" placeholder="qty" required>
+                        <button type="submit" class="btn" style="padding:3px 10px;font-size:12px;">Cross-Dock Straight to Order</button>
+                    </form>
+                    <div class="xdock-note">Routes received qty directly to the selected order instead of putting it away — skips storage entirely.</div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
