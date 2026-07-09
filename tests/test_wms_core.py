@@ -7,7 +7,7 @@ test_capacity_planning_core.py), plus unittest.mock.patch for the
 cross-module functions this module re-imports by name.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -19,6 +19,7 @@ from manufacturing.wms_core import (
     add_carton_item, mark_pick_list_packed, confirm_shipment,
     create_transfer, add_transfer_line, remove_transfer_line,
     ship_transfer, receive_transfer_line, cancel_transfer,
+    _sync_wave_status, create_wave, record_wave_pick, cancel_wave,
 )
 
 
@@ -710,3 +711,160 @@ def test_cancel_transfer_happy_path():
         cancel_transfer(conn, transfer_id=1)
         update_sql = conn.execute.call_args_list[-1][0][0]
         assert "wms_transfer SET status = 'cancelled'" in update_sql
+
+
+# ── wave picking ─────────────────────────────────────────────────────────────
+
+def test_sync_wave_status_returns_empty_for_missing_wave():
+    conn = _conn(fetchone_results=[None])
+    assert _sync_wave_status(conn, wave_id=1) == ''
+
+
+def test_sync_wave_status_short_circuits_for_cancelled():
+    conn = _conn()
+    result = _sync_wave_status(conn, wave_id=1, current_status='cancelled')
+    assert result == 'cancelled'
+    conn.execute.assert_not_called()
+
+
+def test_sync_wave_status_becomes_completed_when_no_pending():
+    conn = _conn(fetchone_results=[{'pending': 0, 'resolved': 5}])
+    result = _sync_wave_status(conn, wave_id=1, current_status='picking')
+    assert result == 'completed'
+    update_calls = [c for c in conn.execute.call_args_list if 'wms_wave SET status' in c[0][0]]
+    assert len(update_calls) == 1
+    assert update_calls[0][0][1] == ('completed', 1)
+
+
+def test_sync_wave_status_becomes_picking_when_some_resolved():
+    conn = _conn(fetchone_results=[{'pending': 3, 'resolved': 2}])
+    result = _sync_wave_status(conn, wave_id=1, current_status='open')
+    assert result == 'picking'
+
+
+def test_sync_wave_status_stays_open_noop_when_nothing_resolved():
+    conn = _conn(fetchone_results=[{'pending': 5, 'resolved': 0}])
+    result = _sync_wave_status(conn, wave_id=1, current_status='open')
+    assert result == 'open'
+    update_calls = [c for c in conn.execute.call_args_list if 'wms_wave SET status' in c[0][0]]
+    assert len(update_calls) == 0
+
+
+def test_create_wave_raises_for_empty_so_ids():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        create_wave(conn, [], created_by='eric')
+    assert conn.execute.call_count == 0
+
+
+@patch('manufacturing.wms_core.generate_pick_list')
+@patch('manufacturing.wms_core._next_sequence')
+def test_create_wave_dedupes_so_ids(mock_seq, mock_gen):
+    mock_seq.return_value = 'WAVE-2026-0001'
+    mock_gen.return_value = 101
+    conn = _conn(fetchone_results=[{'id': 5}])
+    wave_id = create_wave(conn, [9, 9, 9], created_by='eric')
+    assert wave_id == 5
+    mock_gen.assert_called_once_with(conn, 9, 'eric')
+
+
+@patch('manufacturing.wms_core.generate_pick_list')
+@patch('manufacturing.wms_core._next_sequence')
+def test_create_wave_happy_path(mock_seq, mock_gen):
+    mock_seq.return_value = 'WAVE-2026-0001'
+    mock_gen.side_effect = [101, 102]
+    conn = _conn(fetchone_results=[{'id': 5}])
+    wave_id = create_wave(conn, [9, 10], created_by='eric')
+
+    assert wave_id == 5
+    assert mock_gen.call_args_list == [call(conn, 9, 'eric'), call(conn, 10, 'eric')]
+    update_calls = [c for c in conn.execute.call_args_list if 'wms_pick_list SET wave_id' in c[0][0]]
+    assert len(update_calls) == 2
+    assert update_calls[0][0][1] == (5, 101)
+    assert update_calls[1][0][1] == (5, 102)
+
+
+def test_record_wave_pick_raises_for_nonpositive_qty():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        record_wave_pick(conn, wave_id=1, product_id=1, bin_id=1, qty_picked=0, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_record_wave_pick_raises_when_wave_not_found(mock_get_wave):
+    mock_get_wave.return_value = None
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        record_wave_pick(conn, wave_id=1, product_id=1, bin_id=1, qty_picked=5, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_record_wave_pick_raises_when_wave_cancelled(mock_get_wave):
+    mock_get_wave.return_value = {'id': 1, 'status': 'cancelled'}
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        record_wave_pick(conn, wave_id=1, product_id=1, bin_id=1, qty_picked=5, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_record_wave_pick_raises_when_no_matching_lines(mock_get_wave):
+    mock_get_wave.return_value = {'id': 1, 'status': 'open'}
+    conn = _conn(fetchall_results=[[]])
+    with pytest.raises(ValueError):
+        record_wave_pick(conn, wave_id=1, product_id=1, bin_id=1, qty_picked=5, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_record_wave_pick_raises_when_exceeding_total_needed(mock_get_wave):
+    mock_get_wave.return_value = {'id': 1, 'status': 'open'}
+    conn = _conn(fetchall_results=[[
+        {'id': 10, 'qty_ordered': 5}, {'id': 11, 'qty_ordered': 3},
+    ]])
+    with pytest.raises(ValueError):
+        record_wave_pick(conn, wave_id=1, product_id=1, bin_id=1, qty_picked=100, created_by='eric')
+
+
+@patch('manufacturing.wms_core._sync_wave_status')
+@patch('manufacturing.wms_core.record_pick')
+@patch('manufacturing.wms_core.get_wave')
+def test_record_wave_pick_allocates_across_multiple_lines(mock_get_wave, mock_record_pick, mock_sync):
+    mock_get_wave.return_value = {'id': 1, 'status': 'open'}
+    conn = _conn(fetchall_results=[[
+        {'id': 10, 'qty_ordered': 5}, {'id': 11, 'qty_ordered': 3},
+    ]])
+    result = record_wave_pick(conn, wave_id=1, product_id=7, bin_id=3, qty_picked=6, created_by='eric')
+
+    assert mock_record_pick.call_args_list == [
+        call(conn, 10, 5, 'eric'),  # first (oldest) line fully covered
+        call(conn, 11, 1, 'eric'),  # second line gets the remaining 1
+    ]
+    assert result == {'lines_updated': 2, 'total_allocated': 6}
+    mock_sync.assert_called_once_with(conn, 1)
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_cancel_wave_raises_when_missing(mock_get_wave):
+    mock_get_wave.return_value = None
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        cancel_wave(conn, wave_id=1)
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_cancel_wave_raises_when_not_open(mock_get_wave):
+    mock_get_wave.return_value = {'id': 1, 'status': 'picking'}
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        cancel_wave(conn, wave_id=1)
+
+
+@patch('manufacturing.wms_core.get_wave')
+def test_cancel_wave_happy_path(mock_get_wave):
+    mock_get_wave.return_value = {'id': 1, 'status': 'open'}
+    conn = MagicMock()
+    cancel_wave(conn, wave_id=1)
+    calls = conn.execute.call_args_list
+    assert "wms_wave SET status = 'cancelled'" in calls[0][0][0]
+    assert calls[0][0][1] == (1,)
+    assert "wms_pick_list SET status = 'cancelled'" in calls[1][0][0]
+    assert calls[1][0][1] == (1,)

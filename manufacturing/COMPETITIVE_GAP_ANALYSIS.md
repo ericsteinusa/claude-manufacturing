@@ -45,7 +45,18 @@ No corrections were needed; this pass is a clean bill of health, not a new round
 from the "Where We Trail Mid-Market" list once the P1–P4 roadmap and both P3-H/P3-I gaps closed.
 `consignment_core.py` — vendor-owned stock received into the warehouse without touching
 `product.amount` until a separate "usage" action transfers ownership (credits inventory) and
-opens an AP invoice for the vendor in one step. 32 features shipped total.
+opens an AP invoice for the vendor in one step. 32 features shipped total. **Follow-up same day:**
+a code review of P3-J found and fixed three real bugs (agreements could be created with no
+supplier, letting usage silently bill a null vendor; a count-based invoice-numbering scheme that
+would collide under concurrent usage against the same agreement; a silently-swallowed cancel
+error) — shipped as its own small PR, no roadmap-status change.
+
+**2026-07-08, next:** Shipped P3-K (Wave Picking), the next item from the "Where We Trail
+Mid-Market" list. Extends P3-B's pick-list model with a consolidation layer: a wave batches
+several confirmed SOs' pick lists together so a picker walks each (product, bin) combination once
+per wave instead of once per order, then that single consolidated pick is allocated back down
+across every affected order's own pick-list lines by calling the existing, unmodified
+`record_pick()` per line. 33 features shipped total.
 
 ---
 
@@ -115,11 +126,11 @@ forecasting and predictive maintenance.
 | **Cycle count structured workflow** | ✅ Full (P1-D) | ✅ All |
 | **Consignment inventory** | ✅ Full (P3-J) — vendor-owned stock, usage-triggered ownership transfer + AP billing | ✅ 7/10 |
 | **Cross-docking** | ❌ | ✅ 6/10 |
-| **Wave picking management** | ❌ — pick lists are one-per-SO with a zone-aware sort, not multi-order wave batching | ✅ 6/10 |
+| **Wave picking management** | ✅ Full (P3-K) — batches confirmed SOs into a wave; a consolidated (product, bin) pick sheet is allocated back down across every affected order's pick-list lines | ✅ 6/10 |
 | **RFID integration** | ❌ | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** cross-docking, wave picking, RFID.
+**Priority gaps:** cross-docking, RFID.
 
 ---
 
@@ -1195,6 +1206,48 @@ and both P3-H/P3-I gaps closed — vendor-owned stock held in our warehouse, not
   correctly (25.00 remaining, 15.00 used); confirmed attempting to use more than the on-hand
   balance is rejected with a clear error; cleaned up all test data afterward.
 
+#### P3-K: Wave Picking Management ✅ Done
+Extends P3-B (WMS): pick lists were one-per-SO with a zone-aware sort, but nothing batched
+multiple orders into a single consolidated pick run.
+- Batch several confirmed SOs into one wave
+- Consolidated pick sheet: one row per (product, bin) across the whole wave, not per order
+- Recording one consolidated pick allocates it back across every order that needed it
+- Wave auto-completes once every member order's lines are resolved; cancel while still untouched
+- **Shipped:** New functions directly in `wms_core.py` (`wms_wave` table, plus a nullable
+  `wms_pick_list.wave_id` column) — a consolidation layer *on top of* the existing per-order pick
+  list model, not a replacement for it. `create_wave` generates a real pick list per SO by calling
+  the existing, unmodified `generate_pick_list` once per order (so the whole wave fails to create
+  as one unit if any SO isn't eligible, same all-or-nothing transaction semantics as everything
+  else in this module) and assigns them all to a new wave. `get_consolidated_pick_lines` groups
+  every still-pending line across the wave's member pick lists by `(product_id, bin_id)` — the
+  entire point of wave picking: pick everything of one product from one bin in a single trip, once,
+  no matter how many orders in the wave need it. `record_wave_pick` is the actual consolidated
+  pick action: it allocates the picked qty back down across the affected lines (oldest pick list
+  first) by calling `record_pick` once per line — **reused completely unmodified**, so every
+  per-line side effect (crediting `product.amount`, decrementing bin stock, that line's own order
+  flipping to `'picked'` once fully resolved) happens exactly the way single-order picking already
+  did; wave picking adds no new inventory-movement code path, only a smarter allocation front end.
+  An over-pick (asking for more than the wave actually needs for that product/bin) is rejected with
+  a clear error rather than silently over-crediting — mirrors `consignment_core.record_usage`'s
+  on-hand-balance check. Text-only SO lines (`product_id IS NULL`) have no product identity to
+  batch on, so they're explicitly excluded from consolidation and must still be picked from their
+  own order's pick list individually, same as before wave picking existed — a documented scoping
+  choice, not an oversight. Wave status (`open` → `picking` → `completed`, or `cancelled` while
+  still untouched) is lazily re-derived on every read from its member lines' own statuses, the
+  same precedent `blanket_po_core`/`consignment_core` use for their own status sync; cancelling a
+  wave cascades to cancel its member pick lists too, freeing the underlying SOs to be picked again
+  individually or in a new wave. New pages at `/wms/waves/` (list + a checkbox picker over
+  confirmed SOs awaiting a pick list) and `/wms/waves/<id>/` (consolidated pick sheet, member-order
+  progress table, cancel), cross-linked from the existing Pick Lists and Bin Master pages. Verified
+  end-to-end against a running dev server + local Postgres through the actual web views: seeded 50
+  tracked units of a real product into one bin, created two confirmed SOs needing 6 and 4 units of
+  it respectively, batched both into a wave and confirmed the consolidated sheet showed one row
+  summing to 10 (not two separate rows), confirmed an over-pick request (999) was rejected,
+  recorded a single 10-unit consolidated pick and confirmed **both** orders' pick lists flipped to
+  `'picked'`, the bin dropped by exactly 10, `product.amount` dropped by exactly 10, and the wave
+  auto-completed; separately confirmed cancelling an untouched wave cascades to cancel its member
+  pick list. Cleaned up all test data afterward.
+
 ---
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
@@ -1588,12 +1641,13 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No true inter-warehouse transfers | P3-H |
 | No FIFO/LIFO/weighted-average valuation | P3-I |
 | No consignment inventory | P3-J |
+| No wave picking management | P3-K |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
 | Gap | Effort to Close |
 |---|---|
-| No cross-docking / wave picking / RFID | Medium |
+| No cross-docking / RFID | Medium |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
@@ -1614,7 +1668,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 |---|---|---|---|
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
-| Inventory | 9/10 | 8/10 | ▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J); only cross-docking/wave-picking/RFID remain) |
+| Inventory | 9/10 | 8/10 | ▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J); only cross-docking/RFID remain) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
@@ -1626,8 +1680,8 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
-| WMS / Shipping | 7/10 | 6/10 | ▲▲▲ (P3-B full pick/pack/ship) |
-| **Overall** | **9.1/10** | **8.5/10** | **▲ from 7.1 / 5.9** |
+| WMS / Shipping | 8/10 | 6/10 | ▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K)) |
+| **Overall** | **9.2/10** | **8.5/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1642,12 +1696,12 @@ the last batch (P3-F through P4-G) turned out to already have open PRs from a pr
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
 re-built. The two gaps discovered along the way with no PR ever opened for them — true
 inter-warehouse transfers (P3-H) and FIFO/LIFO/weighted-average costing (P3-I) — have since both
-been built fresh and shipped. Consignment inventory (P3-J), the next-highest-ROI item once those
-closed, has since also shipped. Everything tracked in Sections 1–4 above that shows a ✅ or a
-closed-gap entry is real, verified, shipped code; the only gaps left (Section 3's "Where We Trail
-Enterprise" table, and the narrower WMS items — cross-docking/wave-picking/RFID — in Section 1.2)
-are either real external-connectivity dependencies this dev environment has no live counterpart
-for, or lower-ROI items not yet scheduled.
+been built fresh and shipped. Consignment inventory (P3-J) and wave picking (P3-K), the two
+next-highest-ROI items once those closed, have since also shipped. Everything tracked in
+Sections 1–4 above that shows a ✅ or a closed-gap entry is real, verified, shipped code; the only
+gaps left (Section 3's "Where We Trail Enterprise" table, and the narrower WMS items —
+cross-docking/RFID — in Section 1.2) are either real external-connectivity dependencies this dev
+environment has no live counterpart for, or lower-ROI items not yet scheduled.
 
 ---
 

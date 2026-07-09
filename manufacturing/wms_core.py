@@ -54,6 +54,17 @@ only exercises the already-legal ``confirmed -> shipped`` transition once, at
 the very end. One pick list per confirmed SO in v1 — no partial/backorder
 splitting across multiple pick lists.
 
+Wave picking (``create_wave`` / ``record_wave_pick``) is a consolidation
+layer *on top of* the per-order pick list model above, not a replacement for
+it — a wave batches several SOs' pick lists together (``wms_pick_list.wave_id``)
+so a picker walks each (product, bin) combination once per wave instead of
+once per order, then the qty picked in that single trip is allocated back
+down across the affected orders' own pick-list lines by calling
+``record_pick`` per line — reused completely unmodified, never duplicated.
+Consolidation only covers lines with a real ``product_id`` (text-only SO
+lines have no product identity to batch on and must still be picked from
+their own order's pick list, same as before wave picking existed).
+
 Every function takes an open connection; the caller owns the transaction
 (same convention as routing_core / capacity_planning_core / mrp_web_core).
 """
@@ -78,6 +89,7 @@ PICK_LINE_STATUSES = ('pending', 'picked', 'short')
 CARTON_STATUSES = ('open', 'closed', 'shipped')
 TRANSFER_STATUSES = ('draft', 'in_transit', 'completed', 'cancelled')
 TRANSFER_LINE_STATUSES = ('pending', 'in_transit', 'received')
+WAVE_STATUSES = ('open', 'picking', 'completed', 'cancelled')
 
 UNASSIGNED_WAREHOUSE_CODE = 'DEFAULT'
 UNASSIGNED_ZONE_CODE = 'UNASSIGNED'
@@ -149,6 +161,15 @@ def ensure_wms_tables(conn):
         )
     """)
     conn.execute("""
+        CREATE TABLE IF NOT EXISTS wms_wave (
+            id SERIAL PRIMARY KEY,
+            wave_number TEXT NOT NULL UNIQUE,
+            status TEXT NOT NULL DEFAULT 'open',
+            created_by TEXT DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS wms_pick_list (
             id SERIAL PRIMARY KEY,
             pick_number TEXT NOT NULL UNIQUE,
@@ -159,6 +180,14 @@ def ensure_wms_tables(conn):
             notes TEXT DEFAULT ''
         )
     """)
+    conn.execute(
+        "ALTER TABLE wms_pick_list ADD COLUMN IF NOT EXISTS "
+        "wave_id INTEGER REFERENCES wms_wave(id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS wms_pick_list_wave "
+        "ON wms_pick_list(wave_id)"
+    )
     conn.execute("""
         CREATE TABLE IF NOT EXISTS wms_pick_list_line (
             id SERIAL PRIMARY KEY,
@@ -646,6 +675,7 @@ _SEQUENCE_TABLES = {
     'PICK-': ('wms_pick_list', 'pick_number'),
     'CTN-': ('wms_carton', 'carton_number'),
     'TRF-': ('wms_transfer', 'transfer_number'),
+    'WAVE-': ('wms_wave', 'wave_number'),
 }
 
 
@@ -1193,3 +1223,203 @@ def cancel_transfer(conn, transfer_id):
             f"{transfer['status']}, not draft"
         )
     conn.execute("UPDATE wms_transfer SET status = 'cancelled' WHERE id = %s", (transfer_id,))
+
+
+# ---------------------------------------------------------------------------
+# Wave picking
+# ---------------------------------------------------------------------------
+#
+# A wave batches several confirmed SOs' pick lists together so a picker can
+# walk each (product, bin) combination once per wave instead of once per
+# order — see the module docstring's "Wave picking" paragraph. open (being
+# built / not yet started) -> picking (at least one consolidated pick
+# recorded) -> completed (every member line resolved), or cancelled (only
+# while still open, before any picking has begun).
+
+def _sync_wave_status(conn, wave_id, current_status=None):
+    """Lazily recompute a wave's status from its member pick-list lines —
+    same precedent as blanket_po_core / consignment_core's status sync.
+    Cancelled is terminal and short-circuits without a query."""
+    if current_status is None:
+        row = conn.execute("SELECT status FROM wms_wave WHERE id = %s", (wave_id,)).fetchone()
+        if not row:
+            return ''
+        current_status = row['status']
+    if current_status == 'cancelled':
+        return current_status
+
+    counts = conn.execute(
+        "SELECT "
+        "COUNT(*) FILTER (WHERE l.status = 'pending') AS pending, "
+        "COUNT(*) FILTER (WHERE l.status != 'pending') AS resolved "
+        "FROM wms_pick_list_line l "
+        "JOIN wms_pick_list wpl ON wpl.id = l.pick_list_id "
+        "WHERE wpl.wave_id = %s",
+        (wave_id,),
+    ).fetchone()
+    if counts['pending'] == 0:
+        new_status = 'completed'
+    elif counts['resolved'] > 0:
+        new_status = 'picking'
+    else:
+        new_status = 'open'
+
+    if new_status != current_status:
+        conn.execute("UPDATE wms_wave SET status = %s WHERE id = %s", (new_status, wave_id))
+    return new_status
+
+
+def list_waves(conn, status=None):
+    rows = conn.execute("SELECT * FROM wms_wave ORDER BY created_at DESC").fetchall()
+    out = []
+    for r in rows:
+        d = dict(r)
+        d['status'] = _sync_wave_status(conn, d['id'], current_status=d['status'])
+        if status and d['status'] != status:
+            continue
+        out.append(d)
+    return out
+
+
+def get_wave(conn, wave_id):
+    row = conn.execute("SELECT * FROM wms_wave WHERE id = %s", (wave_id,)).fetchone()
+    if not row:
+        return None
+    d = dict(row)
+    d['status'] = _sync_wave_status(conn, wave_id, current_status=d['status'])
+    return d
+
+
+def get_wave_pick_lists(conn, wave_id):
+    rows = conn.execute(
+        "SELECT wpl.*, so.so_number FROM wms_pick_list wpl "
+        "JOIN sales_order so ON so.id = wpl.so_id "
+        "WHERE wpl.wave_id = %s ORDER BY wpl.id",
+        (wave_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def create_wave(conn, so_ids, created_by):
+    """Create a wave from a batch of confirmed SOs: generates a pick list
+    per SO (reusing generate_pick_list unmodified) and assigns them all to
+    a new wave. Does not commit. Raises ValueError if so_ids is empty, or
+    propagates generate_pick_list's own ValueError (e.g. an SO that isn't
+    confirmed or already has an active pick list) — the whole wave fails
+    to create rather than partially forming, since the caller's open
+    transaction rolls back as one unit.
+    """
+    so_ids = list(dict.fromkeys(so_ids))  # de-dupe, preserve order
+    if not so_ids:
+        raise ValueError("Select at least one sales order for the wave")
+
+    wave_number = _next_sequence(conn, 'WAVE-')
+    wave_id = conn.execute(
+        "INSERT INTO wms_wave (wave_number, created_by) VALUES (%s,%s) RETURNING id",
+        (wave_number, created_by),
+    ).fetchone()['id']
+
+    for so_id in so_ids:
+        pick_list_id = generate_pick_list(conn, so_id, created_by)
+        conn.execute(
+            "UPDATE wms_pick_list SET wave_id = %s WHERE id = %s",
+            (wave_id, pick_list_id),
+        )
+    return wave_id
+
+
+def get_consolidated_pick_lines(conn, wave_id):
+    """Group every still-pending line across a wave's member pick lists by
+    (product, bin) — the whole point of wave picking: pick everything of
+    one product from one bin in a single trip, once, no matter how many
+    orders in the wave need it. Text-only SO lines (product_id IS NULL)
+    have no product identity to batch on, so they're excluded here — they
+    still exist on their own order's pick list and must be picked from
+    there individually, same as before wave picking existed."""
+    rows = conn.execute(
+        "SELECT l.product_id, p.name AS product_name, l.bin_id, b.full_code AS bin_full_code, "
+        "COALESCE(z.pick_sequence, 999999) AS zone_seq, "
+        "SUM(l.qty_ordered) AS qty_needed, COUNT(DISTINCT l.pick_list_id) AS order_count "
+        "FROM wms_pick_list_line l "
+        "JOIN wms_pick_list wpl ON wpl.id = l.pick_list_id "
+        "LEFT JOIN product p ON p.id = l.product_id "
+        "LEFT JOIN wms_bin b ON b.id = l.bin_id "
+        "LEFT JOIN wms_zone z ON z.id = l.zone_id "
+        "WHERE wpl.wave_id = %s AND l.status = 'pending' AND l.product_id IS NOT NULL "
+        "GROUP BY l.product_id, p.name, l.bin_id, b.full_code, z.pick_sequence "
+        "ORDER BY zone_seq, b.full_code",
+        (wave_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def record_wave_pick(conn, wave_id, product_id, bin_id, qty_picked, created_by):
+    """Record one consolidated pick — qty_picked of product_id taken from
+    bin_id in a single trip — and allocate it back down across every
+    still-pending line in the wave that needs that exact (product, bin)
+    combination, oldest pick list first, by calling the existing, unmodified
+    record_pick() once per affected line (so every per-line side effect —
+    product.amount, bin stock, that line's own pick list flipping to
+    'picked' once fully resolved — happens exactly the way it always has;
+    nothing about single-order picking changes). Does not commit. Raises
+    ValueError for a non-positive qty, a missing/cancelled wave, no matching
+    pending lines, or a qty exceeding what the wave actually needs for that
+    product/bin (the over-pick guard — mirrors record_usage's on-hand-balance
+    check in consignment_core).
+    """
+    if qty_picked <= 0:
+        raise ValueError("qty_picked must be positive")
+    wave = get_wave(conn, wave_id)
+    if not wave:
+        raise ValueError(f"Wave {wave_id} not found")
+    if wave['status'] == 'cancelled':
+        raise ValueError(f"Wave {wave_id} is cancelled")
+
+    lines = conn.execute(
+        "SELECT l.id, l.qty_ordered FROM wms_pick_list_line l "
+        "JOIN wms_pick_list wpl ON wpl.id = l.pick_list_id "
+        "WHERE wpl.wave_id = %s AND l.product_id = %s AND l.bin_id = %s AND l.status = 'pending' "
+        "ORDER BY wpl.id, l.id",
+        (wave_id, product_id, bin_id),
+    ).fetchall()
+    if not lines:
+        raise ValueError(
+            "No pending lines in this wave need that product/bin combination")
+
+    total_needed = sum(line['qty_ordered'] for line in lines)
+    if qty_picked > total_needed + 1e-9:
+        raise ValueError(
+            f"qty_picked {qty_picked:g} exceeds what this wave needs for "
+            f"that product/bin ({total_needed:g})")
+
+    remaining = qty_picked
+    lines_updated = 0
+    for line in lines:
+        if remaining <= 1e-9:
+            break
+        take = min(line['qty_ordered'], remaining)
+        record_pick(conn, line['id'], take, created_by)
+        remaining -= take
+        lines_updated += 1
+
+    _sync_wave_status(conn, wave_id)
+    return {'lines_updated': lines_updated, 'total_allocated': qty_picked - remaining}
+
+
+def cancel_wave(conn, wave_id):
+    """Cancel a wave that hasn't started picking yet. Does not commit.
+    Raises ValueError if the wave doesn't exist or picking has already
+    begun. Cascades to cancel every member pick list too, so the
+    underlying SOs are free to be picked again individually or in a new
+    wave — generate_pick_list only blocks on a non-cancelled pick list."""
+    wave = get_wave(conn, wave_id)
+    if not wave:
+        raise ValueError(f"Wave {wave_id} not found")
+    if wave['status'] != 'open':
+        raise ValueError(
+            f"Cannot cancel wave {wave_id} — status is {wave['status']}, not open")
+    conn.execute("UPDATE wms_wave SET status = 'cancelled' WHERE id = %s", (wave_id,))
+    conn.execute(
+        "UPDATE wms_pick_list SET status = 'cancelled' WHERE wave_id = %s",
+        (wave_id,),
+    )
