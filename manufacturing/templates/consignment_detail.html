@@ -42,6 +42,7 @@
 {% block body %}
 <div class="content">
     <div class="po-wrap">
+        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
         <div class="po-card">
             <div class="po-head">
                 <h2>{{ agreement.agreement_number }}</h2>

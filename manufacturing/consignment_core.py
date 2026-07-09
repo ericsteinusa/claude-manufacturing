@@ -110,6 +110,22 @@ def next_agreement_number(conn) -> str:
     return next_sequence_number(existing, f"CONSIGN-{year}-")
 
 
+def _next_usage_invoice_number(conn, agreement_number: str) -> str:
+    """Gap-safe max-suffix+1 numbering for a usage invoice, generated on the
+    caller's own open connection (see mrp_core.next_sequence_number) — a
+    plain count (``len(list_usages(...)) + 1``) would collide whenever two
+    usage records for the same agreement are created close together, the
+    same class of bug CLAUDE.md's "Batch number generation" gotcha
+    documents from a past incident with WO/REQ numbering."""
+    prefix = f"{agreement_number}-U"
+    rows = conn.execute(
+        "SELECT invoice_number FROM ap_invoice WHERE invoice_number LIKE %s",
+        (f"{prefix}%",),
+    ).fetchall()
+    existing = [dict(r)['invoice_number'] for r in rows]
+    return next_sequence_number(existing, prefix)
+
+
 def list_products_for_picker(conn) -> list:
     rows = conn.execute("SELECT id, name FROM product ORDER BY name").fetchall()
     return [dict(r) for r in rows]
@@ -247,8 +263,16 @@ def list_usages(conn, agreement_id: int) -> list:
 
 def create_agreement(conn, supplier_id, product_id: int, unit_cost: float,
                       start_date: str, end_date: str, notes: str, created_by: str) -> int:
-    """Create a consignment agreement. Raises ValueError for a non-positive
-    unit_cost, a missing product, or end_date before start_date."""
+    """Create a consignment agreement. Raises ValueError for a missing
+    supplier, a non-positive unit_cost, a missing product, or end_date
+    before start_date.
+
+    A supplier is required (not optional) because ``record_usage`` always
+    bills one — allowing an agreement with no supplier would let usage
+    silently create a vendor-less AP invoice nobody can ever pay.
+    """
+    if not supplier_id:
+        raise ValueError("Select a supplier — usage always bills the vendor on file.")
     unit_cost = float(unit_cost or 0)
     if unit_cost <= 0:
         raise ValueError("Unit cost must be greater than zero.")
@@ -267,7 +291,7 @@ def create_agreement(conn, supplier_id, product_id: int, unit_cost: float,
         "(agreement_number, supplier_id, product_id, unit_cost, start_date, end_date, "
         "status, notes, created_by, created_at) "
         "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
-        (agreement_number, supplier_id or None, product_id, unit_cost,
+        (agreement_number, supplier_id, product_id, unit_cost,
          start_date or '', end_date or '', 'active', notes or '', created_by or '', now),
     ).fetchone()
     return row['id']
@@ -306,6 +330,13 @@ def record_usage(conn, agreement_id: int, qty: float, reference: str, created_by
         raise ValueError("Consignment agreement not found.")
     if agreement['status'] == 'cancelled':
         raise ValueError("Agreement is cancelled — cannot record usage.")
+    if not agreement.get('supplier_id'):
+        # Defense in depth: create_agreement now requires a supplier, but an
+        # agreement created before that check existed could still have none.
+        raise ValueError(
+            "This agreement has no supplier on file — usage bills the "
+            "vendor, so a supplier must be set before usage can be recorded."
+        )
     qty = float(qty or 0)
     if qty <= 0:
         raise ValueError("Quantity must be greater than zero.")
@@ -321,7 +352,7 @@ def record_usage(conn, agreement_id: int, qty: float, reference: str, created_by
         created_by=created_by,
     )
 
-    invoice_number = f"{agreement['agreement_number']}-U{len(list_usages(conn, agreement_id)) + 1:03d}"
+    invoice_number = _next_usage_invoice_number(conn, agreement['agreement_number'])
     today = date.today()
     ap_invoice_id = create_ap_invoice(
         conn, vendor_id=agreement['supplier_id'], invoice_number=invoice_number,

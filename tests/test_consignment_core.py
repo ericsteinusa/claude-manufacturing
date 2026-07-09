@@ -3,8 +3,8 @@
 No live database: a MagicMock connection stands in for psycopg2, with
 ``execute(...).fetchone()``/``fetchall()`` return values queued via
 ``side_effect`` in call order (mirrors test_blanket_po_core.py). Write-path
-tests patch same-module helpers (``get_agreement``, ``list_usages``) and the
-two cross-module functions this module calls by name
+tests patch the same-module helper ``get_agreement`` and the two
+cross-module functions this module calls by name
 (``inventory_core.record_transaction``, ``accounting_core.create_ap_invoice``)
 to isolate validation logic from the read-path query chain.
 """
@@ -15,7 +15,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from manufacturing.consignment_core import (
-    ensure_consignment_tables, next_agreement_number, _sync_status,
+    ensure_consignment_tables, next_agreement_number, _next_usage_invoice_number,
+    _sync_status,
     list_agreements, get_agreement, list_receipts, list_usages,
     create_agreement, receive_stock, record_usage, cancel_agreement,
 )
@@ -62,7 +63,34 @@ def test_next_agreement_number_increments_from_max_suffix():
     assert next_agreement_number(conn) == f"CONSIGN-{YEAR}-0005"
 
 
+def test_next_usage_invoice_number_first_for_agreement():
+    conn = _conn(fetchall_results=[[]])
+    result = _next_usage_invoice_number(conn, f'CONSIGN-{YEAR}-0001')
+    assert result == f"CONSIGN-{YEAR}-0001-U0001"
+
+
+def test_next_usage_invoice_number_gap_safe_not_count_based():
+    """Regression test for the count-based collision bug: max-suffix+1 over
+    the real ap_invoice rows, not len(list_usages(...)) + 1 — two usage
+    records created close together must never compute the same number."""
+    conn = _conn(fetchall_results=[[
+        {'invoice_number': f'CONSIGN-{YEAR}-0001-U0001'},
+        {'invoice_number': f'CONSIGN-{YEAR}-0001-U0003'},  # a gap at U0002
+    ]])
+    result = _next_usage_invoice_number(conn, f'CONSIGN-{YEAR}-0001')
+    assert result == f"CONSIGN-{YEAR}-0001-U0004"
+    select_sql = conn.execute.call_args_list[0][0][0]
+    assert 'FROM ap_invoice' in select_sql
+
+
 # ── create_agreement ─────────────────────────────────────────────────────
+
+def test_create_agreement_raises_without_supplier():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        create_agreement(conn, None, 5, 12.0, '2026-01-01', '2026-12-31', '', 'eric')
+    assert conn.execute.call_count == 0
+
 
 def test_create_agreement_raises_for_nonpositive_unit_cost():
     conn = MagicMock()
@@ -238,7 +266,18 @@ def test_record_usage_raises_if_cancelled():
 
 def test_record_usage_raises_when_exceeding_on_hand_balance():
     with patch('manufacturing.consignment_core.get_agreement',
-               return_value={'status': 'active', 'on_hand_qty': 5.0}):
+               return_value={'status': 'active', 'on_hand_qty': 5.0, 'supplier_id': 2}):
+        conn = MagicMock()
+        with pytest.raises(ValueError):
+            record_usage(conn, 1, 10, '', 'eric')
+
+
+def test_record_usage_raises_without_supplier_on_agreement():
+    """Defense in depth: an agreement created before create_agreement
+    required a supplier (or one otherwise missing its supplier_id) must
+    not be allowed to bill a null vendor."""
+    with patch('manufacturing.consignment_core.get_agreement',
+               return_value={'status': 'active', 'on_hand_qty': 100.0, 'supplier_id': None}):
         conn = MagicMock()
         with pytest.raises(ValueError):
             record_usage(conn, 1, 10, '', 'eric')
@@ -251,13 +290,12 @@ def test_record_usage_happy_path():
         'agreement_number': f'CONSIGN-{YEAR}-0001',
     }
     with patch('manufacturing.consignment_core.get_agreement', return_value=agreement), \
-         patch('manufacturing.consignment_core.list_usages', return_value=[]), \
          patch('manufacturing.consignment_core.record_transaction') as mock_txn, \
          patch('manufacturing.consignment_core.create_ap_invoice') as mock_ap:
         mock_txn.return_value = 60.0
         mock_ap.return_value = 42
 
-        conn = _conn(fetchone_results=[{'id': 99}])
+        conn = _conn(fetchone_results=[{'id': 99}], fetchall_results=[[]])
         result = record_usage(conn, 1, 10, 'WO-500', 'eric')
 
         mock_txn.assert_called_once_with(
