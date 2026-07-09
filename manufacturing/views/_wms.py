@@ -26,6 +26,7 @@ from ..wms_core import (
     receive_transfer_line, cancel_transfer, get_warehouse_stock,
     list_waves, get_wave, get_wave_pick_lists, create_wave,
     get_consolidated_pick_lines, record_wave_pick, cancel_wave,
+    find_cross_dock_candidates, receive_cross_dock,
 )
 from ..purchase_orders_core import list_pos, get_po_items
 
@@ -234,20 +235,33 @@ def wms_receive(request):
     try:
         ensure_wms_tables(conn)
         if request.method == 'POST':
+            action = request.POST.get('action', 'putaway')
             try:
                 po_item_id = int(request.POST.get('po_item_id'))
                 po_id = int(request.POST.get('po_id'))
                 product_id = int(request.POST.get('product_id'))
                 qty = float(request.POST.get('qty'))
-                bin_id = _int_or_none(request.POST.get('bin_id'))
-                if not bin_id:
-                    bin_id = suggest_putaway_bin(conn, product_id)['bin_id']
-                result = receive_and_putaway(
-                    conn, po_item_id, po_id, product_id, qty, bin_id,
-                    created_by=request.session.get('user_email', ''),
-                )
-                conn.commit()
-                success = f"Received {result['received_qty']} and put away."
+                if action == 'cross_dock':
+                    result = receive_cross_dock(
+                        conn, po_item_id, po_id, product_id, qty,
+                        int(request.POST.get('pick_list_line_id')),
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = (
+                        f"Cross-docked {result['received_qty']:g} straight to the "
+                        f"waiting order (pick status: {result['pick_status']})."
+                    )
+                else:
+                    bin_id = _int_or_none(request.POST.get('bin_id'))
+                    if not bin_id:
+                        bin_id = suggest_putaway_bin(conn, product_id)['bin_id']
+                    result = receive_and_putaway(
+                        conn, po_item_id, po_id, product_id, qty, bin_id,
+                        created_by=request.session.get('user_email', ''),
+                    )
+                    conn.commit()
+                    success = f"Received {result['received_qty']:g} and put away."
             except (ValueError, TypeError) as exc:
                 conn.rollback()
                 error = str(exc)
@@ -255,6 +269,7 @@ def wms_receive(request):
         for item in items:
             item['qty_owed'] = item['qty_ordered'] - item['qty_received']
             item['suggested_bin'] = suggest_putaway_bin(conn, item['product_id'])
+            item['cross_dock_candidates'] = find_cross_dock_candidates(conn, item['product_id'])
         bins = list_bins(conn)
     finally:
         conn.close()

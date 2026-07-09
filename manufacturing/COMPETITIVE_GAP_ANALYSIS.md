@@ -58,6 +58,13 @@ per wave instead of once per order, then that single consolidated pick is alloca
 across every affected order's own pick-list lines by calling the existing, unmodified
 `record_pick()` per line. 33 features shipped total.
 
+**2026-07-08, last one:** Shipped P3-L (Cross-Docking), leaving only RFID (a hardware-dependent
+gap this dev environment has no reader to integrate against) on the "Where We Trail Mid-Market"
+list. Routes an inbound PO receipt straight to one specific waiting pick-list line — a genuine
+stock-out pointing at the unassigned sentinel bin — instead of putting it away first, composing
+`receive_and_putaway`'s receiving half with `record_pick`'s existing outbound half so the goods
+never land in `wms_bin_stock` at all. 34 features shipped total.
+
 ---
 
 ## Executive Summary
@@ -125,12 +132,12 @@ forecasting and predictive maintenance.
 | **Pick / Pack / Ship automation** | ✅ Full (P3-B) | ✅ 9/10 |
 | **Cycle count structured workflow** | ✅ Full (P1-D) | ✅ All |
 | **Consignment inventory** | ✅ Full (P3-J) — vendor-owned stock, usage-triggered ownership transfer + AP billing | ✅ 7/10 |
-| **Cross-docking** | ❌ | ✅ 6/10 |
+| **Cross-docking** | ✅ Full (P3-L) — routes an inbound PO receipt straight to a waiting pick-list line for a genuine stock-out, skipping storage entirely | ✅ 6/10 |
 | **Wave picking management** | ✅ Full (P3-K) — batches confirmed SOs into a wave; a consolidated (product, bin) pick sheet is allocated back down across every affected order's pick-list lines | ✅ 6/10 |
 | **RFID integration** | ❌ | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** cross-docking, RFID.
+**Priority gaps:** RFID.
 
 ---
 
@@ -1248,6 +1255,48 @@ multiple orders into a single consolidated pick run.
   auto-completed; separately confirmed cancelling an untouched wave cascades to cancel its member
   pick list. Cleaned up all test data afterward.
 
+#### P3-L: Cross-Docking ✅ Done
+Extends P3-B (WMS): receiving always put stock away into a bin first, even when an order was
+already waiting on it with nothing in stock — cross-docking skips that detour.
+- Receiving screen surfaces waiting orders for whatever product is being received
+- Route the receipt straight to a specific waiting order instead of putting it away
+- Any excess beyond what that order needs still receives normally, separately
+- Only targets genuine stock-outs — a line with a real bin already assigned isn't offered
+- **Shipped:** New functions directly in `wms_core.py`. `receive_and_putaway`'s own receiving
+  logic (PO-item lookup, qty clamping, `receive_po_item` call) was extracted into a shared
+  `_apply_po_receipt` primitive — a pure refactor, no behavior change, verified against the
+  existing mocked-call-argument tests, which don't assert internal structure — so
+  `receive_cross_dock` could reuse it rather than duplicate it.
+  `find_cross_dock_candidates` finds pending pick-list lines for a product that are still
+  pointing at the unassigned sentinel bin (genuine unfulfilled demand with nothing tracked
+  anywhere) — the only lines cross-docking targets; a line that already has a real bin earmarked
+  is received normally instead. `receive_cross_dock` composes `_apply_po_receipt` +
+  `record_transaction` (the receiving half, identical to `receive_and_putaway`) with
+  `record_pick` — **completely unmodified** — for the outbound half, so the cross-docked qty
+  never touches `wms_bin_stock` at all. **A second place, alongside inter-warehouse transfers,
+  where `product.amount` nets to unchanged** — the receive credits +delta and `record_pick`'s own
+  issue debits -delta, because this codebase already decrements `product.amount` at pick time,
+  not ship-confirm time (`confirm_shipment` posts no inventory transaction of its own). This
+  isn't a coincidence or a workaround: it's exactly correct, since cross-docked goods genuinely
+  never spend any time as available on-hand inventory — that's the entire point of cross-docking.
+  Both legs still post a real, separately auditable `inventory_transaction` row (a `receive` and
+  an `issue`), so the movement stays fully traceable even though the net is zero. Qty is capped
+  to what the target line actually needs — cross-docking more than one line's demand in a single
+  action isn't supported; the excess receives normally via the existing put-away form instead. The
+  existing `/wms/receive/` screen gained a highlighted "cross-dock opportunity" row under any PO
+  item with waiting candidates, with its own qty/target-order form, rather than a separate page —
+  the whole point is surfacing the opportunity at the moment of receiving. Verified end-to-end
+  against a running dev server + local Postgres through the actual web views: created a product
+  with zero stock, a confirmed SO needing 6 units of it (its pick-list line fell back to the
+  unassigned bin, confirming a genuine stock-out), and an open PO with 20 owed; confirmed the
+  cross-dock opportunity surfaced on the receiving page; confirmed requesting more than the line's
+  need (50) was rejected; cross-docked 6 units and confirmed the PO's received qty updated, the
+  order's pick-list line flipped to `'picked'`, no row was ever created in a real storage bin, a
+  real `receive` + `issue` transaction pair was posted, and `product.amount` correctly netted to
+  unchanged; then received the remaining 14 units through the normal put-away form and confirmed
+  it worked exactly as before, landing in a real bin with `product.amount` increasing by 14.
+  Cleaned up all test data afterward.
+
 ---
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
@@ -1642,12 +1691,13 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No FIFO/LIFO/weighted-average valuation | P3-I |
 | No consignment inventory | P3-J |
 | No wave picking management | P3-K |
+| No cross-docking | P3-L |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
 | Gap | Effort to Close |
 |---|---|
-| No cross-docking / RFID | Medium |
+| No RFID (hardware-dependent — no reader to integrate against) | Medium |
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
@@ -1668,7 +1718,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 |---|---|---|---|
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
-| Inventory | 9/10 | 8/10 | ▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J); only cross-docking/RFID remain) |
+| Inventory | 9/10 | 8/10 | ▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J); only RFID remains) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
@@ -1680,8 +1730,8 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
 | Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
-| WMS / Shipping | 8/10 | 6/10 | ▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K)) |
-| **Overall** | **9.2/10** | **8.5/10** | **▲ from 7.1 / 5.9** |
+| WMS / Shipping | 9/10 | 7/10 | ▲▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K) + cross-docking (P3-L)) |
+| **Overall** | **9.3/10** | **8.6/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -1696,11 +1746,11 @@ the last batch (P3-F through P4-G) turned out to already have open PRs from a pr
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
 re-built. The two gaps discovered along the way with no PR ever opened for them — true
 inter-warehouse transfers (P3-H) and FIFO/LIFO/weighted-average costing (P3-I) — have since both
-been built fresh and shipped. Consignment inventory (P3-J) and wave picking (P3-K), the two
-next-highest-ROI items once those closed, have since also shipped. Everything tracked in
-Sections 1–4 above that shows a ✅ or a closed-gap entry is real, verified, shipped code; the only
-gaps left (Section 3's "Where We Trail Enterprise" table, and the narrower WMS items —
-cross-docking/RFID — in Section 1.2) are either real external-connectivity dependencies this dev
+been built fresh and shipped. Consignment inventory (P3-J), wave picking (P3-K), and cross-docking
+(P3-L) — three more next-highest-ROI items, taken one at a time as each prior one closed — have
+since also shipped. Everything tracked in Sections 1–4 above that shows a ✅ or a closed-gap entry
+is real, verified, shipped code; the only gaps left (Section 3's "Where We Trail Enterprise" table,
+and RFID in Section 1.2) are either real external-connectivity/hardware dependencies this dev
 environment has no live counterpart for, or lower-ROI items not yet scheduled.
 
 ---

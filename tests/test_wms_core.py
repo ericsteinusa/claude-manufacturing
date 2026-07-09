@@ -20,6 +20,7 @@ from manufacturing.wms_core import (
     create_transfer, add_transfer_line, remove_transfer_line,
     ship_transfer, receive_transfer_line, cancel_transfer,
     _sync_wave_status, create_wave, record_wave_pick, cancel_wave,
+    find_cross_dock_candidates, receive_cross_dock,
 )
 
 
@@ -868,3 +869,124 @@ def test_cancel_wave_happy_path(mock_get_wave):
     assert calls[0][0][1] == (1,)
     assert "wms_pick_list SET status = 'cancelled'" in calls[1][0][0]
     assert calls[1][0][1] == (1,)
+
+
+# ── cross-docking ────────────────────────────────────────────────────────────
+
+def test_find_cross_dock_candidates_queries_unassigned_bin_only():
+    conn = _conn(fetchall_results=[[
+        {'id': 1, 'qty_ordered': 5, 'pick_list_id': 10,
+         'pick_number': 'PICK-2026-0001', 'so_number': 'SO-1'},
+    ]])
+    result = find_cross_dock_candidates(conn, product_id=7)
+    assert result == [{'id': 1, 'qty_ordered': 5, 'pick_list_id': 10,
+                       'pick_number': 'PICK-2026-0001', 'so_number': 'SO-1'}]
+    sql, params = conn.execute.call_args_list[0][0]
+    assert 'wms_pick_list_line' in sql
+    assert params[0] == 7
+    assert params[1] == 'UNASSIGNED-UNASSIGNED'
+
+
+def test_receive_cross_dock_raises_for_nonpositive_qty():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        receive_cross_dock(conn, po_item_id=1, po_id=1, product_id=7, qty=0,
+                           pick_list_line_id=1, created_by='eric')
+    assert conn.execute.call_count == 0
+
+
+def test_receive_cross_dock_raises_when_line_not_found():
+    conn = _conn(fetchone_results=[None])
+    with pytest.raises(ValueError):
+        receive_cross_dock(conn, po_item_id=1, po_id=1, product_id=7, qty=5,
+                           pick_list_line_id=1, created_by='eric')
+
+
+def test_receive_cross_dock_raises_for_wrong_product():
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'product_id': 99, 'qty_ordered': 10, 'status': 'pending', 'bin_id': 5},
+    ])
+    with pytest.raises(ValueError):
+        receive_cross_dock(conn, po_item_id=1, po_id=1, product_id=7, qty=5,
+                           pick_list_line_id=1, created_by='eric')
+
+
+def test_receive_cross_dock_raises_when_line_not_pending():
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'product_id': 7, 'qty_ordered': 10, 'status': 'picked', 'bin_id': 5},
+    ])
+    with pytest.raises(ValueError):
+        receive_cross_dock(conn, po_item_id=1, po_id=1, product_id=7, qty=5,
+                           pick_list_line_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.is_unassigned_bin')
+def test_receive_cross_dock_raises_when_bin_is_real(mock_is_unassigned):
+    mock_is_unassigned.return_value = False
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'product_id': 7, 'qty_ordered': 10, 'status': 'pending', 'bin_id': 5},
+    ])
+    with pytest.raises(ValueError):
+        receive_cross_dock(conn, po_item_id=1, po_id=1, product_id=7, qty=5,
+                           pick_list_line_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.is_unassigned_bin')
+def test_receive_cross_dock_raises_when_qty_exceeds_line_need(mock_is_unassigned):
+    mock_is_unassigned.return_value = True
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'product_id': 7, 'qty_ordered': 10, 'status': 'pending', 'bin_id': 9},
+    ])
+    with pytest.raises(ValueError):
+        receive_cross_dock(conn, po_item_id=1, po_id=1, product_id=7, qty=50,
+                           pick_list_line_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.record_pick')
+@patch('manufacturing.wms_core.record_transaction')
+@patch('manufacturing.wms_core._apply_po_receipt')
+@patch('manufacturing.wms_core.is_unassigned_bin')
+def test_receive_cross_dock_happy_path(
+    mock_is_unassigned, mock_apply, mock_record_txn, mock_record_pick,
+):
+    mock_is_unassigned.return_value = True
+    mock_apply.return_value = 5
+    mock_record_txn.return_value = 42.0
+    mock_record_pick.return_value = 'picked'
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'product_id': 7, 'qty_ordered': 10, 'status': 'pending', 'bin_id': 9},
+    ])
+
+    result = receive_cross_dock(conn, po_item_id=3, po_id=2, product_id=7, qty=5,
+                                pick_list_line_id=1, created_by='eric')
+
+    mock_apply.assert_called_once_with(conn, 3, 2, 5)
+    mock_record_txn.assert_called_once()
+    assert mock_record_txn.call_args[0][2] == 'receive'
+    assert mock_record_txn.call_args[0][3] == 5
+    mock_record_pick.assert_called_once_with(conn, 1, 5, 'eric')
+    assert result == {'received_qty': 5, 'new_amount': 42.0, 'pick_status': 'picked'}
+
+
+@patch('manufacturing.wms_core.record_pick')
+@patch('manufacturing.wms_core.record_transaction')
+@patch('manufacturing.wms_core._apply_po_receipt')
+@patch('manufacturing.wms_core.is_unassigned_bin')
+def test_receive_cross_dock_picks_only_the_actually_received_delta(
+    mock_is_unassigned, mock_apply, mock_record_txn, mock_record_pick,
+):
+    """If the PO item was nearly fully received already, _apply_po_receipt
+    clamps the delta below the requested qty -- the pick must reflect what
+    was actually received, not the original request."""
+    mock_is_unassigned.return_value = True
+    mock_apply.return_value = 3  # clamped below the requested 5
+    mock_record_txn.return_value = 42.0
+    mock_record_pick.return_value = 'short'
+    conn = _conn(fetchone_results=[
+        {'id': 1, 'product_id': 7, 'qty_ordered': 10, 'status': 'pending', 'bin_id': 9},
+    ])
+
+    receive_cross_dock(conn, po_item_id=3, po_id=2, product_id=7, qty=5,
+                       pick_list_line_id=1, created_by='eric')
+
+    mock_record_pick.assert_called_once_with(conn, 1, 3, 'eric')

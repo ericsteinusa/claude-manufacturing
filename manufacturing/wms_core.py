@@ -65,6 +65,22 @@ Consolidation only covers lines with a real ``product_id`` (text-only SO
 lines have no product identity to batch on and must still be picked from
 their own order's pick list, same as before wave picking existed).
 
+Cross-docking (``receive_cross_dock``) routes an inbound PO receipt straight
+to one specific waiting pick-list line instead of putting it away into
+storage first — shares the receiving half with ``receive_and_putaway`` (both
+call ``_apply_po_receipt``) but the outbound half calls ``record_pick``
+instead of ``_adjust_bin_stock``, so the goods never land in
+``wms_bin_stock`` at all. Only pick-list lines still pointing at the
+unassigned sentinel bin (genuine stock-outs) are cross-dock candidates — a
+line that already has a real bin assigned should be received normally.
+**A second place, alongside transfers, where the net change to
+``product.amount`` is zero** — the receive credits +delta and
+``record_pick``'s own issue debits -delta (this codebase already decrements
+``product.amount`` at pick time, not ship-confirm time), which is exactly
+correct: cross-docked goods never spend any time as available on-hand
+inventory. Both legs still post a real, separately auditable
+``inventory_transaction`` row.
+
 Every function takes an open connection; the caller owns the transaction
 (same convention as routing_core / capacity_planning_core / mrp_web_core).
 """
@@ -596,19 +612,16 @@ def suggest_putaway_bin(conn, product_id):
 # Receiving put-away
 # ---------------------------------------------------------------------------
 
-def receive_and_putaway(conn, po_item_id, po_id, product_id, qty, bin_id, created_by):
-    """Receive qty of a PO item and put it away into bin_id, in one step.
-
-    qty is the amount being received *in this transaction* (not the PO
-    item's new running total) — receive_po_item itself stores an absolute
-    qty_received, so this looks up the item's current qty_received first and
-    clamps the new total to qty_ordered exactly like the existing
-    po_receive_item view does, crediting only the resulting delta to
-    inventory (so repeated partial receipts never double-count).
-
-    Does not commit. Raises ValueError if the item doesn't belong to the
-    given PO or qty is not positive.
-    """
+def _apply_po_receipt(conn, po_item_id, po_id, qty):
+    """Shared receiving primitive for both receive_and_putaway and
+    receive_cross_dock: validates qty, looks up the PO item, computes the
+    delta actually receivable *in this transaction* (clamped to
+    qty_ordered so repeated partial receipts never double-count — qty here
+    is not the item's new running total, receive_po_item itself stores
+    that as an absolute), and updates po_item.qty_received via the pinned
+    receive_po_item. Returns the delta. Raises ValueError for a
+    non-positive qty, an item that doesn't belong to the given PO, or
+    nothing left to receive."""
     if qty <= 0:
         raise ValueError("qty must be positive")
     item = conn.execute(
@@ -626,7 +639,23 @@ def receive_and_putaway(conn, po_item_id, po_id, product_id, qty, bin_id, create
     rows = receive_po_item(conn, po_item_id, new_total, po_id=po_id)
     if rows == 0:
         raise ValueError(f"Failed to update PO item {po_item_id}")
+    return delta
 
+
+def receive_and_putaway(conn, po_item_id, po_id, product_id, qty, bin_id, created_by):
+    """Receive qty of a PO item and put it away into bin_id, in one step.
+
+    qty is the amount being received *in this transaction* (not the PO
+    item's new running total) — receive_po_item itself stores an absolute
+    qty_received, so this looks up the item's current qty_received first and
+    clamps the new total to qty_ordered exactly like the existing
+    po_receive_item view does, crediting only the resulting delta to
+    inventory (so repeated partial receipts never double-count).
+
+    Does not commit. Raises ValueError if the item doesn't belong to the
+    given PO or qty is not positive.
+    """
+    delta = _apply_po_receipt(conn, po_item_id, po_id, qty)
     new_amount = record_transaction(
         conn, product_id, 'receive', delta,
         reference=f'PO item {po_item_id}', notes='WMS put-away',
@@ -854,6 +883,103 @@ def record_pick(conn, line_id, qty_picked, created_by):
             (line['pick_list_id'],),
         )
     return new_status
+
+
+# ---------------------------------------------------------------------------
+# Cross-docking
+# ---------------------------------------------------------------------------
+#
+# Cross-docking routes an inbound PO receipt straight to a waiting outbound
+# order instead of putting it away into storage first — the highest-value
+# case is a genuine stock-out: a pending pick-list line with nothing tracked
+# in any bin (pointing at the unassigned sentinel), with inbound stock
+# arriving right now. This shares the receiving half with
+# receive_and_putaway (_apply_po_receipt + record_transaction) but the
+# outbound half calls record_pick — completely unmodified — instead of
+# _adjust_bin_stock, so the cross-docked goods never land in wms_bin_stock
+# at all; they move receive -> outbound in one step, the defining
+# characteristic of cross-docking. A line that already has a real bin
+# assigned isn't a cross-dock candidate — receive that one normally and let
+# it be picked from there.
+
+def find_cross_dock_candidates(conn, product_id):
+    """Pending pick-list lines for product_id currently pointing at the
+    unassigned sentinel bin — genuine unfulfilled outbound demand with
+    nothing in stock, the opportunities a receiving clerk could cross-dock
+    an incoming PO receipt straight into instead of putting it away first.
+    Ordered oldest pick list first (first-come-first-served)."""
+    rows = conn.execute(
+        "SELECT l.id, l.qty_ordered, l.pick_list_id, wpl.pick_number, so.so_number "
+        "FROM wms_pick_list_line l "
+        "JOIN wms_pick_list wpl ON wpl.id = l.pick_list_id "
+        "JOIN sales_order so ON so.id = wpl.so_id "
+        "JOIN wms_bin b ON b.id = l.bin_id "
+        "WHERE l.product_id = %s AND l.status = 'pending' "
+        "AND b.full_code = %s "
+        "ORDER BY wpl.id, l.id",
+        (product_id, f"{UNASSIGNED_ZONE_CODE}-{UNASSIGNED_BIN_CODE}"),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def receive_cross_dock(conn, po_item_id, po_id, product_id, qty, pick_list_line_id, created_by):
+    """Cross-dock a PO receipt straight to one specific waiting pick-list
+    line instead of putting it away into storage first. Does not commit.
+
+    **product.amount nets to unchanged, by design** — record_transaction
+    credits +delta for the receipt, then record_pick's own internal
+    record_transaction call debits -delta for the pick (this codebase's
+    existing model already decrements product.amount at pick time, not at
+    ship-confirm time — see confirm_shipment, which posts no inventory
+    transaction of its own). Both are real, separately auditable
+    inventory_transaction rows (a receive and an issue), they simply net
+    to zero because the goods genuinely never become available on-hand
+    inventory at any point — that dwell time is the entire thing
+    cross-docking exists to skip. This is the same "moves without changing
+    the company-wide total" property the module docstring already
+    documents for inter-warehouse transfers, arrived at here for free by
+    composing two existing, unmodified functions rather than needing its
+    own deliberate exception.
+
+    Raises ValueError for a non-positive qty, if the pick-list line isn't a
+    pending line for this exact product, the line's bin isn't the
+    unassigned sentinel (it already has real stock earmarked — receive
+    normally instead), or qty exceeds what that one line still needs
+    (cross-dock up to the line's need in this action; receive any excess
+    separately via receive_and_putaway) — plus whatever _apply_po_receipt
+    itself raises for an item that doesn't belong to the PO.
+    """
+    if qty <= 0:
+        raise ValueError("qty must be positive")
+    line = conn.execute(
+        "SELECT id, product_id, qty_ordered, status, bin_id "
+        "FROM wms_pick_list_line WHERE id = %s",
+        (pick_list_line_id,),
+    ).fetchone()
+    if not line:
+        raise ValueError(f"Pick list line {pick_list_line_id} not found")
+    if line['product_id'] != product_id:
+        raise ValueError("That pick list line is for a different product")
+    if line['status'] != 'pending':
+        raise ValueError(
+            f"Pick list line {pick_list_line_id} is not pending (status={line['status']})")
+    if not is_unassigned_bin(conn, line['bin_id']):
+        raise ValueError(
+            "This line already has a real bin assigned — receive it "
+            "normally and it will be picked from there")
+    if qty > line['qty_ordered']:
+        raise ValueError(
+            f"qty {qty:g} exceeds what this line needs ({line['qty_ordered']:g}) — "
+            "cross-dock up to the line's need, then receive any excess separately")
+
+    delta = _apply_po_receipt(conn, po_item_id, po_id, qty)
+    new_amount = record_transaction(
+        conn, product_id, 'receive', delta,
+        reference=f'PO item {po_item_id}', notes='Cross-dock receipt',
+        created_by=created_by,
+    )
+    pick_status = record_pick(conn, pick_list_line_id, delta, created_by)
+    return {'received_qty': delta, 'new_amount': new_amount, 'pick_status': pick_status}
 
 
 # ---------------------------------------------------------------------------
