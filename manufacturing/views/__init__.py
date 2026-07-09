@@ -501,6 +501,7 @@ WEB_LEAF_URLS = {
     ('production', 'bin_master'):    '/wms/bins/',
     ('production', 'putaway_rules'): '/wms/putaway-rules/',
     ('production', 'pick_lists'):    '/wms/picks/',
+    ('production', 'wave_picking'):  '/wms/waves/',
     ('production', 'pack_station'):  '/wms/picks/?status=picked',
     ('production', 'transfers'):     '/wms/transfers/',
     # Maintenance

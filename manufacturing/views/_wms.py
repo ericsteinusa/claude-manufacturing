@@ -10,7 +10,7 @@ from ..accounts import READ_ONLY_ROLES
 
 from ..wms_core import (
     ensure_wms_tables, PUTAWAY_MATCH_TYPES, PICK_LIST_STATUSES,
-    TRANSFER_STATUSES,
+    TRANSFER_STATUSES, WAVE_STATUSES,
     get_or_create_default_warehouse, list_warehouses, create_warehouse,
     list_zones, create_zone,
     list_bins, get_bin, create_bin, deactivate_bin, get_bin_stock,
@@ -24,6 +24,8 @@ from ..wms_core import (
     list_transfers, get_transfer, get_transfer_lines, create_transfer,
     add_transfer_line, remove_transfer_line, ship_transfer,
     receive_transfer_line, cancel_transfer, get_warehouse_stock,
+    list_waves, get_wave, get_wave_pick_lists, create_wave,
+    get_consolidated_pick_lines, record_wave_pick, cancel_wave,
 )
 from ..purchase_orders_core import list_pos, get_po_items
 
@@ -515,4 +517,79 @@ def wms_transfer_detail(request, transfer_id):
     return render(request, 'wms_transfer_detail.html', _wms_ctx(
         request, transfer=transfer, lines=lines, available_stock=available_stock,
         to_bins=to_bins, error=error, success=success,
+    ))
+
+
+# ---------------------------------------------------------------------------
+# Wave picking
+# ---------------------------------------------------------------------------
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_wave_list')
+def wms_wave_list(request):
+    status = request.GET.get('status') or None
+    error = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        if request.method == 'POST' and request.POST.get('action') == 'create':
+            try:
+                so_ids = [int(v) for v in request.POST.getlist('so_ids')]
+                wave_id = create_wave(conn, so_ids, created_by=request.session.get('user_email', ''))
+                conn.commit()
+                return redirect('wms_wave_detail', wave_id=wave_id)
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+        awaiting = list_confirmed_sos_awaiting_pick(conn)
+        waves = list_waves(conn, status=status)
+    finally:
+        conn.close()
+    return render(request, 'wms_wave_list.html', _wms_ctx(
+        request, awaiting=awaiting, waves=waves, status=status,
+        wave_statuses=WAVE_STATUSES, error=error,
+    ))
+
+
+@dept_required(_WMS_DEPT_KEYS, write_redirect='wms_wave_list')
+def wms_wave_detail(request, wave_id):
+    error = success = None
+    conn = get_db_connection()
+    try:
+        ensure_wms_tables(conn)
+        wave = get_wave(conn, wave_id)
+        if not wave:
+            return redirect('wms_wave_list')
+
+        if request.method == 'POST':
+            action = request.POST.get('action', '')
+            by = request.session.get('user_email', '')
+            try:
+                if action == 'record_pick':
+                    result = record_wave_pick(
+                        conn, wave_id,
+                        int(request.POST.get('product_id')),
+                        int(request.POST.get('bin_id')),
+                        float(request.POST.get('qty_picked')),
+                        created_by=by,
+                    )
+                    success = (
+                        f"Picked {result['total_allocated']:g} — allocated across "
+                        f"{result['lines_updated']} order line(s)."
+                    )
+                elif action == 'cancel':
+                    cancel_wave(conn, wave_id)
+                    success = 'Wave cancelled.'
+                conn.commit()
+                wave = get_wave(conn, wave_id)
+            except (ValueError, TypeError) as exc:
+                conn.rollback()
+                error = str(exc)
+
+        consolidated = get_consolidated_pick_lines(conn, wave_id)
+        member_pick_lists = get_wave_pick_lists(conn, wave_id)
+    finally:
+        conn.close()
+    return render(request, 'wms_wave_detail.html', _wms_ctx(
+        request, wave=wave, consolidated=consolidated, member_pick_lists=member_pick_lists,
+        error=error, success=success,
     ))
