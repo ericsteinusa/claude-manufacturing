@@ -18,8 +18,8 @@
                 {% csrf_token %}
                 <div class="form-row">
                     <label>Supplier</label>
-                    <select name="supplier_id">
-                        <option value="">(none)</option>
+                    <select name="supplier_id" required>
+                        <option value="">(select a supplier)</option>
                         {% for s in suppliers %}
                         <option value="{{ s.id }}">{{ s.company_name }}</option>
                         {% endfor %}

@@ -6,6 +6,8 @@ views (not nested under an existing PO), with receipts/usage shown as cards
 inside the agreement's own detail page.
 """
 
+from urllib.parse import quote
+
 from django.shortcuts import render, redirect
 
 from ..db_pg import get_db_connection
@@ -131,6 +133,7 @@ def consignment_detail(request, agreement_id):
 
     return render(request, 'consignment_detail.html', _ctx(
         request, agreement=agreement, receipts=receipts, usages=usages,
+        error=request.GET.get('cancel_error'),
         back_url='/consignment/',
     ))
 
@@ -218,8 +221,9 @@ def consignment_cancel(request, agreement_id):
             try:
                 cancel_agreement(conn, agreement_id)
                 conn.commit()
-            except ValueError:
+            except ValueError as e:
                 conn.rollback()
+                return redirect(f'/consignment/{agreement_id}/?cancel_error={quote(str(e))}')
         finally:
             conn.close()
     return redirect('consignment_detail', agreement_id=agreement_id)
