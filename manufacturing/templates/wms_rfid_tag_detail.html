@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block page_title %}Tag {{ tag.tag_code }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/wms/rfid/tags/" class="btn">Back to Tags</a>
+<a href="/wms/rfid/readers/" class="btn">Readers</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="menu-title">{{ tag.tag_code }}</div>
+<p>
+    {{ tag.product_name }} &middot; Qty: {{ tag.qty }}
+    &middot; Status: <span class="pill pill-{{ tag.status }}">{{ tag.status|title }}</span>
+</p>
+<p>Current bin: <strong>{{ tag.bin_full_code|default:"—" }}</strong></p>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+{% if can_edit and tag.status == 'active' %}
+<h3>Simulate a Read</h3>
+<p style="font-size:12px;color:var(--text-muted);max-width:600px;">
+    Stands in for a real RFID antenna capturing this tag. Reading it at a
+    reader whose zone differs from the tag's current zone relocates the
+    tagged qty there automatically; reading the same zone again is just a
+    "still here" heartbeat.
+</p>
+<form method="post" style="display:flex;gap:8px;align-items:center;margin-bottom:20px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="simulate_read">
+    <select name="reader_id" required>
+        {% for r in readers %}
+        <option value="{{ r.id }}">{{ r.reader_code }} — {{ r.zone_code }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Simulate Read</button>
+</form>
+
+<form method="post" onsubmit="return confirm('Retire this tag?');">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="retire">
+    <button type="submit" class="btn">Retire Tag</button>
+</form>
+{% endif %}
+
+<h3 style="margin-top:28px;">Read History</h3>
+{% if history %}
+<div class="erp-table-wrap">
+    <table class="erp-table">
+        <thead><tr><th>Read At</th><th>Reader</th><th>From Bin</th><th>To Bin</th><th>Moved?</th></tr></thead>
+        <tbody>
+            {% for h in history %}
+            <tr>
+                <td>{{ h.read_at }}</td>
+                <td>{{ h.reader_code }}</td>
+                <td>{{ h.from_bin_full_code|default:"—" }}</td>
+                <td>{{ h.to_bin_full_code|default:"—" }}</td>
+                <td>{% if h.moved %}<span class="pill pill-in_transit">Moved</span>{% else %}<span class="pill pill-info">Heartbeat</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No reads recorded yet.</div>
+{% endif %}
+</div>
+{% endblock %}

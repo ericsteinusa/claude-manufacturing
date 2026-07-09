@@ -65,6 +65,17 @@ stock-out pointing at the unassigned sentinel bin — instead of putting it away
 `receive_and_putaway`'s receiving half with `record_pick`'s existing outbound half so the goods
 never land in `wms_bin_stock` at all. 34 features shipped total.
 
+**2026-07-08, truly last one:** Shipped P3-M (RFID Tracking), the final item on the "Where We
+Trail Mid-Market" list — honestly simulated rather than faked, since this dev environment has no
+real RFID reader to integrate against: a "reader" is a virtual antenna tied to one WMS zone, and
+a "read" is a manual "Simulate Read" action standing in for what real antenna hardware would
+capture automatically, the same honest-scoping choice already used for predictive maintenance's
+manual sensor entry and e-commerce's config-gated HTTP stub. Reading a tag at a reader whose zone
+differs from the tag's current zone relocates its qty to a bin in the new zone via
+`_adjust_bin_stock` on both ends — a third documented net-zero-to-`product.amount` exception
+alongside inter-warehouse transfers and cross-docking. 35 features shipped total. **Every item in
+this roadmap, including every gap discovered along the way with no prior PR, is now shipped.**
+
 ---
 
 ## Executive Summary
@@ -76,14 +87,15 @@ HR, payroll, accounting, and IT management, and has closed most of the "visible 
 export, Gantt, RFQ, price lists) that used to stand out immediately in a demo.
 
 Every roadmap item that could be built without a live external system to connect to has now
-shipped, including the last remaining supply-chain costing gap (FIFO/LIFO/weighted-average, P3-I).
-What remains is narrowly **real external connectivity**: EDI (P4-D), e-commerce sync (P4-E), and
-predictive maintenance (P4-B) all ship with real logic but honestly-scoped stubs where this
-environment has no live external system to connect to (file upload/download instead of
-AS2/VAN/SFTP, config-gated HTTP POST instead of a live Shopify/WooCommerce store, manual sensor
-entry instead of IoT hardware); there is also no supplier self-service portal, no real
-carrier-API shipment tracking, and no broader embedded-AI analytics platform beyond demand
-forecasting and predictive maintenance.
+shipped, including the last remaining supply-chain costing gap (FIFO/LIFO/weighted-average, P3-I)
+and RFID tracking (P3-M). What remains is narrowly **real external connectivity and hardware**:
+EDI (P4-D), e-commerce sync (P4-E), predictive maintenance (P4-B), and RFID (P3-M) all ship with
+real logic but honestly-scoped stubs/simulations where this environment has no live external
+system or hardware to connect to (file upload/download instead of AS2/VAN/SFTP, config-gated HTTP
+POST instead of a live Shopify/WooCommerce store, manual sensor entry instead of IoT hardware, a
+manual "Simulate Read" action instead of a real RFID antenna); there is also no supplier
+self-service portal, no real carrier-API shipment tracking, and no broader embedded-AI analytics
+platform beyond demand forecasting and predictive maintenance.
 
 ---
 
@@ -134,10 +146,10 @@ forecasting and predictive maintenance.
 | **Consignment inventory** | ✅ Full (P3-J) — vendor-owned stock, usage-triggered ownership transfer + AP billing | ✅ 7/10 |
 | **Cross-docking** | ✅ Full (P3-L) — routes an inbound PO receipt straight to a waiting pick-list line for a genuine stock-out, skipping storage entirely | ✅ 6/10 |
 | **Wave picking management** | ✅ Full (P3-K) — batches confirmed SOs into a wave; a consolidated (product, bin) pick sheet is allocated back down across every affected order's pick-list lines | ✅ 6/10 |
-| **RFID integration** | ❌ | ✅ 8/10 |
+| **RFID integration** | ✅ Full (P3-M, simulated — no real reader in this environment) | ✅ 8/10 |
 | Barcode scanning (entity lookup + label printing) | ✅ Full | ✅ All |
 
-**Priority gaps:** RFID.
+**Priority gaps:** none remaining in this domain.
 
 ---
 
@@ -1297,6 +1309,45 @@ already waiting on it with nothing in stock — cross-docking skips that detour.
   it worked exactly as before, landing in a real bin with `product.amount` increasing by 14.
   Cleaned up all test data afterward.
 
+#### P3-M: RFID Tracking ✅ Done (simulated)
+There is no real RFID reader anywhere in this dev environment, so this is built as an honestly
+simulated hardware integration, not a fake one — the same scoping choice already used for
+predictive maintenance's manual sensor entry and e-commerce's config-gated HTTP stub.
+- A "reader" is a virtual antenna tied to one WMS zone (zone-level resolution is realistic for
+  RFID — an antenna can tell you a tagged pallet entered a zone, not which exact bin within it)
+- A "tag" labels a qty of one product already tracked in a bin — not a new quantity ledger
+- A manual "Simulate Read" action stands in for what real antenna hardware would capture
+  automatically
+- Reading a tag at a reader in a *different* zone than the tag's current one relocates its qty to
+  the least-full active bin in the new zone; re-reading the same zone is a no-op "still here"
+  heartbeat, logged but not moved
+- **Shipped:** New tables in `wms_core.py` — `wms_rfid_reader`, `wms_rfid_tag`,
+  `wms_rfid_read_event` — plus `create_reader`, `list_readers`, `create_tag`, `list_tags`,
+  `get_tag`, `get_tag_history`, `simulate_tag_read`, and `retire_tag`. `simulate_tag_read` reuses
+  the existing `_least_full_active_bin_in_zone` put-away heuristic to pick the landing bin, and
+  relocates via `_adjust_bin_stock` directly on both ends — **a third documented exception, after
+  inter-warehouse transfers (P3-H) and cross-docking (P3-L), where a real stock movement posts no
+  `record_transaction`** because it isn't a receive/issue event, just a label's tracked bin
+  changing; net change to `product.amount` is zero, though unlike the other two exceptions this
+  one is automatic (triggered by reading a tag) rather than a deliberate multi-step business
+  process — that immediacy is the whole point of RFID versus a manual transfer. Creating a tag
+  sanity-checks that the bin actually has at least that much of the product tracked; tag/bin
+  quantities can still drift from reality if the underlying stock later moves through another path
+  (pick, transfer, cycle count) without also re-reading the tag — documented plainly in the module
+  docstring rather than hidden, the same class of drift already accepted for FIFO/LIFO cost layers
+  and consignment balances. New pages at `/wms/rfid/readers/` (list + create) and
+  `/wms/rfid/tags/` (list with a status filter + create, picking from real tracked stock across
+  every warehouse) and `/wms/rfid/tags/<id>/` (current bin/status, Simulate Read form, Retire
+  button, full read history), cross-linked from the existing Bin Master page. Verified end-to-end
+  against a running dev server + local Postgres through the actual web views: seeded 20 tracked
+  units of a real product into one zone's bin, created a reader in that zone and a second reader
+  in a different zone, tagged 5 of those units, simulated a read at the same-zone reader and
+  confirmed it logged a heartbeat with zero stock movement, simulated a read at the different-zone
+  reader and confirmed exactly 5 units moved from the first bin to a bin in the second zone with
+  `product.amount` staying net-unchanged and both read events recorded correctly, then retired the
+  tag and confirmed its detail page no longer offers a read form. Cleaned up all test data
+  afterward.
+
 ---
 
 ### 🔵 Priority 4 — Future / Advanced (12+ months)
@@ -1692,19 +1743,19 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No consignment inventory | P3-J |
 | No wave picking management | P3-K |
 | No cross-docking | P3-L |
+| No RFID tracking | P3-M |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
-| Gap | Effort to Close |
-|---|---|
-| No RFID (hardware-dependent — no reader to integrate against) | Medium |
+Every item previously listed here has shipped (the last, RFID, closed as P3-M — see the note under
+"Where We Trail Enterprise" below for the real-hardware caveat that remains). None outstanding.
 
 ### Where We Trail Enterprise (SAP / Oracle / Dynamics)
 
 | Gap | Effort to Close |
 |---|---|
 | No broader embedded-AI analytics platform | Very High |
-| No real IoT / sensor hardware integration | Very High |
+| No real IoT / sensor / RFID hardware integration (predictive maintenance and RFID both ship with real logic behind a manual/simulated stand-in for live hardware) | Very High |
 | No supplier self-service portal | High |
 | No real carrier-API shipment tracking (FedEx/UPS/USPS) | Medium–High |
 | No real AS2/VAN/SFTP EDI transport (file upload/download stub only) | Medium |
@@ -1718,7 +1769,7 @@ and charts reflected it correctly; cleaned up all test data afterward.
 |---|---|---|---|
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
-| Inventory | 9/10 | 8/10 | ▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J); only RFID remains) |
+| Inventory | 9/10 | 8/10 | ▲▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J) + RFID tracking (P3-M, simulated)) |
 | Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
@@ -1746,12 +1797,15 @@ the last batch (P3-F through P4-G) turned out to already have open PRs from a pr
 onto current `main`, verify, fix any cross-PR conflicts, confirm before merging) rather than
 re-built. The two gaps discovered along the way with no PR ever opened for them — true
 inter-warehouse transfers (P3-H) and FIFO/LIFO/weighted-average costing (P3-I) — have since both
-been built fresh and shipped. Consignment inventory (P3-J), wave picking (P3-K), and cross-docking
-(P3-L) — three more next-highest-ROI items, taken one at a time as each prior one closed — have
-since also shipped. Everything tracked in Sections 1–4 above that shows a ✅ or a closed-gap entry
-is real, verified, shipped code; the only gaps left (Section 3's "Where We Trail Enterprise" table,
-and RFID in Section 1.2) are either real external-connectivity/hardware dependencies this dev
-environment has no live counterpart for, or lower-ROI items not yet scheduled.
+been built fresh and shipped. Consignment inventory (P3-J), wave picking (P3-K), cross-docking
+(P3-L), and RFID tracking (P3-M) — four more next-highest-ROI items, taken one at a time as each
+prior one closed — have since also shipped, closing out the "Where We Trail Mid-Market" list
+entirely. Everything tracked in Sections 1–4 above that shows a ✅ or a closed-gap entry is real,
+verified, shipped code; the only gaps left are Section 3's "Where We Trail Enterprise" table —
+real external-connectivity/hardware dependencies this dev environment has no live counterpart for
+(RFID and predictive maintenance both ship real logic behind an honestly-scoped manual/simulated
+stand-in for that missing hardware, same as EDI/e-commerce do for missing live external systems) —
+or lower-ROI items not yet scheduled.
 
 ---
 

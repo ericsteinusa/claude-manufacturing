@@ -21,6 +21,7 @@ from manufacturing.wms_core import (
     ship_transfer, receive_transfer_line, cancel_transfer,
     _sync_wave_status, create_wave, record_wave_pick, cancel_wave,
     find_cross_dock_candidates, receive_cross_dock,
+    create_reader, create_tag, simulate_tag_read, retire_tag,
 )
 
 
@@ -990,3 +991,175 @@ def test_receive_cross_dock_picks_only_the_actually_received_delta(
                        pick_list_line_id=1, created_by='eric')
 
     mock_record_pick.assert_called_once_with(conn, 1, 3, 'eric')
+
+
+# ── RFID tracking (simulated) ────────────────────────────────────────────────
+
+def test_create_reader_raises_for_blank_code():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        create_reader(conn, zone_id=1, reader_code='  ')
+    assert conn.execute.call_count == 0
+
+
+def test_create_reader_happy_path():
+    conn = _conn(fetchone_results=[{'id': 5}])
+    reader_id = create_reader(conn, zone_id=1, reader_code='DOCK-A', description='Inbound dock A')
+    assert reader_id == 5
+    insert_sql = conn.execute.call_args_list[0][0][0]
+    assert 'INSERT INTO wms_rfid_reader' in insert_sql
+
+
+def test_create_tag_raises_for_nonpositive_qty():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        create_tag(conn, tag_code='TAG-1', product_id=1, qty=0, bin_id=1, created_by='eric')
+    assert conn.execute.call_count == 0
+
+
+def test_create_tag_raises_for_blank_code():
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        create_tag(conn, tag_code='  ', product_id=1, qty=5, bin_id=1, created_by='eric')
+    assert conn.execute.call_count == 0
+
+
+def test_create_tag_raises_when_bin_has_insufficient_stock():
+    conn = _conn(fetchone_results=[{'qty': 2}])  # only 2 tracked, tagging 5
+    with pytest.raises(ValueError):
+        create_tag(conn, tag_code='TAG-1', product_id=1, qty=5, bin_id=1, created_by='eric')
+
+
+def test_create_tag_raises_when_no_stock_row_at_all():
+    conn = _conn(fetchone_results=[None])
+    with pytest.raises(ValueError):
+        create_tag(conn, tag_code='TAG-1', product_id=1, qty=5, bin_id=1, created_by='eric')
+
+
+def test_create_tag_happy_path():
+    conn = _conn(fetchone_results=[{'qty': 10}, {'id': 9}])
+    tag_id = create_tag(conn, tag_code='TAG-1', product_id=1, qty=5, bin_id=1, created_by='eric')
+    assert tag_id == 9
+    insert_sql = conn.execute.call_args_list[-1][0][0]
+    assert 'INSERT INTO wms_rfid_tag' in insert_sql
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_raises_when_tag_not_found(mock_get_tag):
+    mock_get_tag.return_value = None
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        simulate_tag_read(conn, tag_id=1, reader_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_raises_when_tag_retired(mock_get_tag):
+    mock_get_tag.return_value = {'id': 1, 'status': 'retired', 'bin_id': 3, 'product_id': 7, 'qty': 5}
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        simulate_tag_read(conn, tag_id=1, reader_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_raises_when_reader_not_found(mock_get_tag):
+    mock_get_tag.return_value = {'id': 1, 'status': 'active', 'bin_id': 3, 'product_id': 7, 'qty': 5}
+    conn = _conn(fetchone_results=[None])
+    with pytest.raises(ValueError):
+        simulate_tag_read(conn, tag_id=1, reader_id=1, created_by='eric')
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_same_zone_is_heartbeat_no_move(mock_get_tag):
+    mock_get_tag.return_value = {'id': 1, 'status': 'active', 'bin_id': 3, 'product_id': 7, 'qty': 5}
+    conn = _conn(fetchone_results=[
+        {'id': 10, 'zone_id': 2},  # reader lookup
+        {'zone_id': 2},            # tag's current bin -> same zone
+    ])
+    result = simulate_tag_read(conn, tag_id=1, reader_id=10, created_by='eric')
+    assert result == {'moved': False, 'bin_id': 3}
+    insert_calls = [c for c in conn.execute.call_args_list if 'INSERT INTO wms_rfid_read_event' in c[0][0]]
+    assert len(insert_calls) == 1
+    assert insert_calls[0][0][1] == (1, 10, 3, 3, False, 'eric')
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+@patch('manufacturing.wms_core._least_full_active_bin_in_zone')
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_different_zone_relocates(mock_get_tag, mock_least_full, mock_adjust):
+    mock_get_tag.return_value = {'id': 1, 'status': 'active', 'bin_id': 3, 'product_id': 7, 'qty': 5}
+    mock_least_full.return_value = {'id': 20, 'full_code': 'Z2-B01'}
+    conn = _conn(fetchone_results=[
+        {'id': 10, 'zone_id': 2},  # reader lookup
+        {'zone_id': 9},            # tag's current bin -> different zone
+    ])
+
+    result = simulate_tag_read(conn, tag_id=1, reader_id=10, created_by='eric')
+
+    assert result == {'moved': True, 'bin_id': 20}
+    assert mock_adjust.call_args_list == [
+        call(conn, 3, 7, -5),   # decrement old bin
+        call(conn, 20, 7, 5),   # credit new bin
+    ]
+    update_calls = [c for c in conn.execute.call_args_list if 'wms_rfid_tag SET bin_id' in c[0][0]]
+    assert len(update_calls) == 1
+    assert update_calls[0][0][1] == (20, 1)
+    insert_calls = [c for c in conn.execute.call_args_list if 'INSERT INTO wms_rfid_read_event' in c[0][0]]
+    assert insert_calls[0][0][1] == (1, 10, 3, 20, True, 'eric')
+
+
+@patch('manufacturing.wms_core._least_full_active_bin_in_zone')
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_raises_when_target_zone_has_no_bin(mock_get_tag, mock_least_full):
+    mock_get_tag.return_value = {'id': 1, 'status': 'active', 'bin_id': 3, 'product_id': 7, 'qty': 5}
+    mock_least_full.return_value = None
+    conn = _conn(fetchone_results=[
+        {'id': 10, 'zone_id': 2},
+        {'zone_id': 9},
+    ])
+    with pytest.raises(ValueError):
+        simulate_tag_read(conn, tag_id=1, reader_id=10, created_by='eric')
+
+
+@patch('manufacturing.wms_core._adjust_bin_stock')
+@patch('manufacturing.wms_core._least_full_active_bin_in_zone')
+@patch('manufacturing.wms_core.get_tag')
+def test_simulate_tag_read_first_placement_has_no_source_bin_to_decrement(
+    mock_get_tag, mock_least_full, mock_adjust,
+):
+    """A tag with no prior location (bin_id=None) has never been placed --
+    the first read should credit the target bin without trying to
+    decrement a nonexistent source."""
+    mock_get_tag.return_value = {'id': 1, 'status': 'active', 'bin_id': None, 'product_id': 7, 'qty': 5}
+    mock_least_full.return_value = {'id': 20, 'full_code': 'Z2-B01'}
+    conn = _conn(fetchone_results=[{'id': 10, 'zone_id': 2}])
+
+    result = simulate_tag_read(conn, tag_id=1, reader_id=10, created_by='eric')
+
+    assert result == {'moved': True, 'bin_id': 20}
+    mock_adjust.assert_called_once_with(conn, 20, 7, 5)
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_retire_tag_raises_when_missing(mock_get_tag):
+    mock_get_tag.return_value = None
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        retire_tag(conn, tag_id=1)
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_retire_tag_raises_when_already_retired(mock_get_tag):
+    mock_get_tag.return_value = {'id': 1, 'status': 'retired'}
+    conn = MagicMock()
+    with pytest.raises(ValueError):
+        retire_tag(conn, tag_id=1)
+
+
+@patch('manufacturing.wms_core.get_tag')
+def test_retire_tag_happy_path(mock_get_tag):
+    mock_get_tag.return_value = {'id': 1, 'status': 'active'}
+    conn = MagicMock()
+    retire_tag(conn, tag_id=1)
+    update_sql, params = conn.execute.call_args_list[-1][0]
+    assert "wms_rfid_tag SET status = 'retired'" in update_sql
+    assert params == (1,)
