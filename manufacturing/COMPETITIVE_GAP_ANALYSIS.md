@@ -65,6 +65,21 @@ Personnel and Quality Management are now the only two Section 1 domain tables wi
 Purchasing (supplier self-service portal), Maintenance (technician routing, APM), and Reporting
 (batch record generation) still have real, buildable-without-hardware gaps not yet scheduled.
 
+**2026-07-10, one more:** Shipped the Supplier Self-Service Portal (6/10), closing Purchasing &
+Procurement's last remaining domain gap. `supplier_portal_core.py` mirrors `customer_portal_core.py`
+(P3-C) exactly: a separate bcrypt-login layer on the existing `supplier` master file
+(`supplier_login`, matched against that supplier's own email at registration), session-scoped
+under `portal_supplier_id` — deliberately separate from both the employee `user_*` keys and the
+customer portal's `portal_customer_id`. Every capability reuses an existing core module rather
+than forking it: PO viewing reuses `purchase_orders_core.list_pos/get_po/get_po_items` (PO
+acknowledgement is the one genuinely new piece — two additive columns on `purchase_order`, since
+nothing tracked "did the supplier confirm this order" before); AP invoice submission reuses
+`accounting_core.create_ap_invoice`; RFQ quoting reuses `rfq_core.enter_quote` — a supplier
+submitting a quote through the portal calls the *exact same function* an internal buyer would use
+keying in a phoned-in quote, scoped by an ownership check against `rfq_vendor` (which suppliers
+were actually invited to quote). 46 features shipped total. Purchasing & Procurement joins
+HR/Payroll & Personnel and Quality Management as domain tables with zero remaining ❌ rows.
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -255,13 +270,13 @@ platform beyond demand forecasting and predictive maintenance.
 | **Request for Quote (RFQ) module** | ✅ Full (P1-F) — per-line award, one draft PO per winning vendor | ✅ All |
 | **Vendor quote comparison & scoring** | ✅ Full (P1-F) — side-by-side table, lowest-quote flagging | ✅ All |
 | **Supplier performance scorecard** | ✅ Full (P2-C) — on-time %, fill rate %, quality reject %, composite score | ✅ 7/10 |
-| **Supplier collaboration / self-service portal** | ❌ | ✅ 6/10 |
+| **Supplier collaboration / self-service portal** | ✅ Full (2026-07-10) — separate bcrypt-login portal (mirrors the customer portal) for viewing/acknowledging POs, submitting AP invoices, and quoting on invited RFQs, all reusing existing core modules rather than forking them | ✅ 6/10 |
 | **Blanket orders & call-offs** | ✅ Full (P3-E) — value- or qty-tracked balance, auto-close/auto-expire | ✅ 9/10 |
 | **Freight & landed cost allocation** | ✅ Full (P3-D) — by value/weight/qty, rolls into `product.purchase_price` | ✅ 7/10 |
 | **EDI (850/856/810)** | ✅ Full (P4-D) — real X12 parsing/generation with per-partner item-number field mappings; 850 inbound auto-creates SOs, 855/856/810 generated on demand; trading-partner connectivity is a file upload/download stub, not a real AS2/VAN/SFTP transport | ✅ 8/10 |
 | **Auto-generated POs from MRP** | ✅ Full (P2-H) — preferred-supplier lookup wired into MRP release | ✅ All |
 
-**Priority gaps:** supplier self-service portal.
+**Priority gaps:** none remaining in this domain.
 
 ---
 
@@ -1947,6 +1962,51 @@ tables where each branch had independently completed one adjacent row) before me
 
 ---
 
+### 🔵 Priority 9 — Supplier Self-Service Portal
+
+#### P9-A: Supplier Self-Service Portal ✅ Done
+- A separate, non-employee supplier login for viewing/acknowledging purchase orders, submitting
+  AP invoices, and quoting on invited RFQs. Closes the last remaining gap in the Purchasing &
+  Procurement domain table.
+- **Shipped:** `supplier_portal_core.py`, structurally identical to `customer_portal_core.py`
+  (P3-C): `supplier_login` holds one bcrypt-hashed credential per `supplier.id`, matched at
+  registration time against that supplier's own `email` column — no blind account creation.
+  Session/auth wiring lives in `auth_decorators.supplier_login_required` and
+  `views/_supplier_portal.py`, under `portal_supplier_id` — deliberately separate from the
+  employee `user_*` keys *and* the customer portal's `portal_customer_id`, so a browser could in
+  principle hold both portal sessions at once without collision. Every capability reuses an
+  existing core module rather than forking it:
+  - **Purchase orders** — `purchase_orders_core.list_pos/get_po/get_po_items`, already filterable
+    by `supplier_id`. PO acknowledgement is the one genuinely new piece of state: two additive
+    columns on `purchase_order` (`supplier_acknowledged_at`, `supplier_ack_notes`), since nothing
+    tracked "did the supplier confirm this order" before this module existed.
+  - **AP invoices** — self-service submission reuses `accounting_core.create_ap_invoice`
+    directly (`vendor_id` *is* `supplier_id` — the `ap_invoice` table's column is just named
+    differently), with an ownership check when a `po_id` is supplied so a supplier can't invoice
+    against someone else's order.
+  - **RFQs** — a supplier only sees RFQs they're actually invited to (`rfq_vendor`), and
+    `submit_quote` calls `rfq_core.enter_quote` — the exact same function an internal buyer uses
+    when keying in a phoned-in quote — after verifying the RFQ line's `rfq_id` has this supplier
+    in `rfq_vendor`.
+  New pages at `/supplier-portal/` (dashboard: open PO count, unacknowledged count, open invoice
+  balance, open RFQ count), `/supplier-portal/pos/` + `/supplier-portal/pos/<id>/`
+  (acknowledgement form), `/supplier-portal/invoices/` + `/supplier-portal/invoices/new/`
+  (self-service submission, optionally tied to a PO), and `/supplier-portal/rfqs/` +
+  `/supplier-portal/rfqs/<id>/` (per-line quote entry, pre-filled with the supplier's own
+  existing quote if any), plus `/supplier-portal/register/` and `/supplier-portal/login/`
+  (cross-linked from the employee login page and the Purchasing Dashboard, same pattern as the
+  customer portal's login link). Verified end-to-end against a running dev server + local
+  Postgres through the actual web views: created a real supplier, a PO, and an RFQ inviting that
+  supplier; registered and logged into the portal; confirmed the dashboard and PO detail page
+  showed the real PO; acknowledged the PO and confirmed the timestamp/notes persisted; submitted
+  an AP invoice against that PO and confirmed it appeared correctly in both the list and detail
+  pages; submitted an RFQ quote and confirmed it landed in `rfq_quote_line` under the supplier's
+  own `vendor_id`, visible to an internal buyer's existing quote-comparison view unmodified;
+  confirmed a made-up/unowned PO id correctly 404s rather than leaking another supplier's order.
+  Cleaned up all test data afterward.
+
+---
+
 ## Section 3: Competitive Positioning Summary
 
 ### Where This ERP Already Leads or Matches Mid-Market
@@ -2012,6 +2072,7 @@ tables where each branch had independently completed one adjacent row) before me
 | No regulatory compliance templates (FDA, ISO) | P7-B |
 | No workforce analytics / headcount planning | P7-C |
 | No Applicant Tracking / Recruiting (ATS) | P8-A |
+| No supplier self-service portal | P9-A |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -2039,7 +2100,7 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | MRP | 8/10 | 7/10 | — |
 | Inventory | 9/10 | 8/10 | ▲▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J) + RFID tracking (P3-M, simulated)) |
 | Quality (QA) | 9/10 | 9/10 | ▲▲▲▲ (sampling/AQL + document control + control plans/FMEA (P5-B) + CoA generation (P6-B) + regulatory compliance templates (P7-B) — domain fully closed) |
-| Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
+| Purchasing | 9/10 | 9/10 | ▲▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI + supplier self-service portal (P9-A) — domain fully closed) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync + discount/promotion management (P6-A)) |
 | Finance / GL | 9/10 | 9/10 | ▲▲▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated + carbon/ESG tracking + Activity-Based Costing (P5-C)) |
 | Fixed Assets | 9/10 | 8/10 | — |
@@ -2107,6 +2168,17 @@ buildable-without-hardware domain gaps not yet scheduled — Configure-to-Order/
 management/repetitive-manufacturing (Production Planning), Supplier Self-Service Portal
 (Purchasing), Technician Routing/Asset Performance Management (Maintenance), and Batch Record
 Generation (Reporting).
+
+**Status update (2026-07-10, one more):** shipped the Supplier Self-Service Portal (P9-A),
+closing Purchasing & Procurement's domain table entirely — built as a structural mirror of the
+customer portal (P3-C), reusing `purchase_orders_core`/`accounting_core`/`rfq_core` throughout
+rather than forking any of them. 46 features shipped total. Three of ten Section 1 domain tables
+(HR/Payroll & Personnel, Quality Management, Purchasing & Procurement) now have zero remaining ❌
+rows. The gaps still open: Section 3's "Where We Trail Enterprise" table (real
+external-connectivity/hardware dependencies), and three real, buildable-without-hardware domain
+gaps not yet scheduled — Configure-to-Order/recipe-formula-management/repetitive-manufacturing
+(Production Planning), Technician Routing/Asset Performance Management (Maintenance), and Batch
+Record Generation (Reporting).
 
 ---
 

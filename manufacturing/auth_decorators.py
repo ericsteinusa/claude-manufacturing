@@ -30,6 +30,20 @@ def customer_login_required(view_func):
     return wrapper
 
 
+def supplier_login_required(view_func):
+    """Redirect to 'supplier_portal_login' if there's no active
+    supplier-portal session. Separate from customer_login_required: portal
+    sessions key off 'portal_supplier_id', not 'portal_customer_id' —
+    a browser could conceivably be logged into both portal types at once
+    without collision."""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('portal_supplier_id'):
+            return redirect('supplier_portal_login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
 def _normalize_keys(keys):
     if keys is None:
         return None
