@@ -254,6 +254,7 @@ from ._skills_matrix import *  # noqa: F401,F403
 from ._benefits import *  # noqa: F401,F403
 from ._regulatory_compliance import *  # noqa: F401,F403
 from ._workforce_analytics import *  # noqa: F401,F403
+from ._ats import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
