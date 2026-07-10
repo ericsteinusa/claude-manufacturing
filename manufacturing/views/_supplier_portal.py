@@ -105,6 +105,7 @@ def supplier_portal_home(request):
     try:
         ensure_po_tables(conn)
         ensure_supplier_portal_tables(conn)
+        ensure_rfq_tables(conn)
         conn.commit()
         dashboard = get_portal_dashboard(conn, supplier_id)
         pos = list_my_pos(conn, supplier_id)
@@ -226,6 +227,8 @@ def supplier_portal_rfqs(request):
     supplier_id = _my_supplier_id(request)
     conn = get_db_connection()
     try:
+        ensure_rfq_tables(conn)
+        conn.commit()
         rfqs = list_my_rfqs(conn, supplier_id)
     finally:
         conn.close()
