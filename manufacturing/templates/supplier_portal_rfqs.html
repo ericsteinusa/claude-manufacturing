@@ -1,0 +1,26 @@
+{% extends "base_supplier_portal.html" %}
+{% block page_title %}RFQs — Supplier Portal{% endblock %}
+{% block menu_title %}Requests for Quote{% endblock %}
+
+{% block body %}
+<div class="card">
+    {% if rfqs %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>RFQ #</th><th>Status</th><th>Notes</th></tr></thead>
+            <tbody>
+                {% for r in rfqs %}
+                <tr>
+                    <td><a href="{% url 'supplier_portal_rfq_detail' r.id %}">{{ r.rfq_number }}</a></td>
+                    <td><span class="pill pill-{{ r.status }}">{{ r.status|capfirst }}</span></td>
+                    <td>{{ r.notes|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No RFQs yet — your buyer will invite you to quote when there's a request.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base_supplier_portal.html" %}
+{% block page_title %}{{ po.po_number }} — Supplier Portal{% endblock %}
+{% block menu_title %}{{ po.po_number }}{% endblock %}
+
+{% block body %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+<div class="card">
+    <div class="card-title">Order Summary</div>
+    <p><strong>Status:</strong> <span class="pill pill-{{ po.status }}">{{ po.status|capfirst }}</span></p>
+    <p><strong>Order Date:</strong> {{ po.order_date|default:"—" }}</p>
+    <p><strong>Expected Date:</strong> {{ po.expected_date|default:"—" }}</p>
+    {% if po.notes %}<p><strong>Notes:</strong> {{ po.notes }}</p>{% endif %}
+    <p><strong>Total:</strong> ${{ po.total|floatformat:2 }}</p>
+
+    {% if po.supplier_acknowledged_at %}
+    <p style="margin-top:12px;"><strong>Acknowledged:</strong> {{ po.supplier_acknowledged_at }}
+        {% if po.supplier_ack_notes %} — {{ po.supplier_ack_notes }}{% endif %}</p>
+    {% else %}
+    <form method="post" style="margin-top:16px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="acknowledge">
+        <div class="form-row">
+            <label>Notes (optional)</label>
+            <textarea name="notes" rows="2" placeholder="Confirm ship date, etc."></textarea>
+        </div>
+        <button type="submit" class="btn">Acknowledge This Order</button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-title">Line Items</div>
+    {% if items %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Description</th><th class="num">Qty Ordered</th><th class="num">Unit Price</th><th class="num">Qty Received</th></tr></thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.description }}</td>
+                    <td class="num">{{ it.qty_ordered }}</td>
+                    <td class="num">${{ it.unit_price|floatformat:2 }}</td>
+                    <td class="num">{{ it.qty_received }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No line items.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-title">Submit an Invoice Against This Order</div>
+    <a href="{% url 'supplier_portal_invoice_new' %}?po_id={{ po.id }}" class="btn">Submit Invoice</a>
+</div>
+{% endblock %}

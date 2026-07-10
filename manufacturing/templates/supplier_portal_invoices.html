@@ -1,0 +1,33 @@
+{% extends "base_supplier_portal.html" %}
+{% block page_title %}Invoices — Supplier Portal{% endblock %}
+{% block menu_title %}Invoices{% endblock %}
+
+{% block body %}
+<div style="margin-bottom:16px;">
+    <a href="{% url 'supplier_portal_invoice_new' %}" class="btn">+ Submit New Invoice</a>
+</div>
+
+<div class="card">
+    {% if invoices %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Invoice #</th><th>Invoice Date</th><th>Due Date</th><th class="num">Amount</th><th class="num">Balance</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for inv in invoices %}
+                <tr>
+                    <td><a href="{% url 'supplier_portal_invoice_detail' inv.id %}">{{ inv.invoice_number }}</a></td>
+                    <td>{{ inv.invoice_date|default:"" }}</td>
+                    <td>{{ inv.due_date|default:"" }}</td>
+                    <td class="num">${{ inv.amount|floatformat:2 }}</td>
+                    <td class="num">${{ inv.balance|floatformat:2 }}</td>
+                    <td><span class="pill pill-{{ inv.status }}">{{ inv.status|capfirst }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No invoices submitted yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

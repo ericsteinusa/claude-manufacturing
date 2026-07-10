@@ -1,0 +1,57 @@
+{% extends "base_supplier_portal.html" %}
+{% block page_title %}{{ rfq.rfq_number }} — Supplier Portal{% endblock %}
+{% block menu_title %}{{ rfq.rfq_number }}{% endblock %}
+
+{% block body %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+<div class="card">
+    <p><strong>Status:</strong> <span class="pill pill-{{ rfq.status }}">{{ rfq.status|capfirst }}</span></p>
+    {% if rfq.notes %}<p><strong>Notes:</strong> {{ rfq.notes }}</p>{% endif %}
+</div>
+
+<div class="card">
+    <div class="card-title">Line Items — Enter Your Quote</div>
+    {% if rfq.items %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Description</th><th class="num">Qty</th><th></th></tr></thead>
+            <tbody>
+                {% for item in rfq.items %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td class="num">{{ item.qty }}</td>
+                    <td>
+                        {% if rfq.status == 'open' %}
+                        <form method="post" style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">
+                            {% csrf_token %}
+                            <input type="hidden" name="rfq_item_id" value="{{ item.id }}">
+                            <input type="number" name="quoted_price" step="0.01" min="0"
+                                   value="{{ item.my_quoted_price|default_if_none:'' }}"
+                                   placeholder="Price" style="width:90px;padding:5px;border:1px solid var(--border);border-radius:4px;">
+                            <input type="number" name="lead_time_days" min="0"
+                                   value="{{ item.my_lead_time_days|default_if_none:'' }}"
+                                   placeholder="Lead days" style="width:90px;padding:5px;border:1px solid var(--border);border-radius:4px;">
+                            <button type="submit" class="btn" style="padding:5px 12px;font-size:12px;">
+                                {% if item.my_quoted_price != None %}Update{% else %}Submit{% endif %} Quote
+                            </button>
+                        </form>
+                        {% else %}
+                        {% if item.my_quoted_price != None %}
+                        ${{ item.my_quoted_price|floatformat:2 }} · {{ item.my_lead_time_days }} days
+                        {% else %}
+                        No quote submitted
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No line items on this RFQ.</div>
+    {% endif %}
+</div>
+{% endblock %}

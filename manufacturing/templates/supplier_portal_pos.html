@@ -1,0 +1,29 @@
+{% extends "base_supplier_portal.html" %}
+{% block page_title %}Purchase Orders — Supplier Portal{% endblock %}
+{% block menu_title %}Purchase Orders{% endblock %}
+
+{% block body %}
+<div class="card">
+    {% if pos %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>PO #</th><th>Order Date</th><th>Expected Date</th><th class="num">Total</th><th>Status</th><th>Acknowledged</th></tr></thead>
+            <tbody>
+                {% for po in pos %}
+                <tr>
+                    <td><a href="{% url 'supplier_portal_po_detail' po.id %}">{{ po.po_number }}</a></td>
+                    <td>{{ po.order_date|default:"" }}</td>
+                    <td>{{ po.expected_date|default:"" }}</td>
+                    <td class="num">${{ po.total|floatformat:2 }}</td>
+                    <td><span class="pill pill-{{ po.status }}">{{ po.status|capfirst }}</span></td>
+                    <td>{% if po.supplier_acknowledged_at %}✓{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No purchase orders yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
