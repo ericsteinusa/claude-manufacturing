@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}{{ person.first_name }} {{ person.last_name }} — Benefits{% endblock %}
+
+{% block toolbar_left %}
+<a href="/benefits/" class="btn">Benefits</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:800px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ person.first_name }} {{ person.last_name }} — Benefits</div>
+
+    <div class="card">
+        <h3>Active Enrollments</h3>
+        {% if result.enrollments %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Plan</th><th>Type</th><th>Tier</th><th class="num">Employee $/Pay</th><th class="num">Employer $/Pay</th></tr>
+                </thead>
+                <tbody>
+                    {% for e in result.enrollments %}
+                    <tr>
+                        <td>{{ e.plan_name }}</td>
+                        <td>{{ e.plan_type }}</td>
+                        <td>{{ e.tier }}</td>
+                        <td class="num">${{ e.employee_cost_per_pay|floatformat:2 }}</td>
+                        <td class="num">${{ e.employer_cost_per_pay|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="font-weight:bold;">Total per pay period</td>
+                        <td class="num" style="font-weight:bold;">${{ result.total_employee_cost_per_pay|floatformat:2 }}</td>
+                        <td class="num" style="font-weight:bold;">${{ result.total_employer_cost_per_pay|floatformat:2 }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No active benefit enrollments.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block page_title %}Compliance Checklists{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/compliance/templates/" class="btn">Compliance Templates</a>
+<a href="/qa/" class="btn">QA Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Compliance Checklists</div>
+
+    <form method="get" style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:bold;color:#555;margin-right:6px;">Status</label>
+        <select name="status" onchange="this.form.submit()" style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+            <option value="" {% if not status %}selected{% endif %}>All</option>
+            <option value="open" {% if status == 'open' %}selected{% endif %}>Open</option>
+            <option value="complete" {% if status == 'complete' %}selected{% endif %}>Complete</option>
+        </select>
+    </form>
+
+    {% if checklists %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Name</th><th>Template</th><th>Standard</th><th>Owner</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                {% for c in checklists %}
+                <tr>
+                    <td><a href="/qa/compliance/checklists/{{ c.id }}/">{{ c.name }}</a></td>
+                    <td>{{ c.template_name }}</td>
+                    <td>{{ c.standard|default:"—" }}</td>
+                    <td>{{ c.owner|default:"—" }}</td>
+                    <td>
+                        {% if c.status == 'complete' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Complete</span>
+                        {% else %}
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/qa/compliance/checklists/{{ c.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No checklists yet. Instantiate one from a template.</div>
+    {% endif %}
+</div>
+{% endblock %}

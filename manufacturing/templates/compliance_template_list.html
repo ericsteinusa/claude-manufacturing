@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_title %}Compliance Templates{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">QA Dashboard</a>
+<a href="/qa/compliance/checklists/" class="btn">Checklists</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/qa/compliance/templates/new/" class="btn btn-primary">+ New Template</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Compliance Templates</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Reusable requirement checklists for a named regulation or standard. The seeded ISO/FDA
+        templates are illustrative starter checklists — a small representative subset of clauses,
+        not the full standard. Consult the actual standard text and a qualified auditor for real
+        certification work.
+    </p>
+
+    {% if templates %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Name</th><th>Standard</th><th>Description</th><th></th></tr></thead>
+            <tbody>
+                {% for t in templates %}
+                <tr>
+                    <td><a href="/qa/compliance/templates/{{ t.id }}/">{{ t.name }}</a></td>
+                    <td>{{ t.standard|default:"—" }}</td>
+                    <td>{{ t.description|truncatechars:80 }}</td>
+                    <td><a href="/qa/compliance/templates/{{ t.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No compliance templates yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

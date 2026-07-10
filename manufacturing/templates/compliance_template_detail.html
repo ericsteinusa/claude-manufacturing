@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block page_title %}{{ template.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/compliance/templates/" class="btn">Compliance Templates</a>
+<a href="/qa/compliance/checklists/" class="btn">Checklists</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ template.name }} {% if template.standard %}<span style="font-size:13px;color:#666;">({{ template.standard }})</span>{% endif %}</div>
+    {% if template.description %}<p style="font-size:12.5px;color:var(--text-muted);">{{ template.description }}</p>{% endif %}
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Requirements</h3>
+        {% if template.items %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Clause</th><th>Requirement</th><th>Category</th></tr></thead>
+                <tbody>
+                    {% for item in template.items %}
+                    <tr>
+                        <td>{{ item.clause_ref|default:"—" }}</td>
+                        <td>{{ item.requirement_text }}</td>
+                        <td>{{ item.category|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No requirements added yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Requirement</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_item">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Clause Ref</label>
+                    <input type="text" name="clause_ref" placeholder="e.g. 8.5.1">
+                </div>
+                <div class="form-row">
+                    <label>Requirement *</label>
+                    <input type="text" name="requirement_text" required>
+                </div>
+                <div class="form-row">
+                    <label>Category</label>
+                    <input type="text" name="category">
+                </div>
+                <div class="form-row">
+                    <label>Sort Order</label>
+                    <input type="number" name="sort_order" value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Requirement</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Instantiate a Checklist</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_checklist">
+            <div class="form-row">
+                <label>Checklist Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Q3 2026 Internal Audit">
+            </div>
+            <div class="form-row">
+                <label>Owner</label>
+                <input type="text" name="owner" placeholder="e.g. Dana R.">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Checklist</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
