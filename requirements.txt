@@ -13,3 +13,7 @@ python-dotenv==1.2.2
 openpyxl==3.1.5
 python-barcode==0.16.1
 reportlab==5.0.0
+
+# Production deployment (Phase 1 — see DEPLOYMENT.md)
+gunicorn==26.0.0
+whitenoise==6.12.0
