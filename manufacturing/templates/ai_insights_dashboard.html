@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block page_title %}AI Insights{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dept/reports/" class="btn">Reports</a>
+{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:900px; }
+.insight-card { display:flex; justify-content:space-between; align-items:flex-start;
+    gap:12px; background:white; border:1.5px solid var(--border); border-radius:6px;
+    padding:12px 16px; margin-bottom:10px; }
+.insight-domain { display:inline-block; padding:2px 10px; border-radius:10px;
+    font-size:11px; font-weight:bold; text-transform:uppercase; margin-right:8px; }
+.insight-domain.maintenance, .insight-domain.apm { background:#e0ecff; color:#1d3f8c; }
+.insight-domain.demand { background:#fde7c8; color:#7a4a00; }
+.insight-domain.quality { background:#f8d7da; color:#842029; }
+.insight-domain.churn { background:#e5d9f7; color:#4a2a80; }
+.pill-sev { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; font-weight:bold; }
+.pill-sev.high { background:#f8d7da; color:#842029; }
+.pill-sev.medium { background:#fff3cd; color:#7a5b00; }
+.pill-sev.low { background:#d1e7dd; color:#0a3622; }
+.insight-title { font-weight:bold; margin-bottom:3px; }
+.insight-detail { font-size:13px; color:var(--text-muted); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>AI Insights</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
+        A cross-domain feed combining <a href="/predictive-maintenance/">predictive maintenance</a>
+        risk, <a href="/maint/apm/">asset performance</a> recommendations, and hand-rolled
+        statistical anomaly detection over demand, quality, and customer ordering patterns.
+        Ranked by severity.
+    </p>
+
+    {% for i in insights %}
+    <div class="insight-card">
+        <div>
+            <div class="insight-title">
+                <span class="insight-domain {{ i.domain }}">{{ i.domain }}</span>
+                {{ i.title }}
+            </div>
+            <div class="insight-detail">{{ i.detail }}</div>
+        </div>
+        <div style="text-align:right;white-space:nowrap;">
+            <span class="pill-sev {{ i.severity }}">{{ i.severity|capfirst }}</span><br>
+            <a href="{{ i.link }}" style="font-size:12px;">View &rarr;</a>
+        </div>
+    </div>
+    {% empty %}
+    <p style="text-align:center;color:var(--text-muted);">No active insights right now.</p>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

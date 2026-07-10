@@ -409,6 +409,7 @@ urlpatterns = [
     path('batch-records/', views.batch_record_list, name='batch_record_list'),
     path('batch-records/<int:record_id>/', views.batch_record_detail, name='batch_record_detail'),
     path('batch-records/<int:record_id>/pdf/', views.batch_record_pdf, name='batch_record_pdf'),
+    path('ai-insights/', views.ai_insights_dashboard, name='ai_insights_dashboard'),
     path('prod/reports/', views.prod_reports_view, name='prod_reports_view'),
     path('prod/shipping/', views.prod_shipping_list, name='prod_shipping_list'),
     path('prod/shipping/<int:shipment_id>/', views.prod_shipping_detail, name='prod_shipping_detail'),
