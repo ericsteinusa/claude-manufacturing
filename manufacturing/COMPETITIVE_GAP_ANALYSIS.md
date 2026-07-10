@@ -119,6 +119,25 @@ zero remaining ❌ rows — the only gaps left anywhere in this document are Sec
 Trail Enterprise" table, which needs real external hardware/systems this dev environment has no
 live counterpart for.**
 
+**2026-07-10, final:** Shipped the last buildable-in-pure-software item from Section 3's "Where We
+Trail Enterprise" table: the **broader embedded-AI analytics platform**. `ai_insights_core.py` is a
+pure computed layer (no new tables, same "nothing persisted against real data" choice as
+`cash_flow_core.py`/`scenario_planning_core.py`) that ties together two previously siloed risk
+reports — `predictive_maintenance_core.get_predictive_maintenance_report` and
+`apm_core.get_apm_dashboard` — with three genuinely new hand-rolled statistical detectors: a
+demand-anomaly z-score over each product's actual-vs-forecast history
+(`demand_forecast_core.list_demand_forecast`), a quality-anomaly z-score over the monthly NCR
+total (`quality_core.get_ncr_severity_trend`), and a customer churn-risk score comparing each
+customer's days-since-last-order against their own historical average order interval
+(`contacts_core.get_customer_orders`). All three follow this app's existing no-ML-library
+convention (hand-rolled mean/stdev, no pandas/numpy/statsmodels) and its honest-scoping precedent:
+customers/products without enough history are silently excluded rather than defaulted to "safe" or
+fabricated. Everything merges into one severity-ranked feed at `/ai-insights/`, linked from the
+Reports dashboard. 53 features shipped total. **This closes the only remaining pure-software gap
+in this document — the four items still open in Section 3's "Where We Trail Enterprise" table all
+require a real external account/hardware (carrier API, EDI trading partner, live storefront,
+IoT/RFID readers) this dev environment has no live counterpart for.**
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -210,9 +229,10 @@ EDI (P4-D), e-commerce sync (P4-E), predictive maintenance (P4-B), and RFID (P3-
 real logic but honestly-scoped stubs/simulations where this environment has no live external
 system or hardware to connect to (file upload/download instead of AS2/VAN/SFTP, config-gated HTTP
 POST instead of a live Shopify/WooCommerce store, manual sensor entry instead of IoT hardware, a
-manual "Simulate Read" action instead of a real RFID antenna); there is also no supplier
-self-service portal, no real carrier-API shipment tracking, and no broader embedded-AI analytics
-platform beyond demand forecasting and predictive maintenance.
+manual "Simulate Read" action instead of a real RFID antenna); there is also no real carrier-API
+shipment tracking. (Note: this paragraph predates several later passes — see the dated log above
+for what has shipped since, including the supplier self-service portal and the broader embedded-AI
+analytics platform / AI Insights Hub.)
 
 ---
 
@@ -456,11 +476,11 @@ platform beyond demand forecasting and predictive maintenance.
 | **Custom / self-service report builder** | ✅ Full (P4-F) — allowlist-based field/filter/group-by/aggregate builder over 11 tables (single-table, no cross-table joins in v1), CSV/PDF export, scheduled email delivery | ✅ 7/10 |
 | **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
 | **Live shop floor performance (real-time)** | ✅ Full (P3-G) — live per-shift OEE dashboard + standalone auto-refreshing TV display | ✅ 7/10 |
-| **Predictive / AI analytics** | ✅ Partial (P4-A, P4-B) — seasonal-decomposition demand forecast (product × month) feeding into MRP, plus MTBF-based equipment failure-risk scoring; no broader embedded-AI analytics platform | ✅ 7/10 |
+| **Predictive / AI analytics** | ✅ Full (2026-07-10) — seasonal-decomposition demand forecast and MTBF-based failure-risk scoring (P4-A/P4-B) now feed a cross-domain **AI Insights Hub** (`ai_insights_core.py`) that also adds hand-rolled demand-anomaly, quality-anomaly, and customer churn-risk detection into one severity-ranked feed | ✅ 7/10 |
 | **Batch record generation** | ✅ Full (2026-07-10) — numbered as-built records for completed Work Orders, snapshotting materials/cost/quality inspections at generation time (same snapshot-not-live pattern as CoA generation), with a PDF export | ✅ 6/10 |
 | **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
 
-**Priority gaps:** broader embedded-AI analytics platform (Section 3's "Where We Trail Enterprise" table).
+**Priority gaps:** none remaining in this domain.
 
 ---
 
@@ -2252,6 +2272,7 @@ tables where each branch had independently completed one adjacent row) before me
 | No technician routing & scheduling | P11-A |
 | No Asset Performance Management (APM) | P11-B |
 | No batch record generation | P11-C |
+| No broader embedded-AI analytics platform | P12-A |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -2262,7 +2283,6 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 
 | Gap | Effort to Close |
 |---|---|
-| No broader embedded-AI analytics platform | Very High |
 | No real IoT / sensor / RFID hardware integration (predictive maintenance and RFID both ship with real logic behind a manual/simulated stand-in for live hardware) | Very High |
 | No real carrier-API shipment tracking (FedEx/UPS/USPS) | Medium–High |
 | No real AS2/VAN/SFTP EDI transport (file upload/download stub only) | Medium |
@@ -2286,10 +2306,10 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | HR / Payroll | 9/10 | 9/10 | ▲▲▲▲▲ (ESS portal + skills matrix (P6-C) + benefits management (P7-A) + workforce analytics/headcount planning (P7-C) + ATS (P8-A) — domain fully closed) |
 | Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B) + technician routing (P11-A) + Asset Performance Management (P11-B); mobile app now credited — domain fully closed apart from real IoT hardware) |
 | IT Management | 10/10 | 9/10 | — |
-| Reporting / Analytics | 9/10 | 9/10 | ▲▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), batch record generation (P11-C), digest now credited — domain fully closed apart from a broader embedded-AI platform) |
+| Reporting / Analytics | 9/10 | 9/10 | ▲▲▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), batch record generation (P11-C), digest now credited, broader embedded-AI analytics platform / AI Insights Hub (P12-A) — domain fully closed) |
 | Scheduling / APS | 9/10 | 7/10 | ▲▲▲▲▲▲▲ (P3-A finite capacity scheduling + what-if scenario planning (P5-A) + Configure-to-Order (P10-A) + recipe/formula management (P10-B) + repetitive manufacturing (P10-C) — domain fully closed) |
 | WMS / Shipping | 9/10 | 7/10 | ▲▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K) + cross-docking (P3-L)) |
-| **Overall** | **9.3/10** | **8.6/10** | **▲ from 7.1 / 5.9** |
+| **Overall** | **9.3/10** | **8.7/10** | **▲ from 7.1 / 5.9** |
 
 ---
 
@@ -2379,6 +2399,18 @@ storefront) that this dev environment has no live counterpart for, and which eve
 feature (predictive maintenance, RFID, EDI, e-commerce) already ships real logic behind an
 honestly-scoped manual/simulated stand-in for, rather than faking the missing hardware/system
 outright.
+
+**Status update (2026-07-10, actually final):** shipped the broader embedded-AI analytics platform
+(P12-A) — the one item in Section 3's "Where We Trail Enterprise" table that didn't actually need
+real external hardware/connectivity, just effort. `ai_insights_core.py` unifies the existing
+predictive-maintenance and APM risk reports with three new hand-rolled statistical detectors
+(demand anomaly, quality anomaly, customer churn risk) into one severity-ranked feed at
+`/ai-insights/`. 53 features shipped total. **The only gaps left anywhere in this document are the
+four remaining rows of Section 3's "Where We Trail Enterprise" table, every one of which requires a
+real external account or hardware this dev environment has no live counterpart for** (real
+IoT/sensor/RFID hardware, real carrier-API tracking, real AS2/EDI transport, a live e-commerce
+storefront) — each already ships real logic behind an honestly-scoped manual/simulated stand-in
+rather than faking the missing system outright.
 
 ---
 
