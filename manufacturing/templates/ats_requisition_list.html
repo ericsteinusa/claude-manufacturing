@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block page_title %}Job Requisitions{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ats/" class="btn">Recruiting Dashboard</a>
+<a href="/ats/candidates/" class="btn">Candidates</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/ats/requisitions/new/" class="btn btn-primary">+ New Requisition</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Job Requisitions</div>
+
+    <form method="get" style="margin-bottom:14px;display:flex;gap:8px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search title..."
+               style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+        <select name="status" onchange="this.form.submit()" style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+            <option value="" {% if not status %}selected{% endif %}>All Statuses</option>
+            {% for s in requisition_statuses %}
+            <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+    </form>
+
+    {% if requisitions %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Title</th><th>Department</th><th>Status</th><th>Target Hire Date</th><th></th></tr></thead>
+            <tbody>
+                {% for r in requisitions %}
+                <tr>
+                    <td><a href="/ats/requisitions/{{ r.id }}/">{{ r.title }}</a></td>
+                    <td>{{ r.dept_name|default:"—" }}</td>
+                    <td>
+                        {% if r.status == 'open' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Open</span>
+                        {% elif r.status == 'filled' %}
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Filled</span>
+                        {% else %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{{ r.status|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.target_hire_date|default:"—" }}</td>
+                    <td><a href="/ats/requisitions/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No requisitions found.</div>
+    {% endif %}
+</div>
+{% endblock %}

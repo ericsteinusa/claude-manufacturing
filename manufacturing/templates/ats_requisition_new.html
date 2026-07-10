@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block page_title %}New Requisition{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ats/requisitions/" class="btn">Requisitions</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select, .form-row textarea { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">New Requisition</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Title *</label>
+                <input type="text" name="title" required placeholder="e.g. Welder II">
+            </div>
+            <div class="form-row">
+                <label>Department</label>
+                <select name="dept_id">
+                    <option value="">—</option>
+                    {% for d in depts %}
+                    <option value="{{ d.dept_id }}">{{ d.dept_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Description</label>
+                <textarea name="description" rows="3"></textarea>
+            </div>
+            <div class="form-row">
+                <label>Target Hire Date</label>
+                <input type="date" name="target_hire_date">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Requisition</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

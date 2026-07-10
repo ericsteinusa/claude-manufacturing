@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block page_title %}Recruiting{% endblock %}
+
+{% block toolbar_left %}
+<a href="/ats/requisitions/new/" class="btn btn-primary">+ New Requisition</a>
+<a href="/ats/requisitions/" class="btn">Requisitions</a>
+<a href="/ats/candidates/" class="btn">Candidates</a>
+<a href="/pers/" class="btn">Personnel Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:26px; font-weight:bold; color:var(--accent); }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.funnel-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee; font-size:13px; }
+.funnel-row:last-child { border-bottom:none; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <div class="menu-title">Recruiting Dashboard</div>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Open Requisitions</div>
+            <div class="val">{{ dashboard.open_requisitions|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Candidates</div>
+            <div class="val">{{ dashboard.total_candidates|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">In Pipeline</div>
+            <div class="val">{{ dashboard.by_stage.Applied|add:dashboard.by_stage.Screening|add:dashboard.by_stage.Interview|add:dashboard.by_stage.Offer }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Hired</div>
+            <div class="val">{{ dashboard.by_stage.Hired|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Pipeline Funnel</h3>
+            {% for stage, count in dashboard.by_stage.items %}
+            <div class="funnel-row"><span>{{ stage }}</span><span><strong>{{ count }}</strong></span></div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h3>Recent Hires</h3>
+            {% if dashboard.recent_hires %}
+            <table class="erp-table">
+                <thead><tr><th>Candidate</th><th>Requisition</th></tr></thead>
+                <tbody>
+                {% for h in dashboard.recent_hires %}
+                <tr><td>{{ h.last_name }}, {{ h.first_name }}</td><td>{{ h.requisition_title }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No hires yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Open Requisitions</h3>
+        {% if requisitions %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Title</th><th>Department</th><th>Target Hire Date</th><th></th></tr></thead>
+                <tbody>
+                {% for r in requisitions %}
+                <tr>
+                    <td><a href="/ats/requisitions/{{ r.id }}/">{{ r.title }}</a></td>
+                    <td>{{ r.dept_name|default:"—" }}</td>
+                    <td>{{ r.target_hire_date|default:"—" }}</td>
+                    <td><a href="/ats/requisitions/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No open requisitions.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

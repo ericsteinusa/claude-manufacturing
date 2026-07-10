@@ -51,6 +51,20 @@ anywhere in this app before — and every tenure/trend/turnover number is comput
 employees who actually have a hire date on file, with existing employees silently (but
 documented) excluded rather than backfilled with a fabricated date. 44 features shipped total.
 
+**2026-07-10, later same day:** Shipped Applicant Tracking / Recruiting (ATS, 5/10), the last
+remaining gap in the entire HR/Payroll & Personnel domain table. `ats_core.py` adds job
+requisitions, candidates, and applications moving through a fixed pipeline (Applied → Screening →
+Interview → Offer → Hired/Rejected) with a full stage-history audit trail. The one place this
+module writes outside itself: hiring a candidate (`convert_to_employee`) creates a real `people`
+row via `personnel_core.create_person` and sets its hire_date via
+`workforce_analytics_core.set_employment_dates` — the same hire_date column P7-C added — so a
+candidate hired through the ATS is counted correctly by Workforce Analytics from day one, closing
+the loop between recruiting and the rest of the HR suite. 45 features shipped total. HR/Payroll &
+Personnel and Quality Management are now the only two Section 1 domain tables with zero remaining
+❌ rows; Production Planning (CTO, recipe/formula management, repetitive manufacturing),
+Purchasing (supplier self-service portal), Maintenance (technician routing, APM), and Reporting
+(batch record generation) still have real, buildable-without-hardware gaps not yet scheduled.
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -324,9 +338,9 @@ platform beyond demand forecasting and predictive maintenance.
 | **Benefits management** | ✅ Full (2026-07-10) — a benefit plan catalog (Health/Dental/Vision/Life/Disability/401k) with employee/employer cost per pay period, and per-employee enrollments by tier; deliberately parallel to, not merged with, `payroll_core`'s existing flat/percent deduction tables | ✅ 7/10 |
 | **Skills matrix & competency gap analysis** | ✅ Full (2026-07-09) — a skill master, required-proficiency-level requirements keyed by `position.job_title` (free text, matched case-insensitively — no job-title master table exists to key on instead), and per-employee assessed levels; a per-employee gap report and an org-wide gap-ranked summary | ✅ 6/10 |
 | **Workforce analytics & headcount planning** | ✅ Full (2026-07-10) — headcount summary/trend, avg tenure, and trailing-12-month turnover computed from new hire_date/termination_date columns on `people`; per-dept target-vs-actual headcount planning. Only employees with a hire date actually entered count toward tenure/trend — existing employees default to none and are excluded, not backfilled with a fabricated date | ✅ 7/10 |
-| **Applicant Tracking / Recruiting (ATS)** | ❌ | ✅ 5/10 |
+| **Applicant Tracking / Recruiting (ATS)** | ✅ Full (2026-07-10) — job requisitions, candidates, and applications through a fixed pipeline (Applied → Screening → Interview → Offer → Hired/Rejected) with full stage history; hiring a candidate creates a real Personnel record with hire date set, wired directly into Workforce Analytics | ✅ 5/10 |
 
-**Priority gaps:** Applicant Tracking / Recruiting (ATS).
+**Priority gaps:** none remaining in this domain.
 
 ---
 
@@ -1898,6 +1912,41 @@ tables where each branch had independently completed one adjacent row) before me
 
 ---
 
+### 🟢 Priority 8 — Applicant Tracking / Recruiting
+
+#### P8-A: Applicant Tracking / Recruiting (ATS) ✅ Done
+- Job requisitions, candidates, and applications moving through a fixed pipeline (Applied →
+  Screening → Interview → Offer → Hired/Rejected) with a full stage-history audit trail. Closes
+  the last remaining gap in the HR/Payroll & Personnel domain table.
+- **Shipped:** `ats_core.py` — `job_requisition`/`candidate`/`application`/
+  `application_stage_history` tables; `create_requisition`/`update_requisition_status`,
+  `create_candidate`, `create_application`, `advance_stage` (rejects moving an application that's
+  already in a terminal stage — 'Hired' or 'Rejected' — since reopening a closed application
+  isn't supported; create a new application against a reopened requisition instead), and
+  `get_ats_dashboard` (open requisitions, total candidates, a pipeline-stage funnel, recent
+  hires). **The one place this module writes outside itself**: `convert_to_employee` advances an
+  application to 'Hired' and creates a real `people` row via `personnel_core.create_person`, then
+  sets its `hire_date` via `workforce_analytics_core.set_employment_dates` — the same hire_date
+  column P7-C added. This is the only path in the app that sets a hire_date automatically instead
+  of requiring a manual HR entry, so a candidate hired through the ATS is counted correctly by
+  Workforce Analytics from day one; an employee added directly via `/people/new/` (bypassing the
+  ATS entirely) still needs its hire_date set by hand, same as before this module existed — a
+  `people` row stays the single source of truth for actual staff, `candidate` never becomes one
+  until someone is actually hired. New pages at `/ats/` (dashboard + pipeline funnel + recent
+  hires), `/ats/requisitions/` (list + new + detail with an apply-candidate form),
+  `/ats/candidates/` (list + new + detail with an apply-to-requisition form), and
+  `/ats/applications/<id>/` (stage history, advance-stage form, and the hire-conversion form),
+  cross-linked from the Personnel Dashboard. Verified end-to-end against a running dev server +
+  local Postgres through the actual web views: created a requisition and a candidate, applied the
+  candidate to the requisition, advanced the application through Screening → Interview → Offer
+  confirming stage history recorded each transition, hired the candidate and confirmed a real
+  Personnel record was created with the correct hire date and `employment_status = 'active'`,
+  confirmed the now-terminal application correctly hides its advance-stage form, and confirmed
+  Workforce Analytics remained reachable with the new hire counted. Cleaned up all test data
+  afterward.
+
+---
+
 ## Section 3: Competitive Positioning Summary
 
 ### Where This ERP Already Leads or Matches Mid-Market
@@ -1962,6 +2011,7 @@ tables where each branch had independently completed one adjacent row) before me
 | No benefits management | P7-A |
 | No regulatory compliance templates (FDA, ISO) | P7-B |
 | No workforce analytics / headcount planning | P7-C |
+| No Applicant Tracking / Recruiting (ATS) | P8-A |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1994,7 +2044,7 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | Finance / GL | 9/10 | 9/10 | ▲▲▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated + carbon/ESG tracking + Activity-Based Costing (P5-C)) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
-| HR / Payroll | 9/10 | 8/10 | ▲▲▲▲ (ESS portal + skills matrix (P6-C) + benefits management (P7-A) + workforce analytics/headcount planning (P7-C) — only ATS remaining) |
+| HR / Payroll | 9/10 | 9/10 | ▲▲▲▲▲ (ESS portal + skills matrix (P6-C) + benefits management (P7-A) + workforce analytics/headcount planning (P7-C) + ATS (P8-A) — domain fully closed) |
 | Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
@@ -2045,6 +2095,18 @@ in HR/Payroll), and Configure-to-Order/recipe-formula-management/repetitive-manu
 (Production Planning), Supplier Self-Service Portal (Purchasing), Technician Routing/Asset
 Performance Management (Maintenance), and Batch Record Generation (Reporting) — the remaining
 lower-ROI domain gaps not yet scheduled.
+
+**Status update (2026-07-10, later same day):** shipped Applicant Tracking/Recruiting (ATS,
+P8-A), closing HR/Payroll & Personnel's domain table entirely — its `convert_to_employee`
+function ties directly into the hire_date column P7-C added earlier the same day, so a candidate
+hired through the ATS is immediately counted correctly by Workforce Analytics. 45 features
+shipped total. HR/Payroll & Personnel and Quality Management are now the only two Section 1
+domain tables with zero remaining ❌ rows. The gaps still open: Section 3's "Where We Trail
+Enterprise" table (real external-connectivity/hardware dependencies), and four real,
+buildable-without-hardware domain gaps not yet scheduled — Configure-to-Order/recipe-formula-
+management/repetitive-manufacturing (Production Planning), Supplier Self-Service Portal
+(Purchasing), Technician Routing/Asset Performance Management (Maintenance), and Batch Record
+Generation (Reporting).
 
 ---
 
