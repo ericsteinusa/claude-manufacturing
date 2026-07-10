@@ -116,7 +116,10 @@ inventory alerts, CS open tickets), Time Clock (clock in/out + hours), Work Orde
 (list + detail + status transitions), Requisitions (submit + manager approve/deny),
 Approvals (pending approval-workflow steps, approve/reject), Inventory (stock levels
 + reorder alerts), Lots (lot list with qty/expiry), Maintenance (work order list +
-detail + complete), Quality (NCR list + create + detail). Plus `(auth)/login`.
+detail + complete), Quality (NCR list + create + detail), Costing (product search +
+standard cost/roll/history + routing steps, plus Workcenters/GL Accounts reference
+lists — product search reuses `getInventory` from the Inventory screen's API client
+rather than a dedicated product-list endpoint, since none exists). Plus `(auth)/login`.
 To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
 
 ## Web UI (Django) & menu routing
