@@ -99,6 +99,26 @@ net-zero exception. 49 features shipped total. Production Planning & Scheduling 
 HR/Payroll & Personnel, Quality Management, and Purchasing & Procurement as domain tables with
 zero remaining ❌ rows — four of ten.
 
+**2026-07-10, still one more:** Shipped the last three items across Maintenance and Reporting &
+Analytics together: Technician Routing & Scheduling (6/10), Asset Performance Management (6/10),
+and Batch Record Generation (6/10). None of these reimplement math that already existed —
+`technician_routing_core.py` schedules real maintenance work orders (`maint_work_order`) into an
+ordered daily stop list per mechanic, and completing a stop calls the existing
+`maintenance_core.complete_work_order` rather than forking WO completion. `apm_core.py` is the
+missing layer *on top of* the reliability math this app already had (`maintenance_core.get_mtbf`'s
+MTBF/MTTR/availability, computed from real `maint_downtime` records): an admin-set per-asset
+criticality rating combined with that existing availability data and the asset's real downtime
+cost (`maint_downtime.cost`, tracked but never rolled up per asset before) into a health score and
+a repair-vs-replace recommendation. `batch_record_core.py` snapshots a completed Work Order's
+materials, cost (`work_orders_core.get_wo_cost_summary`), and quality inspections
+(`qa_inspection.wo_id`) into a numbered, point-in-time record with a PDF export — the same
+snapshot-not-live-query choice `coa_core` already made for Certificates of Analysis, for the same
+reason: a record that silently changed if someone later edited a WO's materials would defeat the
+point of having a record. 52 features shipped total. **Every domain table in Section 1 now has
+zero remaining ❌ rows — the only gaps left anywhere in this document are Section 3's "Where We
+Trail Enterprise" table, which needs real external hardware/systems this dev environment has no
+live counterpart for.**
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -395,11 +415,11 @@ platform beyond demand forecasting and predictive maintenance.
 | **OEE (Overall Equipment Effectiveness)** | ✅ Full (P1-C, P3-G) — per-workcenter MTD card/trend/report (P1-C) plus a live per-shift dashboard and shop-floor TV display (P3-G) | ✅ 7/10 |
 | **Predictive maintenance (trend-based alerts)** | ✅ Full (P4-B) — rolling interval-based MTBF, days-since-last-failure vs. threshold, 30-day failure-probability risk score | ✅ 7/10 |
 | **Mobile maintenance app** | ✅ (already existed, not credited in original pass) — `mobile/app/(tabs)/maintenance.tsx`: work order list + detail + complete | ✅ 8/10 |
-| **Technician routing & scheduling** | ❌ | ✅ 6/10 |
-| **Asset Performance Management (APM)** | ❌ | ✅ 6/10 |
+| **Technician routing & scheduling** | ✅ Full (2026-07-10) — ordered daily stop lists per mechanic against real maintenance work orders; completing a stop closes the underlying WO through the existing lifecycle, never a fork of it | ✅ 6/10 |
+| **Asset Performance Management (APM)** | ✅ Full (2026-07-10) — admin-set per-asset criticality combined with the existing MTBF/availability math and real downtime cost into a health score and repair-vs-replace recommendation | ✅ 6/10 |
 | **IoT / sensor integration** | ✅ Partial (P4-B) — manual/simulated sensor-reading entry against per-equipment warning/critical thresholds; no real device connectivity | ✅ 6/10 |
 
-**Priority gaps:** technician routing/scheduling, Asset Performance Management, real IoT/sensor hardware connectivity.
+**Priority gaps:** real IoT/sensor hardware connectivity (Section 3's "Where We Trail Enterprise" table).
 
 ---
 
@@ -437,10 +457,10 @@ platform beyond demand forecasting and predictive maintenance.
 | **OEE reporting** | ✅ Full (P1-C, P3-A) — dashboard card/trend + dedicated `/maint/oee/` report | ✅ 7/10 |
 | **Live shop floor performance (real-time)** | ✅ Full (P3-G) — live per-shift OEE dashboard + standalone auto-refreshing TV display | ✅ 7/10 |
 | **Predictive / AI analytics** | ✅ Partial (P4-A, P4-B) — seasonal-decomposition demand forecast (product × month) feeding into MRP, plus MTBF-based equipment failure-risk scoring; no broader embedded-AI analytics platform | ✅ 7/10 |
-| **Batch record generation** | ❌ | ✅ 6/10 |
+| **Batch record generation** | ✅ Full (2026-07-10) — numbered as-built records for completed Work Orders, snapshotting materials/cost/quality inspections at generation time (same snapshot-not-live pattern as CoA generation), with a PDF export | ✅ 6/10 |
 | **Scheduled report delivery (email)** | ✅ Partial (already existed, not credited in original pass) — `send_daily_digest` management command emails/prints a fixed KPI digest via cron/Task Scheduler; not user-configurable like a report builder | ✅ 7/10 |
 
-**Priority gaps:** broader embedded-AI analytics, batch record generation.
+**Priority gaps:** broader embedded-AI analytics platform (Section 3's "Where We Trail Enterprise" table).
 
 ---
 
@@ -2100,6 +2120,66 @@ tables where each branch had independently completed one adjacent row) before me
 
 ---
 
+### 🟢 Priority 11 — Technician Routing, Asset Performance Management, Batch Records
+
+#### P11-A: Technician Routing & Scheduling ✅ Done
+- Ordered daily stop lists per mechanic against real maintenance work orders, so a dispatcher can
+  see and plan one technician's whole day instead of `maint_work_order.assigned_to`'s bare
+  free-text "who's assigned" with no sequencing. Closes one of the last two Maintenance gaps.
+- **Shipped:** `technician_routing_core.py` — `technician_route` (mechanic, date, status) and
+  `technician_route_stop` (ordered `maint_work_order` references with an estimated duration) 
+  tables. `add_stop` auto-assigns the next sequence number; `move_stop` swaps a stop with its
+  neighbor to reorder. `complete_stop` is the one place this module writes outside itself: it
+  calls `maintenance_core.complete_work_order` — the exact same function an internal CMMS user
+  would call — rather than forking work-order completion, then auto-completes the route once every
+  stop on it is done. New pages at `/maint/routes/` (list + new) and `/maint/routes/<id>/`
+  (reorderable stop list, add-stop form, complete-stop actions), cross-linked from the
+  Maintenance Dashboard.
+
+#### P11-B: Asset Performance Management (APM) ✅ Done
+- A per-asset health score and repair-vs-replace recommendation, ranked dashboard worst-first.
+  Closes the last Maintenance gap.
+- **Shipped:** `apm_core.py` — deliberately does not reimplement reliability math that already
+  existed: `maintenance_core.get_mtbf` already computes real MTBF/MTTR/availability from
+  `maint_downtime` records. APM adds the layer on top — `asset_criticality` (admin-set, since no
+  formula can infer how much an asset actually matters to the business) combined with that
+  existing availability data and the asset's real downtime cost (`maint_downtime.cost`, already
+  tracked but never rolled up per asset before this module) into `get_asset_health`'s health score:
+  `availability_pct` penalized by `failure_count × criticality_weight`, clamped to [0, 100]. The
+  recommendation threshold is stricter for higher-criticality assets — the same failure count
+  matters far more on a critical asset than a low-priority one, so a critical asset crosses into
+  "consider replacement" at a higher score than a low-criticality one would. New pages at
+  `/maint/apm/` (ranked dashboard), `/maint/apm/criticality/` (set ratings), and
+  `/maint/apm/asset/` (one asset's health detail + recommendation), cross-linked from the
+  Maintenance Dashboard.
+
+#### P11-C: Batch Record Generation ✅ Done
+- Numbered, point-in-time as-built records for completed Work Orders — materials consumed, cost,
+  and quality inspections performed — with a PDF export. Closes the last Reporting & Analytics
+  gap (aside from the standing broader-embedded-AI-platform Enterprise gap).
+- **Shipped:** `batch_record_core.py` pulls together data that already existed across three other
+  modules (`work_orders_core.get_wo`/`get_wo_materials`/`get_wo_cost_summary`, and `qa_inspection`
+  rows keyed by `wo_id`) and **snapshots** it into `batch_record`/`batch_record_material`/
+  `batch_record_inspection` rows at generation time — the same snapshot-not-live-query choice
+  `coa_core` already made for Certificates of Analysis, for the same reason: a record that
+  silently changed if someone later edited a WO's materials would defeat the point of having a
+  record. `generate_batch_record` only accepts a `'completed'` Work Order — an unfinished job has
+  no as-built story worth recording yet. `render_batch_record_pdf` mirrors the reportlab pattern
+  already established in `coa_core.py`/`customer_portal_core.py`. New pages at `/batch-records/`
+  (list + generate-from-completed-WO form) and `/batch-records/<id>/` (materials, cost, quality
+  inspections, PDF download), cross-linked from the Production Dashboard. Verified end-to-end
+  against a running dev server + local Postgres through the actual web views for all three P11
+  features in this batch: created a mechanic and a maintenance WO, built a route, added a stop,
+  completed it, and confirmed both the underlying maintenance WO and the route itself flipped to
+  completed automatically; logged two breakdown events with real cost against a test asset, set
+  its criticality to critical, and confirmed the APM dashboard and asset detail page surfaced a
+  real repair/replace recommendation (not just raw MTBF numbers); completed a real production WO
+  with materials and a quality inspection attached, generated a batch record, and confirmed the
+  detail page showed the correct snapshotted materials, inspection, and cost ($20.00 material
+  cost = 200 bolts × $0.10), then downloaded a real PDF. Cleaned up all test data afterward.
+
+---
+
 ## Section 3: Competitive Positioning Summary
 
 ### Where This ERP Already Leads or Matches Mid-Market
@@ -2169,6 +2249,9 @@ tables where each branch had independently completed one adjacent row) before me
 | No Configure-to-Order (CTO) | P10-A |
 | No recipe / formula management (process mfg) | P10-B |
 | No repetitive manufacturing | P10-C |
+| No technician routing & scheduling | P11-A |
+| No Asset Performance Management (APM) | P11-B |
+| No batch record generation | P11-C |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -2201,9 +2284,9 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 9/10 | 9/10 | ▲▲▲▲▲ (ESS portal + skills matrix (P6-C) + benefits management (P7-A) + workforce analytics/headcount planning (P7-C) + ATS (P8-A) — domain fully closed) |
-| Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
+| Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B) + technician routing (P11-A) + Asset Performance Management (P11-B); mobile app now credited — domain fully closed apart from real IoT hardware) |
 | IT Management | 10/10 | 9/10 | — |
-| Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
+| Reporting / Analytics | 9/10 | 9/10 | ▲▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), batch record generation (P11-C), digest now credited — domain fully closed apart from a broader embedded-AI platform) |
 | Scheduling / APS | 9/10 | 7/10 | ▲▲▲▲▲▲▲ (P3-A finite capacity scheduling + what-if scenario planning (P5-A) + Configure-to-Order (P10-A) + recipe/formula management (P10-B) + repetitive manufacturing (P10-C) — domain fully closed) |
 | WMS / Shipping | 9/10 | 7/10 | ▲▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K) + cross-docking (P3-L)) |
 | **Overall** | **9.3/10** | **8.6/10** | **▲ from 7.1 / 5.9** |
@@ -2284,6 +2367,18 @@ Management, Purchasing & Procurement, Production Planning & Scheduling) now have
 table (real external-connectivity/hardware dependencies), and two real, buildable-without-hardware
 domain gaps not yet scheduled — Technician Routing/Asset Performance Management (Maintenance) and
 Batch Record Generation (Reporting).
+
+**Status update (2026-07-10, final):** shipped the last three items anywhere in this roadmap —
+Technician Routing & Scheduling (P11-A), Asset Performance Management (P11-B), and Batch Record
+Generation (P11-C) — closing both Maintenance and Reporting & Analytics entirely. See Priority 11
+above. 52 features shipped total. **Every domain table in Section 1 now has zero remaining ❌
+rows.** The only gap left anywhere in this document is Section 3's "Where We Trail Enterprise"
+table — real external-connectivity/hardware dependencies (broader embedded-AI analytics, real
+IoT/sensor/RFID hardware, real carrier-API tracking, real AS2/EDI transport, a live e-commerce
+storefront) that this dev environment has no live counterpart for, and which every affected
+feature (predictive maintenance, RFID, EDI, e-commerce) already ships real logic behind an
+honestly-scoped manual/simulated stand-in for, rather than faking the missing hardware/system
+outright.
 
 ---
 

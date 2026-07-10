@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block page_title %}Technician Routes{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/" class="btn">Maintenance Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/maint/routes/new/" class="btn btn-primary">+ New Route</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Technician Routes</div>
+
+    <form method="get" style="margin-bottom:14px;">
+        <select name="status" onchange="this.form.submit()" style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+            <option value="" {% if not status %}selected{% endif %}>All Statuses</option>
+            {% for s in route_statuses %}
+            <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if routes %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Mechanic</th><th>Date</th><th class="num">Stops</th><th class="num">Completed</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                {% for r in routes %}
+                <tr>
+                    <td><a href="/maint/routes/{{ r.id }}/">{{ r.mechanic_name }}</a></td>
+                    <td>{{ r.route_date }}</td>
+                    <td class="num">{{ r.stop_count }}</td>
+                    <td class="num">{{ r.completed_count }}</td>
+                    <td>
+                        {% if r.status == 'completed' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Completed</span>
+                        {% elif r.status == 'in_progress' %}
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">In Progress</span>
+                        {% else %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">Planned</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/maint/routes/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No routes yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

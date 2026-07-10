@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block page_title %}{{ record.batch_record_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/batch-records/" class="btn">Batch Records</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:900px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ record.batch_record_number }}
+        <a href="/batch-records/{{ record.id }}/pdf/" class="btn" style="float:right;" target="_blank">Download PDF</a>
+    </div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Work Order: {{ record.wo_number }} · Product: {{ record.product_name }} · Qty: {{ record.quantity }}<br>
+        Generated {{ record.generated_at }} by {{ record.generated_by|default:"—" }}
+    </p>
+
+    <div class="card">
+        <h3>Cost Summary</h3>
+        <p>Material Cost: ${{ record.material_cost|floatformat:2 }}<br>
+           Labor Cost: ${{ record.labor_cost|floatformat:2 }}<br>
+           <strong>Total Cost: ${{ record.total_cost|floatformat:2 }}</strong></p>
+    </div>
+
+    <div class="card">
+        <h3>Materials Consumed</h3>
+        {% if record.materials %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Component</th><th class="num">Qty Required</th><th class="num">Qty Issued</th></tr></thead>
+                <tbody>
+                    {% for m in record.materials %}
+                    <tr><td>{{ m.component_name }}</td><td class="num">{{ m.qty_required }}</td><td class="num">{{ m.qty_issued }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No materials recorded.</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Quality Inspections</h3>
+        {% if record.inspections %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Inspection #</th><th>Inspector</th><th>Date</th><th>Result</th></tr></thead>
+                <tbody>
+                    {% for i in record.inspections %}
+                    <tr><td>{{ i.insp_number }}</td><td>{{ i.inspector }}</td><td>{{ i.insp_date }}</td><td>{{ i.result }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No quality inspections tied to this work order.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
