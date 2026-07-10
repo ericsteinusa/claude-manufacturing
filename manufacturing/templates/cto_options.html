@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block page_title %}{{ product.name }} — Options{% endblock %}
+
+{% block toolbar_left %}
+<a href="/cto/products/" class="btn">Configure-to-Order</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ product.name }} — Option Groups</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% for group in groups %}
+    <div class="card">
+        <h3>{{ group.name }}</h3>
+        {% if group.options %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Option</th><th>Component</th><th class="num">Qty</th></tr></thead>
+                <tbody>
+                    {% for opt in group.options %}
+                    <tr>
+                        <td>{{ opt.name }}</td>
+                        <td>{{ opt.component_name }}</td>
+                        <td class="num">{{ opt.qty_required }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No options in this group yet.</div>
+        {% endif %}
+        {% if can_edit %}
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_option">
+            <input type="hidden" name="group_id" value="{{ group.id }}">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Option Name *</label>
+                    <input type="text" name="name" required placeholder="e.g. Red">
+                </div>
+                <div class="form-row">
+                    <label>Component *</label>
+                    <select name="component_id" required>
+                        {% for c in components %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Qty Required</label>
+                    <input type="number" name="qty_required" step="0.01" min="0" value="1">
+                </div>
+            </div>
+            <button type="submit" class="btn">Add Option</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Option Group</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:end;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_group">
+            <div class="form-row">
+                <label>Group Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Frame Color">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Group</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_title %}Configure-to-Order{% endblock %}
+
+{% block toolbar_left %}
+<a href="/bom/" class="btn">BOM</a>
+<a href="/prod/" class="btn">Production Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Configure-to-Order</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Set up option groups per make product below, then configure individual sales order
+        lines from the SO detail page's "Configure" link.
+    </p>
+
+    {% if products %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Product</th><th>Configurable</th><th></th></tr></thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>
+                        {% if p.is_configurable %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Yes</span>
+                        {% else %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">No</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/cto/products/{{ p.id }}/options/" class="btn" style="padding:3px 10px;font-size:12px;">Manage Options</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No make products yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

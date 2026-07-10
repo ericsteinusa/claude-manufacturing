@@ -80,6 +80,25 @@ keying in a phoned-in quote, scoped by an ownership check against `rfq_vendor` (
 were actually invited to quote). 46 features shipped total. Purchasing & Procurement joins
 HR/Payroll & Personnel and Quality Management as domain tables with zero remaining ❌ rows.
 
+**2026-07-10, one more still:** Shipped the last three items in Production Planning &
+Scheduling's domain table together: Configure-to-Order (7/10), Recipe/Formula Management (7/10),
+and Repetitive Manufacturing (7/10) — closing that domain out entirely. All three release a real
+Work Order through the existing `work_orders_core.create_wo`, never forking WO creation: CTO
+(`cto_core.py`) resolves a per-SO-line configuration (option groups mapped to BOM-component
+substitutions) into a configured material list and fills a genuine prior gap — there was no
+SO-to-WO conversion path anywhere in this app before, production was always planned from
+aggregate MRP demand. Recipe management (`recipe_core.py`) is a deliberately parallel structure
+to the fixed-qty `bom` table, not a fork of it, since scaling a batch formula to an arbitrary
+target output while accounting for process yield loss is a genuinely different computation than
+BOM's per-unit `explode_quantity`. Repetitive manufacturing (`repetitive_core.py`) models
+flow-line production directly — a rate-per-day schedule with daily output logging — rather than
+faking it with one Work Order per day; logging output backflushes BOM components through the same
+audited `inventory_core.record_transaction` path every other stock movement in this app already
+uses (an 'issue' per component, a 'receive' for the finished good), not a bypass or a new
+net-zero exception. 49 features shipped total. Production Planning & Scheduling joins
+HR/Payroll & Personnel, Quality Management, and Purchasing & Procurement as domain tables with
+zero remaining ❌ rows — four of ten.
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -197,11 +216,11 @@ platform beyond demand forecasting and predictive maintenance.
 | **Constraint-based sequencing** | ✅ Partial — cross-workcenter operation ordering enforced; load leveling is a greedy heuristic, not a true solver | ✅ 7/10 (Infor core) |
 | **Bottleneck analysis** | ✅ Full (P3-A) — utilization-% ranking | ✅ 7/10 |
 | **What-if scenario planning** | ✅ Full (2026-07-09) — compares hypothetical demand/capacity adjustments against real MRP and workcenter data entirely in memory, nothing persisted against real data | ✅ 8/10 |
-| **Configure-to-Order (CTO)** | ❌ | ✅ 7/10 |
-| **Recipe / formula management (process mfg)** | ❌ | ✅ 7/10 |
-| **Repetitive manufacturing** | ❌ | ✅ 7/10 |
+| **Configure-to-Order (CTO)** | ✅ Full (2026-07-10) — per-product option groups mapped to BOM-component substitutions; a resolved configuration releases a real Work Order with per-order materials, filling a gap where no SO-to-WO path existed at all before | ✅ 7/10 |
+| **Recipe / formula management (process mfg)** | ✅ Full (2026-07-10) — batch-based recipes with a draft→active→superseded lifecycle, scaling to any target output that correctly accounts for process yield loss | ✅ 7/10 |
+| **Repetitive manufacturing** | ✅ Full (2026-07-10) — rate-per-day production schedules with daily output logging that automatically backflushes BOM components through the same audited inventory_core.record_transaction path every other stock movement uses | ✅ 7/10 |
 
-**Priority gaps:** Configure-to-Order, recipe/formula management (process mfg), repetitive manufacturing.
+**Priority gaps:** none remaining in this domain.
 
 ---
 
@@ -2007,6 +2026,80 @@ tables where each branch had independently completed one adjacent row) before me
 
 ---
 
+### 🟠 Priority 10 — Configure-to-Order, Recipe Management, Repetitive Manufacturing
+
+#### P10-A: Configure-to-Order (CTO) ✅ Done
+- Per-product option groups (e.g. "Frame Color") each holding mutually-exclusive options, each
+  mapped to a BOM-component substitution; a customer's actual selections for one SO line resolve
+  into a configured material list that releases a real Work Order. Closes one of three remaining
+  Production Planning & Scheduling gaps.
+- **Shipped:** `cto_core.py` — `cto_option_group`/`cto_option` (product-level setup) and
+  `cto_configuration`/`cto_configuration_selection` (per-SO-line selections) tables.
+  `generate_configured_bom` resolves a configuration: every base BOM line (via
+  `bom_web_core.get_bom`) except the ones covered by an option group's slot components, plus the
+  selected options' own components — the base `bom` table stays the single source of truth for
+  the product's fixed structure, only the option-covered slots get swapped. **There was no
+  SO-to-WO conversion path anywhere else in this app before this** — production has always been
+  planned from aggregate confirmed-SO demand via MRP, never by converting one SO line into its
+  own WO. `release_configured_wo` fills that gap for the CTO case specifically (where the whole
+  point is that *this* order's WO needs *this* customer's exact configuration), reusing
+  `work_orders_core.create_wo` and `bom_core.explode_quantity` — no forked WO-creation logic.
+  Rejects releasing an incomplete configuration (a selection missing for any option group). New
+  pages at `/cto/products/` (which make products are configurable), `/cto/products/<id>/options/`
+  (set up groups/options), and `/cto/configure/<so_item_id>/` (make selections, see the resolved
+  material list, release the WO), cross-linked from the Production Dashboard and a new
+  "Configure" link on each SO line item.
+
+#### P10-B: Recipe / Formula Management (Process Manufacturing) ✅ Done
+- Batch-based recipes for process manufacturing, with a draft→active→superseded lifecycle and
+  scaling to any target output quantity that correctly accounts for process yield loss.
+- **Shipped:** `recipe_core.py` — `recipe` (product, batch_size, batch_uom, yield_pct, status)
+  and `recipe_ingredient` (qty per batch) tables. Deliberately **parallel to the `bom` table, not
+  a fork or a replacement of it** — the same "parallel, not merged" scoping already used for
+  FIFO/LIFO cost layers next to standard costing: BOM's `qty_required` is a fixed per-unit
+  quantity, right for discrete assembly, but a recipe scales per **batch**, and yield loss means
+  scaling isn't a straight ratio — producing more good output than one batch normally yields
+  requires proportionally *more* input than the naive (target / batch_size) multiply would give,
+  which `scale_recipe` computes correctly (`batches_needed = target_qty / (batch_size *
+  yield_fraction)`). `activate_recipe` mirrors `document_control_core`'s single-active-revision
+  pattern — activating one recipe automatically supersedes whichever was previously active for
+  the same product, so exactly one recipe is ever the one `release_batch_wo` actually uses.
+  `release_batch_wo` creates a real WO via `work_orders_core.create_wo` with materials populated
+  from the scaled recipe. New pages at `/recipes/` (list + new), `/recipes/<id>/` (ingredients,
+  activation, scale-preview, batch release), cross-linked from the Production Dashboard.
+
+#### P10-C: Repetitive Manufacturing ✅ Done
+- Rate-per-day production schedules (product + workcenter) with daily output logging that
+  automatically backflushes BOM components, instead of a discrete Work Order per production run.
+  Closes the last remaining Production Planning & Scheduling gap.
+- **Shipped:** `repetitive_core.py` — `repetitive_schedule` (rate_per_day, effective date range,
+  active/inactive) and `repetitive_production_log` (one row per day's completed/scrapped qty)
+  tables. `log_production` is the core of the module: for the units completed, it computes the
+  BOM-derived component quantities (reusing `bom_web_core.get_bom` + `bom_core.explode_quantity`
+  — no forked BOM logic) and posts them through `inventory_core.record_transaction` — an
+  `'issue'` for each component and a `'receive'` for the finished product, **the same audited
+  transaction path every other inventory movement in this app already goes through**, not a new
+  bypass or net-zero exception. Scrapped units are logged but not backflushed — no component
+  consumption or output credit for units that didn't ship. `get_schedule_summary` reports planned
+  (rate × days in range) vs. actual vs. scrapped vs. attainment % over any date range. New pages
+  at `/repetitive/` (list + new), `/repetitive/<id>/` (status, log production, production log,
+  planned-vs-actual), cross-linked from the Production Dashboard. Verified end-to-end against a
+  running dev server + local Postgres through the actual web views for all three P10 features in
+  this batch: configured a bike's frame-color option, released a WO and confirmed its materials
+  contained only the selected color's component (not the unselected one); created and activated a
+  syrup recipe at 80% yield, confirmed the scaled-ingredient preview and the released batch WO's
+  materials both correctly required more sugar than a naive linear scale would (400 kg sugar for
+  a 500 kg target, not 320 kg); created a repetitive schedule and logged 50 completed + 2 scrapped
+  units, confirming the finished product's on-hand quantity increased by exactly 50 and its BOM
+  component's on-hand quantity decreased by exactly 200 (4 per unit × 50) via real inventory
+  transactions. **Found and fixed one real bug while verifying end-to-end:** the CTO release
+  view passed the release-quantity form field through as a raw string, and `round()` on a string
+  raised `TypeError: type str doesn't define __round__ method` — fixed by coercing to `float()` in
+  the view before calling `release_configured_wo`, the same coercion pattern every other numeric
+  form field in this batch already used. Cleaned up all test data afterward.
+
+---
+
 ## Section 3: Competitive Positioning Summary
 
 ### Where This ERP Already Leads or Matches Mid-Market
@@ -2073,6 +2166,9 @@ tables where each branch had independently completed one adjacent row) before me
 | No workforce analytics / headcount planning | P7-C |
 | No Applicant Tracking / Recruiting (ATS) | P8-A |
 | No supplier self-service portal | P9-A |
+| No Configure-to-Order (CTO) | P10-A |
+| No recipe / formula management (process mfg) | P10-B |
+| No repetitive manufacturing | P10-C |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -2085,7 +2181,6 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 |---|---|
 | No broader embedded-AI analytics platform | Very High |
 | No real IoT / sensor / RFID hardware integration (predictive maintenance and RFID both ship with real logic behind a manual/simulated stand-in for live hardware) | Very High |
-| No supplier self-service portal | High |
 | No real carrier-API shipment tracking (FedEx/UPS/USPS) | Medium–High |
 | No real AS2/VAN/SFTP EDI transport (file upload/download stub only) | Medium |
 | No live storefront to verify outbound e-commerce sync against (config-gated HTTP code only) | Low–Medium |
@@ -2109,7 +2204,7 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
-| Scheduling / APS | 8/10 | 6/10 | ▲▲▲▲ (P3-A finite capacity scheduling + what-if scenario planning (P5-A)) |
+| Scheduling / APS | 9/10 | 7/10 | ▲▲▲▲▲▲▲ (P3-A finite capacity scheduling + what-if scenario planning (P5-A) + Configure-to-Order (P10-A) + recipe/formula management (P10-B) + repetitive manufacturing (P10-C) — domain fully closed) |
 | WMS / Shipping | 9/10 | 7/10 | ▲▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K) + cross-docking (P3-L)) |
 | **Overall** | **9.3/10** | **8.6/10** | **▲ from 7.1 / 5.9** |
 
@@ -2179,6 +2274,16 @@ external-connectivity/hardware dependencies), and three real, buildable-without-
 gaps not yet scheduled — Configure-to-Order/recipe-formula-management/repetitive-manufacturing
 (Production Planning), Technician Routing/Asset Performance Management (Maintenance), and Batch
 Record Generation (Reporting).
+
+**Status update (2026-07-10, one more still):** shipped the last three Production Planning &
+Scheduling gaps together — Configure-to-Order (P10-A), Recipe/Formula Management (P10-B), and
+Repetitive Manufacturing (P10-C) — closing that domain table entirely. See Priority 10 above.
+49 features shipped total. Four of ten Section 1 domain tables (HR/Payroll & Personnel, Quality
+Management, Purchasing & Procurement, Production Planning & Scheduling) now have zero remaining
+❌ rows. The only gaps left anywhere in this document: Section 3's "Where We Trail Enterprise"
+table (real external-connectivity/hardware dependencies), and two real, buildable-without-hardware
+domain gaps not yet scheduled — Technician Routing/Asset Performance Management (Maintenance) and
+Batch Record Generation (Reporting).
 
 ---
 

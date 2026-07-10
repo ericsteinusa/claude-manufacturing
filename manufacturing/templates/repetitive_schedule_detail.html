@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block page_title %}{{ schedule.product_name }} — Repetitive Schedule{% endblock %}
+
+{% block toolbar_left %}
+<a href="/repetitive/" class="btn">Repetitive Manufacturing</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:22px; font-weight:bold; color:var(--accent); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ schedule.product_name }} — {{ schedule.workcenter_name|default:"Unassigned" }}
+        {% if schedule.status == 'active' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        {% else %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        {% endif %}
+    </div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Rate: {{ schedule.rate_per_day }} / day · Effective {{ schedule.effective_start }}{% if schedule.effective_end %} – {{ schedule.effective_end }}{% endif %}
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Status</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_status">
+            <select name="status">
+                {% for s in schedule_statuses %}
+                <option value="{{ s }}" {% if s == schedule.status %}selected{% endif %}>{{ s|title }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Update Status</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Log Production</h3>
+        <p style="font-size:12px;color:var(--text-muted);">
+            Completed units are backflushed automatically: components are issued and the finished product is received.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="log">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Production Date *</label>
+                    <input type="date" name="production_date" value="{{ today }}" required>
+                </div>
+                <div class="form-row">
+                    <label>Qty Completed *</label>
+                    <input type="number" name="qty_completed" step="0.01" min="0" required>
+                </div>
+                <div class="form-row">
+                    <label>Qty Scrapped</label>
+                    <input type="number" name="qty_scrapped" step="0.01" min="0" value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Log &amp; Backflush</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Production Log</h3>
+        {% if log_entries %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Date</th><th class="num">Completed</th><th class="num">Scrapped</th></tr></thead>
+                <tbody>
+                    {% for entry in log_entries %}
+                    <tr>
+                        <td>{{ entry.production_date }}</td>
+                        <td class="num">{{ entry.qty_completed }}</td>
+                        <td class="num">{{ entry.qty_scrapped }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No production logged yet.</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Planned vs. Actual</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:end;margin-bottom:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="summary">
+            <div class="form-row">
+                <label>From</label>
+                <input type="date" name="date_from" required>
+            </div>
+            <div class="form-row">
+                <label>To</label>
+                <input type="date" name="date_to" required>
+            </div>
+            <button type="submit" class="btn">Compute</button>
+        </form>
+        {% if summary %}
+        <div class="kpi-row">
+            <div class="kpi"><div class="lbl">Planned</div><div class="val">{{ summary.planned_qty }}</div></div>
+            <div class="kpi"><div class="lbl">Actual</div><div class="val">{{ summary.actual_qty }}</div></div>
+            <div class="kpi"><div class="lbl">Scrapped</div><div class="val">{{ summary.scrapped_qty }}</div></div>
+            <div class="kpi"><div class="lbl">Attainment</div><div class="val">{% if summary.attainment_pct != None %}{{ summary.attainment_pct }}%{% else %}—{% endif %}</div></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

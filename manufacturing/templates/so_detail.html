@@ -200,8 +200,11 @@
                     <td class="num">${{ it.line_total|floatformat:2 }}</td>
                     {% if can_edit %}
                     <td class="num">
+                        {% if it.product_id %}
+                        <a href="/cto/configure/{{ it.id }}/" class="btn btn-sm">Configure</a>
+                        {% endif %}
                         <form method="post" action="/so/{{ so.id }}/items/remove/"
-                              onsubmit="return confirm('Remove this line item?');">
+                              onsubmit="return confirm('Remove this line item?');" style="display:inline;">
                             {% csrf_token %}
                             <input type="hidden" name="item_id" value="{{ it.id }}">
                             <button type="submit" class="btn btn-sm">Remove</button>

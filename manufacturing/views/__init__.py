@@ -256,6 +256,9 @@ from ._regulatory_compliance import *  # noqa: F401,F403
 from ._workforce_analytics import *  # noqa: F401,F403
 from ._ats import *  # noqa: F401,F403
 from ._supplier_portal import *  # noqa: F401,F403
+from ._cto import *  # noqa: F401,F403
+from ._recipe import *  # noqa: F401,F403
+from ._repetitive import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

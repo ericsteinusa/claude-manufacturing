@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block page_title %}Configure — {{ item.description }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/so/{{ item.so_id }}/" class="btn">Back to Order</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:800px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.opt-choice { display:flex; align-items:center; gap:8px; padding:6px 0; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">Configure — {{ item.description }}
+        {% if complete %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Complete</span>
+        {% else %}
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">In Progress</span>
+        {% endif %}
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if not groups %}
+    <div class="empty-state">This product has no configurable option groups yet.</div>
+    {% endif %}
+
+    {% for group in groups %}
+    <div class="card">
+        <h3>{{ group.name }}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="select">
+            <input type="hidden" name="group_id" value="{{ group.id }}">
+            {% for opt in group.options %}
+            <div class="opt-choice">
+                <input type="radio" name="option_id" value="{{ opt.id }}" id="opt-{{ opt.id }}"
+                    {% for sel in configuration.selections %}{% if sel.group_id == group.id and sel.option_id == opt.id %}checked{% endif %}{% endfor %}
+                    onchange="this.form.submit()" {% if not can_edit %}disabled{% endif %}>
+                <label for="opt-{{ opt.id }}">{{ opt.name }}</label>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+    {% endfor %}
+
+    {% if complete %}
+    <div class="card">
+        <h3>Resolved Configuration</h3>
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Component</th><th class="num">Qty per Unit</th><th>Source</th></tr></thead>
+                <tbody>
+                    {% for line in resolved %}
+                    <tr>
+                        <td>{{ line.component_name|default:line.component_id }}</td>
+                        <td class="num">{{ line.qty_required }}</td>
+                        <td>{{ line.source }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if can_edit %}
+        <form method="post" style="margin-top:16px;display:flex;gap:10px;align-items:end;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="release">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:12px;color:#555;font-weight:bold;">Quantity</label>
+                <input type="number" name="quantity" min="1" value="{{ item.qty|default:1 }}"
+                       style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:100px;">
+            </div>
+            <button type="submit" class="btn btn-primary">Release Work Order</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

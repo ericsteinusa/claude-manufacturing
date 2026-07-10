@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_title %}Recipes{% endblock %}
+
+{% block toolbar_left %}
+<a href="/bom/" class="btn">BOM</a>
+<a href="/prod/" class="btn">Production Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/recipes/new/" class="btn btn-primary">+ New Recipe</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Recipes / Formulas</div>
+
+    <form method="get" style="margin-bottom:14px;">
+        <select name="status" onchange="this.form.submit()" style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+            <option value="" {% if not status %}selected{% endif %}>All Statuses</option>
+            {% for s in recipe_statuses %}
+            <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if recipes %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Name</th><th>Product</th><th>Revision</th><th class="num">Batch Size</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                {% for r in recipes %}
+                <tr>
+                    <td><a href="/recipes/{{ r.id }}/">{{ r.name }}</a></td>
+                    <td>{{ r.product_name }}</td>
+                    <td>{{ r.revision }}</td>
+                    <td class="num">{{ r.batch_size }} {{ r.batch_uom }}</td>
+                    <td>
+                        {% if r.status == 'active' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        {% elif r.status == 'superseded' %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+                        {% else %}
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/recipes/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No recipes yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

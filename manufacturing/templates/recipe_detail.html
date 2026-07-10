@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block page_title %}{{ recipe.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/recipes/" class="btn">Recipes</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ recipe.name }} ({{ recipe.product_name }}, Rev {{ recipe.revision }})
+        {% if recipe.status == 'active' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        {% elif recipe.status == 'superseded' %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+        {% else %}
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+        {% endif %}
+    </div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Batch size: {{ recipe.batch_size }} {{ recipe.batch_uom }} · Yield: {{ recipe.yield_pct }}%
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Ingredients</h3>
+        {% if recipe.ingredients %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Component</th><th class="num">Qty / Batch</th><th>UOM</th></tr></thead>
+                <tbody>
+                    {% for ing in recipe.ingredients %}
+                    <tr>
+                        <td>{{ ing.component_name }}</td>
+                        <td class="num">{{ ing.qty_per_batch }}</td>
+                        <td>{{ ing.uom }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No ingredients added yet.</div>
+        {% endif %}
+
+        {% if can_edit and recipe.status == 'draft' %}
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_ingredient">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Component *</label>
+                    <select name="component_id" required>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Qty / Batch *</label>
+                    <input type="number" name="qty_per_batch" step="0.01" min="0.01" required>
+                </div>
+                <div class="form-row">
+                    <label>UOM</label>
+                    <input type="text" name="uom" value="kg">
+                </div>
+                <div class="form-row">
+                    <label>Sequence</label>
+                    <input type="number" name="sequence" value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn">Add Ingredient</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if can_edit and recipe.status == 'draft' %}
+    <div class="card">
+        <h3>Activate</h3>
+        <p style="font-size:12px;color:var(--text-muted);">Activating this recipe supersedes any other active recipe for this product.</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="activate">
+            <button type="submit" class="btn">Activate Recipe</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if recipe.status == 'active' %}
+    <div class="card">
+        <h3>Scale / Release a Batch</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:end;margin-bottom:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="scale">
+            <div class="form-row">
+                <label>Target Qty</label>
+                <input type="number" name="target_qty" step="0.01" min="0.01" required>
+            </div>
+            <button type="submit" class="btn">Preview Scaled Ingredients</button>
+        </form>
+
+        {% if scaled %}
+        <div class="erp-table-wrap" style="margin-bottom:14px;">
+            <table class="erp-table">
+                <thead><tr><th>Component</th><th class="num">Qty Needed</th><th>UOM</th></tr></thead>
+                <tbody>
+                    {% for s in scaled %}
+                    <tr><td>{{ s.component_name }}</td><td class="num">{{ s.qty_needed }}</td><td>{{ s.uom }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if can_edit %}
+        <form method="post" style="display:flex;gap:10px;align-items:end;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="release">
+            <div class="form-row">
+                <label>Release Qty *</label>
+                <input type="number" name="target_qty" step="0.01" min="0.01" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Release Batch Work Order</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
