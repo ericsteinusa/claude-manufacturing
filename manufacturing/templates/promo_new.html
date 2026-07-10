@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block page_title %}New Promotion{% endblock %}
+
+{% block toolbar_left %}
+<a href="/promotions/" class="btn">Discounts &amp; Promotions</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.promo-wrap { width:100%; max-width:560px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="promo-wrap">
+    <div class="menu-title">New Promotion</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Summer Clearance">
+            </div>
+            <div class="form-grid-2">
+                <div class="form-row">
+                    <label>Discount Type</label>
+                    <select name="discount_type">
+                        {% for dt in discount_types %}
+                        <option value="{{ dt }}">{{ dt|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Discount Value</label>
+                    <input type="number" name="discount_value" step="0.01" min="0" value="0.00">
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Product (leave blank for all products)</label>
+                <select name="product_id">
+                    <option value="">— All products —</option>
+                    {% for p in products %}
+                    <option value="{{ p.id }}">{{ p.product_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Customer (leave blank for all customers)</label>
+                <select name="customer_id">
+                    <option value="">— All customers —</option>
+                    {% for c in customers %}
+                    <option value="{{ c.id }}">{{ c.company_name|default:c.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Minimum Qty</label>
+                <input type="number" name="min_qty" step="any" min="0" value="1">
+            </div>
+            <div class="form-grid-2">
+                <div class="form-row">
+                    <label>Start Date (optional)</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div class="form-row">
+                    <label>End Date (optional)</label>
+                    <input type="date" name="end_date">
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="Optional notes">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Promotion</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

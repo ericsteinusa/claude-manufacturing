@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block page_title %}{{ coa.coa_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/coa/" class="btn">Certificates of Analysis</a>
+<a href="/qa/coa/{{ coa.id }}/pdf/" class="btn btn-primary">⬇ Download PDF</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.coa-wrap { width:100%; max-width:760px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; font-size:13px; }
+.meta-grid dt { color:var(--text-muted); font-weight:bold; }
+.meta-grid dd { margin:0; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="coa-wrap">
+    <div class="menu-title">{{ coa.coa_number }}
+        {% if coa.overall_result == 'pass' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Pass</span>
+        {% elif coa.overall_result == 'fail' %}
+        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Fail</span>
+        {% else %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Pending</span>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Certificate Header</h3>
+        <dl class="meta-grid">
+            <dt>Product</dt><dd>{{ coa.product_name }}</dd>
+            <dt>Lot Number</dt><dd>{{ coa.lot_number }}</dd>
+            <dt>Issued Date</dt><dd>{{ coa.issued_date }}</dd>
+            <dt>Issued By</dt><dd>{{ coa.issued_by|default:"—" }}</dd>
+            <dt>Notes</dt><dd>{{ coa.notes|default:"—" }}</dd>
+        </dl>
+    </div>
+
+    <div class="card">
+        <h3>Certified Characteristics</h3>
+        {% if results %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Characteristic</th>
+                        <th class="num">Measured</th>
+                        <th class="num">Target</th>
+                        <th class="num">LCL</th>
+                        <th class="num">UCL</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td>{{ r.characteristic }}</td>
+                        <td class="num">{{ r.measured_value|default:"—"|floatformat:3 }}</td>
+                        <td class="num">{{ r.target|default:"—"|floatformat:3 }}</td>
+                        <td class="num">{{ r.lcl|default:"—"|floatformat:3 }}</td>
+                        <td class="num">{{ r.ucl|default:"—"|floatformat:3 }}</td>
+                        <td>
+                            {% if r.result == 'pass' %}
+                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Pass</span>
+                            {% elif r.result == 'fail' %}
+                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Fail</span>
+                            {% else %}
+                            <span class="pill" style="font-size:11px;padding:2px 8px;">No Spec</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No characteristics recorded.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

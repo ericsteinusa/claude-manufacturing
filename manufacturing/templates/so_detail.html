@@ -251,6 +251,7 @@
                         <label>Unit Price</label>
                         <input type="number" name="unit_price" min="0"
                                step="0.01" value="0.00" id="so-add-unit-price">
+                        <span id="so-add-promo" style="font-size:11px;color:#1a7f37;"></span>
                     </div>
                     <div>
                         <button type="submit" class="btn">Add</button>
@@ -261,22 +262,44 @@
         <script>
         (function () {
             var priceTiers = {{ price_tiers_json|safe }};
+            var promoTiers = {{ promo_tiers_json|safe }};
             var atpData = {{ atp_json|safe }};
             var productSel = document.getElementById('so-add-product');
             var qtyInput = document.getElementById('so-add-qty');
             var priceInput = document.getElementById('so-add-unit-price');
             var atpSpan = document.getElementById('so-add-atp');
+            var promoSpan = document.getElementById('so-add-promo');
             if (!productSel || !qtyInput || !priceInput) return;
+
+            function applyDiscount(basePrice, qty) {
+                var list = promoTiers[productSel.value] || promoTiers['__all__'];
+                if (!list || !list.length) return null;
+                for (var i = 0; i < list.length; i++) {
+                    var minQty = list[i][0], type = list[i][1], value = list[i][2], name = list[i][3];
+                    if (qty >= minQty) {
+                        var discounted = type === 'percent'
+                            ? basePrice * (1 - value / 100)
+                            : Math.max(0, basePrice - value);
+                        return { price: discounted, name: name };
+                    }
+                }
+                return null;
+            }
 
             function applyPrice() {
                 var tiers = priceTiers[productSel.value];
-                if (!tiers || !tiers.length) return;
                 var qty = parseFloat(qtyInput.value) || 0;
-                for (var i = 0; i < tiers.length; i++) {
-                    if (qty >= tiers[i][0]) {
-                        priceInput.value = tiers[i][1].toFixed(2);
-                        return;
+                var basePrice = null;
+                if (tiers && tiers.length) {
+                    for (var i = 0; i < tiers.length; i++) {
+                        if (qty >= tiers[i][0]) { basePrice = tiers[i][1]; break; }
                     }
+                }
+                if (basePrice === null) basePrice = parseFloat(priceInput.value) || 0;
+                var promo = applyDiscount(basePrice, qty);
+                priceInput.value = (promo ? promo.price : basePrice).toFixed(2);
+                if (promoSpan) {
+                    promoSpan.textContent = promo ? ('Promo applied: ' + promo.name) : '';
                 }
             }
 

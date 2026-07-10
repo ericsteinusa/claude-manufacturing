@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block page_title %}Job Skill Requirements{% endblock %}
+
+{% block toolbar_left %}
+<a href="/skills/" class="btn">Skills</a>
+<a href="/skills/matrix/" class="btn">Skills Matrix</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Job Skill Requirements</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Requirements</h3>
+        {% if requirements %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Skill</th>
+                        <th class="num">Required Level</th>
+                        <th>Notes</th>
+                        {% if can_edit %}<th></th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in requirements %}
+                    <tr>
+                        <td>{{ r.job_title }}</td>
+                        <td>{{ r.skill_name }}</td>
+                        <td class="num">{{ r.required_level }}</td>
+                        <td>{{ r.notes|default:"—" }}</td>
+                        {% if can_edit %}
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="req_id" value="{{ r.id }}">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No requirements defined yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Requirement</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Job Title</label>
+                    <input type="text" name="job_title" required list="job-title-options" placeholder="e.g. Welder">
+                    <datalist id="job-title-options">
+                        {% for jt in job_titles %}
+                        <option value="{{ jt }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="form-row">
+                    <label>Skill</label>
+                    <select name="skill_id" required>
+                        {% for s in skills %}
+                        <option value="{{ s.id }}">{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Required Level</label>
+                    <select name="required_level">
+                        {% for lvl, label in skill_level_choices %}
+                        <option value="{{ lvl }}">{{ lvl }} — {{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Requirement</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

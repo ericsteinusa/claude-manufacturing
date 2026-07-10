@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block page_title %}Certificates of Analysis{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">Quality Home</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/qa/coa/new/" class="btn btn-primary">+ Generate CoA</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Certificates of Analysis</div>
+
+    <form method="get" style="margin-bottom:14px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search CoA #, product, or lot..."
+               style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:260px;">
+        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+    </form>
+
+    {% if coas %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>CoA #</th>
+                    <th>Product</th>
+                    <th>Lot</th>
+                    <th>Issued</th>
+                    <th>Issued By</th>
+                    <th>Result</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coa in coas %}
+                <tr>
+                    <td><a href="/qa/coa/{{ coa.id }}/">{{ coa.coa_number }}</a></td>
+                    <td>{{ coa.product_name }}</td>
+                    <td>{{ coa.lot_number }}</td>
+                    <td>{{ coa.issued_date }}</td>
+                    <td>{{ coa.issued_by|default:"—" }}</td>
+                    <td>
+                        {% if coa.overall_result == 'pass' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Pass</span>
+                        {% elif coa.overall_result == 'fail' %}
+                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Fail</span>
+                        {% else %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/qa/coa/{{ coa.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No certificates generated yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

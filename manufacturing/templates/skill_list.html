@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_title %}Skills{% endblock %}
+
+{% block toolbar_left %}
+<a href="/skills/requirements/" class="btn">Job Requirements</a>
+<a href="/skills/matrix/" class="btn">Skills Matrix</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/skills/new/" class="btn btn-primary">+ New Skill</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Skills</div>
+
+    <form method="get" style="margin-bottom:14px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name or category..."
+               style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:260px;">
+        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+    </form>
+
+    {% if skills %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in skills %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.category|default:"—" }}</td>
+                    <td>{{ s.description|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No skills defined yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
