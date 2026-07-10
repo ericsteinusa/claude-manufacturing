@@ -19,7 +19,7 @@ not supported between str and date`, because confirmed-SO demand dates come back
 as `datetime.date` — the exact same class of bug `demand_forecast_core.get_forecast_demand_dated`
 already normalizes against for the same reason; fixed by normalizing the same way. Details in
 each domain table below and in the three modules' own docstrings (`scenario_planning_core.py`,
-`fmea_core.py`, `abc_costing_core.py`).
+`fmea_core.py`, `abc_costing_core.py`), and in Priority 5 of Section 2. 38 features shipped total.
 
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
@@ -1708,6 +1708,65 @@ and charts reflected it correctly; cleaned up all test data afterward.
 
 ---
 
+### 🟣 Priority 5 — Further "Buildable Now" Gaps Closed
+
+#### P5-A: What-If Scenario Planning ✅ Done
+- A named scenario holds hypothetical adjustments — extra demand for a product, or a temporary
+  capacity override on a workcenter — compared against the real baseline without ever writing to
+  real data
+- **Shipped:** `scenario_planning_core.py` — `create_scenario`/`list_scenarios`, demand/capacity
+  adjustment CRUD, and `run_scenario`, which returns baseline-vs-scenario MRP volume and
+  bottleneck pressure side by side. Demand adjustments feed `mrp_web_core.run_mrp_dated`'s new
+  `extra_demand: dict | None = None` parameter — additive/opt-in, the exact same pattern as
+  P4-A's `include_forecast`, so every existing caller's behavior is byte-for-byte unchanged.
+  Capacity adjustments overlay a hypothetical per-day hours override on top of
+  `capacity_planning_core.get_capacity_check`'s real output entirely in Python; the real
+  `workcenter`/`workcenter_calendar_exception` tables are never written to. New pages at
+  `/scenarios/` (list + create), `/scenarios/<id>/` (adjustment editor), and
+  `/scenarios/<id>/run/` (baseline vs. scenario comparison). **Found and fixed one real bug while
+  verifying end-to-end:** merging a scenario's TEXT `need_date` into MRP's demand list raised
+  `TypeError: '<' not supported between str and date`, because confirmed-SO demand dates come
+  back from Postgres as `datetime.date` — the same class of bug `demand_forecast_core.
+  get_forecast_demand_dated` already normalizes against for the same reason; fixed the same way
+  and locked in with `test_run_scenario_normalizes_string_need_date_to_date`.
+
+#### P5-B: Control Plans & FMEA ✅ Done
+- A control plan is a per-product register of characteristics to control during production, each
+  with a control method and an FMEA risk score: RPN (Risk Priority Number) = Severity x
+  Occurrence x Detection, each rated 1–10 on the standard AIAG-style scale
+- **Shipped:** `fmea_core.py` — `control_plan` (header: product, name/revision, status) and
+  `control_plan_item` (one row per characteristic: spec, control method, S/O/D ratings, computed
+  RPN, recommended action) tables, plus `create_control_plan`, `add_control_plan_item`/
+  `update_control_plan_item` (recomputes RPN on any rating change), and `get_high_risk_items` for
+  a cross-plan risk register filtered by RPN threshold. The specific rating anchors (what makes
+  something a severity 7 vs. 8) vary by organization/industry standard and are deliberately not
+  encoded — this module only enforces the 1–10 range and the multiplication, the same
+  "structure is real, the org's own numbers still need expert judgment" scoping already used for
+  `sampling_plan_core`'s AQL disclaimer. New pages at `/qa/control-plans/` (list + create),
+  `/qa/control-plans/<id>/` (characteristic editor with live RPN), and
+  `/qa/fmea/risk-register/` (cross-plan high-risk view), cross-linked from the QA menu alongside
+  sampling plans.
+
+#### P5-C: Activity-Based Costing (ABC) ✅ Done
+- A parallel, opt-in analysis layer next to `costing_core.roll_standard_cost`'s single flat
+  overhead rate (workcenter `overhead_rate` x routing `std_hours`, still the default for every
+  existing caller) — allocates the same overhead dollars via activity cost pools and real
+  consumption drivers, then flags products where the two methods disagree
+- **Shipped:** `abc_costing_core.py` — `abc_activity` (a cost pool: total overhead $ for one
+  activity plus its driver's unit of measure, e.g. "$40,000 / per setup"), `abc_product_driver`
+  (how much of an activity's driver each product consumed), and `abc_product_output` (units
+  actually produced, kept as its own small table since output doesn't vary by activity).
+  `compute_activity_rate` → `get_abc_overhead_for_product` → `compare_to_traditional` chains
+  through to flag any product where ABC and the existing flat-rate roll disagree by more than
+  `VARIANCE_FLAG_THRESHOLD_PCT` (15%); `get_abc_summary_all_products` sorts the whole product
+  list by absolute variance so the biggest mis-costed items surface first. This closes the last
+  remaining gap in the entire Finance & GL domain table. New pages at
+  `/gl/abc-costing/activities/` (list + create), `/gl/abc-costing/activities/<id>/` (driver
+  entry per product), `/gl/abc-costing/products/<id>/output/` (output qty entry), and
+  `/gl/abc-costing/report/` (the full ABC-vs-traditional comparison, variance-flagged).
+
+---
+
 ## Section 3: Competitive Positioning Summary
 
 ### Where This ERP Already Leads or Matches Mid-Market
@@ -1763,6 +1822,9 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No wave picking management | P3-K |
 | No cross-docking | P3-L |
 | No RFID tracking | P3-M |
+| No what-if scenario planning | P5-A |
+| No control plans / FMEA | P5-B |
+| No Activity-Based Costing (ABC) | P5-C |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1789,17 +1851,17 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
 | Inventory | 9/10 | 8/10 | ▲▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J) + RFID tracking (P3-M, simulated)) |
-| Quality (QA) | 9/10 | 8/10 | ▲ (sampling/AQL + document control) |
+| Quality (QA) | 9/10 | 8/10 | ▲▲ (sampling/AQL + document control + control plans/FMEA (P5-B)) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
 | Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
-| Finance / GL | 9/10 | 9/10 | ▲▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated + carbon/ESG tracking) |
+| Finance / GL | 9/10 | 9/10 | ▲▲▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated + carbon/ESG tracking + Activity-Based Costing (P5-C)) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
 | HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
 | Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
-| Scheduling / APS | 8/10 | 6/10 | ▲▲▲ (P3-A finite capacity scheduling) |
+| Scheduling / APS | 8/10 | 6/10 | ▲▲▲▲ (P3-A finite capacity scheduling + what-if scenario planning (P5-A)) |
 | WMS / Shipping | 9/10 | 7/10 | ▲▲▲▲▲ (P3-B full pick/pack/ship + wave picking (P3-K) + cross-docking (P3-L)) |
 | **Overall** | **9.3/10** | **8.6/10** | **▲ from 7.1 / 5.9** |
 
@@ -1825,6 +1887,16 @@ real external-connectivity/hardware dependencies this dev environment has no liv
 (RFID and predictive maintenance both ship real logic behind an honestly-scoped manual/simulated
 stand-in for that missing hardware, same as EDI/e-commerce do for missing live external systems) —
 or lower-ROI items not yet scheduled.
+
+**Status update (2026-07-09):** with every numbered P1–P4 roadmap item and the "Where We Trail
+Mid-Market" list fully closed, shipped the next 3 highest-ROI items from what remained scattered
+across the Section 1 domain tables as plain ❌ entries: what-if scenario planning (P5-A), control
+plans/FMEA (P5-B), and Activity-Based Costing (P5-C) — see Priority 5 above. None of these needed
+external hardware or a live third-party system, so unlike the Section 3 "Where We Trail
+Enterprise" gaps they shipped as full, non-simulated implementations. 38 features shipped total.
+The only gaps left anywhere in this document are Section 3's "Where We Trail Enterprise" table
+(real external-connectivity/hardware dependencies) and whatever lower-ROI items remain
+unscheduled.
 
 ---
 
