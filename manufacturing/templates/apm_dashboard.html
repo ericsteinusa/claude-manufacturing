@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block page_title %}Asset Performance Management{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/apm/criticality/" class="btn">Manage Criticality</a>
+<a href="/maint/" class="btn">Maintenance Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.health-good { color:#1a7f37; font-weight:bold; }
+.health-warn { color:#a3720b; font-weight:bold; }
+.health-bad { color:#c0392b; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Asset Performance Management</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Ranked worst-first. Health score combines real availability/failure data with criticality —
+        set an asset's criticality to fine-tune its recommendation.
+    </p>
+
+    {% if assets %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead><tr><th>Equipment</th><th>Criticality</th><th class="num">Availability</th><th class="num">Failures</th><th class="num">Lifecycle Cost</th><th class="num">Health</th><th>Recommendation</th></tr></thead>
+            <tbody>
+                {% for a in assets %}
+                <tr>
+                    <td><a href="/maint/apm/asset/?equipment={{ a.equipment|urlencode }}">{{ a.equipment }}</a></td>
+                    <td>{{ a.criticality|title }}</td>
+                    <td class="num">{{ a.availability_pct|floatformat:1 }}%</td>
+                    <td class="num">{{ a.failure_count }}</td>
+                    <td class="num">${{ a.lifecycle_cost|floatformat:2 }}</td>
+                    <td class="num {% if a.health_score >= 80 %}health-good{% elif a.health_score >= 50 %}health-warn{% else %}health-bad{% endif %}">{{ a.health_score }}</td>
+                    <td>
+                        {% if a.recommendation == 'consider_replacement' %}Consider Replacement
+                        {% elif a.recommendation == 'schedule_maintenance' %}Schedule Maintenance
+                        {% else %}Monitor{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No assets with criticality ratings or downtime history yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

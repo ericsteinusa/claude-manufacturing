@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block page_title %}Batch Records{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Production Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Batch Records</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Generate a Batch Record</h3>
+        <p style="font-size:12px;color:var(--text-muted);">
+            Only completed work orders have an as-built story worth recording. Materials, cost, and
+            quality inspections are snapshotted at generation time.
+        </p>
+        <form method="post" style="display:flex;gap:10px;align-items:end;">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Completed Work Order *</label>
+                <select name="wo_id" required>
+                    {% for wo in completed_wos %}
+                    <option value="{{ wo.id }}">{{ wo.wo_number }} — {{ wo.product_name|default:"" }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Batch Record</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Issued Records</h3>
+        <form method="get" style="margin-bottom:14px;">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search record #, WO #, product..."
+                   style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+            <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+        </form>
+        {% if records %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Record #</th><th>Work Order</th><th>Product</th><th class="num">Qty</th><th class="num">Total Cost</th><th>Generated</th></tr></thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td><a href="/batch-records/{{ r.id }}/">{{ r.batch_record_number }}</a></td>
+                        <td>{{ r.wo_number }}</td>
+                        <td>{{ r.product_name }}</td>
+                        <td class="num">{{ r.quantity }}</td>
+                        <td class="num">${{ r.total_cost|floatformat:2 }}</td>
+                        <td>{{ r.generated_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No batch records issued yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

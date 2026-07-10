@@ -259,6 +259,9 @@ from ._supplier_portal import *  # noqa: F401,F403
 from ._cto import *  # noqa: F401,F403
 from ._recipe import *  # noqa: F401,F403
 from ._repetitive import *  # noqa: F401,F403
+from ._technician_routing import *  # noqa: F401,F403
+from ._apm import *  # noqa: F401,F403
+from ._batch_record import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

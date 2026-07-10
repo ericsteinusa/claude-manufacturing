@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_title %}{{ health.equipment }} — Asset Health{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/apm/" class="btn">APM Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:600px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.kpi-row { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:24px; font-weight:bold; color:var(--accent); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ health.equipment }}</div>
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="lbl">Health Score</div><div class="val">{{ health.health_score }}</div></div>
+        <div class="kpi"><div class="lbl">Criticality</div><div class="val">{{ health.criticality|title }}</div></div>
+        <div class="kpi"><div class="lbl">Availability</div><div class="val">{{ health.availability_pct|floatformat:1 }}%</div></div>
+        <div class="kpi"><div class="lbl">Failures</div><div class="val">{{ health.failure_count }}</div></div>
+    </div>
+
+    <div class="card">
+        <h3>Recommendation</h3>
+        <p style="font-size:14px;">
+            {% if health.recommendation == 'consider_replacement' %}
+            <strong style="color:#c0392b;">Consider Replacement</strong> — repeated failures on a
+            {{ health.criticality }}-criticality asset are dragging its health score down.
+            {% elif health.recommendation == 'schedule_maintenance' %}
+            <strong style="color:#a3720b;">Schedule Maintenance</strong> — reliability is trending down; a
+            proactive PM visit now is cheaper than a breakdown later.
+            {% else %}
+            <strong style="color:#1a7f37;">Monitor</strong> — this asset is performing within normal range.
+            {% endif %}
+        </p>
+        <p style="font-size:12.5px;color:var(--text-muted);">Lifecycle cost (trailing 12 months): ${{ health.lifecycle_cost|floatformat:2 }}</p>
+    </div>
+</div>
+</div>
+{% endblock %}

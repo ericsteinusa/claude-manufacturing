@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block page_title %}{{ route.mechanic_name }} — {{ route.route_date }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/routes/" class="btn">Technician Routes</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:22px; font-weight:bold; color:var(--accent); }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ route.mechanic_name }} — {{ route.route_date }}
+        {% if route.status == 'completed' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Completed</span>
+        {% elif route.status == 'in_progress' %}
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">In Progress</span>
+        {% else %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Planned</span>
+        {% endif %}
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="lbl">Stops</div><div class="val">{{ summary.total_stops }}</div></div>
+        <div class="kpi"><div class="lbl">Completed</div><div class="val">{{ summary.completed_stops }} ({{ summary.percent_complete }}%)</div></div>
+        <div class="kpi"><div class="lbl">Est. Minutes</div><div class="val">{{ summary.total_estimated_minutes }}</div></div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Status</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_status">
+            <select name="status">
+                {% for s in route_statuses %}
+                <option value="{{ s }}" {% if s == route.status %}selected{% endif %}>{{ s|title }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Update Status</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Stops</h3>
+        {% if route.stops %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>#</th><th>Work Order</th><th>Equipment</th><th>Priority</th><th class="num">Est. Min</th><th>Status</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
+                <tbody>
+                    {% for stop in route.stops %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ stop.title }}</td>
+                        <td>{{ stop.equipment }}</td>
+                        <td>{{ stop.priority }}</td>
+                        <td class="num">{{ stop.estimated_minutes }}</td>
+                        <td>{{ stop.status|title }}</td>
+                        {% if can_edit %}
+                        <td style="white-space:nowrap;">
+                            {% if stop.status != 'completed' %}
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="move">
+                                <input type="hidden" name="stop_id" value="{{ stop.id }}">
+                                <input type="hidden" name="direction" value="up">
+                                <button type="submit" class="btn" style="padding:2px 7px;font-size:11px;">&uarr;</button>
+                            </form>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="move">
+                                <input type="hidden" name="stop_id" value="{{ stop.id }}">
+                                <input type="hidden" name="direction" value="down">
+                                <button type="submit" class="btn" style="padding:2px 7px;font-size:11px;">&darr;</button>
+                            </form>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="complete_stop">
+                                <input type="hidden" name="stop_id" value="{{ stop.id }}">
+                                <button type="submit" class="btn" style="padding:2px 7px;font-size:11px;">Complete</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No stops on this route yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Stop</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_stop">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Open Work Order *</label>
+                    <select name="wo_id" required>
+                        {% for wo in open_wos %}
+                        <option value="{{ wo.id }}">{{ wo.title }} — {{ wo.equipment }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Est. Minutes</label>
+                    <input type="number" name="estimated_minutes" value="30" min="1">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Stop</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

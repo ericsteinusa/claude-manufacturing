@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block page_title %}Asset Criticality{% endblock %}
+
+{% block toolbar_left %}
+<a href="/maint/apm/" class="btn">APM Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:800px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">Asset Criticality</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Ratings</h3>
+        {% if ratings %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Equipment</th><th>Criticality</th><th class="num">Replacement Cost</th><th>Notes</th></tr></thead>
+                <tbody>
+                    {% for r in ratings %}
+                    <tr>
+                        <td>{{ r.equipment }}</td>
+                        <td>{{ r.criticality|title }}</td>
+                        <td class="num">${{ r.replacement_cost|floatformat:2 }}</td>
+                        <td>{{ r.notes|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No criticality ratings set yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Set Criticality</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Equipment *</label>
+                    <input type="text" name="equipment" required placeholder="e.g. CNC-01">
+                </div>
+                <div class="form-row">
+                    <label>Criticality</label>
+                    <select name="criticality">
+                        {% for c in criticality_levels %}
+                        <option value="{{ c }}">{{ c|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Replacement Cost</label>
+                    <input type="number" name="replacement_cost" step="0.01" min="0" value="0">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
