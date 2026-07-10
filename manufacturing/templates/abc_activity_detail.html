@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block page_title %}{{ activity.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/abc-costing/activities/" class="btn">Activities</a>
+<a href="/gl/abc-costing/report/" class="btn">ABC vs. Traditional Report</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.abc-wrap { width:100%; max-width:800px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="abc-wrap">
+    <div class="menu-title">{{ activity.name }}</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Cost Pool: ${{ activity.cost_pool_amount|floatformat:2 }} ({{ activity.driver_uom|default:"no driver UOM set" }})
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Product Driver Consumption</h3>
+        {% if drivers %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Product</th><th class="num">Driver Qty</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                </thead>
+                <tbody>
+                    {% for d in drivers %}
+                    <tr>
+                        <td>{{ d.product_name }}</td>
+                        <td class="num">{{ d.driver_qty|floatformat:"g" }}</td>
+                        {% if can_edit %}
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove_driver">
+                                <input type="hidden" name="driver_id" value="{{ d.id }}">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No driver consumption recorded yet.</div>
+        {% endif %}
+
+        {% if can_edit %}
+        <form method="post" style="margin-top:14px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_driver">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Product</label>
+                    <select name="product_id" required>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.product_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Driver Qty Consumed</label>
+                    <input type="number" name="driver_qty" step="any" min="0" required>
+                </div>
+                <div class="form-row">
+                    <button type="submit" class="btn">Record Usage</button>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

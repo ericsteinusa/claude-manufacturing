@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block page_title %}{{ result.scenario.name }} — Comparison{% endblock %}
+
+{% block toolbar_left %}
+<a href="/scenarios/{{ result.scenario.id }}/" class="btn">← Scenario</a>
+<a href="/scenarios/" class="btn">All Scenarios</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.scenario-wrap { width:100%; max-width:900px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid var(--border); }
+.compare-col { padding:12px 16px; }
+.compare-col:first-child { border-right:1px solid var(--border); }
+.compare-col h4 { margin:0 0 10px; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); }
+.stat-row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
+.stat-row b { font-variant-numeric:tabular-nums; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="scenario-wrap">
+    <div class="menu-title">{{ result.scenario.name }} — Baseline vs. Scenario</div>
+
+    <div class="card">
+        <h3>MRP Demand</h3>
+        <div class="compare-grid">
+            <div class="compare-col">
+                <h4>Baseline (real)</h4>
+                <div class="stat-row"><span>Planned Orders</span><b>{{ result.mrp_baseline.order_count }}</b></div>
+                <div class="stat-row"><span>Make Qty</span><b>{{ result.mrp_baseline.make_qty|floatformat:"g" }}</b></div>
+                <div class="stat-row"><span>Buy Qty</span><b>{{ result.mrp_baseline.buy_qty|floatformat:"g" }}</b></div>
+                <div class="stat-row"><span>Total Qty</span><b>{{ result.mrp_baseline.total_qty|floatformat:"g" }}</b></div>
+            </div>
+            <div class="compare-col">
+                <h4>Scenario (what-if)</h4>
+                <div class="stat-row"><span>Planned Orders</span><b>{{ result.mrp_scenario.order_count }}</b></div>
+                <div class="stat-row"><span>Make Qty</span><b>{{ result.mrp_scenario.make_qty|floatformat:"g" }}</b></div>
+                <div class="stat-row"><span>Buy Qty</span><b>{{ result.mrp_scenario.buy_qty|floatformat:"g" }}</b></div>
+                <div class="stat-row"><span>Total Qty</span><b>{{ result.mrp_scenario.total_qty|floatformat:"g" }}</b></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Workcenter Bottlenecks (Utilization %)</h3>
+        <div class="compare-grid">
+            <div class="compare-col">
+                <h4>Baseline (real)</h4>
+                {% for b in result.bottlenecks_baseline %}
+                <div class="stat-row">
+                    <span>{{ b.workcenter_name }}</span>
+                    <b style="{% if b.utilization_pct > 100 %}color:#c0392b;{% endif %}">{{ b.utilization_pct|floatformat:0 }}%</b>
+                </div>
+                {% empty %}
+                <div class="empty-state">No workcenters.</div>
+                {% endfor %}
+            </div>
+            <div class="compare-col">
+                <h4>Scenario (what-if)</h4>
+                {% for b in result.bottlenecks_scenario %}
+                <div class="stat-row">
+                    <span>{{ b.workcenter_name }}</span>
+                    <b style="{% if b.utilization_pct > 100 %}color:#c0392b;{% endif %}">{{ b.utilization_pct|floatformat:0 }}%</b>
+                </div>
+                {% empty %}
+                <div class="empty-state">No workcenters.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if result.demand_adjustments or result.capacity_adjustments %}
+    <div class="card">
+        <h3>Adjustments Applied</h3>
+        {% for a in result.demand_adjustments %}
+        <div class="stat-row"><span>+{{ a.qty|floatformat:"g" }} of {{ a.product_name }} needed {{ a.need_date }}</span></div>
+        {% endfor %}
+        {% for a in result.capacity_adjustments %}
+        <div class="stat-row"><span>{{ a.workcenter_name }}: {{ a.hours_per_day|floatformat:"g" }} hrs/day from {{ a.date_from }} to {{ a.date_to }}</span></div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

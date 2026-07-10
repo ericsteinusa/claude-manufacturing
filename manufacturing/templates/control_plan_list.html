@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}Control Plans{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">QA Dashboard</a>
+<a href="/qa/fmea/risk-register/" class="btn">Risk Register</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/qa/control-plans/new/" class="btn btn-primary">+ New Control Plan</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Control Plans</div>
+
+    {% if plans %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Product</th>
+                    <th>Revision</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in plans %}
+                <tr>
+                    <td><a href="/qa/control-plans/{{ p.id }}/">{{ p.name }}</a></td>
+                    <td>{{ p.product_name }}</td>
+                    <td>{{ p.revision }}</td>
+                    <td>
+                        {% if p.status == 'active' %}
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+                        {% elif p.status == 'superseded' %}
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+                        {% else %}
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/qa/control-plans/{{ p.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No control plans yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

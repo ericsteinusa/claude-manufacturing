@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block page_title %}ABC Activities{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/abc-costing/report/" class="btn">ABC vs. Traditional Report</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/gl/abc-costing/activities/new/" class="btn btn-primary">+ New Activity</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Activity Cost Pools</div>
+
+    <form method="get" style="margin-bottom:14px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name..."
+               style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:240px;">
+        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+    </form>
+
+    {% if activities %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Activity</th>
+                    <th>Driver UOM</th>
+                    <th class="num">Cost Pool</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in activities %}
+                <tr>
+                    <td><a href="/gl/abc-costing/activities/{{ a.id }}/">{{ a.name }}</a></td>
+                    <td>{{ a.driver_uom|default:"—" }}</td>
+                    <td class="num">${{ a.cost_pool_amount|floatformat:2 }}</td>
+                    <td><a href="/gl/abc-costing/activities/{{ a.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No activity cost pools yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

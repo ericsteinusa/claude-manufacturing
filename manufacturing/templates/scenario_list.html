@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_title %}What-If Scenarios{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/schedule/capacity/" class="btn">Capacity Planning</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% if can_edit %}
+<a href="/scenarios/new/" class="btn btn-primary">+ New Scenario</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">What-If Scenarios</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Compare hypothetical demand or capacity changes against real MRP and
+        workcenter data without committing anything.
+    </p>
+
+    <form method="get" style="margin-bottom:14px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name..."
+               style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:240px;">
+        <button type="submit" class="btn" style="padding:6px 12px;">Search</button>
+    </form>
+
+    {% if scenarios %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in scenarios %}
+                <tr>
+                    <td><a href="/scenarios/{{ s.id }}/">{{ s.name }}</a></td>
+                    <td>{{ s.description|default:"—" }}</td>
+                    <td>{{ s.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        <a href="/scenarios/{{ s.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a>
+                        <a href="/scenarios/{{ s.id }}/run/" class="btn btn-primary" style="padding:3px 10px;font-size:12px;">Run</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No scenarios yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

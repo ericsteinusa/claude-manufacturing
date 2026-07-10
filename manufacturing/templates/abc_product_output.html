@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block page_title %}{{ product_name }} — ABC Detail{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/abc-costing/report/" class="btn">← ABC Report</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.abc-wrap { width:100%; max-width:640px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.stat-row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="abc-wrap">
+    <div class="menu-title">{{ product_name }}</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Activity Breakdown</h3>
+        {% if comparison.activities %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Activity</th><th class="num">Driver Qty</th><th class="num">Rate</th><th class="num">Allocated</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in comparison.activities %}
+                    <tr>
+                        <td>{{ a.activity_name }}</td>
+                        <td class="num">{{ a.driver_qty|floatformat:"g" }} {{ a.driver_uom }}</td>
+                        <td class="num">{% if a.rate is not None %}${{ a.rate|floatformat:4 }}{% else %}—{% endif %}</td>
+                        <td class="num">{% if a.allocated_cost is not None %}${{ a.allocated_cost|floatformat:2 }}{% else %}—{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No driver consumption recorded for this product yet.</div>
+        {% endif %}
+        <div class="stat-row"><span>Total Allocated</span><b>${{ comparison.total_allocated_cost|floatformat:2 }}</b></div>
+        <div class="stat-row"><span>ABC Overhead / Unit</span><b>{% if comparison.abc_overhead_per_unit is not None %}${{ comparison.abc_overhead_per_unit|floatformat:2 }}{% else %}— (set output qty below){% endif %}</b></div>
+        <div class="stat-row"><span>Traditional Overhead / Unit</span><b>{% if comparison.traditional_overhead_per_unit is not None %}${{ comparison.traditional_overhead_per_unit|floatformat:2 }}{% else %}—{% endif %}</b></div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Output Quantity (for period)</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Units Produced</label>
+                <input type="number" name="output_qty" step="any" min="0"
+                       value="{{ output.output_qty|default:'' }}" required>
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" value="{{ output.notes|default:'' }}" placeholder="Optional — e.g. period covered">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Output Qty</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

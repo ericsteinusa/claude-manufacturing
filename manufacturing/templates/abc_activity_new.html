@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_title %}New Activity{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/abc-costing/activities/" class="btn">Activities</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.abc-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="abc-wrap">
+    <div class="menu-title">New Activity Cost Pool</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Machine Setups">
+            </div>
+            <div class="form-row">
+                <label>Cost Pool Amount ($) *</label>
+                <input type="number" name="cost_pool_amount" step="0.01" min="0" required>
+            </div>
+            <div class="form-row">
+                <label>Driver Unit of Measure</label>
+                <input type="text" name="driver_uom" placeholder="e.g. per setup, per machine hour">
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="Optional">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Activity</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

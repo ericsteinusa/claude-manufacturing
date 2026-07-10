@@ -1,6 +1,25 @@
 # Manufacturing ERP — Competitive Gap Analysis
-**Generated:** 2026-07-05 · **Refreshed:** 2026-07-08
+**Generated:** 2026-07-05 · **Refreshed:** 2026-07-08 · **2026-07-09 update below**
 **Compared Against:** SAP S/4HANA, Oracle Cloud Manufacturing, Microsoft Dynamics 365 SCM, Epicor Kinetic, Infor CloudSuite Industrial, Plex Manufacturing Cloud, SYSPRO, Fishbowl, JobBOSS², MRPeasy
+
+**2026-07-09:** Shipped the next 3 highest-ROI items from the "buildable now" list: **What-If
+Scenario Planning** (8/10 of the top-10 have it — the highest-adoption item remaining),
+**Control Plans & FMEA** (7/10), and **Activity-Based Costing** (6/10, but the last remaining
+gap in the entire Finance & GL domain). All three extend existing infrastructure rather than
+adding a new subsystem: scenario planning layers hypothetical demand/capacity on top of
+`mrp_web_core.run_mrp_dated` (gained an additive `extra_demand` parameter, same opt-in pattern
+as P4-A's `include_forecast`) and `capacity_planning_core.get_capacity_check`, entirely in memory
+— nothing is ever written against real MRP/capacity data; control plans/FMEA is a sibling module
+to `sampling_plan_core.py`/`quality_core.py`'s SPC work; ABC costing (`abc_costing_core.py`) is a
+parallel, opt-in analysis layer that allocates the same overhead dollars `costing_core`'s flat
+rate already computes, but via activity cost pools and real consumption drivers, then flags
+products where the two methods disagree by 15%+. Found and fixed one real bug while verifying
+end-to-end: merging a scenario's TEXT `need_date` into MRP's demand list raised `TypeError: '<'
+not supported between str and date`, because confirmed-SO demand dates come back from Postgres
+as `datetime.date` — the exact same class of bug `demand_forecast_core.get_forecast_demand_dated`
+already normalizes against for the same reason; fixed by normalizing the same way. Details in
+each domain table below and in the three modules' own docstrings (`scenario_planning_core.py`,
+`fmea_core.py`, `abc_costing_core.py`).
 
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
@@ -118,12 +137,12 @@ platform beyond demand forecasting and predictive maintenance.
 | **Gantt chart drag-and-drop scheduler** | ✅ Full (P2-A) | ✅ 8/10 |
 | **Constraint-based sequencing** | ✅ Partial — cross-workcenter operation ordering enforced; load leveling is a greedy heuristic, not a true solver | ✅ 7/10 (Infor core) |
 | **Bottleneck analysis** | ✅ Full (P3-A) — utilization-% ranking | ✅ 7/10 |
-| **What-if scenario planning** | ❌ | ✅ 8/10 |
+| **What-if scenario planning** | ✅ Full (2026-07-09) — compares hypothetical demand/capacity adjustments against real MRP and workcenter data entirely in memory, nothing persisted against real data | ✅ 8/10 |
 | **Configure-to-Order (CTO)** | ❌ | ✅ 7/10 |
 | **Recipe / formula management (process mfg)** | ❌ | ✅ 7/10 |
 | **Repetitive manufacturing** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** what-if scenario planning, Configure-to-Order, recipe/formula management (process mfg), repetitive manufacturing.
+**Priority gaps:** Configure-to-Order, recipe/formula management (process mfg), repetitive manufacturing.
 
 ---
 
@@ -169,12 +188,12 @@ platform beyond demand forecasting and predictive maintenance.
 | Sample management | ✅ | ✅ 7/10 |
 | Audit trail & full traceability | ✅ Full | ✅ All |
 | **Sampling plans & AQL (acceptance quality limit)** | ✅ Full (P2-E) — ISO 2859-1; seeded accept/reject table covers AQL 0.65–4.0, code letters C-N only | ✅ 8/10 |
-| **Control plans & FMEA** | ❌ | ✅ 7/10 |
+| **Control plans & FMEA** | ✅ Full (2026-07-09) — per-product control plans with Severity x Occurrence x Detection RPN scoring per characteristic, plus a cross-plan risk register | ✅ 7/10 |
 | **Certificate of Analysis (CoA) generation** | ❌ | ✅ 7/10 |
 | **Document control & version management** | ✅ Full (P2-F) — draft→review→approved→superseded→obsolete, revision history, file upload/download | ✅ 8/10 |
 | **Regulatory compliance templates (FDA, ISO)** | ❌ | ✅ 7/10 |
 
-**Priority gaps:** CoA generation, FMEA/control plans, regulatory compliance templates.
+**Priority gaps:** CoA generation, regulatory compliance templates.
 
 ---
 
@@ -249,13 +268,13 @@ platform beyond demand forecasting and predictive maintenance.
 | Job costing | ✅ | ✅ All |
 | Cost of Goods Manufactured (COGM) | ✅ | ✅ All |
 | **Cash flow statement & 13-week forecast** | ✅ Full (P2-D) — indirect method; inventory-value change and financing activities explicitly called out as always-zero (no point-in-time inventory valuation or debt table exists) | ✅ 7/10 |
-| **Activity-Based Costing (ABC)** | ❌ | ✅ 6/10 |
+| **Activity-Based Costing (ABC)** | ✅ Full (2026-07-09) — activity cost pools + real consumption drivers allocate the same overhead dollars the flat rate does, then flag products where the two methods disagree by 15%+; a parallel opt-in analysis layer, not a replacement for the existing standard-cost roll | ✅ 6/10 |
 | **Multi-entity / legal entity separation** | ✅ Full (P3-F) — company master + user-to-company assignment, additive `company_id` on GL | ✅ 8/10 |
 | **Intercompany transactions** | ✅ Full (P3-F) — two independently-balanced journals per IC transaction, tagged per entity | ✅ 7/10 |
 | **Consolidated financial reporting** | ✅ Full (P3-F) — reuses the existing unscoped income statement/balance sheet, subtracts the known IC amount as elimination | ✅ 7/10 |
 | **Sustainability / carbon cost tracking** | ✅ Full (P4-G) — BOM carbon rollup mirroring standard costing, per-WO carbon-intensity actuals, ESG dashboard (scope 1/3 from real production data; scope 2 is manual kWh × illustrative grid-factor entry, not full GHG Protocol compliance tooling) | ✅ 5/10 |
 
-**Priority gaps:** Activity-Based Costing.
+**Priority gaps:** none remaining in this domain.
 
 ---
 

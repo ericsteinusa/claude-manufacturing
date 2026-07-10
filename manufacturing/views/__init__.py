@@ -244,6 +244,9 @@ from ._report_builder import *  # noqa: F401,F403
 from ._carbon import *  # noqa: F401,F403
 from ._costing_layers import *  # noqa: F401,F403
 from ._consignment import *  # noqa: F401,F403
+from ._scenario_planning import *  # noqa: F401,F403
+from ._fmea import *  # noqa: F401,F403
+from ._abc_costing import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 
