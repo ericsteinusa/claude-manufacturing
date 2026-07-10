@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block page_title %}New Repetitive Schedule{% endblock %}
+
+{% block toolbar_left %}
+<a href="/repetitive/" class="btn">Repetitive Manufacturing</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">New Repetitive Schedule</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Product *</label>
+                <select name="product_id" required>
+                    {% for p in products %}
+                    <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Workcenter</label>
+                <select name="workcenter_id">
+                    <option value="">—</option>
+                    {% for w in workcenters %}
+                    <option value="{{ w.id }}">{{ w.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Rate / Day *</label>
+                <input type="number" name="rate_per_day" step="0.01" min="0.01" required>
+            </div>
+            <div class="form-row">
+                <label>Effective Start</label>
+                <input type="date" name="effective_start">
+            </div>
+            <div class="form-row">
+                <label>Effective End</label>
+                <input type="date" name="effective_end">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Schedule</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
