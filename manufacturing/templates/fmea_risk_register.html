@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block page_title %}FMEA Risk Register{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/control-plans/" class="btn">Control Plans</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.risk-low { color:#1a7f37; font-weight:bold; }
+.risk-medium { color:#a3720b; font-weight:bold; }
+.risk-high { color:#c0392b; font-weight:bold; }
+.risk-critical { color:#fff; background:#c0392b; padding:1px 7px; border-radius:3px; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">FMEA Risk Register</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Every characteristic at or above RPN {{ threshold }} on an active control plan, highest risk first.
+    </p>
+
+    <form method="get" style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:bold;color:#555;margin-right:6px;">Threshold</label>
+        <input type="number" name="threshold" value="{{ threshold }}" min="1" max="1000"
+               style="padding:6px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:100px;">
+        <button type="submit" class="btn" style="padding:6px 12px;">Apply</button>
+    </form>
+
+    {% if items %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Control Plan</th>
+                    <th>Characteristic</th>
+                    <th class="num">S</th>
+                    <th class="num">O</th>
+                    <th class="num">D</th>
+                    <th class="num">RPN</th>
+                    <th>Risk</th>
+                    <th>Recommended Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td><a href="/qa/control-plans/{{ item.control_plan_id }}/">{{ item.plan_name }} (Rev {{ item.revision }})</a></td>
+                    <td>{{ item.characteristic }}</td>
+                    <td class="num">{{ item.severity }}</td>
+                    <td class="num">{{ item.occurrence }}</td>
+                    <td class="num">{{ item.detection }}</td>
+                    <td class="num">{{ item.rpn }}</td>
+                    <td><span class="risk-{{ item.risk_level }}">{{ item.risk_level|upper }}</span></td>
+                    <td>{{ item.recommended_action|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No items at or above this threshold.</div>
+    {% endif %}
+</div>
+{% endblock %}

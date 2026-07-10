@@ -147,7 +147,7 @@ def get_demand_dated(conn) -> dict:
     return result
 
 
-def run_mrp_dated(conn, include_forecast: bool = False) -> list[dict]:
+def run_mrp_dated(conn, include_forecast: bool = False, extra_demand: dict | None = None) -> list[dict]:
     """Time-phased MRP run — returns planned orders with start_date and due_date.
 
     Each row has:
@@ -160,6 +160,13 @@ def run_mrp_dated(conn, include_forecast: bool = False) -> list[dict]:
     demand from ``demand_forecast_core.get_forecast_demand_dated``, which
     returns the same ``{pid: [(qty, date), ...]}`` shape as
     ``get_demand_dated`` below, so it's a plain per-product list-extend.
+
+    ``extra_demand`` (additive/opt-in — default None leaves every existing
+    caller's behavior unchanged) merges in the same ``{pid: [(qty, date),
+    ...]}`` shape from any other source — used by
+    ``scenario_planning_core.run_scenario`` to layer hypothetical what-if
+    demand on top of real confirmed-SO demand without persisting anything
+    or touching this function's real inputs.
     """
     products_raw, bom_lines, on_hand, scheduled, safety = load_mrp_inputs(conn)
     demand_dated = get_demand_dated(conn)
@@ -167,6 +174,10 @@ def run_mrp_dated(conn, include_forecast: bool = False) -> list[dict]:
     if include_forecast:
         from .demand_forecast_core import get_forecast_demand_dated
         for pid, entries in get_forecast_demand_dated(conn).items():
+            demand_dated.setdefault(pid, []).extend(entries)
+
+    if extra_demand:
+        for pid, entries in extra_demand.items():
             demand_dated.setdefault(pid, []).extend(entries)
 
     products_slim = {

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block page_title %}ABC vs. Traditional Overhead{% endblock %}
+
+{% block toolbar_left %}
+<a href="/gl/abc-costing/activities/" class="btn">Activities</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Activity-Based vs. Traditional Overhead</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Products where the flat overhead rate and actual activity-driver consumption
+        disagree by {{ variance_threshold_pct|floatformat:"g" }}% or more are flagged —
+        worth investigating whether the traditional rate is over- or under-costing them.
+    </p>
+
+    {% if summary %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="num">Traditional OH/Unit</th>
+                    <th class="num">ABC OH/Unit</th>
+                    <th class="num">Variance</th>
+                    <th class="num">Variance %</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in summary %}
+                <tr>
+                    <td>{{ row.product_name }}</td>
+                    <td class="num">
+                        {% if row.traditional_overhead_per_unit is not None %}${{ row.traditional_overhead_per_unit|floatformat:2 }}{% else %}—{% endif %}
+                    </td>
+                    <td class="num">
+                        {% if row.abc_overhead_per_unit is not None %}${{ row.abc_overhead_per_unit|floatformat:2 }}{% else %}—{% endif %}
+                    </td>
+                    <td class="num">
+                        {% if row.variance is not None %}
+                        <span style="{% if row.flagged %}color:#c0392b;font-weight:bold;{% endif %}">
+                            {% if row.variance > 0 %}+{% endif %}${{ row.variance|floatformat:2 }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="num">
+                        {% if row.variance_pct is not None %}{{ row.variance_pct|floatformat:1 }}%{% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if row.flagged %}
+                        <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Investigate</span>
+                        {% endif %}
+                        <a href="/gl/abc-costing/products/{{ row.product_id }}/output/" class="btn" style="padding:3px 10px;font-size:12px;">Set Output</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No products have recorded activity-driver consumption yet — add usage under an Activity.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block page_title %}{{ plan.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/control-plans/" class="btn">Control Plans</a>
+<a href="/qa/fmea/risk-register/" class="btn">Risk Register</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.risk-low { color:#1a7f37; font-weight:bold; }
+.risk-medium { color:#a3720b; font-weight:bold; }
+.risk-high { color:#c0392b; font-weight:bold; }
+.risk-critical { color:#fff; background:#c0392b; padding:1px 7px; border-radius:3px; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ plan.name }} ({{ plan.product_name }}, Rev {{ plan.revision }})
+        {% if plan.status == 'active' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        {% elif plan.status == 'superseded' %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Superseded</span>
+        {% else %}
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Draft</span>
+        {% endif %}
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Status</h3>
+        <form method="post" style="display:flex;gap:10px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_status">
+            <select name="status">
+                {% for s in control_plan_statuses %}
+                <option value="{{ s }}" {% if s == plan.status %}selected{% endif %}>{{ s|title }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Update Status</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Characteristics &amp; FMEA</h3>
+        {% if items %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Seq</th>
+                        <th>Characteristic</th>
+                        <th>Spec</th>
+                        <th>Control Method</th>
+                        <th class="num">S</th>
+                        <th class="num">O</th>
+                        <th class="num">D</th>
+                        <th class="num">RPN</th>
+                        <th>Risk</th>
+                        {% if can_edit %}<th></th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.operation_seq|default:"—" }}</td>
+                        <td>{{ item.characteristic }}</td>
+                        <td>{{ item.specification|default:"—" }}</td>
+                        <td>{{ item.control_method|default:"—" }}</td>
+                        {% if can_edit %}
+                        <td colspan="4">
+                            <form method="post" style="display:flex;gap:4px;justify-content:flex-end;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_item">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="number" name="severity" min="1" max="10" value="{{ item.severity }}" style="width:48px;padding:3px;border:1.5px solid var(--border);border-radius:4px;">
+                                <input type="number" name="occurrence" min="1" max="10" value="{{ item.occurrence }}" style="width:48px;padding:3px;border:1.5px solid var(--border);border-radius:4px;">
+                                <input type="number" name="detection" min="1" max="10" value="{{ item.detection }}" style="width:48px;padding:3px;border:1.5px solid var(--border);border-radius:4px;">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Re-score</button>
+                            </form>
+                        </td>
+                        {% else %}
+                        <td class="num">{{ item.severity }}</td>
+                        <td class="num">{{ item.occurrence }}</td>
+                        <td class="num">{{ item.detection }}</td>
+                        {% endif %}
+                        <td class="num">{{ item.rpn }}</td>
+                        <td><span class="risk-{{ item.risk_level }}">{{ item.risk_level|upper }}</span></td>
+                        {% if can_edit %}
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_item">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Remove</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No characteristics added yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Add Characteristic</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_item">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Operation Seq</label>
+                    <input type="number" name="operation_seq" min="0">
+                </div>
+                <div class="form-row">
+                    <label>Characteristic *</label>
+                    <input type="text" name="characteristic" required placeholder="e.g. Bore Diameter">
+                </div>
+                <div class="form-row">
+                    <label>Specification</label>
+                    <input type="text" name="specification" placeholder="e.g. 25.0 ± 0.05 mm">
+                </div>
+                <div class="form-row">
+                    <label>Control Method</label>
+                    <input type="text" name="control_method" placeholder="e.g. CMM, 100%">
+                </div>
+                <div class="form-row">
+                    <label>Severity (1-10)</label>
+                    <input type="number" name="severity" min="1" max="10" value="1" required>
+                </div>
+                <div class="form-row">
+                    <label>Occurrence (1-10)</label>
+                    <input type="number" name="occurrence" min="1" max="10" value="1" required>
+                </div>
+                <div class="form-row">
+                    <label>Detection (1-10)</label>
+                    <input type="number" name="detection" min="1" max="10" value="1" required>
+                </div>
+                <div class="form-row">
+                    <label>Recommended Action</label>
+                    <input type="text" name="recommended_action" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Characteristic</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
