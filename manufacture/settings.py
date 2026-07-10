@@ -1,28 +1,72 @@
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load DB credentials (and other settings) from a local .env file.
+# Load DB credentials (and other settings) from a local .env file. In a real
+# deployment these env vars should come from the platform's secrets manager
+# (not a .env file on disk) — .env/.env.local are already gitignored and
+# exist only for local dev convenience.
 load_dotenv()
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    val = os.environ.get(name)
+    if val is None:
+        return default
+    return val.strip().lower() in ('1', 'true', 'yes', 'on')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-((^v*$u%ktah0%)58)b&8u1a_1q^(*&wr_47m00&2g__esq+9y',
-)
+# This fallback is only ever used when DJANGO_SECRET_KEY isn't set, which is
+# fine for local dev/CI (DEBUG defaults to True there) — production deploys
+# must set a real DJANGO_SECRET_KEY, enforced below once DEBUG is False.
+_DEV_INSECURE_SECRET_KEY = 'django-insecure-((^v*$u%ktah0%)58)b&8u1a_1q^(*&wr_47m00&2g__esq+9y'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _DEV_INSECURE_SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Defaults to True (today's behavior) so existing dev/CI usage is unchanged;
+# set DJANGO_DEBUG=False for any real deployment.
+DEBUG = _env_bool('DJANGO_DEBUG', True)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.239']
+_allowed_hosts_env = os.environ.get('DJANGO_ALLOWED_HOSTS')
+ALLOWED_HOSTS = (
+    [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()]
+    if _allowed_hosts_env else
+    ['localhost', '127.0.0.1', '192.168.0.239']
+)
+
+_csrf_trusted_origins_env = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = (
+    [o.strip() for o in _csrf_trusted_origins_env.split(',') if o.strip()]
+    if _csrf_trusted_origins_env else []
+)
+
+if not DEBUG:
+    if SECRET_KEY == _DEV_INSECURE_SECRET_KEY:
+        raise ImproperlyConfigured(
+            'DJANGO_SECRET_KEY must be set to a real secret when DJANGO_DEBUG=False.'
+        )
+
+    # HTTPS enforcement — only makes sense once DEBUG is off (a plain HTTP
+    # localhost dev server would otherwise redirect-loop). SECURE_PROXY_SSL_HEADER
+    # is deliberately not set here: it's only safe once Phase 1 picks a specific
+    # reverse proxy/load balancer that's trusted to strip/set X-Forwarded-Proto —
+    # setting it without that in place would let a client spoof the header and
+    # trick Django into treating an insecure request as secure.
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 
 # Application definition
