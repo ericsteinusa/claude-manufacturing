@@ -35,6 +35,22 @@ branch and merged in after a rebase onto the What-If/FMEA/ABC work above. Detail
 table below and in the three modules' own docstrings (`discount_core.py`, `coa_core.py`,
 `skills_matrix_core.py`). 41 features shipped total.
 
+**2026-07-10:** Shipped the next 3 highest-ROI items still marked ❌ across Sections 1.1–1.10:
+**Benefits Management** (7/10), **Regulatory Compliance Templates** (7/10, closes Quality
+Management's last remaining domain gap), and **Workforce Analytics & Headcount Planning** (7/10).
+Benefits (`benefits_core.py`) is a plan catalog + tiered enrollment tracker, deliberately kept
+separate from `payroll_core`'s existing flat/percent deduction tables rather than merged into
+them — the two answer different questions ("what plans exist and who's enrolled" vs. "how much
+comes out of this paycheck"). Compliance templates (`regulatory_compliance_core.py`) snapshot a
+reusable ISO/FDA requirement checklist into a per-audit instance at creation time, the same
+snapshot-at-instantiation choice already used for CoA generation against SPC measurements; the
+two seeded starter templates are explicitly disclosed as illustrative, not certified or
+exhaustive. Workforce analytics (`workforce_analytics_core.py`) required adding hire_date/
+termination_date/employment_status columns to `people` — there was no employment-date tracking
+anywhere in this app before — and every tenure/trend/turnover number is computed only from
+employees who actually have a hire date on file, with existing employees silently (but
+documented) excluded rather than backfilled with a fabricated date. 44 features shipped total.
+
 **What changed since the original pass:** All 6 Priority-1 items, all 8 Priority-2 items, and 2 of 7
 Priority-3 items (P3-A Finite Capacity Scheduling/APS, P3-B WMS pick/pack/ship) have shipped —
 16 features total, verified against the codebase at commit `643f1e7`. This refresh re-scores every
@@ -205,9 +221,9 @@ platform beyond demand forecasting and predictive maintenance.
 | **Control plans & FMEA** | ✅ Full (2026-07-09) — per-product control plans with Severity x Occurrence x Detection RPN scoring per characteristic, plus a cross-plan risk register | ✅ 7/10 |
 | **Certificate of Analysis (CoA) generation** | ✅ Full (2026-07-09) — generated per lot from that lot's existing SPC measurements (`spc_measurement`/`spc_control_limit`), snapshotted at generation time into `coa_document`/`coa_result` so a later measurement edit can't retroactively alter an issued certificate; reportlab PDF matching the customer-portal invoice/packing-slip pattern | ✅ 7/10 |
 | **Document control & version management** | ✅ Full (P2-F) — draft→review→approved→superseded→obsolete, revision history, file upload/download | ✅ 8/10 |
-| **Regulatory compliance templates (FDA, ISO)** | ❌ | ✅ 7/10 |
+| **Regulatory compliance templates (FDA, ISO)** | ✅ Full (2026-07-10) — reusable ISO/FDA requirement checklist templates, instantiated per-audit with per-item status/evidence tracking and a progress rollup; seeded starter ISO 9001/FDA 21 CFR 820 templates are illustrative, not certified or exhaustive | ✅ 7/10 |
 
-**Priority gaps:** regulatory compliance templates.
+**Priority gaps:** none remaining in this domain.
 
 ---
 
@@ -305,12 +321,12 @@ platform beyond demand forecasting and predictive maintenance.
 | Training & certification tracking | ✅ | ✅ 7/10 |
 | Overtime approval workflow | ✅ | ✅ 8/10 |
 | **Employee self-service (ESS) portal** | ✅ Full (P2-G) — pay stubs, time-off balance/request, clock in/out, reviews/training, contact info | ✅ 7/10 |
-| **Benefits management** | ❌ | ✅ 7/10 |
+| **Benefits management** | ✅ Full (2026-07-10) — a benefit plan catalog (Health/Dental/Vision/Life/Disability/401k) with employee/employer cost per pay period, and per-employee enrollments by tier; deliberately parallel to, not merged with, `payroll_core`'s existing flat/percent deduction tables | ✅ 7/10 |
 | **Skills matrix & competency gap analysis** | ✅ Full (2026-07-09) — a skill master, required-proficiency-level requirements keyed by `position.job_title` (free text, matched case-insensitively — no job-title master table exists to key on instead), and per-employee assessed levels; a per-employee gap report and an org-wide gap-ranked summary | ✅ 6/10 |
-| **Workforce analytics & headcount planning** | ❌ | ✅ 7/10 |
+| **Workforce analytics & headcount planning** | ✅ Full (2026-07-10) — headcount summary/trend, avg tenure, and trailing-12-month turnover computed from new hire_date/termination_date columns on `people`; per-dept target-vs-actual headcount planning. Only employees with a hire date actually entered count toward tenure/trend — existing employees default to none and are excluded, not backfilled with a fabricated date | ✅ 7/10 |
 | **Applicant Tracking / Recruiting (ATS)** | ❌ | ✅ 5/10 |
 
-**Priority gaps:** benefits management, workforce analytics.
+**Priority gaps:** Applicant Tracking / Recruiting (ATS).
 
 ---
 
@@ -1781,6 +1797,107 @@ and charts reflected it correctly; cleaned up all test data afterward.
 
 ---
 
+### 🟤 Priority 6 — Discount/CoA/Skills-Matrix (Built in Parallel, Merged After Rebase)
+
+#### P6-A: Discount & Promotion Management ✅ Done
+- Percent/fixed-amount discount rules scoped to a product and/or customer, with a minimum-qty
+  threshold and an effective date window
+- **Shipped:** `discount_core.py`. Resolution picks whichever applicable rule gives the customer
+  the lowest final price. Auto-applies on the SO line-entry form via the same client-side
+  JSON-embed pattern the existing tiered pricing (`price_list_core.py`) already uses — no new
+  pricing-calculation code path, just a second rule source feeding the same "lowest applicable
+  price wins" resolution. Admin at `/promotions/`.
+
+#### P6-B: Certificate of Analysis (CoA) Generation ✅ Done
+- Generates a CoA per lot from that lot's existing SPC measurements
+- **Shipped:** `coa_core.py`, reusing `quality_core.py`'s `spc_measurement`/`spc_control_limit`
+  tables — no new measurement data model. Snapshots results into `coa_document`/`coa_result` at
+  generation time so a later measurement edit can't retroactively alter an issued certificate.
+  Ships a PDF via the same reportlab pattern already used for invoices/packing slips. Pages at
+  `/qa/coa/`.
+
+#### P6-C: Skills Matrix & Competency Gap Analysis ✅ Done
+- A skill master, required-proficiency-per-job-title requirements, per-employee assessed levels,
+  a per-employee gap report, and an org-wide gap-ranked summary
+- **Shipped:** `skills_matrix_core.py`. Requirements key on `position.job_title` (free text,
+  matched case-insensitively) since no job-title master table exists to key on instead. Pages at
+  `/skills/`.
+
+This batch was built on a parallel branch (`feature/discount-coa-skills-matrix`, PR #410) at the
+same time as Priority 5 above, off the same base commit — rebased onto the Priority 5 work with
+three small additive conflicts (an import-block merge, a cross-link button merge, and two domain
+tables where each branch had independently completed one adjacent row) before merging.
+
+---
+
+### ⚪ Priority 7 — Benefits, Regulatory Compliance, and Workforce Analytics
+
+#### P7-A: Benefits Management ✅ Done
+- A benefit plan catalog (Health/Dental/Vision/Life/Disability/401k) with employee/employer cost
+  per pay period, and per-employee enrollments by tier (Employee Only / +Spouse / +Child(ren) /
+  Family)
+- **Shipped:** `benefits_core.py` — `benefit_plan`/`benefit_enrollment` tables, `create_plan`/
+  `enroll_employee` (rejects a duplicate active enrollment in the same plan), `waive_enrollment`/
+  `terminate_enrollment`, and `get_benefits_dashboard` (org-wide cost + enrollment breakdown by
+  plan type). Deliberately kept **separate from** `payroll_core`'s existing `payroll_deduction_type`/
+  `employee_deduction` tables (which already model a flat/percent payroll deduction, including a
+  'Benefits' category) rather than merged into them — the two answer different questions ("which
+  plans exist and who's enrolled at what tier" vs. "how much comes out of this paycheck"); enrolling
+  here does not create or touch any `employee_deduction` row, the same "two independent sources of
+  truth" scoping already accepted for the FIFO/LIFO cost layers existing beside standard costing.
+  New pages at `/benefits/` (org dashboard + plan list), `/benefits/plans/new/`,
+  `/benefits/plans/<id>/` (enrollment management), and `/benefits/employee/<id>/` (an employee's
+  own active enrollments and per-pay-period cost), cross-linked from the Personnel Dashboard and
+  each employee's profile page.
+
+#### P7-B: Regulatory Compliance Templates (FDA, ISO) ✅ Done
+- Reusable requirement checklists for a named standard, instantiated per real audit/scope with
+  per-item status and evidence tracking. Closes Quality Management's last remaining domain gap.
+- **Shipped:** `regulatory_compliance_core.py` — `compliance_template`/`compliance_template_item`
+  (the reusable requirement list) and `compliance_checklist`/`compliance_checklist_item` (one
+  instantiation against a real scope). `create_checklist` snapshots every template item into its
+  own checklist-item row at creation time, the same snapshot-at-instantiation choice already used
+  for CoA generation against SPC measurements — editing the template afterward never rewrites a
+  checklist already in progress. Seeds two starter templates (`seed_default_templates`, called
+  idempotently on every template-list page load): "ISO 9001:2015 Quality Management System" and
+  "FDA 21 CFR Part 820 Quality System Regulation", each with a handful of representative clauses.
+  **These are explicitly disclosed as illustrative, not certified or exhaustive** — the same
+  "structure is real, the org's own content still needs expert judgment" scoping already used for
+  FMEA's S/O/D rating anchors and `sampling_plan_core`'s AQL disclaimer; consult the actual
+  standard text and a qualified auditor for real certification work. New pages at
+  `/qa/compliance/templates/` (list, seeded on load) and `/qa/compliance/templates/new/`,
+  `/qa/compliance/templates/<id>/` (requirements + instantiate-a-checklist), and
+  `/qa/compliance/checklists/` + `/qa/compliance/checklists/<id>/` (per-item status/evidence
+  entry with a live progress rollup), cross-linked from the Sampling Plans page alongside Control
+  Plans and CoA.
+
+#### P7-C: Workforce Analytics & Headcount Planning ✅ Done
+- Headcount summary/trend, average tenure, and trailing-12-month turnover, plus per-department
+  target-vs-actual headcount planning
+- **Shipped:** `workforce_analytics_core.py`. There was no hire-date/termination-date tracking
+  anywhere in this app before this — `ensure_workforce_columns` adds `hire_date`,
+  `termination_date`, and `employment_status` to `people` via additive `ALTER TABLE ... ADD
+  COLUMN IF NOT EXISTS`, the same pattern `personnel_core.ensure_contact_columns` already used for
+  phone/emergency-contact fields. **Every tenure/trend/turnover number is computed only from
+  employees whose hire_date has actually been entered** — existing employees default to an empty
+  string and are silently excluded from the math rather than backfilled with a fabricated hire
+  date, disclosed plainly in the module docstring rather than hidden, the same "drift/gaps are
+  real, document them" scoping already used for RFID tag/bin quantity drift. Headcount planning
+  is a second, independent `headcount_plan` table — an admin-entered target headcount per
+  department by a target date, compared against today's actual active headcount; there's no
+  forecasting model, just a real target vs. a real count. New pages at `/workforce/` (summary +
+  by-dept breakdown + 12-month trend + plan-vs-actual), `/workforce/headcount-plans/new/`, and
+  `/workforce/employee/<id>/` (set an employee's hire/termination dates), cross-linked from the
+  Personnel Dashboard and each employee's profile page. Verified end-to-end against a running dev
+  server + local Postgres through the actual web views for all three P7 features in this batch:
+  created a benefit plan and enrolled/waived a test employee and confirmed the dashboard and
+  employee-facing pages reflected it; confirmed the ISO/FDA templates seed correctly, instantiated
+  a checklist from one, marked an item complete with evidence notes, and confirmed the progress
+  rollup persisted; set a test employee's hire date, created a headcount plan, and confirmed the
+  workforce dashboard reflected both. Cleaned up all test data afterward.
+
+---
+
 ## Section 3: Competitive Positioning Summary
 
 ### Where This ERP Already Leads or Matches Mid-Market
@@ -1839,6 +1956,12 @@ and charts reflected it correctly; cleaned up all test data afterward.
 | No what-if scenario planning | P5-A |
 | No control plans / FMEA | P5-B |
 | No Activity-Based Costing (ABC) | P5-C |
+| No discount & promotion management | P6-A |
+| No Certificate of Analysis (CoA) generation | P6-B |
+| No skills matrix / competency gap analysis | P6-C |
+| No benefits management | P7-A |
+| No regulatory compliance templates (FDA, ISO) | P7-B |
+| No workforce analytics / headcount planning | P7-C |
 
 ### Where We Trail Mid-Market (Epicor / SYSPRO / Infor target)
 
@@ -1865,13 +1988,13 @@ Every item previously listed here has shipped (the last, RFID, closed as P3-M �
 | Work Orders & BOM | 9/10 | 8/10 | — |
 | MRP | 8/10 | 7/10 | — |
 | Inventory | 9/10 | 8/10 | ▲▲▲▲▲ (cycle count + WMS bins + inter-warehouse transfers (P3-H) + FIFO/LIFO/weighted-average costing (P3-I) + consignment inventory (P3-J) + RFID tracking (P3-M, simulated)) |
-| Quality (QA) | 9/10 | 8/10 | ▲▲ (sampling/AQL + document control + control plans/FMEA (P5-B)) |
+| Quality (QA) | 9/10 | 9/10 | ▲▲▲▲ (sampling/AQL + document control + control plans/FMEA (P5-B) + CoA generation (P6-B) + regulatory compliance templates (P7-B) — domain fully closed) |
 | Purchasing | 9/10 | 9/10 | ▲▲▲▲ (RFQ + scorecards + MRP auto-release + landed cost + blanket POs + EDI) |
-| Sales / CRM | 9/10 | 8/10 | ▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync) |
+| Sales / CRM | 9/10 | 8/10 | ▲▲▲▲▲ (ATP + price lists + customer portal + CTP + e-commerce sync + discount/promotion management (P6-A)) |
 | Finance / GL | 9/10 | 9/10 | ▲▲▲▲ (cash flow statement/forecast + multi-entity/intercompany/consolidated + carbon/ESG tracking + Activity-Based Costing (P5-C)) |
 | Fixed Assets | 9/10 | 8/10 | — |
 | Multi-Currency | 8/10 | 7/10 | — |
-| HR / Payroll | 8/10 | 7/10 | ▲ (ESS portal) |
+| HR / Payroll | 9/10 | 8/10 | ▲▲▲▲ (ESS portal + skills matrix (P6-C) + benefits management (P7-A) + workforce analytics/headcount planning (P7-C) — only ATS remaining) |
 | Maintenance (CMMS) | 9/10 | 9/10 | ▲▲▲ (OEE + live shop-floor dashboard/TV (P3-G) + predictive maintenance risk scoring (P4-B); mobile app now credited) |
 | IT Management | 10/10 | 9/10 | — |
 | Reporting / Analytics | 9/10 | 8/10 | ▲▲▲▲▲▲ (charts, CSV+Excel export, OEE reports, live shop-floor OEE (P3-G), AI demand forecast (P4-A), self-service report builder (P4-F), digest now credited) |
@@ -1903,14 +2026,25 @@ stand-in for that missing hardware, same as EDI/e-commerce do for missing live e
 or lower-ROI items not yet scheduled.
 
 **Status update (2026-07-09):** with every numbered P1–P4 roadmap item and the "Where We Trail
-Mid-Market" list fully closed, shipped the next 3 highest-ROI items from what remained scattered
-across the Section 1 domain tables as plain ❌ entries: what-if scenario planning (P5-A), control
-plans/FMEA (P5-B), and Activity-Based Costing (P5-C) — see Priority 5 above. None of these needed
-external hardware or a live third-party system, so unlike the Section 3 "Where We Trail
-Enterprise" gaps they shipped as full, non-simulated implementations. 38 features shipped total.
-The only gaps left anywhere in this document are Section 3's "Where We Trail Enterprise" table
-(real external-connectivity/hardware dependencies) and whatever lower-ROI items remain
-unscheduled.
+Mid-Market" list fully closed, shipped six more highest-ROI items from what remained scattered
+across the Section 1 domain tables as plain ❌ entries, built in two parallel batches off the same
+base commit: what-if scenario planning (P5-A), control plans/FMEA (P5-B), and Activity-Based
+Costing (P5-C) — see Priority 5 above — plus discount/promotion management (P6-A), Certificate of
+Analysis generation (P6-B), and skills matrix/competency gap analysis (P6-C) — see Priority 6
+above, rebased onto the Priority 5 branch and merged in second. None of these needed external
+hardware or a live third-party system, so unlike the Section 3 "Where We Trail Enterprise" gaps
+they shipped as full, non-simulated implementations. 41 features shipped total.
+
+**Status update (2026-07-10):** shipped three more highest-ROI items: benefits management (P7-A),
+regulatory compliance templates (P7-B) — closing out Quality Management's domain table entirely —
+and workforce analytics & headcount planning (P7-C), which also added the app's first
+hire-date/termination-date tracking. See Priority 7 above. 44 features shipped total. The only
+gaps left anywhere in this document are Section 3's "Where We Trail Enterprise" table (real
+external-connectivity/hardware dependencies), Applicant Tracking/Recruiting (ATS, the last item
+in HR/Payroll), and Configure-to-Order/recipe-formula-management/repetitive-manufacturing
+(Production Planning), Supplier Self-Service Portal (Purchasing), Technician Routing/Asset
+Performance Management (Maintenance), and Batch Record Generation (Reporting) — the remaining
+lower-ROI domain gaps not yet scheduled.
 
 ---
 

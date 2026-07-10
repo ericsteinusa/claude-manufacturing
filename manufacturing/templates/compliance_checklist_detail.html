@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block page_title %}{{ checklist.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/compliance/checklists/" class="btn">Checklists</a>
+<a href="/qa/compliance/templates/" class="btn">Templates</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:1000px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.progress-bar { background:#eee; border-radius:6px; height:14px; overflow:hidden; margin:8px 0; }
+.progress-fill { background:var(--accent); height:100%; }
+.form-row select, .form-row input { padding:3px; border:1.5px solid var(--border); border-radius:4px; font-size:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ checklist.name }} — {{ checklist.template_name }}
+        {% if checklist.status == 'complete' %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Complete</span>
+        {% else %}
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+        {% endif %}
+    </div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Standard: {{ checklist.standard|default:"—" }} · Owner: {{ checklist.owner|default:"—" }}
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Progress: {{ checklist.progress.percent }}% ({{ checklist.progress.complete }} complete, {{ checklist.progress.not_applicable }} N/A of {{ checklist.progress.total }})</h3>
+        <div class="progress-bar"><div class="progress-fill" style="width:{{ checklist.progress.percent }}%;"></div></div>
+    </div>
+
+    <div class="card">
+        <h3>Requirements</h3>
+        {% if checklist.items %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Clause</th><th>Requirement</th><th>Status</th><th>Evidence</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                </thead>
+                <tbody>
+                    {% for item in checklist.items %}
+                    <tr>
+                        <td>{{ item.clause_ref|default:"—" }}</td>
+                        <td>{{ item.requirement_text }}</td>
+                        {% if can_edit %}
+                        <td colspan="3">
+                            <form method="post" style="display:flex;gap:6px;align-items:center;">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <select name="status">
+                                    {% for s in item_statuses %}
+                                    <option value="{{ s }}" {% if s == item.status %}selected{% endif %}>{{ s|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="evidence_notes" value="{{ item.evidence_notes }}" placeholder="Evidence / notes" style="flex:1;">
+                                <button type="submit" class="btn" style="padding:3px 10px;font-size:11px;">Update</button>
+                            </form>
+                        </td>
+                        {% else %}
+                        <td>{{ item.status|title }}</td>
+                        <td>{{ item.evidence_notes|default:"—" }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No requirements on this checklist.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

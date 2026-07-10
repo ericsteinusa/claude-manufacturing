@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block page_title %}{{ plan.name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/benefits/" class="btn">Benefits</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:960px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; margin-bottom:14px; align-items:end; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">{{ plan.name }} ({{ plan.plan_type }})
+        {% if plan.is_active %}
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Active</span>
+        {% else %}
+        <span class="pill" style="font-size:11px;padding:2px 8px;">Inactive</span>
+        {% endif %}
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Plan Details</h3>
+        <p style="font-size:13px;color:#444;">
+            Carrier: {{ plan.carrier|default:"—" }}<br>
+            {% if plan.description %}{{ plan.description }}<br>{% endif %}
+            Employee cost: ${{ plan.employee_cost_per_pay|floatformat:2 }} / pay period —
+            Employer cost: ${{ plan.employer_cost_per_pay|floatformat:2 }} / pay period
+        </p>
+        {% if can_edit %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_active">
+            <button type="submit" class="btn">{% if plan.is_active %}Deactivate Plan{% else %}Reactivate Plan{% endif %}</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Enrollments</h3>
+        {% if enrollments %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Employee</th><th>Tier</th><th class="num">Dependents</th><th>Status</th><th>Enrolled</th>{% if can_edit %}<th></th>{% endif %}</tr>
+                </thead>
+                <tbody>
+                    {% for e in enrollments %}
+                    <tr>
+                        <td><a href="/benefits/employee/{{ e.people_id }}/">{{ e.last_name }}, {{ e.first_name }}</a></td>
+                        <td>{{ e.tier }}</td>
+                        <td class="num">{{ e.dependents_count }}</td>
+                        <td>{{ e.status|title }}</td>
+                        <td>{{ e.enrollment_date }}</td>
+                        {% if can_edit %}
+                        <td>
+                            {% if e.status == 'active' %}
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="waive">
+                                <input type="hidden" name="enrollment_id" value="{{ e.id }}">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Waive</button>
+                            </form>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="terminate">
+                                <input type="hidden" name="enrollment_id" value="{{ e.id }}">
+                                <button type="submit" class="btn" style="padding:3px 8px;font-size:11px;">Terminate</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No enrollments yet.</div>
+        {% endif %}
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Enroll Employee</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="enroll">
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Employee *</label>
+                    <select name="people_id" required>
+                        {% for p in people %}
+                        <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Tier</label>
+                    <select name="tier">
+                        {% for t in tiers %}
+                        <option value="{{ t }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Dependents</label>
+                    <input type="number" name="dependents_count" min="0" value="0">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Enroll</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

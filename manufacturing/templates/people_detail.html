@@ -5,6 +5,8 @@
 {% block toolbar_left %}
 <a href="{{ back_url }}" class="btn">Back</a>
 {% if can_edit %}<a href="/people/{{ person.id }}/edit/" class="btn">Edit</a>{% endif %}
+<a href="/benefits/employee/{{ person.id }}/" class="btn">Benefits</a>
+{% if can_edit %}<a href="/workforce/employee/{{ person.id }}/" class="btn">Employment Dates</a>{% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
 <a href="{% url 'audit_record' 'people' person.id %}" class="btn">History</a>
 {% endif %}

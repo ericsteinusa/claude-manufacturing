@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block page_title %}Workforce Analytics{% endblock %}
+
+{% block toolbar_left %}
+<a href="/workforce/headcount-plans/new/" class="btn btn-primary">+ New Headcount Plan</a>
+<a href="/pers/" class="btn">Personnel Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:26px; font-weight:bold; color:var(--accent); }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.gap-pos { color:#c0392b; font-weight:bold; }
+.gap-neg { color:#1a7f37; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <div class="menu-title">Workforce Analytics</div>
+    <p style="font-size:12.5px;color:var(--text-muted);">
+        Tenure and headcount trend are computed only from employees with a hire date on file —
+        set an employee's hire date from their profile to include them.
+    </p>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Active Headcount</div>
+            <div class="val">{{ summary.total_active|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Terminated (All-Time)</div>
+            <div class="val">{{ summary.total_terminated|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Avg Tenure (Years)</div>
+            <div class="val">{% if summary.avg_tenure_years != None %}{{ summary.avg_tenure_years }}{% else %}—{% endif %}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Turnover Rate (TTM)</div>
+            <div class="val">{% if summary.turnover_rate_ttm != None %}{{ summary.turnover_rate_ttm|floatformat:1 }}%{% else %}—{% endif %}</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Headcount by Department</h3>
+            {% if summary.by_dept %}
+            <table class="erp-table">
+                <thead><tr><th>Department</th><th class="num">Active</th></tr></thead>
+                <tbody>
+                {% for d in summary.by_dept %}
+                <tr><td>{{ d.dept_name }}</td><td class="num">{{ d.count }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No active employees.</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>12-Month Headcount Trend</h3>
+            {% if trend %}
+            <table class="erp-table">
+                <thead><tr><th>Month</th><th class="num">Headcount</th></tr></thead>
+                <tbody>
+                {% for point in trend %}
+                <tr><td>{{ point.month }}</td><td class="num">{{ point.headcount }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No hire-date data available.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Headcount Plan vs. Actual</h3>
+        {% if plan_vs_actual %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Department</th><th>Target Date</th><th class="num">Target</th><th class="num">Actual</th><th class="num">Gap</th></tr></thead>
+                <tbody>
+                {% for row in plan_vs_actual %}
+                <tr>
+                    <td>{{ row.dept_name }}</td>
+                    <td>{{ row.target_date }}</td>
+                    <td class="num">{{ row.target_headcount }}</td>
+                    <td class="num">{{ row.actual_headcount }}</td>
+                    <td class="num {% if row.gap > 0 %}gap-pos{% elif row.gap < 0 %}gap-neg{% endif %}">
+                        {% if row.gap > 0 %}+{% endif %}{{ row.gap }}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No headcount plans yet.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block page_title %}New Compliance Template{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/compliance/templates/" class="btn">Compliance Templates</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.cp-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row textarea { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="cp-wrap">
+    <div class="menu-title">New Compliance Template</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Name *</label>
+                <input type="text" name="name" required placeholder="e.g. ISO 13485:2016 Internal Audit">
+            </div>
+            <div class="form-row">
+                <label>Standard</label>
+                <input type="text" name="standard" placeholder="e.g. ISO 13485:2016">
+            </div>
+            <div class="form-row">
+                <label>Description</label>
+                <textarea name="description" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Template</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
