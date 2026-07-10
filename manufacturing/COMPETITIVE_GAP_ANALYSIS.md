@@ -2,6 +2,17 @@
 **Generated:** 2026-07-05 · **Refreshed:** 2026-07-08 · **2026-07-09 update below**
 **Compared Against:** SAP S/4HANA, Oracle Cloud Manufacturing, Microsoft Dynamics 365 SCM, Epicor Kinetic, Infor CloudSuite Industrial, Plex Manufacturing Cloud, SYSPRO, Fishbowl, JobBOSS², MRPeasy
 
+**Roadmap status (2026-07-10): closed for now.** Every Section 1 domain table has zero remaining
+❌ rows, and the broader embedded-AI analytics platform (P12-A) closed the last buildable-in-
+software item in Section 3. The four rows left in Section 3's "Where We Trail Enterprise" table
+(real IoT/sensor/RFID hardware, real carrier-API tracking, real AS2/EDI transport, a live
+e-commerce storefront) are not a backlog of unwritten code — each already ships real logic behind
+an honestly-scoped stub/simulation, and closing them for real requires an actual external account
+or piece of hardware (a carrier API credential, a live trading partner, a real storefront, physical
+sensors/readers) that this dev environment doesn't have, not more engineering effort. This document
+is retained as a reference for what's shipped and what those four gaps would take to close if that
+infrastructure becomes available.
+
 **2026-07-09:** Shipped the next 3 highest-ROI items from the "buildable now" list: **What-If
 Scenario Planning** (8/10 of the top-10 have it — the highest-adoption item remaining),
 **Control Plans & FMEA** (7/10), and **Activity-Based Costing** (6/10, but the last remaining
