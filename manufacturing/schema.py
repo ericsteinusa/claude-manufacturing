@@ -20,6 +20,9 @@ columns (``ALTER TABLE ... ADD COLUMN IF NOT EXISTS``).
 from .audit_core import install_triggers
 from .db_pg import get_db
 from .log_utils import get_logger
+from .purchase_orders_core import ensure_po_tables
+from .sales_orders_core import ensure_so_tables
+from .work_orders_core import ensure_wo_tables
 
 log = get_logger(__name__)
 
@@ -342,6 +345,313 @@ _TABLES = [
             name TEXT NOT NULL,
             dept_key TEXT NOT NULL DEFAULT '',
             is_active BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    """),
+    # --- Tables that historically only ever had a CREATE TABLE in a sample-
+    # data seed script, never in real application code — found via a real
+    # fresh-database boot (Phase 1's docker-compose verification), not a
+    # stale schema.py gap for existing dev DBs, which all happened to have
+    # these from a seed run at some point. DDL below is copied from the
+    # relevant seed script (the more actively-maintained source — cross-
+    # checked against each table's real *_core.py query usage), not
+    # reinvented. -------------------------------------------------------
+    ("gl_account", """
+        CREATE TABLE IF NOT EXISTS gl_account (
+            id SERIAL PRIMARY KEY,
+            account_number TEXT NOT NULL UNIQUE,
+            account_name TEXT NOT NULL,
+            account_type TEXT DEFAULT 'Expense',
+            account_sub TEXT DEFAULT '',
+            is_active INTEGER DEFAULT 1,
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("gl_journal", """
+        CREATE TABLE IF NOT EXISTS gl_journal (
+            id SERIAL PRIMARY KEY,
+            journal_date TEXT DEFAULT '',
+            reference TEXT DEFAULT '',
+            description TEXT DEFAULT '',
+            posted INTEGER DEFAULT 0,
+            created_by TEXT DEFAULT '',
+            created_at TEXT DEFAULT ''
+        )
+    """),
+    ("gl_journal_line", """
+        CREATE TABLE IF NOT EXISTS gl_journal_line (
+            id SERIAL PRIMARY KEY,
+            journal_id INTEGER NOT NULL,
+            account_id INTEGER NOT NULL,
+            debit REAL DEFAULT 0,
+            credit REAL DEFAULT 0,
+            memo TEXT DEFAULT ''
+        )
+    """),
+    ("ap_invoice", """
+        CREATE TABLE IF NOT EXISTS ap_invoice (
+            id SERIAL PRIMARY KEY,
+            vendor_id INTEGER,
+            invoice_number TEXT NOT NULL UNIQUE,
+            invoice_date TEXT DEFAULT '',
+            due_date TEXT,
+            amount REAL DEFAULT 0,
+            description TEXT DEFAULT '',
+            status TEXT DEFAULT 'open',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("ap_payment", """
+        CREATE TABLE IF NOT EXISTS ap_payment (
+            id SERIAL PRIMARY KEY,
+            invoice_id INTEGER NOT NULL,
+            payment_date TEXT DEFAULT '',
+            amount REAL DEFAULT 0,
+            payment_method TEXT DEFAULT 'Check',
+            reference TEXT DEFAULT '',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("ar_invoice", """
+        CREATE TABLE IF NOT EXISTS ar_invoice (
+            id SERIAL PRIMARY KEY,
+            customer_id INTEGER,
+            invoice_number TEXT NOT NULL UNIQUE,
+            invoice_date TEXT DEFAULT '',
+            due_date TEXT,
+            amount REAL DEFAULT 0,
+            description TEXT DEFAULT '',
+            status TEXT DEFAULT 'open',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("ar_payment", """
+        CREATE TABLE IF NOT EXISTS ar_payment (
+            id SERIAL PRIMARY KEY,
+            invoice_id INTEGER NOT NULL,
+            payment_date TEXT DEFAULT '',
+            amount REAL DEFAULT 0,
+            payment_method TEXT DEFAULT 'Check',
+            reference TEXT DEFAULT '',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("bank_account", """
+        CREATE TABLE IF NOT EXISTS bank_account (
+            id SERIAL PRIMARY KEY,
+            account_name TEXT NOT NULL,
+            bank_name TEXT NOT NULL,
+            account_number TEXT DEFAULT '',
+            routing_number TEXT DEFAULT '',
+            is_active INTEGER DEFAULT 1,
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("bank_statement", """
+        CREATE TABLE IF NOT EXISTS bank_statement (
+            id SERIAL PRIMARY KEY,
+            bank_account_id INTEGER NOT NULL,
+            statement_date TEXT NOT NULL,
+            beginning_balance REAL DEFAULT 0,
+            ending_balance REAL DEFAULT 0,
+            status TEXT DEFAULT 'Open',
+            reconciled_by TEXT DEFAULT '',
+            reconciled_at TEXT DEFAULT ''
+        )
+    """),
+    ("budget", """
+        CREATE TABLE IF NOT EXISTS budget (
+            id SERIAL PRIMARY KEY,
+            budget_name TEXT NOT NULL,
+            fiscal_year INTEGER,
+            status TEXT DEFAULT 'draft',
+            notes TEXT DEFAULT '',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("budget_line", """
+        CREATE TABLE IF NOT EXISTS budget_line (
+            id SERIAL PRIMARY KEY,
+            budget_id INTEGER NOT NULL,
+            category TEXT DEFAULT '',
+            description TEXT DEFAULT '',
+            budgeted_amount REAL DEFAULT 0,
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("audit_schedule", """
+        CREATE TABLE IF NOT EXISTS audit_schedule (
+            id SERIAL PRIMARY KEY,
+            audit_name TEXT NOT NULL,
+            audit_type TEXT DEFAULT '',
+            department TEXT DEFAULT '',
+            auditor TEXT DEFAULT '',
+            scheduled TEXT,
+            completed TEXT,
+            status TEXT DEFAULT 'Scheduled',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("audit_finding", """
+        CREATE TABLE IF NOT EXISTS audit_finding (
+            id SERIAL PRIMARY KEY,
+            audit_id INTEGER NOT NULL,
+            finding_ref TEXT DEFAULT '',
+            description TEXT NOT NULL,
+            severity TEXT DEFAULT 'Minor',
+            department TEXT DEFAULT '',
+            found_date TEXT,
+            status TEXT DEFAULT 'Open',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("tax_filing", """
+        CREATE TABLE IF NOT EXISTS tax_filing (
+            id SERIAL PRIMARY KEY,
+            tax_type TEXT NOT NULL,
+            jurisdiction TEXT DEFAULT '',
+            period TEXT DEFAULT '',
+            amount_due REAL DEFAULT 0,
+            amount_paid REAL DEFAULT 0,
+            filed_date TEXT,
+            due_date TEXT,
+            status TEXT DEFAULT 'Pending',
+            reference TEXT DEFAULT '',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("tax_calendar", """
+        CREATE TABLE IF NOT EXISTS tax_calendar (
+            id SERIAL PRIMARY KEY,
+            tax_type TEXT NOT NULL,
+            description TEXT DEFAULT '',
+            due_date TEXT,
+            status TEXT DEFAULT 'Pending',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("customer", """
+        CREATE TABLE IF NOT EXISTS customer (
+            id SERIAL PRIMARY KEY,
+            first_name TEXT,
+            last_name TEXT,
+            company_name TEXT,
+            phone_number TEXT,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            zip_code TEXT,
+            email TEXT,
+            created_by TEXT
+        )
+    """),
+    ("supplier", """
+        CREATE TABLE IF NOT EXISTS supplier (
+            id SERIAL PRIMARY KEY,
+            first_name TEXT,
+            last_name TEXT,
+            company_name TEXT,
+            phone_number TEXT,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            zip_code TEXT,
+            email TEXT,
+            created_by TEXT
+        )
+    """),
+    ("bom", """
+        CREATE TABLE IF NOT EXISTS bom (
+            id SERIAL PRIMARY KEY,
+            product_id INTEGER NOT NULL,
+            component_id INTEGER NOT NULL,
+            qty_required REAL DEFAULT 1.0,
+            unit TEXT,
+            notes TEXT,
+            scrap_pct REAL DEFAULT 0.0
+        )
+    """),
+    ("calls2", """
+        CREATE TABLE IF NOT EXISTS calls2 (
+            id SERIAL PRIMARY KEY,
+            customer_id INTEGER,
+            call TEXT DEFAULT '',
+            call_date TEXT DEFAULT '',
+            call_time TEXT DEFAULT '',
+            completion_date TEXT DEFAULT '',
+            completion_time TEXT DEFAULT '',
+            comments_box TEXT DEFAULT '',
+            completion_box INTEGER DEFAULT 0,
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("cs_improvement_plan", """
+        CREATE TABLE IF NOT EXISTS cs_improvement_plan (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT DEFAULT '',
+            owner TEXT DEFAULT '',
+            target_date TEXT DEFAULT '',
+            status TEXT DEFAULT 'Open',
+            created_date TEXT DEFAULT '',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("eng_project", """
+        CREATE TABLE IF NOT EXISTS eng_project (
+            id SERIAL PRIMARY KEY,
+            project_number TEXT NOT NULL UNIQUE,
+            title TEXT NOT NULL,
+            product_id INTEGER,
+            engineer TEXT DEFAULT '',
+            start_date TEXT DEFAULT '',
+            due_date TEXT,
+            status TEXT DEFAULT 'planning',
+            notes TEXT DEFAULT '',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("eng_task", """
+        CREATE TABLE IF NOT EXISTS eng_task (
+            id SERIAL PRIMARY KEY,
+            project_id INTEGER,
+            task_name TEXT NOT NULL,
+            assigned_to TEXT DEFAULT '',
+            due_date TEXT,
+            priority TEXT DEFAULT 'medium',
+            status TEXT DEFAULT 'open',
+            notes TEXT DEFAULT '',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("eng_design_review", """
+        CREATE TABLE IF NOT EXISTS eng_design_review (
+            id SERIAL PRIMARY KEY,
+            ecr_number TEXT NOT NULL UNIQUE,
+            title TEXT NOT NULL,
+            product_id INTEGER,
+            project_id INTEGER,
+            requested_by TEXT DEFAULT '',
+            review_date TEXT DEFAULT '',
+            status TEXT DEFAULT 'draft',
+            notes TEXT DEFAULT '',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("qa_inspection", """
+        CREATE TABLE IF NOT EXISTS qa_inspection (
+            id SERIAL PRIMARY KEY, insp_number TEXT NOT NULL UNIQUE,
+            product_id INTEGER, wo_id INTEGER,
+            insp_date TEXT DEFAULT '', inspector TEXT DEFAULT '',
+            result TEXT DEFAULT 'pending', notes TEXT DEFAULT '',
+            created_by TEXT DEFAULT ''
+        )
+    """),
+    ("qa_defect", """
+        CREATE TABLE IF NOT EXISTS qa_defect (
+            id SERIAL PRIMARY KEY, insp_id INTEGER NOT NULL,
+            defect_type TEXT DEFAULT '', severity TEXT DEFAULT 'minor',
+            description TEXT NOT NULL, resolved INTEGER DEFAULT 0,
+            created_by TEXT DEFAULT ''
         )
     """),
     # --- Bank reconciliation (Phase 3C) -------------------------------------
@@ -739,13 +1049,71 @@ def init_schema():
     """
     conn = get_db()
     try:
+        # product/work_order/purchase_order/po_item are created lazily by
+        # their own modules (work_orders_core.py / purchase_orders_core.py),
+        # not centrally here — but several tables in _TABLES below have a
+        # hard FK REFERENCES to them (po_approval -> purchase_order,
+        # wo_operation -> work_order, several -> product), so they must exist
+        # *before* the _TABLES loop runs on a completely fresh database.
+        # Every existing dev DB already had these from years of ad-hoc use,
+        # which is why this ordering bug was never caught before a real
+        # fresh-database boot (Phase 1's docker-compose verification).
+        #
+        # `product` is pre-created here (duplicating ensure_wo_tables' own
+        # CREATE TABLE, harmless since IF NOT EXISTS) because
+        # inventory_transaction needs it to exist, and inventory_transaction
+        # itself must exist *before* ensure_wo_tables runs: that function
+        # internally calls lot_core.ensure_lot_tables, which ALTERs
+        # inventory_transaction and would otherwise crash on a fresh DB too.
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS product (
+                id SERIAL PRIMARY KEY,
+                supplier_id INTEGER, name TEXT NOT NULL,
+                purchase_date TEXT, purchase_price REAL DEFAULT 0.0,
+                bin TEXT, amount INTEGER DEFAULT 0, reorder_point INTEGER DEFAULT 0
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS inventory_transaction (
+                id SERIAL PRIMARY KEY,
+                product_id INTEGER NOT NULL REFERENCES product(id),
+                trans_date TEXT,
+                trans_type TEXT,
+                quantity REAL DEFAULT 0,
+                reference TEXT,
+                notes TEXT,
+                created_by TEXT
+            )
+        """)
+        ensure_po_tables(conn)
+        ensure_wo_tables(conn)
+        # sales_order/so_item: same class of gap as above — ensure_so_tables
+        # is real and already handles the "created_by column missing because
+        # an older seed script created the table first" drift itself (its
+        # own defensive ALTER), but was never actually called at startup.
+        ensure_so_tables(conn)
+
         for _name, ddl in _TABLES:
             conn.execute(ddl)
         for table, columns in _RECONCILE.items():
             for col, col_def in columns:
-                conn.execute(
-                    f"ALTER TABLE {table} "
-                    f"ADD COLUMN IF NOT EXISTS {col} {col_def}")
+                # A handful of _RECONCILE entries (maint_equipment, maint_part)
+                # target tables from departments not yet centrally bootstrapped
+                # here (Maintenance/Legal/Marketing/Risk — still only created
+                # via seed scripts or the standalone create_missing_tables.py
+                # migration, a separate, larger follow-up). Skip via savepoint
+                # rather than crash init_schema() entirely on a fresh DB; once
+                # that table exists, this reconciles normally on the next
+                # startup.
+                conn.execute(f"SAVEPOINT reconcile_{table}")
+                try:
+                    conn.execute(
+                        f"ALTER TABLE {table} "
+                        f"ADD COLUMN IF NOT EXISTS {col} {col_def}")
+                    conn.execute(f"RELEASE SAVEPOINT reconcile_{table}")
+                except Exception:
+                    conn.execute(f"ROLLBACK TO SAVEPOINT reconcile_{table}")
+                    conn.execute(f"RELEASE SAVEPOINT reconcile_{table}")
         for idx_sql in _AUDIT_INDEXES:
             conn.execute(idx_sql)
         for name, desc in DEFAULT_ROLES:

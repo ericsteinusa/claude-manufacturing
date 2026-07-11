@@ -104,17 +104,32 @@ def install_triggers(conn=None) -> None:
         conn = get_db_connection()
     try:
         conn.execute(_TRIGGER_FN)
+        installed = 0
         for table in AUDITED_TABLES:
-            conn.execute(
-                f"DROP TRIGGER IF EXISTS _audit ON {table}"
-            )
-            conn.execute(
-                f"CREATE TRIGGER _audit "
-                f"AFTER INSERT OR UPDATE OR DELETE ON {table} "
-                f"FOR EACH ROW EXECUTE FUNCTION _audit_trigger()"
-            )
+            # A handful of AUDITED_TABLES entries (purchase_requisition family,
+            # maint_work_order, etc.) belong to departments not yet centrally
+            # bootstrapped on a fresh database (still only created via seed
+            # scripts or the standalone create_missing_tables.py migration —
+            # a separate, larger follow-up). Skip via savepoint rather than
+            # crash init_schema() entirely; once that table exists, this
+            # attaches its trigger normally on the next startup.
+            conn.execute(f"SAVEPOINT audit_trigger_{table}")
+            try:
+                conn.execute(
+                    f"DROP TRIGGER IF EXISTS _audit ON {table}"
+                )
+                conn.execute(
+                    f"CREATE TRIGGER _audit "
+                    f"AFTER INSERT OR UPDATE OR DELETE ON {table} "
+                    f"FOR EACH ROW EXECUTE FUNCTION _audit_trigger()"
+                )
+                conn.execute(f"RELEASE SAVEPOINT audit_trigger_{table}")
+                installed += 1
+            except Exception:
+                conn.execute(f"ROLLBACK TO SAVEPOINT audit_trigger_{table}")
+                conn.execute(f"RELEASE SAVEPOINT audit_trigger_{table}")
         conn.commit()
-        log.debug("Audit triggers installed on %d tables", len(AUDITED_TABLES))
+        log.debug("Audit triggers installed on %d/%d tables", installed, len(AUDITED_TABLES))
     finally:
         if close_after:
             conn.close()

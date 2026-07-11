@@ -57,7 +57,7 @@ def ensure_wo_tables(conn):
     conn.execute("""
         CREATE TABLE IF NOT EXISTS product (
             id SERIAL PRIMARY KEY,
-            supplier_id TEXT, name TEXT NOT NULL,
+            supplier_id INTEGER, name TEXT NOT NULL,
             purchase_date TEXT, purchase_price REAL DEFAULT 0.0,
             bin TEXT, amount INTEGER DEFAULT 0, reorder_point INTEGER DEFAULT 0
         )
