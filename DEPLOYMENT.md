@@ -1,12 +1,35 @@
 # Deployment
 
-This is Phase 1 of the production deployment plan (Phase 0 — settings
-hardening — already merged). It's a portable Docker Compose stack: no
-hosting target has been chosen yet, so this runs identically on a bare VPS
-today and becomes the base image for a managed platform (Fly/Render/ECS)
-later without redoing this work.
+Phases 0 (settings hardening) and 1 (Docker Compose stack) are merged. Phase
+2 adds VPS provisioning and TLS on top. Two decisions from the original
+scoping doc are resolved: **dedicated instance per customer**, hosted on a
+**self-managed VPS** (DigitalOcean/Hetzner/Linode-class, Ubuntu 22.04/24.04).
 
-## Quick start
+## New customer checklist
+
+1. Provision a fresh VPS (Ubuntu 22.04/24.04), point the customer's domain's
+   DNS `A` record at its IP.
+2. Bootstrap the box (creates a `deploy` user, hardens SSH, installs Docker,
+   configures the firewall — see the script for exactly what it does):
+   ```sh
+   ssh root@<new-vps-ip> 'bash -s' < scripts/provision_vps.sh
+   ```
+3. Log back in as `deploy` (root/password login are disabled by step 2),
+   clone the repo, and configure `.env` — see
+   [Required environment variables](#required-environment-variables) below.
+4. Bring the stack up over plain HTTP first (TLS needs the cert, which needs
+   this running for the HTTP-01 challenge):
+   ```sh
+   docker compose up -d --build
+   ```
+5. Issue the cert and switch on HTTPS:
+   ```sh
+   ./scripts/setup_tls.sh <customer-domain> <your-email>
+   ```
+6. Verify: visit `https://<customer-domain>/`, confirm the cert is valid and
+   plain `http://` redirects to `https://`.
+
+## Quick start (local dev / testing this stack itself)
 
 ```sh
 cp .env.example .env
@@ -44,21 +67,29 @@ See `.env.example` for the full list, including `DJANGO_ALLOWED_HOSTS` and
 
 ## Enabling HTTPS
 
-`nginx/app.conf` has no TLS configured yet — this Phase 1 baseline is
-intentionally hosting-agnostic, and a cert needs a real domain name, which
-depends on a hosting decision not yet made. Until then, `DJANGO_DEBUG=False`
-alone does **not** force HTTPS or mark cookies `Secure`, so login keeps
-working over plain HTTP.
+Handled by `scripts/setup_tls.sh <domain> <email>` (see the
+[New customer checklist](#new-customer-checklist) above) — run it once DNS
+for the domain already points at this box and `docker compose up -d` is
+running. It:
 
-Once you have a domain and a cert:
-
-1. Add a `listen 443 ssl` server block to `nginx/app.conf` with your
-   certificate paths (or terminate TLS at a load balancer in front of nginx
-   instead).
-2. Set `DJANGO_HTTPS_ENABLED=True` in `.env`. This turns on
-   `SECURE_SSL_REDIRECT`, secure cookies, HSTS, and trusts nginx's
+1. Requests a cert from Let's Encrypt via the `certbot` compose service
+   (HTTP-01 challenge, served through nginx's existing `/.well-known/
+   acme-challenge/` location — works against the plain-HTTP config that's
+   already running, no chicken-and-egg problem).
+2. Swaps `nginx/app.conf` for `nginx/app-ssl.conf.template` (domain
+   substituted in) and restarts nginx — the previous HTTP-only config is
+   saved as `nginx/app.conf.pre-tls.bak`.
+3. Sets `DJANGO_HTTPS_ENABLED=True` in `.env` and restarts `web`. This turns
+   on `SECURE_SSL_REDIRECT`, secure cookies, HSTS, and trusts nginx's
    `X-Forwarded-Proto` header (safe because nginx is the only service with a
    published port — a client can never reach gunicorn directly to spoof it).
+
+The `certbot` compose service keeps running afterward (`certbot renew` every
+12h) so renewal is automatic — nothing further to schedule.
+
+Until this has been run, `DJANGO_DEBUG=False` alone does **not** force HTTPS
+or mark cookies `Secure`, so login keeps working over plain HTTP in the
+meantime.
 
 ## Pointing at a managed Postgres
 
@@ -103,16 +134,19 @@ cron / your platform's scheduled-job mechanism.
   up under real concurrent load. Not wired up here because there's no real
   traffic yet to justify it — add it once load testing (Phase 3) shows it's
   needed, not before.
-- **S3/object storage for `MEDIA_ROOT`** — depends on which hosting target
-  gets picked later; forcing a specific provider now would mean redoing this
-  when that decision lands. Uploaded files (Document Control, P2-F) still
-  live on local disk / the `media_files` volume.
+- **S3/object storage for `MEDIA_ROOT`** — dedicated-instance-per-customer
+  (§1, resolved) means this is lower priority than it looked originally: each
+  customer's disk is already isolated, so there's no urgent multi-tenant
+  reason to move off it. Revisit if a customer's data volume genuinely
+  outgrows local disk. Uploaded files (Document Control, P2-F) still live on
+  local disk / the `media_files` volume.
 - **A real deploy step in CI** — `.github/workflows/docker-build.yml` only
-  builds the image to catch a broken Dockerfile on every PR. There's no
-  hosting target/credentials yet to actually deploy to.
-- **TLS/certbot** — needs a real domain name, which depends on the hosting
-  decision. See [Enabling HTTPS](#enabling-https) for what to do once one
-  exists.
+  builds the image to catch a broken Dockerfile on every PR. Deploying is a
+  per-customer VPS operation (see the checklist above), not a single CI
+  target, given the dedicated-instance model.
+- **fail2ban / deeper SSH hardening** — `scripts/provision_vps.sh` covers
+  key-only SSH + a firewall; anything past that is real security-review
+  territory (Phase 3), not provisioning.
 
-These map to Phases 2–4 of the original deployment scoping document, not
+These map to Phases 3–4 of the original deployment scoping document, not
 gaps in this phase.
