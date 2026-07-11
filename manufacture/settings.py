@@ -269,3 +269,28 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL', 'manufacturing@company.local'
 )
+
+# ---------------------------------------------------------------------------
+# Error tracking (Phase 3) — opt-in via SENTRY_DSN, same pattern as
+# EMAIL_BACKEND/DJANGO_HTTPS_ENABLED above: unset by default, so local dev and
+# CI never talk to Sentry at all. A real deployment sets SENTRY_DSN in .env.
+# ---------------------------------------------------------------------------
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=os.environ.get('SENTRY_ENVIRONMENT', 'production'),
+        # This app already has payroll/HR/PII data in scope (see the
+        # deployment scoping doc's compliance-decision callout) — never send
+        # request/user PII to a third-party service by default. Someone
+        # explicitly deciding compliance scope allows it, not this default.
+        send_default_pii=False,
+        # Performance tracing samples real request timings/bodies; off by
+        # default (0.0) until there's a reason — and a compliance answer —
+        # to turn it on. Override via SENTRY_TRACES_SAMPLE_RATE if needed.
+        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0')),
+    )
