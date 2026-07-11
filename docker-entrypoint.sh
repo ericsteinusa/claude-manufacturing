@@ -38,6 +38,20 @@ except psycopg2.OperationalError as e:
 done
 echo "Database is reachable."
 
+# manufacturing/*.py's own schema (init_schema(), run above via app-registry
+# population) never touches Django's own built-in tables -- django_session
+# (contrib.sessions), django_admin_log/auth_permission/etc. (contrib.admin/
+# auth/contenttypes) only exist if `manage.py migrate` has actually run.
+# This app has no real migrations of its own (manufacturing/migrations/ is
+# empty besides __init__.py) so this is only ever applying Django's bundled
+# migrations for those built-in apps -- but skipping it entirely, as this
+# script did until now, meant every fresh deployment 500'd on the very first
+# login: SessionMiddleware tries to save the session to a table that was
+# never created. Caught via real load testing against a fresh container,
+# not by inspection -- collectstatic's own app-registry population made the
+# app *look* fully booted, but nothing had ever exercised an actual login.
+python manage.py migrate --noinput
+
 python manage.py collectstatic --noinput
 
 # --preload loads the WSGI app (triggering Django's app registry population,
