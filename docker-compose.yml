@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-company_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Deliberately not published to the host — web/nginx reach it over the
+    # compose network by service name. Use `docker compose exec db psql ...`
+    # for local access instead of opening the port.
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Overrides whatever DB_HOST/DB_PORT are in .env (which may point at a
+      # non-docker local Postgres for bare `manage.py runserver` use) — inside
+      # the compose network, "db" is always the right hostname.
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db
+    volumes:
+      - staticfiles:/app/staticfiles
+      - media_files:/app/media
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:ro
+      # Static files only — nginx never touches /app/media. Every uploaded
+      # file goes through the authenticated document_download view in the
+      # web container, not a direct nginx alias (see nginx/app.conf).
+      - staticfiles:/app/staticfiles:ro
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  staticfiles:
+  media_files:

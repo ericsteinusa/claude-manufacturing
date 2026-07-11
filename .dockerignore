@@ -1,0 +1,32 @@
+# VCS / CI / editor
+.git
+.github
+.claude
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+*.egg-info
+
+# Virtualenvs (never bundle a host venv into the image)
+venv
+.venv
+env
+
+# Local-only runtime state (created fresh in the container/volumes)
+media
+staticfiles
+*.log
+db.sqlite3
+
+# Env files — injected via `env_file:` in docker-compose, never baked in
+.env
+.env.local
+.env.example
+
+# Not part of the Django backend image
+mobile
+tests
+scripts

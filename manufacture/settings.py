@@ -55,18 +55,24 @@ if not DEBUG:
             'DJANGO_SECRET_KEY must be set to a real secret when DJANGO_DEBUG=False.'
         )
 
-    # HTTPS enforcement — only makes sense once DEBUG is off (a plain HTTP
-    # localhost dev server would otherwise redirect-loop). SECURE_PROXY_SSL_HEADER
-    # is deliberately not set here: it's only safe once Phase 1 picks a specific
-    # reverse proxy/load balancer that's trusted to strip/set X-Forwarded-Proto —
-    # setting it without that in place would let a client spoof the header and
-    # trick Django into treating an insecure request as secure.
+# HTTPS enforcement is intentionally independent of DEBUG. DEBUG=False alone
+# (e.g. the Phase 1 docker-compose stack, whose nginx has no TLS cert yet)
+# must still let cookie-based login work over plain HTTP — SESSION_COOKIE_SECURE
+# would silently break every login if forced on before TLS actually exists.
+# Set DJANGO_HTTPS_ENABLED=True once a real TLS terminator (nginx with a cert,
+# a managed platform's load balancer) sits in front of the app. That same flag
+# gates SECURE_PROXY_SSL_HEADER: trusting X-Forwarded-Proto is only safe once
+# there's a specific, trusted proxy in front of Django that's known to set it
+# on every request (nginx/app.conf does) — a client can't reach gunicorn directly
+# to spoof it, since nginx is the only service with a published port.
+if _env_bool('DJANGO_HTTPS_ENABLED', False):
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -83,6 +89,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Must stay immediately after SecurityMiddleware (whitenoise's own
+    # requirement) — serves collected static files directly from the app
+    # process, so it works whether or not nginx ends up in front of it.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -166,6 +176,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Where `manage.py collectstatic` gathers files for whitenoise/nginx to serve
+# in production. Must run at container *start* (docker-entrypoint.sh), not at
+# `docker build` time — collecting static files populates the full app
+# registry, which triggers manufacturing.apps.ManufacturingConfig.ready() and
+# needs a live Postgres connection that doesn't exist during an image build.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Uploaded files (Document Control module, P2-F) — the first feature in this
 # app to accept file uploads. Deliberately not wired up for direct static

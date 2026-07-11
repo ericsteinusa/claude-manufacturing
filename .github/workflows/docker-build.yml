@@ -1,0 +1,19 @@
+name: docker-build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        # Only builds the image — no live database is available in CI, and
+        # none is needed: collectstatic/migrations run at container start
+        # (docker-entrypoint.sh), never at build time. Catches a broken
+        # Dockerfile/dependency on every PR without needing a real deploy
+        # target, which doesn't exist yet.
+        run: docker build -t manufacture:ci .

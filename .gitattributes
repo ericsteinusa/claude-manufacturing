@@ -1,0 +1,5 @@
+# Shell scripts must always use LF, even checked out on Windows (where
+# core.autocrlf=true is common) — CRLF breaks the shebang line when these
+# get copied into a Linux Docker container (docker-entrypoint.sh,
+# scripts/*.sh).
+*.sh text eol=lf
