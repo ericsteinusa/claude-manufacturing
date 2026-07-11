@@ -17,3 +17,6 @@ reportlab==5.0.0
 # Production deployment (Phase 1 — see DEPLOYMENT.md)
 gunicorn==26.0.0
 whitenoise==6.12.0
+
+# Operational readiness (Phase 3 — see DEPLOYMENT.md)
+sentry-sdk==2.64.0

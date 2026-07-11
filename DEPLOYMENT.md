@@ -91,6 +91,34 @@ Until this has been run, `DJANGO_DEBUG=False` alone does **not** force HTTPS
 or mark cookies `Secure`, so login keeps working over plain HTTP in the
 meantime.
 
+## Error tracking (Sentry)
+
+Opt-in via `SENTRY_DSN` — unset by default, so local dev and CI never talk to
+Sentry at all (`manufacture/settings.py`). To enable:
+
+1. Create a Sentry project and copy its DSN.
+2. Set `SENTRY_DSN` in `.env` (see `.env.example`). Optionally set
+   `SENTRY_ENVIRONMENT` (defaults to `production`) to distinguish multiple
+   customer instances in one Sentry org, one per VPS.
+3. Restart `web`.
+
+Two things are deliberately conservative and **not** configurable via env
+var, given this app already has payroll/HR/PII data in scope:
+- `send_default_pii=False` — request/user PII is never sent to Sentry.
+- `traces_sample_rate` defaults to `0` (`SENTRY_TRACES_SAMPLE_RATE` overrides
+  it) — performance tracing samples real request timings/bodies, so it stays
+  off until there's a specific reason (and a compliance answer) to turn it on.
+
+**Known limitation of this first pass:** Sentry's Django integration
+captures genuinely unhandled exceptions (real 500s) automatically. Several
+views in this app catch their own exceptions and show a friendly error
+message instead of letting one propagate (`except Exception as e: error =
+str(e)`) — those won't reach Sentry unless the code also logs at `ERROR`
+level or above (Sentry's default logging integration picks those up too) or
+calls `sentry_sdk.capture_exception()` explicitly. Auditing which
+error-handling paths should surface in Sentry is real follow-up work, not
+done here.
+
 ## Pointing at a managed Postgres
 
 Nothing to build — `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASSWORD` are
