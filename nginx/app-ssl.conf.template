@@ -1,9 +1,7 @@
-# Reverse proxy for the Manufacture ERP web app. This is the pre-TLS state —
-# scripts/setup_tls.sh swaps this file for nginx/app-ssl.conf.template once a
-# real domain's cert has been issued (see DEPLOYMENT.md's "New customer
-# checklist"). The /.well-known/acme-challenge/ location below is required in
-# both states: certbot's HTTP-01 challenge (initial issuance and renewal)
-# always happens over plain port 80, even after HTTPS is otherwise enforced.
+# TLS-enabled nginx config — swapped in by scripts/setup_tls.sh once a real
+# cert has been issued for DOMAIN (see DEPLOYMENT.md's "New customer
+# checklist"). Not used directly: setup_tls.sh substitutes DOMAIN via sed
+# before copying this over nginx/app.conf and reloading nginx.
 
 client_max_body_size 20M;
 
@@ -11,13 +9,27 @@ upstream app {
     server web:8000;
 }
 
+# Plain HTTP: only the ACME challenge (renewals still happen over port 80)
+# and a redirect to HTTPS for everything else.
 server {
     listen 80;
-    server_name _;
+    server_name DOMAIN;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name DOMAIN;
+
+    ssl_certificate     /etc/letsencrypt/live/DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/DOMAIN/privkey.pem;
 
     # Served directly by nginx, bypassing the Python process entirely — real
     # production practice, not just a proxy passthrough.

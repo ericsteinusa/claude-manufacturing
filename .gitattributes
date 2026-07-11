@@ -3,3 +3,8 @@
 # get copied into a Linux Docker container (docker-entrypoint.sh,
 # scripts/*.sh).
 *.sh text eol=lf
+
+# nginx configs are also bind-mounted straight into a Linux container
+# (docker-compose.yml) — nginx tolerates CRLF in practice, but there's no
+# reason to rely on that.
+nginx/*.conf* text eol=lf
