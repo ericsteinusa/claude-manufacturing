@@ -89,7 +89,6 @@
             </thead>
             <tbody>
             {% for a in audits %}
-            {% with slug=a.status|lower|replace:" ,_" %}
             <tr>
                 <td><a href="/fin/audits/{{ a.id }}/">{{ a.audit_name }}</a></td>
                 <td>{{ a.audit_type|default:"—" }}</td>
@@ -99,7 +98,6 @@
                 <td>{{ a.completed|default:"—" }}</td>
                 <td><span class="badge s-{{ a.status|lower|cut:' ' }}">{{ a.status }}</span></td>
             </tr>
-            {% endwith %}
             {% empty %}
             <tr><td colspan="7" style="color:#888;text-align:center;">No audits found.</td></tr>
             {% endfor %}
