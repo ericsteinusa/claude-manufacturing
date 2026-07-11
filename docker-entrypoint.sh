@@ -40,4 +40,12 @@ echo "Database is reachable."
 
 python manage.py collectstatic --noinput
 
-exec gunicorn manufacture.wsgi:application --bind 0.0.0.0:8000 --workers 3
+# --preload loads the WSGI app (triggering Django's app registry population,
+# and so manufacturing.apps.ManufacturingConfig.ready() -> init_schema()) once
+# in the gunicorn master process *before* forking workers. Without it, each
+# of the 3 workers independently re-imports the app and re-runs init_schema()
+# concurrently — caught in practice as a real
+# "psycopg2.errors.InternalError_: tuple concurrently updated" crash on first
+# boot (multiple workers racing to CREATE/ALTER the same tables and audit
+# trigger function at once), not just a theoretical race.
+exec gunicorn manufacture.wsgi:application --bind 0.0.0.0:8000 --workers 3 --preload
