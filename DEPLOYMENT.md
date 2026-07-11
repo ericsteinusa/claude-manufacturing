@@ -155,13 +155,47 @@ gunzip -c backups/company_db_TIMESTAMP.sql.gz | \
 Neither path is scheduled automatically yet — wire whichever one fits into
 cron / your platform's scheduled-job mechanism.
 
+## Load testing
+
+`scripts/loadtest/locustfile.py` simulates realistic logged-in browsing
+across several departments' list pages — specifically to check whether
+`manufacturing/db_pg.py`'s `get_db_connection()` (a fresh Postgres
+connection per call) bottlenecks under real concurrency.
+
+```sh
+pip install -r requirements-dev.txt
+./scripts/loadtest/run.sh http://your-host 30 5 2m   # 30 users, ramp 5/s, 2 min
+```
+
+Never point this at a real customer's production instance without warning
+them first — it's real concurrent traffic, not a passive check.
+
+**Results (2026-07-10, against the real Docker Compose stack — gunicorn x3
+workers + nginx, not `runserver`):** 30 concurrent users, 2 minutes, **0%
+failure rate** across 1,803 requests. Median response time ~19ms for the
+read-heavy list pages, ~330ms for login (expected — bcrypt password hashing
++ a DB write for the new session). 99th percentile stayed under 500ms
+across the board. Postgres connection count returned to baseline
+immediately after the run, nowhere near the default `max_connections=100`.
+**The per-call connection pattern is not a bottleneck at this scale** — 30
+concurrent users is already a generous assumption for a single "few big
+companies" customer instance. Revisit if a customer's real usage pattern
+looks meaningfully different from this test.
+
+A real, unrelated bug was found running this test the first time (against
+a freshly built container): every fresh deployment 500'd on the very first
+login, because `docker-entrypoint.sh` never ran `manage.py migrate` —
+Django's own `django_session` table never existed. Fixed separately; see
+git history if you want the full story. Re-ran the test above against the
+fixed deployment for the numbers reported here.
+
 ## What's deliberately not done yet (and why)
 
-- **pgbouncer / connection pooling** — `manufacturing/db_pg.py`'s
-  `get_db_connection()` opens a fresh connection per call, which won't hold
-  up under real concurrent load. Not wired up here because there's no real
-  traffic yet to justify it — add it once load testing (Phase 3) shows it's
-  needed, not before.
+- **pgbouncer / connection pooling** — not wired up. The concern (`manufacturing/db_pg.py`'s
+  `get_db_connection()` opens a fresh connection per call) was real enough to
+  test, not just assume: real load testing (above) shows it's not a
+  bottleneck at 30 concurrent users. Revisit if a customer's actual traffic
+  pattern looks meaningfully heavier than what was tested.
 - **S3/object storage for `MEDIA_ROOT`** — dedicated-instance-per-customer
   (§1, resolved) means this is lower priority than it looked originally: each
   customer's disk is already isolated, so there's no urgent multi-tenant
