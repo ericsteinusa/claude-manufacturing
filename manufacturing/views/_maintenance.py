@@ -36,6 +36,7 @@ from ..maintenance_core import (
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
     get_equipment_reliability_report, get_schedule_status_breakdown,
+    get_wo_status_breakdown, get_downtime_by_category,
 )
 
 log = get_logger(__name__)
@@ -69,6 +70,8 @@ def maint_dashboard(request):
         oee_trend = get_oee_trend(conn, end_date=today.isoformat(), weeks=8)
         downtime_by_equipment = get_equipment_reliability_report(conn, months=3)
         schedule_breakdown = get_schedule_status_breakdown(conn)
+        wo_status = get_wo_status_breakdown(conn)
+        downtime_by_cat = get_downtime_by_category(conn, months=3)
     finally:
         conn.close()
     return render(request, 'maint_dashboard.html', _maint_ctx(
@@ -76,6 +79,8 @@ def maint_dashboard(request):
         oee_trend_json=json.dumps(oee_trend),
         downtime_by_equipment_json=json.dumps(downtime_by_equipment),
         schedule_breakdown_json=json.dumps(schedule_breakdown),
+        wo_status_json=json.dumps(wo_status),
+        downtime_by_cat_json=json.dumps(downtime_by_cat),
     ))
 
 

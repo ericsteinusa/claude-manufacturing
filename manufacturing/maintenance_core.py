@@ -79,6 +79,28 @@ def get_schedule_status_breakdown(conn) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def get_wo_status_breakdown(conn) -> list[dict]:
+    """Return [{status, cnt}] — maint work order count by status."""
+    rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM maint_work_order "
+        "GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_downtime_by_category(conn, months: int = 3) -> list[dict]:
+    """Return [{category, hours}] — total downtime hours by category
+    for the last ``months`` months, descending."""
+    rows = conn.execute(
+        "SELECT COALESCE(category, 'Uncategorized') AS category, "
+        "COALESCE(SUM(hours), 0) AS hours "
+        "FROM maint_downtime "
+        "WHERE down_date >= (CURRENT_DATE - INTERVAL '%s months')::text "
+        "GROUP BY category ORDER BY hours DESC LIMIT 8" % months
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ---------------------------------------------------------------------------
 # Mechanic loader (for dropdowns)
 # ---------------------------------------------------------------------------
