@@ -174,6 +174,7 @@ urlpatterns = [
     path('demand-forecast/generate/', views.demand_forecast_generate,
          name='demand_forecast_generate'),
     path('inventory/', views.inventory_list, name='inventory_list'),
+    path('inventory/dashboard/', views.inventory_dashboard, name='inventory_dashboard'),
     path('inventory/export/', views.inventory_export, name='inventory_export'),
     path('inventory/new/', views.inventory_new, name='inventory_new'),
     path('inventory/<int:product_id>/', views.inventory_detail,

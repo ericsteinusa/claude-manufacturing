@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block page_title %}Inventory Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/inventory/" class="btn">All Items</a>
+<a href="/inventory/new/" class="btn btn-primary">+ New Item</a>
+<a href="/inventory/cycle-counts/" class="btn">Cycle Counts</a>
+<a href="/inventory/valuation/" class="btn">Valuation</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:16px 18px; text-align:center; text-decoration:none; display:block; }
+.kpi:hover { border-color:var(--accent); }
+.kpi .val { font-size:30px; font-weight:bold; color:var(--accent); }
+.kpi .val.money { font-size:20px; }
+.kpi .lbl { font-size:11px; color:#555; margin-top:4px; text-transform:uppercase; }
+.kpi.red .val { color:#c62828; }
+.kpi.amber .val { color:#e65100; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Inventory Dashboard</h2>
+
+    <div class="dept-grid">
+        <a href="/inventory/" class="dept-btn">All Items</a>
+        <a href="/inventory/?filter=zero" class="dept-btn">Zero Stock</a>
+        <a href="/inventory/?filter=low" class="dept-btn">Low Stock</a>
+        <a href="/inventory/?item_type=make" class="dept-btn">Make Items</a>
+        <a href="/inventory/?item_type=buy" class="dept-btn">Buy Items</a>
+        <a href="/inventory/cycle-counts/" class="dept-btn">Cycle Counts</a>
+        <a href="/inventory/valuation/" class="dept-btn">Valuation Report</a>
+        <a href="/inventory/new/" class="dept-btn">New Item</a>
+    </div>
+
+    <div class="kpi-row">
+        <a href="/inventory/" class="kpi">
+            <div class="val">{{ kpi.total_products|default:0 }}</div>
+            <div class="lbl">Total Products</div>
+        </a>
+        <a href="/inventory/" class="kpi">
+            <div class="val money">${{ kpi.total_value|floatformat:0|default:0 }}</div>
+            <div class="lbl">Inventory Value</div>
+        </a>
+        <a href="/inventory/?filter=zero" class="kpi {% if kpi.zero_stock %}red{% endif %}">
+            <div class="val">{{ kpi.zero_stock|default:0 }}</div>
+            <div class="lbl">Zero Stock</div>
+        </a>
+        <a href="/inventory/?filter=low" class="kpi {% if kpi.low_stock %}amber{% endif %}">
+            <div class="val">{{ kpi.low_stock|default:0 }}</div>
+            <div class="lbl">Below Reorder Point</div>
+        </a>
+    </div>
+
+    <div class="two-col">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Top Items by Inventory Value</h3>
+            <canvas id="chart-top-value" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Transaction Trend (last 14 days)</h3>
+            <canvas id="chart-txn-trend" height="220"></canvas>
+        </div>
+    </div>
+
+    <div class="two-col" style="margin-top:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Stock Status</h3>
+            <canvas id="chart-stock-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Make vs Buy</h3>
+            <canvas id="chart-make-buy" height="220"></canvas>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var topValue    = {{ top_value_json|safe }};
+    var txnTrend    = {{ txn_trend_json|safe }};
+    var stockStatus = {{ stock_status_json|safe }};
+    var makeBuy     = {{ make_buy_json|safe }};
+
+    new Chart(document.getElementById('chart-top-value'), {
+        type: 'bar',
+        data: {
+            labels: topValue.map(function (r) { return r.name; }),
+            datasets: [{ label: 'Value ($)',
+                data: topValue.map(function (r) { return r.value; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: {
+            indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } },
+        },
+    });
+
+    new Chart(document.getElementById('chart-txn-trend'), {
+        type: 'line',
+        data: {
+            labels: txnTrend.map(function (r) { return r.day; }),
+            datasets: [
+                { label: 'Received',
+                  data: txnTrend.map(function (r) { return r.received; }),
+                  borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)',
+                  fill: true, tension: 0.3 },
+                { label: 'Issued',
+                  data: txnTrend.map(function (r) { return r.issued; }),
+                  borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)',
+                  fill: true, tension: 0.3 },
+            ],
+        },
+        options: { responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true } } },
+    });
+
+    new Chart(document.getElementById('chart-stock-status'), {
+        type: 'doughnut',
+        data: {
+            labels: ['OK', 'Low', 'Zero'],
+            datasets: [{ data: [stockStatus.ok||0, stockStatus.low||0, stockStatus.zero||0],
+                backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-make-buy'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Make', 'Buy'],
+            datasets: [{ data: [makeBuy.make||0, makeBuy.buy||0],
+                backgroundColor: ['#7c3aed', '#1d6fe8'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+})();
+</script>
+{% endblock %}

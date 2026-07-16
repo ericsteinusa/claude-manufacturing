@@ -3652,6 +3652,78 @@ def _inv_context(request, **extra):
 
 
 @dept_required(_INV_DEPT_KEYS)
+def inventory_dashboard(request):
+    conn = get_db_connection()
+    try:
+        alerts = get_alert_counts(conn)
+        kpi = conn.execute("""
+            SELECT
+                COUNT(*)                                          AS total_products,
+                COALESCE(SUM(amount * purchase_price), 0)        AS total_value,
+                COUNT(*) FILTER (WHERE COALESCE(amount,0) <= 0)  AS zero_stock,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(amount,0) > 0
+                      AND reorder_point > 0
+                      AND COALESCE(amount,0) <= reorder_point)   AS low_stock,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(item_type,'buy') = 'make')     AS make_count,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(item_type,'buy') = 'buy')      AS buy_count
+            FROM product
+        """).fetchone()
+        top_value = conn.execute("""
+            SELECT name, COALESCE(amount * purchase_price, 0) AS value
+            FROM product
+            WHERE COALESCE(amount, 0) > 0
+            ORDER BY value DESC
+            LIMIT 8
+        """).fetchall()
+        txn_trend = conn.execute("""
+            SELECT trans_date AS day,
+                COALESCE(SUM(quantity) FILTER (
+                    WHERE trans_type = 'receive'), 0) AS received,
+                COALESCE(SUM(quantity) FILTER (
+                    WHERE trans_type = 'issue'), 0)   AS issued
+            FROM inventory_transaction
+            WHERE trans_date >= CURRENT_DATE - INTERVAL '14 days'
+            GROUP BY trans_date
+            ORDER BY trans_date
+        """).fetchall()
+        stock_status = conn.execute("""
+            SELECT
+                COUNT(*) FILTER (
+                    WHERE COALESCE(amount,0) <= 0)                AS zero,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(amount,0) > 0
+                      AND reorder_point > 0
+                      AND COALESCE(amount,0) <= reorder_point)    AS low,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(amount,0) > 0
+                      AND (reorder_point = 0
+                           OR COALESCE(amount,0) > reorder_point)) AS ok
+            FROM product
+        """).fetchone()
+    finally:
+        conn.close()
+
+    ss = dict(stock_status) if stock_status else {}
+    kpi_d = dict(kpi) if kpi else {}
+    ctx = _inv_context(
+        request,
+        kpi=kpi_d,
+        alerts=alerts,
+        top_value_json=json.dumps([dict(r) for r in top_value]),
+        txn_trend_json=json.dumps([dict(r) for r in txn_trend]),
+        stock_status_json=json.dumps(ss),
+        make_buy_json=json.dumps({
+            'make': kpi_d.get('make_count', 0),
+            'buy': kpi_d.get('buy_count', 0),
+        }),
+    )
+    return render(request, 'inventory_dashboard.html', ctx)
+
+
+@dept_required(_INV_DEPT_KEYS)
 def inventory_list(request):
 
     search = request.GET.get('search', '').strip()
