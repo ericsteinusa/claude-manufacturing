@@ -6636,6 +6636,8 @@ def purch_dashboard(request):
         spend_by_month_json=json.dumps(data.get('spend_by_month', [])),
         top_suppliers_json=json.dumps(data.get('top_suppliers', [])),
         po_trend_json=json.dumps(data.get('po_trend', [])),
+        top_items_json=json.dumps(data.get('top_items', [])),
+        req_status_json=json.dumps(data.get('req_status', [])),
     )
     return render(request, 'purchasing_dashboard.html', ctx)
 

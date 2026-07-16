@@ -107,6 +107,17 @@
         </div>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Top Items by Spend</h3>
+            <canvas id="chart-top-items" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Requisition Status</h3>
+            <canvas id="chart-req-status" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Purchase Orders</h3>
         <table class="list-table">
@@ -147,6 +158,8 @@
     var spendMonth   = {{ spend_by_month_json|safe }};
     var topSuppliers = {{ top_suppliers_json|safe }};
     var poTrend      = {{ po_trend_json|safe }};
+    var topItems     = {{ top_items_json|safe }};
+    var reqStatus    = {{ req_status_json|safe }};
 
     var statusColors = {
         draft: '#94a3b8', pending_approval: '#f59e0b', sent: '#1d6fe8',
@@ -201,6 +214,34 @@
         },
         options: { responsive: true, plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-top-items'), {
+        type: 'bar',
+        data: {
+            labels: topItems.map(function (r) { return r.item; }),
+            datasets: [{ label: 'Spend ($)',
+                data: topItems.map(function (r) { return r.spend; }),
+                backgroundColor: '#06b6d4' }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
+    });
+
+    var reqColors = { draft: '#94a3b8', pending: '#f59e0b', approved: '#22c55e',
+                      rejected: '#ef4444', ordered: '#1d6fe8', cancelled: '#64748b' };
+    new Chart(document.getElementById('chart-req-status'), {
+        type: 'doughnut',
+        data: {
+            labels: reqStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: reqStatus.map(function (r) { return r.cnt; }),
+                backgroundColor: reqStatus.map(function (r) {
+                    return reqColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
     });
 })();
 </script>

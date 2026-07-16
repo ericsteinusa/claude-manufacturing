@@ -69,6 +69,22 @@ def get_purchasing_dashboard(conn) -> dict:
         "ORDER BY DATE_TRUNC('month', order_date::date)"
     ).fetchall()
 
+    # Top items by spend
+    top_items_rows = conn.execute(
+        "SELECT COALESCE(p.name, pi.description, 'Unknown') AS item, "
+        "COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) AS spend "
+        "FROM po_item pi "
+        "LEFT JOIN product p ON p.id = pi.product_id "
+        "GROUP BY COALESCE(p.name, pi.description, 'Unknown') "
+        "ORDER BY spend DESC LIMIT 8"
+    ).fetchall()
+
+    # Requisition status breakdown
+    req_status_rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM purchase_requisition "
+        "GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+
     return {
         'pos': dict(po_row) if po_row else {},
         'recent_pos': [dict(r) for r in recent_rows],
@@ -76,6 +92,8 @@ def get_purchasing_dashboard(conn) -> dict:
         'spend_by_month': [dict(r) for r in spend_rows],
         'top_suppliers': [dict(r) for r in top_supplier_rows],
         'po_trend': [dict(r) for r in po_trend_rows],
+        'top_items': [dict(r) for r in top_items_rows],
+        'req_status': [dict(r) for r in req_status_rows],
     }
 
 

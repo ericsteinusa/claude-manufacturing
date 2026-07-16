@@ -17,7 +17,9 @@ def _conn(po_row, recent_rows):
     mock4 = MagicMock(); mock4.fetchall.return_value = []
     mock5 = MagicMock(); mock5.fetchall.return_value = []
     mock6 = MagicMock(); mock6.fetchall.return_value = []
-    c.execute.side_effect = [mock1, mock2, mock3, mock4, mock5, mock6]
+    mock7 = MagicMock(); mock7.fetchall.return_value = []
+    mock8 = MagicMock(); mock8.fetchall.return_value = []
+    c.execute.side_effect = [mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8]
     return c
 
 
@@ -150,11 +152,11 @@ def test_recent_pos_empty_when_fetchall_returns_empty():
 # SQL sanity checks
 # ---------------------------------------------------------------------------
 
-def test_execute_called_exactly_six_times():
+def test_execute_called_exactly_eight_times():
     conn = _conn({'draft': 0, 'pending_approval': 0, 'sent': 0,
                   'partial': 0, 'received': 0, 'open': 0, 'total': 0}, [])
     get_purchasing_dashboard(conn)
-    assert conn.execute.call_count == 6
+    assert conn.execute.call_count == 8
 
 
 def test_first_sql_references_purchase_order_table():
