@@ -54,6 +54,34 @@ def get_finance_dashboard(conn) -> dict:
     }
 
 
+def get_top_ar_customers(conn, limit: int = 8) -> list[dict]:
+    """Return [{customer, balance}] — top open AR balances by customer."""
+    rows = conn.execute("""
+        SELECT COALESCE(c.company_name, 'Unknown') AS customer,
+               COALESCE(SUM(i.amount), 0) AS balance
+        FROM ar_invoice i
+        LEFT JOIN contact c ON c.id = i.customer_id
+        WHERE i.status IN ('open', 'partial', 'overdue')
+        GROUP BY c.company_name ORDER BY balance DESC LIMIT %s
+    """, (limit,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_invoice_status_mix(conn) -> dict:
+    """Return {ar: [{status, cnt}], ap: [{status, cnt}]} — invoice counts
+    by status for AR and AP, used in a grouped-bar chart."""
+    ar_rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM ar_invoice GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+    ap_rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM ap_invoice GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+    return {
+        'ar': [dict(r) for r in ar_rows],
+        'ap': [dict(r) for r in ap_rows],
+    }
+
+
 def get_revenue_expense_by_month(conn, months: int = 6) -> list[dict]:
     """Return [{month, revenue, expenses}] for the last ``months`` months,
     for a revenue-vs-expense chart. Loops accounting_core.income_statement

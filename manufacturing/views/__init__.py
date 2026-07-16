@@ -197,6 +197,7 @@ from ..purchasing_core import (
 )
 from ..finance_core import (
     get_finance_dashboard, get_revenue_expense_by_month,
+    get_top_ar_customers, get_invoice_status_mix,
     BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
     list_budgets, get_budget, get_budget_lines,
@@ -6992,6 +6993,8 @@ def fin_dashboard(request):
         rev_expense = get_revenue_expense_by_month(conn)
         cash_position = get_cash_position(conn)
         cash_forecast = get_cash_forecast_13wk(conn, starting_balance=cash_position)
+        top_ar_customers = get_top_ar_customers(conn)
+        invoice_status_mix = get_invoice_status_mix(conn)
         ap_aging_row = conn.execute("""
             SELECT
                 COALESCE(SUM(amount) FILTER (
@@ -7016,6 +7019,8 @@ def fin_dashboard(request):
         ap_aging_json=json.dumps(ap_aging),
         rev_expense_json=json.dumps(rev_expense),
         cash_forecast_json=json.dumps(cash_forecast),
+        top_ar_customers_json=json.dumps(top_ar_customers),
+        invoice_status_mix_json=json.dumps(invoice_status_mix),
         cash_position=cash_position,
         cash_forecast_end=cash_forecast[-1]['projected_balance'],
         cash_forecast_net_change=cash_forecast[-1]['projected_balance'] - cash_position,

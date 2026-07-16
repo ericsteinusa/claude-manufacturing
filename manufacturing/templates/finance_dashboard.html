@@ -137,6 +137,17 @@
         </div>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Top AR Customers (open balance)</h3>
+            <canvas id="chart-top-ar" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Invoice Status — AR vs AP</h3>
+            <canvas id="chart-invoice-status" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Journal Entries</h3>
         <table class="list-table">
@@ -181,10 +192,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
-    var revExpense = {{ rev_expense_json|safe }};
-    var arAging = {{ ar_aging_json|safe }};
-    var apAging = {{ ap_aging_json|safe }};
-    var cashForecast = {{ cash_forecast_json|safe }};
+    var revExpense      = {{ rev_expense_json|safe }};
+    var arAging         = {{ ar_aging_json|safe }};
+    var apAging         = {{ ap_aging_json|safe }};
+    var cashForecast    = {{ cash_forecast_json|safe }};
+    var topAR           = {{ top_ar_customers_json|safe }};
+    var invoiceStatusMix = {{ invoice_status_mix_json|safe }};
 
     new Chart(document.getElementById('chart-cash-forecast'), {
         type: 'line',
@@ -242,6 +255,46 @@
                          backgroundColor: ['#22c55e', '#84cc16', '#f59e0b', '#f97316', '#ef4444'] }],
         },
         options: { responsive: true },
+    });
+
+    new Chart(document.getElementById('chart-top-ar'), {
+        type: 'bar',
+        data: {
+            labels: topAR.map(function (r) { return r.customer; }),
+            datasets: [{ label: 'Open Balance ($)',
+                data: topAR.map(function (r) { return r.balance; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
+    });
+
+    var allStatuses = [];
+    (invoiceStatusMix.ar || []).concat(invoiceStatusMix.ap || []).forEach(function (r) {
+        if (allStatuses.indexOf(r.status) === -1) allStatuses.push(r.status);
+    });
+    var statusColorMap = { open: '#1d6fe8', paid: '#22c55e', overdue: '#ef4444',
+                           partial: '#f59e0b', cancelled: '#94a3b8', draft: '#cbd5e1' };
+    function statusCnt(list, s) {
+        var found = (list || []).filter(function (r) { return r.status === s; });
+        return found.length ? found[0].cnt : 0;
+    }
+    new Chart(document.getElementById('chart-invoice-status'), {
+        type: 'bar',
+        data: {
+            labels: allStatuses,
+            datasets: [
+                { label: 'AR', data: allStatuses.map(function (s) { return statusCnt(invoiceStatusMix.ar, s); }),
+                  backgroundColor: '#22c55e' },
+                { label: 'AP', data: allStatuses.map(function (s) { return statusCnt(invoiceStatusMix.ap, s); }),
+                  backgroundColor: '#1d6fe8' },
+            ],
+        },
+        options: { responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
     });
 })();
 </script>
