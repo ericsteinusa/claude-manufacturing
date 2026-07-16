@@ -61,6 +61,39 @@
         </div>
     </div>
 
+    <div style="max-width:1000px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Tickets by Status</div>
+            <canvas id="chart-ticket-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Tickets by Priority</div>
+            <canvas id="chart-ticket-priority" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="max-width:1000px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Tickets by Issue Type</div>
+            <canvas id="chart-ticket-issue" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Ticket Volume by Month (last 6 mo)</div>
+            <canvas id="chart-ticket-trend" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="max-width:1000px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Assets by Status</div>
+            <canvas id="chart-asset-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Assets by Type</div>
+            <canvas id="chart-asset-type" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card" style="max-width:1000px;">
         <div class="card-title">Recent Support Tickets</div>
         <div class="erp-table-wrap" style="margin-top:12px;">
@@ -103,4 +136,95 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var ticketStatus   = {{ ticket_status_json|safe }};
+    var ticketPriority = {{ ticket_priority_json|safe }};
+    var ticketIssue    = {{ ticket_issue_json|safe }};
+    var ticketTrend    = {{ ticket_trend_json|safe }};
+    var assetStatus    = {{ asset_status_json|safe }};
+    var assetType      = {{ asset_type_json|safe }};
+
+    var statusColors = { open:'#ef4444', in_progress:'#f59e0b', resolved:'#1d6fe8', closed:'#22c55e' };
+    new Chart(document.getElementById('chart-ticket-status'), {
+        type: 'doughnut',
+        data: {
+            labels: ticketStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: ticketStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: ticketStatus.map(function(r){
+                    return statusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    var priorityColors = { critical:'#ef4444', high:'#f59e0b', medium:'#1d6fe8', low:'#94a3b8' };
+    new Chart(document.getElementById('chart-ticket-priority'), {
+        type: 'bar',
+        data: {
+            labels: ticketPriority.map(function(r){ return r.priority; }),
+            datasets: [{ label: 'Tickets',
+                data: ticketPriority.map(function(r){ return r.cnt; }),
+                backgroundColor: ticketPriority.map(function(r){
+                    return priorityColors[r.priority] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-ticket-issue'), {
+        type: 'bar',
+        data: {
+            labels: ticketIssue.map(function(r){ return r.issue_type; }),
+            datasets: [{ label: 'Tickets',
+                data: ticketIssue.map(function(r){ return r.cnt; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-ticket-trend'), {
+        type: 'bar',
+        data: {
+            labels: ticketTrend.map(function(r){ return r.month; }),
+            datasets: [{ label: 'Tickets Submitted',
+                data: ticketTrend.map(function(r){ return r.cnt; }),
+                backgroundColor: '#198754' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var assetStatusColors = { active:'#22c55e', repair:'#f59e0b', retired:'#94a3b8', lost:'#ef4444' };
+    new Chart(document.getElementById('chart-asset-status'), {
+        type: 'doughnut',
+        data: {
+            labels: assetStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: assetStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: assetStatus.map(function(r){
+                    return assetStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-asset-type'), {
+        type: 'bar',
+        data: {
+            labels: assetType.map(function(r){ return r.asset_type; }),
+            datasets: [{ label: 'Assets',
+                data: assetType.map(function(r){ return r.cnt; }),
+                backgroundColor: '#8b5cf6' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+})();
+</script>
 {% endblock %}

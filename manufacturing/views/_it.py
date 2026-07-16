@@ -1,5 +1,6 @@
 """Views: it domain."""
 
+import json
 from datetime import date
 
 from django.shortcuts import render, redirect
@@ -57,7 +58,53 @@ def _it_ctx(request, **extra):
 def it_dashboard(request):
     with get_db_connection() as conn:
         data = get_it_dashboard(conn)
-    ctx = _it_ctx(request, **data)
+
+        ticket_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM it_ticket GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ticket_status_json = json.dumps([dict(r) for r in ticket_status_rows])
+
+        ticket_priority_rows = conn.execute("""
+            SELECT priority, COUNT(*) AS cnt FROM it_ticket GROUP BY priority ORDER BY cnt DESC
+        """).fetchall()
+        ticket_priority_json = json.dumps([dict(r) for r in ticket_priority_rows])
+
+        ticket_issue_rows = conn.execute("""
+            SELECT issue_type, COUNT(*) AS cnt FROM it_ticket
+            WHERE issue_type IS NOT NULL AND issue_type != ''
+            GROUP BY issue_type ORDER BY cnt DESC
+        """).fetchall()
+        ticket_issue_json = json.dumps([dict(r) for r in ticket_issue_rows])
+
+        asset_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM it_asset GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        asset_status_json = json.dumps([dict(r) for r in asset_status_rows])
+
+        asset_type_rows = conn.execute("""
+            SELECT asset_type, COUNT(*) AS cnt FROM it_asset
+            WHERE asset_type IS NOT NULL AND asset_type != ''
+            GROUP BY asset_type ORDER BY cnt DESC
+        """).fetchall()
+        asset_type_json = json.dumps([dict(r) for r in asset_type_rows])
+
+        ticket_trend_rows = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', submitted_date::date), 'Mon YYYY') AS month,
+                   COUNT(*) AS cnt
+            FROM it_ticket
+            WHERE submitted_date::date >= CURRENT_DATE - INTERVAL '6 months'
+            GROUP BY DATE_TRUNC('month', submitted_date::date)
+            ORDER BY DATE_TRUNC('month', submitted_date::date)
+        """).fetchall()
+        ticket_trend_json = json.dumps([dict(r) for r in ticket_trend_rows])
+
+    ctx = _it_ctx(request, **data,
+                  ticket_status_json=ticket_status_json,
+                  ticket_priority_json=ticket_priority_json,
+                  ticket_issue_json=ticket_issue_json,
+                  asset_status_json=asset_status_json,
+                  asset_type_json=asset_type_json,
+                  ticket_trend_json=ticket_trend_json)
     return render(request, 'it_dashboard.html', ctx)
 
 

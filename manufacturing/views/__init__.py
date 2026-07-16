@@ -3771,7 +3771,7 @@ def inventory_dashboard(request):
                 COALESCE(SUM(quantity) FILTER (
                     WHERE trans_type = 'issue'), 0)   AS issued
             FROM inventory_transaction
-            WHERE trans_date >= CURRENT_DATE - INTERVAL '14 days'
+            WHERE trans_date::date >= CURRENT_DATE - INTERVAL '14 days'
             GROUP BY trans_date
             ORDER BY trans_date
         """).fetchall()
@@ -3793,7 +3793,7 @@ def inventory_dashboard(request):
             SELECT p.name AS product, COUNT(t.id) AS txn_count
             FROM inventory_transaction t
             JOIN product p ON p.id = t.product_id
-            WHERE t.trans_date >= CURRENT_DATE - INTERVAL '30 days'
+            WHERE t.trans_date::date >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY p.name
             ORDER BY txn_count DESC
             LIMIT 8
@@ -5330,8 +5330,50 @@ def eng_dashboard(request):
         dash = get_eng_dashboard(conn)
         recent_projects = list_projects(conn)[:8]
         recent_ecrs = list_ecrs(conn)[:8]
+        init_eng_standard_table(conn)
+
+        project_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_project GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        project_status_json = json.dumps([dict(r) for r in project_status_rows])
+
+        task_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_task GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        task_status_json = json.dumps([dict(r) for r in task_status_rows])
+
+        task_priority_rows = conn.execute("""
+            SELECT priority, COUNT(*) AS cnt FROM eng_task
+            WHERE status NOT IN ('completed', 'cancelled')
+            GROUP BY priority ORDER BY cnt DESC
+        """).fetchall()
+        task_priority_json = json.dumps([dict(r) for r in task_priority_rows])
+
+        ecr_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_design_review GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ecr_status_json = json.dumps([dict(r) for r in ecr_status_rows])
+
+        project_engineer_rows = conn.execute("""
+            SELECT engineer, COUNT(*) AS cnt FROM eng_project
+            WHERE engineer IS NOT NULL AND engineer != ''
+            GROUP BY engineer ORDER BY cnt DESC LIMIT 8
+        """).fetchall()
+        project_engineer_json = json.dumps([dict(r) for r in project_engineer_rows])
+
+        standard_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_standard GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        standard_status_json = json.dumps([dict(r) for r in standard_status_rows])
+
     ctx = _eng_ctx(request, dash=dash,
-                   recent_projects=recent_projects, recent_ecrs=recent_ecrs)
+                   recent_projects=recent_projects, recent_ecrs=recent_ecrs,
+                   project_status_json=project_status_json,
+                   task_status_json=task_status_json,
+                   task_priority_json=task_priority_json,
+                   ecr_status_json=ecr_status_json,
+                   project_engineer_json=project_engineer_json,
+                   standard_status_json=standard_status_json)
     return render(request, 'eng_dashboard.html', ctx)
 
 
@@ -5774,7 +5816,7 @@ def sales_dashboard(request):
             SELECT c.company_name AS customer,
                    COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
             FROM sales_order so
-            JOIN contact c ON c.id = so.customer_id
+            JOIN customer c ON c.id = so.customer_id
             JOIN so_item si ON si.so_id = so.id
             WHERE so.status IN ('confirmed','shipped','invoiced')
             GROUP BY c.company_name
@@ -6356,7 +6398,7 @@ def prod_dashboard(request):
             FROM work_order wo
             JOIN product p ON p.id = wo.product_id
             WHERE wo.status = 'completed'
-              AND wo.due_date >= CURRENT_DATE - INTERVAL '90 days'
+              AND wo.due_date::date >= CURRENT_DATE - INTERVAL '90 days'
             GROUP BY p.name
             ORDER BY qty DESC
             LIMIT 8
@@ -6365,12 +6407,12 @@ def prod_dashboard(request):
             SELECT
                 COUNT(*) FILTER (
                     WHERE status = 'completed'
-                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '30 days'
                 ) AS total_completed,
                 COUNT(*) FILTER (
                     WHERE status = 'completed'
-                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'
-                      AND due_date >= CURRENT_DATE
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date::date >= CURRENT_DATE
                 ) AS on_time
             FROM work_order
         """).fetchone()
@@ -6883,7 +6925,7 @@ def pers_dashboard(request):
         """).fetchall()
         training_status = conn.execute("""
             SELECT status, COUNT(*) AS cnt
-            FROM training_record
+            FROM pers_training
             GROUP BY status
         """).fetchall()
         review_ratings = conn.execute("""
@@ -7210,18 +7252,18 @@ def fin_dashboard(request):
         ap_aging_row = conn.execute("""
             SELECT
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date >= CURRENT_DATE), 0) AS current,
+                    WHERE due_date::date >= CURRENT_DATE), 0) AS current,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE
-                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
+                    WHERE due_date::date < CURRENT_DATE
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE - INTERVAL '30 days'
-                      AND due_date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
+                    WHERE due_date::date < CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE - INTERVAL '60 days'
-                      AND due_date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
+                    WHERE due_date::date < CURRENT_DATE - INTERVAL '60 days'
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE - INTERVAL '90 days'), 0) AS over_90
+                    WHERE due_date::date < CURRENT_DATE - INTERVAL '90 days'), 0) AS over_90
             FROM ap_invoice WHERE status IN ('open','partial','overdue')
         """).fetchone()
         ap_aging = dict(ap_aging_row) if ap_aging_row else {}
@@ -7652,10 +7694,62 @@ def acct_dashboard(request):
             "ORDER BY j.journal_date DESC, j.id DESC LIMIT 8"
         ).fetchall()
         recent_journals = [dict(r) for r in recent_journals]
+
+        ap_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM ap_invoice GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ap_status_json = json.dumps([dict(r) for r in ap_status_rows])
+
+        ar_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM ar_invoice GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ar_status_json = json.dumps([dict(r) for r in ar_status_rows])
+
+        top_vendors_rows = conn.execute("""
+            SELECT COALESCE(NULLIF(s.company_name, ''), s.first_name || ' ' || s.last_name) AS name,
+                   SUM(i.amount) AS total_outstanding
+            FROM ap_invoice i
+            JOIN supplier s ON s.id = i.vendor_id
+            WHERE i.status IN ('open', 'partial', 'overdue')
+            GROUP BY s.id, name ORDER BY total_outstanding DESC LIMIT 8
+        """).fetchall()
+        top_vendors_json = json.dumps([dict(r) for r in top_vendors_rows])
+
+        top_customers_rows = conn.execute("""
+            SELECT COALESCE(NULLIF(c.company_name, ''), c.first_name || ' ' || c.last_name) AS name,
+                   SUM(i.amount) AS total_outstanding
+            FROM ar_invoice i
+            JOIN customer c ON c.id = i.customer_id
+            WHERE i.status IN ('open', 'partial', 'overdue')
+            GROUP BY c.id, name ORDER BY total_outstanding DESC LIMIT 8
+        """).fetchall()
+        top_customers_json = json.dumps([dict(r) for r in top_customers_rows])
+
+        journal_trend_rows = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', j.journal_date::date), 'Mon YYYY') AS month,
+                   COUNT(*) AS cnt
+            FROM gl_journal j
+            WHERE j.journal_date::date >= CURRENT_DATE - INTERVAL '6 months'
+            GROUP BY DATE_TRUNC('month', j.journal_date::date)
+            ORDER BY DATE_TRUNC('month', j.journal_date::date)
+        """).fetchall()
+        journal_trend_json = json.dumps([dict(r) for r in journal_trend_rows])
+
+        journal_posted_rows = conn.execute("""
+            SELECT CASE WHEN posted = 1 THEN 'Posted' ELSE 'Draft' END AS label, COUNT(*) AS cnt
+            FROM gl_journal GROUP BY label ORDER BY cnt DESC
+        """).fetchall()
+        journal_posted_json = json.dumps([dict(r) for r in journal_posted_rows])
     finally:
         conn.close()
     return render(request, 'acct_dashboard.html', _acct_ctx(
         request, ap=ap, ar=ar, recent_journals=recent_journals,
+        ap_status_json=ap_status_json,
+        ar_status_json=ar_status_json,
+        top_vendors_json=top_vendors_json,
+        top_customers_json=top_customers_json,
+        journal_trend_json=journal_trend_json,
+        journal_posted_json=journal_posted_json,
     ))
 
 
