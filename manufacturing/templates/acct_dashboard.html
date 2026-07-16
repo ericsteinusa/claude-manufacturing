@@ -65,6 +65,39 @@
         </div>
     </div>
 
+    <div style="max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">AP Invoices by Status</div>
+            <canvas id="chart-ap-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">AR Invoices by Status</div>
+            <canvas id="chart-ar-status" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Top Vendors by AP Outstanding</div>
+            <canvas id="chart-top-vendors" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Top Customers by AR Outstanding</div>
+            <canvas id="chart-top-customers" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Journal Entries by Month (last 6 mo)</div>
+            <canvas id="chart-journal-trend" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Journals: Posted vs Draft</div>
+            <canvas id="chart-journal-posted" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card" style="max-width:900px;">
         <div class="card-title">Recent Journal Entries</div>
         <div class="erp-table-wrap" style="margin-top:12px;">
@@ -103,4 +136,89 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var apStatus      = {{ ap_status_json|safe }};
+    var arStatus      = {{ ar_status_json|safe }};
+    var topVendors    = {{ top_vendors_json|safe }};
+    var topCustomers  = {{ top_customers_json|safe }};
+    var journalTrend  = {{ journal_trend_json|safe }};
+    var journalPosted = {{ journal_posted_json|safe }};
+
+    var invStatusColors = { open:'#1d6fe8', partial:'#f59e0b', overdue:'#ef4444', paid:'#22c55e' };
+    new Chart(document.getElementById('chart-ap-status'), {
+        type: 'doughnut',
+        data: {
+            labels: apStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: apStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: apStatus.map(function(r){
+                    return invStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-ar-status'), {
+        type: 'doughnut',
+        data: {
+            labels: arStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: arStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: arStatus.map(function(r){
+                    return invStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-top-vendors'), {
+        type: 'bar',
+        data: {
+            labels: topVendors.map(function(r){ return r.name; }),
+            datasets: [{ label: 'Outstanding',
+                data: topVendors.map(function(r){ return r.total_outstanding; }),
+                backgroundColor: '#ef4444' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } } },
+    });
+
+    new Chart(document.getElementById('chart-top-customers'), {
+        type: 'bar',
+        data: {
+            labels: topCustomers.map(function(r){ return r.name; }),
+            datasets: [{ label: 'Outstanding',
+                data: topCustomers.map(function(r){ return r.total_outstanding; }),
+                backgroundColor: '#198754' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } } },
+    });
+
+    new Chart(document.getElementById('chart-journal-trend'), {
+        type: 'bar',
+        data: {
+            labels: journalTrend.map(function(r){ return r.month; }),
+            datasets: [{ label: 'Journal Entries',
+                data: journalTrend.map(function(r){ return r.cnt; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-journal-posted'), {
+        type: 'doughnut',
+        data: {
+            labels: journalPosted.map(function(r){ return r.label; }),
+            datasets: [{ data: journalPosted.map(function(r){ return r.cnt; }),
+                backgroundColor: ['#22c55e', '#94a3b8'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+})();
+</script>
 {% endblock %}

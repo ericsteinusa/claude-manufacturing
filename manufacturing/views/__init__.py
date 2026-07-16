@@ -5330,8 +5330,50 @@ def eng_dashboard(request):
         dash = get_eng_dashboard(conn)
         recent_projects = list_projects(conn)[:8]
         recent_ecrs = list_ecrs(conn)[:8]
+        init_eng_standard_table(conn)
+
+        project_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_project GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        project_status_json = json.dumps([dict(r) for r in project_status_rows])
+
+        task_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_task GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        task_status_json = json.dumps([dict(r) for r in task_status_rows])
+
+        task_priority_rows = conn.execute("""
+            SELECT priority, COUNT(*) AS cnt FROM eng_task
+            WHERE status NOT IN ('completed', 'cancelled')
+            GROUP BY priority ORDER BY cnt DESC
+        """).fetchall()
+        task_priority_json = json.dumps([dict(r) for r in task_priority_rows])
+
+        ecr_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_design_review GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ecr_status_json = json.dumps([dict(r) for r in ecr_status_rows])
+
+        project_engineer_rows = conn.execute("""
+            SELECT engineer, COUNT(*) AS cnt FROM eng_project
+            WHERE engineer IS NOT NULL AND engineer != ''
+            GROUP BY engineer ORDER BY cnt DESC LIMIT 8
+        """).fetchall()
+        project_engineer_json = json.dumps([dict(r) for r in project_engineer_rows])
+
+        standard_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM eng_standard GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        standard_status_json = json.dumps([dict(r) for r in standard_status_rows])
+
     ctx = _eng_ctx(request, dash=dash,
-                   recent_projects=recent_projects, recent_ecrs=recent_ecrs)
+                   recent_projects=recent_projects, recent_ecrs=recent_ecrs,
+                   project_status_json=project_status_json,
+                   task_status_json=task_status_json,
+                   task_priority_json=task_priority_json,
+                   ecr_status_json=ecr_status_json,
+                   project_engineer_json=project_engineer_json,
+                   standard_status_json=standard_status_json)
     return render(request, 'eng_dashboard.html', ctx)
 
 
@@ -7652,10 +7694,62 @@ def acct_dashboard(request):
             "ORDER BY j.journal_date DESC, j.id DESC LIMIT 8"
         ).fetchall()
         recent_journals = [dict(r) for r in recent_journals]
+
+        ap_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM ap_invoice GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ap_status_json = json.dumps([dict(r) for r in ap_status_rows])
+
+        ar_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM ar_invoice GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        ar_status_json = json.dumps([dict(r) for r in ar_status_rows])
+
+        top_vendors_rows = conn.execute("""
+            SELECT COALESCE(NULLIF(s.company_name, ''), s.first_name || ' ' || s.last_name) AS name,
+                   SUM(i.amount) AS total_outstanding
+            FROM ap_invoice i
+            JOIN supplier s ON s.id = i.vendor_id
+            WHERE i.status IN ('open', 'partial', 'overdue')
+            GROUP BY s.id, name ORDER BY total_outstanding DESC LIMIT 8
+        """).fetchall()
+        top_vendors_json = json.dumps([dict(r) for r in top_vendors_rows])
+
+        top_customers_rows = conn.execute("""
+            SELECT COALESCE(NULLIF(c.company_name, ''), c.first_name || ' ' || c.last_name) AS name,
+                   SUM(i.amount) AS total_outstanding
+            FROM ar_invoice i
+            JOIN customer c ON c.id = i.customer_id
+            WHERE i.status IN ('open', 'partial', 'overdue')
+            GROUP BY c.id, name ORDER BY total_outstanding DESC LIMIT 8
+        """).fetchall()
+        top_customers_json = json.dumps([dict(r) for r in top_customers_rows])
+
+        journal_trend_rows = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', j.journal_date::date), 'Mon YYYY') AS month,
+                   COUNT(*) AS cnt
+            FROM gl_journal j
+            WHERE j.journal_date::date >= CURRENT_DATE - INTERVAL '6 months'
+            GROUP BY DATE_TRUNC('month', j.journal_date::date)
+            ORDER BY DATE_TRUNC('month', j.journal_date::date)
+        """).fetchall()
+        journal_trend_json = json.dumps([dict(r) for r in journal_trend_rows])
+
+        journal_posted_rows = conn.execute("""
+            SELECT CASE WHEN posted = 1 THEN 'Posted' ELSE 'Draft' END AS label, COUNT(*) AS cnt
+            FROM gl_journal GROUP BY label ORDER BY cnt DESC
+        """).fetchall()
+        journal_posted_json = json.dumps([dict(r) for r in journal_posted_rows])
     finally:
         conn.close()
     return render(request, 'acct_dashboard.html', _acct_ctx(
         request, ap=ap, ar=ar, recent_journals=recent_journals,
+        ap_status_json=ap_status_json,
+        ar_status_json=ar_status_json,
+        top_vendors_json=top_vendors_json,
+        top_customers_json=top_customers_json,
+        journal_trend_json=journal_trend_json,
+        journal_posted_json=journal_posted_json,
     ))
 
 
