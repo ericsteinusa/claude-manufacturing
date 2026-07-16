@@ -6268,6 +6268,25 @@ def prod_dashboard(request):
                 ) AS on_time
             FROM work_order
         """).fetchone()
+        scrap_rework = conn.execute("""
+            SELECT operation_name,
+                   COALESCE(SUM(scrap_qty), 0)  AS scrap,
+                   COALESCE(SUM(rework_qty), 0) AS rework
+            FROM wo_operation
+            WHERE operation_name IS NOT NULL
+            GROUP BY operation_name
+            ORDER BY (SUM(scrap_qty) + SUM(rework_qty)) DESC
+            LIMIT 8
+        """).fetchall()
+        wo_by_month = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', due_date::date), 'Mon YYYY') AS month,
+                   COUNT(*) AS cnt
+            FROM work_order
+            WHERE status = 'completed'
+              AND due_date >= (CURRENT_DATE - INTERVAL '6 months')::text
+            GROUP BY DATE_TRUNC('month', due_date::date)
+            ORDER BY DATE_TRUNC('month', due_date::date)
+        """).fetchall()
     on_time = dict(on_time_row) if on_time_row else {}
     ctx = _prod_ctx(
         request, **data,
@@ -6275,6 +6294,8 @@ def prod_dashboard(request):
         wo_status_json=json.dumps(wo_status_breakdown),
         top_products_json=json.dumps([dict(r) for r in top_products]),
         on_time_json=json.dumps(on_time),
+        scrap_rework_json=json.dumps([dict(r) for r in scrap_rework]),
+        wo_by_month_json=json.dumps([dict(r) for r in wo_by_month]),
     )
     return render(request, 'prod_dashboard.html', ctx)
 

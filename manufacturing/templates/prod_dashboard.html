@@ -111,6 +111,16 @@
             <canvas id="chart-on-time" height="200"></canvas>
         </div>
     </div>
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;margin-top:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Scrap &amp; Rework by Operation</h3>
+            <canvas id="chart-scrap-rework" height="200"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>WO Completions by Month (last 6 mo)</h3>
+            <canvas id="chart-wo-month" height="200"></canvas>
+        </div>
+    </div>
 
     <div class="card">
         <h3>Recent Work Orders</h3>
@@ -148,10 +158,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
-    var dailyOutput = {{ daily_output_json|safe }};
-    var woStatus = {{ wo_status_json|safe }};
-    var topProducts = {{ top_products_json|safe }};
-    var onTime = {{ on_time_json|safe }};
+    var dailyOutput  = {{ daily_output_json|safe }};
+    var woStatus     = {{ wo_status_json|safe }};
+    var topProducts  = {{ top_products_json|safe }};
+    var onTime       = {{ on_time_json|safe }};
+    var scrapRework  = {{ scrap_rework_json|safe }};
+    var woByMonth    = {{ wo_by_month_json|safe }};
 
     new Chart(document.getElementById('chart-daily-output'), {
         type: 'bar',
@@ -203,6 +215,34 @@
                          backgroundColor: ['#22c55e', '#ef4444'] }],
         },
         options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-scrap-rework'), {
+        type: 'bar',
+        data: {
+            labels: scrapRework.map(function (r) { return r.operation_name; }),
+            datasets: [
+                { label: 'Scrap',  data: scrapRework.map(function (r) { return r.scrap; }),
+                  backgroundColor: '#ef4444' },
+                { label: 'Rework', data: scrapRework.map(function (r) { return r.rework; }),
+                  backgroundColor: '#f59e0b' },
+            ],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { x: { beginAtZero: true, stacked: false } } },
+    });
+
+    new Chart(document.getElementById('chart-wo-month'), {
+        type: 'bar',
+        data: {
+            labels: woByMonth.map(function (r) { return r.month; }),
+            datasets: [{ label: 'Completed WOs',
+                data: woByMonth.map(function (r) { return r.cnt; }),
+                backgroundColor: '#22c55e' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
     });
 })();
 </script>
