@@ -473,6 +473,8 @@ urlpatterns = [
     # Currency Management
     path('admin/currencies/', views.currency_list, name='currency_list'),
     path('legal/', views.legal_dashboard, name='legal_dashboard'),
+    path('budget/', views.budget_dashboard, name='budget_dashboard'),
+    path('risk/', views.risk_dashboard, name='risk_dashboard'),
     path('legal/contracts/', views.legal_contract_list, name='legal_contract_list'),
     path('legal/contracts/<int:contract_id>/', views.legal_contract_detail, name='legal_contract_detail'),
     path('legal/compliance/', views.legal_compliance_list, name='legal_compliance_list'),

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block page_title %}Budget Management Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/fin/budgets/" class="btn">Budgets</a>
+<a href="/fin/" class="btn">Finance</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:700; text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+.kpi .val { font-size:28px; font-weight:700; color:var(--accent); }
+.kpi.highlight { border-color:var(--accent); }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:700; }
+.st-active { background:#d4edda; color:#0a3622; }
+.st-draft  { background:#f8f9fa; color:#333; border:1px solid #ccc; }
+.st-closed { background:#e2e3e5; color:#383d41; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Budget Management Dashboard</h2>
+
+    <div class="dept-grid">
+        <a href="/fin/budgets/" class="dept-btn">All Budgets</a>
+        <a href="/fin/budgets/" class="dept-btn">New Budget</a>
+        <a href="/fin/" class="dept-btn">Finance Dashboard</a>
+        <a href="/acct/" class="dept-btn">Accounting</a>
+        <a href="/reports/" class="dept-btn">Reports</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi highlight">
+            <div class="lbl">Total Budgeted</div>
+            <div class="val" style="font-size:20px;">${{ kpis.total_budgeted|floatformat:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Budgets</div>
+            <div class="val">{{ kpis.total_budgets|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Active</div>
+            <div class="val">{{ kpis.active_budgets|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Draft</div>
+            <div class="val">{{ kpis.draft_budgets|default:0 }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Budget Status Breakdown</h3>
+            <canvas id="chart-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Active Budgets by Total ($)</h3>
+            <canvas id="chart-budgets" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Spend by Category</h3>
+            <canvas id="chart-categories" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Total Budgeted by Fiscal Year</h3>
+            <canvas id="chart-by-year" height="220"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>All Budgets</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Budget Name</th><th>Fiscal Year</th><th>Status</th><th>Total Budgeted</th></tr>
+            </thead>
+            <tbody>
+            {% for b in recent_budgets %}
+            <tr>
+                <td><a href="/fin/budgets/{{ b.id }}/" style="color:var(--accent);">{{ b.budget_name }}</a></td>
+                <td>{{ b.fiscal_year }}</td>
+                <td><span class="badge st-{{ b.status }}">{{ b.status }}</span></td>
+                <td>${{ b.total_budgeted|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No budgets found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var statusData    = {{ status_json|safe }};
+    var budgetsData   = {{ budgets_json|safe }};
+    var categoriesData= {{ categories_json|safe }};
+    var byYearData    = {{ by_year_json|safe }};
+
+    var statusColors = { active:'#22c55e', draft:'#94a3b8', closed:'#64748b', approved:'#1d6fe8' };
+    new Chart(document.getElementById('chart-status'), {
+        type: 'doughnut',
+        data: {
+            labels: statusData.map(function(r){ return r.status; }),
+            datasets: [{ data: statusData.map(function(r){ return r.cnt; }),
+                backgroundColor: statusData.map(function(r){
+                    return statusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-budgets'), {
+        type: 'bar',
+        data: {
+            labels: budgetsData.map(function(r){ return r.name; }),
+            datasets: [{ label: 'Budgeted ($)',
+                data: budgetsData.map(function(r){ return r.budgeted; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
+    });
+
+    var colors = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#f97316','#64748b','#ec4899','#84cc16'];
+    new Chart(document.getElementById('chart-categories'), {
+        type: 'bar',
+        data: {
+            labels: categoriesData.map(function(r){ return r.category; }),
+            datasets: [{ label: 'Amount ($)',
+                data: categoriesData.map(function(r){ return r.amt; }),
+                backgroundColor: categoriesData.map(function(_,i){ return colors[i % colors.length]; }) }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
+    });
+
+    new Chart(document.getElementById('chart-by-year'), {
+        type: 'bar',
+        data: {
+            labels: byYearData.map(function(r){ return r.yr; }),
+            datasets: [{ label: 'Total Budgeted ($)',
+                data: byYearData.map(function(r){ return r.total; }),
+                backgroundColor: '#7c3aed' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true,
+                ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
+    });
+})();
+</script>
+{% endblock %}

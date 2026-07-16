@@ -219,6 +219,8 @@ from ._payroll import *  # noqa: F401,F403
 from ._it import *  # noqa: F401,F403
 from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
+from ._budget_dash import budget_dashboard  # noqa: F401
+from ._risk_dash import risk_dashboard  # noqa: F401
 from ._marketing import *  # noqa: F401,F403
 from ._cycle_count import *  # noqa: F401,F403
 from ._price_list import *  # noqa: F401,F403
@@ -1025,6 +1027,8 @@ def dashboard(request):
         'sales': '/sales/',
         'finance': '/fin/',
         'legal': '/legal/',
+        'budget_management': '/budget/',
+        'risk_management': '/risk/',
         'reports': '/reports/',
     }
     menu_items = [

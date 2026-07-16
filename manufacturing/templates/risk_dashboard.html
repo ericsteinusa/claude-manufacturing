@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block page_title %}Risk Management Dashboard{% endblock %}
+
+{% block toolbar_left %}
+<a href="/legal/" class="btn">Legal</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.kpi-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:12px 14px; }
+.kpi .lbl { font-size:11px; color:#555; font-weight:700; text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+.kpi .val { font-size:26px; font-weight:700; color:var(--accent); }
+.kpi.warn { border-color:#d97706; }
+.kpi.warn .val { color:#d97706; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:700; }
+.sev-High,.sev-Critical { background:#fee2e2; color:#991b1b; }
+.sev-Medium { background:#fef3c7; color:#92400e; }
+.sev-Low { background:#d1fae5; color:#065f46; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Risk Management Dashboard</h2>
+
+    <div class="dept-grid">
+        <a href="/legal/" class="dept-btn">Legal Dashboard</a>
+        <a href="/legal/compliance/" class="dept-btn">Compliance</a>
+        <a href="/legal/litigation/" class="dept-btn">Litigation</a>
+        <a href="/qa/fmea/risk-register/" class="dept-btn">FMEA Risk Register</a>
+        <a href="/reports/" class="dept-btn">Reports</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi{% if kpis.open_risks %} warn{% endif %}">
+            <div class="lbl">Open Risks</div>
+            <div class="val">{{ kpis.open_risks|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Risks</div>
+            <div class="val">{{ kpis.total_risks|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Assessments</div>
+            <div class="val">{{ kpis.total_assessments|default:0 }}</div>
+        </div>
+        <div class="kpi{% if kpis.open_audits %} warn{% endif %}">
+            <div class="lbl">Open Audits</div>
+            <div class="val">{{ kpis.open_audits|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Active Policies</div>
+            <div class="val">{{ kpis.active_policies|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Continuity Plans</div>
+            <div class="val">{{ kpis.continuity_plans|default:0 }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Risk Register — by Severity</h3>
+            <canvas id="chart-severity" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Risk Register — by Status</h3>
+            <canvas id="chart-reg-status" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Risk Assessments — by Level</h3>
+            <canvas id="chart-risk-level" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Risk Register — by Category</h3>
+            <canvas id="chart-category" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>KRI Status</h3>
+            <canvas id="chart-kri" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Audit Status</h3>
+            <canvas id="chart-audit" height="220"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Risk Register</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Risk</th><th>Category</th><th>Severity</th><th>Status</th><th>Owner</th></tr>
+            </thead>
+            <tbody>
+            {% for r in recent_risks %}
+            <tr>
+                <td>{{ r.risk }}</td>
+                <td>{{ r.category|default:"—" }}</td>
+                <td><span class="badge sev-{{ r.severity }}">{{ r.severity|default:"—" }}</span></td>
+                <td>{{ r.status|default:"—" }}</td>
+                <td>{{ r.owner|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;">No risks recorded yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Recent Risk Assessments</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Title</th><th>Category</th><th>Risk Level</th><th>Status</th><th>Owner</th></tr>
+            </thead>
+            <tbody>
+            {% for a in recent_assessments %}
+            <tr>
+                <td>{{ a.title }}</td>
+                <td>{{ a.category|default:"—" }}</td>
+                <td>{{ a.risk_level|default:"—" }}</td>
+                <td>{{ a.status|default:"—" }}</td>
+                <td>{{ a.owner|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;">No assessments recorded yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var severityData  = {{ severity_json|safe }};
+    var regStatusData = {{ reg_status_json|safe }};
+    var riskLevelData = {{ risk_level_json|safe }};
+    var categoryData  = {{ category_json|safe }};
+    var kriData       = {{ kri_status_json|safe }};
+    var auditData     = {{ audit_status_json|safe }};
+
+    var sevColors = { Critical:'#7f1d1d', High:'#ef4444', Medium:'#f59e0b', Low:'#22c55e' };
+    var levelColors = { Critical:'#7f1d1d', High:'#ef4444', Medium:'#f59e0b', Low:'#22c55e' };
+    var palette = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#f97316','#64748b'];
+
+    function doughnut(id, data, labelKey, cntKey, colorMap) {
+        new Chart(document.getElementById(id), {
+            type: 'doughnut',
+            data: {
+                labels: data.map(function(r){ return r[labelKey]; }),
+                datasets: [{ data: data.map(function(r){ return r[cntKey]; }),
+                    backgroundColor: data.map(function(r,i){
+                        return (colorMap && colorMap[r[labelKey]]) || palette[i % palette.length];
+                    }) }],
+            },
+            options: { responsive: true,
+                plugins: {
+                    legend: { position: 'right' },
+                    title: { display: data.length === 0,
+                             text: 'No data yet', color: '#aaa' }
+                } },
+        });
+    }
+
+    doughnut('chart-severity',  severityData,  'severity',   'cnt', sevColors);
+    doughnut('chart-reg-status',regStatusData, 'status',     'cnt', null);
+    doughnut('chart-risk-level',riskLevelData, 'risk_level', 'cnt', levelColors);
+    doughnut('chart-kri',       kriData,       'status',     'cnt', null);
+    doughnut('chart-audit',     auditData,     'status',     'cnt', null);
+
+    new Chart(document.getElementById('chart-category'), {
+        type: 'bar',
+        data: {
+            labels: categoryData.map(function(r){ return r.category; }),
+            datasets: [{ label: 'Risks',
+                data: categoryData.map(function(r){ return r.cnt; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+})();
+</script>
+{% endblock %}
