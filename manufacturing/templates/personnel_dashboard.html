@@ -80,29 +80,44 @@
     </div>
 
     <div class="two-col" style="margin-bottom:16px;">
-        <div class="card">
+        <div class="card" style="margin-bottom:0;">
             <h3>Headcount by Department</h3>
             <canvas id="chart-dept-headcount" height="220"></canvas>
         </div>
-
-        <div class="card">
-            <h3>Recent Employees</h3>
-            <table class="list-table">
-                <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Title</th></tr></thead>
-                <tbody>
-                {% for p in recent_employees %}
-                <tr>
-                    <td><a href="/people/{{ p.id }}/" style="color:var(--accent);">{{ p.last_name }}, {{ p.first_name }}</a></td>
-                    <td>{{ p.email }}</td>
-                    <td>{{ p.dept_name }}</td>
-                    <td>{{ p.job_title }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="4" style="color:#888;">No employees found.</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <div class="card" style="margin-bottom:0;">
+            <h3>New Hires by Month (last 12 mo)</h3>
+            <canvas id="chart-hire-trend" height="220"></canvas>
         </div>
+    </div>
+
+    <div class="two-col" style="margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Time Off Requests by Status</h3>
+            <canvas id="chart-time-off" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Training Status</h3>
+            <canvas id="chart-training" height="220"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Employees</h3>
+        <table class="list-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Title</th></tr></thead>
+            <tbody>
+            {% for p in recent_employees %}
+            <tr>
+                <td><a href="/people/{{ p.id }}/" style="color:var(--accent);">{{ p.last_name }}, {{ p.first_name }}</a></td>
+                <td>{{ p.email }}</td>
+                <td>{{ p.dept_name }}</td>
+                <td>{{ p.job_title }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No employees found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 </div>
@@ -112,22 +127,66 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
-    var deptData = {{ dept_chart_json|safe }};
+    var deptData       = {{ dept_chart_json|safe }};
+    var hireTrend      = {{ hire_trend_json|safe }};
+    var timeOffStatus  = {{ time_off_status_json|safe }};
+    var trainingStatus = {{ training_status_json|safe }};
     var colors = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4'];
 
     new Chart(document.getElementById('chart-dept-headcount'), {
         type: 'bar',
         data: {
             labels: deptData.map(function (r) { return r.dept_name; }),
-            datasets: [{ label: 'Employees', data: deptData.map(function (r) { return r.count; }),
-                backgroundColor: deptData.map(function (_, i) { return colors[i % colors.length]; }) }],
+            datasets: [{ label: 'Employees',
+                data: deptData.map(function (r) { return r.count; }),
+                backgroundColor: deptData.map(function (_, i) {
+                    return colors[i % colors.length];
+                }) }],
         },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
+        options: { indexAxis: 'y', responsive: true,
             plugins: { legend: { display: false } },
-            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-hire-trend'), {
+        type: 'bar',
+        data: {
+            labels: hireTrend.map(function (r) { return r.month; }),
+            datasets: [{ label: 'New Hires',
+                data: hireTrend.map(function (r) { return r.count; }),
+                backgroundColor: '#1d6fe8' }],
         },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var toColors = { pending: '#f59e0b', approved: '#22c55e',
+                     denied: '#ef4444', cancelled: '#94a3b8' };
+    new Chart(document.getElementById('chart-time-off'), {
+        type: 'doughnut',
+        data: {
+            labels: timeOffStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: timeOffStatus.map(function (r) { return r.cnt; }),
+                backgroundColor: timeOffStatus.map(function (r) {
+                    return toColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    var trColors = { completed: '#22c55e', passed: '#22c55e',
+                     pending: '#f59e0b', failed: '#ef4444',
+                     scheduled: '#1d6fe8' };
+    new Chart(document.getElementById('chart-training'), {
+        type: 'doughnut',
+        data: {
+            labels: trainingStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: trainingStatus.map(function (r) { return r.cnt; }),
+                backgroundColor: trainingStatus.map(function (r) {
+                    return trColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
     });
 })();
 </script>

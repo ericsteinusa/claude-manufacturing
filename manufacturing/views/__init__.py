@@ -6718,9 +6718,32 @@ def purch_reports_view(request):
 def pers_dashboard(request):
     with get_db_connection() as conn:
         data = get_personnel_dashboard(conn)
+        hire_trend = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', hire_date::date), 'YYYY-MM')
+                       AS month,
+                   COUNT(*) AS count
+            FROM people
+            WHERE hire_date IS NOT NULL
+              AND hire_date >= (CURRENT_DATE - INTERVAL '12 months')::text
+            GROUP BY DATE_TRUNC('month', hire_date::date)
+            ORDER BY DATE_TRUNC('month', hire_date::date)
+        """).fetchall()
+        time_off_status = conn.execute("""
+            SELECT status, COUNT(*) AS cnt
+            FROM time_off_request
+            GROUP BY status
+        """).fetchall()
+        training_status = conn.execute("""
+            SELECT status, COUNT(*) AS cnt
+            FROM training_record
+            GROUP BY status
+        """).fetchall()
     ctx = _people_context(
         request, **data,
         dept_chart_json=json.dumps(data.get('by_dept', [])),
+        hire_trend_json=json.dumps([dict(r) for r in hire_trend]),
+        time_off_status_json=json.dumps([dict(r) for r in time_off_status]),
+        training_status_json=json.dumps([dict(r) for r in training_status]),
     )
     return render(request, 'personnel_dashboard.html', ctx)
 
