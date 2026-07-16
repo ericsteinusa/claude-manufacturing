@@ -93,7 +93,7 @@ def get_downtime_by_category(conn, months: int = 3) -> list[dict]:
     for the last ``months`` months, descending."""
     rows = conn.execute(
         "SELECT COALESCE(category, 'Uncategorized') AS category, "
-        "COALESCE(SUM(hours), 0) AS hours "
+        "COALESCE(SUM(hours::numeric), 0) AS hours "
         "FROM maint_downtime "
         "WHERE down_date >= (CURRENT_DATE - INTERVAL '%s months')::text "
         "GROUP BY category ORDER BY hours DESC LIMIT 8" % months
