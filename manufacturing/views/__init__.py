@@ -5681,6 +5681,20 @@ def sales_dashboard(request):
             GROUP BY status
             ORDER BY cnt DESC
         """).fetchall()
+        top_products = conn.execute("""
+            SELECT COALESCE(p.name, si.description, 'Unknown') AS product,
+                   COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
+            FROM so_item si
+            LEFT JOIN product p ON p.id = si.product_id
+            JOIN sales_order so ON so.id = si.so_id
+            WHERE so.status IN ('confirmed','shipped','invoiced')
+            GROUP BY COALESCE(p.name, si.description, 'Unknown')
+            ORDER BY revenue DESC LIMIT 8
+        """).fetchall()
+        order_status = conn.execute("""
+            SELECT status, COUNT(*) AS cnt
+            FROM sales_order GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
     ctx = _sales_ctx(
         request, dash=dash,
         recent_orders=recent_orders, recent_quotes=recent_quotes,
@@ -5689,6 +5703,8 @@ def sales_dashboard(request):
         top_customers_json=json.dumps([dict(r) for r in top_customers]),
         leads_by_status_json=json.dumps([dict(r) for r in leads_by_status]),
         orders_by_status_json=json.dumps(dash.get('orders', {})),
+        top_products_json=json.dumps([dict(r) for r in top_products]),
+        order_status_json=json.dumps([dict(r) for r in order_status]),
     )
     return render(request, 'sales_dashboard.html', ctx)
 

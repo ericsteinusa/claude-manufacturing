@@ -95,6 +95,16 @@
             <canvas id="chart-leads-status" height="200"></canvas>
         </div>
     </div>
+    <div class="two-col" style="margin-bottom:16px;">
+        <div class="card">
+            <h3>Top Products by Revenue</h3>
+            <canvas id="chart-top-products" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h3>Order Status Breakdown</h3>
+            <canvas id="chart-order-status" height="200"></canvas>
+        </div>
+    </div>
 
     <div class="two-col">
         <div>
@@ -139,10 +149,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
-    var funnel = {{ quote_funnel_json|safe }};
-    var revenue = {{ revenue_by_month_json|safe }};
-    var topCustomers = {{ top_customers_json|safe }};
+    var funnel        = {{ quote_funnel_json|safe }};
+    var revenue       = {{ revenue_by_month_json|safe }};
+    var topCustomers  = {{ top_customers_json|safe }};
     var leadsByStatus = {{ leads_by_status_json|safe }};
+    var topProducts   = {{ top_products_json|safe }};
+    var orderStatus   = {{ order_status_json|safe }};
 
     new Chart(document.getElementById('chart-revenue-month'), {
         type: 'line',
@@ -186,6 +198,33 @@
             labels: leadsByStatus.map(function (r) { return r.status; }),
             datasets: [{ data: leadsByStatus.map(function (r) { return r.cnt; }),
                          backgroundColor: leadsByStatus.map(function (r) { return leadColors[r.status] || '#94a3b8'; }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    var colors = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#7c3aed','#f97316'];
+    new Chart(document.getElementById('chart-top-products'), {
+        type: 'bar',
+        data: {
+            labels: topProducts.map(function (r) { return r.product; }),
+            datasets: [{ label: 'Revenue',
+                data: topProducts.map(function (r) { return r.revenue; }),
+                backgroundColor: topProducts.map(function (_, i) { return colors[i % colors.length]; }) }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
+    });
+
+    var soColors = { draft:'#94a3b8', confirmed:'#1d6fe8', shipped:'#f59e0b',
+                     invoiced:'#22c55e', cancelled:'#ef4444' };
+    new Chart(document.getElementById('chart-order-status'), {
+        type: 'doughnut',
+        data: {
+            labels: orderStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: orderStatus.map(function (r) { return r.cnt; }),
+                backgroundColor: orderStatus.map(function (r) { return soColors[r.status] || '#94a3b8'; }) }],
         },
         options: { responsive: true, plugins: { legend: { position: 'right' } } },
     });
