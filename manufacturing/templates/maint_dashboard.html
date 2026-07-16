@@ -39,11 +39,6 @@
     padding:16px 20px; margin-bottom:24px; }
 .oee-trend-title { font-size:12px; font-weight:700; text-transform:uppercase;
     letter-spacing:.4px; color:var(--text-muted); margin-bottom:12px; }
-.oee-bars { display:flex; align-items:flex-end; gap:10px; height:80px; }
-.oee-bar-col { flex:1; display:flex; flex-direction:column; align-items:center;
-    justify-content:flex-end; height:100%; }
-.oee-bar { width:100%; max-width:28px; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; }
-.oee-bar-label { font-size:10px; color:var(--text-muted); margin-top:4px; }
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
@@ -86,15 +81,8 @@
     </div>
 
     <div class="oee-trend">
-        <div class="oee-trend-title">Weekly OEE Trend (last 8 weeks)</div>
-        <div class="oee-bars">
-            {% for point in oee_trend %}
-            <div class="oee-bar-col" title="{{ point.week_start }} to {{ point.week_end }}: {{ point.oee_pct }}%">
-                <div class="oee-bar" style="height:{{ point.oee_pct }}%;"></div>
-                <div class="oee-bar-label">{{ point.oee_pct|floatformat:0 }}%</div>
-            </div>
-            {% endfor %}
-        </div>
+        <div class="oee-trend-title">Weekly OEE Trend (last 8 weeks) — <a href="/maint/oee/" style="color:var(--accent);font-weight:normal;">Full Report →</a></div>
+        <canvas id="chart-oee-trend" height="100"></canvas>
     </div>
 
     <div class="two-col">
@@ -150,8 +138,30 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
+    var oeeTrend = {{ oee_trend_json|safe }};
     var downtime = {{ downtime_by_equipment_json|safe }};
     var pmStatus = {{ schedule_breakdown_json|safe }};
+
+    new Chart(document.getElementById('chart-oee-trend'), {
+        type: 'line',
+        data: {
+            labels: oeeTrend.map(function (r) { return r.week_start.slice(5); }),
+            datasets: [{
+                label: 'OEE %',
+                data: oeeTrend.map(function (r) { return r.oee_pct; }),
+                borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.08)',
+                fill: true, tension: 0.3, pointRadius: 4,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, max: 100,
+                     ticks: { callback: function(v){ return v + '%'; } } },
+            },
+        },
+    });
 
     new Chart(document.getElementById('chart-downtime-equipment'), {
         type: 'bar',

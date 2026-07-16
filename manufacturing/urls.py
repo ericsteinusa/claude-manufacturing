@@ -207,6 +207,7 @@ urlpatterns = [
     path('cs/plans/', views.cs_plans, name='cs_plans'),
     path('maint/', views.maint_dashboard, name='maint_dashboard'),
     path('maint/oee/', views.maint_oee_report, name='maint_oee_report'),
+    path('maint/oee/export/', views.maint_oee_export, name='maint_oee_export'),
     path('predictive-maintenance/', views.predictive_maintenance_dashboard,
          name='predictive_maintenance_dashboard'),
     path('predictive-maintenance/sensor-reading/new/', views.sensor_reading_new,

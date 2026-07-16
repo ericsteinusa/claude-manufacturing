@@ -6,6 +6,8 @@
 {% if can_edit %}
 <a href="{{ new_url }}" class="btn btn-primary">+ New {{ contact_type|capfirst }}</a>
 {% endif %}
+<a href="?export=1{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block body %}

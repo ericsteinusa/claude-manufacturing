@@ -5,6 +5,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import export_response
 
 from ..legal_core import (
     get_legal_dashboard,
@@ -73,6 +74,13 @@ def legal_contract_list(request):
                                            contract_type=type_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'legal_contracts', [
+            ('title', 'Title'), ('counterparty', 'Party'), ('contract_type', 'Type'),
+            ('value', 'Value'), ('start_date', 'Start Date'),
+            ('end_date', 'End Date'), ('owner', 'Owner'), ('status', 'Status'),
+        ], contracts)
+
     return render(request, 'legal_contract_list.html', _legal_ctx(
         request, contracts=contracts, status_filter=status_f, type_filter=type_f,
         search=search, contract_statuses=CONTRACT_STATUSES, contract_types=CONTRACT_TYPES,
@@ -146,6 +154,12 @@ def legal_compliance_list(request):
                 items = list_compliance(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'legal_compliance', [
+            ('requirement', 'Requirement'), ('regulation', 'Regulation'),
+            ('owner', 'Owner'), ('due_date', 'Due Date'), ('status', 'Status'),
+        ], items)
+
     return render(request, 'legal_compliance_list.html', _legal_ctx(
         request, items=items, status_filter=status_f, search=search,
         compliance_statuses=COMPLIANCE_STATUSES, error=error, success=success,
@@ -220,6 +234,13 @@ def legal_litigation_list(request):
                                         case_type=type_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'legal_litigation', [
+            ('case_name', 'Case Name'), ('opposing_party', 'Opposing Party'),
+            ('case_type', 'Type'), ('filed_date', 'Filed Date'),
+            ('status', 'Status'), ('outcome', 'Outcome'),
+        ], cases)
+
     return render(request, 'legal_litigation_list.html', _legal_ctx(
         request, cases=cases, status_filter=status_f, type_filter=type_f,
         search=search, litigation_statuses=LITIGATION_STATUSES,

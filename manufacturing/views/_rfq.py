@@ -5,6 +5,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import export_response
 
 from ..rfq_core import (
     ensure_rfq_tables, create_rfq, get_rfq, list_rfqs,
@@ -39,6 +40,10 @@ def rfq_list(request):
         rfqs = list_rfqs(conn, status=status)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        cols = ['rfq_number', 'status', 'notes', 'created_by', 'created_at']
+        rows = [[r.get(c, '') for c in cols] for r in rfqs]
+        return export_response(request, 'rfqs', cols, rows)
     return render(request, 'rfq_list.html', _rfq_ctx(
         request, rfqs=rfqs, status=status,
     ))
@@ -138,6 +143,22 @@ def rfq_detail(request, rfq_id):
         comparison = get_comparison(conn, rfq_id)
         suppliers = load_suppliers(conn)
         products = load_products(conn)
+
+        if 'export' in request.GET:
+            cols = ['item', 'qty', 'target_price'] + [v['label'] for v in comparison['vendors']] + ['awarded_to']
+            export_rows = []
+            for item, vendor_cells in comparison['rows']:
+                row = [item['description'], item['qty'], item['target_price']]
+                for vendor, cell in vendor_cells:
+                    row.append(cell['quoted_price'] if cell and cell.get('quoted_price') is not None else '')
+                awarded = ''
+                if item.get('awarded_vendor_id'):
+                    for vendor, cell in vendor_cells:
+                        if vendor['id'] == item['awarded_vendor_id']:
+                            awarded = vendor['label']
+                row.append(awarded)
+                export_rows.append(row)
+            return export_response(request, f"rfq_{rfq.get('rfq_number', rfq_id)}", cols, export_rows)
     finally:
         conn.close()
 

@@ -9,6 +9,8 @@
 <a href="/pers/training/" class="btn">Training</a>
 <a href="/time-off/" class="btn">Time Off</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

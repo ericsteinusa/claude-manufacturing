@@ -7,6 +7,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import export_response
 
 from ..fixed_asset_core import (
     init_fixed_asset_tables as _init_fixed_asset_tables,
@@ -96,6 +97,13 @@ def it_ticket_list(request):
                                           priority=priority_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_tickets', [
+            ('ticket_number', 'Ticket #'), ('requester', 'Requester'),
+            ('issue_type', 'Issue Type'), ('priority', 'Priority'),
+            ('assigned_to', 'Assigned To'), ('submitted_date', 'Date'), ('status', 'Status'),
+        ], tickets)
+
     return render(request, 'it_ticket_list.html', _it_ctx(
         request, tickets=tickets, status_filter=status_f, priority_filter=priority_f,
         search=search, ticket_statuses=TICKET_STATUSES, ticket_priorities=TICKET_PRIORITIES,
@@ -183,6 +191,13 @@ def it_asset_list(request):
                                      asset_type=type_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_assets', [
+            ('asset_tag', 'Asset Tag'), ('asset_type', 'Type'), ('make', 'Make'),
+            ('model', 'Model'), ('serial_number', 'Serial #'),
+            ('assigned_to', 'Assigned To'), ('department', 'Department'), ('status', 'Status'),
+        ], assets)
+
     return render(request, 'it_asset_list.html', _it_ctx(
         request, assets=assets, status_filter=status_f, type_filter=type_f,
         search=search, asset_statuses=ASSET_STATUSES, asset_types=ASSET_TYPES,
@@ -374,6 +389,12 @@ def it_software_list(request):
                 installs = list_software(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_software', [
+            ('software_name', 'Software'), ('vendor', 'Vendor'), ('version', 'Version'),
+            ('asset_tag', 'Asset Tag'), ('install_date', 'Install Date'), ('status', 'Status'),
+        ], installs)
+
     return render(request, 'it_software_list.html', _it_ctx(
         request, installs=installs, status_filter=status_f, search=search,
         software_statuses=SOFTWARE_STATUSES, today=date.today().isoformat(),
@@ -451,6 +472,12 @@ def it_license_list(request):
                 licenses = list_licenses(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_licenses', [
+            ('software_name', 'Software'), ('vendor', 'Vendor'), ('license_type', 'License Type'),
+            ('seats', 'Seats'), ('seats_used', 'Used'), ('expiry_date', 'Expiry'), ('status', 'Status'),
+        ], licenses)
+
     return render(request, 'it_license_list.html', _it_ctx(
         request, licenses=licenses, status_filter=status_f, search=search,
         license_types=LICENSE_TYPES, license_statuses=LICENSE_STATUSES,
@@ -534,6 +561,13 @@ def it_network_list(request):
                                                device_type=type_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_network', [
+            ('hostname', 'Hostname'), ('ip_address', 'IP Address'),
+            ('device_type', 'Type'), ('manufacturer', 'Manufacturer'),
+            ('model', 'Model'), ('location', 'Location'), ('status', 'Status'),
+        ], devices)
+
     return render(request, 'it_network_list.html', _it_ctx(
         request, devices=devices, status_filter=status_f, type_filter=type_f,
         search=search, device_types=NETWORK_DEVICE_TYPES,
@@ -578,6 +612,13 @@ def it_task_list(request):
                                    priority=priority_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_tasks', [
+            ('task_number', 'Task #'), ('task_name', 'Task'), ('task_type', 'Type'),
+            ('assigned_to', 'Assigned To'), ('due_date', 'Due Date'),
+            ('priority', 'Priority'), ('status', 'Status'),
+        ], tasks)
+
     return render(request, 'it_task_list.html', _it_ctx(
         request, tasks=tasks, status_filter=status_f, priority_filter=priority_f,
         search=search, task_statuses=TASK_STATUSES, task_priorities=TASK_PRIORITIES,
@@ -661,6 +702,12 @@ def it_incident_list(request):
                                            severity=severity_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'it_incidents', [
+            ('title', 'Title'), ('severity', 'Severity'), ('affected_systems', 'Affected Systems'),
+            ('reported_date', 'Reported Date'), ('status', 'Status'),
+        ], incidents)
+
     return render(request, 'it_incident_list.html', _it_ctx(
         request, incidents=incidents, status_filter=status_f, severity_filter=severity_f,
         search=search, incident_statuses=INCIDENT_STATUSES, incident_severities=INCIDENT_SEVERITIES,

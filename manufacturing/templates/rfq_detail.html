@@ -4,6 +4,7 @@
 {% block toolbar_left %}
 <a href="/rfq/" class="btn">RFQs</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="/rfq/{{ rfq.id }}/?export=1" class="btn">&#8659; CSV</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -19,6 +20,9 @@
 .vendor-tag { display:inline-flex; align-items:center; gap:6px; background:#f0f4ff; border:1px solid var(--border); border-radius:16px; padding:4px 10px 4px 14px; font-size:13px; margin:0 8px 8px 0; }
 .vendor-tag button { border:none; background:none; color:#c62828; cursor:pointer; font-size:14px; line-height:1; }
 .variance-pos { color:#2e7d32; font-weight:bold; }
+.cell-lowest { background:#f0fdf4; color:#15803d; font-weight:bold; border-radius:4px; padding:2px 6px; display:inline-block; }
+.cell-savings { font-size:11px; color:#15803d; display:block; }
+.cell-over { font-size:11px; color:#ef4444; display:block; }
 {% endblock %}
 
 {% block body %}
@@ -126,7 +130,17 @@
                     <tbody>
                         {% for item, vendor_cells in comparison.rows %}
                         <tr>
-                            <td>{{ item.description }}{% if item.product_name %} <span style="color:var(--text-muted);">({{ item.product_name }})</span>{% endif %}</td>
+                            <td>
+                                {{ item.description }}{% if item.product_name %} <span style="color:var(--text-muted);">({{ item.product_name }})</span>{% endif %}
+                                {% if can_edit and rfq.status == 'open' %}
+                                <form method="post" style="display:inline;margin-left:6px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_item">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" title="Remove item" style="border:none;background:none;color:#c62828;cursor:pointer;font-size:13px;padding:0;">&#10005;</button>
+                                </form>
+                                {% endif %}
+                            </td>
                             <td class="num">{{ item.qty }}</td>
                             <td class="num">${{ item.target_price|floatformat:2 }}</td>
                             {% for vendor, cell in vendor_cells %}
@@ -142,8 +156,8 @@
                                        placeholder="days">
                                 {% else %}
                                 {% if cell and cell.quoted_price is not None %}
-                                <span {% if cell.is_lowest %}class="variance-pos"{% endif %}>${{ cell.quoted_price|floatformat:2 }}</span>
-                                {% if cell.lead_time_days %} ({{ cell.lead_time_days }}d){% endif %}
+                                <span {% if cell.is_lowest %}class="cell-lowest"{% endif %}>${{ cell.quoted_price|floatformat:2 }}</span>
+                                {% if cell.lead_time_days %}<span style="font-size:11px;color:#888;"> {{ cell.lead_time_days }}d</span>{% endif %}
                                 {% else %}—{% endif %}
                                 {% endif %}
                             </td>

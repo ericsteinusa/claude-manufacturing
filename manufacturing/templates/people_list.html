@@ -6,6 +6,8 @@
 <a href="{{ back_url }}" class="btn">← Back</a>
 {% if can_edit %}<a href="/people/new/" class="btn btn-primary">+ New Employee</a>{% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="?export=1{% if dept_id %}&dept_id={{ dept_id }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if dept_id %}&dept_id={{ dept_id }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block body %}

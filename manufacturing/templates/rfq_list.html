@@ -7,6 +7,7 @@
 {% if can_edit %}
 <a href="/rfq/new/" class="btn btn-primary">+ New RFQ</a>
 {% endif %}
+<a href="/rfq/?{% if status %}status={{ status }}&{% endif %}export=1" class="btn">&#8659; CSV</a>
 {% endblock %}
 
 {% block body %}
@@ -28,6 +29,8 @@
                 <tr>
                     <th>RFQ #</th>
                     <th>Status</th>
+                    <th>Notes</th>
+                    <th>Created By</th>
                     <th>Created</th>
                     <th></th>
                 </tr>
@@ -45,7 +48,9 @@
                         <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
                         {% endif %}
                     </td>
-                    <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+                    <td style="color:var(--text-muted);">{{ r.notes|default:"—" }}</td>
+                    <td style="color:var(--text-muted);">{{ r.created_by|default:"—" }}</td>
+                    <td>{{ r.created_at|date:"Y-m-d" }}</td>
                     <td><a href="/rfq/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
                 </tr>
                 {% endfor %}

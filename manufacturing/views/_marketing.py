@@ -7,6 +7,7 @@ from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
+from ..csv_export import export_response
 
 from ..marketing_core import (
     get_marketing_dashboard,
@@ -76,6 +77,13 @@ def mkt_campaign_list(request):
                                            channel=channel_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'mkt_campaigns', [
+            ('name', 'Name'), ('channel', 'Channel'), ('objective', 'Objective'),
+            ('owner', 'Owner'), ('start_date', 'Start Date'),
+            ('end_date', 'End Date'), ('budget', 'Budget'), ('status', 'Status'),
+        ], campaigns)
+
     return render(request, 'mkt_campaign_list.html', _mkt_ctx(
         request, campaigns=campaigns, status_filter=status_f, channel_filter=channel_f,
         search=search, campaign_statuses=CAMPAIGN_STATUSES, channels=CHANNELS,
@@ -154,6 +162,13 @@ def mkt_lead_list(request):
                                    source=source_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'mkt_leads', [
+            ('name', 'Name'), ('company', 'Company'), ('email', 'Email'),
+            ('source', 'Source'), ('owner', 'Owner'),
+            ('captured_date', 'Captured Date'), ('status', 'Status'),
+        ], leads)
+
     return render(request, 'mkt_lead_list.html', _mkt_ctx(
         request, leads=leads, status_filter=status_f, source_filter=source_f,
         search=search, lead_statuses=LEAD_STATUSES, lead_sources=LEAD_SOURCES,
@@ -313,6 +328,12 @@ def mkt_ad_list(request):
                                channel=channel_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'mkt_ads', [
+            ('name', 'Name'), ('channel', 'Channel'), ('campaign_name', 'Campaign'),
+            ('budget', 'Budget'), ('spend', 'Spend'), ('status', 'Status'),
+        ], ads)
+
     return render(request, 'mkt_ad_list.html', _mkt_ctx(
         request, ads=ads, status_filter=status_f, channel_filter=channel_f,
         search=search, ad_statuses=AD_STATUSES, ad_channels=AD_CHANNELS,
@@ -396,6 +417,12 @@ def mkt_research_list(request):
                                          research_type=type_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'mkt_research', [
+            ('title', 'Title'), ('research_type', 'Type'), ('owner', 'Owner'),
+            ('start_date', 'Start Date'), ('end_date', 'End Date'), ('status', 'Status'),
+        ], projects)
+
     return render(request, 'mkt_research_list.html', _mkt_ctx(
         request, projects=projects, status_filter=status_f, type_filter=type_f,
         search=search, research_types=RESEARCH_TYPES, research_statuses=RESEARCH_STATUSES,

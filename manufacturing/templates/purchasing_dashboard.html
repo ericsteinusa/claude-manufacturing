@@ -85,6 +85,17 @@
         </div>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card">
+            <h3>PO Status Breakdown</h3>
+            <canvas id="chart-po-status" height="220"></canvas>
+        </div>
+        <div class="card">
+            <h3>Spend by Month</h3>
+            <canvas id="chart-spend-month" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Purchase Orders</h3>
         <table class="list-table">
@@ -115,4 +126,35 @@
 
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var poStatus = {{ po_status_json|safe }};
+    var spendMonth = {{ spend_by_month_json|safe }};
+
+    new Chart(document.getElementById('chart-po-status'), {
+        type: 'doughnut',
+        data: {
+            labels: poStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: poStatus.map(function (r) { return r.cnt; }),
+                backgroundColor: ['#94a3b8','#1d6fe8','#f59e0b','#22c55e','#ef4444','#a855f7'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } },
+    });
+
+    new Chart(document.getElementById('chart-spend-month'), {
+        type: 'bar',
+        data: {
+            labels: spendMonth.map(function (r) { return r.month; }),
+            datasets: [{ label: 'Spend ($)', data: spendMonth.map(function (r) { return r.total; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+                   scales: { y: { beginAtZero: true } } },
+    });
+})();
+</script>
 {% endblock %}

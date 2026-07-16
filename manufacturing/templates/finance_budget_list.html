@@ -8,6 +8,8 @@
 <a href="/fin/bank-rec/" class="btn">Bank Rec</a>
 <a href="/fin/tax/" class="btn">Tax Filings</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

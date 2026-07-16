@@ -12,6 +12,8 @@
 <a href="/it/tasks/" class="btn">Tasks</a>
 <a href="/it/incidents/" class="btn">Incidents</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

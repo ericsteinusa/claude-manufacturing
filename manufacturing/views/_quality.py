@@ -206,6 +206,12 @@ def qa_capa_list(request):
                                    search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'qa_capas', [
+            ('title', 'Title'), ('capa_type', 'Type'), ('ncr_ref', 'NCR Ref'),
+            ('owner', 'Owner'), ('due_date', 'Due Date'), ('status', 'Status'),
+        ], capas)
+
     return render(request, 'qa_capa_list.html', _qa_ctx(
         request, capas=capas, status_filter=status_filter, search=search,
         capa_statuses=CAPA_STATUSES, capa_types=CAPA_TYPES,
@@ -285,6 +291,12 @@ def qa_audit_list(request):
                 audits = list_audits(conn, status=status_filter or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'qa_audits', [
+            ('title', 'Title'), ('audit_type', 'Type'), ('auditor', 'Auditor'),
+            ('scheduled_date', 'Scheduled Date'), ('status', 'Status'),
+        ], audits)
+
     return render(request, 'qa_audit_list.html', _qa_ctx(
         request, audits=audits, status_filter=status_filter,
         audit_statuses=AUDIT_STATUSES, audit_types=AUDIT_TYPES,
@@ -371,6 +383,12 @@ def qa_supplier_list(request):
                                                   search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'qa_suppliers', [
+            ('supplier', 'Supplier'), ('material', 'Material'), ('rating', 'Rating'),
+            ('ppm', 'PPM'), ('last_audit', 'Last Audit'), ('status', 'Status'),
+        ], suppliers)
+
     return render(request, 'qa_supplier_list.html', _qa_ctx(
         request, suppliers=suppliers, status_filter=status_filter, search=search,
         supplier_statuses=SUPPLIER_STATUSES, supplier_ratings=SUPPLIER_RATINGS,
@@ -467,6 +485,12 @@ def qa_inspection_list(request):
             sampling_plans = find_applicable_plans(conn)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'qa_inspections', [
+            ('insp_number', 'Inspection #'), ('product_name', 'Product'),
+            ('insp_date', 'Date'), ('inspector', 'Inspector'), ('result', 'Result'),
+        ], inspections)
+
     return render(request, 'qa_inspection_list.html', _qa_ctx(
         request, inspections=inspections, result_filter=result_filter,
         search=search, insp_results=INSP_RESULTS,

@@ -6,6 +6,8 @@
 <a href="/maint/wo/" class="btn">Work Orders</a>
 <a href="/maint/equipment/" class="btn">Equipment</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

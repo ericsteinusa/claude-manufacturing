@@ -2397,6 +2397,13 @@ def people_list(request):
     finally:
         conn.close()
 
+    if 'export' in request.GET:
+        return export_response(request, 'employees', [
+            ('id', 'ID'), ('first_name', 'First Name'), ('last_name', 'Last Name'),
+            ('email', 'Email'), ('dept_name', 'Department'), ('job_title', 'Job Title'),
+            ('employee_id', 'Employee ID'),
+        ], people)
+
     return render(request, 'people_list.html', _people_context(
         request,
         people=people,
@@ -2574,6 +2581,14 @@ def time_off_list(request):
         if request.session.get('user_dept_key') == 'personnel'
         else '/dashboard/'
     )
+
+    if 'export' in request.GET:
+        return export_response(request, 'time_off_requests', [
+            ('id', 'ID'), ('first_name', 'First Name'), ('last_name', 'Last Name'),
+            ('start_date', 'Start Date'), ('end_date', 'End Date'),
+            ('request_type', 'Type'), ('status', 'Status'), ('notes', 'Notes'),
+        ], requests)
+
     return render(request, 'time_off_list.html', _people_context(
         request,
         requests=requests,
@@ -3290,6 +3305,12 @@ def bom_list(request):
         if dept in _BOM_DEPT_KEYS else '/dashboard/'
     )
 
+    if 'export' in request.GET:
+        return export_response(request, 'bom', [
+            ('name', 'Product Name'), ('uom', 'Unit'), ('item_type', 'Type'),
+            ('lead_time_days', 'Lead Time (Days)'), ('component_count', 'Component Count'),
+        ], products)
+
     return render(request, 'bom_list.html', _bom_context(
         request,
         products=products,
@@ -3853,6 +3874,12 @@ def customer_list(request):
         customers = list_customers(conn, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'customers', [
+            ('company_name', 'Company'), ('first_name', 'First Name'), ('last_name', 'Last Name'),
+            ('email', 'Email'), ('phone_number', 'Phone'), ('city', 'City'), ('state', 'State'),
+        ], customers)
+
     return render(request, 'contacts_list.html', _contacts_context(
         request,
         contacts=customers,
@@ -3975,6 +4002,12 @@ def supplier_list(request):
         suppliers = contacts_list_suppliers(conn, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'suppliers', [
+            ('company_name', 'Company'), ('first_name', 'First Name'), ('last_name', 'Last Name'),
+            ('email', 'Email'), ('phone_number', 'Phone'), ('city', 'City'), ('state', 'State'),
+        ], suppliers)
+
     return render(request, 'contacts_list.html', _contacts_context(
         request,
         contacts=suppliers,
@@ -4110,6 +4143,12 @@ def cs_ticket_list(request):
                            if t['priority'] in ('high', 'critical'))
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'cs_tickets', [
+            ('id', 'ID'), ('customer_name', 'Customer'), ('call_date', 'Date'),
+            ('priority', 'Priority'), ('status', 'Status'), ('created_by', 'Created By'),
+        ], tickets)
+
     return render(request, 'cs_list.html', _cs_context(
         request,
         tickets=tickets,
@@ -5351,6 +5390,12 @@ def eng_tasks_list(request):
         )
         projects = list_projects(conn)
         people = load_people(conn)
+    if 'export' in request.GET:
+        return export_response(request, 'eng_tasks', [
+            ('task_name', 'Task'), ('project_title', 'Project'), ('assigned_to', 'Assigned To'),
+            ('due_date', 'Due Date'), ('priority', 'Priority'), ('status', 'Status'),
+        ], tasks)
+
     return render(request, 'eng_tasks_list.html', _eng_ctx(
         request, tasks=tasks, projects=projects, people=people,
         status_filter=status_f, priority_filter=priority_f,
@@ -5433,6 +5478,12 @@ def eng_specs_list(request):
                 )
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'eng_specs', [
+            ('standard_number', 'Spec Number'), ('title', 'Title'),
+            ('category', 'Category'), ('version', 'Version'), ('status', 'Status'),
+        ], specs)
+
     return render(request, 'eng_specs_list.html', _eng_ctx(
         request, specs=specs, status_filter=status_f, category_filter=cat_f,
         search=search, spec_statuses=ENG_STANDARD_STATUSES,
@@ -5788,6 +5839,12 @@ def sales_leads_list(request):
                 leads = list_sales_leads(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'sales_leads', [
+            ('company', 'Company'), ('contact', 'Contact'), ('source', 'Source'),
+            ('owner', 'Owner'), ('priority', 'Priority'), ('status', 'Status'),
+        ], leads)
+
     return render(request, 'sales_leads_list.html', _sales_ctx(
         request, leads=leads, status_filter=status_f, search=search,
         lead_statuses=SALES_LEAD_STATUSES, lead_sources=SALES_LEAD_SOURCES,
@@ -5867,6 +5924,12 @@ def sales_contracts_list(request):
                 contracts = list_sales_contracts(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'sales_contracts', [
+            ('customer', 'Customer'), ('title', 'Title'), ('value', 'Value'),
+            ('start_date', 'Start Date'), ('end_date', 'End Date'), ('status', 'Status'),
+        ], contracts)
+
     return render(request, 'sales_contracts_list.html', _sales_ctx(
         request, contracts=contracts, status_filter=status_f, search=search,
         contract_statuses=SALES_CONTRACT_STATUSES,
@@ -6139,6 +6202,12 @@ def prod_shipping_list(request):
                 shipments = list_shipments(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'shipments', [
+            ('id', 'ID'), ('ship_number', 'Ship #'), ('ship_date', 'Ship Date'),
+            ('carrier', 'Carrier'), ('tracking_number', 'Tracking #'), ('status', 'Status'),
+        ], shipments)
+
     return render(request, 'prod_shipping_list.html', _prod_ctx(
         request, shipments=shipments, sales_orders=sales_orders,
         status_filter=status_f, search=search,
@@ -6294,6 +6363,12 @@ def prod_returns_list(request):
                 )
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'returns_rma', [
+            ('rma_number', 'RMA #'), ('customer', 'Customer'), ('reason', 'Reason'),
+            ('status', 'Status'), ('created_by', 'Created By'),
+        ], rmas)
+
     return render(request, 'prod_returns_list.html', _prod_ctx(
         request, rmas=rmas, sales_orders=sales_orders,
         status_filter=status_f, search=search,
@@ -6378,7 +6453,11 @@ def _purch_ctx(request, **extra):
 def purch_dashboard(request):
     with get_db_connection() as conn:
         data = get_purchasing_dashboard(conn)
-    ctx = _purch_ctx(request, **data)
+    ctx = _purch_ctx(
+        request, **data,
+        po_status_json=json.dumps(data.get('po_status_chart', [])),
+        spend_by_month_json=json.dumps(data.get('spend_by_month', [])),
+    )
     return render(request, 'purchasing_dashboard.html', ctx)
 
 
@@ -6422,6 +6501,13 @@ def purch_contracts_list(request):
         ).fetchall()
     finally:
         conn.close()
+
+    if 'export' in request.GET:
+        return export_response(request, 'purch_contracts', [
+            ('contract_number', 'Contract #'), ('title', 'Title'), ('supplier_name', 'Supplier'),
+            ('category', 'Category'), ('start_date', 'Start Date'), ('end_date', 'End Date'),
+            ('value', 'Value'), ('status', 'Status'),
+        ], contracts)
 
     ctx = _purch_ctx(
         request,
@@ -6514,7 +6600,10 @@ def purch_reports_view(request):
 def pers_dashboard(request):
     with get_db_connection() as conn:
         data = get_personnel_dashboard(conn)
-    ctx = _people_context(request, **data)
+    ctx = _people_context(
+        request, **data,
+        dept_chart_json=json.dumps(data.get('by_dept', [])),
+    )
     return render(request, 'personnel_dashboard.html', ctx)
 
 
@@ -6595,6 +6684,13 @@ def pers_reviews_list(request):
                 reviews = list_reviews(conn, status=status_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'performance_reviews', [
+            ('first_name', 'First Name'), ('last_name', 'Last Name'),
+            ('reviewer', 'Reviewer'), ('review_type', 'Type'),
+            ('review_date', 'Review Date'), ('rating', 'Rating'), ('status', 'Status'),
+        ], reviews)
+
     return render(request, 'pers_reviews_list.html', _people_context(
         request, reviews=reviews, people=people,
         status_filter=status_f, search=search,
@@ -6678,6 +6774,13 @@ def pers_training_list(request):
                 )
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'training_records', [
+            ('course_name', 'Course'), ('first_name', 'First Name'), ('last_name', 'Last Name'),
+            ('training_type', 'Type'), ('start_date', 'Start Date'),
+            ('end_date', 'End Date'), ('status', 'Status'),
+        ], trainings)
+
     return render(request, 'pers_training_list.html', _people_context(
         request, trainings=trainings, people=people,
         status_filter=status_f, type_filter=type_f, search=search,
@@ -6810,6 +6913,12 @@ def fin_budget_list(request):
                                        search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'budgets', [
+            ('budget_name', 'Budget Name'), ('fiscal_year', 'Fiscal Year'),
+            ('status', 'Status'), ('notes', 'Notes'),
+        ], budgets)
+
     return render(request, 'finance_budget_list.html', _fin_ctx(
         request, budgets=budgets, status_filter=status_f, year_filter=year_f,
         search=search, budget_statuses=BUDGET_STATUSES, error=error, success=success,
@@ -6907,6 +7016,12 @@ def fin_audit_list(request):
                                          audit_type=type_f or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'fin_audits', [
+            ('audit_name', 'Audit Name'), ('audit_type', 'Type'), ('department', 'Department'),
+            ('auditor', 'Auditor'), ('scheduled', 'Scheduled Date'), ('status', 'Status'),
+        ], audits)
+
     return render(request, 'finance_audit_list.html', _fin_ctx(
         request, audits=audits, status_filter=status_f, type_filter=type_f,
         search=search, audit_statuses=FIN_AUDIT_STATUSES, audit_types=FIN_AUDIT_TYPES,
@@ -7529,6 +7644,13 @@ def lot_list(request):
         products = inv_list_products(conn)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'lots', [
+            ('lot_number', 'Lot Number'), ('product_name', 'Product'),
+            ('qty', 'Quantity'), ('status', 'Status'),
+            ('received_date', 'Received Date'), ('expiry_date', 'Expiry Date'),
+        ], lots)
+
     return render(request, 'lot_list.html', _lot_ctx(
         request,
         lots=lots,
@@ -7708,6 +7830,14 @@ def workcenter_list(request):
                         error = str(exc)
     finally:
         conn.close()
+
+    if 'export' in request.GET:
+        return export_response(request, 'workcenters', [
+            ('name', 'Name'), ('dept', 'Department'),
+            ('capacity_hours_per_day', 'Capacity Hours/Day'),
+            ('labor_rate', 'Labor Rate'), ('is_active', 'Active'),
+        ], workcenters)
+
     return render(request, 'workcenter_list.html', _routing_ctx(
         request,
         workcenters=workcenters,
@@ -7996,6 +8126,13 @@ def fixed_asset_list(request):
                 summary = get_fixed_asset_summary(conn)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'fixed_assets', [
+            ('asset_number', 'Asset #'), ('asset_name', 'Name'), ('asset_type', 'Type'),
+            ('serial_number', 'Serial #'), ('purchase_date', 'Purchase Date'),
+            ('purchase_price', 'Purchase Price'), ('location', 'Location'), ('status', 'Status'),
+        ], assets)
+
     return render(request, 'fixed_asset_list.html', {
         'assets': assets,
         'summary': summary,

@@ -54,6 +54,37 @@ def get_dashboard_counts(conn) -> dict:
     }
 
 
+def get_payroll_monthly_gross(conn) -> list:
+    """Return gross payroll by month for last 6 months."""
+    rows = conn.execute(
+        "SELECT TO_CHAR(DATE_TRUNC('month', run_date::date), 'Mon YYYY') AS month, "
+        "COALESCE(SUM(pe.gross_pay), 0) AS gross "
+        "FROM payroll_run pr "
+        "JOIN payroll_entry pe ON pe.run_id = pr.id "
+        "WHERE run_date >= (CURRENT_DATE - INTERVAL '6 months')::text "
+        "GROUP BY DATE_TRUNC('month', run_date::date) "
+        "ORDER BY DATE_TRUNC('month', run_date::date)"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_payroll_dept_breakdown(conn) -> list:
+    """Return gross YTD payroll grouped by department."""
+    year = str(_cur_year())
+    rows = conn.execute(
+        "SELECT COALESCE(d.dept_name, 'Unassigned') AS dept_name, "
+        "COALESCE(SUM(pe.gross_pay), 0) AS gross "
+        "FROM payroll_entry pe "
+        "JOIN payroll_run pr ON pr.id = pe.run_id "
+        "JOIN people p ON p.id = pe.people_id "
+        "LEFT JOIN dept d ON d.dept_id = p.dept_id "
+        "WHERE LEFT(pr.pay_period_start, 4) = %s "
+        "GROUP BY d.dept_name ORDER BY gross DESC LIMIT 8",
+        (year,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ---------------------------------------------------------------------------
 # People loader (for dropdowns)
 # ---------------------------------------------------------------------------

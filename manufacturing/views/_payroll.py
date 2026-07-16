@@ -7,10 +7,13 @@ from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
 from ..csv_export import export_response
 
+import json
+
 from ..payroll_core import (
     SS_RATE, MEDICARE_RATE,
     PAY_TYPES, DED_CATEGORIES, DED_METHODS,
     get_dashboard_counts as payroll_get_dashboard_counts,
+    get_payroll_monthly_gross, get_payroll_dept_breakdown,
     load_people as payroll_load_people,
     list_pay_rates, upsert_pay_rate, delete_pay_rate,
     list_deduction_types, create_deduction_type, update_deduction_type,
@@ -47,10 +50,14 @@ def payroll_dashboard(request):
     try:
         counts = payroll_get_dashboard_counts(conn)
         runs = list_payroll_runs(conn)[:5]
+        monthly_gross = get_payroll_monthly_gross(conn)
+        dept_breakdown = get_payroll_dept_breakdown(conn)
     finally:
         conn.close()
     return render(request, 'payroll_dashboard.html', _payroll_ctx(
         request, counts=counts, recent_runs=runs,
+        monthly_gross_json=json.dumps(monthly_gross),
+        dept_breakdown_json=json.dumps(dept_breakdown),
     ))
 
 

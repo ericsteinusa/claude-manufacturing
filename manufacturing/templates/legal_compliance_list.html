@@ -7,6 +7,8 @@
 <a href="/legal/compliance/" class="btn">Compliance</a>
 <a href="/legal/litigation/" class="btn">Litigation</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}

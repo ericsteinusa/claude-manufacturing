@@ -33,9 +33,26 @@ def get_purchasing_dashboard(conn) -> dict:
         "ORDER BY po.id DESC LIMIT 8"
     ).fetchall()
 
+    # PO status breakdown for doughnut chart
+    status_rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM purchase_order GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+
+    # Spend by month (last 6 months) for bar chart
+    spend_rows = conn.execute(
+        "SELECT TO_CHAR(DATE_TRUNC('month', order_date::date), 'Mon YYYY') AS month, "
+        "COALESCE(SUM(total), 0) AS total "
+        "FROM purchase_order "
+        "WHERE order_date >= (CURRENT_DATE - INTERVAL '6 months')::text "
+        "GROUP BY DATE_TRUNC('month', order_date::date) "
+        "ORDER BY DATE_TRUNC('month', order_date::date)"
+    ).fetchall()
+
     return {
         'pos': dict(po_row) if po_row else {},
         'recent_pos': [dict(r) for r in recent_rows],
+        'po_status_chart': [dict(r) for r in status_rows],
+        'spend_by_month': [dict(r) for r in spend_rows],
     }
 
 

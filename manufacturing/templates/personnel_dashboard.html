@@ -79,24 +79,10 @@
         </div>
     </div>
 
-    <div class="two-col">
+    <div class="two-col" style="margin-bottom:16px;">
         <div class="card">
-            <h3>Department Breakdown</h3>
-            {% if by_dept %}
-            <table class="list-table">
-                <thead><tr><th>Department</th><th>Headcount</th></tr></thead>
-                <tbody>
-                {% for d in by_dept %}
-                <tr>
-                    <td>{{ d.dept_name }}</td>
-                    <td>{{ d.count }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p style="color:#888;font-size:13px;">No department data available.</p>
-            {% endif %}
+            <h3>Headcount by Department</h3>
+            <canvas id="chart-dept-headcount" height="220"></canvas>
         </div>
 
         <div class="card">
@@ -120,4 +106,29 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var deptData = {{ dept_chart_json|safe }};
+    var colors = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4'];
+
+    new Chart(document.getElementById('chart-dept-headcount'), {
+        type: 'bar',
+        data: {
+            labels: deptData.map(function (r) { return r.dept_name; }),
+            datasets: [{ label: 'Employees', data: deptData.map(function (r) { return r.count; }),
+                backgroundColor: deptData.map(function (_, i) { return colors[i % colors.length]; }) }],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+    });
+})();
+</script>
 {% endblock %}

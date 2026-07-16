@@ -67,6 +67,17 @@
         <a href="/payroll/ytd/" class="dept-btn">YTD Report</a>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card">
+            <h3>Monthly Gross Payroll</h3>
+            <canvas id="chart-monthly-gross" height="220"></canvas>
+        </div>
+        <div class="card">
+            <h3>YTD Payroll by Department</h3>
+            <canvas id="chart-dept-gross" height="220"></canvas>
+        </div>
+    </div>
+
     {% if recent_runs %}
     <div class="card">
         <h3>Recent Payroll Runs</h3>
@@ -100,4 +111,36 @@
     {% endif %}
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var monthly = {{ monthly_gross_json|safe }};
+    var deptGross = {{ dept_breakdown_json|safe }};
+    var colors = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#f97316','#64748b'];
+
+    new Chart(document.getElementById('chart-monthly-gross'), {
+        type: 'bar',
+        data: {
+            labels: monthly.map(function (r) { return r.month; }),
+            datasets: [{ label: 'Gross ($)', data: monthly.map(function (r) { return r.gross; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+                   scales: { y: { beginAtZero: true } } },
+    });
+
+    new Chart(document.getElementById('chart-dept-gross'), {
+        type: 'doughnut',
+        data: {
+            labels: deptGross.map(function (r) { return r.dept_name; }),
+            datasets: [{ data: deptGross.map(function (r) { return r.gross; }),
+                backgroundColor: colors }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } },
+    });
+})();
+</script>
 {% endblock %}

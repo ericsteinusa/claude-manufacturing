@@ -73,6 +73,7 @@ def maint_dashboard(request):
         conn.close()
     return render(request, 'maint_dashboard.html', _maint_ctx(
         request, counts=counts, oee=oee, oee_trend=oee_trend,
+        oee_trend_json=json.dumps(oee_trend),
         downtime_by_equipment_json=json.dumps(downtime_by_equipment),
         schedule_breakdown_json=json.dumps(schedule_breakdown),
     ))
@@ -81,26 +82,108 @@ def maint_dashboard(request):
 @dept_required(_MAINT_DEPT_KEYS)
 def maint_oee_report(request):
     period = request.GET.get('period', 'month')
-    if period not in ('week', 'month'):
-        period = 'month'
-
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
     today = datetime.date.today()
-    if period == 'week':
+
+    if date_from and date_to:
+        # custom range overrides period chip
+        try:
+            start = datetime.date.fromisoformat(date_from)
+            end = datetime.date.fromisoformat(date_to)
+            if end < start:
+                start, end = end, start
+        except ValueError:
+            start, end = today.replace(day=1), today
+        period = 'custom'
+    elif period == 'week':
         start = today - datetime.timedelta(days=today.weekday())
+        end = today
+    elif period == 'quarter':
+        q_start_month = ((today.month - 1) // 3) * 3 + 1
+        start = today.replace(month=q_start_month, day=1)
+        end = today
+    elif period == 'year':
+        start = today.replace(month=1, day=1)
+        end = today
     else:
+        period = 'month'
         start = today.replace(day=1)
+        end = today
 
     conn = get_db_connection()
     try:
-        breakdown = list_workcenter_oee(conn, start.isoformat(), today.isoformat())
-        overall = get_overall_oee(conn, start.isoformat(), today.isoformat())
+        breakdown = list_workcenter_oee(conn, start.isoformat(), end.isoformat())
+        overall = get_overall_oee(conn, start.isoformat(), end.isoformat())
+        trend = get_oee_trend(conn, end_date=end.isoformat(), weeks=12)
     finally:
         conn.close()
 
+    # per-workcenter bar chart data
+    wc_chart = [
+        {'name': wc['workcenter_name'],
+         'availability': wc['availability_pct'],
+         'performance': wc['performance_pct'],
+         'quality': wc['quality_pct'],
+         'oee': wc['oee_pct']}
+        for wc in breakdown if wc
+    ]
+
     return render(request, 'maint_oee_report.html', _maint_ctx(
         request, breakdown=breakdown, overall=overall,
-        period=period, start=start.isoformat(), end=today.isoformat(),
+        period=period, start=start.isoformat(), end=end.isoformat(),
+        trend_json=json.dumps(trend),
+        wc_chart_json=json.dumps(wc_chart),
+        date_from=date_from, date_to=date_to,
     ))
+
+
+@dept_required(_MAINT_DEPT_KEYS)
+def maint_oee_export(request):
+    period = request.GET.get('period', 'month')
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    today = datetime.date.today()
+
+    if date_from and date_to:
+        try:
+            start = datetime.date.fromisoformat(date_from)
+            end = datetime.date.fromisoformat(date_to)
+        except ValueError:
+            start, end = today.replace(day=1), today
+    elif period == 'week':
+        start = today - datetime.timedelta(days=today.weekday())
+        end = today
+    elif period == 'quarter':
+        q_start_month = ((today.month - 1) // 3) * 3 + 1
+        start = today.replace(month=q_start_month, day=1)
+        end = today
+    elif period == 'year':
+        start = today.replace(month=1, day=1)
+        end = today
+    else:
+        start = today.replace(day=1)
+        end = today
+
+    conn = get_db_connection()
+    try:
+        breakdown = list_workcenter_oee(conn, start.isoformat(), end.isoformat())
+    finally:
+        conn.close()
+
+    rows = [wc for wc in breakdown if wc]
+    return export_response(request, f'oee_{start}_{end}', [
+        ('workcenter_name', 'Workcenter'),
+        ('availability_pct', 'Availability %'),
+        ('performance_pct', 'Performance %'),
+        ('quality_pct', 'Quality %'),
+        ('oee_pct', 'OEE %'),
+        ('scheduled_hours', 'Scheduled Hrs'),
+        ('downtime_hours', 'Downtime Hrs'),
+        ('actual_hours', 'Actual Hrs'),
+        ('total_qty', 'Total Qty'),
+        ('total_scrap', 'Scrap Qty'),
+    ], rows)
 
 
 # --- Work Orders ---
@@ -255,6 +338,13 @@ def maint_equipment_list(request):
                                            search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'maint_equipment', [
+            ('name', 'Equipment Name'), ('asset_tag', 'Asset Tag'), ('location', 'Location'),
+            ('manufacturer', 'Manufacturer'), ('install_date', 'Install Date'),
+            ('last_service', 'Last Service'), ('status', 'Status'),
+        ], equipment)
+
     return render(request, 'maint_equipment_list.html', _maint_ctx(
         request, equipment=equipment, status_filter=status_filter,
         search=search, equipment_statuses=EQUIPMENT_STATUSES,
@@ -336,6 +426,13 @@ def maint_schedule_list(request):
                                            search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'maint_schedules', [
+            ('task', 'Task'), ('equipment', 'Equipment'), ('frequency', 'Frequency'),
+            ('assigned_to', 'Assigned To'), ('last_done', 'Last Done'),
+            ('next_due', 'Next Due'), ('status', 'Status'),
+        ], schedules)
+
     return render(request, 'maint_schedule_list.html', _maint_ctx(
         request, schedules=schedules, mechanics=mechanics,
         status_filter=status_filter, search=search,
@@ -421,6 +518,13 @@ def maint_inspection_list(request):
                     conn, status=status_filter or None, search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'maint_inspections', [
+            ('area', 'Area'), ('inspection_type', 'Type'), ('inspector', 'Inspector'),
+            ('scheduled_date', 'Scheduled Date'), ('completed_date', 'Completed Date'),
+            ('result', 'Result'), ('status', 'Status'),
+        ], inspections)
+
     return render(request, 'maint_inspection_list.html', _maint_ctx(
         request, inspections=inspections, status_filter=status_filter,
         search=search, inspection_statuses=INSPECTION_STATUSES,
@@ -511,6 +615,12 @@ def maint_downtime_list(request):
                                                  search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'maint_downtime', [
+            ('equipment', 'Equipment'), ('reason', 'Reason'), ('category', 'Category'),
+            ('down_date', 'Date'), ('hours', 'Hours'), ('cost', 'Cost'), ('status', 'Status'),
+        ], downtime_records)
+
     return render(request, 'maint_downtime_list.html', _maint_ctx(
         request, downtime_records=downtime_records,
         status_filter=status_filter, search=search,
@@ -600,6 +710,13 @@ def maint_parts_list(request):
                                    search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'maint_parts', [
+            ('part_number', 'Part #'), ('name', 'Description'), ('category', 'Category'),
+            ('quantity', 'Quantity'), ('unit_cost', 'Unit Cost'),
+            ('location', 'Location'), ('reorder_level', 'Reorder Point'), ('status', 'Status'),
+        ], parts)
+
     return render(request, 'maint_parts_list.html', _maint_ctx(
         request, parts=parts, status_filter=status_filter, search=search,
         part_statuses=PART_STATUSES, part_categories=PART_CATEGORIES,
@@ -679,6 +796,12 @@ def maint_mechanics_list(request):
                                            search=search or None)
     finally:
         conn.close()
+    if 'export' in request.GET:
+        return export_response(request, 'maint_mechanics', [
+            ('name', 'Name'), ('trade', 'Trade'), ('shift', 'Shift'),
+            ('phone', 'Phone'), ('status', 'Status'),
+        ], mechanics)
+
     return render(request, 'maint_mechanics_list.html', _maint_ctx(
         request, mechanics=mechanics, status_filter=status_filter,
         search=search, mechanic_statuses=MECHANIC_STATUSES,

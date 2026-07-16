@@ -7,6 +7,8 @@
 <a href="/qa/suppliers/" class="btn">Suppliers</a>
 <a href="/sampling-plans/" class="btn">Sampling Plans</a>
 <a href="/dashboard/" class="btn">Home</a>
+<a href="?export=1{% if result_filter %}&result={{ result_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
+<a href="?export=1{% if result_filter %}&result={{ result_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}
