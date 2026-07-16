@@ -6871,11 +6871,19 @@ def fin_dashboard(request):
         cash_forecast = get_cash_forecast_13wk(conn, starting_balance=cash_position)
         ap_aging_row = conn.execute("""
             SELECT
-                COALESCE(SUM(amount) FILTER (WHERE due_date >= CURRENT_DATE), 0)                                        AS current,
-                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE AND due_date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
-                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE - INTERVAL '30 days' AND due_date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
-                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE - INTERVAL '60 days' AND due_date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
-                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE - INTERVAL '90 days'), 0)                   AS over_90
+                COALESCE(SUM(amount) FILTER (
+                    WHERE due_date >= CURRENT_DATE), 0) AS current,
+                COALESCE(SUM(amount) FILTER (
+                    WHERE due_date < CURRENT_DATE
+                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
+                COALESCE(SUM(amount) FILTER (
+                    WHERE due_date < CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
+                COALESCE(SUM(amount) FILTER (
+                    WHERE due_date < CURRENT_DATE - INTERVAL '60 days'
+                      AND due_date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
+                COALESCE(SUM(amount) FILTER (
+                    WHERE due_date < CURRENT_DATE - INTERVAL '90 days'), 0) AS over_90
             FROM ap_invoice WHERE status IN ('open','partial','overdue')
         """).fetchone()
         ap_aging = dict(ap_aging_row) if ap_aging_row else {}
