@@ -5591,11 +5591,31 @@ def sales_dashboard(request):
         recent_orders = list_sos(conn)[:8]
         recent_quotes = list_quotes(conn)[:8]
         revenue_by_month = get_revenue_by_month(conn)
+        top_customers = conn.execute("""
+            SELECT c.company_name AS customer,
+                   COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
+            FROM sales_order so
+            JOIN contact c ON c.id = so.customer_id
+            JOIN so_item si ON si.so_id = so.id
+            WHERE so.status IN ('confirmed','shipped','invoiced')
+            GROUP BY c.company_name
+            ORDER BY revenue DESC
+            LIMIT 8
+        """).fetchall()
+        leads_by_status = conn.execute("""
+            SELECT status, COUNT(*) AS cnt
+            FROM sales_lead
+            GROUP BY status
+            ORDER BY cnt DESC
+        """).fetchall()
     ctx = _sales_ctx(
         request, dash=dash,
         recent_orders=recent_orders, recent_quotes=recent_quotes,
         quote_funnel_json=json.dumps(dash.get('quotes', {})),
         revenue_by_month_json=json.dumps(revenue_by_month),
+        top_customers_json=json.dumps([dict(r) for r in top_customers]),
+        leads_by_status_json=json.dumps([dict(r) for r in leads_by_status]),
+        orders_by_status_json=json.dumps(dash.get('orders', {})),
     )
     return render(request, 'sales_dashboard.html', ctx)
 

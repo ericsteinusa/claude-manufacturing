@@ -77,12 +77,22 @@
 
     <div class="two-col" style="margin-bottom:16px;">
         <div class="card">
+            <h3>Revenue by Month (last 6 mo)</h3>
+            <canvas id="chart-revenue-month" height="200"></canvas>
+        </div>
+        <div class="card">
+            <h3>Top Customers by Revenue</h3>
+            <canvas id="chart-top-customers" height="200"></canvas>
+        </div>
+    </div>
+    <div class="two-col" style="margin-bottom:16px;">
+        <div class="card">
             <h3>Quote Pipeline</h3>
             <canvas id="chart-quote-funnel" height="200"></canvas>
         </div>
         <div class="card">
-            <h3>Revenue by Month</h3>
-            <canvas id="chart-revenue-month" height="200"></canvas>
+            <h3>Leads by Status</h3>
+            <canvas id="chart-leads-status" height="200"></canvas>
         </div>
     </div>
 
@@ -131,17 +141,8 @@
 (function () {
     var funnel = {{ quote_funnel_json|safe }};
     var revenue = {{ revenue_by_month_json|safe }};
-
-    new Chart(document.getElementById('chart-quote-funnel'), {
-        type: 'bar',
-        data: {
-            labels: ['Draft', 'Sent', 'Won'],
-            datasets: [{ label: 'Quotes', data: [funnel.draft || 0, funnel.sent || 0, funnel.won || 0],
-                         backgroundColor: ['#94a3b8', '#f59e0b', '#22c55e'] }],
-        },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
-                   scales: { x: { beginAtZero: true } } },
-    });
+    var topCustomers = {{ top_customers_json|safe }};
+    var leadsByStatus = {{ leads_by_status_json|safe }};
 
     new Chart(document.getElementById('chart-revenue-month'), {
         type: 'line',
@@ -151,7 +152,42 @@
                          borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.15)', fill: true, tension: 0.3 }],
         },
         options: { responsive: true, plugins: { legend: { display: false } },
-                   scales: { y: { beginAtZero: true } } },
+                   scales: { y: { beginAtZero: true, ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
+    });
+
+    new Chart(document.getElementById('chart-top-customers'), {
+        type: 'bar',
+        data: {
+            labels: topCustomers.map(function (r) { return r.customer; }),
+            datasets: [{ label: 'Revenue', data: topCustomers.map(function (r) { return r.revenue; }),
+                         backgroundColor: '#1d6fe8' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+                   scales: { x: { beginAtZero: true, ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
+    });
+
+    new Chart(document.getElementById('chart-quote-funnel'), {
+        type: 'bar',
+        data: {
+            labels: ['Draft', 'Sent', 'Won', 'Lost', 'Expired'],
+            datasets: [{ label: 'Quotes',
+                         data: [funnel.draft||0, funnel.sent||0, funnel.won||0, funnel.lost||0, funnel.expired||0],
+                         backgroundColor: ['#94a3b8', '#f59e0b', '#22c55e', '#ef4444', '#64748b'] }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+                   scales: { x: { beginAtZero: true } } },
+    });
+
+    var leadColors = { New:'#1d6fe8', Contacted:'#f59e0b', Qualified:'#7c3aed',
+                       Proposal:'#0891b2', Won:'#22c55e', Lost:'#ef4444' };
+    new Chart(document.getElementById('chart-leads-status'), {
+        type: 'doughnut',
+        data: {
+            labels: leadsByStatus.map(function (r) { return r.status; }),
+            datasets: [{ data: leadsByStatus.map(function (r) { return r.cnt; }),
+                         backgroundColor: leadsByStatus.map(function (r) { return leadColors[r.status] || '#94a3b8'; }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
     });
 })();
 </script>
