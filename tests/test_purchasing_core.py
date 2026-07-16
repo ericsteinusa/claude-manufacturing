@@ -13,12 +13,18 @@ def _conn(po_row, recent_rows):
     mock1.fetchone.return_value = po_row
     mock2 = MagicMock()
     mock2.fetchall.return_value = recent_rows
-    mock3 = MagicMock(); mock3.fetchall.return_value = []
-    mock4 = MagicMock(); mock4.fetchall.return_value = []
-    mock5 = MagicMock(); mock5.fetchall.return_value = []
-    mock6 = MagicMock(); mock6.fetchall.return_value = []
-    mock7 = MagicMock(); mock7.fetchall.return_value = []
-    mock8 = MagicMock(); mock8.fetchall.return_value = []
+    mock3 = MagicMock()
+    mock3.fetchall.return_value = []
+    mock4 = MagicMock()
+    mock4.fetchall.return_value = []
+    mock5 = MagicMock()
+    mock5.fetchall.return_value = []
+    mock6 = MagicMock()
+    mock6.fetchall.return_value = []
+    mock7 = MagicMock()
+    mock7.fetchall.return_value = []
+    mock8 = MagicMock()
+    mock8.fetchall.return_value = []
     c.execute.side_effect = [mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8]
     return c
 
