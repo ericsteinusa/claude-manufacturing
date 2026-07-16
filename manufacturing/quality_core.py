@@ -114,6 +114,22 @@ def get_ncr_severity_trend(conn, months: int = 6) -> dict:
     }
 
 
+def get_inspection_results(conn) -> list[dict]:
+    """Return [{result, cnt}] for all inspection outcomes."""
+    rows = conn.execute(
+        "SELECT result, COUNT(*) AS cnt FROM qa_inspection GROUP BY result ORDER BY cnt DESC"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_ncr_by_status(conn) -> list[dict]:
+    """Return [{status, cnt}] for NCR status breakdown."""
+    rows = conn.execute(
+        "SELECT status, COUNT(*) AS cnt FROM qa_ncr GROUP BY status ORDER BY cnt DESC"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ---------------------------------------------------------------------------
 # Non-Conformance Reports (qa_ncr)
 # ---------------------------------------------------------------------------

@@ -27,6 +27,7 @@ from ..quality_core import (
     load_products_for_qa, load_work_orders_for_qa,
     get_qa_reports,
     get_defect_pareto, get_ncr_severity_trend,
+    get_inspection_results, get_ncr_by_status,
 )
 from ..sampling_plan_core import ensure_sampling_plan_tables, find_applicable_plans
 
@@ -57,12 +58,16 @@ def qa_dashboard(request):
         counts = get_dashboard_counts(conn)
         defect_pareto = get_defect_pareto(conn)
         ncr_trend = get_ncr_severity_trend(conn)
+        insp_results = get_inspection_results(conn)
+        ncr_status = get_ncr_by_status(conn)
     finally:
         conn.close()
     return render(request, 'qa_dashboard.html', _qa_ctx(
         request, counts=counts,
         defect_pareto_json=json.dumps(defect_pareto),
         ncr_trend_json=json.dumps(ncr_trend),
+        insp_results_json=json.dumps(insp_results),
+        ncr_status_json=json.dumps(ncr_status),
     ))
 
 
