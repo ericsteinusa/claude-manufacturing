@@ -6799,12 +6799,29 @@ def pers_dashboard(request):
             FROM training_record
             GROUP BY status
         """).fetchall()
+        review_ratings = conn.execute("""
+            SELECT rating::text AS rating, COUNT(*) AS cnt
+            FROM pers_review
+            WHERE rating IS NOT NULL
+            GROUP BY rating ORDER BY rating
+        """).fetchall()
+        payroll_by_month = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', pr.run_date::date), 'Mon YYYY') AS month,
+                   COALESCE(SUM(pe.gross_pay), 0)::float AS gross
+            FROM payroll_run pr
+            JOIN payroll_entry pe ON pe.run_id = pr.id
+            WHERE pr.run_date >= (CURRENT_DATE - INTERVAL '6 months')::text
+            GROUP BY DATE_TRUNC('month', pr.run_date::date)
+            ORDER BY DATE_TRUNC('month', pr.run_date::date)
+        """).fetchall()
     ctx = _people_context(
         request, **data,
         dept_chart_json=json.dumps(data.get('by_dept', [])),
         hire_trend_json=json.dumps([dict(r) for r in hire_trend]),
         time_off_status_json=json.dumps([dict(r) for r in time_off_status]),
         training_status_json=json.dumps([dict(r) for r in training_status]),
+        review_ratings_json=json.dumps([dict(r) for r in review_ratings]),
+        payroll_by_month_json=json.dumps([dict(r) for r in payroll_by_month]),
     )
     return render(request, 'personnel_dashboard.html', ctx)
 

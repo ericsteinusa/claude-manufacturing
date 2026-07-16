@@ -101,6 +101,17 @@
         </div>
     </div>
 
+    <div class="two-col" style="margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Performance Review Ratings</h3>
+            <canvas id="chart-review-ratings" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Gross Payroll by Month (last 6 mo)</h3>
+            <canvas id="chart-payroll-month" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Employees</h3>
         <table class="list-table">
@@ -131,6 +142,8 @@
     var hireTrend      = {{ hire_trend_json|safe }};
     var timeOffStatus  = {{ time_off_status_json|safe }};
     var trainingStatus = {{ training_status_json|safe }};
+    var reviewRatings  = {{ review_ratings_json|safe }};
+    var payrollMonth   = {{ payroll_by_month_json|safe }};
     var colors = ['#1d6fe8','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4'];
 
     new Chart(document.getElementById('chart-dept-headcount'), {
@@ -187,6 +200,33 @@
                 }) }],
         },
         options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+    var ratingColors = ['#ef4444','#f59e0b','#eab308','#22c55e','#1d6fe8'];
+    new Chart(document.getElementById('chart-review-ratings'), {
+        type: 'bar',
+        data: {
+            labels: reviewRatings.map(function (r) { return 'Rating ' + r.rating; }),
+            datasets: [{ label: 'Reviews',
+                data: reviewRatings.map(function (r) { return r.cnt; }),
+                backgroundColor: reviewRatings.map(function (_, i) {
+                    return ratingColors[i % ratingColors.length];
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-payroll-month'), {
+        type: 'bar',
+        data: {
+            labels: payrollMonth.map(function (r) { return r.month; }),
+            datasets: [{ label: 'Gross Pay ($)',
+                data: payrollMonth.map(function (r) { return r.gross; }),
+                backgroundColor: '#7c3aed' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
     });
 })();
 </script>
