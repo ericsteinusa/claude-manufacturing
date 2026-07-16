@@ -111,6 +111,7 @@ from ..personnel_core import (
     list_trainings, get_training, create_training, update_training, init_training_table,
     get_personnel_dashboard,
 )
+from ..workforce_analytics_core import ensure_workforce_columns
 from ..sales_orders_core import (
     SO_STATUSES, SO_STATUS_COLORS, SO_STATUS_ACTION_LABELS,
     list_sos, get_so, get_so_items,
@@ -6907,6 +6908,7 @@ def purch_reports_view(request):
 @dept_required('personnel', role_keys=_PERSONNEL_ROLES)
 def pers_dashboard(request):
     with get_db_connection() as conn:
+        ensure_workforce_columns(conn)
         data = get_personnel_dashboard(conn)
         hire_trend = conn.execute("""
             SELECT TO_CHAR(DATE_TRUNC('month', hire_date::date), 'YYYY-MM')
