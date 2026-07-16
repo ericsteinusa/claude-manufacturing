@@ -3704,6 +3704,25 @@ def inventory_dashboard(request):
                            OR COALESCE(amount,0) > reorder_point)) AS ok
             FROM product
         """).fetchone()
+        top_movers = conn.execute("""
+            SELECT p.name AS product, COUNT(t.id) AS txn_count
+            FROM inventory_transaction t
+            JOIN product p ON p.id = t.product_id
+            WHERE t.trans_date >= CURRENT_DATE - INTERVAL '30 days'
+            GROUP BY p.name
+            ORDER BY txn_count DESC
+            LIMIT 8
+        """).fetchall()
+        value_by_supplier = conn.execute("""
+            SELECT COALESCE(s.company_name, 'No Supplier') AS supplier,
+                   COALESCE(SUM(p.amount * p.purchase_price), 0) AS value
+            FROM product p
+            LEFT JOIN supplier s ON s.id = p.supplier_id
+            WHERE COALESCE(p.amount, 0) > 0
+            GROUP BY s.company_name
+            ORDER BY value DESC
+            LIMIT 8
+        """).fetchall()
     finally:
         conn.close()
 
@@ -3720,6 +3739,8 @@ def inventory_dashboard(request):
             'make': kpi_d.get('make_count', 0),
             'buy': kpi_d.get('buy_count', 0),
         }),
+        top_movers_json=json.dumps([dict(r) for r in top_movers]),
+        value_by_supplier_json=json.dumps([dict(r) for r in value_by_supplier]),
     )
     return render(request, 'inventory_dashboard.html', ctx)
 

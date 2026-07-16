@@ -82,6 +82,17 @@
             <canvas id="chart-make-buy" height="220"></canvas>
         </div>
     </div>
+
+    <div class="two-col" style="margin-top:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Top Movers (last 30 days)</h3>
+            <canvas id="chart-top-movers" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Inventory Value by Supplier</h3>
+            <canvas id="chart-value-supplier" height="220"></canvas>
+        </div>
+    </div>
 </div>
 </div>
 {% endblock %}
@@ -90,10 +101,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
-    var topValue    = {{ top_value_json|safe }};
-    var txnTrend    = {{ txn_trend_json|safe }};
-    var stockStatus = {{ stock_status_json|safe }};
-    var makeBuy     = {{ make_buy_json|safe }};
+    var topValue        = {{ top_value_json|safe }};
+    var txnTrend        = {{ txn_trend_json|safe }};
+    var stockStatus     = {{ stock_status_json|safe }};
+    var makeBuy         = {{ make_buy_json|safe }};
+    var topMovers       = {{ top_movers_json|safe }};
+    var valueBySupplier = {{ value_by_supplier_json|safe }};
 
     new Chart(document.getElementById('chart-top-value'), {
         type: 'bar',
@@ -149,6 +162,33 @@
                 backgroundColor: ['#7c3aed', '#1d6fe8'] }],
         },
         options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-top-movers'), {
+        type: 'bar',
+        data: {
+            labels: topMovers.map(function (r) { return r.product; }),
+            datasets: [{ label: 'Transactions',
+                data: topMovers.map(function (r) { return r.txn_count; }),
+                backgroundColor: '#06b6d4' }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-value-supplier'), {
+        type: 'bar',
+        data: {
+            labels: valueBySupplier.map(function (r) { return r.supplier; }),
+            datasets: [{ label: 'Value ($)',
+                data: valueBySupplier.map(function (r) { return r.value; }),
+                backgroundColor: '#a855f7' }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
     });
 })();
 </script>
