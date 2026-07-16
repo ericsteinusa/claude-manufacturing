@@ -7139,7 +7139,57 @@ def cs_dashboard_view(request):
     with get_db_connection() as conn:
         stats = get_summary_stats(conn)
         recent_tickets = list_tickets(conn)[:8]
-    ctx = _cs_context(request, stats=stats, recent_tickets=recent_tickets)
+
+        ticket_trend_rows = conn.execute("""
+            SELECT TO_CHAR(DATE_TRUNC('month', call_date::date), 'Mon YYYY') AS month,
+                   COUNT(*) AS total,
+                   SUM(CASE WHEN completion_box = 0 THEN 1 ELSE 0 END) AS open_cnt,
+                   SUM(CASE WHEN completion_box = 1 THEN 1 ELSE 0 END) AS closed_cnt
+            FROM calls2
+            WHERE call_date::date >= CURRENT_DATE - INTERVAL '6 months'
+            GROUP BY DATE_TRUNC('month', call_date::date)
+            ORDER BY DATE_TRUNC('month', call_date::date)
+        """).fetchall()
+        ticket_trend_json = json.dumps([dict(r) for r in ticket_trend_rows])
+
+        return_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM cs_return GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        return_status_json = json.dumps([dict(r) for r in return_status_rows])
+
+        return_reason_rows = conn.execute("""
+            SELECT reason, COUNT(*) AS cnt
+            FROM cs_return
+            WHERE reason IS NOT NULL AND reason != ''
+            GROUP BY reason ORDER BY cnt DESC LIMIT 8
+        """).fetchall()
+        return_reason_json = json.dumps([dict(r) for r in return_reason_rows])
+
+        survey_score_rows = conn.execute("""
+            SELECT score, COUNT(*) AS cnt
+            FROM cs_survey_response
+            WHERE score IS NOT NULL
+            GROUP BY score ORDER BY score
+        """).fetchall()
+        survey_score_json = json.dumps([dict(r) for r in survey_score_rows])
+
+        kb_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM cs_kb_article GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        kb_status_json = json.dumps([dict(r) for r in kb_status_rows])
+
+        open_closed_json = json.dumps([
+            {'label': 'Open', 'cnt': stats.get('open_count', 0)},
+            {'label': 'Closed', 'cnt': stats.get('completed_count', 0)},
+        ])
+
+    ctx = _cs_context(request, stats=stats, recent_tickets=recent_tickets,
+                      ticket_trend_json=ticket_trend_json,
+                      return_status_json=return_status_json,
+                      return_reason_json=return_reason_json,
+                      survey_score_json=survey_score_json,
+                      kb_status_json=kb_status_json,
+                      open_closed_json=open_closed_json)
     return render(request, 'cs_dashboard.html', ctx)
 
 

@@ -14,12 +14,6 @@
 
 {% block extra_styles %}
 .m-wrap { width:100%; max-width:1100px; }
-
-.nav-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-.nav-btn { display:block; background:white; border: 1.5px solid var(--border); border-radius:8px;
-    padding:14px 10px; text-align:center; color:var(--accent); font-weight:bold;
-    font-size:13px; text-decoration:none; }
-.nav-btn:hover { background:var(--accent); color:white; }
 .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
 .kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
 .kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
@@ -85,6 +79,39 @@
         </div>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Ticket Volume by Month (last 6 mo)</h3>
+            <canvas id="chart-ticket-trend" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Open vs Closed Tickets</h3>
+            <canvas id="chart-open-closed" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Return Status</h3>
+            <canvas id="chart-return-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Return Reasons</h3>
+            <canvas id="chart-return-reason" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Survey Response Scores</h3>
+            <canvas id="chart-survey-scores" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Knowledge Base Articles by Status</h3>
+            <canvas id="chart-kb-status" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Tickets</h3>
         <table class="list-table">
@@ -120,4 +147,99 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var ticketTrend   = {{ ticket_trend_json|safe }};
+    var openClosed    = {{ open_closed_json|safe }};
+    var returnStatus  = {{ return_status_json|safe }};
+    var returnReason  = {{ return_reason_json|safe }};
+    var surveyScores  = {{ survey_score_json|safe }};
+    var kbStatus      = {{ kb_status_json|safe }};
+
+    new Chart(document.getElementById('chart-ticket-trend'), {
+        type: 'bar',
+        data: {
+            labels: ticketTrend.map(function(r){ return r.month; }),
+            datasets: [
+                { label: 'Closed', data: ticketTrend.map(function(r){ return r.closed_cnt; }),
+                  backgroundColor: '#22c55e', stack: 'tickets' },
+                { label: 'Open', data: ticketTrend.map(function(r){ return r.open_cnt; }),
+                  backgroundColor: '#ef4444', stack: 'tickets' },
+            ],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'top' } },
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true,
+                ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-open-closed'), {
+        type: 'doughnut',
+        data: {
+            labels: openClosed.map(function(r){ return r.label; }),
+            datasets: [{ data: openClosed.map(function(r){ return r.cnt; }),
+                backgroundColor: ['#ef4444', '#22c55e'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    var retColors = { Pending:'#f59e0b', Approved:'#1d6fe8', Refunded:'#22c55e', Closed:'#64748b' };
+    new Chart(document.getElementById('chart-return-status'), {
+        type: 'doughnut',
+        data: {
+            labels: returnStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: returnStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: returnStatus.map(function(r){
+                    return retColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-return-reason'), {
+        type: 'bar',
+        data: {
+            labels: returnReason.map(function(r){ return r.reason; }),
+            datasets: [{ label: 'Returns',
+                data: returnReason.map(function(r){ return r.cnt; }),
+                backgroundColor: '#f59e0b' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var scoreColors = surveyScores.map(function(r){
+        if (r.score <= 6) return '#ef4444';
+        if (r.score <= 8) return '#f59e0b';
+        return '#22c55e';
+    });
+    new Chart(document.getElementById('chart-survey-scores'), {
+        type: 'bar',
+        data: {
+            labels: surveyScores.map(function(r){ return 'Score ' + r.score; }),
+            datasets: [{ label: 'Responses',
+                data: surveyScores.map(function(r){ return r.cnt; }),
+                backgroundColor: scoreColors }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var kbColors = { Published:'#22c55e', Draft:'#94a3b8', 'In Review':'#f59e0b' };
+    new Chart(document.getElementById('chart-kb-status'), {
+        type: 'doughnut',
+        data: {
+            labels: kbStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: kbStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: kbStatus.map(function(r){
+                    return kbColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+})();
+</script>
 {% endblock %}
