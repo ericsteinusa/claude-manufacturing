@@ -1010,8 +1010,24 @@ def dashboard(request):
         dept_key = request.session.get('user_dept_key')
         if dept_key:
             return redirect('dept_menu', dept=dept_key)
+    _dept_dashboard_urls = {
+        'accounting': '/acct/',
+        'customer_service': '/cs-dash/',
+        'engineering': '/eng/',
+        'information_tech': '/it/',
+        'maintenance': '/maint/',
+        'marketing': '/mkt/',
+        'personnel': '/pers/',
+        'production': '/prod/',
+        'purchasing': '/purch/',
+        'quality_assurance': '/qa/',
+        'sales': '/sales/',
+        'finance': '/fin/',
+        'legal': '/legal/',
+        'reports': '/reports/',
+    }
     menu_items = [
-        ('/dept/{}/'.format(key), label)
+        (_dept_dashboard_urls.get(key, '/dept/{}/'.format(key)), label)
         for key, label in DASHBOARD_DEPARTMENTS
     ]
     pending_approvals = 0
