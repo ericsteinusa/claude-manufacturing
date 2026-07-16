@@ -3771,7 +3771,7 @@ def inventory_dashboard(request):
                 COALESCE(SUM(quantity) FILTER (
                     WHERE trans_type = 'issue'), 0)   AS issued
             FROM inventory_transaction
-            WHERE trans_date >= CURRENT_DATE - INTERVAL '14 days'
+            WHERE trans_date::date >= CURRENT_DATE - INTERVAL '14 days'
             GROUP BY trans_date
             ORDER BY trans_date
         """).fetchall()
@@ -3793,7 +3793,7 @@ def inventory_dashboard(request):
             SELECT p.name AS product, COUNT(t.id) AS txn_count
             FROM inventory_transaction t
             JOIN product p ON p.id = t.product_id
-            WHERE t.trans_date >= CURRENT_DATE - INTERVAL '30 days'
+            WHERE t.trans_date::date >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY p.name
             ORDER BY txn_count DESC
             LIMIT 8
@@ -5816,7 +5816,7 @@ def sales_dashboard(request):
             SELECT c.company_name AS customer,
                    COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
             FROM sales_order so
-            JOIN contact c ON c.id = so.customer_id
+            JOIN customer c ON c.id = so.customer_id
             JOIN so_item si ON si.so_id = so.id
             WHERE so.status IN ('confirmed','shipped','invoiced')
             GROUP BY c.company_name
@@ -6398,7 +6398,7 @@ def prod_dashboard(request):
             FROM work_order wo
             JOIN product p ON p.id = wo.product_id
             WHERE wo.status = 'completed'
-              AND wo.due_date >= CURRENT_DATE - INTERVAL '90 days'
+              AND wo.due_date::date >= CURRENT_DATE - INTERVAL '90 days'
             GROUP BY p.name
             ORDER BY qty DESC
             LIMIT 8
@@ -6407,12 +6407,12 @@ def prod_dashboard(request):
             SELECT
                 COUNT(*) FILTER (
                     WHERE status = 'completed'
-                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '30 days'
                 ) AS total_completed,
                 COUNT(*) FILTER (
                     WHERE status = 'completed'
-                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'
-                      AND due_date >= CURRENT_DATE
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date::date >= CURRENT_DATE
                 ) AS on_time
             FROM work_order
         """).fetchone()
@@ -6925,7 +6925,7 @@ def pers_dashboard(request):
         """).fetchall()
         training_status = conn.execute("""
             SELECT status, COUNT(*) AS cnt
-            FROM training_record
+            FROM pers_training
             GROUP BY status
         """).fetchall()
         review_ratings = conn.execute("""
@@ -7252,18 +7252,18 @@ def fin_dashboard(request):
         ap_aging_row = conn.execute("""
             SELECT
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date >= CURRENT_DATE), 0) AS current,
+                    WHERE due_date::date >= CURRENT_DATE), 0) AS current,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE
-                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
+                    WHERE due_date::date < CURRENT_DATE
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE - INTERVAL '30 days'
-                      AND due_date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
+                    WHERE due_date::date < CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE - INTERVAL '60 days'
-                      AND due_date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
+                    WHERE due_date::date < CURRENT_DATE - INTERVAL '60 days'
+                      AND due_date::date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
                 COALESCE(SUM(amount) FILTER (
-                    WHERE due_date < CURRENT_DATE - INTERVAL '90 days'), 0) AS over_90
+                    WHERE due_date::date < CURRENT_DATE - INTERVAL '90 days'), 0) AS over_90
             FROM ap_invoice WHERE status IN ('open','partial','overdue')
         """).fetchone()
         ap_aging = dict(ap_aging_row) if ap_aging_row else {}
