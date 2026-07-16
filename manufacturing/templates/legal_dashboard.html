@@ -96,6 +96,39 @@
         </div>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Contracts by Status</h3>
+            <canvas id="chart-contract-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Contracts by Type</h3>
+            <canvas id="chart-contract-type" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Contract Value by Counterparty (top 8)</h3>
+            <canvas id="chart-contract-value" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Compliance Items by Status</h3>
+            <canvas id="chart-compliance-status" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Litigation by Status</h3>
+            <canvas id="chart-litigation-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Litigation by Case Type</h3>
+            <canvas id="chart-litigation-type" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Contracts</h3>
         <table class="list-table">
@@ -128,4 +161,97 @@
 
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var contractStatus   = {{ contract_status_json|safe }};
+    var contractType     = {{ contract_type_json|safe }};
+    var contractValue    = {{ contract_value_json|safe }};
+    var complianceStatus = {{ compliance_status_json|safe }};
+    var litigationStatus = {{ litigation_status_json|safe }};
+    var litigationType   = {{ litigation_type_json|safe }};
+
+    var statusColors = {
+        Draft: '#94a3b8', Active: '#22c55e', Renewed: '#1d6fe8',
+        Expired: '#f59e0b', Terminated: '#ef4444',
+    };
+    new Chart(document.getElementById('chart-contract-status'), {
+        type: 'doughnut',
+        data: {
+            labels: contractStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: contractStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: contractStatus.map(function(r){
+                    return statusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-contract-type'), {
+        type: 'bar',
+        data: {
+            labels: contractType.map(function(r){ return r.contract_type; }),
+            datasets: [{ label: 'Contracts',
+                data: contractType.map(function(r){ return r.cnt; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-contract-value'), {
+        type: 'bar',
+        data: {
+            labels: contractValue.map(function(r){ return r.counterparty; }),
+            datasets: [{ label: 'Total Value',
+                data: contractValue.map(function(r){ return r.total_value; }),
+                backgroundColor: '#198754' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } } },
+    });
+
+    var compColors = { Pending:'#f59e0b', 'In Progress':'#1d6fe8', Complete:'#22c55e', Overdue:'#ef4444' };
+    new Chart(document.getElementById('chart-compliance-status'), {
+        type: 'doughnut',
+        data: {
+            labels: complianceStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: complianceStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: complianceStatus.map(function(r){
+                    return compColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    var litColors = { Open:'#ef4444', 'In Discovery':'#f59e0b', Settled:'#1d6fe8',
+        Dismissed:'#94a3b8', Closed:'#22c55e' };
+    new Chart(document.getElementById('chart-litigation-status'), {
+        type: 'doughnut',
+        data: {
+            labels: litigationStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: litigationStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: litigationStatus.map(function(r){
+                    return litColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-litigation-type'), {
+        type: 'bar',
+        data: {
+            labels: litigationType.map(function(r){ return r.case_type; }),
+            datasets: [{ label: 'Cases',
+                data: litigationType.map(function(r){ return r.cnt; }),
+                backgroundColor: '#b8860b' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+})();
+</script>
 {% endblock %}

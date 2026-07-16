@@ -102,6 +102,39 @@
         </div>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Campaigns by Status</h3>
+            <canvas id="chart-campaign-status" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Campaigns by Channel</h3>
+            <canvas id="chart-campaign-channel" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Budget by Channel</h3>
+            <canvas id="chart-budget-channel" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Leads by Status</h3>
+            <canvas id="chart-lead-status" height="220"></canvas>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Leads by Source</h3>
+            <canvas id="chart-lead-source" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Content by Status</h3>
+            <canvas id="chart-content-status" height="220"></canvas>
+        </div>
+    </div>
+
     <div class="card">
         <h3>Recent Campaigns</h3>
         <table class="list-table">
@@ -136,4 +169,96 @@
 
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var campaignStatus  = {{ campaign_status_json|safe }};
+    var campaignChannel = {{ campaign_channel_json|safe }};
+    var budgetChannel   = {{ budget_channel_json|safe }};
+    var leadStatus      = {{ lead_status_json|safe }};
+    var leadSource      = {{ lead_source_json|safe }};
+    var contentStatus   = {{ content_status_json|safe }};
+
+    var campStatusColors = { Planned:'#1d6fe8', Active:'#22c55e', Paused:'#f59e0b',
+        Completed:'#94a3b8', Cancelled:'#ef4444' };
+    new Chart(document.getElementById('chart-campaign-status'), {
+        type: 'doughnut',
+        data: {
+            labels: campaignStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: campaignStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: campaignStatus.map(function(r){
+                    return campStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-campaign-channel'), {
+        type: 'bar',
+        data: {
+            labels: campaignChannel.map(function(r){ return r.channel; }),
+            datasets: [{ label: 'Campaigns',
+                data: campaignChannel.map(function(r){ return r.cnt; }),
+                backgroundColor: '#1d6fe8' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-budget-channel'), {
+        type: 'bar',
+        data: {
+            labels: budgetChannel.map(function(r){ return r.channel; }),
+            datasets: [{ label: 'Budget',
+                data: budgetChannel.map(function(r){ return r.total_budget; }),
+                backgroundColor: '#198754' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } } },
+    });
+
+    var leadStatusColors = { New:'#f59e0b', Contacted:'#1d6fe8', Qualified:'#22c55e',
+        Nurturing:'#8b5cf6', Converted:'#0a3622', Lost:'#ef4444' };
+    new Chart(document.getElementById('chart-lead-status'), {
+        type: 'doughnut',
+        data: {
+            labels: leadStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: leadStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: leadStatus.map(function(r){
+                    return leadStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-lead-source'), {
+        type: 'bar',
+        data: {
+            labels: leadSource.map(function(r){ return r.source; }),
+            datasets: [{ label: 'Leads',
+                data: leadSource.map(function(r){ return r.cnt; }),
+                backgroundColor: '#f59e0b' }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var contentStatusColors = { Draft:'#94a3b8', 'In Review':'#f59e0b', Approved:'#1d6fe8',
+        Published:'#22c55e', Archived:'#64748b' };
+    new Chart(document.getElementById('chart-content-status'), {
+        type: 'doughnut',
+        data: {
+            labels: contentStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: contentStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: contentStatus.map(function(r){
+                    return contentStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+})();
+</script>
 {% endblock %}
