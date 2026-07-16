@@ -1019,6 +1019,7 @@ def dashboard(request):
         'marketing': '/mkt/',
         'personnel': '/pers/',
         'production': '/prod/',
+        'inventory': '/inventory/dashboard/',
         'purchasing': '/purch/',
         'quality_assurance': '/qa/',
         'sales': '/sales/',

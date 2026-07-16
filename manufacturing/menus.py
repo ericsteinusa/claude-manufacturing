@@ -1683,6 +1683,7 @@ DASHBOARD_DEPARTMENTS = [
     ('marketing', 'Marketing'),
     ('personnel', 'Personnel'),
     ('production', 'Production'),
+    ('inventory', 'Inventory'),
     ('purchasing', 'Purchasing'),
     ('quality_assurance', 'Quality Assurance'),
     ('sales', 'Sales'),
