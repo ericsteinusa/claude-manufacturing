@@ -92,13 +92,23 @@
     </div>
 
     <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-        <div class="card">
-            <h3>Daily Output Trend</h3>
+        <div class="card" style="margin-bottom:0;">
+            <h3>Daily Output Trend (last 14 days)</h3>
             <canvas id="chart-daily-output" height="200"></canvas>
         </div>
-        <div class="card">
+        <div class="card" style="margin-bottom:0;">
             <h3>Work Order Status</h3>
             <canvas id="chart-wo-status" height="200"></canvas>
+        </div>
+    </div>
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;margin-top:16px;">
+        <div class="card" style="margin-bottom:0;">
+            <h3>Top Products by Output (last 90 days)</h3>
+            <canvas id="chart-top-products" height="200"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>On-Time Delivery (last 30 days)</h3>
+            <canvas id="chart-on-time" height="200"></canvas>
         </div>
     </div>
 
@@ -140,26 +150,59 @@
 (function () {
     var dailyOutput = {{ daily_output_json|safe }};
     var woStatus = {{ wo_status_json|safe }};
+    var topProducts = {{ top_products_json|safe }};
+    var onTime = {{ on_time_json|safe }};
 
     new Chart(document.getElementById('chart-daily-output'), {
         type: 'bar',
         data: {
             labels: dailyOutput.map(function (r) { return r.day; }),
-            datasets: [{ label: 'Units Completed', data: dailyOutput.map(function (r) { return r.qty; }),
+            datasets: [{ label: 'Units Completed',
+                         data: dailyOutput.map(function (r) { return r.qty; }),
                          backgroundColor: '#1d6fe8' }],
         },
         options: { responsive: true, plugins: { legend: { display: false } },
                    scales: { y: { beginAtZero: true } } },
     });
 
+    var statusColors = {
+        draft: '#94a3b8', open: '#1d6fe8', in_progress: '#f59e0b',
+        completed: '#22c55e', cancelled: '#ef4444'
+    };
     new Chart(document.getElementById('chart-wo-status'), {
         type: 'doughnut',
         data: {
             labels: woStatus.map(function (r) { return r.status; }),
             datasets: [{ data: woStatus.map(function (r) { return r.cnt; }),
-                         backgroundColor: ['#94a3b8', '#1d6fe8', '#f59e0b', '#22c55e', '#ef4444'] }],
+                         backgroundColor: woStatus.map(function (r) {
+                             return statusColors[r.status] || '#94a3b8';
+                         }) }],
         },
-        options: { responsive: true },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-top-products'), {
+        type: 'bar',
+        data: {
+            labels: topProducts.map(function (r) { return r.product; }),
+            datasets: [{ label: 'Units',
+                         data: topProducts.map(function (r) { return r.qty; }),
+                         backgroundColor: '#7c3aed' }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+                   plugins: { legend: { display: false } },
+                   scales: { x: { beginAtZero: true } } },
+    });
+
+    var late = (onTime.total_completed || 0) - (onTime.on_time || 0);
+    new Chart(document.getElementById('chart-on-time'), {
+        type: 'doughnut',
+        data: {
+            labels: ['On Time', 'Late'],
+            datasets: [{ data: [onTime.on_time || 0, late < 0 ? 0 : late],
+                         backgroundColor: ['#22c55e', '#ef4444'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
     });
 })();
 </script>

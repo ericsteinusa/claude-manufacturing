@@ -6156,10 +6156,36 @@ def prod_dashboard(request):
         data = get_production_dashboard(conn)
         daily_output = get_daily_output_trend(conn)
         wo_status_breakdown = get_wo_status_breakdown(conn)
+        top_products = conn.execute("""
+            SELECT p.name AS product, COALESCE(SUM(wo.quantity), 0) AS qty
+            FROM work_order wo
+            JOIN product p ON p.id = wo.product_id
+            WHERE wo.status = 'completed'
+              AND wo.due_date >= CURRENT_DATE - INTERVAL '90 days'
+            GROUP BY p.name
+            ORDER BY qty DESC
+            LIMIT 8
+        """).fetchall()
+        on_time_row = conn.execute("""
+            SELECT
+                COUNT(*) FILTER (
+                    WHERE status = 'completed'
+                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'
+                ) AS total_completed,
+                COUNT(*) FILTER (
+                    WHERE status = 'completed'
+                      AND due_date >= CURRENT_DATE - INTERVAL '30 days'
+                      AND due_date >= CURRENT_DATE
+                ) AS on_time
+            FROM work_order
+        """).fetchone()
+    on_time = dict(on_time_row) if on_time_row else {}
     ctx = _prod_ctx(
         request, **data,
         daily_output_json=json.dumps(daily_output),
         wo_status_json=json.dumps(wo_status_breakdown),
+        top_products_json=json.dumps([dict(r) for r in top_products]),
+        on_time_json=json.dumps(on_time),
     )
     return render(request, 'prod_dashboard.html', ctx)
 
