@@ -15,43 +15,165 @@
 {% endif %}
 {% endblock %}
 
+{% block extra_styles %}
+.exec-kpi-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; max-width:1100px; margin-bottom:22px; }
+.exec-kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:12px 14px; }
+.exec-kpi .lbl { font-size:11px; color:#555; font-weight:700; text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+.exec-kpi .val { font-size:26px; font-weight:700; color:var(--accent); }
+.exec-kpi .sub { font-size:11px; color:#888; margin-top:2px; }
+.exec-kpi.warn { border-color:#d97706; }
+.exec-kpi.warn .val { color:#d97706; }
+.exec-kpi.ok { border-color:#22c55e; }
+.exec-kpi.ok .val { color:#22c55e; }
+.exec-card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:0; }
+.exec-card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+{% endblock %}
+
 {% block body %}
 <div class="content">
 
     <div class="menu-title">Company Main Menu</div>
 
     {% if pending_approvals %}
-    <div class="alert alert-warning" style="max-width:640px; margin-bottom:20px;">
+    <div class="alert alert-warning" style="max-width:1100px; margin-bottom:16px;">
         ⚠ You have <strong>{{ pending_approvals }}</strong> purchase order{{ pending_approvals|pluralize }} awaiting approval.
         <a href="{% url 'po_approvals' %}" style="color:inherit;font-weight:700;"> Review now →</a>
     </div>
     {% endif %}
 
-    <!-- KPI row -->
-    <div class="kpi-grid" style="max-width:900px; margin-bottom:28px;">
-        <div class="kpi-card">
-            <div class="kpi-label">Role</div>
-            <div class="kpi-value" style="font-size:16px;margin-top:4px;">{{ user_role|default:"—" }}</div>
-            <div class="kpi-sub">{{ email }}</div>
+    <!-- Cross-department executive KPIs -->
+    <div class="exec-kpi-row">
+        <div class="exec-kpi{% if kpis.open_wos %} warn{% endif %}">
+            <div class="lbl">Open Work Orders</div>
+            <div class="val">{{ kpis.open_wos|default:0 }}</div>
+            <div class="sub">Production</div>
         </div>
-        {% if pending_approvals %}
-        <div class="kpi-card" style="border-left:4px solid #d97706;">
-            <div class="kpi-label">Pending Approvals</div>
-            <div class="kpi-value warn">{{ pending_approvals }}</div>
-            <div class="kpi-sub"><a href="{% url 'po_approvals' %}" style="color:#d97706;">Review POs →</a></div>
+        <div class="exec-kpi{% if kpis.open_pos %} warn{% endif %}">
+            <div class="lbl">Open POs</div>
+            <div class="val">{{ kpis.open_pos|default:0 }}</div>
+            <div class="sub">Purchasing</div>
         </div>
-        {% endif %}
+        <div class="exec-kpi{% if kpis.open_ncrs %} warn{% endif %}">
+            <div class="lbl">Open NCRs</div>
+            <div class="val">{{ kpis.open_ncrs|default:0 }}</div>
+            <div class="sub">Quality</div>
+        </div>
+        <div class="exec-kpi{% if kpis.open_maint_wos %} warn{% endif %}">
+            <div class="lbl">Maint. Work Orders</div>
+            <div class="val">{{ kpis.open_maint_wos|default:0 }}</div>
+            <div class="sub">Maintenance</div>
+        </div>
+        <div class="exec-kpi{% if kpis.low_stock %} warn{% else %} ok{% endif %}">
+            <div class="lbl">Low Stock Items</div>
+            <div class="val">{{ kpis.low_stock|default:0 }}</div>
+            <div class="sub">{{ kpis.zero_stock|default:0 }} at zero</div>
+        </div>
+        <div class="exec-kpi">
+            <div class="lbl">Cash Position</div>
+            <div class="val" style="font-size:18px;">${{ kpis.cash_position|default:0|floatformat:0 }}</div>
+            <div class="sub">Finance</div>
+        </div>
+    </div>
+
+    <!-- Charts row 1 -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;max-width:1100px;margin-bottom:16px;">
+        <div class="exec-card">
+            <h3>Revenue vs Expense by Month</h3>
+            <canvas id="chart-rev-expense" height="160"></canvas>
+        </div>
+        <div class="exec-card">
+            <h3>Open Items by Department</h3>
+            <canvas id="chart-open-items" height="160"></canvas>
+        </div>
+    </div>
+
+    <!-- Charts row 2 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1100px;margin-bottom:24px;">
+        <div class="exec-card">
+            <h3>Inventory Stock Status</h3>
+            <canvas id="chart-stock-status" height="200"></canvas>
+        </div>
+        <div class="exec-card">
+            <h3>AR vs AP Open Balance</h3>
+            <canvas id="chart-ar-ap" height="200"></canvas>
+        </div>
     </div>
 
     <!-- Department grid -->
-    <div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;max-width:1100px;">
         Departments
     </div>
-    <div class="dept-grid" style="max-width:900px;">
+    <div class="dept-grid" style="max-width:1100px;">
         {% for url, label in menu_items %}
         <a href="{{ url }}" class="dept-btn">{{ label }}</a>
         {% endfor %}
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var revExpense  = {{ rev_expense_json|safe }};
+    var openItems   = {{ open_items_json|safe }};
+    var stockStatus = {{ stock_status_json|safe }};
+    var arAp        = {{ ar_ap_json|safe }};
+
+    new Chart(document.getElementById('chart-rev-expense'), {
+        type: 'line',
+        data: {
+            labels: revExpense.map(function (r) { return r.month; }),
+            datasets: [
+                { label: 'Revenue', data: revExpense.map(function (r) { return r.revenue; }),
+                  borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.1)',
+                  tension: 0.3, fill: true },
+                { label: 'Expenses', data: revExpense.map(function (r) { return r.expense; }),
+                  borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,.08)',
+                  tension: 0.3, fill: true },
+            ],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'top' } },
+            scales: { y: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
+    });
+
+    new Chart(document.getElementById('chart-open-items'), {
+        type: 'bar',
+        data: {
+            labels: openItems.map(function (r) { return r.dept; }),
+            datasets: [{ label: 'Open Items',
+                data: openItems.map(function (r) { return r.count; }),
+                backgroundColor: ['#1d6fe8','#f59e0b','#ef4444','#a855f7'] }],
+        },
+        options: { indexAxis: 'y', responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    new Chart(document.getElementById('chart-stock-status'), {
+        type: 'doughnut',
+        data: {
+            labels: ['In Stock', 'Low Stock', 'Zero Stock'],
+            datasets: [{ data: [stockStatus.ok || 0, stockStatus.low || 0, stockStatus.zero || 0],
+                backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'] }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-ar-ap'), {
+        type: 'bar',
+        data: {
+            labels: ['AR Open', 'AP Open'],
+            datasets: [{ label: 'Balance ($)',
+                data: [arAp.ar || 0, arAp.ap || 0],
+                backgroundColor: ['#1d6fe8', '#ef4444'] }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true,
+                ticks: { callback: function(v) { return '$' + v.toLocaleString(); } } } } },
+    });
+})();
+</script>
 {% endblock %}

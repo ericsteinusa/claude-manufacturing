@@ -1015,12 +1015,71 @@ def dashboard(request):
         for key, label in DASHBOARD_DEPARTMENTS
     ]
     pending_approvals = 0
-    if request.session.get('user_role') in APPROVAL_ROLES:
-        conn = get_db_connection()
-        try:
+    kpis = {}
+    rev_expense_json = '[]'
+    open_items_json = '[]'
+    stock_status_json = '{}'
+    ar_ap_json = '{}'
+    conn = get_db_connection()
+    try:
+        if request.session.get('user_role') in APPROVAL_ROLES:
             pending_approvals = count_pending(conn)
-        finally:
-            conn.close()
+        kpi_row = conn.execute("""
+            SELECT
+                (SELECT COUNT(*) FROM work_order
+                 WHERE status NOT IN ('completed','cancelled')) AS open_wos,
+                (SELECT COUNT(*) FROM purchase_order
+                 WHERE status NOT IN ('received','cancelled')) AS open_pos,
+                (SELECT COUNT(*) FROM qa_ncr WHERE status != 'Closed') AS open_ncrs,
+                (SELECT COUNT(*) FROM maint_work_order
+                 WHERE status NOT IN ('Completed','Cancelled')) AS open_maint_wos,
+                (SELECT COUNT(*) FROM product
+                 WHERE COALESCE(amount,0) > 0 AND reorder_point > 0
+                   AND COALESCE(amount,0) <= reorder_point) AS low_stock,
+                (SELECT COUNT(*) FROM product
+                 WHERE COALESCE(amount,0) <= 0) AS zero_stock
+        """).fetchone()
+        kpis = dict(kpi_row) if kpi_row else {}
+        cash_position = get_cash_position(conn)
+        kpis['cash_position'] = cash_position
+        rev_expense = get_revenue_expense_by_month(conn)
+        rev_expense_json = json.dumps(rev_expense)
+        open_items = [
+            {'dept': 'Production', 'count': kpis.get('open_wos', 0)},
+            {'dept': 'Purchasing', 'count': kpis.get('open_pos', 0)},
+            {'dept': 'Quality', 'count': kpis.get('open_ncrs', 0)},
+            {'dept': 'Maintenance', 'count': kpis.get('open_maint_wos', 0)},
+        ]
+        open_items_json = json.dumps(open_items)
+        ss_row = conn.execute("""
+            SELECT
+                COUNT(*) FILTER (WHERE COALESCE(amount,0) <= 0) AS zero,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(amount,0) > 0 AND reorder_point > 0
+                      AND COALESCE(amount,0) <= reorder_point) AS low,
+                COUNT(*) FILTER (
+                    WHERE COALESCE(amount,0) > 0
+                      AND (reorder_point = 0
+                           OR COALESCE(amount,0) > reorder_point)) AS ok
+            FROM product
+        """).fetchone()
+        stock_status_json = json.dumps(dict(ss_row) if ss_row else {})
+        ar_row = conn.execute("""
+            SELECT COALESCE(SUM(amount) FILTER (
+                       WHERE status IN ('open','partial','overdue')), 0) AS ar_open
+            FROM ar_invoice
+        """).fetchone()
+        ap_row = conn.execute("""
+            SELECT COALESCE(SUM(amount) FILTER (
+                       WHERE status IN ('open','partial','overdue')), 0) AS ap_open
+            FROM ap_invoice
+        """).fetchone()
+        ar_ap_json = json.dumps({
+            'ar': float(ar_row['ar_open']) if ar_row else 0,
+            'ap': float(ap_row['ap_open']) if ap_row else 0,
+        })
+    finally:
+        conn.close()
     return render(request, 'dashboard.html', {
         'email': email,
         'user_role': request.session.get('user_role', ''),
@@ -1028,6 +1087,11 @@ def dashboard(request):
         'full_access': request.session.get('user_full_access', False),
         'menu_items': menu_items,
         'pending_approvals': pending_approvals,
+        'kpis': kpis,
+        'rev_expense_json': rev_expense_json,
+        'open_items_json': open_items_json,
+        'stock_status_json': stock_status_json,
+        'ar_ap_json': ar_ap_json,
     })
 
 
