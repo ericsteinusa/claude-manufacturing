@@ -122,14 +122,18 @@
         </p>
     </div>
 
-    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Revenue vs. Expense</h3>
+            <h3>Revenue vs. Expense &amp; Net Income</h3>
             <canvas id="chart-rev-expense" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
             <h3>AR Aging</h3>
             <canvas id="chart-ar-aging" height="220"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <h3>AP Aging</h3>
+            <canvas id="chart-ap-aging" height="220"></canvas>
         </div>
     </div>
 
@@ -179,6 +183,7 @@
 (function () {
     var revExpense = {{ rev_expense_json|safe }};
     var arAging = {{ ar_aging_json|safe }};
+    var apAging = {{ ap_aging_json|safe }};
     var cashForecast = {{ cash_forecast_json|safe }};
 
     new Chart(document.getElementById('chart-cash-forecast'), {
@@ -190,7 +195,8 @@
                   borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.1)', fill: true, tension: 0.2 },
             ],
         },
-        options: { responsive: true, scales: { y: { beginAtZero: false } } },
+        options: { responsive: true, scales: { y: { beginAtZero: false,
+            ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
     });
 
     new Chart(document.getElementById('chart-rev-expense'), {
@@ -198,11 +204,18 @@
         data: {
             labels: revExpense.map(function (r) { return r.month; }),
             datasets: [
-                { label: 'Revenue', data: revExpense.map(function (r) { return r.revenue; }), backgroundColor: '#22c55e' },
-                { label: 'Expense', data: revExpense.map(function (r) { return r.expenses; }), backgroundColor: '#ef4444' },
+                { label: 'Revenue', data: revExpense.map(function (r) { return r.revenue; }),
+                  backgroundColor: '#22c55e', order: 2 },
+                { label: 'Expense', data: revExpense.map(function (r) { return r.expenses; }),
+                  backgroundColor: '#ef4444', order: 2 },
+                { label: 'Net Income', type: 'line',
+                  data: revExpense.map(function (r) { return r.revenue - r.expenses; }),
+                  borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.1)',
+                  fill: false, tension: 0.3, pointRadius: 4, order: 1 },
             ],
         },
-        options: { responsive: true, scales: { y: { beginAtZero: true } } },
+        options: { responsive: true, scales: { y: { beginAtZero: true,
+            ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } } },
     });
 
     var agingLabels = { current: 'Current', '1_30': '1-30 days', '31_60': '31-60 days',
@@ -213,6 +226,19 @@
         data: {
             labels: agingKeys.map(function (k) { return agingLabels[k]; }),
             datasets: [{ data: agingKeys.map(function (k) { return arAging[k]; }),
+                         backgroundColor: ['#22c55e', '#84cc16', '#f59e0b', '#f97316', '#ef4444'] }],
+        },
+        options: { responsive: true },
+    });
+
+    var apAgingMap = { current: 'Current', d1_30: '1-30 days', d31_60: '31-60 days',
+                       d61_90: '61-90 days', over_90: '90+ days' };
+    var apAgingKeys = Object.keys(apAgingMap).filter(function (k) { return apAging[k]; });
+    new Chart(document.getElementById('chart-ap-aging'), {
+        type: 'pie',
+        data: {
+            labels: apAgingKeys.map(function (k) { return apAgingMap[k]; }),
+            datasets: [{ data: apAgingKeys.map(function (k) { return apAging[k]; }),
                          backgroundColor: ['#22c55e', '#84cc16', '#f59e0b', '#f97316', '#ef4444'] }],
         },
         options: { responsive: true },

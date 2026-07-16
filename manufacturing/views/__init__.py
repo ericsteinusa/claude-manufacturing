@@ -6869,9 +6869,20 @@ def fin_dashboard(request):
         rev_expense = get_revenue_expense_by_month(conn)
         cash_position = get_cash_position(conn)
         cash_forecast = get_cash_forecast_13wk(conn, starting_balance=cash_position)
+        ap_aging_row = conn.execute("""
+            SELECT
+                COALESCE(SUM(amount) FILTER (WHERE due_date >= CURRENT_DATE), 0)                                        AS current,
+                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE AND due_date >= CURRENT_DATE - INTERVAL '30 days'), 0) AS d1_30,
+                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE - INTERVAL '30 days' AND due_date >= CURRENT_DATE - INTERVAL '60 days'), 0) AS d31_60,
+                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE - INTERVAL '60 days' AND due_date >= CURRENT_DATE - INTERVAL '90 days'), 0) AS d61_90,
+                COALESCE(SUM(amount) FILTER (WHERE due_date < CURRENT_DATE - INTERVAL '90 days'), 0)                   AS over_90
+            FROM ap_invoice WHERE status IN ('open','partial','overdue')
+        """).fetchone()
+        ap_aging = dict(ap_aging_row) if ap_aging_row else {}
     ctx = _acct_ctx(
         request, **data,
         ar_aging_json=json.dumps(ar_aging['totals']),
+        ap_aging_json=json.dumps(ap_aging),
         rev_expense_json=json.dumps(rev_expense),
         cash_forecast_json=json.dumps(cash_forecast),
         cash_position=cash_position,
