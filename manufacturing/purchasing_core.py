@@ -40,8 +40,29 @@ def get_purchasing_dashboard(conn) -> dict:
 
     # Spend by month (last 6 months) for bar chart
     spend_rows = conn.execute(
+        "SELECT TO_CHAR(DATE_TRUNC('month', po.order_date::date), 'Mon YYYY') AS month, "
+        "COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) AS total "
+        "FROM purchase_order po "
+        "LEFT JOIN po_item pi ON pi.po_id = po.id "
+        "WHERE po.order_date >= (CURRENT_DATE - INTERVAL '6 months')::text "
+        "GROUP BY DATE_TRUNC('month', po.order_date::date) "
+        "ORDER BY DATE_TRUNC('month', po.order_date::date)"
+    ).fetchall()
+
+    # Top suppliers by spend
+    top_supplier_rows = conn.execute(
+        "SELECT COALESCE(s.company_name, 'Unknown') AS supplier, "
+        "COALESCE(SUM(pi.qty_ordered * pi.unit_price), 0) AS spend "
+        "FROM purchase_order po "
+        "LEFT JOIN supplier s ON s.id = po.supplier_id "
+        "LEFT JOIN po_item pi ON pi.po_id = po.id "
+        "GROUP BY s.company_name ORDER BY spend DESC LIMIT 8"
+    ).fetchall()
+
+    # PO count by month (last 6 months)
+    po_trend_rows = conn.execute(
         "SELECT TO_CHAR(DATE_TRUNC('month', order_date::date), 'Mon YYYY') AS month, "
-        "COALESCE(SUM(total), 0) AS total "
+        "COUNT(*) AS cnt "
         "FROM purchase_order "
         "WHERE order_date >= (CURRENT_DATE - INTERVAL '6 months')::text "
         "GROUP BY DATE_TRUNC('month', order_date::date) "
@@ -53,6 +74,8 @@ def get_purchasing_dashboard(conn) -> dict:
         'recent_pos': [dict(r) for r in recent_rows],
         'po_status_chart': [dict(r) for r in status_rows],
         'spend_by_month': [dict(r) for r in spend_rows],
+        'top_suppliers': [dict(r) for r in top_supplier_rows],
+        'po_trend': [dict(r) for r in po_trend_rows],
     }
 
 
