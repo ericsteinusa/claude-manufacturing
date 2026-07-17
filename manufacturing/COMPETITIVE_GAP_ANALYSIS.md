@@ -2749,3 +2749,27 @@ Row-level/field-level RBAC, GDPR erasure tooling, vertical compliance packs, and
 real, honestly-scored gaps above but are lower-ROI relative to their effort for this app's actual
 buyer profile (SMB/mid-market, single-language, single-tenant) and are deliberately left off this
 top-5 list rather than padded in for volume.
+
+---
+
+**2026-07-17:** Shipped item 1 from the list above — the **Admin UI for approval rules** (§6.7).
+`/approval-rules/` (list, filterable by entity type), `/approval-rules/new/`, and
+`/approval-rules/<id>/` (edit, activate/deactivate, delete) now exist under the Admin sidebar
+section, gated to full-access roles the same way User Roles and Currencies already are. No new
+core logic was needed — `create_approval_rule`/`update_approval_rule`/`delete_approval_rule` were
+already correct, just never called from a view; the one real addition was `get_approval_rule()`
+(a single-row getter the edit page needs, which the CRUD surface was missing). Deleting a rule that
+already has `approval_step` rows against it now surfaces the real FK-violation error rather than a
+500, with deactivation offered as the safe alternative. **Found and worked around a real routing bug
+while building this:** the obvious URL prefix, `/admin/approval-rules/`, silently redirects to
+Django's own admin login, because `manufacture/urls.py` mounts `admin.site.urls` at `path('admin/',
+...)` ahead of `manufacturing.urls`, and that catches every path under `/admin/` first. Verified this
+is pre-existing and not new: `/admin/currencies/` — the *existing* Currency Management page — has the
+exact same bug and is currently unreachable in the deployed app; left that as a separate,
+already-there issue rather than folding an unrelated fix into this PR. Routed the new pages at
+`/approval-rules/` instead (no `/admin/` prefix), consistent with every other cross-cutting config
+page in this app (`/price-lists/`, `/sampling-plans/`, `/rfq/`). Verified end-to-end against a
+running dev server via the Django test client: create/edit/deactivate/reactivate/delete all confirmed
+working, non-admin roles confirmed redirected away without ever seeing the page content, and the
+FK-violation-on-delete path confirmed to show a real error instead of crashing. Full suite: 2647
+passed (2644 + 3 new tests for `get_approval_rule`), ruff clean.
