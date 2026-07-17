@@ -11,6 +11,11 @@ env/
 .env/
 venv/
 
+# Per-deployment local customizations (see DEPLOYMENT.md) — not shared
+# across deployments, same as .env above.
+docker-compose.override.yml
+nginx/selfsigned/
+
 # Databases (the app uses PostgreSQL; no SQLite file should be committed)
 *.sqlite3
 
