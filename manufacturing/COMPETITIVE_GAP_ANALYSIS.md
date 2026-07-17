@@ -2773,3 +2773,19 @@ running dev server via the Django test client: create/edit/deactivate/reactivate
 working, non-admin roles confirmed redirected away without ever seeing the page content, and the
 FK-violation-on-delete path confirmed to show a real error instead of crashing. Full suite: 2647
 passed (2644 + 3 new tests for `get_approval_rule`), ruff clean.
+
+**2026-07-17, later same day:** Shipped item 2 from the list above — the **health-check endpoint**
+(§6.12). `GET /healthz/` (`manufacturing/views/_health.py`) runs a trivial `SELECT 1` through
+`get_db_connection()` and returns `200 {"status": "ok"}`, or `503 {"status": "error", "detail":
+...}` if the database call raises — the non-2xx status matters as much as the body, since that's
+what a load balancer or container orchestrator actually keys its routing/restart decision on, not
+JSON content. Deliberately unauthenticated (no session/login check) since the callers here are
+infrastructure, not a logged-in user, unlike every other view in this app; restricted to `GET` via
+`@require_GET` (confirmed `POST` returns 405). No `*_core.py` module or unit test was added —
+there's no extractable business logic here to test Qt-free, consistent with this repo's convention
+that the test suite covers `*_core.py` modules, not view glue. Verified via the Django test client
+against the real dev DB (200 with no session, 405 on POST) plus the full suite (2647 passed, no
+new tests since there's nothing core-level to add one for) and `ruff check .` clean. Not wired into
+`.github/workflows/docker-build.yml` or a Dockerfile `HEALTHCHECK` instruction — the endpoint now
+exists for whoever sets up the container/load-balancer config to point at, but that wiring is a
+deployment-config change outside this repo's own test/lint loop, left for a follow-up.
