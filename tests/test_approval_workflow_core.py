@@ -283,7 +283,10 @@ def test_submit_for_approval_creates_steps_for_rules():
     conn = _FakeConn(
         [],          # existence check → no existing steps
         [rule],      # get_applicable_rules
+        [],          # ensure_notification_table: CREATE TABLE
+        [],          # ensure_notification_table: CREATE INDEX
         [_row(id=5)],  # INSERT step RETURNING id
+        [],          # notify fan-out to VP role
     )
     result = submit_for_approval(conn, 'purchase_order', 1, 600.0, requested_by='alice')
     assert result == [5]
@@ -306,11 +309,26 @@ def test_submit_for_approval_creates_one_step_per_rule():
     conn = _FakeConn(
         [],               # no existing steps
         [rule1, rule2],   # two applicable rules
+        [],               # ensure_notification_table: CREATE TABLE
+        [],               # ensure_notification_table: CREATE INDEX
         [_row(id=10)],    # step 1 insert
+        [],               # notify fan-out to Manager role
         [_row(id=11)],    # step 2 insert
+        [],               # notify fan-out to VP role
     )
     result = submit_for_approval(conn, 'purchase_order', 1, 6000.0)
     assert result == [10, 11]
+
+
+def test_submit_for_approval_notifies_approver_role():
+    rule = _row(id=1, entity_type='purchase_requisition', dept_key='', threshold_amount=500.0,
+                approver_role='Department Manager', seq=10, escalate_after_hours=24.0)
+    conn = _FakeConn([], [rule], [], [], [_row(id=5)], [])
+    submit_for_approval(conn, 'purchase_requisition', 7, 600.0)
+    notify_sql, notify_params = conn.calls[-1]
+    assert 'INSERT INTO notification' in notify_sql
+    assert 'Department Manager' in notify_params
+    assert 7 in notify_params
 
 
 # ---------------------------------------------------------------------------

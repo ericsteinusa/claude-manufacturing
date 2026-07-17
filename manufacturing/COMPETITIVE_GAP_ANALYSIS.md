@@ -2789,3 +2789,42 @@ new tests since there's nothing core-level to add one for) and `ruff check .` cl
 `.github/workflows/docker-build.yml` or a Dockerfile `HEALTHCHECK` instruction — the endpoint now
 exists for whoever sets up the container/load-balancer config to point at, but that wiring is a
 deployment-config change outside this repo's own test/lint loop, left for a follow-up.
+
+**2026-07-17, one more:** Shipped item 3 from the list above — the **in-app notification center**
+(§6.8). A `notification(people_id, type, entity_type, entity_id, message, read_at, created_at)`
+table plus `notify_core.py` helpers (`create_notification`, `create_notifications_for_role`,
+`create_notifications_for_dept`, `list_notifications`, `get_unread_count`, `mark_read`,
+`mark_all_read`) back a bell icon in `base.html` (unread badge, dropdown feed, mark-read/mark-all
+actions) polling `/notifications/unread-count/` every 45s via vanilla `fetch()` — the same
+CSRF-token pattern `prod_schedule_gantt.html`'s drag-reschedule endpoint already established, not a
+new one. Hung real notification creation off two existing choke points exactly as scoped: (1)
+`approval_workflow_core.submit_for_approval()` now fans a notification out to every person holding
+the relevant `approver_role` — a one-query `INSERT ... SELECT`, not an N+1 per person — the instant
+a step is created, so **every** entity type this engine covers (PO, requisition, GL journal, cycle
+count, document) gets this for free, not just PO which already had its own separate email-only
+notice; (2) `inventory_core.record_transaction()` now detects the exact transaction that crosses a
+product from above its reorder point to at-or-below it (`old_qty > reorder_point >= new_qty`,
+computed from `delta` with no extra query) and notifies the Purchasing department once, at the
+crossing — not on every subsequent transaction while it stays low, and never on a `receive` (which
+can only move stock upward, so it can never trigger this by construction). Deliberately **did not**
+wire NCR assignment (the third call site named in the original scoping) — confirmed `qa_ncr.owner`
+is a free-text `<input>` field, not a people_id FK, and fuzzy-matching a name string to a real
+person to notify would be fragile in a way this app's own conventions elsewhere (e.g. workforce
+analytics' hire-date exclusion) argue against; noted here as a real, deliberately-scoped gap rather
+than silently dropped. **Found and fixed a real bug while verifying end-to-end:** the first
+implementation let `submit_for_approval`/`record_transaction` write to the `notification` table
+without ever ensuring it exists, which throws `UndefinedTable` on a fresh database the moment the
+very first approval step or stock breach happens before anyone has ever loaded a page that
+happened to ensure it — reproduced this exactly against the real dev DB, then fixed by calling
+`ensure_notification_table()` at the point of writing in both integration points (guarded so it
+only runs on the code path that's actually about to write, not on every call — confirmed via the
+existing sequenced-mock test suite, which needed updating in four files —
+`test_approval_workflow_core.py`, `test_phase4.py`, `test_cycle_count_core.py`,
+`test_inventory_core.py` — for the added query, a normal consequence of a real behavior change to
+an already-tested function, not a workaround). Verified end-to-end against the real dev DB via the
+Django test client: an approval step for a real configured rule notified the correct Department
+Manager (and only that person — a second manager's attempt to mark it read correctly returned
+`false`); a real low-stock crossing on a live product notified the correct Purchasing-department
+person with the right message; the bell icon renders when logged in and is absent when anonymous.
+Full suite: 2669 passed (2647 + 22 new: 3 for `get_approval_rule` from the prior item plus 19 for
+the new notification functions/behavior), `ruff check .` clean.

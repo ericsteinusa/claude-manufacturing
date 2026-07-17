@@ -21,6 +21,7 @@ Supported entity types: 'purchase_order', 'purchase_requisition', 'gl_journal',
 """
 
 from .log_utils import get_logger
+from .notify_core import create_notifications_for_role, ensure_notification_table
 
 log = get_logger(__name__)
 
@@ -195,6 +196,8 @@ def submit_for_approval(
 
     rules = get_applicable_rules(conn, entity_type, amount, dept_key)
     step_ids: list[int] = []
+    if rules:
+        ensure_notification_table(conn)
     for rule in rules:
         row = conn.execute(
             "INSERT INTO approval_step "
@@ -204,6 +207,11 @@ def submit_for_approval(
              rule['seq'], rule['approver_role']),
         ).fetchone()
         step_ids.append(row['id'])
+        create_notifications_for_role(
+            conn, rule['approver_role'], 'approval_pending',
+            f"Approval required: {entity_type.replace('_', ' ')} #{entity_id}",
+            entity_type=entity_type, entity_id=entity_id,
+        )
         log.info(
             "Approval step %s created for %s#%s (seq=%s, role=%s) by %s",
             row['id'], entity_type, entity_id,
