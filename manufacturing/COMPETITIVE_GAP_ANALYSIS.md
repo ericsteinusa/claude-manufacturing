@@ -2427,3 +2427,325 @@ rather than faking the missing system outright.
 
 *This document is maintained in the repository at `manufacturing/COMPETITIVE_GAP_ANALYSIS.md`.*
 *Update this file as features are added to track progress against the roadmap.*
+
+---
+
+## Section 6: 2026-07-17 Fresh Pass — Platform & Competitive Dimensions Beyond Section 1
+
+**Why this pass exists:** the 2026-07-10 status line at the top of this document is accurate —
+every Section 1 domain table genuinely has zero remaining ❌ rows, and the four items left in
+Section 3 ("Where We Trail Enterprise") all require external hardware or accounts (IoT/RFID
+readers, a carrier-API credential, a live AS2/EDI trading partner, a live e-commerce storefront)
+that this dev environment doesn't have and the owner has confirmed he can't get. Re-running
+Section 1's feature tables would reproduce a result the owner already knows. Instead, this pass
+does two things: (1) spot-verifies a sample of prior "✅ Full" claims directly against the running
+codebase rather than trusting the document's own prose, and (2) scores this app against **platform-
+level dimensions top-10 ERP vendors compete on today that no part of this document has ever scored**
+— frontend architecture, SSO, RBAC granularity, GDPR-style data governance, vertical compliance
+depth, integration/webhooks, low-code workflow tooling, notifications, mobile breadth, offline
+support, localization, observability, and load-testing maturity. Every claim below is grounded in a
+specific file/line actually read this session — nothing here is inferred from the document's own
+narrative.
+
+### 6.0 Spot-check: does Section 1's "✅ Full" hold up?
+
+Ten claims were checked directly against code (module exists, is wired to a URL, and is reachable
+from somewhere a user would actually click), spanning Production, Purchasing, Quality, Finance,
+Sales, Maintenance, and Reporting:
+
+| # | Claim checked | Verified? | What was actually read |
+|---|---|---|---|
+| 1 | Configure-to-Order / Recipe / Repetitive Mfg (1.1) are "Full" | ✅ Holds | `cto_core.py`/`recipe_core.py`/`repetitive_core.py` all have URL routes in `manufacturing/urls.py` (`/cto/`, `/recipes/`, `/repetitive/...`) **and** are linked from `manufacturing/templates/prod_dashboard.html` — reachable, not orphaned code. None of the three appear in `views.WEB_LEAF_URLS` (the menu-tree resolution path CLAUDE.md describes as the *only* one) — like the ESS portal before them, they're reached via a direct dashboard button instead, a precedent this same document already disclosed for P2-G. Worth a documentation note: CLAUDE.md's claim that `WEB_LEAF_URLS` is the department menu's "only resolution path" is true for the *menu tree* but several 2026-07-10 features are deliberately outside that tree entirely. |
+| 2 | Technician Routing (1.8) / APM (1.8) / Batch Record Generation (1.10) are "Full" | ✅ Holds | `/maint/routes/` linked from `maint_dashboard.html`; `/maint/apm/` linked from `maint_dashboard.html`; `/batch-records/` linked from `prod_dashboard.html` (line 9: `<a href="/batch-records/" class="btn">Batch Records</a>`). All reachable. |
+| 3 | Discount/Promotion Mgmt (1.5), What-If Scenario Planning (1.1), ABC Costing (1.6), Regulatory Compliance Templates (1.3) are "Full" | ✅ Holds | Wired under different URL prefixes than their module names (`/promotions/`, `/scenarios/`, `/gl/abc-costing/`, `/qa/compliance/templates/` — `manufacturing/urls.py` lines 94-96, 353-356, 361-367, 372-378) and each has a template linking to it (`pl_list.html`/`so_list.html` → promo; `capacity_planning.html` → scenario; `finance_dashboard.html` → abc). Confirms the doc is accurate, but also confirms a real methodology risk: matching module names against `urls.py` alone produces false negatives, since several features are wired under a business-facing route name, not their module name. |
+| 4 | FIFO/LIFO/Weighted-Average Costing (`costing_layers_core.py`, P3-I, 1.2) is "Full" | ✅ Holds | Wired as `/inventory/valuation/` (`costing_valuation_list`) and `/inventory/<id>/valuation/`, linked from `inventory_dashboard.html` and present in `WEB_LEAF_URLS` as `('production', 'cost_valuation')`. Real logic confirmed: `costing_layers_core.py` has genuine `_consume_fifo`/`_consume_lifo`/`_consume_average` implementations, not stubs. |
+| 5 | Regulatory Compliance Templates (1.3) — "seeded starter templates are illustrative, not certified or exhaustive" | ✅ Holds, and worth restating for §6.5 below | `manufacturing/regulatory_compliance_core.py` seeds exactly two templates: `'ISO 9001:2015 Quality Management System (starter)'` and `'FDA 21 CFR Part 820 Quality System Regulation (starter)'`. No AS9100, IATF 16949, or GxP/21 CFR Part 11 content anywhere in the file or in `seed_sample_quality.py`. The doc's own hedge is accurate — this is a generic checklist engine with two illustrative seeds, not vertical compliance depth. |
+| 6 | e-Commerce inbound webhook (P4-E, 1.5) is "real, verified" | ✅ Holds | `manufacturing/ecommerce_core.py` has a real `verify_webhook_signature` (Shopify HMAC-SHA256 / WooCommerce signature) and `receive_order_webhook` with dedupe against `ecommerce_order_log` — genuine signature-checked code, not a stub that always returns success. |
+| 7 | "Full audit trail (old/new values by user/timestamp)" (1.10, and the Executive Summary's "matches SAP/Oracle/Dynamics enterprise level" claim) | ✅ Holds, and better than expected | `manufacturing/audit_core.py` installs real PostgreSQL `AFTER INSERT OR UPDATE OR DELETE` triggers (`install_triggers`) on 29+ tables (`AUDITED_TABLES`), including `people` and `user_roles` — meaning role/permission changes on a person **are** already captured with old/new JSONB values, which directly informs §6.3 below (this is a genuine, unscored positive that the document never explicitly credited toward RBAC). |
+| 8 | Cycle Count (P1-D) / Document Control (P2-F) "fails open... no admin UI yet" for `approval_rule` | ✅ Holds, and generalizes further than the doc states | Grepped every caller of `create_approval_rule`/`update_approval_rule` across `manufacturing/views/*.py` and `manufacturing/seeds/*.py`: the **only** caller anywhere in the codebase is `manufacturing/seeds/seed_sample_operations.py:429`. This isn't just true for cycle-count/document-control specifically (as the doc states in those two sections) — it's true for **every** entity type the approval engine supports (PO, PR, GL journal, cycle count, document, etc.). There is no admin screen anywhere to create or edit an approval rule; it's a seed-script/direct-SQL-only concern app-wide. This is a real, previously-under-stated gap, expanded on in §6.7. |
+| 9 | "Live shop floor performance (real-time)" (1.10, P3-G) | ✅ Technically accurate, mechanism worth naming | `manufacturing/templates/sf_tv.html` line 5: `<meta http-equiv="refresh" content="30">`. The doc already says "auto-refreshing TV display," which is honest — but it's a 30-second full-page reload, not a push/websocket update, which matters directly for §6.1 below. Not a correction, just the concrete mechanism behind an already-honest claim. |
+| 10 | Testing maturity — assumed (going in) that only unit tests exist, no load/perf testing | ❌ This assumption was wrong — corrected here | `scripts/loadtest/locustfile.py` is a real Locust load-test script (`git log` shows it landed in commit `514c226`, "Phase 3: add load testing (locust)") simulating logged-in browsing across dashboard/WO/inventory/PO/SO/QA pages, plus `scripts/loadtest/run.sh` and `locust==2.45.0` in `requirements-dev.txt`. It is **not** wired into any GitHub Actions workflow (checked `.github/workflows/tests.yml`, `ruff.yml`, `docker-build.yml` — no `locust` reference in any of them), so it's a real but manual-only tool, never run in CI. This document has never mentioned this file; see §6.13. |
+
+**Net result of the spot-check: no over-claimed features were found.** Every "✅ Full" sampled was
+real, wired, and reachable. The one correction is to my own starting assumption about load testing
+(item 10), not to the document.
+
+### 6.1 Modern Frontend / Real-Time UX
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Component-based / reactive frontend (SPA or islands) | ❌ — 100% server-rendered Django templates + vanilla JS; no React/Vue/Angular/htmx/Alpine anywhere in `manufacturing/templates/` or a root `package.json` (only `mobile/package.json` exists, for the separate React Native app) | ✅ 9/10 (SAP Fiori, Oracle Redwood, Dynamics' Power Apps/React-based UI, Epicor Kinetic, Infor Mingle/CloudSuite, Plex are all modern reactive web UIs; only MRPeasy-tier tools stay closer to classic server-rendered forms) |
+| Live data without a page reload (websocket/SSE/polling-driven partial update) | ❌ — grepped for `websocket`, `django-channels`, `EventSource`, `htmx` across templates and `requirements*.txt`: zero hits. The one page marketed as "live" (`sf_tv.html`, the shop-floor TV display from P3-G) is a `<meta http-equiv="refresh" content="30">` full-page reload, not a partial live update | ✅ 7/10 have real push/live-refresh dashboards (SAP, Oracle, Dynamics, Plex's real-time shop floor); mid-market tools vary |
+| Mobile-responsive web layout | ✅ Partial — Bootstrap-based templates render acceptably on phones but there's no distinct mobile-web breakpoint strategy beyond the framework defaults | ✅ All |
+
+**Assessment:** this is the single most visible gap in any live demo against a modern competitor.
+Every top-10 vendor's current web UI is a reactive SPA with live-updating widgets; this app is
+architecturally committed to full-page Django template renders. This isn't necessarily wrong for a
+mid-market on-prem tool (it's simpler to maintain, no build pipeline, no JS framework churn), but
+it is the thing a buyer evaluating against Epicor Kinetic or Dynamics 365 side-by-side will notice
+in the first five minutes. **What it would take:** the honest options are (a) introduce `htmx` for
+partial-page updates on the highest-traffic dashboards/lists — a small, incremental addition that
+doesn't require a SPA rewrite and matches this app's "no heavy JS framework" convention, or (b) add
+a lightweight polling-based live-refresh (a `setInterval` + `fetch()` partial DOM swap) to the 5-6
+dashboard pages that most need it (production, maintenance, shop-floor TV, AI Insights). A full SPA
+rewrite is not proportionate to this codebase's size or the owner's stated priorities.
+
+### 6.2 Enterprise Auth / SSO
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| SAML 2.0 / OAuth2 / OIDC SSO (Azure AD, Okta, Google Workspace) | ❌ — `manufacturing/accounts.py` `_verify_login` (lines 105-134) checks `bcrypt.checkpw` against a plain `passwd` table; grepped for `saml`, `oauth`, `openid`, `social_auth`, `allauth` across every `.py` file and `requirements*.txt` — zero hits anywhere in the app (only unrelated substring matches in `edi_core.py`/`maintenance_core.py` comments) | ✅ 10/10 — SSO is table-stakes for every enterprise/mid-market ERP buyer today; every one of the ten named competitors supports SAML/OIDC federation |
+| Multi-factor authentication | ✅ Partial — TOTP 2FA exists but only for the mobile REST API (`manufacturing/api_auth.py`: `generate_totp_secret`/`verify_totp_code`/`set_totp_secret`), not for the web login flow in `accounts.py` | ✅ 9/10 |
+| Password policy / rotation enforcement | ❌ — no password complexity check, expiry, or history found in `accounts.py` beyond bcrypt storage | ✅ 8/10 |
+
+**Assessment:** this is a real, unscored, and significant enterprise gap — no top-10 buyer's IT
+department will accept plain email+password with no SSO option for a system touching payroll,
+finance, and HR data. **What it would take:** adding `django-allauth` (or a hand-rolled OIDC client
+against `authlib`) for at least one identity provider (Azure AD / Google Workspace cover the large
+majority of buyers), mapping the IdP's group/role claims onto the existing `user_dept_key`/
+`user_role` session keys so `dept_required`/`role_required` continue working unchanged. Extending
+the existing mobile TOTP 2FA to the web login path is a smaller, faster win that reuses code
+already in `api_auth.py`.
+
+### 6.3 Granular RBAC / Field-Level Permissions
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Whole-view gating by department + role | ✅ Full — `manufacturing/auth_decorators.py`: `dept_required(dept_keys, *, role_keys=None, write_redirect=None)` and `role_required` gate entire views; full-access roles (President/VP) bypass | ✅ All |
+| Row-level permission control (e.g., a rep sees only their own accounts) | ❌ — no row-level filter mechanism found anywhere in `auth_decorators.py`; the closest analog is ESS's manual per-view ownership check (`people_id` compared against the caller's own), which is a one-off pattern hand-copied per view, not a reusable row-level security layer | ✅ 6/10 (SAP/Oracle/Dynamics have real row-level security; mid-market tools vary) |
+| Field-level permission control (e.g., hide salary field from non-HR roles within a shared view) | ❌ — none found | ✅ 5/10 |
+| Audit-logged permission/role changes | ✅ Full, and previously uncredited — `manufacturing/audit_core.py`'s `AUDITED_TABLES` list includes `'people'` and `'user_roles'` (lines 50-51), and `install_triggers` attaches a real `AFTER INSERT OR UPDATE OR DELETE` PostgreSQL trigger to both. A change to someone's role is captured with full old/new JSONB values in `audit_log`, queryable via `audit_core.get_history('user_roles', id)` | ✅ 8/10 |
+
+**Assessment:** this is a genuine mixed picture the document has never scored. The gating model is
+coarse (dept + role, whole-view) with no row- or field-level control, but permission/role *changes*
+themselves are already captured by the generic DB-trigger audit trail — a real strength this
+document's Section 1 audit-trail row never connected to the RBAC question. **What it would take**
+for row-level: a reusable helper (e.g. `owned_by_filter(queryset_or_sql, request)`) generalizing the
+ESS ownership-check pattern, rather than one-off checks per view. Field-level masking would need a
+small per-template convention (e.g. a `{% if_can_view field %}` templatetag backed by a
+role→field-visibility table) — there is no such mechanism today.
+
+### 6.4 Data Governance / GDPR-Style Tooling
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Right-to-erasure / data deletion for a data subject | ❌ — grepped `personnel_core.py` for any `delete_person`/`deactivate_person`/`remove_person` function: none exist. There is no way to delete or scrub a person's PII anywhere in the app | ✅ 6/10 (formal GDPR toolkits are common in SAP/Oracle/Dynamics; smaller vendors vary) |
+| Subject data export ("give me everything you have on me") | ❌ — the existing CSV/Excel export (P1-B/P1-G) is a list-level report export, not a per-subject compiled export across tables | ✅ 5/10 |
+| PII field tagging / classification | ❌ — no PII metadata, tagging, or masking mechanism found anywhere in `schema.py` or `*_core.py` | ✅ 5/10 |
+| Data retention policy engine (auto-purge after N years) | ❌ — none found; no scheduled purge job beyond `api_auth.py`'s `purge_old_attempts` (which is a security rate-limit table, not a PII retention policy) | ✅ 5/10 |
+| Soft-delete pattern for auditability of deletions | ❌ — grepped for `is_deleted`/`deleted_at`/soft-delete conventions app-wide: the only hit is a code comment in `scenario_planning_core.py` explicitly noting deletes there are "plain cascade-by-hand," not soft | — |
+
+**Assessment:** genuinely zero data-governance tooling exists — not partial, not stubbed, simply
+absent. This tracks with the app's overall design (it was built feature-by-feature against
+functional ERP gaps, not compliance-officer requirements) but it is a real, buildable-in-software
+gap that would matter to any EU-facing buyer or any US buyer selling into the EU. **What it would
+take:** a `data_governance_core.py` with (1) a `delete_person`/anonymize path that overwrites PII
+columns on `people` while preserving FK-referenced history rows (name → "Redacted", email → a
+placeholder), consistent with how this codebase already treats deletion elsewhere (mostly avoided
+in favor of status flags); (2) a per-subject export view joining `people` against every table that
+references `people_id`; (3) a `retention_policy` table + a scheduled command modeled directly on
+`send_daily_digest`'s existing management-command pattern.
+
+### 6.5 Industry-Vertical Compliance Packs
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Generic ISO/FDA compliance checklist engine | ✅ Full (already scored in 1.3, P7-B) — confirmed real: `regulatory_compliance_core.py` snapshots a reusable checklist template into a per-audit instance | ✅ All |
+| AS9100 (aerospace) specific content/depth | ❌ — no mention anywhere in `regulatory_compliance_core.py` or its seed data | ✅ 4/10 (Epicor, Infor, SAP have named aerospace compliance modules or partner content; most mid-market tools don't either) |
+| IATF 16949 (automotive) specific content/depth | ❌ — none found | ✅ 4/10 (Plex is automotive-native and IATF-aligned out of the box; others need partner add-ons) |
+| GxP / 21 CFR Part 11 electronic signatures (signed meaning, re-authentication at sign time) | ❌ — grepped `document_control_core.py` and `approval_workflow_core.py` for `signature`/`esign`: zero hits. Approvals are a role-based click (`decide_step`), not a compliant e-signature (no re-entered password, no "meaning of signature" capture) | ✅ 5/10 (SAP/Oracle/Dynamics and several mid-market vendors offer certified Part-11 e-signature modules for pharma/medical customers) |
+
+**Assessment:** the existing compliance engine is exactly what its own docstring says — a generic,
+illustrative checklist tool with two starter templates, not vertical depth. This matches the
+document's own honest framing and isn't a correction, but it's worth scoring explicitly since
+"generic ISO/FDA templates" and "AS9100/IATF/GxP depth" are different competitive claims that top-10
+marketing decks distinguish sharply. **What it would take:** vertical template content (AS9100/
+IATF 16949 are themselves just more checklist rows — cheap to seed) is low-effort; a real Part-11
+e-signature (password re-entry + a captured "meaning of signature" string per `approval_step`
+decision) is a moderate, contained addition to the existing `decide_step` function.
+
+### 6.6 Integration Platform / Webhooks / API Marketplace
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| REST API for custom integration | ✅ Full (already scored in 1.10) — `manufacturing/api_views.py`, `/api/v1/...`, used by the mobile app | ✅ All |
+| Inbound webhook receiver | ✅ Full (already scored in 1.5, P4-E) — `ecommerce_core.py`'s signature-verified Shopify/WooCommerce order webhook | ✅ All |
+| **General-purpose outbound webhook system** (notify a third party on any business event — PO approved, WO completed, NCR opened, etc.) | ❌ — grepped `webhook` across the whole codebase: the only outbound HTTP calls are the e-commerce-specific `push_inventory_level`/`push_price_update` functions in `ecommerce_core.py`, scoped only to that one integration, not a general subscribable event bus | ✅ 7/10 (Dynamics/SAP/Oracle/Epicor all offer a general webhook or event-subscription mechanism) |
+| Published API docs (OpenAPI/Swagger) or a self-serve API/developer portal | ❌ — grepped for `swagger`, `openapi`, `drf_yasg`, `drf-spectacular`: zero hits; no API docs page found in `manufacturing/templates/` | ✅ 6/10 |
+| Per-endpoint API rate limiting | ❌ Partial — `api_auth.py`'s `is_rate_limited`/`record_login_attempt` only guard the **login** endpoint; no throttling exists on any other `/api/v1/...` endpoint | ✅ 7/10 |
+
+**Assessment:** the REST API and inbound webhook are real and already credited elsewhere in this
+document — that part of the story is accurate. What's missing and unscored is the *outbound*,
+general-purpose side: nothing in this app can notify an external system ("Zapier, a customer's own
+ERP, a Slack channel") when an arbitrary business event happens, and there's no public API
+documentation surface a third-party integrator could self-serve from. **What it would take:** a
+`webhook_subscription(event_type, target_url, secret)` table plus a small dispatch helper called
+from the handful of places that already change entity status (WO/PO/SO status-change functions,
+NCR creation) — the same "hang a new capability off an existing state-transition function" pattern
+this codebase already uses everywhere (e.g. inventory transactions on receive/ship). Auto-generating
+OpenAPI docs from `api_views.py`'s existing `@api_required`-decorated functions via
+`drf-spectacular`-style introspection (or even a hand-written docs page) is comparatively cheap.
+
+### 6.7 Low-Code / Workflow Customization
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Reusable, generic approval/workflow engine (in code) | ✅ Full — `approval_workflow_core.py`'s `ENTITY_TYPES` already spans `purchase_order`, `purchase_requisition`, `gl_journal`, `cycle_count`, `document`, and more; genuinely reusable, not forked per domain | ✅ All |
+| **Admin UI to create/edit workflow rules without a developer** | ❌ — confirmed by grep: `create_approval_rule`/`update_approval_rule` are called from exactly one place in the entire codebase, `manufacturing/seeds/seed_sample_operations.py:429`. No view in `manufacturing/views/*.py` ever calls either function. An org wanting a new approval rule for any entity type must have a developer insert a row directly (or extend the seed script) — there is no self-service path at all, for any of the entity types, not just the two the document already flagged this for (cycle count, document control) | ✅ 7/10 (Dynamics Power Automate, SAP Business Workflow/BTP, Oracle Process Cloud, Infor ION Workflow all ship a visual rule/workflow builder a business admin can use directly) |
+| General-purpose business-rule engine (beyond approvals — e.g. configurable validation/automation rules) | ❌ — no such engine found; every business rule (MRP logic, costing, ATP, discount resolution) is hardcoded Python in its respective `*_core.py` module | ✅ 6/10 |
+
+**Assessment:** this is a real, previously under-stated gap. The document credits the approval
+engine's *code*-level genericness (correctly), but never flagged that its *configuration* path is
+entirely developer/seed-script-only, with zero admin UI anywhere — this is true across the whole
+app, not just the two places the document happened to mention it in passing. **What it would take:**
+an `/approval-rules/` CRUD screen (list/new/edit) over the existing `approval_rule` table —
+genuinely low effort since `create_approval_rule`/`update_approval_rule`/`delete_approval_rule`
+already exist and work; this is a pure UI-wiring gap, not a missing-logic one. A full low-code
+business-rule engine (beyond approvals) is a much larger, lower-ROI undertaking not worth pursuing
+before the cheap admin-UI win above.
+
+### 6.8 Notifications / Alerting Engine
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Scheduled email digest | ✅ Partial (already scored in 1.10) — `manufacturing/management/commands/send_daily_digest.py`, confirmed real: builds `reports_core.daily_digest_text` and either emails it or prints to stdout | ✅ 7/10 |
+| Transactional email on specific events (PO approval step) | ✅ Partial — `manufacturing/notify_core.py` sends email specifically for the PO approval workflow | ✅ 8/10 |
+| **In-app real-time notification center** (bell icon, unread count, per-user feed) | ❌ — grepped for `Notification`/`notification_center`/a `CREATE TABLE ... notification` anywhere: zero hits beyond the two email-only mechanisms above. There is no persisted, in-app notification model at all | ✅ 8/10 |
+| Push notifications to the mobile app | ❌ — no push-notification SDK (Expo Notifications, FCM/APNs) referenced in `mobile/package.json` or `mobile/app/` | ✅ 7/10 |
+
+**Assessment:** every "notification" in this app today is either a scheduled batch email or a
+single-purpose transactional email tied to one workflow (PO approval). There's no unified,
+persisted, in-app notification concept a user could open and see "5 unread" for across NCRs,
+approvals-pending-your-decision, low-stock alerts, etc. — despite plenty of individual signals
+already existing (`approval_workflow_core.get_pending_steps`, inventory reorder alerts, NCR
+creation) that a notification center would just need to fan into one feed. **What it would take:**
+a `notification(people_id, type, entity_type, entity_id, message, read_at, created_at)` table, a
+small `notify_core.create_notification()` helper called from the handful of places that already
+know "someone needs to act on this" (approval step creation, low-stock breach, NCR assignment), and
+a bell-icon partial in `base.html` polling `/api/notifications/unread-count/` every 30-60s — the
+same lightweight polling this document already uses elsewhere (`sf_tv.html`), not a new
+architecture pattern.
+
+### 6.9 Mobile App Coverage
+
+`manufacturing/` has **17 department subpackages**: `accounting`, `customer_service`, `customers`,
+`engineering`, `finance`, `it`, `legal`, `maintenance`, `marketing`, `payroll`, `personnel`,
+`production`, `purchasing`, `quality`, `reports`, `sales`, `time_clock`. `mobile/app/(tabs)/` has
+**9 screens**: `index` (dashboard), `time-clock`, `work-orders`, `requisitions`, `approvals`,
+`inventory`, `lots`, `maintenance`, `quality`, `costing` (plus `(auth)/login`).
+
+| Department | Mobile coverage |
+|---|---|
+| time_clock | ✅ dedicated screen |
+| production (work orders, inventory, lots, costing) | ✅ dedicated screens (4) |
+| maintenance | ✅ dedicated screen |
+| quality | ✅ dedicated screen |
+| purchasing | ✅ Partial — requisitions + approvals screens only (no PO list/detail, no RFQ, no supplier scorecard) |
+| accounting, customer_service, customers, engineering, finance, it, legal, marketing, payroll, personnel, sales | ❌ **zero mobile screens** |
+
+**11 of 17 departments (65%) have no mobile presence at all.** This is a real, quantifiable,
+previously-unscored gap — CLAUDE.md's own mobile section lists the screens accurately, but this
+document has never stated the gap in terms of department coverage. Compared to top-10 vendors: most
+ship either a single universal mobile app covering most modules (Dynamics 365, SAP Fiori mobile,
+Oracle) or dedicated apps per persona (warehouse/plant floor apps, ESS apps) that still net out to
+broader coverage than 6/17 departments — score **7/10** of the top 10 have materially broader
+mobile breadth. **What it would take:** the existing REST API (`api_views.py`) already has
+Financial/Production/Inventory dashboard endpoints per CLAUDE.md's own inventory of routes, so the
+gap for at least a read-only Sales/Finance/HR mobile view is mobile-app screen work, not new backend
+API surface — the ROI-ordered list at the end of this section reflects that.
+
+### 6.10 Offline Support
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Mobile app offline data caching / sync queue | ❌ — `mobile/app/_layout.tsx` and `mobile/src/api/client.ts` only use `AsyncStorage` to persist the `api_token`/`api_user` session; grepped the whole `mobile/` tree for `NetInfo`, offline queueing, or a local SQLite/WatermelonDB store: none found. Every screen requires a live connection to `EXPO_PUBLIC_API_URL` | ✅ 5/10 (Dynamics Field Service, SAP mobile apps, and Oracle field apps support real offline-first sync; several mid-market vendors' mobile apps are online-only too) |
+| Web UI offline support (service worker / PWA) | ❌ — no service worker, manifest, or PWA config found anywhere in `manufacturing/templates/` or `manufacture/settings.py` | ✅ 3/10 |
+
+**Assessment:** a plant-floor worker or field technician with a dead connection gets a blank screen
+in this app's mobile client, no cached fallback. Not universal among competitors either (many are
+online-only too), but it's a real gap worth naming rather than assuming away. **What it would take:**
+non-trivial — a proper offline-first mobile architecture (local SQLite cache + a sync/conflict-
+resolution layer) is a substantial rewrite of the mobile data layer, not a quick add; this is
+correctly a lower-priority item relative to the other gaps in this section.
+
+### 6.11 Multi-Language / Localization
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Any UI translation / i18n in active use | ❌ — grepped every template for `{% trans %}`/`{% blocktrans %}`/`{% translate %}`: **zero** matches across the entire `manufacturing/templates/` tree. Grepped all `.py` files for `gettext`/`ugettext`: zero matches. No `.po`/`.mo` files exist anywhere in the repo | ✅ 10/10 — every one of the ten named competitors ships localized UI in dozens of languages as standard |
+| Django i18n scaffolding present | ✅ Partial, unused — `manufacture/settings.py` has `LANGUAGE_CODE = 'en-us'` and `USE_I18N = True`, but these are Django's stock project-template defaults, not evidence of active localization; no `LocaleMiddleware` in `MIDDLEWARE`, no `LOCALE_PATHS` | — |
+
+**Assessment:** this app is English-only, full stop — not "partially localized," genuinely zero
+translation infrastructure in active use despite Django's i18n flag technically being on. For a
+buyer comparing against SAP/Oracle/Dynamics (all localized to 40+ languages) this is a hard
+disqualifier for any multinational deployment, though largely irrelevant for a single-site,
+English-speaking SMB buyer — which is this app's actual competitive lane against Fishbowl/JobBOSS²/
+MRPeasy (also effectively English-first tools). **What it would take:** wrapping every user-facing
+string in `{% trans %}` across ~150+ templates is a large, mechanical effort with real ongoing
+translation-maintenance cost — reasonable to leave unscheduled unless a specific non-English-market
+deal requires it.
+
+### 6.12 Observability / Ops Maturity
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Structured application logging | ✅ Full, previously uncredited — `manufacturing/log_utils.py`'s `get_logger()` plus `manufacture/settings.py`'s `LOGGING` dict (lines 228-254) give every module a consistent formatter, `LOG_LEVEL`/`LOG_FILE` env-driven configuration, and separate `django`/`manufacturing` logger namespaces | ✅ All |
+| Error tracking / APM integration | ✅ Full, previously uncredited — `manufacture/settings.py` lines 274-295: real, working `sentry_sdk` integration, opt-in via a `SENTRY_DSN` env var (so CI/dev never talk to Sentry), `DjangoIntegration`, configurable `SENTRY_ENVIRONMENT` and `SENTRY_TRACES_SAMPLE_RATE` (defaults to `0`) | ✅ 8/10 |
+| Health-check endpoint (`/healthz`, `/ping`, readiness/liveness) | ❌ — grepped `manufacturing/urls.py` for `health`/`ping`/`status/`/`readiness`/`liveness`: no dedicated health endpoint exists (the `status/` hits found are all entity-status-change routes like `/wo/<id>/status/`, unrelated) | ✅ 7/10 |
+| Uptime/SLA tooling | ❌ — n/a for a self-hosted Django app in this dev environment; not applicable in the same way it is for a SaaS vendor | — |
+
+**Assessment:** genuinely better than a first guess would suggest — structured logging and a real,
+correctly-opt-in Sentry integration already exist and were never credited anywhere in this
+document. The one real, concrete, cheap gap is a health-check endpoint, useful for any container/
+load-balancer deployment (relevant given `.github/workflows/docker-build.yml` exists). **What it
+would take:** a single `path('healthz/', views.healthz)` returning `200 {"status": "ok"}` after a
+trivial `SELECT 1` against `get_db_connection()` — this is close to a 15-minute addition, one of the
+cheapest items in this entire section.
+
+### 6.13 Testing / QA Maturity as a Competitive Signal
+
+| Feature | Us | Top 10 |
+|---|---|---|
+| Unit test coverage on business logic | ✅ Full — 89 `test_*.py` files under `./tests`, all against Qt-free `*_core.py` modules per this app's own testing convention | ✅ Table stakes, not usually vendor-marketed |
+| Load/performance testing | ✅ Partial, previously uncredited — `scripts/loadtest/locustfile.py` + `scripts/loadtest/run.sh` + `locust==2.45.0` in `requirements-dev.txt`; simulates realistic concurrent browsing (dashboard/WO/PO/SO/inventory/QA) and is explicitly designed to surface whether `db_pg.get_db_connection()`'s per-call-fresh-connection pattern bottlenecks under concurrency. Real and usable, but confirmed **not** wired into any CI workflow — a manual, on-demand tool only | — (not typically a customer-visible differentiator; matters more for the vendor's own confidence at scale) |
+| CI-gated performance regression testing | ❌ — the load test above is never invoked by `.github/workflows/*.yml` | — |
+
+**Assessment:** the app is in a materially better position here than the initial framing for this
+pass assumed — real load-testing tooling already exists and specifically targets this codebase's
+one known architectural risk (`get_db_connection()` under concurrency). It's just not automated.
+**What it would take:** the cheapest real improvement is wiring `scripts/loadtest/run.sh` into a
+manually-triggered (`workflow_dispatch`) GitHub Actions job against a throwaway Postgres service
+container — not a full CI gate on every PR (too slow/costly for that), but at least a repeatable,
+one-click way to run it that doesn't depend on a developer's local machine.
+
+### Prioritized Buildable-in-Software Next Steps
+
+Unlike Section 3's four hardware-gated items, everything below is pure software effort the owner
+can actually pursue. Ranked by ROI (impact × how cheap the fix is given what already exists):
+
+1. **Admin UI for approval rules** (§6.7) — the lowest-effort item in this entire section:
+   `create_approval_rule`/`update_approval_rule`/`delete_approval_rule` already exist and work;
+   this is purely a missing CRUD screen over an existing, tested backend. Unblocks self-service
+   workflow configuration for every entity type at once (PO, PR, GL journal, cycle count,
+   document control, and any future entity type), not just one feature.
+2. **Health-check endpoint** (§6.12) — a ~15-minute addition (`/healthz/` + `SELECT 1`) that
+   directly benefits the existing Docker build workflow and any real deployment behind a load
+   balancer or container orchestrator.
+3. **In-app notification center** (§6.8) — a single new table plus a helper function called from
+   signals that already exist (pending approval steps, low-stock breach, NCR assignment) turns
+   several already-computed "someone should look at this" facts into one visible, persisted feed —
+   high perceived-modernness payoff for a contained build.
+4. **General-purpose outbound webhook system** (§6.6) — extends the existing, real inbound
+   webhook/signature-verification pattern from `ecommerce_core.py` to a general
+   `webhook_subscription` table and dispatch helper hung off existing status-change functions;
+   turns "has a REST API" into "has an integration platform," a distinction top-10 marketing
+   decks draw explicitly.
+5. **SSO (SAML/OIDC) for at least one identity provider** — the highest business-impact item on
+   this list (a hard blocker for many enterprise IT-security reviews) but also the most build
+   effort, since it touches the session/login path directly; sequenced last of the five for that
+   reason, not because it matters least.
+
+Row-level/field-level RBAC, GDPR erasure tooling, vertical compliance packs, and full i18n are all
+real, honestly-scored gaps above but are lower-ROI relative to their effort for this app's actual
+buyer profile (SMB/mid-market, single-language, single-tenant) and are deliberately left off this
+top-5 list rather than padded in for volume.
