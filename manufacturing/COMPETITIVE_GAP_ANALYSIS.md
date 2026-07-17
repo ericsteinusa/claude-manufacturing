@@ -2828,3 +2828,47 @@ Manager (and only that person — a second manager's attempt to mark it read cor
 person with the right message; the bell icon renders when logged in and is absent when anonymous.
 Full suite: 2669 passed (2647 + 22 new: 3 for `get_approval_rule` from the prior item plus 19 for
 the new notification functions/behavior), `ruff check .` clean.
+
+**2026-07-17, one more still:** Shipped item 4 from the list above — the **general-purpose
+outbound webhook system** (§6.6). A new `webhook_core.py` adds `webhook_subscription(event_type,
+target_url, secret, is_active)` + `webhook_delivery` (an audit log of every dispatch attempt,
+mirroring `ecommerce_core.py`'s own `ecommerce_sync_log` for its outbound pushes) and a
+`dispatch_event(conn, event_type, entity_type, entity_id, extra=None)` helper. Event types follow
+a dotted `"<entity>.<status>"` convention (`po.received`, `wo.completed`, `so.confirmed`,
+`ncr.opened`, etc.) — Stripe/GitHub-style — so a subscriber picks exactly the transition it cares
+about rather than every status change for an entity type. Hung real dispatch off all four
+call sites the doc originally named: `work_orders_core.set_wo_status`,
+`purchase_orders_core.set_po_status`, and `sales_orders_core.set_so_status` each fire
+`f'{entity}.{new_status}'` for whatever status was just set (one line added right after each
+existing `UPDATE`, no branching needed since every status is a valid event type), and
+`quality_core.create_ncr` fires a fixed `ncr.opened`. Delivery itself reuses
+`ecommerce_core.py`'s own established outbound pattern exactly: stdlib `urllib` (no new
+dependency), a narrow `except (URLError, OSError)` around the network call so a transport failure
+degrades to a logged `'failed'` delivery rather than raising, plus `dispatch_event`'s own outer
+`except Exception` around subscription lookup and each per-subscriber delivery so a broken
+subscriber (or a bug in the delivery-log write itself) can never break the real WO/PO/SO/NCR
+transaction it's hung off of — the same fire-and-forget guarantee `notify_core.py`'s `_send`
+already makes for email. Signed payloads reuse the exact same `base64(HMAC-SHA256(secret, body))`
+scheme `ecommerce_core.verify_webhook_signature` already verifies on the *inbound* side, so a
+subscriber built against this app's existing inbound-webhook documentation can verify outbound
+deliveries with the same code. A new Admin-sidebar page (`/webhooks/` list + filter,
+`/webhooks/new/`, `/webhooks/<id>/` edit/activate-deactivate/delete, with a live "Recent
+Deliveries" panel per subscription) mirrors the approval-rule admin UI's exact structure and
+full-access-only gating — without it, a webhook subscription would need direct database access to
+create, the same self-service gap the approval-rule admin UI closed for approval config. **Did
+not** build OpenAPI/Swagger docs or per-endpoint API rate limiting (the other two ❌ rows in this
+section's table) — those are real, separately-scoped gaps, not part of this item.
+
+Adding a real DB call to four already-tested, already-shipped functions meant updating five
+existing test files whose fixtures assumed exact call counts or a specific "last SQL executed"
+(`test_work_orders_core.py`, `test_purchase_orders_core.py`, `test_sales_orders_core.py`,
+`test_quality_core.py`) — a normal, expected consequence of a real behavior change, exactly the
+same kind of update the approval-rule and notification-center PRs already needed for
+`submit_for_approval`/`record_transaction`. 27 new tests for `webhook_core.py` itself. Verified
+end-to-end against the real dev DB: spun up a real local HTTP listener (Python's stdlib
+`http.server`, no mocking), created subscriptions for all four event types through the actual
+admin UI via the Django test client, then triggered a real WO/PO/SO status change and NCR creation
+— all four fired, the listener received all four POSTs with correct payloads, and every
+`X-Webhook-Signature` header verified correctly against the configured secret. Also confirmed the
+delivery log renders on the subscription's edit page, non-admin roles are denied, and
+toggle-active/delete work. Full suite: 2696 passed (2669 + 27 new), `ruff check .` clean.

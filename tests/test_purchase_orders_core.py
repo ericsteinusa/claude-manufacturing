@@ -216,21 +216,25 @@ def test_can_transition_rejects_skips_and_reopens():
 
 
 def test_set_po_status_updates_status():
+    # set_po_status also fires an outbound webhook dispatch after the UPDATE
+    # (webhook_core.dispatch_event) — check the first call, not the last.
     conn = _FakeConn()
     set_po_status(conn, 5, "sent")
-    assert "UPDATE purchase_order SET status=%s" in conn.last_sql
-    assert conn.last_params == ["sent", 5]
+    sql, params = conn.calls[0]
+    assert "UPDATE purchase_order SET status=%s" in sql
+    assert params == ["sent", 5]
 
 
 def test_set_po_status_stamps_received_date_only_when_received():
     conn = _FakeConn()
     set_po_status(conn, 5, "received")
-    assert "received_date = COALESCE(received_date, CURRENT_DATE::TEXT)" in conn.last_sql
-    assert conn.last_params == ["received", 5]
+    sql, params = conn.calls[0]
+    assert "received_date = COALESCE(received_date, CURRENT_DATE::TEXT)" in sql
+    assert params == ["received", 5]
 
     conn2 = _FakeConn()
     set_po_status(conn2, 5, "partial")
-    assert "received_date" not in conn2.last_sql
+    assert "received_date" not in conn2.calls[0][0]
 
 
 # ── receiving ──────────────────────────────────────────────────────────────
@@ -253,10 +257,12 @@ def test_receive_po_item_without_po_scope():
 def test_set_po_status_does_not_guard_transition():
     # set_po_status is intentionally unconditional; callers gate with
     # can_transition. Verify it accepts any status without raising.
+    # Each call: 1 UPDATE + webhook_core.dispatch_event's 3 ensure-table
+    # DDL calls + 1 subscription lookup (no subs configured) = 5 calls.
     conn = _FakeConn()
     set_po_status(conn, 5, "received")   # legal
     set_po_status(conn, 5, "draft")      # illegal reopen — no exception raised
-    assert len(conn.calls) == 2
+    assert len(conn.calls) == 10
 
 
 def test_transition_workflow_draft_to_received():

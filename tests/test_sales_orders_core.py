@@ -248,17 +248,22 @@ def test_delete_so_item_without_so_scope():
 
 
 def test_set_so_status_updates_status():
+    # set_so_status also fires an outbound webhook dispatch after the UPDATE
+    # (webhook_core.dispatch_event) — check the first call, not the last.
     conn = _FakeConn()
     set_so_status(conn, 4, "shipped")
-    assert "UPDATE sales_order SET status=%s" in conn.last_sql
-    assert conn.last_params == ["shipped", 4]
+    sql, params = conn.calls[0]
+    assert "UPDATE sales_order SET status=%s" in sql
+    assert params == ["shipped", 4]
 
 
 def test_set_so_status_does_not_guard_transition():
+    # Each call: 1 UPDATE + webhook_core.dispatch_event's 3 ensure-table
+    # DDL calls + 1 subscription lookup (no subs configured) = 5 calls.
     conn = _FakeConn()
     set_so_status(conn, 4, "invoiced")
     set_so_status(conn, 4, "draft")    # illegal reopen — no exception
-    assert len(conn.calls) == 2
+    assert len(conn.calls) == 10
 
 
 # ── load helpers ─────────────────────────────────────────────────────────

@@ -261,6 +261,8 @@ def set_so_status(conn, so_id, new_status):
         "UPDATE sales_order SET status=%s WHERE id=%s",
         (new_status, so_id)
     )
+    from .webhook_core import dispatch_event
+    dispatch_event(conn, f'so.{new_status}', 'sales_order', so_id)
 
 
 def _so_dict(row):
