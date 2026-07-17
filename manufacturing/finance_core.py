@@ -60,7 +60,7 @@ def get_top_ar_customers(conn, limit: int = 8) -> list[dict]:
         SELECT COALESCE(c.company_name, 'Unknown') AS customer,
                COALESCE(SUM(i.amount), 0) AS balance
         FROM ar_invoice i
-        LEFT JOIN contact c ON c.id = i.customer_id
+        LEFT JOIN customer c ON c.id = i.customer_id
         WHERE i.status IN ('open', 'partial', 'overdue')
         GROUP BY c.company_name ORDER BY balance DESC LIMIT %s
     """, (limit,)).fetchall()

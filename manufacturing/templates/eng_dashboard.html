@@ -72,6 +72,39 @@
         <div class="kpi"><div class="val">{{ dash.tasks.overdue_tasks|default:0 }}</div><div class="lbl">Overdue Tasks</div></div>
     </div>
 
+    <div class="two-col" style="margin-bottom:16px;">
+        <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
+            <div class="section-hdr" style="color:#333;">Projects by Status</div>
+            <canvas id="chart-project-status" height="200"></canvas>
+        </div>
+        <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
+            <div class="section-hdr" style="color:#333;">Tasks by Status</div>
+            <canvas id="chart-task-status" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:16px;">
+        <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
+            <div class="section-hdr" style="color:#333;">Open Tasks by Priority</div>
+            <canvas id="chart-task-priority" height="200"></canvas>
+        </div>
+        <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
+            <div class="section-hdr" style="color:#333;">ECRs by Status</div>
+            <canvas id="chart-ecr-status" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:16px;">
+        <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
+            <div class="section-hdr" style="color:#333;">Projects by Engineer</div>
+            <canvas id="chart-project-engineer" height="200"></canvas>
+        </div>
+        <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
+            <div class="section-hdr" style="color:#333;">Standards by Status</div>
+            <canvas id="chart-standard-status" height="200"></canvas>
+        </div>
+    </div>
+
     <div class="two-col">
         <div>
             <div class="section-hdr">Recent Projects</div>
@@ -109,4 +142,98 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var projectStatus   = {{ project_status_json|safe }};
+    var taskStatus      = {{ task_status_json|safe }};
+    var taskPriority    = {{ task_priority_json|safe }};
+    var ecrStatus       = {{ ecr_status_json|safe }};
+    var projectEngineer = {{ project_engineer_json|safe }};
+    var standardStatus  = {{ standard_status_json|safe }};
+
+    var projStatusColors = { planning:'#1d6fe8', in_progress:'#f59e0b', on_hold:'#ef4444',
+        completed:'#22c55e', cancelled:'#94a3b8' };
+    new Chart(document.getElementById('chart-project-status'), {
+        type: 'doughnut',
+        data: {
+            labels: projectStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: projectStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: projectStatus.map(function(r){
+                    return projStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-task-status'), {
+        type: 'doughnut',
+        data: {
+            labels: taskStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: taskStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: taskStatus.map(function(r){
+                    return projStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    var priorityColors = { critical:'#ef4444', high:'#f59e0b', medium:'#1d6fe8', low:'#94a3b8' };
+    new Chart(document.getElementById('chart-task-priority'), {
+        type: 'bar',
+        data: {
+            labels: taskPriority.map(function(r){ return r.priority; }),
+            datasets: [{ label: 'Open Tasks',
+                data: taskPriority.map(function(r){ return r.cnt; }),
+                backgroundColor: taskPriority.map(function(r){
+                    return priorityColors[r.priority] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var ecrStatusColors = { draft:'#94a3b8', pending:'#f59e0b', approved:'#22c55e', rejected:'#ef4444',
+        revision_needed:'#fb923c' };
+    new Chart(document.getElementById('chart-ecr-status'), {
+        type: 'doughnut',
+        data: {
+            labels: ecrStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: ecrStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: ecrStatus.map(function(r){
+                    return ecrStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+
+    new Chart(document.getElementById('chart-project-engineer'), {
+        type: 'bar',
+        data: {
+            labels: projectEngineer.map(function(r){ return r.engineer; }),
+            datasets: [{ label: 'Projects',
+                data: projectEngineer.map(function(r){ return r.cnt; }),
+                backgroundColor: '#8b5cf6' }],
+        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+    });
+
+    var stdStatusColors = { Active:'#22c55e', Draft:'#94a3b8', Superseded:'#f59e0b', Obsolete:'#ef4444' };
+    new Chart(document.getElementById('chart-standard-status'), {
+        type: 'doughnut',
+        data: {
+            labels: standardStatus.map(function(r){ return r.status; }),
+            datasets: [{ data: standardStatus.map(function(r){ return r.cnt; }),
+                backgroundColor: standardStatus.map(function(r){
+                    return stdStatusColors[r.status] || '#94a3b8';
+                }) }],
+        },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+    });
+})();
+</script>
 {% endblock %}
