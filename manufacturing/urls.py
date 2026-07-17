@@ -472,6 +472,11 @@ urlpatterns = [
     path('assets/fixed/<int:asset_id>/', views.fixed_asset_detail, name='fixed_asset_detail'),
     # Currency Management
     path('admin/currencies/', views.currency_list, name='currency_list'),
+    # Approval Rule Management
+    path('approval-rules/', views.approval_rule_list, name='approval_rule_list'),
+    path('approval-rules/new/', views.approval_rule_new, name='approval_rule_new'),
+    path('approval-rules/<int:rule_id>/', views.approval_rule_edit,
+         name='approval_rule_edit'),
     path('legal/', views.legal_dashboard, name='legal_dashboard'),
     path('budget/', views.budget_dashboard, name='budget_dashboard'),
     path('risk/', views.risk_dashboard, name='risk_dashboard'),

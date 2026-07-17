@@ -538,6 +538,9 @@
         <a href="{% url 'currency_list' %}" class="sb-link{% if '/admin/currencies/' in request.path %} active{% endif %}">
             <span class="sb-icon">💱</span> Currencies
         </a>
+        <a href="{% url 'approval_rule_list' %}" class="sb-link{% if '/approval-rules/' in request.path %} active{% endif %}">
+            <span class="sb-icon">✔️</span> Approval Rules
+        </a>
         <a href="{% url 'reports_dashboard' %}" class="sb-link{% if '/reports/' in request.path %} active{% endif %}">
             <span class="sb-icon">📈</span> Reports
         </a>

@@ -96,6 +96,16 @@ def create_approval_rule(
     return row['id']
 
 
+def get_approval_rule(conn, rule_id: int) -> dict | None:
+    row = conn.execute(
+        "SELECT id, entity_type, dept_key, threshold_amount, approver_role, "
+        "seq, escalate_after_hours, is_active, notes "
+        "FROM approval_rule WHERE id = %s",
+        (rule_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
 def list_approval_rules(conn, entity_type: str | None = None,
                         active_only: bool = True) -> list[dict]:
     conds, params = [], []

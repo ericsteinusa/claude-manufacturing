@@ -6,6 +6,7 @@ from manufacturing.approval_workflow_core import (
     ensure_approval_tables,
     create_approval_rule,
     list_approval_rules,
+    get_approval_rule,
     update_approval_rule,
     delete_approval_rule,
     get_applicable_rules,
@@ -165,6 +166,34 @@ def test_list_approval_rules_no_filter_no_where_on_type():
     list_approval_rules(conn, active_only=False)
     sql, _ = conn.calls[0]
     assert 'entity_type = %s' not in sql  # no WHERE filter on entity_type
+
+
+# ---------------------------------------------------------------------------
+# get_approval_rule
+# ---------------------------------------------------------------------------
+
+def test_get_approval_rule_returns_dict():
+    row = _row(id=7, entity_type='purchase_order', dept_key='', threshold_amount=500.0,
+               approver_role='VP', seq=10, escalate_after_hours=24.0,
+               is_active=True, notes='')
+    conn = _FakeConn([row])
+    result = get_approval_rule(conn, 7)
+    assert result['id'] == 7
+    assert result['approver_role'] == 'VP'
+
+
+def test_get_approval_rule_returns_none_when_missing():
+    conn = _FakeConn([])
+    result = get_approval_rule(conn, 999)
+    assert result is None
+
+
+def test_get_approval_rule_queries_by_id():
+    conn = _FakeConn([])
+    get_approval_rule(conn, 3)
+    sql, params = conn.calls[0]
+    assert 'FROM approval_rule WHERE id = %s' in sql
+    assert params == (3,)
 
 
 # ---------------------------------------------------------------------------
