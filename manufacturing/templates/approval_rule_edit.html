@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block page_title %}Edit Approval Rule{% endblock %}
+
+{% block toolbar_left %}
+<a href="/approval-rules/" class="btn">Approval Rules</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ar-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:16px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.form-hint { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.danger-zone { border-color: #fecaca; }
+.danger-zone h3 { color: var(--danger-fg); font-size:14px; margin-bottom:10px; }
+.btn-row { display:flex; gap:8px; margin-top:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ar-wrap">
+    <div class="menu-title">
+        Edit Approval Rule
+        {% if rule.is_active %}<span class="pill pill-ok">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-row">
+                <label>Entity Type *</label>
+                <select name="entity_type" required>
+                    {% for et in entity_types %}
+                    <option value="{{ et }}"{% if et == rule.entity_type %} selected{% endif %}>{{ et }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Department</label>
+                <select name="dept_key">
+                    <option value=""{% if not rule.dept_key %} selected{% endif %}>— All departments —</option>
+                    {% for key, label in departments %}
+                    <option value="{{ key }}"{% if key == rule.dept_key %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Threshold Amount *</label>
+                <input type="number" name="threshold_amount" step="0.01" min="0" value="{{ rule.threshold_amount }}" required>
+            </div>
+            <div class="form-row">
+                <label>Approver Role *</label>
+                <select name="approver_role" required>
+                    <option value="">— Select role —</option>
+                    {% for role in roles %}
+                    <option value="{{ role.role_name }}"{% if role.role_name == rule.approver_role %} selected{% endif %}>{{ role.role_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Sequence *</label>
+                <input type="number" name="seq" value="{{ rule.seq }}" step="1" required>
+            </div>
+            <div class="form-row">
+                <label>Escalate After (hours) *</label>
+                <input type="number" name="escalate_after_hours" value="{{ rule.escalate_after_hours }}" step="0.5" min="0" required>
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" value="{{ rule.notes }}" placeholder="Optional notes">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <div class="card danger-zone">
+        <h3>Danger Zone</h3>
+        <div class="btn-row">
+            <form method="post" onsubmit="return confirm('{% if rule.is_active %}Deactivate{% else %}Activate{% endif %} this rule?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_active">
+                <button type="submit" class="btn">
+                    {% if rule.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+            </form>
+            <form method="post" onsubmit="return confirm('Delete this rule permanently? This cannot be undone.');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+        <div class="form-hint" style="margin-top:10px;">
+            Deleting fails if approval steps have already been created against this rule —
+            deactivate it instead to stop it from applying to new entities.
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

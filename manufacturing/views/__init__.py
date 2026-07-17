@@ -267,6 +267,7 @@ from ._technician_routing import *  # noqa: F401,F403
 from ._apm import *  # noqa: F401,F403
 from ._batch_record import *  # noqa: F401,F403
 from ._ai_insights import *  # noqa: F401,F403
+from ._approval_rules import *  # noqa: F401,F403
 
 log = get_logger(__name__)
 

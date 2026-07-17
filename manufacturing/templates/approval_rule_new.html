@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block page_title %}New Approval Rule{% endblock %}
+
+{% block toolbar_left %}
+<a href="/approval-rules/" class="btn">Approval Rules</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.ar-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.form-hint { font-size:11px; color:var(--text-muted); margin-top:2px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="ar-wrap">
+    <div class="menu-title">New Approval Rule</div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label>Entity Type *</label>
+                <select name="entity_type" required>
+                    {% for et in entity_types %}
+                    <option value="{{ et }}">{{ et }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Department</label>
+                <select name="dept_key">
+                    <option value="">— All departments —</option>
+                    {% for key, label in departments %}
+                    <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <div class="form-hint">Leave as "All departments" unless this rule should only fire for one dept.</div>
+            </div>
+            <div class="form-row">
+                <label>Threshold Amount *</label>
+                <input type="number" name="threshold_amount" step="0.01" min="0" value="0" required>
+                <div class="form-hint">Rule applies once the entity's amount is greater than or equal to this.</div>
+            </div>
+            <div class="form-row">
+                <label>Approver Role *</label>
+                <select name="approver_role" required>
+                    <option value="">— Select role —</option>
+                    {% for role in roles %}
+                    <option value="{{ role.role_name }}">{{ role.role_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Sequence *</label>
+                <input type="number" name="seq" value="10" step="1" required>
+                <div class="form-hint">Lower sequence numbers must be decided first.</div>
+            </div>
+            <div class="form-row">
+                <label>Escalate After (hours) *</label>
+                <input type="number" name="escalate_after_hours" value="24" step="0.5" min="0" required>
+            </div>
+            <div class="form-row">
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="Optional notes">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Rule</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
