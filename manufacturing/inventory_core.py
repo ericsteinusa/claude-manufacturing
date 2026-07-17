@@ -15,6 +15,7 @@ adjust   — physical-count correction (signed qty, positive or negative)
 from datetime import date
 
 from .log_utils import get_logger
+from .notify_core import create_notifications_for_dept, ensure_notification_table
 
 log = get_logger(__name__)
 
@@ -180,12 +181,26 @@ def record_transaction(conn, product_id: int, trans_type: str,
     )
     row = conn.execute(
         "UPDATE product SET amount = COALESCE(amount, 0) + %s WHERE id = %s "
-        "RETURNING amount",
+        "RETURNING amount, reorder_point, name",
         (delta, product_id),
     ).fetchone()
     new_qty = row['amount'] if row else 0.0
     log.info("Inventory %s: product_id=%s qty=%s delta=%s → on_hand=%.4f",
              trans_type, product_id, quantity, delta, new_qty)
+
+    if row:
+        reorder_point = row['reorder_point'] or 0
+        old_qty = new_qty - delta
+        if reorder_point > 0 and old_qty > reorder_point >= new_qty:
+            ensure_notification_table(conn)
+            create_notifications_for_dept(
+                conn, 'Purchasing', 'low_stock',
+                f"Low stock: {row['name']} at {new_qty:g} "
+                f"(reorder point {reorder_point:g})",
+                entity_type='product', entity_id=product_id,
+            )
+            log.info("Low-stock breach notified for product_id=%s", product_id)
+
     return new_qty
 
 

@@ -399,10 +399,14 @@ def test_submit_for_approval_creates_steps_for_each_rule():
          'threshold_amount': 5000.0, 'escalate_after_hours': 48.0,
          'dept_key': ''},
     ]
-    # INSERT step 1 → id=10, INSERT step 2 → id=11
+    # INSERT step 1 → id=10, notify fan-out, INSERT step 2 → id=11, notify fan-out
     insert_step1 = [{'id': 10}]
     insert_step2 = [{'id': 11}]
-    conn = _MultiConn([existing_query, rules_query, insert_step1, insert_step2])
+    conn = _MultiConn([
+        existing_query, rules_query,
+        [], [],  # ensure_notification_table: CREATE TABLE, CREATE INDEX
+        insert_step1, [], insert_step2, [],
+    ])
     result = submit_for_approval(conn, 'purchase_order', 5, 6000.0)
     assert result == [10, 11]
     inserts = [s for s, _ in conn.calls if 'INSERT INTO approval_step' in s]

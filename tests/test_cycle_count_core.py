@@ -192,7 +192,7 @@ def test_enter_counts_with_variance_and_no_rule_fails_open_and_posts():
           'variance_qty': 3.0, 'posted': False, 'product_name': 'Widget',
           'bin': 'A1', 'uom': 'ea'}],           # get_cycle_count_lines
         [],                                      # record_transaction: insert inventory_transaction
-        [{'amount': 8.0}],                        # record_transaction: update product returning amount
+        [{'amount': 8.0, 'reorder_point': 0, 'name': 'Widget'}],  # record_transaction: update product returning amount
         [],                                      # update cycle_count_line posted=TRUE
         [],                                      # update cycle_count status=posted
     ])
@@ -211,7 +211,10 @@ def test_enter_counts_with_variance_and_matching_rule_stays_pending():
         [],                                      # submit_for_approval: existing steps (none)
         [{'id': 5, 'entity_type': 'cycle_count', 'dept_key': '', 'threshold_amount': 1.0,
           'approver_role': 'Department Manager', 'seq': 10, 'escalate_after_hours': 24.0}],
+        [],                                      # ensure_notification_table: CREATE TABLE
+        [],                                      # ensure_notification_table: CREATE INDEX
         [{'id': 900}],                            # insert approval_step returning id
+        [],                                      # notify fan-out to Department Manager role
     ])
     status = enter_counts(conn, 3, {1: 8.0}, 'eric')
     assert status == 'submitted'
@@ -231,7 +234,7 @@ def test_decide_cycle_count_approve_posts():
           'variance_qty': 3.0, 'posted': False, 'product_name': 'Widget',
           'bin': 'A1', 'uom': 'ea'}],           # get_cycle_count_lines
         [],                                       # record_transaction insert
-        [{'amount': 8.0}],                         # record_transaction update returning
+        [{'amount': 8.0, 'reorder_point': 0, 'name': 'Widget'}],  # record_transaction update returning
         [],                                       # update line posted
         [],                                       # update cycle_count status=posted
     ])
@@ -275,7 +278,7 @@ def test_post_cycle_count_posts_variance_line_with_signed_delta():
         [{'id': 2, 'product_id': 20, 'system_qty': 5.0, 'counted_qty': 8.0,
           'variance_qty': 3.0, 'posted': False, 'product_name': 'B', 'bin': '', 'uom': 'ea'}],
         [],                                        # record_transaction insert
-        [{'amount': 8.0}],                          # record_transaction update returning
+        [{'amount': 8.0, 'reorder_point': 0, 'name': 'Widget'}],  # record_transaction update returning
         [],                                        # update line posted
         [],                                        # update cycle_count status=posted
     ])

@@ -211,9 +211,11 @@ def test_load_suppliers_empty():
 # record_transaction — delta logic
 # ---------------------------------------------------------------------------
 
-def _record_conn(new_amount=40.0):
+def _record_conn(new_amount=40.0, reorder_point=0.0, name='Test Product'):
     conn = MagicMock()
-    conn.execute.return_value.fetchone.return_value = {'amount': new_amount}
+    conn.execute.return_value.fetchone.return_value = {
+        'amount': new_amount, 'reorder_point': reorder_point, 'name': name,
+    }
     return conn
 
 
@@ -286,6 +288,57 @@ def test_record_transaction_returns_new_qty():
     conn = _record_conn(new_amount=77.5)
     result = record_transaction(conn, 1, 'receive', 10.0, '', '', 'u@e.com')
     assert result == pytest.approx(77.5)
+
+
+# ---------------------------------------------------------------------------
+# record_transaction — low-stock breach notification
+# ---------------------------------------------------------------------------
+
+def test_record_transaction_notifies_on_breach():
+    # old_qty = 5 - (-20) = 25 > reorder_point(10) >= new_qty(5) → crossed into breach
+    conn = _record_conn(new_amount=5.0, reorder_point=10.0, name='Widget')
+    record_transaction(conn, 1, 'issue', 20.0, '', '', 'u@e.com')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert any('INSERT INTO notification' in s for s in sqls)
+
+
+def test_record_transaction_no_notification_when_still_above_reorder_point():
+    # old_qty = 50 - (-5) = 55 > reorder_point(10), new_qty(50) still above too
+    conn = _record_conn(new_amount=50.0, reorder_point=10.0, name='Widget')
+    record_transaction(conn, 1, 'issue', 5.0, '', '', 'u@e.com')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert not any('INSERT INTO notification' in s for s in sqls)
+
+
+def test_record_transaction_no_notification_when_already_below_before_transaction():
+    # old_qty = 3 - (-2) = 5, not > reorder_point(10) → was already low, no new breach event
+    conn = _record_conn(new_amount=3.0, reorder_point=10.0, name='Widget')
+    record_transaction(conn, 1, 'issue', 2.0, '', '', 'u@e.com')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert not any('INSERT INTO notification' in s for s in sqls)
+
+
+def test_record_transaction_no_notification_when_reorder_point_zero():
+    conn = _record_conn(new_amount=0.0, reorder_point=0, name='Widget')
+    record_transaction(conn, 1, 'issue', 10.0, '', '', 'u@e.com')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert not any('INSERT INTO notification' in s for s in sqls)
+
+
+def test_record_transaction_no_notification_on_receive():
+    # A receive only ever increases stock, so it can never cross downward into breach.
+    conn = _record_conn(new_amount=15.0, reorder_point=10.0, name='Widget')
+    record_transaction(conn, 1, 'receive', 5.0, '', '', 'u@e.com')
+    sqls = [c[0][0] for c in conn.execute.call_args_list]
+    assert not any('INSERT INTO notification' in s for s in sqls)
+
+
+def test_record_transaction_notification_targets_purchasing_dept():
+    conn = _record_conn(new_amount=5.0, reorder_point=10.0, name='Widget')
+    record_transaction(conn, 1, 'issue', 20.0, '', '', 'u@e.com')
+    notify_call = next(
+        c for c in conn.execute.call_args_list if 'INSERT INTO notification' in c[0][0])
+    assert 'Purchasing' in notify_call[0][1]
 
 
 # ---------------------------------------------------------------------------

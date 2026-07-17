@@ -5,6 +5,13 @@ from . import api_views
 urlpatterns = [
     path('', views.home, name='home'),
     path('healthz/', views.healthz, name='healthz'),
+    path('notifications/', views.notifications_list, name='notifications_list'),
+    path('notifications/unread-count/', views.notifications_unread_count,
+         name='notifications_unread_count'),
+    path('notifications/mark-all-read/', views.notifications_mark_all_read,
+         name='notifications_mark_all_read'),
+    path('notifications/<int:notification_id>/read/', views.notifications_mark_read,
+         name='notifications_mark_read'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('logout/', views.logout, name='logout'),
     path('register/', views.register, name='register'),
