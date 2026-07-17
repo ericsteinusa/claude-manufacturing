@@ -485,6 +485,10 @@ urlpatterns = [
     path('approval-rules/new/', views.approval_rule_new, name='approval_rule_new'),
     path('approval-rules/<int:rule_id>/', views.approval_rule_edit,
          name='approval_rule_edit'),
+    # Webhook Subscription Management
+    path('webhooks/', views.webhook_list, name='webhook_list'),
+    path('webhooks/new/', views.webhook_new, name='webhook_new'),
+    path('webhooks/<int:subscription_id>/', views.webhook_edit, name='webhook_edit'),
     path('legal/', views.legal_dashboard, name='legal_dashboard'),
     path('budget/', views.budget_dashboard, name='budget_dashboard'),
     path('risk/', views.risk_dashboard, name='risk_dashboard'),

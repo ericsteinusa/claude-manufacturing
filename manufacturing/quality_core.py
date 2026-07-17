@@ -169,7 +169,12 @@ def create_ncr(conn, title: str, source: str, severity: str, product: str,
          detected_date or _today(), disposition, owner.strip(),
          notes.strip(), created_by),
     ).fetchone()
-    return row['id']
+    ncr_id = row['id']
+
+    from .webhook_core import dispatch_event
+    dispatch_event(conn, 'ncr.opened', 'ncr', ncr_id)
+
+    return ncr_id
 
 
 def update_ncr(conn, ncr_id: int, title: str, source: str, severity: str,

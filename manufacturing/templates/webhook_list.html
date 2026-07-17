@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block page_title %}Webhook Subscriptions{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+<a href="/webhooks/new/" class="btn btn-primary">+ New Subscription</a>
+{% endblock %}
+
+{% block extra_styles %}
+.wh-filter { display:flex; gap:8px; align-items:center; margin-bottom:14px; }
+.wh-filter select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <div class="menu-title">Webhook Subscriptions</div>
+    <p style="color:var(--text-muted);margin-bottom:14px;font-size:13px;">
+        Notify an external system (Zapier, a customer's own ERP, a Slack channel) when a business
+        event happens — a purchase order status changes, a work order completes, a sales order
+        ships, or an NCR opens. Each subscription is delivered as a signed JSON POST to your
+        target URL.
+    </p>
+
+    <form method="get" class="wh-filter">
+        <label for="event_type" style="font-size:12px;font-weight:bold;color:#555;">Filter by event:</label>
+        <select name="event_type" id="event_type" onchange="this.form.submit()">
+            <option value="">All events</option>
+            {% for et in event_types %}
+            <option value="{{ et }}"{% if et == event_type %} selected{% endif %}>{{ et }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if subscriptions %}
+    <div class="erp-table-wrap">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Event Type</th>
+                    <th>Target URL</th>
+                    <th>Signed</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in subscriptions %}
+                <tr>
+                    <td>{{ s.event_type }}</td>
+                    <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ s.target_url }}</td>
+                    <td>{% if s.secret %}✅{% else %}—{% endif %}</td>
+                    <td>
+                        {% if s.is_active %}
+                        <span class="pill pill-ok">Active</span>
+                        {% else %}
+                        <span class="pill pill-cancelled">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ s.created_by|default:"—" }}</td>
+                    <td><a href="/webhooks/{{ s.id }}/" class="btn btn-sm">Edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No webhook subscriptions configured{% if event_type %} for {{ event_type }}{% endif %}.</div>
+    {% endif %}
+</div>
+{% endblock %}

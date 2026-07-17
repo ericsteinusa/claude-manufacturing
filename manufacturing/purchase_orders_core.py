@@ -296,6 +296,9 @@ def set_po_status(conn, po_id, new_status):
             "UPDATE purchase_order SET status=%s WHERE id=%s",
             (new_status, po_id))
 
+    from .webhook_core import dispatch_event
+    dispatch_event(conn, f'po.{new_status}', 'purchase_order', po_id)
+
 
 def receive_po_item(conn, item_id, qty_received, po_id=None):
     """Record received quantity for a line item. Does not commit.

@@ -171,18 +171,23 @@ def test_add_wo_material_inserts_line():
 
 
 def test_set_wo_status_updates_status():
+    # set_wo_status also fires an outbound webhook dispatch after the UPDATE
+    # (webhook_core.dispatch_event) — check the first call, not the last.
     conn = _FakeConn()
     set_wo_status(conn, 5, "in_progress")
-    assert "UPDATE work_order SET status=%s" in conn.last_sql
-    assert conn.last_params == ["in_progress", 5]
+    sql, params = conn.calls[0]
+    assert "UPDATE work_order SET status=%s" in sql
+    assert params == ["in_progress", 5]
 
 
 def test_set_wo_status_does_not_guard_transition():
     conn = _FakeConn()
     set_wo_status(conn, 5, "completed")  # triggers costing SELECT (returns None → skips)
     set_wo_status(conn, 5, "draft")      # illegal reopen — no exception
-    # 'completed' does UPDATE + SELECT wo_number; 'draft' does just UPDATE
-    assert len(conn.calls) == 3
+    # 'completed': UPDATE + dispatch_event (3 ensure DDL + 1 subscription
+    # lookup, no subs configured) + SELECT wo_number = 6.
+    # 'draft': UPDATE + dispatch_event (4) = 5. Total = 11.
+    assert len(conn.calls) == 11
 
 
 # ── load_products ─────────────────────────────────────────────────────────

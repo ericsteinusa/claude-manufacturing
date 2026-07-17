@@ -165,10 +165,12 @@ def test_create_ncr_returns_id():
 
 
 def test_create_ncr_inserts_open_status():
+    # create_ncr also fires an outbound webhook dispatch after the INSERT
+    # (webhook_core.dispatch_event) — check the first call, not the last.
     conn = _conn(fetchone={'id': 1})
     create_ncr(conn, 'Title', 'Incoming', 'Minor', '', _today(),
                'Pending', '', '', 'u@e.com')
-    sql = conn.execute.call_args[0][0]
+    sql = conn.execute.call_args_list[0][0][0]
     assert 'INSERT INTO qa_ncr' in sql
     assert "'Open'" in sql
 

@@ -237,6 +237,9 @@ def set_wo_status(conn, wo_id, new_status, created_by=None):
         "UPDATE work_order SET status=%s WHERE id=%s",
         (new_status, wo_id)
     )
+    from .webhook_core import dispatch_event
+    dispatch_event(conn, f'wo.{new_status}', 'work_order', wo_id)
+
     if new_status == 'open':
         row = conn.execute(
             "SELECT product_id FROM work_order WHERE id=%s", (wo_id,)
