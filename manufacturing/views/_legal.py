@@ -1,5 +1,7 @@
 """Views: legal domain."""
 
+import json
+
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
@@ -37,7 +39,53 @@ def _legal_ctx(request, **extra):
 def legal_dashboard(request):
     with get_db_connection() as conn:
         data = get_legal_dashboard(conn)
-    ctx = _legal_ctx(request, **data)
+
+        contract_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM legal_contract
+            GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        contract_status_json = json.dumps([dict(r) for r in contract_status_rows])
+
+        contract_type_rows = conn.execute("""
+            SELECT contract_type, COUNT(*) AS cnt FROM legal_contract
+            WHERE contract_type IS NOT NULL AND contract_type != ''
+            GROUP BY contract_type ORDER BY cnt DESC
+        """).fetchall()
+        contract_type_json = json.dumps([dict(r) for r in contract_type_rows])
+
+        contract_value_rows = conn.execute("""
+            SELECT counterparty, SUM(value) AS total_value FROM legal_contract
+            WHERE counterparty IS NOT NULL AND counterparty != ''
+            GROUP BY counterparty ORDER BY total_value DESC LIMIT 8
+        """).fetchall()
+        contract_value_json = json.dumps([dict(r) for r in contract_value_rows])
+
+        compliance_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM legal_compliance
+            GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        compliance_status_json = json.dumps([dict(r) for r in compliance_status_rows])
+
+        litigation_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM legal_litigation
+            GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        litigation_status_json = json.dumps([dict(r) for r in litigation_status_rows])
+
+        litigation_type_rows = conn.execute("""
+            SELECT case_type, COUNT(*) AS cnt FROM legal_litigation
+            WHERE case_type IS NOT NULL AND case_type != ''
+            GROUP BY case_type ORDER BY cnt DESC
+        """).fetchall()
+        litigation_type_json = json.dumps([dict(r) for r in litigation_type_rows])
+
+    ctx = _legal_ctx(request, **data,
+                      contract_status_json=contract_status_json,
+                      contract_type_json=contract_type_json,
+                      contract_value_json=contract_value_json,
+                      compliance_status_json=compliance_status_json,
+                      litigation_status_json=litigation_status_json,
+                      litigation_type_json=litigation_type_json)
     return render(request, 'legal_dashboard.html', ctx)
 
 

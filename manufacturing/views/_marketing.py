@@ -1,5 +1,6 @@
 """Views: marketing domain."""
 
+import json
 from datetime import date
 
 from django.shortcuts import render, redirect
@@ -40,7 +41,53 @@ def _mkt_ctx(request, **extra):
 def mkt_dashboard(request):
     with get_db_connection() as conn:
         data = get_marketing_dashboard(conn)
-    ctx = _mkt_ctx(request, **data)
+
+        campaign_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM marketing_campaign
+            GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        campaign_status_json = json.dumps([dict(r) for r in campaign_status_rows])
+
+        campaign_channel_rows = conn.execute("""
+            SELECT channel, COUNT(*) AS cnt FROM marketing_campaign
+            WHERE channel IS NOT NULL AND channel != ''
+            GROUP BY channel ORDER BY cnt DESC
+        """).fetchall()
+        campaign_channel_json = json.dumps([dict(r) for r in campaign_channel_rows])
+
+        budget_channel_rows = conn.execute("""
+            SELECT channel, SUM(budget) AS total_budget FROM marketing_campaign
+            WHERE channel IS NOT NULL AND channel != ''
+            GROUP BY channel ORDER BY total_budget DESC
+        """).fetchall()
+        budget_channel_json = json.dumps([dict(r) for r in budget_channel_rows])
+
+        lead_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM marketing_lead
+            GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        lead_status_json = json.dumps([dict(r) for r in lead_status_rows])
+
+        lead_source_rows = conn.execute("""
+            SELECT source, COUNT(*) AS cnt FROM marketing_lead
+            WHERE source IS NOT NULL AND source != ''
+            GROUP BY source ORDER BY cnt DESC
+        """).fetchall()
+        lead_source_json = json.dumps([dict(r) for r in lead_source_rows])
+
+        content_status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS cnt FROM marketing_content
+            GROUP BY status ORDER BY cnt DESC
+        """).fetchall()
+        content_status_json = json.dumps([dict(r) for r in content_status_rows])
+
+    ctx = _mkt_ctx(request, **data,
+                    campaign_status_json=campaign_status_json,
+                    campaign_channel_json=campaign_channel_json,
+                    budget_channel_json=budget_channel_json,
+                    lead_status_json=lead_status_json,
+                    lead_source_json=lead_source_json,
+                    content_status_json=content_status_json)
     return render(request, 'marketing_dashboard.html', ctx)
 
 
