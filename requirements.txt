@@ -20,3 +20,7 @@ whitenoise==6.12.0
 
 # Operational readiness (Phase 3 — see DEPLOYMENT.md)
 sentry-sdk==2.64.0
+
+# SSO (OpenID Connect) — RS256 ID token verification via the IdP's JWKS.
+# See sso_core.py / manufacture/settings.py's OIDC_* opt-in settings.
+joserfc==1.7.3

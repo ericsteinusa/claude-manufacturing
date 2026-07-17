@@ -294,3 +294,16 @@ if SENTRY_DSN:
         # to turn it on. Override via SENTRY_TRACES_SAMPLE_RATE if needed.
         traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0')),
     )
+
+# ---------------------------------------------------------------------------
+# SSO (OpenID Connect) — opt-in via OIDC_CLIENT_ID/OIDC_DISCOVERY_URL, same
+# pattern as SENTRY_DSN above: unset by default, so local dev/CI never
+# attempt an SSO round-trip and the login page shows password-only. Works
+# against any spec-compliant OIDC provider (Azure AD/Entra ID, Google
+# Workspace, Okta, or a local test IdP) — only these four values change,
+# not sso_core.py. See sso_core.py for the client itself.
+# ---------------------------------------------------------------------------
+OIDC_CLIENT_ID = os.environ.get('OIDC_CLIENT_ID', '')
+OIDC_CLIENT_SECRET = os.environ.get('OIDC_CLIENT_SECRET', '')
+OIDC_DISCOVERY_URL = os.environ.get('OIDC_DISCOVERY_URL', '')
+OIDC_REDIRECT_URI = os.environ.get('OIDC_REDIRECT_URI', '')

@@ -271,6 +271,7 @@ from ._approval_rules import *  # noqa: F401,F403
 from ._health import healthz  # noqa: F401
 from ._notifications import *  # noqa: F401,F403
 from ._webhooks import *  # noqa: F401,F403
+from ._sso import sso_login, sso_callback  # noqa: F401
 
 log = get_logger(__name__)
 
@@ -972,6 +973,9 @@ def _init_schema():
 def home(request):
     # Schema and canonical roles are seeded once at startup by
     # AppConfig.ready() (-> _init_schema), so no per-request seeding here.
+    from ..sso_core import is_configured as _sso_is_configured
+    sso_enabled = _sso_is_configured()
+
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -980,6 +984,7 @@ def home(request):
             return render(request, 'home.html', {
                 'error': 'Please enter both email and password.',
                 'email_value': email,
+                'sso_enabled': sso_enabled,
             })
 
         if _verify_login(email, password):
@@ -1001,12 +1006,13 @@ def home(request):
         return render(request, 'home.html', {
             'error': 'Invalid email or password.',
             'email_value': email,
+            'sso_enabled': sso_enabled,
         })
 
     if request.session.get('user_email'):
         return redirect('dashboard')
 
-    return render(request, 'home.html', {})
+    return render(request, 'home.html', {'sso_enabled': sso_enabled})
 
 
 def dashboard(request):

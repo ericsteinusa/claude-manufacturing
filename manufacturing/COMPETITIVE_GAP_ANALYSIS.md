@@ -2872,3 +2872,51 @@ admin UI via the Django test client, then triggered a real WO/PO/SO status chang
 `X-Webhook-Signature` header verified correctly against the configured secret. Also confirmed the
 delivery log renders on the subscription's edit page, non-admin roles are denied, and
 toggle-active/delete work. Full suite: 2696 passed (2669 + 27 new), `ruff check .` clean.
+
+**2026-07-17, last one:** Shipped item 5 from the list above — **SSO (OpenID Connect) for at
+least one identity provider** (§6.2), closing out every item on the prioritized buildable-in-
+software list. Before starting, checked with the owner whether real credentials existed for any
+IdP (Azure AD, Google Workspace, Okta) to wire this up against for real — none did, so this was
+built and verified the same honest way Section 3's hardware-gated items already are: real client
+code, verified end-to-end against a locally-run stand-in, with only the discovery URL and client
+credentials changing to point at a real provider later. New `sso_core.py` implements the full
+Authorization Code flow against any spec-compliant OIDC provider — discovery-document fetch,
+authorize-URL construction with `state`/`nonce`, code-for-token exchange, and RS256 ID-token
+verification via the IdP's published JWKS. HTTP calls use stdlib `urllib` (no new dependency,
+matching `ecommerce_core.py`/`webhook_core.py`'s existing convention); the one genuinely new
+dependency is `joserfc` (RFC 7515/7517/7519 JWS/JWK/JWT) for the signature verification itself —
+hand-rolling RSA signature checking instead of using an audited library would mean reimplementing
+security-critical crypto, the wrong call even though this codebase otherwise avoids new
+dependencies aggressively. **Identity vs. authorization, a deliberate scope decision:** SSO here
+only proves *who* the user is (a verified email from the signed ID token); it does not attempt to
+map arbitrary IdP group/role claims onto this app's `user_dept_key`/`user_role` session keys, since
+that mapping is customer-tenant-specific configuration this dev environment has no real tenant to
+verify against. Instead, the verified email is looked up in this app's own existing
+`people`/`user_roles`/`dept` tables via the same `accounts._get_user_profile()` the password-login
+path already uses — SSO replaces *how* identity is proven, not *where* authorization data lives. A
+person must already exist in the app by email for SSO login to succeed; it does not provision new
+accounts. New `/sso/login/` and `/sso/callback/` routes (`views/_sso.py`) set the exact same
+session keys (`user_email`/`user_role`/`user_dept_key`/`user_dept_name`/`user_full_access`/
+`user_is_manager`) the password-login path sets, so `dept_required`/`role_required` and every
+existing view continue working completely unchanged regardless of which path a user logged in
+through. Opt-in via `OIDC_CLIENT_ID`/`OIDC_DISCOVERY_URL` env vars, same pattern as `SENTRY_DSN` —
+unset by default, so local dev/CI never attempt an SSO round-trip and the login page shows
+password-only; a "Sign in with SSO" button appears on `home.html` only when configured. 15 new
+tests in `test_sso_core.py`, deliberately testing real cryptography rather than mocking it away: a
+real locally-generated RSA keypair signs real JWTs, verified by real `joserfc` code, with dedicated
+tests confirming rejection of a wrong nonce, wrong audience, wrong issuer, expired token, a token
+signed by a *different* key than the one in the (mocked) JWKS, and a tampered payload with an
+otherwise-valid signature — only the HTTP calls (discovery/JWKS/token-endpoint) are mocked, since
+those are network I/O, not the security-critical part. **Verified end-to-end for real, not just
+unit-tested:** wrote a genuine local mock OIDC provider (stdlib `http.server`, real RS256 signing)
+implementing actual discovery/authorize/token/JWKS endpoints, then drove the complete flow through
+the Django test client against the real dev DB — hit `/sso/login/`, followed the real redirect to
+the mock IdP's `/authorize` endpoint, received a real authorization code via a real HTTP redirect,
+hit `/sso/callback/` with it, and confirmed the app correctly exchanged the code, verified the RS256
+signature via the mock IdP's JWKS endpoint, resolved the real `james.carter@example.com` President
+account, and landed on `/dashboard/` fully authenticated with the correct session keys — plus two
+negative cases: an email with no matching account is denied with a visible error and no session
+created, and a tampered/mismatched `state` parameter is rejected. Full suite: 2711 passed (2696 +
+15 new), `ruff check .` clean. **This closes every item on the prioritized buildable-in-software
+list — the only gaps left anywhere in this document are Section 3's four hardware/external-account-
+gated items, which the owner has confirmed he has no access to pursue.**
