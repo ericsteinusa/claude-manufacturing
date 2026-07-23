@@ -9,7 +9,7 @@ description: Run the pytest test suite. Use when asked to run tests, check if te
 /c/tester/virt/Scripts/python.exe -m pytest tests/ -v
 ```
 
-All 1606 tests should pass in under a second.
+All 2711 tests should pass in under a second.
 
 ## What the tests cover
 
@@ -64,11 +64,14 @@ fake DB connections, so no display or live database is needed.
 | `test_time_clock_core.py` | Clock in/out, hours computation, attendance |
 | `test_time_clock_poller_core.py` | Time-clock device polling, punch import, sync log |
 | `test_time_clock_web_core.py` | OT computation, OT reports, schedule summary |
+| `test_webhook_core.py` | Outbound webhook subscriptions CRUD, event dispatch/delivery logging, HMAC payload signing |
+| `test_wms_core.py` | Warehouse mgmt: bins/putaway, pick lists, cartons/shipment confirm, transfers, waves, cross-dock, RFID tag simulation |
 | `test_work_orders_core.py` | WO filter assembly, status transitions, numbering |
+| `test_workforce_analytics_core.py` | Headcount summary/trend, employment status validation, headcount plan vs actual |
 
 ## Interpreting results
 
-- All tests should pass (`1606 passed`).
+- All tests should pass (`2711 passed`).
 - A failure in a `*_core.py` test means broken pure logic — fix before merging.
 - `ImportError` on a test file usually means a Qt module leaked into a
   `*_core.py` import chain (violates the Qt-free contract).
