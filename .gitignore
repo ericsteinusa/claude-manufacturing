@@ -29,6 +29,7 @@ nginx/selfsigned/
 # Claude Code — ignore session/settings data, but commit project skills
 .claude/*
 !.claude/skills
+manufacturing/.claude/
 
 # Local launchers and one-off scripts
 launch_app.bat
