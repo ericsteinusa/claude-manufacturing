@@ -15,6 +15,7 @@ venv/
 # across deployments, same as .env above.
 docker-compose.override.yml
 nginx/selfsigned/
+nginx/app-selfsigned.conf
 
 # Databases (the app uses PostgreSQL; no SQLite file should be committed)
 *.sqlite3
