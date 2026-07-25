@@ -123,6 +123,12 @@ rather than a dedicated product-list endpoint, since none exists). Plus `(auth)/
 To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
 
 ## Web UI (Django) & menu routing
+- **End-user documentation** for every department's pages, workflows, and the
+  role/permission model lives in `docs/user-guide/` (Markdown source, plus a
+  combined `Manufacturing System User Manual.docx` for distribution to
+  non-technical staff). Keep it in sync when adding/moving a leaf in
+  `WEB_LEAF_URLS` or changing access rules in `auth_decorators.py` — it has
+  gone stale before (see the Mobile REST API section above for the pattern).
 - The department menu tree (`menus.MENU_TREE`) is served entirely as web
   pages via `python manage.py runserver`. Every `(dept, leaf_key)` leaf
   resolves to a URL in `views.WEB_LEAF_URLS`; `generic_menu`
