@@ -7,7 +7,10 @@ see an **Accounting Manager** menu bundling all of the above plus Payroll and
 Financial Reports.
 
 **Who can access it:** Accounting and Finance staff (the two departments
-share these screens). Auditors can view everything but cannot save changes.
+share these screens). An Auditor filed under Accounting or Finance can view
+these screens but cannot save changes; Auditors filed under other
+departments don't get special access here beyond the cash-flow report noted
+in [Getting Started](00-getting-started.md).
 
 ## Dashboard (`/acct/`)
 

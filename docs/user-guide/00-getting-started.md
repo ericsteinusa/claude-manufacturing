@@ -50,7 +50,7 @@ don't see — things like approvals, budget management, and staff reports.
 | **President / Vice President** | Everything, everywhere — every department, every manager screen. |
 | **Department Manager** | Full access to their own department, including that department's manager-only screens (approvals, budget, staff management, etc.). |
 | **Supervisor** | Normal day-to-day access to their own department's screens. No manager sub-menus. |
-| **Auditor** | Can *view* every page in every department, but cannot create, edit, submit, or delete anything — every "Save/New/Delete" button is hidden or blocked for this role. |
+| **Auditor** | Same department-scoped access as a regular employee — cannot create, edit, submit, or delete anything (every "Save/New/Delete" button is hidden or blocked). The exceptions are the Audit Log and a handful of cross-department read-only reports (cash flow, ATP, supplier scorecard), which Auditors can view regardless of department. |
 | **HR / Personnel** | Full access to the Personnel department's screens, regardless of which department they're actually filed under. |
 
 A few things worth knowing:
@@ -62,9 +62,11 @@ A few things worth knowing:
   staff all see the same customer tickets.
 - If you try to open a page outside your access, you'll be redirected back to
   your dashboard.
-- If you're an **Auditor** and you open a page you'd normally be able to edit,
-  you can still browse it — but submitting the form (Save/Approve/Delete)
-  will bounce you back without making the change.
+- If you're an **Auditor** and you open a page in your own department that
+  you'd normally be able to edit, you can still browse it — but submitting
+  the form (Save/Approve/Delete) will bounce you back without making the
+  change. Auditors do not get access to other departments' pages beyond the
+  Audit Log and the read-only reports noted above.
 
 ## Approvals and dollar thresholds
 
@@ -75,7 +77,8 @@ Some transactions require sign-off before they take effect:
   (`/po/approvals/`) instead of being sent immediately. Only a **President**
   or **Vice President** can approve or reject it there.
 - **Purchase Requisitions**: submitted by staff, approved or rejected by a
-  department manager.
+  Supervisor or Department Manager in the requester's department (President/VP
+  can also approve any requisition).
 - A **notification bell** in the top navigation shows you unread
   notifications — including when something you submitted has been approved
   or rejected, or when something is waiting on your approval.
