@@ -91,11 +91,45 @@ SUB_PARENTS = {
     "Warehouse Personnel": "Warehouse",
 }
 
-# Departments (and their sub-departments) that the app has menu screens for
-# but that were never created as ``dept`` rows, so they had no staff and the
-# requisition screen's host-department default fell back to company-wide.
-# ``ensure_departments`` creates these (idempotently) before seeding people.
+# Every department (and its sub-departments) referenced by SUB_PARENTS
+# above. On a database with years of ad-hoc manual use (the assumption this
+# seed script was originally written under), these already existed as
+# ``dept``/``dept_sub`` rows -- but a genuinely fresh database (e.g. a new
+# Docker deployment following DEPLOYMENT.md's own Quick Start) has none of
+# them, so every hire in HIRES got silently skipped except the four
+# departments below that a past bug report had already flagged as missing
+# (Finance/Legal/Risk Management/Warehouse) -- a fresh install ended up with
+# only those 12 people and, critically, no President/Vice President account
+# at all, since "Company" was never in this list either.
+# ``ensure_departments`` creates whichever of these are missing
+# (idempotently) before seeding people, so this now covers every department
+# HIRES actually hires into, not just the four that were noticed before.
 NEW_DEPARTMENTS = {
+    "Company": ["Company President", "Company Vice President"],
+    "Accounting": [
+        "Accounts payable", "Accounts receivable",
+        "Accounts payable Supervisor", "Accounts receivable Supervisor",
+        "Accounting Manager",
+    ],
+    "Information Technologies": ["IT Technician", "IT Manager"],
+    "Customer Service": [
+        "Customer Service Rep", "Customer Service Lead",
+        "Customer Service Manager",
+    ],
+    "Personnel": ["Personnel Manager", "Personnel Assistant"],
+    "Engineering": ["Engineer Manager", "Engineer"],
+    "Maintenance": ["Maintenance Manager", "Maintenance Mechanic"],
+    "Purchasing": ["Purchasing Manager", "Purchasing Personnel"],
+    "Quality Assurance": [
+        "Quality Assurance Manager", "Quality Assurance Lead",
+        "Quality Assurance Technician",
+    ],
+    "Labs": ["Lab Manager", "Lab Technician"],
+    "Marketing": ["Marketing Manager", "Marketing Personnel"],
+    "Production": [
+        "Production Manager", "Production Foreman", "Production Personnel",
+    ],
+    "Sales": ["Sales Manager", "Sales Personnel"],
     "Finance": ["Finance Manager", "Finance Personnel"],
     "Legal": ["Legal Manager", "Legal Personnel"],
     "Risk Management": ["Risk Manager", "Risk Personnel"],
