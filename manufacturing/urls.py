@@ -521,6 +521,7 @@ urlpatterns = [
     path('mkt/research/', views.mkt_research_list, name='mkt_research_list'),
     path('mkt/research/<int:project_id>/', views.mkt_research_detail, name='mkt_research_detail'),
     path('mkt/analytics/', views.mkt_analytics, name='mkt_analytics'),
+    path('mkt/budget/', views.mkt_budget_list, name='mkt_budget_list'),
     path('purch/', views.purch_dashboard, name='purch_dashboard'),
     path('purch/contracts/', views.purch_contracts_list, name='purch_contracts_list'),
     path('purch/contracts/<int:contract_id>/', views.purch_contract_detail, name='purch_contract_detail'),

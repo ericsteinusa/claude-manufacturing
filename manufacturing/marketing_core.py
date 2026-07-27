@@ -32,6 +32,11 @@ RESEARCH_TYPES = (
 )
 RESEARCH_STATUSES = ('Planned', 'In Progress', 'Completed', 'Cancelled')
 
+BUDGET_CATEGORIES = (
+    'Advertising', 'Content', 'Events', 'Research', 'Software', 'Other',
+)
+BUDGET_STATUSES = ('Pending', 'Approved', 'Rejected', 'Spent')
+
 
 # ---------------------------------------------------------------------------
 # Dashboard
@@ -506,3 +511,83 @@ def get_analytics_data(conn) -> dict:
         'leads_by_source': [dict(r) for r in recent_leads],
         'channel_performance': [dict(r) for r in channel_perf],
     }
+
+
+# ---------------------------------------------------------------------------
+# Budget
+# ---------------------------------------------------------------------------
+
+_CREATE_BUDGET_TABLE = """
+CREATE TABLE IF NOT EXISTS marketing_budget (
+    id           SERIAL PRIMARY KEY,
+    item         TEXT    NOT NULL,
+    campaign     TEXT    DEFAULT '',
+    category     TEXT    DEFAULT '',
+    amount       REAL    DEFAULT 0,
+    requested_by TEXT    DEFAULT '',
+    request_date TEXT    DEFAULT '',
+    status       TEXT    DEFAULT 'Pending',
+    notes        TEXT    DEFAULT ''
+)
+"""
+
+
+def _ensure_budget_table(conn) -> None:
+    conn.execute(_CREATE_BUDGET_TABLE)
+    conn.commit()
+
+
+def list_budget_items(conn, status=None, category=None, search=None) -> list:
+    _ensure_budget_table(conn)
+    sql = (
+        "SELECT id, item, campaign, category, amount, requested_by, "
+        "request_date, status FROM marketing_budget WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if category:
+        sql += " AND category = %s"
+        params.append(category)
+    if search:
+        sql += " AND (item ILIKE %s OR campaign ILIKE %s OR requested_by ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def get_budget_item(conn, item_id: int) -> dict | None:
+    _ensure_budget_table(conn)
+    row = conn.execute(
+        "SELECT * FROM marketing_budget WHERE id = %s", (item_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def create_budget_item(conn, item, campaign, category, amount,
+                        requested_by, request_date, status, notes) -> int:
+    _ensure_budget_table(conn)
+    cur = conn.execute(
+        "INSERT INTO marketing_budget "
+        "(item, campaign, category, amount, requested_by, request_date, status, notes) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (item, campaign, category, amount or 0, requested_by,
+         request_date or None, status or 'Pending', notes),
+    )
+    return cur.fetchone()[0]
+
+
+def update_budget_item(conn, item_id: int, **fields) -> None:
+    allowed = {
+        'item', 'campaign', 'category', 'amount',
+        'requested_by', 'request_date', 'status', 'notes',
+    }
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    set_clause = ", ".join(f"{k} = %s" for k in cols)
+    conn.execute(
+        f"UPDATE marketing_budget SET {set_clause} WHERE id = %s",
+        list(cols.values()) + [item_id],
+    )

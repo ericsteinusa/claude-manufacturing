@@ -7,8 +7,10 @@ from manufacturing.marketing_core import (
     list_campaigns, get_campaign, create_campaign, update_campaign,
     list_leads, get_lead, create_lead, update_lead,
     list_content, get_content_item, create_content, update_content,
+    list_budget_items, get_budget_item, create_budget_item, update_budget_item,
     CHANNELS, OBJECTIVES, CAMPAIGN_STATUSES,
     LEAD_SOURCES, LEAD_STATUSES, CONTENT_TYPES, CONTENT_STATUSES,
+    BUDGET_CATEGORIES, BUDGET_STATUSES,
 )
 
 _CAMPAIGN_STATS = {'total': 12, 'active': 4, 'planned': 3}
@@ -465,4 +467,98 @@ def test_update_content_ignores_unknown_fields():
 def test_update_content_noop_when_no_fields():
     c = MagicMock()
     update_content(c, 1)
+    c.execute.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Budget
+# ---------------------------------------------------------------------------
+
+def test_budget_categories_has_advertising():
+    assert 'Advertising' in BUDGET_CATEGORIES
+
+def test_budget_statuses_has_pending():
+    assert 'Pending' in BUDGET_STATUSES
+
+def test_budget_statuses_has_approved():
+    assert 'Approved' in BUDGET_STATUSES
+
+
+def test_list_budget_items_returns_list():
+    assert isinstance(list_budget_items(_list_conn([])), list)
+
+def test_list_budget_items_status_filter():
+    c = _list_conn([])
+    list_budget_items(c, status='Approved')
+    sql, params = c.execute.call_args[0]
+    assert 'status' in sql and 'Approved' in params
+
+def test_list_budget_items_category_filter():
+    c = _list_conn([])
+    list_budget_items(c, category='Advertising')
+    sql, params = c.execute.call_args[0]
+    assert 'category' in sql and 'Advertising' in params
+
+def test_list_budget_items_search_filter():
+    c = _list_conn([])
+    list_budget_items(c, search='booth')
+    sql, params = c.execute.call_args[0]
+    assert 'ILIKE' in sql and any('booth' in str(p) for p in params)
+
+def test_list_budget_items_converts_to_dicts():
+    row = {'id': 1, 'item': 'Trade show booth', 'campaign': '', 'category': 'Events',
+           'amount': 5000.0, 'requested_by': 'Alice', 'request_date': '2026-06-01',
+           'status': 'Pending'}
+    result = list_budget_items(_list_conn([row]))
+    assert result[0]['item'] == 'Trade show booth'
+
+
+def test_get_budget_item_returns_dict():
+    row = {'id': 2, 'item': 'Booth', 'status': 'Pending'}
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = row
+    assert get_budget_item(c, 2) == row
+
+def test_get_budget_item_returns_none_when_missing():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = None
+    assert get_budget_item(c, 99) is None
+
+
+def test_create_budget_item_returns_id():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [7]
+    result = create_budget_item(c, 'Trade show booth', 'Q3 Launch', 'Events',
+                                5000.0, 'Alice', '2026-06-01', 'Pending', '')
+    assert result == 7
+
+def test_create_budget_item_uses_insert():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [1]
+    create_budget_item(c, 'Booth', '', '', 0, '', '', 'Pending', '')
+    sql = c.execute.call_args[0][0]
+    assert 'INSERT' in sql and 'marketing_budget' in sql
+
+def test_create_budget_item_defaults_amount_zero():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [1]
+    create_budget_item(c, 'Booth', '', '', None, '', '', 'Pending', '')
+    params = c.execute.call_args[0][1]
+    assert params[3] == 0
+
+
+def test_update_budget_item_builds_set_clause():
+    c = MagicMock()
+    update_budget_item(c, 1, status='Approved')
+    sql = c.execute.call_args[0][0]
+    assert 'UPDATE marketing_budget' in sql and 'status' in sql
+
+def test_update_budget_item_ignores_unknown_fields():
+    c = MagicMock()
+    update_budget_item(c, 1, bogus='x')
+    c.execute.assert_not_called()
+
+def test_update_budget_item_noop_when_no_fields():
+    c = MagicMock()
+    update_budget_item(c, 1)
     c.execute.assert_not_called()

@@ -21,6 +21,8 @@ from ..marketing_core import (
     list_research, get_research_project, create_research, update_research,
     RESEARCH_TYPES, RESEARCH_STATUSES,
     get_analytics_data,
+    list_budget_items, create_budget_item,
+    BUDGET_CATEGORIES, BUDGET_STATUSES,
 )
 
 log = get_logger(__name__)
@@ -522,5 +524,44 @@ def mkt_analytics(request):
     with get_db_connection() as conn:
         data = get_analytics_data(conn)
     return render(request, 'mkt_analytics.html', _mkt_ctx(request, **data))
+
+
+@dept_required('marketing')
+def mkt_budget_list(request):
+    status_f = request.GET.get('status', '').strip()
+    category_f = request.GET.get('category', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_budget_items(conn, status=status_f or None,
+                                  category=category_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_budget_item(
+                    conn,
+                    item=request.POST.get('item', ''),
+                    campaign=request.POST.get('campaign', ''),
+                    category=request.POST.get('category', ''),
+                    amount=float(request.POST.get('amount', 0) or 0),
+                    requested_by=request.POST.get('requested_by', ''),
+                    request_date=request.POST.get('request_date', ''),
+                    status=request.POST.get('status', 'Pending'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('mkt_budget_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_budget_items(conn, status=status_f or None,
+                                          category=category_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'mkt_budget_list.html', _mkt_ctx(
+        request, rows=rows, status_filter=status_f, category_filter=category_f,
+        search=search, statuses=BUDGET_STATUSES, categories=BUDGET_CATEGORIES,
+        error=error,
+    ))
 
 
