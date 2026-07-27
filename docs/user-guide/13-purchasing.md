@@ -49,8 +49,10 @@ date, value, status, notes.
 
 ## Requisitions
 
-Submit a purchase requisition; a department manager approves or rejects it.
-Pages cover new, pending-approval, approved, and history views.
+Submit a purchase requisition; a Supervisor or Department Manager in your
+department approves or rejects it (President/VP can also approve any
+requisition). Pages cover new, pending-approval, approved, and history
+views.
 
 ## Blanket POs & Call-Offs (`/blanket-po/`)
 

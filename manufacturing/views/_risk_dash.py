@@ -5,9 +5,32 @@ import json
 from django.shortcuts import render, redirect
 
 from ..db_pg import get_db_connection
+from ..auth_decorators import dept_required
 from ..log_utils import get_logger
+from ..accounts import READ_ONLY_ROLES
+
+from ..risk_core import (
+    list_risk_register, create_risk_register,
+    list_risk_assessments, create_risk_assessment,
+    list_risk_insurance, create_risk_insurance,
+    list_risk_continuity, create_risk_continuity,
+    list_risk_audits, create_risk_audit,
+    list_risk_kris, create_risk_kri,
+    RISK_STATUSES, ASSESSMENT_STATUSES, INSURANCE_STATUSES,
+    CONTINUITY_STATUSES, AUDIT_STATUSES, KRI_STATUSES,
+)
 
 log = get_logger(__name__)
+
+_RISK_DEPT_KEYS = {'risk_management', 'legal'}
+
+
+def _risk_ctx(request, **extra):
+    return {
+        'email': request.session.get('user_email', ''),
+        'user_role': request.session.get('user_role', ''),
+        **extra,
+    }
 
 
 def risk_dashboard(request):
@@ -105,3 +128,215 @@ def risk_dashboard(request):
         'recent_risks': recent_risks,
         'recent_assessments': recent_assessments,
     })
+
+
+@dept_required(_RISK_DEPT_KEYS)
+def risk_register_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_risk_register(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_risk_register(
+                    conn,
+                    risk=request.POST.get('risk', ''),
+                    category=request.POST.get('category', ''),
+                    severity=request.POST.get('severity', ''),
+                    response=request.POST.get('response', ''),
+                    owner=request.POST.get('owner', ''),
+                    target_date=request.POST.get('target_date', ''),
+                    status=request.POST.get('status', 'Open'),
+                    mitigation=request.POST.get('mitigation', ''),
+                )
+                conn.commit()
+                return redirect('risk_register_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_risk_register(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'risk_register_list.html', _risk_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=RISK_STATUSES, error=error,
+    ))
+
+
+@dept_required(_RISK_DEPT_KEYS)
+def risk_assessment_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_risk_assessments(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_risk_assessment(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    category=request.POST.get('category', ''),
+                    likelihood=request.POST.get('likelihood', ''),
+                    impact=request.POST.get('impact', ''),
+                    risk_level=request.POST.get('risk_level', ''),
+                    owner=request.POST.get('owner', ''),
+                    assessed_date=request.POST.get('assessed_date', ''),
+                    status=request.POST.get('status', 'Identified'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('risk_assessment_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_risk_assessments(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'risk_assessment_list.html', _risk_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=ASSESSMENT_STATUSES, error=error,
+    ))
+
+
+@dept_required(_RISK_DEPT_KEYS)
+def risk_insurance_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_risk_insurance(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_risk_insurance(
+                    conn,
+                    policy=request.POST.get('policy', ''),
+                    insurer=request.POST.get('insurer', ''),
+                    policy_type=request.POST.get('policy_type', ''),
+                    coverage=float(request.POST.get('coverage', 0) or 0),
+                    premium=float(request.POST.get('premium', 0) or 0),
+                    start_date=request.POST.get('start_date', ''),
+                    end_date=request.POST.get('end_date', ''),
+                    status=request.POST.get('status', 'Active'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('risk_insurance_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_risk_insurance(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'risk_insurance_list.html', _risk_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=INSURANCE_STATUSES, error=error,
+    ))
+
+
+@dept_required(_RISK_DEPT_KEYS)
+def risk_continuity_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_risk_continuity(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_risk_continuity(
+                    conn,
+                    plan=request.POST.get('plan', ''),
+                    scope=request.POST.get('scope', ''),
+                    criticality=request.POST.get('criticality', ''),
+                    owner=request.POST.get('owner', ''),
+                    last_tested=request.POST.get('last_tested', ''),
+                    next_test=request.POST.get('next_test', ''),
+                    status=request.POST.get('status', 'Draft'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('risk_continuity_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_risk_continuity(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'risk_continuity_list.html', _risk_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=CONTINUITY_STATUSES, error=error,
+    ))
+
+
+@dept_required(_RISK_DEPT_KEYS)
+def risk_audit_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_risk_audits(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_risk_audit(
+                    conn,
+                    audit=request.POST.get('audit', ''),
+                    framework=request.POST.get('framework', ''),
+                    auditor=request.POST.get('auditor', ''),
+                    scheduled_date=request.POST.get('scheduled_date', ''),
+                    completed_date=request.POST.get('completed_date', ''),
+                    finding=request.POST.get('finding', ''),
+                    status=request.POST.get('status', 'Scheduled'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('risk_audit_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_risk_audits(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'risk_audit_list.html', _risk_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=AUDIT_STATUSES, error=error,
+    ))
+
+
+@dept_required(_RISK_DEPT_KEYS)
+def risk_kri_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_risk_kris(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_risk_kri(
+                    conn,
+                    indicator=request.POST.get('indicator', ''),
+                    category=request.POST.get('category', ''),
+                    threshold=request.POST.get('threshold', ''),
+                    current_value=request.POST.get('current_value', ''),
+                    owner=request.POST.get('owner', ''),
+                    measured_date=request.POST.get('measured_date', ''),
+                    status=request.POST.get('status', 'Normal'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('risk_kri_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_risk_kris(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'risk_kri_list.html', _risk_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=KRI_STATUSES, error=error,
+    ))

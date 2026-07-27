@@ -1,21 +1,19 @@
 {% extends "base.html" %}
-{% block page_title %}Compliance{% endblock %}
+{% block page_title %}Compliance Audits{% endblock %}
 
 {% block toolbar_left %}
-<a href="/legal/" class="btn">Legal Dashboard</a>
-<a href="/legal/contracts/" class="btn">Contracts</a>
-<a href="/legal/compliance/" class="btn">Compliance</a>
-<a href="/legal/litigation/" class="btn">Litigation</a>
-<a href="/legal/ip/" class="btn">IP</a>
-<a href="/legal/employment/" class="btn">Employment</a>
-<a href="/legal/governance/" class="btn">Governance</a>
+<a href="/risk/" class="btn">Risk Dashboard</a>
+<a href="/risk/register/" class="btn">Risk Register</a>
+<a href="/risk/assessments/" class="btn">Assessments</a>
+<a href="/risk/insurance/" class="btn">Insurance</a>
+<a href="/risk/continuity/" class="btn">Continuity</a>
+<a href="/risk/audits/" class="btn">Audits</a>
+<a href="/risk/kri/" class="btn">KRIs</a>
 <a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
 {% endblock %}
 
 {% block extra_styles %}
-.lg-wrap { width:100%; max-width:1100px; }
+.lg-wrap { width:100%; max-width:1200px; }
 .lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
 .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
 .filter-bar select, .filter-bar input[type=text] {
@@ -29,16 +27,12 @@
 .list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
 .list-table th { background:var(--accent); color:white; }
 .list-table tr:last-child td { border-bottom:none; }
-.list-table tbody tr:hover { background:#f0f4ff; }
-.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
-.list-table a:hover { text-decoration:underline; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
-.s-pending     { background:#fff3cd; color:#856404; }
-.s-in-progress { background:#d1ecf1; color:#0c5460; }
-.s-complete    { background:#d4edda; color:#0a3622; }
-.s-overdue     { background:#f8d7da; color:#721c24; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.s-scheduled  { background:#e2e3e5; color:#383d41; }
+.s-inprogress { background:#fff3cd; color:#856404; }
+.s-completed  { background:#d4edda; color:#0a3622; }
+.s-closed     { background:#d1ecf1; color:#0c5460; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
 .form-group label { font-size:12px; font-weight:bold; color:#444; }
 .form-group input, .form-group select, .form-group textarea {
@@ -50,53 +44,48 @@
 .btn-submit:hover { background:var(--accent-hover); }
 .alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
 .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
-.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
 {% endblock %}
 
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Compliance Requirements</h2>
+    <h2>Compliance Audits</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
-    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
             <option value="">All Statuses</option>
-            {% for s in compliance_statuses %}
+            {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search requirement / regulation…">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search audit / framework / auditor…">
         <button type="submit">Filter</button>
-        <a href="/legal/compliance/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <a href="/risk/audits/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Requirement</th>
-                    <th>Regulation</th>
-                    <th>Owner</th>
-                    <th>Due Date</th>
-                    <th>Completed</th>
-                    <th>Status</th>
+                    <th>Audit</th><th>Framework</th><th>Auditor</th><th>Scheduled</th>
+                    <th>Completed</th><th>Finding</th><th>Status</th>
                 </tr>
             </thead>
             <tbody>
-            {% for item in items %}
+            {% for r in rows %}
             <tr>
-                <td><a href="/legal/compliance/{{ item.id }}/">{{ item.requirement }}</a></td>
-                <td>{{ item.regulation|default:"—" }}</td>
-                <td>{{ item.owner|default:"—" }}</td>
-                <td>{{ item.due_date|default:"—" }}</td>
-                <td>{{ item.completed_date|default:"—" }}</td>
-                <td><span class="badge s-{{ item.status|lower|slugify }}">{{ item.status }}</span></td>
+                <td>{{ r.audit }}</td>
+                <td>{{ r.framework|default:"—" }}</td>
+                <td>{{ r.auditor|default:"—" }}</td>
+                <td>{{ r.scheduled_date|default:"—" }}</td>
+                <td>{{ r.completed_date|default:"—" }}</td>
+                <td>{{ r.finding|default:"—" }}</td>
+                <td><span class="badge s-{{ r.status|lower|cut:" " }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No compliance items found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">No audits found.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -104,40 +93,48 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Compliance Item</h3>
+        <h3>New Audit</h3>
         <form method="post">
             {% csrf_token %}
-            <div class="form-grid three">
+            <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Requirement *</label>
-                    <input type="text" name="requirement" required>
+                    <label>Audit *</label>
+                    <input type="text" name="audit" required>
                 </div>
                 <div class="form-group">
-                    <label>Regulation / Standard</label>
-                    <input type="text" name="regulation" placeholder="e.g. OSHA 29 CFR 1910">
+                    <label>Framework</label>
+                    <input type="text" name="framework" placeholder="ISO 27001 / SOC 2 / …">
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
-                    <input type="text" name="owner">
+                    <label>Auditor</label>
+                    <input type="text" name="auditor">
+                </div>
+                <div class="form-group">
+                    <label>Scheduled Date</label>
+                    <input type="date" name="scheduled_date">
+                </div>
+                <div class="form-group">
+                    <label>Completed Date</label>
+                    <input type="date" name="completed_date">
                 </div>
                 <div class="form-group">
                     <label>Status</label>
                     <select name="status">
-                        {% for s in compliance_statuses %}
-                        <option value="{{ s }}"{% if s == 'Pending' %} selected{% endif %}>{{ s }}</option>
+                        {% for s in statuses %}
+                        <option value="{{ s }}"{% if s == 'Scheduled' %} selected{% endif %}>{{ s }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date">
+                <div class="form-group full-span">
+                    <label>Finding</label>
+                    <input type="text" name="finding">
                 </div>
                 <div class="form-group full-span">
                     <label>Notes</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Item</button>
+            <button type="submit" class="btn-submit">Create Audit</button>
         </form>
     </div>
     {% endif %}

@@ -13,6 +13,17 @@ LITIGATION_TYPES = (
 )
 LITIGATION_STATUSES = ('Open', 'In Discovery', 'Settled', 'Dismissed', 'Closed')
 
+IP_TYPES = ('Patent', 'Trademark', 'Copyright', 'Trade Secret')
+IP_STATUSES = ('Pending', 'Filed', 'Registered', 'Expired', 'Abandoned')
+
+EMPLOYMENT_MATTER_TYPES = (
+    'Discrimination', 'Wage & Hour', 'Termination', 'Harassment', 'Other',
+)
+EMPLOYMENT_STATUSES = ('Open', 'Investigating', 'Resolved', 'Closed')
+
+GOVERNANCE_CATEGORIES = ('Bylaw', 'Board Resolution', 'Policy', 'Charter')
+GOVERNANCE_STATUSES = ('Active', 'Under Review', 'Superseded', 'Retired')
+
 
 # ---------------------------------------------------------------------------
 # Dashboard
@@ -244,3 +255,99 @@ def update_litigation(conn, case_id: int, **fields) -> None:
         f"UPDATE legal_litigation SET {set_clause} WHERE id = %s",
         list(cols.values()) + [case_id],
     )
+
+
+# ---------------------------------------------------------------------------
+# Intellectual Property
+# ---------------------------------------------------------------------------
+
+def list_ip(conn, status=None, search=None) -> list:
+    sql = (
+        "SELECT id, title, ip_type, registration_no, jurisdiction, filed_date, "
+        "expiry_date, status FROM legal_ip WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if search:
+        sql += " AND (title ILIKE %s OR registration_no ILIKE %s OR jurisdiction ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def create_ip(conn, title, ip_type, registration_no, jurisdiction,
+              filed_date, expiry_date, status, notes) -> int:
+    cur = conn.execute(
+        "INSERT INTO legal_ip "
+        "(title, ip_type, registration_no, jurisdiction, filed_date, expiry_date, "
+        "status, notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (title, ip_type, registration_no, jurisdiction, filed_date or None,
+         expiry_date or None, status or 'Pending', notes),
+    )
+    return cur.fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# Employment Law
+# ---------------------------------------------------------------------------
+
+def list_employment(conn, status=None, search=None) -> list:
+    sql = (
+        "SELECT id, matter, employee, matter_type, owner, opened_date, "
+        "closed_date, status FROM legal_employment WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if search:
+        sql += " AND (matter ILIKE %s OR employee ILIKE %s OR owner ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def create_employment(conn, matter, employee, matter_type, owner,
+                       opened_date, closed_date, status, notes) -> int:
+    cur = conn.execute(
+        "INSERT INTO legal_employment "
+        "(matter, employee, matter_type, owner, opened_date, closed_date, status, notes) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (matter, employee, matter_type, owner, opened_date or None,
+         closed_date or None, status or 'Open', notes),
+    )
+    return cur.fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# Corporate Governance
+# ---------------------------------------------------------------------------
+
+def list_governance(conn, status=None, search=None) -> list:
+    sql = (
+        "SELECT id, item, category, owner, ref_date, reference, status "
+        "FROM legal_governance WHERE TRUE"
+    )
+    params: list = []
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    if search:
+        sql += " AND (item ILIKE %s OR reference ILIKE %s OR owner ILIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+    sql += " ORDER BY id DESC"
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def create_governance(conn, item, category, owner, ref_date, reference,
+                       status, notes) -> int:
+    cur = conn.execute(
+        "INSERT INTO legal_governance "
+        "(item, category, owner, ref_date, reference, status, notes) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        (item, category, owner, ref_date or None, reference,
+         status or 'Active', notes),
+    )
+    return cur.fetchone()[0]
