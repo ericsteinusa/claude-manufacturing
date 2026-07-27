@@ -101,6 +101,8 @@ def maint_oee_report(request):
         except ValueError:
             start, end = today.replace(day=1), today
         period = 'custom'
+    elif period == 'day':
+        start = end = today
     elif period == 'week':
         start = today - datetime.timedelta(days=today.weekday())
         end = today
@@ -156,6 +158,8 @@ def maint_oee_export(request):
             end = datetime.date.fromisoformat(date_to)
         except ValueError:
             start, end = today.replace(day=1), today
+    elif period == 'day':
+        start = end = today
     elif period == 'week':
         start = today - datetime.timedelta(days=today.weekday())
         end = today
