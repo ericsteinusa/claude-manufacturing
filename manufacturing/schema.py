@@ -1032,6 +1032,32 @@ _TABLES = [
             notes TEXT DEFAULT ''
         )
     """),
+    ("legal_ip", """
+        CREATE TABLE IF NOT EXISTS legal_ip (
+            id SERIAL PRIMARY KEY, title TEXT NOT NULL,
+            ip_type TEXT DEFAULT '', registration_no TEXT DEFAULT '',
+            jurisdiction TEXT DEFAULT '', filed_date TEXT DEFAULT '',
+            expiry_date TEXT DEFAULT '', status TEXT DEFAULT 'Pending',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("legal_employment", """
+        CREATE TABLE IF NOT EXISTS legal_employment (
+            id SERIAL PRIMARY KEY, matter TEXT NOT NULL,
+            employee TEXT DEFAULT '', matter_type TEXT DEFAULT '',
+            owner TEXT DEFAULT '', opened_date TEXT DEFAULT '',
+            closed_date TEXT DEFAULT '', status TEXT DEFAULT 'Open',
+            notes TEXT DEFAULT ''
+        )
+    """),
+    ("legal_governance", """
+        CREATE TABLE IF NOT EXISTS legal_governance (
+            id SERIAL PRIMARY KEY, item TEXT NOT NULL,
+            category TEXT DEFAULT '', owner TEXT DEFAULT '',
+            ref_date TEXT DEFAULT '', reference TEXT DEFAULT '',
+            status TEXT DEFAULT 'Active', notes TEXT DEFAULT ''
+        )
+    """),
     ("marketing_campaign", """
         CREATE TABLE IF NOT EXISTS marketing_campaign (
             id SERIAL PRIMARY KEY, name TEXT NOT NULL,

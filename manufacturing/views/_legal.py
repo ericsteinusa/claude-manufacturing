@@ -14,8 +14,13 @@ from ..legal_core import (
     list_contracts, get_contract, create_contract, update_contract,
     list_compliance, get_compliance_item, create_compliance, update_compliance,
     list_litigation, get_litigation_case, create_litigation, update_litigation,
+    list_ip, create_ip,
+    list_employment, create_employment,
+    list_governance, create_governance,
     CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
     LITIGATION_TYPES, LITIGATION_STATUSES,
+    IP_TYPES, IP_STATUSES, EMPLOYMENT_MATTER_TYPES, EMPLOYMENT_STATUSES,
+    GOVERNANCE_CATEGORIES, GOVERNANCE_STATUSES,
 )
 
 log = get_logger(__name__)
@@ -331,6 +336,110 @@ def legal_litigation_detail(request, case_id):
         request, case=case, can_edit=can_edit,
         litigation_statuses=LITIGATION_STATUSES, litigation_types=LITIGATION_TYPES,
         error=error, success=success,
+    ))
+
+
+@dept_required(_LEGAL_DEPT_KEYS)
+def legal_ip_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_ip(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_ip(
+                    conn,
+                    title=request.POST.get('title', ''),
+                    ip_type=request.POST.get('ip_type', ''),
+                    registration_no=request.POST.get('registration_no', ''),
+                    jurisdiction=request.POST.get('jurisdiction', ''),
+                    filed_date=request.POST.get('filed_date', ''),
+                    expiry_date=request.POST.get('expiry_date', ''),
+                    status=request.POST.get('status', 'Pending'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('legal_ip_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_ip(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'legal_ip_list.html', _legal_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=IP_STATUSES, ip_types=IP_TYPES, error=error,
+    ))
+
+
+@dept_required(_LEGAL_DEPT_KEYS)
+def legal_employment_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_employment(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_employment(
+                    conn,
+                    matter=request.POST.get('matter', ''),
+                    employee=request.POST.get('employee', ''),
+                    matter_type=request.POST.get('matter_type', ''),
+                    owner=request.POST.get('owner', ''),
+                    opened_date=request.POST.get('opened_date', ''),
+                    closed_date=request.POST.get('closed_date', ''),
+                    status=request.POST.get('status', 'Open'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('legal_employment_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_employment(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'legal_employment_list.html', _legal_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=EMPLOYMENT_STATUSES, matter_types=EMPLOYMENT_MATTER_TYPES, error=error,
+    ))
+
+
+@dept_required(_LEGAL_DEPT_KEYS)
+def legal_governance_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        rows = list_governance(conn, status=status_f or None, search=search or None)
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                create_governance(
+                    conn,
+                    item=request.POST.get('item', ''),
+                    category=request.POST.get('category', ''),
+                    owner=request.POST.get('owner', ''),
+                    ref_date=request.POST.get('ref_date', ''),
+                    reference=request.POST.get('reference', ''),
+                    status=request.POST.get('status', 'Active'),
+                    notes=request.POST.get('notes', ''),
+                )
+                conn.commit()
+                return redirect('legal_governance_list')
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_governance(conn, status=status_f or None, search=search or None)
+    finally:
+        conn.close()
+    return render(request, 'legal_governance_list.html', _legal_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=GOVERNANCE_STATUSES, categories=GOVERNANCE_CATEGORIES, error=error,
     ))
 
 

@@ -7,8 +7,13 @@ from manufacturing.legal_core import (
     list_contracts, get_contract, create_contract, update_contract,
     list_compliance, get_compliance_item, create_compliance, update_compliance,
     list_litigation, get_litigation_case, create_litigation, update_litigation,
+    list_ip, create_ip,
+    list_employment, create_employment,
+    list_governance, create_governance,
     CONTRACT_TYPES, CONTRACT_STATUSES, COMPLIANCE_STATUSES,
     LITIGATION_TYPES, LITIGATION_STATUSES,
+    IP_TYPES, IP_STATUSES, EMPLOYMENT_MATTER_TYPES, EMPLOYMENT_STATUSES,
+    GOVERNANCE_CATEGORIES, GOVERNANCE_STATUSES,
 )
 
 _CONTRACT_STATS = {'total': 10, 'active': 6, 'draft': 2}
@@ -456,3 +461,123 @@ def test_update_litigation_noop_when_no_fields():
     c = MagicMock()
     update_litigation(c, 1)
     c.execute.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Intellectual Property
+# ---------------------------------------------------------------------------
+
+def test_ip_types_has_patent():
+    assert 'Patent' in IP_TYPES
+
+def test_ip_statuses_has_registered():
+    assert 'Registered' in IP_STATUSES
+
+def test_list_ip_returns_list():
+    assert isinstance(list_ip(_list_conn([])), list)
+
+def test_list_ip_status_filter():
+    c = _list_conn([])
+    list_ip(c, status='Registered')
+    sql, params = c.execute.call_args[0]
+    assert 'status' in sql and 'Registered' in params
+
+def test_list_ip_search_filter():
+    c = _list_conn([])
+    list_ip(c, search='widget')
+    sql, params = c.execute.call_args[0]
+    assert 'ILIKE' in sql and any('widget' in str(p) for p in params)
+
+def test_create_ip_returns_id():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [11]
+    result = create_ip(c, 'Widget Patent', 'Patent', 'US123456', 'US',
+                        '2026-01-01', '2046-01-01', 'Pending', '')
+    assert result == 11
+
+def test_create_ip_uses_insert():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [1]
+    create_ip(c, 'Widget Patent', 'Patent', '', '', '', '', 'Pending', '')
+    sql = c.execute.call_args[0][0]
+    assert 'INSERT' in sql and 'legal_ip' in sql
+
+
+# ---------------------------------------------------------------------------
+# Employment Law
+# ---------------------------------------------------------------------------
+
+def test_employment_matter_types_has_discrimination():
+    assert 'Discrimination' in EMPLOYMENT_MATTER_TYPES
+
+def test_employment_statuses_has_open():
+    assert 'Open' in EMPLOYMENT_STATUSES
+
+def test_list_employment_returns_list():
+    assert isinstance(list_employment(_list_conn([])), list)
+
+def test_list_employment_status_filter():
+    c = _list_conn([])
+    list_employment(c, status='Investigating')
+    sql, params = c.execute.call_args[0]
+    assert 'status' in sql and 'Investigating' in params
+
+def test_list_employment_search_filter():
+    c = _list_conn([])
+    list_employment(c, search='smith')
+    sql, params = c.execute.call_args[0]
+    assert 'ILIKE' in sql
+
+def test_create_employment_returns_id():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [12]
+    result = create_employment(c, 'Wrongful termination claim', 'J. Smith',
+                                'Termination', 'HR', '2026-02-01', '', 'Open', '')
+    assert result == 12
+
+def test_create_employment_uses_insert():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [1]
+    create_employment(c, 'Claim', '', '', '', '', '', 'Open', '')
+    sql = c.execute.call_args[0][0]
+    assert 'INSERT' in sql and 'legal_employment' in sql
+
+
+# ---------------------------------------------------------------------------
+# Corporate Governance
+# ---------------------------------------------------------------------------
+
+def test_governance_categories_has_bylaw():
+    assert 'Bylaw' in GOVERNANCE_CATEGORIES
+
+def test_governance_statuses_has_active():
+    assert 'Active' in GOVERNANCE_STATUSES
+
+def test_list_governance_returns_list():
+    assert isinstance(list_governance(_list_conn([])), list)
+
+def test_list_governance_status_filter():
+    c = _list_conn([])
+    list_governance(c, status='Active')
+    sql, params = c.execute.call_args[0]
+    assert 'status' in sql and 'Active' in params
+
+def test_list_governance_search_filter():
+    c = _list_conn([])
+    list_governance(c, search='bylaws')
+    sql, params = c.execute.call_args[0]
+    assert 'ILIKE' in sql
+
+def test_create_governance_returns_id():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [13]
+    result = create_governance(c, 'Board Bylaws Amendment', 'Bylaw', 'Corp Sec',
+                                '2026-01-01', 'BYL-2026-01', 'Active', '')
+    assert result == 13
+
+def test_create_governance_uses_insert():
+    c = MagicMock()
+    c.execute.return_value.fetchone.return_value = [1]
+    create_governance(c, 'Bylaws', '', '', '', '', 'Active', '')
+    sql = c.execute.call_args[0][0]
+    assert 'INSERT' in sql and 'legal_governance' in sql
