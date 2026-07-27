@@ -554,8 +554,8 @@ WEB_LEAF_URLS = {
     ('maintenance', 'parts_req'): '/maint/parts/',
     ('maintenance', 'reorder'): '/maint/parts/?status=Low+Stock',
     ('maintenance', 'parts_hist'): '/maint/parts/',
-    ('maintenance', 'daily_rpt'): '/maint/',
-    ('maintenance', 'week_rpt'): '/maint/',
+    ('maintenance', 'daily_rpt'): '/maint/oee/?period=day',
+    ('maintenance', 'week_rpt'): '/maint/oee/?period=week',
     ('maintenance', 'cost_analy'): '/maint/downtime/',
     ('maintenance', 'down_rpt'): '/maint/downtime/',
     ('maintenance', 'sched_insp'): '/maint/inspections/?status=Scheduled',
@@ -570,10 +570,10 @@ WEB_LEAF_URLS = {
     ('maintenance', 'appr_wo'): '/maint/wo/',
     ('maintenance', 'rej_wo'): '/maint/wo/',
     ('maintenance', 'appr_hist'): '/maint/wo/?status=Completed',
-    ('maintenance', 'maint_budg'): '/maint/',
-    ('maintenance', 'budg_act'): '/maint/',
-    ('maintenance', 'budg_req'): '/maint/',
-    ('maintenance', 'month_sum'): '/maint/',
+    ('maintenance', 'maint_budg'): '/fin/budgets/',
+    ('maintenance', 'budg_act'): '/fin/budgets/',
+    ('maintenance', 'budg_req'): '/fin/budgets/',
+    ('maintenance', 'month_sum'): '/maint/oee/?period=month',
     ('maintenance', 'equip_rpts'): '/maint/equipment/',
     ('maintenance', 'cost_rpts'): '/maint/downtime/',
     ('maintenance', 'maint_rpts'): '/maint/',
@@ -7312,7 +7312,11 @@ def _fin_ctx(request, **extra):
 
 # ── Budgets ──────────────────────────────────────────────────────────────────
 
-@dept_required(_ACCOUNTING_DEPT_KEYS)
+# Maintenance's own budget leaves (Budget Requests, Budget vs. Actual,
+# Maintenance Budget) route here too, since there's no maintenance-specific
+# budget table — only this one view (not the other Finance sub-pages that
+# share _ACCOUNTING_DEPT_KEYS) grants that extra department access.
+@dept_required(_ACCOUNTING_DEPT_KEYS | {'maintenance'})
 def fin_budget_list(request):
     status_f = request.GET.get('status', '').strip()
     year_f = request.GET.get('fiscal_year', '').strip()

@@ -50,6 +50,7 @@
     <h2>OEE Report</h2>
 
     <div class="chip-row">
+        <a href="/maint/oee/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">Today</a>
         <a href="/maint/oee/?period=week"    class="chip {% if period == 'week' %}active{% endif %}">This Week</a>
         <a href="/maint/oee/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">This Month</a>
         <a href="/maint/oee/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">This Quarter</a>
