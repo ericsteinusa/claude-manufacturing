@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block page_title %}Risk Register{% endblock %}
+
+{% block toolbar_left %}
+<a href="/risk/" class="btn">Risk Dashboard</a>
+<a href="/risk/register/" class="btn">Risk Register</a>
+<a href="/risk/assessments/" class="btn">Assessments</a>
+<a href="/risk/insurance/" class="btn">Insurance</a>
+<a href="/risk/continuity/" class="btn">Continuity</a>
+<a href="/risk/audits/" class="btn">Audits</a>
+<a href="/risk/kri/" class="btn">KRIs</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1200px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-open       { background:#f8d7da; color:#721c24; }
+.s-mitigating { background:#fff3cd; color:#856404; }
+.s-mitigated  { background:#d1ecf1; color:#0c5460; }
+.s-closed     { background:#d4edda; color:#0a3622; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>Risk Register</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search risk / category / owner…">
+        <button type="submit">Filter</button>
+        <a href="/risk/register/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Risk</th><th>Category</th><th>Severity</th><th>Response</th>
+                    <th>Owner</th><th>Target Date</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+            <tr>
+                <td>{{ r.risk }}</td>
+                <td>{{ r.category|default:"—" }}</td>
+                <td>{{ r.severity|default:"—" }}</td>
+                <td>{{ r.response|default:"—" }}</td>
+                <td>{{ r.owner|default:"—" }}</td>
+                <td>{{ r.target_date|default:"—" }}</td>
+                <td><span class="badge s-{{ r.status|lower }}">{{ r.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;text-align:center;">No risks found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if user_role != 'viewer' and user_role != 'read_only' %}
+    <div class="card">
+        <h3>New Risk</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Risk *</label>
+                    <input type="text" name="risk" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category">
+                </div>
+                <div class="form-group">
+                    <label>Severity</label>
+                    <input type="text" name="severity" placeholder="Low / Medium / High">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in statuses %}
+                        <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Response</label>
+                    <input type="text" name="response">
+                </div>
+                <div class="form-group">
+                    <label>Owner</label>
+                    <input type="text" name="owner">
+                </div>
+                <div class="form-group">
+                    <label>Target Date</label>
+                    <input type="date" name="target_date">
+                </div>
+                <div class="form-group full-span">
+                    <label>Mitigation</label>
+                    <textarea name="mitigation"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Risk</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

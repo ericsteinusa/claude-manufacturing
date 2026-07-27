@@ -221,7 +221,7 @@ from ._it import *  # noqa: F401,F403
 from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
 from ._budget_dash import budget_dashboard  # noqa: F401
-from ._risk_dash import risk_dashboard  # noqa: F401
+from ._risk_dash import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
 from ._cycle_count import *  # noqa: F401,F403
 from ._price_list import *  # noqa: F401,F403
@@ -865,15 +865,15 @@ WEB_LEAF_URLS = {
     ('legal', 'litigation_mgmt'):    '/legal/litigation/',
     ('legal', 'compliance_mgmt'):    '/legal/compliance/',
     ('legal', 'corp_gov'):           '/legal/',
-    ('risk_management', 'risk_assess'):      '/legal/',
-    ('risk_management', 'risk_register'):    '/legal/',
-    ('risk_management', 'insurance'):        '/legal/',
-    ('risk_management', 'biz_cont'):         '/legal/',
-    ('risk_management', 'comp_audit'):       '/legal/',
-    ('risk_management', 'risk_register_mgr'): '/legal/',
-    ('risk_management', 'kri'):              '/legal/',
-    ('risk_management', 'biz_continuity'):   '/legal/',
-    ('risk_management', 'audit_compliance'): '/legal/',
+    ('risk_management', 'risk_assess'):      '/risk/assessments/',
+    ('risk_management', 'risk_register'):    '/risk/register/',
+    ('risk_management', 'insurance'):        '/risk/insurance/',
+    ('risk_management', 'biz_cont'):         '/risk/continuity/',
+    ('risk_management', 'comp_audit'):       '/risk/audits/',
+    ('risk_management', 'risk_register_mgr'): '/risk/register/',
+    ('risk_management', 'kri'):              '/risk/kri/',
+    ('risk_management', 'biz_continuity'):   '/risk/continuity/',
+    ('risk_management', 'audit_compliance'): '/risk/audits/',
     # Information Technology dashboard
     ('information_tech', 'it_calls'):    '/it/tickets/',
     ('information_tech', 'it_tasks'):    '/it/tasks/',
