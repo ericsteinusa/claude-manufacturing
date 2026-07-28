@@ -271,6 +271,7 @@ from ._skills_matrix import *  # noqa: F401,F403
 from ._benefits import *  # noqa: F401,F403
 from ._regulatory_compliance import *  # noqa: F401,F403
 from ._workforce_analytics import *  # noqa: F401,F403
+from ._terminations import *  # noqa: F401,F403
 from ._ats import *  # noqa: F401,F403
 from ._supplier_portal import *  # noqa: F401,F403
 from ._cto import *  # noqa: F401,F403
@@ -775,10 +776,10 @@ WEB_LEAF_URLS = {
     ('personnel', 'appl_track'):   '/ats/candidates/',
     ('personnel', 'int_sched'):    '/ats/',
     ('personnel', 'offer_mgmt'):   '/ats/',
-    ('personnel', 'term_proc'):    '/pers/',
-    ('personnel', 'exit_int'):     '/pers/',
+    ('personnel', 'term_proc'):    '/pers/terminations/',
+    ('personnel', 'exit_int'):     '/pers/exit-interviews/',
     ('personnel', 'final_pay'):    '/payroll/',
-    ('personnel', 'offboard'):     '/pers/',
+    ('personnel', 'offboard'):     '/pers/offboarding/',
     ('personnel', 'sal_review'):   '/payroll/pay-rates/',
     ('personnel', 'sal_adj'):      '/payroll/pay-rates/',
     ('personnel', 'comp_rpts'):    '/payroll/',

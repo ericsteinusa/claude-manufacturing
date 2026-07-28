@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block page_title %}Termination — {{ term.employee_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/pers/" class="btn">Personnel</a>
+<a href="/pers/terminations/" class="btn">Terminations</a>
+<a href="/pers/exit-interviews/" class="btn">Exit Interviews</a>
+<a href="/pers/offboarding/" class="btn">Offboarding</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:800px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.detail-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+.detail-grid .field .lbl { font-size:11px; color:var(--text-muted); font-weight:bold; text-transform:uppercase; }
+.detail-grid .field .val { font-size:14px; color:var(--text); margin-top:2px; }
+.full-span { grid-column:1/-1; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-initiated   { background:#fff3cd; color:#856404; }
+.s-in-progress { background:#d1ecf1; color:#0c5460; }
+.s-completed   { background:#d4edda; color:#0a3622; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>{{ term.employee_name }}
+        <span class="badge s-{{ term.status|lower|cut:" " }}">{{ term.status }}</span>
+    </h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <div class="detail-grid">
+            <div class="field"><div class="lbl">Department</div><div class="val">{{ term.dept_name|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">Termination Date</div><div class="val">{{ term.termination_date|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">Type</div><div class="val">{{ term.term_type|default:"—" }}</div></div>
+            <div class="field"><div class="lbl">Rehire Eligible</div><div class="val">{{ term.rehire_eligible|default:"—" }}</div></div>
+            <div class="field full-span"><div class="lbl">Reason</div><div class="val">{{ term.reason|default:"—" }}</div></div>
+            {% if term.notes %}
+            <div class="field full-span"><div class="lbl">Notes</div><div class="val">{{ term.notes }}</div></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <p style="font-size:13px;color:var(--text-muted);">
+            Log this employee's <a href="/pers/exit-interviews/">exit interview</a> or track their
+            <a href="/pers/offboarding/">offboarding checklist</a> from their respective pages.
+        </p>
+    </div>
+
+</div>
+</div>
+{% endblock %}

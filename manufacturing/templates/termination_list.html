@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block page_title %}Terminations{% endblock %}
+
+{% block toolbar_left %}
+<a href="/pers/" class="btn">Personnel</a>
+<a href="/pers/terminations/" class="btn">Terminations</a>
+<a href="/pers/exit-interviews/" class="btn">Exit Interviews</a>
+<a href="/pers/offboarding/" class="btn">Offboarding</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1200px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.list-table a:hover { text-decoration:underline; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-initiated   { background:#fff3cd; color:#856404; }
+.s-in-progress { background:#d1ecf1; color:#0c5460; }
+.s-completed   { background:#d4edda; color:#0a3622; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>Termination Process</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search employee / reason…">
+        <button type="submit">Filter</button>
+        <a href="/pers/terminations/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Employee</th><th>Department</th><th>Term. Date</th>
+                    <th>Type</th><th>Reason</th><th>Rehire Eligible</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+            <tr>
+                <td><a href="/pers/terminations/{{ r.id }}/">{{ r.employee_name|default:"—" }}</a></td>
+                <td>{{ r.dept_name|default:"—" }}</td>
+                <td>{{ r.termination_date|default:"—" }}</td>
+                <td>{{ r.term_type|default:"—" }}</td>
+                <td>{{ r.reason|default:"—"|truncatechars:40 }}</td>
+                <td>{{ r.rehire_eligible|default:"—" }}</td>
+                <td><span class="badge s-{{ r.status|lower|cut:" " }}">{{ r.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;text-align:center;">No terminations recorded.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if user_role != 'Auditor' %}
+    <div class="card">
+        <h3>Initiate Termination</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Employee *</label>
+                    <select name="people_id" required>
+                        <option value="">— Select —</option>
+                        {% for e in employees %}
+                        <option value="{{ e.id }}">{{ e.first_name }} {{ e.last_name }} ({{ e.dept_name|default:"—" }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Termination Date</label>
+                    <input type="date" name="termination_date">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select name="term_type">
+                        {% for t in term_types %}
+                        <option value="{{ t }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rehire Eligible</label>
+                    <select name="rehire_eligible">
+                        {% for r in rehire_options %}
+                        <option value="{{ r }}">{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Reason</label>
+                    <input type="text" name="reason">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in statuses %}
+                        <option value="{{ s }}"{% if s == 'Initiated' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Initiate Termination</button>
+        </form>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">
+            Setting a termination date also marks the employee as terminated on their record.
+        </p>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
