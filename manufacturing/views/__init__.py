@@ -125,7 +125,11 @@ from ..sales_orders_core import (
 from ..atp_core import get_atp_qty_for_products, check_so_atp
 from ..capable_to_promise_core import check_so_capacity
 from ..work_orders_core import (
-    WO_STATUSES, WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
+    # Aliased: maintenance_core also exports WO_STATUSES (its own maintenance
+    # work-order statuses), and `from ._maintenance import *` below would
+    # otherwise silently shadow this with the wrong (maintenance) values.
+    WO_STATUSES as PROD_WO_STATUSES,
+    WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
     next_wo_number, load_products as load_wo_products,
     create_wo, update_wo, add_wo_material, set_wo_status,
@@ -1793,7 +1797,7 @@ def reports_dashboard(request):
         'cs': cs,
         'po_statuses': _status_pills(PO_STATUSES, PO_STATUS_COLORS,
                                      po['by_status'] if po else {}),
-        'wo_statuses': _status_pills(WO_STATUSES, WO_STATUS_COLORS,
+        'wo_statuses': _status_pills(PROD_WO_STATUSES, WO_STATUS_COLORS,
                                      wo['by_status'] if wo else {}),
     })
 
@@ -1820,7 +1824,7 @@ def _wo_context(request, **extra):
 def wo_list(request):
 
     status = request.GET.get('status') or None
-    if status not in WO_STATUSES:
+    if status not in PROD_WO_STATUSES:
         status = None
 
     conn = get_db_connection()
@@ -1843,7 +1847,7 @@ def wo_list(request):
         request,
         wos=wos,
         status=status,
-        statuses=[(s, s.replace('_', ' ').title()) for s in WO_STATUSES],
+        statuses=[(s, s.replace('_', ' ').title()) for s in PROD_WO_STATUSES],
         can_edit=request.session.get('user_role') not in READ_ONLY_ROLES,
         back_url=back_url,
     ))
@@ -1852,7 +1856,7 @@ def wo_list(request):
 @dept_required(_WO_DEPT_KEYS)
 def wo_export(request):
     status = request.GET.get('status') or None
-    if status not in WO_STATUSES:
+    if status not in PROD_WO_STATUSES:
         status = None
 
     conn = get_db_connection()
@@ -6533,7 +6537,7 @@ def prod_schedule(request):
     return render(request, 'prod_schedule.html', _prod_ctx(
         request, wos=wos,
         date_from=date_from, date_to=date_to, status_filter=status_f,
-        WO_STATUSES=WO_STATUSES,
+        WO_STATUSES=PROD_WO_STATUSES,
     ))
 
 
@@ -6682,7 +6686,7 @@ def prod_daily_report(request):
     with get_db_connection() as conn:
         data = get_daily_report(conn, report_date=report_date)
     return render(request, 'prod_daily_report.html', _prod_ctx(
-        request, WO_STATUSES=WO_STATUSES, **data,
+        request, WO_STATUSES=PROD_WO_STATUSES, **data,
     ))
 
 
