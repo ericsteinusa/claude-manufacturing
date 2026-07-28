@@ -727,6 +727,22 @@ def init_commission_tables(conn) -> None:
             created_date TEXT DEFAULT ''
         )
     """)
+    # Older deployments created this table via create_missing_tables.py's
+    # pre-plan_id schema (sales_amount/rate, no plan_id) — CREATE TABLE IF
+    # NOT EXISTS above is then a no-op, so self-heal it here.
+    conn.execute(
+        "ALTER TABLE sales_commission ADD COLUMN IF NOT EXISTS plan_id INTEGER")
+    conn.execute(
+        "ALTER TABLE sales_commission ADD COLUMN IF NOT EXISTS sale_amount REAL DEFAULT 0")
+    conn.execute(
+        "ALTER TABLE sales_commission ADD COLUMN IF NOT EXISTS created_date TEXT DEFAULT ''")
+    if conn.execute(
+        "SELECT 1 FROM information_schema.columns"
+        " WHERE table_name='sales_commission' AND column_name='sales_amount'"
+    ).fetchone():
+        conn.execute(
+            "UPDATE sales_commission SET sale_amount = sales_amount"
+            " WHERE sale_amount = 0 AND sales_amount IS NOT NULL")
 
 
 def list_commission_plans(conn, active_only=False) -> list:

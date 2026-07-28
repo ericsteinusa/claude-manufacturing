@@ -432,11 +432,13 @@ STATEMENTS = [
         id           SERIAL PRIMARY KEY,
         rep          TEXT    NOT NULL,
         period       TEXT    DEFAULT '',
-        sales_amount REAL    DEFAULT 0,
-        rate         TEXT    DEFAULT '',
+        plan_id      INTEGER,
+        sale_amount  REAL    DEFAULT 0,
         commission   REAL    DEFAULT 0,
         status       TEXT    DEFAULT 'Pending',
-        notes        TEXT    DEFAULT ''
+        notes        TEXT    DEFAULT '',
+        created_by   TEXT    DEFAULT '',
+        created_date TEXT    DEFAULT ''
     )""",
 
     # ------------------------------------------------------------ Time / HR
