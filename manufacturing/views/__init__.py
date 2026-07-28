@@ -213,7 +213,8 @@ from ..purchase_requisitions_core import (
 from ..finance_core import (
     get_finance_dashboard, get_revenue_expense_by_month,
     get_top_ar_customers, get_invoice_status_mix,
-    BUDGET_STATUSES, FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
+    BUDGET_STATUSES as FIN_BUDGET_STATUSES,
+    FIN_AUDIT_TYPES, FIN_AUDIT_STATUSES, FINDING_SEVERITIES,
     TAX_TYPES, TAX_FILING_STATUSES, BANK_STATEMENT_STATUSES,
     list_budgets, get_budget, get_budget_lines,
     create_budget, update_budget, create_budget_line, delete_budget_line,
@@ -7554,7 +7555,7 @@ def fin_budget_list(request):
 
     return render(request, 'finance_budget_list.html', _fin_ctx(
         request, budgets=budgets, status_filter=status_f, year_filter=year_f,
-        search=search, budget_statuses=BUDGET_STATUSES, error=error, success=success,
+        search=search, budget_statuses=FIN_BUDGET_STATUSES, error=error, success=success,
     ))
 
 
@@ -7611,7 +7612,7 @@ def fin_budget_detail(request, budget_id):
         conn.close()
     return render(request, 'finance_budget_detail.html', _fin_ctx(
         request, budget=budget, lines=lines, total_budgeted=total_budgeted,
-        can_edit=can_edit, budget_statuses=BUDGET_STATUSES,
+        can_edit=can_edit, budget_statuses=FIN_BUDGET_STATUSES,
         error=error, success=success,
     ))
 
