@@ -196,6 +196,19 @@ from ..purchasing_core import (
     init_purch_contract_table,
     get_purch_reports,
 )
+# Aliased: ats_core (job requisitions) also exports list_requisitions/
+# get_requisition/create_requisition, and `from ._ats import *` below would
+# otherwise silently shadow these with the wrong (ATS) functions.
+from ..purchase_requisitions_core import (
+    REQ_STATUSES,
+    is_manager as req_is_manager, can_authorize as req_can_authorize,
+    list_requisitions as list_purchase_reqs,
+    get_requisition as get_purchase_req,
+    list_requisition_items, list_requisition_approvals,
+    create_requisition as create_purchase_req,
+    add_requisition_item,
+    submit_requisition, decide_requisition,
+)
 from ..finance_core import (
     get_finance_dashboard, get_revenue_expense_by_month,
     get_top_ar_customers, get_invoice_status_mix,
@@ -716,10 +729,10 @@ WEB_LEAF_URLS = {
     ('purchasing', 'recv_items'):  '/po/',
     ('purchasing', 'disc_rpts'):   '/po/',
     ('purchasing', 'recv_hist'):   '/po/',
-    ('purchasing', 'req_hist'):    '/po/',
-    ('purchasing', 'new_req'):     '/po/new/',
-    ('purchasing', 'pend_appr'):   '/po/approvals/',
-    ('purchasing', 'appr_reqs'):   '/po/',
+    ('purchasing', 'req_hist'):    '/purch/requisitions/',
+    ('purchasing', 'new_req'):     '/purch/requisitions/',
+    ('purchasing', 'pend_appr'):   '/purch/requisitions/?status=submitted',
+    ('purchasing', 'appr_reqs'):   '/purch/requisitions/?status=dept_approved',
     ('purchasing', 'appr_pos'):    '/po/',
     ('purchasing', 'rej_pos'):     '/po/',
     ('purchasing', 'appr_hist'):   '/po/',
@@ -6952,6 +6965,144 @@ def purch_reports_view(request):
         conn.close()
     ctx = _purch_ctx(request, **data)
     return render(request, 'purch_reports.html', ctx)
+
+
+# ---------------------------------------------------------------------------
+# Purchase Requisitions — open to every department (any employee can
+# request goods/services), so gated by login_required only, not
+# dept_required('purchasing'). Visibility within the list/detail views is
+# still scoped by role, mirroring the Mobile API (api_views.py's api_req*).
+# ---------------------------------------------------------------------------
+
+def _req_actor(request, conn):
+    """Resolve the caller's people_id/dept_id/role/full_access/is_manager
+    for requisition visibility + authorization checks.
+
+    is_manager here means "may authorize requisitions" — role in
+    AUTHORIZER_ROLES (Dept Manager/Supervisor/President/VP), matching the
+    Mobile API's api_auth._MANAGERS and purchase_requisitions_core.is_manager.
+    That's a different, broader concept than the web session's
+    user_is_manager flag (dept_sub_id-based menu visibility), so it's
+    deliberately not reused here.
+    """
+    role = request.session.get('user_role', '')
+    person = get_person_by_email(conn, request.session.get('user_email', ''))
+    people_id = person['id'] if person else None
+    full = person and get_person(conn, people_id)
+    return {
+        'people_id': people_id,
+        'dept_id': full['dept_id'] if full else None,
+        'role': role,
+        'full_access': request.session.get('user_full_access', False),
+        'is_manager': req_is_manager(role),
+    }
+
+
+@login_required
+def req_list(request):
+    status_f = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+    error = None
+    conn = get_db_connection()
+    try:
+        actor = _req_actor(request, conn)
+        if not actor['people_id']:
+            return redirect('dashboard')
+        rows = list_purchase_reqs(
+            conn, full_access=actor['full_access'],
+            is_manager_role=actor['is_manager'], dept_id=actor['dept_id'],
+            requester_id=actor['people_id'], status=status_f or None,
+            search=search or None,
+        )
+        if request.method == 'POST' and request.session.get('user_role') not in READ_ONLY_ROLES:
+            try:
+                req_id = create_purchase_req(
+                    conn,
+                    requester_id=actor['people_id'], dept_id=actor['dept_id'],
+                    dept_sub_id=None,
+                    needed_date=request.POST.get('needed_date', ''),
+                    justification=request.POST.get('justification', ''),
+                    notes=request.POST.get('notes', ''),
+                    created_by=request.session.get('user_email', ''),
+                )
+                conn.commit()
+                return redirect('req_detail', req_id=req_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+                rows = list_purchase_reqs(
+                    conn, full_access=actor['full_access'],
+                    is_manager_role=actor['is_manager'], dept_id=actor['dept_id'],
+                    requester_id=actor['people_id'], status=status_f or None,
+                    search=search or None,
+                )
+    finally:
+        conn.close()
+    return render(request, 'req_list.html', _purch_ctx(
+        request, rows=rows, status_filter=status_f, search=search,
+        statuses=REQ_STATUSES, error=error,
+    ))
+
+
+@login_required
+def req_detail(request, req_id):
+    conn = get_db_connection()
+    error = None
+    req = None
+    try:
+        actor = _req_actor(request, conn)
+        req = get_purchase_req(conn, req_id)
+        if not req:
+            return redirect('req_list')
+        is_own = req['requester_id'] == actor['people_id']
+        can_view = actor['full_access'] or is_own or (
+            actor['is_manager'] and req['dept_id'] == actor['dept_id'])
+        if not can_view:
+            return redirect('req_list')
+
+        can_edit = is_own and req['status'] == 'draft' \
+            and request.session.get('user_role') not in READ_ONLY_ROLES
+        can_decide = req_can_authorize(
+            actor['role'], req['status'], req['dept_id'], actor['dept_id'], is_own)
+
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            try:
+                if action == 'add_item' and can_edit:
+                    add_requisition_item(
+                        conn, req_id,
+                        description=request.POST.get('description', ''),
+                        qty=int(request.POST.get('qty', 1) or 1),
+                        est_unit_price=float(request.POST.get('est_unit_price', 0) or 0),
+                    )
+                    conn.commit()
+                    return redirect('req_detail', req_id=req_id)
+                elif action == 'submit' and can_edit:
+                    submit_requisition(conn, req_id)
+                    conn.commit()
+                    return redirect('req_detail', req_id=req_id)
+                elif action == 'decide' and can_decide:
+                    decision = request.POST.get('decision')
+                    if decision in ('approve', 'deny'):
+                        decide_requisition(
+                            conn, req_id, decision, actor['people_id'],
+                            request.POST.get('comment', ''),
+                        )
+                        conn.commit()
+                        return redirect('req_detail', req_id=req_id)
+            except Exception as e:
+                conn.rollback()
+                error = str(e)
+
+        req = get_purchase_req(conn, req_id)
+        items = list_requisition_items(conn, req_id)
+        approvals = list_requisition_approvals(conn, req_id)
+    finally:
+        conn.close()
+    return render(request, 'req_detail.html', _purch_ctx(
+        request, req=req, items=items, approvals=approvals,
+        can_edit=can_edit, can_decide=can_decide, error=error,
+    ))
 
 
 # ---------------------------------------------------------------------------
