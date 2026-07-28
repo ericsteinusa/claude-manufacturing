@@ -447,7 +447,7 @@ def init_return_table(conn) -> None:
 # Knowledge Base
 # ---------------------------------------------------------------------------
 
-KB_STATUSES = ('Draft', 'Published', 'Archived')
+KB_STATUSES = ('Draft', 'In Review', 'Published', 'Archived')
 KB_CATEGORIES = (
     'Product', 'Shipping', 'Returns', 'Account', 'Billing',
     'Technical', 'Policy', 'FAQ', 'Other',
