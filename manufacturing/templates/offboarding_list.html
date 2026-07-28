@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block page_title %}Offboarding{% endblock %}
+
+{% block toolbar_left %}
+<a href="/pers/" class="btn">Personnel</a>
+<a href="/pers/terminations/" class="btn">Terminations</a>
+<a href="/pers/exit-interviews/" class="btn">Exit Interviews</a>
+<a href="/pers/offboarding/" class="btn">Offboarding</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1200px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select, .filter-bar input[type=text] {
+    padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.filter-bar button:hover { background:var(--accent); color:white; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-pending     { background:#fff3cd; color:#856404; }
+.s-in-progress { background:#d1ecf1; color:#0c5460; }
+.s-completed   { background:#d4edda; color:#0a3622; }
+.btn-mini { padding:4px 10px; background:var(--accent); color:white; border:none;
+    border-radius:5px; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-mini:hover { background:var(--accent-hover); }
+.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.hint { font-size:12px; color:var(--text-muted); margin:0 0 10px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>Offboarding Checklist</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search employee / task…">
+        <button type="submit">Filter</button>
+        <a href="/pers/offboarding/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Employee</th><th>Task</th><th>Due Date</th>
+                    <th>Assigned To</th><th>Status</th><th>Completed</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+            <tr>
+                <td>{{ r.employee_name|default:"—" }}</td>
+                <td>{{ r.task }}</td>
+                <td>{{ r.due_date|default:"—" }}</td>
+                <td>{{ r.assigned_to|default:"—" }}</td>
+                <td><span class="badge s-{{ r.status|lower|cut:" " }}">{{ r.status }}</span></td>
+                <td>{{ r.completed_date|default:"—" }}</td>
+                <td>
+                    {% if r.status != 'Completed' and user_role != 'Auditor' %}
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="complete">
+                        <input type="hidden" name="task_id" value="{{ r.id }}">
+                        <input type="hidden" name="completed_date" value="{% now 'Y-m-d' %}">
+                        <button type="submit" class="btn-mini">Mark Complete</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="color:#888;text-align:center;">No offboarding tasks found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if user_role != 'Auditor' %}
+    <div class="card">
+        <h3>Add Offboarding Task</h3>
+        <p class="hint">Common tasks: {{ default_tasks|join:", " }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Employee *</label>
+                    <select name="people_id" required>
+                        <option value="">— Select —</option>
+                        {% for e in employees %}
+                        <option value="{{ e.id }}">{{ e.first_name }} {{ e.last_name }} ({{ e.dept_name|default:"—" }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Task *</label>
+                    <input type="text" name="task" required placeholder="e.g. Return company laptop">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date">
+                </div>
+                <div class="form-group">
+                    <label>Assigned To</label>
+                    <input type="text" name="assigned_to">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in statuses %}
+                        <option value="{{ s }}"{% if s == 'Pending' %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Add Task</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
