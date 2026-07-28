@@ -382,6 +382,26 @@ CREATE TABLE IF NOT EXISTS marketing_research (
 
 def _ensure_research_table(conn) -> None:
     conn.execute(_CREATE_RESEARCH_TABLE)
+    # Older deployments created this table via create_missing_tables.py's
+    # pre-redesign schema (methodology/completed_date, no description/
+    # end_date/budget/notes) — CREATE TABLE IF NOT EXISTS above is then a
+    # no-op, so self-heal it here.
+    conn.execute(
+        "ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''")
+    conn.execute(
+        "ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS end_date DATE")
+    conn.execute(
+        "ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS budget REAL DEFAULT 0")
+    conn.execute(
+        "ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS notes TEXT DEFAULT ''")
+    if conn.execute(
+        "SELECT 1 FROM information_schema.columns"
+        " WHERE table_name='marketing_research' AND column_name='completed_date'"
+    ).fetchone():
+        conn.execute(
+            "UPDATE marketing_research SET end_date = completed_date::date"
+            " WHERE end_date IS NULL AND completed_date IS NOT NULL"
+            " AND completed_date != ''")
     conn.commit()
 
 
