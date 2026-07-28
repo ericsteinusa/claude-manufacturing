@@ -277,13 +277,14 @@ def test_post_cycle_count_posts_variance_line_with_signed_delta():
         [{'id': 3, 'count_number': 'CC-2026-0001'}],  # get_cycle_count
         [{'id': 2, 'product_id': 20, 'system_qty': 5.0, 'counted_qty': 8.0,
           'variance_qty': 3.0, 'posted': False, 'product_name': 'B', 'bin': '', 'uom': 'ea'}],
+        [],                                        # record_transaction ALTER (self-heal)
         [],                                        # record_transaction insert
         [{'amount': 8.0, 'reorder_point': 0, 'name': 'Widget'}],  # record_transaction update returning
         [],                                        # update line posted
         [],                                        # update cycle_count status=posted
     ])
     post_cycle_count(conn, 3, 'eric')
-    update_product_call = conn.calls[3]
+    update_product_call = conn.calls[4]
     assert update_product_call[1] == [3.0, 20]  # delta, product_id
 
 

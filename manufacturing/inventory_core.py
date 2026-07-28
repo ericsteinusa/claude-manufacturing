@@ -178,6 +178,12 @@ def record_transaction(conn, product_id: int, trans_type: str,
     else:
         delta = sign * abs(quantity)
 
+    # inventory_transaction predates created_by on some deployments (whichever
+    # CREATE TABLE ran first won, and schema.py's version is a no-op against
+    # an already-existing table) — self-heal since this function doesn't
+    # commit its own transaction for callers to run an ensure-step against.
+    conn.execute(
+        "ALTER TABLE inventory_transaction ADD COLUMN IF NOT EXISTS created_by TEXT")
     conn.execute(
         "INSERT INTO inventory_transaction "
         "(product_id, trans_date, trans_type, quantity, reference, notes, created_by) "

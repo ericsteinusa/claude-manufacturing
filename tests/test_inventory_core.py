@@ -224,7 +224,7 @@ def test_record_transaction_receive_adds_to_stock():
     new_qty = record_transaction(conn, 1, 'receive', 10.0, '', '', 'u@e.com')
     assert new_qty == 60.0
     # Check UPDATE delta is positive
-    update_call = conn.execute.call_args_list[1]
+    update_call = conn.execute.call_args_list[2]
     params = update_call[0][1]
     assert params[0] == pytest.approx(10.0)  # delta = +10
 
@@ -232,28 +232,28 @@ def test_record_transaction_receive_adds_to_stock():
 def test_record_transaction_issue_subtracts():
     conn = _record_conn(new_amount=40.0)
     record_transaction(conn, 1, 'issue', 10.0, '', '', 'u@e.com')
-    update_params = conn.execute.call_args_list[1][0][1]
+    update_params = conn.execute.call_args_list[2][0][1]
     assert update_params[0] == pytest.approx(-10.0)  # delta = -10
 
 
 def test_record_transaction_return_adds():
     conn = _record_conn(new_amount=60.0)
     record_transaction(conn, 1, 'return', 10.0, '', '', 'u@e.com')
-    update_params = conn.execute.call_args_list[1][0][1]
+    update_params = conn.execute.call_args_list[2][0][1]
     assert update_params[0] == pytest.approx(10.0)
 
 
 def test_record_transaction_adjust_positive():
     conn = _record_conn(new_amount=55.0)
     record_transaction(conn, 1, 'adjust', 5.0, '', '', 'u@e.com')
-    update_params = conn.execute.call_args_list[1][0][1]
+    update_params = conn.execute.call_args_list[2][0][1]
     assert update_params[0] == pytest.approx(5.0)
 
 
 def test_record_transaction_adjust_negative():
     conn = _record_conn(new_amount=45.0)
     record_transaction(conn, 1, 'adjust', -5.0, '', '', 'u@e.com')
-    update_params = conn.execute.call_args_list[1][0][1]
+    update_params = conn.execute.call_args_list[2][0][1]
     assert update_params[0] == pytest.approx(-5.0)
 
 
@@ -261,7 +261,7 @@ def test_record_transaction_issue_with_negative_input_still_subtracts():
     """Issue: user accidentally enters -10 → still treated as deduction."""
     conn = _record_conn(new_amount=40.0)
     record_transaction(conn, 1, 'issue', -10.0, '', '', 'u@e.com')
-    update_params = conn.execute.call_args_list[1][0][1]
+    update_params = conn.execute.call_args_list[2][0][1]
     assert update_params[0] == pytest.approx(-10.0)  # abs then negate
 
 
@@ -274,7 +274,7 @@ def test_record_transaction_invalid_type_raises():
 def test_record_transaction_inserts_row():
     conn = _record_conn()
     record_transaction(conn, 1, 'receive', 5.0, 'PO-1', 'note', 'u@e.com')
-    insert_sql = conn.execute.call_args_list[0][0][0]
+    insert_sql = conn.execute.call_args_list[1][0][0]
     assert 'INSERT INTO inventory_transaction' in insert_sql
 
 
