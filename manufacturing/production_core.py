@@ -174,7 +174,7 @@ def get_prod_reports(conn) -> dict:
 # Shipping
 # ---------------------------------------------------------------------------
 
-SHIPMENT_STATUSES = ('pending', 'in_transit', 'delivered', 'cancelled')
+SHIPMENT_STATUSES = ('pending', 'shipped', 'delivered', 'returned')
 
 
 def _today_str() -> str:
@@ -321,11 +321,11 @@ def get_tracking_dashboard(conn) -> dict:
 
     counts = conn.execute("""
         SELECT
-            COUNT(*) FILTER (WHERE status = 'pending')    AS pending,
-            COUNT(*) FILTER (WHERE status = 'in_transit') AS in_transit,
-            COUNT(*) FILTER (WHERE status = 'delivered')  AS delivered,
-            COUNT(*) FILTER (WHERE status = 'cancelled')  AS cancelled,
-            COUNT(*)                                       AS total
+            COUNT(*) FILTER (WHERE status = 'pending')  AS pending,
+            COUNT(*) FILTER (WHERE status = 'shipped')  AS shipped,
+            COUNT(*) FILTER (WHERE status = 'delivered') AS delivered,
+            COUNT(*) FILTER (WHERE status = 'returned') AS returned,
+            COUNT(*)                                     AS total
         FROM shipment
     """).fetchone()
 

@@ -28,10 +28,10 @@
 .list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
 .list-table a:hover { text-decoration:underline; }
 .badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
-.s-pending    { background:#cce5ff; color:#004085; }
-.s-in_transit { background:#fff3cd; color:#856404; }
-.s-delivered  { background:#d4edda; color:#0a3622; }
-.s-cancelled  { background:#e2e3e5; color:#383d41; }
+.s-pending   { background:#cce5ff; color:#004085; }
+.s-shipped   { background:#fff3cd; color:#856404; }
+.s-delivered { background:#d4edda; color:#0a3622; }
+.s-returned  { background:#e2e3e5; color:#383d41; }
 {% endblock %}
 
 {% block body %}
@@ -49,16 +49,16 @@
             <div class="lbl">Pending</div>
         </div>
         <div class="kpi">
-            <div class="val" style="color:#856404;">{{ counts.in_transit|default:0 }}</div>
-            <div class="lbl">In Transit</div>
+            <div class="val" style="color:#856404;">{{ counts.shipped|default:0 }}</div>
+            <div class="lbl">Shipped</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#0a3622;">{{ counts.delivered|default:0 }}</div>
             <div class="lbl">Delivered</div>
         </div>
         <div class="kpi">
-            <div class="val" style="color:#383d41;">{{ counts.cancelled|default:0 }}</div>
-            <div class="lbl">Cancelled</div>
+            <div class="val" style="color:#383d41;">{{ counts.returned|default:0 }}</div>
+            <div class="lbl">Returned</div>
         </div>
     </div>
 
