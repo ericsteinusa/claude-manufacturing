@@ -60,7 +60,8 @@ from ..cs_calls_core import (
     load_customers_for_cs,
     list_tickets, get_ticket, create_ticket, update_ticket, close_ticket,
     get_escalations, get_summary_stats, get_monthly_volume,
-    list_plans, create_plan, update_plan,
+    list_plans as cs_list_plans, create_plan as cs_create_plan,
+    update_plan as cs_update_plan,
     RETURN_STATUSES, RETURN_REASONS,
     list_returns, get_return, create_return, update_return,
     KB_STATUSES, KB_CATEGORIES,
@@ -4517,12 +4518,12 @@ def cs_plans(request):
     success = None
     plans = []
     try:
-        plans = list_plans(conn, status=status_filter or None)
+        plans = cs_list_plans(conn, status=status_filter or None)
         if request.method == 'POST' and can_edit:
             action = request.POST.get('action', '')
             try:
                 if action == 'create':
-                    create_plan(
+                    cs_create_plan(
                         conn,
                         title=request.POST.get('title', ''),
                         description=request.POST.get('description', ''),
@@ -4534,7 +4535,7 @@ def cs_plans(request):
                     success = 'Plan created.'
                 elif action == 'update':
                     pid = int(request.POST.get('plan_id', 0))
-                    update_plan(
+                    cs_update_plan(
                         conn, pid,
                         title=request.POST.get('title', ''),
                         description=request.POST.get('description', ''),
@@ -4544,7 +4545,7 @@ def cs_plans(request):
                     )
                     conn.commit()
                     success = 'Plan updated.'
-                plans = list_plans(conn, status=status_filter or None)
+                plans = cs_list_plans(conn, status=status_filter or None)
             except Exception as e:
                 conn.rollback()
                 error = str(e)
