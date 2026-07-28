@@ -859,8 +859,10 @@ def get_sales_performance(conn) -> dict:
 
     # sales_order has no sales_rep column (never wired to a real column —
     # see CLAUDE.md's live-schema-vs-DDL gotcha); created_by is the closest
-    # real substitute, though nothing currently populates it on order
-    # creation either, so this list is empty until that's addressed.
+    # real substitute. so_new/sales_orders_list already stamp it with the
+    # logged-in user's email on creation, so this fills in for orders made
+    # through the web UI — it's just blank for older/seeded rows that
+    # predate that (or were inserted directly, bypassing those views).
     so_rep_rows = conn.execute("""
         SELECT
             so.created_by AS sales_rep,

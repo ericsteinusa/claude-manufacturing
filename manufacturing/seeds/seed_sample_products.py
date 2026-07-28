@@ -86,14 +86,18 @@ BOMS = {
     ],
 }
 
-# Sample demand. so_number_suffix, status, [(product_name, qty, unit_price)].
+# Sample demand. so_number_suffix, status, [(product_name, qty, unit_price)],
+# created_by (a rep name, matching the sample style used by the Sales
+# department's targets/forecasts in seed_sample_sales.py, so the Sales
+# Performance page's "Rep Rankings — Revenue from Orders" table has
+# something to show on a fresh dev DB rather than sitting empty).
 # MRP counts only 'confirmed' orders as demand; the 'draft' one is seeded to
 # demonstrate that it is correctly excluded from the plan.
 SALES_ORDERS = [
-    ("1", "confirmed", [("Mountain Bike", 10, 450.00)]),
+    ("1", "confirmed", [("Mountain Bike", 10, 450.00)], "Karen Walsh"),
     ("2", "confirmed", [("Road Bike", 4, 520.00),
-                        ("Mountain Bike", 2, 450.00)]),
-    ("3", "draft",     [("Road Bike", 5, 520.00)]),
+                        ("Mountain Bike", 2, 450.00)], "Tom Deluca"),
+    ("3", "draft",     [("Road Bike", 5, 520.00)], "Jenna Park"),
 ]
 
 
@@ -144,9 +148,12 @@ def ensure_tables(conn):
             order_date TEXT,
             ship_date TEXT,
             status TEXT DEFAULT 'draft',
-            notes TEXT
+            notes TEXT,
+            created_by TEXT
         )
     """)
+    conn.execute(
+        "ALTER TABLE sales_order ADD COLUMN IF NOT EXISTS created_by TEXT")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS so_item (
             id SERIAL PRIMARY KEY,
@@ -248,7 +255,7 @@ def seed_sales_orders(conn):
     today = date.today().isoformat()
     ship = (date.today() + timedelta(days=21)).isoformat()
     orders = lines = 0
-    for suffix, status, items in SALES_ORDERS:
+    for suffix, status, items, created_by in SALES_ORDERS:
         so_number = SAMPLE_SO_PREFIX + suffix
         existing = conn.execute(
             "SELECT id FROM sales_order WHERE so_number = %s",
@@ -257,8 +264,9 @@ def seed_sales_orders(conn):
             continue
         cur = conn.execute(
             "INSERT INTO sales_order (so_number, order_date, ship_date, "
-            "status, notes) VALUES (%s,%s,%s,%s,'sample') RETURNING id",
-            (so_number, today, ship, status))
+            "status, notes, created_by) VALUES (%s,%s,%s,%s,'sample',%s) "
+            "RETURNING id",
+            (so_number, today, ship, status, created_by))
         so_id = cur.fetchone()["id"]
         orders += 1
         for prod_name, qty, price in items:
