@@ -186,12 +186,15 @@ STATEMENTS = [
         id             SERIAL PRIMARY KEY,
         title          TEXT    NOT NULL,
         research_type  TEXT    DEFAULT '',
+        description    TEXT    DEFAULT '',
         owner          TEXT    DEFAULT '',
-        methodology    TEXT    DEFAULT '',
-        start_date     TEXT    DEFAULT '',
-        completed_date TEXT    DEFAULT '',
-        status         TEXT    DEFAULT 'Proposed',
-        findings       TEXT    DEFAULT ''
+        start_date     DATE,
+        end_date       DATE,
+        status         TEXT    DEFAULT 'Planned',
+        findings       TEXT    DEFAULT '',
+        budget         REAL    DEFAULT 0,
+        notes          TEXT    DEFAULT '',
+        created_by     TEXT    DEFAULT ''
     )""",
     """CREATE TABLE IF NOT EXISTS marketing_content (
         id           SERIAL PRIMARY KEY,

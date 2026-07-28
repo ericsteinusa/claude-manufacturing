@@ -97,7 +97,14 @@ def _ensure_tables(conn):
             notes TEXT DEFAULT ''
         )
     """)
+    # Older deployments created this table via create_missing_tables.py's
+    # pre-redesign schema (methodology/completed_date, no description/
+    # end_date/budget/notes) — self-heal it.
     conn.execute("ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
+    conn.execute("ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''")
+    conn.execute("ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS end_date DATE")
+    conn.execute("ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS budget REAL DEFAULT 0")
+    conn.execute("ALTER TABLE marketing_research ADD COLUMN IF NOT EXISTS notes TEXT DEFAULT ''")
     conn.commit()
 
 
@@ -303,8 +310,9 @@ def _seed_research(conn):
         comp = _d(comp_off) if comp_off is not None else None
         conn.execute(
             "INSERT INTO marketing_research"
-            " (title, research_type, methodology, owner, start_date, completed_date, status, findings, created_by)"
-            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'','{TAG}')",
+            " (title, research_type, description, owner, start_date, end_date,"
+            "  status, findings, budget, notes, created_by)"
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,'',0,'Sample data','{TAG}')",
             (title, rtype, methodology, owner, _d(start_ago), comp, status),
         )
     conn.commit()
