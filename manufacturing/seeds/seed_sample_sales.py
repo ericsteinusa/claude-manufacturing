@@ -138,6 +138,14 @@ def _ensure_tables(conn):
             created_date TEXT DEFAULT ''
         )
     """)
+    # Older deployments created this table via create_missing_tables.py's
+    # pre-plan_id schema (sales_amount/rate, no plan_id) — self-heal it.
+    conn.execute(
+        "ALTER TABLE sales_commission ADD COLUMN IF NOT EXISTS plan_id INTEGER")
+    conn.execute(
+        "ALTER TABLE sales_commission ADD COLUMN IF NOT EXISTS sale_amount REAL DEFAULT 0")
+    conn.execute(
+        "ALTER TABLE sales_commission ADD COLUMN IF NOT EXISTS created_date TEXT DEFAULT ''")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS sales_coaching_note (
             id SERIAL PRIMARY KEY,
@@ -446,19 +454,22 @@ COMMISSIONS = [
 
 
 def _seed_commissions(conn):
+    plan_ids = {}
     plan_rates = {}
     for name, plan_type, rate, desc in PLANS:
         existing = conn.execute(
-            "SELECT rate FROM sales_commission_plan WHERE name=%s", (name,)
+            "SELECT id, rate FROM sales_commission_plan WHERE name=%s", (name,)
         ).fetchone()
         if existing:
+            plan_ids[name] = existing["id"]
             plan_rates[name] = existing["rate"]
             continue
-        conn.execute(
+        row = conn.execute(
             "INSERT INTO sales_commission_plan (name, plan_type, rate, description, active, created_by, created_date)"
-            f" VALUES (%s,%s,%s,%s,TRUE,'{TAG}',%s)",
+            f" VALUES (%s,%s,%s,%s,TRUE,'{TAG}',%s) RETURNING id",
             (name, plan_type, rate, desc, TODAY.isoformat()),
-        )
+        ).fetchone()
+        plan_ids[name] = row["id"]
         plan_rates[name] = rate
     conn.commit()
 
@@ -468,13 +479,14 @@ def _seed_commissions(conn):
             (rep, period)
         ).fetchone():
             continue
+        plan_id = plan_ids.get(plan_name)
         rate = plan_rates.get(plan_name, 0.05)
         commission = round(sale_amount * rate, 2)
         conn.execute(
             "INSERT INTO sales_commission"
-            " (rep, period, sales_amount, rate, commission, status, notes, created_by)"
+            " (rep, period, plan_id, sale_amount, commission, status, notes, created_by)"
             f" VALUES (%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
-            (rep, period, sale_amount, rate, commission, status),
+            (rep, period, plan_id, sale_amount, commission, status),
         )
     conn.commit()
 
