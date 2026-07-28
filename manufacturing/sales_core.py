@@ -80,6 +80,64 @@ def get_revenue_by_month(conn, months: int = 6) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def get_sales_reports(conn, start: str, end: str) -> dict:
+    """Aggregate KPIs, a daily revenue trend, and top customers/products for
+    the [start, end] date range — backs the Daily/Monthly/Annual sales
+    report leaves, which all just view this same data at a different
+    default range."""
+    totals = conn.execute("""
+        SELECT
+            COUNT(DISTINCT so.id) AS order_count,
+            COALESCE(SUM(si.qty * si.unit_price), 0) AS total_revenue
+        FROM sales_order so
+        LEFT JOIN so_item si ON si.so_id = so.id
+        WHERE so.order_date >= %s AND so.order_date <= %s
+    """, (start, end)).fetchone()
+    totals = dict(totals) if totals else {'order_count': 0, 'total_revenue': 0}
+    totals['avg_order_value'] = (
+        totals['total_revenue'] / totals['order_count'] if totals['order_count'] else 0
+    )
+
+    trend = conn.execute("""
+        SELECT so.order_date::date AS day,
+               COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
+        FROM sales_order so
+        LEFT JOIN so_item si ON si.so_id = so.id
+        WHERE so.order_date >= %s AND so.order_date <= %s
+        GROUP BY so.order_date::date
+        ORDER BY so.order_date::date
+    """, (start, end)).fetchall()
+
+    top_customers = conn.execute("""
+        SELECT c.company_name AS customer,
+               COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
+        FROM sales_order so
+        JOIN customer c ON c.id = so.customer_id
+        JOIN so_item si ON si.so_id = so.id
+        WHERE so.order_date >= %s AND so.order_date <= %s
+        GROUP BY c.company_name
+        ORDER BY revenue DESC LIMIT 8
+    """, (start, end)).fetchall()
+
+    top_products = conn.execute("""
+        SELECT COALESCE(p.name, si.description, 'Unknown') AS product,
+               COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
+        FROM so_item si
+        LEFT JOIN product p ON p.id = si.product_id
+        JOIN sales_order so ON so.id = si.so_id
+        WHERE so.order_date >= %s AND so.order_date <= %s
+        GROUP BY COALESCE(p.name, si.description, 'Unknown')
+        ORDER BY revenue DESC LIMIT 8
+    """, (start, end)).fetchall()
+
+    return {
+        'totals': totals,
+        'trend': [dict(r) for r in trend],
+        'top_customers': [dict(r) for r in top_customers],
+        'top_products': [dict(r) for r in top_products],
+    }
+
+
 # ---------------------------------------------------------------------------
 # Quotes
 # ---------------------------------------------------------------------------
@@ -799,15 +857,19 @@ def get_sales_performance(conn) -> dict:
         ORDER BY attainment_pct DESC
     """).fetchall()
 
+    # sales_order has no sales_rep column (never wired to a real column —
+    # see CLAUDE.md's live-schema-vs-DDL gotcha); created_by is the closest
+    # real substitute, though nothing currently populates it on order
+    # creation either, so this list is empty until that's addressed.
     so_rep_rows = conn.execute("""
         SELECT
-            so.sales_rep,
+            so.created_by AS sales_rep,
             COUNT(so.id) AS order_count,
             COALESCE(SUM(si.qty * si.unit_price), 0) AS revenue
         FROM sales_order so
         LEFT JOIN so_item si ON si.so_id = so.id
-        WHERE so.sales_rep IS NOT NULL AND so.sales_rep != ''
-        GROUP BY so.sales_rep
+        WHERE so.created_by IS NOT NULL AND so.created_by != ''
+        GROUP BY so.created_by
         ORDER BY revenue DESC
     """).fetchall()
 

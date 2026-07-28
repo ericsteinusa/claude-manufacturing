@@ -306,10 +306,10 @@ WEB_LEAF_URLS = {
     ('sales', 'quote_hist'): '/sales/quotes/',
     ('sales', 'conv_order'): '/sales/quotes/',
     # Sales reports
-    ('sales', 'daily_sales'): '/sales/',
-    ('sales', 'month_sales'): '/sales/',
-    ('sales', 'annual_rpt'):  '/sales/',
-    ('sales', 'by_rep'):      '/sales/',
+    ('sales', 'daily_sales'): '/sales/reports/?period=day',
+    ('sales', 'month_sales'): '/sales/reports/?period=month',
+    ('sales', 'annual_rpt'):  '/sales/reports/?period=year',
+    ('sales', 'by_rep'):      '/sales/performance/',
     # Leads & Opportunities
     ('sales', 'new_lead'):  '/sales/leads/',
     ('sales', 'act_leads'): '/sales/leads/',
@@ -5767,7 +5767,7 @@ from ..sales_core import (  # noqa: E402
     load_customers, load_products,  # noqa: F811
     create_so, update_so, add_so_item, delete_so_item, set_so_status,  # noqa: F811
     QUOTE_STATUSES, TARGET_STATUSES,
-    get_sales_dashboard, get_revenue_by_month,
+    get_sales_dashboard, get_revenue_by_month, get_sales_reports,
     list_quotes, create_quote, update_quote, set_quote_status,
     list_targets, create_target, update_target,
     SALES_LEAD_STATUSES, SALES_LEAD_SOURCES, SALES_LEAD_PRIORITIES,
@@ -5866,6 +5866,49 @@ def sales_dashboard(request):
         order_status_json=json.dumps([dict(r) for r in order_status]),
     )
     return render(request, 'sales_dashboard.html', ctx)
+
+
+@dept_required(_SALES_DEPT_KEYS)
+def sales_reports_view(request):
+    period = request.GET.get('period', 'month')
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    today = date.today()
+
+    if date_from and date_to:
+        try:
+            start = date.fromisoformat(date_from)
+            end = date.fromisoformat(date_to)
+            if end < start:
+                start, end = end, start
+        except ValueError:
+            start, end = today.replace(day=1), today
+        period = 'custom'
+    elif period == 'day':
+        start = end = today
+    elif period == 'quarter':
+        q_start_month = ((today.month - 1) // 3) * 3 + 1
+        start = today.replace(month=q_start_month, day=1)
+        end = today
+    elif period == 'year':
+        start = today.replace(month=1, day=1)
+        end = today
+    else:
+        period = 'month'
+        start = today.replace(day=1)
+        end = today
+
+    with get_db_connection() as conn:
+        data = get_sales_reports(conn, start.isoformat(), end.isoformat())
+
+    return render(request, 'sales_reports.html', _sales_ctx(
+        request, **data, period=period,
+        start=start.isoformat(), end=end.isoformat(),
+        date_from=date_from, date_to=date_to,
+        trend_json=json.dumps(data['trend'], default=str),
+        top_customers_json=json.dumps(data['top_customers']),
+        top_products_json=json.dumps(data['top_products']),
+    ))
 
 
 @dept_required(_SALES_DEPT_KEYS)

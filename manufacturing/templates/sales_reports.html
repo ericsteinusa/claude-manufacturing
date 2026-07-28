@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block page_title %}Sales Reports{% endblock %}
+
+{% block toolbar_left %}
+<a href="/sales/" class="btn">Dashboard</a>
+<a href="/sales/orders/" class="btn">Orders</a>
+<a href="/sales/reports/" class="btn">Reports</a>
+<a href="/sales/performance/" class="btn">Performance</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+.chip { display:inline-block; padding:4px 15px; border-radius:20px; font-size:13px;
+    font-weight:bold; text-decoration:none; background:white; color:#555; border:1.5px solid var(--border); }
+.chip.active { background:var(--accent); color:white; border-color:var(--accent); }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+.kpi { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:20px; text-align:center; }
+.kpi .num { font-size:32px; font-weight:bold; color:var(--accent); }
+.kpi .lbl { font-size:12px; color:var(--text-muted); margin-top:6px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #eee; font-size:13px; }
+.list-table th { background:var(--accent); color:white; font-size:12px; }
+.list-table tr:last-child td { border-bottom:none; }
+.date-form { display:flex; gap:8px; align-items:center; }
+.date-form input[type=date] { padding:4px 8px; border:1.5px solid var(--border);
+    border-radius:6px; font-size:13px; }
+.date-form button { padding:4px 14px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Sales Reports</h2>
+
+    <div class="chip-row">
+        <a href="/sales/reports/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">Today</a>
+        <a href="/sales/reports/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">This Month</a>
+        <a href="/sales/reports/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">This Quarter</a>
+        <a href="/sales/reports/?period=year"     class="chip {% if period == 'year' %}active{% endif %}">This Year</a>
+        <form method="get" action="/sales/reports/" class="date-form" style="margin-left:8px;">
+            <input type="hidden" name="period" value="custom">
+            <input type="date" name="date_from" value="{{ date_from }}" required>
+            <span style="font-size:13px;color:#888;">to</span>
+            <input type="date" name="date_to" value="{{ date_to }}" required>
+            <button type="submit">Go</button>
+        </form>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 20px;">{{ start }} → {{ end }}</p>
+
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="num">${{ totals.total_revenue|floatformat:0 }}</div>
+            <div class="lbl">Total Revenue</div>
+        </div>
+        <div class="kpi">
+            <div class="num">{{ totals.order_count }}</div>
+            <div class="lbl">Orders</div>
+        </div>
+        <div class="kpi">
+            <div class="num">${{ totals.avg_order_value|floatformat:0 }}</div>
+            <div class="lbl">Avg. Order Value</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+        <h3>Revenue Trend</h3>
+        <canvas id="chart-revenue-trend" height="90"></canvas>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <h3>Top Customers</h3>
+            <table class="list-table">
+                <thead><tr><th>Customer</th><th>Revenue</th></tr></thead>
+                <tbody>
+                {% for c in top_customers %}
+                <tr><td>{{ c.customer }}</td><td>${{ c.revenue|floatformat:0 }}</td></tr>
+                {% empty %}
+                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No orders in this range.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card">
+            <h3>Top Products</h3>
+            <table class="list-table">
+                <thead><tr><th>Product</th><th>Revenue</th></tr></thead>
+                <tbody>
+                {% for p in top_products %}
+                <tr><td>{{ p.product }}</td><td>${{ p.revenue|floatformat:0 }}</td></tr>
+                {% empty %}
+                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No orders in this range.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var trend = {{ trend_json|safe }};
+
+    new Chart(document.getElementById('chart-revenue-trend'), {
+        type: 'line',
+        data: {
+            labels: trend.map(function (r) { return r.day.slice(5); }),
+            datasets: [{
+                label: 'Revenue',
+                data: trend.map(function (r) { return r.revenue; }),
+                borderColor: '#1d6fe8', backgroundColor: 'rgba(29,111,232,0.08)',
+                fill: true, tension: 0.3, pointRadius: 3,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } },
+        },
+    });
+})();
+</script>
+{% endblock %}
