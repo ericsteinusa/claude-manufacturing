@@ -16,7 +16,12 @@ from ..ecommerce_core import (
     ensure_ecommerce_tables, PLATFORMS, create_connection, update_connection,
     get_connection, list_connections, set_item_xref, list_item_xrefs,
     receive_order_webhook, push_inventory_level, push_price_update,
-    push_shipment_confirmation, find_connection_for_so, list_sync_log,
+    push_shipment_confirmation, find_connection_for_so,
+    # Aliased: time_clock_poller_core also exports list_sync_log (imported
+    # directly into views/__init__.py, not through a submodule), and this
+    # module's `from ._ecommerce import *` would otherwise silently shadow
+    # it with the wrong (ecommerce) function.
+    list_sync_log as list_ecommerce_sync_log,
 )
 from ..sales_orders_core import load_customers, load_products
 from ..production_core import get_shipment
@@ -199,7 +204,7 @@ def ecommerce_sync_log_list(request):
     try:
         ensure_ecommerce_tables(conn)
         conn.commit()
-        log_rows = list_sync_log(conn)
+        log_rows = list_ecommerce_sync_log(conn)
     finally:
         conn.close()
     return render(request, 'ecommerce_sync_log_list.html', _ec_ctx(
