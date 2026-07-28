@@ -92,6 +92,12 @@ def list_products(conn, search=None, filter_status=None,
 
 def get_product(conn, product_id: int) -> dict | None:
     """Single product with supplier name."""
+    # `product` has no created_by column in the base schema, and no other
+    # module's ensure/ALTER step adds one — self-heal here since this is the
+    # only query in the codebase that selects it.
+    conn.execute(
+        "ALTER TABLE product ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
+    conn.commit()
     row = conn.execute(
         "SELECT p.id, p.name, "
         "COALESCE(p.item_type, 'buy') AS item_type, "
