@@ -5320,7 +5320,7 @@ def gl_balance_sheet(request):
 
 from ..engineering_core import (  # noqa: E402
     PROJECT_STATUSES, TASK_STATUSES, ECR_STATUSES, PRIORITIES,  # noqa: F811
-    load_products, load_people,  # noqa: F811
+    load_products as eng_load_products, load_people,  # noqa: F811
     get_eng_dashboard, next_project_number, next_ecr_number,
     list_projects, get_project, create_project, update_project,
     list_project_tasks, list_tasks, get_task, create_task, update_task,
@@ -5433,7 +5433,7 @@ def eng_projects(request):
         projects = list_projects(conn, status=status or None,
                                  engineer=engineer or None,
                                  search=search or None)
-        products = load_products(conn)
+        products = eng_load_products(conn)
         people = load_people(conn)
     ctx = _eng_ctx(request, projects=projects, products=products, people=people,
                    filter_status=status, filter_engineer=engineer,
@@ -5494,7 +5494,7 @@ def eng_project_detail(request, project_id=None):
                 error = str(e)
         project = get_project(conn, project_id) if project_id else None
         tasks = list_project_tasks(conn, project_id) if project_id else []
-        products = load_products(conn)
+        products = eng_load_products(conn)
         people = load_people(conn)
         new_proj_num = next_project_number(conn) if not project_id else ''
     ctx = _eng_ctx(request, project=project, tasks=tasks,
@@ -5535,7 +5535,7 @@ def eng_ecrs(request):
                          project_id=int(proj_filter) if proj_filter.isdigit() else None,
                          search=search or None)
         projects = list_projects(conn)
-        products = load_products(conn)
+        products = eng_load_products(conn)
         people = load_people(conn)
     ctx = _eng_ctx(request, ecrs=ecrs, projects=projects, products=products,
                    people=people, filter_status=status,
@@ -5589,7 +5589,7 @@ def eng_ecr_detail(request, ecr_id=None):
                 error = str(e)
         ecr = get_ecr(conn, ecr_id) if ecr_id else None
         projects = list_projects(conn)
-        products = load_products(conn)
+        products = eng_load_products(conn)
         people = load_people(conn)
         new_ecr_num = next_ecr_number(conn) if not ecr_id else ''
     ctx = _eng_ctx(request, ecr=ecr, projects=projects, products=products,
