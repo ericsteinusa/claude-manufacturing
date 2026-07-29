@@ -9,7 +9,7 @@ import {
 } from '../../src/api/maintenance';
 import StatusBadge from '../../src/components/StatusBadge';
 
-const STATUSES = ['', 'open', 'in_progress', 'completed', 'cancelled'];
+const STATUSES = ['', 'Open', 'Assigned', 'In Progress', 'On Hold', 'Completed', 'Cancelled'];
 
 export default function MaintenanceScreen() {
   const [wos, setWos] = useState<any[]>([]);
@@ -90,15 +90,15 @@ export default function MaintenanceScreen() {
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.card} onPress={() => openDetail(item.id)}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.woNum}>{item.wo_number ?? `MWO-${item.id}`}</Text>
+                  <Text style={styles.woNum}>{`MWO-${item.id}`}</Text>
                   <StatusBadge status={item.status} />
                 </View>
-                <Text style={styles.desc} numberOfLines={2}>{item.description}</Text>
+                <Text style={styles.desc} numberOfLines={2}>{item.title}</Text>
                 <Text style={styles.meta}>
                   {[
-                    item.equipment_name && `Equipment: ${item.equipment_name}`,
+                    item.equipment && `Equipment: ${item.equipment}`,
                     item.priority && `Priority: ${item.priority}`,
-                    item.scheduled_date && `Scheduled: ${item.scheduled_date}`,
+                    item.due_date && `Due: ${item.due_date}`,
                   ].filter(Boolean).join('  ·  ') || 'No details'}
                 </Text>
               </TouchableOpacity>
@@ -116,19 +116,19 @@ export default function MaintenanceScreen() {
               <Text style={styles.closeTxt}>← Back</Text>
             </TouchableOpacity>
 
-            <Text style={styles.modalTitle}>{selected.wo_number ?? `MWO-${selected.id}`}</Text>
+            <Text style={styles.modalTitle}>{`MWO-${selected.id}`}</Text>
             <StatusBadge status={selected.status} />
-            <Text style={styles.modalDesc}>{selected.description}</Text>
+            <Text style={styles.modalDesc}>{selected.title}</Text>
 
             <View style={{ marginTop: 16 }}>
               {[
-                ['Equipment', selected.equipment_name],
+                ['Equipment', selected.equipment],
+                ['Work type', selected.work_type],
                 ['Priority', selected.priority],
-                ['Scheduled', selected.scheduled_date],
+                ['Requested', selected.requested_date],
+                ['Due', selected.due_date],
                 ['Completed', selected.completed_date],
-                ['Assigned to', selected.assigned_to_name],
-                ['Estimated hrs', selected.estimated_hours],
-                ['Actual hrs', selected.actual_hours],
+                ['Assigned to', selected.assigned_to],
               ]
                 .filter(([, v]) => v)
                 .map(([label, value]) => (
@@ -146,7 +146,7 @@ export default function MaintenanceScreen() {
               </View>
             ) : null}
 
-            {selected.status !== 'completed' && selected.status !== 'cancelled' && (
+            {selected.status !== 'Completed' && selected.status !== 'Cancelled' && (
               <TouchableOpacity
                 style={[styles.completeBtn, completing && { opacity: 0.6 }]}
                 onPress={complete}

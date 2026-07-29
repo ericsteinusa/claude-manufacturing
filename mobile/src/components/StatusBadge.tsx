@@ -6,7 +6,9 @@ const STATUS_COLORS: Record<string, string> = {
   // Work orders
   draft:       '#ffffff',
   open:        '#cce5ff',
+  assigned:    '#cce5ff',
   in_progress: '#fff3cd',
+  on_hold:     '#f8d7da',
   completed:   '#d4edda',
   cancelled:   '#dcdcdc',
   // Requisitions
@@ -27,8 +29,12 @@ interface Props {
   status: string;
 }
 
+function normalize(status: string): string {
+  return status.trim().toLowerCase().replace(/\s+/g, '_');
+}
+
 export default function StatusBadge({ status }: Props) {
-  const bg = STATUS_COLORS[status] ?? '#f0f0f0';
+  const bg = STATUS_COLORS[normalize(status)] ?? '#f0f0f0';
   return (
     <View style={[styles.badge, { backgroundColor: bg }]}>
       <Text style={styles.text}>{status.replace(/_/g, ' ')}</Text>
