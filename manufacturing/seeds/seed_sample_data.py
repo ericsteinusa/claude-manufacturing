@@ -136,13 +136,14 @@ NEW_DEPARTMENTS = {
     "Warehouse": ["Warehouse Manager", "Warehouse Personnel"],
 }
 
-# How many sample hires to add per sub-department (sums to 53). Weighted so
+# How many sample hires to add per sub-department (sums to 54). Weighted so
 # previously-empty departments/sub-departments and thin teams get covered.
 HIRES = {
-    # A President gives a sample full-access account (President / Vice
-    # President are FULL_ACCESS_ROLES) for testing the all-departments
-    # dashboard, not just a single department menu.
+    # A President and Vice President each give a sample full-access account
+    # (President / Vice President are FULL_ACCESS_ROLES) for testing the
+    # all-departments dashboard, not just a single department menu.
     "Company President": 1,
+    "Company Vice President": 1,
     "Quality Assurance Manager": 1,
     "Quality Assurance Lead": 1,
     "Quality Assurance Technician": 3,
