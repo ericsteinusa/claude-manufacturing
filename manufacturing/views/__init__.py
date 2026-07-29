@@ -97,7 +97,13 @@ from ..time_clock_core import (
     get_period_dates, get_attendance,
 )
 from ..time_clock_web_core import (
-    get_ot_report, get_ot_report_all, get_schedule_summary,
+    get_ot_report, get_ot_report_all,
+    # Aliased: repetitive_core also exports get_schedule_summary (a different,
+    # incompatible signature: (conn, schedule_id, date_from, date_to)), and
+    # `from ._repetitive import *` below would otherwise silently shadow this
+    # with that version, breaking the tc_schedule view (TypeError: missing
+    # 'schedule_id').
+    get_schedule_summary as tc_schedule_summary,
 )
 from ..time_clock_poller_core import (
     DEVICE_TYPES, DEVICE_TYPE_LABELS,
@@ -3187,7 +3193,7 @@ def tc_schedule(request):
 
     conn = get_db_connection()
     try:
-        summary = get_schedule_summary(conn,
+        summary = tc_schedule_summary(conn,
                                        date_from=date_from or None,
                                        date_to=date_to or None)
     finally:
