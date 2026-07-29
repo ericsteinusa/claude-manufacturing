@@ -11,6 +11,5 @@ export const createNcr = (payload: {
   source?: string;
   severity?: string;
   product?: string;
-  lot_number?: string;
   description?: string;
 }) => apiClient.post('/quality/ncr/', payload);
