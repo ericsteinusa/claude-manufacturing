@@ -258,10 +258,14 @@ def _seed_applications(conn):
         cid = _cust_id(conn, company)
         if cid is None:
             continue
+        # Keyed on notes (distinct per row) rather than applied_date: the
+        # latter is TODAY + offset, so it drifts every day and a same-day
+        # idempotency check would never match a row inserted on a prior day,
+        # inserting a duplicate application on every non-reset re-run.
         if conn.execute(
             "SELECT 1 FROM credit_application"
-            " WHERE customer_id=%s AND created_by=%s AND applied_date=%s",
-            (cid, TAG, _d(applied_ago)),
+            " WHERE customer_id=%s AND created_by=%s AND notes=%s",
+            (cid, TAG, notes),
         ).fetchone():
             continue
         review_date = _d(review_ago) if review_ago is not None else None
@@ -306,10 +310,13 @@ def _seed_limit_history(conn):
         cid = _cust_id(conn, company)
         if cid is None:
             continue
+        # Keyed on reason (distinct per row, and a customer can have more
+        # than one history row) rather than changed_date -- see
+        # _seed_applications for why the drifting-date key is wrong.
         if conn.execute(
             "SELECT 1 FROM credit_limit_history"
-            " WHERE customer_id=%s AND changed_by=%s AND changed_date=%s",
-            (cid, TAG, _d(changed_ago)),
+            " WHERE customer_id=%s AND changed_by=%s AND reason=%s",
+            (cid, TAG, reason),
         ).fetchone():
             continue
         conn.execute(
@@ -359,11 +366,14 @@ def _seed_collection_activity(conn):
         cid = _cust_id(conn, company)
         if cid is None:
             continue
+        # Keyed on notes (distinct per row, and a customer can have several
+        # activities of the same type) rather than activity_date -- see
+        # _seed_applications for why the drifting-date key is wrong.
         if conn.execute(
             "SELECT 1 FROM collection_activity"
             " WHERE customer_id=%s AND created_by=%s"
-            " AND activity_date=%s AND activity_type=%s",
-            (cid, TAG, _d(act_ago), act_type),
+            " AND activity_type=%s AND notes=%s",
+            (cid, TAG, act_type, notes),
         ).fetchone():
             continue
         promise_date = _d(promise_ago) if promise_ago is not None else None
