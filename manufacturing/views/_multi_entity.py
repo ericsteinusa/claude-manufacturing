@@ -130,6 +130,7 @@ def company_assign_user(request, company_id):
     if request.method == 'POST':
         conn = get_db_connection()
         try:
+            ensure_multi_entity_tables(conn)
             people_id = int(request.POST.get('people_id'))
             assign_user_company(conn, company_id, people_id)
             conn.commit()
@@ -143,6 +144,7 @@ def company_revoke_user(request, company_id, people_id):
     if request.method == 'POST':
         conn = get_db_connection()
         try:
+            ensure_multi_entity_tables(conn)
             revoke_user_company(conn, company_id, people_id)
             conn.commit()
         finally:

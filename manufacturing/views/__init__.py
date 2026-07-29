@@ -2241,6 +2241,7 @@ def so_detail(request, so_id):
         products = load_so_products(conn) if (so and can_edit) else []
         currencies = list_currencies(conn)
         base_currency = get_base_currency(conn).get("code", "USD")
+        ensure_price_list_tables(conn)
         price_tiers = (
             get_customer_price_tiers(conn, so['customer_id'])
             if (so and can_edit and so.get('customer_id')) else {}
@@ -4629,6 +4630,7 @@ def cs_returns_detail(request, return_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_return_table(conn)
         ret = get_return(conn, return_id)
         if not ret:
             return redirect('cs_returns_list')
@@ -4713,6 +4715,7 @@ def cs_kb_detail(request, article_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_kb_table(conn)
         article = get_kb_article(conn, article_id)
         if not article:
             return redirect('cs_kb_list')
@@ -4793,6 +4796,7 @@ def cs_surveys_detail(request, survey_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_survey_tables(conn)
         survey = get_survey(conn, survey_id)
         if not survey:
             return redirect('cs_surveys_list')
@@ -5774,6 +5778,7 @@ def eng_spec_detail(request, spec_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_eng_standard_table(conn)
         spec = get_eng_standard(conn, spec_id)
         if not spec:
             return redirect('eng_specs_list')
@@ -5863,6 +5868,7 @@ def _sales_ctx(request, **extra):
 @dept_required(_SALES_DEPT_KEYS)
 def sales_dashboard(request):
     with get_db_connection() as conn:
+        init_sales_lead_table(conn)
         dash = get_sales_dashboard(conn)
         recent_orders = list_sos(conn)[:8]
         recent_quotes = list_quotes(conn)[:8]
@@ -6214,6 +6220,7 @@ def sales_leads_detail(request, lead_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_sales_lead_table(conn)
         lead = get_sales_lead(conn, lead_id)
         if not lead:
             return redirect('sales_leads_list')
@@ -6298,6 +6305,7 @@ def sales_contracts_detail(request, contract_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_sales_contract_table(conn)
         contract = get_sales_contract(conn, contract_id)
         if not contract:
             return redirect('sales_contracts_list')
@@ -6625,6 +6633,7 @@ def prod_shipping_detail(request, shipment_id):
     success = request.session.pop('_ec_flash', None)
     conn = get_db_connection()
     try:
+        init_shipment_tables(conn)
         shipment = get_shipment(conn, shipment_id)
         if not shipment:
             return redirect('prod_shipping_list')
@@ -7144,6 +7153,8 @@ def req_detail(request, req_id):
 def pers_dashboard(request):
     with get_db_connection() as conn:
         ensure_workforce_columns(conn)
+        init_training_table(conn)
+        init_review_table(conn)
         data = get_personnel_dashboard(conn)
         hire_trend = conn.execute("""
             SELECT TO_CHAR(DATE_TRUNC('month', hire_date::date), 'YYYY-MM')
@@ -7290,6 +7301,7 @@ def pers_review_detail(request, review_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_review_table(conn)
         review = get_review(conn, review_id)
         if not review:
             return redirect('pers_reviews_list')
@@ -7380,6 +7392,7 @@ def pers_training_detail(request, training_id):
     error = success = None
     conn = get_db_connection()
     try:
+        init_training_table(conn)
         training = get_training(conn, training_id)
         if not training:
             return redirect('pers_training_list')
@@ -7416,6 +7429,9 @@ def pers_training_detail(request, training_id):
 @dept_required(_CS_DEPT_KEYS)
 def cs_dashboard_view(request):
     with get_db_connection() as conn:
+        init_return_table(conn)
+        init_survey_tables(conn)
+        init_kb_table(conn)
         stats = get_summary_stats(conn)
         recent_tickets = list_tickets(conn)[:8]
 

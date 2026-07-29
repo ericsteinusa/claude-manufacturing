@@ -68,6 +68,7 @@ def po_landed_cost_new(request, po_id):
 def po_landed_cost_detail(request, po_id, lc_id):
     conn = get_db_connection()
     try:
+        ensure_landed_cost_tables(conn)
         po = get_po(conn, po_id)
         lc = get_landed_cost(conn, lc_id)
         if not po or not lc or lc['po_id'] != po_id:
