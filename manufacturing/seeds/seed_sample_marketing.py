@@ -114,11 +114,15 @@ def _ensure_tables(conn):
 
 CAMPAIGNS = [
     # (name, channel, objective, owner, start_ago, end_offset, budget, status)
+    # end_offset is a DURATION added to start_ago (end_date = _d(start_ago +
+    # end_offset)), not an absolute day count from today -- for a
+    # "Completed" campaign that ended N days ago, end_offset must be
+    # (N days ago) - start_ago, not simply -N.
     (f"{TAG}Summer Product Launch 2026",     "Email",      "Launch",    "Priya Nair",   -45,  45,   18000, "Active"),
-    (f"{TAG}Trade Show Spring Circuit",      "Event",      "Lead Gen",  "Marco Reyes",  -90,  -30,  32000, "Completed"),
+    (f"{TAG}Trade Show Spring Circuit",      "Event",      "Lead Gen",  "Marco Reyes",  -90,  60,  32000, "Completed"),
     (f"{TAG}Q3 LinkedIn Brand Awareness",    "Social",     "Awareness", "Priya Nair",   -15,  75,    9500, "Active"),
     (f"{TAG}Google Search — Valve Parts",    "Search",     "Conversion","Marco Reyes",  -30,  60,   14000, "Active"),
-    (f"{TAG}Partner Newsletter Co-marketing","Email",      "Lead Gen",  "Priya Nair",   -60,  -15,   5500, "Completed"),
+    (f"{TAG}Partner Newsletter Co-marketing","Email",      "Lead Gen",  "Priya Nair",   -60,  45,   5500, "Completed"),
     (f"{TAG}Product Webinar Series Q2",      "Webinar",    "Retention", "Marco Reyes",  -20,  10,    7200, "Active"),
     (f"{TAG}Holiday Promo Direct Mail",      "Direct Mail","Conversion","Priya Nair",    30,  90,   11000, "Planned"),
     (f"{TAG}Industry Expo Q4",               "Event",      "Lead Gen",  "Marco Reyes",  60,   120,  28000, "Planned"),
@@ -243,13 +247,13 @@ ADS = [
      3000, 1450, 92000, 320, 8, -15, 75, "Active", "Priya Nair"),
     (f"{TAG}Spring Trade Show Display Ad", "Display",
      f"{TAG}Trade Show Spring Circuit",
-     2500, 2500, 54000, 180, 12, -90, -30, "Completed", "Marco Reyes"),
+     2500, 2500, 54000, 180, 12, -90, 60, "Completed", "Marco Reyes"),
     (f"{TAG}Facebook Retargeting — Launch", "Facebook",
      f"{TAG}Summer Product Launch 2026",
      4000, 2100, 76000, 420, 18, -45, 45, "Active", "Priya Nair"),
     (f"{TAG}Email Promo — Partner Co-brand", "Email",
      f"{TAG}Partner Newsletter Co-marketing",
-     1500, 1500, 41000, 920, 31, -60, -15, "Completed", "Priya Nair"),
+     1500, 1500, 41000, 920, 31, -60, 45, "Completed", "Priya Nair"),
     (f"{TAG}Holiday Display Banner Set", "Display",
      f"{TAG}Holiday Promo Direct Mail",
      3500, 0, 0, 0, 0, 30, 90, "Scheduled", "Marco Reyes"),
