@@ -492,12 +492,11 @@ def api_req_add_item(request, req_id):
             return api_err('Permission denied.', 403)
         row = conn.execute(
             "INSERT INTO requisition_item"
-            " (req_id, description, quantity, unit_price, notes)"
-            " VALUES (%s, %s, %s, %s, %s) RETURNING id",
+            " (req_id, description, qty, est_unit_price)"
+            " VALUES (%s, %s, %s, %s) RETURNING id",
             (req_id, description,
              body.get('quantity', 1),
-             body.get('unit_price', 0.0),
-             body.get('notes', '')),
+             body.get('unit_price', 0.0)),
         ).fetchone()
         conn.commit()
     finally:

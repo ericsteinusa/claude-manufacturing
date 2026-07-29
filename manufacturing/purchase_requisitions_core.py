@@ -4,11 +4,7 @@ Tables: purchase_requisition, requisition_item, requisition_approval.
 Mirrors the existing Mobile API's requisition endpoints
 (api_views.py's api_req / api_req_add_item / api_req_submit / api_req_decide)
 so the web UI behaves identically — same statuses, same visibility rules,
-same dept-level (not multi-tier) decision. Note: api_req_add_item currently
-inserts into requisition_item using columns ('quantity', 'unit_price',
-'notes') that don't exist on the live table (only 'qty'/'est_unit_price'
-do — see seed_sample_purchasing.py's DDL, which matches the live schema);
-this module uses the real columns instead of repeating that bug.
+same dept-level (not multi-tier) decision.
 """
 
 import datetime
