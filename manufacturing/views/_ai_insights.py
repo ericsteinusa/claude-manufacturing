@@ -8,6 +8,9 @@ from django.shortcuts import render
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 
+from ..apm_core import ensure_apm_tables
+from ..demand_forecast_core import ensure_demand_forecast_tables
+from ..predictive_maintenance_core import ensure_predictive_maintenance_tables
 from ..ai_insights_core import get_ai_insights_summary
 
 _LINKS = {
@@ -23,6 +26,9 @@ _LINKS = {
 def ai_insights_dashboard(request):
     conn = get_db_connection()
     try:
+        ensure_apm_tables(conn)
+        ensure_demand_forecast_tables(conn)
+        ensure_predictive_maintenance_tables(conn)
         insights = get_ai_insights_summary(conn)
     finally:
         conn.close()
