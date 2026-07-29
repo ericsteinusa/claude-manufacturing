@@ -112,6 +112,13 @@ def remove_sample(conn):
         (SAMPLE_WO_PREFIX + "%",)).fetchall()]
     mat_n = wo_n = 0
     if ids:
+        # wo_operation/wo_cost_actual are populated against these same WO ids
+        # by seed_sample_operations.py (NO ACTION FKs on work_order, not
+        # CASCADE) -- clean them up first regardless of whether that seed's
+        # own --remove has run, so this seed's --reset/--remove doesn't
+        # depend on running the other one first.
+        conn.execute("DELETE FROM wo_operation WHERE wo_id = ANY(%s)", (ids,))
+        conn.execute("DELETE FROM wo_cost_actual WHERE wo_id = ANY(%s)", (ids,))
         mat_n = conn.execute(
             "DELETE FROM wo_material WHERE wo_id = ANY(%s)",
             (ids,)).rowcount
