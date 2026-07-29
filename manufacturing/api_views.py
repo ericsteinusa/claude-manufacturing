@@ -16,6 +16,7 @@ from .api_auth import (
 )
 from .api_decorators import api_err, api_ok, api_required
 from .db_pg import get_db_connection
+from .menus import DEPT_MENU_KEY
 from .mrp_core import next_sequence_number
 from . import (
     approval_workflow_core,
@@ -534,11 +535,11 @@ def api_req_submit(request, req_id):
         ).fetchone()
         total = float(total_row['total']) if total_row else 0.0
         dept_row = conn.execute(
-            "SELECT dept_key FROM dept WHERE dept_id ="
+            "SELECT dept_name FROM dept WHERE dept_id ="
             " (SELECT dept_id FROM purchase_requisition WHERE id = %s)",
             (req_id,),
         ).fetchone()
-        dept_key = dept_row['dept_key'] if dept_row else ''
+        dept_key = DEPT_MENU_KEY.get(dept_row['dept_name'], '') if dept_row else ''
         approval_workflow_core.ensure_approval_tables(conn)
         approval_workflow_core.submit_for_approval(
             conn, 'purchase_requisition', req_id, total, dept_key,
