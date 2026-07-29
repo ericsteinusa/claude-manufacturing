@@ -762,8 +762,10 @@ def api_ncr(request):
                 source=source,
                 severity=severity,
                 product=body.get('product', ''),
-                lot_number=body.get('lot_number', ''),
-                description=body.get('description', ''),
+                detected_date=body.get('detected_date', ''),
+                disposition=body.get('disposition', ''),
+                owner=body.get('owner', ''),
+                notes=body.get('description', ''),
                 created_by=request.api_user['email'],
             )
             conn.commit()
