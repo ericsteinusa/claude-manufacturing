@@ -305,10 +305,13 @@ def _remove_kb(conn):
 
 SURVEYS = [
     # (title, description, survey_type, status, start_ago, end_offset)
+    # end_offset is a DURATION added to start_ago, not an absolute day count
+    # from today -- for a "Closed" survey that ended N days ago, end_offset
+    # must be (N days ago) - start_ago, not simply -N.
     (f"{TAG}Q1 Customer Satisfaction Survey", "Post-purchase CSAT — Q1 closed orders",
-     "CSAT", "Closed", -90, -60),
+     "CSAT", "Closed", -90, 30),
     (f"{TAG}Q2 Net Promoter Score", "NPS survey sent to all active accounts",
-     "NPS", "Closed", -45, -15),
+     "NPS", "Closed", -45, 30),
     (f"{TAG}Post-Purchase Survey — June", "Automated survey after order completion",
      "Post-Purchase", "Active", -20, 10),
     (f"{TAG}Product Quality Feedback", "Targeted survey for valve assembly buyers",
