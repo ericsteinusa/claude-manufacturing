@@ -78,9 +78,16 @@ from ..period_locking_core import (
 from ..purchase_orders_core import (
     PO_STATUSES, PO_STATUS_COLORS, PO_STATUS_ACTION_LABELS,
     list_pos, get_po, get_po_items,
-    next_po_number, load_suppliers, load_products,
+    next_po_number, load_suppliers,
+    # Aliased: sales_core also exports load_products/allowed_transitions/
+    # can_transition (re-exported from sales_orders_core), and the
+    # `from ..sales_core import (...)` block below would otherwise silently
+    # shadow these with the wrong (SO-status) values/shape.
+    load_products as po_load_products,
     create_po, update_po, add_po_item, delete_po_item,
-    allowed_transitions, can_transition, set_po_status, receive_po_item,
+    allowed_transitions as po_allowed_transitions,
+    can_transition as po_can_transition,
+    set_po_status, receive_po_item,
 )
 from ..wms_core import ensure_wms_tables, credit_unassigned_receipt
 from ..landed_cost_core import ensure_landed_cost_tables, list_landed_costs
@@ -1454,7 +1461,7 @@ def po_detail(request, po_id):
         init_currency_schema(conn)
         po = get_po(conn, po_id)
         items = get_po_items(conn, po_id) if po else []
-        products = load_products(conn) if (po and can_edit) else []
+        products = po_load_products(conn) if (po and can_edit) else []
         approval = get_po_approval(conn, po_id) if po else None
         currencies = list_currencies(conn, active_only=True)
         base_currency = get_base_currency(conn).get("code", "USD")
@@ -1486,7 +1493,7 @@ def po_detail(request, po_id):
 
     status_actions = [
         (target, PO_STATUS_ACTION_LABELS.get(target, target))
-        for target in allowed_transitions(po['status'])
+        for target in po_allowed_transitions(po['status'])
     ] if can_edit else []
     # Receiving is offered once the PO is out (sent/partial).
     can_receive = can_edit and po['status'] in ('sent', 'partial')
@@ -1698,7 +1705,7 @@ def po_set_status(request, po_id):
     _notify_approval_args = None
     try:
         po = get_po(conn, po_id)
-        if po and can_transition(po['status'], target):
+        if po and po_can_transition(po['status'], target):
             if target == 'sent' and needs_approval(po.get('total', 0)):
                 requester = request.session.get('user_email', '')
                 request_approval(conn, po_id, requested_by=requester)
@@ -4819,7 +4826,14 @@ def cs_surveys_detail(request, survey_id):
 
 
 from ..accounting_core import (  # noqa: E402
-    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors, load_customers,  # noqa: F811
+    INVOICE_STATUSES, PAYMENT_METHODS, ACCOUNT_TYPES, load_vendors,
+    # Aliased: sales_core also exports load_customers (re-exported from
+    # sales_orders_core, shape {id, company_name, first_name, last_name} —
+    # no 'label' key), and the `from ..sales_core import (...)` block below
+    # would otherwise silently shadow this with that shape, leaving the AR
+    # customer dropdown's option text blank (ar_list.html/ar_invoice_detail.html
+    # render {{ c.label }}).
+    load_customers as acct_load_customers,
     get_ap_dashboard, list_ap_invoices, get_ap_invoice,
     create_ap_invoice, update_ap_invoice, set_ap_status,
     list_ap_payments, record_ap_payment,
@@ -5028,7 +5042,7 @@ def ar_list(request):
         date_to=date_to or None,
     )
     dashboard = get_ar_dashboard(conn)
-    customers = load_customers(conn)
+    customers = acct_load_customers(conn)
     conn.close()
     ctx = _acct_ctx(request,
         invoices=invoices, dashboard=dashboard, customers=customers,
@@ -5114,7 +5128,7 @@ def ar_invoice_detail(request, inv_id=None):
             error = str(exc)
     invoice   = get_ar_invoice(conn, inv_id) if inv_id else None
     payments  = list_ar_payments(conn, inv_id) if inv_id else []
-    customers = load_customers(conn)
+    customers = acct_load_customers(conn)
     currencies = list_currencies(conn, active_only=True)
     base_currency = get_base_currency(conn).get("code", "USD")
     conn.close()
