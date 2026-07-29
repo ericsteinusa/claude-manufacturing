@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getLots, getLot, getLotExpiry, createLot, updateLotStatus } from '../../src/api/lots';
+import { getInventory } from '../../src/api/inventory';
 import StatusBadge from '../../src/components/StatusBadge';
 
 const LOT_STATUSES = ['available', 'quarantine', 'hold', 'consumed', 'rejected'];
@@ -29,6 +30,10 @@ export default function LotsScreen() {
   const [statusNotes, setStatusNotes] = useState('');
   const [form, setForm] = useState({ lot_number: '', qty: '', received_date: '', expiry_date: '', notes: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [productSearch, setProductSearch] = useState('');
+  const [productResults, setProductResults] = useState<any[]>([]);
+  const [productSearching, setProductSearching] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -57,21 +62,42 @@ export default function LotsScreen() {
     }
   };
 
+  const searchProducts = async (q: string) => {
+    setProductSearch(q);
+    setProductSearching(true);
+    try {
+      const res = await getInventory(q ? { q } : undefined);
+      setProductResults(res.data.data.products ?? []);
+    } catch {
+      setProductResults([]);
+    } finally {
+      setProductSearching(false);
+    }
+  };
+
+  const closeCreateModal = () => {
+    setCreateModal(false);
+    setForm({ lot_number: '', qty: '', received_date: '', expiry_date: '', notes: '' });
+    setSelectedProduct(null);
+    setProductSearch('');
+    setProductResults([]);
+  };
+
   const submitCreate = async () => {
+    if (!selectedProduct) { Alert.alert('Required', 'Select a product.'); return; }
     const qty = parseFloat(form.qty);
     if (!qty || qty <= 0) { Alert.alert('Required', 'Enter a valid quantity.'); return; }
     setSubmitting(true);
     try {
       await createLot({
-        product_id: 0,
+        product_id: selectedProduct.id,
         qty,
         lot_number: form.lot_number.trim() || undefined,
         received_date: form.received_date || undefined,
         expiry_date: form.expiry_date || undefined,
         notes: form.notes.trim(),
       });
-      setCreateModal(false);
-      setForm({ lot_number: '', qty: '', received_date: '', expiry_date: '', notes: '' });
+      closeCreateModal();
       load();
     } catch (err: any) {
       Alert.alert('Error', err?.response?.data?.error ?? 'Could not create lot.');
@@ -106,19 +132,24 @@ export default function LotsScreen() {
         </View>
       )}
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
-        {['', ...LOT_STATUSES].map((s) => (
-          <TouchableOpacity
-            key={s || 'all'}
-            style={[styles.filterBtn, statusFilter === s && styles.filterBtnActive]}
-            onPress={() => setStatusFilter(s)}
-          >
-            <Text style={[styles.filterLabel, statusFilter === s && styles.filterLabelActive]}>
-              {s || 'All'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.topBar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
+          {['', ...LOT_STATUSES].map((s) => (
+            <TouchableOpacity
+              key={s || 'all'}
+              style={[styles.filterBtn, statusFilter === s && styles.filterBtnActive]}
+              onPress={() => setStatusFilter(s)}
+            >
+              <Text style={[styles.filterLabel, statusFilter === s && styles.filterLabelActive]}>
+                {s || 'All'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <TouchableOpacity style={styles.newBtn} onPress={() => setCreateModal(true)}>
+          <Text style={styles.newTxt}>+ New</Text>
+        </TouchableOpacity>
+      </View>
 
       {loading
         ? <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#1a73e8" />
@@ -245,6 +276,102 @@ export default function LotsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Create Lot Modal */}
+      <Modal visible={createModal} animationType="slide" onRequestClose={closeCreateModal}>
+        <ScrollView style={styles.modal}>
+          <TouchableOpacity style={styles.closeBtn} onPress={closeCreateModal}>
+            <Text style={styles.closeTxt}>Cancel</Text>
+          </TouchableOpacity>
+          <Text style={styles.modalTitle}>New Lot</Text>
+
+          <Text style={styles.fieldLabel}>Product *</Text>
+          {selectedProduct ? (
+            <View style={styles.selectedProduct}>
+              <Text style={styles.selectedProductTxt}>{selectedProduct.name}</Text>
+              <TouchableOpacity onPress={() => setSelectedProduct(null)}>
+                <Text style={styles.changeTxt}>Change</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <TextInput
+                style={styles.fieldInput}
+                placeholder="Search products…"
+                value={productSearch}
+                onChangeText={searchProducts}
+              />
+              {productSearching ? (
+                <ActivityIndicator style={{ marginTop: 8 }} />
+              ) : (
+                productResults.slice(0, 8).map((p) => (
+                  <TouchableOpacity
+                    key={p.id}
+                    style={styles.productRow}
+                    onPress={() => { setSelectedProduct(p); setProductResults([]); }}
+                  >
+                    <Text style={styles.productRowTxt}>{p.name}</Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </>
+          )}
+
+          <Text style={styles.fieldLabel}>Lot Number (optional)</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="Auto-generated if left blank"
+            value={form.lot_number}
+            onChangeText={(v) => setForm((f) => ({ ...f, lot_number: v }))}
+          />
+
+          <Text style={styles.fieldLabel}>Quantity *</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="0"
+            keyboardType="numeric"
+            value={form.qty}
+            onChangeText={(v) => setForm((f) => ({ ...f, qty: v }))}
+          />
+
+          <Text style={styles.fieldLabel}>Received Date (YYYY-MM-DD, optional)</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="2026-01-01"
+            value={form.received_date}
+            onChangeText={(v) => setForm((f) => ({ ...f, received_date: v }))}
+          />
+
+          <Text style={styles.fieldLabel}>Expiry Date (YYYY-MM-DD, optional)</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="2026-12-31"
+            value={form.expiry_date}
+            onChangeText={(v) => setForm((f) => ({ ...f, expiry_date: v }))}
+          />
+
+          <Text style={styles.fieldLabel}>Notes (optional)</Text>
+          <TextInput
+            style={[styles.fieldInput, styles.multiline]}
+            placeholder="Additional details…"
+            value={form.notes}
+            onChangeText={(v) => setForm((f) => ({ ...f, notes: v }))}
+            multiline
+            numberOfLines={4}
+          />
+
+          <TouchableOpacity
+            style={[styles.submitLargeBtn, submitting && { opacity: 0.6 }]}
+            onPress={submitCreate}
+            disabled={submitting}
+          >
+            {submitting
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.submitLargeTxt}>Create Lot</Text>
+            }
+          </TouchableOpacity>
+        </ScrollView>
+      </Modal>
     </View>
   );
 }
@@ -253,7 +380,10 @@ const styles = StyleSheet.create({
   screen:       { flex: 1, backgroundColor: '#f4f6fb' },
   expiryBanner: { backgroundColor: '#fff3cd', padding: 10, borderBottomWidth: 1, borderBottomColor: '#ffc107' },
   expiryTxt:    { color: '#856404', fontSize: 13, fontWeight: '600', textAlign: 'center' },
-  filterBar:    { maxHeight: 48, paddingHorizontal: 12, paddingVertical: 8 },
+  topBar:       { flexDirection: 'row', alignItems: 'center', paddingRight: 12 },
+  newBtn:       { backgroundColor: '#1a73e8', borderRadius: 16, paddingHorizontal: 14, paddingVertical: 7, marginLeft: 8 },
+  newTxt:       { color: '#fff', fontSize: 13, fontWeight: '700' },
+  filterBar:    { flex: 1, maxHeight: 48, paddingHorizontal: 12, paddingVertical: 8 },
   filterBtn:    { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: '#fff', marginRight: 8, borderWidth: 1, borderColor: '#ddd' },
   filterBtnActive: { backgroundColor: '#1a73e8', borderColor: '#1a73e8' },
   filterLabel:  { fontSize: 13, color: '#555', fontWeight: '500' },
@@ -294,4 +424,14 @@ const styles = StyleSheet.create({
   cancelTxt:    { color: '#555', fontWeight: '600' },
   submitBtn:    { flex: 1, borderRadius: 10, padding: 14, alignItems: 'center', backgroundColor: '#1a73e8' },
   submitTxt:    { color: '#fff', fontWeight: '700' },
+  fieldLabel:   { fontSize: 13, fontWeight: '600', color: '#555', marginBottom: 6, marginTop: 16 },
+  fieldInput:   { borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 12, fontSize: 14, backgroundColor: '#fff' },
+  multiline:    { minHeight: 90, textAlignVertical: 'top' },
+  selectedProduct: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 12, backgroundColor: '#fff' },
+  selectedProductTxt: { fontSize: 14, color: '#1a1a2e', fontWeight: '600' },
+  changeTxt:    { color: '#1a73e8', fontSize: 13, fontWeight: '600' },
+  productRow:   { borderWidth: 1, borderColor: '#eee', borderRadius: 8, padding: 10, marginTop: 6, backgroundColor: '#fff' },
+  productRowTxt: { fontSize: 14, color: '#1a1a2e' },
+  submitLargeBtn: { backgroundColor: '#1a73e8', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 28, marginBottom: 40 },
+  submitLargeTxt: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
