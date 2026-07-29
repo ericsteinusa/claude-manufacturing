@@ -34,6 +34,9 @@ def _d(offset: int) -> str:
 TICKETS = [
     # (suffix, requester, dept, issue_type, priority, status,
     #  submitted_ago, due_offset, assigned_to, description)
+    # due_offset is a DURATION added to submitted_ago, not an absolute day
+    # count from today -- for a resolved/closed ticket whose due date was N
+    # days ago, due_offset must be (N days ago) - submitted_ago, not simply -N.
     ("TKT-001", "Linda Carter", "Accounting", "Software", "high", "open",
      -2, 3, "Mike Torres", "Excel crashes on large pivot tables — latest update broke something"),
     ("TKT-002", "James Wu", "Production", "Hardware", "critical", "in_progress",
@@ -43,11 +46,11 @@ TICKETS = [
     ("TKT-004", "Bob Nguyen", "Sales", "Network", "low", "open",
      -4, 7, "", "VPN drops every hour when working from home"),
     ("TKT-005", "Priya Sharma", "Engineering", "Printer", "medium", "resolved",
-     -10, -5, "Mike Torres", "HP printer in lab won't accept jobs from macOS clients"),
+     -10, 5, "Mike Torres", "HP printer in lab won't accept jobs from macOS clients"),
     ("TKT-006", "Tom Bradley", "Warehouse", "Hardware", "high", "in_progress",
      -1, 2, "Sara Patel", "Barcode scanner keeps dropping Bluetooth connection"),
     ("TKT-007", "Rachel Green", "Customer Svc", "Email", "medium", "closed",
-     -14, -9, "Mike Torres", "Outlook not syncing shared calendar with team"),
+     -14, 5, "Mike Torres", "Outlook not syncing shared calendar with team"),
     ("TKT-008", "David Kim", "Finance", "Software", "low", "open",
      -1, 5, "", "QuickBooks license expired — need renewal or replacement"),
     ("TKT-009", "Susan Park", "Legal", "Access / Permissions", "medium", "in_progress",
@@ -55,7 +58,7 @@ TICKETS = [
     ("TKT-010", "Carlos Ruiz", "Production", "Hardware", "critical", "open",
      0, 1, "", "Monitor on assembly line PC showing color distortion"),
     ("TKT-011", "Janet Mills", "Purchasing", "Other", "low", "resolved",
-     -20, -15, "Mike Torres", "Keyboard sticking on multiple keys — request replacement"),
+     -20, 5, "Mike Torres", "Keyboard sticking on multiple keys — request replacement"),
     ("TKT-012", "Frank Deluca", "IT", "Network", "high", "open",
      -1, 1, "", "Core switch log showing excessive CRC errors on port 24"),
 ]
@@ -402,6 +405,9 @@ def _remove_network(conn):
 
 TASKS = [
     # (suffix, name, type, description, assigned_to, dept, priority, sched_ago, due_offset, status)
+    # due_offset is a DURATION added to sched_ago -- see the TICKETS comment
+    # above for why a negative value meaning "due N days ago" must be
+    # (N days ago) - sched_ago.
     ("TASK-001", "Patch Tuesday server updates", "Maintenance",
      "Apply June security patches to all servers",
      "Mike Torres", "IT", "high", -1, 1, "in_progress"),
@@ -413,7 +419,7 @@ TASKS = [
      "Mike Torres", "IT", "high", -7, 0, "in_progress"),
     ("TASK-004", "Upgrade NAS firmware", "Upgrade",
      "Synology DSM upgrade to 7.2.1",
-     "Sara Patel", "IT", "medium", -14, -10, "completed"),
+     "Sara Patel", "IT", "medium", -14, 4, "completed"),
     ("TASK-005", "Configure new VoIP phones", "Configuration",
      "Set up 10 Cisco phones for Sales expansion",
      "Mike Torres", "Sales", "medium", 0, 5, "pending"),
@@ -425,7 +431,7 @@ TASKS = [
      "Mike Torres", "Production", "high", -5, 2, "in_progress"),
     ("TASK-008", "Quarterly backup verification", "Backup / Recovery",
      "Restore test from NAS to verify backup integrity",
-     "Sara Patel", "IT", "high", -30, -25, "completed"),
+     "Sara Patel", "IT", "high", -30, 5, "completed"),
     ("TASK-009", "Decommission old file server", "Maintenance",
      "Migrate remaining shares, wipe and retire srv-old-01",
      "Mike Torres", "IT", "low", 0, 14, "pending"),
