@@ -171,7 +171,11 @@ from ..auth_decorators import dept_required, login_required, role_required
 from ..production_core import (
     get_production_dashboard,
     get_daily_output_trend,
-    get_wo_status_breakdown,
+    # Aliased: maintenance_core also exports get_wo_status_breakdown (its own
+    # maintenance work-order breakdown), and `from ._maintenance import *`
+    # below would otherwise silently shadow this with the wrong (maintenance)
+    # data.
+    get_wo_status_breakdown as prod_wo_status_breakdown,
     list_scheduled_wos,
     get_prod_reports,
     SHIPMENT_STATUSES,
@@ -6480,7 +6484,7 @@ def prod_dashboard(request):
     with get_db_connection() as conn:
         data = get_production_dashboard(conn)
         daily_output = get_daily_output_trend(conn)
-        wo_status_breakdown = get_wo_status_breakdown(conn)
+        wo_status_breakdown = prod_wo_status_breakdown(conn)
         top_products = conn.execute("""
             SELECT p.name AS product, COALESCE(SUM(wo.quantity), 0) AS qty
             FROM work_order wo
