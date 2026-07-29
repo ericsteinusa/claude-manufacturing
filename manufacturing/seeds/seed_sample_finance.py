@@ -330,9 +330,15 @@ def _seed_bank(conn):
         if not acct_id:
             continue
         stmt_date = _d(stmt_ago)
+        # Keyed on the balance pair (distinct per statement for a given
+        # account) rather than statement_date: the latter is TODAY + offset,
+        # so it drifts every day and a same-day idempotency check would
+        # never match a row inserted on a prior day, inserting a duplicate
+        # statement on every non-reset re-run.
         if conn.execute(
-            "SELECT 1 FROM bank_statement WHERE bank_account_id=%s AND statement_date=%s",
-            (acct_id, stmt_date)
+            "SELECT 1 FROM bank_statement WHERE bank_account_id=%s"
+            " AND beginning_balance=%s AND ending_balance=%s",
+            (acct_id, beg, end)
         ).fetchone():
             continue
         conn.execute(
