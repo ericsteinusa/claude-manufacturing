@@ -73,6 +73,9 @@ def _ensure_tables(conn):
 
 CONTRACTS = [
     # (title, counterparty, contract_type, value, start_ago, end_days, status, owner)
+    # end_days is a DURATION added to start_ago, not an absolute day count
+    # from today -- for an "Expired" contract that ended N days ago,
+    # end_days must be (N days ago) - start_ago, not simply -N.
     (f"{TAG}Apex Manufacturing — Annual Supply Agreement",
      "Apex Manufacturing Inc.", "Service Agreement", 96000, -365, 0, "Active", "Sandra Pierce"),
     (f"{TAG}Office Lease — Main Plant",
@@ -88,11 +91,11 @@ CONTRACTS = [
     (f"{TAG}Employment Contract — Engineering Director",
      "Raj Patel", "Employment", 145000, -365, 0, "Active", "Janet Flores"),
     (f"{TAG}IT Services Agreement — TechSupport Co.",
-     "TechSupport Co.", "Service Agreement", 18000, -90, -30, "Expired", "Janet Flores"),
+     "TechSupport Co.", "Service Agreement", 18000, -90, 60, "Expired", "Janet Flores"),
     (f"{TAG}Partnership Agreement — Allied Components",
      "Allied Components", "Partnership", 55000, -60, 305, "Active", "Sandra Pierce"),
     (f"{TAG}Consulting Services — Apex Consulting",
-     "Apex Consulting LLC", "Service Agreement", 38000, -120, -30, "Expired", "Sandra Pierce"),
+     "Apex Consulting LLC", "Service Agreement", 38000, -120, 90, "Expired", "Sandra Pierce"),
     (f"{TAG}Renewal — ERP Software License",
      "TechCorp ERP", "Licensing", 30000, -1, 364, "Draft", "Janet Flores"),
     (f"{TAG}Confidentiality — Inova Systems",
