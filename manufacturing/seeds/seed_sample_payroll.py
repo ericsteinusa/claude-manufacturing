@@ -276,15 +276,22 @@ def _seed_payroll_runs(conn):
             (ded_name, dt_row["is_pre_tax"], calc_method, amount)
         )
 
+    # RUNS is processed in a fixed order and each pass either fully commits a
+    # run or not (conn.commit() below, once per run_idx), so "how many of
+    # our runs already exist" is a stable proxy for "which run_idx to resume
+    # from" -- unlike matching on pay_period_start/end, which are TODAY + a
+    # fixed offset and drift every day, so a same-day check would never
+    # match a run inserted on a prior day and would insert a full duplicate
+    # payroll run (plus its entries/deductions) on every non-reset re-run.
+    already_seeded = conn.execute(
+        f"SELECT COUNT(*) FROM payroll_run WHERE created_by='{TAG}'"
+    ).fetchone()[0]
+
     for run_idx, (start_off, end_off) in enumerate(RUNS):
+        if run_idx < already_seeded:
+            continue
         start = _d(start_off)
         end = _d(end_off)
-        if conn.execute(
-            "SELECT 1 FROM payroll_run"
-            f" WHERE pay_period_start=%s AND pay_period_end=%s AND created_by='{TAG}'",
-            (start, end)
-        ).fetchone():
-            continue
 
         run_row = conn.execute(
             "INSERT INTO payroll_run"
