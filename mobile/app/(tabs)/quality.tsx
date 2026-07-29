@@ -7,14 +7,14 @@ import { useFocusEffect } from 'expo-router';
 import { getNcrs, getNcr, createNcr } from '../../src/api/quality';
 import StatusBadge from '../../src/components/StatusBadge';
 
-const STATUSES = ['', 'open', 'under_review', 'resolved', 'closed'];
-const SEVERITIES = ['minor', 'major', 'critical'];
-const SOURCES = ['internal', 'customer', 'supplier', 'audit'];
+const STATUSES = ['', 'Open', 'Under Review', 'Dispositioned', 'Closed'];
+const SEVERITIES = ['Minor', 'Major', 'Critical'];
+const SOURCES = ['Incoming', 'In-Process', 'Final', 'Customer', 'Supplier', 'Audit'];
 
 const SEVERITY_COLORS: Record<string, string> = {
-  minor: '#f9ab00',
-  major: '#e8710a',
-  critical: '#d93025',
+  Minor: '#f9ab00',
+  Major: '#e8710a',
+  Critical: '#d93025',
 };
 
 export default function QualityScreen() {
@@ -24,7 +24,7 @@ export default function QualityScreen() {
   const [selected, setSelected] = useState<any>(null);
   const [createModal, setCreateModal] = useState(false);
   const [form, setForm] = useState({
-    title: '', source: 'internal', severity: 'minor', product: '', description: '',
+    title: '', source: 'Incoming', severity: 'Minor', product: '', description: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,7 +66,7 @@ export default function QualityScreen() {
         description: form.description.trim(),
       });
       setCreateModal(false);
-      setForm({ title: '', source: 'internal', severity: 'minor', product: '', description: '' });
+      setForm({ title: '', source: 'Incoming', severity: 'Minor', product: '', description: '' });
       load();
     } catch (err: any) {
       Alert.alert('Error', err?.response?.data?.error ?? 'Could not create NCR.');
@@ -106,7 +106,7 @@ export default function QualityScreen() {
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.card} onPress={() => openDetail(item.id)}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.ncrNum}>{item.ncr_number ?? `NCR-${item.id}`}</Text>
+                  <Text style={styles.ncrNum}>{`NCR-${item.id}`}</Text>
                   <View style={styles.badges}>
                     <View style={[styles.severityBadge, { backgroundColor: SEVERITY_COLORS[item.severity] ?? '#888' }]}>
                       <Text style={styles.severityTxt}>{(item.severity ?? '').toUpperCase()}</Text>
@@ -119,7 +119,7 @@ export default function QualityScreen() {
                   {[
                     item.source && `Source: ${item.source}`,
                     item.product && `Product: ${item.product}`,
-                    item.created_at && item.created_at.slice(0, 10),
+                    item.detected_date,
                   ].filter(Boolean).join('  ·  ')}
                 </Text>
               </TouchableOpacity>
@@ -137,7 +137,7 @@ export default function QualityScreen() {
             <TouchableOpacity style={styles.closeBtn} onPress={() => setSelected(null)}>
               <Text style={styles.closeTxt}>← Back</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>{selected.ncr_number ?? `NCR-${selected.id}`}</Text>
+            <Text style={styles.modalTitle}>{`NCR-${selected.id}`}</Text>
             <View style={styles.badges}>
               <View style={[styles.severityBadge, { backgroundColor: SEVERITY_COLORS[selected.severity] ?? '#888' }]}>
                 <Text style={styles.severityTxt}>{(selected.severity ?? '').toUpperCase()}</Text>
@@ -149,11 +149,11 @@ export default function QualityScreen() {
             {[
               ['Source', selected.source],
               ['Product', selected.product],
-              ['Lot #', selected.lot_number],
+              ['Owner', selected.owner],
               ['Reported by', selected.created_by],
-              ['Date', selected.created_at?.slice(0, 10)],
+              ['Detected', selected.detected_date],
               ['Disposition', selected.disposition],
-              ['Root cause', selected.root_cause],
+              ['Closed', selected.closed_date],
             ].filter(([, v]) => v).map(([label, value]) => (
               <View key={label} style={styles.infoRow}>
                 <Text style={styles.infoLabel}>{label}</Text>
@@ -161,17 +161,10 @@ export default function QualityScreen() {
               </View>
             ))}
 
-            {selected.description ? (
+            {selected.notes ? (
               <View style={{ marginTop: 16 }}>
-                <Text style={styles.sectionTitle}>Description</Text>
-                <Text style={styles.bodyText}>{selected.description}</Text>
-              </View>
-            ) : null}
-
-            {selected.corrective_action ? (
-              <View style={{ marginTop: 12 }}>
-                <Text style={styles.sectionTitle}>Corrective Action</Text>
-                <Text style={styles.bodyText}>{selected.corrective_action}</Text>
+                <Text style={styles.sectionTitle}>Notes</Text>
+                <Text style={styles.bodyText}>{selected.notes}</Text>
               </View>
             ) : null}
           </ScrollView>
