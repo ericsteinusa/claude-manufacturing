@@ -90,11 +90,14 @@ def _ensure_tables(conn):
 
 PROJECTS = [
     # (proj_num, title, engineer, start_ago, due_offset, status)
+    # due_offset is a DURATION added to start_ago, not an absolute day count
+    # from today -- for an on_hold/completed project whose due date is N
+    # days ago, due_offset must be (N days ago) - start_ago, not simply -N.
     (f"{TAG}PROJ-{YEAR}-0001", "Next-Gen Drive Shaft Redesign",       "Sarah Chen",     -120, 60,  "in_progress"),
     (f"{TAG}PROJ-{YEAR}-0002", "Weight Reduction Initiative — Frame",  "Raj Patel",      -90,  30,  "in_progress"),
     (f"{TAG}PROJ-{YEAR}-0003", "Automated Assembly Fixture Design",    "Sarah Chen",     -45,  90,  "planning"),
-    (f"{TAG}PROJ-{YEAR}-0004", "Hydraulic System Upgrade v2",         "Wei Zhang",      -180, -10, "on_hold"),
-    (f"{TAG}PROJ-{YEAR}-0005", "Laser Cutter Integration Study",      "Raj Patel",      -200, -30, "completed"),
+    (f"{TAG}PROJ-{YEAR}-0004", "Hydraulic System Upgrade v2",         "Wei Zhang",      -180, 170, "on_hold"),
+    (f"{TAG}PROJ-{YEAR}-0005", "Laser Cutter Integration Study",      "Raj Patel",      -200, 170, "completed"),
     (f"{TAG}PROJ-{YEAR}-0006", "New Product Line — Compact Module",   "Wei Zhang",       -30, 120, "planning"),
 ]
 
