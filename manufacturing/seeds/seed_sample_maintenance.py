@@ -172,6 +172,10 @@ def _remove_equipment(conn):
 WORK_ORDERS = [
     # (title, equipment, work_type, priority, assigned_to,
     #  req_ago, due_offset, completed_offset, status)
+    # due_offset/completed_offset are DURATIONS added to req_ago, not
+    # absolute day counts from today -- for a "Completed" WO whose due/
+    # completed date is N days ago, the offset must be (N days ago) -
+    # req_ago, not simply -N.
     ("Replace worn bearings on CNC Mill #1", "CNC Mill #1", "Replacement", "High",
      "SMPL-MAINT-Bob Harmon", -3, 4, None, "In Progress"),
     ("Quarterly PM — Hydraulic Press", "Hydraulic Press", "Preventive", "Medium",
@@ -183,15 +187,15 @@ WORK_ORDERS = [
     ("Industrial chiller coil cleaning", "Industrial Chiller", "Cleaning", "Critical",
      "SMPL-MAINT-Tim Okafor", -1, 1, None, "Assigned"),
     ("Conveyor belt tension adjustment", "Conveyor Belt #1", "Repair", "Medium",
-     "SMPL-MAINT-Bob Harmon", -14, -10, -9, "Completed"),
+     "SMPL-MAINT-Bob Harmon", -14, 4, 5, "Completed"),
     ("Paint booth filter replacement", "Paint Booth", "Replacement", "Medium",
      "SMPL-MAINT-Ed Paulson", -5, 3, None, "On Hold"),
     ("Annual overhead crane inspection", "Overhead Crane", "Inspection", "High",
-     "SMPL-MAINT-Lynn Marsh", -30, -27, -26, "Completed"),
+     "SMPL-MAINT-Lynn Marsh", -30, 3, 4, "Completed"),
     ("MIG welder electrode tip replacement", "MIG Welder", "Replacement", "Low",
      "SMPL-MAINT-Carlos Vega", -2, 5, None, "Open"),
     ("Injection molder hydraulic fluid flush", "Injection Molder", "Preventive", "Medium",
-     "SMPL-MAINT-Carlos Vega", -10, -5, -4, "Completed"),
+     "SMPL-MAINT-Carlos Vega", -10, 5, 6, "Completed"),
 ]
 
 
@@ -224,12 +228,15 @@ def _remove_work_orders(conn):
 
 SCHEDULES = [
     # (task, equipment, frequency, assigned_to, last_ago, next_offset, status)
+    # next_offset is a DURATION added to last_ago, not an absolute day count
+    # from today -- for an "Overdue" schedule whose next-due date is N days
+    # ago, next_offset must be (N days ago) - last_ago, not simply -N.
     ("Lubricate spindle bearings", "CNC Mill #1", "Monthly",
      "SMPL-MAINT-Bob Harmon", -28, 2, "Scheduled"),
     ("Check hydraulic fluid level", "Hydraulic Press", "Weekly",
      "SMPL-MAINT-Carlos Vega", -7, 0, "Due"),
     ("Inspect air filters", "Air Compressor", "Monthly",
-     "SMPL-MAINT-Tim Okafor", -45, -15, "Overdue"),
+     "SMPL-MAINT-Tim Okafor", -45, 30, "Overdue"),
     ("Calibrate laser optics", "Laser Cutter", "Quarterly",
      "SMPL-MAINT-Bob Harmon", -90, 2, "Scheduled"),
     ("Test crane load limit switch", "Overhead Crane", "Semi-Annual",
