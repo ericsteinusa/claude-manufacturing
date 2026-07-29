@@ -156,6 +156,12 @@ def create_project(conn, project_number, title, product_id, engineer,
         project_number = next_project_number(conn)
     if status not in PROJECT_STATUSES:
         status = 'planning'
+    # eng_project predates created_by on some deployments (whichever CREATE
+    # TABLE ran first won, and this module's own DDL is a no-op against an
+    # already-existing table) -- self-heal since callers commit right after
+    # calling this function.
+    conn.execute(
+        "ALTER TABLE eng_project ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     row = conn.execute(
         "INSERT INTO eng_project (project_number, title, product_id, engineer,"
         " start_date, due_date, status, notes, created_by)"
@@ -225,6 +231,9 @@ def create_task(conn, project_id, task_name, assigned_to, due_date,
         raise ValueError('Task name is required')
     if priority not in PRIORITIES:
         priority = 'medium'
+    # eng_task predates created_by on some deployments -- see create_project.
+    conn.execute(
+        "ALTER TABLE eng_task ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     row = conn.execute(
         "INSERT INTO eng_task (project_id, task_name, assigned_to, due_date,"
         " priority, status, notes, created_by)"
@@ -299,6 +308,10 @@ def create_ecr(conn, ecr_number, title, product_id, project_id,
         raise ValueError('ECR title is required')
     if not ecr_number:
         ecr_number = next_ecr_number(conn)
+    # eng_design_review predates created_by on some deployments -- see
+    # create_project.
+    conn.execute(
+        "ALTER TABLE eng_design_review ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
     row = conn.execute(
         "INSERT INTO eng_design_review (ecr_number, title, product_id,"
         " project_id, requested_by, review_date, status, notes, created_by)"
