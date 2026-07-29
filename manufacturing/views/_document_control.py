@@ -196,6 +196,7 @@ def document_detail(request, doc_id):
 def document_download(request, doc_id):
     conn = get_db_connection()
     try:
+        ensure_document_tables(conn)
         doc = get_document(conn, doc_id)
     finally:
         conn.close()

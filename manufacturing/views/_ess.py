@@ -173,6 +173,7 @@ def ess_review_detail(request, review_id):
     conn = get_db_connection()
     try:
         pid = _my_people_id(request, conn)
+        init_review_table(conn)
         review = get_review(conn, review_id)
         if not review or not pid or review.get('people_id') != pid:
             return redirect('ess_reviews')
@@ -201,6 +202,7 @@ def ess_training_detail(request, training_id):
     conn = get_db_connection()
     try:
         pid = _my_people_id(request, conn)
+        init_training_table(conn)
         training = get_training(conn, training_id)
         if not training or not pid or training.get('people_id') != pid:
             return redirect('ess_trainings')
