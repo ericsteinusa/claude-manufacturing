@@ -435,6 +435,7 @@ def api_req(request):
             return api_err('purpose is required.')
         conn = get_db_connection()
         try:
+            purchase_requisitions_core.ensure_requisition_tables(conn)
             year = datetime.date.today().year
             prefix = f'REQ-{year}-'
             existing = [
@@ -480,6 +481,7 @@ def api_req_add_item(request, req_id):
     u = request.api_user
     conn = get_db_connection()
     try:
+        purchase_requisitions_core.ensure_requisition_tables(conn)
         req_row = conn.execute(
             "SELECT status, requester_id FROM purchase_requisition WHERE id = %s",
             (req_id,),
@@ -512,6 +514,7 @@ def api_req_submit(request, req_id):
     u = request.api_user
     conn = get_db_connection()
     try:
+        purchase_requisitions_core.ensure_requisition_tables(conn)
         req_row = conn.execute(
             "SELECT status, requester_id FROM purchase_requisition WHERE id = %s",
             (req_id,),
@@ -559,6 +562,7 @@ def api_req_pending(request):
         return api_err('Manager access required.', 403)
     conn = get_db_connection()
     try:
+        purchase_requisitions_core.ensure_requisition_tables(conn)
         sql = """
             SELECT pr.id, pr.req_number, pr.dept_id, pr.purpose,
                    pr.status, pr.notes,
@@ -597,6 +601,7 @@ def api_req_decide(request, req_id):
         return api_err("decision must be 'approve' or 'deny'.")
     conn = get_db_connection()
     try:
+        purchase_requisitions_core.ensure_requisition_tables(conn)
         req_row = conn.execute(
             "SELECT status, requester_id, dept_id"
             " FROM purchase_requisition WHERE id = %s",
