@@ -195,6 +195,38 @@ def remove_sample(conn):
     ids = list(_sample_ids(conn).values())
     bom_n = prod_n = 0
     if ids:
+        # routing/lot/cost_roll (and lot's own children serial_number/
+        # spc_measurement, and routing's own child wo_operation) are
+        # populated against these same product ids by
+        # seed_sample_operations.py via NO ACTION (not CASCADE) foreign
+        # keys -- clean them up first regardless of whether that seed's
+        # own --remove has run, so this seed's --reset/--remove doesn't
+        # depend on running the other one first. Guard by table existence
+        # since seed_sample_operations.py may never have been run (its
+        # CREATE TABLE IF NOT EXISTS is the only thing that creates these).
+        existing = {r["table_name"] for r in conn.execute(
+            "SELECT table_name FROM information_schema.tables "
+            "WHERE table_schema='public' AND table_name = ANY(%s)",
+            (['lot', 'routing', 'cost_roll', 'serial_number',
+              'spc_measurement', 'wo_operation'],)).fetchall()}
+        if 'spc_measurement' in existing and 'lot' in existing:
+            conn.execute(
+                "DELETE FROM spc_measurement WHERE lot_id IN "
+                "(SELECT id FROM lot WHERE product_id = ANY(%s))", (ids,))
+        if 'serial_number' in existing and 'lot' in existing:
+            conn.execute(
+                "DELETE FROM serial_number WHERE lot_id IN "
+                "(SELECT id FROM lot WHERE product_id = ANY(%s))", (ids,))
+        if 'wo_operation' in existing and 'routing' in existing:
+            conn.execute(
+                "DELETE FROM wo_operation WHERE routing_id IN "
+                "(SELECT id FROM routing WHERE product_id = ANY(%s))", (ids,))
+        if 'lot' in existing:
+            conn.execute("DELETE FROM lot WHERE product_id = ANY(%s)", (ids,))
+        if 'routing' in existing:
+            conn.execute("DELETE FROM routing WHERE product_id = ANY(%s)", (ids,))
+        if 'cost_roll' in existing:
+            conn.execute("DELETE FROM cost_roll WHERE product_id = ANY(%s)", (ids,))
         bom_n = conn.execute(
             "DELETE FROM bom WHERE product_id = ANY(%s) "
             "OR component_id = ANY(%s)", (ids, ids)).rowcount
