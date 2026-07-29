@@ -255,7 +255,7 @@ def update_target(conn, target_id, rep, period, target, actual,
 # Leads & Opportunities
 # ---------------------------------------------------------------------------
 
-SALES_LEAD_STATUSES = ('New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost')
+SALES_LEAD_STATUSES = ('New', 'Contacted', 'Qualified', 'Nurturing', 'Proposal', 'Won', 'Lost')
 SALES_LEAD_SOURCES = (
     'Website', 'Referral', 'Cold Call', 'Trade Show', 'Email Campaign',
     'Social Media', 'Partner', 'Other',
