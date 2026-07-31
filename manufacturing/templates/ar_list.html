@@ -116,9 +116,9 @@
             <input type="hidden" name="action" value="new">
             <div class="inv-form-grid">
                 <div class="inv-form-row">
-                    <label>Customer</label>
-                    <select name="customer_id">
-                        <option value="">(none)</option>
+                    <label>Customer *</label>
+                    <select name="customer_id" required>
+                        <option value="">(select a customer)</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}">{{ c.label }}</option>
                         {% endfor %}
@@ -133,8 +133,8 @@
                     <input type="date" name="invoice_date">
                 </div>
                 <div class="inv-form-row">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date">
+                    <label>Due Date *</label>
+                    <input type="date" name="due_date" required>
                 </div>
                 <div class="inv-form-row">
                     <label>Amount ($)</label>

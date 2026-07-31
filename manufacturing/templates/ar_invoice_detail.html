@@ -89,9 +89,9 @@
             <input type="hidden" name="action" value="save">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Customer</label>
-                    <select name="customer_id">
-                        <option value="">(none)</option>
+                    <label>Customer *</label>
+                    <select name="customer_id" required>
+                        <option value="">(select a customer)</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}" {% if invoice and invoice.customer_id == c.id %}selected{% endif %}>{{ c.label }}</option>
                         {% endfor %}
@@ -113,8 +113,8 @@
                     <input type="date" name="invoice_date" value="{{ invoice.invoice_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date" value="{{ invoice.due_date|default:'' }}">
+                    <label>Due Date *</label>
+                    <input type="date" name="due_date" required value="{{ invoice.due_date|default:'' }}">
                 </div>
                 <div class="form-row">
                     <label>Amount</label>

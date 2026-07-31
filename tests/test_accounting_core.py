@@ -189,46 +189,96 @@ def test_create_ap_invoice_returns_id():
 
 
 def test_create_ap_invoice_rejects_empty_number():
-    with pytest.raises(ValueError):
-        create_ap_invoice(_conn(), None, '', '2024-01-01', None, 0, '', '')
+    with pytest.raises(ValueError, match='Invoice number'):
+        create_ap_invoice(_conn(), None, '', '2024-01-01', '2024-02-01', 0, '', '')
 
 
 def test_create_ap_invoice_defaults_status_open():
     conn = _conn(fetchone={'id': 1})
-    create_ap_invoice(conn, None, 'INV-X', '', None, 0, '', '')
+    create_ap_invoice(conn, None, 'INV-X', '', '2024-02-01', 0, '', '')
     sql = conn.execute.call_args[0][0]
     assert 'open' in sql
 
 
 def test_create_ap_invoice_does_not_commit():
     conn = _conn(fetchone={'id': 1})
-    create_ap_invoice(conn, None, 'INV-X', '', None, 0, '', '')
+    create_ap_invoice(conn, None, 'INV-X', '', '2024-02-01', 0, '', '')
     conn.commit.assert_not_called()
 
 
 def test_update_ap_invoice_executes_update():
     conn = _conn()
-    update_ap_invoice(conn, 1, None, 'INV-001', '2024-01-01', None, 1000, '', 'open')
+    update_ap_invoice(conn, 1, None, 'INV-001', '2024-01-01', '2024-02-01', 1000, '', 'open')
     sql = conn.execute.call_args[0][0]
     assert 'UPDATE ap_invoice' in sql
 
 
 def test_update_ap_invoice_rejects_empty_number():
-    with pytest.raises(ValueError):
-        update_ap_invoice(_conn(), 1, None, '', '', None, 0, '', 'open')
+    with pytest.raises(ValueError, match='Invoice number'):
+        update_ap_invoice(_conn(), 1, None, '', '', '2024-02-01', 0, '', 'open')
 
 
 def test_update_ap_invoice_corrects_bad_status():
     conn = _conn()
-    update_ap_invoice(conn, 1, None, 'INV-001', '', None, 0, '', 'bogus')
+    update_ap_invoice(conn, 1, None, 'INV-001', '', '2024-02-01', 0, '', 'bogus')
     params = conn.execute.call_args[0][1]
     assert 'open' in params
 
 
 def test_update_ap_invoice_does_not_commit():
     conn = _conn()
-    update_ap_invoice(conn, 1, None, 'INV-001', '', None, 0, '', 'open')
+    update_ap_invoice(conn, 1, None, 'INV-001', '', '2024-02-01', 0, '', 'open')
     conn.commit.assert_not_called()
+
+
+# --- required-field validation ------------------------------------------
+# The live schema has NOT NULL on ap_invoice.due_date, ar_invoice.due_date
+# and ar_invoice.customer_id even though schema.py's DDL declares them
+# nullable. Passing an empty value used to reach Postgres as an
+# IntegrityError (a 500 on the web form); these guards reject it up front.
+
+def test_create_ap_invoice_requires_due_date():
+    with pytest.raises(ValueError, match='Due date'):
+        create_ap_invoice(_conn(), 1, 'INV-1', '2024-01-01', '', 0, '', '')
+
+
+def test_create_ap_invoice_requires_due_date_when_none():
+    with pytest.raises(ValueError, match='Due date'):
+        create_ap_invoice(_conn(), 1, 'INV-1', '2024-01-01', None, 0, '', '')
+
+
+def test_update_ap_invoice_requires_due_date():
+    with pytest.raises(ValueError, match='Due date'):
+        update_ap_invoice(_conn(), 1, 1, 'INV-1', '2024-01-01', '', 0, '', 'open')
+
+
+def test_create_ar_invoice_requires_customer():
+    with pytest.raises(ValueError, match='Customer'):
+        create_ar_invoice(_conn(), None, 'AR-1', '2024-01-01', '2024-02-01',
+                          0, '', '')
+
+
+def test_create_ar_invoice_requires_due_date():
+    with pytest.raises(ValueError, match='Due date'):
+        create_ar_invoice(_conn(), 1, 'AR-1', '2024-01-01', '', 0, '', '')
+
+
+def test_update_ar_invoice_requires_customer():
+    with pytest.raises(ValueError, match='Customer'):
+        update_ar_invoice(_conn(), 1, None, 'AR-1', '2024-01-01', '2024-02-01',
+                          0, '', 'open')
+
+
+def test_update_ar_invoice_requires_due_date():
+    with pytest.raises(ValueError, match='Due date'):
+        update_ar_invoice(_conn(), 1, 1, 'AR-1', '2024-01-01', '', 0, '',
+                          'open')
+
+
+def test_create_ar_invoice_accepts_valid_input():
+    conn = _conn(fetchone={'id': 9})
+    assert create_ar_invoice(conn, 1, 'AR-9', '2024-01-01', '2024-02-01',
+                             100, '', 'u@e.com') == 9
 
 
 def test_set_ap_status_executes_update():
@@ -360,19 +410,19 @@ def test_get_ar_invoice_returns_none():
 
 
 def test_create_ar_invoice_rejects_empty_number():
-    with pytest.raises(ValueError):
-        create_ar_invoice(_conn(), None, '', '', None, 0, '', '')
+    with pytest.raises(ValueError, match='Invoice number'):
+        create_ar_invoice(_conn(), 1, '', '', '2024-02-01', 0, '', '')
 
 
 def test_create_ar_invoice_returns_id():
     conn = _conn(fetchone={'id': 7})
-    rid = create_ar_invoice(conn, 1, 'AR-002', '2024-01-01', None, 200, '', 'u@e.com')
+    rid = create_ar_invoice(conn, 1, 'AR-002', '2024-01-01', '2024-02-01', 200, '', 'u@e.com')
     assert rid == 7
 
 
 def test_update_ar_invoice_executes_update():
     conn = _conn()
-    update_ar_invoice(conn, 1, None, 'AR-001', '', None, 0, '', 'open')
+    update_ar_invoice(conn, 1, 1, 'AR-001', '', '2024-02-01', 0, '', 'open')
     sql = conn.execute.call_args[0][0]
     assert 'UPDATE ar_invoice' in sql
 
