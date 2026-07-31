@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block page_title %}Log SPC Measurement{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/spc/" class="btn">SPC Home</a>
+<a href="/qa/" class="btn">Quality Home</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.spc-wrap { width:100%; max-width:900px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select,.form-row textarea {
+    padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:12px; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+.cpk-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.cpk-tile { text-align:center; }
+.cpk-tile .num { font-size:22px; font-weight:bold; color:var(--accent); }
+.cpk-tile .lbl { font-size:11px; color:#777; text-transform:uppercase; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="spc-wrap">
+    <div class="menu-title">Log SPC Measurement</div>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>New Measurement</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Product</label>
+                    <select name="product_id" required>
+                        {% for p in products %}
+                        <option value="{{ p.id }}" {% if product_id == p.id|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Characteristic</label>
+                    <input type="text" name="characteristic" value="{{ characteristic }}" placeholder="e.g. Diameter (mm)" required>
+                </div>
+                <div class="form-row">
+                    <label>Measured Value *</label>
+                    <input type="number" step="any" name="measured_value" required>
+                </div>
+                <div class="form-row">
+                    <label>Lot (optional — required to later certify via CoA)</label>
+                    <select name="lot_id">
+                        <option value="">— No lot —</option>
+                        {% for l in lots %}
+                        <option value="{{ l.id }}">{{ l.lot_number }} ({{ l.product_name }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row full">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="save-btn">Log Measurement</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if characteristic %}
+    <div class="card">
+        <h3>Process Capability (Cpk) — {{ characteristic }}</h3>
+        {% if cpk.cpk != None %}
+        <div class="cpk-grid">
+            <div class="cpk-tile"><div class="num">{{ cpk.cpk }}</div><div class="lbl">Cpk</div></div>
+            <div class="cpk-tile"><div class="num">{{ cpk.mean }}</div><div class="lbl">Mean</div></div>
+            <div class="cpk-tile"><div class="num">{{ cpk.std_dev }}</div><div class="lbl">Std Dev</div></div>
+            <div class="cpk-tile"><div class="num">{{ cpk.n }}</div><div class="lbl">Samples</div></div>
+        </div>
+        {% else %}
+        <div class="empty-state">{{ cpk.error|default:"Not enough data yet." }}</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Recent Measurements</h3>
+        {% if measurements %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead><tr><th>Value</th><th>Status</th><th>Lot</th><th>Measured</th><th>By</th></tr></thead>
+                <tbody>
+                    {% for m in measurements %}
+                    <tr>
+                        <td>{{ m.measured_value }}</td>
+                        <td>
+                            {% if m.in_control %}
+                            <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">In Control</span>
+                            {% else %}
+                            <span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">Out of Control</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ m.lot_id|default:"—" }}</td>
+                        <td>{{ m.measured_at }}</td>
+                        <td>{{ m.measured_by|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No measurements logged yet for this characteristic.</div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
