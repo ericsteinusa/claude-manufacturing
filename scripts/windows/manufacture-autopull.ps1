@@ -44,7 +44,7 @@ if ($local -eq $remote) {
     exit 0
 }
 
-Write-Log "New commits detected ($local -> $remote), pulling"
+Write-Log "New commits detected (was $local, now $remote), pulling"
 
 git pull origin main --ff-only
 if ($LASTEXITCODE -ne 0) {
