@@ -290,6 +290,7 @@ from ._fmea import *  # noqa: F401,F403
 from ._abc_costing import *  # noqa: F401,F403
 from ._discount import *  # noqa: F401,F403
 from ._coa import *  # noqa: F401,F403
+from ._spc import *  # noqa: F401,F403
 from ._skills_matrix import *  # noqa: F401,F403
 from ._benefits import *  # noqa: F401,F403
 from ._regulatory_compliance import *  # noqa: F401,F403

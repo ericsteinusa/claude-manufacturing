@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block page_title %}Statistical Process Control{% endblock %}
+
+{% block toolbar_left %}
+<a href="/qa/" class="btn">Quality Home</a>
+<a href="/qa/spc/log/" class="btn btn-primary">+ Log Measurement</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.spc-wrap { width:100%; max-width:1000px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:12px; }
+.msg-ok { background:#efffef;border:1px solid #3a3;border-radius:5px;
+    padding:8px 14px;color:#060;font-size:13px;margin-bottom:12px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="spc-wrap">
+    <div class="menu-title">Statistical Process Control</div>
+    {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Set Control Limit</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Product</label>
+                    <select name="product_id" required>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Characteristic</label>
+                    <input type="text" name="characteristic" placeholder="e.g. Diameter (mm)" required>
+                </div>
+                <div class="form-row">
+                    <label>Target</label>
+                    <input type="number" step="any" name="target">
+                </div>
+                <div class="form-row">
+                    <label>Sigma</label>
+                    <input type="number" step="any" name="sigma">
+                </div>
+                <div class="form-row">
+                    <label>LCL *</label>
+                    <input type="number" step="any" name="lcl" required>
+                </div>
+                <div class="form-row">
+                    <label>UCL *</label>
+                    <input type="number" step="any" name="ucl" required>
+                </div>
+                <div class="form-row">
+                    <label>Subgroup Size</label>
+                    <select name="subgroup_size">
+                        {% for n in subgroup_sizes %}
+                        <option value="{{ n }}" {% if n == 5 %}selected{% endif %}>{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="save-btn">Save Control Limit</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Active Control Limits</h3>
+        {% if limits %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Product</th><th>Characteristic</th><th>LCL</th><th>Target</th><th>UCL</th><th>Subgroup</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for l in limits %}
+                    <tr>
+                        <td>{{ l.product_name|default:"(any)" }}</td>
+                        <td>{{ l.characteristic }}</td>
+                        <td>{{ l.lcl }}</td>
+                        <td>{{ l.target|default:"—" }}</td>
+                        <td>{{ l.ucl }}</td>
+                        <td>{{ l.subgroup_size }}</td>
+                        <td><a href="/qa/spc/log/?product_id={{ l.product_id }}&characteristic={{ l.characteristic|urlencode }}"
+                               class="btn" style="padding:3px 10px;font-size:12px;">Log / View</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No control limits defined yet.</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Out-of-Control Alerts</h3>
+        {% if alerts %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Product</th><th>Characteristic</th><th>Value</th><th>Limits</th><th>Measured</th><th>By</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in alerts %}
+                    <tr>
+                        <td>{{ a.product_name|default:"—" }}</td>
+                        <td>{{ a.characteristic }}</td>
+                        <td><span class="pill pill-danger" style="font-size:11px;padding:2px 8px;">{{ a.measured_value }}</span></td>
+                        <td>{{ a.lcl }} – {{ a.ucl }}</td>
+                        <td>{{ a.measured_at }}</td>
+                        <td>{{ a.measured_by|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No out-of-control measurements.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
