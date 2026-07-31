@@ -21,6 +21,8 @@ from .mrp_core import next_sequence_number
 from . import (
     approval_workflow_core,
     costing_core,
+    cycle_count_core,
+    document_control_core,
     inventory_core,
     lot_core,
     maintenance_core,
@@ -930,11 +932,31 @@ def api_workflow_decide(request, step_id):
     conn = get_db_connection()
     try:
         approval_workflow_core.ensure_approval_tables(conn)
-        overall = approval_workflow_core.decide_step(
-            conn, step_id, decision,
-            decided_by=u.get('email', str(u['id'])),
-            notes=body.get('notes', ''),
-        )
+        decided_by = u.get('email', str(u['id']))
+        notes = body.get('notes', '')
+        step = conn.execute(
+            "SELECT entity_type, entity_id FROM approval_step WHERE id = %s",
+            (step_id,),
+        ).fetchone()
+        entity_type = step['entity_type'] if step else None
+        entity_id = step['entity_id'] if step else None
+        # Deciding via the raw engine only flips approval_step.status — the
+        # entity it's gating (requisition/cycle count/document) has its own
+        # status column that approval_step never touches directly, so each
+        # domain needs its own sync wrapper (mirroring decide_cycle_count /
+        # decide_document) or the decision silently never reaches the entity.
+        if entity_type == 'purchase_requisition' and entity_id:
+            overall = purchase_requisitions_core.decide_requisition_via_workflow(
+                conn, entity_id, step_id, decision, decided_by, notes)
+        elif entity_type == 'cycle_count' and entity_id:
+            overall = cycle_count_core.decide_cycle_count(
+                conn, entity_id, step_id, decision, decided_by, notes)
+        elif entity_type == 'document' and entity_id:
+            overall = document_control_core.decide_document(
+                conn, entity_id, step_id, decision, decided_by, notes)
+        else:
+            overall = approval_workflow_core.decide_step(
+                conn, step_id, decision, decided_by=decided_by, notes=notes)
         conn.commit()
     except ValueError as exc:
         conn.close()

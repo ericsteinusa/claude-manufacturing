@@ -248,3 +248,34 @@ def decide_requisition(conn, req_id: int, decision: str,
         VALUES (%s, 'dept', %s, %s, %s, CURRENT_DATE::text)
     """, (req_id, decision, approver_id, comment))
     return new_status
+
+
+def decide_requisition_via_workflow(conn, req_id: int, step_id: int, decision: str,
+                                     decided_by: str, notes: str = '') -> str:
+    """Decide one approval_workflow step for a requisition — the path used
+    by the mobile Approvals tab (api_workflow_decide) — and sync
+    purchase_requisition.status to match, mirroring decide_requisition()'s
+    dept_approved/dept_denied semantics.
+
+    Without this, deciding a step via the generic approval_workflow_core
+    engine (as opposed to the web app's decide_requisition() path) leaves
+    the requisition itself permanently stuck at 'submitted', since
+    approval_step and purchase_requisition are otherwise unlinked tables.
+    Returns the resulting purchase_requisition status.
+    """
+    from . import approval_workflow_core
+    overall = approval_workflow_core.decide_step(
+        conn, step_id, decision, decided_by, notes)
+    if overall == 'approved':
+        conn.execute(
+            "UPDATE purchase_requisition SET status = 'dept_approved' WHERE id = %s",
+            (req_id,),
+        )
+        return 'dept_approved'
+    if overall == 'rejected':
+        conn.execute(
+            "UPDATE purchase_requisition SET status = 'dept_denied' WHERE id = %s",
+            (req_id,),
+        )
+        return 'dept_denied'
+    return 'submitted'
