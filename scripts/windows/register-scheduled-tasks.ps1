@@ -14,14 +14,23 @@
 #>
 
 $ScriptDir = $PSScriptRoot
-$RunScript      = Join-Path $ScriptDir 'manufacture-run.ps1'
-$AutopullScript = Join-Path $ScriptDir 'manufacture-autopull.ps1'
+$RunScript          = Join-Path $ScriptDir 'manufacture-run.ps1'
+$RunLauncher        = Join-Path $ScriptDir 'run-server-hidden.vbs'
+$AutopullLauncher   = Join-Path $ScriptDir 'autopull-hidden.vbs'
+
+# Both tasks run wscript.exe against a tiny VBScript launcher (see the two
+# *-hidden.vbs files) rather than calling powershell.exe directly. A task's
+# own "Hidden" setting does not reliably suppress the console flash for a
+# task running in an interactive logon session — WScript.Shell.Run with
+# window style 0 does. -ExecutionPolicy Bypass is intentionally omitted:
+# this machine's LocalMachine execution policy is already Unrestricted, so
+# it's not needed (and it's the kind of flag worth not reaching for out of
+# habit).
 
 # --- Task 1: start the server at logon (systemd's WantedBy=multi-user.target) ---
-$startAction  = New-ScheduledTaskAction -Execute 'powershell.exe' `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$RunScript`""
+$startAction  = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$RunLauncher`""
 $startTrigger = New-ScheduledTaskTrigger -AtLogOn
-$startSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+$startSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -Hidden
 
 Register-ScheduledTask -TaskName 'ManufactureServer' `
     -Action $startAction -Trigger $startTrigger -Settings $startSettings `
@@ -29,12 +38,11 @@ Register-ScheduledTask -TaskName 'ManufactureServer' `
     -Force
 
 # --- Task 2: poll for new commits every 2 minutes (systemd's OnUnitActiveSec=2min) ---
-$pullAction  = New-ScheduledTaskAction -Execute 'powershell.exe' `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$AutopullScript`""
+$pullAction  = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$AutopullLauncher`""
 $pullTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) `
     -RepetitionInterval (New-TimeSpan -Minutes 2) `
     -RepetitionDuration (New-TimeSpan -Days 3650)
-$pullSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -MultipleInstances IgnoreNew
+$pullSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -MultipleInstances IgnoreNew -Hidden
 
 Register-ScheduledTask -TaskName 'ManufactureAutopull' `
     -Action $pullAction -Trigger $pullTrigger -Settings $pullSettings `
