@@ -133,18 +133,20 @@ def create_fixed_asset(conn, asset_number: str, asset_name: str, asset_type: str
                         purchase_date: str, purchase_price: float, salvage_value: float,
                         useful_life_years: int, depreciation_method: str,
                         status: str, serial_number: str, notes: str,
-                        created_by: str) -> int:
+                        created_by: str, in_service_date: str = '') -> int:
     row = conn.execute("""
         INSERT INTO fixed_asset
             (asset_number, asset_name, asset_type, category, location, department,
              vendor, purchase_date, purchase_price, salvage_value, useful_life_years,
-             depreciation_method, status, serial_number, notes, created_by, created_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+             depreciation_method, status, serial_number, notes, created_by, created_date,
+             in_service_date)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id
     """, (asset_number, asset_name, asset_type, category, location, department,
           vendor, purchase_date, float(purchase_price or 0), float(salvage_value or 0),
           int(useful_life_years or 5), depreciation_method, status or 'Active',
-          serial_number, notes, created_by, str(_date.today()))).fetchone()
+          serial_number, notes, created_by, str(_date.today()),
+          in_service_date or None)).fetchone()
     return row['id']
 
 
@@ -205,8 +207,8 @@ def calc_accumulated_depreciation(asset: dict) -> float:
     if not purchase_date:
         return 0.0
     try:
-        purchase_year = int(str(purchase_date)[:4])
-        years_owned = max(0, _date.today().year - purchase_year)
+        p_date = _date.fromisoformat(str(purchase_date)[:10])
+        years_owned = max(0.0, (_date.today() - p_date).days / 365.25)
     except (ValueError, TypeError):
         return 0.0
     annual = calc_annual_depreciation(asset)
