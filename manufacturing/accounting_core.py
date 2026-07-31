@@ -3,6 +3,14 @@ accounting_core.py — Qt-free data layer for Accounting web views.
 Tables: ap_invoice, ap_payment, ar_invoice, ar_payment,
         gl_account, gl_journal, gl_journal_line
 No PyQt6, no commit inside any function.
+
+Invoice required-field validation: the live schema is stricter than this
+app's own DDL in ``schema.py`` (which declares ``ar_invoice.customer_id``
+and both invoice tables' ``due_date`` as nullable).  Live, all three are
+NOT NULL, so passing None reached the database as an IntegrityError rather
+than a usable message.  The create/update functions below reject the empty
+values up front so the behavior is the same on a drifted legacy database
+and on a fresh one built from the DDL.
 """
 
 import datetime
@@ -132,6 +140,8 @@ def create_ap_invoice(conn, vendor_id, invoice_number, invoice_date,
                       due_date, amount, description, created_by):
     if not invoice_number:
         raise ValueError('Invoice number is required')
+    if not due_date:
+        raise ValueError('Due date is required')
     row = conn.execute(
         "INSERT INTO ap_invoice (vendor_id, invoice_number, invoice_date,"
         " due_date, amount, description, status, created_by)"
@@ -148,6 +158,8 @@ def update_ap_invoice(conn, inv_id, vendor_id, invoice_number, invoice_date,
                       due_date, amount, description, status):
     if not invoice_number:
         raise ValueError('Invoice number is required')
+    if not due_date:
+        raise ValueError('Due date is required')
     if status not in INVOICE_STATUSES:
         status = 'open'
     conn.execute(
@@ -283,6 +295,10 @@ def create_ar_invoice(conn, customer_id, invoice_number, invoice_date,
                       due_date, amount, description, created_by):
     if not invoice_number:
         raise ValueError('Invoice number is required')
+    if not customer_id:
+        raise ValueError('Customer is required')
+    if not due_date:
+        raise ValueError('Due date is required')
     row = conn.execute(
         "INSERT INTO ar_invoice (customer_id, invoice_number, invoice_date,"
         " due_date, amount, description, status, created_by)"
@@ -299,6 +315,10 @@ def update_ar_invoice(conn, inv_id, customer_id, invoice_number, invoice_date,
                       due_date, amount, description, status):
     if not invoice_number:
         raise ValueError('Invoice number is required')
+    if not customer_id:
+        raise ValueError('Customer is required')
+    if not due_date:
+        raise ValueError('Due date is required')
     if status not in INVOICE_STATUSES:
         status = 'open'
     conn.execute(

@@ -113,8 +113,8 @@
                     <input type="date" name="invoice_date" value="{{ invoice.invoice_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date" value="{{ invoice.due_date|default:'' }}">
+                    <label>Due Date *</label>
+                    <input type="date" name="due_date" required value="{{ invoice.due_date|default:'' }}">
                 </div>
                 <div class="form-row">
                     <label>Amount</label>

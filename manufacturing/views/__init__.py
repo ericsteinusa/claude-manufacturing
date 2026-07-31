@@ -4902,6 +4902,7 @@ def ap_list(request):
                 conn.commit()
                 success = 'Invoice created.'
         except Exception as exc:
+            conn.rollback()
             error = str(exc)
     status  = request.GET.get('status', '')
     vendor_id = request.GET.get('vendor_id', '')
@@ -5006,6 +5007,7 @@ def ap_invoice_detail(request, inv_id=None):
                 conn.commit()
                 success = 'Status updated.'
         except Exception as exc:
+            conn.rollback()
             error = str(exc)
     invoice  = get_ap_invoice(conn, inv_id) if inv_id else None
     payments = list_ap_payments(conn, inv_id) if inv_id else []
@@ -5052,6 +5054,7 @@ def ar_list(request):
                 conn.commit()
                 success = 'Invoice created.'
         except Exception as exc:
+            conn.rollback()
             error = str(exc)
     status      = request.GET.get('status', '')
     customer_id = request.GET.get('customer_id', '')
@@ -5156,6 +5159,7 @@ def ar_invoice_detail(request, inv_id=None):
                 conn.commit()
                 success = 'Status updated.'
         except Exception as exc:
+            conn.rollback()
             error = str(exc)
     invoice   = get_ar_invoice(conn, inv_id) if inv_id else None
     payments  = list_ar_payments(conn, inv_id) if inv_id else []
