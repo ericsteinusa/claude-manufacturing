@@ -117,6 +117,19 @@
                     <input class="ro" readonly value="{{ eq.last_service|default:'' }}">
                     {% endif %}
                 </div>
+                <div class="form-row">
+                    <label>Parent Equipment</label>
+                    {% if can_edit %}
+                    <select name="parent_id">
+                        <option value="">— Top level —</option>
+                        {% for e in all_equipment %}
+                        <option value="{{ e.id }}" {% if eq.parent_id == e.id %}selected{% endif %}>{{ e.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{% for e in all_equipment %}{% if e.id == eq.parent_id %}{{ e.name }}{% endif %}{% endfor %}">
+                    {% endif %}
+                </div>
                 <div class="form-row full">
                     <label>Notes</label>
                     {% if can_edit %}
@@ -134,6 +147,24 @@
             {% endif %}
         </form>
     </div>
+
+    {% if children %}
+    <div class="card">
+        <h3>Sub-Equipment</h3>
+        {% for c in children %}
+        <div><a href="/maint/equipment/{{ c.id }}/">{{ c.name }}</a> <span style="color:#777;font-size:12px;">{{ c.status }}</span></div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if parts %}
+    <div class="card">
+        <h3>Spare Parts On File For This Equipment</h3>
+        {% for p in parts %}
+        <div><a href="/maint/parts/{{ p.id }}/">{{ p.name }}</a> <span style="color:#777;font-size:12px;">qty {{ p.quantity }}</span></div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 </div>
 {% endblock %}

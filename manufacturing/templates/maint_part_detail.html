@@ -115,6 +115,19 @@
                     <input class="ro" readonly value="{{ part.status }}">
                     {% endif %}
                 </div>
+                <div class="form-row">
+                    <label>Fits Equipment</label>
+                    {% if can_edit %}
+                    <select name="equipment_id">
+                        <option value="">— None —</option>
+                        {% for e in all_equipment %}
+                        <option value="{{ e.id }}" {% if part.equipment_id == e.id %}selected{% endif %}>{{ e.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% else %}
+                    <input class="ro" readonly value="{% for e in all_equipment %}{% if e.id == part.equipment_id %}{{ e.name }}{% endif %}{% endfor %}">
+                    {% endif %}
+                </div>
                 <div class="form-row full">
                     <label>Notes</label>
                     {% if can_edit %}

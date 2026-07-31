@@ -107,7 +107,7 @@ def get_downtime_by_category(conn, months: int = 3) -> list[dict]:
 
 def load_mechanics(conn) -> list[dict]:
     rows = conn.execute(
-        "SELECT name FROM maint_mechanic WHERE status='Active' ORDER BY name"
+        "SELECT id, name FROM maint_mechanic WHERE status='Active' ORDER BY name"
     ).fetchall()
     return [dict(r) for r in rows]
 
