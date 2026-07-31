@@ -58,3 +58,10 @@ manufacturing/.vscode/
 # OS
 .DS_Store
 Thumbs.db
+
+# Windows deployment runtime artifacts (scripts/windows/) — PID file and
+# server/autopull logs generated on whichever machine runs them, not shared.
+manufacture-server.pid
+manufacture-server.log
+manufacture-server.log.err
+manufacture-autopull.log
