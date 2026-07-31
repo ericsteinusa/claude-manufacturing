@@ -4964,11 +4964,15 @@ def ap_invoice_detail(request, inv_id=None):
         action = request.POST.get('action', '')
         try:
             if action == 'save' and inv_id:
+                invoice_date = request.POST.get('invoice_date', '')
+                if is_period_locked(conn, invoice_date):
+                    raise ValueError("Period %s is closed." % period_label(
+                        *map(int, invoice_date[:7].split('-'))))
                 update_ap_invoice(
                     conn, inv_id,
                     request.POST.get('vendor_id') or None,
                     request.POST.get('invoice_number', '').strip(),
-                    request.POST.get('invoice_date', ''),
+                    invoice_date,
                     request.POST.get('due_date', ''),
                     request.POST.get('amount', 0),
                     request.POST.get('description', '').strip(),
@@ -4982,9 +4986,13 @@ def ap_invoice_detail(request, inv_id=None):
                 conn.commit()
                 success = 'Invoice updated.'
             elif action == 'payment' and inv_id:
+                payment_date = request.POST.get('payment_date', '')
+                if is_period_locked(conn, payment_date):
+                    raise ValueError("Period %s is closed." % period_label(
+                        *map(int, payment_date[:7].split('-'))))
                 record_ap_payment(
                     conn, inv_id,
-                    request.POST.get('payment_date', ''),
+                    payment_date,
                     request.POST.get('amount', 0),
                     request.POST.get('method', 'Check'),
                     request.POST.get('reference', '').strip(),
@@ -5106,11 +5114,15 @@ def ar_invoice_detail(request, inv_id=None):
         action = request.POST.get('action', '')
         try:
             if action == 'save' and inv_id:
+                invoice_date = request.POST.get('invoice_date', '')
+                if is_period_locked(conn, invoice_date):
+                    raise ValueError("Period %s is closed." % period_label(
+                        *map(int, invoice_date[:7].split('-'))))
                 update_ar_invoice(
                     conn, inv_id,
                     request.POST.get('customer_id') or None,
                     request.POST.get('invoice_number', '').strip(),
-                    request.POST.get('invoice_date', ''),
+                    invoice_date,
                     request.POST.get('due_date', ''),
                     request.POST.get('amount', 0),
                     request.POST.get('description', '').strip(),
@@ -5124,9 +5136,13 @@ def ar_invoice_detail(request, inv_id=None):
                 conn.commit()
                 success = 'Invoice updated.'
             elif action == 'payment' and inv_id:
+                payment_date = request.POST.get('payment_date', '')
+                if is_period_locked(conn, payment_date):
+                    raise ValueError("Period %s is closed." % period_label(
+                        *map(int, payment_date[:7].split('-'))))
                 record_ar_payment(
                     conn, inv_id,
-                    request.POST.get('payment_date', ''),
+                    payment_date,
                     request.POST.get('amount', 0),
                     request.POST.get('method', 'Check'),
                     request.POST.get('reference', '').strip(),
@@ -5277,9 +5293,13 @@ def gl_journal_detail(request, journal_id=None):
                     for i in range(len(acct_ids))
                     if acct_ids[i]
                 ]
+                journal_date = request.POST.get('journal_date', '')
+                if is_period_locked(conn, journal_date):
+                    raise ValueError("Period %s is closed." % period_label(
+                        *map(int, journal_date[:7].split('-'))))
                 new_id = create_journal(
                     conn,
-                    request.POST.get('journal_date', ''),
+                    journal_date,
                     request.POST.get('reference', '').strip(),
                     request.POST.get('description', '').strip(),
                     lines,
@@ -5292,6 +5312,10 @@ def gl_journal_detail(request, journal_id=None):
                 if request.session.get('user_role') in READ_ONLY_ROLES:
                     conn.close()
                     return redirect('acct_dashboard')
+                jrl = get_journal(conn, journal_id)
+                if jrl and is_period_locked(conn, jrl.get('journal_date')):
+                    raise ValueError("Period %s is closed." % period_label(
+                        *map(int, jrl['journal_date'][:7].split('-'))))
                 post_journal(conn, journal_id)
                 conn.commit()
                 success = 'Journal entry posted.'
@@ -8844,6 +8868,7 @@ def fixed_asset_list(request):
                     serial_number=request.POST.get('serial_number', ''),
                     notes=request.POST.get('notes', ''),
                     created_by=request.session.get('user_email', ''),
+                    in_service_date=request.POST.get('in_service_date', ''),
                 )
                 log_fixed_asset_event(conn, asset_id, 'created',
                                       f"Asset {asset_number} created.", request.session.get('user_email', ''))
