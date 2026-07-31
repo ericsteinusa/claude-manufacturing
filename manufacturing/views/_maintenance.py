@@ -24,6 +24,8 @@ from ..maintenance_core import (
     list_work_orders, get_work_order, create_work_order,
     update_work_order, complete_work_order,
     list_equipment, get_equipment, create_equipment, update_equipment,
+    set_equipment_parent, get_equipment_children,
+    link_part_to_equipment, get_parts_for_equipment,
     list_schedules, get_schedule, create_schedule,
     update_schedule, complete_schedule,
     list_inspections as maint_list_inspections,
@@ -36,7 +38,7 @@ from ..maintenance_core import (
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
     get_equipment_reliability_report, get_schedule_status_breakdown,
-    get_wo_status_breakdown, get_downtime_by_category,
+    get_wo_status_breakdown, get_downtime_by_category, get_pm_alerts,
 )
 
 log = get_logger(__name__)
@@ -72,6 +74,7 @@ def maint_dashboard(request):
         schedule_breakdown = get_schedule_status_breakdown(conn)
         wo_status = get_wo_status_breakdown(conn)
         downtime_by_cat = get_downtime_by_category(conn, months=3)
+        pm_alerts = get_pm_alerts(conn, days_ahead=14)
     finally:
         conn.close()
     return render(request, 'maint_dashboard.html', _maint_ctx(
@@ -81,6 +84,7 @@ def maint_dashboard(request):
         schedule_breakdown_json=json.dumps(schedule_breakdown),
         wo_status_json=json.dumps(wo_status),
         downtime_by_cat_json=json.dumps(downtime_by_cat),
+        pm_alerts=pm_alerts[:8],
     ))
 
 
@@ -384,17 +388,23 @@ def maint_equipment_detail(request, eq_id):
                     status=request.POST.get('status', ''),
                     notes=request.POST.get('notes', ''),
                 )
+                parent_raw = request.POST.get('parent_id', '').strip()
+                set_equipment_parent(conn, eq_id, int(parent_raw) if parent_raw else None)
                 conn.commit()
                 eq = get_equipment(conn, eq_id)
                 success = 'Equipment updated.'
             except Exception as e:
                 conn.rollback()
                 error = str(e)
+        all_equipment = [e for e in list_equipment(conn) if e['id'] != eq_id]
+        children = get_equipment_children(conn, eq_id)
+        parts = get_parts_for_equipment(conn, eq_id)
     finally:
         conn.close()
     return render(request, 'maint_equipment_detail.html', _maint_ctx(
         request, eq=eq, can_edit=can_edit,
         equipment_statuses=EQUIPMENT_STATUSES,
+        all_equipment=all_equipment, children=children, parts=parts,
         error=error, success=success,
     ))
 
@@ -757,17 +767,21 @@ def maint_part_detail(request, part_id):
                     status=request.POST.get('status', ''),
                     notes=request.POST.get('notes', ''),
                 )
+                eq_raw = request.POST.get('equipment_id', '').strip()
+                link_part_to_equipment(conn, part_id, int(eq_raw) if eq_raw else None)
                 conn.commit()
                 part = get_part(conn, part_id)
                 success = 'Part updated.'
             except Exception as e:
                 conn.rollback()
                 error = str(e)
+        all_equipment = list_equipment(conn)
     finally:
         conn.close()
     return render(request, 'maint_part_detail.html', _maint_ctx(
         request, part=part, can_edit=can_edit,
         part_statuses=PART_STATUSES, part_categories=PART_CATEGORIES,
+        all_equipment=all_equipment,
         error=error, success=success,
     ))
 

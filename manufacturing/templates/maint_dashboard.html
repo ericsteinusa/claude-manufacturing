@@ -42,6 +42,18 @@
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
 .card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; }
 .card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.pm-alerts { list-style:none; margin:0; padding:0; }
+.pm-alerts li { display:flex; justify-content:space-between; align-items:center;
+    gap:12px; padding:8px 0; border-bottom:1px solid #eee; font-size:13px; }
+.pm-alerts li:last-child { border-bottom:none; }
+.pm-alerts .task { color:#333; }
+.pm-alerts .equip { color:#777; font-size:12px; }
+.urgency-badge { font-size:11px; font-weight:bold; padding:2px 9px; border-radius:12px;
+    white-space:nowrap; }
+.urgency-badge.overdue { background:#ffebee; color:#c62828; }
+.urgency-badge.due_soon { background:#fff3e0; color:#e65100; }
+.urgency-badge.due { background:#eef1ff; color:#3949ab; }
+.pm-alerts-empty { font-size:13px; color:#777; }
 {% endblock %}
 
 {% block body %}
@@ -78,6 +90,32 @@
             <div class="num">{{ oee.oee_pct }}%</div>
             <div class="lbl">OEE (month to date)</div>
         </a>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+        <h3>PM Alerts (next 14 days) — <a href="/maint/schedule/" style="color:var(--accent);font-weight:normal;font-size:12px;">Full Schedule →</a></h3>
+        {% if pm_alerts %}
+        <ul class="pm-alerts">
+            {% for a in pm_alerts %}
+            <li>
+                <span>
+                    <span class="task">{{ a.task }}</span>
+                    <span class="equip"> — {{ a.equipment }}</span>
+                </span>
+                <span>
+                    <span style="font-size:12px;color:#777;margin-right:8px;">{{ a.next_due }}</span>
+                    <span class="urgency-badge {{ a.urgency }}">
+                        {% if a.urgency == 'overdue' %}Overdue
+                        {% elif a.urgency == 'due_soon' %}Due Soon
+                        {% else %}Due{% endif %}
+                    </span>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="pm-alerts-empty">No PM tasks overdue or due in the next 14 days.</div>
+        {% endif %}
     </div>
 
     <div class="oee-trend">
