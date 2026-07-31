@@ -277,6 +277,7 @@ urlpatterns = [
     path('payroll/pay-rates/', views.payroll_pay_rates, name='payroll_pay_rates'),
     path('payroll/deductions/', views.payroll_deductions, name='payroll_deductions'),
     path('payroll/history/', views.payroll_history, name='payroll_history'),
+    path('payroll/history/new/', views.payroll_run_new, name='payroll_run_new'),
     path('payroll/history/export/', views.payroll_history_export,
          name='payroll_history_export'),
     path('payroll/history/<int:run_id>/', views.payroll_run_detail, name='payroll_run_detail'),
