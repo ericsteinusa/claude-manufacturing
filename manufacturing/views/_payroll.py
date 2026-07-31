@@ -10,7 +10,7 @@ from ..csv_export import export_response
 import json
 
 from ..payroll_core import (
-    SS_RATE, MEDICARE_RATE,
+    SS_RATE, MEDICARE_RATE, FREQUENCIES,
     PAY_TYPES, DED_CATEGORIES, DED_METHODS,
     get_dashboard_counts as payroll_get_dashboard_counts,
     get_payroll_monthly_gross, get_payroll_dept_breakdown,
@@ -18,7 +18,7 @@ from ..payroll_core import (
     list_pay_rates, upsert_pay_rate, delete_pay_rate,
     list_deduction_types, create_deduction_type, update_deduction_type,
     list_employee_deductions, create_employee_deduction, delete_employee_deduction,
-    list_payroll_runs, get_payroll_run, get_run_entries,
+    list_payroll_runs, get_payroll_run, get_run_entries, process_payroll,
     get_pay_stub, get_stub_deductions, get_ytd,
 )
 
@@ -200,6 +200,39 @@ def payroll_history_export(request):
         ('total_gross', 'Total Gross'), ('total_net', 'Total Net'),
         ('status', 'Status'),
     ], runs)
+
+
+@dept_required(_PAYROLL_DEPT_KEYS, write_redirect='payroll_history')
+def payroll_run_new(request):
+    can_edit = _payroll_ctx(request)['can_edit']
+    error = ''
+    if request.method == 'POST' and can_edit:
+        conn = get_db_connection()
+        try:
+            try:
+                fed_pct = float(request.POST.get('federal_tax_pct', '0') or '0')
+                state_pct = float(request.POST.get('state_tax_pct', '0') or '0')
+            except ValueError:
+                fed_pct = state_pct = 0.0
+            run_id = process_payroll(
+                conn,
+                pay_period_start=request.POST.get('pay_period_start', '').strip(),
+                pay_period_end=request.POST.get('pay_period_end', '').strip(),
+                pay_frequency=request.POST.get('pay_frequency', 'Bi-Weekly'),
+                federal_tax_rate=fed_pct / 100.0,
+                state_tax_rate=state_pct / 100.0,
+                created_by=request.session.get('user_email', ''),
+            )
+            conn.commit()
+            return redirect('payroll_run_detail', run_id=run_id)
+        except Exception as e:
+            conn.rollback()
+            error = str(e)
+        finally:
+            conn.close()
+    return render(request, 'payroll_run_new.html', _payroll_ctx(
+        request, frequencies=FREQUENCIES, error=error,
+    ))
 
 
 @dept_required(_PAYROLL_DEPT_KEYS)

@@ -307,6 +307,132 @@ def get_run_entries(conn, run_id: int) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def process_payroll(conn, pay_period_start: str, pay_period_end: str,
+                    pay_frequency: str, federal_tax_rate: float,
+                    state_tax_rate: float, created_by: str,
+                    run_date: str | None = None) -> int:
+    """Process a real payroll run for every employee with a pay rate on
+    file: hourly employees are paid on actual clocked hours for the period
+    (via time_clock_web_core's existing OT engine — the same regular/OT
+    split shown on the OT report, so payroll and that report can never
+    disagree); salaried employees are paid pay_rate / periods-per-year for
+    the chosen frequency. Applies each employee's active deductions and
+    withholds federal/state/SS/Medicare on the post-pre-tax-deduction
+    taxable amount. Writes payroll_run + payroll_entry +
+    payroll_entry_deduction rows and returns the new run id.
+
+    *federal_tax_rate* / *state_tax_rate* are fractions (0.22, not 22).
+
+    Raises ValueError if pay_frequency is invalid, the period is empty or
+    backwards, no employee has a pay rate on file, or a run already exists
+    for this exact period (re-running it would double-pay everyone).
+    """
+    if pay_frequency not in FREQUENCIES:
+        raise ValueError(f"pay_frequency must be one of {FREQUENCIES}")
+    if not pay_period_start or not pay_period_end:
+        raise ValueError("Pay period start and end are required.")
+    if pay_period_end < pay_period_start:
+        raise ValueError("Pay period end must be on or after the start.")
+
+    existing = conn.execute(
+        "SELECT id FROM payroll_run WHERE pay_period_start=%s AND pay_period_end=%s",
+        (pay_period_start, pay_period_end),
+    ).fetchone()
+    if existing:
+        raise ValueError(
+            f"A payroll run already exists for {pay_period_start} to "
+            f"{pay_period_end} (run #{existing['id']}).")
+
+    from .time_clock_web_core import get_ot_report_all
+
+    pay_rows = conn.execute("""
+        SELECT ep.people_id, ep.pay_type, ep.pay_rate
+        FROM employee_pay ep
+        JOIN people p ON p.id = ep.people_id
+        WHERE COALESCE(p.employment_status, '') != 'terminated'
+    """).fetchall()
+    if not pay_rows:
+        raise ValueError("No employees have a pay rate on file.")
+
+    hours_by_person = {
+        r['people_id']: r
+        for r in get_ot_report_all(conn, date_from=pay_period_start,
+                                   date_to=pay_period_end)
+    }
+
+    run_row = conn.execute(
+        "INSERT INTO payroll_run "
+        "(pay_period_start, pay_period_end, run_date, pay_frequency, "
+        " federal_tax_rate, state_tax_rate, status, created_by) "
+        "VALUES (%s,%s,%s,%s,%s,%s,'processed',%s) RETURNING id",
+        (pay_period_start, pay_period_end, run_date or _today(),
+         pay_frequency, float(federal_tax_rate), float(state_tax_rate),
+         created_by),
+    ).fetchone()
+    run_id = run_row['id']
+
+    for pr in pay_rows:
+        pid = pr['people_id']
+        pay_type = pr['pay_type'] if pr['pay_type'] in PAY_TYPES else 'hourly'
+        pay_rate = float(pr['pay_rate'] or 0)
+
+        if pay_type == 'hourly':
+            hrs = hours_by_person.get(pid)
+            total_hrs = float(hrs['total_hours']) if hrs else 0.0
+            ot_hrs = float(hrs['ot_hours']) if hrs else 0.0
+            reg_hrs = max(0.0, total_hrs - ot_hrs)
+            gross = round(pay_rate * reg_hrs + pay_rate * 1.5 * ot_hrs, 2)
+        else:
+            reg_hrs = ot_hrs = 0.0
+            gross = round(pay_rate / FREQ_DIVISORS[pay_frequency], 2)
+
+        emp_deds = [
+            d for d in list_employee_deductions(conn, people_id=pid)
+            if d.get('is_active')
+        ]
+        pre_total = 0.0
+        post_total = 0.0
+        ded_items = []  # [(name, is_pre_tax, amount)]
+        for d in emp_deds:
+            amt = (round(gross * (float(d['amount']) / 100.0), 2)
+                   if d['calc_method'] == 'percent' else float(d['amount']))
+            ded_items.append((d['ded_name'], 1 if d['is_pre_tax'] else 0, amt))
+            if d['is_pre_tax']:
+                pre_total += amt
+            else:
+                post_total += amt
+        pre_total = round(pre_total, 2)
+        post_total = round(post_total, 2)
+
+        taxable = max(0.0, gross - pre_total)
+        fed = round(taxable * float(federal_tax_rate), 2)
+        state_tax = round(taxable * float(state_tax_rate), 2)
+        ss = round(taxable * SS_RATE, 2)
+        med = round(taxable * MEDICARE_RATE, 2)
+        net = round(max(0.0, taxable - fed - state_tax - ss - med - post_total), 2)
+
+        entry_row = conn.execute(
+            "INSERT INTO payroll_entry "
+            "(run_id, people_id, regular_hours, overtime_hours, "
+            " gross_pay, federal_tax, state_tax, social_security, medicare, "
+            " net_pay, pre_tax_deductions, post_tax_deductions) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+            (run_id, pid, reg_hrs, ot_hrs, gross, fed, state_tax,
+             ss, med, net, pre_total, post_total),
+        ).fetchone()
+        entry_id = entry_row['id']
+
+        for ded_name, is_pre_tax, amt in ded_items:
+            conn.execute(
+                "INSERT INTO payroll_entry_deduction "
+                "(entry_id, deduction_name, is_pre_tax, amount) "
+                "VALUES (%s,%s,%s,%s)",
+                (entry_id, ded_name, is_pre_tax, amt),
+            )
+
+    return run_id
+
+
 # ---------------------------------------------------------------------------
 # Pay Stubs
 # ---------------------------------------------------------------------------

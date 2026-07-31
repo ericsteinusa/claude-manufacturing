@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block page_title %}Run Payroll{% endblock %}
+
+{% block toolbar_left %}
+<a href="/payroll/history/" class="btn">Payroll History</a>
+<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:640px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:20px 24px; }
+.card h3 { margin:0 0 6px; font-size:15px; color:#333; }
+.card .hint { font-size:13px; color:var(--text-muted); margin:0 0 18px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
+.form-row { display:flex; flex-direction:column; gap:4px; }
+.form-row.full { grid-column:1/-1; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input,.form-row select { padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; }
+.save-btn { padding:7px 20px; background:var(--accent); color:white;
+    border:none; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold; margin-top:16px; }
+.msg-err { background:#ffefef;border:1px solid #c33;border-radius:5px;
+    padding:8px 14px;color:#900;font-size:13px;margin-bottom:12px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Run Payroll</h2>
+    {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>New Payroll Run</h3>
+        <p class="hint">
+            Hourly employees are paid on actual clocked hours for this period
+            (regular + overtime, same split as the Time Clock OT report).
+            Salaried employees are paid their annual rate divided by the
+            number of pay periods per year for the frequency chosen below.
+            Only employees with a pay rate on file are included.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>Pay Period Start *</label>
+                    <input type="date" name="pay_period_start" required>
+                </div>
+                <div class="form-row">
+                    <label>Pay Period End *</label>
+                    <input type="date" name="pay_period_end" required>
+                </div>
+                <div class="form-row">
+                    <label>Pay Frequency</label>
+                    <select name="pay_frequency">
+                        {% for f in frequencies %}
+                        <option value="{{ f }}" {% if f == "Bi-Weekly" %}selected{% endif %}>{{ f }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row"></div>
+                <div class="form-row">
+                    <label>Federal Tax Rate (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" name="federal_tax_pct" value="22" required>
+                </div>
+                <div class="form-row">
+                    <label>State Tax Rate (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" name="state_tax_pct" value="5" required>
+                </div>
+            </div>
+            <button type="submit" class="save-btn">Process Payroll</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
