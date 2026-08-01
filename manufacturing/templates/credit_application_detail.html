@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block page_title %}Credit Application — {{ application.company_name|default:application.first_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/credit/" class="btn">Credit Dashboard</a>
+<a href="/credit/accounts/" class="btn">Accounts</a>
+<a href="/credit/applications/" class="btn">Applications</a>
+<a href="/credit/collections/" class="btn">Collections</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:900px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.field-group { display:flex; flex-direction:column; gap:3px; }
+.field-group label { font-size:11px; font-weight:bold; color:#666; text-transform:uppercase; }
+.field-group .val { font-size:14px; color:#222; }
+.full-span { grid-column:1/-1; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.s-pending   { background:#fff3cd; color:#856404; }
+.s-approved  { background:#d4edda; color:#0a3622; }
+.s-denied    { background:#f8d7da; color:#721c24; }
+.btn-save { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-save:hover { background:var(--accent-hover); }
+.btn-deny { padding:8px 20px; background:#c33; color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; margin-left:8px; }
+.btn-deny:hover { background:#a22; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>{{ application.company_name|default:application.first_name }} {{ application.last_name }}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <div class="field-grid">
+            <div class="field-group">
+                <label>Status</label>
+                <div class="val"><span class="badge s-{{ application.status }}">{{ application.status }}</span></div>
+            </div>
+            <div class="field-group">
+                <label>Applied Date</label>
+                <div class="val">{{ application.applied_date }}</div>
+            </div>
+            <div class="field-group">
+                <label>Requested Limit</label>
+                <div class="val">${{ application.requested_limit|floatformat:2 }}</div>
+            </div>
+            <div class="field-group">
+                <label>Approved Limit</label>
+                <div class="val">{% if application.approved_limit %}${{ application.approved_limit|floatformat:2 }}{% else %}—{% endif %}</div>
+            </div>
+            <div class="field-group">
+                <label>Reviewed By</label>
+                <div class="val">{{ application.reviewed_by|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Review Date</label>
+                <div class="val">{{ application.review_date|default:"—" }}</div>
+            </div>
+            {% if application.notes %}
+            <div class="field-group full-span">
+                <label>Notes</label>
+                <div class="val">{{ application.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if existing_account %}
+    <div class="card">
+        <p style="margin:0;font-size:13px;">This customer already has a credit account: <a href="/credit/accounts/{{ existing_account.id }}/">view account</a> (current limit ${{ existing_account.credit_limit|floatformat:2 }}, status {{ existing_account.status }}).</p>
+    </div>
+    {% endif %}
+
+    {% if can_edit and application.status == 'pending' %}
+    <div class="card">
+        <h3>Review Application</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Approved Limit ($)</label>
+                    <input type="number" name="approved_limit" min="0" step="0.01" value="{{ application.requested_limit }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ application.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" name="action" value="approved" class="btn-save">Approve</button>
+            <button type="submit" name="action" value="denied" class="btn-deny">Deny</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block page_title %}Credit Department{% endblock %}
+
+{% block toolbar_left %}
+<a href="/credit/" class="btn">Credit Dashboard</a>
+<a href="/credit/accounts/" class="btn">Accounts</a>
+<a href="/credit/applications/" class="btn">Applications</a>
+<a href="/credit/collections/" class="btn">Collections</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1100px; }
+.section-label { color: var(--text-muted); font-size:12px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; margin-bottom:10px; margin-top:4px; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:14px 18px; }
+.kpi .lbl { font-size:12px; color:#555; font-weight:bold; margin-bottom:4px; }
+.kpi .val { font-size:28px; font-weight:bold; color:var(--accent); }
+.kpi.red { border-color:#c33; }
+.kpi.red .val { color:#c33; }
+.kpi.yellow { border-color:#b8860b; }
+.kpi.yellow .val { color:#b8860b; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-good      { background:#d4edda; color:#0a3622; }
+.s-hold      { background:#fff3cd; color:#856404; }
+.s-suspended { background:#f8d7da; color:#721c24; }
+.s-closed    { background:#e2e3e5; color:#383d41; }
+.s-pending   { background:#fff3cd; color:#856404; }
+.s-approved  { background:#d4edda; color:#0a3622; }
+.s-denied    { background:#f8d7da; color:#721c24; }
+.s-open           { background:#f8d7da; color:#721c24; }
+.s-in-progress    { background:#fff3cd; color:#856404; }
+.s-escalated      { background:#f8d7da; color:#721c24; }
+.s-resolved       { background:#d4edda; color:#0a3622; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Credit Department</h2>
+
+    <div class="dept-grid">
+        <a href="/credit/accounts/" class="dept-btn">Credit Accounts</a>
+        <a href="/credit/applications/" class="dept-btn">Credit Applications</a>
+        <a href="/credit/collections/" class="dept-btn">Collections</a>
+        <a href="/customers/" class="dept-btn">Customers</a>
+        <a href="/dashboard/" class="dept-btn">Home</a>
+    </div>
+
+    <div class="section-label">Credit Accounts</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Accounts</div>
+            <div class="val">{{ accounts.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if accounts.hold or accounts.suspended %} yellow{% endif %}">
+            <div class="lbl">Hold / Suspended</div>
+            <div class="val">{{ accounts.hold|add:accounts.suspended|default:0 }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Exposure</div>
+            <div class="val">${{ accounts.total_exposure|floatformat:0|default:0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-label">Applications</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Applications</div>
+            <div class="val">{{ applications.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if applications.pending %} yellow{% endif %}">
+            <div class="lbl">Pending Review</div>
+            <div class="val">{{ applications.pending|default:0 }}</div>
+        </div>
+        <div class="kpi">&nbsp;</div>
+    </div>
+
+    <div class="section-label">Collections</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="lbl">Total Activities</div>
+            <div class="val">{{ collections.total|default:0 }}</div>
+        </div>
+        <div class="kpi{% if collections.open %} red{% endif %}">
+            <div class="lbl">Open</div>
+            <div class="val">{{ collections.open|default:0 }}</div>
+        </div>
+        <div class="kpi">&nbsp;</div>
+    </div>
+
+    <div class="card">
+        <h3>Credit Accounts</h3>
+        <table class="list-table">
+            <thead><tr><th>Customer</th><th>Limit</th><th>Terms</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for a in recent_accounts %}
+            <tr>
+                <td><a href="/credit/accounts/{{ a.id }}/">{{ a.company_name|default:a.first_name }} {{ a.last_name }}</a></td>
+                <td>${{ a.credit_limit|floatformat:2 }}</td>
+                <td>{{ a.terms|default:"—" }}</td>
+                <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No credit accounts found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Pending Applications</h3>
+        <table class="list-table">
+            <thead><tr><th>Customer</th><th>Applied</th><th>Requested Limit</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for a in recent_applications %}
+            <tr>
+                <td><a href="/credit/applications/{{ a.id }}/">{{ a.company_name|default:a.first_name }} {{ a.last_name }}</a></td>
+                <td>{{ a.applied_date }}</td>
+                <td>${{ a.requested_limit|floatformat:2 }}</td>
+                <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No pending applications.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Open Collections</h3>
+        <table class="list-table">
+            <thead><tr><th>Customer</th><th>Type</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for c in recent_collections %}
+            <tr>
+                <td><a href="/credit/collections/{{ c.id }}/">{{ c.company_name|default:c.first_name }} {{ c.last_name }}</a></td>
+                <td>{{ c.activity_type }}</td>
+                <td>{{ c.activity_date }}</td>
+                <td><span class="badge s-{{ c.status|lower|slugify }}">{{ c.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No open collection activities.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

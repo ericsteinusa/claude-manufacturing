@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block page_title %}Credit Account — {{ account.company_name|default:account.first_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/credit/" class="btn">Credit Dashboard</a>
+<a href="/credit/accounts/" class="btn">Accounts</a>
+<a href="/credit/applications/" class="btn">Applications</a>
+<a href="/credit/collections/" class="btn">Collections</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:900px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.field-group { display:flex; flex-direction:column; gap:3px; }
+.field-group label { font-size:11px; font-weight:bold; color:#666; text-transform:uppercase; }
+.field-group .val { font-size:14px; color:#222; }
+.full-span { grid-column:1/-1; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.badge { display:inline-block; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:bold; }
+.s-good      { background:#d4edda; color:#0a3622; }
+.s-hold      { background:#fff3cd; color:#856404; }
+.s-suspended { background:#f8d7da; color:#721c24; }
+.s-closed    { background:#e2e3e5; color:#383d41; }
+.s-pending   { background:#fff3cd; color:#856404; }
+.s-approved  { background:#d4edda; color:#0a3622; }
+.s-denied    { background:#f8d7da; color:#721c24; }
+.btn-save { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-save:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>{{ account.company_name|default:account.first_name }} {{ account.last_name }}</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <div class="field-grid">
+            <div class="field-group">
+                <label>Status</label>
+                <div class="val"><span class="badge s-{{ account.status }}">{{ account.status }}</span></div>
+            </div>
+            <div class="field-group">
+                <label>Credit Limit</label>
+                <div class="val">${{ account.credit_limit|floatformat:2 }}</div>
+            </div>
+            <div class="field-group">
+                <label>Terms</label>
+                <div class="val">{{ account.terms|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Opened</label>
+                <div class="val">{{ account.opened_date|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Email</label>
+                <div class="val">{{ account.email|default:"—" }}</div>
+            </div>
+            <div class="field-group">
+                <label>Phone</label>
+                <div class="val">{{ account.phone_number|default:"—" }}</div>
+            </div>
+            {% if account.notes %}
+            <div class="field-group full-span">
+                <label>Notes</label>
+                <div class="val">{{ account.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="card">
+        <h3>Update Account</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Credit Limit ($)</label>
+                    <input type="number" name="credit_limit" min="0" step="0.01" value="{{ account.credit_limit }}">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        {% for s in credit_statuses %}
+                        <option value="{{ s }}"{% if account.status == s %} selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Terms</label>
+                    <input type="text" name="terms" value="{{ account.terms|default:'' }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Reason for change</label>
+                    <input type="text" name="reason" placeholder="Only needed if limit or status changes">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ account.notes|default:'' }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-save">Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Limit / Status History</h3>
+        <table class="list-table">
+            <thead><tr><th>Date</th><th>Limit</th><th>Status</th><th>Changed By</th><th>Reason</th></tr></thead>
+            <tbody>
+            {% for h in history %}
+            <tr>
+                <td>{{ h.changed_date }}</td>
+                <td>{% if h.old_limit %}${{ h.old_limit|floatformat:2 }} →{% endif %} ${{ h.new_limit|floatformat:2 }}</td>
+                <td>{% if h.old_status %}{{ h.old_status }} →{% endif %} {{ h.new_status }}</td>
+                <td>{{ h.changed_by|default:"—" }}</td>
+                <td>{{ h.reason|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;">No history yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Applications</h3>
+        <table class="list-table">
+            <thead><tr><th>Applied</th><th>Requested</th><th>Approved</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for a in applications %}
+            <tr>
+                <td><a href="/credit/applications/{{ a.id }}/">{{ a.applied_date }}</a></td>
+                <td>${{ a.requested_limit|floatformat:2 }}</td>
+                <td>{% if a.approved_limit %}${{ a.approved_limit|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No applications on file.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Collection Activities</h3>
+        <table class="list-table">
+            <thead><tr><th>Date</th><th>Type</th><th>Contact</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for c in collections %}
+            <tr>
+                <td><a href="/credit/collections/{{ c.id }}/">{{ c.activity_date }}</a></td>
+                <td>{{ c.activity_type }}</td>
+                <td>{{ c.contact_name|default:"—" }}</td>
+                <td>{{ c.status }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;">No collection activity.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}
