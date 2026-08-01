@@ -184,6 +184,19 @@ To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
   that pattern rather than assuming a direct balance column (a past bug in
   `reports_core.financial_dashboard` did, and 500'd; fixed in PR #336).
 
+## Windows deployment (`scripts/windows/`)
+`manufacture-autopull.ps1` (polls `origin/main` and redeploys) and
+`manufacture-run.ps1` (start/restart the dev server, tracked by port
+listening rather than PID — see its own docstring) run this app on a
+Windows box as a separate deployment from the Linux one, each against its
+**own local Postgres** (`DB_HOST=localhost` in that machine's `.env`, not
+shared). On a **fresh Postgres DB**, run `python manage.py migrate` before
+anything else — this app's own tables are created ad hoc via the seed
+scripts' `CREATE TABLE IF NOT EXISTS`, but Django's built-in tables
+(`django_session`, auth, admin, contenttypes) still go through the normal
+Django migration system. Skipping it doesn't surface until first login,
+which 500s with `relation "django_session" does not exist`.
+
 ## Sample data (dev DB)
 
 Seed scripts live in `manufacturing/seeds/`. Use `python -m manufacturing.seeds.<name>`.
