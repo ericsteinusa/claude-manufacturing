@@ -299,8 +299,7 @@ def get_schedule_summary(conn,
 
     total_present = sum(r['present'] for r in day_rows)
     total_entries_h = sum(r['total_hours'] for r in day_rows)
-    n_days = len(day_rows)
-    avg_daily = total_entries_h / n_days if n_days else 0.0
+    avg_daily = total_entries_h / total_present if total_present else 0.0
 
     return {
         'date_from': date_from,

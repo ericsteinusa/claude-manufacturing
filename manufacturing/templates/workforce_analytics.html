@@ -44,7 +44,7 @@
         </div>
         <div class="kpi">
             <div class="lbl">Turnover Rate (TTM)</div>
-            <div class="val">{% if summary.turnover_rate_ttm != None %}{{ summary.turnover_rate_ttm|floatformat:1 }}%{% else %}—{% endif %}</div>
+            <div class="val">{% if summary.turnover_rate_ttm != None %}{% widthratio summary.turnover_rate_ttm 1 100 %}%{% else %}—{% endif %}</div>
         </div>
     </div>
 
