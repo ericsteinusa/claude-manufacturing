@@ -206,13 +206,13 @@ def list_project_tasks(conn, project_id):
 def list_tasks(conn, status=None, priority=None, assigned_to=None):
     conds, params = [], []
     if status:
-        conds.append('status = %s')
+        conds.append('t.status = %s')
         params.append(status)
     if priority:
-        conds.append('priority = %s')
+        conds.append('t.priority = %s')
         params.append(priority)
     if assigned_to:
-        conds.append('assigned_to = %s')
+        conds.append('t.assigned_to = %s')
         params.append(assigned_to)
     where = ('WHERE ' + ' AND '.join(conds)) if conds else ''
     return conn.execute(
