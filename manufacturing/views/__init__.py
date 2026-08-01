@@ -5526,6 +5526,21 @@ def eng_project_detail(request, project_id=None):
                         )
                         conn.commit()
                         success = 'Project updated.'
+                    else:
+                        pid = create_project(
+                            conn,
+                            project_number='',
+                            title=request.POST.get('title', '').strip(),
+                            product_id=request.POST.get('product_id') or None,
+                            engineer=request.POST.get('engineer', '').strip(),
+                            start_date=request.POST.get('start_date', ''),
+                            due_date=request.POST.get('due_date', '') or None,
+                            status=request.POST.get('status', 'planning'),
+                            notes=request.POST.get('notes', '').strip(),
+                            created_by=request.session.get('user_email', ''),
+                        )
+                        conn.commit()
+                        return redirect(f'/eng/projects/{pid}/')
                 elif action == 'add_task':
                     create_task(
                         conn,

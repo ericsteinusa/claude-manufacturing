@@ -51,7 +51,7 @@ def get_legal_dashboard(conn) -> dict:
         "SELECT "
         "COUNT(*) AS total, "
         "COUNT(*) FILTER (WHERE status = 'Pending') AS pending, "
-        "COUNT(*) FILTER (WHERE status = 'Completed') AS completed "
+        "COUNT(*) FILTER (WHERE status = 'Complete') AS completed "
         "FROM legal_compliance"
     ).fetchone()
     compliance = dict(comp) if comp else {'total': 0, 'pending': 0, 'completed': 0}
