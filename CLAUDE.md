@@ -77,17 +77,22 @@ this section in sync when adding endpoints, it has gone stale before.
 - `manufacturing/api_auth.py` — `api_token` table DDL, plus:
   - Tokens: `create_token`, `verify_token`, `refresh_token`, `revoke_token`,
     `revoke_all_tokens`. Tokens are UUID hex strings stored in
-    `api_token(token, people_id, created_at)`.
+    `api_token(token, people_id, created_at, expires_at)`; `expires_at` backs
+    `TOKEN_LIFETIME_HOURS` expiry checked in `verify_token`.
   - Login rate limiting: `record_login_attempt`, `is_rate_limited`,
     `purge_old_attempts`.
   - TOTP two-factor auth: `generate_totp_secret`, `verify_totp_code`,
-    `set_totp_secret`, `get_totp_secret`, `disable_totp`, `verify_totp_for_user`.
+    `set_totp_secret`, `get_totp_secret`, `disable_totp`, `verify_totp_for_user`
+    — fully implemented but currently **dead code**; `api_login` only does
+    bcrypt + rate limiting, no route wires TOTP in yet.
 - `manufacturing/api_decorators.py` — `api_ok(data)`, `api_err(msg, status)`, `@api_required`
   decorator (checks `Authorization: Bearer <token>`, injects `request.api_user` dict).
 - `manufacturing/api_views.py` — all view functions; `@csrf_exempt` throughout; reuses
   `reports_core`, `time_clock_core`, `work_orders_core`, `personnel_core`,
   `purchase_requisitions_core`, `approval_workflow_core`, `costing_core`,
-  `inventory_core`, `lot_core`, `maintenance_core`, `quality_core`, `routing_core`
+  `inventory_core`, `lot_core`, `maintenance_core`, `quality_core`, `routing_core`,
+  `cycle_count_core`, `document_control_core` (the last two back the polymorphic
+  entity types in `api_workflow_decide`)
   — no PyQt6, safe in web context. No test coverage yet despite being Qt-free.
 - Routes wired at `/api/v1/` in `manufacturing/urls.py`:
   - Auth: login/logout/refresh/profile.

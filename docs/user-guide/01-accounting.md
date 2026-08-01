@@ -10,7 +10,9 @@ Financial Reports.
 share these screens). An Auditor filed under Accounting or Finance can view
 these screens but cannot save changes; Auditors filed under other
 departments don't get special access here beyond the cash-flow report noted
-in [Getting Started](00-getting-started.md).
+in [Getting Started](00-getting-started.md). **Credit Dept** is the
+exception — those screens are also open to Customers department staff (see
+below).
 
 ## Dashboard (`/acct/`)
 
@@ -43,6 +45,31 @@ invoice, record a customer payment against it.
   Sheet (`/gl/balance-sheet/`), Cash Flow (`/gl/cash-flow/`).
 - **Activity-Based Costing** (`/gl/abc-costing/`) — define cost-pool
   activities and view the ABC allocation report / per-product cost output.
+
+## Credit Dept (`/credit/`)
+
+Open to Accounting, Finance, **and Customers** department staff. Read-only
+roles (Auditor) can view but not save changes, same as elsewhere in
+Accounting.
+
+- **Dashboard** (`/credit/`) — outstanding-balance and past-due summary
+  tiles, plus recent accounts, pending applications, and open collection
+  activities.
+- **Accounts** (`/credit/accounts/`) — list, filter by status or search;
+  **New Account** links a customer (only customers without one already are
+  offered) to a credit limit, status, and terms. Account detail
+  (`/credit/accounts/<id>/`) shows limit-change history and lets you update
+  the limit/status/terms, recording a reason for the change.
+- **Applications** (`/credit/applications/`) — list, filter by status or
+  search; **New Application** records a customer's requested limit.
+  Application detail (`/credit/applications/<id>/`) approves or denies it
+  (optionally overriding the approved limit) and shows whether the customer
+  already has a credit account.
+- **Collections** (`/credit/collections/`) — list, filter by status or
+  search; **New Activity** logs a collection contact (call, letter, etc.)
+  against a customer, with an optional promise-to-pay amount/date and
+  follow-up date. Activity detail (`/credit/collections/<id>/`) updates the
+  activity's outcome and status.
 
 ## Multi-Entity (`/companies/`)
 
