@@ -112,10 +112,15 @@ this section in sync when adding endpoints, it has gone stale before.
 
 ## Mobile app (`mobile/`)
 React Native (expo-router) companion app. Set `EXPO_PUBLIC_API_URL` in `.env.local`.
-Installed Expo SDK is `~54.0.0` (`mobile/package.json`) — `mobile/AGENTS.md` says
-to read the v56 docs before writing code, which reads like a planned-but-not-yet-
-done upgrade; check `mobile/package.json` for the actual installed version before
-assuming either way.
+Installed Expo SDK is `^57.0.0` (`mobile/package.json`) — upgraded from `~54.0.0`
+staged one major at a time (54→55→56→57) via `expo install`/`expo install --fix`
+at each step, verified with `expo-doctor` and a full `expo export --platform web`
+bundle build at each stage. `mobile/AGENTS.md` points at the matching v57 docs.
+`babel-preset-expo` must stay an explicit `dependencies` entry in
+`mobile/package.json` — it's only ever transitively available via `expo`'s own
+`node_modules`, and relying on npm's hoisting for it is fragile: a
+routine reinstall during this upgrade un-hoisted it and broke every build with
+`Cannot find module 'babel-preset-expo'` until it was added explicitly.
 Screens under `mobile/app/(tabs)/`: Dashboard (4 KPI cards: active WOs, open POs,
 inventory alerts, CS open tickets), Time Clock (clock in/out + hours), Work Orders
 (list + detail + status transitions), Requisitions (submit + manager approve/deny),
