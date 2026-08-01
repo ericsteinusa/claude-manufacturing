@@ -36,7 +36,10 @@ filter.
 ## Schedule (`/time-clock/schedule/`)
 
 A shift/schedule summary derived from clock-in records, date-range
-filterable.
+filterable. Full-access users (managers/President/VP) also get a
+**Devices** link in the toolbar here to reach [Time Clock
+Devices](#time-clock-devices-time-clockdevices) — otherwise that page isn't
+linked from anywhere else in the app.
 
 ## Time Off Requests
 
