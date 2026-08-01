@@ -5,6 +5,7 @@
 <a href="/time-clock/" class="btn">Time Clock</a>
 <a href="/time-clock/attendance/" class="btn">Attendance</a>
 <a href="/time-clock/ot/" class="btn">OT Report</a>
+{% if full_access %}<a href="/time-clock/devices/" class="btn">Devices</a>{% endif %}
 {% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
 {% endblock %}
 
