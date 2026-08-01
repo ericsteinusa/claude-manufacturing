@@ -32,6 +32,11 @@ log = get_logger(__name__)
 _CREDIT_DEPT_KEYS = {'accounting', 'customers', 'finance'}
 
 
+def _opt_float(post, key):
+    val = post.get(key)
+    return float(val) if val else None
+
+
 def _credit_ctx(request, **extra):
     return {
         'email': request.session.get('user_email', ''),
@@ -231,7 +236,7 @@ def credit_collections_list(request):
                     activity_type=request.POST.get('activity_type', 'Call'),
                     contact_name=request.POST.get('contact_name', ''),
                     notes=request.POST.get('notes', ''),
-                    amount_promised=float(request.POST['amount_promised']) if request.POST.get('amount_promised') else None,
+                    amount_promised=_opt_float(request.POST, 'amount_promised'),
                     promise_date=request.POST.get('promise_date') or None,
                     follow_up_date=request.POST.get('follow_up_date') or None,
                     status=request.POST.get('status', 'Open'),
@@ -270,7 +275,7 @@ def credit_collections_detail(request, activity_id):
                     activity_type=request.POST.get('activity_type', 'Call'),
                     contact_name=request.POST.get('contact_name', ''),
                     notes=request.POST.get('notes', ''),
-                    amount_promised=float(request.POST['amount_promised']) if request.POST.get('amount_promised') else None,
+                    amount_promised=_opt_float(request.POST, 'amount_promised'),
                     promise_date=request.POST.get('promise_date') or None,
                     follow_up_date=request.POST.get('follow_up_date') or None,
                     status=request.POST.get('status', 'Open'),
