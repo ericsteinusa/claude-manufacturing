@@ -126,6 +126,8 @@ def create_campaign(
     conn, name: str, channel: str, objective: str, owner: str,
     start_date: str, end_date: str, budget: float, status: str, notes: str,
 ) -> int:
+    if not name.strip():
+        raise ValueError('Name is required')
     cur = conn.execute(
         "INSERT INTO marketing_campaign "
         "(name, channel, objective, owner, start_date, end_date, budget, status, notes) "
