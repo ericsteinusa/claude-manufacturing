@@ -256,6 +256,7 @@ from ._payroll import *  # noqa: F401,F403
 from ._it import *  # noqa: F401,F403
 from ._barcode import *  # noqa: F401,F403
 from ._legal import *  # noqa: F401,F403
+from ._credit import *  # noqa: F401,F403
 from ._budget_dash import budget_dashboard  # noqa: F401
 from ._risk_dash import *  # noqa: F401,F403
 from ._marketing import *  # noqa: F401,F403
@@ -726,7 +727,7 @@ WEB_LEAF_URLS = {
     ('accounting', 'cash_flow'):  '/gl/cash-flow/',
     ('accounting', 'cust_rpts'):  '/gl/',
     ('accounting', 'fin_reports'): '/gl/',
-    ('accounting', 'credit'):     '/gl/',
+    ('accounting', 'credit'):     '/credit/',
     ('finance', 'fin_plan'):       '/fin/budgets/',
     ('finance', 'fin_forecast'):   '/fin/budgets/',
     ('finance', 'fin_analysis'):   '/fin/audits/',
