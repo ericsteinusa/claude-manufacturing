@@ -19,4 +19,9 @@ extend-exclude = [
 
 [lint]
 # ruff defaults (E4, E7, E9, F) plus E501 line-length enforcement.
-extend-select = ["E501"]
+#
+# Written as an explicit `select`, not `extend-select`, because ruff >=0.16
+# stopped treating `extend-select` as additive to the default rule set when
+# no `select` is also given — with only `extend-select = ["E501"]` it
+# enabled every rule ruff knows, not just E501 on top of the defaults.
+select = ["E4", "E7", "E9", "F", "E501"]

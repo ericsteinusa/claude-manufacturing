@@ -4,8 +4,8 @@
 #
 # ruff is pinned to match the version run in CI (.github/workflows/ruff.yml).
 
-pytest==9.0.3
-ruff==0.15.15
+pytest==9.1.1
+ruff==0.16.1
 
 # Load testing (Phase 3 — scripts/loadtest/, see DEPLOYMENT.md)
-locust==2.45.0
+locust==2.46.3
