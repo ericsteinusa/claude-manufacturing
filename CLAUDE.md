@@ -51,10 +51,14 @@ manufacturing/
   └── templates/         Django HTML templates
 ```
 
-**Import conventions for code in a subpackage:**
-- Root module: `from ..db_pg import get_db_connection`
-- Same subpackage: `from .purchase_orders_core import …`
-- Cross-dept: `from ..customers.Credit_dept import CreditDeptWidget`
+**Import conventions:**
+- From a `views/` submodule to a root module: `from ..db_pg import get_db_connection`
+- Department subpackages (`accounting/`, `customers/`, etc.) currently hold no
+  business-logic modules of their own — only an empty `__init__.py` each, since
+  the desktop screens that used to live there were removed. All business
+  logic lives in root-level `*_core.py` modules; `views/` imports them
+  directly, e.g. `from ..purchase_requisitions_core import …` (see
+  "Testing & CI" below).
 
 ## Workflow
 - Always use **feature branches + PRs**; never commit directly to `main`.
