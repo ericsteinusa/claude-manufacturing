@@ -526,10 +526,10 @@ _PERS_MENU = {
     'items': [
         ('pers_crm', 'Personnel CRM', 'personnel/personnel_crm.py'),
         ('reg_form', 'Registration Form', 'registration_form.py'),
-        ('upd_pass', 'Update Password', 'payroll/update_users.py'),
-        ('disp_dept', 'Display Department', 'personnel/display_people_department.py'),
+        ('upd_pass', 'Update Password', ''),
+        ('disp_dept', 'Display Department', ''),
         ('dept_entry', 'Dept Entry', 'personnel/dept_entry.py'),
-        ('dept_sub', 'Dept Sub Entry', 'personnel/dept_sub_entry.py'),
+        ('dept_sub', 'Dept Sub Entry', ''),
         ('time_clock', 'Time Clock', _TIME_CLOCK_MENU),
         ('emp_records', 'Employee Records', {
             'title': 'Employee Records',
