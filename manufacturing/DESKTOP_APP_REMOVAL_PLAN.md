@@ -38,8 +38,10 @@ wrap and should be closed unmerged once this work is underway.
   `qt_tabs.py`, `qt_fixed_buttons.py`) are manual smoke scripts pytest
   never collects.
 - **`python-barcode`/`reportlab` stay** — confirmed shared: `barcode_
-  core.py` backs both the (deleted) desktop `qt_barcode.py` and five
-  live web views (`label_wo`/`label_part`/`label_po`/`label_receiving`/
+  core.py` backs both the desktop `qt_barcode.py` (missed by the
+  original PyQt6 file sweep below, left as unreferenced dead code
+  until deleted separately in PR #74) and five live web views
+  (`label_wo`/`label_part`/`label_po`/`label_receiving`/
   `label_asset` in `views/_barcode.py`, routed in `urls.py:419-423`).
   Only `PyQt6`/`PyQt6-WebEngine` are desktop-only and get dropped from
   `requirements.txt`.
