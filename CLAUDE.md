@@ -6,59 +6,49 @@ below are the non-obvious things that have bitten past changes.
 
 ## Directory structure
 
-`manufacturing/` is organized into department subpackages plus a shared root:
+`manufacturing/` has one department-named subpackage per business area
+(`accounting/`, `customer_service/`, `customers/`, `engineering/`,
+`finance/`, `it/`, `legal/`, `maintenance/`, `marketing/`, `payroll/`,
+`personnel/`, `production/`, `purchasing/`, `quality/`, `reports/`,
+`sales/`, `time_clock/`) — but each is now an **empty placeholder**: just
+`__init__.py`, nothing else. They used to hold that department's PyQt6
+desktop screens; those were deleted when the desktop app was retired
+(PR #397) and its stragglers cleaned up afterward. Nothing currently
+repopulates them — nothing to update there when adding a feature.
+
+All real code lives at the package root (`*_core.py`, routing, utilities)
+plus one large `views/` subpackage:
 
 ```
 manufacturing/
-  ├── accounting/        Accounting, A/P, A/R, General Ledger
-  ├── customer_service/  CS calls, escalations, satisfaction, staff
-  ├── customers/         Customer & supplier master files, credit
-  ├── engineering/       Design, specs, reviews, reports
-  ├── finance/           Audit, bank reconciliation, budget, tax
-  ├── it/                Help desk, tasks, technician views
-  ├── legal/             Contracts, compliance, risk management
-  ├── maintenance/       Equipment, PM schedules, work orders
-  ├── marketing/         Campaigns, leads, analytics
-  ├── payroll/           Payroll processing
-  ├── personnel/         Employee directory, dept/sub-dept, HR
-  ├── production/        BOM, MRP, work orders, inventory, warehouse
-  ├── purchasing/        Purchase orders, menus
-  ├── quality/           QA lab, NCR, CAPA, audits
-  ├── reports/           Dashboard and KPI reports
-  ├── sales/             Sales orders, quotes, targets
-  ├── time_clock/        Clock in/out, time-off, TK login
+  ├── accounting/ … time_clock/   17 empty department placeholders
+  │                                (__init__.py only — see above)
   │
   ├── management/        Django management commands (e.g. send_daily_digest)
   ├── migrations/        Django migrations (empty besides __init__.py — this
   │                      app manages its schema via CREATE TABLE IF NOT EXISTS
   │                      in *_core.py, not the Django ORM)
   ├── seeds/             Dev-DB seeders (python -m manufacturing.seeds.seed_sample_*)
-  ├── views/             Django HTTP handlers (package split by domain)
-  │   ├── __init__.py    Core navigation + re-exports from sub-modules
-  │   ├── _quality.py    QA views
-  │   ├── _maintenance.py Maintenance views
-  │   ├── _payroll.py    Payroll views
-  │   ├── _it.py         IT views
-  │   ├── _legal.py      Legal views
-  │   └── _marketing.py  Marketing views
+  ├── views/             Django HTTP handlers — __init__.py (core navigation +
+  │                      re-exports) plus 60+ domain-specific submodules, one
+  │                      per feature area, e.g. _quality.py, _maintenance.py,
+  │                      _payroll.py, _it.py, _legal.py, _marketing.py, _wms.py
   │
-  ├── *_core.py          Business logic (stay at root — imported by
-  │                      views/, seeds/, and cross-dept callers, e.g.
+  ├── *_core.py          Business logic (~85 modules, stay at root — imported
+  │                      by views/, seeds/, and cross-dept callers, e.g.
   │                      purchase_requisitions_core.py by 4+ departments)
   ├── accounts.py        Cross-cutting user/session helpers
   ├── menus.py / urls.py Django routing
   ├── db_pg.py / schema.py / gl_utils.py  DB & shared utilities
-  └── templates/         Django HTML templates
+  └── templates/         Django HTML templates (flat directory, ~430 files —
+                         not nested per department)
 ```
 
 **Import conventions:**
 - From a `views/` submodule to a root module: `from ..db_pg import get_db_connection`
-- Department subpackages (`accounting/`, `customers/`, etc.) currently hold no
-  business-logic modules of their own — only an empty `__init__.py` each, since
-  the desktop screens that used to live there were removed. All business
-  logic lives in root-level `*_core.py` modules; `views/` imports them
-  directly, e.g. `from ..purchase_requisitions_core import …` (see
-  "Testing & CI" below).
+- Cross-dept sharing happens via those root `*_core.py` modules — `views/`
+  imports them directly, e.g. `from ..purchase_requisitions_core import …`
+  (see "Testing & CI" below).
 
 ## Workflow
 - Always use **feature branches + PRs**; never commit directly to `main`.
