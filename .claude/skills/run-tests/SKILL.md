@@ -5,11 +5,17 @@ description: Run the pytest test suite. Use when asked to run tests, check if te
 
 ## Run
 
+On Windows:
 ```bash
 /c/tester/virt/Scripts/python.exe -m pytest tests/ -v
 ```
 
-All 2711 tests should pass in under a second.
+On Linux:
+```bash
+venv/bin/pytest tests/ -v
+```
+
+All 2911 tests should pass in under a second.
 
 ## What the tests cover
 
@@ -71,13 +77,26 @@ fake DB connections, so no display or live database is needed.
 
 ## Interpreting results
 
-- All tests should pass (`2711 passed`).
+- All tests should pass (`2911 passed`).
 - A failure in a `*_core.py` test means broken pure logic — fix before merging.
 - `ImportError` on a test file usually means a Qt module leaked into a
   `*_core.py` import chain (violates the Qt-free contract).
 
 ## Venv note
 
-The venv is at `C:\tester\virt`. It was originally created on Linux;
-`pyvenv.cfg` was updated to point at the Windows Python 3.14 install.
+On Windows, the venv is at `C:\tester\virt`. It was originally created on
+Linux; `pyvenv.cfg` was updated to point at the Windows Python 3.14 install.
 `pytest` and `bcrypt` are installed in `Lib\site-packages\`.
+
+On Linux, use the dedicated venv at the repo root (`manufacture/venv/`,
+already covered by `.gitignore`'s `venv/` entry) — don't reuse
+`~/tester/virt`, which is the Linux-side view of the Windows venv above and
+has no working `bin/python3`. Create it with:
+
+```bash
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+```
+
+(Requires the `python3.12-venv` apt package if `python3 -m venv` fails with
+"ensurepip is not available".)
