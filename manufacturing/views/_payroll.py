@@ -10,6 +10,7 @@ from ..csv_export import export_response
 import json
 
 from ..payroll_core import (
+    ensure_payroll_tables,
     SS_RATE, MEDICARE_RATE, FREQUENCIES,
     PAY_TYPES, DED_CATEGORIES, DED_METHODS,
     get_dashboard_counts as payroll_get_dashboard_counts,
@@ -48,6 +49,7 @@ def _payroll_ctx(request, **extra):
 def payroll_dashboard(request):
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         counts = payroll_get_dashboard_counts(conn)
         runs = list_payroll_runs(conn)[:5]
         monthly_gross = get_payroll_monthly_gross(conn)
@@ -71,6 +73,7 @@ def payroll_pay_rates(request):
         action = request.POST.get('action', '')
         conn = get_db_connection()
         try:
+            ensure_payroll_tables(conn)
             if action == 'upsert':
                 pid = int(request.POST.get('people_id', 0))
                 pay_type = request.POST.get('pay_type', 'hourly')
@@ -95,6 +98,7 @@ def payroll_pay_rates(request):
 
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         employees = list_pay_rates(conn, search=search or None)
         people = payroll_load_people(conn)
     finally:
@@ -116,6 +120,7 @@ def payroll_deductions(request):
         action = request.POST.get('action', '')
         conn = get_db_connection()
         try:
+            ensure_payroll_tables(conn)
             if action == 'create_type':
                 name = request.POST.get('name', '').strip()
                 cat = request.POST.get('category', 'Other')
@@ -158,6 +163,7 @@ def payroll_deductions(request):
 
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         ded_types = list_deduction_types(conn)
         active_types = list_deduction_types(conn, active_only=True)
         pid = int(people_filter) if people_filter else None
@@ -178,6 +184,7 @@ def payroll_deductions(request):
 def payroll_history(request):
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         runs = list_payroll_runs(conn)
     finally:
         conn.close()
@@ -190,6 +197,7 @@ def payroll_history(request):
 def payroll_history_export(request):
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         runs = list_payroll_runs(conn)
     finally:
         conn.close()
@@ -209,6 +217,7 @@ def payroll_run_new(request):
     if request.method == 'POST' and can_edit:
         conn = get_db_connection()
         try:
+            ensure_payroll_tables(conn)
             try:
                 fed_pct = float(request.POST.get('federal_tax_pct', '0') or '0')
                 state_pct = float(request.POST.get('state_tax_pct', '0') or '0')
@@ -239,6 +248,7 @@ def payroll_run_new(request):
 def payroll_run_detail(request, run_id):
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         run = get_payroll_run(conn, run_id)
         if not run:
             return redirect('/payroll/history/')
@@ -257,6 +267,7 @@ def payroll_run_detail(request, run_id):
 def payroll_stub_detail(request, entry_id):
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         stub = get_pay_stub(conn, entry_id)
         if not stub:
             return redirect('/payroll/history/')
@@ -291,6 +302,7 @@ def payroll_ytd(request):
 
     conn = get_db_connection()
     try:
+        ensure_payroll_tables(conn)
         rows = get_ytd(conn, year, pid)
         people = payroll_load_people(conn)
     finally:
