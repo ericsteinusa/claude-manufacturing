@@ -203,6 +203,14 @@ which 500s with `relation "django_session" does not exist`.
 
 ## Sample data (dev DB)
 
+**On a fresh Postgres DB, run `python manage.py migrate` before anything
+else** — this app's own tables are created ad hoc by the seed scripts below,
+but Django's built-in tables (`django_session`, auth, admin, contenttypes)
+still need the normal Django migration system. Skipping it doesn't surface
+until first login, which 500s with `relation "django_session" does not
+exist` (see "Windows deployment" below for the platform-specific version of
+this note — it applies to any fresh DB, not just Windows).
+
 Seed scripts live in `manufacturing/seeds/`. Use `python -m manufacturing.seeds.<name>`.
 
 - People: `python -m manufacturing.seeds.seed_sample_data` (tagged `@example.com`).
