@@ -1168,7 +1168,13 @@ def dashboard(request):
 
 def logout(request):
     email = request.session.get('user_email')
-    request.session.flush()
+    # Pop only the employee keys and rotate the session id — session.flush()
+    # would also wipe an active customer- or supplier-portal login sharing
+    # the same browser session (see portal_logout in views/_portal.py).
+    for key in ('user_email', 'user_role', 'user_dept_key',
+                'user_full_access', 'user_dept_name', 'user_is_manager'):
+        request.session.pop(key, None)
+    request.session.cycle_key()
     if email:
         log.info("User %s logged out", email)
     return redirect('home')

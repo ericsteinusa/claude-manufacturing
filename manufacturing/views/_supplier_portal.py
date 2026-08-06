@@ -29,8 +29,8 @@ log = get_logger(__name__)
 
 def _portal_ctx(request, **extra):
     ctx = {
-        'portal_email': request.session.get('portal_email', ''),
-        'portal_company': request.session.get('portal_company', ''),
+        'portal_email': request.session.get('portal_supplier_email', ''),
+        'portal_company': request.session.get('portal_supplier_company', ''),
     }
     ctx.update(extra)
     return ctx
@@ -78,8 +78,8 @@ def supplier_portal_login(request):
             conn.close()
         if profile:
             request.session['portal_supplier_id'] = profile['supplier_id']
-            request.session['portal_email'] = profile['email']
-            request.session['portal_company'] = profile['display_name']
+            request.session['portal_supplier_email'] = profile['email']
+            request.session['portal_supplier_company'] = profile['display_name']
             return redirect('supplier_portal_home')
         return render(request, 'supplier_portal_login.html', {
             'error': 'Invalid email or password.', 'email_value': email,
@@ -90,7 +90,11 @@ def supplier_portal_login(request):
 
 
 def supplier_portal_logout(request):
-    request.session.flush()
+    # Pop only this portal's own keys — see portal_logout in views/_portal.py
+    # for why session.flush() is wrong here.
+    for key in ('portal_supplier_id', 'portal_supplier_email', 'portal_supplier_company'):
+        request.session.pop(key, None)
+    request.session.cycle_key()
     return redirect('supplier_portal_login')
 
 
@@ -204,7 +208,7 @@ def supplier_portal_invoice_new(request):
                     request.POST.get('due_date', '').strip(),
                     float(request.POST.get('amount') or 0),
                     request.POST.get('description', '').strip(),
-                    request.session.get('portal_email', ''),
+                    request.session.get('portal_supplier_email', ''),
                 )
                 conn.commit()
                 return redirect('supplier_portal_invoice_detail', inv_id=inv_id)

@@ -33,8 +33,8 @@ log = get_logger(__name__)
 
 def _portal_ctx(request, **extra):
     ctx = {
-        'portal_email': request.session.get('portal_email', ''),
-        'portal_company': request.session.get('portal_company', ''),
+        'portal_email': request.session.get('portal_customer_email', ''),
+        'portal_company': request.session.get('portal_customer_company', ''),
     }
     ctx.update(extra)
     return ctx
@@ -82,8 +82,8 @@ def portal_login(request):
             conn.close()
         if profile:
             request.session['portal_customer_id'] = profile['customer_id']
-            request.session['portal_email'] = profile['email']
-            request.session['portal_company'] = profile['display_name']
+            request.session['portal_customer_email'] = profile['email']
+            request.session['portal_customer_company'] = profile['display_name']
             return redirect('portal_home')
         return render(request, 'portal_login.html', {
             'error': 'Invalid email or password.', 'email_value': email,
@@ -94,7 +94,15 @@ def portal_login(request):
 
 
 def portal_logout(request):
-    request.session.flush()
+    # Pop only this portal's own keys — session.flush() would also wipe an
+    # active supplier-portal or employee session sharing the same browser
+    # session (customer/supplier/employee logins previously shared the
+    # single Django session object with unnamespaced 'portal_email'/
+    # 'portal_company' keys, so logging out of one silently logged out the
+    # others too).
+    for key in ('portal_customer_id', 'portal_customer_email', 'portal_customer_company'):
+        request.session.pop(key, None)
+    request.session.cycle_key()
     return redirect('portal_login')
 
 
@@ -298,7 +306,7 @@ def portal_rma_new(request):
             try:
                 rma_id = submit_rma(
                     conn, customer_id, int(so_id), reason, description,
-                    request.session.get('portal_email', ''))
+                    request.session.get('portal_customer_email', ''))
                 conn.commit()
             except (ValueError, TypeError) as e:
                 orders = list_sos(conn, customer_id=customer_id)
