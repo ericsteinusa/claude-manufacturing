@@ -12,6 +12,12 @@ Line items reference the sample products seeded by
 the products to be linked. A line whose product is missing is still inserted
 with its description and a NULL ``product_id`` so the PO is never empty.
 
+Each PO is attached to the first existing supplier row. If none exists yet
+(this seed can run before ``seed_sample_purchasing``, which is what
+actually creates suppliers), a minimal fallback supplier is created instead
+of leaving ``supplier_id`` NULL — tagged ``created_by='SMPL-PO-FALLBACK'``
+and removed along with the sample POs on ``--reset``/``--remove``.
+
 Usage::
 
     python -m manufacturing.seeds.seed_sample_pos            # add (idempotent)
@@ -27,6 +33,8 @@ from ..purchase_orders_core import ensure_po_tables
 
 
 SAMPLE_PO_PREFIX = "SMPL-PO-"   # po_number prefix marking sample rows
+FALLBACK_SUPPLIER_TAG = "SMPL-PO-FALLBACK"  # created_by tag for the
+# fallback supplier row created below when no supplier exists yet
 
 # suffix, status, order_date offset (days ago), expected offset (days from
 # order), received offset (days ago, or None if not yet received), notes,
@@ -59,13 +67,33 @@ PURCHASE_ORDERS = [
 
 
 def _first_supplier_id(conn):
-    """Return an arbitrary supplier id to attach POs to, or None."""
+    """Return an arbitrary supplier id to attach POs to.
+
+    If the `supplier` table doesn't exist at all, schema.py's init_schema()
+    (normally run via the Django app's startup) hasn't happened yet —
+    that's a different, unsupported precondition than this seed can fix, so
+    behave like every other seed here and return None rather than trying to
+    create tables of our own.
+
+    If the table exists but is empty (e.g. this seed ran before
+    seed_sample_purchasing, which CLAUDE.md's own documented seed order
+    does), create a minimal fallback supplier instead of leaving
+    purchase_order.supplier_id NULL — a PO with no supplier is silently
+    invisible to every supplier-portal account, which isn't a case any
+    seed here should produce."""
     try:
         row = conn.execute(
             "SELECT id FROM supplier ORDER BY id LIMIT 1").fetchone()
     except Exception:
         return None
-    return row["id"] if row else None
+    if row:
+        return row["id"]
+    return conn.execute(
+        "INSERT INTO supplier (company_name, email, created_by)"
+        " VALUES (%s,%s,%s) RETURNING id",
+        ("Sample Fallback Supplier", "fallback-supplier@example.com",
+         FALLBACK_SUPPLIER_TAG),
+    ).fetchone()["id"]
 
 
 def _sample_product_ids(conn):
@@ -82,7 +110,8 @@ def sample_present(conn):
 
 
 def remove_sample(conn):
-    """Delete sample POs and their line items. Returns (pos, items)."""
+    """Delete sample POs, their line items, and the fallback supplier (if
+    one was created). Returns (pos, items)."""
     ids = [r["id"] for r in conn.execute(
         "SELECT id FROM purchase_order WHERE po_number LIKE %s",
         (SAMPLE_PO_PREFIX + "%",)).fetchall()]
@@ -92,6 +121,8 @@ def remove_sample(conn):
             "DELETE FROM po_item WHERE po_id = ANY(%s)", (ids,)).rowcount
         po_n = conn.execute(
             "DELETE FROM purchase_order WHERE id = ANY(%s)", (ids,)).rowcount
+    conn.execute(
+        "DELETE FROM supplier WHERE created_by = %s", (FALLBACK_SUPPLIER_TAG,))
     return po_n, item_n
 
 
