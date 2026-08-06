@@ -32,6 +32,95 @@ def _cur_year() -> int:
     return datetime.date.today().year
 
 
+def ensure_payroll_tables(conn):
+    """Create the payroll tables if absent. Idempotent — does not commit.
+
+    Unlike most *_core.py modules, payroll_core historically assumed these
+    tables already existed (inherited from a pre-Django DB that had them
+    from years of desktop-app use) — on a freshly provisioned database
+    every payroll view/seed call fails with UndefinedTable. Mirrors the
+    ensure_benefits_tables(conn) pattern in benefits_core.py."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS payroll_deduction_type (
+            id          SERIAL PRIMARY KEY,
+            name        TEXT NOT NULL,
+            category    TEXT NOT NULL DEFAULT 'Other',
+            is_pre_tax  INTEGER NOT NULL DEFAULT 0,
+            is_active   INTEGER NOT NULL DEFAULT 1,
+            created_by  TEXT NOT NULL DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS employee_pay (
+            people_id       INTEGER PRIMARY KEY REFERENCES people(id),
+            pay_type        TEXT NOT NULL DEFAULT 'hourly',
+            pay_rate        REAL NOT NULL DEFAULT 0,
+            effective_date  TEXT NOT NULL DEFAULT '',
+            created_by      TEXT NOT NULL DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS employee_deduction (
+            id                 SERIAL PRIMARY KEY,
+            people_id          INTEGER NOT NULL REFERENCES people(id),
+            deduction_type_id  INTEGER NOT NULL REFERENCES payroll_deduction_type(id),
+            calc_method        TEXT NOT NULL DEFAULT 'flat',
+            amount             REAL NOT NULL DEFAULT 0,
+            is_active          INTEGER NOT NULL DEFAULT 1,
+            notes              TEXT NOT NULL DEFAULT '',
+            effective_date     TEXT NOT NULL DEFAULT '',
+            created_by         TEXT NOT NULL DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS payroll_run (
+            id                 SERIAL PRIMARY KEY,
+            pay_period_start   TEXT NOT NULL,
+            pay_period_end     TEXT NOT NULL,
+            run_date           TEXT NOT NULL DEFAULT '',
+            pay_frequency      TEXT NOT NULL DEFAULT 'Bi-Weekly',
+            federal_tax_rate   REAL NOT NULL DEFAULT 0,
+            state_tax_rate     REAL NOT NULL DEFAULT 0,
+            status             TEXT NOT NULL DEFAULT 'processed',
+            created_by         TEXT NOT NULL DEFAULT ''
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS payroll_entry (
+            id                    SERIAL PRIMARY KEY,
+            run_id                INTEGER NOT NULL REFERENCES payroll_run(id),
+            people_id             INTEGER NOT NULL REFERENCES people(id),
+            regular_hours         REAL NOT NULL DEFAULT 0,
+            overtime_hours        REAL NOT NULL DEFAULT 0,
+            gross_pay             REAL NOT NULL DEFAULT 0,
+            federal_tax           REAL NOT NULL DEFAULT 0,
+            state_tax             REAL NOT NULL DEFAULT 0,
+            social_security       REAL NOT NULL DEFAULT 0,
+            medicare              REAL NOT NULL DEFAULT 0,
+            net_pay               REAL NOT NULL DEFAULT 0,
+            pre_tax_deductions    REAL NOT NULL DEFAULT 0,
+            post_tax_deductions   REAL NOT NULL DEFAULT 0
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS payroll_entry_deduction (
+            id               SERIAL PRIMARY KEY,
+            entry_id         INTEGER NOT NULL REFERENCES payroll_entry(id),
+            deduction_name   TEXT NOT NULL DEFAULT '',
+            is_pre_tax       INTEGER NOT NULL DEFAULT 0,
+            amount           REAL NOT NULL DEFAULT 0
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS payroll_entry_run "
+        "ON payroll_entry(run_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS employee_deduction_people "
+        "ON employee_deduction(people_id)"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------

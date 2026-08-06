@@ -18,6 +18,7 @@ import argparse
 from datetime import date, timedelta
 
 from ..db_pg import get_db_connection
+from ..payroll_core import ensure_payroll_tables
 
 TAG = "SMPL-PAY-"
 TODAY = date.today()
@@ -358,6 +359,8 @@ def _remove_payroll_runs(conn):
 # ---------------------------------------------------------------------------
 
 def seed(conn):
+    ensure_payroll_tables(conn)
+    conn.commit()
     _ensure_tables(conn)
     _seed_deduction_types(conn)
     _seed_pay_rates(conn)
