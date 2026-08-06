@@ -219,7 +219,10 @@ Seed scripts live in `manufacturing/seeds/`. Use `python -m manufacturing.seeds.
 - Purchase orders for the web PO pages (every status + a partial receipt):
   `python -m manufacturing.seeds.seed_sample_pos` (tagged `po_number` prefix
   `SMPL-PO-`; line items use the `bin='SAMPLE'` products, so run that seed
-  first to link them).
+  first to link them). Each PO is attached to the first existing supplier;
+  if none exists yet (i.e. run before `seed_sample_purchasing` below), a
+  minimal fallback supplier is created instead of leaving `supplier_id`
+  NULL, tagged `created_by='SMPL-PO-FALLBACK'`.
 - Work orders (every status + materials):
   `python -m manufacturing.seeds.seed_sample_wos` (tagged `wo_number` prefix
   `SMPL-WO-`; materials use the `bin='SAMPLE'` products, so run that seed
