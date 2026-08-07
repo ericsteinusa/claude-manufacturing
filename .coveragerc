@@ -1,0 +1,9 @@
+[run]
+source = manufacturing
+omit =
+    manufacturing/migrations/*
+    manufacturing/seeds/*
+    manufacturing/management/*
+
+[report]
+skip_empty = True

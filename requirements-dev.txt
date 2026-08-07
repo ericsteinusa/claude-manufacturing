@@ -3,9 +3,11 @@
 # Install with:  pip install -r requirements-dev.txt
 #
 # ruff is pinned to match the version run in CI (.github/workflows/ruff.yml).
+# coverage is pinned to match the version run in CI (.github/workflows/tests.yml).
 
 pytest==9.1.1
 ruff==0.16.1
+coverage==7.15.4
 
 # Load testing (Phase 3 — scripts/loadtest/, see DEPLOYMENT.md)
 locust==2.46.3
