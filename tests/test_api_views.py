@@ -26,8 +26,10 @@ api_req_pending, api_req_decide), the Inventory group
 api_maint_wo_detail, api_maint_wo_complete), the Approval Workflow
 group (api_workflow_pending, api_workflow_decide), and the
 Lots/Serials group (api_lot_list, api_lot_expiry, api_lot_detail,
-api_lot_status, api_serial_list, api_serial_status); other endpoint
-groups (workcenters/routing, costing) are a separate follow-up.
+api_lot_status, api_serial_list, api_serial_status), the Routing group
+(api_workcenters, api_product_routing), and the Costing group
+(api_product_cost, api_cost_roll, api_cost_history, api_wo_cost,
+api_wo_cost_compute, api_gl_accounts).
 """
 import json
 
@@ -50,13 +52,16 @@ from manufacturing.api_views import (
     api_workflow_pending, api_workflow_decide,
     api_lot_list, api_lot_expiry, api_lot_detail, api_lot_status,
     api_serial_list, api_serial_status,
+    api_workcenters, api_product_routing,
+    api_product_cost, api_cost_roll, api_cost_history, api_wo_cost,
+    api_wo_cost_compute, api_gl_accounts,
 )
 from manufacturing import (
     reports_core, time_clock_core, personnel_core,
     work_orders_core, routing_core,
     purchase_requisitions_core, approval_workflow_core,
     inventory_core, quality_core, maintenance_core,
-    cycle_count_core, document_control_core, lot_core,
+    cycle_count_core, document_control_core, lot_core, costing_core,
 )
 
 
@@ -2379,3 +2384,283 @@ def test_api_serial_status_success():
     assert seen == [(1, 'installed', '')]
     assert conn.committed is True
     assert conn.closed is True
+
+
+# ── routing: workcenters & product routing ──────────────────────────────
+
+_ROUTING_USER = {'id': 7, 'email': 'worker@example.com'}
+
+
+def test_api_workcenters_requires_auth():
+    resp = api_workcenters(rf.get('/api/v1/workcenters/'))
+    assert resp.status_code == 401
+
+
+def test_api_workcenters_success_lists_all_including_inactive():
+    conn = _FakeConn()
+    seen = []
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(routing_core, 'ensure_routing_tables', lambda c: None), \
+         patch.object(routing_core, 'list_workcenters',
+                      lambda c, active_only=True: seen.append(active_only) or
+                          [{'id': 1, 'name': 'Assembly'}]):
+        resp = api_workcenters(_auth_get('/api/v1/workcenters/'))
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['workcenters'] == [{'id': 1, 'name': 'Assembly'}]
+    assert seen == [False]
+    assert conn.closed is True
+
+
+def test_api_product_routing_requires_auth():
+    resp = api_product_routing(rf.get('/api/v1/routing/1/'), 1)
+    assert resp.status_code == 401
+
+
+def test_api_product_routing_success():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(routing_core, 'ensure_routing_tables', lambda c: None), \
+         patch.object(routing_core, 'get_routing',
+                      lambda c, product_id: [{'seq': 1, 'workcenter_id': 2}]):
+        resp = api_product_routing(_auth_get('/api/v1/routing/1/'), 1)
+    assert resp.status_code == 200
+    data = json.loads(resp.content)['data']
+    assert data['product_id'] == 1
+    assert data['steps'] == [{'seq': 1, 'workcenter_id': 2}]
+    assert conn.closed is True
+
+
+# ── costing ──────────────────────────────────────────────────────────────
+
+def test_api_product_cost_requires_auth():
+    resp = api_product_cost(rf.get('/api/v1/costs/1/'), 1)
+    assert resp.status_code == 401
+
+
+def test_api_product_cost_not_found_returns_404():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'get_standard_cost', lambda c, product_id: None):
+        resp = api_product_cost(_auth_get('/api/v1/costs/1/'), 1)
+    assert resp.status_code == 404
+    assert json.loads(resp.content)['error'] == 'No standard cost on record for this product.'
+    assert conn.closed is True
+
+
+def test_api_product_cost_success():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'get_standard_cost',
+                      lambda c, product_id: {'product_id': 1, 'total_cost': 12.5}):
+        resp = api_product_cost(_auth_get('/api/v1/costs/1/'), 1)
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['cost'] == {'product_id': 1, 'total_cost': 12.5}
+
+
+def test_api_cost_roll_requires_auth():
+    resp = api_cost_roll(rf.post('/api/v1/costs/1/roll/'), 1)
+    assert resp.status_code == 401
+
+
+def test_api_cost_roll_error_returns_400_and_closes_connection():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'roll_standard_cost',
+                      side_effect=ValueError('BOM cycle detected.')):
+        resp = api_cost_roll(_auth_post('/api/v1/costs/1/roll/'), 1)
+    assert resp.status_code == 400
+    assert json.loads(resp.content)['error'] == 'BOM cycle detected.'
+    assert conn.closed is True
+
+
+def test_api_cost_roll_success_passes_created_by_and_commits():
+    conn = _FakeConn()
+    seen = []
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'roll_standard_cost',
+                      lambda c, product_id, created_by=None: seen.append(
+                          (product_id, created_by)) or
+                          {'product_id': product_id, 'total_cost': 9.0}):
+        resp = api_cost_roll(_auth_post('/api/v1/costs/1/roll/'), 1)
+    assert resp.status_code == 200
+    data = json.loads(resp.content)['data']
+    assert data['cost'] == {'product_id': 1, 'total_cost': 9.0}
+    assert data['message'] == 'Standard cost rolled.'
+    assert seen == [(1, 'worker@example.com')]
+    assert conn.committed is True
+    assert conn.closed is True
+
+
+def test_api_cost_history_requires_auth():
+    resp = api_cost_history(rf.get('/api/v1/costs/1/history/'), 1)
+    assert resp.status_code == 401
+
+
+def test_api_cost_history_success():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'list_cost_history',
+                      lambda c, product_id: [{'id': 1, 'total_cost': 9.0}]):
+        resp = api_cost_history(_auth_get('/api/v1/costs/1/history/'), 1)
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['history'] == [{'id': 1, 'total_cost': 9.0}]
+    assert conn.closed is True
+
+
+def test_api_wo_cost_requires_auth():
+    resp = api_wo_cost(rf.get('/api/v1/wo/1/cost/'), 1)
+    assert resp.status_code == 401
+
+
+def test_api_wo_cost_not_found_returns_404():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'get_wo_cost', lambda c, wo_id: None):
+        resp = api_wo_cost(_auth_get('/api/v1/wo/1/cost/'), 1)
+    assert resp.status_code == 404
+    assert json.loads(resp.content)['error'] == 'No cost record for this work order yet.'
+    assert conn.closed is True
+
+
+def test_api_wo_cost_success():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'get_wo_cost',
+                      lambda c, wo_id: {'wo_id': 1, 'variance': -3.2}):
+        resp = api_wo_cost(_auth_get('/api/v1/wo/1/cost/'), 1)
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['cost'] == {'wo_id': 1, 'variance': -3.2}
+
+
+def test_api_wo_cost_compute_requires_auth():
+    resp = api_wo_cost_compute(rf.post('/api/v1/wo/1/cost/compute/'), 1)
+    assert resp.status_code == 401
+
+
+def test_api_wo_cost_compute_error_returns_400_and_closes_connection():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'save_wo_actual_cost',
+                      side_effect=ValueError('No routing operations found.')):
+        resp = api_wo_cost_compute(_auth_post('/api/v1/wo/1/cost/compute/'), 1)
+    assert resp.status_code == 400
+    assert json.loads(resp.content)['error'] == 'No routing operations found.'
+    assert conn.closed is True
+
+
+def test_api_wo_cost_compute_success_passes_created_by_and_commits():
+    conn = _FakeConn()
+    seen = []
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'save_wo_actual_cost',
+                      lambda c, wo_id, created_by=None: seen.append(
+                          (wo_id, created_by)) or {'wo_id': wo_id, 'variance': 1.5}):
+        resp = api_wo_cost_compute(_auth_post('/api/v1/wo/1/cost/compute/'), 1)
+    assert resp.status_code == 200
+    data = json.loads(resp.content)['data']
+    assert data['cost'] == {'wo_id': 1, 'variance': 1.5}
+    assert data['message'] == 'WO actual cost computed.'
+    assert seen == [(1, 'worker@example.com')]
+    assert conn.committed is True
+    assert conn.closed is True
+
+
+# ── costing: GL account map ─────────────────────────────────────────────
+
+def test_api_gl_accounts_requires_auth():
+    resp = api_gl_accounts(rf.get('/api/v1/gl-accounts/'))
+    assert resp.status_code == 401
+
+
+def test_api_gl_accounts_get_success():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'list_gl_account_map',
+                      lambda c: [{'category': 'wip', 'account_number': '1300'}]):
+        resp = api_gl_accounts(_auth_get('/api/v1/gl-accounts/'))
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['accounts'] == [
+        {'category': 'wip', 'account_number': '1300'}]
+    assert conn.closed is True
+
+
+def test_api_gl_accounts_post_invalid_json_returns_400():
+    with _decorator_auth(_ROUTING_USER):
+        request = rf.post('/api/v1/gl-accounts/', data=b'not json',
+                           content_type='application/json',
+                           HTTP_AUTHORIZATION='Bearer goodtoken')
+        resp = api_gl_accounts(request)
+    assert resp.status_code == 400
+    assert json.loads(resp.content)['error'] == 'Invalid JSON.'
+
+
+def test_api_gl_accounts_post_requires_category_and_account_number():
+    with _decorator_auth(_ROUTING_USER):
+        resp = api_gl_accounts(_auth_post_json(
+            '/api/v1/gl-accounts/', {'category': 'wip', 'account_number': ''}))
+    assert resp.status_code == 400
+    assert json.loads(resp.content)['error'] == 'category and account_number are required.'
+
+
+def test_api_gl_accounts_post_value_error_returns_400_and_closes_connection():
+    conn = _FakeConn()
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'set_gl_account_map',
+                      side_effect=ValueError('Unknown category.')):
+        resp = api_gl_accounts(_auth_post_json(
+            '/api/v1/gl-accounts/', {'category': 'bogus', 'account_number': '9999'}))
+    assert resp.status_code == 400
+    assert json.loads(resp.content)['error'] == 'Unknown category.'
+    assert conn.closed is True
+
+
+def test_api_gl_accounts_post_success():
+    conn = _FakeConn()
+    seen = []
+    with _decorator_auth(_ROUTING_USER), \
+         patch.multiple('manufacturing.api_views', get_db_connection=lambda: conn), \
+         patch.object(costing_core, 'ensure_costing_tables', lambda c: None), \
+         patch.object(costing_core, 'set_gl_account_map',
+                      lambda c, category, account_number, description='':
+                          seen.append((category, account_number, description))):
+        resp = api_gl_accounts(_auth_post_json('/api/v1/gl-accounts/', {
+            'category': 'wip', 'account_number': '1300',
+            'description': 'Work in process',
+        }))
+    assert resp.status_code == 200
+    assert json.loads(resp.content)['data']['message'] == 'GL account wip → 1300 saved.'
+    assert seen == [('wip', '1300', 'Work in process')]
+    assert conn.committed is True
+    assert conn.closed is True
+
+
+def test_api_gl_accounts_unsupported_method_returns_405():
+    with _decorator_auth(_ROUTING_USER):
+        request = rf.delete('/api/v1/gl-accounts/', HTTP_AUTHORIZATION='Bearer goodtoken')
+        resp = api_gl_accounts(request)
+    assert resp.status_code == 405
+    assert json.loads(resp.content)['error'] == 'Method not allowed.'
