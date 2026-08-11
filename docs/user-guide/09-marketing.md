@@ -43,5 +43,6 @@ Website, campaign, and sales analytics dashboard.
 
 ## Marketing Budget (`/mkt/budget/`)
 
-Manager-only menu leaf. Create or edit a budget request line: item,
+Only linked from the Marketing Manager menu (the page itself has no
+additional role restriction). Create or edit a budget request line: item,
 campaign, category, amount, requested by, request date, status, notes.
