@@ -46,8 +46,9 @@ owner, opened/closed date, status, notes.
 
 ## Corporate Governance (`/legal/governance/`)
 
-Create or edit a governance item (manager-only menu leaf): item, category,
-owner, reference date, reference, status, notes.
+Only linked from the manager menu (the page itself has no additional role
+restriction). Create or edit a governance item: item, category, owner,
+reference date, reference, status, notes.
 
 ## Risk Management (`/risk/...`)
 

@@ -53,7 +53,8 @@ requisition — the full hiring pipeline.
 
 ## Terminations (`/pers/terminations/`)
 
-Manager-only menu leaf. Initiate a termination record for an employee
+Only linked from the Personnel Manager menu (the page itself has no
+additional role restriction). Initiate a termination record for an employee
 (termination date, type, reason, status, rehire eligibility, notes); each
 record has its own detail page (`/pers/terminations/<id>/`) for tracking
 status.
