@@ -49,6 +49,8 @@ dashboard — they're reached as sub-menus of Accounting and Personnel,
 respectively, even though each has a full set of pages of its own.
 
 **Budget Management** and **Risk Management** appear as their own dashboard
-tiles for full-access users, but both are thin wrappers that route straight
-into the Finance/Accounting Budget pages and the Legal department's pages,
-respectively.
+tiles for full-access users, each with its own dashboard KPIs. Budget
+Management's individual menu leaves still all route to the single
+Finance/Accounting Budget page, but Risk Management has its own dedicated
+pages (Risk Register, Risk Assessments, Insurance, Business Continuity,
+Compliance & Audit) — see the [Legal & Risk guide](07-legal-risk.md).

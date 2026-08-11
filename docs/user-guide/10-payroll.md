@@ -21,6 +21,13 @@ Create a deduction type (name, category, pre-tax flag); assign a deduction to
 an employee (method flat/percent, amount, active flag, notes); remove an
 assignment.
 
+## Run New Payroll (`/payroll/history/new/`)
+
+Process a payroll run for a pay period: enter the pay period start/end date,
+pay frequency, and federal/state tax percentages, then submit. This computes
+gross/net pay and taxes/deductions for every employee and creates the run —
+you're taken straight to its detail page afterward.
+
 ## Payroll History (`/payroll/history/`)
 
 View a past payroll run's total gross/net and per-employee entries.
