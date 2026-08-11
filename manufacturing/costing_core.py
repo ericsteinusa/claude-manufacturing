@@ -480,7 +480,8 @@ def post_wo_close_gl(conn, wo_id, wo_number, quantity, created_by=None):
 
     Entries:
         DR Finished Goods   (standard cost × qty)
-        CR WIP              (actual material already charged to WIP)
+        CR WIP              (total actual cost — material + labour + overhead —
+                             already charged to WIP)
         DR/CR Material Variance
         DR/CR Labour Variance
 
@@ -505,8 +506,8 @@ def post_wo_close_gl(conn, wo_id, wo_number, quantity, created_by=None):
 
     lines = [
         (fg_acct, std_cost, 0.0, f"FG completion {wo_number}"),
-        (wip_acct, 0.0, cost['actual_material_cost'],
-         f"WIP material clearance {wo_number}"),
+        (wip_acct, 0.0, cost['total_actual_cost'],
+         f"WIP clearance {wo_number}"),
     ]
     # Material variance: unfavorable (actual > std) → DR variance account
     if mat_var_acct and abs(mat_var) >= 0.01:

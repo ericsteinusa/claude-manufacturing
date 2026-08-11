@@ -410,6 +410,12 @@ def test_post_wo_close_gl_posts_fg_dr_wip_cr():
     journal_params = [p for s, p in conn.calls if 'INSERT INTO gl_journal' in s
                       and 'gl_journal_line' not in s]
     assert len(journal_params) == 1
+    # WIP clearance line must credit total_actual_cost (material + labour +
+    # overhead), not just actual_material_cost — otherwise the entry doesn't
+    # balance against the full std_cost debited to Finished Goods.
+    line_params = [p for s, p in conn.calls if 'INSERT INTO gl_journal_line' in s]
+    wip_line = next(p for p in line_params if p[1] == 11)  # account_id 11 = WIP
+    assert wip_line[3] == 180.0  # credit == total_actual_cost, not 120.0
 
 
 def test_post_wo_close_gl_skips_small_variances():
