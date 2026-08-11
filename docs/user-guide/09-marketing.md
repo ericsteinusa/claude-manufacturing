@@ -40,3 +40,8 @@ budget, findings.
 ## Analytics (`/mkt/analytics/`)
 
 Website, campaign, and sales analytics dashboard.
+
+## Marketing Budget (`/mkt/budget/`)
+
+Manager-only menu leaf. Create or edit a budget request line: item,
+campaign, category, amount, requested by, request date, status, notes.
