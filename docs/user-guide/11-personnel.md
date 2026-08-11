@@ -51,6 +51,23 @@ Define benefit plans and enroll/view an employee's benefit elections.
 Create job requisitions, track candidates, and manage applications tied to a
 requisition — the full hiring pipeline.
 
+## Terminations (`/pers/terminations/`)
+
+Manager-only menu leaf. Initiate a termination record for an employee
+(termination date, type, reason, status, rehire eligibility, notes); each
+record has its own detail page (`/pers/terminations/<id>/`) for tracking
+status.
+
+## Exit Interviews (`/pers/exit-interviews/`)
+
+Log an exit interview: employee, interview date, interviewer, reason for
+leaving, feedback, whether they'd recommend the company, notes.
+
+## Offboarding (`/pers/offboarding/`)
+
+Track offboarding checklist tasks per departing employee (task, status, due
+date, assigned to, notes) and mark tasks complete.
+
 ## Workforce Analytics (`/workforce/`)
 
 Create a headcount plan and track per-employee employment dates.

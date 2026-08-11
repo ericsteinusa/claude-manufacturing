@@ -16,6 +16,19 @@ product/material data.
 Daily-output trend, work-order status, top products, on-time %, scrap/rework
 by operation, monthly completed-work-order trend.
 
+## Production Reports (`/prod/reports/`)
+
+Work-order status breakdown, completed-count today/this-week/this-month,
+overdue work orders (product, due date, status), and low-stock products
+nearing their reorder point. All of the "Production Reports" and "Labor
+Tracking" manager-menu leaves (Daily Production, Weekly Summary, Efficiency,
+Scrap, KPI Dashboard, Current Labor, Labor by Shift/Job, Labor Reports) route
+to this single page, as does the "Resource Management" leaf **Resource
+Reports**. The other Resource Management leaves route to the Dashboard
+(`/prod/`) or Capacity Planning (`/prod/schedule/capacity/`) above, and the
+manager-menu **Budget** leaves route to Finance's Budget page — see the
+[Accounting guide](01-accounting.md#budget-management-finbudgets).
+
 ## Work Orders (`/wo/`)
 
 - **New** (`/wo/new/`) — number, product, description, quantity, start/due

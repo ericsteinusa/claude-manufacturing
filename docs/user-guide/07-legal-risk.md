@@ -34,6 +34,21 @@ owner, due date, status) and mark it completed.
 Create or edit a litigation case: case name, opposing party, court, case
 type, filed date, status, outcome.
 
+## Intellectual Property (`/legal/ip/`)
+
+Create or edit an IP record: title, type, registration number, jurisdiction,
+filed/expiry date, status, notes.
+
+## Employment Law (`/legal/employment/`)
+
+Create or edit an employment-law matter: matter name, employee, matter type,
+owner, opened/closed date, status, notes.
+
+## Corporate Governance (`/legal/governance/`)
+
+Create or edit a governance item (manager-only menu leaf): item, category,
+owner, reference date, reference, status, notes.
+
 ## Risk Management (`/risk/...`)
 
 - **Risk Register** (`/risk/register/`) — log and track individual risks.
