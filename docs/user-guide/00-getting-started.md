@@ -50,7 +50,7 @@ don't see — things like approvals, budget management, and staff reports.
 | **President / Vice President** | Everything, everywhere — every department, every manager screen. |
 | **Department Manager** | Full access to their own department, including that department's manager-only screens (approvals, budget, staff management, etc.). |
 | **Supervisor** | Normal day-to-day access to their own department's screens. No manager sub-menus. |
-| **Auditor** | Same department-scoped access as a regular employee — cannot create, edit, submit, or delete anything (every "Save/New/Delete" button is hidden or blocked). The exceptions are the Audit Log and a handful of cross-department read-only reports (cash flow, ATP, supplier scorecard), which Auditors can view regardless of department. |
+| **Auditor** | Same department-scoped access as a regular employee — cannot create, edit, submit, or delete anything (every "Save/New/Delete" button is hidden or blocked). The one cross-department exception is the Audit Log, which Auditors can view regardless of department. |
 | **HR / Personnel** | Full access to the Personnel department's screens, regardless of which department they're actually filed under. |
 
 A few things worth knowing:
@@ -66,7 +66,7 @@ A few things worth knowing:
   you'd normally be able to edit, you can still browse it — but submitting
   the form (Save/Approve/Delete) will bounce you back without making the
   change. Auditors do not get access to other departments' pages beyond the
-  Audit Log and the read-only reports noted above.
+  Audit Log noted above.
 
 ## Approvals and dollar thresholds
 
@@ -106,6 +106,17 @@ These aren't tied to one department — they apply company-wide:
   (`/reports/builder/`) — build your own report by picking a table, columns,
   filters, grouping, and sorting; save it privately or share it; export to
   CSV or PDF.
+- **Barcode Scanning** (`/scan/`) — type or scan a barcode (WO, part, PO,
+  receiving, or asset) and get redirected straight to that record. A
+  dedicated **Receiving Scan** session (`/scan/receive/`) lets you scan a
+  PO's barcode to open it, then scan each part barcode in turn to mark it
+  received. Printable barcode labels (PDF) are available from Work Order,
+  Part, PO, Receiving, and Fixed Asset detail pages.
+- **Sustainability / ESG Dashboard** (`/esg/`) — company-wide carbon
+  emissions summary and Scope 2 (electricity) entry logging. Per-product
+  carbon footprint rolls (`/carbon/<product_id>/`) and per-work-order carbon
+  actuals (`/carbon/wo/<wo_id>/`) are available from the Production and
+  Costing pages, mirroring standard cost rolls.
 
 ## Employee Self-Service (everyone, regardless of department)
 

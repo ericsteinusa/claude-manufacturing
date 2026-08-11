@@ -5,9 +5,9 @@ Employment Law. Managers also see a **Legal Manager** menu with Contract
 Management, Litigation Management, Compliance Management, and Corporate
 Governance.
 
-Risk Management is a related department (Risk Assessment, Risk Register,
-Insurance, Business Continuity, Compliance & Audit) whose menu items mostly
-lead back to these same Legal pages.
+Risk Management is a related department with its own dedicated pages: Risk
+Register, Risk Assessments, Insurance, Business Continuity, and Compliance &
+Audit.
 
 **Who can access it:** Legal and Risk Management staff.
 
@@ -15,7 +15,9 @@ lead back to these same Legal pages.
 
 - **Legal** (`/legal/`) — contract status/type/value-by-counterparty charts,
   compliance status, litigation status/type charts.
-- **Risk** (`/risk/`) — risk-focused view of the same underlying data.
+- **Risk** (`/risk/`) — its own KPIs drawn from the risk register,
+  assessments, audits, insurance, and continuity records below (not a view
+  of Legal's data).
 
 ## Contracts (`/legal/contracts/`)
 
@@ -32,8 +34,19 @@ owner, due date, status) and mark it completed.
 Create or edit a litigation case: case name, opposing party, court, case
 type, filed date, status, outcome.
 
+## Risk Management (`/risk/...`)
+
+- **Risk Register** (`/risk/register/`) — log and track individual risks.
+- **Risk Assessments** (`/risk/assessments/`) — likelihood/impact scoring.
+- **Insurance** (`/risk/insurance/`) — policy tracking.
+- **Business Continuity** (`/risk/continuity/`) — continuity plans.
+- **Compliance & Audit** (`/risk/audits/`) — audit schedule and findings.
+- **Key Risk Indicators** (`/risk/kri/`) — KRI tracking.
+
 ## Budget Management
 
 The **Budget Management** department tile (visible on the full-access
-dashboard) is a thin wrapper that routes entirely to the Finance/Accounting
-Budget pages — see the [Accounting guide](01-accounting.md#budget-management-finbudgets).
+dashboard) has its own dashboard, but all of its individual menu leaves
+(Budgets, Budget Detail, BVA, Variance, Approval Workflow) route to the
+single Finance/Accounting Budget page — see the
+[Accounting guide](01-accounting.md#budget-management-finbudgets).
