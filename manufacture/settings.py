@@ -49,6 +49,32 @@ CSRF_TRUSTED_ORIGINS = (
     if _csrf_trusted_origins_env else []
 )
 
+# CORS — scoped to the mobile REST API only (CORS_URLS_REGEX below); the
+# cookie/session-based web app never needs cross-origin requests and stays
+# fully closed. The mobile app's web target (Expo `expo start --web` / the
+# static `expo export --platform web` bundle) runs on its own origin/port
+# and calls the API on Django's origin, which browsers (unlike native
+# iOS/Android) block by default without these headers. Token auth via
+# `Authorization: Bearer <token>` is used here, not cookies, so
+# CORS_ALLOW_CREDENTIALS stays off — no cross-origin cookie exposure.
+_cors_allowed_origins_env = os.environ.get('CORS_ALLOWED_ORIGINS')
+CORS_ALLOWED_ORIGINS = (
+    [o.strip() for o in _cors_allowed_origins_env.split(',') if o.strip()]
+    if _cors_allowed_origins_env else [
+        # Metro's `expo start --web` dev server default port.
+        'http://localhost:8081', 'http://127.0.0.1:8081',
+        # Legacy Expo web dev port (pre-SDK 50 default), kept for older docs/muscle memory.
+        'http://localhost:19006', 'http://127.0.0.1:19006',
+        # `npx serve`/`python -m http.server` etc. serving a static
+        # `expo export --platform web` bundle — no fixed port, so 4173
+        # (Vite's preview default, commonly reused for this) is a
+        # reasonable dev default; override via CORS_ALLOWED_ORIGINS for
+        # anything else.
+        'http://localhost:4173', 'http://127.0.0.1:4173',
+    ]
+)
+CORS_URLS_REGEX = r'^/api/v1/.*$'
+
 if not DEBUG:
     if SECRET_KEY == _DEV_INSECURE_SECRET_KEY:
         raise ImproperlyConfigured(
@@ -84,6 +110,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'manufacturing',
 ]
 
@@ -93,6 +120,10 @@ MIDDLEWARE = [
     # requirement) — serves collected static files directly from the app
     # process, so it works whether or not nginx ends up in front of it.
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    # Must come before CommonMiddleware (django-cors-headers' own
+    # requirement) so CORS headers make it onto every response, including
+    # ones CommonMiddleware itself can short-circuit.
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
