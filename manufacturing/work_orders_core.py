@@ -120,7 +120,7 @@ def list_wos(conn, status=None, date_from=None, date_to=None):
     sql = """
         SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
                wo.start_date, wo.due_date, wo.status, wo.notes,
-               wo.created_by, p.name AS product_name,
+               wo.created_by, wo.product_id, p.name AS product_name,
                (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
                    AS mat_count
         FROM work_order wo
@@ -148,7 +148,7 @@ def get_wo(conn, wo_id):
     row = conn.execute("""
         SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
                wo.start_date, wo.due_date, wo.status, wo.notes,
-               wo.created_by, p.name AS product_name,
+               wo.created_by, wo.product_id, p.name AS product_name,
                (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
                    AS mat_count
         FROM work_order wo
