@@ -406,8 +406,8 @@ def api_req(request):
                 )
             conn.commit()
             sql = """
-                SELECT pr.id, pr.req_number, pr.dept_id, pr.purpose,
-                       pr.status, pr.notes, pr.created_by,
+                SELECT pr.id, pr.req_number, pr.requester_id, pr.dept_id,
+                       pr.purpose, pr.status, pr.notes, pr.created_by,
                        p.first_name || ' ' || p.last_name AS requester_name,
                        d.dept_name
                 FROM purchase_requisition pr
@@ -566,8 +566,8 @@ def api_req_pending(request):
     try:
         purchase_requisitions_core.ensure_requisition_tables(conn)
         sql = """
-            SELECT pr.id, pr.req_number, pr.dept_id, pr.purpose,
-                   pr.status, pr.notes,
+            SELECT pr.id, pr.req_number, pr.requester_id, pr.dept_id,
+                   pr.purpose, pr.status, pr.notes,
                    p.first_name || ' ' || p.last_name AS requester_name,
                    d.dept_name
             FROM purchase_requisition pr
