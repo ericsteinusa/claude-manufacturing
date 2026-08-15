@@ -49,7 +49,7 @@ def wo_summary(conn) -> dict:
 def inventory_alerts(conn) -> dict:
     """Return products at or below their reorder point (up to 20 rows)."""
     items = conn.execute(
-        "SELECT name, COALESCE(amount, 0) AS on_hand, "
+        "SELECT id, name, COALESCE(amount, 0) AS on_hand, "
         "COALESCE(reorder_point, 0) AS reorder_point "
         "FROM product "
         "WHERE COALESCE(reorder_point, 0) > 0 "
