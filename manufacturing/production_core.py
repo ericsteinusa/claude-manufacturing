@@ -208,7 +208,7 @@ def list_shipments(conn, status=None, search=None) -> list:
     where = ("WHERE " + " AND ".join(conds)) if conds else ""
     return [dict(r) for r in conn.execute(f"""
         SELECT s.id, s.ship_number, s.ship_date, s.carrier,
-               s.tracking_number, s.status, s.notes,
+               s.tracking_number, s.status, s.notes, s.so_id,
                so.so_number
         FROM shipment s
         LEFT JOIN sales_order so ON so.id = s.so_id
