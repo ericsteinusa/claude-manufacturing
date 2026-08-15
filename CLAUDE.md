@@ -125,6 +125,13 @@ standard cost/roll/history + routing steps, plus Workcenters/GL Accounts referen
 lists — product search reuses `getInventory` from the Inventory screen's API client
 rather than a dedicated product-list endpoint, since none exists). Plus `(auth)/login`.
 To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
+CI (`.github/workflows/mobile.yml`: `npm ci`, `tsc --noEmit`, `expo-doctor`,
+`expo export --platform web`) can fail on PRs that never touch `mobile/` —
+Expo periodically ships new SDK 57 patch releases, so the pinned patch
+versions in `package.json`/`package-lock.json` drift behind what
+`expo-doctor` currently expects (not a regression in that PR). Fix with
+`npx expo install --fix`, then re-verify with `expo-doctor` and
+`expo export --platform web` (done in PR #90, and again in PR #96).
 
 ## Web UI (Django) & menu routing
 - **End-user documentation** for every department's pages, workflows, and the
@@ -187,6 +194,20 @@ To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
   `accounting_core.get_dso`/`get_dpo` already do this join correctly — reuse
   that pattern rather than assuming a direct balance column (a past bug in
   `reports_core.financial_dashboard` did, and 500'd; fixed in PR #336).
+- **A query that JOINs a table to show a display field must also select that
+  table's id.** Code rendering `x_name`/`x_number` as a link or API reference
+  back to the joined row needs the matching `x_id` in the same result, or
+  callers get a name with nothing to link through — in the web UI that's a
+  hardcoded `href="/so/{{ s.so_id }}/"` silently rendering as `/so//` (404,
+  since the field is missing from the row dict) rather than an obvious error;
+  in the API it's a JSON field a mobile client can't follow up on. Found
+  missing in four places at once: `production_core.list_shipments` (`so_id`
+  dropped — 404'd the Shipping list's SO# link), `work_orders_core.list_wos`/
+  `get_wo` (`product_id` dropped), `api_views.api_req`/`api_req_pending`
+  (`requester_id` dropped, unlike the `dept_id` alongside it in the same
+  query), and `reports_core.inventory_alerts` (never selected `id` at all).
+  Fixed in PR #94/#95 — when adding or touching a query that joins for a
+  `_name`/`_number` display field, check its sibling `_id` is selected too.
 
 ## Windows deployment (`scripts/windows/`)
 `manufacture-autopull.ps1` (polls `origin/main` and redeploys) and
