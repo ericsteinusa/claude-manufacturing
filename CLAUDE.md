@@ -221,6 +221,12 @@ scripts' `CREATE TABLE IF NOT EXISTS`, but Django's built-in tables
 (`django_session`, auth, admin, contenttypes) still go through the normal
 Django migration system. Skipping it doesn't surface until first login,
 which 500s with `relation "django_session" does not exist`.
+`manufacture-autopull.ps1` only restarts the running server if the pull is a
+clean fast-forward **and** `manage.py check` **and** the full `pytest tests/`
+suite both pass on the newly-pulled commit — a diverged `--ff-only` pull or a
+failing check/test leaves whatever was already running in place and just
+logs to `manufacture-autopull.log`, so a broken push to `main` never takes
+down what's live on the Windows box.
 
 ## Sample data (dev DB)
 
