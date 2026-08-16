@@ -23,11 +23,13 @@ const OP_STATUS_COLORS: Record<string, string> = {
 
 export default function WorkOrdersScreen() {
   const { user } = useAuth();
-  // "Production Manager" isn't a role in this app's role table (it's only a
-  // job title) — the actual manager-of-Production is whoever holds the
-  // 'Department Manager' role in the 'production' dept.
+  // "Production Manager"/"Production Foreman" aren't roles in this app's
+  // role table (they're only job titles) — the actual manager-of-Production
+  // and foremen are whoever holds the 'Department Manager' or 'Supervisor'
+  // role in the 'production' dept.
   const canAssign = !!user?.full_access
-    || (user?.dept_key === 'production' && user?.role === 'Department Manager');
+    || (user?.dept_key === 'production'
+        && (user?.role === 'Department Manager' || user?.role === 'Supervisor'));
   const [wos, setWos] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);

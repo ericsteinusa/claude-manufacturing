@@ -1903,13 +1903,14 @@ def wo_export(request):
 def wo_detail(request, wo_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
-    # "Production Manager" isn't a role_name in the roles table (it's only
-    # a position.job_title) — the actual manager-of-Production is whoever
-    # holds the 'Department Manager' role in the 'production' dept.
+    # "Production Manager"/"Production Foreman" aren't role_names in the
+    # roles table (they're only position.job_title) — the actual
+    # manager-of-Production and foremen are whoever holds the 'Department
+    # Manager' or 'Supervisor' role in the 'production' dept.
     can_assign = can_edit and (
         request.session.get('user_full_access')
         or (request.session.get('user_dept_key') == 'production'
-            and request.session.get('user_role') == 'Department Manager')
+            and request.session.get('user_role') in ('Department Manager', 'Supervisor'))
     )
     schedule_error = schedule_success = None
     conn = get_db_connection()
