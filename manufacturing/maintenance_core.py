@@ -8,6 +8,8 @@ No PyQt6, no commit inside any function.
 
 import datetime
 
+from .notify_core import create_notifications_for_dept, ensure_notification_table
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -157,22 +159,40 @@ def get_work_order(conn, wo_id: int) -> dict | None:
     return _annotate_wo(dict(row)) if row else None
 
 
+def _notify_maint_wo_assigned(conn, wo_id: int, title: str, assigned_to: str) -> None:
+    # maint_mechanic has no people_id/login link (it's a standalone roster,
+    # unlike Production WO assignees which are `people` rows) — so we can't
+    # target an individual's in-app inbox. Notify the whole Maintenance dept
+    # instead, same fallback pattern as inventory_core's low-stock alert.
+    ensure_notification_table(conn)
+    create_notifications_for_dept(
+        conn, 'Maintenance', 'wo_assigned',
+        f"Maintenance Work Order #{wo_id} ({title}) assigned to {assigned_to}.",
+        entity_type='maint_work_order', entity_id=wo_id,
+    )
+
+
 def create_work_order(conn, title: str, equipment: str, work_type: str,
                       priority: str, assigned_to: str, requested_date: str,
                       due_date: str, notes: str, created_by: str) -> int:
     if not title.strip():
         raise ValueError("Title is required.")
+    title = title.strip()
+    assigned_to = assigned_to.strip()
     row = conn.execute(
         "INSERT INTO maint_work_order "
         "(title, equipment, work_type, priority, assigned_to, "
         "requested_date, due_date, status, notes, created_by) "
         "VALUES (%s,%s,%s,%s,%s,%s,%s,'Open',%s,%s) RETURNING id",
-        (title.strip(), equipment.strip(), work_type,
+        (title, equipment.strip(), work_type,
          priority if priority in PRIORITIES else 'Medium',
-         assigned_to.strip(), requested_date or _today(),
+         assigned_to, requested_date or _today(),
          due_date, notes.strip(), created_by),
     ).fetchone()
-    return row['id']
+    wo_id = row['id']
+    if assigned_to:
+        _notify_maint_wo_assigned(conn, wo_id, title, assigned_to)
+    return wo_id
 
 
 def update_work_order(conn, wo_id: int, title: str, equipment: str,
@@ -181,14 +201,22 @@ def update_work_order(conn, wo_id: int, title: str, equipment: str,
                       status: str, notes: str) -> None:
     if not title.strip():
         raise ValueError("Title is required.")
+    title = title.strip()
+    assigned_to = assigned_to.strip()
+    old = conn.execute(
+        "SELECT assigned_to FROM maint_work_order WHERE id=%s", (wo_id,)
+    ).fetchone()
     conn.execute(
         "UPDATE maint_work_order SET title=%s, equipment=%s, work_type=%s, "
         "priority=%s, assigned_to=%s, requested_date=%s, due_date=%s, "
         "completed_date=%s, status=%s, notes=%s WHERE id=%s",
-        (title.strip(), equipment.strip(), work_type, priority,
-         assigned_to.strip(), requested_date, due_date, completed_date,
+        (title, equipment.strip(), work_type, priority,
+         assigned_to, requested_date, due_date, completed_date,
          status, notes.strip(), wo_id),
     )
+    old_assignee = (old['assigned_to'] if old else '') or ''
+    if assigned_to and assigned_to != old_assignee:
+        _notify_maint_wo_assigned(conn, wo_id, title, assigned_to)
 
 
 def complete_work_order(conn, wo_id: int) -> None:

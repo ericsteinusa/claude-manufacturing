@@ -1942,7 +1942,8 @@ def wo_detail(request, wo_id):
                         )
                 elif action == 'assign' and can_assign:
                     assign_wo(conn, wo_id,
-                             (request.POST.get('assigned_to') or '').strip())
+                             (request.POST.get('assigned_to') or '').strip(),
+                             wo_number=wo['wo_number'])
                     conn.commit()
                     wo = get_wo(conn, wo_id)
             except ValueError as exc:

@@ -208,14 +208,44 @@ def test_load_products_returns_empty_on_error():
 def test_assign_wo_sets_assigned_to():
     conn = _FakeConn()
     assign_wo(conn, 5, "Jane Smith")
-    assert "UPDATE work_order SET assigned_to=%s WHERE id=%s" in conn.last_sql
-    assert conn.last_params == ["Jane Smith", 5]
+    assert "UPDATE work_order SET assigned_to=%s WHERE id=%s" in conn.calls[0][0]
+    assert conn.calls[0][1] == ["Jane Smith", 5]
 
 
 def test_assign_wo_blank_stores_null():
     conn = _FakeConn()
     assign_wo(conn, 5, "")
     assert conn.last_params == [None, 5]
+
+
+def test_assign_wo_notifies_known_assignee():
+    conn = _FakeConn(rows=[{"id": 42}])
+    assign_wo(conn, 5, "Jane Smith", wo_number="WO-2026-0007")
+    insert_calls = [c for c in conn.calls if "INSERT INTO notification" in c[0]]
+    assert len(insert_calls) == 1
+    _, params = insert_calls[0]
+    assert params[0] == 42
+    assert "WO-2026-0007" in params[4]
+    assert "Production Work Order" in params[4]
+
+
+def test_assign_wo_message_falls_back_to_wo_id_without_wo_number():
+    conn = _FakeConn(rows=[{"id": 42}])
+    assign_wo(conn, 5, "Jane Smith")
+    insert_calls = [c for c in conn.calls if "INSERT INTO notification" in c[0]]
+    assert "5" in insert_calls[0][1][4]
+
+
+def test_assign_wo_no_notification_when_assignee_unrecognized():
+    conn = _FakeConn(rows=[])
+    assign_wo(conn, 5, "Nobody Real")
+    assert not any("INSERT INTO notification" in c[0] for c in conn.calls)
+
+
+def test_assign_wo_no_notification_when_blank():
+    conn = _FakeConn(rows=[{"id": 42}])
+    assign_wo(conn, 5, "")
+    assert not any("INSERT INTO notification" in c[0] for c in conn.calls)
 
 
 def test_load_wo_assignees_returns_rows():
