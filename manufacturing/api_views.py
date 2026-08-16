@@ -378,7 +378,7 @@ def api_wo_assign(request, wo_id):
         wo = work_orders_core.get_wo(conn, wo_id)
         if wo is None:
             return api_err('Work order not found.', 404)
-        work_orders_core.assign_wo(conn, wo_id, assigned_to)
+        work_orders_core.assign_wo(conn, wo_id, assigned_to, wo_number=wo['wo_number'])
         conn.commit()
     finally:
         conn.close()

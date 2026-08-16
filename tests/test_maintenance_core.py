@@ -235,6 +235,58 @@ def test_update_work_order_does_not_commit():
     conn.commit.assert_not_called()
 
 
+# ---------------------------------------------------------------------------
+# create_work_order / update_work_order — assignment notification
+# ---------------------------------------------------------------------------
+
+def test_create_work_order_notifies_maintenance_dept_when_assigned():
+    conn = _conn(fetchone={'id': 9})
+    create_work_order(conn, 'Fix motor', 'Motor A', 'Repair', 'High',
+                      'Bob Mechanic', _today(), '', '', 'u@e.com')
+    calls = conn.execute.call_args_list
+    notify_call = next(c for c in calls if 'INSERT INTO notification' in c[0][0])
+    type_, entity_type, entity_id, message, dept_name = notify_call[0][1]
+    assert dept_name == 'Maintenance'
+    assert entity_type == 'maint_work_order'
+    assert entity_id == 9
+    assert 'Bob Mechanic' in message
+    assert 'Maintenance Work Order' in message
+
+
+def test_create_work_order_no_notification_when_unassigned():
+    conn = _conn(fetchone={'id': 9})
+    create_work_order(conn, 'Fix motor', 'Motor A', 'Repair', 'High',
+                      '', _today(), '', '', 'u@e.com')
+    calls = conn.execute.call_args_list
+    assert not any('INSERT INTO notification' in c[0][0] for c in calls)
+
+
+def test_update_work_order_notifies_on_reassignment():
+    conn = _conn(fetchone={'assigned_to': 'Old Mechanic'})
+    update_work_order(conn, 1, 'Title', '', 'Repair', 'Medium',
+                      'New Mechanic', '', '', '', 'Open', '')
+    calls = conn.execute.call_args_list
+    notify_call = next(c for c in calls if 'INSERT INTO notification' in c[0][0])
+    message = notify_call[0][1][3]
+    assert 'New Mechanic' in message
+
+
+def test_update_work_order_no_notification_when_assignee_unchanged():
+    conn = _conn(fetchone={'assigned_to': 'Same Mechanic'})
+    update_work_order(conn, 1, 'Title', '', 'Repair', 'Medium',
+                      'Same Mechanic', '', '', '', 'Open', '')
+    calls = conn.execute.call_args_list
+    assert not any('INSERT INTO notification' in c[0][0] for c in calls)
+
+
+def test_update_work_order_no_notification_when_assignee_cleared():
+    conn = _conn(fetchone={'assigned_to': 'Old Mechanic'})
+    update_work_order(conn, 1, 'Title', '', 'Repair', 'Medium',
+                      '', '', '', '', 'Open', '')
+    calls = conn.execute.call_args_list
+    assert not any('INSERT INTO notification' in c[0][0] for c in calls)
+
+
 def test_complete_work_order_sets_completed():
     conn = _conn()
     complete_work_order(conn, 1)

@@ -9,6 +9,7 @@ from datetime import date
 import psycopg2
 
 from .mrp_core import next_sequence_number
+from .notify_core import create_notification, ensure_notification_table
 
 WO_STATUSES = ("draft", "open", "in_progress", "completed", "cancelled")
 
@@ -290,11 +291,26 @@ def set_wo_status(conn, wo_id, new_status, created_by=None):
                              wo_row['quantity'], created_by=created_by)
 
 
-def assign_wo(conn, wo_id, assigned_to):
-    """Set a WO's assignee. Does not commit."""
+def assign_wo(conn, wo_id, assigned_to, wo_number=None):
+    """Set a WO's assignee and, if the assignee resolves to a known
+    person, send them an in-app notification. Does not commit."""
     conn.execute(
         "UPDATE work_order SET assigned_to=%s WHERE id=%s",
         (assigned_to or None, wo_id)
+    )
+    if not assigned_to:
+        return
+    person = conn.execute(
+        "SELECT id FROM people WHERE first_name || ' ' || last_name = %s",
+        (assigned_to,)
+    ).fetchone()
+    if not person:
+        return
+    ensure_notification_table(conn)
+    create_notification(
+        conn, person['id'], 'wo_assigned',
+        f"You've been assigned to Production Work Order {wo_number or wo_id}.",
+        entity_type='work_order', entity_id=wo_id,
     )
 
 
