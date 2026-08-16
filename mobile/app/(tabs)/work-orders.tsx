@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator, Alert, FlatList, Modal, RefreshControl,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
@@ -7,8 +7,10 @@ import { useFocusEffect } from 'expo-router';
 import {
   getWorkOrder, getWorkOrders, setWorkOrderStatus,
   getWoOperations, startWoOperation, completeWoOperation,
+  getWoAssignees, assignWorkOrder,
 } from '../../src/api/workorders';
 import StatusBadge from '../../src/components/StatusBadge';
+import { useAuth } from '../../src/hooks/useAuth';
 
 const STATUSES = ['', 'draft', 'open', 'in_progress', 'completed', 'cancelled'];
 
@@ -20,6 +22,12 @@ const OP_STATUS_COLORS: Record<string, string> = {
 };
 
 export default function WorkOrdersScreen() {
+  const { user } = useAuth();
+  // "Production Manager" isn't a role in this app's role table (it's only a
+  // job title) — the actual manager-of-Production is whoever holds the
+  // 'Department Manager' role in the 'production' dept.
+  const canAssign = !!user?.full_access
+    || (user?.dept_key === 'production' && user?.role === 'Department Manager');
   const [wos, setWos] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
@@ -28,6 +36,14 @@ export default function WorkOrdersScreen() {
   const [updating, setUpdating] = useState(false);
   const [completeModal, setCompleteModal] = useState<{ op: any } | null>(null);
   const [actualHours, setActualHours] = useState('');
+  const [assignees, setAssignees] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!canAssign) return;
+    getWoAssignees()
+      .then((res) => setAssignees(res.data.data.assignees ?? []))
+      .catch(() => setAssignees([]));
+  }, [canAssign]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -65,6 +81,21 @@ export default function WorkOrdersScreen() {
       load();
     } catch (err: any) {
       Alert.alert('Error', err?.response?.data?.error ?? 'Status update failed.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const assignTo = async (name: string) => {
+    if (!selected) return;
+    setUpdating(true);
+    try {
+      await assignWorkOrder(selected.id, name);
+      const res = await getWorkOrder(selected.id);
+      setSelected(res.data.data.work_order);
+      load();
+    } catch (err: any) {
+      Alert.alert('Error', err?.response?.data?.error ?? 'Could not assign work order.');
     } finally {
       setUpdating(false);
     }
@@ -141,7 +172,10 @@ export default function WorkOrdersScreen() {
                 </View>
                 <Text style={styles.desc} numberOfLines={2}>{item.description}</Text>
                 <Text style={styles.meta}>
-                  {`Qty: ${item.quantity}${item.due_date ? `  ·  Due: ${item.due_date}` : ''}${item.mat_count > 0 ? `  ·  ${item.mat_count} materials` : ''}`}
+                  {`Qty: ${item.quantity}${item.due_date ? `  ·  Due: ${item.due_date}` : ''}${item.mat_count > 0 ? `  ·  ${item.mat_count} materials` : ''}${item.op_total > 0 ? `  ·  ${item.op_done}/${item.op_total} steps` : ''}`}
+                </Text>
+                <Text style={styles.meta}>
+                  {`Assigned: ${item.assigned_to || 'Unassigned'}`}
                 </Text>
               </TouchableOpacity>
             )}
@@ -162,6 +196,32 @@ export default function WorkOrdersScreen() {
             <Text style={styles.modalDesc}>{selected.description}</Text>
             <Text style={styles.modalMeta}>{`Qty: ${selected.quantity}`}</Text>
             {selected.due_date ? <Text style={styles.modalMeta}>{`Due: ${selected.due_date}`}</Text> : null}
+            <Text style={styles.modalMeta}>{`Assigned: ${selected.assigned_to || 'Unassigned'}`}</Text>
+
+            {canAssign && (
+              <View style={{ marginTop: 16 }}>
+                <Text style={styles.sectionTitle}>Assign To</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  <TouchableOpacity
+                    style={styles.transitionBtn}
+                    onPress={() => assignTo('')}
+                    disabled={updating}
+                  >
+                    <Text style={styles.transitionLabel}>Unassigned</Text>
+                  </TouchableOpacity>
+                  {assignees.map((a: any) => (
+                    <TouchableOpacity
+                      key={a.id}
+                      style={styles.transitionBtn}
+                      onPress={() => assignTo(a.name)}
+                      disabled={updating}
+                    >
+                      <Text style={styles.transitionLabel}>{a.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
 
             {selected.materials?.length > 0 && (
               <View style={{ marginTop: 16 }}>

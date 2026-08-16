@@ -81,6 +81,10 @@ def ensure_wo_tables(conn):
         ADD COLUMN IF NOT EXISTS created_by TEXT
     """)
     conn.execute("""
+        ALTER TABLE work_order
+        ADD COLUMN IF NOT EXISTS assigned_to TEXT
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS wo_material (
             id SERIAL PRIMARY KEY,
             wo_id INTEGER NOT NULL REFERENCES work_order(id),
@@ -120,9 +124,14 @@ def list_wos(conn, status=None, date_from=None, date_to=None):
     sql = """
         SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
                wo.start_date, wo.due_date, wo.status, wo.notes,
-               wo.created_by, wo.product_id, p.name AS product_name,
+               wo.created_by, wo.assigned_to, wo.product_id,
+               p.name AS product_name,
                (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
-                   AS mat_count
+                   AS mat_count,
+               (SELECT COUNT(*) FROM wo_operation o WHERE o.wo_id = wo.id)
+                   AS op_total,
+               (SELECT COUNT(*) FROM wo_operation o WHERE o.wo_id = wo.id
+                   AND o.status = 'completed') AS op_done
         FROM work_order wo
         LEFT JOIN product p ON p.id = wo.product_id
     """
@@ -148,9 +157,14 @@ def get_wo(conn, wo_id):
     row = conn.execute("""
         SELECT wo.id, wo.wo_number, wo.description, wo.quantity,
                wo.start_date, wo.due_date, wo.status, wo.notes,
-               wo.created_by, wo.product_id, p.name AS product_name,
+               wo.created_by, wo.assigned_to, wo.product_id,
+               p.name AS product_name,
                (SELECT COUNT(*) FROM wo_material m WHERE m.wo_id = wo.id)
-                   AS mat_count
+                   AS mat_count,
+               (SELECT COUNT(*) FROM wo_operation o WHERE o.wo_id = wo.id)
+                   AS op_total,
+               (SELECT COUNT(*) FROM wo_operation o WHERE o.wo_id = wo.id
+                   AND o.status = 'completed') AS op_done
         FROM work_order wo
         LEFT JOIN product p ON p.id = wo.product_id
         WHERE wo.id = %s
@@ -177,6 +191,22 @@ def load_products(conn):
         rows = conn.execute(
             "SELECT id, name AS product_name FROM product ORDER BY name"
         ).fetchall()
+    except psycopg2.Error:
+        return []
+    return [dict(r) for r in rows]
+
+
+def load_wo_assignees(conn):
+    """Return [{id, name}] for people in the Production dept (empty on
+    error), for the WO "Assigned To" picker."""
+    try:
+        rows = conn.execute("""
+            SELECT p.id, p.first_name || ' ' || p.last_name AS name
+            FROM people p
+            JOIN dept d ON d.dept_id = p.dept_id
+            WHERE d.dept_name = 'Production'
+            ORDER BY name
+        """).fetchall()
     except psycopg2.Error:
         return []
     return [dict(r) for r in rows]
@@ -258,6 +288,14 @@ def set_wo_status(conn, wo_id, new_status, created_by=None):
             save_wo_actual_cost(conn, wo_id, created_by=created_by)
             post_wo_close_gl(conn, wo_id, wo_row['wo_number'],
                              wo_row['quantity'], created_by=created_by)
+
+
+def assign_wo(conn, wo_id, assigned_to):
+    """Set a WO's assignee. Does not commit."""
+    conn.execute(
+        "UPDATE work_order SET assigned_to=%s WHERE id=%s",
+        (assigned_to or None, wo_id)
+    )
 
 
 def get_wo_cost_summary(conn, wo_id):

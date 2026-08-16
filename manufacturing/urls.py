@@ -572,8 +572,10 @@ urlpatterns = [
     path('api/v1/time-clock/hours/',     api_views.api_tc_hours,     name='api_tc_hours'),
     path('api/v1/time-off/',      api_views.api_time_off, name='api_time_off'),
     path('api/v1/wo/',            api_views.api_wo_list,  name='api_wo_list'),
+    path('api/v1/wo/assignees/',            api_views.api_wo_assignees, name='api_wo_assignees'),
     path('api/v1/wo/<int:wo_id>/',          api_views.api_wo_detail,   name='api_wo_detail'),
     path('api/v1/wo/<int:wo_id>/status/',   api_views.api_wo_status,   name='api_wo_status'),
+    path('api/v1/wo/<int:wo_id>/assign/',   api_views.api_wo_assign,   name='api_wo_assign'),
     # Phase 5C — WO operations (routing steps)
     path('api/v1/wo/<int:wo_id>/operations/',
          api_views.api_wo_operations, name='api_wo_operations'),

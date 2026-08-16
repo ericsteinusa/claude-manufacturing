@@ -23,3 +23,9 @@ export const getWoCost = (woId: number) =>
 
 export const computeWoCost = (woId: number) =>
   apiClient.post(`/wo/${woId}/cost/compute/`);
+
+export const getWoAssignees = () =>
+  apiClient.get('/wo/assignees/');
+
+export const assignWorkOrder = (woId: number, assignedTo: string) =>
+  apiClient.post(`/wo/${woId}/assign/`, { assigned_to: assignedTo });
