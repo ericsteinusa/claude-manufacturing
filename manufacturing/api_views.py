@@ -359,15 +359,16 @@ def api_wo_status(request, wo_id):
 @require_http_methods(['POST'])
 @api_required
 def api_wo_assign(request, wo_id):
-    # "Production Manager" isn't a role_name in the roles table (it's only a
-    # position.job_title) — the actual manager-of-Production is whoever
-    # holds the 'Department Manager' role in the 'production' dept.
-    is_production_manager = (
+    # "Production Manager"/"Production Foreman" aren't role_names in the
+    # roles table (they're only position.job_title) — the actual
+    # manager-of-Production and foremen are whoever holds the 'Department
+    # Manager' or 'Supervisor' role in the 'production' dept.
+    can_assign = (
         request.api_user['dept_key'] == 'production'
-        and request.api_user['role'] == 'Department Manager'
+        and request.api_user['role'] in ('Department Manager', 'Supervisor')
     )
-    if not is_production_manager and not request.api_user['full_access']:
-        return api_err('Only a Production Manager can assign work orders.', 403)
+    if not can_assign and not request.api_user['full_access']:
+        return api_err('Only a Production Manager or Foreman can assign work orders.', 403)
     try:
         body = json.loads(request.body)
     except Exception:
