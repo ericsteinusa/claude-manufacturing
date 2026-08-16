@@ -7,6 +7,7 @@ from manufacturing.work_orders_core import (
     allowed_transitions, can_transition,
     next_wo_number, list_wos, load_products,
     create_wo, update_wo, add_wo_material, set_wo_status,
+    assign_wo, load_wo_assignees,
 )
 
 
@@ -200,3 +201,34 @@ def test_load_products_returns_empty_on_error():
             raise psycopg2.Error("table missing")
 
     assert load_products(_ErrorConn()) == []
+
+
+# ── assign_wo / load_wo_assignees ─────────────────────────────────────────
+
+def test_assign_wo_sets_assigned_to():
+    conn = _FakeConn()
+    assign_wo(conn, 5, "Jane Smith")
+    assert "UPDATE work_order SET assigned_to=%s WHERE id=%s" in conn.last_sql
+    assert conn.last_params == ["Jane Smith", 5]
+
+
+def test_assign_wo_blank_stores_null():
+    conn = _FakeConn()
+    assign_wo(conn, 5, "")
+    assert conn.last_params == [None, 5]
+
+
+def test_load_wo_assignees_returns_rows():
+    conn = _FakeConn(rows=[{"id": 1, "name": "Jane Smith"}])
+    assert load_wo_assignees(conn) == [{"id": 1, "name": "Jane Smith"}]
+    assert "dept_name = 'Production'" in conn.last_sql
+
+
+def test_load_wo_assignees_returns_empty_on_error():
+    import psycopg2
+
+    class _ErrorConn:
+        def execute(self, *a, **kw):
+            raise psycopg2.Error("table missing")
+
+    assert load_wo_assignees(_ErrorConn()) == []

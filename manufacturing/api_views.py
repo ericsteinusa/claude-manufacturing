@@ -355,6 +355,48 @@ def api_wo_status(request, wo_id):
     return api_ok({'status': new_status, 'message': f"Status updated to '{new_status}'."})
 
 
+@csrf_exempt
+@require_http_methods(['POST'])
+@api_required
+def api_wo_assign(request, wo_id):
+    # "Production Manager" isn't a role_name in the roles table (it's only a
+    # position.job_title) — the actual manager-of-Production is whoever
+    # holds the 'Department Manager' role in the 'production' dept.
+    is_production_manager = (
+        request.api_user['dept_key'] == 'production'
+        and request.api_user['role'] == 'Department Manager'
+    )
+    if not is_production_manager and not request.api_user['full_access']:
+        return api_err('Only a Production Manager can assign work orders.', 403)
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return api_err('Invalid JSON.')
+    assigned_to = (body.get('assigned_to') or '').strip()
+    conn = get_db_connection()
+    try:
+        wo = work_orders_core.get_wo(conn, wo_id)
+        if wo is None:
+            return api_err('Work order not found.', 404)
+        work_orders_core.assign_wo(conn, wo_id, assigned_to)
+        conn.commit()
+    finally:
+        conn.close()
+    return api_ok({'assigned_to': assigned_to, 'message': 'Work order assigned.'})
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_wo_assignees(request):
+    conn = get_db_connection()
+    try:
+        assignees = work_orders_core.load_wo_assignees(conn)
+    finally:
+        conn.close()
+    return api_ok({'assignees': assignees})
+
+
 # ---------------------------------------------------------------------------
 # Purchase Requisitions
 # ---------------------------------------------------------------------------

@@ -44,6 +44,12 @@
 .wo-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px;
            font-size: 13px; }
 .wo-meta b { color: #003cb4; }
+.wo-assign-form { display: flex; gap: 6px; align-items: center; }
+.wo-assign-form select { padding: 3px 6px; border: 1.5px solid var(--border);
+    border-radius: 4px; font-size: 13px; }
+.wo-progress-bar { background: #e6e6e6; border-radius: 6px; height: 10px;
+    overflow: hidden; margin: 6px 0 4px; }
+.wo-progress-bar-fill { background: #22c55e; height: 100%; }
 .wo-table {
     width: 100%; border-collapse: collapse; background: white;
     border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
@@ -104,6 +110,27 @@
                     <b>Description:</b> {{ wo.description|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
                     <b>Notes:</b> {{ wo.notes|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;">
+                    <b>Assigned To:</b>
+                    {% if can_assign %}
+                    <form method="post" class="wo-assign-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="assign">
+                        <select name="assigned_to">
+                            <option value="">— Unassigned —</option>
+                            {% for a in assignees %}
+                            <option {% if wo.assigned_to == a.name %}selected{% endif %}>{{ a.name }}</option>
+                            {% endfor %}
+                            {% if wo.assigned_to and wo.assigned_to not in assignees|join:"," %}
+                            <option selected>{{ wo.assigned_to }}</option>
+                            {% endif %}
+                        </select>
+                        <button type="submit" class="btn btn-sm">Assign</button>
+                    </form>
+                    {% else %}
+                    {{ wo.assigned_to|default:"— Unassigned —" }}
+                    {% endif %}
+                </div>
             </div>
             {% if status_actions %}
             <div class="wo-status-actions">
@@ -181,6 +208,16 @@
         {% if operations %}
         <div class="wo-card" style="margin-top:18px;">
             <h3 style="font-size:14px;color:var(--accent-hover);margin:0 0 10px;">Operations</h3>
+            {% if op_total %}
+            <div style="margin-bottom:12px;">
+                <div style="font-size:12px;color:#555;">
+                    Progress: {{ op_done }} / {{ op_total }} steps complete
+                </div>
+                <div class="wo-progress-bar">
+                    <div class="wo-progress-bar-fill" style="width:{% widthratio op_done op_total 100 %}%;"></div>
+                </div>
+            </div>
+            {% endif %}
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
                 <thead>
                     <tr style="background:var(--accent);color:white;">

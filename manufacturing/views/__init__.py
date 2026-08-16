@@ -145,6 +145,7 @@ from ..work_orders_core import (
     WO_STATUS_COLORS, WO_STATUS_ACTION_LABELS,  # noqa: F811
     list_wos, get_wo, get_wo_materials,
     next_wo_number, load_products as load_wo_products,
+    load_wo_assignees, assign_wo,
     create_wo, update_wo, add_wo_material, set_wo_status,
     can_transition as wo_can_transition,
     allowed_transitions as wo_allowed_transitions,
@@ -1902,6 +1903,14 @@ def wo_export(request):
 def wo_detail(request, wo_id):
 
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    # "Production Manager" isn't a role_name in the roles table (it's only
+    # a position.job_title) — the actual manager-of-Production is whoever
+    # holds the 'Department Manager' role in the 'production' dept.
+    can_assign = can_edit and (
+        request.session.get('user_full_access')
+        or (request.session.get('user_dept_key') == 'production'
+            and request.session.get('user_role') == 'Department Manager')
+    )
     schedule_error = schedule_success = None
     conn = get_db_connection()
     try:
@@ -1931,12 +1940,18 @@ def wo_detail(request, wo_id):
                         schedule_success += (
                             " This is before today — the due date is at risk."
                         )
+                elif action == 'assign' and can_assign:
+                    assign_wo(conn, wo_id,
+                             (request.POST.get('assigned_to') or '').strip())
+                    conn.commit()
+                    wo = get_wo(conn, wo_id)
             except ValueError as exc:
                 conn.rollback()
                 schedule_error = str(exc)
 
         materials = get_wo_materials(conn, wo_id)
         products = load_wo_products(conn) if can_edit else []
+        assignees = load_wo_assignees(conn) if can_assign else []
         operations, wo_labor_cost, wo_cost = [], None, None
         try:
             routing_core.ensure_routing_tables(conn)
@@ -1959,6 +1974,8 @@ def wo_detail(request, wo_id):
         (target, WO_STATUS_ACTION_LABELS.get(target, target))
         for target in wo_allowed_transitions(wo['status'])
     ] if can_edit else []
+    op_total = len(operations)
+    op_done = sum(1 for o in operations if o['status'] == 'completed')
 
     return render(request, 'wo_detail.html', _wo_context(
         request,
@@ -1966,9 +1983,13 @@ def wo_detail(request, wo_id):
         materials=materials,
         products=products,
         can_edit=can_edit,
+        can_assign=can_assign,
+        assignees=assignees,
         status_actions=status_actions,
         back_url='/wo/',
         operations=operations,
+        op_total=op_total,
+        op_done=op_done,
         wo_labor_cost=wo_labor_cost,
         wo_cost=wo_cost,
         schedule_error=schedule_error,

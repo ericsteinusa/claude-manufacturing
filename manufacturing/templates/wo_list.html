@@ -35,6 +35,8 @@
                     <th>Due Date</th>
                     <th>Status</th>
                     <th class="num">Materials</th>
+                    <th>Assigned To</th>
+                    <th class="num">Progress</th>
                 </tr>
             </thead>
             <tbody>
@@ -51,6 +53,8 @@
                         </span>
                     </td>
                     <td class="num">{{ wo.mat_count }}</td>
+                    <td>{{ wo.assigned_to|default:"—" }}</td>
+                    <td class="num">{% if wo.op_total %}{{ wo.op_done }}/{{ wo.op_total }}{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
