@@ -1,4 +1,8 @@
-FROM python:3.12-slim
+# Pinned to a digest (not just the "3.12-slim" tag) so CI/local builds are
+# reproducible — that tag gets rebuilt over time against new Python 3.12
+# patch releases and Debian package updates. Bump deliberately with:
+#   docker pull python:3.12-slim && docker images --digests python:3.12-slim
+FROM python:3.12-slim@sha256:dd29372629eeba2dd003fd9e9d35a5b8236c44727875a0364254b5127af88e65
 
 # No extra OS packages needed: psycopg2-binary ships its own libpq, and every
 # other pinned dependency in requirements.txt is pure Python.
