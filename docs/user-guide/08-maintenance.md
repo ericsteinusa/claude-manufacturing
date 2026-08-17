@@ -16,13 +16,37 @@ schedule/work-order status breakdown, downtime-by-category.
 ## OEE Report (`/maint/oee/`)
 
 Per-workcenter Availability / Performance / Quality / OEE %, filterable by
-week/month/quarter/year or a custom range. Exportable to CSV.
+week/month/quarter/year or a custom range. Exportable to CSV. The manager-menu
+**Daily Report** and **Weekly Report** leaves route here (pre-filtered to
+day/week).
+
+## Labor Time & Cost Report (`/maint/reports/labor/`)
+
+**Who can access it:** the Maintenance Department Manager, or President/VP.
+The manager-menu **Cost Analysis** leaf routes here.
+
+Filterable by period (day/week/month/quarter/year or a custom date range)
+and work-order status:
+
+- **Work Order Time Variance** — for every work order with an estimated or
+  actual hours value, the estimate vs. actual hours, the variance, and the
+  labor cost (actual hours × the assigned mechanic's hourly rate).
+- **Labor by Mechanic** — for each mechanic matched to a work order's
+  "Assigned To" field, total hours tracked vs. estimated, how many work
+  orders they were assigned, their hourly rate, and cost per work order plus
+  a running total.
+
+Both tables export to CSV independently via the toolbar. The **Downtime
+Report** leaf is unaffected and still routes to Downtime (`/maint/downtime/`)
+below.
 
 ## Work Orders (`/maint/wo/`)
 
 Create a maintenance work order (title, equipment, work type, priority,
-assignee/mechanic, requested/due date, notes); mark **Complete**; filter by
-status/priority/search.
+assignee/mechanic, requested/due date, estimated hours, notes); mark
+**Complete** (optionally recording actual hours worked at that point); filter
+by status/priority/search. Estimated and actual hours feed the Labor Time &
+Cost Report above.
 
 ## Equipment (`/maint/equipment/`)
 
@@ -51,7 +75,8 @@ quantity, reorder level, unit cost, status.
 
 ## Mechanics (`/maint/mechanics/`)
 
-Staff roster: name, trade, shift, phone, status.
+Staff roster: name, trade, shift, phone, status, hourly rate (used to
+compute cost on the Labor Time & Cost Report above).
 
 ## Predictive Maintenance (`/predictive-maintenance/`)
 

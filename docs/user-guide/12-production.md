@@ -20,14 +20,34 @@ by operation, monthly completed-work-order trend.
 
 Work-order status breakdown, completed-count today/this-week/this-month,
 overdue work orders (product, due date, status), and low-stock products
-nearing their reorder point. All of the "Production Reports" and "Labor
-Tracking" manager-menu leaves (Daily Production, Weekly Summary, Efficiency,
-Scrap, KPI Dashboard, Current Labor, Labor by Shift/Job, Labor Reports) route
-to this single page, as does the "Resource Management" leaf **Resource
+nearing their reorder point. The "Production Reports" manager-menu leaves
+(Daily Production, Weekly Summary, Efficiency, Scrap, KPI Dashboard) route to
+this single page, as does the "Resource Management" leaf **Resource
 Reports**. The other Resource Management leaves route to the Dashboard
 (`/prod/`) or Capacity Planning (`/prod/schedule/capacity/`) above, and the
 manager-menu **Budget** leaves route to Finance's Budget page — see the
 [Accounting guide](01-accounting.md#budget-management-finbudgets).
+
+## Labor Time & Cost Report (`/prod/reports/labor/`)
+
+**Who can access it:** the Production Department Manager, or President/VP.
+All four "Labor Tracking" menu leaves (Current Labor, Labor by Shift, Labor
+by Job, Labor Reports) route here.
+
+Filterable by period (day/week/month/quarter/year or a custom date range)
+and work-order status:
+
+- **Work Order Time Variance** — for every work order with routing
+  operations, standard hours vs. actual hours, the variance, and the labor
+  cost (actual hours × the operation's workcenter rate).
+- **Labor by Person** — for each person whose name matches a work order's
+  "Completed By" or "Assigned To", total hours tracked vs. standard, how
+  many work orders they touched, and cost per work order plus a running
+  total. Cost only shows for hourly-paid employees — salaried staff show
+  hours and work-order count with no dollar figure, since their pay rate
+  isn't an hourly rate.
+
+Both tables export to CSV independently via the toolbar.
 
 ## Work Orders (`/wo/`)
 
