@@ -22,6 +22,7 @@ from manufacturing.maintenance_core import (
     list_parts, get_part, create_part, update_part,
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
     get_schedule_status_breakdown,
+    get_maint_wo_time_variance_report, get_maint_labor_by_mechanic_report,
 )
 
 
@@ -300,6 +301,63 @@ def test_complete_work_order_does_not_commit():
     conn = _conn()
     complete_work_order(conn, 1)
     conn.commit.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# create_work_order / update_work_order / complete_work_order — hours
+# ---------------------------------------------------------------------------
+
+def test_create_work_order_persists_estimated_hours():
+    conn = _conn(fetchone={'id': 5})
+    create_work_order(conn, 'Fix motor', 'Motor A', 'Repair', 'High',
+                      '', _today(), '', '', 'u@e.com', estimated_hours=3.5)
+    params = conn.execute.call_args_list[0][0][1]
+    assert 3.5 in params
+
+
+def test_create_work_order_estimated_hours_defaults_none():
+    conn = _conn(fetchone={'id': 5})
+    create_work_order(conn, 'Fix motor', 'Motor A', 'Repair', 'High',
+                      '', _today(), '', '', 'u@e.com')
+    params = conn.execute.call_args_list[0][0][1]
+    assert None in params
+
+
+def test_update_work_order_persists_estimated_hours():
+    conn = _conn(fetchone={'assigned_to': ''})
+    update_work_order(conn, 1, 'Title', '', 'Repair', 'Medium',
+                      '', '', '', '', 'Open', '', estimated_hours=2.0)
+    sql = conn.execute.call_args_list[-1][0][0]
+    params = conn.execute.call_args_list[-1][0][1]
+    assert 'COALESCE(%s, estimated_hours)' in sql
+    assert 2.0 in params
+
+
+def test_update_work_order_omitted_hours_preserves_existing_via_coalesce():
+    conn = _conn(fetchone={'assigned_to': ''})
+    update_work_order(conn, 1, 'Title', '', 'Repair', 'Medium',
+                      '', '', '', '', 'Open', '')
+    sql = conn.execute.call_args_list[-1][0][0]
+    # COALESCE(%s, estimated_hours) means a None param leaves the DB value alone
+    assert 'COALESCE(%s, estimated_hours)' in sql
+
+
+def test_complete_work_order_persists_actual_hours():
+    conn = _conn()
+    complete_work_order(conn, 1, actual_hours=6.5)
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'COALESCE(%s, actual_hours)' in sql
+    assert 6.5 in params
+
+
+def test_complete_work_order_omitted_hours_uses_coalesce():
+    conn = _conn()
+    complete_work_order(conn, 1)
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'COALESCE(%s, actual_hours)' in sql
+    assert None in params
 
 
 # ---------------------------------------------------------------------------
@@ -892,6 +950,42 @@ def test_update_mechanic_does_not_commit():
     conn.commit.assert_not_called()
 
 
+def test_create_mechanic_persists_hourly_rate():
+    conn = _conn(fetchone={'id': 1})
+    create_mechanic(conn, 'Alice', 'General', 'Day', '', 'Active', '',
+                    'u@e.com', hourly_rate=27.5)
+    params = conn.execute.call_args[0][1]
+    assert 27.5 in params
+
+
+def test_create_mechanic_clamps_negative_hourly_rate():
+    conn = _conn(fetchone={'id': 1})
+    create_mechanic(conn, 'Alice', 'General', 'Day', '', 'Active', '',
+                    'u@e.com', hourly_rate=-5.0)
+    params = conn.execute.call_args[0][1]
+    assert 0.0 in params
+    assert -5.0 not in params
+
+
+def test_update_mechanic_persists_hourly_rate_via_coalesce():
+    conn = _conn()
+    update_mechanic(conn, 1, 'Bob', 'General', 'Day', '', 'Active', '',
+                    hourly_rate=15.0)
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'COALESCE(%s, hourly_rate)' in sql
+    assert 15.0 in params
+
+
+def test_update_mechanic_omitted_rate_preserves_existing_via_coalesce():
+    conn = _conn()
+    update_mechanic(conn, 1, 'Bob', 'General', 'Day', '', 'Active', '')
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'COALESCE(%s, hourly_rate)' in sql
+    assert None in params
+
+
 # ---------------------------------------------------------------------------
 # get_schedule_status_breakdown
 # ---------------------------------------------------------------------------
@@ -912,3 +1006,111 @@ def test_schedule_status_breakdown_queries_maint_schedule():
     get_schedule_status_breakdown(conn)
     sql = conn.execute.call_args[0][0]
     assert 'maint_schedule' in sql
+
+
+# ---------------------------------------------------------------------------
+# get_maint_wo_time_variance_report
+# ---------------------------------------------------------------------------
+
+def _maint_variance_row(wo_id=1, title='Fix motor', equipment='Motor A',
+                        status='Completed', due_date='2026-06-01',
+                        estimated_hours=4.0, actual_hours=5.0, labor_cost=100.0):
+    return {
+        'wo_id': wo_id, 'title': title, 'equipment': equipment,
+        'status': status, 'due_date': due_date,
+        'estimated_hours': estimated_hours, 'actual_hours': actual_hours,
+        'labor_cost': labor_cost,
+    }
+
+
+def test_maint_wo_time_variance_report_computes_variance():
+    conn = _conn(fetchall=[_maint_variance_row(estimated_hours=4.0, actual_hours=5.0)])
+    result = get_maint_wo_time_variance_report(conn)
+    assert result[0]['hours_variance'] == 1.0
+    assert result[0]['variance_pct'] == 25.0
+
+
+def test_maint_wo_time_variance_report_no_filters_no_where_clauses():
+    conn = _conn(fetchall=[])
+    get_maint_wo_time_variance_report(conn)
+    sql = conn.execute.call_args[0][0]
+    assert 'wo.due_date >=' not in sql
+    assert 'wo.status =' not in sql
+
+
+def test_maint_wo_time_variance_report_date_and_status_filters():
+    conn = _conn(fetchall=[])
+    get_maint_wo_time_variance_report(
+        conn, date_from='2026-01-01', date_to='2026-06-30', status='Completed')
+    sql = conn.execute.call_args[0][0]
+    params = conn.execute.call_args[0][1]
+    assert 'wo.due_date >= %s' in sql
+    assert 'wo.due_date <= %s' in sql
+    assert 'wo.status = %s' in sql
+    assert params == ['2026-01-01', '2026-06-30', 'Completed']
+
+
+def test_maint_wo_time_variance_report_matches_mechanic_case_insensitively():
+    conn = _conn(fetchall=[])
+    get_maint_wo_time_variance_report(conn)
+    sql = conn.execute.call_args[0][0]
+    assert 'LOWER(mech.name) = LOWER(wo.assigned_to)' in sql
+
+
+def test_maint_wo_time_variance_report_empty():
+    conn = _conn(fetchall=[])
+    assert get_maint_wo_time_variance_report(conn) == []
+
+
+# ---------------------------------------------------------------------------
+# get_maint_labor_by_mechanic_report
+# ---------------------------------------------------------------------------
+
+def _mech_labor_row(mechanic_id=1, mechanic_name='Bob Smith', hourly_rate=20.0,
+                    wo_id=1, title='Fix motor', estimated_hours=4.0, actual_hours=5.0):
+    return {
+        'mechanic_id': mechanic_id, 'mechanic_name': mechanic_name,
+        'hourly_rate': hourly_rate, 'wo_id': wo_id, 'title': title,
+        'estimated_hours': estimated_hours, 'actual_hours': actual_hours,
+    }
+
+
+def test_maint_labor_by_mechanic_aggregates_single_row():
+    conn = _conn(fetchall=[_mech_labor_row(hourly_rate=20.0, actual_hours=5.0)])
+    result = get_maint_labor_by_mechanic_report(conn)
+    assert len(result) == 1
+    assert result[0]['mechanic_name'] == 'Bob Smith'
+    assert result[0]['wo_count'] == 1
+    assert result[0]['actual_hours'] == 5.0
+    assert result[0]['total_cost'] == 100.0
+
+
+def test_maint_labor_by_mechanic_aggregates_multiple_wos():
+    conn = _conn(fetchall=[
+        _mech_labor_row(wo_id=1, estimated_hours=4.0, actual_hours=5.0, hourly_rate=10.0),
+        _mech_labor_row(wo_id=2, estimated_hours=2.0, actual_hours=1.0, hourly_rate=10.0),
+    ])
+    result = get_maint_labor_by_mechanic_report(conn)
+    assert result[0]['wo_count'] == 2
+    assert result[0]['estimated_hours'] == 6.0
+    assert result[0]['actual_hours'] == 6.0
+    assert result[0]['total_cost'] == 60.0
+
+
+def test_maint_labor_by_mechanic_computes_variance():
+    conn = _conn(fetchall=[_mech_labor_row(estimated_hours=4.0, actual_hours=5.0)])
+    result = get_maint_labor_by_mechanic_report(conn)
+    assert result[0]['hours_variance'] == 1.0
+    assert result[0]['variance_pct'] == 25.0
+
+
+def test_maint_labor_by_mechanic_excludes_blank_assignee():
+    conn = _conn(fetchall=[])
+    get_maint_labor_by_mechanic_report(conn)
+    sql = conn.execute.call_args[0][0]
+    assert "wo.assigned_to != ''" in sql
+
+
+def test_maint_labor_by_mechanic_empty():
+    conn = _conn(fetchall=[])
+    assert get_maint_labor_by_mechanic_report(conn) == []

@@ -5,7 +5,7 @@ import json
 
 from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
-from ..auth_decorators import dept_required
+from ..auth_decorators import dept_required, dept_manager_required
 from ..log_utils import get_logger
 from ..accounts import READ_ONLY_ROLES
 from ..csv_export import export_response
@@ -39,6 +39,7 @@ from ..maintenance_core import (
     list_mechanics, get_mechanic, create_mechanic, update_mechanic,
     get_equipment_reliability_report, get_schedule_status_breakdown,
     get_wo_status_breakdown, get_downtime_by_category, get_pm_alerts,
+    get_maint_wo_time_variance_report, get_maint_labor_by_mechanic_report,
 )
 
 log = get_logger(__name__)
@@ -48,6 +49,50 @@ log = get_logger(__name__)
 # ---------------------------------------------------------------------------
 
 _MAINT_DEPT_KEYS = {'maintenance', 'production', 'purchasing'}
+
+
+def _opt_float(val):
+    """Parse a form field into a float, or None when blank (so callers can
+    tell "not supplied" apart from 0 and leave existing DB values alone)."""
+    val = (val or '').strip()
+    return float(val) if val else None
+
+
+def _resolve_period(request):
+    """Resolve the period-chip / custom-range GET params shared by every
+    period-filtered maintenance report (OEE, labor time/cost) into
+    (period, start, end, date_from, date_to)."""
+    period = request.GET.get('period', 'month')
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    today = datetime.date.today()
+
+    if date_from and date_to:
+        try:
+            start = datetime.date.fromisoformat(date_from)
+            end = datetime.date.fromisoformat(date_to)
+            if end < start:
+                start, end = end, start
+        except ValueError:
+            start, end = today.replace(day=1), today
+        period = 'custom'
+    elif period == 'day':
+        start = end = today
+    elif period == 'week':
+        start = today - datetime.timedelta(days=today.weekday())
+        end = today
+    elif period == 'quarter':
+        q_start_month = ((today.month - 1) // 3) * 3 + 1
+        start = today.replace(month=q_start_month, day=1)
+        end = today
+    elif period == 'year':
+        start = today.replace(month=1, day=1)
+        end = today
+    else:
+        period = 'month'
+        start = today.replace(day=1)
+        end = today
+    return period, start, end, date_from, date_to
 
 
 def _maint_ctx(request, **extra):
@@ -90,37 +135,7 @@ def maint_dashboard(request):
 
 @dept_required(_MAINT_DEPT_KEYS)
 def maint_oee_report(request):
-    period = request.GET.get('period', 'month')
-    date_from = request.GET.get('date_from', '').strip()
-    date_to = request.GET.get('date_to', '').strip()
-    today = datetime.date.today()
-
-    if date_from and date_to:
-        # custom range overrides period chip
-        try:
-            start = datetime.date.fromisoformat(date_from)
-            end = datetime.date.fromisoformat(date_to)
-            if end < start:
-                start, end = end, start
-        except ValueError:
-            start, end = today.replace(day=1), today
-        period = 'custom'
-    elif period == 'day':
-        start = end = today
-    elif period == 'week':
-        start = today - datetime.timedelta(days=today.weekday())
-        end = today
-    elif period == 'quarter':
-        q_start_month = ((today.month - 1) // 3) * 3 + 1
-        start = today.replace(month=q_start_month, day=1)
-        end = today
-    elif period == 'year':
-        start = today.replace(month=1, day=1)
-        end = today
-    else:
-        period = 'month'
-        start = today.replace(day=1)
-        end = today
+    period, start, end, date_from, date_to = _resolve_period(request)
 
     conn = get_db_connection()
     try:
@@ -151,32 +166,7 @@ def maint_oee_report(request):
 
 @dept_required(_MAINT_DEPT_KEYS)
 def maint_oee_export(request):
-    period = request.GET.get('period', 'month')
-    date_from = request.GET.get('date_from', '').strip()
-    date_to = request.GET.get('date_to', '').strip()
-    today = datetime.date.today()
-
-    if date_from and date_to:
-        try:
-            start = datetime.date.fromisoformat(date_from)
-            end = datetime.date.fromisoformat(date_to)
-        except ValueError:
-            start, end = today.replace(day=1), today
-    elif period == 'day':
-        start = end = today
-    elif period == 'week':
-        start = today - datetime.timedelta(days=today.weekday())
-        end = today
-    elif period == 'quarter':
-        q_start_month = ((today.month - 1) // 3) * 3 + 1
-        start = today.replace(month=q_start_month, day=1)
-        end = today
-    elif period == 'year':
-        start = today.replace(month=1, day=1)
-        end = today
-    else:
-        start = today.replace(day=1)
-        end = today
+    period, start, end, date_from, date_to = _resolve_period(request)
 
     conn = get_db_connection()
     try:
@@ -196,6 +186,74 @@ def maint_oee_export(request):
         ('actual_hours', 'Actual Hrs'),
         ('total_qty', 'Total Qty'),
         ('total_scrap', 'Scrap Qty'),
+    ], rows)
+
+
+@dept_manager_required(_MAINT_DEPT_KEYS)
+def maint_labor_report(request):
+    """WO estimated-vs-actual time/cost variance + by-mechanic rollup.
+    Restricted to the Maintenance department manager (and President/VP)."""
+    period, start, end, date_from, date_to = _resolve_period(request)
+    status_filter = request.GET.get('status', '').strip()
+
+    conn = get_db_connection()
+    try:
+        wo_variance = get_maint_wo_time_variance_report(
+            conn, date_from=start.isoformat(), date_to=end.isoformat(),
+            status=status_filter or None)
+        by_mechanic = get_maint_labor_by_mechanic_report(
+            conn, date_from=start.isoformat(), date_to=end.isoformat())
+    finally:
+        conn.close()
+
+    kpis = {
+        'wo_count': len(wo_variance),
+        'estimated_hours': sum(w['estimated_hours'] or 0 for w in wo_variance),
+        'actual_hours': sum(w['actual_hours'] or 0 for w in wo_variance),
+        'labor_cost': sum(w['labor_cost'] or 0 for w in wo_variance),
+        'mechanic_count': len(by_mechanic),
+        'total_mechanic_cost': sum(m['total_cost'] or 0 for m in by_mechanic),
+    }
+
+    return render(request, 'maint_labor_report.html', _maint_ctx(
+        request, wo_variance=wo_variance, by_mechanic=by_mechanic, kpis=kpis,
+        period=period, start=start.isoformat(), end=end.isoformat(),
+        date_from=date_from, date_to=date_to,
+        status_filter=status_filter, wo_statuses=WO_STATUSES,
+    ))
+
+
+@dept_manager_required(_MAINT_DEPT_KEYS)
+def maint_labor_report_export(request):
+    period, start, end, date_from, date_to = _resolve_period(request)
+    status_filter = request.GET.get('status', '').strip()
+    section = request.GET.get('section', 'wo')
+
+    conn = get_db_connection()
+    try:
+        if section == 'mechanic':
+            rows = get_maint_labor_by_mechanic_report(
+                conn, date_from=start.isoformat(), date_to=end.isoformat())
+        else:
+            rows = get_maint_wo_time_variance_report(
+                conn, date_from=start.isoformat(), date_to=end.isoformat(),
+                status=status_filter or None)
+    finally:
+        conn.close()
+
+    if section == 'mechanic':
+        return export_response(request, f'maint_labor_by_mechanic_{start}_{end}', [
+            ('mechanic_name', 'Mechanic'), ('wo_count', 'WO Count'),
+            ('estimated_hours', 'Estimated Hrs'), ('actual_hours', 'Actual Hrs'),
+            ('hours_variance', 'Variance Hrs'), ('variance_pct', 'Variance %'),
+            ('hourly_rate', 'Hourly Rate'), ('total_cost', 'Total Cost'),
+        ], rows)
+    return export_response(request, f'maint_wo_time_variance_{start}_{end}', [
+        ('wo_id', 'WO #'), ('title', 'Title'), ('equipment', 'Equipment'),
+        ('status', 'Status'), ('due_date', 'Due Date'),
+        ('estimated_hours', 'Estimated Hrs'), ('actual_hours', 'Actual Hrs'),
+        ('hours_variance', 'Variance Hrs'), ('variance_pct', 'Variance %'),
+        ('labor_cost', 'Labor Cost'),
     ], rows)
 
 
@@ -228,6 +286,7 @@ def maint_wo_list(request):
                     due_date=request.POST.get('due_date', ''),
                     notes=request.POST.get('notes', ''),
                     created_by=request.session.get('user_email', ''),
+                    estimated_hours=_opt_float(request.POST.get('estimated_hours')),
                 )
                 conn.commit()
                 return redirect('maint_wo_list')
@@ -285,7 +344,10 @@ def maint_wo_detail(request, wo_id):
             action = request.POST.get('action', 'update')
             try:
                 if action == 'complete':
-                    complete_work_order(conn, wo_id)
+                    complete_work_order(
+                        conn, wo_id,
+                        actual_hours=_opt_float(request.POST.get('actual_hours')),
+                    )
                     success = 'Work order completed.'
                 else:
                     update_work_order(
@@ -300,6 +362,7 @@ def maint_wo_detail(request, wo_id):
                         completed_date=request.POST.get('completed_date', ''),
                         status=request.POST.get('status', ''),
                         notes=request.POST.get('notes', ''),
+                        estimated_hours=_opt_float(request.POST.get('estimated_hours')),
                     )
                     success = 'Work order updated.'
                 conn.commit()
@@ -809,6 +872,7 @@ def maint_mechanics_list(request):
                     status=request.POST.get('status', 'Active'),
                     notes=request.POST.get('notes', ''),
                     created_by=request.session.get('user_email', ''),
+                    hourly_rate=_opt_float(request.POST.get('hourly_rate')) or 0.0,
                 )
                 conn.commit()
                 return redirect('maint_mechanics_list')
@@ -853,6 +917,7 @@ def maint_mechanic_detail(request, mech_id):
                     phone=request.POST.get('phone', ''),
                     status=request.POST.get('status', ''),
                     notes=request.POST.get('notes', ''),
+                    hourly_rate=_opt_float(request.POST.get('hourly_rate')),
                 )
                 conn.commit()
                 mechanic = get_mechanic(conn, mech_id)

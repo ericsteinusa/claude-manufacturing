@@ -70,6 +70,12 @@
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="complete">
+            <div class="form-row" style="max-width:200px;margin-bottom:10px;">
+                <label>Actual Hours</label>
+                <input type="number" name="actual_hours" step="0.1" min="0"
+                       value="{{ wo.actual_hours|default:'' }}"
+                       placeholder="Time actually worked">
+            </div>
             <button type="submit" class="ok-btn">Mark Complete</button>
         </form>
     </div>
@@ -172,6 +178,18 @@
                     {% else %}
                     <input class="ro" readonly value="{{ wo.completed_date|default:'' }}">
                     {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Estimated Hours</label>
+                    {% if can_edit %}
+                    <input type="number" name="estimated_hours" step="0.1" min="0" value="{{ wo.estimated_hours|default:'' }}">
+                    {% else %}
+                    <input class="ro" readonly value="{{ wo.estimated_hours|default:'' }}">
+                    {% endif %}
+                </div>
+                <div class="form-row">
+                    <label>Actual Hours</label>
+                    <input class="ro" readonly value="{{ wo.actual_hours|default:'—' }}">
                 </div>
                 <div class="form-row full">
                     <label>Notes</label>

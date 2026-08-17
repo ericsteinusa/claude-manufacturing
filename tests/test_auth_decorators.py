@@ -6,7 +6,9 @@ verify which named URL (or path) is passed to it, not the resolved URL.
 
 from unittest.mock import patch, MagicMock
 
-from manufacturing.auth_decorators import dept_required, login_required, role_required
+from manufacturing.auth_decorators import (
+    dept_required, dept_manager_required, login_required, role_required,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -213,6 +215,63 @@ class TestDeptRequiredDenyRedirect:
         with _patched() as mock_redir:
             view(_req(user_email='a@b.com', user_dept_key='sales'))
             mock_redir.assert_called_once_with('dashboard')
+
+
+# ---------------------------------------------------------------------------
+# dept_manager_required
+# ---------------------------------------------------------------------------
+
+class TestDeptManagerRequired:
+    def test_redirects_anonymous_to_home(self):
+        view = dept_manager_required('production')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req())
+            mock_redir.assert_called_once_with('home')
+
+    def test_allows_department_manager_of_matching_dept(self):
+        view = dept_manager_required('production')(_sentinel)
+        assert view(_req(user_email='a@b.com', user_dept_key='production',
+                         user_role='Department Manager')) == 'ok'
+
+    def test_blocks_non_manager_in_matching_dept(self):
+        """Dept membership alone is NOT sufficient, unlike dept_required."""
+        view = dept_manager_required('production')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_dept_key='production',
+                      user_role='Supervisor'))
+            mock_redir.assert_called_once_with('dashboard')
+
+    def test_blocks_manager_of_a_different_dept(self):
+        view = dept_manager_required('production')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_dept_key='maintenance',
+                      user_role='Department Manager'))
+            mock_redir.assert_called_once_with('dashboard')
+
+    def test_full_access_bypasses_manager_check(self):
+        view = dept_manager_required('production')(_sentinel)
+        assert view(_req(user_email='a@b.com', user_full_access=True,
+                         user_dept_key='sales', user_role='Employee')) == 'ok'
+
+    def test_allows_any_key_in_multi_dept_set(self):
+        view = dept_manager_required({'maintenance', 'production'})(_sentinel)
+        assert view(_req(user_email='a@b.com', user_dept_key='maintenance',
+                         user_role='Department Manager')) == 'ok'
+        assert view(_req(user_email='a@b.com', user_dept_key='production',
+                         user_role='Department Manager')) == 'ok'
+
+    def test_custom_deny_redirect(self):
+        view = dept_manager_required('production', deny_redirect='po_list')(_sentinel)
+        with _patched() as mock_redir:
+            view(_req(user_email='a@b.com', user_dept_key='production',
+                      user_role='Supervisor'))
+            mock_redir.assert_called_once_with('po_list')
+
+    def test_functools_wraps_preserves_name(self):
+        def my_view(request):
+            return 'ok'
+        wrapped = dept_manager_required('production')(my_view)
+        assert wrapped.__name__ == 'my_view'
 
 
 # ---------------------------------------------------------------------------

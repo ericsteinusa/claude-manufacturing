@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block page_title %}Labor Time & Cost Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/prod/" class="btn">Dashboard</a>
+<a href="/prod/reports/labor/export/?section=wo&period={{ period }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="btn">⬇ WO CSV</a>
+<a href="/prod/reports/labor/export/?section=person&period={{ period }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Person CSV</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1200px; }
+.chip-row { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+.chip { display:inline-block; padding:4px 15px; border-radius:20px; font-size:13px;
+    font-weight:bold; text-decoration:none; background:white; color:#555; border:1.5px solid var(--border); }
+.chip.active { background:var(--accent); color:white; border-color:var(--accent); }
+.rpt-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.rpt-kpi { background:white; border:1.5px solid var(--border); border-radius:8px;
+    padding:18px; text-align:center; }
+.rpt-kpi .num { font-size:28px; font-weight:bold; }
+.rpt-kpi .lbl { font-size:12px; color:var(--text-muted); margin-top:6px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; margin-bottom:4px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left;
+    border-bottom:1px solid #eee; font-size:13px; }
+.list-table th { background:var(--accent); color:white; font-size:12px; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table td.num { text-align:right; }
+.over { color:#c62828; font-weight:bold; }
+.under { color:#2e7d32; }
+.date-form { display:flex; gap:8px; align-items:center; }
+.date-form input[type=date] { padding:4px 8px; border:1.5px solid var(--border);
+    border-radius:6px; font-size:13px; }
+.date-form select { padding:4px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.date-form button { padding:4px 14px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:bold; }
+details.person-wos summary { cursor:pointer; color:var(--accent); font-size:12px; }
+details.person-wos table { margin-top:8px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Labor Time &amp; Cost Report</h2>
+
+    <div class="chip-row">
+        <a href="/prod/reports/labor/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">Today</a>
+        <a href="/prod/reports/labor/?period=week"    class="chip {% if period == 'week' %}active{% endif %}">This Week</a>
+        <a href="/prod/reports/labor/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">This Month</a>
+        <a href="/prod/reports/labor/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">This Quarter</a>
+        <a href="/prod/reports/labor/?period=year"    class="chip {% if period == 'year' %}active{% endif %}">This Year</a>
+        <form method="get" action="/prod/reports/labor/" class="date-form" style="margin-left:8px;">
+            <input type="hidden" name="period" value="custom">
+            <input type="date" name="date_from" value="{{ date_from }}" required>
+            <span style="font-size:13px;color:#888;">to</span>
+            <input type="date" name="date_to" value="{{ date_to }}" required>
+            <select name="status">
+                <option value="">All Statuses</option>
+                {% for s in WO_STATUSES %}
+                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s|title }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Go</button>
+        </form>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 20px;">{{ start }} → {{ end }}</p>
+
+    <div class="rpt-kpis">
+        <div class="rpt-kpi">
+            <div class="num">{{ kpis.wo_count }}</div>
+            <div class="lbl">Work Orders</div>
+        </div>
+        <div class="rpt-kpi">
+            <div class="num">{{ kpis.std_hours|floatformat:1 }}h / {{ kpis.actual_hours|floatformat:1 }}h</div>
+            <div class="lbl">Std / Actual Hours</div>
+        </div>
+        <div class="rpt-kpi">
+            <div class="num">${{ kpis.labor_cost|floatformat:2 }}</div>
+            <div class="lbl">Total Labor Cost (by WO)</div>
+        </div>
+        <div class="rpt-kpi">
+            <div class="num">{{ kpis.person_count }}</div>
+            <div class="lbl">Personnel with Tracked Time</div>
+        </div>
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>Work Order Time Variance</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>WO #</th><th>Product</th><th>Status</th><th>Due Date</th>
+                    <th class="num">Std Hrs</th><th class="num">Actual Hrs</th>
+                    <th class="num">Variance</th><th class="num">Variance %</th>
+                    <th class="num">Labor Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for w in wo_variance %}
+            <tr>
+                <td><a href="/wo/{{ w.wo_id }}/">{{ w.wo_number }}</a></td>
+                <td>{{ w.product_name|default:"—" }}</td>
+                <td>{{ w.status|title }}</td>
+                <td>{{ w.due_date|default:"—" }}</td>
+                <td class="num">{{ w.std_hours|floatformat:1 }}</td>
+                <td class="num">{{ w.actual_hours|floatformat:1 }}</td>
+                <td class="num {% if w.hours_variance > 0 %}over{% elif w.hours_variance < 0 %}under{% endif %}">{{ w.hours_variance|floatformat:1 }}</td>
+                <td class="num">{% if w.variance_pct != None %}{{ w.variance_pct|floatformat:0 }}%{% else %}—{% endif %}</td>
+                <td class="num">${{ w.labor_cost|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No work orders with routing operations in this range.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>Labor by Person</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Person</th><th class="num">WO Count</th>
+                    <th class="num">Std Hrs</th><th class="num">Actual Hrs</th>
+                    <th class="num">Variance</th><th class="num">Variance %</th>
+                    <th class="num">Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in by_person %}
+            <tr>
+                <td>
+                    {{ p.person_name }}
+                    <details class="person-wos">
+                        <summary>{{ p.wo_count }} WO{{ p.wo_count|pluralize }}</summary>
+                        <table class="list-table">
+                            <thead><tr><th>WO #</th><th class="num">Std Hrs</th><th class="num">Actual Hrs</th><th class="num">Cost</th></tr></thead>
+                            <tbody>
+                            {% for w in p.wos %}
+                            <tr>
+                                <td><a href="/wo/{{ w.wo_id }}/">{{ w.wo_number }}</a></td>
+                                <td class="num">{{ w.std_hours|floatformat:1 }}</td>
+                                <td class="num">{{ w.actual_hours|floatformat:1 }}</td>
+                                <td class="num">{% if w.cost != None %}${{ w.cost|floatformat:2 }}{% else %}—{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </details>
+                </td>
+                <td class="num">{{ p.wo_count }}</td>
+                <td class="num">{{ p.std_hours|floatformat:1 }}</td>
+                <td class="num">{{ p.actual_hours|floatformat:1 }}</td>
+                <td class="num {% if p.hours_variance > 0 %}over{% elif p.hours_variance < 0 %}under{% endif %}">{{ p.hours_variance|floatformat:1 }}</td>
+                <td class="num">{% if p.variance_pct != None %}{{ p.variance_pct|floatformat:0 }}%{% else %}—{% endif %}</td>
+                <td class="num">{% if p.total_cost != None %}${{ p.total_cost|floatformat:2 }}{% else %}—{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No attributable labor in this range.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+            Cost is only shown for hourly-paid employees whose name matches the operation's
+            "Completed By" or the work order's "Assigned To". Salaried or unmatched personnel
+            show hours only.
+        </p>
+    </div>
+
+</div>
+</div>
+{% endblock %}

@@ -1233,6 +1233,20 @@ _RECONCILE = {
     "maint_part": [
         ("equipment_id", "INTEGER"),
     ],
+    # Backfill hourly labor rate onto maint_mechanic, so Maintenance WOs get
+    # a real per-mechanic cost instead of falling back to workcenter rate
+    # (WO time/cost variance reports).
+    "maint_mechanic": [
+        ("hourly_rate", "REAL NOT NULL DEFAULT 0.0"),
+    ],
+    # Backfill actual/estimated hours onto maint_work_order — mirrors
+    # wo_operation.std_hours/actual_hours on the Production side, entered
+    # manually since maintenance WOs have no routing-equivalent template
+    # (WO time/cost variance reports).
+    "maint_work_order": [
+        ("actual_hours", "REAL"),
+        ("estimated_hours", "REAL"),
+    ],
     # Backfill columns added to it_ticket after initial release
     "it_ticket": [
         ("created_by", "TEXT DEFAULT ''"),

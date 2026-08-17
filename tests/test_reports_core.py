@@ -1,8 +1,40 @@
 """Tests for reports_core — Qt-free, no live DB."""
 
 from manufacturing.reports_core import (
-    po_summary, wo_summary, inventory_alerts, cs_summary,
+    po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
 )
+
+
+# ── hours_variance ──────────────────────────────────────────────────────────
+
+def test_hours_variance_over_standard():
+    variance, pct = hours_variance(std_hours=10.0, actual_hours=12.0)
+    assert variance == 2.0
+    assert pct == 20.0
+
+
+def test_hours_variance_under_standard():
+    variance, pct = hours_variance(std_hours=10.0, actual_hours=8.0)
+    assert variance == -2.0
+    assert pct == -20.0
+
+
+def test_hours_variance_zero_std_hours_pct_is_none():
+    variance, pct = hours_variance(std_hours=0.0, actual_hours=5.0)
+    assert variance == 5.0
+    assert pct is None
+
+
+def test_hours_variance_none_std_hours_pct_is_none():
+    variance, pct = hours_variance(std_hours=None, actual_hours=3.0)
+    assert variance == 3.0
+    assert pct is None
+
+
+def test_hours_variance_none_actual_hours_treated_as_zero():
+    variance, pct = hours_variance(std_hours=4.0, actual_hours=None)
+    assert variance == -4.0
+    assert pct == -100.0
 
 
 class _FakeCursor:
