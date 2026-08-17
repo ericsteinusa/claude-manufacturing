@@ -9,6 +9,19 @@ import textwrap
 from .finance_core import get_cash_position
 
 
+def hours_variance(std_hours, actual_hours) -> tuple[float, float | None]:
+    """Return (variance, variance_pct) for a standard-vs-actual hours pair.
+
+    variance = actual - std (positive = over standard). variance_pct is
+    None when std_hours is 0/None, since percent-of-zero is undefined.
+    """
+    std_hours = std_hours or 0.0
+    actual_hours = actual_hours or 0.0
+    variance = actual_hours - std_hours
+    variance_pct = (variance / std_hours * 100) if std_hours else None
+    return variance, variance_pct
+
+
 def po_summary(conn) -> dict:
     """Return PO counts by status, total active spend, and overdue count."""
     rows = conn.execute(

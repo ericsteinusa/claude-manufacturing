@@ -108,6 +108,38 @@ def dept_required(dept_keys, *, role_keys=None, write_redirect=None,
     return decorator
 
 
+def dept_manager_required(dept_keys, *, deny_redirect='dashboard'):
+    """Gate a view to the Department Manager of the given dept(s), or
+    full-access roles (President, Vice President — same bypass convention
+    as dept_required).
+
+    Unlike dept_required(dept_keys, role_keys=...), dept membership alone
+    is NOT sufficient here — the two checks are ANDed, not ORed, so e.g.
+    dept_manager_required('production') admits only a user whose
+    user_dept_key is 'production' AND whose user_role is
+    'Department Manager' (plus the full-access bypass). Used for reports
+    that should stay scoped to a department's own manager rather than
+    every employee in that department.
+    """
+    dept_keys = _normalize_keys(dept_keys)
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if not request.session.get('user_email'):
+                return redirect('home')
+            if not request.session.get('user_full_access'):
+                is_manager = (
+                    request.session.get('user_role') == 'Department Manager'
+                    and request.session.get('user_dept_key') in dept_keys
+                )
+                if not is_manager:
+                    return redirect(deny_redirect)
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def role_required(role_keys, *, deny_redirect='dashboard'):
     """Gate a view to logged-in users with one of the given roles.
 

@@ -173,7 +173,9 @@ from ..accounts import (
     _set_user_role,
     _remove_user_role,
 )
-from ..auth_decorators import dept_required, login_required, role_required
+from ..auth_decorators import (
+    dept_required, dept_manager_required, login_required, role_required,
+)
 
 from ..production_core import (
     get_production_dashboard,
@@ -185,6 +187,7 @@ from ..production_core import (
     get_wo_status_breakdown as prod_wo_status_breakdown,
     list_scheduled_wos,
     get_prod_reports,
+    get_wo_time_variance_report, get_labor_by_personnel_report,
     SHIPMENT_STATUSES,
     list_shipments, get_shipment, get_shipment_items,
     create_shipment, update_shipment, add_shipment_item,
@@ -517,11 +520,12 @@ WEB_LEAF_URLS = {
     ('production', 'scrap_rpt'):    '/prod/reports/',
     ('production', 'eff_rpts'):     '/prod/reports/',
     ('production', 'kpi_dash'):     '/prod/reports/',
-    # Labor Tracking → Reports
-    ('production', 'cur_labor'):    '/prod/reports/',
-    ('production', 'labor_shft'):   '/prod/reports/',
-    ('production', 'labor_job'):    '/prod/reports/',
-    ('production', 'labor_rpts'):   '/prod/reports/',
+    # Labor Tracking → dedicated time/cost variance + by-personnel report
+    # (was: all 4 -> /prod/reports/, a page with no labor content at all)
+    ('production', 'cur_labor'):    '/prod/reports/labor/',
+    ('production', 'labor_shft'):   '/prod/reports/labor/',
+    ('production', 'labor_job'):    '/prod/reports/labor/',
+    ('production', 'labor_rpts'):   '/prod/reports/labor/',
     # Resource Management
     ('production', 'res_alloc'):    '/prod/',
     ('production', 'cap_plan'):     '/prod/schedule/capacity/',
@@ -596,7 +600,7 @@ WEB_LEAF_URLS = {
     ('maintenance', 'parts_hist'): '/maint/parts/',
     ('maintenance', 'daily_rpt'): '/maint/oee/?period=day',
     ('maintenance', 'week_rpt'): '/maint/oee/?period=week',
-    ('maintenance', 'cost_analy'): '/maint/downtime/',
+    ('maintenance', 'cost_analy'): '/maint/reports/labor/',
     ('maintenance', 'down_rpt'): '/maint/downtime/',
     ('maintenance', 'sched_insp'): '/maint/inspections/?status=Scheduled',
     ('maintenance', 'insp_chk'): '/maint/inspections/',
@@ -6567,6 +6571,43 @@ def _prod_ctx(request, **extra):
     }
 
 
+def _resolve_period(request):
+    """Resolve the period-chip / custom-range GET params into
+    (period, start, end, date_from, date_to). Same shape as the
+    equivalent helper in views/_maintenance.py."""
+    period = request.GET.get('period', 'month')
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    today = date.today()
+
+    if date_from and date_to:
+        try:
+            start = date.fromisoformat(date_from)
+            end = date.fromisoformat(date_to)
+            if end < start:
+                start, end = end, start
+        except ValueError:
+            start, end = today.replace(day=1), today
+        period = 'custom'
+    elif period == 'day':
+        start = end = today
+    elif period == 'week':
+        start = today - timedelta(days=today.weekday())
+        end = today
+    elif period == 'quarter':
+        q_start_month = ((today.month - 1) // 3) * 3 + 1
+        start = today.replace(month=q_start_month, day=1)
+        end = today
+    elif period == 'year':
+        start = today.replace(month=1, day=1)
+        end = today
+    else:
+        period = 'month'
+        start = today.replace(day=1)
+        end = today
+    return period, start, end, date_from, date_to
+
+
 @dept_required('production')
 def prod_dashboard(request):
     with get_db_connection() as conn:
@@ -6652,6 +6693,68 @@ def prod_reports_view(request):
     with get_db_connection() as conn:
         data = get_prod_reports(conn)
     return render(request, 'prod_reports.html', _prod_ctx(request, **data))
+
+
+@dept_manager_required('production')
+def prod_labor_report(request):
+    """WO time variance + by-personnel labor/cost rollup. Restricted to the
+    Production department manager (and President/VP)."""
+    period, start, end, date_from, date_to = _resolve_period(request)
+    status_f = request.GET.get('status', '').strip()
+
+    with get_db_connection() as conn:
+        wo_variance = get_wo_time_variance_report(
+            conn, date_from=start.isoformat(), date_to=end.isoformat(),
+            status=status_f or None)
+        by_person = get_labor_by_personnel_report(
+            conn, date_from=start.isoformat(), date_to=end.isoformat())
+
+    kpis = {
+        'wo_count': len(wo_variance),
+        'std_hours': sum(w['std_hours'] for w in wo_variance),
+        'actual_hours': sum(w['actual_hours'] for w in wo_variance),
+        'labor_cost': sum(w['labor_cost'] for w in wo_variance),
+        'person_count': len(by_person),
+        'total_person_cost': sum(p['total_cost'] or 0 for p in by_person),
+    }
+
+    return render(request, 'prod_labor_report.html', _prod_ctx(
+        request, wo_variance=wo_variance, by_person=by_person, kpis=kpis,
+        period=period, start=start.isoformat(), end=end.isoformat(),
+        date_from=date_from, date_to=date_to,
+        status_filter=status_f, WO_STATUSES=PROD_WO_STATUSES,
+    ))
+
+
+@dept_manager_required('production')
+def prod_labor_report_export(request):
+    period, start, end, date_from, date_to = _resolve_period(request)
+    status_f = request.GET.get('status', '').strip()
+    section = request.GET.get('section', 'wo')
+
+    with get_db_connection() as conn:
+        if section == 'person':
+            rows = get_labor_by_personnel_report(
+                conn, date_from=start.isoformat(), date_to=end.isoformat())
+        else:
+            rows = get_wo_time_variance_report(
+                conn, date_from=start.isoformat(), date_to=end.isoformat(),
+                status=status_f or None)
+
+    if section == 'person':
+        return export_response(request, f'prod_labor_by_person_{start}_{end}', [
+            ('person_name', 'Person'), ('wo_count', 'WO Count'),
+            ('std_hours', 'Std Hrs'), ('actual_hours', 'Actual Hrs'),
+            ('hours_variance', 'Variance Hrs'), ('variance_pct', 'Variance %'),
+            ('total_cost', 'Total Cost'),
+        ], rows)
+    return export_response(request, f'prod_wo_time_variance_{start}_{end}', [
+        ('wo_id', 'WO #'), ('wo_number', 'WO Number'),
+        ('product_name', 'Product'), ('status', 'Status'),
+        ('due_date', 'Due Date'), ('std_hours', 'Std Hrs'),
+        ('actual_hours', 'Actual Hrs'), ('hours_variance', 'Variance Hrs'),
+        ('variance_pct', 'Variance %'), ('labor_cost', 'Labor Cost'),
+    ], rows)
 
 
 @dept_required('production')

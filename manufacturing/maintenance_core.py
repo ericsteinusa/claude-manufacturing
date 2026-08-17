@@ -174,7 +174,8 @@ def _notify_maint_wo_assigned(conn, wo_id: int, title: str, assigned_to: str) ->
 
 def create_work_order(conn, title: str, equipment: str, work_type: str,
                       priority: str, assigned_to: str, requested_date: str,
-                      due_date: str, notes: str, created_by: str) -> int:
+                      due_date: str, notes: str, created_by: str,
+                      estimated_hours: float | None = None) -> int:
     if not title.strip():
         raise ValueError("Title is required.")
     title = title.strip()
@@ -182,12 +183,13 @@ def create_work_order(conn, title: str, equipment: str, work_type: str,
     row = conn.execute(
         "INSERT INTO maint_work_order "
         "(title, equipment, work_type, priority, assigned_to, "
-        "requested_date, due_date, status, notes, created_by) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,'Open',%s,%s) RETURNING id",
+        "requested_date, due_date, status, notes, created_by, "
+        "estimated_hours) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,'Open',%s,%s,%s) RETURNING id",
         (title, equipment.strip(), work_type,
          priority if priority in PRIORITIES else 'Medium',
          assigned_to, requested_date or _today(),
-         due_date, notes.strip(), created_by),
+         due_date, notes.strip(), created_by, estimated_hours),
     ).fetchone()
     wo_id = row['id']
     if assigned_to:
@@ -198,7 +200,8 @@ def create_work_order(conn, title: str, equipment: str, work_type: str,
 def update_work_order(conn, wo_id: int, title: str, equipment: str,
                       work_type: str, priority: str, assigned_to: str,
                       requested_date: str, due_date: str, completed_date: str,
-                      status: str, notes: str) -> None:
+                      status: str, notes: str,
+                      estimated_hours: float | None = None) -> None:
     if not title.strip():
         raise ValueError("Title is required.")
     title = title.strip()
@@ -209,20 +212,24 @@ def update_work_order(conn, wo_id: int, title: str, equipment: str,
     conn.execute(
         "UPDATE maint_work_order SET title=%s, equipment=%s, work_type=%s, "
         "priority=%s, assigned_to=%s, requested_date=%s, due_date=%s, "
-        "completed_date=%s, status=%s, notes=%s WHERE id=%s",
+        "completed_date=%s, status=%s, notes=%s, "
+        "estimated_hours=COALESCE(%s, estimated_hours) "
+        "WHERE id=%s",
         (title, equipment.strip(), work_type, priority,
          assigned_to, requested_date, due_date, completed_date,
-         status, notes.strip(), wo_id),
+         status, notes.strip(), estimated_hours, wo_id),
     )
     old_assignee = (old['assigned_to'] if old else '') or ''
     if assigned_to and assigned_to != old_assignee:
         _notify_maint_wo_assigned(conn, wo_id, title, assigned_to)
 
 
-def complete_work_order(conn, wo_id: int) -> None:
+def complete_work_order(conn, wo_id: int,
+                        actual_hours: float | None = None) -> None:
     conn.execute(
-        "UPDATE maint_work_order SET status='Completed', completed_date=%s WHERE id=%s",
-        (_today(), wo_id),
+        "UPDATE maint_work_order SET status='Completed', completed_date=%s, "
+        "actual_hours=COALESCE(%s, actual_hours) WHERE id=%s",
+        (_today(), actual_hours, wo_id),
     )
 
 
@@ -607,30 +614,35 @@ def get_mechanic(conn, mech_id: int) -> dict | None:
 
 
 def create_mechanic(conn, name: str, trade: str, shift: str, phone: str,
-                    status: str, notes: str, created_by: str) -> int:
+                    status: str, notes: str, created_by: str,
+                    hourly_rate: float = 0.0) -> int:
     if not name.strip():
         raise ValueError("Name is required.")
     row = conn.execute(
         "INSERT INTO maint_mechanic "
-        "(name, trade, shift, phone, status, notes, created_by) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        "(name, trade, shift, phone, status, notes, created_by, hourly_rate) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
         (name.strip(), trade, shift,
          phone.strip(),
          status if status in MECHANIC_STATUSES else 'Active',
-         notes.strip(), created_by),
+         notes.strip(), created_by, max(0.0, hourly_rate)),
     ).fetchone()
     return row['id']
 
 
 def update_mechanic(conn, mech_id: int, name: str, trade: str, shift: str,
-                    phone: str, status: str, notes: str) -> None:
+                    phone: str, status: str, notes: str,
+                    hourly_rate: float | None = None) -> None:
     if not name.strip():
         raise ValueError("Name is required.")
+    if hourly_rate is not None:
+        hourly_rate = max(0.0, hourly_rate)
     conn.execute(
         "UPDATE maint_mechanic SET name=%s, trade=%s, shift=%s, "
-        "phone=%s, status=%s, notes=%s WHERE id=%s",
+        "phone=%s, status=%s, notes=%s, "
+        "hourly_rate=COALESCE(%s, hourly_rate) WHERE id=%s",
         (name.strip(), trade, shift, phone.strip(),
-         status, notes.strip(), mech_id),
+         status, notes.strip(), hourly_rate, mech_id),
     )
 
 
@@ -831,4 +843,137 @@ def get_pm_alerts(conn, days_ahead: int = 14) -> list[dict]:
         else:
             d['urgency'] = 'due'
         result.append(d)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Labor time & cost reports (WO estimated-vs-actual, by-mechanic rollup)
+# ---------------------------------------------------------------------------
+
+def get_maint_wo_time_variance_report(conn, date_from=None, date_to=None,
+                                      status=None) -> list[dict]:
+    """maint_work_order-level estimated-vs-actual hours & labor cost.
+
+    One row per WO that has an estimated_hours or actual_hours value set
+    (WOs never given an hour estimate/actual have nothing to compare).
+    Bounded by due_date, matching list_work_orders' date-agnostic filter
+    style (status/search).
+
+    Returns dicts with keys: wo_id, title, equipment, status, due_date,
+    estimated_hours, actual_hours, hours_variance, variance_pct,
+    labor_cost (actual_hours * matched mechanic's hourly_rate, 0 if the
+    assignee doesn't case-insensitively match a maint_mechanic.name).
+    """
+    from .reports_core import hours_variance
+
+    conditions, params = [
+        "(wo.estimated_hours IS NOT NULL OR wo.actual_hours IS NOT NULL)",
+    ], []
+    if date_from:
+        conditions.append("wo.due_date >= %s")
+        params.append(date_from)
+    if date_to:
+        conditions.append("wo.due_date <= %s")
+        params.append(date_to)
+    if status:
+        conditions.append("wo.status = %s")
+        params.append(status)
+    where = "WHERE " + " AND ".join(conditions)
+
+    rows = conn.execute(
+        "SELECT wo.id AS wo_id, wo.title, wo.equipment, wo.status, "
+        "wo.due_date, wo.estimated_hours, wo.actual_hours, "
+        "COALESCE(wo.actual_hours, 0) * COALESCE(mech.hourly_rate, 0) "
+        "  AS labor_cost "
+        "FROM maint_work_order wo "
+        "LEFT JOIN maint_mechanic mech "
+        "  ON LOWER(mech.name) = LOWER(wo.assigned_to) "
+        f"{where} "
+        "ORDER BY wo.due_date DESC NULLS LAST, wo.id DESC",
+        params,
+    ).fetchall()
+
+    result = []
+    for r in rows:
+        d = dict(r)
+        d['hours_variance'], d['variance_pct'] = hours_variance(
+            d['estimated_hours'], d['actual_hours'])
+        result.append(d)
+    return result
+
+
+def get_maint_labor_by_mechanic_report(conn, date_from=None,
+                                       date_to=None) -> list[dict]:
+    """Per-mechanic rollup across all Maintenance WOs in range.
+
+    maint_work_order.assigned_to is matched case-insensitively to
+    maint_mechanic.name — simpler and more reliable than the Production
+    side's completed_by matching, since mechanics aren't logins so there's
+    no email-vs-name ambiguity (see _notify_maint_wo_assigned's comment on
+    why mechanics have no people_id/login link).
+
+    Returns dicts with keys: mechanic_id, mechanic_name, wo_count,
+    estimated_hours, actual_hours, hours_variance, variance_pct,
+    hourly_rate, total_cost, wos (list of {wo_id, title, estimated_hours,
+    actual_hours, cost}).
+    """
+    from .reports_core import hours_variance
+
+    conditions, params = [
+        "(wo.estimated_hours IS NOT NULL OR wo.actual_hours IS NOT NULL)",
+        "wo.assigned_to != ''",
+    ], []
+    if date_from:
+        conditions.append("wo.due_date >= %s")
+        params.append(date_from)
+    if date_to:
+        conditions.append("wo.due_date <= %s")
+        params.append(date_to)
+    where = "WHERE " + " AND ".join(conditions)
+
+    rows = conn.execute(
+        "SELECT mech.id AS mechanic_id, mech.name AS mechanic_name, "
+        "mech.hourly_rate, wo.id AS wo_id, wo.title, "
+        "wo.estimated_hours, wo.actual_hours "
+        "FROM maint_work_order wo "
+        "JOIN maint_mechanic mech "
+        "  ON LOWER(mech.name) = LOWER(wo.assigned_to) "
+        f"{where} "
+        "ORDER BY mech.name, wo.id",
+        params,
+    ).fetchall()
+
+    mech_acc: dict[int, dict] = {}
+    for r in rows:
+        mid = r['mechanic_id']
+        acc = mech_acc.setdefault(mid, {
+            'mechanic_id': mid,
+            'mechanic_name': r['mechanic_name'],
+            'hourly_rate': r['hourly_rate'] or 0.0,
+            'estimated_hours': 0.0, 'actual_hours': 0.0,
+            'total_cost': 0.0,
+            'wos': [],
+        })
+        est_h = r['estimated_hours'] or 0.0
+        act_h = r['actual_hours'] or 0.0
+        cost = act_h * acc['hourly_rate']
+        acc['estimated_hours'] += est_h
+        acc['actual_hours'] += act_h
+        acc['total_cost'] += cost
+        acc['wos'].append({
+            'wo_id': r['wo_id'], 'title': r['title'],
+            'estimated_hours': est_h, 'actual_hours': act_h, 'cost': cost,
+        })
+
+    result = []
+    for acc in mech_acc.values():
+        variance, variance_pct = hours_variance(
+            acc['estimated_hours'], acc['actual_hours'])
+        result.append({
+            **acc,
+            'wo_count': len(acc['wos']),
+            'hours_variance': variance,
+            'variance_pct': variance_pct,
+        })
+    result.sort(key=lambda d: d['mechanic_name'])
     return result

@@ -2,6 +2,8 @@ from unittest.mock import MagicMock
 
 from manufacturing.production_core import (
     get_production_dashboard, get_daily_output_trend, get_wo_status_breakdown,
+    get_wo_time_variance_report, get_labor_by_personnel_report,
+    resolve_operation_owner,
 )
 
 
@@ -244,3 +246,171 @@ def test_wo_status_breakdown_returns_list():
 def test_wo_status_breakdown_empty():
     c = _trend_conn([])
     assert get_wo_status_breakdown(c) == []
+
+
+# ── resolve_operation_owner (pure, no DB) ────────────────────────────────
+
+def test_resolve_operation_owner_prefers_completed_by():
+    assert resolve_operation_owner('a@example.com', 'Jane Doe') == 'a@example.com'
+
+
+def test_resolve_operation_owner_falls_back_to_assigned_to():
+    assert resolve_operation_owner('', 'Jane Doe') == 'Jane Doe'
+    assert resolve_operation_owner(None, 'Jane Doe') == 'Jane Doe'
+
+
+def test_resolve_operation_owner_blank_when_both_empty():
+    assert resolve_operation_owner('', '') == ''
+    assert resolve_operation_owner(None, None) == ''
+
+
+def test_resolve_operation_owner_strips_whitespace():
+    assert resolve_operation_owner('  a@example.com  ', '') == 'a@example.com'
+    assert resolve_operation_owner('   ', 'Jane Doe') == 'Jane Doe'
+
+
+# ── get_wo_time_variance_report ──────────────────────────────────────────
+
+def _wo_variance_row(wo_id=1, wo_number='WO-2024-0001', product_name='Widget',
+                     status='completed', due_date='2026-06-01',
+                     std_hours=10.0, actual_hours=12.0, labor_cost=120.0):
+    return {
+        'wo_id': wo_id, 'wo_number': wo_number, 'product_name': product_name,
+        'status': status, 'due_date': due_date,
+        'std_hours': std_hours, 'actual_hours': actual_hours,
+        'labor_cost': labor_cost,
+    }
+
+
+def test_wo_time_variance_report_computes_variance():
+    c = _trend_conn([_wo_variance_row(std_hours=10.0, actual_hours=12.0)])
+    result = get_wo_time_variance_report(c)
+    assert result[0]['hours_variance'] == 2.0
+    assert result[0]['variance_pct'] == 20.0
+
+
+def test_wo_time_variance_report_no_filters_no_where():
+    c = _trend_conn([])
+    get_wo_time_variance_report(c)
+    sql = c.execute.call_args_list[0][0][0]
+    assert 'wo.due_date >=' not in sql
+    assert 'wo.status =' not in sql
+
+
+def test_wo_time_variance_report_date_and_status_filters():
+    c = _trend_conn([])
+    get_wo_time_variance_report(c, date_from='2026-01-01', date_to='2026-06-30',
+                                status='completed')
+    sql = c.execute.call_args_list[0][0][0]
+    params = c.execute.call_args_list[0][0][1]
+    assert 'wo.due_date >= %s' in sql
+    assert 'wo.due_date <= %s' in sql
+    assert 'wo.status = %s' in sql
+    assert params == ['2026-01-01', '2026-06-30', 'completed']
+
+
+def test_wo_time_variance_report_empty():
+    c = _trend_conn([])
+    assert get_wo_time_variance_report(c) == []
+
+
+# ── get_labor_by_personnel_report ────────────────────────────────────────
+
+def _labor_conn(op_rows, people_rows, pay_rows):
+    c = MagicMock()
+    op_mock, people_mock, pay_mock = MagicMock(), MagicMock(), MagicMock()
+    op_mock.fetchall.return_value = op_rows
+    people_mock.fetchall.return_value = people_rows
+    pay_mock.fetchall.return_value = pay_rows
+    c.execute.side_effect = [op_mock, people_mock, pay_mock]
+    return c
+
+
+def test_labor_by_personnel_matches_completed_by_email():
+    c = _labor_conn(
+        op_rows=[{'wo_id': 1, 'wo_number': 'WO-0001', 'wo_assigned_to': '',
+                  'completed_by': 'a@example.com',
+                  'std_hours': 4.0, 'actual_hours': 5.0}],
+        people_rows=[{'id': 9, 'first_name': 'Ann', 'last_name': 'Lee',
+                      'email': 'a@example.com'}],
+        pay_rows=[{'people_id': 9, 'pay_type': 'hourly', 'pay_rate': 20.0}],
+    )
+    result = get_labor_by_personnel_report(c)
+    assert len(result) == 1
+    assert result[0]['person_name'] == 'Ann Lee'
+    assert result[0]['wo_count'] == 1
+    assert result[0]['actual_hours'] == 5.0
+    assert result[0]['total_cost'] == 100.0
+    assert result[0]['wos'][0]['cost'] == 100.0
+
+
+def test_labor_by_personnel_falls_back_to_assigned_to_name():
+    c = _labor_conn(
+        op_rows=[{'wo_id': 1, 'wo_number': 'WO-0001', 'wo_assigned_to': 'Ann Lee',
+                  'completed_by': '', 'std_hours': 4.0, 'actual_hours': 5.0}],
+        people_rows=[{'id': 9, 'first_name': 'Ann', 'last_name': 'Lee',
+                      'email': 'a@example.com'}],
+        pay_rows=[],
+    )
+    result = get_labor_by_personnel_report(c)
+    assert len(result) == 1
+    assert result[0]['person_name'] == 'Ann Lee'
+
+
+def test_labor_by_personnel_salaried_pay_type_gives_none_cost():
+    c = _labor_conn(
+        op_rows=[{'wo_id': 1, 'wo_number': 'WO-0001', 'wo_assigned_to': '',
+                  'completed_by': 'a@example.com',
+                  'std_hours': 4.0, 'actual_hours': 5.0}],
+        people_rows=[{'id': 9, 'first_name': 'Ann', 'last_name': 'Lee',
+                      'email': 'a@example.com'}],
+        pay_rows=[{'people_id': 9, 'pay_type': 'salary', 'pay_rate': 60000.0}],
+    )
+    result = get_labor_by_personnel_report(c)
+    assert result[0]['total_cost'] is None
+    assert result[0]['wos'][0]['cost'] is None
+    # hours are still tracked even without a usable hourly rate
+    assert result[0]['actual_hours'] == 5.0
+
+
+def test_labor_by_personnel_unmatched_owner_skipped():
+    c = _labor_conn(
+        op_rows=[{'wo_id': 1, 'wo_number': 'WO-0001', 'wo_assigned_to': '',
+                  'completed_by': 'nobody@example.com',
+                  'std_hours': 4.0, 'actual_hours': 5.0}],
+        people_rows=[{'id': 9, 'first_name': 'Ann', 'last_name': 'Lee',
+                      'email': 'a@example.com'}],
+        pay_rows=[],
+    )
+    result = get_labor_by_personnel_report(c)
+    assert result == []
+
+
+def test_labor_by_personnel_empty_owner_skipped():
+    c = _labor_conn(
+        op_rows=[{'wo_id': 1, 'wo_number': 'WO-0001', 'wo_assigned_to': '',
+                  'completed_by': '', 'std_hours': 4.0, 'actual_hours': 5.0}],
+        people_rows=[],
+        pay_rows=[],
+    )
+    result = get_labor_by_personnel_report(c)
+    assert result == []
+
+
+def test_labor_by_personnel_aggregates_multiple_wos():
+    c = _labor_conn(
+        op_rows=[
+            {'wo_id': 1, 'wo_number': 'WO-0001', 'wo_assigned_to': '',
+             'completed_by': 'a@example.com', 'std_hours': 4.0, 'actual_hours': 5.0},
+            {'wo_id': 2, 'wo_number': 'WO-0002', 'wo_assigned_to': '',
+             'completed_by': 'a@example.com', 'std_hours': 2.0, 'actual_hours': 1.0},
+        ],
+        people_rows=[{'id': 9, 'first_name': 'Ann', 'last_name': 'Lee',
+                      'email': 'a@example.com'}],
+        pay_rows=[{'people_id': 9, 'pay_type': 'hourly', 'pay_rate': 10.0}],
+    )
+    result = get_labor_by_personnel_report(c)
+    assert result[0]['wo_count'] == 2
+    assert result[0]['std_hours'] == 6.0
+    assert result[0]['actual_hours'] == 6.0
+    assert result[0]['total_cost'] == 60.0

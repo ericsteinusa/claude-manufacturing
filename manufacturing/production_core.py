@@ -171,6 +171,194 @@ def get_prod_reports(conn) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Labor time & cost reports (WO standard-vs-actual, by-personnel rollup)
+# ---------------------------------------------------------------------------
+
+def get_wo_time_variance_report(conn, date_from=None, date_to=None,
+                                status=None) -> list[dict]:
+    """WO-level standard-vs-actual hours & labor cost, across many WOs.
+
+    One row per work order that has at least one wo_operation row (WOs with
+    no routing/operations have nothing to compare against). Bounded by
+    wo.due_date, same convention as work_orders_core.list_wos filters.
+
+    Returns dicts with keys: wo_id, wo_number, product_name, status,
+    due_date, std_hours, actual_hours, hours_variance, variance_pct,
+    labor_cost (actual_hours * workcenter.labor_rate, completed ops only).
+    """
+    from .reports_core import hours_variance
+
+    conditions, params = [], []
+    if date_from:
+        conditions.append("wo.due_date >= %s")
+        params.append(date_from)
+    if date_to:
+        conditions.append("wo.due_date <= %s")
+        params.append(date_to)
+    if status:
+        conditions.append("wo.status = %s")
+        params.append(status)
+    where = ("AND " + " AND ".join(conditions)) if conditions else ""
+
+    rows = conn.execute(
+        "SELECT wo.id AS wo_id, wo.wo_number, p.name AS product_name, "
+        "wo.status, wo.due_date, "
+        "COALESCE(SUM(op.std_hours), 0) AS std_hours, "
+        "COALESCE(SUM(op.actual_hours), 0) AS actual_hours, "
+        "COALESCE(SUM(COALESCE(op.actual_hours,0) * "
+        "             COALESCE(wc.labor_rate,0)) "
+        "         FILTER (WHERE op.status = 'completed'), 0) AS labor_cost "
+        "FROM work_order wo "
+        "JOIN wo_operation op ON op.wo_id = wo.id "
+        "LEFT JOIN product p ON p.id = wo.product_id "
+        "LEFT JOIN workcenter wc ON wc.id = op.workcenter_id "
+        f"WHERE 1=1 {where} "
+        "GROUP BY wo.id, wo.wo_number, p.name, wo.status, wo.due_date "
+        "ORDER BY wo.due_date DESC NULLS LAST, wo.id DESC",
+        params,
+    ).fetchall()
+
+    result = []
+    for r in rows:
+        d = dict(r)
+        d['hours_variance'], d['variance_pct'] = hours_variance(
+            d['std_hours'], d['actual_hours'])
+        result.append(d)
+    return result
+
+
+def resolve_operation_owner(completed_by, wo_assigned_to):
+    """Pure function: which raw text string (if any) attributes a
+    wo_operation's hours to a person.
+
+    completed_by wins when set (operator-entered at completion); falls
+    back to the parent WO's assigned_to. Returns '' if neither is set.
+    No DB access — the caller resolves the returned text against `people`
+    by email or full name.
+    """
+    return (completed_by or '').strip() or (wo_assigned_to or '').strip()
+
+
+def get_labor_by_personnel_report(conn, date_from=None, date_to=None) -> list[dict]:
+    """Per-person rollup across all Production WOs in range.
+
+    Attributes each wo_operation to a person via resolve_operation_owner(),
+    matched against `people` by email OR "first last" name — completed_by
+    is an email address when captured via the mobile API
+    (api_wo_operation_complete), a name string when it falls back to the
+    parent WO's assigned_to (set from the load_wo_assignees() picker).
+
+    Cost is only computed for people with an hourly employee_pay row —
+    employee_pay.pay_rate is a period salary (not hourly) for pay_type
+    'salary', so hours * pay_rate would fabricate a cost for salaried
+    staff. Their hours/WO-count still show; total_cost is None instead.
+
+    Returns dicts with keys: people_id, person_name, wo_count, std_hours,
+    actual_hours, hours_variance, variance_pct, total_cost (None if no
+    hourly pay rate matched), wos (list of {wo_id, wo_number, std_hours,
+    actual_hours, cost}, cost None under the same hourly-only rule).
+    """
+    from .reports_core import hours_variance
+
+    conditions, params = [], []
+    if date_from:
+        conditions.append("wo.due_date >= %s")
+        params.append(date_from)
+    if date_to:
+        conditions.append("wo.due_date <= %s")
+        params.append(date_to)
+    where = ("AND " + " AND ".join(conditions)) if conditions else ""
+
+    op_rows = conn.execute(
+        "SELECT op.wo_id, wo.wo_number, wo.assigned_to AS wo_assigned_to, "
+        "op.completed_by, op.std_hours, op.actual_hours "
+        "FROM wo_operation op "
+        "JOIN work_order wo ON wo.id = op.wo_id "
+        f"WHERE 1=1 {where}",
+        params,
+    ).fetchall()
+
+    people_rows = conn.execute(
+        "SELECT id, first_name, last_name, email FROM people"
+    ).fetchall()
+    by_email, by_name = {}, {}
+    for p in people_rows:
+        full_name = f"{p['first_name']} {p['last_name']}".strip()
+        if p['email']:
+            by_email[p['email'].strip().lower()] = p
+        if full_name:
+            by_name[full_name.lower()] = p
+
+    pay_rows = conn.execute(
+        "SELECT people_id, pay_type, pay_rate FROM employee_pay"
+    ).fetchall()
+    pay_by_people = {r['people_id']: dict(r) for r in pay_rows}
+
+    people_acc: dict[int, dict] = {}
+    for r in op_rows:
+        owner_text = resolve_operation_owner(r['completed_by'], r['wo_assigned_to'])
+        if not owner_text:
+            continue
+        key = owner_text.lower()
+        person = by_email.get(key) or by_name.get(key)
+        if not person:
+            continue
+
+        pid = person['id']
+        pay = pay_by_people.get(pid)
+        hourly_rate = (pay['pay_rate'] if pay and pay.get('pay_type') == 'hourly'
+                       else None)
+
+        acc = people_acc.setdefault(pid, {
+            'people_id': pid,
+            'person_name': f"{person['first_name']} {person['last_name']}".strip(),
+            'std_hours': 0.0, 'actual_hours': 0.0,
+            'has_hourly_rate': hourly_rate is not None,
+            'total_cost': 0.0,
+            'wos': {},
+        })
+
+        std_h = r['std_hours'] or 0.0
+        act_h = r['actual_hours'] or 0.0
+        cost = (act_h * hourly_rate) if hourly_rate is not None else 0.0
+
+        acc['std_hours'] += std_h
+        acc['actual_hours'] += act_h
+        if hourly_rate is not None:
+            acc['total_cost'] += cost
+
+        wo_acc = acc['wos'].setdefault(r['wo_id'], {
+            'wo_id': r['wo_id'], 'wo_number': r['wo_number'],
+            'std_hours': 0.0, 'actual_hours': 0.0, 'cost': 0.0,
+        })
+        wo_acc['std_hours'] += std_h
+        wo_acc['actual_hours'] += act_h
+        if hourly_rate is not None:
+            wo_acc['cost'] += cost
+
+    result = []
+    for acc in people_acc.values():
+        variance, variance_pct = hours_variance(acc['std_hours'], acc['actual_hours'])
+        wos = sorted(acc['wos'].values(), key=lambda w: w['wo_id'])
+        if not acc['has_hourly_rate']:
+            for w in wos:
+                w['cost'] = None
+        result.append({
+            'people_id': acc['people_id'],
+            'person_name': acc['person_name'],
+            'wo_count': len(wos),
+            'std_hours': acc['std_hours'],
+            'actual_hours': acc['actual_hours'],
+            'hours_variance': variance,
+            'variance_pct': variance_pct,
+            'total_cost': acc['total_cost'] if acc['has_hourly_rate'] else None,
+            'wos': wos,
+        })
+    result.sort(key=lambda d: d['person_name'])
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Shipping
 # ---------------------------------------------------------------------------
 
