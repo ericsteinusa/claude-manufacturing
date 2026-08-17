@@ -62,7 +62,7 @@
 .wo-table td.num, .wo-table th.num { text-align: right; }
 .wo-empty { color: #555; padding: 8px 0; }
 .btn-sm { padding: 2px 10px; font-size: 12px; }
-.btn-danger { background: #f8d7da; border-color: #c33; }
+.btn-danger { background: #f8d7da; border-color: #c33; color: #842029; }
 .btn-danger:hover { background: #f1aeb5; }
 .wo-status-actions {
     display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
@@ -125,7 +125,7 @@
                             <option selected>{{ wo.assigned_to }}</option>
                             {% endif %}
                         </select>
-                        <button type="submit" class="btn btn-sm">Assign</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
                     </form>
                     {% else %}
                     {{ wo.assigned_to|default:"— Unassigned —" }}
@@ -140,7 +140,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="status" value="{{ target }}">
                     <button type="submit"
-                            class="btn btn-sm{% if target == 'cancelled' %} btn-danger{% endif %}">
+                            class="btn btn-sm{% if target == 'cancelled' %} btn-danger{% else %} btn-primary{% endif %}">
                         {{ label }}</button>
                 </form>
                 {% endfor %}
@@ -197,7 +197,7 @@
                         <input type="text" name="notes">
                     </div>
                     <div>
-                        <button type="submit" class="btn">Add</button>
+                        <button type="submit" class="btn btn-primary">Add</button>
                     </div>
                 </div>
             </form>
@@ -266,14 +266,14 @@
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="forward_schedule">
-                    <button type="submit" class="btn btn-sm">Auto-Schedule Forward</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Auto-Schedule Forward</button>
                 </form>
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="backward_schedule">
-                    <button type="submit" class="btn btn-sm">Schedule to Due Date</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Schedule to Due Date</button>
                 </form>
-                <a href="/prod/schedule/gantt/" class="btn btn-sm">View on Gantt</a>
+                <a href="/prod/schedule/gantt/" class="btn btn-primary btn-sm">View on Gantt</a>
             </div>
             <p style="font-size:11px;color:#888;margin-top:8px;">
                 Forward: packs operations from today, in sequence, into each work center's
