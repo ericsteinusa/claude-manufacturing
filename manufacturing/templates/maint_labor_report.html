@@ -104,8 +104,8 @@ details.mech-wos table { margin-top:8px; }
                 <td>{{ w.equipment|default:"—" }}</td>
                 <td>{{ w.status }}</td>
                 <td>{{ w.due_date|default:"—" }}</td>
-                <td class="num">{{ w.estimated_hours|default_if_none:"—"|floatformat:1 }}</td>
-                <td class="num">{{ w.actual_hours|default_if_none:"—"|floatformat:1 }}</td>
+                <td class="num">{% if w.estimated_hours != None %}{{ w.estimated_hours|floatformat:1 }}{% else %}—{% endif %}</td>
+                <td class="num">{% if w.actual_hours != None %}{{ w.actual_hours|floatformat:1 }}{% else %}—{% endif %}</td>
                 <td class="num {% if w.hours_variance > 0 %}over{% elif w.hours_variance < 0 %}under{% endif %}">{{ w.hours_variance|floatformat:1 }}</td>
                 <td class="num">{% if w.variance_pct != None %}{{ w.variance_pct|floatformat:0 }}%{% else %}—{% endif %}</td>
                 <td class="num">${{ w.labor_cost|floatformat:2 }}</td>
