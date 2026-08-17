@@ -93,6 +93,10 @@ def _ensure_tables(conn):
     for tbl in ("maint_mechanic", "maint_equipment", "maint_work_order",
                 "maint_schedule", "maint_inspection", "maint_downtime", "maint_part"):
         conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS created_by TEXT DEFAULT ''")
+    # Backfill labor time/cost tracking columns (WO labor time/cost reports)
+    conn.execute("ALTER TABLE maint_mechanic ADD COLUMN IF NOT EXISTS hourly_rate REAL NOT NULL DEFAULT 0.0")
+    conn.execute("ALTER TABLE maint_work_order ADD COLUMN IF NOT EXISTS estimated_hours REAL")
+    conn.execute("ALTER TABLE maint_work_order ADD COLUMN IF NOT EXISTS actual_hours REAL")
     conn.commit()
 
 
@@ -101,24 +105,24 @@ def _ensure_tables(conn):
 # ---------------------------------------------------------------------------
 
 MECHANICS = [
-    # (name, trade, shift, phone, status)
-    ("SMPL-MAINT-Bob Harmon",    "Mechanical",  "Day",   "555-2101", "Active"),
-    ("SMPL-MAINT-Denise Fowler", "Electrical",  "Day",   "555-2102", "Active"),
-    ("SMPL-MAINT-Carlos Vega",   "Hydraulics",  "Swing", "555-2103", "Active"),
-    ("SMPL-MAINT-Tim Okafor",    "HVAC",        "Day",   "555-2104", "Active"),
-    ("SMPL-MAINT-Lynn Marsh",    "Welding",     "Night", "555-2105", "Active"),
-    ("SMPL-MAINT-Ed Paulson",    "General",     "Day",   "555-2106", "On Leave"),
+    # (name, trade, shift, phone, status, hourly_rate)
+    ("SMPL-MAINT-Bob Harmon",    "Mechanical",  "Day",   "555-2101", "Active",   27.50),
+    ("SMPL-MAINT-Denise Fowler", "Electrical",  "Day",   "555-2102", "Active",   31.00),
+    ("SMPL-MAINT-Carlos Vega",   "Hydraulics",  "Swing", "555-2103", "Active",   29.50),
+    ("SMPL-MAINT-Tim Okafor",    "HVAC",        "Day",   "555-2104", "Active",   28.00),
+    ("SMPL-MAINT-Lynn Marsh",    "Welding",     "Night", "555-2105", "Active",   26.50),
+    ("SMPL-MAINT-Ed Paulson",    "General",     "Day",   "555-2106", "On Leave", 22.00),
 ]
 
 
 def _seed_mechanics(conn):
-    for name, trade, shift, phone, status in MECHANICS:
+    for name, trade, shift, phone, status, hourly_rate in MECHANICS:
         if conn.execute("SELECT 1 FROM maint_mechanic WHERE name=%s", (name,)).fetchone():
             continue
         conn.execute(
-            "INSERT INTO maint_mechanic (name, trade, shift, phone, status, notes, created_by)"
-            f" VALUES (%s,%s,%s,%s,%s,'Sample data','{TAG}')",
-            (name, trade, shift, phone, status),
+            "INSERT INTO maint_mechanic (name, trade, shift, phone, status, hourly_rate, notes, created_by)"
+            f" VALUES (%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
+            (name, trade, shift, phone, status, hourly_rate),
         )
     conn.commit()
 
@@ -171,37 +175,41 @@ def _remove_equipment(conn):
 
 WORK_ORDERS = [
     # (title, equipment, work_type, priority, assigned_to,
-    #  req_ago, due_offset, completed_offset, status)
+    #  req_ago, due_offset, completed_offset, status,
+    #  estimated_hours, actual_hours)
     # due_offset/completed_offset are DURATIONS added to req_ago, not
     # absolute day counts from today -- for a "Completed" WO whose due/
     # completed date is N days ago, the offset must be (N days ago) -
     # req_ago, not simply -N.
+    # actual_hours is only set for "Completed" WOs (entered on completion,
+    # mirrors wo_operation.actual_hours on the Production side); other
+    # statuses only carry an estimated_hours target.
     ("Replace worn bearings on CNC Mill #1", "CNC Mill #1", "Replacement", "High",
-     "SMPL-MAINT-Bob Harmon", -3, 4, None, "In Progress"),
+     "SMPL-MAINT-Bob Harmon", -3, 4, None, "In Progress", 6.0, None),
     ("Quarterly PM — Hydraulic Press", "Hydraulic Press", "Preventive", "Medium",
-     "SMPL-MAINT-Carlos Vega", -7, 0, None, "Assigned"),
+     "SMPL-MAINT-Carlos Vega", -7, 0, None, "Assigned", 2.5, None),
     ("Air compressor pressure relief check", "Air Compressor", "Inspection", "High",
-     "SMPL-MAINT-Denise Fowler", -1, 2, None, "Open"),
+     "SMPL-MAINT-Denise Fowler", -1, 2, None, "Open", 1.0, None),
     ("Laser cutter alignment & calibration", "Laser Cutter", "Calibration", "Critical",
-     "SMPL-MAINT-Bob Harmon", -2, 1, None, "In Progress"),
+     "SMPL-MAINT-Bob Harmon", -2, 1, None, "In Progress", 3.0, None),
     ("Industrial chiller coil cleaning", "Industrial Chiller", "Cleaning", "Critical",
-     "SMPL-MAINT-Tim Okafor", -1, 1, None, "Assigned"),
+     "SMPL-MAINT-Tim Okafor", -1, 1, None, "Assigned", 4.0, None),
     ("Conveyor belt tension adjustment", "Conveyor Belt #1", "Repair", "Medium",
-     "SMPL-MAINT-Bob Harmon", -14, 4, 5, "Completed"),
+     "SMPL-MAINT-Bob Harmon", -14, 4, 5, "Completed", 2.0, 2.5),
     ("Paint booth filter replacement", "Paint Booth", "Replacement", "Medium",
-     "SMPL-MAINT-Ed Paulson", -5, 3, None, "On Hold"),
+     "SMPL-MAINT-Ed Paulson", -5, 3, None, "On Hold", 1.5, None),
     ("Annual overhead crane inspection", "Overhead Crane", "Inspection", "High",
-     "SMPL-MAINT-Lynn Marsh", -30, 3, 4, "Completed"),
+     "SMPL-MAINT-Lynn Marsh", -30, 3, 4, "Completed", 5.0, 4.5),
     ("MIG welder electrode tip replacement", "MIG Welder", "Replacement", "Low",
-     "SMPL-MAINT-Carlos Vega", -2, 5, None, "Open"),
+     "SMPL-MAINT-Carlos Vega", -2, 5, None, "Open", 0.5, None),
     ("Injection molder hydraulic fluid flush", "Injection Molder", "Preventive", "Medium",
-     "SMPL-MAINT-Carlos Vega", -10, 5, 6, "Completed"),
+     "SMPL-MAINT-Carlos Vega", -10, 5, 6, "Completed", 3.0, 3.75),
 ]
 
 
 def _seed_work_orders(conn):
     for (title, equip, wtype, priority, assigned, req_ago, due_off,
-         comp_off, status) in WORK_ORDERS:
+         comp_off, status, est_hours, act_hours) in WORK_ORDERS:
         if conn.execute(f"SELECT 1 FROM maint_work_order WHERE title=%s AND created_by='{TAG}'",
                         (title,)).fetchone():
             continue
@@ -209,10 +217,11 @@ def _seed_work_orders(conn):
         conn.execute(
             "INSERT INTO maint_work_order "
             "(title, equipment, work_type, priority, assigned_to, requested_date,"
-            " due_date, completed_date, status, notes, created_by)"
-            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
+            " due_date, completed_date, status, estimated_hours, actual_hours,"
+            " notes, created_by)"
+            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Sample data','{TAG}')",
             (title, equip, wtype, priority, assigned, _d(req_ago),
-             _d(req_ago + due_off), completed_date, status),
+             _d(req_ago + due_off), completed_date, status, est_hours, act_hours),
         )
     conn.commit()
 
