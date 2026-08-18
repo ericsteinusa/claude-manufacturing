@@ -89,10 +89,11 @@ def _first_supplier_id(conn):
     if row:
         return row["id"]
     return conn.execute(
-        "INSERT INTO supplier (company_name, email, created_by)"
-        " VALUES (%s,%s,%s) RETURNING id",
-        ("Sample Fallback Supplier", "fallback-supplier@example.com",
-         FALLBACK_SUPPLIER_TAG),
+        "INSERT INTO supplier (first_name, last_name, company_name,"
+        " phone_number, address, city, state, zip_code, email, created_by)"
+        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        ("", "", "Sample Fallback Supplier", "", "", "", "", "",
+         "fallback-supplier@example.com", FALLBACK_SUPPLIER_TAG),
     ).fetchone()["id"]
 
 
