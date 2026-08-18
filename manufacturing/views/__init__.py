@@ -278,6 +278,7 @@ from ._ess import *  # noqa: F401,F403
 from ._capacity_planning import *  # noqa: F401,F403
 from ._wms import *  # noqa: F401,F403
 from ._landed_cost import *  # noqa: F401,F403
+from ._consultants import *  # noqa: F401,F403
 from ._blanket_po import *  # noqa: F401,F403
 from ._portal import *  # noqa: F401,F403
 from ._multi_entity import *  # noqa: F401,F403
@@ -767,6 +768,10 @@ WEB_LEAF_URLS = {
     ('purchasing', 'appr_pos'):    '/po/',
     ('purchasing', 'rej_pos'):     '/po/',
     ('purchasing', 'appr_hist'):   '/po/',
+    ('purchasing', 'cons_list'):   '/consultants/',
+    ('purchasing', 'cons_eng'):    '/consultants/engagements/',
+    ('purchasing', 'cons_inv'):    '/consultants/invoices/',
+    ('purchasing', 'cons_rpt'):    '/consultants/reports/spend/',
     ('purchasing', 'purch_budg'):  '/purch/reports/',
     ('purchasing', 'budg_rpts'):   '/purch/reports/',
     ('purchasing', 'spend_analy'): '/purch/reports/',

@@ -1400,6 +1400,15 @@ MENU_TREE = {
                              ''),
                         ],
                     }),
+                    ('consultants', 'Consultant Management', {
+                        'title': 'Consultant Management',
+                        'items': [
+                            ('cons_list', 'Consultants', ''),
+                            ('cons_eng', 'Engagements', ''),
+                            ('cons_inv', 'Invoices', ''),
+                            ('cons_rpt', 'Spend Report', ''),
+                        ],
+                    }),
                 ],
             }),
             ('purch', 'Purchasing Menu', _PURCH_MENU),

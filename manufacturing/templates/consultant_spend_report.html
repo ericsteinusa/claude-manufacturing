@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block page_title %}Consultant Spend Report{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/" class="btn">Consultants</a>
+<a href="/consultants/reports/spend/export/?section=consultant&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Consultant CSV</a>
+<a href="/consultants/reports/spend/export/?section=engagement&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Engagement CSV</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.m-wrap { width:100%; max-width:1200px; }
+.rpt-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.rpt-kpi { background:white; border:1.5px solid var(--border); border-radius:8px; padding:18px; text-align:center; }
+.rpt-kpi .num { font-size:28px; font-weight:bold; }
+.rpt-kpi .lbl { font-size:12px; color:var(--text-muted); margin-top:6px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:20px; }
+.card h3 { margin:0 0 14px; font-size:15px; color:#333; }
+.list-table { width:100%; border-collapse:collapse; margin-bottom:4px; }
+.list-table th,.list-table td { padding:9px 13px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
+.list-table th { background:var(--accent); color:white; font-size:12px; }
+.list-table td.num { text-align:right; }
+.date-form { display:flex; gap:8px; align-items:center; margin-bottom:16px; }
+.date-form input[type=date] { padding:4px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.date-form button { padding:4px 14px; background:var(--accent); color:white; border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:bold; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="m-wrap">
+    <h2>Consultant Spend Report</h2>
+
+    <form method="get" class="date-form">
+        <input type="date" name="date_from" value="{{ date_from }}">
+        <span style="font-size:13px;color:#888;">to</span>
+        <input type="date" name="date_to" value="{{ date_to }}">
+        <button type="submit">Go</button>
+    </form>
+
+    <div class="rpt-kpis">
+        <div class="rpt-kpi"><div class="num">{{ kpis.consultant_count }}</div><div class="lbl">Consultants</div></div>
+        <div class="rpt-kpi"><div class="num">{{ kpis.engagement_count }}</div><div class="lbl">Engagements</div></div>
+        <div class="rpt-kpi"><div class="num">{{ kpis.total_hours|floatformat:1 }}h</div><div class="lbl">Total Hours</div></div>
+        <div class="rpt-kpi"><div class="num">${{ kpis.total_cost|floatformat:2 }}</div><div class="lbl">Total Cost (resolved rates only)</div></div>
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>By Consultant</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Consultant</th><th class="num">Engagements</th><th class="num">Hours</th>
+                    <th class="num">Time Cost</th><th class="num">Charges</th><th class="num">Total</th></tr>
+            </thead>
+            <tbody>
+            {% for c in by_consultant %}
+            <tr>
+                <td>{{ c.consultant_name }}</td>
+                <td class="num">{{ c.engagement_count }}</td>
+                <td class="num">{{ c.hours|floatformat:1 }}</td>
+                <td class="num">{% if c.time_cost != None %}${{ c.time_cost|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="num">${{ c.charge_total|floatformat:2 }}</td>
+                <td class="num">{% if c.grand_total != None %}${{ c.grand_total|floatformat:2 }}{% else %}—{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No consultant activity in this range.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+            "—" means at least one time entry has no resolvable hourly rate (entry, engagement, and
+            consultant defaults are all unset) — cost is withheld rather than shown as $0.
+        </p>
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>By Engagement</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Engagement</th><th>Consultant</th><th>Department</th><th>Status</th>
+                    <th class="num">Hours</th><th class="num">Total</th>
+                    <th class="num">Invoiced</th><th class="num">Open Balance</th></tr>
+            </thead>
+            <tbody>
+            {% for e in by_engagement %}
+            <tr>
+                <td><a href="/consultants/engagements/{{ e.engagement_id }}/" style="color:var(--accent);font-weight:bold;text-decoration:none;">{{ e.engagement_number }}</a></td>
+                <td>{{ e.consultant_name }}</td>
+                <td>{{ e.dept_name|default:"—" }}</td>
+                <td>{{ e.status }}</td>
+                <td class="num">{{ e.hours|floatformat:1 }}</td>
+                <td class="num">{% if e.grand_total != None %}${{ e.grand_total|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="num">${{ e.invoiced_total|floatformat:2 }}</td>
+                <td class="num">${{ e.open_balance|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No engagements in this range.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>By Department</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Department</th><th class="num">Engagements</th><th class="num">Consultants</th>
+                    <th class="num">Hours</th><th class="num">Total Cost</th></tr>
+            </thead>
+            <tbody>
+            {% for d in by_dept %}
+            <tr>
+                <td>{{ d.dept_name }}</td>
+                <td class="num">{{ d.engagement_count }}</td>
+                <td class="num">{{ d.consultant_count }}</td>
+                <td class="num">{{ d.hours|floatformat:1 }}</td>
+                <td class="num">{% if d.total_cost != None %}${{ d.total_cost|floatformat:2 }}{% else %}—{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No department activity in this range.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+{% endblock %}

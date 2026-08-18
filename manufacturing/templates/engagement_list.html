@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block page_title %}Consultant Engagements{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/" class="btn">Consultants</a>
+<a href="/consultants/engagements/" class="btn">Engagements</a>
+<a href="/consultants/invoices/" class="btn">Invoices</a>
+<a href="/consultants/engagements/new/" class="btn">+ New Engagement</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1200px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select { padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.metric { text-align:right; font-variant-numeric:tabular-nums; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft{background:#e2e3e5;color:#383d41;} .s-active{background:#d4edda;color:#0a3622;}
+.s-closed{background:#e2e3e5;color:#383d41;} .s-cancelled{background:#f8d7da;color:#721c24;}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>Consultant Engagements</h2>
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for s in statuses %}
+            <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="/consultants/engagements/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Engagement #</th><th>Title</th><th>Consultant</th>
+                    <th>Department</th><th>Status</th><th class="metric">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for e in rows %}
+            <tr>
+                <td><a href="/consultants/engagements/{{ e.id }}/">{{ e.engagement_number }}</a></td>
+                <td>{{ e.title }}</td>
+                <td>{{ e.consultant_name }}</td>
+                <td>{{ e.dept_name|default:"—" }}</td>
+                <td><span class="badge s-{{ e.status }}">{{ e.status }}</span></td>
+                <td class="metric">${{ e.grand_total|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="color:#888;text-align:center;">No engagements found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}
