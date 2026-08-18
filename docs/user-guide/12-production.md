@@ -57,6 +57,13 @@ Both tables export to CSV independently via the toolbar.
   in_progress → completed/cancelled); forward/backward capacity-based
   scheduling buttons; view routing operations and rolled-up labor/actual
   cost.
+- **Assigning a work order** — on that same detail page, a Production
+  Department Manager or Supervisor (or President/VP) picks a name from the
+  **Assigned To** dropdown and clicks **Assign**; only people in the
+  Production department appear in the list. There's no separate reassign
+  page — pick a different name (or "— Unassigned —") and click Assign
+  again. The person assigned gets an in-app notification (the bell icon in
+  the top bar) right away.
 
 ## MRP — Material Requirements Planning (`/mrp/`)
 

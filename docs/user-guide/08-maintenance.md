@@ -48,6 +48,16 @@ assignee/mechanic, requested/due date, estimated hours, notes); mark
 by status/priority/search. Estimated and actual hours feed the Labor Time &
 Cost Report above.
 
+**Assigning a work order:** pick a mechanic from the active roster (see
+[Mechanics](#mechanics-maintmechanics) below) either right on the New Work
+Order form or later from the same **Assigned To** field on the work order's
+detail page — no manager role is required, anyone with Maintenance access
+can assign or reassign. Unlike Production, mechanics aren't system logins,
+so the system can't notify one specific person — instead, assigning or
+changing a work order's mechanic notifies everyone in the Maintenance
+department (the bell icon in the top bar), so whoever's covering that day
+sees it.
+
 ## Equipment (`/maint/equipment/`)
 
 Register or edit equipment: name, asset tag, location, manufacturer, install

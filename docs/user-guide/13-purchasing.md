@@ -54,6 +54,41 @@ department approves or rejects it (President/VP can also approve any
 requisition). Pages cover new, pending-approval, approved, and history
 views.
 
+## Consultant Time & Charges (`/consultants/`)
+
+Track billable time and itemized expenses for both external consulting
+firms and internal-style contract labor, and turn a billing period into a
+real payable.
+
+- **Consultants** (`/consultants/`) — the consultant or firm record: name,
+  optionally linked to an existing supplier (external) or an existing
+  employee (internal-style contract labor), default hourly rate,
+  specialty, contact info.
+- **Engagements** (`/consultants/engagements/`) — unlike the rest of this
+  page, any employee can create an engagement for their own department
+  (the same way anyone can file a requisition); Purchasing staff and
+  full-access roles see engagements across every department. Log **time
+  entries** (date, hours, optional rate override) and **itemized
+  charges** (Travel, Materials, Lodging, Software/Tools, Other) against
+  an engagement as work happens.
+- **Cutting an invoice** — from an engagement's page, pick a date range
+  and select **Cut Invoice** to bundle its unbilled time and charges into
+  a draft invoice. This is blocked if any time entry has no hourly rate
+  anywhere in the fallback chain (the entry's own rate, then the
+  engagement's default, then the consultant's default) — set one before
+  trying again.
+- **Invoices** (`/consultants/invoices/`) — submit a draft invoice for
+  approval; once approved it becomes a real Accounts Payable invoice (see
+  the [Accounting guide](01-accounting.md#accounts-payable-ap)), so payment
+  is recorded the same way as for any other vendor. Rejecting an invoice
+  releases its claimed time and charges so they can be billed on a later
+  invoice instead.
+- **Spend Report** (`/consultants/reports/spend/`, Purchasing managers
+  and full-access roles only) — hours and cost broken down by consultant,
+  by engagement, and by department, with CSV/Excel export. Cost is left
+  blank rather than shown as $0 for any consultant with an unresolved
+  hourly rate.
+
 ## Blanket POs & Call-Offs (`/blanket-po/`)
 
 A standing agreement with a supplier (ceiling value/quantity, validity
