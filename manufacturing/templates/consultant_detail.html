@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block page_title %}{{ consultant.display_name }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/" class="btn">Consultants</a>
+<a href="/consultants/engagements/" class="btn">Engagements</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1000px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.btn-secondary { background:#6c757d; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.metric { text-align:right; font-variant-numeric:tabular-nums; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft{background:#e2e3e5;color:#383d41;} .s-active{background:#d4edda;color:#0a3622;}
+.s-closed{background:#e2e3e5;color:#383d41;} .s-cancelled{background:#f8d7da;color:#721c24;}
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.alert-success { background:#d4edda; color:#0a3622; border:1px solid #c3e6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>{{ consultant.display_name }}
+        {% if not consultant.is_active %}<span class="badge s-cancelled">Inactive</span>{% endif %}
+    </h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Details</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Name *</label>
+                    <input type="text" name="display_name" value="{{ consultant.display_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Default Hourly Rate ($)</label>
+                    <input type="number" name="default_hourly_rate" step="0.01" min="0"
+                           value="{{ consultant.default_hourly_rate|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Specialty</label>
+                    <input type="text" name="specialty" value="{{ consultant.specialty }}">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ consultant.email }}">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone_number" value="{{ consultant.phone_number }}">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes">{{ consultant.notes }}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Save</button>
+        </form>
+        <form method="post" style="display:inline-block;margin-top:8px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_active">
+            <button type="submit" class="btn-submit btn-secondary">
+                {% if consultant.is_active %}Deactivate{% else %}Activate{% endif %}
+            </button>
+        </form>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+            {% if consultant.supplier_id %}External — linked to supplier <strong>{{ consultant.supplier_name }}</strong>.{% endif %}
+            {% if consultant.people_id %}Internal — linked to {{ consultant.people_first_name }} {{ consultant.people_last_name }}.{% endif %}
+            {% if not consultant.supplier_id and not consultant.people_id %}Ad hoc — no linked supplier or personnel record. A supplier will be auto-created on first approved invoice.{% endif %}
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Engagements</h3>
+        <table class="list-table">
+            <thead>
+                <tr><th>Engagement #</th><th>Title</th><th>Department</th><th>Status</th><th class="metric">Total</th></tr>
+            </thead>
+            <tbody>
+            {% for e in engagements %}
+            <tr>
+                <td><a href="/consultants/engagements/{{ e.id }}/">{{ e.engagement_number }}</a></td>
+                <td>{{ e.title }}</td>
+                <td>{{ e.dept_name|default:"—" }}</td>
+                <td><span class="badge s-{{ e.status }}">{{ e.status }}</span></td>
+                <td class="metric">${{ e.grand_total|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No engagements yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

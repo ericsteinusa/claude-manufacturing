@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block page_title %}Consultants{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/" class="btn">Consultants</a>
+<a href="/consultants/engagements/" class="btn">Engagements</a>
+<a href="/consultants/invoices/" class="btn">Invoices</a>
+<a href="/consultants/reports/spend/" class="btn">Spend Report</a>
+<a href="/consultants/new/" class="btn">+ New Consultant</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1200px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar input[type=text] { padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table tr:last-child td { border-bottom:none; }
+.list-table tbody tr:hover { background:#f0f4ff; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.metric { text-align:right; font-variant-numeric:tabular-nums; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.b-external { background:#d1ecf1; color:#0c5460; }
+.b-internal { background:#d4edda; color:#0a3622; }
+.b-adhoc    { background:#e2e3e5; color:#383d41; }
+.b-inactive { background:#f8d7da; color:#721c24; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>Consultants</h2>
+
+    <form method="get" class="filter-bar">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search name / specialty…">
+        <button type="submit">Filter</button>
+        <a href="/consultants/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Name</th><th>Type</th><th>Specialty</th>
+                    <th class="metric">Default Rate</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in rows %}
+            <tr>
+                <td><a href="/consultants/{{ c.id }}/">{{ c.display_name }}</a></td>
+                <td>
+                    {% if c.supplier_id %}<span class="badge b-external">External — {{ c.supplier_name|default:"Linked Supplier" }}</span>{% endif %}
+                    {% if c.people_id %}<span class="badge b-internal">Internal — {{ c.people_first_name }} {{ c.people_last_name }}</span>{% endif %}
+                    {% if not c.supplier_id and not c.people_id %}<span class="badge b-adhoc">Ad hoc</span>{% endif %}
+                </td>
+                <td>{{ c.specialty|default:"—" }}</td>
+                <td class="metric">{% if c.default_hourly_rate %}${{ c.default_hourly_rate|floatformat:2 }}/hr{% else %}—{% endif %}</td>
+                <td>{% if c.is_active %}Active{% else %}<span class="badge b-inactive">Inactive</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No consultants found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

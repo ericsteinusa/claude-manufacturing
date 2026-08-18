@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block page_title %}Consultant Invoices{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/" class="btn">Consultants</a>
+<a href="/consultants/engagements/" class="btn">Engagements</a>
+<a href="/consultants/invoices/" class="btn">Invoices</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:1100px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.filter-bar select { padding:6px 10px; border: 1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.filter-bar button { padding:6px 14px; background:white; border: 1.5px solid var(--border);
+    border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft{background:#e2e3e5;color:#383d41;} .s-submitted{background:#fff3cd;color:#856404;}
+.s-approved{background:#d4edda;color:#0a3622;} .s-rejected{background:#f8d7da;color:#721c24;}
+.s-invoiced{background:#d1ecf1;color:#0c5460;}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>Consultant Invoices</h2>
+
+    <form method="get" class="filter-bar">
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="draft"{% if status_filter == "draft" %} selected{% endif %}>Draft</option>
+            <option value="submitted"{% if status_filter == "submitted" %} selected{% endif %}>Submitted</option>
+            <option value="rejected"{% if status_filter == "rejected" %} selected{% endif %}>Rejected</option>
+            <option value="invoiced"{% if status_filter == "invoiced" %} selected{% endif %}>Invoiced</option>
+        </select>
+        <button type="submit">Filter</button>
+        <a href="/consultants/invoices/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+    </form>
+
+    <div class="card">
+        <table class="list-table">
+            <thead><tr><th>Invoice #</th><th>Engagement</th><th>Consultant</th><th>Period</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for i in rows %}
+            <tr>
+                <td><a href="/consultants/invoices/{{ i.id }}/">{{ i.invoice_number }}</a></td>
+                <td><a href="/consultants/engagements/{{ i.engagement_id }}/">{{ i.engagement_number }}</a></td>
+                <td>{{ i.consultant_name }}</td>
+                <td>{{ i.period_start }} → {{ i.period_end }}</td>
+                <td><span class="badge s-{{ i.status }}">{{ i.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No invoices found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

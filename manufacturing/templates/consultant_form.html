@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block page_title %}New Consultant{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/" class="btn">Consultants</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:800px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.hint { font-size:11px; color:var(--text-muted); margin-top:2px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>New Consultant</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Name *</label>
+                    <input type="text" name="display_name" required placeholder="Consultant or firm name">
+                </div>
+                <div class="form-group">
+                    <label>Linked Supplier (external)</label>
+                    <select name="supplier_id">
+                        <option value="">— None —</option>
+                        {% for v in vendors %}
+                        <option value="{{ v.id }}">{{ v.label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="hint">Leave blank for internal-style or ad-hoc consultants.</div>
+                </div>
+                <div class="form-group">
+                    <label>Default Hourly Rate ($)</label>
+                    <input type="number" name="default_hourly_rate" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Specialty</label>
+                    <input type="text" name="specialty">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone_number">
+                </div>
+                <div class="form-group full-span">
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Consultant</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

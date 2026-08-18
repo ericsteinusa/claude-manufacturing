@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block page_title %}{{ cinv.invoice_number }}{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/invoices/" class="btn">Invoices</a>
+<a href="/consultants/engagements/{{ cinv.engagement_id }}/" class="btn">Engagement</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:900px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:8px; }
+.detail-grid .field .lbl { font-size:11px; color:var(--text-muted); font-weight:bold; text-transform:uppercase; }
+.detail-grid .field .val { font-size:14px; color:var(--text); margin-top:2px; }
+.list-table { width:100%; border-collapse:collapse; }
+.list-table th,.list-table td { padding:7px 10px; border-bottom:1px solid #ddd; font-size:13px; }
+.list-table th { background:var(--accent); color:white; }
+.list-table a { color:var(--accent); text-decoration:none; font-weight:bold; }
+.metric { text-align:right; font-variant-numeric:tabular-nums; }
+.total-row td { font-weight:bold; border-top:2px solid var(--border); }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:11px; font-weight:bold; }
+.s-draft{background:#e2e3e5;color:#383d41;} .s-submitted{background:#fff3cd;color:#856404;}
+.s-approved{background:#d4edda;color:#0a3622;} .s-rejected{background:#f8d7da;color:#721c24;}
+.s-invoiced{background:#d1ecf1;color:#0c5460;} .s-pending{background:#fff3cd;color:#856404;}
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-approve { background:#2e7d32; }
+.btn-deny { background:#c62828; }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-warning { background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>{{ cinv.invoice_number }}
+        <span class="badge s-{{ cinv.status }}">{{ cinv.status }}</span>
+    </h2>
+
+    <div class="card">
+        <div class="detail-grid">
+            <div class="field"><div class="lbl">Engagement</div><div class="val"><a href="/consultants/engagements/{{ cinv.engagement_id }}/">{{ cinv.engagement_number }}</a></div></div>
+            <div class="field"><div class="lbl">Consultant</div><div class="val">{{ cinv.consultant_name }}</div></div>
+            <div class="field"><div class="lbl">Period</div><div class="val">{{ cinv.period_start }} → {{ cinv.period_end }}</div></div>
+            {% if cinv.ap_invoice_id %}
+            <div class="field"><div class="lbl">AP Invoice</div><div class="val"><a href="/ap/{{ cinv.ap_invoice_id }}/">View AP Invoice #{{ cinv.ap_invoice_id }}</a></div></div>
+            {% endif %}
+        </div>
+
+        {% if cinv.status == 'draft' %}
+        <form method="post" action="/consultants/invoices/{{ cinv.id }}/submit/">
+            {% csrf_token %}
+            <button type="submit" class="btn-submit">Submit for Approval</button>
+        </form>
+        {% endif %}
+
+        {% if pending_step %}
+        <div class="alert alert-warning" style="margin-top:14px;">
+            Awaiting approval as <strong>{{ pending_step.approver_role }}</strong>.
+            <form method="post" action="/consultants/invoices/{{ cinv.id }}/decide/" style="display:inline;margin-left:10px;">
+                {% csrf_token %}
+                <button type="submit" name="decision" value="approved" class="btn-submit btn-approve" style="padding:5px 14px;font-size:12px;">Approve</button>
+                <button type="submit" name="decision" value="rejected" class="btn-submit btn-deny" style="padding:5px 14px;font-size:12px;">Reject</button>
+            </form>
+        </div>
+        {% elif cinv.status == 'submitted' %}
+        <div class="alert alert-warning" style="margin-top:14px;">
+            Submitted — no approval rule is configured for consultant invoices yet, so nothing is pending.
+            Add an <a href="/approval-rules/new/">approval rule</a> for entity type <code>consultant_invoice</code>.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>Itemized Time</h3>
+        <table class="list-table">
+            <thead><tr><th>Date</th><th>Description</th><th class="metric">Hours</th><th class="metric">Rate</th><th class="metric">Cost</th></tr></thead>
+            <tbody>
+            {% for t in lines.time_entries %}
+            <tr>
+                <td>{{ t.work_date }}</td>
+                <td>{{ t.description|default:"—" }}</td>
+                <td class="metric">{{ t.hours|floatformat:2 }}</td>
+                <td class="metric">${{ t.resolved_rate|floatformat:2 }}</td>
+                <td class="metric">${{ t.cost|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">No time entries on this invoice.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" style="overflow-x:auto;">
+        <h3>Itemized Charges</h3>
+        <table class="list-table">
+            <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="metric">Amount</th></tr></thead>
+            <tbody>
+            {% for c in lines.charges %}
+            <tr>
+                <td>{{ c.charge_date }}</td>
+                <td>{{ c.category }}</td>
+                <td>{{ c.description|default:"—" }}</td>
+                <td class="metric">${{ c.amount|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#888;text-align:center;">No charges on this invoice.</td></tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="total-row"><td colspan="3">Total</td><td class="metric">${{ lines.total|floatformat:2 }}</td></tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Approval History</h3>
+        <table class="list-table">
+            <thead><tr><th>Seq</th><th>Approver Role</th><th>Status</th><th>Decided By</th><th>Decided At</th></tr></thead>
+            <tbody>
+            {% for s in approval.steps %}
+            <tr>
+                <td>{{ s.seq }}</td>
+                <td>{{ s.approver_role }}</td>
+                <td><span class="badge s-{{ s.status }}">{{ s.status }}</span></td>
+                <td>{{ s.decided_by|default:"—" }}</td>
+                <td>{{ s.decided_at|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="color:#888;text-align:center;">Not yet submitted.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block page_title %}New Engagement{% endblock %}
+
+{% block toolbar_left %}
+<a href="/consultants/engagements/" class="btn">Engagements</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.lg-wrap { width:100%; max-width:800px; }
+.lg-wrap h2 { color: var(--text); font-size:20px; margin-bottom:14px; }
+.card { background:white; border: 1.5px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:16px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; font-weight:bold; color:#444; }
+.form-group input, .form-group select, .form-group textarea {
+    padding:7px 10px; border:1px solid #ccc; border-radius:5px; font-size:13px; }
+.form-group textarea { height:60px; resize:vertical; }
+.full-span { grid-column:1/-1; }
+.btn-submit { padding:8px 20px; background:var(--accent); color:white;
+    border:none; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:8px; }
+.btn-submit:hover { background:var(--accent-hover); }
+.alert { padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:13px; }
+.alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="lg-wrap">
+    <h2>New Consultant Engagement</h2>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        {% if not consultants %}
+        <p style="font-size:13px;color:var(--text-muted);">
+            No consultants yet — <a href="/consultants/new/">add one first</a>.
+        </p>
+        {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label>Title *</label>
+                    <input type="text" name="title" required placeholder="e.g. Q3 ERP Migration Support">
+                </div>
+                <div class="form-group">
+                    <label>Consultant *</label>
+                    <select name="consultant_id" required>
+                        {% for c in consultants %}
+                        <option value="{{ c.id }}">{{ c.display_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select name="dept_id">
+                        <option value="">— Use my department —</option>
+                        {% for d in depts %}
+                        <option value="{{ d.dept_id }}">{{ d.dept_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date">
+                </div>
+                <div class="form-group">
+                    <label>Default Hourly Rate ($)</label>
+                    <input type="number" name="default_hourly_rate" step="0.01" min="0">
+                    <div style="font-size:11px;color:var(--text-muted);">Used when a time entry doesn't specify its own rate.</div>
+                </div>
+                <div class="form-group full-span">
+                    <label>Purpose</label>
+                    <textarea name="purpose"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Create Engagement</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

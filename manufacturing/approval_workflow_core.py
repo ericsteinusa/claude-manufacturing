@@ -17,7 +17,7 @@ ordered by seq, and returns the list of step ids.  Steps must be approved
 in seq order — a step is only actionable once all lower-seq steps are done.
 
 Supported entity types: 'purchase_order', 'purchase_requisition', 'gl_journal',
-'cycle_count', 'document'
+'cycle_count', 'document', 'consultant_invoice'
 """
 
 from .log_utils import get_logger
@@ -26,7 +26,7 @@ from .notify_core import create_notifications_for_role, ensure_notification_tabl
 log = get_logger(__name__)
 
 ENTITY_TYPES = ('purchase_order', 'purchase_requisition', 'gl_journal',
-                'cycle_count', 'document')
+                'cycle_count', 'document', 'consultant_invoice')
 STEP_STATUSES = ('pending', 'approved', 'rejected', 'escalated', 'skipped')
 
 
