@@ -8,7 +8,6 @@ is a Purchasing responsibility (like Vendor Management / deciding a PO).
 """
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required, dept_manager_required, login_required
