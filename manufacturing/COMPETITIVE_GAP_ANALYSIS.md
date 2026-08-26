@@ -2920,3 +2920,74 @@ created, and a tampered/mismatched `state` parameter is rejected. Full suite: 27
 15 new), `ruff check .` clean. **This closes every item on the prioritized buildable-in-software
 list — the only gaps left anywhere in this document are Section 3's four hardware/external-account-
 gated items, which the owner has confirmed he has no access to pursue.**
+
+---
+
+## Section 7: 2026-08-26 Fresh Pass — Mobile Coverage Update and New Domains Since Section 6
+
+**Why this pass exists:** five weeks of further work landed after Section 6's five-item
+buildable-in-software list closed out on 2026-07-17. None of it maps onto that list — it's either
+an update to a Section 6 metric that kept moving on its own (mobile coverage), or genuinely new
+domains this document has never scored. This pass does not re-verify Sections 1–6's other claims
+(no reason to expect drift there); it only accounts for what's new.
+
+### 7.1 Mobile App Coverage — updated from §6.9
+
+`mobile/app/(tabs)/` now has **10 screens**, up from the 6 §6.9 scored: `index` (dashboard),
+`time-clock`, `work-orders`, `maintenance`, `inventory`, `quality`, `approvals`, `lots`,
+`requisitions`, `costing`. That's real growth (requisitions and costing are new since the last
+count) but the underlying gap §6.9 named is unchanged in kind: **10 of 17 departments** now have a
+mobile screen, still leaving accounting, customer_service, engineering, IT, legal, marketing,
+payroll, personnel, and sales with zero mobile presence. Scored **partially closed**, not closed —
+progress, not parity with the "one universal app" or "per-persona app" breadth most of the top 10
+ship.
+
+### 7.2 New domain: Credit / AR Risk Management
+
+Section 1.6 (Finance & Accounting) already credited "Accounts Receivable with aging & DSO" as
+Full, but that's collections *reporting* — nothing in this document ever scored proactive credit
+*risk management*, because the app didn't have any until now. `manufacturing/credit_core.py` +
+`manufacturing/views/_credit.py` (routed under `/credit/...`) now provide: credit account
+open/update with automatic limit-change history logging, a credit-application intake and
+approve/deny workflow (`decide_credit_application`) that opens or updates the linked account on
+approval, and collections-activity tracking tied to at-risk accounts. This is the kind of module
+SAP/Oracle/Dynamics ship as part of their credit-management suites and Fishbowl/JobBOSS²/MRPeasy
+generally don't — a genuine mid-market-leading capability, not just a gap-fill. Not added as a new
+scorecard row in Section 4 (deliberately, to avoid scorecard inflation for a single module); folded
+into the existing Finance & Accounting domain's standing.
+
+### 7.3 New domain: Payroll Processing
+
+HR/Payroll (Section 1.7) was already scored 9/10 mid-market on the strength of ESS, benefits,
+skills matrix, and workforce analytics — but the actual pay-run engine underneath it was thinner
+than that score implied. `manufacturing/payroll_core.py` (609 lines) now has real pay-rate
+management (hourly/salary via `upsert_pay_rate`), configurable deduction types and per-employee
+deductions, a `process_payroll` engine that runs a full pay period into entries and pay stubs, and
+pay-stub/YTD/department-cost reporting. This is a genuine strengthening of an already-credited
+domain, not a new gap closure — the prior 9/10 score holds, but is now resting on more solid
+ground underneath it.
+
+### 7.4 Operational additions (not separately scored)
+
+Three smaller shipped items worth naming without inflating the scorecard for them:
+
+- **Work order assignment + notification** — `work_orders_core.py` gained an `assigned_to` column
+  and `assign_wo()`, which fires a `wo_assigned` entry through the notification center §6.8 shipped
+  on 2026-07-17. A small but real example of the notification infrastructure actually being reused
+  by a second feature, not a one-off.
+- **Work order labor time/cost reporting** — department-scoped reports layered on existing WO labor
+  data; a reporting addition, not new core capability.
+- **Consultant time & billing** — `consultants_core.py` adds engagement tracking, time entries,
+  misc charges, rate/cost resolution, and consultant invoice generation with line items. Adjacent
+  to Purchasing/Finance but its own small domain; not scored separately here.
+
+### Net effect on standing
+
+Sections 1–6's scores and the Section 4 scorecard (9.3/10 mid-market, 8.7/10 enterprise) are
+unchanged — nothing above corrects a prior claim, and nothing above closes any of Section 6's
+remaining honest gaps (modern frontend, row/field-level RBAC, GDPR tooling, vertical compliance
+packs, mobile offline support, localization, CI-gated load testing all remain exactly as scored in
+§6.1–§6.13). What changed is coverage of ground this document never scored at all — mobile breadth
+moved from 6/17 to 10/17 departments, and two genuinely new modules (credit risk management,
+payroll processing) plus three smaller operational features shipped without ever appearing in this
+document until now.
