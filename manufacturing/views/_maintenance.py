@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required, dept_manager_required
 from ..log_utils import get_logger
+from ..rbac_core import can_view_compensation
 from ..accounts import READ_ONLY_ROLES
 from ..csv_export import export_response
 from ..oee_core import get_overall_oee, get_oee_trend, list_workcenter_oee
@@ -869,6 +870,7 @@ def maint_part_detail(request, part_id):
 def maint_mechanics_list(request):
     status_filter = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
+    can_view_comp = can_view_compensation(request)
     conn = get_db_connection()
     error = success = None
     mechanics = []
@@ -886,7 +888,12 @@ def maint_mechanics_list(request):
                     status=request.POST.get('status', 'Active'),
                     notes=request.POST.get('notes', ''),
                     created_by=request.session.get('user_email', ''),
-                    hourly_rate=_opt_float(request.POST.get('hourly_rate')) or 0.0,
+                    # Compensation field — a non-Payroll/HR viewer can't set
+                    # a new mechanic's pay rate even at creation time; it
+                    # defaults to 0 for Payroll/HR to set afterward via the
+                    # detail page (see maint_mechanic_detail's own masking).
+                    hourly_rate=(_opt_float(request.POST.get('hourly_rate')) or 0.0
+                                if can_view_comp else 0.0),
                 )
                 conn.commit()
                 return redirect('maint_mechanics_list')
@@ -907,6 +914,7 @@ def maint_mechanics_list(request):
         request, mechanics=mechanics, status_filter=status_filter,
         search=search, mechanic_statuses=MECHANIC_STATUSES,
         mechanic_trades=MECHANIC_TRADES, mechanic_shifts=MECHANIC_SHIFTS,
+        can_view_comp=can_view_comp,
         error=error, success=success,
     ))
 
@@ -914,6 +922,13 @@ def maint_mechanics_list(request):
 @dept_required(_MAINT_DEPT_KEYS)
 def maint_mechanic_detail(request, mech_id):
     can_edit = request.session.get('user_role') not in READ_ONLY_ROLES
+    # Field-level masking (rbac_core): hourly_rate is a compensation field
+    # — whole-view access to a mechanic's record (dept_required already
+    # granted that) does not imply the viewer should see or change their
+    # pay rate. Enforced server-side (hourly_rate=None below is a no-op
+    # thanks to update_mechanic's COALESCE), not just hidden in the
+    # template, so a crafted POST can't bypass it.
+    can_view_comp = can_view_compensation(request)
     conn = get_db_connection()
     error = success = None
     mechanic = None
@@ -931,7 +946,8 @@ def maint_mechanic_detail(request, mech_id):
                     phone=request.POST.get('phone', ''),
                     status=request.POST.get('status', ''),
                     notes=request.POST.get('notes', ''),
-                    hourly_rate=_opt_float(request.POST.get('hourly_rate')),
+                    hourly_rate=(_opt_float(request.POST.get('hourly_rate'))
+                                if can_view_comp else None),
                 )
                 conn.commit()
                 mechanic = get_mechanic(conn, mech_id)
@@ -943,6 +959,7 @@ def maint_mechanic_detail(request, mech_id):
         conn.close()
     return render(request, 'maint_mechanic_detail.html', _maint_ctx(
         request, mechanic=mechanic, can_edit=can_edit,
+        can_view_comp=can_view_comp,
         mechanic_statuses=MECHANIC_STATUSES,
         mechanic_trades=MECHANIC_TRADES, mechanic_shifts=MECHANIC_SHIFTS,
         error=error, success=success,
