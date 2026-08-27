@@ -1,0 +1,17 @@
+{% for i in insights %}
+<div class="insight-card">
+    <div>
+        <div class="insight-title">
+            <span class="insight-domain {{ i.domain }}">{{ i.domain }}</span>
+            {{ i.title }}
+        </div>
+        <div class="insight-detail">{{ i.detail }}</div>
+    </div>
+    <div style="text-align:right;white-space:nowrap;">
+        <span class="pill-sev {{ i.severity }}">{{ i.severity|capfirst }}</span><br>
+        <a href="{{ i.link }}" style="font-size:12px;">View &rarr;</a>
+    </div>
+</div>
+{% empty %}
+<p style="text-align:center;color:var(--text-muted);">No active insights right now.</p>
+{% endfor %}

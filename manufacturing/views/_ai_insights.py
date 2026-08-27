@@ -22,8 +22,7 @@ _LINKS = {
 }
 
 
-@dept_required('reports')
-def ai_insights_dashboard(request):
+def _get_insights():
     conn = get_db_connection()
     try:
         ensure_apm_tables(conn)
@@ -35,10 +34,20 @@ def ai_insights_dashboard(request):
 
     for row in insights:
         row['link'] = _LINKS[row['domain']](row['ref'])
+    return insights
 
+
+@dept_required('reports')
+def ai_insights_dashboard(request):
     return render(request, 'ai_insights_dashboard.html', {
         'email': request.session.get('user_email', ''),
         'user_role': request.session.get('user_role', ''),
         'full_access': request.session.get('user_full_access', False),
-        'insights': insights,
+        'insights': _get_insights(),
     })
+
+
+@dept_required('reports')
+def ai_insights_feed_fragment(request):
+    """htmx polling target for the AI Insights feed."""
+    return render(request, 'ai_insights_feed.html', {'insights': _get_insights()})

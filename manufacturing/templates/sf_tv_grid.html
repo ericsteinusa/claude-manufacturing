@@ -1,0 +1,28 @@
+{% if live %}
+<div class="tv-grid">
+    {% for wc in live %}
+    <div class="tv-card">
+        <h2>{{ wc.workcenter_name }}</h2>
+        <div class="tv-oee {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}">
+            {{ wc.oee_pct }}%</div>
+        <div class="tv-bar-track">
+            <div class="tv-bar-fill {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}"
+                 style="width:{{ wc.oee_pct }}%;"></div>
+        </div>
+        <div class="tv-metrics">
+            <span>A {{ wc.availability_pct }}%</span>
+            <span>P {{ wc.performance_pct }}%</span>
+            <span>Q {{ wc.quality_pct }}%</span>
+        </div>
+        <div class="tv-output">
+            {{ wc.qty_produced|floatformat:0 }} produced
+            {% if wc.has_plan %} / {{ wc.planned_qty|floatformat:0 }} planned{% endif %}
+            &middot; {{ wc.qty_scrapped|floatformat:0 }} scrapped
+        </div>
+        {% if not wc.has_plan %}<div class="tv-noplan">No plan set for this shift</div>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="tv-empty">No active workcenters found.</div>
+{% endif %}

@@ -1,0 +1,26 @@
+    <div class="kpi-row">
+        <a href="/wo/?status=open" class="kpi">
+            <div class="lbl">Open WOs</div>
+            <div class="val">{{ work_orders.open }}</div>
+        </a>
+        <a href="/wo/?status=in_progress" class="kpi">
+            <div class="lbl">In Progress</div>
+            <div class="val">{{ work_orders.in_progress }}</div>
+        </a>
+        <div class="kpi{% if work_orders.overdue %} red{% endif %}">
+            <div class="lbl">Overdue</div>
+            <div class="val">{{ work_orders.overdue }}</div>
+        </div>
+        <div class="kpi">
+            <div class="lbl">Total Products</div>
+            <div class="val">{{ inventory.total_products }}</div>
+        </div>
+        <div class="kpi{% if inventory.zero_stock %} red{% endif %}">
+            <div class="lbl">Zero Stock</div>
+            <div class="val">{{ inventory.zero_stock }}</div>
+        </div>
+        <div class="kpi{% if inventory.low_stock %} yellow{% endif %}">
+            <div class="lbl">Low Stock</div>
+            <div class="val">{{ inventory.low_stock }}</div>
+        </div>
+    </div>

@@ -6675,6 +6675,14 @@ def prod_dashboard(request):
 
 
 @dept_required('production')
+def prod_dashboard_kpis_fragment(request):
+    """htmx polling target for prod_dashboard's KPI row."""
+    with get_db_connection() as conn:
+        data = get_production_dashboard(conn)
+    return render(request, 'prod_dashboard_kpis.html', data)
+
+
+@dept_required('production')
 def prod_schedule(request):
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
