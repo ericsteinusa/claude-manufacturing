@@ -452,6 +452,7 @@
         {% if user_role %}<strong>{{ user_role }}</strong> · {% endif %}{{ email }}
     </span>
     <a href="{% url 'change_password' %}" class="btn btn-sm">Password</a>
+    <a href="{% url 'mfa_settings' %}" class="btn btn-sm">2FA</a>
     <a href="{% url 'logout' %}" class="btn btn-sm">Logout</a>
     {% endblock %}
 </header>

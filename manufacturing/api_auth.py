@@ -57,6 +57,13 @@ def ensure_api_token_table(conn) -> None:
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     """)
+    # audit_core.AUDITED_TABLES requires every audited table to have an
+    # integer `id` column (its generic trigger reads NEW.id/OLD.id) —
+    # api_totp_secret's natural key is people_id, so add a plain id
+    # column purely to satisfy that invariant. ADD COLUMN IF NOT EXISTS
+    # for tables that already exist from before this was caught.
+    conn.execute(
+        "ALTER TABLE api_totp_secret ADD COLUMN IF NOT EXISTS id SERIAL")
     conn.commit()
 
 

@@ -1,0 +1,43 @@
+{% extends "base_card.html" %}
+
+{% block page_title %}Two-Factor Authentication{% endblock %}
+
+{% block card_content %}
+<h1>Two-Factor Authentication</h1>
+
+{% if success %}
+<div class="success-msg">{{ success }}</div>
+{% endif %}
+{% if error %}
+<div class="error-msg">{{ error }}</div>
+{% endif %}
+
+{% if enrolled %}
+<p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">
+    Two-factor authentication is <strong>enabled</strong> on your account.
+    You'll be asked for a code from your authenticator app each time you sign in.
+</p>
+<form method="post" action="{% url 'mfa_disable' %}">
+    {% csrf_token %}
+    <div class="form-row">
+        <label for="current_password">Current Password</label>
+        <input type="password" id="current_password" name="current_password"
+               placeholder="Confirm your password to disable" required>
+    </div>
+    <button type="submit" class="btn-submit" style="background:#a33;">Disable Two-Factor Authentication</button>
+</form>
+{% else %}
+<p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">
+    Two-factor authentication is <strong>not enabled</strong> on your account.
+    Turning it on requires a code from an authenticator app (Google Authenticator,
+    Authy, 1Password, etc.) every time you sign in.
+</p>
+<a href="{% url 'mfa_enroll' %}" class="btn-submit" style="display:block;text-align:center;text-decoration:none;">
+    Set Up Two-Factor Authentication
+</a>
+{% endif %}
+
+<div class="links">
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+</div>
+{% endblock %}

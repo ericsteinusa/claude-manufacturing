@@ -1,6 +1,8 @@
 """User accounts: authentication, registration, and role persistence."""
 
+import datetime as _dt
 import os
+import re
 import bcrypt
 import psycopg2
 
@@ -9,6 +11,12 @@ from .log_utils import get_logger
 from .menus import DEPT_MENU_KEY
 
 log = get_logger(__name__)
+
+# Password rotation window. A NULL password_changed_at (every account that
+# existed before this policy shipped) is treated as not-yet-expired rather
+# than immediately locking out every seeded/pre-existing user — rotation is
+# only enforced going forward from whenever a password is actually set.
+PASSWORD_MAX_AGE_DAYS = 90
 
 # Environment variable used to propagate the logged-in user's email to every
 # subprocess spawned from the session (set once by login_app.SessionWindow).
@@ -135,6 +143,52 @@ def _verify_login(email: str, password: str) -> bool:
     return ok
 
 
+def validate_password_strength(password: str) -> str | None:
+    """Return a human-readable error if *password* fails policy, else None.
+
+    Policy: at least 8 characters, one uppercase, one lowercase, one digit.
+    Pure function — no DB access — so callers can check before touching
+    the database.
+    """
+    if len(password) < 8:
+        return 'Password must be at least 8 characters.'
+    if not re.search(r'[A-Z]', password):
+        return 'Password must contain at least one uppercase letter.'
+    if not re.search(r'[a-z]', password):
+        return 'Password must contain at least one lowercase letter.'
+    if not re.search(r'[0-9]', password):
+        return 'Password must contain at least one digit.'
+    return None
+
+
+def ensure_password_policy_columns(conn) -> None:
+    """Lazily add the column password rotation tracking needs."""
+    conn.execute(
+        "ALTER TABLE passwd ADD COLUMN IF NOT EXISTS "
+        "password_changed_at TIMESTAMPTZ")
+
+
+def password_needs_rotation(conn, email: str,
+                            max_age_days: int = PASSWORD_MAX_AGE_DAYS) -> bool:
+    """True if this account's password is older than max_age_days.
+
+    An account with no recorded change date (every account that predates
+    this policy) is treated as not expired.
+    """
+    ensure_password_policy_columns(conn)
+    row = conn.execute(
+        "SELECT pw.password_changed_at FROM passwd pw "
+        "JOIN people p ON pw.people_id = p.id "
+        "WHERE p.email = %s ORDER BY pw.id DESC LIMIT 1",
+        (email,),
+    ).fetchone()
+    if not row or not row['password_changed_at']:
+        return False
+    changed_at = row['password_changed_at']
+    age_days = (_dt.datetime.now(tz=_dt.timezone.utc) - changed_at).days
+    return age_days >= max_age_days
+
+
 def _email_exists(email: str) -> bool:
     conn = _get_db()
     found = conn.execute(
@@ -162,8 +216,10 @@ def _create_user(email, password, first_name='', last_name='',
         )
         people_id = cursor.fetchone()['id']
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+        ensure_password_policy_columns(conn)
         conn.execute(
-            "INSERT INTO passwd (people_id, password) VALUES (%s, %s)",
+            "INSERT INTO passwd (people_id, password, password_changed_at) "
+            "VALUES (%s, %s, NOW())",
             (people_id, hashed),
         )
         conn.commit()
@@ -191,8 +247,11 @@ def _reset_password(email: str, new_password: str) -> bool:
         log.warning("Password reset failed for %s: no such account", email)
         return False
     hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-    conn.execute("UPDATE passwd SET password = %s WHERE id = %s",
-                 (hashed, row["pw_id"]))
+    ensure_password_policy_columns(conn)
+    conn.execute(
+        "UPDATE passwd SET password = %s, password_changed_at = NOW() "
+        "WHERE id = %s",
+        (hashed, row["pw_id"]))
     conn.commit()
     conn.close()
     log.info("Password reset for %s", email)
