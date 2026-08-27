@@ -2991,3 +2991,87 @@ packs, mobile offline support, localization, CI-gated load testing all remain ex
 moved from 6/17 to 10/17 departments, and two genuinely new modules (credit risk management,
 payroll processing) plus three smaller operational features shipped without ever appearing in this
 document until now.
+
+---
+
+## Section 8: 2026-08-27 Fresh Pass — Closing Section 6's Remaining Platform Gaps
+
+**Why this pass exists:** eleven PRs (#114, #117–#124) landed after Section 7 closed, all aimed
+squarely at Section 6's named platform gaps rather than at Section 1 feature rows. Re-verified
+each claim below directly against the code on `main` at commit `720ccb3` rather than trusting PR
+titles alone.
+
+| §6 gap | Prior status | Now | Verified against |
+|---|---|---|---|
+| §6.1 Modern frontend — live-refresh without a full page reload | ❌ none | ✅ Partial (PR #114) — 4 of the highest-traffic dashboards (`sf_tv.html`, `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`) use htmx for partial-page live refresh, replacing `sf_tv.html`'s old 30-second full reload | `grep -rl htmx manufacturing/templates/` — exactly these 4 files |
+| §6.2 SSO — SAML 2.0 / OIDC | ❌ none (then OIDC-only after 07-17) | ✅ Full — OIDC now supports multiple concurrent providers (PR #118, `sso_core.get_providers()` returns a list, not one hardcoded provider), first-time SSO logins can self-provision a new `people` row instead of requiring one to pre-exist (PR #119), and SAML 2.0 (PR #120, `saml_core.py`, `python3-saml`) now sits alongside OIDC as a second federation protocol | `manufacturing/sso_core.py`, `manufacturing/saml_core.py`, `manufacturing/views/_saml.py` all present and routed |
+| §6.2 Password policy / MFA for web login | ❌ TOTP existed only for the mobile API | ✅ Full (PR #117) — `accounts.py`'s `ensure_password_policy_columns` plus TOTP verification wired into the standard `home` login view (`mfa_pending_email`/`mfa_pending_people_id` session flow), not just `api_auth.py` | `manufacturing/views/__init__.py` lines ~1073–1091 |
+| §6.3 Row-level permission control | ❌ none — ESS's ownership check was a one-off pattern | ✅ Full (PR #122/#124, merged via #123's squash) — `rbac_core.py`'s `is_privileged`/`owned_scope`/`owns_row` (+ `_strict` variants for ESS) are the reusable helper the original assessment called for | `manufacturing/rbac_core.py`, `tests/test_rbac_core.py` (23 tests) |
+| §6.3 Field-level permission control | ❌ none | ✅ Full (PR #124) — `rbac_core.can_view_compensation()` masks the one concrete example named in the original gap text (mechanic hourly_rate, hidden from non-Payroll/HR/full-access viewers), enforced server-side via the existing `COALESCE(%s, hourly_rate)` update pattern, not just template hiding | `manufacturing/views/_maintenance.py`, live-verified against the running dev server this session |
+| §6.5 AS9100 / IATF 16949 vertical compliance content | ❌ none — generic ISO/FDA checklist only | ✅ Full (PR #123) — `regulatory_compliance_core.py` now seeds real AS9100D and IATF 16949 checklist templates alongside the original two generic starters | `grep -c "AS9100\|IATF" manufacturing/regulatory_compliance_core.py` → 11 hits |
+| §6.13 CI-gated load testing | ❌ Locust script existed but ran manually only | ✅ Partial (PR #121) — wired into `.github/workflows/loadtest.yml` as a `workflow_dispatch` manual trigger (matches the original "cheapest real improvement" recommendation exactly: repeatable one-click run, not a full per-PR gate) | `.github/workflows/loadtest.yml` |
+
+**What's still open, unchanged from Section 6/7:**
+- **§6.1 Modern frontend** — only 4 dashboards got htmx; the other ~430 templates are still
+  full-page Django renders. No SPA rewrite, still correctly out of scope for this codebase's size.
+- **§6.4 Data governance / GDPR tooling** — genuinely zero: still no `delete_person`/anonymize
+  path, no per-subject data export, no PII tagging, no retention-policy engine anywhere in the
+  codebase (confirmed by grep this session — no `data_governance_core.py` exists).
+- **§6.5 GxP / 21 CFR Part 11 e-signatures** — the vertical *checklist content* gap closed (AS9100/
+  IATF), but real e-signature (password re-entry + captured "meaning of signature" on
+  `approval_step` decisions) was not part of PR #123's scope and remains unbuilt.
+- **§6.6 OpenAPI/Swagger docs, per-endpoint API rate limiting** — both named as deliberately out of
+  scope when the outbound webhook system shipped (07-17); still unbuilt.
+- **§6.9 Mobile app coverage** — unchanged since Section 7 (10/17 departments).
+- **§6.10 Mobile offline support** — unchanged, zero (`grep -rl "NetInfo\|offline" mobile/` — no
+  hits).
+- **§6.11 Localization / i18n** — unchanged, zero (`{% trans %}`/`{% blocktrans %}` — no hits across
+  ~430 templates).
+
+**Net effect on standing:** every item on Section 6's original five-item "prioritized
+buildable-in-software" list was already closed by 07-17 (see that section's own dated log); this
+pass closes three items Section 6 explicitly named as real gaps but deliberately left off that
+top-5 list for being lower-ROI at the time — row/field-level RBAC (§6.3, both halves) and vertical
+compliance pack content (§6.5, checklist rows specifically, not e-signatures). Modern frontend and
+CI-gated load testing also moved from "none" to "partial," matching honestly-scoped, low-effort
+slices of each rather than the full item. The five gaps left genuinely untouched — GDPR/data
+governance, GxP e-signatures, API docs/rate limiting, mobile offline, and localization — are the
+same ones Section 6 already flagged as lower-ROI for this app's actual buyer profile (SMB/
+mid-market, single-tenant, single-language) rather than newly discovered.
+
+---
+
+**2026-08-27:** Shipped **§6.4 Data Governance / GDPR-Style Tooling**, the highest-remaining-value
+item from this pass's own "still open" list. `data_governance_core.py` adds three pieces exactly
+as scoped in §6.4's own "what it would take" note: (1) `anonymize_person()` — right-to-erasure as
+anonymization, not row deletion: overwrites `people`'s PII columns (name/address/email/phone/
+emergency contact) with placeholders and revokes login (deletes the `passwd` row, revokes all API
+tokens, disables TOTP), while deliberately leaving every other people_id-referencing table (time
+clock, payroll, reviews, notifications, etc.) untouched — deleting that history would break
+financial/operational recordkeeping this app needs to keep, the same tradeoff CLAUDE.md's own note
+on this gap already called for; (2) `export_person_data()` — a genuine "give me everything you have
+on me" subject-access export joining `people` against 20 known people_id-referencing tables, download-
+able as JSON from a new `/data-governance/` admin page; (3) a `retention_policy` engine
+(months-after-termination cutoff) plus `python manage.py run_data_retention`, a new scheduled
+command modeled directly on `send_daily_digest`'s own pattern, that auto-anonymizes terminated
+employees once a policy's cutoff passes. `people` was already one of `audit_core.py`'s
+`AUDITED_TABLES`, so every anonymization's own UPDATE is captured with full old/new values by the
+existing DB-trigger audit trail for free; a lightweight `erasure_log` table sits on top of that for
+fast per-subject "when/why/by whom" lookups without reconstructing it from `audit_log`'s JSONB each
+time. New admin UI (`/data-governance/` search+erase+export+policy list, `/data-governance/
+retention-policies/<id>/` edit) gated to full-access roles only, mirroring the Approval Rules and
+Webhooks admin pages' exact structure and gating. 14 new tests in `test_data_governance_core.py`,
+all against the mocked-connection convention this app's other `*_core.py` tests already use.
+Verified end-to-end against the real dev DB rather than just unit-tested: created two throwaway
+test people, anonymized one manually through the live web UI (confirmed `people` row scrubbed,
+`passwd` row deleted, and a matching `erasure_log` entry with the acting admin's email), set the
+other's termination date 400 days in the past, created a real 6-month retention policy through the
+UI (dashboard correctly showed "1 candidate"), ran `run_data_retention` for real and confirmed it
+anonymized exactly that person and logged the erasure as `performed_by='system:retention_policy'`
+(candidate count dropped to 0 afterward), confirmed a non-admin session is redirected away from
+`/data-governance/` entirely, and confirmed the JSON export endpoint returns the person's real data
+plus their referencing `position` row. All test data deleted afterward. Full suite: 3396 passed
+(3382 + 14 new), `ruff check .` clean, `manage.py check` clean. **This leaves four gaps genuinely
+open from this section's list: GxP e-signatures, API docs/rate limiting, mobile offline support,
+and localization** — none started, all still correctly scored as lower-ROI for this app's buyer
+profile.

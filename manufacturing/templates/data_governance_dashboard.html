@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block page_title %}Data Governance{% endblock %}
+
+{% block toolbar_left %}
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.dg-wrap { width:100%; max-width:900px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.card h3 { margin:0 0 12px; font-size:15px; color:#333; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input, .form-row select { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.search-bar { display:flex; gap:8px; margin-bottom:12px; }
+.search-bar input { flex:1; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.inline-form { display:inline; }
+.danger-zone { border-color: #fecaca; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="dg-wrap">
+    <div class="menu-title">Data Governance</div>
+    <p style="color:var(--text-muted);margin-bottom:14px;font-size:13px;">
+        Right-to-erasure (anonymization), subject-access export, and automatic retention
+        policies for employee PII. Erasure overwrites a person's name/address/contact/email
+        with placeholders and revokes their login — it does not delete their time clock,
+        payroll, or review history, which this app must keep for financial/operational
+        recordkeeping.
+    </p>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Find a Person</h3>
+        <form method="get" class="search-bar">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search by name or email…">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        {% if search %}
+            {% if people %}
+            <div class="erp-table-wrap">
+                <table class="erp-table">
+                    <thead>
+                        <tr><th>Name</th><th>Email</th><th>Department</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        {% for p in people %}
+                        <tr>
+                            <td>{{ p.first_name }} {{ p.last_name }}</td>
+                            <td>{{ p.email }}</td>
+                            <td>{{ p.dept_name|default:"—" }}</td>
+                            <td style="display:flex;gap:6px;">
+                                <a href="/data-governance/person/{{ p.id }}/export/" class="btn btn-sm">Export Data</a>
+                                <form method="post" class="inline-form" onsubmit="return confirm('Anonymize {{ p.first_name }} {{ p.last_name }}? This overwrites their name/address/email/phone with placeholders and revokes login access. This cannot be undone.');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="erase">
+                                    <input type="hidden" name="person_id" value="{{ p.id }}">
+                                    <input type="hidden" name="reason" value="Manual erasure request">
+                                    <button type="submit" class="btn btn-sm btn-danger">Erase</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">No matches for "{{ search }}".</div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Retention Policies</h3>
+        <p class="form-hint" style="margin-bottom:10px;">
+            Automatically anonymizes terminated employees once their termination date is older
+            than the policy's cutoff. Run via <code>python manage.py run_data_retention</code>.
+        </p>
+        {% if policies %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Name</th><th class="num">Months After Termination</th><th class="num">Candidates Now</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for pol in policies %}
+                    <tr>
+                        <td>{{ pol.name }}</td>
+                        <td class="num">{{ pol.months_after_termination }}</td>
+                        <td class="num">{{ pol.candidate_count }}</td>
+                        <td>
+                            {% if pol.is_active %}<span class="pill pill-ok">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}
+                        </td>
+                        <td><a href="/data-governance/retention-policies/{{ pol.id }}/" class="btn btn-sm">Edit</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No retention policies configured.</div>
+        {% endif %}
+
+        <form method="post" style="margin-top:16px;display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_policy">
+            <div class="form-row" style="margin-bottom:0;">
+                <label>Policy Name *</label>
+                <input type="text" name="name" required placeholder="e.g. Terminated employees, 7 years">
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+                <label>Months After Termination *</label>
+                <input type="number" name="months_after_termination" min="1" required placeholder="84">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Policy</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Erasure Log</h3>
+        {% if erasure_log %}
+        <div class="erp-table-wrap">
+            <table class="erp-table">
+                <thead>
+                    <tr><th>Person</th><th>Reason</th><th>Performed By</th><th>When</th></tr>
+                </thead>
+                <tbody>
+                    {% for e in erasure_log %}
+                    <tr>
+                        <td>{{ e.person_name }} (id {{ e.people_id }})</td>
+                        <td>{{ e.reason|default:"—" }}</td>
+                        <td>{{ e.performed_by }}</td>
+                        <td>{{ e.performed_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No erasures recorded yet.</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

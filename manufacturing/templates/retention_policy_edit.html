@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block page_title %}Edit Retention Policy{% endblock %}
+
+{% block toolbar_left %}
+<a href="/data-governance/" class="btn">Data Governance</a>
+<a href="/dashboard/" class="btn">Home</a>
+{% endblock %}
+
+{% block extra_styles %}
+.rp-wrap { width:100%; max-width:520px; }
+.card { background:white; border:1.5px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:16px; }
+.form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+.form-row label { font-size:12px; color:#555; font-weight:bold; }
+.form-row input { padding:6px 9px; border:1.5px solid var(--border); border-radius:6px; font-size:13px; }
+.form-hint { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.danger-zone { border-color: #fecaca; }
+.danger-zone h3 { color: var(--danger-fg); font-size:14px; margin-bottom:10px; }
+.btn-row { display:flex; gap:8px; margin-top:4px; }
+{% endblock %}
+
+{% block body %}
+<div class="content">
+<div class="rp-wrap">
+    <div class="menu-title">
+        Edit Retention Policy
+        {% if policy.is_active %}<span class="pill pill-ok">Active</span>{% else %}<span class="pill pill-cancelled">Inactive</span>{% endif %}
+    </div>
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <div class="form-row">
+                <label>Policy Name *</label>
+                <input type="text" name="name" value="{{ policy.name }}" required>
+            </div>
+            <div class="form-row">
+                <label>Months After Termination *</label>
+                <input type="number" name="months_after_termination" value="{{ policy.months_after_termination }}" min="1" required>
+                <div class="form-hint">Terminated employees are anonymized once this many months have passed since their termination date.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <div class="card danger-zone">
+        <h3>Danger Zone</h3>
+        <div class="btn-row">
+            <form method="post" onsubmit="return confirm('{% if policy.is_active %}Deactivate{% else %}Activate{% endif %} this policy?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_active">
+                <button type="submit" class="btn">
+                    {% if policy.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+            </form>
+            <form method="post" onsubmit="return confirm('Delete this policy permanently?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
