@@ -69,3 +69,8 @@ manufacture-server.pid
 manufacture-server.log
 manufacture-server.log.err
 manufacture-autopull.log
+
+# scripts/loadtest/run.sh output — regenerated on every run, uploaded as a
+# CI artifact by .github/workflows/loadtest.yml rather than committed.
+scripts/loadtest/report.html
+scripts/loadtest/results_*.csv

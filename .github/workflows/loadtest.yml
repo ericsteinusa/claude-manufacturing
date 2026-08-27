@@ -1,0 +1,91 @@
+name: loadtest
+
+# Manually-triggered only — not a gate on every PR (too slow/costly for
+# that per COMPETITIVE_GAP_ANALYSIS.md §6.13's own assessment). This gives
+# a repeatable, one-click way to run scripts/loadtest/locustfile.py against
+# a throwaway Postgres service container without depending on a
+# developer's local machine, checking specifically whether
+# manufacturing/db_pg.py's get_db_connection() (a fresh Postgres connection
+# per call) bottlenecks under real concurrent HTTP traffic.
+on:
+  workflow_dispatch:
+    inputs:
+      users:
+        description: 'Concurrent simulated users'
+        default: '10'
+      spawn_rate:
+        description: 'Users spawned per second'
+        default: '2'
+      duration:
+        description: 'Test duration (e.g. 30s, 2m)'
+        default: '1m'
+
+jobs:
+  loadtest:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: company_db
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_HOST: localhost
+      DB_NAME: company_db
+      DB_USER: postgres
+      DB_PASSWORD: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+      - name: Migrate Django's built-in tables
+        run: python manage.py migrate --noinput
+      - name: Seed sample data (creates the account locustfile.py logs in as)
+        run: python -m manufacturing.seeds.seed_sample_data
+      - name: Start the dev server
+        run: |
+          nohup python manage.py runserver 0.0.0.0:8000 > server.log 2>&1 &
+          echo $! > server.pid
+      - name: Wait for the server to be ready
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8000/ -o /dev/null && exit 0
+            sleep 1
+          done
+          echo "Server never became reachable:" >&2
+          cat server.log >&2
+          exit 1
+      - name: Run load test
+        run: |
+          ./scripts/loadtest/run.sh http://localhost:8000 \
+            "${{ inputs.users }}" "${{ inputs.spawn_rate }}" "${{ inputs.duration }}"
+      - name: Stop the dev server
+        if: always()
+        run: kill "$(cat server.pid)" 2>/dev/null || true
+      - name: Upload load test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loadtest-results
+          path: |
+            scripts/loadtest/results_stats.csv
+            scripts/loadtest/results_stats_history.csv
+            scripts/loadtest/results_failures.csv
+            scripts/loadtest/results_exceptions.csv
+            scripts/loadtest/report.html
+            server.log
+          if-no-files-found: warn
