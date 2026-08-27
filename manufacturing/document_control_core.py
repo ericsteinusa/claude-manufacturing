@@ -276,10 +276,12 @@ def submit_for_review(conn, doc_id, requested_by=''):
     return 'in_review'
 
 
-def decide_document(conn, doc_id, step_id, decision, decided_by, notes=''):
+def decide_document(conn, doc_id, step_id, decision, decided_by, notes='',
+                    signature_meaning=''):
     """Record an approve/reject decision on a pending review step.
     Returns the resulting document status."""
-    overall = decide_step(conn, step_id, decision, decided_by, notes)
+    overall = decide_step(conn, step_id, decision, decided_by, notes,
+                          signature_meaning=signature_meaning)
     if overall == 'approved':
         approve_document(conn, doc_id)
         return 'approved'

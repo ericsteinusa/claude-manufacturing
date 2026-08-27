@@ -406,6 +406,36 @@ def test_decide_step_rejected_returns_rejected_immediately():
     assert len(conn.calls) == 3
 
 
+def test_decide_step_stores_signature_meaning():
+    step = _row(id=1, entity_type='cycle_count', entity_id=5,
+                seq=10, status='pending')
+    conn = _FakeConn(
+        [step],
+        [_row(cnt=0)],
+        [],
+        [_row(cnt=0)],
+    )
+    decide_step(conn, 1, 'approved', 'alice',
+                signature_meaning='I approve this cycle count as accurate')
+    update_sql, update_params = conn.calls[2]
+    assert 'signature_meaning' in update_sql
+    assert 'I approve this cycle count as accurate' in update_params
+
+
+def test_decide_step_signature_meaning_defaults_to_empty():
+    step = _row(id=1, entity_type='cycle_count', entity_id=5,
+                seq=10, status='pending')
+    conn = _FakeConn(
+        [step],
+        [_row(cnt=0)],
+        [],
+        [_row(cnt=0)],
+    )
+    decide_step(conn, 1, 'approved', 'alice')
+    _, update_params = conn.calls[2]
+    assert '' in update_params
+
+
 # ---------------------------------------------------------------------------
 # get_entity_approval_status
 # ---------------------------------------------------------------------------
