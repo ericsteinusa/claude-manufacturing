@@ -3,10 +3,15 @@
 Every view here is scoped to the logged-in employee's own records —
 gated by login_required (any authenticated user, no dept/role check, since
 employees belong to every department) plus an explicit ownership check on
-every detail view (compare the record's people_id to the caller's own).
-Time-off request/history and clock in/out were already self-scoped before
-this module (time_off_list/new/detail, time_clock_status/hours) — ESS
-just links to those directly rather than duplicating them.
+every detail view. That ownership check now goes through rbac_core's
+_strict helpers (owns_row_strict/owned_scope_strict) instead of a
+hand-copied comparison per view — ESS is the one place row-level scoping
+must never bypass for a privileged role, since "my own record" is what
+Employee Self-Service means, not a management view (see rbac_core.py's
+module docstring). Time-off request/history and clock in/out were
+already self-scoped before this module (time_off_list/new/detail,
+time_clock_status/hours) — ESS just links to those directly rather than
+duplicating them.
 """
 
 from datetime import date
@@ -16,6 +21,7 @@ from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import login_required
 from ..log_utils import get_logger
+from ..rbac_core import owns_row_strict
 
 from ..personnel_core import (
     get_person_by_email, get_person,
@@ -40,6 +46,12 @@ def _ess_ctx(request, **extra):
 
 
 def _my_people_id(request, conn):
+    """The caller's own people_id — cached in session at login
+    (user_people_id); falls back to a DB lookup by email for sessions
+    established before that existed."""
+    cached = request.session.get('user_people_id')
+    if cached is not None:
+        return cached
     person = get_person_by_email(conn, request.session.get('user_email', ''))
     return person['id'] if person else None
 
@@ -91,9 +103,8 @@ def ess_pay_stubs(request):
 def ess_pay_stub_detail(request, entry_id):
     conn = get_db_connection()
     try:
-        pid = _my_people_id(request, conn)
         stub = get_pay_stub(conn, entry_id)
-        if not stub or not pid or stub.get('people_id') != pid:
+        if not stub or not owns_row_strict(request, stub, 'people_id', 'user_people_id'):
             return redirect('ess_pay_stubs')
         deds = get_stub_deductions(conn, entry_id)
     finally:
@@ -172,10 +183,9 @@ def ess_reviews(request):
 def ess_review_detail(request, review_id):
     conn = get_db_connection()
     try:
-        pid = _my_people_id(request, conn)
         init_review_table(conn)
         review = get_review(conn, review_id)
-        if not review or not pid or review.get('people_id') != pid:
+        if not review or not owns_row_strict(request, review, 'people_id', 'user_people_id'):
             return redirect('ess_reviews')
     finally:
         conn.close()
@@ -201,10 +211,9 @@ def ess_trainings(request):
 def ess_training_detail(request, training_id):
     conn = get_db_connection()
     try:
-        pid = _my_people_id(request, conn)
         init_training_table(conn)
         training = get_training(conn, training_id)
-        if not training or not pid or training.get('people_id') != pid:
+        if not training or not owns_row_strict(request, training, 'people_id', 'user_people_id'):
             return redirect('ess_trainings')
     finally:
         conn.close()

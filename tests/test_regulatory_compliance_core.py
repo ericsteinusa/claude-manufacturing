@@ -5,7 +5,7 @@ import pytest
 from manufacturing.regulatory_compliance_core import (
     create_template, add_template_item, create_checklist,
     update_checklist_item, get_checklist_progress, seed_default_templates,
-    ITEM_STATUSES,
+    ITEM_STATUSES, _SEED_TEMPLATES,
 )
 
 
@@ -153,10 +153,39 @@ def test_get_checklist_progress_empty_checklist_is_zero_percent():
 # ── seed_default_templates ───────────────────────────────────────────────
 
 def test_seed_default_templates_skips_existing():
-    # Both templates already exist -> no creation.
-    conn = _MultiConn([
-        [{'id': 1}],  # ISO exists
-        [{'id': 2}],  # FDA exists
-    ])
+    # Every seed template already exists -> no creation. One "exists"
+    # response per template, matching _SEED_TEMPLATES' current length so
+    # this doesn't need updating every time a template is added.
+    conn = _MultiConn([[{'id': i}] for i in range(1, len(_SEED_TEMPLATES) + 1)])
     created = seed_default_templates(conn)
     assert created == 0
+
+
+def test_seed_default_templates_creates_all_when_none_exist():
+    # One "doesn't exist" response per template, then a create_template
+    # response and one add_template_item response per item — built from
+    # _SEED_TEMPLATES itself so this stays correct as templates are added.
+    responses = []
+    next_id = 1
+    for tpl in _SEED_TEMPLATES:
+        responses.append([])
+        responses.append([{'id': next_id}])
+        next_id += 1
+        for _ in tpl['items']:
+            responses.append([{'id': next_id}])
+            next_id += 1
+    conn = _MultiConn(responses)
+    created = seed_default_templates(conn)
+    assert created == len(_SEED_TEMPLATES)
+
+
+def test_seed_templates_include_as9100d_and_iatf_16949():
+    names = [tpl['name'] for tpl in _SEED_TEMPLATES]
+    assert any('AS9100D' in n for n in names)
+    assert any('IATF 16949' in n for n in names)
+
+
+def test_vertical_pack_templates_have_multiple_items():
+    for tpl in _SEED_TEMPLATES:
+        if 'AS9100D' in tpl['name'] or 'IATF 16949' in tpl['name']:
+            assert len(tpl['items']) >= 5

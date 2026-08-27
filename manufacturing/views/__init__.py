@@ -176,6 +176,7 @@ from ..accounts import (
     password_needs_rotation,
     PASSWORD_MAX_AGE_DAYS,
 )
+from ..rbac_core import is_privileged, owns_row
 from ..api_auth import (
     ensure_api_token_table,
     generate_totp_secret,
@@ -1044,6 +1045,7 @@ def _complete_login(request, email):
     request.session['user_dept_name'] = profile.get('dept_name', '')
     request.session['user_full_access'] = _is_full_access(profile)
     request.session['user_is_manager'] = profile.get('is_manager', False)
+    request.session['user_people_id'] = profile.get('people_id')
 
     with get_db_connection() as conn:
         rotation_needed = password_needs_rotation(conn, email)
@@ -4549,7 +4551,15 @@ def cs_ticket_list(request):
     search = request.GET.get('search', '').strip()
     status_filter = request.GET.get('status', '').strip()
     my_only = request.GET.get('my', '') == '1'
-    created_by = request.session.get('user_email', '') if my_only else None
+    # Row-level ownership scoping (rbac_core): a regular rep only ever
+    # sees their own tickets, full stop — "my=1" is a no-op for them, not
+    # something they can turn off. A manager/full-access role sees every
+    # ticket by default and can still opt into "my=1" as a convenience.
+    if is_privileged(request):
+        created_by = request.session.get('user_email', '') if my_only else None
+    else:
+        created_by = request.session.get('user_email', '')
+        my_only = True
     conn = get_db_connection()
     try:
         tickets = list_tickets(
@@ -4637,6 +4647,8 @@ def cs_ticket_detail(request, ticket_id):
     try:
         ticket = get_ticket(conn, ticket_id)
         if not ticket:
+            return redirect('cs_ticket_list')
+        if not owns_row(request, ticket, 'created_by'):
             return redirect('cs_ticket_list')
         customers = load_customers_for_cs(conn) if can_edit else []
 
@@ -6409,10 +6421,17 @@ def sales_leads_list(request):
     status_f = request.GET.get('status', '').strip()
     search = request.GET.get('search', '').strip()
     error = success = None
+    # Row-level ownership scoping (rbac_core): a regular rep only sees
+    # leads they created; a manager/full-access role sees the whole
+    # department's leads, matching dept_required's existing privilege
+    # model rather than introducing a second one.
+    own_filter = (None if is_privileged(request)
+                 else request.session.get('user_email', ''))
     conn = get_db_connection()
     try:
         init_sales_lead_table(conn)
-        leads = list_sales_leads(conn, status=status_f or None, search=search or None)
+        leads = list_sales_leads(conn, status=status_f or None, search=search or None,
+                                 created_by=own_filter)
         if request.method == 'POST' and can_edit:
             try:
                 create_sales_lead(
@@ -6432,7 +6451,8 @@ def sales_leads_list(request):
             except Exception as e:
                 conn.rollback()
                 error = str(e)
-                leads = list_sales_leads(conn, status=status_f or None, search=search or None)
+                leads = list_sales_leads(conn, status=status_f or None, search=search or None,
+                                         created_by=own_filter)
     finally:
         conn.close()
     if 'export' in request.GET:
@@ -6458,6 +6478,8 @@ def sales_leads_detail(request, lead_id):
         init_sales_lead_table(conn)
         lead = get_sales_lead(conn, lead_id)
         if not lead:
+            return redirect('sales_leads_list')
+        if not owns_row(request, lead, 'created_by'):
             return redirect('sales_leads_list')
         if request.method == 'POST' and can_edit:
             try:
