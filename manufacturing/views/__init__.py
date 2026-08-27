@@ -327,6 +327,7 @@ from ._health import healthz  # noqa: F401
 from ._notifications import *  # noqa: F401,F403
 from ._webhooks import *  # noqa: F401,F403
 from ._sso import sso_login, sso_callback  # noqa: F401
+from ._saml import saml_login, saml_acs, saml_metadata  # noqa: F401
 
 log = get_logger(__name__)
 
@@ -1062,7 +1063,9 @@ def home(request):
     # Schema and canonical roles are seeded once at startup by
     # AppConfig.ready() (-> _init_schema), so no per-request seeding here.
     from ..sso_core import get_providers as _sso_get_providers
+    from ..saml_core import get_providers as _saml_get_providers
     sso_providers = _sso_get_providers()
+    saml_providers = _saml_get_providers()
 
     if request.GET.get('cancel'):
         request.session.pop('mfa_pending_email', None)
@@ -1094,6 +1097,7 @@ def home(request):
                 'error': 'Please enter both email and password.',
                 'email_value': email,
                 'sso_providers': sso_providers,
+                'saml_providers': saml_providers,
             })
 
         if _verify_login(email, password):
@@ -1113,6 +1117,7 @@ def home(request):
             'error': 'Invalid email or password.',
             'email_value': email,
             'sso_providers': sso_providers,
+            'saml_providers': saml_providers,
         })
 
     if pending_email:
@@ -1121,7 +1126,7 @@ def home(request):
     if request.session.get('user_email'):
         return redirect('dashboard')
 
-    return render(request, 'home.html', {'sso_providers': sso_providers})
+    return render(request, 'home.html', {'sso_providers': sso_providers, 'saml_providers': saml_providers})
 
 
 def dashboard(request):

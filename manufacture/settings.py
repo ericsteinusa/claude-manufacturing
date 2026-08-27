@@ -302,22 +302,46 @@ if SENTRY_DSN:
 # (Azure AD/Entra ID, Google Workspace, Okta, or a local test IdP).
 #
 # Multiple providers can be configured at once via OIDC_PROVIDERS, a JSON
-# list of {"key", "label", "client_id", "client_secret", "discovery_url"}
-# objects — "key" is a short URL-safe slug used in /sso/login/<key>/ and
-# /sso/callback/<key>/, and must be registered as that provider's own
-# callback URL on the IdP's side. Example:
+# list of {"key", "label", "client_id", "client_secret", "discovery_url",
+# "auto_provision", "default_dept_key"} objects — "key" is a short
+# URL-safe slug used in /sso/login/<key>/ and /sso/callback/<key>/, and
+# must be registered as that provider's own callback URL on the IdP's
+# side. auto_provision (bool, default false) + default_dept_key opt a
+# provider into creating a new account on first login instead of
+# requiring one to already exist — see accounts.provision_sso_user().
+# Example:
 #   OIDC_PROVIDERS=[{"key":"azure","label":"Azure AD","client_id":"...",
 #     "client_secret":"...","discovery_url":"https://login.microsoftonline
-#     .com/<tenant>/v2.0/.well-known/openid-configuration"}, {"key":"google",
+#     .com/<tenant>/v2.0/.well-known/openid-configuration",
+#     "auto_provision":true,"default_dept_key":"sales"}, {"key":"google",
 #     "label":"Google Workspace", ...}]
 #
 # The single-provider OIDC_CLIENT_ID/OIDC_CLIENT_SECRET/OIDC_DISCOVERY_URL
 # vars are kept as a fallback for existing deployments that set those
 # instead — sso_core.get_providers() only falls back to them when
-# OIDC_PROVIDERS is unset, and assigns that provider the key "default".
-# See sso_core.py for the client itself.
+# OIDC_PROVIDERS is unset, and assigns that provider the key "default"
+# (never auto-provisioning). See sso_core.py for the client itself.
 # ---------------------------------------------------------------------------
 OIDC_PROVIDERS = os.environ.get('OIDC_PROVIDERS', '')
 OIDC_CLIENT_ID = os.environ.get('OIDC_CLIENT_ID', '')
 OIDC_CLIENT_SECRET = os.environ.get('OIDC_CLIENT_SECRET', '')
 OIDC_DISCOVERY_URL = os.environ.get('OIDC_DISCOVERY_URL', '')
+
+# ---------------------------------------------------------------------------
+# SSO (SAML 2.0) — same opt-in pattern as OIDC_PROVIDERS above, for
+# identity providers/IT departments that specifically require SAML rather
+# than OIDC. A JSON list of {"key", "label", "idp_entity_id",
+# "idp_sso_url", "idp_x509_cert", "auto_provision", "default_dept_key"}
+# objects — "key" is a short URL-safe slug used in /sso/saml/login/<key>/,
+# /sso/saml/acs/<key>/, and /sso/saml/metadata/<key>/ (the SP metadata XML
+# an IdP admin imports to configure the trust relationship).
+# idp_x509_cert is the IdP's public signing certificate (PEM, without the
+# ----BEGIN/END CERTIFICATE---- lines) — required, since that's what
+# proves an assertion actually came from the IdP. Example:
+#   SAML_PROVIDERS=[{"key":"okta","label":"Okta","idp_entity_id":"http://
+#     www.okta.com/<app-id>","idp_sso_url":"https://<org>.okta.com/app/
+#     <app-id>/sso/saml","idp_x509_cert":"MIIDpDCCAoyg...",
+#     "auto_provision":true,"default_dept_key":"sales"}]
+# See saml_core.py for the client itself.
+# ---------------------------------------------------------------------------
+SAML_PROVIDERS = os.environ.get('SAML_PROVIDERS', '')
