@@ -1,0 +1,30 @@
+    <div class="kpi-grid">
+        <a href="/maint/wo/" class="kpi-card {% if counts.critical_wos %}danger{% elif counts.open_wos %}warn{% endif %}">
+            <div class="num">{{ counts.open_wos }}</div>
+            <div class="lbl">Open Work Orders{% if counts.critical_wos %} &mdash; {{ counts.critical_wos }} critical{% endif %}</div>
+        </a>
+        <a href="/maint/wo/" class="kpi-card {% if counts.overdue_wos %}danger{% endif %}">
+            <div class="num">{{ counts.overdue_wos }}</div>
+            <div class="lbl">Overdue WOs</div>
+        </a>
+        <a href="/maint/equipment/" class="kpi-card {% if counts.equip_issues %}warn{% endif %}">
+            <div class="num">{{ counts.equip_issues }}</div>
+            <div class="lbl">Equipment Issues</div>
+        </a>
+        <a href="/maint/schedule/" class="kpi-card {% if counts.due_schedules %}warn{% endif %}">
+            <div class="num">{{ counts.due_schedules }}</div>
+            <div class="lbl">PM Tasks Due / Overdue</div>
+        </a>
+        <a href="/maint/inspections/?status=Scheduled" class="kpi-card">
+            <div class="num">{{ counts.pending_inspections }}</div>
+            <div class="lbl">Scheduled Inspections</div>
+        </a>
+        <a href="/maint/downtime/" class="kpi-card {% if counts.active_downtime %}danger{% endif %}">
+            <div class="num">{{ counts.active_downtime }}</div>
+            <div class="lbl">Active Downtime Events</div>
+        </a>
+        <a href="/maint/oee/" class="kpi-card {% if oee.oee_pct >= 85 %}good{% elif oee.oee_pct < 60 %}danger{% else %}warn{% endif %}">
+            <div class="num">{{ oee.oee_pct }}%</div>
+            <div class="lbl">OEE (month to date)</div>
+        </a>
+    </div>

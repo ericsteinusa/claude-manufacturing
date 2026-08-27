@@ -134,6 +134,20 @@ def maint_dashboard(request):
 
 
 @dept_required(_MAINT_DEPT_KEYS)
+def maint_dashboard_kpis_fragment(request):
+    """htmx polling target for maint_dashboard's KPI row."""
+    today = datetime.date.today()
+    month_start = today.replace(day=1)
+    conn = get_db_connection()
+    try:
+        counts = maint_get_dashboard_counts(conn)
+        oee = get_overall_oee(conn, month_start.isoformat(), today.isoformat())
+    finally:
+        conn.close()
+    return render(request, 'maint_dashboard_kpis.html', {'counts': counts, 'oee': oee})
+
+
+@dept_required(_MAINT_DEPT_KEYS)
 def maint_oee_report(request):
     period, start, end, date_from, date_to = _resolve_period(request)
 

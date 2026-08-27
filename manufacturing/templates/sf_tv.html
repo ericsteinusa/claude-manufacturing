@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="30">
 <title>Shop Floor OEE — {{ shift }} Shift</title>
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <style>
     * { box-sizing: border-box; }
     body {
@@ -30,41 +30,25 @@
     .tv-output { font-size: 20px; margin-top: 14px; color: #dbe6ff; }
     .tv-noplan { color: #fbbf24; font-size: 16px; margin-top: 6px; }
     .tv-empty { font-size: 24px; color: #9fb3d9; text-align: center; margin-top: 60px; }
+    .tv-grid.htmx-swapping { opacity: 0.4; transition: opacity 200ms ease-out; }
 </style>
 </head>
 <body>
     <div class="tv-header">
         <h1>Shop Floor OEE — {{ shift }} Shift</h1>
-        <div class="clock">{{ entry_date }} &middot; {{ now|date:"g:i A" }}</div>
+        <div class="clock">{{ entry_date }} &middot; <span id="tv-clock">{{ now|date:"g:i A" }}</span></div>
     </div>
 
-    {% if live %}
-    <div class="tv-grid">
-        {% for wc in live %}
-        <div class="tv-card">
-            <h2>{{ wc.workcenter_name }}</h2>
-            <div class="tv-oee {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}">
-                {{ wc.oee_pct }}%</div>
-            <div class="tv-bar-track">
-                <div class="tv-bar-fill {% if wc.oee_pct >= 85 %}good{% elif wc.oee_pct >= 60 %}warn{% else %}danger{% endif %}"
-                     style="width:{{ wc.oee_pct }}%;"></div>
-            </div>
-            <div class="tv-metrics">
-                <span>A {{ wc.availability_pct }}%</span>
-                <span>P {{ wc.performance_pct }}%</span>
-                <span>Q {{ wc.quality_pct }}%</span>
-            </div>
-            <div class="tv-output">
-                {{ wc.qty_produced|floatformat:0 }} produced
-                {% if wc.has_plan %} / {{ wc.planned_qty|floatformat:0 }} planned{% endif %}
-                &middot; {{ wc.qty_scrapped|floatformat:0 }} scrapped
-            </div>
-            {% if not wc.has_plan %}<div class="tv-noplan">No plan set for this shift</div>{% endif %}
-        </div>
-        {% endfor %}
+    <div id="tv-content" hx-get="/shop-floor/tv/fragment/" hx-trigger="every 10s" hx-swap="innerHTML">
+        {% include "sf_tv_grid.html" %}
     </div>
-    {% else %}
-    <div class="tv-empty">No active workcenters found.</div>
-    {% endif %}
 </body>
+<script>
+    // Ticks the header clock every second between htmx's 10s data polls,
+    // so the display never looks frozen on a shop-floor monitor.
+    setInterval(function () {
+        document.getElementById('tv-clock').textContent =
+            new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+    }, 1000);
+</script>
 </html>

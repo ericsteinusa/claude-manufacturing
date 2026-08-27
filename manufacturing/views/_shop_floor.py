@@ -158,10 +158,7 @@ def sf_dashboard(request):
     ))
 
 
-@dept_required(_SF_DEPT_KEYS)
-def sf_tv(request):
-    """Large-format, no-picker, auto-refreshing view of the current shift —
-    always 'right now', for an actual shop-floor TV display."""
+def _sf_tv_context():
     shift, entry_date = current_shift_for_now()
     conn = get_db_connection()
     try:
@@ -170,8 +167,21 @@ def sf_tv(request):
         live = list_live_shift_oee(conn, shift, entry_date.isoformat())
     finally:
         conn.close()
-
-    return render(request, 'sf_tv.html', {
+    return {
         'live': live, 'shift': shift, 'entry_date': entry_date.isoformat(),
         'now': _dt.datetime.now(),
-    })
+    }
+
+
+@dept_required(_SF_DEPT_KEYS)
+def sf_tv(request):
+    """Large-format, no-picker, auto-refreshing view of the current shift —
+    always 'right now', for an actual shop-floor TV display. The grid
+    polls sf_tv_fragment every 10s via htmx instead of a full-page reload."""
+    return render(request, 'sf_tv.html', _sf_tv_context())
+
+
+@dept_required(_SF_DEPT_KEYS)
+def sf_tv_fragment(request):
+    """htmx polling target for sf_tv — same grid markup, no page chrome."""
+    return render(request, 'sf_tv_grid.html', _sf_tv_context())

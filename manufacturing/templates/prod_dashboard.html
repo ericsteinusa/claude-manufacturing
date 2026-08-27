@@ -66,31 +66,8 @@ a.kpi:hover { border-color:var(--accent); }
         <a href="/dashboard/" class="dept-btn">Home</a>
     </div>
 
-    <div class="kpi-row">
-        <a href="/wo/?status=open" class="kpi">
-            <div class="lbl">Open WOs</div>
-            <div class="val">{{ work_orders.open }}</div>
-        </a>
-        <a href="/wo/?status=in_progress" class="kpi">
-            <div class="lbl">In Progress</div>
-            <div class="val">{{ work_orders.in_progress }}</div>
-        </a>
-        <div class="kpi{% if work_orders.overdue %} red{% endif %}">
-            <div class="lbl">Overdue</div>
-            <div class="val">{{ work_orders.overdue }}</div>
-        </div>
-        <div class="kpi">
-            <div class="lbl">Total Products</div>
-            <div class="val">{{ inventory.total_products }}</div>
-        </div>
-        <div class="kpi{% if inventory.zero_stock %} red{% endif %}">
-            <div class="lbl">Zero Stock</div>
-            <div class="val">{{ inventory.zero_stock }}</div>
-        </div>
-        <div class="kpi{% if inventory.low_stock %} yellow{% endif %}">
-            <div class="lbl">Low Stock</div>
-            <div class="val">{{ inventory.low_stock }}</div>
-        </div>
+    <div id="prod-kpis" hx-get="/prod/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
+        {% include "prod_dashboard_kpis.html" %}
     </div>
 
     <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -157,6 +134,7 @@ a.kpi:hover { border-color:var(--accent); }
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
