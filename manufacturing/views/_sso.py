@@ -13,7 +13,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .. import sso_core
-from ..accounts import _get_user_profile, _is_full_access, provision_sso_user
+from ..accounts import _get_user_profile, apply_sso_session, provision_sso_user
 from ..log_utils import get_logger
 
 log = get_logger(__name__)
@@ -76,12 +76,7 @@ def sso_callback(request, provider_key):
             'error': f'No account found for {email}. Contact your administrator.',
         })
 
-    request.session['user_email'] = email
-    request.session['user_role'] = profile.get('role_name', '')
-    request.session['user_dept_key'] = profile.get('dept_key') or ''
-    request.session['user_dept_name'] = profile.get('dept_name', '')
-    request.session['user_full_access'] = _is_full_access(profile)
-    request.session['user_is_manager'] = profile.get('is_manager', False)
+    apply_sso_session(request, email, profile)
     log.info("SSO login succeeded for %s via provider %s", email, provider_key)
 
     if request.session['user_full_access']:

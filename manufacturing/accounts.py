@@ -299,6 +299,19 @@ def provision_sso_user(email: str, claims: dict, dept_key: str) -> bool:
     return ok
 
 
+def apply_sso_session(request, email: str, profile: dict) -> None:
+    """Set the same session keys the password-login path sets, so
+    dept_required/role_required keep working unchanged regardless of
+    whether a user logged in with a password, OIDC, or SAML. Shared by
+    views/_sso.py and views/_saml.py so the two protocols can't drift."""
+    request.session['user_email'] = email
+    request.session['user_role'] = profile.get('role_name', '')
+    request.session['user_dept_key'] = profile.get('dept_key') or ''
+    request.session['user_dept_name'] = profile.get('dept_name', '')
+    request.session['user_full_access'] = _is_full_access(profile)
+    request.session['user_is_manager'] = profile.get('is_manager', False)
+
+
 def _reset_password(email: str, new_password: str) -> bool:
     conn = _get_db()
     row = conn.execute(
