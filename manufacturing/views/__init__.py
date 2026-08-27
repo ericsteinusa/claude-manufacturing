@@ -172,6 +172,17 @@ from ..accounts import (
     _get_all_roles,
     _set_user_role,
     _remove_user_role,
+    validate_password_strength,
+    password_needs_rotation,
+    PASSWORD_MAX_AGE_DAYS,
+)
+from ..api_auth import (
+    ensure_api_token_table,
+    generate_totp_secret,
+    verify_totp_code,
+    set_totp_secret,
+    get_totp_secret,
+    disable_totp,
 )
 from ..auth_decorators import (
     dept_required, dept_manager_required, login_required, role_required,
@@ -1019,11 +1030,60 @@ def _init_schema():
 # ---------------------------------------------------------------------------
 
 
+def _complete_login(request, email):
+    """Finish authenticating *email*: set session keys and pick a redirect.
+
+    Shared by the direct password path and the post-MFA-verification path
+    so both end up in exactly the same state.
+    """
+    request.session['user_email'] = email
+    profile = _get_user_profile(email)
+    request.session['user_role'] = profile.get('role_name', '')
+    request.session['user_dept_key'] = profile.get('dept_key') or ''
+    request.session['user_dept_name'] = profile.get('dept_name', '')
+    request.session['user_full_access'] = _is_full_access(profile)
+    request.session['user_is_manager'] = profile.get('is_manager', False)
+
+    with get_db_connection() as conn:
+        rotation_needed = password_needs_rotation(conn, email)
+    if rotation_needed:
+        request.session['password_rotation_required'] = True
+        return redirect('change_password')
+
+    if request.session['user_full_access']:
+        return redirect('dashboard')
+    dept_key = profile.get('dept_key')
+    if dept_key:
+        return redirect('dept_menu', dept=dept_key)
+    return redirect('dashboard')
+
+
 def home(request):
     # Schema and canonical roles are seeded once at startup by
     # AppConfig.ready() (-> _init_schema), so no per-request seeding here.
     from ..sso_core import is_configured as _sso_is_configured
     sso_enabled = _sso_is_configured()
+
+    if request.GET.get('cancel'):
+        request.session.pop('mfa_pending_email', None)
+        request.session.pop('mfa_pending_people_id', None)
+        return redirect('home')
+
+    pending_email = request.session.get('mfa_pending_email')
+
+    if request.method == 'POST' and pending_email:
+        code = request.POST.get('mfa_code', '').strip()
+        people_id = request.session.get('mfa_pending_people_id')
+        secret = None
+        with get_db_connection() as conn:
+            secret = get_totp_secret(conn, people_id)
+        if secret and verify_totp_code(secret, code):
+            del request.session['mfa_pending_email']
+            del request.session['mfa_pending_people_id']
+            return _complete_login(request, pending_email)
+        return render(request, 'home_mfa.html', {
+            'error': 'Incorrect or expired code. Please try again.',
+        })
 
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
@@ -1037,26 +1097,26 @@ def home(request):
             })
 
         if _verify_login(email, password):
-            request.session['user_email'] = email
             profile = _get_user_profile(email)
-            request.session['user_role'] = profile.get('role_name', '')
-            request.session['user_dept_key'] = profile.get('dept_key') or ''
-            request.session['user_dept_name'] = profile.get('dept_name', '')
-            request.session['user_full_access'] = _is_full_access(profile)
-            request.session['user_is_manager'] = profile.get(
-                'is_manager', False)
-            if request.session['user_full_access']:
-                return redirect('dashboard')
-            dept_key = profile.get('dept_key')
-            if dept_key:
-                return redirect('dept_menu', dept=dept_key)
-            return redirect('dashboard')
+            people_id = profile.get('people_id')
+            with get_db_connection() as conn:
+                ensure_api_token_table(conn)
+                conn.commit()
+                secret = get_totp_secret(conn, people_id)
+            if secret:
+                request.session['mfa_pending_email'] = email
+                request.session['mfa_pending_people_id'] = people_id
+                return render(request, 'home_mfa.html', {})
+            return _complete_login(request, email)
 
         return render(request, 'home.html', {
             'error': 'Invalid email or password.',
             'email_value': email,
             'sso_enabled': sso_enabled,
         })
+
+    if pending_email:
+        return render(request, 'home_mfa.html', {})
 
     if request.session.get('user_email'):
         return redirect('dashboard')
@@ -1257,12 +1317,12 @@ def register(request):
             error = 'First and last name are required.'
         elif not email or '@' not in email:
             error = 'Please enter a valid email address.'
-        elif len(password) < 8:
-            error = 'Password must be at least 8 characters.'
         elif password != confirm:
             error = 'Passwords do not match.'
         elif emp_id_text and not emp_id_text.isdigit():
             error = 'Employee ID must be a number.'
+        else:
+            error = validate_password_strength(password)
 
         if error:
             return render(request, 'register.html', {
@@ -1320,9 +1380,10 @@ def forgot_password_reset(request):
         new_pw = request.POST.get('password', '')
         confirm = request.POST.get('confirm', '')
 
-        if len(new_pw) < 8:
+        strength_error = validate_password_strength(new_pw)
+        if strength_error:
             return render(request, 'forgot_password_reset.html', {
-                'error': 'Password must be at least 8 characters.',
+                'error': strength_error,
                 'email': email,
             })
         if new_pw != confirm:
@@ -1361,12 +1422,12 @@ def change_password(request):
             error = 'Please enter a valid email address.'
         elif not current:
             error = 'Please enter your current password.'
-        elif len(new_pw) < 8:
-            error = 'New password must be at least 8 characters.'
         elif new_pw != confirm:
             error = 'New passwords do not match.'
         elif new_pw == current:
             error = 'New password must differ from your current password.'
+        else:
+            error = validate_password_strength(new_pw)
 
         if error:
             return render(request, 'change_password.html', {
@@ -1384,11 +1445,97 @@ def change_password(request):
             })
 
         _reset_password(email, new_pw)
+        request.session.pop('password_rotation_required', None)
         return render(request, 'home.html', {
             'success': 'Your password has been changed. You can now log in.',
         })
 
-    return render(request, 'change_password.html', {})
+    rotation_notice = None
+    if request.session.get('password_rotation_required'):
+        rotation_notice = (
+            f'Your password is over {PASSWORD_MAX_AGE_DAYS} days old and '
+            'must be changed before continuing.')
+    return render(request, 'change_password.html', {
+        'rotation_notice': rotation_notice,
+    })
+
+
+# ---------------------------------------------------------------------------
+# Two-factor authentication (TOTP) self-service — shared with the mobile
+# API's api_totp_secret table, so enrolling here also covers mobile login.
+# ---------------------------------------------------------------------------
+
+@login_required
+def mfa_settings(request):
+    people_id = _get_user_profile(
+        request.session['user_email']).get('people_id')
+    with get_db_connection() as conn:
+        ensure_api_token_table(conn)
+        conn.commit()
+        enrolled = bool(get_totp_secret(conn, people_id))
+    return render(request, 'mfa_settings.html', {'enrolled': enrolled})
+
+
+@login_required
+def mfa_enroll(request):
+    email = request.session['user_email']
+    people_id = _get_user_profile(email).get('people_id')
+
+    if request.method == 'POST':
+        code = request.POST.get('mfa_code', '').strip()
+        secret = request.session.get('pending_totp_secret')
+        if not secret:
+            return redirect('mfa_enroll')
+        if not verify_totp_code(secret, code):
+            return render(request, 'mfa_enroll.html', {
+                'secret': secret,
+                'error': 'Incorrect code. Make sure your app clock is '
+                         'in sync and try the newest code shown.',
+            })
+        with get_db_connection() as conn:
+            ensure_api_token_table(conn)
+            set_totp_secret(conn, people_id, secret)
+            conn.commit()
+        del request.session['pending_totp_secret']
+        return render(request, 'mfa_settings.html', {
+            'enrolled': True,
+            'success': 'Two-factor authentication is now enabled.',
+        })
+
+    secret = request.session.get('pending_totp_secret')
+    if not secret:
+        secret = generate_totp_secret()
+        request.session['pending_totp_secret'] = secret
+    otpauth_uri = (
+        f"otpauth://totp/Manufacturing%20ERP:{email}"
+        f"?secret={secret}&issuer=Manufacturing%20ERP"
+    )
+    return render(request, 'mfa_enroll.html', {
+        'secret': secret, 'otpauth_uri': otpauth_uri,
+    })
+
+
+@login_required
+def mfa_disable(request):
+    email = request.session['user_email']
+    people_id = _get_user_profile(email).get('people_id')
+
+    if request.method == 'POST':
+        current = request.POST.get('current_password', '')
+        if not _verify_login(email, current):
+            return render(request, 'mfa_settings.html', {
+                'enrolled': True,
+                'error': 'Incorrect current password.',
+            })
+        with get_db_connection() as conn:
+            disable_totp(conn, people_id)
+            conn.commit()
+        return render(request, 'mfa_settings.html', {
+            'enrolled': False,
+            'success': 'Two-factor authentication has been disabled.',
+        })
+
+    return redirect('mfa_settings')
 
 
 # ---------------------------------------------------------------------------
