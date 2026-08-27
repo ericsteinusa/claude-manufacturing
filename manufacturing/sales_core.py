@@ -263,10 +263,11 @@ SALES_LEAD_SOURCES = (
 SALES_LEAD_PRIORITIES = ('Low', 'Medium', 'High')
 
 
-def list_sales_leads(conn, status=None, owner=None, search=None) -> list:
+def list_sales_leads(conn, status=None, owner=None, search=None,
+                     created_by=None) -> list:
     sql = (
         "SELECT id, company, contact, source, status, priority, "
-        "estimated_value, owner, created_date "
+        "estimated_value, owner, created_by, created_date "
         "FROM sales_lead WHERE TRUE"
     )
     params: list = []
@@ -276,6 +277,9 @@ def list_sales_leads(conn, status=None, owner=None, search=None) -> list:
     if owner:
         sql += " AND owner ILIKE %s"
         params.append(f"%{owner}%")
+    if created_by:
+        sql += " AND created_by = %s"
+        params.append(created_by)
     if search:
         sql += " AND (company ILIKE %s OR contact ILIKE %s OR notes ILIKE %s)"
         params.extend([f"%{search}%"] * 3)

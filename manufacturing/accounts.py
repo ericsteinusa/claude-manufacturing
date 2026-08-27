@@ -310,6 +310,7 @@ def apply_sso_session(request, email: str, profile: dict) -> None:
     request.session['user_dept_name'] = profile.get('dept_name', '')
     request.session['user_full_access'] = _is_full_access(profile)
     request.session['user_is_manager'] = profile.get('is_manager', False)
+    request.session['user_people_id'] = profile.get('people_id')
 
 
 def _reset_password(email: str, new_password: str) -> bool:
