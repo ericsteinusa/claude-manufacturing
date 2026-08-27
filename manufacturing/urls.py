@@ -537,6 +537,12 @@ urlpatterns = [
     path('webhooks/', views.webhook_list, name='webhook_list'),
     path('webhooks/new/', views.webhook_new, name='webhook_new'),
     path('webhooks/<int:subscription_id>/', views.webhook_edit, name='webhook_edit'),
+    # Data Governance / GDPR tooling
+    path('data-governance/', views.data_governance_dashboard, name='data_governance_dashboard'),
+    path('data-governance/person/<int:person_id>/export/', views.data_governance_export,
+         name='data_governance_export'),
+    path('data-governance/retention-policies/<int:policy_id>/', views.retention_policy_edit,
+         name='retention_policy_edit'),
     path('legal/', views.legal_dashboard, name='legal_dashboard'),
     path('budget/', views.budget_dashboard, name='budget_dashboard'),
     path('risk/', views.risk_dashboard, name='risk_dashboard'),

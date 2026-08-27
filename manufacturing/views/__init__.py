@@ -327,6 +327,7 @@ from ._approval_rules import *  # noqa: F401,F403
 from ._health import healthz  # noqa: F401
 from ._notifications import *  # noqa: F401,F403
 from ._webhooks import *  # noqa: F401,F403
+from ._data_governance import *  # noqa: F401,F403
 from ._sso import sso_login, sso_callback  # noqa: F401
 from ._saml import saml_login, saml_acs, saml_metadata  # noqa: F401
 

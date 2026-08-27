@@ -584,6 +584,9 @@
         <a href="{% url 'webhook_list' %}" class="sb-link{% if '/webhooks/' in request.path %} active{% endif %}">
             <span class="sb-icon">🔗</span> Webhooks
         </a>
+        <a href="{% url 'data_governance_dashboard' %}" class="sb-link{% if '/data-governance/' in request.path %} active{% endif %}">
+            <span class="sb-icon">🛡️</span> Data Governance
+        </a>
         <a href="{% url 'reports_dashboard' %}" class="sb-link{% if '/reports/' in request.path %} active{% endif %}">
             <span class="sb-icon">📈</span> Reports
         </a>
