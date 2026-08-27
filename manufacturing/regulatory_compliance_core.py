@@ -1,6 +1,9 @@
 """regulatory_compliance_core.py — Qt-free Regulatory Compliance Templates
-(FDA, ISO), 7/10 of the top-10 ERPs have it. Closes Quality Management's
-last remaining domain gap.
+(FDA, ISO, plus the AS9100D/IATF 16949 vertical packs), 7/10 of the top-10
+ERPs have it. Closes Quality Management's last remaining domain gap, and
+separately closes COMPETITIVE_GAP_ANALYSIS.md §6.5's "vertical compliance
+depth" gap (AS9100D for aerospace, IATF 16949 for automotive) — previously
+this module only had the two generic ISO/FDA templates.
 
 A compliance **template** is a reusable requirement checklist for a named
 standard (e.g. "ISO 9001:2015", "FDA 21 CFR Part 820") — a header plus a
@@ -14,10 +17,14 @@ SPC measurements.
 
 **The seeded starter templates are illustrative, not exhaustive or
 certified.** The clause list here is a small, representative subset picked
-to demonstrate the structure — real ISO/FDA compliance requires the actual
-standard text and a qualified auditor, the same "structure is real, the
-org's own numbers/content still need expert judgment" scoping already used
-for FMEA's S/O/D rating anchors and sampling_plan_core's AQL disclaimer.
+to demonstrate the structure — real ISO/FDA/AS9100D/IATF 16949 compliance
+requires the actual standard text and a qualified auditor, the same
+"structure is real, the org's own numbers/content still need expert
+judgment" scoping already used for FMEA's S/O/D rating anchors and
+sampling_plan_core's AQL disclaimer. The AS9100D and IATF 16949 templates
+specifically cover only the clauses that *add to* ISO 9001 (both standards
+are built on top of it) — not the shared ISO 9001 base clauses, which are
+the separate ISO 9001 template above.
 
 Tables:
   compliance_template       — header: name, standard, description
@@ -126,6 +133,75 @@ _SEED_TEMPLATES = [
             ('820.80', 'Receiving, in-process, and finished device acceptance activities are documented', 'Inspection'),
             ('820.100', 'A corrective and preventive action (CAPA) procedure is documented and followed', 'CAPA'),
             ('820.184', 'Device history records (DHR) are maintained for each unit/lot/batch', 'Records'),
+        ],
+    },
+    {
+        # AS9100D is ISO 9001 plus aerospace-specific additions — this
+        # starter covers only the additions that distinguish it from the
+        # ISO 9001 template above, not the shared base clauses.
+        'name': 'AS9100D Aerospace Quality Management (starter)',
+        'standard': 'AS9100D',
+        'items': [
+            ('8.1.1',
+             'Operational risk is identified and managed across product realization processes',
+             'Risk Management'),
+            ('8.1.2',
+             'Configuration of the product is identified, controlled, and traceable throughout its lifecycle',
+             'Configuration Management'),
+            ('8.1.3',
+             'Product safety is addressed throughout design, production, and use',
+             'Product Safety'),
+            ('8.1.4',
+             'Personnel are aware of their contribution to product conformity, safety, and ethical behavior',
+             'Human Factors / Awareness'),
+            ('8.1.4',
+             'Purchasing and receiving controls address prevention of counterfeit or suspect unapproved parts',
+             'Counterfeit Parts'),
+            ('8.4.2',
+             'Special requirements, critical items, and key characteristics are flowed down to suppliers',
+             'Supplier Flow-Down'),
+            ('8.5.1',
+             'First article inspection verifies that documented processes are capable of producing conforming product',
+             'Production Process Verification'),
+            ('8.6',
+             'Release of product includes documented evidence of conformity and authorized release authority',
+             'Product Release'),
+        ],
+    },
+    {
+        # IATF 16949 is likewise ISO 9001 plus automotive-specific
+        # additions — same "additions only" scoping as the AS9100D
+        # template above.
+        'name': 'IATF 16949:2016 Automotive Quality Management (starter)',
+        'standard': 'IATF 16949:2016',
+        'items': [
+            ('4.3.2',
+             'Customer-specific requirements are identified and incorporated into the QMS',
+             'Customer Requirements'),
+            ('6.1.2.1',
+             'Risk analysis includes lessons learned from field returns, recalls, and warranty claims',
+             'Risk Analysis'),
+            ('7.1.5.1.1',
+             'Measurement system analysis (e.g. Gage R&R) is performed on equipment used for product/process approval',
+             'Measurement Systems Analysis'),
+            ('8.3.4.3',
+             'A Production Part Approval Process (PPAP) is completed and approved before regular production shipments',
+             'PPAP'),
+            ('8.3.5.2',
+             'Manufacturing process design incorporates error-proofing methods, verified for effectiveness',
+             'Error-Proofing'),
+            ('8.5.1.1',
+             'A control plan is developed, implemented, and maintained for each part/process family',
+             'Control Plan'),
+            ('8.7.1.5',
+             'Nonconforming product control includes containment and customer notification per customer requirements',
+             'Containment & Notification'),
+            ('9.2.2.3',
+             'Layered process audits verify at multiple organizational levels that processes meet requirements',
+             'Layered Process Audits'),
+            ('10.2.3',
+             'Warranty management analyzes returned product to identify and address root cause',
+             'Warranty Management'),
         ],
     },
 ]
