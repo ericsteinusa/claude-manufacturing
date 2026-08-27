@@ -228,6 +228,28 @@ failing check/test leaves whatever was already running in place and just
 logs to `manufacture-autopull.log`, so a broken push to `main` never takes
 down what's live on the Windows box.
 
+**A DHCP IP change on the Windows box breaks three unrelated things at
+once**, seen in practice when its address moved from `192.168.4.46` to
+`192.168.0.188`: (1) Windows Firewall silently drops inbound connections
+(including ping) after the network is treated as "new," even with the
+profile still set to Private — the fix is temporarily disabling the
+firewall to confirm it's the cause, then re-enabling it with a proper
+inbound rule for the port; (2) `manufacture/settings.py`'s `ALLOWED_HOSTS`
+default (`['localhost', '127.0.0.1', '192.168.0.239']` — that last address
+is the *Linux* box's own IP, hardcoded) doesn't include whatever the
+Windows box's new address is, so requests 400 until `DJANGO_ALLOWED_HOSTS`
+in that machine's `.env` is updated and the server restarted (env vars only
+take effect on process restart, not on save); (3) a stale Postgres
+`postgres`-user password in `.env` can surface at the exact same time by
+pure coincidence (e.g. if the machine was reimaged/reset around when the
+IP changed) — `psycopg2.OperationalError: ... FATAL: password
+authentication failed` in the crashed autoreloader's traceback is that
+specific failure, unrelated to the network issue, and needs `DB_PASSWORD`
+in `.env` corrected separately. Diagnose in order: `ping` the new IP first
+(rules firewall in/out), then a plain `curl`/browser hit to port 8000
+(400 = ALLOWED_HOSTS, connection refused/timeout = server not actually
+listening — check the crashed process's traceback for the real reason).
+
 ## Sample data (dev DB)
 
 **On a fresh Postgres DB, run `python manage.py migrate` before anything
