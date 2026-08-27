@@ -13,7 +13,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .. import sso_core
-from ..accounts import _get_user_profile, _is_full_access
+from ..accounts import _get_user_profile, _is_full_access, provision_sso_user
 from ..log_utils import get_logger
 
 log = get_logger(__name__)
@@ -67,6 +67,9 @@ def sso_callback(request, provider_key):
 
     email = claims.get('email', '')
     profile = _get_user_profile(email) if email else {}
+    if not profile and email and provider.get('auto_provision'):
+        if provision_sso_user(email, claims, provider['default_dept_key']):
+            profile = _get_user_profile(email)
     if not profile:
         log.warning("SSO login denied: no account for %s", email)
         return render(request, 'home.html', {

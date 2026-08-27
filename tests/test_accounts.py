@@ -5,11 +5,13 @@ MagicMock connection.
 """
 
 import datetime as dt
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
+from manufacturing import accounts
 from manufacturing.accounts import (
     validate_password_strength,
     password_needs_rotation,
+    provision_sso_user,
     PASSWORD_MAX_AGE_DAYS,
 )
 
@@ -91,3 +93,75 @@ def test_ensure_columns_called_before_select():
     password_needs_rotation(c, 'a@example.com')
     first_sql = c.execute.call_args_list[0][0][0]
     assert 'ALTER TABLE passwd' in first_sql
+
+
+# ---------------------------------------------------------------------------
+# provision_sso_user
+# ---------------------------------------------------------------------------
+
+def test_unknown_dept_key_denied_without_touching_db():
+    with patch.object(accounts, '_get_db') as mock_get_db:
+        result = provision_sso_user(
+            'new@example.com', {'given_name': 'Jane'}, 'not_a_real_dept')
+    assert result is False
+    mock_get_db.assert_not_called()
+
+
+def test_dept_not_found_in_db_denied():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = None
+    with patch.object(accounts, '_get_db', return_value=conn):
+        result = provision_sso_user(
+            'new@example.com', {'given_name': 'Jane'}, 'sales')
+    assert result is False
+
+
+def test_creates_account_using_given_and_family_name_claims():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = {'dept_id': 7}
+    with patch.object(accounts, '_get_db', return_value=conn), \
+         patch.object(accounts, '_create_user', return_value=True) as mock_create:
+        result = provision_sso_user(
+            'jane@example.com',
+            {'given_name': 'Jane', 'family_name': 'Doe'},
+            'sales')
+    assert result is True
+    args, kwargs = mock_create.call_args
+    assert args[0] == 'jane@example.com'
+    assert args[2] == 'Jane'
+    assert args[3] == 'Doe'
+    assert kwargs['dept_id'] == 7
+
+
+def test_falls_back_to_name_claim_when_no_given_family_name():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = {'dept_id': 7}
+    with patch.object(accounts, '_get_db', return_value=conn), \
+         patch.object(accounts, '_create_user', return_value=True) as mock_create:
+        provision_sso_user(
+            'jane@example.com', {'name': 'Jane Doe'}, 'sales')
+    args, _kwargs = mock_create.call_args
+    assert args[2] == 'Jane'
+    assert args[3] == 'Doe'
+
+
+def test_falls_back_to_email_prefix_when_no_name_claims_at_all():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = {'dept_id': 7}
+    with patch.object(accounts, '_get_db', return_value=conn), \
+         patch.object(accounts, '_create_user', return_value=True) as mock_create:
+        provision_sso_user('jane@example.com', {}, 'sales')
+    args, _kwargs = mock_create.call_args
+    assert args[2] == 'jane'
+    assert args[3] == ''
+
+
+def test_generated_password_is_not_predictable():
+    conn = MagicMock()
+    conn.execute.return_value.fetchone.return_value = {'dept_id': 7}
+    with patch.object(accounts, '_get_db', return_value=conn), \
+         patch.object(accounts, '_create_user', return_value=True) as mock_create:
+        provision_sso_user('jane@example.com', {'given_name': 'Jane'}, 'sales')
+    password_arg = mock_create.call_args[0][1]
+    assert len(password_arg) >= 32
+    assert password_arg != 'jane@example.com'

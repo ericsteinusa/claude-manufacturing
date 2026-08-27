@@ -3,6 +3,7 @@
 import datetime as _dt
 import os
 import re
+import secrets
 import bcrypt
 import psycopg2
 
@@ -11,6 +12,11 @@ from .log_utils import get_logger
 from .menus import DEPT_MENU_KEY
 
 log = get_logger(__name__)
+
+# Reverse of DEPT_MENU_KEY (dept_name -> dept_key), for resolving an
+# SSO provider's configured default_dept_key back to a real department
+# name when auto-provisioning a first-time SSO login.
+_DEPT_KEY_TO_NAME = {v: k for k, v in DEPT_MENU_KEY.items()}
 
 # Password rotation window. A NULL password_changed_at (every account that
 # existed before this policy shipped) is treated as not-yet-expired rather
@@ -199,7 +205,7 @@ def _email_exists(email: str) -> bool:
 
 def _create_user(email, password, first_name='', last_name='',
                  address='', city='', state='', zip_code='',
-                 employee_id=0) -> bool:
+                 employee_id=0, dept_id=None) -> bool:
     conn = _get_db()
     try:
         if conn.execute("SELECT id FROM people WHERE email = %s",
@@ -209,10 +215,10 @@ def _create_user(email, password, first_name='', last_name='',
             return False
         cursor = conn.execute(
             "INSERT INTO people (first_name, last_name, "
-            "employee_id, address, city, state, zip_code, email) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
+            "employee_id, address, city, state, zip_code, email, dept_id) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (first_name, last_name, employee_id,
-             address, city, state, zip_code, email),
+             address, city, state, zip_code, email, dept_id),
         )
         people_id = cursor.fetchone()['id']
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
@@ -232,6 +238,65 @@ def _create_user(email, password, first_name='', last_name='',
             exc_info=True)
         conn.close()
         return False
+
+
+def provision_sso_user(email: str, claims: dict, dept_key: str) -> bool:
+    """Create a new account for a first-time SSO login that has no existing
+    people row, in the department named by *dept_key*, with no role row —
+    the same least-privilege state an existing roleless account already has
+    in this app (whole-view access scoped to their own department only,
+    never full-access). Returns False (denying the login) if dept_key
+    doesn't resolve to a real department, rather than creating an orphaned
+    account with no department at all.
+
+    Deliberately does NOT attempt to map arbitrary IdP group/role claims
+    onto a role — that mapping is customer-tenant-specific and unverifiable
+    without a real tenant's actual claim shape (see sso_core.py's module
+    docstring). What this closes is narrower and safer: the account gets
+    created automatically instead of requiring an admin to pre-create it,
+    always landing in one fixed, admin-configured department with no
+    elevated access.
+
+    The created account gets a random password nobody knows (a real
+    passwd row is still required elsewhere in this schema) — it exists
+    only so the account is well-formed; the account is only reachable via
+    SSO unless the owner later resets it through the normal
+    forgot-password flow.
+    """
+    dept_name = _DEPT_KEY_TO_NAME.get(dept_key)
+    if not dept_name:
+        log.error(
+            "SSO auto-provision denied for %s: unknown dept_key %r",
+            email, dept_key)
+        return False
+
+    conn = _get_db()
+    dept_row = conn.execute(
+        "SELECT dept_id FROM dept WHERE dept_name = %s", (dept_name,)
+    ).fetchone()
+    conn.close()
+    if not dept_row:
+        log.error(
+            "SSO auto-provision denied for %s: department %r not found",
+            email, dept_name)
+        return False
+
+    first = claims.get('given_name', '') or ''
+    last = claims.get('family_name', '') or ''
+    if not first and not last:
+        full_name = (claims.get('name') or '').strip()
+        parts = full_name.split(' ', 1) if full_name else []
+        first = parts[0] if parts else email.split('@')[0]
+        last = parts[1] if len(parts) > 1 else ''
+
+    ok = _create_user(
+        email, secrets.token_urlsafe(32), first, last,
+        dept_id=dept_row['dept_id'])
+    if ok:
+        log.info(
+            "SSO auto-provisioned new account for %s in dept %r",
+            email, dept_name)
+    return ok
 
 
 def _reset_password(email: str, new_password: str) -> bool:

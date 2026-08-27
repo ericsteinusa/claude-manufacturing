@@ -52,12 +52,21 @@ _DISCOVERY_CACHE: dict[str, dict] = {}
 
 def get_providers() -> list[dict]:
     """Return configured OIDC providers as a list of dicts with keys:
-    key, label, client_id, client_secret, discovery_url.
+    key, label, client_id, client_secret, discovery_url, auto_provision,
+    default_dept_key.
 
     OIDC_PROVIDERS (a JSON list) takes precedence when set. Falls back to
     a single provider (key='default') assembled from the legacy
     OIDC_CLIENT_ID/OIDC_CLIENT_SECRET/OIDC_DISCOVERY_URL vars, so existing
     single-provider deployments keep working unchanged.
+
+    auto_provision (bool, default False) and default_dept_key (str) are
+    optional per-provider settings: when auto_provision is true and a
+    first-time SSO login's email has no existing account, one is created
+    automatically in the department named by default_dept_key, with no
+    role — see accounts.provision_sso_user(). Off by default; the legacy
+    single-provider fallback never auto-provisions, matching this
+    module's original behavior.
     """
     raw = settings.OIDC_PROVIDERS
     if raw:
@@ -73,12 +82,22 @@ def get_providers() -> list[dict]:
                     "Skipping OIDC_PROVIDERS entry missing key/client_id/"
                     "discovery_url: %r", p)
                 continue
+            auto_provision = bool(p.get('auto_provision'))
+            default_dept_key = p.get('default_dept_key') or ''
+            if auto_provision and not default_dept_key:
+                log.error(
+                    "OIDC_PROVIDERS entry %r has auto_provision=true but no "
+                    "default_dept_key; disabling auto-provision for it",
+                    p.get('key'))
+                auto_provision = False
             providers.append({
                 'key': p['key'],
                 'label': p.get('label') or p['key'],
                 'client_id': p['client_id'],
                 'client_secret': p.get('client_secret', ''),
                 'discovery_url': p['discovery_url'],
+                'auto_provision': auto_provision,
+                'default_dept_key': default_dept_key,
             })
         return providers
 
@@ -89,6 +108,8 @@ def get_providers() -> list[dict]:
             'client_id': settings.OIDC_CLIENT_ID,
             'client_secret': settings.OIDC_CLIENT_SECRET,
             'discovery_url': settings.OIDC_DISCOVERY_URL,
+            'auto_provision': False,
+            'default_dept_key': '',
         }]
     return []
 

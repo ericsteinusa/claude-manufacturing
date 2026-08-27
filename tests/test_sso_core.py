@@ -146,6 +146,45 @@ def test_oidc_providers_entry_missing_required_field_is_skipped(monkeypatch):
     assert [p['key'] for p in providers] == ['azure']
 
 
+def test_provider_defaults_to_no_auto_provision(monkeypatch):
+    monkeypatch.setattr(django_settings, 'OIDC_PROVIDERS', json.dumps([
+        {'key': 'azure', 'label': 'Azure AD', 'client_id': 'a-id',
+         'discovery_url': f'{ISSUER}/.well-known/openid-configuration'},
+    ]))
+    providers = sso_core.get_providers()
+    assert providers[0]['auto_provision'] is False
+    assert providers[0]['default_dept_key'] == ''
+
+
+def test_legacy_single_provider_never_auto_provisions(monkeypatch):
+    monkeypatch.setattr(django_settings, 'OIDC_CLIENT_ID', CLIENT_ID)
+    monkeypatch.setattr(django_settings, 'OIDC_DISCOVERY_URL',
+                        f'{ISSUER}/.well-known/openid-configuration')
+    providers = sso_core.get_providers()
+    assert providers[0]['auto_provision'] is False
+
+
+def test_auto_provision_enabled_with_default_dept_key(monkeypatch):
+    monkeypatch.setattr(django_settings, 'OIDC_PROVIDERS', json.dumps([
+        {'key': 'azure', 'label': 'Azure AD', 'client_id': 'a-id',
+         'discovery_url': f'{ISSUER}/.well-known/openid-configuration',
+         'auto_provision': True, 'default_dept_key': 'sales'},
+    ]))
+    providers = sso_core.get_providers()
+    assert providers[0]['auto_provision'] is True
+    assert providers[0]['default_dept_key'] == 'sales'
+
+
+def test_auto_provision_without_default_dept_key_is_disabled(monkeypatch):
+    monkeypatch.setattr(django_settings, 'OIDC_PROVIDERS', json.dumps([
+        {'key': 'azure', 'label': 'Azure AD', 'client_id': 'a-id',
+         'discovery_url': f'{ISSUER}/.well-known/openid-configuration',
+         'auto_provision': True},
+    ]))
+    providers = sso_core.get_providers()
+    assert providers[0]['auto_provision'] is False
+
+
 def test_get_provider_returns_none_for_unknown_key(monkeypatch):
     monkeypatch.setattr(django_settings, 'OIDC_PROVIDERS', json.dumps([
         {'key': 'azure', 'label': 'Azure AD', 'client_id': 'a-id',
