@@ -1061,8 +1061,8 @@ def _complete_login(request, email):
 def home(request):
     # Schema and canonical roles are seeded once at startup by
     # AppConfig.ready() (-> _init_schema), so no per-request seeding here.
-    from ..sso_core import is_configured as _sso_is_configured
-    sso_enabled = _sso_is_configured()
+    from ..sso_core import get_providers as _sso_get_providers
+    sso_providers = _sso_get_providers()
 
     if request.GET.get('cancel'):
         request.session.pop('mfa_pending_email', None)
@@ -1093,7 +1093,7 @@ def home(request):
             return render(request, 'home.html', {
                 'error': 'Please enter both email and password.',
                 'email_value': email,
-                'sso_enabled': sso_enabled,
+                'sso_providers': sso_providers,
             })
 
         if _verify_login(email, password):
@@ -1112,7 +1112,7 @@ def home(request):
         return render(request, 'home.html', {
             'error': 'Invalid email or password.',
             'email_value': email,
-            'sso_enabled': sso_enabled,
+            'sso_providers': sso_providers,
         })
 
     if pending_email:
@@ -1121,7 +1121,7 @@ def home(request):
     if request.session.get('user_email'):
         return redirect('dashboard')
 
-    return render(request, 'home.html', {'sso_enabled': sso_enabled})
+    return render(request, 'home.html', {'sso_providers': sso_providers})
 
 
 def dashboard(request):

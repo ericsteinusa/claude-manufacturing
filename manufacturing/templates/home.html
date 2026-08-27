@@ -27,11 +27,14 @@
     <button type="submit" class="btn-submit">Sign In</button>
 </form>
 
-{% if sso_enabled %}
+{% if sso_providers %}
 <div class="sso-divider" style="text-align:center;margin:14px 0;color:#888;font-size:12px;">— or —</div>
-<a href="{% url 'sso_login' %}" class="btn-submit" style="display:block;text-align:center;text-decoration:none;background:#444;">
-    Sign in with SSO
+{% for provider in sso_providers %}
+<a href="{% url 'sso_login' provider.key %}" class="btn-submit"
+   style="display:block;text-align:center;text-decoration:none;background:#444;margin-bottom:8px;">
+    Sign in with {{ provider.label }}
 </a>
+{% endfor %}
 {% endif %}
 
 <div class="links">

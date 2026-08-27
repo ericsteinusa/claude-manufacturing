@@ -296,14 +296,28 @@ if SENTRY_DSN:
     )
 
 # ---------------------------------------------------------------------------
-# SSO (OpenID Connect) — opt-in via OIDC_CLIENT_ID/OIDC_DISCOVERY_URL, same
-# pattern as SENTRY_DSN above: unset by default, so local dev/CI never
-# attempt an SSO round-trip and the login page shows password-only. Works
-# against any spec-compliant OIDC provider (Azure AD/Entra ID, Google
-# Workspace, Okta, or a local test IdP) — only these four values change,
-# not sso_core.py. See sso_core.py for the client itself.
+# SSO (OpenID Connect) — opt-in, same pattern as SENTRY_DSN above: unset by
+# default, so local dev/CI never attempt an SSO round-trip and the login
+# page shows password-only. Works against any spec-compliant OIDC provider
+# (Azure AD/Entra ID, Google Workspace, Okta, or a local test IdP).
+#
+# Multiple providers can be configured at once via OIDC_PROVIDERS, a JSON
+# list of {"key", "label", "client_id", "client_secret", "discovery_url"}
+# objects — "key" is a short URL-safe slug used in /sso/login/<key>/ and
+# /sso/callback/<key>/, and must be registered as that provider's own
+# callback URL on the IdP's side. Example:
+#   OIDC_PROVIDERS=[{"key":"azure","label":"Azure AD","client_id":"...",
+#     "client_secret":"...","discovery_url":"https://login.microsoftonline
+#     .com/<tenant>/v2.0/.well-known/openid-configuration"}, {"key":"google",
+#     "label":"Google Workspace", ...}]
+#
+# The single-provider OIDC_CLIENT_ID/OIDC_CLIENT_SECRET/OIDC_DISCOVERY_URL
+# vars are kept as a fallback for existing deployments that set those
+# instead — sso_core.get_providers() only falls back to them when
+# OIDC_PROVIDERS is unset, and assigns that provider the key "default".
+# See sso_core.py for the client itself.
 # ---------------------------------------------------------------------------
+OIDC_PROVIDERS = os.environ.get('OIDC_PROVIDERS', '')
 OIDC_CLIENT_ID = os.environ.get('OIDC_CLIENT_ID', '')
 OIDC_CLIENT_SECRET = os.environ.get('OIDC_CLIENT_SECRET', '')
 OIDC_DISCOVERY_URL = os.environ.get('OIDC_DISCOVERY_URL', '')
-OIDC_REDIRECT_URI = os.environ.get('OIDC_REDIRECT_URI', '')

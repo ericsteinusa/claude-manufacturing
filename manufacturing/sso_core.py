@@ -1,12 +1,17 @@
 """
 sso_core.py — OpenID Connect SSO client (Authorization Code flow).
 
-Opt-in via OIDC_CLIENT_ID / OIDC_DISCOVERY_URL in settings (see
-manufacture/settings.py) — same pattern as SENTRY_DSN: unset by default, so
-local dev/CI never attempt an SSO round-trip. Works against any
-spec-compliant OIDC provider (Azure AD/Entra ID, Google Workspace, Okta, or
-a local test IdP) — only the discovery URL and client credentials change,
-not this module.
+Opt-in via OIDC_PROVIDERS (or the legacy single-provider OIDC_CLIENT_ID/
+OIDC_DISCOVERY_URL vars) in settings (see manufacture/settings.py) — same
+pattern as SENTRY_DSN: unset by default, so local dev/CI never attempt an
+SSO round-trip. Works against any spec-compliant OIDC provider (Azure AD/
+Entra ID, Google Workspace, Okta, or a local test IdP).
+
+Supports multiple providers configured at once (get_providers()), each
+identified by a short "key" slug used in the login/callback URLs. Every
+function below takes the specific provider dict to act against — there is
+no implicit "the configured provider" global anymore now that there can be
+more than one.
 
 Identity vs. authorization: SSO here only proves *who* the user is (a
 verified email from the IdP's signed ID token). It deliberately does NOT
@@ -45,8 +50,59 @@ log = get_logger(__name__)
 _DISCOVERY_CACHE: dict[str, dict] = {}
 
 
+def get_providers() -> list[dict]:
+    """Return configured OIDC providers as a list of dicts with keys:
+    key, label, client_id, client_secret, discovery_url.
+
+    OIDC_PROVIDERS (a JSON list) takes precedence when set. Falls back to
+    a single provider (key='default') assembled from the legacy
+    OIDC_CLIENT_ID/OIDC_CLIENT_SECRET/OIDC_DISCOVERY_URL vars, so existing
+    single-provider deployments keep working unchanged.
+    """
+    raw = settings.OIDC_PROVIDERS
+    if raw:
+        try:
+            configured = json.loads(raw)
+        except (TypeError, ValueError):
+            log.error("OIDC_PROVIDERS is not valid JSON; SSO disabled")
+            return []
+        providers = []
+        for p in configured:
+            if not p.get('key') or not p.get('client_id') or not p.get('discovery_url'):
+                log.error(
+                    "Skipping OIDC_PROVIDERS entry missing key/client_id/"
+                    "discovery_url: %r", p)
+                continue
+            providers.append({
+                'key': p['key'],
+                'label': p.get('label') or p['key'],
+                'client_id': p['client_id'],
+                'client_secret': p.get('client_secret', ''),
+                'discovery_url': p['discovery_url'],
+            })
+        return providers
+
+    if settings.OIDC_CLIENT_ID and settings.OIDC_DISCOVERY_URL:
+        return [{
+            'key': 'default',
+            'label': 'SSO',
+            'client_id': settings.OIDC_CLIENT_ID,
+            'client_secret': settings.OIDC_CLIENT_SECRET,
+            'discovery_url': settings.OIDC_DISCOVERY_URL,
+        }]
+    return []
+
+
+def get_provider(key: str) -> dict | None:
+    """Return the configured provider matching *key*, or None."""
+    for p in get_providers():
+        if p['key'] == key:
+            return p
+    return None
+
+
 def is_configured() -> bool:
-    return bool(settings.OIDC_CLIENT_ID and settings.OIDC_DISCOVERY_URL)
+    return bool(get_providers())
 
 
 def _fetch_json(url: str, timeout: int = 5) -> dict:
@@ -55,16 +111,16 @@ def _fetch_json(url: str, timeout: int = 5) -> dict:
         return json.loads(resp.read().decode('utf-8'))
 
 
-def get_discovery_document(discovery_url: str | None = None) -> dict:
+def get_discovery_document(provider: dict) -> dict:
     """Fetch (and cache in-process) the IdP's .well-known/openid-configuration."""
-    url = discovery_url or settings.OIDC_DISCOVERY_URL
+    url = provider['discovery_url']
     if url not in _DISCOVERY_CACHE:
         _DISCOVERY_CACHE[url] = _fetch_json(url)
     return _DISCOVERY_CACHE[url]
 
 
-def get_jwks(discovery_url: str | None = None) -> KeySet:
-    doc = get_discovery_document(discovery_url)
+def get_jwks(provider: dict) -> KeySet:
+    doc = get_discovery_document(provider)
     jwks_dict = _fetch_json(doc['jwks_uri'])
     return KeySet.import_key_set(jwks_dict)
 
@@ -77,12 +133,12 @@ def new_nonce() -> str:
     return secrets.token_urlsafe(24)
 
 
-def build_authorize_url(state: str, nonce: str, redirect_uri: str | None = None) -> str:
-    doc = get_discovery_document()
+def build_authorize_url(provider: dict, state: str, nonce: str, redirect_uri: str) -> str:
+    doc = get_discovery_document(provider)
     params = {
         'response_type': 'code',
-        'client_id': settings.OIDC_CLIENT_ID,
-        'redirect_uri': redirect_uri or settings.OIDC_REDIRECT_URI,
+        'client_id': provider['client_id'],
+        'redirect_uri': redirect_uri,
         'scope': 'openid email profile',
         'state': state,
         'nonce': nonce,
@@ -90,14 +146,14 @@ def build_authorize_url(state: str, nonce: str, redirect_uri: str | None = None)
     return f"{doc['authorization_endpoint']}?{urlencode(params)}"
 
 
-def exchange_code_for_tokens(code: str, redirect_uri: str | None = None) -> dict:
-    doc = get_discovery_document()
+def exchange_code_for_tokens(provider: dict, code: str, redirect_uri: str) -> dict:
+    doc = get_discovery_document(provider)
     data = urlencode({
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_uri': redirect_uri or settings.OIDC_REDIRECT_URI,
-        'client_id': settings.OIDC_CLIENT_ID,
-        'client_secret': settings.OIDC_CLIENT_SECRET,
+        'redirect_uri': redirect_uri,
+        'client_id': provider['client_id'],
+        'client_secret': provider['client_secret'],
     }).encode('utf-8')
     req = Request(doc['token_endpoint'], data=data, method='POST',
                   headers={'Content-Type': 'application/x-www-form-urlencoded'})
@@ -105,7 +161,7 @@ def exchange_code_for_tokens(code: str, redirect_uri: str | None = None) -> dict
         return json.loads(resp.read().decode('utf-8'))
 
 
-def verify_id_token(id_token: str, nonce: str) -> dict:
+def verify_id_token(provider: dict, id_token: str, nonce: str) -> dict:
     """Verify signature (RS256 via the IdP's published JWKS), issuer,
     audience, and expiry/not-before, then check *nonce* against the
     one-time value this app generated for the login attempt.
@@ -113,11 +169,11 @@ def verify_id_token(id_token: str, nonce: str) -> dict:
     Raises ValueError on any verification failure — callers must treat that
     as 'reject the login', never fall back to trusting unverified claims.
     """
-    doc = get_discovery_document()
-    jwks = get_jwks()
+    doc = get_discovery_document(provider)
+    jwks = get_jwks(provider)
     registry = JWTClaimsRegistry(
         iss={'essential': True, 'value': doc['issuer']},
-        aud={'essential': True, 'value': settings.OIDC_CLIENT_ID},
+        aud={'essential': True, 'value': provider['client_id']},
     )
     try:
         token = jose_jwt.decode(id_token, jwks)
