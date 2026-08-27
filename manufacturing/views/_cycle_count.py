@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES
+from ..accounts import READ_ONLY_ROLES, _verify_login
 
 from ..cycle_count_core import (
     GROUP_BY_OPTIONS,
@@ -108,9 +108,18 @@ def cc_detail(request, count_id):
                 elif action == 'decide':
                     step_id = int(request.POST.get('step_id'))
                     decision = request.POST.get('decision', '')
+                    by = request.session.get('user_email', '')
+                    signature_meaning = request.POST.get('signature_meaning', '').strip()
+                    password = request.POST.get('password', '')
+                    if not signature_meaning:
+                        raise ValueError(
+                            'A meaning of signature is required to record this decision.')
+                    if not _verify_login(by, password):
+                        raise ValueError(
+                            'Incorrect password — signature not recorded.')
                     decide_cycle_count(
-                        conn, count_id, step_id, decision,
-                        request.session.get('user_email', ''),
+                        conn, count_id, step_id, decision, by,
+                        signature_meaning=signature_meaning,
                     )
                     conn.commit()
                     return redirect('cc_detail', count_id=count_id)

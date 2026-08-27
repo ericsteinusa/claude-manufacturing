@@ -576,7 +576,8 @@ def _resolve_vendor_id(conn, consultant: dict) -> int:
 
 def decide_consultant_invoice_via_workflow(conn, cinv_id: int, step_id: int,
                                             decision: str, decided_by: str,
-                                            notes: str = '') -> str:
+                                            notes: str = '',
+                                            signature_meaning: str = '') -> str:
     """Decide one approval_workflow step for a consultant invoice, syncing
     consultant_invoice.status to match — mirrors
     purchase_requisitions_core.decide_requisition_via_workflow's sync
@@ -592,7 +593,9 @@ def decide_consultant_invoice_via_workflow(conn, cinv_id: int, step_id: int,
     from . import approval_workflow_core
     from . import accounting_core
 
-    overall = approval_workflow_core.decide_step(conn, step_id, decision, decided_by, notes)
+    overall = approval_workflow_core.decide_step(
+        conn, step_id, decision, decided_by, notes,
+        signature_meaning=signature_meaning)
 
     if overall == 'approved':
         cinv = get_consultant_invoice(conn, cinv_id)

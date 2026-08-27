@@ -235,12 +235,14 @@ def enter_counts(conn, count_id, counted_qtys, counted_by):
     return 'submitted'
 
 
-def decide_cycle_count(conn, count_id, step_id, decision, decided_by, notes=''):
+def decide_cycle_count(conn, count_id, step_id, decision, decided_by, notes='',
+                       signature_meaning=''):
     """Record an approve/reject decision; posts the adjustment once every
     approval step for this sheet is approved. Returns the resulting
     cycle_count status.
     """
-    overall = decide_step(conn, step_id, decision, decided_by, notes)
+    overall = decide_step(conn, step_id, decision, decided_by, notes,
+                          signature_meaning=signature_meaning)
     if overall == 'approved':
         post_cycle_count(conn, count_id, decided_by)
         return 'posted'

@@ -63,6 +63,15 @@ def ensure_approval_tables(conn) -> None:
             created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     """)
+    # 21 CFR Part 11-style e-signature: the "meaning of signature" (e.g.
+    # "I approve this cycle count") captured alongside decided_by/decided_at,
+    # which this table already had. Password re-authentication itself isn't
+    # stored anywhere (it's a one-time check at decision time, not data) --
+    # see decide_step()'s docstring.
+    conn.execute(
+        "ALTER TABLE approval_step ADD COLUMN IF NOT EXISTS "
+        "signature_meaning TEXT NOT NULL DEFAULT ''"
+    )
     conn.execute(
         "CREATE INDEX IF NOT EXISTS approval_step_entity "
         "ON approval_step(entity_type, entity_id)"
@@ -232,10 +241,20 @@ def _all_prior_steps_done(conn, entity_type: str,
 
 
 def decide_step(conn, step_id: int, decision: str,
-                decided_by: str, notes: str = '') -> str:
+                decided_by: str, notes: str = '',
+                signature_meaning: str = '') -> str:
     """Record a decision on one approval step.
 
-    *decision* must be 'approved' or 'rejected'.
+    *decision* must be 'approved' or 'rejected'. *signature_meaning* is the
+    21 CFR Part 11-style "meaning of signature" text (e.g. "I approve this
+    cycle count as accurate") for callers that capture one -- password
+    re-authentication itself happens in the caller (the view has the
+    plaintext password from the request; this function never sees it) via
+    the same accounts._verify_login() re-entered-password check already
+    used for change-password and MFA-disable confirmation. Left optional
+    here (default '') since not every caller of this generic engine
+    (e.g. the mobile API) captures a signature.
+
     Returns the overall entity approval status after this decision:
       'approved'   — all steps approved
       'rejected'   — any step rejected
@@ -263,9 +282,10 @@ def decide_step(conn, step_id: int, decision: str,
 
     conn.execute(
         "UPDATE approval_step "
-        "SET status=%s, decided_by=%s, decided_at=NOW(), notes=%s "
+        "SET status=%s, decided_by=%s, decided_at=NOW(), notes=%s, "
+        "signature_meaning=%s "
         "WHERE id=%s",
-        (decision, decided_by, notes or '', step_id),
+        (decision, decided_by, notes or '', signature_meaning or '', step_id),
     )
     log.info("Step %s %s by %s", step_id, decision, decided_by)
 
@@ -286,8 +306,8 @@ def get_entity_approval_status(
     """Return all steps for an entity and the overall status."""
     rows = conn.execute("""
         SELECT s.id, s.seq, s.approver_role, s.status,
-               s.decided_by, s.decided_at, s.notes, s.created_at,
-               r.threshold_amount, r.escalate_after_hours
+               s.decided_by, s.decided_at, s.notes, s.signature_meaning,
+               s.created_at, r.threshold_amount, r.escalate_after_hours
         FROM approval_step s
         LEFT JOIN approval_rule r ON r.id = s.rule_id
         WHERE s.entity_type = %s AND s.entity_id = %s

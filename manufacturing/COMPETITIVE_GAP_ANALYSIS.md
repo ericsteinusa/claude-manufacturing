@@ -3075,3 +3075,44 @@ plus their referencing `position` row. All test data deleted afterward. Full sui
 open from this section's list: GxP e-signatures, API docs/rate limiting, mobile offline support,
 and localization** — none started, all still correctly scored as lower-ROI for this app's buyer
 profile.
+
+---
+
+**2026-08-27, later same day:** Shipped **§6.5 GxP / 21 CFR Part 11 e-signatures**, exactly as
+scoped in that section's own "what it would take" note: "password re-entry + a captured 'meaning
+of signature' string per `approval_step` decision... a moderate, contained addition to the existing
+`decide_step` function." `approval_workflow_core.decide_step()` gains a `signature_meaning`
+parameter (stored in a new `approval_step.signature_meaning` column, added via `ALTER TABLE ... ADD
+COLUMN IF NOT EXISTS` since the table pre-dates this column) alongside the `decided_by`/`decided_at`
+columns it already had — together the three satisfy Part 11's baseline signature-record
+requirements (who, when, and what the signature meant). Password re-authentication itself isn't
+stored anywhere (it's a one-time gate at decision time, not a data field) — it reuses
+`accounts._verify_login()`, the exact same re-entered-password check this app already uses for
+change-password and MFA-disable confirmation, so no new verification code was written. Threaded
+through all three real web decision points that call the generic engine — `document_control_core
+.decide_document`, `cycle_count_core.decide_cycle_count`, and `consultants_core
+.decide_consultant_invoice_via_workflow` — plus their corresponding views (`_document_control.py`,
+`_cycle_count.py`, `_consultants.py`), each of which now requires both a non-empty
+`signature_meaning` and a correct password re-entry before calling into the wrapper; either
+failure returns a clear error and records nothing (confirmed live — see below). Left the
+`signature_meaning` parameter optional (default `''`) on `decide_step` itself and did **not** touch
+the mobile API's decision path (`api_views.py`) or `purchase_requisitions_core
+.decide_requisition_via_workflow`, since mobile capturing a re-entered password over the API is a
+separate, larger design question (secure password transmission/storage on-device) not in this
+item's scope — a real gap worth flagging for later, not silently dropped. Also discovered along
+the way: web requisition approvals don't actually go through this generic engine at all (they use
+`purchase_requisitions_core.decide_requisition`, a separate simpler status-transition function) —
+`decide_requisition_via_workflow` is mobile-only. 4 new tests in `test_approval_workflow_core.py`
+covering `signature_meaning` storage and its empty-by-default behavior; full suite: 3398 passed
+(3396 + 4 — wrapper-function signature changes needed no fixture updates since existing tests use a
+lenient sequenced-mock connection). Verified end-to-end against the real dev DB rather than just
+unit-tested: created a real `document` approval rule + a real document + a real pending
+`approval_step` via the actual core functions, then drove the decision through the live web UI as a
+real Department Manager account — confirmed submitting with no `signature_meaning` is rejected with
+a clear error and the step stays `pending`, confirmed submitting with a wrong password is rejected
+the same way with nothing recorded, and confirmed a correct password + a real signature-meaning
+string is accepted, immediately visible in `approval_step.signature_meaning`, and the document
+correctly cascades to `approved`. All test data deleted afterward. `ruff check .` and `manage.py
+check` clean. **This leaves three gaps genuinely open: API docs/rate limiting, mobile offline
+support, and localization** — none started, all still correctly scored as lower-ROI for this app's
+buyer profile.

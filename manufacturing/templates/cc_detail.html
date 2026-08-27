@@ -38,10 +38,12 @@
         {% if pending_step %}
         <div class="alert alert-warning" style="margin-bottom:16px;">
             Awaiting your approval as <strong>{{ pending_step.approver_role }}</strong>.
-            <form method="post" style="display:inline;margin-left:10px;">
+            <form method="post" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="decide">
                 <input type="hidden" name="step_id" value="{{ pending_step.id }}">
+                <input type="text" name="signature_meaning" placeholder="Meaning of signature (e.g. &quot;I approve this count as accurate&quot;)" required style="flex:1;min-width:220px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                <input type="password" name="password" placeholder="Re-enter your password" required style="width:170px;padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
                 <button type="submit" name="decision" value="approved" class="btn btn-primary" style="padding:4px 12px;font-size:12px;">Approve</button>
                 <button type="submit" name="decision" value="rejected" class="btn" style="padding:4px 12px;font-size:12px;">Reject</button>
             </form>

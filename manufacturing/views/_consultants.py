@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required, dept_manager_required, login_required
-from ..accounts import READ_ONLY_ROLES
+from ..accounts import READ_ONLY_ROLES, _verify_login
 from ..csv_export import export_response
 from ..personnel_core import get_person, get_person_by_email, load_depts
 from ..accounting_core import load_vendors
@@ -416,10 +416,19 @@ def consultant_invoice_decide(request, cinv_id):
             (s for s in approval['steps'] if s['status'] == 'pending'), None)
         if pending_step:
             try:
+                by = request.session.get('user_email', '')
+                signature_meaning = request.POST.get('signature_meaning', '').strip()
+                password = request.POST.get('password', '')
+                if not signature_meaning:
+                    raise ValueError(
+                        'A meaning of signature is required to record this decision.')
+                if not _verify_login(by, password):
+                    raise ValueError(
+                        'Incorrect password — signature not recorded.')
                 decide_consultant_invoice_via_workflow(
-                    conn, cinv_id, pending_step['id'], decision,
-                    request.session.get('user_email', ''),
+                    conn, cinv_id, pending_step['id'], decision, by,
                     notes=request.POST.get('notes', ''),
+                    signature_meaning=signature_meaning,
                 )
                 conn.commit()
             except Exception as exc:

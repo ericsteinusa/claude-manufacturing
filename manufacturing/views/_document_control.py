@@ -11,7 +11,7 @@ from django.utils.text import get_valid_filename
 from ..db_pg import get_db_connection
 from ..auth_decorators import dept_required
 from ..log_utils import get_logger
-from ..accounts import READ_ONLY_ROLES
+from ..accounts import READ_ONLY_ROLES, _verify_login
 
 from ..document_control_core import (
     ensure_document_tables, list_documents, get_document, create_document,
@@ -125,10 +125,19 @@ def document_detail(request, doc_id):
                 if action == 'submit_review':
                     submit_for_review(conn, doc_id, requested_by=by)
                 elif action == 'decide':
+                    signature_meaning = request.POST.get('signature_meaning', '').strip()
+                    password = request.POST.get('password', '')
+                    if not signature_meaning:
+                        raise ValueError(
+                            'A meaning of signature is required to record this decision.')
+                    if not _verify_login(by, password):
+                        raise ValueError(
+                            'Incorrect password — signature not recorded.')
                     decide_document(
                         conn, doc_id, int(request.POST.get('step_id')),
                         request.POST.get('decision', ''), by,
                         notes=request.POST.get('notes', '').strip(),
+                        signature_meaning=signature_meaning,
                     )
                 elif action == 'upload':
                     upload = request.FILES.get('file')
