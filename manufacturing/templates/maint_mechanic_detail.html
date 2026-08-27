@@ -96,10 +96,14 @@
                 </div>
                 <div class="form-row">
                     <label>Hourly Rate</label>
-                    {% if can_edit %}
-                    <input type="number" name="hourly_rate" step="0.01" min="0" value="{{ mechanic.hourly_rate|default:'0' }}">
+                    {% if can_view_comp %}
+                        {% if can_edit %}
+                        <input type="number" name="hourly_rate" step="0.01" min="0" value="{{ mechanic.hourly_rate|default:'0' }}">
+                        {% else %}
+                        <input class="ro" readonly value="{{ mechanic.hourly_rate|default:'0' }}">
+                        {% endif %}
                     {% else %}
-                    <input class="ro" readonly value="{{ mechanic.hourly_rate|default:'0' }}">
+                    <input class="ro" readonly value="Hidden — Payroll/HR only" title="Compensation fields are only visible to Payroll, Personnel, or HR roles">
                     {% endif %}
                 </div>
                 <div class="form-row full">

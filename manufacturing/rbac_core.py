@@ -74,3 +74,38 @@ def owns_row_strict(request, record: dict, column: str, session_key: str) -> boo
     """Like owns_row(), but never bypassed by privilege."""
     value = request.session.get(session_key)
     return value is not None and record.get(column) == value
+
+
+# ---------------------------------------------------------------------------
+# Field-level masking
+#
+# Closes the second half of COMPETITIVE_GAP_ANALYSIS.md §6.3's "Granular
+# RBAC" gap: everything above controls which *records* a view returns;
+# this controls which *fields* of an otherwise-visible record a viewer
+# may see or change. The two are independent — a Maintenance supervisor
+# legitimately has whole-view access to a mechanic's record
+# (dept_required already granted that), but the mechanic's hourly rate is
+# a compensation field that should stay HR/Payroll's concern regardless
+# of which department's view happens to display it.
+# ---------------------------------------------------------------------------
+
+# Departments/roles that may see compensation-sensitive fields (salary,
+# hourly/pay rate) wherever they appear, independent of which department
+# owns the view displaying them.
+_COMPENSATION_DEPT_KEYS = {'payroll', 'personnel'}
+_COMPENSATION_ROLE = 'HR / Personnel'
+
+
+def can_view_compensation(request) -> bool:
+    """True if this session may see compensation-sensitive fields (salary,
+    hourly/pay rate, etc.) wherever they appear in the app — not just
+    within Payroll/HR's own department-gated views. Full-access roles,
+    Payroll/Personnel department members, and the HR / Personnel role
+    (which can sit in any department) all qualify; nobody else does,
+    regardless of whether they otherwise have whole-view access to the
+    record the field lives on."""
+    if request.session.get('user_full_access'):
+        return True
+    if request.session.get('user_dept_key') in _COMPENSATION_DEPT_KEYS:
+        return True
+    return request.session.get('user_role') == _COMPENSATION_ROLE

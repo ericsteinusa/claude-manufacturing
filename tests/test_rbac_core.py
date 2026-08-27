@@ -2,6 +2,7 @@
 
 from manufacturing.rbac_core import (
     is_privileged, owned_scope, owns_row, owned_scope_strict, owns_row_strict,
+    can_view_compensation,
 )
 
 
@@ -127,3 +128,45 @@ def test_owns_row_strict_false_when_session_key_missing():
     req = _FakeRequest({})
     record = {'people_id': None}
     assert owns_row_strict(req, record, 'people_id', 'user_people_id') is False
+
+
+# ---------------------------------------------------------------------------
+# can_view_compensation
+# ---------------------------------------------------------------------------
+
+def test_full_access_can_view_compensation():
+    req = _FakeRequest({'user_full_access': True})
+    assert can_view_compensation(req) is True
+
+
+def test_payroll_dept_can_view_compensation():
+    req = _FakeRequest({'user_dept_key': 'payroll'})
+    assert can_view_compensation(req) is True
+
+
+def test_personnel_dept_can_view_compensation():
+    req = _FakeRequest({'user_dept_key': 'personnel'})
+    assert can_view_compensation(req) is True
+
+
+def test_hr_personnel_role_can_view_compensation_regardless_of_dept():
+    req = _FakeRequest({'user_dept_key': 'maintenance', 'user_role': 'HR / Personnel'})
+    assert can_view_compensation(req) is True
+
+
+def test_maintenance_supervisor_cannot_view_compensation():
+    req = _FakeRequest({
+        'user_dept_key': 'maintenance', 'user_role': 'Supervisor',
+        'user_is_manager': False, 'user_full_access': False,
+    })
+    assert can_view_compensation(req) is False
+
+
+def test_being_a_manager_alone_does_not_grant_compensation_visibility():
+    # is_manager (used for row-level privilege) must NOT leak into the
+    # separate compensation-visibility check -- a manager of Sales, say,
+    # still shouldn't see a Maintenance mechanic's pay rate.
+    req = _FakeRequest({
+        'user_dept_key': 'sales', 'user_is_manager': True, 'user_role': 'Supervisor',
+    })
+    assert can_view_compensation(req) is False
