@@ -1,51 +1,95 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator, Alert, RefreshControl, ScrollView,
   StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { clockIn, clockOut, getHours, getStatus } from '../../src/api/timeclock';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
+import { enqueueMutation, getQueuedMutations } from '../../src/offline/queue';
+import { useIsOnline } from '../../src/offline/netStatus';
+import OfflineBanner from '../../src/components/OfflineBanner';
 
 type Period = 'today' | 'week' | 'month';
 
 export default function TimeClockScreen() {
+  const isOnline = useIsOnline();
   const [clockedIn, setClockedIn] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<any>(null);
   const [hours, setHours] = useState<any>(null);
   const [period, setPeriod] = useState<Period>('week');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
+  const [queuedCount, setQueuedCount] = useState(0);
+
+  const refreshQueueCount = useCallback(async () => {
+    const queue = await getQueuedMutations();
+    setQueuedCount(queue.filter((m) => m.url === '/time-clock/clock-in/' || m.url === '/time-clock/clock-out/').length);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [statusRes, hoursRes] = await Promise.all([
-        getStatus(),
-        getHours(period),
+      const [statusResult, hoursResult] = await Promise.all([
+        fetchWithOfflineCache('tc_status', async () => (await getStatus()).data.data),
+        fetchWithOfflineCache(`tc_hours_${period}`, async () => (await getHours(period)).data.data),
       ]);
-      setClockedIn(statusRes.data.data.clocked_in);
-      setCurrentEntry(statusRes.data.data.entry);
-      setHours(hoursRes.data.data);
+      setClockedIn(statusResult.data.clocked_in);
+      setCurrentEntry(statusResult.data.entry);
+      setHours(hoursResult.data);
+      setIsStale(statusResult.isStale || hoursResult.isStale);
+      setCachedAt(statusResult.isStale ? statusResult.cachedAt : hoursResult.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load time clock data.');
     } finally {
+      await refreshQueueCount();
       setLoading(false);
     }
-  }, [period]);
+  }, [period, refreshQueueCount]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  // Pick up mutations the app-wide reconnect listener (app/_layout.tsx)
+  // just flushed while this screen wasn't focused — only on an actual
+  // offline-to-online transition, not on the initial mount (useFocusEffect
+  // above already covers that).
+  const wasOnline = useRef(isOnline);
+  useEffect(() => {
+    if (isOnline && !wasOnline.current) load();
+    wasOnline.current = isOnline;
+  }, [isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleToggle = async () => {
     setActionLoading(true);
+    const goingClockedIn = !clockedIn;
     try {
-      if (clockedIn) {
+      if (!isOnline) {
+        // Queue it and optimistically flip the toggle — a plant-floor
+        // worker needs clock-in/out to work with no signal; this is
+        // exactly the case COMPETITIVE_GAP_ANALYSIS.md's §6.10 called out.
+        await enqueueMutation(
+          'post',
+          goingClockedIn ? '/time-clock/clock-in/' : '/time-clock/clock-out/',
+          goingClockedIn ? { notes: '' } : undefined,
+          goingClockedIn ? 'Clock in' : 'Clock out',
+        );
+        setClockedIn(goingClockedIn);
+        await refreshQueueCount();
+        Alert.alert(
+          goingClockedIn ? 'Clock-in queued' : 'Clock-out queued',
+          'No connection — this will sync automatically once you\'re back online.',
+        );
+      } else if (clockedIn) {
         await clockOut();
         Alert.alert('Clocked Out', 'Your time has been recorded.');
+        await load();
       } else {
         await clockIn();
         Alert.alert('Clocked In', 'Have a great shift!');
+        await load();
       }
-      await load();
     } catch (err: any) {
       Alert.alert('Error', err?.response?.data?.error ?? 'Action failed.');
     } finally {
@@ -58,6 +102,7 @@ export default function TimeClockScreen() {
       style={styles.screen}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
     >
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} queuedCount={queuedCount} />
       <View style={styles.statusCard}>
         <Text style={styles.statusLabel}>
           {clockedIn ? 'Currently Clocked In' : 'Not Clocked In'}

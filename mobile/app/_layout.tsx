@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import { AuthContext } from '../src/hooks/useAuth';
 import { login as apiLogin, logout as apiLogout } from '../src/api/auth';
 import type { User } from '../src/api/auth';
+import { flushQueue } from '../src/offline/queue';
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -30,6 +32,23 @@ export default function RootLayout() {
     if (!token && !inAuth) router.replace('/(auth)/login');
     if (token && inAuth) router.replace('/(tabs)');
   }, [token, ready, segments, router]);
+
+  // Replay any offline-queued mutations (see src/offline/queue.ts) the
+  // moment connectivity comes back, regardless of which screen the user
+  // happens to be on — a queued clock-out shouldn't wait for the user to
+  // revisit the Time Clock screen before it syncs.
+  useEffect(() => {
+    if (!token) return;
+    let wasOffline = false;
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      const isOnline = state.isConnected !== false && state.isInternetReachable !== false;
+      if (isOnline && wasOffline) {
+        flushQueue().catch(() => { /* will retry on the next reconnect event */ });
+      }
+      wasOffline = !isOnline;
+    });
+    return unsubscribe;
+  }, [token]);
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await apiLogin(email, password);
