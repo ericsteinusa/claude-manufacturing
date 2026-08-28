@@ -3513,3 +3513,33 @@ Engineering) have now all had a pre-existing dashboard function reused rather th
 backend work — at this point the working assumption should flip: **check the department's own
 `*_core.py` for a `get_*_dashboard`/`*_dashboard` function before doing anything else**, since it
 has been there every single time so far.
+
+---
+
+**2026-08-28, five for five:** Closed **Customers** — the pattern held a fifth consecutive time.
+No `customers_core.py` file exists (there never was one); the department's real logic lives in
+`credit_core.py` (credit accounts, applications, collections — this is the credit/collections
+risk-management domain, distinct from Sales' order pipeline and Customer Service's support
+tickets) and `contacts_core.py`. `credit_core.get_credit_dashboard()` and
+`list_collection_activities()` already existed and were already in real use by the web
+`credit_dashboard` view. Added `reports_core.customers_dashboard()` combining the two — filtering
+`list_collection_activities()`'s results down to Open/In Progress/Escalated (matching the same
+filter `credit_dashboard`'s own view already applies) rather than duplicating the query. New
+`api_customers_dashboard` view + `/api/v1/dashboards/customers/` route, added to
+`api_openapi_core.py`'s `ENDPOINTS`. The new `customers.tsx` mobile screen shows accounts-at-risk
+count, total credit exposure, pending credit applications, open collections, and a recent
+collection-activity list — this one reused the shared `StatusBadge` component directly rather than
+building a second local status-color map (its `escalated`/`closed` colors were added to
+`StatusBadge`'s own map, the fifth mobile-coverage PR in a row to touch it). 2 new tests for
+`customers_dashboard()` (KPI+recent-collections combination including the open/closed status
+filter, and the contact-name fallback when no company is linked); full suite 3423 passed
+(3421 + 2), `ruff check .` and `manage.py check` clean (one line-length fixup needed in the new
+`ENDPOINTS` entry); mobile's `tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web` all
+clean. Verified end-to-end against the real dev server: hit `/api/v1/dashboards/customers/`
+directly with a real bearer token and confirmed live data (11 real credit accounts, real exposure
+total, 5 real open/escalated collection activities with real customer names and promised amounts)
+matches the TypeScript interface exactly. §6.9's explicit zero-coverage list now drops to **4**:
+`it`, `legal`, `marketing`, `payroll`. Five for five on the "check `*_core.py` for an existing
+dashboard function first" pattern — worth checking `it_core.py`, `legal_core.py`,
+`marketing_core.py`, and `payroll_core.py` next before assuming any of them is the one that finally
+breaks the streak.
