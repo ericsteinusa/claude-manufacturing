@@ -616,6 +616,8 @@ urlpatterns = [
     path('api/v1/dashboards/accounting/',  api_views.api_accounting_dashboard, name='api_accounting_dashboard'),
     path('api/v1/dashboards/customer-service/', api_views.api_customer_service_dashboard,
          name='api_customer_service_dashboard'),
+    path('api/v1/dashboards/engineering/', api_views.api_engineering_dashboard,
+         name='api_engineering_dashboard'),
     path('api/v1/time-clock/status/',    api_views.api_tc_status,    name='api_tc_status'),
     path('api/v1/time-clock/clock-in/',  api_views.api_tc_clock_in,  name='api_tc_clock_in'),
     path('api/v1/time-clock/clock-out/', api_views.api_tc_clock_out, name='api_tc_clock_out'),

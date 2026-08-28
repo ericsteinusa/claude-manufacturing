@@ -140,6 +140,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🎧</Text>,
         }}
       />
+      <Tabs.Screen
+        name="engineering"
+        options={{
+          title: 'Engineering',
+          tabBarLabel: ({ focused }) => <TabIcon label="Eng" focused={focused} />,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⚗</Text>,
+        }}
+      />
     </Tabs>
   );
 }

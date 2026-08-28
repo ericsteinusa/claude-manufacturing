@@ -3,6 +3,7 @@
 from manufacturing.reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
     sales_dashboard, accounting_dashboard, customer_service_dashboard,
+    engineering_dashboard,
 )
 
 
@@ -280,3 +281,41 @@ def test_customer_service_dashboard_truncates_recent_tickets_to_eight():
     result = customer_service_dashboard(conn)
     assert len(result["recent_tickets"]) == 8
     assert result["recent_tickets"][0]["call_date"] is None
+
+
+# ── engineering_dashboard ─────────────────────────────────────────────────────
+
+def test_engineering_dashboard_combines_kpis_and_recent_projects():
+    conn = _FakeConn([
+        [{"planning": 2, "in_progress": 3, "on_hold": 1, "completed": 5, "total": 11}],
+        [{"draft": 1, "pending": 2, "approved": 4, "total": 7}],
+        [{"open_tasks": 6, "active_tasks": 3, "overdue_tasks": 2}],
+        [{"id": 1, "project_number": "ENG-2026-001", "title": "New valve design",
+          "product_id": 5, "engineer": "Alice", "start_date": "2026-07-01",
+          "due_date": "2026-09-01", "status": "in_progress", "notes": "",
+          "created_by": "x", "task_count": 5, "done_count": 2, "overdue_tasks": 1}],
+    ])
+    result = engineering_dashboard(conn)
+    assert result["projects"]["total"] == 11
+    assert result["ecrs"]["pending"] == 2
+    assert result["tasks"]["overdue_tasks"] == 2
+    assert result["recent_projects"] == [{
+        "id": 1, "project_number": "ENG-2026-001", "title": "New valve design",
+        "engineer": "Alice", "status": "in_progress", "due_date": "2026-09-01",
+        "task_count": 5, "done_count": 2, "overdue_tasks": 1,
+    }]
+
+
+def test_engineering_dashboard_truncates_recent_projects_to_eight():
+    project_row = {"id": 1, "project_number": "ENG-1", "title": "X",
+                   "product_id": None, "engineer": "", "start_date": None,
+                   "due_date": None, "status": "planning", "notes": "",
+                   "created_by": "x", "task_count": 0, "done_count": 0, "overdue_tasks": 0}
+    conn = _FakeConn([
+        [{"planning": 0, "in_progress": 0, "on_hold": 0, "completed": 0, "total": 0}],
+        [{"draft": 0, "pending": 0, "approved": 0, "total": 0}],
+        [{"open_tasks": 0, "active_tasks": 0, "overdue_tasks": 0}],
+        [dict(project_row) for _ in range(12)],
+    ])
+    result = engineering_dashboard(conn)
+    assert len(result["recent_projects"]) == 8

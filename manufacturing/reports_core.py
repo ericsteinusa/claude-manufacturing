@@ -8,6 +8,7 @@ import textwrap
 
 from .accounting_core import get_ap_dashboard, get_ar_dashboard
 from .cs_calls_core import get_summary_stats, list_tickets
+from .engineering_core import get_eng_dashboard, list_projects
 from .finance_core import get_cash_position
 from .sales_core import get_sales_dashboard
 from .sales_orders_core import list_sos
@@ -464,6 +465,40 @@ def customer_service_dashboard(conn) -> dict:
         for r in recent
     ]
     return stats
+
+
+def engineering_dashboard(conn) -> dict:
+    """Return project/ECR/task KPIs + recent projects for the mobile
+    Engineering screen (COMPETITIVE_GAP_ANALYSIS.md §6.9's mobile-coverage
+    gap) — reuses engineering_core's own get_eng_dashboard() and
+    list_projects() (already real, in use by the web eng_dashboard view)
+    rather than a third copy of the same queries.
+
+    Keys returned:
+      projects          {planning, in_progress, on_hold, completed, total}
+      ecrs              {draft, pending, approved, total}
+      tasks             {open_tasks, active_tasks, overdue_tasks}
+      recent_projects   Up to 8 most recent projects (id, project_number,
+                        title, engineer, status, due_date, task_count,
+                        done_count, overdue_tasks)
+    """
+    dash = get_eng_dashboard(conn)
+    recent = list_projects(conn)[:8]
+    dash['recent_projects'] = [
+        {
+            'id': r['id'],
+            'project_number': r['project_number'],
+            'title': r['title'],
+            'engineer': r['engineer'],
+            'status': r['status'],
+            'due_date': r['due_date'],
+            'task_count': r['task_count'],
+            'done_count': r['done_count'],
+            'overdue_tasks': r['overdue_tasks'],
+        }
+        for r in recent
+    ]
+    return dash
 
 
 # ---------------------------------------------------------------------------
