@@ -3463,3 +3463,28 @@ be more about whether a department already had a dashboard-shaped aggregation fu
 (Accounting did, quietly) than about which items this document happened to flag as cheap in
 advance — worth spot-checking each remaining department's own `*_core.py` for an existing
 `get_*_dashboard`/`*_dashboard` function before assuming new backend work is required.
+
+---
+
+**2026-08-28, and the pattern held again:** Closed **Customer Service** by applying that exact
+lesson — checked `cs_calls_core.py` first and found `get_summary_stats()` and `list_tickets()`
+already existed and were already in real use by the web `cs_dashboard_view`. Added
+`reports_core.customer_service_dashboard()` combining the two (matching Accounting's and Sales'
+shape: reuse the domain module's own dashboard-shaped function, add a recent-items list, no new
+SQL of substance) plus a new `api_customer_service_dashboard` view and
+`/api/v1/dashboards/customer-service/` route, added to `api_openapi_core.py`'s `ENDPOINTS`. The new
+`customer-service.tsx` mobile screen shows open-ticket count, completion rate, average resolution
+time, average age of currently-open tickets, and the 8 most recent tickets with an Open/Closed
+badge. 2 new tests for `customer_service_dashboard()` (stats+recent-tickets combination, and the
+8-ticket cap with a null call_date); full suite 3419 passed (3417 + 2), `ruff check .` and
+`manage.py check` clean; mobile's `tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web`
+all clean — including confirming a hyphenated route filename (`customer-service.tsx`, needed since
+the department name has a space) works fine with Expo Router. Verified end-to-end against the real
+dev server: hit `/api/v1/dashboards/customer-service/` directly with a real bearer token and
+confirmed live data (26 real tickets, real completion-rate/resolution-time figures, 8 real recent
+tickets with real customer names and call descriptions) matches the TypeScript interface exactly.
+§6.9's explicit zero-coverage list now drops to **6**: `customers`, `engineering`, `it`, `legal`,
+`marketing`, `payroll`. Three departments in a row (Personnel, Accounting, Customer Service) turned
+out to already have a reusable dashboard function sitting in their own `*_core.py` — worth checking
+`engineering_core.py`, `it_core.py`, `legal_core.py`, `marketing_core.py`, and `payroll_core.py` for
+the same pattern before assuming any of them needs real new backend work.

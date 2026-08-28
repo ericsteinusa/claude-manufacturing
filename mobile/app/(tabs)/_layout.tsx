@@ -132,6 +132,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>💼</Text>,
         }}
       />
+      <Tabs.Screen
+        name="customer-service"
+        options={{
+          title: 'Customer Service',
+          tabBarLabel: ({ focused }) => <TabIcon label="CS" focused={focused} />,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🎧</Text>,
+        }}
+      />
     </Tabs>
   );
 }
