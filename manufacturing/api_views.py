@@ -719,6 +719,18 @@ def api_inventory_dashboard(request):
     return api_ok(data)
 
 
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_sales_dashboard(request):
+    conn = get_db_connection()
+    try:
+        data = reports_core.sales_dashboard(conn)
+    finally:
+        conn.close()
+    return api_ok(data)
+
+
 # ---------------------------------------------------------------------------
 # Inventory  (5C)
 # ---------------------------------------------------------------------------

@@ -7,6 +7,8 @@ import io
 import textwrap
 
 from .finance_core import get_cash_position
+from .sales_core import get_sales_dashboard
+from .sales_orders_core import list_sos
 
 
 def hours_variance(std_hours, actual_hours) -> tuple[float, float | None]:
@@ -366,6 +368,35 @@ def inventory_dashboard(conn) -> dict:
         'slow_mover_count':      int(slow_mover_count_row['n'] if slow_mover_count_row else 0),
         'slow_movers':           [dict(r) for r in slow_rows],
     }
+
+
+def sales_dashboard(conn) -> dict:
+    """Return sales KPIs for the mobile Sales screen (COMPETITIVE_GAP_
+    ANALYSIS.md §6.9's mobile-coverage gap) — reuses sales_core's own
+    dashboard aggregation and sales_orders_core.list_sos rather than a
+    third copy of the same queries.
+
+    Keys returned:
+      orders          {draft, confirmed, shipped, invoiced, total, total_value}
+      quotes          {draft, sent, won, total, won_value}
+      targets         {total_target, total_actual}
+      recent_orders   Up to 8 most recent sales orders (so_number, customer,
+                       status, total, order_date)
+    """
+    dash = get_sales_dashboard(conn)
+    recent = list_sos(conn)[:8]
+    dash['recent_orders'] = [
+        {
+            'id': r['id'],
+            'so_number': r['so_number'],
+            'customer': r['company_name'] or f"{r['first_name'] or ''} {r['last_name'] or ''}".strip(),
+            'status': r['status'],
+            'total': r['total'],
+            'order_date': str(r['order_date']) if r['order_date'] else None,
+        }
+        for r in recent
+    ]
+    return dash
 
 
 # ---------------------------------------------------------------------------

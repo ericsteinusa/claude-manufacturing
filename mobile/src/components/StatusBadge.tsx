@@ -23,6 +23,10 @@ const STATUS_COLORS: Record<string, string> = {
   sent:     '#cce5ff',
   partial:  '#fff3cd',
   received: '#d4edda',
+  // Sales orders
+  confirmed: '#cce5ff',
+  shipped:   '#d4edda',
+  invoiced:  '#d1ecf1',
 };
 
 interface Props {
