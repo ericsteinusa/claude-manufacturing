@@ -6,6 +6,7 @@ import datetime
 import io
 import textwrap
 
+from .accounting_core import get_ap_dashboard, get_ar_dashboard
 from .finance_core import get_cash_position
 from .sales_core import get_sales_dashboard
 from .sales_orders_core import list_sos
@@ -397,6 +398,39 @@ def sales_dashboard(conn) -> dict:
         for r in recent
     ]
     return dash
+
+
+def accounting_dashboard(conn) -> dict:
+    """Return AP/AR KPIs + recent GL journals for the mobile Accounting
+    screen (COMPETITIVE_GAP_ANALYSIS.md §6.9's mobile-coverage gap) —
+    reuses accounting_core's own AP/AR dashboard functions (already real,
+    in-use by the web acct_dashboard view) plus the same recent-journals
+    query that view already runs, rather than a third copy.
+
+    Keys returned:
+      ap                {open_count, overdue_count, total_outstanding,
+                         total_invoiced, total_invoices}
+      ar                same shape as ap, for accounts receivable
+      recent_journals   Up to 8 most recent GL journal entries (id,
+                        journal_date, reference, description, posted,
+                        line_count, total_debit)
+    """
+    ap = get_ap_dashboard(conn)
+    ar = get_ar_dashboard(conn)
+    journal_rows = conn.execute("""
+        SELECT j.id, j.journal_date, j.reference, j.description, j.posted,
+               COUNT(jl.id) AS line_count,
+               COALESCE(SUM(jl.debit), 0) AS total_debit
+        FROM gl_journal j
+        LEFT JOIN gl_journal_line jl ON jl.journal_id = j.id
+        GROUP BY j.id
+        ORDER BY j.journal_date DESC, j.id DESC LIMIT 8
+    """).fetchall()
+    return {
+        'ap': ap,
+        'ar': ar,
+        'recent_journals': [dict(r) for r in journal_rows],
+    }
 
 
 # ---------------------------------------------------------------------------

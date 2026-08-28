@@ -2,7 +2,7 @@
 
 from manufacturing.reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
-    sales_dashboard,
+    sales_dashboard, accounting_dashboard,
 )
 
 
@@ -208,3 +208,37 @@ def test_sales_dashboard_truncates_recent_orders_to_eight():
     ])
     result = sales_dashboard(conn)
     assert len(result["recent_orders"]) == 8
+
+
+# ── accounting_dashboard ─────────────────────────────────────────────────────
+
+def test_accounting_dashboard_combines_ap_ar_and_journals():
+    conn = _FakeConn([
+        [{"open_count": 3, "overdue_count": 1, "total_outstanding": "5000.00",
+          "total_invoiced": "20000.00", "total_invoices": 10}],
+        [{"open_count": 5, "overdue_count": 2, "total_outstanding": "8000.00",
+          "total_invoiced": "30000.00", "total_invoices": 12}],
+        [{"id": 1, "journal_date": "2026-08-01", "reference": "JE-1",
+          "description": "Month-end accrual", "posted": 1, "line_count": 4,
+          "total_debit": "1200.00"}],
+    ])
+    result = accounting_dashboard(conn)
+    assert result["ap"]["overdue_count"] == 1
+    assert result["ar"]["total_invoices"] == 12
+    assert result["recent_journals"] == [{
+        "id": 1, "journal_date": "2026-08-01", "reference": "JE-1",
+        "description": "Month-end accrual", "posted": 1, "line_count": 4,
+        "total_debit": "1200.00",
+    }]
+
+
+def test_accounting_dashboard_empty_journals():
+    conn = _FakeConn([
+        [{"open_count": 0, "overdue_count": 0, "total_outstanding": 0,
+          "total_invoiced": 0, "total_invoices": 0}],
+        [{"open_count": 0, "overdue_count": 0, "total_outstanding": 0,
+          "total_invoiced": 0, "total_invoices": 0}],
+        [],
+    ])
+    result = accounting_dashboard(conn)
+    assert result["recent_journals"] == []
