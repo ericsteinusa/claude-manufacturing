@@ -3153,3 +3153,35 @@ than a blanket per-user cap. All test rate-limit-log rows and tokens deleted aft
 check .` and `manage.py check` clean. **This leaves two gaps genuinely open: mobile offline support
 and localization** — both still correctly scored as lower-ROI/higher-effort for this app's buyer
 profile than everything shipped in this pass.
+
+---
+
+**2026-08-28, later same day:** Shipped **§6.10 Mobile offline support** — deliberately partial,
+matching the honest-scoping precedent this document already used for RFID (P3-M) and predictive
+maintenance (P4-B) rather than claiming full offline-first coverage this pass doesn't deliver. A
+reusable `mobile/src/offline/` module adds three pieces: `cache.ts`'s `fetchWithOfflineCache()`
+wraps any GET call, caching the response to `AsyncStorage` on success and falling back to the last
+cached value (flagged stale) when the network call fails, instead of a blank screen or a raw error
+alert; `queue.ts`'s `enqueueMutation()`/`flushQueue()` persist a mutating call to replay once
+connectivity returns, in the original order (stopping at the first failure rather than reordering
+around it); `netStatus.ts`'s `useIsOnline()` (backed by the new `@react-native-community/netinfo`
+dependency — no real alternative exists for this, the same "real, necessary new dependency" call
+already made for `joserfc` in the SSO work) plus a shared `OfflineBanner` component surface
+"showing cached data" / "N actions waiting to sync" instead of failing silently. A global `NetInfo`
+listener in `app/_layout.tsx` flushes the queue the instant the device reconnects, regardless of
+which screen is focused — a queued clock-out shouldn't wait for the user to revisit the Time Clock
+tab. **Wired into exactly two of the ten screens**: Time Clock (full read-cache + write-queue —
+clock in/out with no signal is the canonical plant-floor case this gap named) and Work Orders' list
+view (read-cache only; status changes/assignment still require connectivity). The other 8 screens
+remain unmodified — extending the same pattern to them is mechanical but is real, not-yet-done work,
+stated plainly rather than implied as complete. No test framework exists for `mobile/` to add unit
+tests to (CI's own three checks — `tsc --noEmit`, `expo-doctor`, `expo export --platform web` — are
+this package's entire verification surface); all three ran clean against the changes. Interactive
+browser verification of the offline/online transition itself (toggling connectivity and watching
+the banner/queue behave) was attempted via this session's preview tooling but blocked by an
+environment constraint — the preview harness's fixed project root doesn't support the mobile app's
+separate `package.json` location — so this pass relies on the three static CI checks plus code
+review rather than a live interactive demonstration; noted here rather than silently claimed as
+verified. **This leaves one gap genuinely open: localization** — the last item on the entire
+Section 6/7/8 buildable-in-software list, still correctly scored as the lowest-ROI/highest-
+ongoing-cost item for this app's single-language buyer profile.

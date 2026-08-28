@@ -138,6 +138,24 @@ standard cost/roll/history + routing steps, plus Workcenters/GL Accounts referen
 lists — product search reuses `getInventory` from the Inventory screen's API client
 rather than a dedicated product-list endpoint, since none exists). Plus `(auth)/login`.
 To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
+
+**Offline support (`mobile/src/offline/`)** — closes COMPETITIVE_GAP_ANALYSIS.md §6.10,
+deliberately partial rather than a full offline-first rewrite of every screen:
+`cache.ts`'s `fetchWithOfflineCache()` wraps a GET call, caching the response to
+`AsyncStorage` on success and falling back to the last cached value (marked stale)
+if the network call fails; `queue.ts`'s `enqueueMutation()`/`flushQueue()` persist a
+mutating call (method/url/body) to replay in order once connectivity returns, flushed
+automatically by a global `NetInfo` listener in `app/_layout.tsx` the instant the
+device reconnects — not tied to whichever screen happens to be focused at that
+moment. `netStatus.ts`'s `useIsOnline()` hook and the shared `OfflineBanner`
+component surface "showing cached data" / "N actions waiting to sync" to the user
+rather than failing silently. **Wired into exactly two screens so far**: Time Clock
+(full read-cache + write-queue — clock in/out are the canonical "plant-floor worker
+with no signal" case) and Work Orders' list view (read-cache only; status changes
+and assignment still require connectivity). The other 8 screens have no offline
+support yet — extending this pattern to them is mechanical (wrap the existing `load()`
+in `fetchWithOfflineCache`, wrap write actions in `enqueueMutation` where queuing
+makes sense) but not yet done.
 CI (`.github/workflows/mobile.yml`: `npm ci`, `tsc --noEmit`, `expo-doctor`,
 `expo export --platform web`) can fail on PRs that never touch `mobile/` —
 Expo periodically ships new SDK 57 patch releases, so the pinned patch

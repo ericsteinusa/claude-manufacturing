@@ -11,6 +11,8 @@ import {
 } from '../../src/api/workorders';
 import StatusBadge from '../../src/components/StatusBadge';
 import { useAuth } from '../../src/hooks/useAuth';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
+import OfflineBanner from '../../src/components/OfflineBanner';
 
 const STATUSES = ['', 'draft', 'open', 'in_progress', 'completed', 'cancelled'];
 
@@ -39,6 +41,8 @@ export default function WorkOrdersScreen() {
   const [completeModal, setCompleteModal] = useState<{ op: any } | null>(null);
   const [actualHours, setActualHours] = useState('');
   const [assignees, setAssignees] = useState<any[]>([]);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!canAssign) return;
@@ -50,8 +54,17 @@ export default function WorkOrdersScreen() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getWorkOrders(statusFilter || undefined);
-      setWos(res.data.data.work_orders);
+      // Read-only offline support: the list view falls back to the last
+      // cached response when there's no connection. Status changes and
+      // assignment still require connectivity — those are deliberately not
+      // queued in this pass (see mobile section of the root CLAUDE.md).
+      const result = await fetchWithOfflineCache(
+        `wo_list_${statusFilter}`,
+        async () => (await getWorkOrders(statusFilter || undefined)).data.data.work_orders,
+      );
+      setWos(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load work orders.');
     } finally {
@@ -145,6 +158,7 @@ export default function WorkOrdersScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
         {STATUSES.map((s) => (
           <TouchableOpacity
