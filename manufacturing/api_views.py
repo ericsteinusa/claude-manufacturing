@@ -28,6 +28,7 @@ from . import (
     legal_core,
     lot_core,
     maintenance_core,
+    marketing_core,
     personnel_core,
     purchase_requisitions_core,
     quality_core,
@@ -812,6 +813,18 @@ def api_legal_dashboard(request):
     conn = get_db_connection()
     try:
         data = legal_core.get_legal_dashboard(conn)
+    finally:
+        conn.close()
+    return api_ok(data)
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_marketing_dashboard(request):
+    conn = get_db_connection()
+    try:
+        data = marketing_core.get_marketing_dashboard(conn)
     finally:
         conn.close()
     return api_ok(data)
