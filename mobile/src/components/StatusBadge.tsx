@@ -39,6 +39,9 @@ const STATUS_COLORS: Record<string, string> = {
   renewed:    '#d1ecf1',
   expired:    '#f8d7da',
   terminated: '#dcdcdc',
+  // Marketing campaigns
+  planned: '#cce5ff',
+  paused:  '#f8d7da',
 };
 
 interface Props {

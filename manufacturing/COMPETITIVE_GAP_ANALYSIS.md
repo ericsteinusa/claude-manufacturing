@@ -3593,3 +3593,26 @@ TypeScript interface exactly. §6.9's explicit zero-coverage list now drops to *
 pattern, and two in a row needing no wrapper — worth checking `marketing_core.py` and
 `payroll_core.py` next the same way, though at this point either remaining department breaking the
 streak would be the more notable outcome.
+
+---
+
+**2026-08-28, eight for eight:** Closed **Marketing** — same shape again, three departments in a
+row now with no wrapper needed. `marketing_core.get_marketing_dashboard()` already existed, was
+already in real use by the web `_marketing.py` dashboard view, and already bundled
+`recent_campaigns` directly into its own return dict — so once again no `reports_core` change, just
+a new `api_marketing_dashboard` view calling `marketing_core.get_marketing_dashboard()` straight
+through, plus `/api/v1/dashboards/marketing/` route, added to `api_openapi_core.py`'s `ENDPOINTS`
+(wrapped across two lines like the Legal/IT/Customers entries). Zero new core logic, zero new
+tests — full suite held at 3423 passed, `ruff check .` and `manage.py check` clean. The new
+`marketing.tsx` mobile screen shows active/planned campaign counts, new/qualified lead counts,
+published/draft content counts, and a recent-campaigns list with channel/objective/date-range/
+budget and a status badge; `planned`/`paused` were added to `StatusBadge`'s shared color map (the
+eighth mobile-coverage PR in a row to touch it) to cover `marketing_core.CAMPAIGN_STATUSES` in full
+(`active`/`completed`/`cancelled` were already there from earlier departments). Mobile's
+`tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web` all clean. Verified end-to-end
+against the real dev server: hit `/api/v1/dashboards/marketing/` directly with a real bearer token
+and confirmed live data (10 real campaigns spanning Planned/Active/Completed, 11 leads, 10 content
+items) matches the TypeScript interface exactly. §6.9's explicit zero-coverage list now drops to
+**1**: `payroll` — the last department standing. Eight for eight on the "check `*_core.py` for an
+existing dashboard function first" pattern, and three in a row needing no wrapper — `payroll_core.py`
+is the one to check next, and closing it would mean full 17/17 mobile department coverage.
