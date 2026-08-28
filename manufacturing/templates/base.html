@@ -1,5 +1,6 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -419,7 +420,7 @@
 
 <!-- ── Top Header ── -->
 <header class="app-header">
-    <button class="sb-toggle" id="sbToggle" aria-label="Toggle menu">☰</button>
+    <button class="sb-toggle" id="sbToggle" aria-label="{% trans 'Toggle menu' %}">☰</button>
     <a href="{% url 'dashboard' %}" class="app-brand">⚙ <span>MFG</span> ERP</a>
     <div class="spacer"></div>
     <!-- Global scan bar -->
@@ -433,16 +434,16 @@
     </form>
     {% if request.session.user_email %}
     <div class="notif-bell" id="notifBell">
-        <button type="button" id="notifBellBtn" class="btn btn-sm" aria-label="Notifications">
+        <button type="button" id="notifBellBtn" class="btn btn-sm" aria-label="{% trans 'Notifications' %}">
             🔔<span id="notifBadge" class="notif-badge" style="display:none;">0</span>
         </button>
         <div id="notifPanel" class="notif-panel" style="display:none;">
             <div class="notif-panel-header">
-                <strong>Notifications</strong>
-                <button type="button" id="notifMarkAllBtn" class="notif-mark-all">Mark all read</button>
+                <strong>{% trans "Notifications" %}</strong>
+                <button type="button" id="notifMarkAllBtn" class="notif-mark-all">{% trans "Mark all read" %}</button>
             </div>
             <div id="notifList" class="notif-list">
-                <div class="notif-empty">Loading…</div>
+                <div class="notif-empty">{% trans "Loading…" %}</div>
             </div>
         </div>
     </div>
@@ -451,9 +452,20 @@
     <span class="hdr-user">
         {% if user_role %}<strong>{{ user_role }}</strong> · {% endif %}{{ email }}
     </span>
-    <a href="{% url 'change_password' %}" class="btn btn-sm">Password</a>
-    <a href="{% url 'mfa_settings' %}" class="btn btn-sm">2FA</a>
-    <a href="{% url 'logout' %}" class="btn btn-sm">Logout</a>
+    <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()" class="btn btn-sm" style="cursor:pointer;">
+            {% get_current_language as CURRENT_LANGUAGE %}
+            {% get_available_languages as AVAILABLE_LANGUAGES %}
+            {% for code, name in AVAILABLE_LANGUAGES %}
+            <option value="{{ code }}"{% if code == CURRENT_LANGUAGE %} selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <a href="{% url 'change_password' %}" class="btn btn-sm">{% trans "Password" %}</a>
+    <a href="{% url 'mfa_settings' %}" class="btn btn-sm">{% trans "2FA" %}</a>
+    <a href="{% url 'logout' %}" class="btn btn-sm">{% trans "Logout" %}</a>
     {% endblock %}
 </header>
 
@@ -463,135 +475,135 @@
     <!-- ── Sidebar ── -->
     <aside class="app-sidebar">
         <a href="{% url 'dashboard' %}" class="sb-link{% if request.path == '/dashboard/' %} active{% endif %}">
-            <span class="sb-icon">🏠</span> Dashboard
+            <span class="sb-icon">🏠</span> {% trans "Dashboard" %}
         </a>
 
-        <div class="sb-section">Operations</div>
+        <div class="sb-section">{% trans "Operations" %}</div>
         <a href="{% url 'wo_list' %}" class="sb-link{% if '/wo/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🔧</span> Work Orders
+            <span class="sb-icon">🔧</span> {% trans "Work Orders" %}
         </a>
         <a href="{% url 'bom_list' %}" class="sb-link{% if '/bom/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📋</span> Bill of Materials
+            <span class="sb-icon">📋</span> {% trans "Bill of Materials" %}
         </a>
         <a href="{% url 'mrp_home' %}" class="sb-link{% if '/mrp/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📊</span> MRP
+            <span class="sb-icon">📊</span> {% trans "MRP" %}
         </a>
         <a href="{% url 'workcenter_list' %}" class="sb-link{% if '/workcenters/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🏭</span> Work Centers
+            <span class="sb-icon">🏭</span> {% trans "Work Centers" %}
         </a>
 
-        <div class="sb-section">Procurement</div>
+        <div class="sb-section">{% trans "Procurement" %}</div>
         <a href="{% url 'po_list' %}" class="sb-link{% if '/po/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📦</span> Purchase Orders
+            <span class="sb-icon">📦</span> {% trans "Purchase Orders" %}
         </a>
         <a href="{% url 'supplier_list' %}" class="sb-link{% if '/suppliers/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🏪</span> Suppliers
+            <span class="sb-icon">🏪</span> {% trans "Suppliers" %}
         </a>
 
-        <div class="sb-section">Sales</div>
+        <div class="sb-section">{% trans "Sales" %}</div>
         <a href="{% url 'so_list' %}" class="sb-link{% if '/so/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🛒</span> Sales Orders
+            <span class="sb-icon">🛒</span> {% trans "Sales Orders" %}
         </a>
         <a href="{% url 'customer_list' %}" class="sb-link{% if '/customers/' in request.path %} active{% endif %}">
-            <span class="sb-icon">👥</span> Customers
+            <span class="sb-icon">👥</span> {% trans "Customers" %}
         </a>
         <a href="{% url 'cs_ticket_list' %}" class="sb-link{% if '/cs/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🎧</span> Customer Service
+            <span class="sb-icon">🎧</span> {% trans "Customer Service" %}
         </a>
 
-        <div class="sb-section">Inventory</div>
+        <div class="sb-section">{% trans "Inventory" %}</div>
         <a href="{% url 'inventory_list' %}" class="sb-link{% if '/inventory/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📦</span> Inventory
+            <span class="sb-icon">📦</span> {% trans "Inventory" %}
         </a>
         <a href="{% url 'lot_list' %}" class="sb-link{% if '/lots/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🔖</span> Lot Tracking
+            <span class="sb-icon">🔖</span> {% trans "Lot Tracking" %}
         </a>
 
-        <div class="sb-section">Finance</div>
+        <div class="sb-section">{% trans "Finance" %}</div>
         <a href="{% url 'acct_dashboard' %}" class="sb-link{% if '/acct/' in request.path %} active{% endif %}">
-            <span class="sb-icon">💼</span> Accounting
+            <span class="sb-icon">💼</span> {% trans "Accounting" %}
         </a>
         <a href="{% url 'ap_list' %}" class="sb-link{% if '/ap/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📤</span> Accounts Payable
+            <span class="sb-icon">📤</span> {% trans "Accounts Payable" %}
         </a>
         <a href="{% url 'ar_list' %}" class="sb-link{% if '/ar/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📥</span> Accounts Receivable
+            <span class="sb-icon">📥</span> {% trans "Accounts Receivable" %}
         </a>
         <a href="{% url 'gl_dashboard' %}" class="sb-link{% if '/gl/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📒</span> General Ledger
+            <span class="sb-icon">📒</span> {% trans "General Ledger" %}
         </a>
         <a href="{% url 'payroll_dashboard' %}" class="sb-link{% if '/payroll/' in request.path %} active{% endif %}">
-            <span class="sb-icon">💰</span> Payroll
+            <span class="sb-icon">💰</span> {% trans "Payroll" %}
         </a>
 
-        <div class="sb-section">Human Resources</div>
+        <div class="sb-section">{% trans "Human Resources" %}</div>
         <a href="{% url 'people_list' %}" class="sb-link{% if '/people/' in request.path %} active{% endif %}">
-            <span class="sb-icon">👤</span> Personnel
+            <span class="sb-icon">👤</span> {% trans "Personnel" %}
         </a>
         <a href="{% url 'time_clock_status' %}" class="sb-link{% if '/time-clock/' in request.path %} active{% endif %}">
-            <span class="sb-icon">⏱</span> Time Clock
+            <span class="sb-icon">⏱</span> {% trans "Time Clock" %}
         </a>
         <a href="{% url 'time_off_list' %}" class="sb-link{% if '/time-off/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🏖</span> Time Off
+            <span class="sb-icon">🏖</span> {% trans "Time Off" %}
         </a>
         <a href="{% url 'ess_home' %}" class="sb-link{% if '/ess/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🙋</span> My Info
+            <span class="sb-icon">🙋</span> {% trans "My Info" %}
         </a>
 
-        <div class="sb-section">Engineering</div>
+        <div class="sb-section">{% trans "Engineering" %}</div>
         <a href="{% url 'eng_dashboard' %}" class="sb-link{% if '/eng/' in request.path %} active{% endif %}">
-            <span class="sb-icon">⚗</span> Engineering
+            <span class="sb-icon">⚗</span> {% trans "Engineering" %}
         </a>
 
-        <div class="sb-section">Quality</div>
+        <div class="sb-section">{% trans "Quality" %}</div>
         <a href="{% url 'qa_dashboard' %}" class="sb-link{% if '/qa/' in request.path %} active{% endif %}">
-            <span class="sb-icon">✅</span> Quality Assurance
+            <span class="sb-icon">✅</span> {% trans "Quality Assurance" %}
         </a>
 
-        <div class="sb-section">Maintenance</div>
+        <div class="sb-section">{% trans "Maintenance" %}</div>
         <a href="{% url 'maint_dashboard' %}" class="sb-link{% if '/maint/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🔩</span> Maintenance
+            <span class="sb-icon">🔩</span> {% trans "Maintenance" %}
         </a>
 
-        <div class="sb-section">Departments</div>
+        <div class="sb-section">{% trans "Departments" %}</div>
         <a href="{% url 'it_dashboard' %}" class="sb-link{% if '/it/' in request.path %} active{% endif %}">
-            <span class="sb-icon">💻</span> IT
+            <span class="sb-icon">💻</span> {% trans "IT" %}
         </a>
         <a href="{% url 'legal_dashboard' %}" class="sb-link{% if '/legal/' in request.path %} active{% endif %}">
-            <span class="sb-icon">⚖</span> Legal
+            <span class="sb-icon">⚖</span> {% trans "Legal" %}
         </a>
         <a href="{% url 'mkt_dashboard' %}" class="sb-link{% if '/mkt/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📣</span> Marketing
+            <span class="sb-icon">📣</span> {% trans "Marketing" %}
         </a>
 
         <hr class="sb-divider">
-        <div class="sb-section">Admin</div>
+        <div class="sb-section">{% trans "Admin" %}</div>
         <a href="{% url 'user_roles' %}" class="sb-link{% if '/user-roles/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🔑</span> User Roles
+            <span class="sb-icon">🔑</span> {% trans "User Roles" %}
         </a>
         <a href="{% url 'audit_log' %}" class="sb-link{% if '/audit/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📜</span> Audit Log
+            <span class="sb-icon">📜</span> {% trans "Audit Log" %}
         </a>
         <a href="{% url 'fixed_asset_list' %}" class="sb-link{% if '/assets/fixed/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🏭</span> Fixed Assets
+            <span class="sb-icon">🏭</span> {% trans "Fixed Assets" %}
         </a>
         <a href="{% url 'currency_list' %}" class="sb-link{% if '/admin/currencies/' in request.path %} active{% endif %}">
-            <span class="sb-icon">💱</span> Currencies
+            <span class="sb-icon">💱</span> {% trans "Currencies" %}
         </a>
         <a href="{% url 'approval_rule_list' %}" class="sb-link{% if '/approval-rules/' in request.path %} active{% endif %}">
-            <span class="sb-icon">✔️</span> Approval Rules
+            <span class="sb-icon">✔️</span> {% trans "Approval Rules" %}
         </a>
         <a href="{% url 'webhook_list' %}" class="sb-link{% if '/webhooks/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🔗</span> Webhooks
+            <span class="sb-icon">🔗</span> {% trans "Webhooks" %}
         </a>
         <a href="{% url 'data_governance_dashboard' %}" class="sb-link{% if '/data-governance/' in request.path %} active{% endif %}">
-            <span class="sb-icon">🛡️</span> Data Governance
+            <span class="sb-icon">🛡️</span> {% trans "Data Governance" %}
         </a>
         <a href="{% url 'reports_dashboard' %}" class="sb-link{% if '/reports/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📈</span> Reports
+            <span class="sb-icon">📈</span> {% trans "Reports" %}
         </a>
         <a href="{% url 'periods' %}" class="sb-link{% if '/periods/' in request.path %} active{% endif %}">
-            <span class="sb-icon">📅</span> Periods
+            <span class="sb-icon">📅</span> {% trans "Periods" %}
         </a>
     </aside>
 
