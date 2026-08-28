@@ -1,0 +1,266 @@
+# Spanish translations for the Manufacturing ERP core navigation shell
+# (sidebar, top bar, login page). See CLAUDE.md's Localization section for
+# exactly what's covered — this is a deliberately partial first pass, not
+# a translation of the full ~450-template application.
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-28 02:30+0000\n"
+"PO-Revision-Date: 2026-08-28 02:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: manufacturing/templates/base.html:423
+msgid "Toggle menu"
+msgstr "Mostrar/ocultar menú"
+
+#: manufacturing/templates/base.html:437 manufacturing/templates/base.html:442
+msgid "Notifications"
+msgstr "Notificaciones"
+
+#: manufacturing/templates/base.html:443
+msgid "Mark all read"
+msgstr "Marcar todo como leído"
+
+#: manufacturing/templates/base.html:446
+msgid "Loading…"
+msgstr "Cargando…"
+
+#: manufacturing/templates/base.html:466 manufacturing/templates/home.html:24
+msgid "Password"
+msgstr "Contraseña"
+
+#: manufacturing/templates/base.html:467
+msgid "2FA"
+msgstr "Autenticación en dos pasos"
+
+#: manufacturing/templates/base.html:468
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+#: manufacturing/templates/base.html:478
+msgid "Dashboard"
+msgstr "Panel de control"
+
+#: manufacturing/templates/base.html:481
+msgid "Operations"
+msgstr "Operaciones"
+
+#: manufacturing/templates/base.html:483
+msgid "Work Orders"
+msgstr "Órdenes de trabajo"
+
+#: manufacturing/templates/base.html:486
+msgid "Bill of Materials"
+msgstr "Lista de materiales"
+
+#: manufacturing/templates/base.html:489
+msgid "MRP"
+msgstr "MRP"
+
+#: manufacturing/templates/base.html:492
+msgid "Work Centers"
+msgstr "Centros de trabajo"
+
+#: manufacturing/templates/base.html:495
+msgid "Procurement"
+msgstr "Compras"
+
+#: manufacturing/templates/base.html:497
+msgid "Purchase Orders"
+msgstr "Órdenes de compra"
+
+#: manufacturing/templates/base.html:500
+msgid "Suppliers"
+msgstr "Proveedores"
+
+#: manufacturing/templates/base.html:503
+msgid "Sales"
+msgstr "Ventas"
+
+#: manufacturing/templates/base.html:505
+msgid "Sales Orders"
+msgstr "Pedidos de venta"
+
+#: manufacturing/templates/base.html:508
+msgid "Customers"
+msgstr "Clientes"
+
+#: manufacturing/templates/base.html:511
+msgid "Customer Service"
+msgstr "Atención al cliente"
+
+#: manufacturing/templates/base.html:514 manufacturing/templates/base.html:516
+msgid "Inventory"
+msgstr "Inventario"
+
+#: manufacturing/templates/base.html:519
+msgid "Lot Tracking"
+msgstr "Seguimiento de lotes"
+
+#: manufacturing/templates/base.html:522
+msgid "Finance"
+msgstr "Finanzas"
+
+#: manufacturing/templates/base.html:524
+msgid "Accounting"
+msgstr "Contabilidad"
+
+#: manufacturing/templates/base.html:527
+msgid "Accounts Payable"
+msgstr "Cuentas por pagar"
+
+#: manufacturing/templates/base.html:530
+msgid "Accounts Receivable"
+msgstr "Cuentas por cobrar"
+
+#: manufacturing/templates/base.html:533
+msgid "General Ledger"
+msgstr "Libro mayor"
+
+#: manufacturing/templates/base.html:536
+msgid "Payroll"
+msgstr "Nómina"
+
+#: manufacturing/templates/base.html:539
+msgid "Human Resources"
+msgstr "Recursos humanos"
+
+#: manufacturing/templates/base.html:541
+msgid "Personnel"
+msgstr "Personal"
+
+#: manufacturing/templates/base.html:544
+msgid "Time Clock"
+msgstr "Reloj de asistencia"
+
+#: manufacturing/templates/base.html:547
+msgid "Time Off"
+msgstr "Ausencias"
+
+#: manufacturing/templates/base.html:550
+msgid "My Info"
+msgstr "Mi información"
+
+#: manufacturing/templates/base.html:553 manufacturing/templates/base.html:555
+msgid "Engineering"
+msgstr "Ingeniería"
+
+#: manufacturing/templates/base.html:558
+msgid "Quality"
+msgstr "Calidad"
+
+#: manufacturing/templates/base.html:560
+msgid "Quality Assurance"
+msgstr "Aseguramiento de calidad"
+
+#: manufacturing/templates/base.html:563 manufacturing/templates/base.html:565
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+#: manufacturing/templates/base.html:568
+msgid "Departments"
+msgstr "Departamentos"
+
+#: manufacturing/templates/base.html:570
+msgid "IT"
+msgstr "TI"
+
+#: manufacturing/templates/base.html:573
+msgid "Legal"
+msgstr "Legal"
+
+#: manufacturing/templates/base.html:576
+msgid "Marketing"
+msgstr "Marketing"
+
+#: manufacturing/templates/base.html:580
+msgid "Admin"
+msgstr "Administración"
+
+#: manufacturing/templates/base.html:582
+msgid "User Roles"
+msgstr "Roles de usuario"
+
+#: manufacturing/templates/base.html:585
+msgid "Audit Log"
+msgstr "Registro de auditoría"
+
+#: manufacturing/templates/base.html:588
+msgid "Fixed Assets"
+msgstr "Activos fijos"
+
+#: manufacturing/templates/base.html:591
+msgid "Currencies"
+msgstr "Monedas"
+
+#: manufacturing/templates/base.html:594
+msgid "Approval Rules"
+msgstr "Reglas de aprobación"
+
+#: manufacturing/templates/base.html:597
+msgid "Webhooks"
+msgstr "Webhooks"
+
+#: manufacturing/templates/base.html:600
+msgid "Data Governance"
+msgstr "Gobernanza de datos"
+
+#: manufacturing/templates/base.html:603
+msgid "Reports"
+msgstr "Informes"
+
+#: manufacturing/templates/base.html:606
+msgid "Periods"
+msgstr "Períodos"
+
+#: manufacturing/templates/home.html:4
+msgid "Login"
+msgstr "Iniciar sesión"
+
+#: manufacturing/templates/home.html:4
+msgid "Manufacturing ERP"
+msgstr "ERP de Manufactura"
+
+#: manufacturing/templates/home.html:18
+msgid "Email"
+msgstr "Correo electrónico"
+
+#: manufacturing/templates/home.html:26
+msgid "Enter your password"
+msgstr "Ingrese su contraseña"
+
+#: manufacturing/templates/home.html:28
+msgid "Sign In"
+msgstr "Iniciar sesión"
+
+#: manufacturing/templates/home.html:32
+msgid "or"
+msgstr "o"
+
+#: manufacturing/templates/home.html:36 manufacturing/templates/home.html:42
+#, python-format
+msgid "Sign in with %(label)s"
+msgstr "Iniciar sesión con %(label)s"
+
+#: manufacturing/templates/home.html:48
+msgid "Forgot password?"
+msgstr "¿Olvidó su contraseña?"
+
+#: manufacturing/templates/home.html:49
+msgid "Register new user"
+msgstr "Registrar nuevo usuario"
+
+#: manufacturing/templates/home.html:50
+msgid "Are you a customer? Log in to the Customer Portal"
+msgstr "¿Es usted cliente? Inicie sesión en el Portal de Clientes"
+
+#: manufacturing/templates/home.html:51
+msgid "Are you a supplier? Log in to the Supplier Portal"
+msgstr "¿Es usted proveedor? Inicie sesión en el Portal de Proveedores"

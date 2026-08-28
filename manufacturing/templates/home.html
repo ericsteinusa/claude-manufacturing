@@ -1,6 +1,7 @@
 {% extends "base_card.html" %}
+{% load i18n %}
 
-{% block page_title %}Login — Manufacturing ERP{% endblock %}
+{% block page_title %}{% trans "Login" %} — {% trans "Manufacturing ERP" %}{% endblock %}
 
 {% block card_content %}
 
@@ -14,40 +15,40 @@
 <form method="post" action="">
     {% csrf_token %}
     <div class="form-row">
-        <label for="email">Email</label>
+        <label for="email">{% trans "Email" %}</label>
         <input type="email" id="email" name="email"
                placeholder="you@company.com"
                value="{{ email_value }}" required autofocus>
     </div>
     <div class="form-row">
-        <label for="password">Password</label>
+        <label for="password">{% trans "Password" %}</label>
         <input type="password" id="password" name="password"
-               placeholder="Enter your password" required>
+               placeholder="{% trans 'Enter your password' %}" required>
     </div>
-    <button type="submit" class="btn-submit">Sign In</button>
+    <button type="submit" class="btn-submit">{% trans "Sign In" %}</button>
 </form>
 
 {% if sso_providers or saml_providers %}
-<div class="sso-divider" style="text-align:center;margin:14px 0;color:#888;font-size:12px;">— or —</div>
+<div class="sso-divider" style="text-align:center;margin:14px 0;color:#888;font-size:12px;">— {% trans "or" %} —</div>
 {% for provider in sso_providers %}
 <a href="{% url 'sso_login' provider.key %}" class="btn-submit"
    style="display:block;text-align:center;text-decoration:none;background:#444;margin-bottom:8px;">
-    Sign in with {{ provider.label }}
+    {% blocktrans with label=provider.label %}Sign in with {{ label }}{% endblocktrans %}
 </a>
 {% endfor %}
 {% for provider in saml_providers %}
 <a href="{% url 'saml_login' provider.key %}" class="btn-submit"
    style="display:block;text-align:center;text-decoration:none;background:#444;margin-bottom:8px;">
-    Sign in with {{ provider.label }}
+    {% blocktrans with label=provider.label %}Sign in with {{ label }}{% endblocktrans %}
 </a>
 {% endfor %}
 {% endif %}
 
 <div class="links">
-    <a href="{% url 'forgot_password' %}">Forgot password?</a>
-    <a href="{% url 'register' %}">Register new user</a>
-    <a href="{% url 'portal_login' %}">Are you a customer? Log in to the Customer Portal</a>
-    <a href="{% url 'supplier_portal_login' %}">Are you a supplier? Log in to the Supplier Portal</a>
+    <a href="{% url 'forgot_password' %}">{% trans "Forgot password?" %}</a>
+    <a href="{% url 'register' %}">{% trans "Register new user" %}</a>
+    <a href="{% url 'portal_login' %}">{% trans "Are you a customer? Log in to the Customer Portal" %}</a>
+    <a href="{% url 'supplier_portal_login' %}">{% trans "Are you a supplier? Log in to the Supplier Portal" %}</a>
 </div>
 
 {% endblock %}

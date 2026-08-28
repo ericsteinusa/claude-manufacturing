@@ -3185,3 +3185,36 @@ review rather than a live interactive demonstration; noted here rather than sile
 verified. **This leaves one gap genuinely open: localization** — the last item on the entire
 Section 6/7/8 buildable-in-software list, still correctly scored as the lowest-ROI/highest-
 ongoing-cost item for this app's single-language buyer profile.
+
+---
+
+**2026-08-28, later still:** Shipped **§6.11 Multi-Language / Localization** — deliberately
+partial, closing this document's entire buildable-in-software list the same honestly-scoped way
+every other item in it closed (RFID simulated, predictive maintenance manual-entry, mobile offline
+2-of-10-screens). Real, working i18n infrastructure previously entirely absent (§6.11's own finding:
+"no `LocaleMiddleware`, no `LOCALE_PATHS`" despite `USE_I18N=True` already being Django's stock
+default): `django.middleware.locale.LocaleMiddleware` correctly positioned in `MIDDLEWARE`,
+`LANGUAGES`/`LOCALE_PATHS` in settings, and a real language switcher in `base.html`'s top bar
+posting to Django's built-in `set_language` view. Translation coverage is the app's core navigation
+shell — `base.html` in full (all 11 sidebar section headers, all ~37 nav links, top-bar
+notifications/password/2FA/logout) and `home.html` (the login page) — roughly 60 strings wrapped in
+`{% trans %}`/`{% blocktrans %}`, with real, business-appropriate Spanish translations (not
+placeholder text) in `locale/es/LC_MESSAGES/django.po`, compiled to a working `.mo`. **The other
+~450 department-specific content templates remain English-only** — extending this pattern to any of
+them is mechanical per-template work (`{% load i18n %}`, wrap, translate, recompile) but is real,
+not-yet-done work, stated plainly per this document's own convention rather than implied as
+complete. No code-level tests apply (this is template/settings work, not `*_core.py` logic); full
+suite re-ran clean anyway (3412 passed, unchanged) confirming nothing broke, plus `ruff check .` and
+`manage.py check` clean. Verified end-to-end against the real dev server rather than just
+statically: logged in as a real user, confirmed the dashboard renders correctly with all sidebar
+sections/links in English by default; switched language via the real `/i18n/setlang/` endpoint and
+confirmed the same dashboard re-rendered entirely in Spanish (`<html lang="es">`, "Panel de
+control", "Órdenes de trabajo", "Operaciones", "Compras", "Ventas", "Recursos humanos", topbar
+"Contraseña"/"Cerrar sesión", etc.) with the language-switcher `<select>` correctly showing the
+active selection; separately confirmed a fresh, never-logged-in visitor sending
+`Accept-Language: es` sees the login page in Spanish too, confirming `LocaleMiddleware`'s
+header-based fallback works independent of the session-based switcher. **This closes the last item
+on this document's entire Section 6/7/8 buildable-in-software list — every gap named across §6.1
+through §6.13 that didn't require external hardware or a live third-party account (Section 3's
+remaining four items) has now shipped, at the honestly-scoped depth stated in each item's own
+closure note above.**

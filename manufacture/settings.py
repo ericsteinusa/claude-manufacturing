@@ -125,6 +125,11 @@ MIDDLEWARE = [
     # ones CommonMiddleware itself can short-circuit.
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Must come after SessionMiddleware and before CommonMiddleware (Django's
+    # own requirement) — resolves the active language per-request from the
+    # session (set via the set_language view, see urls.py's i18n/ include),
+    # then the Accept-Language header, falling back to LANGUAGE_CODE.
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -193,8 +198,23 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
+#
+# Real, working infrastructure as of the localization pass (COMPETITIVE_GAP_
+# ANALYSIS.md §6.11) — LocaleMiddleware above, LANGUAGES/LOCALE_PATHS below,
+# and a language switcher in base.html (posts to the set_language view at
+# /i18n/setlang/, wired in manufacture/urls.py). Translation coverage itself
+# is deliberately partial, not all ~450 templates: see locale/es/LC_MESSAGES/
+# django.po and the CLAUDE.md note on this section for exactly what's
+# wrapped in {% trans %}/{% blocktrans %} so far.
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+]
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
 TIME_ZONE = 'UTC'
 

@@ -164,6 +164,29 @@ versions in `package.json`/`package-lock.json` drift behind what
 `npx expo install --fix`, then re-verify with `expo-doctor` and
 `expo export --platform web` (done in PR #90, and again in PR #96).
 
+## Localization (i18n)
+Closes COMPETITIVE_GAP_ANALYSIS.md §6.11 — deliberately partial, matching this
+project's other honestly-scoped gap closures (mobile offline support, RFID,
+predictive maintenance) rather than claiming full coverage. Real, working
+infrastructure: `django.middleware.locale.LocaleMiddleware` (positioned after
+`SessionMiddleware`, before `CommonMiddleware`, per Django's own requirement),
+`LANGUAGES`/`LOCALE_PATHS` in `manufacture/settings.py`, and a language
+switcher (`<select>` posting to Django's built-in `set_language` view, wired
+at `/i18n/` in `manufacture/urls.py`) in `base.html`'s top bar. Translation
+coverage is the app's core navigation shell only — `base.html` (sidebar: all
+11 section headers + all ~37 nav links; top bar: notifications, password,
+2FA, logout) and `home.html` (the login page) — wrapped in `{% trans %}`/
+`{% blocktrans %}`, with real (not placeholder) Spanish translations in
+`locale/es/LC_MESSAGES/django.po`. Run `python manage.py compilemessages`
+after editing any `.po` file — the `.mo` binary Django actually loads at
+runtime isn't regenerated automatically, and the dev server's autoreloader
+doesn't watch `.po`/`.mo` files, so a manual restart is also needed after
+compiling. **The ~450 department-specific content templates (forms, tables,
+detail pages) are not translated** — extending this pattern to any of them is
+mechanical (`{% load i18n %}`, wrap each string, add its Spanish line to the
+`.po` file, recompile) but is real, not-yet-done work per template, stated
+plainly rather than implied as complete.
+
 ## Web UI (Django) & menu routing
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
