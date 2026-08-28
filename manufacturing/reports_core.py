@@ -7,6 +7,7 @@ import io
 import textwrap
 
 from .accounting_core import get_ap_dashboard, get_ar_dashboard
+from .cs_calls_core import get_summary_stats, list_tickets
 from .finance_core import get_cash_position
 from .sales_core import get_sales_dashboard
 from .sales_orders_core import list_sos
@@ -431,6 +432,38 @@ def accounting_dashboard(conn) -> dict:
         'ar': ar,
         'recent_journals': [dict(r) for r in journal_rows],
     }
+
+
+def customer_service_dashboard(conn) -> dict:
+    """Return CS KPIs + recent tickets for the mobile Customer Service
+    screen (COMPETITIVE_GAP_ANALYSIS.md §6.9's mobile-coverage gap) —
+    reuses cs_calls_core's own get_summary_stats() and list_tickets()
+    (already real, in use by the web cs_dashboard_view) rather than a
+    third copy of the same queries.
+
+    Keys returned:
+      total             Tickets logged in the last 365 days
+      open_count        Currently open tickets
+      completed_count   Currently completed tickets
+      completion_rate   % of tickets completed
+      avg_resolution    Average days to resolve a completed ticket (or None)
+      avg_age_open      Average age in days of currently-open tickets (or None)
+      recent_tickets    Up to 8 most recent tickets (id, customer_name, call,
+                        call_date, completion_box)
+    """
+    stats = get_summary_stats(conn)
+    recent = list_tickets(conn)[:8]
+    stats['recent_tickets'] = [
+        {
+            'id': r['id'],
+            'customer_name': r['customer_name'],
+            'call': r['call'],
+            'call_date': str(r['call_date']) if r['call_date'] else None,
+            'completion_box': r['completion_box'],
+        }
+        for r in recent
+    ]
+    return stats
 
 
 # ---------------------------------------------------------------------------

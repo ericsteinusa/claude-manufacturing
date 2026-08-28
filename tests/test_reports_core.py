@@ -2,7 +2,7 @@
 
 from manufacturing.reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
-    sales_dashboard, accounting_dashboard,
+    sales_dashboard, accounting_dashboard, customer_service_dashboard,
 )
 
 
@@ -242,3 +242,41 @@ def test_accounting_dashboard_empty_journals():
     ])
     result = accounting_dashboard(conn)
     assert result["recent_journals"] == []
+
+
+# ── customer_service_dashboard ───────────────────────────────────────────────
+
+def test_customer_service_dashboard_combines_stats_and_recent_tickets():
+    conn = _FakeConn([
+        [{"total": 20, "open_count": 5, "completed_count": 15,
+          "avg_resolution": "2.50"}],
+        [{"avg_age": "3.00"}],
+        [{"id": 1, "customer_id": 7, "call": "Damaged shipment",
+          "call_date": "2026-08-01", "call_time": "09:00", "completion_date": "",
+          "completion_time": "", "comments_box": "", "completion_box": 0,
+          "created_by": "x", "customer_name": "Acme Corp"}],
+    ])
+    result = customer_service_dashboard(conn)
+    assert result["total"] == 20
+    assert result["open_count"] == 5
+    assert result["completion_rate"] == 75.0
+    assert result["avg_age_open"] == 3.0
+    assert result["recent_tickets"] == [{
+        "id": 1, "customer_name": "Acme Corp", "call": "Damaged shipment",
+        "call_date": "2026-08-01", "completion_box": 0,
+    }]
+
+
+def test_customer_service_dashboard_truncates_recent_tickets_to_eight():
+    ticket_row = {"id": 1, "customer_id": 1, "call": "x", "call_date": None,
+                  "call_time": "", "completion_date": "", "completion_time": "",
+                  "comments_box": "", "completion_box": 0, "created_by": "x",
+                  "customer_name": "X"}
+    conn = _FakeConn([
+        [{"total": 0, "open_count": 0, "completed_count": 0, "avg_resolution": None}],
+        [{"avg_age": None}],
+        [dict(ticket_row) for _ in range(12)],
+    ])
+    result = customer_service_dashboard(conn)
+    assert len(result["recent_tickets"]) == 8
+    assert result["recent_tickets"][0]["call_date"] is None
