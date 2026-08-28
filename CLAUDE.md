@@ -103,7 +103,7 @@ this section in sync when adding endpoints, it has gone stale before.
   — no PyQt6, safe in web context. No test coverage yet despite being Qt-free.
 - Routes wired at `/api/v1/` in `manufacturing/urls.py`:
   - Auth: login/logout/refresh/profile.
-  - Dashboards: main (4 KPIs) + financial/production/inventory/sales/personnel.
+  - Dashboards: main (4 KPIs) + financial/production/inventory/sales/personnel/accounting.
   - Time clock (status/clock-in/clock-out/hours) + time-off.
   - Work orders: list/detail/status, operations (list/start/complete), cost (get/compute).
   - Requisitions: list/pending, add item, submit, decide.
@@ -147,8 +147,13 @@ Sales-department mobile gap), Personnel (headcount, by-department breakdown, tim
 pending/approved, recent hires — the underlying `personnel_core.get_personnel_dashboard()`
 already existed and was already used by the web dashboard, so this only needed a new
 `api_personnel_dashboard` view + `/api/v1/dashboards/personnel/` route, no new core
-logic; closes §6.9's Personnel-department mobile gap). Plus `(auth)/login`. To run:
-`cd mobile && npx expo start` → scan QR with Expo Go on phone.
+logic; closes §6.9's Personnel-department mobile gap), Accounting (AP/AR outstanding
++ overdue counts, all-time invoiced totals, recent GL journals — new `reports_core
+.accounting_dashboard()` combining `accounting_core`'s existing `get_ap_dashboard()`/
+`get_ar_dashboard()` — both already real and in use by the web `acct_dashboard` view
+— with the same recent-journals query that view already runs; closes §6.9's
+Accounting-department mobile gap). Plus `(auth)/login`. To run: `cd mobile && npx
+expo start` → scan QR with Expo Go on phone.
 
 **Offline support (`mobile/src/offline/`)** — closes COMPETITIVE_GAP_ANALYSIS.md §6.10,
 deliberately partial rather than a full offline-first rewrite of every screen:

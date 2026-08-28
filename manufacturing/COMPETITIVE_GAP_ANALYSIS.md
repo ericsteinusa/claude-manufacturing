@@ -3437,3 +3437,29 @@ titles) matches the TypeScript interface exactly. §6.9's explicit zero-coverage
 Personnel) is now shipped** — every department left on the list would need real new backend work
 the way Sales did, not a free reuse; picking further ones is a judgment call on which department's
 data is most valuable on a phone, not an ROI-obvious next step the way these three were.
+
+---
+
+**2026-08-28, and one that turned out cheap too:** Closed **Accounting** next, despite the note
+directly above saying everything left would need "real new backend work the way Sales did" — this
+one turned out closer to Personnel's shape than Sales'. `accounting_core.get_ap_dashboard()` and
+`get_ar_dashboard()` already existed and were already in real use by four different web views
+(`views/__init__.py` lines 5141, 5293, 5411-5412, 8326-8327, including the department's own
+`acct_dashboard` landing page), so the only new code is a small `reports_core
+.accounting_dashboard()` combining those two existing functions with the same recent-GL-journals
+query `acct_dashboard` already runs — not a third copy, and not new SQL. New `api_accounting_dashboard`
+view + `/api/v1/dashboards/accounting/` route, added to `api_openapi_core.py`'s `ENDPOINTS`. The
+new `accounting.tsx` mobile screen shows AP/AR outstanding balances with overdue counts, all-time
+invoiced totals for both ledgers, and the 8 most recent GL journal entries with a Posted/Draft
+badge. 2 new tests for `accounting_dashboard()` (combining AP+AR+journals, and the empty-journals
+edge case); full suite 3417 passed (3415 + 2), `ruff check .` and `manage.py check` clean; mobile's
+`tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web` all clean. Verified end-to-end
+against the real dev server: hit `/api/v1/dashboards/accounting/` directly with a real bearer token
+and confirmed live data (real AP/AR balances, 8 real GL journal entries including WO-close and
+intercompany transactions) matches the TypeScript interface exactly. §6.9's explicit zero-coverage
+list now drops to **7**: `customer_service`, `customers`, `engineering`, `it`, `legal`, `marketing`,
+`payroll`. The lesson from this pass: "needs new backend work" and "is cheap to add" turned out to
+be more about whether a department already had a dashboard-shaped aggregation function lying around
+(Accounting did, quietly) than about which items this document happened to flag as cheap in
+advance — worth spot-checking each remaining department's own `*_core.py` for an existing
+`get_*_dashboard`/`*_dashboard` function before assuming new backend work is required.
