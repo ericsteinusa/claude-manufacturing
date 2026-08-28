@@ -136,8 +136,11 @@ Approvals (pending approval-workflow steps, approve/reject), Inventory (stock le
 detail + complete), Quality (NCR list + create + detail), Costing (product search +
 standard cost/roll/history + routing steps, plus Workcenters/GL Accounts reference
 lists — product search reuses `getInventory` from the Inventory screen's API client
-rather than a dedicated product-list endpoint, since none exists). Plus `(auth)/login`.
-To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
+rather than a dedicated product-list endpoint, since none exists), Finance (cash
+position, DSO/DPO, gross margin, AP due this week, AR aging buckets — reuses the
+existing `/api/v1/dashboards/financial/` endpoint verbatim, no new backend work;
+closes COMPETITIVE_GAP_ANALYSIS.md §6.9's Finance-department mobile gap). Plus
+`(auth)/login`. To run: `cd mobile && npx expo start` → scan QR with Expo Go on phone.
 
 **Offline support (`mobile/src/offline/`)** — closes COMPETITIVE_GAP_ANALYSIS.md §6.10,
 deliberately partial rather than a full offline-first rewrite of every screen:
