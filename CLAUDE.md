@@ -104,7 +104,7 @@ this section in sync when adding endpoints, it has gone stale before.
 - Routes wired at `/api/v1/` in `manufacturing/urls.py`:
   - Auth: login/logout/refresh/profile.
   - Dashboards: main (4 KPIs) + financial/production/inventory/sales/personnel/
-    accounting/customer-service/engineering/customers.
+    accounting/customer-service/engineering/customers/it.
   - Time clock (status/clock-in/clock-out/hours) + time-off.
   - Work orders: list/detail/status, operations (list/start/complete), cost (get/compute).
   - Requisitions: list/pending, add item, submit, decide.
@@ -167,7 +167,13 @@ credit applications, open collections, recent collection activity — new `repor
 .customers_dashboard()` combining `credit_core`'s existing `get_credit_dashboard()`/
 `list_collection_activities()`, both already real and in use by the web
 `credit_dashboard` view; closes §6.9's Customers-department mobile gap — this is the
-credit/collections risk-management domain, distinct from Sales and Customer Service).
+credit/collections risk-management domain, distinct from Sales and Customer Service),
+IT (open/critical/in-progress helpdesk ticket counts, asset repair status, recent
+tickets with priority — pure reuse of `it_core.get_it_dashboard()`, which already
+bundled `recent_tickets` into its own return value and was already in use by the web
+`it_dashboard` view, so this needed only a new `api_it_dashboard` view +
+`/api/v1/dashboards/it/` route, no `reports_core` wrapper at all; closes §6.9's
+IT-department mobile gap).
 Plus `(auth)/login`. To run: `cd mobile && npx expo start` → scan QR with Expo Go on
 phone.
 
