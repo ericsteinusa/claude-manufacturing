@@ -34,6 +34,11 @@ const STATUS_COLORS: Record<string, string> = {
   closed:    '#d4edda',
   // IT tickets
   resolved:  '#d4edda',
+  // Legal contracts
+  active:     '#d4edda',
+  renewed:    '#d1ecf1',
+  expired:    '#f8d7da',
+  terminated: '#dcdcdc',
 };
 
 interface Props {
