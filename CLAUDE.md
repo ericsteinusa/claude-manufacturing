@@ -104,7 +104,7 @@ this section in sync when adding endpoints, it has gone stale before.
 - Routes wired at `/api/v1/` in `manufacturing/urls.py`:
   - Auth: login/logout/refresh/profile.
   - Dashboards: main (4 KPIs) + financial/production/inventory/sales/personnel/
-    accounting/customer-service/engineering/customers/it.
+    accounting/customer-service/engineering/customers/it/legal.
   - Time clock (status/clock-in/clock-out/hours) + time-off.
   - Work orders: list/detail/status, operations (list/start/complete), cost (get/compute).
   - Requisitions: list/pending, add item, submit, decide.
@@ -173,7 +173,13 @@ tickets with priority — pure reuse of `it_core.get_it_dashboard()`, which alre
 bundled `recent_tickets` into its own return value and was already in use by the web
 `it_dashboard` view, so this needed only a new `api_it_dashboard` view +
 `/api/v1/dashboards/it/` route, no `reports_core` wrapper at all; closes §6.9's
-IT-department mobile gap).
+IT-department mobile gap), Legal (active contract count, pending compliance items,
+open litigation cases, recent contracts with value/status — pure reuse of
+`legal_core.get_legal_dashboard()`, which already bundled `recent_contracts` into its
+own return value and was already in use by the web `_legal.py` dashboard view, so this
+also needed only a new `api_legal_dashboard` view + `/api/v1/dashboards/legal/` route,
+no `reports_core` wrapper, matching the IT precedent; closes §6.9's Legal-department
+mobile gap).
 Plus `(auth)/login`. To run: `cd mobile && npx expo start` → scan QR with Expo Go on
 phone.
 

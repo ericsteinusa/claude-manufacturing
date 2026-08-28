@@ -3570,3 +3570,26 @@ matches the TypeScript interface exactly. §6.9's explicit zero-coverage list no
 function first" pattern, and the first time the reused function needed no wrapper at all — worth
 checking `legal_core.py`, `marketing_core.py`, and `payroll_core.py` next the same way before
 assuming either the pattern or the "needs a wrapper" sub-pattern holds a seventh time.
+
+---
+
+**2026-08-28, seven for seven:** Closed **Legal** — same shape as IT, both the department-dashboard
+pattern and the no-wrapper-needed sub-pattern held again. `legal_core.get_legal_dashboard()`
+already existed, was already in real use by the web `_legal.py` dashboard view, and already bundled
+`recent_contracts` directly into its own return dict — so again no `reports_core` change, just a
+new `api_legal_dashboard` view calling `legal_core.get_legal_dashboard()` straight through, plus
+`/api/v1/dashboards/legal/` route, added to `api_openapi_core.py`'s `ENDPOINTS` (wrapped across two
+lines like the Customers/IT entries). Zero new core logic, zero new tests — full suite held at 3423
+passed, `ruff check .` and `manage.py check` clean. The new `legal.tsx` mobile screen shows active-
+contract count, pending-compliance count, open-litigation count, and a recent-contracts list with
+counterparty/type/value/end-date and a status badge; `active`/`renewed`/`expired`/`terminated` were
+added to `StatusBadge`'s shared color map (the seventh mobile-coverage PR in a row to touch it) to
+cover `legal_core.CONTRACT_STATUSES` in full. Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/
+`expo export --platform web` all clean. Verified end-to-end against the real dev server: hit
+`/api/v1/dashboards/legal/` directly with a real bearer token and confirmed live data (13 real
+contracts spanning Active/Draft/Expired, 13 compliance items, 6 litigation cases) matches the
+TypeScript interface exactly. §6.9's explicit zero-coverage list now drops to **2**: `marketing`,
+`payroll`. Seven for seven on the "check `*_core.py` for an existing dashboard function first"
+pattern, and two in a row needing no wrapper — worth checking `marketing_core.py` and
+`payroll_core.py` next the same way, though at this point either remaining department breaking the
+streak would be the more notable outcome.
