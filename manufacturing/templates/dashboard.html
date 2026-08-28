@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Dashboard — Manufacturing ERP{% endblock %}
+{% block page_title %}{% trans "Dashboard" %} — {% trans "Manufacturing ERP" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{% url 'user_roles' %}" class="btn">🔑 User Roles</a>
+<a href="{% url 'user_roles' %}" class="btn">🔑 {% trans "User Roles" %}</a>
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
-<a href="{% url 'audit_log' %}" class="btn">📜 Audit Log</a>
+<a href="{% url 'audit_log' %}" class="btn">📜 {% trans "Audit Log" %}</a>
 {% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' %}
-<a href="{% url 'periods' %}" class="btn">📅 Periods</a>
+<a href="{% url 'periods' %}" class="btn">📅 {% trans "Periods" %}</a>
 <a href="{% url 'po_approvals' %}" class="btn {% if pending_approvals %}btn-primary{% endif %}">
-    ✅ PO Approvals{% if pending_approvals %} <strong>({{ pending_approvals }})</strong>{% endif %}
+    ✅ {% trans "PO Approvals" %}{% if pending_approvals %} <strong>({{ pending_approvals }})</strong>{% endif %}
 </a>
 {% endif %}
 {% endblock %}
@@ -32,57 +33,57 @@
 {% block body %}
 <div class="content">
 
-    <div class="menu-title">Company Main Menu</div>
+    <div class="menu-title">{% trans "Company Main Menu" %}</div>
 
     {% if pending_approvals %}
     <div class="alert alert-warning" style="max-width:1100px; margin-bottom:16px;">
-        ⚠ You have <strong>{{ pending_approvals }}</strong> purchase order{{ pending_approvals|pluralize }} awaiting approval.
-        <a href="{% url 'po_approvals' %}" style="color:inherit;font-weight:700;"> Review now →</a>
+        ⚠ {% blocktrans count counter=pending_approvals %}You have <strong>{{ counter }}</strong> purchase order awaiting approval.{% plural %}You have <strong>{{ counter }}</strong> purchase orders awaiting approval.{% endblocktrans %}
+        <a href="{% url 'po_approvals' %}" style="color:inherit;font-weight:700;"> {% trans "Review now →" %}</a>
     </div>
     {% endif %}
 
     <!-- Cross-department executive KPIs -->
     <div class="exec-kpi-row">
         <div class="exec-kpi{% if kpis.open_wos %} warn{% endif %}">
-            <div class="lbl">Open Work Orders</div>
+            <div class="lbl">{% trans "Open Work Orders" %}</div>
             <div class="val">{{ kpis.open_wos|default:0 }}</div>
-            <div class="sub">Production</div>
+            <div class="sub">{% trans "Production" %}</div>
         </div>
         <div class="exec-kpi{% if kpis.open_pos %} warn{% endif %}">
-            <div class="lbl">Open POs</div>
+            <div class="lbl">{% trans "Open POs" %}</div>
             <div class="val">{{ kpis.open_pos|default:0 }}</div>
-            <div class="sub">Purchasing</div>
+            <div class="sub">{% trans "Purchasing" %}</div>
         </div>
         <div class="exec-kpi{% if kpis.open_ncrs %} warn{% endif %}">
-            <div class="lbl">Open NCRs</div>
+            <div class="lbl">{% trans "Open NCRs" %}</div>
             <div class="val">{{ kpis.open_ncrs|default:0 }}</div>
-            <div class="sub">Quality</div>
+            <div class="sub">{% trans "Quality" %}</div>
         </div>
         <div class="exec-kpi{% if kpis.open_maint_wos %} warn{% endif %}">
-            <div class="lbl">Maint. Work Orders</div>
+            <div class="lbl">{% trans "Maint. Work Orders" %}</div>
             <div class="val">{{ kpis.open_maint_wos|default:0 }}</div>
-            <div class="sub">Maintenance</div>
+            <div class="sub">{% trans "Maintenance" %}</div>
         </div>
         <div class="exec-kpi{% if kpis.low_stock %} warn{% else %} ok{% endif %}">
-            <div class="lbl">Low Stock Items</div>
+            <div class="lbl">{% trans "Low Stock Items" %}</div>
             <div class="val">{{ kpis.low_stock|default:0 }}</div>
-            <div class="sub">{{ kpis.zero_stock|default:0 }} at zero</div>
+            <div class="sub">{% blocktrans with zero=kpis.zero_stock|default:0 %}{{ zero }} at zero{% endblocktrans %}</div>
         </div>
         <div class="exec-kpi">
-            <div class="lbl">Cash Position</div>
+            <div class="lbl">{% trans "Cash Position" %}</div>
             <div class="val" style="font-size:18px;">${{ kpis.cash_position|default:0|floatformat:0 }}</div>
-            <div class="sub">Finance</div>
+            <div class="sub">{% trans "Finance" %}</div>
         </div>
     </div>
 
     <!-- Charts row 1 -->
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;max-width:1100px;margin-bottom:16px;">
         <div class="exec-card">
-            <h3>Revenue vs Expense by Month</h3>
+            <h3>{% trans "Revenue vs Expense by Month" %}</h3>
             <canvas id="chart-rev-expense" height="160"></canvas>
         </div>
         <div class="exec-card">
-            <h3>Open Items by Department</h3>
+            <h3>{% trans "Open Items by Department" %}</h3>
             <canvas id="chart-open-items" height="160"></canvas>
         </div>
     </div>
@@ -90,18 +91,18 @@
     <!-- Charts row 2 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1100px;margin-bottom:24px;">
         <div class="exec-card">
-            <h3>Inventory Stock Status</h3>
+            <h3>{% trans "Inventory Stock Status" %}</h3>
             <canvas id="chart-stock-status" height="200"></canvas>
         </div>
         <div class="exec-card">
-            <h3>AR vs AP Open Balance</h3>
+            <h3>{% trans "AR vs AP Open Balance" %}</h3>
             <canvas id="chart-ar-ap" height="200"></canvas>
         </div>
     </div>
 
     <!-- Department grid -->
     <div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;max-width:1100px;">
-        Departments
+        {% trans "Departments" %}
     </div>
     <div class="dept-grid" style="max-width:1100px;">
         {% for url, label in menu_items %}
