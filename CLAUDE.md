@@ -103,7 +103,7 @@ this section in sync when adding endpoints, it has gone stale before.
   — no PyQt6, safe in web context. No test coverage yet despite being Qt-free.
 - Routes wired at `/api/v1/` in `manufacturing/urls.py`:
   - Auth: login/logout/refresh/profile.
-  - Dashboards: main (4 KPIs) + financial/production/inventory/sales.
+  - Dashboards: main (4 KPIs) + financial/production/inventory/sales/personnel.
   - Time clock (status/clock-in/clock-out/hours) + time-off.
   - Work orders: list/detail/status, operations (list/start/complete), cost (get/compute).
   - Requisitions: list/pending, add item, submit, decide.
@@ -143,8 +143,12 @@ closes COMPETITIVE_GAP_ANALYSIS.md §6.9's Finance-department mobile gap), Sales
 (open orders, order value, quotes won, target attainment, recent orders — backed
 by a genuinely new `/api/v1/dashboards/sales/` endpoint and `reports_core
 .sales_dashboard()`, since no sales API surface existed before this; closes §6.9's
-Sales-department mobile gap). Plus `(auth)/login`. To run: `cd mobile && npx expo
-start` → scan QR with Expo Go on phone.
+Sales-department mobile gap), Personnel (headcount, by-department breakdown, time-off
+pending/approved, recent hires — the underlying `personnel_core.get_personnel_dashboard()`
+already existed and was already used by the web dashboard, so this only needed a new
+`api_personnel_dashboard` view + `/api/v1/dashboards/personnel/` route, no new core
+logic; closes §6.9's Personnel-department mobile gap). Plus `(auth)/login`. To run:
+`cd mobile && npx expo start` → scan QR with Expo Go on phone.
 
 **Offline support (`mobile/src/offline/`)** — closes COMPETITIVE_GAP_ANALYSIS.md §6.10,
 deliberately partial rather than a full offline-first rewrite of every screen:
