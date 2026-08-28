@@ -1133,6 +1133,45 @@ def home(request):
     return render(request, 'home.html', {'sso_providers': sso_providers, 'saml_providers': saml_providers})
 
 
+def _dashboard_kpis(request, conn):
+    """Shared by dashboard() and dashboard_kpis_fragment() — the htmx
+    polling target for the KPI row + pending-approvals banner needs the
+    exact same numbers the full page render uses, computed once here
+    rather than duplicated."""
+    pending_approvals = 0
+    if request.session.get('user_role') in APPROVAL_ROLES:
+        pending_approvals = count_pending(conn)
+    kpi_row = conn.execute("""
+        SELECT
+            (SELECT COUNT(*) FROM work_order
+             WHERE status NOT IN ('completed','cancelled')) AS open_wos,
+            (SELECT COUNT(*) FROM purchase_order
+             WHERE status NOT IN ('received','cancelled')) AS open_pos,
+            (SELECT COUNT(*) FROM qa_ncr WHERE status != 'Closed') AS open_ncrs,
+            (SELECT COUNT(*) FROM maint_work_order
+             WHERE status NOT IN ('Completed','Cancelled')) AS open_maint_wos,
+            (SELECT COUNT(*) FROM product
+             WHERE COALESCE(amount,0) > 0 AND reorder_point > 0
+               AND COALESCE(amount,0) <= reorder_point) AS low_stock,
+            (SELECT COUNT(*) FROM product
+             WHERE COALESCE(amount,0) <= 0) AS zero_stock
+    """).fetchone()
+    kpis = dict(kpi_row) if kpi_row else {}
+    kpis['cash_position'] = get_cash_position(conn)
+    return pending_approvals, kpis
+
+
+@login_required
+def dashboard_kpis_fragment(request):
+    """htmx polling target for dashboard's KPI row + pending-approvals banner."""
+    with get_db_connection() as conn:
+        pending_approvals, kpis = _dashboard_kpis(request, conn)
+    return render(request, 'dashboard_kpis.html', {
+        'pending_approvals': pending_approvals,
+        'kpis': kpis,
+    })
+
+
 def dashboard(request):
     email = request.session.get('user_email')
     if not email:
@@ -1164,34 +1203,13 @@ def dashboard(request):
         (_dept_dashboard_urls.get(key, '/dept/{}/'.format(key)), label)
         for key, label in DASHBOARD_DEPARTMENTS
     ]
-    pending_approvals = 0
-    kpis = {}
     rev_expense_json = '[]'
     open_items_json = '[]'
     stock_status_json = '{}'
     ar_ap_json = '{}'
     conn = get_db_connection()
     try:
-        if request.session.get('user_role') in APPROVAL_ROLES:
-            pending_approvals = count_pending(conn)
-        kpi_row = conn.execute("""
-            SELECT
-                (SELECT COUNT(*) FROM work_order
-                 WHERE status NOT IN ('completed','cancelled')) AS open_wos,
-                (SELECT COUNT(*) FROM purchase_order
-                 WHERE status NOT IN ('received','cancelled')) AS open_pos,
-                (SELECT COUNT(*) FROM qa_ncr WHERE status != 'Closed') AS open_ncrs,
-                (SELECT COUNT(*) FROM maint_work_order
-                 WHERE status NOT IN ('Completed','Cancelled')) AS open_maint_wos,
-                (SELECT COUNT(*) FROM product
-                 WHERE COALESCE(amount,0) > 0 AND reorder_point > 0
-                   AND COALESCE(amount,0) <= reorder_point) AS low_stock,
-                (SELECT COUNT(*) FROM product
-                 WHERE COALESCE(amount,0) <= 0) AS zero_stock
-        """).fetchone()
-        kpis = dict(kpi_row) if kpi_row else {}
-        cash_position = get_cash_position(conn)
-        kpis['cash_position'] = cash_position
+        pending_approvals, kpis = _dashboard_kpis(request, conn)
         rev_expense = get_revenue_expense_by_month(conn)
         rev_expense_json = json.dumps(rev_expense)
         open_items = [

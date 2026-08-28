@@ -1,0 +1,41 @@
+{% load i18n %}
+{% if pending_approvals %}
+<div class="alert alert-warning" style="max-width:1100px; margin-bottom:16px;">
+    ⚠ {% blocktrans count counter=pending_approvals %}You have <strong>{{ counter }}</strong> purchase order awaiting approval.{% plural %}You have <strong>{{ counter }}</strong> purchase orders awaiting approval.{% endblocktrans %}
+    <a href="{% url 'po_approvals' %}" style="color:inherit;font-weight:700;"> {% trans "Review now →" %}</a>
+</div>
+{% endif %}
+
+<!-- Cross-department executive KPIs -->
+<div class="exec-kpi-row">
+    <div class="exec-kpi{% if kpis.open_wos %} warn{% endif %}">
+        <div class="lbl">{% trans "Open Work Orders" %}</div>
+        <div class="val">{{ kpis.open_wos|default:0 }}</div>
+        <div class="sub">{% trans "Production" %}</div>
+    </div>
+    <div class="exec-kpi{% if kpis.open_pos %} warn{% endif %}">
+        <div class="lbl">{% trans "Open POs" %}</div>
+        <div class="val">{{ kpis.open_pos|default:0 }}</div>
+        <div class="sub">{% trans "Purchasing" %}</div>
+    </div>
+    <div class="exec-kpi{% if kpis.open_ncrs %} warn{% endif %}">
+        <div class="lbl">{% trans "Open NCRs" %}</div>
+        <div class="val">{{ kpis.open_ncrs|default:0 }}</div>
+        <div class="sub">{% trans "Quality" %}</div>
+    </div>
+    <div class="exec-kpi{% if kpis.open_maint_wos %} warn{% endif %}">
+        <div class="lbl">{% trans "Maint. Work Orders" %}</div>
+        <div class="val">{{ kpis.open_maint_wos|default:0 }}</div>
+        <div class="sub">{% trans "Maintenance" %}</div>
+    </div>
+    <div class="exec-kpi{% if kpis.low_stock %} warn{% else %} ok{% endif %}">
+        <div class="lbl">{% trans "Low Stock Items" %}</div>
+        <div class="val">{{ kpis.low_stock|default:0 }}</div>
+        <div class="sub">{% blocktrans with zero=kpis.zero_stock|default:0 %}{{ zero }} at zero{% endblocktrans %}</div>
+    </div>
+    <div class="exec-kpi">
+        <div class="lbl">{% trans "Cash Position" %}</div>
+        <div class="val" style="font-size:18px;">${{ kpis.cash_position|default:0|floatformat:0 }}</div>
+        <div class="sub">{% trans "Finance" %}</div>
+    </div>
+</div>

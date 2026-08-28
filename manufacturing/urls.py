@@ -13,6 +13,7 @@ urlpatterns = [
     path('notifications/<int:notification_id>/read/', views.notifications_mark_read,
          name='notifications_mark_read'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/kpis-fragment/', views.dashboard_kpis_fragment, name='dashboard_kpis_fragment'),
     path('logout/', views.logout, name='logout'),
     path('register/', views.register, name='register'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
