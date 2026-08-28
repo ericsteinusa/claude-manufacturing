@@ -172,20 +172,41 @@ infrastructure: `django.middleware.locale.LocaleMiddleware` (positioned after
 `SessionMiddleware`, before `CommonMiddleware`, per Django's own requirement),
 `LANGUAGES`/`LOCALE_PATHS` in `manufacture/settings.py`, and a language
 switcher (`<select>` posting to Django's built-in `set_language` view, wired
-at `/i18n/` in `manufacture/urls.py`) in `base.html`'s top bar. Translation
-coverage is the app's core navigation shell only — `base.html` (sidebar: all
-11 section headers + all ~37 nav links; top bar: notifications, password,
-2FA, logout) and `home.html` (the login page) — wrapped in `{% trans %}`/
-`{% blocktrans %}`, with real (not placeholder) Spanish translations in
-`locale/es/LC_MESSAGES/django.po`. Run `python manage.py compilemessages`
-after editing any `.po` file — the `.mo` binary Django actually loads at
-runtime isn't regenerated automatically, and the dev server's autoreloader
-doesn't watch `.po`/`.mo` files, so a manual restart is also needed after
-compiling. **The ~450 department-specific content templates (forms, tables,
-detail pages) are not translated** — extending this pattern to any of them is
-mechanical (`{% load i18n %}`, wrap each string, add its Spanish line to the
-`.po` file, recompile) but is real, not-yet-done work per template, stated
-plainly rather than implied as complete.
+at `/i18n/` in `manufacture/urls.py`) in `base.html`'s top bar. Four languages
+are wired up: English (default), Spanish, French, German
+(`locale/{es,fr,de}/LC_MESSAGES/django.po`, all real translations, not
+placeholder text — added after the original Spanish-only pass to close the
+localization-breadth gap flagged in COMPETITIVE_GAP_ANALYSIS.md §9's
+comparison against MRPeasy, which ships more languages than a single-language
+pass would have). Translation coverage is the app's core navigation shell and
+main landing page only — `base.html` (sidebar: all 11 section headers + all
+~37 nav links; top bar: notifications, password, 2FA, logout), `home.html`
+(the login page), and `dashboard.html` (the post-login main dashboard: KPI
+labels, chart titles, the pending-PO-approvals banner using a real
+`{% blocktrans count %}` plural, not a hardcoded English `|pluralize`) —
+wrapped in `{% trans %}`/`{% blocktrans %}`. The main dashboard's department
+grid button labels are the one exception — they're rendered from
+`menus.py`-generated Python strings, not template-static text, so
+translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,
+a different mechanism from the template-level `{% trans %}` used everywhere
+else here; not done.
+
+Run `python manage.py makemessages -l <code>` after adding a new `{% trans %}`
+to catch the new string in every existing `.po` file (it merges via
+`msgmerge`, preserving existing translations by matching on the English
+source text) — but check the merge output for `#, fuzzy` markers before
+trusting it: `msgmerge` will guess-match a new string against a similar
+existing one (e.g. it once fuzzy-matched a new "PO Approvals" against the
+existing translation of "Approval Rules") and leave that wrong guess in
+place unless it's corrected by hand. Then `python manage.py compilemessages`
+— the `.mo` binary Django actually loads at runtime isn't regenerated
+automatically, and the dev server's autoreloader doesn't watch `.po`/`.mo`
+files, so a manual restart is also needed after compiling. **The other
+~450 department-specific content templates (forms, tables, detail pages)
+remain untranslated** — extending this pattern to any of them, or adding an
+already-wired language, is mechanical (`{% load i18n %}`, wrap each string,
+add its line to each `.po` file, recompile) but is real, not-yet-done work
+per template, stated plainly rather than implied as complete.
 
 ## Web UI (Django) & menu routing
 - **End-user documentation** for every department's pages, workflows, and the

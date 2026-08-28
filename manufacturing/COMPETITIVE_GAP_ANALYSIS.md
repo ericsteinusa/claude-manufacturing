@@ -3218,3 +3218,118 @@ on this document's entire Section 6/7/8 buildable-in-software list — every gap
 through §6.13 that didn't require external hardware or a live third-party account (Section 3's
 remaining four items) has now shipped, at the honestly-scoped depth stated in each item's own
 closure note above.**
+
+---
+
+## Section 9: 2026-08-28 Full Re-Assessment vs. the Named Top 10
+
+**Why this pass exists:** every item on Sections 6–8's platform-maturity list has now shipped
+(§6.2 SSO/SAML/MFA, §6.3 row+field RBAC, §6.4 GDPR tooling, §6.5 vertical compliance content +
+Part-11 e-signatures, §6.6 outbound webhooks + published API docs + per-endpoint rate limiting,
+§6.7 self-service approval-rule admin, §6.8 notification center, §6.12 health checks, §6.13
+CI-gated load testing — 11 of 13 items fully or partially closed since Section 6 first scored this
+app against platform dimensions no part of Section 1–5 ever touched). This is the first pass to ask
+the follow-up question directly: **given all of that, how does this app actually compare to each of
+the ten named vendors today, not just against an abstract checklist?** Vendor claims below come from
+each company's own public documentation/marketing and third-party review sites (Software Advice,
+Capterra, Epicor's own user forums, etc.), spot-checked this session — not a live audit of their
+current admin consoles, which none of the ten grant public access to. Where evidence was thin or
+contradictory, that's stated rather than guessed past.
+
+### 9.1 Top-line stats (this app, verified this session)
+
+| Metric | Count |
+|---|---|
+| Qt-free business-logic modules (`*_core.py`) | 92 |
+| Django web templates | 454 |
+| View submodules | 67 |
+| Automated test files | 104 |
+| Automated tests passing | 3,412 |
+| Section 1 feature domains with zero remaining ❌ | 15 / 15 |
+| Section 6–8 platform-maturity items fully or partially closed | 11 / 13 |
+
+### 9.2 Platform-maturity scorecard (Sections 6–8, current state)
+
+| Dimension | Status | What's real |
+|---|---|---|
+| SSO — OIDC (multi-provider) + SAML 2.0 | ✅ Full | + self-service provisioning, password policy, TOTP MFA on web login |
+| Row-level RBAC | ✅ Full | `rbac_core.py`, reusable ownership-scoping helper, adopted by Sales/CS/ESS |
+| Field-level RBAC | ✅ Full | compensation-field masking, server-enforced (not just template-hidden) |
+| GDPR / data governance | ✅ Full | erasure (anonymize, not delete), subject-access export, retention-policy engine |
+| Vertical compliance content (AS9100D, IATF 16949) | ✅ Full | real checklist rows, not just generic ISO/FDA templates |
+| 21 CFR Part 11 e-signatures | ✅ Full | password re-auth + captured meaning-of-signature on approval decisions |
+| Published API docs (OpenAPI/Swagger) | ✅ Full | `/api/docs/`, hand-curated spec matching real `@require_http_methods` |
+| Per-endpoint API rate limiting | ✅ Full | 120 req/60s per user per endpoint, independent of the login-lockout limiter |
+| Outbound webhook system | ✅ Full | subscription + HMAC-signed delivery, 4 real event sources |
+| In-app notification center | ✅ Full | bell icon, unread count, fed by approvals + low-stock crossings |
+| Self-service approval-rule admin UI | ✅ Full | no-developer-needed CRUD over the existing engine |
+| Health-check endpoint | ✅ Full | `/healthz/`, real `SELECT 1` |
+| CI-gated load testing | 🟡 Partial | real Locust script, wired as a manual `workflow_dispatch` job, not per-PR |
+| Modern reactive frontend | 🟡 Partial | htmx live-refresh on 4 of ~450 templates |
+| Mobile app department coverage | 🟡 Partial | 10 of 17 departments have a mobile screen |
+| Mobile offline support | 🟡 Partial | read-cache + write-queue on 2 of 10 mobile screens |
+| Localization / i18n | 🟡 Partial | core nav shell + login + main dashboard, four languages (en/es/fr/de) — see 2026-08-28 update below |
+
+### 9.3 Feature-domain scorecard (Section 4, unchanged — recapped for context)
+
+Section 1's 15 feature domains are unaffected by this pass (nothing in Sections 6–9 touched Work
+Orders, MRP, Inventory, Quality, etc.) — still averaging **9.3/10 vs. mid-market, 8.7/10 vs.
+enterprise**, with 8 of 15 domains fully closed (Quality, Purchasing, HR/Payroll, Maintenance,
+Reporting/Analytics, Scheduling/APS all have zero remaining ❌ rows per Section 4's own log).
+
+### 9.4 Verdict against each of the ten named vendors
+
+| Vendor | Where they still lead | Where this app now stands |
+|---|---|---|
+| **SAP S/4HANA** | Global multi-entity financial consolidation depth, Fiori UX polish, dozens of shipped languages | The SSO/RBAC/GDPR/compliance gap that used to be a hard blocker in an SAP-shop IT security review is closed; frontend modernity and localization depth are not |
+| **Oracle Cloud Manufacturing (Fusion)** | Same enterprise financial/localization depth as SAP | Same story — platform-maturity parity reached, i18n breadth is the widest remaining gap |
+| **Microsoft Dynamics 365 SCM** | Power Platform (Power Automate/Power BI/Power Apps) gives far deeper low-code/BI reach than this app's approval-rule admin UI + webhooks | The specific "self-service workflow config without a developer" gap Dynamics wins on is closed; Power Platform's broader no-code surface is not matched |
+| **Epicor Kinetic** | Confirmed (this session) to already ship native field/row-level security, and purpose-built, certified AS9100/Part-11/aerospace compliance modules — more mature than this app's equivalents | This app now approaches parity on RBAC granularity and vertical compliance *content*; Epicor's modules are certified/purpose-built where this app's are honestly-scoped and non-certified — narrows, doesn't erase, the gap |
+| **Infor CloudSuite Industrial** | ION integration platform has a more mature no-code UI than this app's webhook/approval-rule admin screens | Conceptually equivalent capability now exists (subscription-based event routing, self-service rule config); Infor's tooling is more polished |
+| **Plex Manufacturing Cloud** | Native real-time shop-floor/MES depth, automotive-native heritage | The vertical-compliance and e-signature work narrows Plex's automotive/aerospace-specific edge without closing its shop-floor MES depth |
+| **SYSPRO** | Comparable overall scale/target market | Likely at or near parity on RBAC/GDPR/API governance now — dimensions that used to be SYSPRO's edge over smaller point tools |
+| **Fishbowl** | — | Fishbowl's own privacy page doesn't clearly state GDPR compliance and no SSO/SAML capability is publicly documented; this app is now genuinely ahead on RBAC, GDPR tooling, e-signatures, and published API docs, on top of already-comparable core feature depth |
+| **JobBOSS² (ECI Solutions)** | Shop-floor/job-shop scheduling depth for its niche | No comparable RBAC/GDPR/compliance/API-governance depth found in public documentation; same verdict as Fishbowl on platform maturity |
+| **MRPeasy** | **Genuinely ahead on localization** — confirmed shipping in 13+ languages (English, Spanish, French, German, Portuguese, Dutch, and more) against this app's single added language | Simple, SMB-focused by design — no RBAC/GDPR/compliance tooling to compare against; but on the one dimension this app just worked on, MRPeasy is still ahead |
+
+**Net read:** this app has moved from "strong mid-market, several upper-mid-market capabilities"
+(this document's original framing) to something closer to **upper-mid-market approaching
+lower-enterprise** — comprehensive Section 1 feature depth *and* the platform-governance maturity
+(SSO, granular RBAC, GDPR, vertical compliance, e-signatures, API governance) that used to be
+almost exclusively SAP/Oracle/Dynamics territory. The two dimensions where the gap is still real and
+wide, even against SMB-tier peers, are **localization breadth** (MRPeasy alone ships more languages
+than this app's one) and **frontend modernity** (every enterprise vendor and Epicor/Infor/Plex ship
+a reactive SPA; this app is 4 htmx pages into ~450 server-rendered templates). Both are already
+honestly scored as such in §9.2 — this pass doesn't change either score, it just confirms the
+scores hold up against the vendors' actual public positioning, not just this document's own prior
+claims about them.
+
+---
+
+**2026-08-28, follow-up:** Extended localization directly in response to §9.4's own finding —
+MRPeasy, the simplest SMB-tier named competitor, ships in 13+ languages against this app's one.
+Added two more languages (French, German) alongside the existing Spanish, and extended translation
+coverage from the nav shell + login page to the post-login **main dashboard** (`dashboard.html`):
+all 6 executive KPI card labels, all 4 chart titles, the "Company Main Menu" heading, and the
+pending-PO-approvals banner — the last one using a real `{% blocktrans count %}` plural form (not
+a hardcoded English `|pluralize`), verified to resolve correctly in all three languages via
+`django.utils.translation.ngettext` (Spanish/French singular-vs-plural at n=1 vs n=3, German's
+`nplurals=2; plural=(n != 1)` rule). All three `.po` files hand-translated in full — 79 messages
+each, zero fuzzy/untranslated per `msgfmt --statistics` — not machine-translated placeholder text.
+One process finding worth keeping: re-running `makemessages` to pick up the new `dashboard.html`
+strings correctly preserved the existing Spanish translations via `msgmerge` matching on source
+text, but also **fuzzy-matched two new strings to the wrong existing translation** ("PO Approvals"
+guessed as similar enough to already-translated "Approval Rules", "Open Work Orders"/"Maint. Work
+Orders" both guessed against "Work Orders") — `#, fuzzy` markers that would have shipped silently
+wrong translations if not caught and hand-corrected; now documented as a required review step in
+CLAUDE.md's Localization section for the next language or template added. The one remaining
+department-grid button labels on the same dashboard page are the sole exception — sourced from
+`menus.py`-generated Python strings rather than template-static text, so translating them needs
+`gettext_lazy` in Python, a different mechanism, not done this pass. Full suite re-ran clean (3412,
+unchanged — this is template/settings/locale-file work, no `*_core.py` logic touched), `ruff
+check .` and `manage.py check` clean. Verified end-to-end against the real dev server for all three
+languages: logged in, switched to each via the real `/i18n/setlang/` endpoint, and confirmed the
+dashboard's `<html lang>` attribute, KPI labels, and chart titles all render correctly in Spanish,
+French, and German respectively. **Localization remains honestly scored as partial** — three
+languages and two templates is real progress against the specific gap named in §9.4, not a claim
+that the ~450 remaining templates or MRPeasy's full language count are now matched.
