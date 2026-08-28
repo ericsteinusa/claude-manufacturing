@@ -3,7 +3,7 @@
 from manufacturing.reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
     sales_dashboard, accounting_dashboard, customer_service_dashboard,
-    engineering_dashboard,
+    engineering_dashboard, customers_dashboard,
 )
 
 
@@ -319,3 +319,47 @@ def test_engineering_dashboard_truncates_recent_projects_to_eight():
     ])
     result = engineering_dashboard(conn)
     assert len(result["recent_projects"]) == 8
+
+
+# ── customers_dashboard ──────────────────────────────────────────────────────
+
+def test_customers_dashboard_combines_kpis_and_recent_collections():
+    conn = _FakeConn([
+        [{"total": 10, "good": 7, "hold": 2, "suspended": 1, "total_exposure": "500000.00"}],
+        [{"total": 4, "pending": 1}],
+        [{"total": 5, "open": 3}],
+        [{"id": 1, "customer_id": 9, "activity_date": "2026-08-01",
+          "activity_type": "Phone Call", "contact_name": "Bob", "notes": "",
+          "amount_promised": 1200.0, "promise_date": "2026-08-15",
+          "follow_up_date": "2026-08-10", "status": "Open", "created_by": "x",
+          "company_name": "Acme Corp", "first_name": None, "last_name": None},
+         {"id": 2, "customer_id": 3, "activity_date": "2026-07-20",
+          "activity_type": "Email", "contact_name": "Sue", "notes": "",
+          "amount_promised": None, "promise_date": None,
+          "follow_up_date": None, "status": "Closed", "created_by": "x",
+          "company_name": "", "first_name": "Sue", "last_name": "Jones"}],
+    ])
+    result = customers_dashboard(conn)
+    assert result["accounts"]["hold"] == 2
+    assert result["applications"]["pending"] == 1
+    assert result["collections"]["open"] == 3
+    # Only the "Open"-status activity survives the status filter.
+    assert result["recent_collections"] == [{
+        "id": 1, "customer_name": "Acme Corp", "activity_type": "Phone Call",
+        "activity_date": "2026-08-01", "status": "Open", "amount_promised": 1200.0,
+    }]
+
+
+def test_customers_dashboard_recent_collection_falls_back_to_contact_name():
+    conn = _FakeConn([
+        [{"total": 0, "good": 0, "hold": 0, "suspended": 0, "total_exposure": 0}],
+        [{"total": 0, "pending": 0}],
+        [{"total": 0, "open": 0}],
+        [{"id": 1, "customer_id": 3, "activity_date": "2026-07-20",
+          "activity_type": "Email", "contact_name": "Sue", "notes": "",
+          "amount_promised": None, "promise_date": None,
+          "follow_up_date": None, "status": "Escalated", "created_by": "x",
+          "company_name": "", "first_name": "Sue", "last_name": "Jones"}],
+    ])
+    result = customers_dashboard(conn)
+    assert result["recent_collections"][0]["customer_name"] == "Sue Jones"

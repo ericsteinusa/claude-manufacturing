@@ -7,6 +7,7 @@ import io
 import textwrap
 
 from .accounting_core import get_ap_dashboard, get_ar_dashboard
+from .credit_core import get_credit_dashboard, list_collection_activities
 from .cs_calls_core import get_summary_stats, list_tickets
 from .engineering_core import get_eng_dashboard, list_projects
 from .finance_core import get_cash_position
@@ -495,6 +496,40 @@ def engineering_dashboard(conn) -> dict:
             'task_count': r['task_count'],
             'done_count': r['done_count'],
             'overdue_tasks': r['overdue_tasks'],
+        }
+        for r in recent
+    ]
+    return dash
+
+
+def customers_dashboard(conn) -> dict:
+    """Return credit/collections KPIs + recent collection activity for the
+    mobile Customers screen (COMPETITIVE_GAP_ANALYSIS.md §6.9's mobile-
+    coverage gap) — reuses credit_core's own get_credit_dashboard() and
+    list_collection_activities() (already real, in use by the web
+    credit_dashboard view) rather than a third copy of the same queries.
+
+    Keys returned:
+      accounts             {total, good, hold, suspended, total_exposure}
+      applications         {total, pending}
+      collections          {total, open}
+      recent_collections   Up to 8 open/in-progress/escalated collection
+                           activities (id, customer_name, activity_type,
+                           activity_date, status, amount_promised)
+    """
+    dash = get_credit_dashboard(conn)
+    recent = [
+        c for c in list_collection_activities(conn)
+        if c['status'] in ('Open', 'In Progress', 'Escalated')
+    ][:8]
+    dash['recent_collections'] = [
+        {
+            'id': r['id'],
+            'customer_name': r['company_name'] or f"{r['first_name'] or ''} {r['last_name'] or ''}".strip(),
+            'activity_type': r['activity_type'],
+            'activity_date': r['activity_date'],
+            'status': r['status'],
+            'amount_promised': r['amount_promised'],
         }
         for r in recent
     ]

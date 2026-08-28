@@ -148,6 +148,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⚗</Text>,
         }}
       />
+      <Tabs.Screen
+        name="customers"
+        options={{
+          title: 'Customers',
+          tabBarLabel: ({ focused }) => <TabIcon label="Customers" focused={focused} />,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>👥</Text>,
+        }}
+      />
     </Tabs>
   );
 }

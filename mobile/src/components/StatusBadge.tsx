@@ -29,6 +29,9 @@ const STATUS_COLORS: Record<string, string> = {
   invoiced:  '#d1ecf1',
   // Engineering projects
   planning:  '#e2e3e5',
+  // Collection activities
+  escalated: '#f8d7da',
+  closed:    '#d4edda',
 };
 
 interface Props {
