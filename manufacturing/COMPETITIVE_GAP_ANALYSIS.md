@@ -3266,7 +3266,7 @@ contradictory, that's stated rather than guessed past.
 | Health-check endpoint | ✅ Full | `/healthz/`, real `SELECT 1` |
 | CI-gated load testing | 🟡 Partial | real Locust script, wired as a manual `workflow_dispatch` job, not per-PR |
 | Modern reactive frontend | 🟡 Partial | htmx live-refresh on 5 of ~450 templates — see 2026-08-28 update below |
-| Mobile app department coverage | 🟡 Partial | 10 of 17 departments have a mobile screen |
+| Mobile app department coverage | 🟡 Partial | 11 of 17 departments have a mobile screen — see 2026-08-28 update below |
 | Mobile offline support | 🟡 Partial | read-cache + write-queue on 2 of 10 mobile screens |
 | Localization / i18n | 🟡 Partial | core nav shell + login + main dashboard, four languages (en/es/fr/de) — see 2026-08-28 update below |
 
@@ -3359,3 +3359,25 @@ cached or static partial — then deleted the test work order; separately confir
 correctly renders in the active session's language (French) when fetched with that session's
 cookies, proving the i18n and htmx-fragment work compose without conflict (`LocaleMiddleware` reads
 the session on every request, including polling `GET`s).
+
+---
+
+**2026-08-28, one more:** Closed the **Finance** row in §6.9's Mobile App Coverage table — exactly
+the item that section's own "what it would take" note called cheapest: "the existing REST API
+already has Financial/Production/Inventory dashboard endpoints... so the gap for at least a
+read-only Sales/Finance/HR mobile view is mobile-app screen work, not new backend API surface." A
+new `finance.tsx` tab reuses `/api/v1/dashboards/financial/` (`reports_core.financial_dashboard`)
+completely as-is — zero new backend code — surfacing cash position, DSO, DPO, gross margin %, AP
+due this week, and the AR aging bucket breakdown (current/1-30/31-60/61-90/over-90 days) via the
+same `KpiCard` component and `ScrollView`/`RefreshControl` pattern the main dashboard screen already
+established. §6.9's own explicit zero-coverage list drops from 11 named departments to **10**:
+`accounting`, `customer_service`, `customers`, `engineering`, `it`, `legal`, `marketing`,
+`payroll`, `personnel`, `sales` — one department closed this pass, matching this section's own
+precedent of picking off the cheapest remaining item first (Sales and HR are the other two
+"read-only, existing-API" candidates named in §6.9's own text, both still open). No backend tests
+needed (no Python changed); mobile's own three-check CI surface (`tsc --noEmit`, `expo-doctor`,
+`expo export --platform web`) all ran clean. Verified end-to-end rather than just statically: hit
+the real `/api/v1/dashboards/financial/` endpoint directly with a real bearer token against the
+live dev server and confirmed the actual JSON response shape (`cash_position`, `dso`, `dpo`,
+`ar_aging` with all five bucket keys, `ap_due_week`, `gross_margin_pct`) matches the TypeScript
+interface the new screen was written against exactly — not just trusting the Python source read.
