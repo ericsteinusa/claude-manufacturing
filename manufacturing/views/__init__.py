@@ -325,6 +325,7 @@ from ._batch_record import *  # noqa: F401,F403
 from ._ai_insights import *  # noqa: F401,F403
 from ._approval_rules import *  # noqa: F401,F403
 from ._health import healthz  # noqa: F401
+from ._api_docs import api_openapi_spec, api_docs  # noqa: F401
 from ._notifications import *  # noqa: F401,F403
 from ._webhooks import *  # noqa: F401,F403
 from ._data_governance import *  # noqa: F401,F403

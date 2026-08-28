@@ -23,6 +23,12 @@ TOKEN_LIFETIME_HOURS = 8
 _LOGIN_MAX_ATTEMPTS = 5
 _LOGIN_WINDOW_MINUTES = 15
 
+# Per-endpoint API rate limiting (distinct from the login-attempt lockout
+# above): caps how many requests one authenticated user can make against
+# one endpoint in a rolling window, applied to every @api_required view.
+API_RATE_LIMIT_MAX_REQUESTS = 120
+API_RATE_LIMIT_WINDOW_SECONDS = 60
+
 
 # ---------------------------------------------------------------------------
 # Table DDL
@@ -48,6 +54,18 @@ def ensure_api_token_table(conn) -> None:
     conn.execute("""
         CREATE INDEX IF NOT EXISTS api_login_attempt_ident
         ON api_login_attempt(identifier, attempted_at DESC)
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS api_request_log (
+            id           SERIAL PRIMARY KEY,
+            identifier   TEXT NOT NULL,
+            endpoint     TEXT NOT NULL,
+            requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """)
+    conn.execute("""
+        CREATE INDEX IF NOT EXISTS api_request_log_ident
+        ON api_request_log(identifier, endpoint, requested_at DESC)
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS api_totp_secret (
@@ -189,6 +207,49 @@ def purge_old_attempts(conn, keep_minutes: int = 60) -> int:
     cur = conn.execute(
         "DELETE FROM api_login_attempt "
         "WHERE attempted_at < NOW() - (%s * INTERVAL '1 minute')",
+        (keep_minutes,),
+    )
+    return cur.rowcount if hasattr(cur, 'rowcount') else 0
+
+
+# ---------------------------------------------------------------------------
+# Per-endpoint API rate limiting
+#
+# Distinct from the failed-login-attempt lockout above: this counts *every*
+# request (successful or not) a given user makes against a given endpoint,
+# so an authenticated client hammering one endpoint gets throttled even
+# though every individual call succeeds. Applied automatically to every
+# @api_required view (see api_decorators.py) rather than opt-in per view.
+# ---------------------------------------------------------------------------
+
+def record_api_request(conn, identifier: str, endpoint: str) -> None:
+    """Log one API request. Does not commit."""
+    conn.execute(
+        "INSERT INTO api_request_log (identifier, endpoint) VALUES (%s, %s)",
+        (identifier, endpoint),
+    )
+
+
+def is_api_rate_limited(conn, identifier: str, endpoint: str,
+                        max_requests: int = API_RATE_LIMIT_MAX_REQUESTS,
+                        window_seconds: int = API_RATE_LIMIT_WINDOW_SECONDS) -> bool:
+    """Return True if *identifier* has made >= max_requests calls to
+    *endpoint* within the last window_seconds."""
+    row = conn.execute("""
+        SELECT COUNT(*) AS cnt
+        FROM api_request_log
+        WHERE identifier = %s
+          AND endpoint = %s
+          AND requested_at > NOW() - (%s * INTERVAL '1 second')
+    """, (identifier, endpoint, window_seconds)).fetchone()
+    return (row['cnt'] if row else 0) >= max_requests
+
+
+def purge_old_api_requests(conn, keep_minutes: int = 60) -> int:
+    """Delete request-log rows older than keep_minutes. Returns row count deleted."""
+    cur = conn.execute(
+        "DELETE FROM api_request_log "
+        "WHERE requested_at < NOW() - (%s * INTERVAL '1 minute')",
         (keep_minutes,),
     )
     return cur.rowcount if hasattr(cur, 'rowcount') else 0

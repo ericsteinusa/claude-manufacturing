@@ -658,6 +658,9 @@ urlpatterns = [
     path('api/v1/wo/<int:wo_id>/cost/',            api_views.api_wo_cost,           name='api_wo_cost'),
     path('api/v1/wo/<int:wo_id>/cost/compute/',    api_views.api_wo_cost_compute,   name='api_wo_cost_compute'),
     path('api/v1/gl-accounts/',                    api_views.api_gl_accounts,       name='api_gl_accounts'),
+    # API docs (OpenAPI spec + Swagger UI)
+    path('api/v1/openapi.json', views.api_openapi_spec, name='api_openapi_spec'),
+    path('api/docs/',           views.api_docs,         name='api_docs'),
     # Barcode scan & label printing
     path('scan/', views.scan_home, name='scan_home'),
     path('scan/lookup/', views.scan_lookup, name='scan_lookup'),

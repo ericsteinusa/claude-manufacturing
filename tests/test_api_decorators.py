@@ -24,25 +24,33 @@ class _FakeConn:
     def __init__(self):
         self.calls = []
         self.closed = False
+        self.committed = False
 
     def execute(self, sql, params=None):
         self.calls.append((sql, params))
         return self
 
+    def commit(self):
+        self.committed = True
+
     def close(self):
         self.closed = True
 
 
-def _patched(user):
+def _patched(user, rate_limited=False):
     """Patch get_db_connection/ensure_api_token_table/verify_token as seen
     from inside api_decorators.py, returning the fake conn used and letting
-    the caller control what verify_token resolves to."""
+    the caller control what verify_token resolves to. Rate-limit check/log
+    functions are patched out too since _FakeConn doesn't implement a real
+    fetchone()."""
     conn = _FakeConn()
     ctx = patch.multiple(
         'manufacturing.api_decorators',
         get_db_connection=lambda: conn,
         ensure_api_token_table=lambda c: None,
         verify_token=lambda c, token: user,
+        is_api_rate_limited=lambda c, i, e: rate_limited,
+        record_api_request=lambda c, i, e: None,
     )
     return ctx, conn
 
@@ -145,6 +153,8 @@ def test_api_required_strips_bearer_prefix_and_whitespace_from_token():
         get_db_connection=lambda: conn,
         ensure_api_token_table=lambda c: None,
         verify_token=lambda c, token: seen_tokens.append(token) or {'id': 1},
+        is_api_rate_limited=lambda c, i, e: False,
+        record_api_request=lambda c, i, e: None,
     ):
         request = rf.get('/api/v1/whatever/', HTTP_AUTHORIZATION='Bearer   abc123  ')
         view(request)
@@ -157,3 +167,46 @@ def test_api_required_preserves_wrapped_function_name():
         return api_ok({})
 
     assert my_view.__name__ == 'my_view'
+
+
+# ── per-endpoint rate limiting ──────────────────────────────────────────
+
+def test_api_required_rate_limited_returns_429_and_does_not_call_view():
+    called = []
+
+    @api_required
+    def view(request):
+        called.append(True)
+        return api_ok({'reached': True})
+
+    ctx, conn = _patched(user={'id': 1}, rate_limited=True)
+    request = rf.get('/api/v1/whatever/', HTTP_AUTHORIZATION='Bearer goodtoken')
+    with ctx:
+        resp = view(request)
+    assert resp.status_code == 429
+    assert 'Rate limit exceeded' in json.loads(resp.content)['error']
+    assert called == []
+    assert conn.closed is True
+
+
+def test_api_required_under_limit_calls_view_and_records_request():
+    user = {'id': 1, 'email': 'a@b.com'}
+    recorded = []
+
+    @api_required
+    def view(request):
+        return api_ok({'reached': True})
+
+    conn = _FakeConn()
+    with patch.multiple(
+        'manufacturing.api_decorators',
+        get_db_connection=lambda: conn,
+        ensure_api_token_table=lambda c: None,
+        verify_token=lambda c, token: user,
+        is_api_rate_limited=lambda c, i, e: False,
+        record_api_request=lambda c, i, e: recorded.append((i, e)),
+    ):
+        request = rf.get('/api/v1/whatever/', HTTP_AUTHORIZATION='Bearer goodtoken')
+        resp = view(request)
+    assert resp.status_code == 200
+    assert recorded == [('1', '/api/v1/whatever/')]

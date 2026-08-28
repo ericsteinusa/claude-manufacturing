@@ -3116,3 +3116,40 @@ correctly cascades to `approved`. All test data deleted afterward. `ruff check .
 check` clean. **This leaves three gaps genuinely open: API docs/rate limiting, mobile offline
 support, and localization** — none started, all still correctly scored as lower-ROI for this app's
 buyer profile.
+
+---
+
+**2026-08-28:** Shipped **§6.6 Published API docs (OpenAPI/Swagger)** and **per-endpoint API rate
+limiting**, closing both remaining rows in that section's table together since one PR touches the
+same choke point (`api_decorators.api_required`) either way. Docs: `api_openapi_core.py` hand-builds
+a full OpenAPI 3.0 spec from a plain `ENDPOINTS` list — deliberately not introspected from Django's
+URL resolver and not built on `drf-spectacular` (which would mean adopting Django REST Framework,
+a framework this app has never used, just to document 48 already-working endpoints). Every entry's
+method(s) were read directly off `api_views.py`'s own `@require_http_methods` decorators (or, for
+the six endpoints with internal GET/POST branching, both), not guessed from naming convention.
+Served as raw JSON at `/api/v1/openapi.json` and as interactive Swagger UI at `/api/docs/`
+(`views/_api_docs.py`) — the UI loads `swagger-ui-dist` from a CDN, the same pattern every
+dashboard's Chart.js `<script src="cdn.jsdelivr.net">` tag already uses, rather than vendoring a
+JS toolchain into a repo that has none. Rate limiting: `api_auth.py` gains a second, independent
+limiter alongside the existing login-attempt lockout — `is_api_rate_limited`/`record_api_request`
+log every request (not just failures) per `(people_id, endpoint path)` into a new
+`api_request_log` table, and `api_required` (the single decorator wrapping all 48 `@api_required`
+views) now checks it on every call, returning `429` once a caller exceeds
+`API_RATE_LIMIT_MAX_REQUESTS=120` requests in `API_RATE_LIMIT_WINDOW_SECONDS=60` against one
+endpoint — applied automatically with no per-view opt-in, closing the gap for every endpoint at
+once rather than one at a time. 16 new tests (12 for the OpenAPI spec's structure/coverage, 4
+extending the existing `@api_required` test suite for the 429 path and confirming under-limit
+calls still reach the view and get logged); full suite: 3412 passed (3398 + 16 — three pre-existing
+`test_api_decorators.py` tests needed their `_FakeConn`/patch fixtures extended for the new
+rate-limit check and `commit()` call, the same "adding a call to an already-tested function needs a
+fixture update" pattern this document's own log has hit repeatedly). Verified end-to-end against
+the real dev server rather than just unit-tested: fetched `/api/v1/openapi.json` and confirmed all
+49 paths resolve with the live server's own host baked into `servers[0].url`; loaded `/api/docs/`
+and confirmed the Swagger UI bundle renders; logged in for a real token and fired 125 real requests
+at `/api/v1/auth/profile/` — the first 120 returned `200`, the remaining 5 returned `429` with a
+clear error message, and the *same* token hitting a *different* endpoint (`/api/v1/dashboard/`)
+immediately afterward still returned `200`, confirming the limit is genuinely per-endpoint rather
+than a blanket per-user cap. All test rate-limit-log rows and tokens deleted afterward. `ruff
+check .` and `manage.py check` clean. **This leaves two gaps genuinely open: mobile offline support
+and localization** — both still correctly scored as lower-ROI/higher-effort for this app's buyer
+profile than everything shipped in this pass.

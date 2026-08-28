@@ -75,12 +75,25 @@ this section in sync when adding endpoints, it has gone stale before.
     `TOKEN_LIFETIME_HOURS` expiry checked in `verify_token`.
   - Login rate limiting: `record_login_attempt`, `is_rate_limited`,
     `purge_old_attempts`.
+  - Per-endpoint API rate limiting (distinct from the login-attempt lockout
+    above — this throttles *all* requests, not just failed logins):
+    `record_api_request`, `is_api_rate_limited`, `purge_old_api_requests`,
+    logged in `api_request_log`. Applied automatically inside
+    `@api_required` to every endpoint it decorates, keyed on
+    `(people_id, endpoint path)`; default `API_RATE_LIMIT_MAX_REQUESTS=120`
+    per `API_RATE_LIMIT_WINDOW_SECONDS=60`, returns `429` once exceeded.
   - TOTP two-factor auth: `generate_totp_secret`, `verify_totp_code`,
     `set_totp_secret`, `get_totp_secret`, `disable_totp`, `verify_totp_for_user`
     — fully implemented but currently **dead code**; `api_login` only does
     bcrypt + rate limiting, no route wires TOTP in yet.
 - `manufacturing/api_decorators.py` — `api_ok(data)`, `api_err(msg, status)`, `@api_required`
-  decorator (checks `Authorization: Bearer <token>`, injects `request.api_user` dict).
+  decorator (checks `Authorization: Bearer <token>`, enforces the per-endpoint rate limit
+  above, injects `request.api_user` dict).
+- `manufacturing/api_openapi_core.py` — hand-curated OpenAPI 3.0 spec (`build_openapi_spec()`,
+  a plain `ENDPOINTS` list kept in sync with `urls.py`/`api_views.py`'s `@require_http_methods`
+  decorators, not introspected). Served as JSON at `/api/v1/openapi.json` and as interactive
+  Swagger UI at `/api/docs/` (`views/_api_docs.py`, both unauthenticated — a third-party
+  integrator needs to read the docs before they have a token).
 - `manufacturing/api_views.py` — all view functions; `@csrf_exempt` throughout; reuses
   `reports_core`, `time_clock_core`, `work_orders_core`, `personnel_core`,
   `purchase_requisitions_core`, `approval_workflow_core`, `costing_core`,
