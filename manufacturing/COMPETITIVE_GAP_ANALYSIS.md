@@ -3488,3 +3488,28 @@ tickets with real customer names and call descriptions) matches the TypeScript i
 out to already have a reusable dashboard function sitting in their own `*_core.py` — worth checking
 `engineering_core.py`, `it_core.py`, `legal_core.py`, `marketing_core.py`, and `payroll_core.py` for
 the same pattern before assuming any of them needs real new backend work.
+
+---
+
+**2026-08-28, four in a row now:** Closed **Engineering** — checked `engineering_core.py` first per
+the standing lesson and found `get_eng_dashboard()` and `list_projects()` already existed, already
+real, already in use by the web `eng_dashboard` view. Added `reports_core.engineering_dashboard()`
+combining project/ECR/task KPIs with up to 8 recent projects (including per-project task progress:
+`task_count`/`done_count`/`overdue_tasks`, already computed by `list_projects`' own `LEFT JOIN` —
+no new SQL needed there either). New `api_engineering_dashboard` view + `/api/v1/dashboards
+/engineering/` route, added to `api_openapi_core.py`'s `ENDPOINTS`. The new `engineering.tsx` mobile
+screen shows active/planning project counts, overdue task count, pending ECR count, and a recent-
+projects list with a status badge and task-progress line per project — also extended
+`StatusBadge`'s color map with `planning` (engineering projects), the fourth mobile-coverage PR in a
+row to need a one-line addition there. 2 new tests for `engineering_dashboard()` (KPI+recent-
+projects combination, and the 8-project cap); full suite 3421 passed (3419 + 2), `ruff check .` and
+`manage.py check` clean; mobile's `tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web`
+all clean. Verified end-to-end against the real dev server: hit `/api/v1/dashboards/engineering/`
+directly with a real bearer token and confirmed live data (8 real projects across every status, 8
+real ECRs, real overdue-task counts) matches the TypeScript interface exactly, including a project
+with a null `due_date`. §6.9's explicit zero-coverage list now drops to **5**: `customers`, `it`,
+`legal`, `marketing`, `payroll`. Four departments running (Personnel, Accounting, Customer Service,
+Engineering) have now all had a pre-existing dashboard function reused rather than needing real new
+backend work — at this point the working assumption should flip: **check the department's own
+`*_core.py` for a `get_*_dashboard`/`*_dashboard` function before doing anything else**, since it
+has been there every single time so far.
