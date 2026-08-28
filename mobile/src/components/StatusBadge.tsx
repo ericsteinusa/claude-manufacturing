@@ -32,6 +32,8 @@ const STATUS_COLORS: Record<string, string> = {
   // Collection activities
   escalated: '#f8d7da',
   closed:    '#d4edda',
+  // IT tickets
+  resolved:  '#d4edda',
 };
 
 interface Props {

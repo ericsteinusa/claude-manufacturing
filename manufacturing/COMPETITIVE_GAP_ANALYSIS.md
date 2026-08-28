@@ -3543,3 +3543,30 @@ matches the TypeScript interface exactly. §6.9's explicit zero-coverage list no
 dashboard function first" pattern — worth checking `it_core.py`, `legal_core.py`,
 `marketing_core.py`, and `payroll_core.py` next before assuming any of them is the one that finally
 breaks the streak.
+
+---
+
+**2026-08-28, six for six:** Closed **IT** — the pattern held a sixth consecutive time, and this
+was the simplest case yet. `it_core.get_it_dashboard()` already existed, was already in real use by
+the web `it_dashboard` view, and — unlike the four departments before it (Accounting, Customer
+Service, Engineering, Customers all needed a new `reports_core.*_dashboard()` wrapper combining two
+separate functions) — already bundled its `recent_tickets` list directly into its own return dict.
+So this needed no `reports_core` change at all: just a new `api_it_dashboard` view calling
+`it_core.get_it_dashboard()` straight through, plus `/api/v1/dashboards/it/` route, added to
+`api_openapi_core.py`'s `ENDPOINTS` (with the same line-length wrap the Customers entry needed).
+Zero new core logic means zero new tests — full suite held at 3423 passed, `ruff check .` and
+`manage.py check` clean. The new `it.tsx` mobile screen shows open/critical/in-progress ticket
+counts and assets-in-repair, plus a recent-tickets list with requester/department/issue type and a
+priority tag; `resolved` was added to `StatusBadge`'s shared color map (the sixth mobile-coverage
+PR in a row to touch it) for the ticket status badge, while ticket *priority* (critical/high/
+medium/low) got its own small local color helper inside `it.tsx` rather than being folded into
+`StatusBadge`, since priority and status are different axes on the same ticket and conflating them
+into one shared map would have made both harder to read. Mobile's `tsc --noEmit`/`expo-doctor`
+(21/21)/`expo export --platform web` all clean. Verified end-to-end against the real dev server:
+hit `/api/v1/dashboards/it/` directly with a real bearer token and confirmed live data (13 real
+tickets across every status including 2 unresolved critical, 16 real assets with 1 in repair)
+matches the TypeScript interface exactly. §6.9's explicit zero-coverage list now drops to **3**:
+`legal`, `marketing`, `payroll`. Six for six on the "check `*_core.py` for an existing dashboard
+function first" pattern, and the first time the reused function needed no wrapper at all — worth
+checking `legal_core.py`, `marketing_core.py`, and `payroll_core.py` next the same way before
+assuming either the pattern or the "needs a wrapper" sub-pattern holds a seventh time.

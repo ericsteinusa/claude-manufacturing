@@ -44,6 +44,7 @@ ENDPOINTS: list[tuple[str, list[str], str, bool]] = [
     ('/dashboards/engineering/', ['get'], 'Engineering dashboard: project/ECR/task KPIs and recent projects.', True),
     ('/dashboards/customers/', ['get'],
      'Customers dashboard: credit/collections KPIs and recent collection activity.', True),
+    ('/dashboards/it/', ['get'], 'IT dashboard: helpdesk ticket/asset KPIs and recent tickets.', True),
 
     ('/time-clock/status/', ['get'], "Whether the caller is currently clocked in.", True),
     ('/time-clock/clock-in/', ['post'], 'Clock in.', True),

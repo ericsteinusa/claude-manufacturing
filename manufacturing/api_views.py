@@ -24,6 +24,7 @@ from . import (
     cycle_count_core,
     document_control_core,
     inventory_core,
+    it_core,
     lot_core,
     maintenance_core,
     personnel_core,
@@ -786,6 +787,18 @@ def api_customers_dashboard(request):
     conn = get_db_connection()
     try:
         data = reports_core.customers_dashboard(conn)
+    finally:
+        conn.close()
+    return api_ok(data)
+
+
+@csrf_exempt
+@require_http_methods(['GET'])
+@api_required
+def api_it_dashboard(request):
+    conn = get_db_connection()
+    try:
+        data = it_core.get_it_dashboard(conn)
     finally:
         conn.close()
     return api_ok(data)
