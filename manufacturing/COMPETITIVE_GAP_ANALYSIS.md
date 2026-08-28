@@ -2652,7 +2652,10 @@ broader coverage than 6/17 departments — score **7/10** of the top 10 have mat
 mobile breadth. **What it would take:** the existing REST API (`api_views.py`) already has
 Financial/Production/Inventory dashboard endpoints per CLAUDE.md's own inventory of routes, so the
 gap for at least a read-only Sales/Finance/HR mobile view is mobile-app screen work, not new backend
-API surface — the ROI-ordered list at the end of this section reflects that.
+API surface — the ROI-ordered list at the end of this section reflects that. **Correction
+(2026-08-28):** this held for Finance (a mobile screen shipped reusing the existing endpoint
+verbatim) but not for Sales — there was no `/api/v1/...` sales route of any kind, so that one
+needed genuinely new backend work too. See the dated log at the end of the document for both.
 
 ### 6.10 Offline Support
 
@@ -3381,3 +3384,34 @@ the real `/api/v1/dashboards/financial/` endpoint directly with a real bearer to
 live dev server and confirmed the actual JSON response shape (`cash_position`, `dso`, `dpo`,
 `ar_aging` with all five bucket keys, `ap_due_week`, `gross_margin_pct`) matches the TypeScript
 interface the new screen was written against exactly — not just trusting the Python source read.
+
+---
+
+**2026-08-28, last one for now:** Closed the **Sales** row too. Unlike Finance, this one genuinely
+needed new backend API surface — §6.9's own text had claimed "the existing REST API already has
+Financial/Production/Inventory dashboard endpoints... so the gap for at least a read-only
+Sales/Finance/HR mobile view is mobile-app screen work, not new backend API surface," but that
+claim was inaccurate for Sales specifically: grepping `urls.py`/`api_views.py` found zero
+`/api/v1/...` sales routes of any kind before this pass (`sales_dashboard` at `urls.py:369` is the
+*web* UI view, not part of the mobile API) — worth correcting here rather than silently building on
+top of a stale claim. Added a real `reports_core.sales_dashboard(conn)` (housed alongside
+`financial_dashboard`/`production_dashboard`/`inventory_dashboard`, the same domain-dashboard
+convention) that reuses `sales_core.get_sales_dashboard()` and `sales_orders_core.list_sos()`
+rather than a third copy of the same queries, plus a genuinely new `api_sales_dashboard` view and
+`/api/v1/dashboards/sales/` route, added to `api_openapi_core.py`'s `ENDPOINTS` list so the
+published API docs stay in sync. The new `sales.tsx` mobile screen surfaces open-order count, total
+order value, quotes won, target attainment %, and up to 8 recent orders with customer/status/total
+— also extended `StatusBadge`'s color map with the three sales-order statuses (`confirmed`,
+`shipped`, `invoiced`) it didn't have colors for yet. 3 new tests for `sales_dashboard()` (including
+the customer-name fallback to first/last name when no company is linked, and the 8-order cap) plus
+the pre-existing OpenAPI spec-coverage tests automatically covering the new endpoint; full suite
+3415 passed (3412 + 3), `ruff check .` and `manage.py check` clean; mobile's `tsc --noEmit`/
+`expo-doctor` (21/21)/`expo export --platform web` all clean. Verified end-to-end against the real
+dev server: hit `/api/v1/dashboards/sales/` directly with a real bearer token and confirmed live
+data (10 real sales orders, real customer names, real target/actual figures) matches the TypeScript
+interface exactly, including the empty-customer-name edge case for orders with no linked contact.
+§6.9's explicit zero-coverage list now drops to **9** named departments: `accounting`,
+`customer_service`, `customers`, `engineering`, `it`, `legal`, `marketing`, `payroll`, `personnel`.
+HR/Personnel is the last "cheap, existing-API-adjacent" candidate that section named; the rest
+(accounting, customer_service, engineering, IT, legal, marketing) would need real new backend work
+the way Sales just did, not a free reuse the way Finance was.

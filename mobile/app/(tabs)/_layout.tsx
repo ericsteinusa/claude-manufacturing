@@ -108,6 +108,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>💵</Text>,
         }}
       />
+      <Tabs.Screen
+        name="sales"
+        options={{
+          title: 'Sales',
+          tabBarLabel: ({ focused }) => <TabIcon label="Sales" focused={focused} />,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🛒</Text>,
+        }}
+      />
     </Tabs>
   );
 }

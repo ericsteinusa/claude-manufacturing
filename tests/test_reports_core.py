@@ -2,6 +2,7 @@
 
 from manufacturing.reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
+    sales_dashboard,
 )
 
 
@@ -152,3 +153,58 @@ def test_cs_summary_empty_db():
     assert result["open"] == 0
     assert result["closed"] == 0
     assert result["today"] == 0
+
+
+# ── sales_dashboard ──────────────────────────────────────────────────────────
+
+def test_sales_dashboard_combines_kpis_and_recent_orders():
+    conn = _FakeConn([
+        [{"draft": 2, "confirmed": 3, "shipped": 1, "invoiced": 4,
+          "total": 10, "total_value": "50000.00"}],
+        [{"draft": 1, "sent": 2, "won": 3, "total": 6, "won_value": "20000.00"}],
+        [{"total_target": "100000.00", "total_actual": "75000.00"}],
+        [{"id": 1, "so_number": "SO-2026-0001", "order_date": "2026-08-01",
+          "ship_date": None, "status": "confirmed", "notes": "", "created_by": "x",
+          "customer_id": 5, "company_name": "Acme Corp", "first_name": None,
+          "last_name": None, "item_count": 3, "total": "1200.00"}],
+    ])
+    result = sales_dashboard(conn)
+    assert result["orders"]["total"] == 10
+    assert result["quotes"]["won"] == 3
+    assert result["targets"]["total_target"] == "100000.00"
+    assert result["recent_orders"] == [{
+        "id": 1, "so_number": "SO-2026-0001", "customer": "Acme Corp",
+        "status": "confirmed", "total": 1200.0, "order_date": "2026-08-01",
+    }]
+
+
+def test_sales_dashboard_recent_order_falls_back_to_contact_name():
+    conn = _FakeConn([
+        [{"draft": 0, "confirmed": 0, "shipped": 0, "invoiced": 0,
+          "total": 0, "total_value": 0}],
+        [{"draft": 0, "sent": 0, "won": 0, "total": 0, "won_value": 0}],
+        [{"total_target": 0, "total_actual": 0}],
+        [{"id": 2, "so_number": "SO-2026-0002", "order_date": None,
+          "ship_date": None, "status": "draft", "notes": "", "created_by": "x",
+          "customer_id": None, "company_name": None, "first_name": "Jane",
+          "last_name": "Doe", "item_count": 0, "total": 0}],
+    ])
+    result = sales_dashboard(conn)
+    assert result["recent_orders"][0]["customer"] == "Jane Doe"
+    assert result["recent_orders"][0]["order_date"] is None
+
+
+def test_sales_dashboard_truncates_recent_orders_to_eight():
+    order_row = {"id": 1, "so_number": "SO-1", "order_date": None,
+                 "ship_date": None, "status": "draft", "notes": "", "created_by": "x",
+                 "customer_id": 1, "company_name": "X", "first_name": None,
+                 "last_name": None, "item_count": 1, "total": 1}
+    conn = _FakeConn([
+        [{"draft": 0, "confirmed": 0, "shipped": 0, "invoiced": 0,
+          "total": 0, "total_value": 0}],
+        [{"draft": 0, "sent": 0, "won": 0, "total": 0, "won_value": 0}],
+        [{"total_target": 0, "total_actual": 0}],
+        [dict(order_row) for _ in range(12)],
+    ])
+    result = sales_dashboard(conn)
+    assert len(result["recent_orders"]) == 8
