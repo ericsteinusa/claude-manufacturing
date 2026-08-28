@@ -209,6 +209,19 @@ add its line to each `.po` file, recompile) but is real, not-yet-done work
 per template, stated plainly rather than implied as complete.
 
 ## Web UI (Django) & menu routing
+- **Live-refresh via htmx** (COMPETITIVE_GAP_ANALYSIS.md §6.1 "Modern Frontend," deliberately
+  partial — a full SPA rewrite isn't proportionate to this codebase's size). 5 of ~450 templates
+  poll a small fragment view every 30s instead of doing a full page reload: `sf_tv.html`,
+  `prod_dashboard.html`, `maint_dashboard.html`, `ai_insights_dashboard.html`, and `dashboard.html`
+  (the main company dashboard). Pattern to copy for the next page: a `<div id="..."
+  hx-get="/path/to/fragment/" hx-trigger="every 30s" hx-swap="innerHTML">{% include
+  "the_fragment.html" %}</div>` wrapping whatever needs to stay live, a `{name}_fragment` view
+  (same auth decorator as the parent view) that renders that same partial template standalone, and
+  `<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>` in the page's
+  `extra_scripts` block — matches the Chart.js CDN-script precedent, not a new dependency-management
+  pattern. Factor the shared data-fetching logic (SQL/computation) into one helper function called
+  by both the full-page view and the fragment view — `dashboard.html`'s `_dashboard_kpis()` in
+  `views/__init__.py` is the reference example — so the two can't silently drift out of sync.
 - **End-user documentation** for every department's pages, workflows, and the
   role/permission model lives in `docs/user-guide/` (Markdown source, plus a
   combined `Manufacturing System User Manual.docx` for distribution to

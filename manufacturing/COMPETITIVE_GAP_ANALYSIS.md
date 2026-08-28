@@ -3265,7 +3265,7 @@ contradictory, that's stated rather than guessed past.
 | Self-service approval-rule admin UI | ✅ Full | no-developer-needed CRUD over the existing engine |
 | Health-check endpoint | ✅ Full | `/healthz/`, real `SELECT 1` |
 | CI-gated load testing | 🟡 Partial | real Locust script, wired as a manual `workflow_dispatch` job, not per-PR |
-| Modern reactive frontend | 🟡 Partial | htmx live-refresh on 4 of ~450 templates |
+| Modern reactive frontend | 🟡 Partial | htmx live-refresh on 5 of ~450 templates — see 2026-08-28 update below |
 | Mobile app department coverage | 🟡 Partial | 10 of 17 departments have a mobile screen |
 | Mobile offline support | 🟡 Partial | read-cache + write-queue on 2 of 10 mobile screens |
 | Localization / i18n | 🟡 Partial | core nav shell + login + main dashboard, four languages (en/es/fr/de) — see 2026-08-28 update below |
@@ -3333,3 +3333,29 @@ dashboard's `<html lang>` attribute, KPI labels, and chart titles all render cor
 French, and German respectively. **Localization remains honestly scored as partial** — three
 languages and two templates is real progress against the specific gap named in §9.4, not a claim
 that the ~450 remaining templates or MRPeasy's full language count are now matched.
+
+---
+
+**2026-08-28, still later:** Extended **§6.1 Modern Frontend** by one more page — the **main company
+dashboard** (`dashboard.html`), the single highest-traffic page in the app (every logged-in user's
+landing page) — using the exact same htmx live-refresh pattern PR #114 already established for
+`sf_tv.html`/`prod_dashboard.html`/`maint_dashboard.html`/`ai_insights_dashboard.html`, not a new
+mechanism: a `dashboard_kpis.html` partial (the pending-PO-approvals banner + all 6 executive KPI
+cards, extracted verbatim from `dashboard.html`) is both `{% include %}`d for the initial render and
+served standalone by a new `dashboard_kpis_fragment` view, polled every 30s via
+`hx-get`/`hx-trigger`/`hx-swap`. The KPI-computation SQL itself was factored out of the `dashboard()`
+view into a shared `_dashboard_kpis(request, conn)` helper so the full-page render and the polling
+fragment can never drift out of sync by construction — the fragment isn't a separate, hand-maintained
+copy of the same six queries. This is now 5 of ~450 templates with live-refresh, still correctly
+scored as partial; the doc's own §6.1 conclusion that a full SPA rewrite isn't proportionate to this
+codebase's size is unchanged — the next htmx target (if pursued) should stay this same
+highest-traffic-page-at-a-time approach, not a framework migration. Full suite re-ran clean (3412,
+unchanged — the refactor is a pure extraction, no behavior change to the existing `dashboard()`
+view's own output), `ruff check .` and `manage.py check` clean. Verified end-to-end against the real
+dev server, not just statically: hit `/dashboard/kpis-fragment/` directly and confirmed it renders
+standalone; created a real work order via `work_orders_core.create_wo` (status `'open'`), re-fetched
+the fragment, and confirmed "Open Work Orders" incremented from 4 to 5 — genuine live data, not a
+cached or static partial — then deleted the test work order; separately confirmed the fragment
+correctly renders in the active session's language (French) when fetched with that session's
+cookies, proving the i18n and htmx-fragment work compose without conflict (`LocaleMiddleware` reads
+the session on every request, including polling `GET`s).
