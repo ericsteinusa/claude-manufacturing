@@ -3415,3 +3415,25 @@ interface exactly, including the empty-customer-name edge case for orders with n
 HR/Personnel is the last "cheap, existing-API-adjacent" candidate that section named; the rest
 (accounting, customer_service, engineering, IT, legal, marketing) would need real new backend work
 the way Sales just did, not a free reuse the way Finance was.
+
+---
+
+**2026-08-28, and the last cheap one:** Closed **Personnel** — the item flagged above as the last
+"cheap, existing-API-adjacent" candidate, and it held up: unlike Sales, `personnel_core
+.get_personnel_dashboard()` already existed *and* was already in real use by the web personnel
+dashboard (`views/__init__.py:7542`), so this needed only a new `api_personnel_dashboard` view and
+`/api/v1/dashboards/personnel/` route — zero new core logic, the same reuse-only shape as Finance
+rather than Sales' genuinely-new-backend shape. The new `personnel.tsx` mobile screen surfaces
+total headcount, pending/approved time-off counts, a by-department headcount breakdown (bar-style,
+top 6 departments), and the 8 most recently added employees with job title and department. No new
+backend tests needed (no new Python logic, matching Finance's precedent, not Sales'); full suite
+still 3415 passed (unchanged), `ruff check .` and `manage.py check` clean; mobile's `tsc --noEmit`/
+`expo-doctor` (21/21)/`expo export --platform web` all clean. Verified end-to-end against the real
+dev server: hit `/api/v1/dashboards/personnel/` directly with a real bearer token and confirmed
+live data (74 real employees, a real by-department breakdown, real recent hires with job
+titles) matches the TypeScript interface exactly. §6.9's explicit zero-coverage list now drops to
+**8** named departments: `accounting`, `customer_service`, `customers`, `engineering`, `it`,
+`legal`, `marketing`, `payroll`. **Every "cheap" candidate this section ever named (Finance, Sales,
+Personnel) is now shipped** — every department left on the list would need real new backend work
+the way Sales did, not a free reuse; picking further ones is a judgment call on which department's
+data is most valuable on a phone, not an ROI-obvious next step the way these three were.

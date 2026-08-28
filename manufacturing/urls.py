@@ -612,6 +612,7 @@ urlpatterns = [
     path('api/v1/dashboards/production/',  api_views.api_production_dashboard, name='api_production_dashboard'),
     path('api/v1/dashboards/inventory/',   api_views.api_inventory_dashboard,  name='api_inventory_dashboard'),
     path('api/v1/dashboards/sales/',       api_views.api_sales_dashboard,      name='api_sales_dashboard'),
+    path('api/v1/dashboards/personnel/',   api_views.api_personnel_dashboard,  name='api_personnel_dashboard'),
     path('api/v1/time-clock/status/',    api_views.api_tc_status,    name='api_tc_status'),
     path('api/v1/time-clock/clock-in/',  api_views.api_tc_clock_in,  name='api_tc_clock_in'),
     path('api/v1/time-clock/clock-out/', api_views.api_tc_clock_out, name='api_tc_clock_out'),
