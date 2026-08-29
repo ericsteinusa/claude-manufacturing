@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Run Payroll{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Run Payroll" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/payroll/history/" class="btn">Payroll History</a>
-<a href="/payroll/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/payroll/history/" class="btn">{% trans "Payroll History" %}</a>
+<a href="/payroll/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -26,31 +27,31 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Run Payroll</h2>
+    <h2>{% trans "Run Payroll" %}</h2>
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>New Payroll Run</h3>
+        <h3>{% trans "New Payroll Run" %}</h3>
         <p class="hint">
-            Hourly employees are paid on actual clocked hours for this period
+            {% blocktrans %}Hourly employees are paid on actual clocked hours for this period
             (regular + overtime, same split as the Time Clock OT report).
             Salaried employees are paid their annual rate divided by the
             number of pay periods per year for the frequency chosen below.
-            Only employees with a pay rate on file are included.
+            Only employees with a pay rate on file are included.{% endblocktrans %}
         </p>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Pay Period Start *</label>
+                    <label>{% trans "Pay Period Start" %} *</label>
                     <input type="date" name="pay_period_start" required>
                 </div>
                 <div class="form-row">
-                    <label>Pay Period End *</label>
+                    <label>{% trans "Pay Period End" %} *</label>
                     <input type="date" name="pay_period_end" required>
                 </div>
                 <div class="form-row">
-                    <label>Pay Frequency</label>
+                    <label>{% trans "Pay Frequency" %}</label>
                     <select name="pay_frequency">
                         {% for f in frequencies %}
                         <option value="{{ f }}" {% if f == "Bi-Weekly" %}selected{% endif %}>{{ f }}</option>
@@ -59,15 +60,15 @@
                 </div>
                 <div class="form-row"></div>
                 <div class="form-row">
-                    <label>Federal Tax Rate (%)</label>
+                    <label>{% trans "Federal Tax Rate (%)" %}</label>
                     <input type="number" step="0.01" min="0" max="100" name="federal_tax_pct" value="22" required>
                 </div>
                 <div class="form-row">
-                    <label>State Tax Rate (%)</label>
+                    <label>{% trans "State Tax Rate (%)" %}</label>
                     <input type="number" step="0.01" min="0" max="100" name="state_tax_pct" value="5" required>
                 </div>
             </div>
-            <button type="submit" class="save-btn">Process Payroll</button>
+            <button type="submit" class="save-btn">{% trans "Process Payroll" %}</button>
         </form>
     </div>
 </div>

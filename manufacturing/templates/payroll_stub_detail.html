@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Pay Stub{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Pay Stub" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/payroll/history/{{ stub.run_id }}/" class="btn">Back to Run</a>
-<a href="/payroll/history/" class="btn">All Runs</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/payroll/history/{{ stub.run_id }}/" class="btn">{% trans "Back to Run" %}</a>
+<a href="/payroll/history/" class="btn">{% trans "All Runs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -31,88 +32,88 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Pay Stub</h2>
-    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    <h2>{% trans "Pay Stub" %}</h2>
+    <button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 
     <div class="stub">
-        <div class="stub-header">PAY STUB</div>
+        <div class="stub-header">{% trans "PAY STUB" %}</div>
 
         <div class="stub-section">
-            <div class="stub-line"><span class="lbl">Employee:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Employee:" %}</span>
                 <span class="val">{{ stub.last_name }}, {{ stub.first_name }}</span></div>
-            <div class="stub-line"><span class="lbl">Employee ID:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Employee ID:" %}</span>
                 <span class="val">{{ stub.employee_id|default:"—" }}</span></div>
-            <div class="stub-line"><span class="lbl">Pay Period:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Pay Period:" %}</span>
                 <span class="val">{{ stub.pay_period_start }} to {{ stub.pay_period_end }}</span></div>
-            <div class="stub-line"><span class="lbl">Payment Date:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Payment Date:" %}</span>
                 <span class="val">{{ stub.run_date|slice:":10" }}</span></div>
-            <div class="stub-line"><span class="lbl">Pay Type:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Pay Type:" %}</span>
                 <span class="val">{{ stub.pay_type|default:"—" }}</span></div>
             {% if stub.pay_type == "hourly" %}
-            <div class="stub-line"><span class="lbl">Pay Rate:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Pay Rate:" %}</span>
                 <span class="val">${{ stub.pay_rate|floatformat:2 }}/hr</span></div>
             {% elif stub.pay_type == "salary" %}
-            <div class="stub-line"><span class="lbl">Annual Salary:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Annual Salary:" %}</span>
                 <span class="val">${{ stub.pay_rate|floatformat:0 }}/yr</span></div>
             {% endif %}
         </div>
 
         <div class="stub-section">
-            <h4>Earnings</h4>
-            <div class="stub-line"><span class="lbl">Regular Hours:</span>
+            <h4>{% trans "Earnings" %}</h4>
+            <div class="stub-line"><span class="lbl">{% trans "Regular Hours:" %}</span>
                 <span class="val">{{ stub.regular_hours|floatformat:2 }} hrs</span></div>
-            <div class="stub-line"><span class="lbl">Overtime Hours:</span>
+            <div class="stub-line"><span class="lbl">{% trans "Overtime Hours:" %}</span>
                 <span class="val">{{ stub.overtime_hours|floatformat:2 }} hrs</span></div>
             <div class="stub-line" style="margin-top:6px;">
-                <span class="lbl" style="font-weight:bold;">Gross Pay:</span>
+                <span class="lbl" style="font-weight:bold;">{% trans "Gross Pay:" %}</span>
                 <span class="val">${{ stub.gross_pay|floatformat:2 }}</span></div>
         </div>
 
         {% if pre_tax %}
         <div class="stub-section">
-            <h4>Pre-Tax Deductions</h4>
+            <h4>{% trans "Pre-Tax Deductions" %}</h4>
             {% for d in pre_tax %}
             <div class="stub-line"><span class="lbl">{{ d.deduction_name }}:</span>
                 <span class="debit">-${{ d.amount|floatformat:2 }}</span></div>
             {% endfor %}
             <div class="stub-line" style="margin-top:4px;">
-                <span class="lbl" style="font-weight:bold;">Total Pre-Tax Deductions:</span>
+                <span class="lbl" style="font-weight:bold;">{% trans "Total Pre-Tax Deductions:" %}</span>
                 <span class="debit">-${{ stub.pre_tax_deductions|floatformat:2 }}</span></div>
         </div>
         {% endif %}
 
         <div class="stub-section">
-            <h4>Taxes</h4>
-            <div class="stub-line"><span class="lbl">Federal Income Tax:</span>
+            <h4>{% trans "Taxes" %}</h4>
+            <div class="stub-line"><span class="lbl">{% trans "Federal Income Tax:" %}</span>
                 <span class="debit">-${{ stub.federal_tax|floatformat:2 }}</span></div>
-            <div class="stub-line"><span class="lbl">State Income Tax:</span>
+            <div class="stub-line"><span class="lbl">{% trans "State Income Tax:" %}</span>
                 <span class="debit">-${{ stub.state_tax|floatformat:2 }}</span></div>
             <div class="stub-line">
-                <span class="lbl">Social Security ({{ ss_rate|floatformat:1 }}%):</span>
+                <span class="lbl">{% blocktrans with rate=ss_rate|floatformat:1 %}Social Security ({{ rate }}%):{% endblocktrans %}</span>
                 <span class="debit">-${{ stub.social_security|floatformat:2 }}</span></div>
             <div class="stub-line">
-                <span class="lbl">Medicare ({{ medicare_rate|floatformat:2 }}%):</span>
+                <span class="lbl">{% blocktrans with rate=medicare_rate|floatformat:2 %}Medicare ({{ rate }}%):{% endblocktrans %}</span>
                 <span class="debit">-${{ stub.medicare|floatformat:2 }}</span></div>
             <div class="stub-line" style="margin-top:4px;">
-                <span class="lbl" style="font-weight:bold;">Total Taxes:</span>
+                <span class="lbl" style="font-weight:bold;">{% trans "Total Taxes:" %}</span>
                 <span class="debit">-${{ total_tax|floatformat:2 }}</span></div>
         </div>
 
         {% if post_tax %}
         <div class="stub-section">
-            <h4>Post-Tax Deductions</h4>
+            <h4>{% trans "Post-Tax Deductions" %}</h4>
             {% for d in post_tax %}
             <div class="stub-line"><span class="lbl">{{ d.deduction_name }}:</span>
                 <span class="debit">-${{ d.amount|floatformat:2 }}</span></div>
             {% endfor %}
             <div class="stub-line" style="margin-top:4px;">
-                <span class="lbl" style="font-weight:bold;">Total Post-Tax Deductions:</span>
+                <span class="lbl" style="font-weight:bold;">{% trans "Total Post-Tax Deductions:" %}</span>
                 <span class="debit">-${{ stub.post_tax_deductions|floatformat:2 }}</span></div>
         </div>
         {% endif %}
 
         <div class="stub-total">
-            <span>NET PAY:</span>
+            <span>{% trans "NET PAY:" %}</span>
             <span class="net-val">${{ stub.net_pay|floatformat:2 }}</span>
         </div>
     </div>

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Deductions & Benefits{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Deductions & Benefits" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/payroll/" class="btn">Dashboard</a>
-<a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
-<a href="/payroll/history/" class="btn">History</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/payroll/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/payroll/pay-rates/" class="btn">{% trans "Pay Rates" %}</a>
+<a href="/payroll/history/" class="btn">{% trans "History" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,18 +42,18 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Deductions &amp; Benefits</h2>
+    <h2>{% trans "Deductions &amp; Benefits" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="two-col">
         <!-- Deduction Types -->
         <div class="card">
-            <h3>Deduction Types</h3>
+            <h3>{% trans "Deduction Types" %}</h3>
             {% if ded_types %}
             <table class="list-table">
                 <thead><tr>
-                    <th>Name</th><th>Category</th><th>Pre-Tax</th><th>Active</th>
+                    <th>{% trans "Name" %}</th><th>{% trans "Category" %}</th><th>{% trans "Pre-Tax" %}</th><th>{% trans "Active" %}</th>
                 </tr></thead>
                 <tbody>
                 {% for d in ded_types %}
@@ -60,52 +61,52 @@
                     <td><strong>{{ d.name }}</strong></td>
                     <td>{{ d.category }}</td>
                     <td><span class="badge {% if d.is_pre_tax %}yes{% else %}no{% endif %}">
-                        {% if d.is_pre_tax %}Yes{% else %}No{% endif %}</span></td>
+                        {% if d.is_pre_tax %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</span></td>
                     <td><span class="badge {% if d.is_active %}yes{% else %}no{% endif %}">
-                        {% if d.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+                        {% if d.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</span></td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
             {% else %}
-            <p style="color:#888;font-size:13px;">No deduction types defined.</p>
+            <p style="color:#888;font-size:13px;">{% trans "No deduction types defined." %}</p>
             {% endif %}
 
             {% if can_edit %}
             <hr style="margin:14px 0;">
-            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">Add Deduction Type</div>
+            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">{% trans "Add Deduction Type" %}</div>
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="create_type">
                 <div class="form-grid-2">
                     <div class="form-row">
-                        <label>Name *</label>
+                        <label>{% trans "Name" %} *</label>
                         <input type="text" name="name" required>
                     </div>
                     <div class="form-row">
-                        <label>Category</label>
+                        <label>{% trans "Category" %}</label>
                         <select name="category">
                             {% for c in ded_categories %}<option>{{ c }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="form-row full">
-                        <label><input type="checkbox" name="is_pre_tax" value="1" checked> Pre-Tax Deduction</label>
+                        <label><input type="checkbox" name="is_pre_tax" value="1" checked> {% trans "Pre-Tax Deduction" %}</label>
                     </div>
                 </div>
-                <button type="submit" class="save-btn">Add Type</button>
+                <button type="submit" class="save-btn">{% trans "Add Type" %}</button>
             </form>
             {% endif %}
         </div>
 
         <!-- Assign Deductions -->
         <div class="card">
-            <h3>Assign Deductions to Employees</h3>
+            <h3>{% trans "Assign Deductions to Employees" %}</h3>
 
             <form method="get" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;">
-                <label style="font-size:12px;color:#555;font-weight:bold;">Filter by Employee:</label>
+                <label style="font-size:12px;color:#555;font-weight:bold;">{% trans "Filter by Employee:" %}</label>
                 <select name="people_id" onchange="this.form.submit()"
                         style="padding:5px 9px;border:1px solid #ccc;border-radius:4px;font-size:13px;">
-                    <option value="">All Employees</option>
+                    <option value="">{% trans "All Employees" %}</option>
                     {% for p in people %}
                     <option value="{{ p.id }}" {% if people_filter == p.id|stringformat:"s" %}selected{% endif %}>
                         {{ p.last_name }}, {{ p.first_name }}
@@ -117,7 +118,7 @@
             {% if emp_deds %}
             <table class="list-table" style="margin-bottom:12px;">
                 <thead><tr>
-                    <th>Employee</th><th>Deduction</th><th>Method</th><th>Amount</th><th>Active</th>
+                    <th>{% trans "Employee" %}</th><th>{% trans "Deduction" %}</th><th>{% trans "Method" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Active" %}</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr></thead>
                 <tbody>
@@ -128,7 +129,7 @@
                     <td>{{ d.calc_method }}</td>
                     <td>{% if d.calc_method == "percent" %}{{ d.amount|floatformat:1 }}%{% else %}${{ d.amount|floatformat:2 }}{% endif %}</td>
                     <td><span class="badge {% if d.is_active %}yes{% else %}no{% endif %}">
-                        {% if d.is_active %}Yes{% else %}No{% endif %}</span></td>
+                        {% if d.is_active %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</span></td>
                     {% if can_edit %}
                     <td>
                         <form method="post" style="display:inline;">
@@ -137,7 +138,7 @@
                             <input type="hidden" name="emp_ded_id" value="{{ d.id }}">
                             {% if people_filter %}<input type="hidden" name="next_people_id" value="{{ people_filter }}">{% endif %}
                             <button type="submit" style="background:#c33;color:white;border:none;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:11px;"
-                                onclick="return confirm('Remove this assignment?')">Remove</button>
+                                onclick="return confirm('Remove this assignment?')">{% trans "Remove" %}</button>
                         </form>
                     </td>
                     {% endif %}
@@ -146,53 +147,53 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color:#888;font-size:13px;margin-bottom:12px;">No deduction assignments found.</p>
+            <p style="color:#888;font-size:13px;margin-bottom:12px;">{% trans "No deduction assignments found." %}</p>
             {% endif %}
 
             {% if can_edit %}
             <hr style="margin:12px 0;">
-            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">Assign Deduction</div>
+            <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">{% trans "Assign Deduction" %}</div>
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="assign">
                 <div class="form-grid-2">
                     <div class="form-row">
-                        <label>Employee *</label>
+                        <label>{% trans "Employee" %} *</label>
                         <select name="people_id" required>
-                            <option value="">-- select --</option>
+                            <option value="">{% trans "-- select --" %}</option>
                             {% for p in people %}
                             <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="form-row">
-                        <label>Deduction Type *</label>
+                        <label>{% trans "Deduction Type" %} *</label>
                         <select name="deduction_type_id" required>
-                            <option value="">-- select --</option>
+                            <option value="">{% trans "-- select --" %}</option>
                             {% for t in active_types %}
                             <option value="{{ t.id }}">{{ t.name }} ({{ t.category }})</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="form-row">
-                        <label>Method</label>
+                        <label>{% trans "Method" %}</label>
                         <select name="calc_method">
                             {% for m in ded_methods %}<option>{{ m }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="form-row">
-                        <label>Amount ($/%)</label>
+                        <label>{% trans "Amount ($/%)" %}</label>
                         <input type="number" name="amount" step="0.01" min="0" value="0">
                     </div>
                     <div class="form-row full">
-                        <label><input type="checkbox" name="is_active" value="1" checked> Active</label>
+                        <label><input type="checkbox" name="is_active" value="1" checked> {% trans "Active" %}</label>
                     </div>
                     <div class="form-row full">
-                        <label>Notes</label>
+                        <label>{% trans "Notes" %}</label>
                         <input type="text" name="notes">
                     </div>
                 </div>
-                <button type="submit" class="save-btn">Assign Deduction</button>
+                <button type="submit" class="save-btn">{% trans "Assign Deduction" %}</button>
             </form>
             {% endif %}
         </div>

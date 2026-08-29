@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Payroll{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Payroll" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
-<a href="/payroll/deductions/" class="btn">Deductions</a>
-<a href="/payroll/history/" class="btn">History</a>
-<a href="/payroll/ytd/" class="btn">YTD Report</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/payroll/pay-rates/" class="btn">{% trans "Pay Rates" %}</a>
+<a href="/payroll/deductions/" class="btn">{% trans "Deductions" %}</a>
+<a href="/payroll/history/" class="btn">{% trans "History" %}</a>
+<a href="/payroll/ytd/" class="btn">{% trans "YTD Report" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,56 +36,56 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Payroll Department</h2>
+    <h2>{% trans "Payroll Department" %}</h2>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="num">{{ counts.total_runs }}</div>
-            <div class="lbl">Payroll Runs</div>
+            <div class="lbl">{% trans "Payroll Runs" %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ counts.emp_with_rates }}</div>
-            <div class="lbl">Employees with Pay Rates</div>
+            <div class="lbl">{% trans "Employees with Pay Rates" %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ counts.total_people }}</div>
-            <div class="lbl">Total Employees</div>
+            <div class="lbl">{% trans "Total Employees" %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ counts.active_ded_types }}</div>
-            <div class="lbl">Active Deduction Types</div>
+            <div class="lbl">{% trans "Active Deduction Types" %}</div>
         </div>
         <div class="kpi">
             <div class="num">${{ counts.ytd_gross|floatformat:0 }}</div>
-            <div class="lbl">YTD Gross Payroll</div>
+            <div class="lbl">{% trans "YTD Gross Payroll" %}</div>
         </div>
     </div>
 
     <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
-        <a href="/payroll/pay-rates/" class="dept-btn">Pay Rates</a>
-        <a href="/payroll/deductions/" class="dept-btn">Deductions &amp; Benefits</a>
-        <a href="/payroll/history/" class="dept-btn">Payroll History</a>
-        <a href="/payroll/ytd/" class="dept-btn">YTD Report</a>
+        <a href="/payroll/pay-rates/" class="dept-btn">{% trans "Pay Rates" %}</a>
+        <a href="/payroll/deductions/" class="dept-btn">{% trans "Deductions &amp; Benefits" %}</a>
+        <a href="/payroll/history/" class="dept-btn">{% trans "Payroll History" %}</a>
+        <a href="/payroll/ytd/" class="dept-btn">{% trans "YTD Report" %}</a>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card">
-            <h3>Monthly Gross Payroll</h3>
+            <h3>{% trans "Monthly Gross Payroll" %}</h3>
             <canvas id="chart-monthly-gross" height="220"></canvas>
         </div>
         <div class="card">
-            <h3>YTD Payroll by Department</h3>
+            <h3>{% trans "YTD Payroll by Department" %}</h3>
             <canvas id="chart-dept-gross" height="220"></canvas>
         </div>
     </div>
 
     {% if recent_runs %}
     <div class="card">
-        <h3>Recent Payroll Runs</h3>
+        <h3>{% trans "Recent Payroll Runs" %}</h3>
         <table class="list-table">
             <thead><tr>
-                <th>Run Date</th><th>Period</th>
-                <th>Employees</th><th>Total Gross</th><th>Net Pay</th><th>Status</th>
+                <th>{% trans "Run Date" %}</th><th>{% trans "Period" %}</th>
+                <th>{% trans "Employees" %}</th><th>{% trans "Total Gross" %}</th><th>{% trans "Net Pay" %}</th><th>{% trans "Status" %}</th>
             </tr></thead>
             <tbody>
             {% for r in recent_runs %}
@@ -100,13 +101,13 @@
             </tbody>
         </table>
         <div style="margin-top:10px;">
-            <a href="/payroll/history/" style="color:#36c;font-size:13px;">View all runs →</a>
+            <a href="/payroll/history/" style="color:#36c;font-size:13px;">{% trans "View all runs →" %}</a>
         </div>
     </div>
     {% else %}
     <div class="card">
-        <h3>No Payroll Runs Yet</h3>
-        <p style="color:#666;font-size:13px;">Payroll runs are created from the desktop application.</p>
+        <h3>{% trans "No Payroll Runs Yet" %}</h3>
+        <p style="color:#666;font-size:13px;">{% trans "Payroll runs are created from the desktop application." %}</p>
     </div>
     {% endif %}
 </div>
