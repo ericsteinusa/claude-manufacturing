@@ -1,17 +1,18 @@
 {% extends "base.html" %}
-{% block page_title %}Litigation{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Litigation" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/legal/" class="btn">Legal Dashboard</a>
-<a href="/legal/contracts/" class="btn">Contracts</a>
-<a href="/legal/compliance/" class="btn">Compliance</a>
-<a href="/legal/litigation/" class="btn">Litigation</a>
-<a href="/legal/ip/" class="btn">IP</a>
-<a href="/legal/employment/" class="btn">Employment</a>
-<a href="/legal/governance/" class="btn">Governance</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&case_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&case_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/legal/" class="btn">{% trans "Legal Dashboard" %}</a>
+<a href="/legal/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/legal/compliance/" class="btn">{% trans "Compliance" %}</a>
+<a href="/legal/litigation/" class="btn">{% trans "Litigation" %}</a>
+<a href="/legal/ip/" class="btn">{% trans "IP" %}</a>
+<a href="/legal/employment/" class="btn">{% trans "Employment" %}</a>
+<a href="/legal/governance/" class="btn">{% trans "Governance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&case_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&case_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -57,40 +58,40 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Litigation Cases</h2>
+    <h2>{% trans "Litigation Cases" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in litigation_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
         <select name="case_type">
-            <option value="">All Types</option>
+            <option value="">{% trans "All Types" %}</option>
             {% for t in litigation_types %}
             <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search case / party / court…">
-        <button type="submit">Filter</button>
-        <a href="/legal/litigation/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search case / party / court…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/legal/litigation/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Case Name</th>
-                    <th>Opposing Party</th>
-                    <th>Court</th>
-                    <th>Type</th>
-                    <th>Filed</th>
-                    <th>Status</th>
-                    <th>Outcome</th>
+                    <th>{% trans "Case Name" %}</th>
+                    <th>{% trans "Opposing Party" %}</th>
+                    <th>{% trans "Court" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Filed" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Outcome" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -105,7 +106,7 @@
                 <td>{{ c.outcome|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No cases found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No cases found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -113,24 +114,24 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Case</h3>
+        <h3>{% trans "New Case" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Case Name *</label>
+                    <label>{% trans "Case Name" %} *</label>
                     <input type="text" name="case_name" required>
                 </div>
                 <div class="form-group">
-                    <label>Opposing Party</label>
+                    <label>{% trans "Opposing Party" %}</label>
                     <input type="text" name="opposing_party">
                 </div>
                 <div class="form-group">
-                    <label>Court</label>
+                    <label>{% trans "Court" %}</label>
                     <input type="text" name="court">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="case_type">
                         {% for t in litigation_types %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -138,11 +139,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Filed Date</label>
+                    <label>{% trans "Filed Date" %}</label>
                     <input type="date" name="filed_date">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in litigation_statuses %}
                         <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
@@ -150,11 +151,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Case</button>
+            <button type="submit" class="btn-submit">{% trans "Add Case" %}</button>
         </form>
     </div>
     {% endif %}

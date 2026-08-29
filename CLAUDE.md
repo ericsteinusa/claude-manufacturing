@@ -275,7 +275,26 @@ convention of keeping industry acronyms like MRP/BOM/OEE untranslated) —
 wrapped in `{% trans %}`/`{% blocktrans %}`. This closes out all 5 of
 §6.1's htmx live-refresh templates (`dashboard.html`, `prod_dashboard.html`,
 `maint_dashboard.html`, `ai_insights_dashboard.html`, `sf_tv.html`) as
-translated. The main dashboard's department grid
+translated. Also fully translated: the entire **Legal department**
+(`legal_dashboard.html`, `legal_contract_list.html`/`_detail.html`,
+`legal_compliance_list.html`/`_detail.html`, `legal_litigation_list.html`/
+`_detail.html`, `legal_employment_list.html`, `legal_governance_list.html`,
+`legal_ip_list.html` — 10 templates, the smallest full department by
+template count, picked as a "close out one entire department" milestone
+rather than another single dashboard) — nav/toolbar labels, KPI labels,
+filter-bar labels/placeholders, table headers, detail-page field labels,
+and create/edit form labels and buttons across all 10; page titles using
+a record's own name (contract title, case name, compliance requirement)
+use `{% blocktrans %}` with a named variable. Status values themselves
+(e.g. `contract.status`, `case.status`) are left untranslated, matching
+the established precedent of not translating raw DB enum values. Picking
+an entire department surfaced a real pre-existing gap while re-running
+`makemessages` over the same files: the Maintenance dashboard's
+`{% trans "No PM tasks overdue or due in the next 14 days." %}` (added in
+an earlier pass) had an empty `msgstr` in all three `.po` files the whole
+time — the empty-state branch was never exercised by live sample data
+during that pass's own verification, so the gap went uncaught; fixed here.
+The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}Legal Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Legal Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/legal/" class="btn">Legal Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/legal/" class="btn">{% trans "Legal Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -39,111 +40,111 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Legal Dashboard</h2>
+    <h2>{% trans "Legal Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/legal/contracts/" class="dept-btn">Contracts</a>
-        <a href="/legal/compliance/" class="dept-btn">Compliance</a>
-        <a href="/legal/litigation/" class="dept-btn">Litigation</a>
-        <a href="/legal/ip/" class="dept-btn">Intellectual Property</a>
-        <a href="/legal/employment/" class="dept-btn">Employment Law</a>
-        <a href="/legal/governance/" class="dept-btn">Corporate Governance</a>
-        <a href="/risk/" class="dept-btn">Risk Management</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/legal/contracts/" class="dept-btn">{% trans "Contracts" %}</a>
+        <a href="/legal/compliance/" class="dept-btn">{% trans "Compliance" %}</a>
+        <a href="/legal/litigation/" class="dept-btn">{% trans "Litigation" %}</a>
+        <a href="/legal/ip/" class="dept-btn">{% trans "Intellectual Property" %}</a>
+        <a href="/legal/employment/" class="dept-btn">{% trans "Employment Law" %}</a>
+        <a href="/legal/governance/" class="dept-btn">{% trans "Corporate Governance" %}</a>
+        <a href="/risk/" class="dept-btn">{% trans "Risk Management" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
-    <div class="section-label">Contracts</div>
+    <div class="section-label">{% trans "Contracts" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Contracts</div>
+            <div class="lbl">{% trans "Total Contracts" %}</div>
             <div class="val">{{ contracts.total|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Active</div>
+            <div class="lbl">{% trans "Active" %}</div>
             <div class="val">{{ contracts.active|default:0 }}</div>
         </div>
         <div class="kpi{% if contracts.draft %} yellow{% endif %}">
-            <div class="lbl">Draft</div>
+            <div class="lbl">{% trans "Draft" %}</div>
             <div class="val">{{ contracts.draft|default:0 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Compliance</div>
+    <div class="section-label">{% trans "Compliance" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Items</div>
+            <div class="lbl">{% trans "Total Items" %}</div>
             <div class="val">{{ compliance.total|default:0 }}</div>
         </div>
         <div class="kpi{% if compliance.pending %} yellow{% endif %}">
-            <div class="lbl">Pending</div>
+            <div class="lbl">{% trans "Pending" %}</div>
             <div class="val">{{ compliance.pending|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Completed</div>
+            <div class="lbl">{% trans "Completed" %}</div>
             <div class="val">{{ compliance.completed|default:0 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Litigation</div>
+    <div class="section-label">{% trans "Litigation" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Cases</div>
+            <div class="lbl">{% trans "Total Cases" %}</div>
             <div class="val">{{ litigation.total|default:0 }}</div>
         </div>
         <div class="kpi{% if litigation.open %} red{% endif %}">
-            <div class="lbl">Open</div>
+            <div class="lbl">{% trans "Open" %}</div>
             <div class="val">{{ litigation.open|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Closed</div>
+            <div class="lbl">{% trans "Closed" %}</div>
             <div class="val">{{ litigation.closed|default:0 }}</div>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Contracts by Status</h3>
+            <h3>{% trans "Contracts by Status" %}</h3>
             <canvas id="chart-contract-status" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Contracts by Type</h3>
+            <h3>{% trans "Contracts by Type" %}</h3>
             <canvas id="chart-contract-type" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Contract Value by Counterparty (top 8)</h3>
+            <h3>{% trans "Contract Value by Counterparty (top 8)" %}</h3>
             <canvas id="chart-contract-value" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Compliance Items by Status</h3>
+            <h3>{% trans "Compliance Items by Status" %}</h3>
             <canvas id="chart-compliance-status" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Litigation by Status</h3>
+            <h3>{% trans "Litigation by Status" %}</h3>
             <canvas id="chart-litigation-status" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Litigation by Case Type</h3>
+            <h3>{% trans "Litigation by Case Type" %}</h3>
             <canvas id="chart-litigation-type" height="220"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>Recent Contracts</h3>
+        <h3>{% trans "Recent Contracts" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Counterparty</th>
-                    <th>Type</th>
-                    <th>Value</th>
-                    <th>End Date</th>
-                    <th>Status</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans "Counterparty" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Value" %}</th>
+                    <th>{% trans "End Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -157,7 +158,7 @@
                 <td><span class="badge st-{{ c.status|lower }}">{{ c.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;">No contracts found.</td></tr>
+            <tr><td colspan="6" style="color:#888;">{% trans "No contracts found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
