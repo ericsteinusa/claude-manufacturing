@@ -19,6 +19,12 @@ on:
       duration:
         description: 'Test duration (e.g. 30s, 2m)'
         default: '1m'
+      max_failure_rate:
+        description: 'Max allowed failure rate, in percent, before the job fails'
+        default: '1.0'
+      max_p95_ms:
+        description: 'Max allowed p95 response time, in ms, before the job fails'
+        default: '3000'
 
 jobs:
   loadtest:
@@ -73,6 +79,11 @@ jobs:
         run: |
           ./scripts/loadtest/run.sh http://localhost:8000 \
             "${{ inputs.users }}" "${{ inputs.spawn_rate }}" "${{ inputs.duration }}"
+      - name: Check regression thresholds
+        run: |
+          python scripts/loadtest/check_thresholds.py scripts/loadtest/results_stats.csv \
+            --max-failure-rate "${{ inputs.max_failure_rate }}" \
+            --max-p95-ms "${{ inputs.max_p95_ms }}"
       - name: Stop the dev server
         if: always()
         run: kill "$(cat server.pid)" 2>/dev/null || true
