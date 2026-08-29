@@ -301,18 +301,35 @@ Also fully translated: the entire **Marketing department**
 `mkt_analytics.html`, `mkt_budget_list.html` — 13 templates, the second
 "whole department" pass after Legal), same treatment plus `{% blocktrans
 count %}` for several "N active"/"N converted"/"N clicks"/"N in draft"
-KPI sub-labels on `mkt_analytics.html`. **New gotcha found here**: a
-`makemessages` re-run can silently **revert an already-correct
-translation back to blank**, not just fuzzy-match new strings — the
-just-fixed Maintenance dashboard string above went blank *again* on the
-very next `makemessages` run (confirmed via `git diff` on the `.po` file
-before re-fixing it a second time), even though its msgid text and
-source location were byte-identical to the working, committed version.
-Root cause not fully diagnosed (a `msgmerge` quirk, most likely); the
-practical mitigation is to diff old vs. new `.po` content after every
-`makemessages` run looking for any existing translation that went from
-populated to `msgstr ""`, not just checking the new batch's own fuzzy/
-blank counts. The main dashboard's department grid
+KPI sub-labels on `mkt_analytics.html`.
+
+**Corrected gotcha** (an earlier version of this note, written during the
+Marketing pass, misdiagnosed this as "`makemessages` can silently revert an
+already-correct translation back to blank... a `msgmerge` quirk, most
+likely" — that theory was wrong, root-caused in a follow-up fix; see below).
+What actually happened: gettext line-wraps long translated values across
+multiple `"..."` continuation lines in the `.po` file (`msgstr ""` followed
+by several bare quoted-string lines that concatenate per `.po` syntax)
+whenever a value is long enough, which `msgmerge` can trigger on any re-run
+simply by reformatting. A hand-rolled fix script used for the Legal/
+Marketing passes replaced only the *first* `msgstr "..."` line and `break`'d,
+leaving the old wrapped continuation lines in place below the new one —
+which then concatenated the old translation fragments onto the new one
+instead of replacing them. Applied twice in a row (once per pass) to the
+Maintenance dashboard's `"No PM tasks overdue or due in the next 14 days."`
+string, this produced a 2-3x duplicated/garbled value in all three
+languages, silently merged to `main` and deployed to the Windows box via
+the Legal and Marketing PRs. A naive single-line-regex "did an existing
+translation go blank" diff check (used to try to catch exactly this) also
+missed it, because it only matched single-line `msgstr "..."` values and
+misread the legitimately-wrapped (but now-corrupted) entry as blank rather
+than parsing the continuation lines. Fixed for real (PR following #154):
+audited all three `.po` files for any msgstr value containing a repeated
+≥20-char substring (found only this one affected string), then replaced it
+by consuming the *entire* old value (the `msgstr` line plus every following
+bare-quoted continuation line) before writing the single-line replacement —
+the correct pattern for any future manual `.po` edit: never replace just
+the first line of a multi-line value. The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,

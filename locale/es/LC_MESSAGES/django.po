@@ -1255,9 +1255,6 @@ msgstr "Vencimiento"
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
 msgstr "No hay tareas de mantenimiento preventivo atrasadas ni próximas a vencer en los próximos 14 días."
-"No hay tareas de mantenimiento preventivo atrasadas ni próximas a vencer en "
-"los próximos 14 días.No hay tareas de mantenimiento preventivo atrasadas o "
-"próximas a vencer en los próximos 14 días."
 
 #: manufacturing/templates/maint_dashboard.html:96
 msgid "Weekly OEE Trend (last 8 weeks)"

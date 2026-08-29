@@ -3918,17 +3918,20 @@ combined `#, fuzzy, python-format` comment line rather than separate `#, fuzzy` 
 lines (the `%(name)s`/`%(title)s` page-title entries), which the fix script's exact-match check for
 `#, fuzzy` didn't catch — caught by re-checking the fuzzy count after the "fixed" run still showed
 3 remaining, fixed with a one-line `sed` swapping the combined flag for the bare `python-format`
-one. **More serious finding:** re-running `makemessages` for this batch silently reverted the
-Maintenance dashboard's `"No PM tasks overdue or due in the next 14 days."` string — the one just
-fixed in the previous (Legal) entry — back to an empty `msgstr`, in all three languages, despite its
-msgid text and source location being byte-identical to the working version. Confirmed via a
-programmatic diff of the committed `.po` against the freshly-regenerated one (not just eyeballing),
-and confirmed it was an isolated regression, not a systemic wipe, by diffing every other previously-
-translated string across all three files and finding no other casualties. Root cause not fully
-diagnosed — a `msgmerge` quirk is the leading theory — but the practical lesson is now written into
-CLAUDE.md: **every `makemessages` run needs an old-vs-new diff for regressions on already-translated
-strings, not just a fuzzy/blank count on the new batch.** Fixed the same string a second time with
-the same translations as before. `mkt_analytics.html` needed `{% blocktrans count %}` for four KPI
+one. **More serious finding (misdiagnosed at the time, corrected in the dedicated fix entry
+below):** re-running `makemessages` for this batch appeared to silently revert the Maintenance
+dashboard's `"No PM tasks overdue or due in the next 14 days."` string — the one just fixed in the
+previous (Legal) entry — back to an empty `msgstr`, in all three languages, despite its msgid text
+and source location being byte-identical to the working version. At the time this was chalked up to
+an undiagnosed `msgmerge` quirk and "fixed" by re-applying the same translation. **That diagnosis
+was wrong.** The string was never actually blank — gettext had merely line-wrapped it across
+multiple `"..."` continuation lines, which the diff script used to check for regressions only parsed
+as single-line `msgstr "..."` values and misread as empty. The real bug, found and fixed in the
+dedicated fix entry below, was in the fix script used for both the Legal and this Marketing entry:
+it replaced only the first `msgstr "..."` line and left the old wrapped continuation lines in place,
+which — per `.po` string-concatenation syntax — glued the old translation onto the new one each
+time, corrupting this string with 2-3x duplicated text in the version that shipped to `main` and the
+Windows deployment via this PR. `mkt_analytics.html` needed `{% blocktrans count %}` for four KPI
 sub-labels ("N active," "N converted," "N clicks," "N in draft") and a `{% blocktrans with %}` using
 a piped filter value (`ads.total_spend|floatformat:0`) inside the `with` assignment, confirmed to
 work exactly like an unfiltered variable. Full suite 3431 passed (unchanged), `ruff check .` and
@@ -3943,3 +3946,38 @@ templates across three languages** (core shell + login + main dashboard + all 5 
 the full Legal department (10) + the full Marketing department (13)) out of ~450 total. IT (17
 templates) is the last department-sized candidate named so far if this thread continues; Payroll
 and Sales are comparable in size and also unclaimed.
+
+---
+
+**2026-08-29, production data-corruption fix:** Root-caused and fixed a real, live data-corruption
+bug that had shipped to `main` and the Windows production deployment via the Legal and Marketing
+PRs above. While preparing the next department's `makemessages` diff, the Maintenance dashboard's
+`"No PM tasks overdue..."` string again looked blank per the regression-check script — the third
+time this exact symptom had appeared. Rather than re-applying the same fix a third time, inspected
+the raw `.po` content directly and found the value wasn't blank at all: it was legitimately
+line-wrapped by gettext (`msgstr ""` followed by several bare `"..."` continuation lines, valid
+`.po` syntax), which the diff/regression-check script's single-line regex had never been able to
+parse — a **false positive**, not a real regression, meaning the "Marketing silently reverted a
+translation" diagnosis two entries above was wrong. But the *content* of those wrapped lines was
+not fine: it contained the French/Spanish/German translation duplicated 2-3 times, concatenated
+with no separator (e.g. French: "...jours.Aucune tâche de maintenance préventive..." repeating).
+Root cause: the fix script used for both the Legal and Marketing passes replaced only the *first*
+`msgstr "..."` line when correcting a fuzzy/blank entry, then `break`'d — leaving any pre-existing
+wrapped continuation lines from the old translation in place below the new one. Per `.po` syntax,
+consecutive bare quoted-string lines after a `msgstr` concatenate into one value, so every re-run
+that touched this string glued the old fragments onto the new text instead of replacing them.
+Confirmed via `git show HEAD:locale/fr/.../django.po` that this corruption was **already merged to
+`main` and already deployed to the Windows box** (pulled and restarted after the Marketing PR).
+Audited all three `.po` files for any other value containing a repeated ≥20-character substring —
+found only this one affected string, in all three languages — then fixed it by consuming the
+*entire* old `msgstr` value, including every wrapped continuation line, before writing the
+single-line replacement, rather than just the first line (the correct pattern going forward for any
+manual `.po` edit). CLAUDE.md's i18n section corrected to reflect the real root cause and fix in
+place of the earlier (wrong) "`msgmerge` quirk" theory. Split out from the next department's i18n
+work into its own dedicated fix, since it corrects an already-shipped defect and warranted a fast,
+independent merge rather than waiting on unrelated new-translation work. Full suite 3431 passed
+(unchanged), `manage.py check` clean, `compilemessages` clean, zero fuzzy/blank/duplicated entries
+confirmed programmatically across all three `.po` files (re-swept with a corrected multi-line-aware
+check, not the flawed single-line regex that missed this the first three times). Verified via
+Django's own `gettext()` that the string now resolves cleanly (no duplication) in Spanish, French,
+and German.

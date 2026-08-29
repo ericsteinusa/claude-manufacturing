@@ -1256,9 +1256,6 @@ msgstr "Dû"
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
 msgstr "Aucune tâche de maintenance préventive en retard ou à échéance dans les 14 prochains jours."
-"Aucune tâche de maintenance préventive en retard ou à échéance dans les 14 "
-"prochains jours.Aucune tâche de maintenance préventive en retard ou à "
-"échéance dans les 14 prochains jours."
 
 #: manufacturing/templates/maint_dashboard.html:96
 msgid "Weekly OEE Trend (last 8 weeks)"
