@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Reports Dashboard{% endblock %}
+{% block page_title %}{% trans "Reports Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/dept/reports/" class="btn">Back</a>
-<a href="/reports/builder/" class="btn">Custom Reports</a>
-<a href="/esg/" class="btn">ESG Dashboard</a>
-<a href="/ai-insights/" class="btn">AI Insights</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/dept/reports/" class="btn">{% trans "Back" %}</a>
+<a href="/reports/builder/" class="btn">{% trans "Custom Reports" %}</a>
+<a href="/esg/" class="btn">{% trans "ESG Dashboard" %}</a>
+<a href="/ai-insights/" class="btn">{% trans "AI Insights" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -135,18 +136,18 @@
 
 {% block body %}
 <div class="rpt-content">
-    <div class="rpt-title">Reports Dashboard</div>
+    <div class="rpt-title">{% trans "Reports Dashboard" %}</div>
     <div class="rpt-grid">
 
         {# ── Purchase Orders ──────────────────────────────────────── #}
         <div class="kpi-card">
-            <div class="kpi-head">Purchase Orders</div>
+            <div class="kpi-head">{% trans "Purchase Orders" %}</div>
             <div class="kpi-body">
                 {% if po %}
                 <div class="kpi-spend">${{ po.total_spend|floatformat:2 }}</div>
-                <div class="kpi-sublabel">total active spend</div>
+                <div class="kpi-sublabel">{% trans "total active spend" %}</div>
                 {% if po.overdue %}
-                <div class="kpi-overdue">&#9888; {{ po.overdue }} overdue</div>
+                <div class="kpi-overdue">&#9888; {% blocktrans count counter=po.overdue %}{{ counter }} overdue{% plural %}{{ counter }} overdue{% endblocktrans %}</div>
                 {% endif %}
                 <div class="kpi-pills">
                     {% for label, count, color in po_statuses %}
@@ -155,16 +156,16 @@
                     </span>
                     {% endfor %}
                 </div>
-                <a href="/po/" class="kpi-link">View purchase orders &rarr;</a>
+                <a href="/po/" class="kpi-link">{% trans "View purchase orders →" %}</a>
                 {% else %}
-                <p class="unavail">Data unavailable</p>
+                <p class="unavail">{% trans "Data unavailable" %}</p>
                 {% endif %}
             </div>
         </div>
 
         {# ── Work Orders ──────────────────────────────────────────── #}
         <div class="kpi-card">
-            <div class="kpi-head">Work Orders</div>
+            <div class="kpi-head">{% trans "Work Orders" %}</div>
             <div class="kpi-body">
                 {% if wo %}
                 <div class="kpi-pills">
@@ -175,29 +176,29 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="unavail">Data unavailable</p>
+                <p class="unavail">{% trans "Data unavailable" %}</p>
                 {% endif %}
             </div>
         </div>
 
         {# ── Inventory Alerts ─────────────────────────────────────── #}
         <div class="kpi-card">
-            <div class="kpi-head">Inventory Alerts</div>
+            <div class="kpi-head">{% trans "Inventory Alerts" %}</div>
             <div class="kpi-body">
                 {% if inv %}
                 <div class="kpi-alert-count {% if inv.alert_count %}warn{% else %}ok{% endif %}">
                     {{ inv.alert_count }}
                 </div>
                 <div class="kpi-sublabel">
-                    item{{ inv.alert_count|pluralize }} at or below reorder point
+                    {% blocktrans count counter=inv.alert_count %}item at or below reorder point{% plural %}items at or below reorder point{% endblocktrans %}
                 </div>
                 {% if inv.items %}
                 <table class="alert-tbl">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th>On Hand</th>
-                            <th>Reorder At</th>
+                            <th>{% trans "Product" %}</th>
+                            <th>{% trans "On Hand" %}</th>
+                            <th>{% trans "Reorder At" %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -212,36 +213,36 @@
                 </table>
                 {% endif %}
                 {% else %}
-                <p class="unavail">Data unavailable</p>
+                <p class="unavail">{% trans "Data unavailable" %}</p>
                 {% endif %}
             </div>
         </div>
 
         {# ── Customer Service ─────────────────────────────────────── #}
         <div class="kpi-card">
-            <div class="kpi-head">Customer Service</div>
+            <div class="kpi-head">{% trans "Customer Service" %}</div>
             <div class="kpi-body">
                 {% if cs %}
                 <div class="kpi-nums">
                     <div class="kpi-num-box">
                         <div class="kpi-num-val">{{ cs.total }}</div>
-                        <div class="kpi-num-lbl">Total</div>
+                        <div class="kpi-num-lbl">{% trans "Total" %}</div>
                     </div>
                     <div class="kpi-num-box">
                         <div class="kpi-num-val">{{ cs.open }}</div>
-                        <div class="kpi-num-lbl">Open</div>
+                        <div class="kpi-num-lbl">{% trans "Open" %}</div>
                     </div>
                     <div class="kpi-num-box">
                         <div class="kpi-num-val">{{ cs.closed }}</div>
-                        <div class="kpi-num-lbl">Closed</div>
+                        <div class="kpi-num-lbl">{% trans "Closed" %}</div>
                     </div>
                     <div class="kpi-num-box">
                         <div class="kpi-num-val">{{ cs.today }}</div>
-                        <div class="kpi-num-lbl">Today</div>
+                        <div class="kpi-num-lbl">{% trans "Today" %}</div>
                     </div>
                 </div>
                 {% else %}
-                <p class="unavail">Data unavailable</p>
+                <p class="unavail">{% trans "Data unavailable" %}</p>
                 {% endif %}
             </div>
         </div>

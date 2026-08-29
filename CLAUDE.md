@@ -329,7 +329,25 @@ audited all three `.po` files for any msgstr value containing a repeated
 by consuming the *entire* old value (the `msgstr` line plus every following
 bare-quoted continuation line) before writing the single-line replacement —
 the correct pattern for any future manual `.po` edit: never replace just
-the first line of a multi-line value. The main dashboard's department grid
+the first line of a multi-line value (shipped as PR #155, ahead of and
+independent from the next department's i18n PR since it corrected an
+already-shipped defect). The same audit incidentally surfaced a second,
+narrower gap while adding the next department below: a msgid can itself
+span multiple wrapped lines (not just its msgstr), and a check that
+assumes single-line msgids will silently skip those entries entirely —
+`report_builder_detail.html`'s scheduled-delivery description was blank
+in all three languages for exactly this reason until caught by hand.
+
+Also fully translated: the entire **Reports department**
+(`reports_dashboard.html`, `report_builder_list.html`,
+`report_builder_detail.html`, `report_builder_form.html` — 4 templates,
+the smallest remaining department, the third "whole department" pass),
+same treatment plus `{% blocktrans count %}` for the PO-overdue and
+inventory-reorder-point KPI sub-labels and the results/preview row-count
+headers, and `{% blocktrans with %}` for the "Edit Report: {name}" and
+"Last run: {timestamp}" headers.
+
+The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,

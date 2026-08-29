@@ -3981,3 +3981,29 @@ confirmed programmatically across all three `.po` files (re-swept with a correct
 check, not the flawed single-line regex that missed this the first three times). Verified via
 Django's own `gettext()` that the string now resolves cleanly (no duplication) in Spanish, French,
 and German.
+
+---
+
+**2026-08-29, third whole department:** Continued the "whole department" approach — surveyed all
+remaining departments' template counts and picked **Reports** (4 templates:
+`reports_dashboard.html`, `report_builder_list.html`, `report_builder_detail.html`,
+`report_builder_form.html`) as the smallest remaining group, rather than IT/Payroll/Sales named as
+candidates above. Translated all 4, including `{% blocktrans count %}` for the PO-overdue and
+inventory-reorder-point KPI sub-labels and the results/preview row-count headers on the report
+builder's detail and form pages, and `{% blocktrans with %}` for the "Edit Report: {name}" and
+"Last run: {timestamp}" headers. Built on top of the just-merged PR #155 corruption fix rather than
+bundled with it, so this `makemessages` run started from an already-clean baseline — confirmed the
+fix survives a fresh re-run (the string re-wraps across lines again, as gettext does for any long
+value, but with no duplicated content this time). One more instance of the multi-line-msgid gap
+noted in PR #155 surfaced again here: `report_builder_detail.html`'s scheduled-delivery description
+msgid spans multiple wrapped lines, so it needed the same by-hand multi-line-aware fix as before to
+avoid leaving it blank. Full suite 3431 passed (unchanged), `manage.py check` clean, `compilemessages`
+clean, zero fuzzy/blank/duplicated entries confirmed programmatically across all three `.po` files.
+Verified end-to-end against the real dev server: navigated the Reports dashboard, the report builder
+list, an existing custom report's detail page (results table, scheduled-delivery section, translated
+description text), and the new-report form (all 6 numbered sections, filter operators, aggregate
+functions, sort directions) in Spanish, French, and German with real sample data, no console errors.
+**Localization coverage is now 34 templates across three languages** (core shell + login + main
+dashboard + all 5 htmx templates + the full Legal department (10) + the full Marketing department
+(13) + the full Reports department (4)) out of ~450 total. IT (17 templates), Payroll (8), and Time
+Clock (10) remain the smallest unclaimed department-sized candidates.
