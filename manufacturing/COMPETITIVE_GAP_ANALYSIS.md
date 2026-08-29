@@ -3904,3 +3904,42 @@ German with real sample data. **Localization coverage is now 17 templates across
 department) out of ~450 total. Marketing (13 templates) or IT (17) would be the natural next
 "whole department" picks if this approach continues to be preferred over more individual
 dashboards.
+
+---
+
+**2026-08-29, second whole department:** Continued the "whole department" approach per direct
+instruction — picked **Marketing** (13 templates, ~2270 lines, the next-smallest department after
+Legal) over IT (17 templates): `marketing_dashboard.html`, campaign/lead/content/ad/research
+list+detail pairs, `mkt_analytics.html`, `mkt_budget_list.html`. Larger batch than Legal — 60 fuzzy
+matches and 56 blank entries (~114 unique strings) per language, the biggest single `makemessages`
+diff in this series — expected given 13 files sharing generic field names ("Name," "Status,"
+"Company," "Amount"). One additional wrinkle not seen in earlier fuzzy fixes: 3 entries had a
+combined `#, fuzzy, python-format` comment line rather than separate `#, fuzzy` / `#, python-format`
+lines (the `%(name)s`/`%(title)s` page-title entries), which the fix script's exact-match check for
+`#, fuzzy` didn't catch — caught by re-checking the fuzzy count after the "fixed" run still showed
+3 remaining, fixed with a one-line `sed` swapping the combined flag for the bare `python-format`
+one. **More serious finding:** re-running `makemessages` for this batch silently reverted the
+Maintenance dashboard's `"No PM tasks overdue or due in the next 14 days."` string — the one just
+fixed in the previous (Legal) entry — back to an empty `msgstr`, in all three languages, despite its
+msgid text and source location being byte-identical to the working version. Confirmed via a
+programmatic diff of the committed `.po` against the freshly-regenerated one (not just eyeballing),
+and confirmed it was an isolated regression, not a systemic wipe, by diffing every other previously-
+translated string across all three files and finding no other casualties. Root cause not fully
+diagnosed — a `msgmerge` quirk is the leading theory — but the practical lesson is now written into
+CLAUDE.md: **every `makemessages` run needs an old-vs-new diff for regressions on already-translated
+strings, not just a fuzzy/blank count on the new batch.** Fixed the same string a second time with
+the same translations as before. `mkt_analytics.html` needed `{% blocktrans count %}` for four KPI
+sub-labels ("N active," "N converted," "N clicks," "N in draft") and a `{% blocktrans with %}` using
+a piped filter value (`ads.total_spend|floatformat:0`) inside the `with` assignment, confirmed to
+work exactly like an unfiltered variable. Full suite 3431 passed (unchanged), `ruff check .` and
+`manage.py check` clean, `compilemessages` clean, zero fuzzy/blank confirmed programmatically for
+both the new Marketing entries and the re-fixed Maintenance one. Verified end-to-end against the
+real dev server for all three languages: logged in, navigated all 8 Marketing URLs (dashboard,
+campaigns list + a campaign detail, leads, content, ads list + an ad detail, research, analytics,
+budget), switched languages via the real `/i18n/setlang/` endpoint, and confirmed every heading,
+label, table header, form field, and the analytics page's plural/filtered interpolations render
+correctly in Spanish, French, and German with real sample data. **Localization coverage is now 30
+templates across three languages** (core shell + login + main dashboard + all 5 htmx templates +
+the full Legal department (10) + the full Marketing department (13)) out of ~450 total. IT (17
+templates) is the last department-sized candidate named so far if this thread continues; Payroll
+and Sales are comparable in size and also unclaimed.

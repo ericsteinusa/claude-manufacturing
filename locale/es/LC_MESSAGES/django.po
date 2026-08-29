@@ -1,15 +1,15 @@
 # Spanish translations for the Manufacturing ERP core navigation shell
 # (sidebar, top bar, login page, main dashboard), the Production and
 # Maintenance dashboards, the AI Insights feed, the shop-floor OEE TV
-# display, and the entire Legal department (10 templates). See
-# CLAUDE.md's Localization section for exactly what's covered — this
-# is a deliberately partial pass, not a translation of the full
-# ~450-template application.
+# display, and the entire Legal (10 templates) and Marketing (13
+# templates) departments. See CLAUDE.md's Localization section for
+# exactly what's covered — this is a deliberately partial pass, not a
+# translation of the full ~450-template application.
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 18:02+0000\n"
+"POT-Creation-Date: 2026-08-29 18:32+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
@@ -43,6 +43,20 @@ msgstr "Informes"
 #: manufacturing/templates/legal_litigation_detail.html:10
 #: manufacturing/templates/legal_litigation_list.html:13
 #: manufacturing/templates/maint_dashboard.html:17
+#: manufacturing/templates/marketing_dashboard.html:13
+#: manufacturing/templates/marketing_dashboard.html:60
+#: manufacturing/templates/mkt_ad_detail.html:10
+#: manufacturing/templates/mkt_ad_list.html:14
+#: manufacturing/templates/mkt_analytics.html:14
+#: manufacturing/templates/mkt_budget_list.html:14
+#: manufacturing/templates/mkt_campaign_detail.html:10
+#: manufacturing/templates/mkt_campaign_list.html:11
+#: manufacturing/templates/mkt_content_detail.html:10
+#: manufacturing/templates/mkt_content_list.html:11
+#: manufacturing/templates/mkt_lead_detail.html:10
+#: manufacturing/templates/mkt_lead_list.html:11
+#: manufacturing/templates/mkt_research_detail.html:9
+#: manufacturing/templates/mkt_research_list.html:14
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
 msgid "Home"
@@ -151,6 +165,7 @@ msgid "Sales Orders"
 msgstr "Pedidos de venta"
 
 #: manufacturing/templates/base.html:508
+#: manufacturing/templates/marketing_dashboard.html:59
 msgid "Customers"
 msgstr "Clientes"
 
@@ -245,6 +260,13 @@ msgid "Legal"
 msgstr "Legal"
 
 #: manufacturing/templates/base.html:576
+#: manufacturing/templates/marketing_dashboard.html:6
+#: manufacturing/templates/mkt_ad_detail.html:6
+#: manufacturing/templates/mkt_ad_list.html:6
+#: manufacturing/templates/mkt_analytics.html:6
+#: manufacturing/templates/mkt_budget_list.html:6
+#: manufacturing/templates/mkt_research_detail.html:6
+#: manufacturing/templates/mkt_research_list.html:6
 msgid "Marketing"
 msgstr "Marketing"
 
@@ -374,6 +396,10 @@ msgid "Login"
 msgstr "Iniciar sesión"
 
 #: manufacturing/templates/home.html:18
+#: manufacturing/templates/mkt_lead_detail.html:68
+#: manufacturing/templates/mkt_lead_detail.html:103
+#: manufacturing/templates/mkt_lead_list.html:89
+#: manufacturing/templates/mkt_lead_list.html:129
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -495,6 +521,29 @@ msgstr "Litigios"
 #: manufacturing/templates/legal_litigation_detail.html:118
 #: manufacturing/templates/legal_litigation_list.html:93
 #: manufacturing/templates/legal_litigation_list.html:146
+#: manufacturing/templates/marketing_dashboard.html:155
+#: manufacturing/templates/mkt_ad_detail.html:70
+#: manufacturing/templates/mkt_ad_detail.html:154
+#: manufacturing/templates/mkt_ad_list.html:95
+#: manufacturing/templates/mkt_ad_list.html:160
+#: manufacturing/templates/mkt_budget_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:141
+#: manufacturing/templates/mkt_campaign_detail.html:55
+#: manufacturing/templates/mkt_campaign_detail.html:118
+#: manufacturing/templates/mkt_campaign_list.html:93
+#: manufacturing/templates/mkt_campaign_list.html:142
+#: manufacturing/templates/mkt_content_detail.html:55
+#: manufacturing/templates/mkt_content_detail.html:114
+#: manufacturing/templates/mkt_content_list.html:90
+#: manufacturing/templates/mkt_content_list.html:138
+#: manufacturing/templates/mkt_lead_detail.html:56
+#: manufacturing/templates/mkt_lead_detail.html:123
+#: manufacturing/templates/mkt_lead_list.html:93
+#: manufacturing/templates/mkt_lead_list.html:149
+#: manufacturing/templates/mkt_research_detail.html:65
+#: manufacturing/templates/mkt_research_detail.html:137
+#: manufacturing/templates/mkt_research_list.html:95
+#: manufacturing/templates/mkt_research_list.html:153
 #: manufacturing/templates/prod_dashboard.html:114
 msgid "Status"
 msgstr "Estado"
@@ -516,6 +565,21 @@ msgstr "Normativa"
 #: manufacturing/templates/legal_employment_list.html:134
 #: manufacturing/templates/legal_governance_list.html:74
 #: manufacturing/templates/legal_governance_list.html:129
+#: manufacturing/templates/mkt_ad_detail.html:82
+#: manufacturing/templates/mkt_ad_detail.html:182
+#: manufacturing/templates/mkt_ad_list.html:176
+#: manufacturing/templates/mkt_campaign_detail.html:67
+#: manufacturing/templates/mkt_campaign_detail.html:126
+#: manufacturing/templates/mkt_campaign_list.html:89
+#: manufacturing/templates/mkt_campaign_list.html:150
+#: manufacturing/templates/mkt_lead_detail.html:72
+#: manufacturing/templates/mkt_lead_detail.html:115
+#: manufacturing/templates/mkt_lead_list.html:91
+#: manufacturing/templates/mkt_lead_list.html:141
+#: manufacturing/templates/mkt_research_detail.html:61
+#: manufacturing/templates/mkt_research_detail.html:121
+#: manufacturing/templates/mkt_research_list.html:91
+#: manufacturing/templates/mkt_research_list.html:137
 msgid "Owner"
 msgstr "Responsable"
 
@@ -523,6 +587,10 @@ msgstr "Responsable"
 #: manufacturing/templates/legal_compliance_detail.html:109
 #: manufacturing/templates/legal_compliance_list.html:84
 #: manufacturing/templates/legal_compliance_list.html:133
+#: manufacturing/templates/mkt_content_detail.html:71
+#: manufacturing/templates/mkt_content_detail.html:126
+#: manufacturing/templates/mkt_content_list.html:88
+#: manufacturing/templates/mkt_content_list.html:150
 #: manufacturing/templates/prod_dashboard.html:113
 msgid "Due Date"
 msgstr "Fecha de vencimiento"
@@ -544,6 +612,22 @@ msgstr "Fecha de finalización"
 #: manufacturing/templates/legal_litigation_detail.html:80
 #: manufacturing/templates/legal_litigation_detail.html:130
 #: manufacturing/templates/legal_litigation_list.html:154
+#: manufacturing/templates/mkt_ad_detail.html:116
+#: manufacturing/templates/mkt_ad_detail.html:186
+#: manufacturing/templates/mkt_ad_list.html:180
+#: manufacturing/templates/mkt_budget_list.html:149
+#: manufacturing/templates/mkt_campaign_detail.html:84
+#: manufacturing/templates/mkt_campaign_detail.html:142
+#: manufacturing/templates/mkt_campaign_list.html:166
+#: manufacturing/templates/mkt_content_detail.html:80
+#: manufacturing/templates/mkt_content_detail.html:134
+#: manufacturing/templates/mkt_content_list.html:158
+#: manufacturing/templates/mkt_lead_detail.html:81
+#: manufacturing/templates/mkt_lead_detail.html:131
+#: manufacturing/templates/mkt_lead_list.html:157
+#: manufacturing/templates/mkt_research_detail.html:95
+#: manufacturing/templates/mkt_research_detail.html:153
+#: manufacturing/templates/mkt_research_list.html:165
 msgid "Notes"
 msgstr "Notas"
 
@@ -565,6 +649,11 @@ msgstr "Normativa / estándar"
 #: manufacturing/templates/legal_compliance_detail.html:121
 #: manufacturing/templates/legal_contract_detail.html:142
 #: manufacturing/templates/legal_litigation_detail.html:134
+#: manufacturing/templates/mkt_ad_detail.html:190
+#: manufacturing/templates/mkt_campaign_detail.html:146
+#: manufacturing/templates/mkt_content_detail.html:138
+#: manufacturing/templates/mkt_lead_detail.html:135
+#: manufacturing/templates/mkt_research_detail.html:157
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
@@ -598,12 +687,20 @@ msgstr "Gobernanza"
 #: manufacturing/templates/legal_compliance_list.html:14
 #: manufacturing/templates/legal_contract_list.html:14
 #: manufacturing/templates/legal_litigation_list.html:14
+#: manufacturing/templates/mkt_ad_list.html:15
+#: manufacturing/templates/mkt_campaign_list.html:12
+#: manufacturing/templates/mkt_lead_list.html:12
+#: manufacturing/templates/mkt_research_list.html:15
 msgid "CSV"
 msgstr "CSV"
 
 #: manufacturing/templates/legal_compliance_list.html:15
 #: manufacturing/templates/legal_contract_list.html:15
 #: manufacturing/templates/legal_litigation_list.html:15
+#: manufacturing/templates/mkt_ad_list.html:16
+#: manufacturing/templates/mkt_campaign_list.html:13
+#: manufacturing/templates/mkt_lead_list.html:13
+#: manufacturing/templates/mkt_research_list.html:16
 msgid "Excel"
 msgstr "Excel"
 
@@ -617,6 +714,12 @@ msgstr "Requisitos de cumplimiento"
 #: manufacturing/templates/legal_governance_list.html:59
 #: manufacturing/templates/legal_ip_list.html:60
 #: manufacturing/templates/legal_litigation_list.html:68
+#: manufacturing/templates/mkt_ad_list.html:71
+#: manufacturing/templates/mkt_budget_list.html:62
+#: manufacturing/templates/mkt_campaign_list.html:66
+#: manufacturing/templates/mkt_content_list.html:64
+#: manufacturing/templates/mkt_lead_list.html:67
+#: manufacturing/templates/mkt_research_list.html:68
 msgid "All Statuses"
 msgstr "Todos los estados"
 
@@ -630,6 +733,12 @@ msgstr "Buscar requisito / normativa…"
 #: manufacturing/templates/legal_governance_list.html:65
 #: manufacturing/templates/legal_ip_list.html:66
 #: manufacturing/templates/legal_litigation_list.html:80
+#: manufacturing/templates/mkt_ad_list.html:83
+#: manufacturing/templates/mkt_budget_list.html:74
+#: manufacturing/templates/mkt_campaign_list.html:78
+#: manufacturing/templates/mkt_content_list.html:76
+#: manufacturing/templates/mkt_lead_list.html:79
+#: manufacturing/templates/mkt_research_list.html:80
 msgid "Filter"
 msgstr "Filtrar"
 
@@ -639,11 +748,18 @@ msgstr "Filtrar"
 #: manufacturing/templates/legal_governance_list.html:66
 #: manufacturing/templates/legal_ip_list.html:67
 #: manufacturing/templates/legal_litigation_list.html:81
+#: manufacturing/templates/mkt_ad_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:75
+#: manufacturing/templates/mkt_campaign_list.html:79
+#: manufacturing/templates/mkt_content_list.html:77
+#: manufacturing/templates/mkt_lead_list.html:80
+#: manufacturing/templates/mkt_research_list.html:81
 msgid "Clear"
 msgstr "Borrar"
 
 #: manufacturing/templates/legal_compliance_list.html:85
 #: manufacturing/templates/legal_dashboard.html:83
+#: manufacturing/templates/mkt_analytics.html:143
 msgid "Completed"
 msgstr "Completado"
 
@@ -681,6 +797,14 @@ msgstr "Contrato — %(title)s"
 #: manufacturing/templates/legal_litigation_detail.html:106
 #: manufacturing/templates/legal_litigation_list.html:91
 #: manufacturing/templates/legal_litigation_list.html:134
+#: manufacturing/templates/mkt_content_detail.html:59
+#: manufacturing/templates/mkt_content_detail.html:98
+#: manufacturing/templates/mkt_content_list.html:85
+#: manufacturing/templates/mkt_content_list.html:122
+#: manufacturing/templates/mkt_research_detail.html:57
+#: manufacturing/templates/mkt_research_detail.html:112
+#: manufacturing/templates/mkt_research_list.html:90
+#: manufacturing/templates/mkt_research_list.html:128
 msgid "Type"
 msgstr "Tipo"
 
@@ -701,6 +825,16 @@ msgstr "Valor"
 #: manufacturing/templates/legal_contract_detail.html:71
 #: manufacturing/templates/legal_contract_detail.html:126
 #: manufacturing/templates/legal_contract_list.html:152
+#: manufacturing/templates/mkt_ad_detail.html:86
+#: manufacturing/templates/mkt_ad_detail.html:174
+#: manufacturing/templates/mkt_ad_list.html:168
+#: manufacturing/templates/mkt_campaign_detail.html:71
+#: manufacturing/templates/mkt_campaign_detail.html:130
+#: manufacturing/templates/mkt_campaign_list.html:154
+#: manufacturing/templates/mkt_research_detail.html:69
+#: manufacturing/templates/mkt_research_detail.html:125
+#: manufacturing/templates/mkt_research_list.html:92
+#: manufacturing/templates/mkt_research_list.html:141
 msgid "Start Date"
 msgstr "Fecha de inicio"
 
@@ -708,6 +842,16 @@ msgstr "Fecha de inicio"
 #: manufacturing/templates/legal_contract_detail.html:130
 #: manufacturing/templates/legal_contract_list.html:156
 #: manufacturing/templates/legal_dashboard.html:146
+#: manufacturing/templates/mkt_ad_detail.html:90
+#: manufacturing/templates/mkt_ad_detail.html:178
+#: manufacturing/templates/mkt_ad_list.html:172
+#: manufacturing/templates/mkt_campaign_detail.html:75
+#: manufacturing/templates/mkt_campaign_detail.html:134
+#: manufacturing/templates/mkt_campaign_list.html:158
+#: manufacturing/templates/mkt_research_detail.html:73
+#: manufacturing/templates/mkt_research_detail.html:129
+#: manufacturing/templates/mkt_research_list.html:93
+#: manufacturing/templates/mkt_research_list.html:145
 msgid "End Date"
 msgstr "Fecha de finalización"
 
@@ -721,6 +865,12 @@ msgstr "Editar contrato"
 #: manufacturing/templates/legal_dashboard.html:142
 #: manufacturing/templates/legal_ip_list.html:74
 #: manufacturing/templates/legal_ip_list.html:103
+#: manufacturing/templates/mkt_content_detail.html:94
+#: manufacturing/templates/mkt_content_list.html:84
+#: manufacturing/templates/mkt_content_list.html:118
+#: manufacturing/templates/mkt_research_detail.html:108
+#: manufacturing/templates/mkt_research_list.html:89
+#: manufacturing/templates/mkt_research_list.html:124
 msgid "Title"
 msgstr "Título"
 
@@ -731,6 +881,8 @@ msgstr "Valor ($)"
 
 #: manufacturing/templates/legal_contract_list.html:74
 #: manufacturing/templates/legal_litigation_list.html:74
+#: manufacturing/templates/mkt_content_list.html:70
+#: manufacturing/templates/mkt_research_list.html:74
 msgid "All Types"
 msgstr "Todos los tipos"
 
@@ -739,10 +891,16 @@ msgid "Search title / party / owner…"
 msgstr "Buscar título / parte / responsable…"
 
 #: manufacturing/templates/legal_contract_list.html:92
+#: manufacturing/templates/marketing_dashboard.html:153
+#: manufacturing/templates/mkt_ad_list.html:101
+#: manufacturing/templates/mkt_campaign_list.html:90
 msgid "Start"
 msgstr "Inicio"
 
 #: manufacturing/templates/legal_contract_list.html:93
+#: manufacturing/templates/marketing_dashboard.html:154
+#: manufacturing/templates/mkt_ad_list.html:102
+#: manufacturing/templates/mkt_campaign_list.html:91
 msgid "End"
 msgstr "Fin"
 
@@ -786,14 +944,18 @@ msgid "Total Contracts"
 msgstr "Total de contratos"
 
 #: manufacturing/templates/legal_dashboard.html:63
+#: manufacturing/templates/marketing_dashboard.html:70
+#: manufacturing/templates/mkt_analytics.html:142
 msgid "Active"
 msgstr "Activo"
 
 #: manufacturing/templates/legal_dashboard.html:67
+#: manufacturing/templates/marketing_dashboard.html:102
 msgid "Draft"
 msgstr "Borrador"
 
 #: manufacturing/templates/legal_dashboard.html:75
+#: manufacturing/templates/marketing_dashboard.html:98
 msgid "Total Items"
 msgstr "Total de elementos"
 
@@ -886,11 +1048,15 @@ msgstr "Buscar elemento / referencia / responsable…"
 
 #: manufacturing/templates/legal_governance_list.html:73
 #: manufacturing/templates/legal_governance_list.html:101
+#: manufacturing/templates/mkt_budget_list.html:82
+#: manufacturing/templates/mkt_budget_list.html:112
 msgid "Item"
 msgstr "Elemento"
 
 #: manufacturing/templates/legal_governance_list.html:73
 #: manufacturing/templates/legal_governance_list.html:105
+#: manufacturing/templates/mkt_budget_list.html:82
+#: manufacturing/templates/mkt_budget_list.html:120
 msgid "Category"
 msgstr "Categoría"
 
@@ -1089,8 +1255,9 @@ msgstr "Vencimiento"
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
 msgstr "No hay tareas de mantenimiento preventivo atrasadas ni próximas a vencer en los próximos 14 días."
-"No hay tareas de mantenimiento preventivo atrasadas o próximas a vencer en "
-"los próximos 14 días."
+"No hay tareas de mantenimiento preventivo atrasadas ni próximas a vencer en "
+"los próximos 14 días.No hay tareas de mantenimiento preventivo atrasadas o "
+"próximas a vencer en los próximos 14 días."
 
 #: manufacturing/templates/maint_dashboard.html:96
 msgid "Weekly OEE Trend (last 8 weeks)"
@@ -1151,6 +1318,661 @@ msgstr "Eventos de inactividad activos"
 #: manufacturing/templates/maint_dashboard_kpis.html:29
 msgid "OEE (month to date)"
 msgstr "OEE (mes actual)"
+
+#: manufacturing/templates/marketing_dashboard.html:3
+#: manufacturing/templates/marketing_dashboard.html:49
+#: manufacturing/templates/mkt_campaign_detail.html:6
+#: manufacturing/templates/mkt_campaign_list.html:6
+#: manufacturing/templates/mkt_content_detail.html:6
+#: manufacturing/templates/mkt_content_list.html:6
+#: manufacturing/templates/mkt_lead_detail.html:6
+#: manufacturing/templates/mkt_lead_list.html:6
+msgid "Marketing Dashboard"
+msgstr "Panel de marketing"
+
+#: manufacturing/templates/marketing_dashboard.html:7
+#: manufacturing/templates/marketing_dashboard.html:52
+#: manufacturing/templates/marketing_dashboard.html:63
+#: manufacturing/templates/mkt_ad_detail.html:7
+#: manufacturing/templates/mkt_ad_list.html:7
+#: manufacturing/templates/mkt_analytics.html:7
+#: manufacturing/templates/mkt_analytics.html:53
+#: manufacturing/templates/mkt_analytics.html:140
+#: manufacturing/templates/mkt_budget_list.html:7
+#: manufacturing/templates/mkt_campaign_detail.html:7
+#: manufacturing/templates/mkt_campaign_list.html:3
+#: manufacturing/templates/mkt_campaign_list.html:7
+#: manufacturing/templates/mkt_campaign_list.html:59
+#: manufacturing/templates/mkt_content_detail.html:7
+#: manufacturing/templates/mkt_content_list.html:7
+#: manufacturing/templates/mkt_lead_detail.html:7
+#: manufacturing/templates/mkt_lead_list.html:7
+#: manufacturing/templates/mkt_research_detail.html:8
+#: manufacturing/templates/mkt_research_list.html:7
+msgid "Campaigns"
+msgstr "Campañas"
+
+#: manufacturing/templates/marketing_dashboard.html:8
+#: manufacturing/templates/marketing_dashboard.html:53
+#: manufacturing/templates/marketing_dashboard.html:79
+#: manufacturing/templates/mkt_ad_list.html:8
+#: manufacturing/templates/mkt_analytics.html:8
+#: manufacturing/templates/mkt_analytics.html:58
+#: manufacturing/templates/mkt_analytics.html:147
+#: manufacturing/templates/mkt_budget_list.html:8
+#: manufacturing/templates/mkt_campaign_detail.html:8
+#: manufacturing/templates/mkt_campaign_list.html:8
+#: manufacturing/templates/mkt_content_detail.html:8
+#: manufacturing/templates/mkt_content_list.html:8
+#: manufacturing/templates/mkt_lead_detail.html:8
+#: manufacturing/templates/mkt_lead_list.html:3
+#: manufacturing/templates/mkt_lead_list.html:8
+#: manufacturing/templates/mkt_lead_list.html:60
+#: manufacturing/templates/mkt_research_list.html:8
+msgid "Leads"
+msgstr "Clientes potenciales"
+
+#: manufacturing/templates/marketing_dashboard.html:9
+#: manufacturing/templates/marketing_dashboard.html:55
+#: manufacturing/templates/mkt_ad_detail.html:8
+#: manufacturing/templates/mkt_ad_list.html:3
+#: manufacturing/templates/mkt_ad_list.html:9
+#: manufacturing/templates/mkt_ad_list.html:64
+#: manufacturing/templates/mkt_analytics.html:9
+#: manufacturing/templates/mkt_analytics.html:154
+#: manufacturing/templates/mkt_budget_list.html:9
+#: manufacturing/templates/mkt_research_list.html:9
+msgid "Advertising"
+msgstr "Publicidad"
+
+#: manufacturing/templates/marketing_dashboard.html:10
+#: manufacturing/templates/marketing_dashboard.html:56
+#: manufacturing/templates/mkt_ad_list.html:10
+#: manufacturing/templates/mkt_analytics.html:10
+#: manufacturing/templates/mkt_budget_list.html:10
+#: manufacturing/templates/mkt_research_detail.html:7
+#: manufacturing/templates/mkt_research_list.html:10
+msgid "Research"
+msgstr "Investigación"
+
+#: manufacturing/templates/marketing_dashboard.html:11
+#: manufacturing/templates/marketing_dashboard.html:57
+#: manufacturing/templates/mkt_ad_detail.html:9
+#: manufacturing/templates/mkt_ad_list.html:11
+#: manufacturing/templates/mkt_analytics.html:11
+#: manufacturing/templates/mkt_budget_list.html:11
+#: manufacturing/templates/mkt_research_list.html:11
+msgid "Analytics"
+msgstr "Análisis"
+
+#: manufacturing/templates/marketing_dashboard.html:12
+#: manufacturing/templates/marketing_dashboard.html:54
+#: manufacturing/templates/marketing_dashboard.html:95
+#: manufacturing/templates/mkt_ad_list.html:12
+#: manufacturing/templates/mkt_analytics.html:12
+#: manufacturing/templates/mkt_analytics.html:161
+#: manufacturing/templates/mkt_budget_list.html:12
+#: manufacturing/templates/mkt_campaign_detail.html:9
+#: manufacturing/templates/mkt_campaign_list.html:9
+#: manufacturing/templates/mkt_content_detail.html:9
+#: manufacturing/templates/mkt_content_list.html:3
+#: manufacturing/templates/mkt_content_list.html:9
+#: manufacturing/templates/mkt_content_list.html:57
+#: manufacturing/templates/mkt_lead_detail.html:9
+#: manufacturing/templates/mkt_lead_list.html:9
+#: manufacturing/templates/mkt_research_list.html:12
+msgid "Content"
+msgstr "Contenido"
+
+#: manufacturing/templates/marketing_dashboard.html:58
+#: manufacturing/templates/marketing_dashboard.html:152
+#: manufacturing/templates/mkt_ad_detail.html:74
+#: manufacturing/templates/mkt_ad_list.html:13
+#: manufacturing/templates/mkt_ad_list.html:96
+#: manufacturing/templates/mkt_analytics.html:13
+#: manufacturing/templates/mkt_analytics.html:156
+#: manufacturing/templates/mkt_budget_list.html:13
+#: manufacturing/templates/mkt_campaign_detail.html:79
+#: manufacturing/templates/mkt_campaign_list.html:10
+#: manufacturing/templates/mkt_campaign_list.html:92
+#: manufacturing/templates/mkt_content_list.html:10
+#: manufacturing/templates/mkt_lead_list.html:10
+#: manufacturing/templates/mkt_research_detail.html:77
+#: manufacturing/templates/mkt_research_list.html:13
+#: manufacturing/templates/mkt_research_list.html:94
+msgid "Budget"
+msgstr "Presupuesto"
+
+#: manufacturing/templates/marketing_dashboard.html:66
+#: manufacturing/templates/mkt_analytics.html:141
+#: manufacturing/templates/mkt_analytics.html:148
+#: manufacturing/templates/mkt_analytics.html:162
+msgid "Total"
+msgstr "Total"
+
+#: manufacturing/templates/marketing_dashboard.html:74
+msgid "Planned"
+msgstr "Planificado"
+
+#: manufacturing/templates/marketing_dashboard.html:82
+msgid "Total Leads"
+msgstr "Total de clientes potenciales"
+
+#: manufacturing/templates/marketing_dashboard.html:86
+#: manufacturing/templates/mkt_analytics.html:149
+msgid "New"
+msgstr "Nuevo"
+
+#: manufacturing/templates/marketing_dashboard.html:90
+#: manufacturing/templates/mkt_analytics.html:150
+msgid "Qualified"
+msgstr "Calificado"
+
+#: manufacturing/templates/marketing_dashboard.html:106
+#: manufacturing/templates/mkt_analytics.html:78
+#: manufacturing/templates/mkt_analytics.html:163
+msgid "Published"
+msgstr "Publicado"
+
+#: manufacturing/templates/marketing_dashboard.html:113
+msgid "Campaigns by Status"
+msgstr "Campañas por estado"
+
+#: manufacturing/templates/marketing_dashboard.html:117
+msgid "Campaigns by Channel"
+msgstr "Campañas por canal"
+
+#: manufacturing/templates/marketing_dashboard.html:124
+msgid "Budget by Channel"
+msgstr "Presupuesto por canal"
+
+#: manufacturing/templates/marketing_dashboard.html:128
+msgid "Leads by Status"
+msgstr "Clientes potenciales por estado"
+
+#: manufacturing/templates/marketing_dashboard.html:135
+#: manufacturing/templates/mkt_analytics.html:85
+msgid "Leads by Source"
+msgstr "Clientes potenciales por fuente"
+
+#: manufacturing/templates/marketing_dashboard.html:139
+msgid "Content by Status"
+msgstr "Contenido por estado"
+
+#: manufacturing/templates/marketing_dashboard.html:145
+msgid "Recent Campaigns"
+msgstr "Campañas recientes"
+
+#: manufacturing/templates/marketing_dashboard.html:149
+#: manufacturing/templates/mkt_campaign_detail.html:98
+#: manufacturing/templates/mkt_campaign_list.html:86
+#: manufacturing/templates/mkt_campaign_list.html:122
+#: manufacturing/templates/mkt_lead_detail.html:95
+#: manufacturing/templates/mkt_lead_list.html:87
+#: manufacturing/templates/mkt_lead_list.html:121
+msgid "Name"
+msgstr "Nombre"
+
+#: manufacturing/templates/marketing_dashboard.html:150
+#: manufacturing/templates/mkt_ad_detail.html:62
+#: manufacturing/templates/mkt_ad_detail.html:133
+#: manufacturing/templates/mkt_ad_list.html:93
+#: manufacturing/templates/mkt_ad_list.html:139
+#: manufacturing/templates/mkt_analytics.html:111
+#: manufacturing/templates/mkt_campaign_detail.html:59
+#: manufacturing/templates/mkt_campaign_detail.html:102
+#: manufacturing/templates/mkt_campaign_list.html:87
+#: manufacturing/templates/mkt_campaign_list.html:126
+#: manufacturing/templates/mkt_content_detail.html:63
+#: manufacturing/templates/mkt_content_detail.html:106
+#: manufacturing/templates/mkt_content_list.html:86
+#: manufacturing/templates/mkt_content_list.html:130
+msgid "Channel"
+msgstr "Canal"
+
+#: manufacturing/templates/marketing_dashboard.html:151
+#: manufacturing/templates/mkt_campaign_detail.html:63
+#: manufacturing/templates/mkt_campaign_detail.html:110
+#: manufacturing/templates/mkt_campaign_list.html:88
+#: manufacturing/templates/mkt_campaign_list.html:134
+msgid "Objective"
+msgstr "Objetivo"
+
+#: manufacturing/templates/marketing_dashboard.html:170
+#: manufacturing/templates/mkt_campaign_list.html:109
+msgid "No campaigns found."
+msgstr "No se encontraron campañas."
+
+#: manufacturing/templates/mkt_ad_detail.html:3
+#, python-format
+msgid "Ad #%(id)s"
+msgstr "Anuncio n.º %(id)s"
+
+#: manufacturing/templates/mkt_ad_detail.html:53
+msgid "Ad"
+msgstr "Anuncio"
+
+#: manufacturing/templates/mkt_ad_detail.html:59
+msgid "Overview"
+msgstr "Resumen"
+
+#: manufacturing/templates/mkt_ad_detail.html:66
+#: manufacturing/templates/mkt_ad_detail.html:142
+#: manufacturing/templates/mkt_ad_list.html:94
+#: manufacturing/templates/mkt_ad_list.html:148
+#: manufacturing/templates/mkt_budget_list.html:82
+#: manufacturing/templates/mkt_budget_list.html:116
+msgid "Campaign"
+msgstr "Campaña"
+
+#: manufacturing/templates/mkt_ad_detail.html:78
+#: manufacturing/templates/mkt_ad_list.html:97
+#: manufacturing/templates/mkt_analytics.html:113
+#: manufacturing/templates/mkt_analytics.html:157
+msgid "Spend"
+msgstr "Gasto"
+
+#: manufacturing/templates/mkt_ad_detail.html:97
+#: manufacturing/templates/mkt_ad_detail.html:162
+#: manufacturing/templates/mkt_ad_list.html:98
+#: manufacturing/templates/mkt_analytics.html:68
+#: manufacturing/templates/mkt_analytics.html:158
+msgid "Impressions"
+msgstr "Impresiones"
+
+#: manufacturing/templates/mkt_ad_detail.html:101
+#: manufacturing/templates/mkt_ad_detail.html:166
+#: manufacturing/templates/mkt_ad_list.html:99
+#: manufacturing/templates/mkt_analytics.html:114
+msgid "Clicks"
+msgstr "Clics"
+
+#: manufacturing/templates/mkt_ad_detail.html:105
+#: manufacturing/templates/mkt_ad_detail.html:170
+#: manufacturing/templates/mkt_analytics.html:73
+msgid "Conversions"
+msgstr "Conversiones"
+
+#: manufacturing/templates/mkt_ad_detail.html:110
+msgid "CTR"
+msgstr "CTR"
+
+#: manufacturing/templates/mkt_ad_detail.html:124
+msgid "Edit Ad"
+msgstr "Editar anuncio"
+
+#: manufacturing/templates/mkt_ad_detail.html:129
+#: manufacturing/templates/mkt_ad_list.html:92
+#: manufacturing/templates/mkt_ad_list.html:135
+msgid "Ad Name"
+msgstr "Nombre del anuncio"
+
+#: manufacturing/templates/mkt_ad_detail.html:135
+#: manufacturing/templates/mkt_ad_list.html:141
+#: manufacturing/templates/mkt_budget_list.html:122
+#: manufacturing/templates/mkt_research_detail.html:114
+#: manufacturing/templates/mkt_research_list.html:130
+msgid "— Select —"
+msgstr "— Seleccionar —"
+
+#: manufacturing/templates/mkt_ad_detail.html:146
+#: manufacturing/templates/mkt_ad_list.html:152
+#: manufacturing/templates/mkt_campaign_detail.html:138
+#: manufacturing/templates/mkt_campaign_list.html:162
+#: manufacturing/templates/mkt_research_detail.html:133
+#: manufacturing/templates/mkt_research_list.html:149
+msgid "Budget ($)"
+msgstr "Presupuesto ($)"
+
+#: manufacturing/templates/mkt_ad_detail.html:150
+#: manufacturing/templates/mkt_ad_list.html:156
+msgid "Spend ($)"
+msgstr "Gasto ($)"
+
+#: manufacturing/templates/mkt_ad_list.html:77
+#: manufacturing/templates/mkt_campaign_list.html:72
+msgid "All Channels"
+msgstr "Todos los canales"
+
+#: manufacturing/templates/mkt_ad_list.html:82
+msgid "Search name / campaign / owner…"
+msgstr "Buscar nombre / campaña / responsable…"
+
+#: manufacturing/templates/mkt_ad_list.html:100
+#: manufacturing/templates/mkt_analytics.html:115
+msgid "Conv."
+msgstr "Conv."
+
+#: manufacturing/templates/mkt_ad_list.html:122
+msgid "No ads found."
+msgstr "No se encontraron anuncios."
+
+#: manufacturing/templates/mkt_ad_list.html:130
+msgid "New Ad"
+msgstr "Nuevo anuncio"
+
+#: manufacturing/templates/mkt_ad_list.html:136
+msgid "e.g. Spring Product Launch"
+msgstr "p. ej. Lanzamiento de producto de primavera"
+
+#: manufacturing/templates/mkt_ad_list.html:149
+#: manufacturing/templates/mkt_budget_list.html:117
+msgid "Associated campaign name"
+msgstr "Nombre de la campaña asociada"
+
+#: manufacturing/templates/mkt_ad_list.html:177
+msgid "Campaign manager"
+msgstr "Gerente de campaña"
+
+#: manufacturing/templates/mkt_ad_list.html:181
+#: manufacturing/templates/mkt_research_list.html:166
+msgid "Optional notes"
+msgstr "Notas opcionales"
+
+#: manufacturing/templates/mkt_ad_list.html:184
+msgid "Add Ad"
+msgstr "Agregar anuncio"
+
+#: manufacturing/templates/mkt_analytics.html:3
+#: manufacturing/templates/mkt_analytics.html:48
+msgid "Marketing Analytics"
+msgstr "Análisis de marketing"
+
+#, python-format
+#: manufacturing/templates/mkt_analytics.html:54
+msgid "%(counter)s active"
+msgid_plural "%(counter)s active"
+msgstr[0] "%(counter)s activa"
+msgstr[1] "%(counter)s activas"
+
+#, python-format
+#: manufacturing/templates/mkt_analytics.html:59
+msgid "%(counter)s converted"
+msgid_plural "%(counter)s converted"
+msgstr[0] "%(counter)s convertido"
+msgstr[1] "%(counter)s convertidos"
+
+#: manufacturing/templates/mkt_analytics.html:63
+#: manufacturing/templates/mkt_analytics.html:112
+msgid "Ads"
+msgstr "Anuncios"
+
+#: manufacturing/templates/mkt_analytics.html:64
+#, python-format
+msgid "$%(spend)s spend"
+msgstr "$%(spend)s de gasto"
+
+#, python-format
+#: manufacturing/templates/mkt_analytics.html:69
+msgid "%(counter)s clicks"
+msgid_plural "%(counter)s clicks"
+msgstr[0] "%(counter)s clic"
+msgstr[1] "%(counter)s clics"
+
+#: manufacturing/templates/mkt_analytics.html:74
+msgid "from ads"
+msgstr "de anuncios"
+
+#, python-format
+#: manufacturing/templates/mkt_analytics.html:79
+msgid "%(counter)s in draft"
+msgid_plural "%(counter)s in draft"
+msgstr[0] "%(counter)s en borrador"
+msgstr[1] "%(counter)s en borrador"
+
+#: manufacturing/templates/mkt_analytics.html:101
+msgid "No lead data yet."
+msgstr "Aún no hay datos de clientes potenciales."
+
+#: manufacturing/templates/mkt_analytics.html:106
+msgid "Ad Performance by Channel"
+msgstr "Rendimiento de anuncios por canal"
+
+#: manufacturing/templates/mkt_analytics.html:131
+msgid "No ad performance data yet."
+msgstr "Aún no hay datos de rendimiento de anuncios."
+
+#: manufacturing/templates/mkt_analytics.html:137
+msgid "Summary"
+msgstr "Resumen"
+
+#: manufacturing/templates/mkt_analytics.html:144
+msgid "Total Budget"
+msgstr "Presupuesto total"
+
+#: manufacturing/templates/mkt_analytics.html:151
+msgid "Converted"
+msgstr "Convertido"
+
+#: manufacturing/templates/mkt_analytics.html:155
+msgid "Total Ads"
+msgstr "Total de anuncios"
+
+#: manufacturing/templates/mkt_analytics.html:164
+msgid "In Draft"
+msgstr "En borrador"
+
+#: manufacturing/templates/mkt_budget_list.html:3
+#: manufacturing/templates/mkt_budget_list.html:56
+msgid "Marketing Budget"
+msgstr "Presupuesto de marketing"
+
+#: manufacturing/templates/mkt_budget_list.html:68
+msgid "All Categories"
+msgstr "Todas las categorías"
+
+#: manufacturing/templates/mkt_budget_list.html:73
+msgid "Search item / campaign / requester…"
+msgstr "Buscar elemento / campaña / solicitante…"
+
+#: manufacturing/templates/mkt_budget_list.html:83
+msgid "Amount"
+msgstr "Monto"
+
+#: manufacturing/templates/mkt_budget_list.html:83
+#: manufacturing/templates/mkt_budget_list.html:133
+msgid "Requested By"
+msgstr "Solicitado por"
+
+#: manufacturing/templates/mkt_budget_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:137
+msgid "Request Date"
+msgstr "Fecha de solicitud"
+
+#: manufacturing/templates/mkt_budget_list.html:99
+msgid "No budget items found."
+msgstr "No se encontraron elementos de presupuesto."
+
+#: manufacturing/templates/mkt_budget_list.html:107
+msgid "New Budget Request"
+msgstr "Nueva solicitud de presupuesto"
+
+#: manufacturing/templates/mkt_budget_list.html:113
+msgid "e.g. Trade show booth"
+msgstr "p. ej. Stand de feria comercial"
+
+#: manufacturing/templates/mkt_budget_list.html:129
+msgid "Amount ($)"
+msgstr "Monto ($)"
+
+#: manufacturing/templates/mkt_budget_list.html:153
+msgid "Submit Request"
+msgstr "Enviar solicitud"
+
+#: manufacturing/templates/mkt_campaign_detail.html:3
+#, python-format
+msgid "Campaign — %(name)s"
+msgstr "Campaña — %(name)s"
+
+#: manufacturing/templates/mkt_campaign_detail.html:93
+msgid "Edit Campaign"
+msgstr "Editar campaña"
+
+#: manufacturing/templates/mkt_campaign_list.html:77
+msgid "Search name / objective / owner…"
+msgstr "Buscar nombre / objetivo / responsable…"
+
+#: manufacturing/templates/mkt_campaign_list.html:117
+msgid "New Campaign"
+msgstr "Nueva campaña"
+
+#: manufacturing/templates/mkt_campaign_list.html:170
+msgid "Add Campaign"
+msgstr "Agregar campaña"
+
+#: manufacturing/templates/mkt_content_detail.html:3
+#, python-format
+msgid "Content — %(title)s"
+msgstr "Contenido — %(title)s"
+
+#: manufacturing/templates/mkt_content_detail.html:67
+#: manufacturing/templates/mkt_content_detail.html:122
+#: manufacturing/templates/mkt_content_list.html:87
+#: manufacturing/templates/mkt_content_list.html:146
+msgid "Author"
+msgstr "Autor"
+
+#: manufacturing/templates/mkt_content_detail.html:75
+#: manufacturing/templates/mkt_content_detail.html:130
+#: manufacturing/templates/mkt_content_list.html:89
+#: manufacturing/templates/mkt_content_list.html:154
+msgid "Publish Date"
+msgstr "Fecha de publicación"
+
+#: manufacturing/templates/mkt_content_detail.html:89
+msgid "Edit Content"
+msgstr "Editar contenido"
+
+#: manufacturing/templates/mkt_content_list.html:75
+msgid "Search title / author…"
+msgstr "Buscar título / autor…"
+
+#: manufacturing/templates/mkt_content_list.html:105
+msgid "No content found."
+msgstr "No se encontró contenido."
+
+#: manufacturing/templates/mkt_content_list.html:113
+msgid "New Content"
+msgstr "Nuevo contenido"
+
+#: manufacturing/templates/mkt_content_list.html:162
+msgid "Add Content"
+msgstr "Agregar contenido"
+
+#: manufacturing/templates/mkt_lead_detail.html:3
+#, python-format
+msgid "Lead — %(name)s"
+msgstr "Cliente potencial — %(name)s"
+
+#: manufacturing/templates/mkt_lead_detail.html:60
+#: manufacturing/templates/mkt_lead_detail.html:107
+#: manufacturing/templates/mkt_lead_list.html:90
+#: manufacturing/templates/mkt_lead_list.html:133
+msgid "Source"
+msgstr "Fuente"
+
+#: manufacturing/templates/mkt_lead_detail.html:64
+#: manufacturing/templates/mkt_lead_detail.html:99
+#: manufacturing/templates/mkt_lead_list.html:88
+#: manufacturing/templates/mkt_lead_list.html:125
+msgid "Company"
+msgstr "Empresa"
+
+#: manufacturing/templates/mkt_lead_detail.html:76
+#: manufacturing/templates/mkt_lead_detail.html:119
+#: manufacturing/templates/mkt_lead_list.html:145
+msgid "Captured Date"
+msgstr "Fecha de captura"
+
+#: manufacturing/templates/mkt_lead_detail.html:90
+msgid "Edit Lead"
+msgstr "Editar cliente potencial"
+
+#: manufacturing/templates/mkt_lead_list.html:73
+msgid "All Sources"
+msgstr "Todas las fuentes"
+
+#: manufacturing/templates/mkt_lead_list.html:78
+msgid "Search name / company / email…"
+msgstr "Buscar nombre / empresa / correo electrónico…"
+
+#: manufacturing/templates/mkt_lead_list.html:92
+msgid "Captured"
+msgstr "Capturado"
+
+#: manufacturing/templates/mkt_lead_list.html:108
+msgid "No leads found."
+msgstr "No se encontraron clientes potenciales."
+
+#: manufacturing/templates/mkt_lead_list.html:116
+msgid "New Lead"
+msgstr "Nuevo cliente potencial"
+
+#: manufacturing/templates/mkt_lead_list.html:161
+msgid "Add Lead"
+msgstr "Agregar cliente potencial"
+
+#: manufacturing/templates/mkt_research_detail.html:3
+#, python-format
+msgid "Research #%(id)s"
+msgstr "Investigación n.º %(id)s"
+
+#: manufacturing/templates/mkt_research_detail.html:48
+msgid "Research Project"
+msgstr "Proyecto de investigación"
+
+#: manufacturing/templates/mkt_research_detail.html:54
+msgid "Project Details"
+msgstr "Detalles del proyecto"
+
+#: manufacturing/templates/mkt_research_detail.html:83
+#: manufacturing/templates/mkt_research_detail.html:145
+#: manufacturing/templates/mkt_research_list.html:161
+#: manufacturing/templates/prod_dashboard.html:111
+msgid "Description"
+msgstr "Descripción"
+
+#: manufacturing/templates/mkt_research_detail.html:89
+#: manufacturing/templates/mkt_research_detail.html:149
+msgid "Findings"
+msgstr "Hallazgos"
+
+#: manufacturing/templates/mkt_research_detail.html:103
+msgid "Edit Project"
+msgstr "Editar proyecto"
+
+#: manufacturing/templates/mkt_research_list.html:3
+#: manufacturing/templates/mkt_research_list.html:61
+msgid "Market Research"
+msgstr "Investigación de mercado"
+
+#: manufacturing/templates/mkt_research_list.html:79
+msgid "Search title / owner…"
+msgstr "Buscar título / responsable…"
+
+#: manufacturing/templates/mkt_research_list.html:111
+msgid "No research projects found."
+msgstr "No se encontraron proyectos de investigación."
+
+#: manufacturing/templates/mkt_research_list.html:119
+msgid "New Research Project"
+msgstr "Nuevo proyecto de investigación"
+
+#: manufacturing/templates/mkt_research_list.html:125
+msgid "e.g. Q3 Competitor Analysis"
+msgstr "p. ej. Análisis de la competencia del tercer trimestre"
+
+#: manufacturing/templates/mkt_research_list.html:138
+msgid "Responsible person"
+msgstr "Persona responsable"
+
+#: manufacturing/templates/mkt_research_list.html:162
+msgid "What will this research cover?"
+msgstr "¿Qué cubrirá esta investigación?"
+
+#: manufacturing/templates/mkt_research_list.html:169
+msgid "Create Project"
+msgstr "Crear proyecto"
 
 #: manufacturing/templates/prod_dashboard.html:7
 msgid "Schedule"
@@ -1233,10 +2055,6 @@ msgstr "Órdenes de trabajo recientes"
 #: manufacturing/templates/prod_dashboard.html:110
 msgid "WO #"
 msgstr "N.º de OT"
-
-#: manufacturing/templates/prod_dashboard.html:111
-msgid "Description"
-msgstr "Descripción"
 
 #: manufacturing/templates/prod_dashboard.html:112
 msgid "Product"

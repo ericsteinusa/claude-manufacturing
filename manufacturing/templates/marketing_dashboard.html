@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Marketing Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Marketing Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/mkt/leads/" class="btn">Leads</a>
-<a href="/mkt/ads/" class="btn">Advertising</a>
-<a href="/mkt/research/" class="btn">Research</a>
-<a href="/mkt/analytics/" class="btn">Analytics</a>
-<a href="/mkt/content/" class="btn">Content</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mkt/" class="btn">{% trans "Marketing" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/mkt/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/mkt/ads/" class="btn">{% trans "Advertising" %}</a>
+<a href="/mkt/research/" class="btn">{% trans "Research" %}</a>
+<a href="/mkt/analytics/" class="btn">{% trans "Analytics" %}</a>
+<a href="/mkt/content/" class="btn">{% trans "Content" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -45,113 +46,113 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Marketing Dashboard</h2>
+    <h2>{% trans "Marketing Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/mkt/campaigns/" class="dept-btn">Campaigns</a>
-        <a href="/mkt/leads/" class="dept-btn">Leads</a>
-        <a href="/mkt/content/" class="dept-btn">Content</a>
-        <a href="/mkt/ads/" class="dept-btn">Advertising</a>
-        <a href="/mkt/research/" class="dept-btn">Research</a>
-        <a href="/mkt/analytics/" class="dept-btn">Analytics</a>
-        <a href="/mkt/budget/" class="dept-btn">Budget</a>
-        <a href="/customers/" class="dept-btn">Customers</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/mkt/campaigns/" class="dept-btn">{% trans "Campaigns" %}</a>
+        <a href="/mkt/leads/" class="dept-btn">{% trans "Leads" %}</a>
+        <a href="/mkt/content/" class="dept-btn">{% trans "Content" %}</a>
+        <a href="/mkt/ads/" class="dept-btn">{% trans "Advertising" %}</a>
+        <a href="/mkt/research/" class="dept-btn">{% trans "Research" %}</a>
+        <a href="/mkt/analytics/" class="dept-btn">{% trans "Analytics" %}</a>
+        <a href="/mkt/budget/" class="dept-btn">{% trans "Budget" %}</a>
+        <a href="/customers/" class="dept-btn">{% trans "Customers" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
-    <div class="section-label">Campaigns</div>
+    <div class="section-label">{% trans "Campaigns" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total</div>
+            <div class="lbl">{% trans "Total" %}</div>
             <div class="val">{{ campaigns.total|default:0 }}</div>
         </div>
         <div class="kpi{% if campaigns.active %} green{% endif %}">
-            <div class="lbl">Active</div>
+            <div class="lbl">{% trans "Active" %}</div>
             <div class="val">{{ campaigns.active|default:0 }}</div>
         </div>
         <div class="kpi{% if campaigns.planned %} yellow{% endif %}">
-            <div class="lbl">Planned</div>
+            <div class="lbl">{% trans "Planned" %}</div>
             <div class="val">{{ campaigns.planned|default:0 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Leads</div>
+    <div class="section-label">{% trans "Leads" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Leads</div>
+            <div class="lbl">{% trans "Total Leads" %}</div>
             <div class="val">{{ leads.total|default:0 }}</div>
         </div>
         <div class="kpi{% if leads.new_count %} yellow{% endif %}">
-            <div class="lbl">New</div>
+            <div class="lbl">{% trans "New" %}</div>
             <div class="val">{{ leads.new_count|default:0 }}</div>
         </div>
         <div class="kpi{% if leads.qualified %} green{% endif %}">
-            <div class="lbl">Qualified</div>
+            <div class="lbl">{% trans "Qualified" %}</div>
             <div class="val">{{ leads.qualified|default:0 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Content</div>
+    <div class="section-label">{% trans "Content" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Items</div>
+            <div class="lbl">{% trans "Total Items" %}</div>
             <div class="val">{{ content.total|default:0 }}</div>
         </div>
         <div class="kpi{% if content.draft %} yellow{% endif %}">
-            <div class="lbl">Draft</div>
+            <div class="lbl">{% trans "Draft" %}</div>
             <div class="val">{{ content.draft|default:0 }}</div>
         </div>
         <div class="kpi{% if content.published %} green{% endif %}">
-            <div class="lbl">Published</div>
+            <div class="lbl">{% trans "Published" %}</div>
             <div class="val">{{ content.published|default:0 }}</div>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Campaigns by Status</h3>
+            <h3>{% trans "Campaigns by Status" %}</h3>
             <canvas id="chart-campaign-status" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Campaigns by Channel</h3>
+            <h3>{% trans "Campaigns by Channel" %}</h3>
             <canvas id="chart-campaign-channel" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Budget by Channel</h3>
+            <h3>{% trans "Budget by Channel" %}</h3>
             <canvas id="chart-budget-channel" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Leads by Status</h3>
+            <h3>{% trans "Leads by Status" %}</h3>
             <canvas id="chart-lead-status" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Leads by Source</h3>
+            <h3>{% trans "Leads by Source" %}</h3>
             <canvas id="chart-lead-source" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Content by Status</h3>
+            <h3>{% trans "Content by Status" %}</h3>
             <canvas id="chart-content-status" height="220"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>Recent Campaigns</h3>
+        <h3>{% trans "Recent Campaigns" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Channel</th>
-                    <th>Objective</th>
-                    <th>Budget</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Status</th>
+                    <th>{% trans "Name" %}</th>
+                    <th>{% trans "Channel" %}</th>
+                    <th>{% trans "Objective" %}</th>
+                    <th>{% trans "Budget" %}</th>
+                    <th>{% trans "Start" %}</th>
+                    <th>{% trans "End" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -166,7 +167,7 @@
                 <td><span class="badge st-{{ c.status|lower }}">{{ c.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;">No campaigns found.</td></tr>
+            <tr><td colspan="7" style="color:#888;">{% trans "No campaigns found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

@@ -294,7 +294,25 @@ an entire department surfaced a real pre-existing gap while re-running
 an earlier pass) had an empty `msgstr` in all three `.po` files the whole
 time — the empty-state branch was never exercised by live sample data
 during that pass's own verification, so the gap went uncaught; fixed here.
-The main dashboard's department grid
+Also fully translated: the entire **Marketing department**
+(`marketing_dashboard.html`, `mkt_campaign_list.html`/`_detail.html`,
+`mkt_lead_list.html`/`_detail.html`, `mkt_content_list.html`/`_detail.html`,
+`mkt_ad_list.html`/`_detail.html`, `mkt_research_list.html`/`_detail.html`,
+`mkt_analytics.html`, `mkt_budget_list.html` — 13 templates, the second
+"whole department" pass after Legal), same treatment plus `{% blocktrans
+count %}` for several "N active"/"N converted"/"N clicks"/"N in draft"
+KPI sub-labels on `mkt_analytics.html`. **New gotcha found here**: a
+`makemessages` re-run can silently **revert an already-correct
+translation back to blank**, not just fuzzy-match new strings — the
+just-fixed Maintenance dashboard string above went blank *again* on the
+very next `makemessages` run (confirmed via `git diff` on the `.po` file
+before re-fixing it a second time), even though its msgid text and
+source location were byte-identical to the working, committed version.
+Root cause not fully diagnosed (a `msgmerge` quirk, most likely); the
+practical mitigation is to diff old vs. new `.po` content after every
+`makemessages` run looking for any existing translation that went from
+populated to `msgstr ""`, not just checking the new batch's own fuzzy/
+blank counts. The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,

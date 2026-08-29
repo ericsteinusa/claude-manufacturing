@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Research #{{ project.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with id=project.id %}Research #{{ id }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing</a>
-<a href="/mkt/research/" class="btn">Research</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mkt/" class="btn">{% trans "Marketing" %}</a>
+<a href="/mkt/research/" class="btn">{% trans "Research" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -44,54 +45,54 @@
 {% block body %}
 <div class="content">
 <div class="mkt-wrap">
-    <h2>{{ project.title|default:"Research Project" }} — #{{ project.id }}</h2>
+    <h2>{% if project.title %}{{ project.title }}{% else %}{% trans "Research Project" %}{% endif %} — #{{ project.id }}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Project Details</h3>
+        <h3>{% trans "Project Details" %}</h3>
         <div class="detail-grid three" style="margin-bottom:14px;">
             <div class="detail-item">
-                <span class="lbl">Type</span>
+                <span class="lbl">{% trans "Type" %}</span>
                 <span class="val">{{ project.research_type|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Owner</span>
+                <span class="lbl">{% trans "Owner" %}</span>
                 <span class="val">{{ project.owner|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Status</span>
+                <span class="lbl">{% trans "Status" %}</span>
                 <span class="val"><span class="badge s-{{ project.status|cut:' ' }}">{{ project.status }}</span></span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Start Date</span>
+                <span class="lbl">{% trans "Start Date" %}</span>
                 <span class="val">{{ project.start_date|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">End Date</span>
+                <span class="lbl">{% trans "End Date" %}</span>
                 <span class="val">{{ project.end_date|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Budget</span>
+                <span class="lbl">{% trans "Budget" %}</span>
                 <span class="val">${{ project.budget|floatformat:2 }}</span>
             </div>
         </div>
         {% if project.description %}
         <div style="margin-bottom:12px;">
-            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">Description</span>
+            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Description" %}</span>
             <div style="font-size:14px;margin-top:4px;white-space:pre-wrap;">{{ project.description }}</div>
         </div>
         {% endif %}
         {% if project.findings %}
         <div>
-            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">Findings</span>
+            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Findings" %}</span>
             <div class="findings-box">{{ project.findings }}</div>
         </div>
         {% endif %}
         {% if project.notes %}
         <div style="margin-top:10px;">
-            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">Notes</span>
+            <span style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;">{% trans "Notes" %}</span>
             <div style="font-size:14px;margin-top:4px;">{{ project.notes }}</div>
         </div>
         {% endif %}
@@ -99,41 +100,41 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Project</h3>
+        <h3>{% trans "Edit Project" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Title</label>
+                    <label>{% trans "Title" %}</label>
                     <input type="text" name="title" value="{{ project.title }}">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="research_type">
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for t in research_types %}
                         <option value="{{ t }}"{% if project.research_type == t %} selected{% endif %}>{{ t }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner" value="{{ project.owner }}">
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ project.start_date }}">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ project.end_date }}">
                 </div>
                 <div class="form-group">
-                    <label>Budget ($)</label>
+                    <label>{% trans "Budget ($)" %}</label>
                     <input type="number" name="budget" value="{{ project.budget }}" step="0.01" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in research_statuses %}
                         <option value="{{ s }}"{% if project.status == s %} selected{% endif %}>{{ s }}</option>
@@ -141,19 +142,19 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description">{{ project.description }}</textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Findings</label>
+                    <label>{% trans "Findings" %}</label>
                     <textarea name="findings" style="height:120px;">{{ project.findings }}</textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ project.notes }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="submit" class="btn-primary">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}
