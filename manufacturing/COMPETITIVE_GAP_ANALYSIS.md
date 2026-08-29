@@ -3788,3 +3788,36 @@ testing" row moves from 🟡 Partial (real script, manual trigger, never fails) 
 🟡 Partial (manual trigger, now actually gates on regression) — still not per-PR by design, so not
 promoted to ✅ Full; that would require revisiting the per-PR-cost tradeoff this document has
 already argued against twice.
+
+---
+
+**2026-08-29, one more:** Extended §6.11's template coverage to a fourth template pair —
+`maint_dashboard.html` + `maint_dashboard_kpis.html`, the Maintenance department's own landing page
+(also one of the 5 htmx live-refreshed templates, per §6.1) — per direct instruction, continuing
+right where the Production dashboard pass left off. Same treatment: toolbar/section-link nav
+labels, all 5 chart/section titles, the PM-alert urgency badges (Overdue/Due Soon/Due), and the KPI
+row wrapped in `{% trans %}`/`{% blocktrans %}` (~28 new strings); a second `{% blocktrans count %}`
+plural for the "N critical" work-order sub-label (mirroring `dashboard_kpis.html`'s existing PO
+plural) rather than a hardcoded English suffix. Both known process risks recurred and were handled
+per the now-documented CLAUDE.md procedure: `makemessages` ran clean with the required `--ignore`
+flags (no venv contamination this time), and `msgmerge` again fuzzy-matched 9 of the ~28 new
+strings to wrong existing translations (e.g. "Inspections" guessed as "Operations", "PM Schedule"
+guessed as plain "Schedule") — all corrected by hand. One new wrinkle: the hand-written Python fix
+script itself had a bug this time — round-tripping non-ASCII msgids (the "→" arrow character in
+"Full Schedule →"/"Full Report →") through `.encode().decode('unicode_escape')` corrupted the
+string, silently causing those two entries' dict lookups to miss and stay unfixed; caught by
+re-checking for remaining `#, fuzzy` markers after the "fixed" run still showed 1 per file, tracked
+down, and patched with a small follow-up script using direct regex substitution instead (no
+escape-decoding needed — the file is already read as proper UTF-8 text). Full suite 3431 passed
+(unchanged, template/locale-only work), `ruff check .` and `manage.py check` clean. Verified
+end-to-end against the real dev server for all three languages: logged in, navigated to `/maint/`,
+switched languages via the real `/i18n/setlang/` endpoint, and confirmed the heading, all 12 nav/
+section-link labels, all 7 KPI labels (including the "1 critical"/"1 critique"/"1 crítica"/"1
+kritisch" plural interpolation with correct grammatical agreement per language), the PM-alerts
+title/urgency badges, and all 5 chart/section titles render correctly in Spanish, French, and
+German. **Localization remains honestly scored as partial** — five templates and three languages;
+Quality's NCR-adjacent dashboard or the Sales dashboard would be reasonable next picks if this
+thread continues, though at this point the remaining ~445 templates make clear that department-
+dashboard-by-department-dashboard is a slow way to close the full gap — worth revisiting whether
+that's still the right unit of work versus, say, translating one entire smaller department's full
+template set end-to-end as the next increment.

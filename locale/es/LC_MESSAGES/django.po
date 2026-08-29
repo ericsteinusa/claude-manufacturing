@@ -1,13 +1,13 @@
 # Spanish translations for the Manufacturing ERP core navigation shell
-# (sidebar, top bar, login page, main dashboard) plus the Production
-# dashboard. See CLAUDE.md's Localization section for exactly what's
-# covered — this is a deliberately partial pass, not a translation of
-# the full ~450-template application.
+# (sidebar, top bar, login page, main dashboard) plus the Production and
+# Maintenance dashboards. See CLAUDE.md's Localization section for
+# exactly what's covered — this is a deliberately partial pass, not a
+# translation of the full ~450-template application.
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 03:41+0000\n"
+"POT-Creation-Date: 2026-08-29 03:55+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
@@ -55,6 +55,8 @@ msgid "Operations"
 msgstr "Operaciones"
 
 #: manufacturing/templates/base.html:483
+#: manufacturing/templates/maint_dashboard.html:6
+#: manufacturing/templates/maint_dashboard.html:125
 #: manufacturing/templates/prod_dashboard.html:6
 #: manufacturing/templates/prod_dashboard.html:58
 msgid "Work Orders"
@@ -279,6 +281,7 @@ msgid "Review now →"
 msgstr "Revisar ahora →"
 
 #: manufacturing/templates/dashboard_kpis.html:12
+#: manufacturing/templates/maint_dashboard_kpis.html:5
 msgid "Open Work Orders"
 msgstr "Órdenes de trabajo abiertas"
 
@@ -357,6 +360,148 @@ msgstr "¿Es usted cliente? Inicie sesión en el Portal de Clientes"
 msgid "Are you a supplier? Log in to the Supplier Portal"
 msgstr "¿Es usted proveedor? Inicie sesión en el Portal de Proveedores"
 
+#: manufacturing/templates/maint_dashboard.html:3
+#: manufacturing/templates/maint_dashboard.html:63
+msgid "Maintenance Dashboard"
+msgstr "Panel de mantenimiento"
+
+#: manufacturing/templates/maint_dashboard.html:7
+#: manufacturing/templates/maint_dashboard.html:129
+msgid "Equipment"
+msgstr "Equipos"
+
+#: manufacturing/templates/maint_dashboard.html:8
+#: manufacturing/templates/maint_dashboard.html:133
+msgid "PM Schedule"
+msgstr "Programa de mantenimiento preventivo"
+
+#: manufacturing/templates/maint_dashboard.html:9
+#: manufacturing/templates/maint_dashboard.html:137
+msgid "Inspections"
+msgstr "Inspecciones"
+
+#: manufacturing/templates/maint_dashboard.html:10
+#: manufacturing/templates/maint_dashboard.html:141
+msgid "Downtime"
+msgstr "Tiempo de inactividad"
+
+#: manufacturing/templates/maint_dashboard.html:11
+#: manufacturing/templates/maint_dashboard.html:145
+msgid "Parts"
+msgstr "Repuestos"
+
+#: manufacturing/templates/maint_dashboard.html:12
+#: manufacturing/templates/maint_dashboard.html:149
+msgid "Mechanics"
+msgstr "Mecánicos"
+
+#: manufacturing/templates/maint_dashboard.html:13
+msgid "OEE"
+msgstr "OEE"
+
+#: manufacturing/templates/maint_dashboard.html:14
+msgid "Predictive Maintenance"
+msgstr "Mantenimiento predictivo"
+
+#: manufacturing/templates/maint_dashboard.html:15
+msgid "Technician Routes"
+msgstr "Rutas de técnicos"
+
+#: manufacturing/templates/maint_dashboard.html:16
+msgid "Asset Performance"
+msgstr "Rendimiento de activos"
+
+#: manufacturing/templates/maint_dashboard.html:17
+#: manufacturing/templates/prod_dashboard.html:17
+#: manufacturing/templates/prod_dashboard.html:67
+msgid "Home"
+msgstr "Inicio"
+
+#: manufacturing/templates/maint_dashboard.html:70
+msgid "PM Alerts (next 14 days)"
+msgstr "Alertas de mantenimiento preventivo (próximos 14 días)"
+
+#: manufacturing/templates/maint_dashboard.html:70
+msgid "Full Schedule →"
+msgstr "Programa completo →"
+
+#: manufacturing/templates/maint_dashboard.html:82
+#: manufacturing/templates/prod_dashboard_kpis.html:12
+msgid "Overdue"
+msgstr "Atrasadas"
+
+#: manufacturing/templates/maint_dashboard.html:83
+msgid "Due Soon"
+msgstr "Próximo a vencer"
+
+#: manufacturing/templates/maint_dashboard.html:84
+msgid "Due"
+msgstr "Vencimiento"
+
+#: manufacturing/templates/maint_dashboard.html:91
+msgid "No PM tasks overdue or due in the next 14 days."
+msgstr "No hay tareas de mantenimiento preventivo atrasadas o próximas a vencer en los próximos 14 días."
+
+#: manufacturing/templates/maint_dashboard.html:96
+msgid "Weekly OEE Trend (last 8 weeks)"
+msgstr "Tendencia semanal de OEE (últimas 8 semanas)"
+
+#: manufacturing/templates/maint_dashboard.html:96
+msgid "Full Report →"
+msgstr "Informe completo →"
+
+#: manufacturing/templates/maint_dashboard.html:102
+msgid "Downtime by Equipment (last 3 mo)"
+msgstr "Tiempo de inactividad por equipo (últimos 3 meses)"
+
+#: manufacturing/templates/maint_dashboard.html:106
+msgid "PM Schedule Status"
+msgstr "Estado del programa de mantenimiento preventivo"
+
+#: manufacturing/templates/maint_dashboard.html:113
+#: manufacturing/templates/prod_dashboard.html:80
+msgid "Work Order Status"
+msgstr "Estado de la orden de trabajo"
+
+#: manufacturing/templates/maint_dashboard.html:117
+msgid "Downtime Hours by Category (last 3 mo)"
+msgstr "Horas de inactividad por categoría (últimos 3 meses)"
+
+#: manufacturing/templates/maint_dashboard.html:153
+msgid "OEE Report"
+msgstr "Informe de OEE"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:5
+#, python-format
+msgid "%(counter)s critical"
+msgid_plural "%(counter)s critical"
+msgstr[0] "%(counter)s crítica"
+msgstr[1] "%(counter)s críticas"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:9
+msgid "Overdue WOs"
+msgstr "OT atrasadas"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:13
+msgid "Equipment Issues"
+msgstr "Problemas de equipo"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:17
+msgid "PM Tasks Due / Overdue"
+msgstr "Tareas de mantenimiento preventivo vencidas/próximas"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:21
+msgid "Scheduled Inspections"
+msgstr "Inspecciones programadas"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:25
+msgid "Active Downtime Events"
+msgstr "Eventos de inactividad activos"
+
+#: manufacturing/templates/maint_dashboard_kpis.html:29
+msgid "OEE (month to date)"
+msgstr "OEE (mes actual)"
+
 #: manufacturing/templates/prod_dashboard.html:7
 msgid "Schedule"
 msgstr "Programa"
@@ -387,11 +532,6 @@ msgstr "Recetas"
 msgid "Repetitive Mfg"
 msgstr "Fabricación repetitiva"
 
-#: manufacturing/templates/prod_dashboard.html:17
-#: manufacturing/templates/prod_dashboard.html:67
-msgid "Home"
-msgstr "Inicio"
-
 #: manufacturing/templates/prod_dashboard.html:55
 msgid "Production Dashboard"
 msgstr "Panel de producción"
@@ -419,10 +559,6 @@ msgstr "Informes de producción"
 #: manufacturing/templates/prod_dashboard.html:76
 msgid "Daily Output Trend (last 14 days)"
 msgstr "Tendencia de producción diaria (últimos 14 días)"
-
-#: manufacturing/templates/prod_dashboard.html:80
-msgid "Work Order Status"
-msgstr "Estado de la orden de trabajo"
 
 #: manufacturing/templates/prod_dashboard.html:86
 msgid "Top Products by Output (last 90 days)"
@@ -475,10 +611,6 @@ msgstr "OT abiertas"
 #: manufacturing/templates/prod_dashboard_kpis.html:8
 msgid "In Progress"
 msgstr "En progreso"
-
-#: manufacturing/templates/prod_dashboard_kpis.html:12
-msgid "Overdue"
-msgstr "Atrasadas"
 
 #: manufacturing/templates/prod_dashboard_kpis.html:16
 msgid "Total Products"
