@@ -3616,3 +3616,40 @@ items) matches the TypeScript interface exactly. §6.9's explicit zero-coverage 
 **1**: `payroll` — the last department standing. Eight for eight on the "check `*_core.py` for an
 existing dashboard function first" pattern, and three in a row needing no wrapper — `payroll_core.py`
 is the one to check next, and closing it would mean full 17/17 mobile department coverage.
+
+---
+
+**2026-08-28, nine for nine — full 17/17 mobile department coverage:** Closed **Payroll**, the last
+department in §6.9's original zero-coverage list. This is the one that finally broke the
+no-wrapper-needed streak (three departments running: IT, Legal, Marketing) but not the underlying
+"check `*_core.py` first" pattern — `payroll_core.py` has no single `get_payroll_dashboard()`-shaped
+function, only `get_dashboard_counts()` (KPI dict) and `list_payroll_runs()` (all runs) as separate
+pieces, exactly the shape the web `payroll_dashboard` view itself already combines by hand
+(`counts`, `list_payroll_runs()[:5]`, plus two chart-data helpers the mobile screen skips, matching
+every other department's chart-free precedent). Added `reports_core.payroll_dashboard()` combining
+`get_dashboard_counts()` with the same `[:5]`-sliced `list_payroll_runs()`, mirroring the
+Accounting/Customer-Service/Engineering/Customers wrapper shape rather than the three-in-a-row
+no-wrapper cases immediately before it. New `api_payroll_dashboard` view + `/api/v1/dashboards/
+payroll/` route, added to `api_openapi_core.py`'s `ENDPOINTS`. 2 new tests for
+`payroll_dashboard()` (KPI+recent-runs combination, and the 5-run cap matching the web view's own
+slice); full suite 3425 passed (3423 + 2), `ruff check .` and `manage.py check` clean. The new
+`payroll.tsx` mobile screen shows YTD gross payroll, employees-with-pay-rates, and active-deduction-
+type counts, plus a recent-runs list with pay period/employee count/gross/net and a status badge;
+`processed` was added to `StatusBadge`'s shared color map (the ninth mobile-coverage PR in a row to
+touch it) — `payroll_run.status` turned out to have only one real value in practice (`'processed'`,
+the column's own hardcoded default; no status-transition code exists anywhere in `payroll_core.py`).
+Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web` all clean. Verified
+end-to-end against the real dev server: hit `/api/v1/dashboards/payroll/` directly with a real
+bearer token and confirmed live data (7 real payroll runs, $214,158.48 YTD gross, 12 employees with
+pay rates of 74 total people) matches the TypeScript interface exactly. **§6.9's zero-coverage list
+is now empty — all 17 departments have a mobile screen.** `mobile/app/(tabs)/` has grown from the
+9 screens §6.9 originally scored to **19** across this nine-PR series (Finance, Sales, Personnel,
+Accounting, Customer Service, Engineering, Customers, IT, Legal, Marketing, Payroll), landing on
+either a pure-reuse pattern (Finance, Personnel, IT, Legal, Marketing — 5 of 9) or a small
+`reports_core.*_dashboard()` KPI+recent-list wrapper (Accounting, Customer Service, Engineering,
+Customers, Payroll — 5 of 9; Sales counted separately as the one genuinely-new-backend case) in
+every single instance — no department needed a larger rewrite. This closes the mobile-coverage gap
+named in §6.9 to full parity in *breadth* (a screen touching every department) though not
+necessarily *depth* (most of these screens are KPI+recent-list dashboards, not full CRUD workflows
+the way Work Orders/Requisitions/Quality are) — a fair distinction for whoever revisits this section
+next.

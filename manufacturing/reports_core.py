@@ -11,6 +11,8 @@ from .credit_core import get_credit_dashboard, list_collection_activities
 from .cs_calls_core import get_summary_stats, list_tickets
 from .engineering_core import get_eng_dashboard, list_projects
 from .finance_core import get_cash_position
+from .payroll_core import get_dashboard_counts as get_payroll_dashboard_counts
+from .payroll_core import list_payroll_runs
 from .sales_core import get_sales_dashboard
 from .sales_orders_core import list_sos
 
@@ -534,6 +536,41 @@ def customers_dashboard(conn) -> dict:
         for r in recent
     ]
     return dash
+
+
+def payroll_dashboard(conn) -> dict:
+    """Return payroll KPIs + recent payroll runs for the mobile Payroll
+    screen (COMPETITIVE_GAP_ANALYSIS.md §6.9's mobile-coverage gap) —
+    reuses payroll_core's own get_dashboard_counts() and
+    list_payroll_runs() (already real, in use by the web payroll_dashboard
+    view) rather than a third copy of the same queries.
+
+    Keys returned:
+      counts        {total_runs, emp_with_rates, total_people,
+                     active_ded_types, ytd_gross}
+      recent_runs   Up to 5 most recent payroll runs (id, run_date,
+                    pay_period_start, pay_period_end, status, emp_count,
+                    total_gross, total_net) — matches the web dashboard's
+                    own [:5] slice
+    """
+    counts = get_payroll_dashboard_counts(conn)
+    runs = list_payroll_runs(conn)[:5]
+    return {
+        'counts': counts,
+        'recent_runs': [
+            {
+                'id': r['id'],
+                'run_date': r['run_date'],
+                'pay_period_start': r['pay_period_start'],
+                'pay_period_end': r['pay_period_end'],
+                'status': r['status'],
+                'emp_count': r['emp_count'],
+                'total_gross': r['total_gross'],
+                'total_net': r['total_net'],
+            }
+            for r in runs
+        ],
+    }
 
 
 # ---------------------------------------------------------------------------
