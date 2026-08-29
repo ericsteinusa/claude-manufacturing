@@ -3653,3 +3653,22 @@ named in §6.9 to full parity in *breadth* (a screen touching every department) 
 necessarily *depth* (most of these screens are KPI+recent-list dashboards, not full CRUD workflows
 the way Work Orders/Requisitions/Quality are) — a fair distinction for whoever revisits this section
 next.
+
+---
+
+**2026-08-29:** Extended §6.10's **mobile offline support** to a third screen — Maintenance's work
+order list — picked as the next gap once §6.9's mobile-coverage series closed out, since it's the
+cheapest remaining item still explicitly flagged as "not yet done" in both CLAUDE.md and
+`mobile/README.md`. Mechanical, exactly as those docs predicted: wrapped `maintenance.tsx`'s
+existing `load()` in the same `fetchWithOfflineCache()` helper Work Orders' list already uses,
+added the shared `OfflineBanner`, and kept the same scope boundary (list is read-cache only;
+completing a work order still requires connectivity — not queued, matching the Work Orders
+precedent of leaving mutations for a later pass). No backend touched at all — this is a
+mobile-only, docs-only change. Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/
+`expo export --platform web` all clean; full backend suite untouched (3425 passed, unchanged).
+§6.10's offline-covered screen count moves from 2 of ~19 to **3 of 21** — Time Clock (full
+read-cache + write-queue), Work Orders list, and now Maintenance list (both read-cache only). The
+other 18 screens remain candidates for the same mechanical extension, roughly in order of which
+department most plausibly has field/plant-floor connectivity gaps: Quality (NCR list, inspectors on
+the shop floor) and Inventory (stock levels, warehouse staff) look like the next two cheapest,
+highest-value picks.

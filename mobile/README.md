@@ -72,7 +72,9 @@ Deliberately partial, not a full offline-first rewrite:
   canonical "plant-floor worker with no signal" case).
 - **Work Orders list** — read-cache only; status changes and assignment
   still require connectivity.
-- The other 19 screens have no offline support yet. Extending the pattern
+- **Maintenance list** — read-cache only, same rationale as Work Orders;
+  completing a work order still requires connectivity.
+- The other 18 screens have no offline support yet. Extending the pattern
   to a screen is mechanical: wrap its `load()` in
   `fetchWithOfflineCache()` (`src/offline/cache.ts`) and wrap write
   actions in `enqueueMutation()` (`src/offline/queue.ts`) where queuing
