@@ -5,6 +5,8 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getInventory, receiveStock } from '../../src/api/inventory';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 export default function InventoryScreen() {
   const [products, setProducts] = useState<any[]>([]);
@@ -15,13 +17,28 @@ export default function InventoryScreen() {
   const [receiveQty, setReceiveQty] = useState('');
   const [receiveRef, setReceiveRef] = useState('');
   const [receiving, setReceiving] = useState(false);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getInventory(search ? { q: search } : undefined);
-      setProducts(res.data.data.products ?? []);
-      setAlerts(res.data.data.alerts ?? {});
+      // Read-only offline support: falls back to the last cached response
+      // when there's no connection. Receiving stock still requires
+      // connectivity — not queued in this pass, matching the Work
+      // Orders/Maintenance/Quality list precedent (see mobile section of
+      // the root CLAUDE.md).
+      const result = await fetchWithOfflineCache(
+        `inventory_list_${search}`,
+        async () => {
+          const res = await getInventory(search ? { q: search } : undefined);
+          return { products: res.data.data.products ?? [], alerts: res.data.data.alerts ?? {} };
+        },
+      );
+      setProducts(result.data.products);
+      setAlerts(result.data.alerts);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load inventory.');
     } finally {
@@ -62,6 +79,7 @@ export default function InventoryScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       {(alerts.below_reorder > 0) && (
         <View style={styles.alertBanner}>
           <Text style={styles.alertBannerTxt}>
