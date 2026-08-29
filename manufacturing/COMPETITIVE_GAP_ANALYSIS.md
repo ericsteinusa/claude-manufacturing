@@ -3339,6 +3339,38 @@ that the ~450 remaining templates or MRPeasy's full language count are now match
 
 ---
 
+**2026-08-29:** Extended §6.11's template coverage to a third template pair —
+`prod_dashboard.html` + `prod_dashboard_kpis.html`, the Production department's own landing page
+(one of only 5 templates with htmx live-refresh, per §6.1, putting it in the same visibility class
+as the already-translated main dashboard) — per direct instruction, picked as the next gap. Wrapped
+toolbar/dept-grid nav labels, the KPI row, all 6 chart titles, and the Recent Work Orders table
+headers in `{% trans %}` (~37 new strings across the two files); left the embedded Chart.js JS
+string labels (legend text like "Units Completed") untouched, matching `dashboard.html`'s own
+precedent of only translating template-level text, not JS literals. Two real process findings, both
+now documented in CLAUDE.md's Localization section for next time: (1) a bare `makemessages -l es -l
+fr -l de` **is not safe to run in this repo** — Django's `makemessages` doesn't respect
+`.gitignore` and has no default ignore for `venv/`, so the first attempt scanned the entire
+virtualenv's site-packages and added **1800+ lines of unrelated Django/click/etc. internals to all
+three `.po` files**; caught before committing via `git diff --stat` looking suspiciously large,
+reverted with `git checkout -- locale/`, and re-run correctly with `--ignore=venv --ignore=mobile
+--ignore=media --ignore=backups --ignore=docs`. (2) The known fuzzy-match risk recurred at greater
+scale than the Finance/Sales pass — `msgmerge` fuzzy-matched **11 of the ~37 new strings** against
+wrong existing translations (e.g. "Product" guessed as "Production", "No work orders yet." guessed
+as "Work Orders"), plus separately surfaced that 4 chart-title strings already present in
+`dashboard.html`'s own source since the previous pass had never actually been synced into the `.po`
+files at all (blank stubs, not fuzzy — a pre-existing drift this pass happened to catch and fix
+while already in these files). All fuzzy flags and blanks corrected by hand with real translations
+(not machine-translated placeholders) across all three languages. Full suite re-ran clean (3431,
+unchanged — template/locale-file work only), `ruff check .` and `manage.py check` clean. Verified
+end-to-end against the real dev server: logged in, navigated to `/prod/`, switched languages via
+the real `/i18n/setlang/` endpoint, and confirmed the heading, all 12 nav/dept-grid labels, all 6
+KPI labels, all 6 chart titles, and all 5 table headers render correctly in Spanish, French, and
+German. **Localization remains honestly scored as partial** — four templates and three languages,
+still a small fraction of the ~450-template application; `manufacturing/menus.py`'s department-grid
+button labels remain the one known untranslated exception on the main dashboard specifically.
+
+---
+
 **2026-08-28, still later:** Extended **§6.1 Modern Frontend** by one more page — the **main company
 dashboard** (`dashboard.html`), the single highest-traffic page in the app (every logged-in user's
 landing page) — using the exact same htmx live-refresh pattern PR #114 already established for

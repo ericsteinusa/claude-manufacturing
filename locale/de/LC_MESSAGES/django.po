@@ -1,13 +1,13 @@
 # German translations for the Manufacturing ERP core navigation shell
-# (sidebar, top bar, login page, main dashboard). See CLAUDE.md's
-# Localization section for exactly what's covered — this is a
-# deliberately partial pass, not a translation of the full ~450-template
-# application.
+# (sidebar, top bar, login page, main dashboard) plus the Production
+# dashboard. See CLAUDE.md's Localization section for exactly what's
+# covered — this is a deliberately partial pass, not a translation of
+# the full ~450-template application.
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 04:06+0000\n"
+"POT-Creation-Date: 2026-08-29 03:41+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -55,6 +55,8 @@ msgid "Operations"
 msgstr "Betrieb"
 
 #: manufacturing/templates/base.html:483
+#: manufacturing/templates/prod_dashboard.html:6
+#: manufacturing/templates/prod_dashboard.html:58
 msgid "Work Orders"
 msgstr "Fertigungsaufträge"
 
@@ -63,6 +65,7 @@ msgid "Bill of Materials"
 msgstr "Stückliste"
 
 #: manufacturing/templates/base.html:489
+#: manufacturing/templates/prod_dashboard.html:15
 msgid "MRP"
 msgstr "MRP"
 
@@ -99,6 +102,8 @@ msgid "Customer Service"
 msgstr "Kundendienst"
 
 #: manufacturing/templates/base.html:514 manufacturing/templates/base.html:516
+#: manufacturing/templates/prod_dashboard.html:16
+#: manufacturing/templates/prod_dashboard.html:64
 msgid "Inventory"
 msgstr "Lagerbestand"
 
@@ -107,7 +112,7 @@ msgid "Lot Tracking"
 msgstr "Chargenverfolgung"
 
 #: manufacturing/templates/base.html:522
-#: manufacturing/templates/dashboard.html:75
+#: manufacturing/templates/dashboard_kpis.html:39
 msgid "Finance"
 msgstr "Finanzen"
 
@@ -156,7 +161,7 @@ msgid "Engineering"
 msgstr "Konstruktion"
 
 #: manufacturing/templates/base.html:558
-#: manufacturing/templates/dashboard.html:60
+#: manufacturing/templates/dashboard_kpis.html:24
 msgid "Quality"
 msgstr "Qualität"
 
@@ -165,12 +170,12 @@ msgid "Quality Assurance"
 msgstr "Qualitätssicherung"
 
 #: manufacturing/templates/base.html:563 manufacturing/templates/base.html:565
-#: manufacturing/templates/dashboard.html:65
+#: manufacturing/templates/dashboard_kpis.html:29
 msgid "Maintenance"
 msgstr "Instandhaltung"
 
 #: manufacturing/templates/base.html:568
-#: manufacturing/templates/dashboard.html:105
+#: manufacturing/templates/dashboard.html:68
 msgid "Departments"
 msgstr "Abteilungen"
 
@@ -221,6 +226,7 @@ msgid "Data Governance"
 msgstr "Datenverwaltung"
 
 #: manufacturing/templates/base.html:603
+#: manufacturing/templates/prod_dashboard.html:9
 msgid "Reports"
 msgstr "Berichte"
 
@@ -241,70 +247,75 @@ msgstr "Bestellgenehmigungen"
 msgid "Company Main Menu"
 msgstr "Hauptmenü"
 
-#: manufacturing/templates/dashboard.html:40
+#: manufacturing/templates/dashboard.html:45
+msgid "Revenue vs Expense by Month"
+msgstr "Umsatz vs. Ausgaben nach Monat"
+
+#: manufacturing/templates/dashboard.html:49
+msgid "Open Items by Department"
+msgstr "Offene Posten nach Abteilung"
+
+#: manufacturing/templates/dashboard.html:57
+msgid "Inventory Stock Status"
+msgstr "Lagerbestandsstatus"
+
+#: manufacturing/templates/dashboard.html:61
+msgid "AR vs AP Open Balance"
+msgstr "Offener Saldo Debitoren vs. Kreditoren"
+
+#: manufacturing/templates/dashboard_kpis.html:4
 #, python-format
 msgid "You have <strong>%(counter)s</strong> purchase order awaiting approval."
 msgid_plural ""
 "You have <strong>%(counter)s</strong> purchase orders awaiting approval."
-msgstr[0] "Sie haben <strong>%(counter)s</strong> Bestellung, die auf Genehmigung wartet."
-msgstr[1] "Sie haben <strong>%(counter)s</strong> Bestellungen, die auf Genehmigung warten."
+msgstr[0] ""
+"Sie haben <strong>%(counter)s</strong> Bestellung, die auf Genehmigung "
+"wartet."
+msgstr[1] ""
+"Sie haben <strong>%(counter)s</strong> Bestellungen, die auf Genehmigung "
+"warten."
 
-#: manufacturing/templates/dashboard.html:41
+#: manufacturing/templates/dashboard_kpis.html:5
 msgid "Review now →"
 msgstr "Jetzt prüfen →"
 
-#: manufacturing/templates/dashboard.html:48
+#: manufacturing/templates/dashboard_kpis.html:12
 msgid "Open Work Orders"
 msgstr "Offene Fertigungsaufträge"
 
-#: manufacturing/templates/dashboard.html:50
+#: manufacturing/templates/dashboard_kpis.html:14
+#: manufacturing/templates/prod_dashboard.html:3
 msgid "Production"
 msgstr "Produktion"
 
-#: manufacturing/templates/dashboard.html:53
+#: manufacturing/templates/dashboard_kpis.html:17
 msgid "Open POs"
 msgstr "Offene Bestellungen"
 
-#: manufacturing/templates/dashboard.html:55
+#: manufacturing/templates/dashboard_kpis.html:19
 msgid "Purchasing"
 msgstr "Einkauf"
 
-#: manufacturing/templates/dashboard.html:58
+#: manufacturing/templates/dashboard_kpis.html:22
 msgid "Open NCRs"
 msgstr "Offene Abweichungsberichte"
 
-#: manufacturing/templates/dashboard.html:63
+#: manufacturing/templates/dashboard_kpis.html:27
 msgid "Maint. Work Orders"
 msgstr "Instandhaltungsaufträge"
 
-#: manufacturing/templates/dashboard.html:68
+#: manufacturing/templates/dashboard_kpis.html:32
 msgid "Low Stock Items"
 msgstr "Artikel mit niedrigem Bestand"
 
-#: manufacturing/templates/dashboard.html:70
+#: manufacturing/templates/dashboard_kpis.html:34
 #, python-format
 msgid "%(zero)s at zero"
 msgstr "%(zero)s bei null"
 
-#: manufacturing/templates/dashboard.html:73
+#: manufacturing/templates/dashboard_kpis.html:37
 msgid "Cash Position"
 msgstr "Liquiditätsposition"
-
-#: manufacturing/templates/dashboard.html:82
-msgid "Revenue vs Expense by Month"
-msgstr "Umsatz vs. Kosten nach Monat"
-
-#: manufacturing/templates/dashboard.html:86
-msgid "Open Items by Department"
-msgstr "Offene Posten nach Abteilung"
-
-#: manufacturing/templates/dashboard.html:94
-msgid "Inventory Stock Status"
-msgstr "Lagerbestandsstatus"
-
-#: manufacturing/templates/dashboard.html:98
-msgid "AR vs AP Open Balance"
-msgstr "Offener Saldo Debitoren vs. Kreditoren"
 
 #: manufacturing/templates/home.html:4
 msgid "Login"
@@ -346,3 +357,138 @@ msgstr "Sind Sie Kunde? Melden Sie sich im Kundenportal an"
 #: manufacturing/templates/home.html:51
 msgid "Are you a supplier? Log in to the Supplier Portal"
 msgstr "Sind Sie Lieferant? Melden Sie sich im Lieferantenportal an"
+
+#: manufacturing/templates/prod_dashboard.html:7
+msgid "Schedule"
+msgstr "Zeitplan"
+
+#: manufacturing/templates/prod_dashboard.html:8
+#: manufacturing/templates/prod_dashboard.html:61
+msgid "Shipping"
+msgstr "Versand"
+
+#: manufacturing/templates/prod_dashboard.html:10
+msgid "Batch Records"
+msgstr "Chargenprotokolle"
+
+#: manufacturing/templates/prod_dashboard.html:11
+#: manufacturing/templates/prod_dashboard.html:62
+msgid "BOM"
+msgstr "BOM"
+
+#: manufacturing/templates/prod_dashboard.html:12
+msgid "Configure-to-Order"
+msgstr "Konfiguration nach Auftrag"
+
+#: manufacturing/templates/prod_dashboard.html:13
+msgid "Recipes"
+msgstr "Rezepturen"
+
+#: manufacturing/templates/prod_dashboard.html:14
+msgid "Repetitive Mfg"
+msgstr "Wiederholfertigung"
+
+#: manufacturing/templates/prod_dashboard.html:17
+#: manufacturing/templates/prod_dashboard.html:67
+msgid "Home"
+msgstr "Startseite"
+
+#: manufacturing/templates/prod_dashboard.html:55
+msgid "Production Dashboard"
+msgstr "Produktions-Dashboard"
+
+#: manufacturing/templates/prod_dashboard.html:59
+msgid "New Work Order"
+msgstr "Neuer Fertigungsauftrag"
+
+#: manufacturing/templates/prod_dashboard.html:60
+msgid "Production Schedule"
+msgstr "Produktionsplan"
+
+#: manufacturing/templates/prod_dashboard.html:63
+msgid "MRP Planning"
+msgstr "MRP-Planung"
+
+#: manufacturing/templates/prod_dashboard.html:65
+msgid "New Inventory Item"
+msgstr "Neuer Lagerartikel"
+
+#: manufacturing/templates/prod_dashboard.html:66
+msgid "Production Reports"
+msgstr "Produktionsberichte"
+
+#: manufacturing/templates/prod_dashboard.html:76
+msgid "Daily Output Trend (last 14 days)"
+msgstr "Täglicher Ausstoßtrend (letzte 14 Tage)"
+
+#: manufacturing/templates/prod_dashboard.html:80
+msgid "Work Order Status"
+msgstr "Status des Fertigungsauftrags"
+
+#: manufacturing/templates/prod_dashboard.html:86
+msgid "Top Products by Output (last 90 days)"
+msgstr "Top-Produkte nach Ausstoß (letzte 90 Tage)"
+
+#: manufacturing/templates/prod_dashboard.html:90
+msgid "On-Time Delivery (last 30 days)"
+msgstr "Termintreue (letzte 30 Tage)"
+
+#: manufacturing/templates/prod_dashboard.html:96
+msgid "Scrap &amp; Rework by Operation"
+msgstr "Ausschuss &amp; Nacharbeit nach Arbeitsgang"
+
+#: manufacturing/templates/prod_dashboard.html:100
+msgid "WO Completions by Month (last 6 mo)"
+msgstr "Abgeschlossene Fertigungsaufträge nach Monat (letzte 6 Monate)"
+
+#: manufacturing/templates/prod_dashboard.html:106
+msgid "Recent Work Orders"
+msgstr "Aktuelle Fertigungsaufträge"
+
+#: manufacturing/templates/prod_dashboard.html:110
+msgid "WO #"
+msgstr "FA-Nr."
+
+#: manufacturing/templates/prod_dashboard.html:111
+msgid "Description"
+msgstr "Beschreibung"
+
+#: manufacturing/templates/prod_dashboard.html:112
+msgid "Product"
+msgstr "Produkt"
+
+#: manufacturing/templates/prod_dashboard.html:113
+msgid "Due Date"
+msgstr "Fälligkeitsdatum"
+
+#: manufacturing/templates/prod_dashboard.html:114
+msgid "Status"
+msgstr "Status"
+
+#: manufacturing/templates/prod_dashboard.html:127
+msgid "No work orders yet."
+msgstr "Noch keine Fertigungsaufträge."
+
+#: manufacturing/templates/prod_dashboard_kpis.html:4
+msgid "Open WOs"
+msgstr "Offene FA"
+
+#: manufacturing/templates/prod_dashboard_kpis.html:8
+msgid "In Progress"
+msgstr "In Bearbeitung"
+
+#: manufacturing/templates/prod_dashboard_kpis.html:12
+msgid "Overdue"
+msgstr "Überfällig"
+
+#: manufacturing/templates/prod_dashboard_kpis.html:16
+msgid "Total Products"
+msgstr "Produkte insgesamt"
+
+#: manufacturing/templates/prod_dashboard_kpis.html:20
+msgid "Zero Stock"
+msgstr "Kein Bestand"
+
+#: manufacturing/templates/prod_dashboard_kpis.html:24
+msgid "Low Stock"
+msgstr "Niedriger Bestand"

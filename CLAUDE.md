@@ -247,27 +247,40 @@ are wired up: English (default), Spanish, French, German
 placeholder text — added after the original Spanish-only pass to close the
 localization-breadth gap flagged in COMPETITIVE_GAP_ANALYSIS.md §9's
 comparison against MRPeasy, which ships more languages than a single-language
-pass would have). Translation coverage is the app's core navigation shell and
-main landing page only — `base.html` (sidebar: all 11 section headers + all
-~37 nav links; top bar: notifications, password, 2FA, logout), `home.html`
-(the login page), and `dashboard.html` (the post-login main dashboard: KPI
-labels, chart titles, the pending-PO-approvals banner using a real
-`{% blocktrans count %}` plural, not a hardcoded English `|pluralize`) —
-wrapped in `{% trans %}`/`{% blocktrans %}`. The main dashboard's department
-grid button labels are the one exception — they're rendered from
+pass would have). Translation coverage is the app's core navigation shell,
+main landing page, and one department dashboard so far — `base.html`
+(sidebar: all 11 section headers + all ~37 nav links; top bar: notifications,
+password, 2FA, logout), `home.html` (the login page), `dashboard.html` (the
+post-login main dashboard: KPI labels, chart titles, the pending-PO-approvals
+banner using a real `{% blocktrans count %}` plural, not a hardcoded English
+`|pluralize`), and `prod_dashboard.html` + `prod_dashboard_kpis.html` (the
+Production dashboard: toolbar/dept-grid nav labels, KPI labels, chart
+titles, the Recent Work Orders table headers) — wrapped in
+`{% trans %}`/`{% blocktrans %}`. The main dashboard's department grid
+button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,
 a different mechanism from the template-level `{% trans %}` used everywhere
-else here; not done.
+else here; not done. `manage.py makemessages` does **not** ignore `venv/` by
+default (unlike `.gitignore`-based tools) — a bare `makemessages -l <code>`
+run against this repo will scan the whole venv's site-packages and pollute
+every `.po` file with hundreds of unrelated strings; always pass
+`--ignore=venv --ignore=mobile --ignore=media --ignore=backups --ignore=docs`
+(confirmed the hard way once: a bare run added 1800+ lines of Django/click
+internals to all three `.po` files before being caught and reverted).
 
-Run `python manage.py makemessages -l <code>` after adding a new `{% trans %}`
-to catch the new string in every existing `.po` file (it merges via
-`msgmerge`, preserving existing translations by matching on the English
-source text) — but check the merge output for `#, fuzzy` markers before
-trusting it: `msgmerge` will guess-match a new string against a similar
-existing one (e.g. it once fuzzy-matched a new "PO Approvals" against the
-existing translation of "Approval Rules") and leave that wrong guess in
-place unless it's corrected by hand. Then `python manage.py compilemessages`
+Run `python manage.py makemessages -l <code> --ignore=venv --ignore=mobile
+--ignore=media --ignore=backups --ignore=docs` after adding a new
+`{% trans %}` to catch the new string in every existing `.po` file (it
+merges via `msgmerge`, preserving existing translations by matching on the
+English source text) — but check the merge output for `#, fuzzy` markers
+before trusting it: `msgmerge` will guess-match a new string against a
+similar existing one (e.g. it once fuzzy-matched a new "PO Approvals"
+against the existing translation of "Approval Rules", and separately
+fuzzy-matched 11 of the ~37 new strings added for the Production
+dashboard, e.g. guessing "Product" → the existing translation of
+"Production") and leave that wrong guess in place unless it's corrected
+by hand. Then `python manage.py compilemessages`
 — the `.mo` binary Django actually loads at runtime isn't regenerated
 automatically, and the dev server's autoreloader doesn't watch `.po`/`.mo`
 files, so a manual restart is also needed after compiling. **The other
