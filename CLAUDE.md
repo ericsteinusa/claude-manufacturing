@@ -210,17 +210,19 @@ automatically by a global `NetInfo` listener in `app/_layout.tsx` the instant th
 device reconnects — not tied to whichever screen happens to be focused at that
 moment. `netStatus.ts`'s `useIsOnline()` hook and the shared `OfflineBanner`
 component surface "showing cached data" / "N actions waiting to sync" to the user
-rather than failing silently. **Wired into five screens so far**: Time Clock
+rather than failing silently. **Wired into six screens so far**: Time Clock
 (full read-cache + write-queue — clock in/out are the canonical "plant-floor worker
 with no signal" case), Work Orders' list view (read-cache only; status changes
 and assignment still require connectivity), Maintenance's list view (read-cache
 only, same rationale as Work Orders — completing a work order still requires
 connectivity), Quality's NCR list view (read-cache only — creating an NCR
-still requires connectivity), and Inventory's product list (read-cache only,
+still requires connectivity), Inventory's product list (read-cache only,
 caching `products` and the reorder `alerts` banner data together as one unit
 since they come from the same response — receiving stock still requires
-connectivity). The other 16 screens have no offline support yet — extending
-this pattern to them is mechanical (wrap the existing `load()` in
+connectivity), and Costing's product-search list (read-cache only; the
+cost/history/routing/reference-data drill-downs it opens into a modal are
+not cached in this pass). The other 15 screens have no offline support yet —
+extending this pattern to them is mechanical (wrap the existing `load()` in
 `fetchWithOfflineCache`, wrap write actions in `enqueueMutation` where queuing
 makes sense) but not yet done.
 CI (`.github/workflows/mobile.yml`: `npm ci`, `tsc --noEmit`, `expo-doctor`,

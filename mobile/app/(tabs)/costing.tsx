@@ -9,11 +9,15 @@ import {
   getProductCost, rollStandardCost, getCostHistory,
   getGlAccounts, getWorkcenters, getProductRouting,
 } from '../../src/api/costing';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 export default function CostingScreen() {
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const [selected, setSelected] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -31,8 +35,19 @@ export default function CostingScreen() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getInventory(search ? { q: search } : undefined);
-      setProducts(res.data.data.products ?? []);
+      // Read-only offline support: the product list falls back to the
+      // last cached response when there's no connection. The cost/
+      // history/routing/reference-data drill-downs are not cached in
+      // this pass — not queued, matching the Work Orders/Maintenance/
+      // Quality/Inventory list precedent (see mobile section of the
+      // root CLAUDE.md).
+      const result = await fetchWithOfflineCache(
+        `costing_product_list_${search}`,
+        async () => (await getInventory(search ? { q: search } : undefined)).data.data.products ?? [],
+      );
+      setProducts(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load products.');
     } finally {
@@ -111,6 +126,7 @@ export default function CostingScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       <View style={styles.headerRow}>
         <TouchableOpacity style={styles.headerBtn} onPress={openWorkcenters}>
           <Text style={styles.headerBtnTxt}>Workcenters</Text>
