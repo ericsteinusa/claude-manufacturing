@@ -248,15 +248,19 @@ placeholder text — added after the original Spanish-only pass to close the
 localization-breadth gap flagged in COMPETITIVE_GAP_ANALYSIS.md §9's
 comparison against MRPeasy, which ships more languages than a single-language
 pass would have). Translation coverage is the app's core navigation shell,
-main landing page, and one department dashboard so far — `base.html`
+main landing page, and two department dashboards so far — `base.html`
 (sidebar: all 11 section headers + all ~37 nav links; top bar: notifications,
 password, 2FA, logout), `home.html` (the login page), `dashboard.html` (the
 post-login main dashboard: KPI labels, chart titles, the pending-PO-approvals
 banner using a real `{% blocktrans count %}` plural, not a hardcoded English
-`|pluralize`), and `prod_dashboard.html` + `prod_dashboard_kpis.html` (the
+`|pluralize`), `prod_dashboard.html` + `prod_dashboard_kpis.html` (the
 Production dashboard: toolbar/dept-grid nav labels, KPI labels, chart
-titles, the Recent Work Orders table headers) — wrapped in
-`{% trans %}`/`{% blocktrans %}`. The main dashboard's department grid
+titles, the Recent Work Orders table headers), and `maint_dashboard.html` +
+`maint_dashboard_kpis.html` (the Maintenance dashboard: toolbar/section-link
+nav labels, KPI labels including a second `{% blocktrans count %}` plural
+for the "N critical" work-order sub-label, PM-alert urgency badges, and all
+5 chart/section titles) — wrapped in `{% trans %}`/`{% blocktrans %}`. The
+main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,

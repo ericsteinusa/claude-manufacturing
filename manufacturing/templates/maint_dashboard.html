@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}Maintenance Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Maintenance Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/maint/wo/" class="btn">Work Orders</a>
-<a href="/maint/equipment/" class="btn">Equipment</a>
-<a href="/maint/schedule/" class="btn">PM Schedule</a>
-<a href="/maint/inspections/" class="btn">Inspections</a>
-<a href="/maint/downtime/" class="btn">Downtime</a>
-<a href="/maint/parts/" class="btn">Parts</a>
-<a href="/maint/mechanics/" class="btn">Mechanics</a>
-<a href="/maint/oee/" class="btn">OEE</a>
-<a href="/predictive-maintenance/" class="btn">Predictive Maintenance</a>
-<a href="/maint/routes/" class="btn">Technician Routes</a>
-<a href="/maint/apm/" class="btn">Asset Performance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/maint/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/maint/equipment/" class="btn">{% trans "Equipment" %}</a>
+<a href="/maint/schedule/" class="btn">{% trans "PM Schedule" %}</a>
+<a href="/maint/inspections/" class="btn">{% trans "Inspections" %}</a>
+<a href="/maint/downtime/" class="btn">{% trans "Downtime" %}</a>
+<a href="/maint/parts/" class="btn">{% trans "Parts" %}</a>
+<a href="/maint/mechanics/" class="btn">{% trans "Mechanics" %}</a>
+<a href="/maint/oee/" class="btn">{% trans "OEE" %}</a>
+<a href="/predictive-maintenance/" class="btn">{% trans "Predictive Maintenance" %}</a>
+<a href="/maint/routes/" class="btn">{% trans "Technician Routes" %}</a>
+<a href="/maint/apm/" class="btn">{% trans "Asset Performance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -59,14 +60,14 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Maintenance Dashboard</h2>
+    <h2>{% trans "Maintenance Dashboard" %}</h2>
 
     <div id="maint-kpis" hx-get="/maint/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
         {% include "maint_dashboard_kpis.html" %}
     </div>
 
     <div class="card" style="margin-bottom:24px;">
-        <h3>PM Alerts (next 14 days) — <a href="/maint/schedule/" style="color:var(--accent);font-weight:normal;font-size:12px;">Full Schedule →</a></h3>
+        <h3>{% trans "PM Alerts (next 14 days)" %} — <a href="/maint/schedule/" style="color:var(--accent);font-weight:normal;font-size:12px;">{% trans "Full Schedule →" %}</a></h3>
         {% if pm_alerts %}
         <ul class="pm-alerts">
             {% for a in pm_alerts %}
@@ -78,42 +79,42 @@
                 <span>
                     <span style="font-size:12px;color:#777;margin-right:8px;">{{ a.next_due }}</span>
                     <span class="urgency-badge {{ a.urgency }}">
-                        {% if a.urgency == 'overdue' %}Overdue
-                        {% elif a.urgency == 'due_soon' %}Due Soon
-                        {% else %}Due{% endif %}
+                        {% if a.urgency == 'overdue' %}{% trans "Overdue" %}
+                        {% elif a.urgency == 'due_soon' %}{% trans "Due Soon" %}
+                        {% else %}{% trans "Due" %}{% endif %}
                     </span>
                 </span>
             </li>
             {% endfor %}
         </ul>
         {% else %}
-        <div class="pm-alerts-empty">No PM tasks overdue or due in the next 14 days.</div>
+        <div class="pm-alerts-empty">{% trans "No PM tasks overdue or due in the next 14 days." %}</div>
         {% endif %}
     </div>
 
     <div class="oee-trend">
-        <div class="oee-trend-title">Weekly OEE Trend (last 8 weeks) — <a href="/maint/oee/" style="color:var(--accent);font-weight:normal;">Full Report →</a></div>
+        <div class="oee-trend-title">{% trans "Weekly OEE Trend (last 8 weeks)" %} — <a href="/maint/oee/" style="color:var(--accent);font-weight:normal;">{% trans "Full Report →" %}</a></div>
         <canvas id="chart-oee-trend" height="100"></canvas>
     </div>
 
     <div class="two-col">
         <div class="card" style="margin-bottom:0;">
-            <h3>Downtime by Equipment (last 3 mo)</h3>
+            <h3>{% trans "Downtime by Equipment (last 3 mo)" %}</h3>
             <canvas id="chart-downtime-equipment" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>PM Schedule Status</h3>
+            <h3>{% trans "PM Schedule Status" %}</h3>
             <canvas id="chart-pm-status" height="220"></canvas>
         </div>
     </div>
 
     <div class="two-col" style="margin-top:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Work Order Status</h3>
+            <h3>{% trans "Work Order Status" %}</h3>
             <canvas id="chart-wo-status" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Downtime Hours by Category (last 3 mo)</h3>
+            <h3>{% trans "Downtime Hours by Category (last 3 mo)" %}</h3>
             <canvas id="chart-downtime-cat" height="220"></canvas>
         </div>
     </div>
@@ -121,35 +122,35 @@
     <div class="section-links">
         <a href="/maint/wo/" class="section-link">
             <div class="icon">&#128295;</div>
-            <div class="name">Work Orders</div>
+            <div class="name">{% trans "Work Orders" %}</div>
         </a>
         <a href="/maint/equipment/" class="section-link">
             <div class="icon">&#9881;</div>
-            <div class="name">Equipment</div>
+            <div class="name">{% trans "Equipment" %}</div>
         </a>
         <a href="/maint/schedule/" class="section-link">
             <div class="icon">&#128197;</div>
-            <div class="name">PM Schedule</div>
+            <div class="name">{% trans "PM Schedule" %}</div>
         </a>
         <a href="/maint/inspections/" class="section-link">
             <div class="icon">&#128203;</div>
-            <div class="name">Inspections</div>
+            <div class="name">{% trans "Inspections" %}</div>
         </a>
         <a href="/maint/downtime/" class="section-link">
             <div class="icon">&#9889;</div>
-            <div class="name">Downtime</div>
+            <div class="name">{% trans "Downtime" %}</div>
         </a>
         <a href="/maint/parts/" class="section-link">
             <div class="icon">&#128230;</div>
-            <div class="name">Parts</div>
+            <div class="name">{% trans "Parts" %}</div>
         </a>
         <a href="/maint/mechanics/" class="section-link">
             <div class="icon">&#128100;</div>
-            <div class="name">Mechanics</div>
+            <div class="name">{% trans "Mechanics" %}</div>
         </a>
         <a href="/maint/oee/" class="section-link">
             <div class="icon">&#128202;</div>
-            <div class="name">OEE Report</div>
+            <div class="name">{% trans "OEE Report" %}</div>
         </a>
     </div>
 </div>
