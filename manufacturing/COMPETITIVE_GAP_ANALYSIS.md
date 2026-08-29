@@ -3821,3 +3821,41 @@ thread continues, though at this point the remaining ~445 templates make clear t
 dashboard-by-department-dashboard is a slow way to close the full gap — worth revisiting whether
 that's still the right unit of work versus, say, translating one entire smaller department's full
 template set end-to-end as the next increment.
+
+---
+
+**2026-08-29, closing out §6.1's htmx set:** Per direct instruction to keep going on i18n template
+coverage, picked the two remaining htmx live-refresh templates (§6.1) rather than a department
+dashboard — `ai_insights_dashboard.html` + `ai_insights_feed.html` and `sf_tv.html` +
+`sf_tv_grid.html` — since both were small (~50 lines each) and doing both closes out every one of
+§6.1's 5 named live-refresh templates as translated in a single PR. Two things made this pair
+different from the four dashboards before it: (1) `sf_tv.html` is the only translated template so
+far that doesn't extend `base.html` — it's a standalone fullscreen display meant for a shop-floor
+monitor, so it needed its own `{% load i18n %}` and has no language switcher on the page itself
+(language has to be set from another page first, then carries over via session). (2) It surfaced a
+new naming convention question — the per-workcenter A/P/Q (Availability/Performance/Quality)
+letter labels were left untranslated, following the same "keep industry acronyms as-is" precedent
+already set for MRP/BOM/OEE, rather than trying to swap in each language's own first letter (which
+wouldn't even be consistent — French "Disponibilité" and Spanish "Disponibilidad" don't share an
+initial with English "Availability" either). `makemessages` ran clean with the required `--ignore`
+flags; `msgmerge` fuzzy-matched only 1 of ~12 new strings this time ("View →" guessed against
+"Review now →"). A more serious bug surfaced in the hand-written fix script itself: extracting the
+AI Insights intro paragraph's multi-line msgid via a regex (`"[^"]*"` per line) silently truncated
+it at the first escaped quote inside `href=\"...\"`, corrupting the msgid so it would never again
+match the real template string — caught immediately by inspecting the patched file rather than
+trusting the "N entries patched" count, reverted, and re-fixed with a strictly safer approach:
+never reconstruct or regex-match the msgid lines at all, only locate the block by a substring
+search and replace the trailing `msgstr ""` line in place. Full suite 3431 passed (unchanged,
+template/locale-only work), `ruff check .` and `manage.py check` clean, `compilemessages` clean
+with zero fuzzy markers. Verified end-to-end against the real dev server for all three languages:
+logged in, navigated to `/ai-insights/` and `/shop-floor/tv/`, switched languages via the real
+`/i18n/setlang/` endpoint, and confirmed the AI Insights heading/toolbar/intro-paragraph-with-links/
+"View →" link and the TV display's header/per-workcenter produced-planned-scrapped line/no-plan
+message all render correctly in Spanish, French, and German — including the `{% blocktrans %}`
+quantity interpolations. **This closes §6.1's entire htmx-live-refresh-template set (all 5) as
+translated** — `dashboard.html`, `prod_dashboard.html`, `maint_dashboard.html`,
+`ai_insights_dashboard.html`, `sf_tv.html`. Localization remains honestly scored as partial —
+seven templates and three languages out of ~450 total — but every template with real-time polling
+now has full language coverage, which is a meaningfully different (and arguably higher-value)
+milestone than "N templates done" alone. The department-by-department-dashboard-vs-full-department
+question raised in the previous entry is still open for whoever picks this thread up next.
