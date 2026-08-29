@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Contract — {{ contract.title }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with title=contract.title %}Contract — {{ title }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/legal/" class="btn">Legal Dashboard</a>
-<a href="/legal/contracts/" class="btn">Contracts</a>
-<a href="/legal/compliance/" class="btn">Compliance</a>
-<a href="/legal/litigation/" class="btn">Litigation</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/legal/" class="btn">{% trans "Legal Dashboard" %}</a>
+<a href="/legal/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/legal/compliance/" class="btn">{% trans "Compliance" %}</a>
+<a href="/legal/litigation/" class="btn">{% trans "Litigation" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,36 +52,36 @@
     <div class="card">
         <div class="field-grid">
             <div class="field-group">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <div class="val"><span class="badge s-{{ contract.status|lower }}">{{ contract.status }}</span></div>
             </div>
             <div class="field-group">
-                <label>Type</label>
+                <label>{% trans "Type" %}</label>
                 <div class="val">{{ contract.contract_type|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Counterparty</label>
+                <label>{% trans "Counterparty" %}</label>
                 <div class="val">{{ contract.counterparty|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Value</label>
+                <label>{% trans "Value" %}</label>
                 <div class="val">{% if contract.value %}${{ contract.value|floatformat:2 }}{% else %}—{% endif %}</div>
             </div>
             <div class="field-group">
-                <label>Start Date</label>
+                <label>{% trans "Start Date" %}</label>
                 <div class="val">{{ contract.start_date|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>End Date</label>
+                <label>{% trans "End Date" %}</label>
                 <div class="val">{{ contract.end_date|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Owner</label>
+                <label>{% trans "Owner" %}</label>
                 <div class="val">{{ contract.owner|default:"—" }}</div>
             </div>
             {% if contract.notes %}
             <div class="field-group full-span">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <div class="val">{{ contract.notes }}</div>
             </div>
             {% endif %}
@@ -89,20 +90,20 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Contract</h3>
+        <h3>{% trans "Edit Contract" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Title *</label>
+                    <label>{% trans "Title" %} *</label>
                     <input type="text" name="title" value="{{ contract.title }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Counterparty</label>
+                    <label>{% trans "Counterparty" %}</label>
                     <input type="text" name="counterparty" value="{{ contract.counterparty|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="contract_type">
                         {% for t in contract_types %}
                         <option value="{{ t }}"{% if contract.contract_type == t %} selected{% endif %}>{{ t }}</option>
@@ -110,7 +111,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in contract_statuses %}
                         <option value="{{ s }}"{% if contract.status == s %} selected{% endif %}>{{ s }}</option>
@@ -118,27 +119,27 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Value ($)</label>
+                    <label>{% trans "Value ($)" %}</label>
                     <input type="number" name="value" min="0" step="0.01" value="{{ contract.value|default:0 }}">
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ contract.start_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ contract.end_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner" value="{{ contract.owner|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ contract.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="submit" class="btn-save">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}

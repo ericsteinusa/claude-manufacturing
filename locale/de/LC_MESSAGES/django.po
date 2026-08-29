@@ -1,14 +1,15 @@
 # German translations for the Manufacturing ERP core navigation shell
-# (sidebar, top bar, login page, main dashboard) plus the Production and
-# Maintenance dashboards, the AI Insights feed, and the shop-floor OEE TV
-# display. See CLAUDE.md's Localization section for exactly what's
-# covered — this is a deliberately partial pass, not a translation of
-# the full ~450-template application.
+# (sidebar, top bar, login page, main dashboard), the Production and
+# Maintenance dashboards, the AI Insights feed, the shop-floor OEE TV
+# display, and the entire Legal department (10 templates). See
+# CLAUDE.md's Localization section for exactly what's covered — this
+# is a deliberately partial pass, not a translation of the full
+# ~450-template application.
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 17:43+0000\n"
+"POT-Creation-Date: 2026-08-29 18:02+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -30,6 +31,17 @@ msgid "Reports"
 msgstr "Berichte"
 
 #: manufacturing/templates/ai_insights_dashboard.html:7
+#: manufacturing/templates/legal_compliance_detail.html:10
+#: manufacturing/templates/legal_compliance_list.html:13
+#: manufacturing/templates/legal_contract_detail.html:10
+#: manufacturing/templates/legal_contract_list.html:13
+#: manufacturing/templates/legal_dashboard.html:7
+#: manufacturing/templates/legal_dashboard.html:53
+#: manufacturing/templates/legal_employment_list.html:13
+#: manufacturing/templates/legal_governance_list.html:13
+#: manufacturing/templates/legal_ip_list.html:13
+#: manufacturing/templates/legal_litigation_detail.html:10
+#: manufacturing/templates/legal_litigation_list.html:13
 #: manufacturing/templates/maint_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
@@ -45,7 +57,12 @@ msgid ""
 "        statistical anomaly detection over demand, quality, and customer "
 "ordering patterns.\n"
 "        Ranked by severity."
-msgstr "Ein bereichsübergreifender Feed, der das Risiko der <a href=\"/predictive-maintenance/\">vorausschauenden Wartung</a>, Empfehlungen zur <a href=\"/maint/apm/\">Anlagenleistung</a> und eine selbst entwickelte statistische Anomalieerkennung für Nachfrage-, Qualitäts- und Kundenbestellmuster kombiniert. Nach Schweregrad geordnet."
+msgstr ""
+"Ein bereichsübergreifender Feed, der das Risiko der <a href=\"/predictive-"
+"maintenance/\">vorausschauenden Wartung</a>, Empfehlungen zur <a href=\"/"
+"maint/apm/\">Anlagenleistung</a> und eine selbst entwickelte statistische "
+"Anomalieerkennung für Nachfrage-, Qualitäts- und Kundenbestellmuster "
+"kombiniert. Nach Schweregrad geordnet."
 
 #: manufacturing/templates/ai_insights_feed.html:13
 msgid "View →"
@@ -394,6 +411,610 @@ msgstr "Sind Sie Kunde? Melden Sie sich im Kundenportal an"
 msgid "Are you a supplier? Log in to the Supplier Portal"
 msgstr "Sind Sie Lieferant? Melden Sie sich im Lieferantenportal an"
 
+#: manufacturing/templates/legal_compliance_detail.html:3
+#, python-format
+msgid "Compliance — %(requirement)s"
+msgstr "Compliance — %(requirement)s"
+
+#: manufacturing/templates/legal_compliance_detail.html:6
+#: manufacturing/templates/legal_compliance_list.html:6
+#: manufacturing/templates/legal_contract_detail.html:6
+#: manufacturing/templates/legal_contract_list.html:6
+#: manufacturing/templates/legal_dashboard.html:3
+#: manufacturing/templates/legal_dashboard.html:6
+#: manufacturing/templates/legal_dashboard.html:43
+#: manufacturing/templates/legal_employment_list.html:6
+#: manufacturing/templates/legal_governance_list.html:6
+#: manufacturing/templates/legal_ip_list.html:6
+#: manufacturing/templates/legal_litigation_detail.html:6
+#: manufacturing/templates/legal_litigation_list.html:6
+msgid "Legal Dashboard"
+msgstr "Rechtsabteilungs-Dashboard"
+
+#: manufacturing/templates/legal_compliance_detail.html:7
+#: manufacturing/templates/legal_compliance_list.html:7
+#: manufacturing/templates/legal_contract_detail.html:7
+#: manufacturing/templates/legal_contract_list.html:3
+#: manufacturing/templates/legal_contract_list.html:7
+#: manufacturing/templates/legal_contract_list.html:61
+#: manufacturing/templates/legal_dashboard.html:46
+#: manufacturing/templates/legal_dashboard.html:56
+#: manufacturing/templates/legal_employment_list.html:7
+#: manufacturing/templates/legal_governance_list.html:7
+#: manufacturing/templates/legal_ip_list.html:7
+#: manufacturing/templates/legal_litigation_detail.html:7
+#: manufacturing/templates/legal_litigation_list.html:7
+msgid "Contracts"
+msgstr "Verträge"
+
+#: manufacturing/templates/legal_compliance_detail.html:8
+#: manufacturing/templates/legal_compliance_list.html:3
+#: manufacturing/templates/legal_compliance_list.html:8
+#: manufacturing/templates/legal_contract_detail.html:8
+#: manufacturing/templates/legal_contract_list.html:8
+#: manufacturing/templates/legal_dashboard.html:47
+#: manufacturing/templates/legal_dashboard.html:72
+#: manufacturing/templates/legal_employment_list.html:8
+#: manufacturing/templates/legal_governance_list.html:8
+#: manufacturing/templates/legal_ip_list.html:8
+#: manufacturing/templates/legal_litigation_detail.html:8
+#: manufacturing/templates/legal_litigation_list.html:8
+msgid "Compliance"
+msgstr "Compliance"
+
+#: manufacturing/templates/legal_compliance_detail.html:9
+#: manufacturing/templates/legal_compliance_list.html:9
+#: manufacturing/templates/legal_contract_detail.html:9
+#: manufacturing/templates/legal_contract_list.html:9
+#: manufacturing/templates/legal_dashboard.html:48
+#: manufacturing/templates/legal_dashboard.html:88
+#: manufacturing/templates/legal_employment_list.html:9
+#: manufacturing/templates/legal_governance_list.html:9
+#: manufacturing/templates/legal_ip_list.html:9
+#: manufacturing/templates/legal_litigation_detail.html:9
+#: manufacturing/templates/legal_litigation_list.html:3
+#: manufacturing/templates/legal_litigation_list.html:9
+msgid "Litigation"
+msgstr "Rechtsstreitigkeiten"
+
+#: manufacturing/templates/legal_compliance_detail.html:54
+#: manufacturing/templates/legal_compliance_detail.html:101
+#: manufacturing/templates/legal_compliance_list.html:86
+#: manufacturing/templates/legal_compliance_list.html:125
+#: manufacturing/templates/legal_contract_detail.html:55
+#: manufacturing/templates/legal_contract_detail.html:114
+#: manufacturing/templates/legal_contract_list.html:95
+#: manufacturing/templates/legal_contract_list.html:140
+#: manufacturing/templates/legal_dashboard.html:147
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:118
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:113
+#: manufacturing/templates/legal_ip_list.html:75
+#: manufacturing/templates/legal_ip_list.html:123
+#: manufacturing/templates/legal_litigation_detail.html:55
+#: manufacturing/templates/legal_litigation_detail.html:118
+#: manufacturing/templates/legal_litigation_list.html:93
+#: manufacturing/templates/legal_litigation_list.html:146
+#: manufacturing/templates/prod_dashboard.html:114
+msgid "Status"
+msgstr "Status"
+
+#: manufacturing/templates/legal_compliance_detail.html:58
+#: manufacturing/templates/legal_compliance_list.html:82
+msgid "Regulation"
+msgstr "Vorschrift"
+
+#: manufacturing/templates/legal_compliance_detail.html:62
+#: manufacturing/templates/legal_compliance_detail.html:97
+#: manufacturing/templates/legal_compliance_list.html:83
+#: manufacturing/templates/legal_compliance_list.html:121
+#: manufacturing/templates/legal_contract_detail.html:79
+#: manufacturing/templates/legal_contract_detail.html:134
+#: manufacturing/templates/legal_contract_list.html:94
+#: manufacturing/templates/legal_contract_list.html:160
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:134
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:129
+msgid "Owner"
+msgstr "Verantwortlicher"
+
+#: manufacturing/templates/legal_compliance_detail.html:66
+#: manufacturing/templates/legal_compliance_detail.html:109
+#: manufacturing/templates/legal_compliance_list.html:84
+#: manufacturing/templates/legal_compliance_list.html:133
+#: manufacturing/templates/prod_dashboard.html:113
+msgid "Due Date"
+msgstr "Fälligkeitsdatum"
+
+#: manufacturing/templates/legal_compliance_detail.html:70
+#: manufacturing/templates/legal_compliance_detail.html:113
+msgid "Completed Date"
+msgstr "Abschlussdatum"
+
+#: manufacturing/templates/legal_compliance_detail.html:75
+#: manufacturing/templates/legal_compliance_detail.html:117
+#: manufacturing/templates/legal_compliance_list.html:137
+#: manufacturing/templates/legal_contract_detail.html:84
+#: manufacturing/templates/legal_contract_detail.html:138
+#: manufacturing/templates/legal_contract_list.html:164
+#: manufacturing/templates/legal_employment_list.html:138
+#: manufacturing/templates/legal_governance_list.html:133
+#: manufacturing/templates/legal_ip_list.html:139
+#: manufacturing/templates/legal_litigation_detail.html:80
+#: manufacturing/templates/legal_litigation_detail.html:130
+#: manufacturing/templates/legal_litigation_list.html:154
+msgid "Notes"
+msgstr "Notizen"
+
+#: manufacturing/templates/legal_compliance_detail.html:84
+msgid "Edit Item"
+msgstr "Element bearbeiten"
+
+#: manufacturing/templates/legal_compliance_detail.html:89
+#: manufacturing/templates/legal_compliance_list.html:81
+#: manufacturing/templates/legal_compliance_list.html:113
+msgid "Requirement"
+msgstr "Anforderung"
+
+#: manufacturing/templates/legal_compliance_detail.html:93
+#: manufacturing/templates/legal_compliance_list.html:117
+msgid "Regulation / Standard"
+msgstr "Vorschrift / Norm"
+
+#: manufacturing/templates/legal_compliance_detail.html:121
+#: manufacturing/templates/legal_contract_detail.html:142
+#: manufacturing/templates/legal_litigation_detail.html:134
+msgid "Save Changes"
+msgstr "Änderungen speichern"
+
+#: manufacturing/templates/legal_compliance_list.html:10
+#: manufacturing/templates/legal_contract_list.html:10
+#: manufacturing/templates/legal_employment_list.html:10
+#: manufacturing/templates/legal_governance_list.html:10
+#: manufacturing/templates/legal_ip_list.html:10
+#: manufacturing/templates/legal_litigation_list.html:10
+msgid "IP"
+msgstr "IP"
+
+#: manufacturing/templates/legal_compliance_list.html:11
+#: manufacturing/templates/legal_contract_list.html:11
+#: manufacturing/templates/legal_employment_list.html:11
+#: manufacturing/templates/legal_governance_list.html:11
+#: manufacturing/templates/legal_ip_list.html:11
+#: manufacturing/templates/legal_litigation_list.html:11
+msgid "Employment"
+msgstr "Beschäftigung"
+
+#: manufacturing/templates/legal_compliance_list.html:12
+#: manufacturing/templates/legal_contract_list.html:12
+#: manufacturing/templates/legal_employment_list.html:12
+#: manufacturing/templates/legal_governance_list.html:12
+#: manufacturing/templates/legal_ip_list.html:12
+#: manufacturing/templates/legal_litigation_list.html:12
+msgid "Governance"
+msgstr "Governance"
+
+#: manufacturing/templates/legal_compliance_list.html:14
+#: manufacturing/templates/legal_contract_list.html:14
+#: manufacturing/templates/legal_litigation_list.html:14
+msgid "CSV"
+msgstr "CSV"
+
+#: manufacturing/templates/legal_compliance_list.html:15
+#: manufacturing/templates/legal_contract_list.html:15
+#: manufacturing/templates/legal_litigation_list.html:15
+msgid "Excel"
+msgstr "Excel"
+
+#: manufacturing/templates/legal_compliance_list.html:60
+msgid "Compliance Requirements"
+msgstr "Compliance-Anforderungen"
+
+#: manufacturing/templates/legal_compliance_list.html:67
+#: manufacturing/templates/legal_contract_list.html:68
+#: manufacturing/templates/legal_employment_list.html:59
+#: manufacturing/templates/legal_governance_list.html:59
+#: manufacturing/templates/legal_ip_list.html:60
+#: manufacturing/templates/legal_litigation_list.html:68
+msgid "All Statuses"
+msgstr "Alle Status"
+
+#: manufacturing/templates/legal_compliance_list.html:72
+msgid "Search requirement / regulation…"
+msgstr "Anforderung / Vorschrift suchen…"
+
+#: manufacturing/templates/legal_compliance_list.html:73
+#: manufacturing/templates/legal_contract_list.html:80
+#: manufacturing/templates/legal_employment_list.html:65
+#: manufacturing/templates/legal_governance_list.html:65
+#: manufacturing/templates/legal_ip_list.html:66
+#: manufacturing/templates/legal_litigation_list.html:80
+msgid "Filter"
+msgstr "Filtern"
+
+#: manufacturing/templates/legal_compliance_list.html:74
+#: manufacturing/templates/legal_contract_list.html:81
+#: manufacturing/templates/legal_employment_list.html:66
+#: manufacturing/templates/legal_governance_list.html:66
+#: manufacturing/templates/legal_ip_list.html:67
+#: manufacturing/templates/legal_litigation_list.html:81
+msgid "Clear"
+msgstr "Zurücksetzen"
+
+#: manufacturing/templates/legal_compliance_list.html:85
+#: manufacturing/templates/legal_dashboard.html:83
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+#: manufacturing/templates/legal_compliance_list.html:100
+msgid "No compliance items found."
+msgstr "Keine Compliance-Elemente gefunden."
+
+#: manufacturing/templates/legal_compliance_list.html:108
+msgid "New Compliance Item"
+msgstr "Neues Compliance-Element"
+
+#: manufacturing/templates/legal_compliance_list.html:118
+msgid "e.g. OSHA 29 CFR 1910"
+msgstr "z. B. OSHA 29 CFR 1910"
+
+#: manufacturing/templates/legal_compliance_list.html:141
+msgid "Add Item"
+msgstr "Element hinzufügen"
+
+#: manufacturing/templates/legal_contract_detail.html:3
+#, python-format
+msgid "Contract — %(title)s"
+msgstr "Vertrag — %(title)s"
+
+#: manufacturing/templates/legal_contract_detail.html:59
+#: manufacturing/templates/legal_contract_detail.html:106
+#: manufacturing/templates/legal_contract_list.html:90
+#: manufacturing/templates/legal_contract_list.html:132
+#: manufacturing/templates/legal_dashboard.html:144
+#: manufacturing/templates/legal_employment_list.html:73
+#: manufacturing/templates/legal_employment_list.html:106
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:107
+#: manufacturing/templates/legal_litigation_detail.html:59
+#: manufacturing/templates/legal_litigation_detail.html:106
+#: manufacturing/templates/legal_litigation_list.html:91
+#: manufacturing/templates/legal_litigation_list.html:134
+msgid "Type"
+msgstr "Typ"
+
+#: manufacturing/templates/legal_contract_detail.html:63
+#: manufacturing/templates/legal_contract_detail.html:102
+#: manufacturing/templates/legal_contract_list.html:89
+#: manufacturing/templates/legal_contract_list.html:128
+#: manufacturing/templates/legal_dashboard.html:143
+msgid "Counterparty"
+msgstr "Vertragspartner"
+
+#: manufacturing/templates/legal_contract_detail.html:67
+#: manufacturing/templates/legal_contract_list.html:91
+#: manufacturing/templates/legal_dashboard.html:145
+msgid "Value"
+msgstr "Wert"
+
+#: manufacturing/templates/legal_contract_detail.html:71
+#: manufacturing/templates/legal_contract_detail.html:126
+#: manufacturing/templates/legal_contract_list.html:152
+msgid "Start Date"
+msgstr "Startdatum"
+
+#: manufacturing/templates/legal_contract_detail.html:75
+#: manufacturing/templates/legal_contract_detail.html:130
+#: manufacturing/templates/legal_contract_list.html:156
+#: manufacturing/templates/legal_dashboard.html:146
+msgid "End Date"
+msgstr "Enddatum"
+
+#: manufacturing/templates/legal_contract_detail.html:93
+msgid "Edit Contract"
+msgstr "Vertrag bearbeiten"
+
+#: manufacturing/templates/legal_contract_detail.html:98
+#: manufacturing/templates/legal_contract_list.html:88
+#: manufacturing/templates/legal_contract_list.html:124
+#: manufacturing/templates/legal_dashboard.html:142
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:103
+msgid "Title"
+msgstr "Titel"
+
+#: manufacturing/templates/legal_contract_detail.html:122
+#: manufacturing/templates/legal_contract_list.html:148
+msgid "Value ($)"
+msgstr "Wert ($)"
+
+#: manufacturing/templates/legal_contract_list.html:74
+#: manufacturing/templates/legal_litigation_list.html:74
+msgid "All Types"
+msgstr "Alle Typen"
+
+#: manufacturing/templates/legal_contract_list.html:79
+msgid "Search title / party / owner…"
+msgstr "Titel / Partei / Verantwortlichen suchen…"
+
+#: manufacturing/templates/legal_contract_list.html:92
+msgid "Start"
+msgstr "Beginn"
+
+#: manufacturing/templates/legal_contract_list.html:93
+msgid "End"
+msgstr "Ende"
+
+#: manufacturing/templates/legal_contract_list.html:111
+#: manufacturing/templates/legal_dashboard.html:161
+msgid "No contracts found."
+msgstr "Keine Verträge gefunden."
+
+#: manufacturing/templates/legal_contract_list.html:119
+msgid "New Contract"
+msgstr "Neuer Vertrag"
+
+#: manufacturing/templates/legal_contract_list.html:168
+msgid "Create Contract"
+msgstr "Vertrag erstellen"
+
+#: manufacturing/templates/legal_dashboard.html:49
+#: manufacturing/templates/legal_ip_list.html:3
+#: manufacturing/templates/legal_ip_list.html:54
+msgid "Intellectual Property"
+msgstr "Geistiges Eigentum"
+
+#: manufacturing/templates/legal_dashboard.html:50
+#: manufacturing/templates/legal_employment_list.html:3
+#: manufacturing/templates/legal_employment_list.html:53
+msgid "Employment Law"
+msgstr "Arbeitsrecht"
+
+#: manufacturing/templates/legal_dashboard.html:51
+#: manufacturing/templates/legal_governance_list.html:3
+#: manufacturing/templates/legal_governance_list.html:53
+msgid "Corporate Governance"
+msgstr "Unternehmensführung"
+
+#: manufacturing/templates/legal_dashboard.html:52
+msgid "Risk Management"
+msgstr "Risikomanagement"
+
+#: manufacturing/templates/legal_dashboard.html:59
+msgid "Total Contracts"
+msgstr "Verträge gesamt"
+
+#: manufacturing/templates/legal_dashboard.html:63
+msgid "Active"
+msgstr "Aktiv"
+
+#: manufacturing/templates/legal_dashboard.html:67
+msgid "Draft"
+msgstr "Entwurf"
+
+#: manufacturing/templates/legal_dashboard.html:75
+msgid "Total Items"
+msgstr "Elemente gesamt"
+
+#: manufacturing/templates/legal_dashboard.html:79
+msgid "Pending"
+msgstr "Ausstehend"
+
+#: manufacturing/templates/legal_dashboard.html:91
+msgid "Total Cases"
+msgstr "Fälle gesamt"
+
+#: manufacturing/templates/legal_dashboard.html:95
+msgid "Open"
+msgstr "Offen"
+
+#: manufacturing/templates/legal_dashboard.html:99
+#: manufacturing/templates/legal_employment_list.html:74
+msgid "Closed"
+msgstr "Abgeschlossen"
+
+#: manufacturing/templates/legal_dashboard.html:106
+msgid "Contracts by Status"
+msgstr "Verträge nach Status"
+
+#: manufacturing/templates/legal_dashboard.html:110
+msgid "Contracts by Type"
+msgstr "Verträge nach Typ"
+
+#: manufacturing/templates/legal_dashboard.html:117
+msgid "Contract Value by Counterparty (top 8)"
+msgstr "Vertragswert nach Vertragspartner (Top 8)"
+
+#: manufacturing/templates/legal_dashboard.html:121
+msgid "Compliance Items by Status"
+msgstr "Compliance-Elemente nach Status"
+
+#: manufacturing/templates/legal_dashboard.html:128
+msgid "Litigation by Status"
+msgstr "Rechtsstreitigkeiten nach Status"
+
+#: manufacturing/templates/legal_dashboard.html:132
+msgid "Litigation by Case Type"
+msgstr "Rechtsstreitigkeiten nach Falltyp"
+
+#: manufacturing/templates/legal_dashboard.html:138
+msgid "Recent Contracts"
+msgstr "Aktuelle Verträge"
+
+#: manufacturing/templates/legal_employment_list.html:64
+msgid "Search matter / employee / owner…"
+msgstr "Fall / Mitarbeiter / Verantwortlichen suchen…"
+
+#: manufacturing/templates/legal_employment_list.html:73
+#: manufacturing/templates/legal_employment_list.html:102
+msgid "Matter"
+msgstr "Fall"
+
+#: manufacturing/templates/legal_employment_list.html:73
+#: manufacturing/templates/legal_employment_list.html:114
+msgid "Employee"
+msgstr "Mitarbeiter"
+
+#: manufacturing/templates/legal_employment_list.html:74
+msgid "Opened"
+msgstr "Eröffnet"
+
+#: manufacturing/templates/legal_employment_list.html:89
+msgid "No matters found."
+msgstr "Keine Fälle gefunden."
+
+#: manufacturing/templates/legal_employment_list.html:97
+msgid "New Matter"
+msgstr "Neuer Fall"
+
+#: manufacturing/templates/legal_employment_list.html:126
+msgid "Opened Date"
+msgstr "Eröffnungsdatum"
+
+#: manufacturing/templates/legal_employment_list.html:130
+msgid "Closed Date"
+msgstr "Abschlussdatum"
+
+#: manufacturing/templates/legal_employment_list.html:142
+msgid "Create Matter"
+msgstr "Fall erstellen"
+
+#: manufacturing/templates/legal_governance_list.html:64
+msgid "Search item / reference / owner…"
+msgstr "Element / Referenz / Verantwortlichen suchen…"
+
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:101
+msgid "Item"
+msgstr "Element"
+
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:105
+msgid "Category"
+msgstr "Kategorie"
+
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:121
+msgid "Reference"
+msgstr "Referenz"
+
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:125
+msgid "Ref. Date"
+msgstr "Referenzdatum"
+
+#: manufacturing/templates/legal_governance_list.html:88
+msgid "No governance items found."
+msgstr "Keine Governance-Elemente gefunden."
+
+#: manufacturing/templates/legal_governance_list.html:96
+msgid "New Governance Item"
+msgstr "Neues Governance-Element"
+
+#: manufacturing/templates/legal_governance_list.html:137
+msgid "Create Item"
+msgstr "Element erstellen"
+
+#: manufacturing/templates/legal_ip_list.html:65
+msgid "Search title / registration # / jurisdiction…"
+msgstr "Titel / Registrierungsnr. / Gerichtsbarkeit suchen…"
+
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:115
+msgid "Registration #"
+msgstr "Registrierungsnr."
+
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:119
+msgid "Jurisdiction"
+msgstr "Gerichtsbarkeit"
+
+#: manufacturing/templates/legal_ip_list.html:75
+#: manufacturing/templates/legal_ip_list.html:131
+#: manufacturing/templates/legal_litigation_detail.html:71
+#: manufacturing/templates/legal_litigation_detail.html:114
+#: manufacturing/templates/legal_litigation_list.html:142
+msgid "Filed Date"
+msgstr "Einreichungsdatum"
+
+#: manufacturing/templates/legal_ip_list.html:75
+#: manufacturing/templates/legal_ip_list.html:135
+msgid "Expiry Date"
+msgstr "Ablaufdatum"
+
+#: manufacturing/templates/legal_ip_list.html:90
+msgid "No IP records found."
+msgstr "Keine IP-Datensätze gefunden."
+
+#: manufacturing/templates/legal_ip_list.html:98
+msgid "New IP Record"
+msgstr "Neuer IP-Datensatz"
+
+#: manufacturing/templates/legal_ip_list.html:143
+msgid "Create IP Record"
+msgstr "IP-Datensatz erstellen"
+
+#: manufacturing/templates/legal_litigation_detail.html:3
+#, python-format
+msgid "Case — %(case_name)s"
+msgstr "Fall — %(case_name)s"
+
+#: manufacturing/templates/legal_litigation_detail.html:63
+#: manufacturing/templates/legal_litigation_detail.html:98
+#: manufacturing/templates/legal_litigation_list.html:89
+#: manufacturing/templates/legal_litigation_list.html:126
+msgid "Opposing Party"
+msgstr "Gegenpartei"
+
+#: manufacturing/templates/legal_litigation_detail.html:67
+#: manufacturing/templates/legal_litigation_detail.html:102
+#: manufacturing/templates/legal_litigation_list.html:90
+#: manufacturing/templates/legal_litigation_list.html:130
+msgid "Court"
+msgstr "Gericht"
+
+#: manufacturing/templates/legal_litigation_detail.html:75
+#: manufacturing/templates/legal_litigation_detail.html:126
+#: manufacturing/templates/legal_litigation_list.html:94
+msgid "Outcome"
+msgstr "Ergebnis"
+
+#: manufacturing/templates/legal_litigation_detail.html:89
+msgid "Edit Case"
+msgstr "Fall bearbeiten"
+
+#: manufacturing/templates/legal_litigation_detail.html:94
+#: manufacturing/templates/legal_litigation_list.html:88
+#: manufacturing/templates/legal_litigation_list.html:122
+msgid "Case Name"
+msgstr "Fallname"
+
+#: manufacturing/templates/legal_litigation_list.html:61
+msgid "Litigation Cases"
+msgstr "Rechtsstreitigkeiten"
+
+#: manufacturing/templates/legal_litigation_list.html:79
+msgid "Search case / party / court…"
+msgstr "Fall / Partei / Gericht suchen…"
+
+#: manufacturing/templates/legal_litigation_list.html:92
+msgid "Filed"
+msgstr "Eingereicht"
+
+#: manufacturing/templates/legal_litigation_list.html:109
+msgid "No cases found."
+msgstr "Keine Fälle gefunden."
+
+#: manufacturing/templates/legal_litigation_list.html:117
+msgid "New Case"
+msgstr "Neuer Fall"
+
+#: manufacturing/templates/legal_litigation_list.html:158
+msgid "Add Case"
+msgstr "Fall hinzufügen"
+
 #: manufacturing/templates/maint_dashboard.html:3
 #: manufacturing/templates/maint_dashboard.html:63
 msgid "Maintenance Dashboard"
@@ -468,7 +1089,7 @@ msgstr "Fällig"
 
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
-msgstr ""
+msgstr "Keine überfälligen oder in den nächsten 14 Tagen fälligen Wartungsaufgaben."
 "Keine überfälligen oder in den nächsten 14 Tagen fälligen Wartungsaufgaben."
 
 #: manufacturing/templates/maint_dashboard.html:96
@@ -620,14 +1241,6 @@ msgstr "Beschreibung"
 #: manufacturing/templates/prod_dashboard.html:112
 msgid "Product"
 msgstr "Produkt"
-
-#: manufacturing/templates/prod_dashboard.html:113
-msgid "Due Date"
-msgstr "Fälligkeitsdatum"
-
-#: manufacturing/templates/prod_dashboard.html:114
-msgid "Status"
-msgstr "Status"
 
 #: manufacturing/templates/prod_dashboard.html:127
 msgid "No work orders yet."

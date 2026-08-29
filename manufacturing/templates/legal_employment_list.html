@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Employment Law{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Employment Law" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/legal/" class="btn">Legal Dashboard</a>
-<a href="/legal/contracts/" class="btn">Contracts</a>
-<a href="/legal/compliance/" class="btn">Compliance</a>
-<a href="/legal/litigation/" class="btn">Litigation</a>
-<a href="/legal/ip/" class="btn">IP</a>
-<a href="/legal/employment/" class="btn">Employment</a>
-<a href="/legal/governance/" class="btn">Governance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/legal/" class="btn">{% trans "Legal Dashboard" %}</a>
+<a href="/legal/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/legal/compliance/" class="btn">{% trans "Compliance" %}</a>
+<a href="/legal/litigation/" class="btn">{% trans "Litigation" %}</a>
+<a href="/legal/ip/" class="btn">{% trans "IP" %}</a>
+<a href="/legal/employment/" class="btn">{% trans "Employment" %}</a>
+<a href="/legal/governance/" class="btn">{% trans "Governance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,28 +50,28 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Employment Law</h2>
+    <h2>{% trans "Employment Law" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search matter / employee / owner…">
-        <button type="submit">Filter</button>
-        <a href="/legal/employment/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search matter / employee / owner…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/legal/employment/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Matter</th><th>Type</th><th>Employee</th>
-                    <th>Opened</th><th>Closed</th><th>Owner</th><th>Status</th>
+                    <th>{% trans "Matter" %}</th><th>{% trans "Type" %}</th><th>{% trans "Employee" %}</th>
+                    <th>{% trans "Opened" %}</th><th>{% trans "Closed" %}</th><th>{% trans "Owner" %}</th><th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,7 +86,7 @@
                 <td><span class="badge s-{{ r.status|lower }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No matters found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No matters found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -93,16 +94,16 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Matter</h3>
+        <h3>{% trans "New Matter" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Matter *</label>
+                    <label>{% trans "Matter" %} *</label>
                     <input type="text" name="matter" required>
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="matter_type">
                         {% for t in matter_types %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -110,11 +111,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Employee</label>
+                    <label>{% trans "Employee" %}</label>
                     <input type="text" name="employee">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statuses %}
                         <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
@@ -122,23 +123,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Opened Date</label>
+                    <label>{% trans "Opened Date" %}</label>
                     <input type="date" name="opened_date">
                 </div>
                 <div class="form-group">
-                    <label>Closed Date</label>
+                    <label>{% trans "Closed Date" %}</label>
                     <input type="date" name="closed_date">
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Matter</button>
+            <button type="submit" class="btn-submit">{% trans "Create Matter" %}</button>
         </form>
     </div>
     {% endif %}

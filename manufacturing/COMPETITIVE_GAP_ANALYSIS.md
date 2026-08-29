@@ -3859,3 +3859,48 @@ seven templates and three languages out of ~450 total — but every template wit
 now has full language coverage, which is a meaningfully different (and arguably higher-value)
 milestone than "N templates done" alone. The department-by-department-dashboard-vs-full-department
 question raised in the previous entry is still open for whoever picks this thread up next.
+
+---
+
+**2026-08-29, whole department:** Answered the previous entry's own open question by picking a
+full department rather than another single dashboard — surveyed template filenames by prefix
+(IT: 17, Marketing: 13, Legal: 10) and picked **Legal**, the smallest, as the first "entire
+department" milestone: `legal_dashboard.html`, `legal_contract_list.html`/`_detail.html`,
+`legal_compliance_list.html`/`_detail.html`, `legal_litigation_list.html`/`_detail.html`,
+`legal_employment_list.html`, `legal_governance_list.html`, `legal_ip_list.html` — 10 templates,
+~1600 lines, none previously translated. Translated nav/toolbar labels, KPI labels, filter-bar
+labels/placeholders (including the `placeholder="{% trans '...' %}"` single-quote-inside-
+double-quote gotcha needed whenever `{% trans %}` sits inside an HTML attribute — caught by
+grepping for existing precedent in `home.html` before it became a live bug), table headers, detail
+field labels, and create/edit form labels/buttons across all 10; the three page titles that embed a
+record's own name (contract title, case name, compliance requirement) use `{% blocktrans %}` with a
+named variable. Left `contract.status`/`case.status`/etc. untranslated, matching the established
+precedent for raw DB enum values. `makemessages` (with the required `--ignore` flags) produced 25
+fuzzy matches and ~78 blank new entries across ~101 unique strings per language — by far the
+largest single batch in this series, expected given 10 files' worth of overlapping short field
+names ("Type," "Status," "Owner," "Notes"). Wrote a corrected fix script this time, informed by two
+earlier mistakes in this same series: never round-trip non-ASCII msgid text through
+`.encode().decode('unicode_escape')` (corrupted an arrow character two entries ago) and never
+regex-reconstruct a msgid at all (truncated a multi-line one at an escaped quote one entry ago) —
+several of this batch's strings contain em dashes and ellipses (`Contract — %(title)s`, `Search
+title / party / owner…`), so both prior bug classes were live risks here; used the raw
+regex-captured group directly with no decode step, and only ever replaced trailing `msgstr` lines.
+Zero fuzzy markers and zero blank entries remained afterward, confirmed programmatically, not just
+by spot-check. **Incidental find:** re-running `makemessages` surfaced that the Maintenance
+dashboard's `"No PM tasks overdue or due in the next 14 days."` string (added when §6.1's htmx set
+was translated) had sat with an empty `msgstr` in all three languages the entire time — that pass's
+own live-verification never exercised the empty-state branch, since the sample data always has PM
+alerts present. Fixed alongside the Legal work since it was cheap and already in front of us; a
+reminder that empty-state/error-state strings are easy to miss in this project's DB-driven
+verification approach specifically because they require deliberately empty data to trigger. Full
+suite 3431 passed (unchanged, template/locale-only work), `ruff check .` and `manage.py check`
+clean, `compilemessages` clean. Verified end-to-end against the real dev server for all three
+languages: logged in, navigated to all 10 Legal URLs (`/legal/`, `/legal/contracts/` + a contract
+detail page, `/legal/compliance/`, `/legal/litigation/`, `/legal/employment/`, `/legal/governance/`,
+`/legal/ip/`), switched languages via the real `/i18n/setlang/` endpoint, and confirmed every
+heading, toolbar label, KPI, table header, and form field renders correctly in Spanish, French, and
+German with real sample data. **Localization coverage is now 17 templates across three languages**
+(core shell + login + main dashboard + all 5 htmx templates + the full 10-template Legal
+department) out of ~450 total. Marketing (13 templates) or IT (17) would be the natural next
+"whole department" picks if this approach continues to be preferred over more individual
+dashboards.
