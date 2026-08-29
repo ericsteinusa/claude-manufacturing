@@ -3727,3 +3727,32 @@ signal" justification than Time Clock/Work Orders/Maintenance/Quality/Inventory 
 picks up this thread next should weigh whether continuing screen-by-screen is still the highest-
 value use of effort here versus one of this document's other partial gaps (i18n template coverage,
 htmx frontend coverage, CI-gated load testing).
+
+---
+
+**2026-08-29:** Picked "CI-gated load testing" (§6.13/§9.2, still 🟡 Partial) as the next gap, per
+direct instruction. Discovered mid-implementation that the underlying wiring was already done (PR
+#121, `.github/workflows/loadtest.yml`, a `workflow_dispatch` job matching this document's own
+"cheapest real improvement" recommendation exactly) — what was actually still missing was the
+"gated" half of "CI-gated": the job ran Locust, uploaded a report, and always succeeded regardless
+of the results, so nothing ever actually failed on a real regression. Rather than either leaving it
+as-is or making it a full per-PR gate (explicitly rejected elsewhere in this document as too slow/
+costly for this app's traffic profile), asked the user which extension they wanted; they chose
+adding pass/fail thresholds while keeping it manually-triggered. New `scripts/loadtest/
+check_thresholds.py` parses the `Aggregated` row of Locust's `results_stats.csv` and fails
+(exit 1) if the failure rate or p95 response time exceeds a configurable threshold (new
+`max_failure_rate`/`max_p95_ms` `workflow_dispatch` inputs, defaulting to 1% and 3000ms) — wired in
+as a new "Check regression thresholds" step in `loadtest.yml` right after the existing "Run load
+test" step, with the existing "Stop the dev server"/"Upload load test results" steps' `if: always()`
+guards already covering the new failure path correctly. Core threshold logic lives in a pure
+`evaluate()` function specifically so it has real unit coverage — 6 new tests in `tests/
+test_loadtest_check_thresholds.py` (within-threshold pass, failure-rate violation, p95 violation,
+both at once, zero-request division-by-zero guard, exact-threshold-is-not-a-violation boundary
+case). Verified against a real Locust run (started the dev server, ran `locustfile.py` directly for
+10s/3 users) that the script correctly passes real results and correctly fails when given an
+artificially tight `--max-p95-ms`. Full suite 3431 passed (3425 + 6), `ruff check .` (confirmed it
+actually lints `scripts/loadtest/`, not excluded) and `manage.py check` clean. §9.2's "CI-gated load
+testing" row moves from 🟡 Partial (real script, manual trigger, never fails) to a more complete
+🟡 Partial (manual trigger, now actually gates on regression) — still not per-PR by design, so not
+promoted to ✅ Full; that would require revisiting the per-PR-cost tradeoff this document has
+already argued against twice.
