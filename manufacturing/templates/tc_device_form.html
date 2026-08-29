@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-
-{% block page_title %}{% if is_new %}Add Time Clock{% else %}Edit Time Clock{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if is_new %}{% trans "Add Time Clock" %}{% else %}{% trans "Edit Time Clock" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
 {% if not is_new %}
-<a href="/time-clock/devices/" class="btn">All Devices</a>
+<a href="/time-clock/devices/" class="btn">{% trans "All Devices" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -63,7 +63,7 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">{% if is_new %}Add Time Clock Device{% else %}{{ form.name }}{% endif %}</div>
+    <div class="menu-title">{% if is_new %}{% trans "Add Time Clock Device" %}{% else %}{{ form.name }}{% endif %}</div>
     <div class="tcf-wrap">
 
         {% if error %}<div class="tcf-err">{{ error }}</div>{% endif %}
@@ -74,111 +74,111 @@
 
                 <!-- ── Step 1: What type of time clock? ── -->
                 <div class="tcf-row">
-                    <label for="id_device_type">What type of time clock is this?</label>
+                    <label for="id_device_type">{% trans "What type of time clock is this?" %}</label>
                     <select id="id_device_type" name="device_type" onchange="onTypeChange(this.value)" required>
-                        <option value="">— select a type —</option>
-                        <option value="csv"       {% if form.device_type == 'csv' %}selected{% endif %}>CSV File Import — clock exports a CSV to a shared folder</option>
-                        <option value="http_rest" {% if form.device_type == 'http_rest' %}selected{% endif %}>HTTP REST API — clock has a web API you can poll</option>
-                        <option value="zkteco"    {% if form.device_type == 'zkteco' %}selected{% endif %}>ZKTeco Terminal — fingerprint / badge terminal (TCP port 4370)</option>
-                        <option value="manual"    {% if form.device_type == 'manual' %}selected{% endif %}>Manual Entry — punches entered via the web UI (no polling)</option>
+                        <option value="">{% trans "— select a type —" %}</option>
+                        <option value="csv"       {% if form.device_type == 'csv' %}selected{% endif %}>{% trans "CSV File Import — clock exports a CSV to a shared folder" %}</option>
+                        <option value="http_rest" {% if form.device_type == 'http_rest' %}selected{% endif %}>{% trans "HTTP REST API — clock has a web API you can poll" %}</option>
+                        <option value="zkteco"    {% if form.device_type == 'zkteco' %}selected{% endif %}>{% trans "ZKTeco Terminal — fingerprint / badge terminal (TCP port 4370)" %}</option>
+                        <option value="manual"    {% if form.device_type == 'manual' %}selected{% endif %}>{% trans "Manual Entry — punches entered via the web UI (no polling)" %}</option>
                     </select>
                 </div>
 
                 <!-- ── Step 2: Name + Location (always shown once type chosen) ── -->
                 <div id="section-basic" class="tcf-section {% if form.device_type %}visible{% endif %}">
-                    <div class="tcf-section-title">Device Info</div>
+                    <div class="tcf-section-title">{% trans "Device Info" %}</div>
                     <div class="tcf-row">
-                        <label for="id_name">Device Name *</label>
+                        <label for="id_name">{% trans "Device Name" %} *</label>
                         <input type="text" id="id_name" name="name"
                                value="{{ form.name|default:'' }}"
-                               placeholder="e.g. Front Door Clock" required>
+                               placeholder="{% trans 'e.g. Front Door Clock' %}" required>
                     </div>
                     <div class="tcf-row">
-                        <label for="id_location">Location</label>
+                        <label for="id_location">{% trans "Location" %}</label>
                         <input type="text" id="id_location" name="location"
                                value="{{ form.location|default:'' }}"
-                               placeholder="e.g. Main Entrance">
+                               placeholder="{% trans 'e.g. Main Entrance' %}">
                     </div>
                     {% if not is_new %}
                     <div class="tcf-row" style="display:flex;align-items:center;gap:8px;">
                         <input type="checkbox" id="id_enabled" name="enabled"
                                {% if form.enabled %}checked{% endif %} style="width:auto;">
-                        <label for="id_enabled" style="margin:0;color:#333;font-size:13px;">Enabled</label>
+                        <label for="id_enabled" style="margin:0;color:#333;font-size:13px;">{% trans "Enabled" %}</label>
                     </div>
                     {% endif %}
                 </div>
 
                 <!-- ── CSV config ── -->
                 <div id="section-csv" class="tcf-section {% if form.device_type == 'csv' %}visible{% endif %}">
-                    <div class="tcf-section-title">CSV Configuration</div>
+                    <div class="tcf-section-title">{% trans "CSV Configuration" %}</div>
                     <div class="tcf-row">
-                        <label>CSV File Path</label>
+                        <label>{% trans "CSV File Path" %}</label>
                         <input type="text" id="csv_file_path" name="csv_file_path"
                                placeholder="/shared/timeclock/punches.csv">
                         <div class="tcf-hint">
-                            The server-side path to the CSV the clock writes.<br>
-                            Expected columns: <code>employee_id, datetime, direction</code>
+                            {% trans "The server-side path to the CSV the clock writes." %}<br>
+                            {% trans "Expected columns:" %} <code>employee_id, datetime, direction</code>
                         </div>
                     </div>
                 </div>
 
                 <!-- ── HTTP REST config ── -->
                 <div id="section-http_rest" class="tcf-section {% if form.device_type == 'http_rest' %}visible{% endif %}">
-                    <div class="tcf-section-title">HTTP REST Configuration</div>
+                    <div class="tcf-section-title">{% trans "HTTP REST Configuration" %}</div>
                     <div class="tcf-row">
-                        <label>Base URL</label>
+                        <label>{% trans "Base URL" %}</label>
                         <input type="text" id="http_base_url" name="http_base_url"
                                placeholder="http://192.168.1.50">
                     </div>
                     <div class="tcf-row">
-                        <label>API Endpoint</label>
+                        <label>{% trans "API Endpoint" %}</label>
                         <input type="text" id="http_endpoint" name="http_endpoint"
                                placeholder="/api/punches" value="/api/punches">
                     </div>
                     <div class="tcf-row">
-                        <label>API Key (optional)</label>
+                        <label>{% trans "API Key (optional)" %}</label>
                         <input type="text" id="http_api_key" name="http_api_key"
-                               placeholder="Bearer token or key">
+                               placeholder="{% trans 'Bearer token or key' %}">
                     </div>
                     <div class="tcf-hint">
-                        Response must be a JSON array:
+                        {% trans "Response must be a JSON array:" %}
                         <code>[{"employee_id":1001,"datetime":"2026-06-21 08:05:00","direction":"in"},...]</code>
                     </div>
                 </div>
 
                 <!-- ── ZKTeco config ── -->
                 <div id="section-zkteco" class="tcf-section {% if form.device_type == 'zkteco' %}visible{% endif %}">
-                    <div class="tcf-section-title">ZKTeco Terminal Configuration</div>
+                    <div class="tcf-section-title">{% trans "ZKTeco Terminal Configuration" %}</div>
                     <div class="tcf-row">
-                        <label>IP Address</label>
+                        <label>{% trans "IP Address" %}</label>
                         <input type="text" id="id_ip_address" name="ip_address"
                                value="{{ form.ip_address|default:'' }}"
                                placeholder="192.168.1.100">
                     </div>
                     <div class="tcf-row">
-                        <label>Port</label>
+                        <label>{% trans "Port" %}</label>
                         <input type="number" id="id_port" name="port"
                                value="{{ form.port|default:'4370' }}"
                                placeholder="4370">
                     </div>
                     <div class="tcf-row">
-                        <label>Device Password (usually 0)</label>
+                        <label>{% trans "Device Password (usually 0)" %}</label>
                         <input type="text" id="zk_password" name="zk_password"
                                placeholder="0">
                     </div>
                     <div class="tcf-hint">
-                        Requires <code>pip install pyzk</code> on the server.
-                        The terminal must be on the same network as the server.
+                        {% blocktrans %}Requires <code>pip install pyzk</code> on the server.
+                        The terminal must be on the same network as the server.{% endblocktrans %}
                     </div>
                 </div>
 
                 <!-- ── Manual: no extra config ── -->
                 <div id="section-manual" class="tcf-section {% if form.device_type == 'manual' %}visible{% endif %}">
-                    <div class="tcf-section-title">Manual Entry</div>
+                    <div class="tcf-section-title">{% trans "Manual Entry" %}</div>
                     <p style="font-size:13px;color:#555;margin:0;">
-                        No connection needed. Employees punch in and out via the
+                        {% blocktrans %}No connection needed. Employees punch in and out via the
                         web Time Clock page. Use "Poll Now" on the device to confirm
-                        (it will always return 0 records).
+                        (it will always return 0 records).{% endblocktrans %}
                     </p>
                 </div>
 
@@ -189,9 +189,9 @@
 
             <div class="tcf-btns">
                 <button type="submit" class="btn" style="padding:8px 24px;font-size:14px;font-weight:bold;">
-                    {% if is_new %}Add Device{% else %}Save Changes{% endif %}
+                    {% if is_new %}{% trans "Add Device" %}{% else %}{% trans "Save Changes" %}{% endif %}
                 </button>
-                <a href="{{ back_url }}" class="btn" style="padding:8px 18px;">Cancel</a>
+                <a href="{{ back_url }}" class="btn" style="padding:8px 18px;">{% trans "Cancel" %}</a>
             </div>
 
         </form>
@@ -201,7 +201,7 @@
               style="margin-top:10px;"
               onsubmit="return confirm('Delete this device and all sync history?')">
             {% csrf_token %}
-            <button type="submit" class="tcf-del">Delete Device</button>
+            <button type="submit" class="tcf-del">{% trans "Delete Device" %}</button>
         </form>
         {% endif %}
 
@@ -209,25 +209,25 @@
         {% if not is_new %}
         <div style="margin-top:28px;">
             <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;">
-                <div class="menu-title" style="font-size:16px;margin:0;">Sync History</div>
+                <div class="menu-title" style="font-size:16px;margin:0;">{% trans "Sync History" %}</div>
                 <form method="post" action="/time-clock/devices/{{ device_id }}/poll/">
                     {% csrf_token %}
-                    <button type="submit" class="btn" style="padding:5px 14px;font-size:13px;">Poll Now</button>
+                    <button type="submit" class="btn" style="padding:5px 14px;font-size:13px;">{% trans "Poll Now" %}</button>
                 </form>
             </div>
             {% if sync_log %}
             <table class="tcl-table">
                 <thead>
-                    <tr><th>When</th><th>Status</th><th>Records</th><th>Message</th></tr>
+                    <tr><th>{% trans "When" %}</th><th>{% trans "Status" %}</th><th>{% trans "Records" %}</th><th>{% trans "Message" %}</th></tr>
                 </thead>
                 <tbody>
                     {% for entry in sync_log %}
                     <tr>
                         <td>{{ entry.synced_at }}</td>
                         <td>
-                            {% if entry.status == 'ok' %}<span class="badge-ok">OK</span>
-                            {% elif entry.status == 'error' %}<span class="badge-err">Error</span>
-                            {% else %}<span class="badge-par">Partial</span>{% endif %}
+                            {% if entry.status == 'ok' %}<span class="badge-ok">{% trans "OK" %}</span>
+                            {% elif entry.status == 'error' %}<span class="badge-err">{% trans "Error" %}</span>
+                            {% else %}<span class="badge-par">{% trans "Partial" %}</span>{% endif %}
                         </td>
                         <td>{{ entry.records_imported }}</td>
                         <td style="color:#900;font-size:11px;">{{ entry.error_msg|default:"" }}</td>
@@ -236,7 +236,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color:white;font-size:13px;">No sync history yet. Click "Poll Now" to test the connection.</p>
+            <p style="color:white;font-size:13px;">{% trans 'No sync history yet. Click "Poll Now" to test the connection.' %}</p>
             {% endif %}
         </div>
         {% endif %}

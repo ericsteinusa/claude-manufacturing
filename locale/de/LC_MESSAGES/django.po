@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 23:11+0000\n"
+"POT-Creation-Date: 2026-08-29 23:33+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -70,6 +70,11 @@ msgstr "Berichte"
 #: manufacturing/templates/prod_dashboard.html:67
 #: manufacturing/templates/report_builder_list.html:8
 #: manufacturing/templates/reports_dashboard.html:11
+#: manufacturing/templates/tc_ot_report.html:9
+#: manufacturing/templates/tc_schedule.html:10
+#: manufacturing/templates/time_clock_attendance.html:7
+#: manufacturing/templates/time_clock_hours.html:7
+#: manufacturing/templates/time_clock_status.html:9
 msgid "Home"
 msgstr "Startseite"
 
@@ -238,6 +243,10 @@ msgid "Personnel"
 msgstr "Personal"
 
 #: manufacturing/templates/base.html:544
+#: manufacturing/templates/tc_ot_report.html:6
+#: manufacturing/templates/tc_schedule.html:6
+#: manufacturing/templates/time_clock_status.html:3
+#: manufacturing/templates/time_clock_status.html:57
 msgid "Time Clock"
 msgstr "Zeiterfassung"
 
@@ -570,6 +579,9 @@ msgstr "Rechtsstreitigkeiten"
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:41
 #: manufacturing/templates/prod_dashboard.html:114
+#: manufacturing/templates/tc_device_form.html:221
+#: manufacturing/templates/tc_device_list.html:45
+#: manufacturing/templates/time_clock_attendance.html:89
 msgid "Status"
 msgstr "Status"
 
@@ -682,6 +694,7 @@ msgstr "Vorschrift / Norm"
 #: manufacturing/templates/mkt_content_detail.html:138
 #: manufacturing/templates/mkt_lead_detail.html:135
 #: manufacturing/templates/mkt_research_detail.html:157
+#: manufacturing/templates/tc_device_form.html:192
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -834,6 +847,7 @@ msgstr "Vertrag — %(title)s"
 #: manufacturing/templates/mkt_research_detail.html:112
 #: manufacturing/templates/mkt_research_list.html:90
 #: manufacturing/templates/mkt_research_list.html:128
+#: manufacturing/templates/tc_device_list.html:42
 msgid "Type"
 msgstr "Typ"
 
@@ -1058,6 +1072,8 @@ msgstr "Fall"
 #: manufacturing/templates/payroll_pay_rates.html:148
 #: manufacturing/templates/payroll_run_detail.html:65
 #: manufacturing/templates/payroll_ytd.html:55
+#: manufacturing/templates/tc_ot_report.html:112
+#: manufacturing/templates/time_clock_attendance.html:84
 msgid "Employee"
 msgstr "Mitarbeiter"
 
@@ -1491,6 +1507,8 @@ msgstr "Budget"
 #: manufacturing/templates/mkt_analytics.html:148
 #: manufacturing/templates/mkt_analytics.html:162
 #: manufacturing/templates/reports_dashboard.html:229
+#: manufacturing/templates/time_clock_attendance.html:77
+#: manufacturing/templates/time_clock_hours.html:84
 msgid "Total"
 msgstr "Gesamt"
 
@@ -1557,6 +1575,7 @@ msgstr "Aktuelle Kampagnen"
 #: manufacturing/templates/payroll_deductions.html:56
 #: manufacturing/templates/payroll_deductions.html:83
 #: manufacturing/templates/report_builder_list.html:20
+#: manufacturing/templates/tc_device_list.html:40
 msgid "Name"
 msgstr "Name"
 
@@ -2189,6 +2208,7 @@ msgstr "Nach Mitarbeiter filtern:"
 
 #: manufacturing/templates/payroll_deductions.html:109
 #: manufacturing/templates/payroll_ytd.html:42
+#: manufacturing/templates/tc_ot_report.html:57
 msgid "All Employees"
 msgstr "Alle Mitarbeiter"
 
@@ -2225,6 +2245,7 @@ msgid "Deduction Type"
 msgstr "Abzugsart"
 
 #: manufacturing/templates/payroll_deductions.html:185
+#, python-format
 msgid "Amount ($/%%)"
 msgstr "Betrag ($/%%)"
 
@@ -2301,6 +2322,7 @@ msgstr "Gültig ab"
 #: manufacturing/templates/payroll_pay_rates.html:87
 #: manufacturing/templates/report_builder_detail.html:7
 #: manufacturing/templates/report_builder_list.html:37
+#: manufacturing/templates/tc_device_list.html:72
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -2325,6 +2347,7 @@ msgid "Remove Rate"
 msgstr "Satz entfernen"
 
 #: manufacturing/templates/payroll_pay_rates.html:131
+#: manufacturing/templates/tc_device_form.html:194
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -2405,7 +2428,9 @@ msgstr "GESAMT"
 
 #: manufacturing/templates/payroll_run_detail.html:100
 msgid "Click a row to view that employee's pay stub."
-msgstr "Klicken Sie auf eine Zeile, um die Gehaltsabrechnung dieses Mitarbeiters anzuzeigen."
+msgstr ""
+"Klicken Sie auf eine Zeile, um die Gehaltsabrechnung dieses Mitarbeiters "
+"anzuzeigen."
 
 #: manufacturing/templates/payroll_run_detail.html:102
 msgid "No entries for this run."
@@ -2422,7 +2447,13 @@ msgid ""
 "            Salaried employees are paid their annual rate divided by the\n"
 "            number of pay periods per year for the frequency chosen below.\n"
 "            Only employees with a pay rate on file are included."
-msgstr "Stundenlöhner werden auf Basis der tatsächlich erfassten Arbeitsstunden für diesen Zeitraum bezahlt (reguläre Stunden + Überstunden, gleiche Aufteilung wie im Zeiterfassungs-Überstundenbericht). Gehaltsempfänger erhalten ihren Jahressatz geteilt durch die Anzahl der Zahlungszeiträume pro Jahr für die unten gewählte Häufigkeit. Es werden nur Mitarbeiter mit hinterlegtem Gehaltssatz berücksichtigt."
+msgstr ""
+"Stundenlöhner werden auf Basis der tatsächlich erfassten Arbeitsstunden für "
+"diesen Zeitraum bezahlt (reguläre Stunden + Überstunden, gleiche Aufteilung "
+"wie im Zeiterfassungs-Überstundenbericht). Gehaltsempfänger erhalten ihren "
+"Jahressatz geteilt durch die Anzahl der Zahlungszeiträume pro Jahr für die "
+"unten gewählte Häufigkeit. Es werden nur Mitarbeiter mit hinterlegtem "
+"Gehaltssatz berücksichtigt."
 
 #: manufacturing/templates/payroll_run_new.html:46
 msgid "Pay Period Start"
@@ -2579,6 +2610,7 @@ msgid "Runs"
 msgstr "Läufe"
 
 #: manufacturing/templates/payroll_ytd.html:95
+#, python-format
 msgid "%(counter)s employee"
 msgid_plural "%(counter)s employees"
 msgstr[0] "%(counter)s Mitarbeiter"
@@ -2599,6 +2631,7 @@ msgstr "Keine Lohndaten für %(year)s gefunden."
 
 #: manufacturing/templates/prod_dashboard.html:7
 #: manufacturing/templates/report_builder_list.html:23
+#: manufacturing/templates/tc_schedule.html:3
 msgid "Schedule"
 msgstr "Zeitplan"
 
@@ -2713,6 +2746,11 @@ msgstr "Niedriger Bestand"
 #: manufacturing/templates/report_builder_form.html:6
 #: manufacturing/templates/report_builder_list.html:6
 #: manufacturing/templates/reports_dashboard.html:7
+#: manufacturing/templates/tc_device_form.html:6
+#: manufacturing/templates/tc_device_list.html:6
+#: manufacturing/templates/time_clock_attendance.html:6
+#: manufacturing/templates/time_clock_hours.html:6
+#: manufacturing/templates/time_clock_status.html:6
 msgid "Back"
 msgstr "Zurück"
 
@@ -2755,6 +2793,7 @@ msgstr ""
 "aber nicht gesendet."
 
 #: manufacturing/templates/report_builder_detail.html:62
+#: manufacturing/templates/tc_device_form.html:106
 msgid "Enabled"
 msgstr "Aktiviert"
 
@@ -2987,6 +3026,7 @@ msgid "Reorder At"
 msgstr "Meldebestand"
 
 #: manufacturing/templates/reports_dashboard.html:241
+#: manufacturing/templates/time_clock_hours.html:45
 msgid "Today"
 msgstr "Heute"
 
@@ -3017,3 +3057,437 @@ msgstr "Kein Plan für diese Schicht festgelegt"
 #: manufacturing/templates/sf_tv_grid.html:28
 msgid "No active workcenters found."
 msgstr "Keine aktiven Arbeitsplätze gefunden."
+
+#: manufacturing/templates/tc_device_form.html:3
+msgid "Add Time Clock"
+msgstr "Stempeluhr hinzufügen"
+
+#: manufacturing/templates/tc_device_form.html:3
+msgid "Edit Time Clock"
+msgstr "Stempeluhr bearbeiten"
+
+#: manufacturing/templates/tc_device_form.html:8
+msgid "All Devices"
+msgstr "Alle Geräte"
+
+#: manufacturing/templates/tc_device_form.html:66
+msgid "Add Time Clock Device"
+msgstr "Stempeluhr-Gerät hinzufügen"
+
+#: manufacturing/templates/tc_device_form.html:77
+msgid "What type of time clock is this?"
+msgstr "Um welchen Stempeluhrtyp handelt es sich?"
+
+#: manufacturing/templates/tc_device_form.html:79
+msgid "— select a type —"
+msgstr "— Typ auswählen —"
+
+#: manufacturing/templates/tc_device_form.html:80
+msgid "CSV File Import — clock exports a CSV to a shared folder"
+msgstr "CSV-Dateiimport — die Uhr exportiert eine CSV-Datei in einen freigegebenen Ordner"
+
+#: manufacturing/templates/tc_device_form.html:81
+msgid "HTTP REST API — clock has a web API you can poll"
+msgstr "HTTP-REST-API — die Uhr verfügt über eine Web-API, die abgefragt werden kann"
+
+#: manufacturing/templates/tc_device_form.html:82
+msgid "ZKTeco Terminal — fingerprint / badge terminal (TCP port 4370)"
+msgstr "ZKTeco-Terminal — Fingerabdruck-/Ausweisterminal (TCP-Port 4370)"
+
+#: manufacturing/templates/tc_device_form.html:83
+msgid "Manual Entry — punches entered via the web UI (no polling)"
+msgstr "Manuelle Eingabe — Stempelungen werden über die Weboberfläche erfasst (keine Abfrage)"
+
+#: manufacturing/templates/tc_device_form.html:89
+msgid "Device Info"
+msgstr "Geräteinformationen"
+
+#: manufacturing/templates/tc_device_form.html:91
+msgid "Device Name"
+msgstr "Gerätename"
+
+#: manufacturing/templates/tc_device_form.html:94
+msgid "e.g. Front Door Clock"
+msgstr "z. B. Stempeluhr Haupteingang"
+
+#: manufacturing/templates/tc_device_form.html:97
+#: manufacturing/templates/tc_device_list.html:41
+msgid "Location"
+msgstr "Standort"
+
+#: manufacturing/templates/tc_device_form.html:100
+msgid "e.g. Main Entrance"
+msgstr "z. B. Haupteingang"
+
+#: manufacturing/templates/tc_device_form.html:113
+msgid "CSV Configuration"
+msgstr "CSV-Konfiguration"
+
+#: manufacturing/templates/tc_device_form.html:115
+msgid "CSV File Path"
+msgstr "CSV-Dateipfad"
+
+#: manufacturing/templates/tc_device_form.html:119
+msgid "The server-side path to the CSV the clock writes."
+msgstr "Der serverseitige Pfad zur CSV-Datei, die die Uhr schreibt."
+
+#: manufacturing/templates/tc_device_form.html:120
+msgid "Expected columns:"
+msgstr "Erwartete Spalten:"
+
+#: manufacturing/templates/tc_device_form.html:127
+msgid "HTTP REST Configuration"
+msgstr "HTTP-REST-Konfiguration"
+
+#: manufacturing/templates/tc_device_form.html:129
+msgid "Base URL"
+msgstr "Basis-URL"
+
+#: manufacturing/templates/tc_device_form.html:134
+msgid "API Endpoint"
+msgstr "API-Endpunkt"
+
+#: manufacturing/templates/tc_device_form.html:139
+msgid "API Key (optional)"
+msgstr "API-Schlüssel (optional)"
+
+#: manufacturing/templates/tc_device_form.html:141
+msgid "Bearer token or key"
+msgstr "Bearer-Token oder Schlüssel"
+
+#: manufacturing/templates/tc_device_form.html:144
+msgid "Response must be a JSON array:"
+msgstr "Die Antwort muss ein JSON-Array sein:"
+
+#: manufacturing/templates/tc_device_form.html:151
+msgid "ZKTeco Terminal Configuration"
+msgstr "ZKTeco-Terminal-Konfiguration"
+
+#: manufacturing/templates/tc_device_form.html:153
+#: manufacturing/templates/tc_device_list.html:43
+msgid "IP Address"
+msgstr "IP-Adresse"
+
+#: manufacturing/templates/tc_device_form.html:159
+msgid "Port"
+msgstr "Port"
+
+#: manufacturing/templates/tc_device_form.html:165
+msgid "Device Password (usually 0)"
+msgstr "Gerätepasswort (normalerweise 0)"
+
+#: manufacturing/templates/tc_device_form.html:170
+msgid ""
+"Requires <code>pip install pyzk</code> on the server.\n"
+"                        The terminal must be on the same network as the "
+"server."
+msgstr "Erfordert <code>pip install pyzk</code> auf dem Server. Das Terminal muss sich im selben Netzwerk wie der Server befinden."
+
+#: manufacturing/templates/tc_device_form.html:177
+msgid "Manual Entry"
+msgstr "Manuelle Eingabe"
+
+#: manufacturing/templates/tc_device_form.html:179
+msgid ""
+"No connection needed. Employees punch in and out via the\n"
+"                        web Time Clock page. Use \"Poll Now\" on the device "
+"to confirm\n"
+"                        (it will always return 0 records)."
+msgstr "Keine Verbindung erforderlich. Mitarbeiter stempeln über die Web-Zeiterfassungsseite ein und aus. Verwenden Sie \"Jetzt abfragen\" am Gerät zur Bestätigung (es werden immer 0 Datensätze zurückgegeben)."
+
+#: manufacturing/templates/tc_device_form.html:192
+#: manufacturing/templates/tc_device_list.html:7
+msgid "Add Device"
+msgstr "Gerät hinzufügen"
+
+#: manufacturing/templates/tc_device_form.html:204
+msgid "Delete Device"
+msgstr "Gerät löschen"
+
+#: manufacturing/templates/tc_device_form.html:212
+msgid "Sync History"
+msgstr "Synchronisierungshistorie"
+
+#: manufacturing/templates/tc_device_form.html:215
+msgid "Poll Now"
+msgstr "Jetzt abfragen"
+
+#: manufacturing/templates/tc_device_form.html:221
+msgid "When"
+msgstr "Wann"
+
+#: manufacturing/templates/tc_device_form.html:221
+msgid "Records"
+msgstr "Datensätze"
+
+#: manufacturing/templates/tc_device_form.html:221
+msgid "Message"
+msgstr "Nachricht"
+
+#: manufacturing/templates/tc_device_form.html:228
+#: manufacturing/templates/tc_device_list.html:61
+msgid "OK"
+msgstr "OK"
+
+#: manufacturing/templates/tc_device_form.html:229
+#: manufacturing/templates/tc_device_list.html:63
+msgid "Error"
+msgstr "Fehler"
+
+#: manufacturing/templates/tc_device_form.html:230
+#: manufacturing/templates/tc_device_list.html:65
+msgid "Partial"
+msgstr "Teilweise"
+
+#: manufacturing/templates/tc_device_form.html:239
+msgid "No sync history yet. Click \"Poll Now\" to test the connection."
+msgstr "Noch keine Synchronisierungshistorie. Klicken Sie auf \"Jetzt abfragen\", um die Verbindung zu testen."
+
+#: manufacturing/templates/tc_device_list.html:3
+#: manufacturing/templates/tc_device_list.html:34
+msgid "Time Clock Devices"
+msgstr "Stempeluhr-Geräte"
+
+#: manufacturing/templates/tc_device_list.html:44
+msgid "Last Sync"
+msgstr "Letzte Synchronisierung"
+
+#: manufacturing/templates/tc_device_list.html:46
+msgid "Actions"
+msgstr "Aktionen"
+
+#: manufacturing/templates/tc_device_list.html:56
+msgid "Never"
+msgstr "Nie"
+
+#: manufacturing/templates/tc_device_list.html:59
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+#: manufacturing/templates/tc_device_list.html:76
+msgid "Poll"
+msgstr "Abfragen"
+
+#: manufacturing/templates/tc_device_list.html:85
+msgid "No time clock devices registered yet."
+msgstr "Noch keine Stempeluhr-Geräte registriert."
+
+#: manufacturing/templates/tc_device_list.html:85
+msgid "Add one."
+msgstr "Eines hinzufügen."
+
+#: manufacturing/templates/tc_ot_report.html:3
+msgid "Overtime Report"
+msgstr "Überstundenbericht"
+
+#: manufacturing/templates/tc_ot_report.html:7
+#: manufacturing/templates/tc_schedule.html:7
+#: manufacturing/templates/time_clock_status.html:8
+msgid "Attendance"
+msgstr "Anwesenheit"
+
+#: manufacturing/templates/tc_ot_report.html:8
+#: manufacturing/templates/time_clock_hours.html:3
+#: manufacturing/templates/time_clock_hours.html:39
+#: manufacturing/templates/time_clock_status.html:7
+msgid "My Hours"
+msgstr "Meine Stunden"
+
+#: manufacturing/templates/tc_ot_report.html:45
+msgid "Overtime Reports"
+msgstr "Überstundenberichte"
+
+#: manufacturing/templates/tc_ot_report.html:49
+#: manufacturing/templates/tc_schedule.html:50
+msgid "to"
+msgstr "bis"
+
+#: manufacturing/templates/tc_ot_report.html:51
+msgid "Apply"
+msgstr "Anwenden"
+
+#: manufacturing/templates/tc_ot_report.html:52
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: manufacturing/templates/tc_ot_report.html:59
+msgid "My OT"
+msgstr "Meine Überstunden"
+
+#: manufacturing/templates/tc_ot_report.html:66
+#: manufacturing/templates/tc_ot_report.html:114
+#: manufacturing/templates/tc_schedule.html:78
+msgid "Total Hours"
+msgstr "Gesamtstunden"
+
+#: manufacturing/templates/tc_ot_report.html:70
+#: manufacturing/templates/tc_ot_report.html:89
+#: manufacturing/templates/tc_ot_report.html:115
+msgid "Overtime"
+msgstr "Überstunden"
+
+#: manufacturing/templates/tc_ot_report.html:74
+msgid "Daily OT Accum."
+msgstr "Tägl. Überstd.-Summe"
+
+#: manufacturing/templates/tc_ot_report.html:78
+msgid "Weekly OT Accum."
+msgstr "Wöchentl. Überstd.-Summe"
+
+#: manufacturing/templates/tc_ot_report.html:83
+msgid "Daily Breakdown"
+msgstr "Tägliche Aufschlüsselung"
+
+#: manufacturing/templates/tc_ot_report.html:87
+#: manufacturing/templates/tc_schedule.html:76
+#: manufacturing/templates/time_clock_attendance.html:58
+#: manufacturing/templates/time_clock_hours.html:60
+msgid "Date"
+msgstr "Datum"
+
+#: manufacturing/templates/tc_ot_report.html:88
+msgid "Hours Worked"
+msgstr "Gearbeitete Stunden"
+
+#: manufacturing/templates/tc_ot_report.html:100
+msgid "No entries for this period."
+msgstr "Keine Einträge für diesen Zeitraum."
+
+#: manufacturing/templates/tc_ot_report.html:108
+msgid "OT Summary — All Employees"
+msgstr "Überstundenübersicht — Alle Mitarbeiter"
+
+#: manufacturing/templates/tc_ot_report.html:113
+#: manufacturing/templates/time_clock_attendance.html:85
+msgid "Department"
+msgstr "Abteilung"
+
+#: manufacturing/templates/tc_ot_report.html:127
+#: manufacturing/templates/time_clock_hours.html:90
+msgid "No time entries for this period."
+msgstr "Keine Zeiteinträge für diesen Zeitraum."
+
+#: manufacturing/templates/tc_schedule.html:8
+msgid "OT Report"
+msgstr "Überstundenbericht"
+
+#: manufacturing/templates/tc_schedule.html:9
+msgid "Devices"
+msgstr "Geräte"
+
+#: manufacturing/templates/tc_schedule.html:41
+msgid "Schedule &amp; Shift Summary"
+msgstr "Zeitplan & Schichtübersicht"
+
+#: manufacturing/templates/tc_schedule.html:44
+msgid ""
+"Schedule data is derived from actual clock-in/out records for the selected "
+"period.\n"
+"        A dedicated shift-planning module can be configured separately."
+msgstr "Die Zeitplandaten werden aus den tatsächlichen Ein-/Ausstempel-Datensätzen für den ausgewählten Zeitraum abgeleitet. Ein eigenes Schichtplanungsmodul kann separat konfiguriert werden."
+
+#: manufacturing/templates/tc_schedule.html:52
+#: manufacturing/templates/time_clock_attendance.html:62
+msgid "Load"
+msgstr "Laden"
+
+#: manufacturing/templates/tc_schedule.html:58
+msgid "Attendance Records"
+msgstr "Anwesenheitsdatensätze"
+
+#: manufacturing/templates/tc_schedule.html:62
+msgid "Avg Hours / Day"
+msgstr "Ø Stunden/Tag"
+
+#: manufacturing/templates/tc_schedule.html:66
+msgid "Active Days"
+msgstr "Aktive Tage"
+
+#: manufacturing/templates/tc_schedule.html:71
+#, python-format
+msgid "Daily Summary (%(start)s &ndash; %(end)s)"
+msgstr "Tageszusammenfassung (%(start)s – %(end)s)"
+
+#: manufacturing/templates/tc_schedule.html:77
+#: manufacturing/templates/time_clock_attendance.html:69
+#: manufacturing/templates/time_clock_attendance.html:105
+msgid "Present"
+msgstr "Anwesend"
+
+#: manufacturing/templates/tc_schedule.html:79
+msgid "Avg Hours / Person"
+msgstr "Ø Stunden/Person"
+
+#: manufacturing/templates/tc_schedule.html:94
+msgid "No clock-in records for this period."
+msgstr "Keine Einstempeldaten für diesen Zeitraum."
+
+#: manufacturing/templates/time_clock_attendance.html:3
+#: manufacturing/templates/time_clock_attendance.html:54
+msgid "Daily Attendance"
+msgstr "Tägliche Anwesenheit"
+
+#: manufacturing/templates/time_clock_attendance.html:73
+#: manufacturing/templates/time_clock_attendance.html:111
+msgid "Absent"
+msgstr "Abwesend"
+
+#: manufacturing/templates/time_clock_attendance.html:86
+#: manufacturing/templates/time_clock_hours.html:61
+#: manufacturing/templates/time_clock_status.html:79
+#: manufacturing/templates/time_clock_status.html:89
+msgid "Clock In"
+msgstr "Einstempeln"
+
+#: manufacturing/templates/time_clock_attendance.html:87
+#: manufacturing/templates/time_clock_hours.html:62
+#: manufacturing/templates/time_clock_status.html:71
+#: manufacturing/templates/time_clock_status.html:90
+msgid "Clock Out"
+msgstr "Ausstempeln"
+
+#: manufacturing/templates/time_clock_attendance.html:88
+#: manufacturing/templates/time_clock_hours.html:63
+#: manufacturing/templates/time_clock_status.html:91
+msgid "Hours"
+msgstr "Stunden"
+
+#: manufacturing/templates/time_clock_attendance.html:102
+#: manufacturing/templates/time_clock_hours.html:75
+#: manufacturing/templates/time_clock_status.html:98
+msgid "in progress"
+msgstr "läuft"
+
+#: manufacturing/templates/time_clock_hours.html:47
+msgid "This Week"
+msgstr "Diese Woche"
+
+#: manufacturing/templates/time_clock_hours.html:49
+msgid "This Month"
+msgstr "Diesen Monat"
+
+#: manufacturing/templates/time_clock_status.html:64
+msgid "Current Status"
+msgstr "Aktueller Status"
+
+#: manufacturing/templates/time_clock_status.html:66
+msgid "Clocked In"
+msgstr "Eingestempelt"
+
+#: manufacturing/templates/time_clock_status.html:67
+#, python-format
+msgid "Since %(time)s"
+msgstr "Seit %(time)s"
+
+#: manufacturing/templates/time_clock_status.html:74
+msgid "Clocked Out"
+msgstr "Ausgestempelt"
+
+#: manufacturing/templates/time_clock_status.html:85
+msgid "Today&rsquo;s Log"
+msgstr "Heutiges Protokoll"
+
+#: manufacturing/templates/time_clock_status.html:104
+#, python-format
+msgid "Total today: %(total)s"
+msgstr "Heute gesamt: %(total)s"

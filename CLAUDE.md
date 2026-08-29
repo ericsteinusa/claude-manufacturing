@@ -368,6 +368,27 @@ msgid itself wraps across multiple `.po` lines and was left blank by the
 same kind of check that only understands single-line msgids; fixed by
 hand the same way as the Reports-pass instance.
 
+Also fully translated: the entire **Time Clock department**
+(`time_clock_status.html`, `time_clock_hours.html`,
+`time_clock_attendance.html`, `tc_ot_report.html`, `tc_schedule.html`,
+`tc_device_list.html`, `tc_device_form.html` — 7 templates, the fifth
+"whole department" pass, tied with Customers/Credit for the smallest
+remaining department at the time), same treatment plus `{% blocktrans
+with %}` for the clock-status page's "Since {time}" and "Total today:
+{total}" lines, the schedule page's "Daily Summary ({start} – {end})"
+header, and a couple of multi-line device-form hints (the ZKTeco/manual
+config help text). **New gotcha found here**: a translated `msgstr` that
+itself contains a literal double quote (e.g. Spanish `Use "Consultar
+ahora"...`, German `Verwenden Sie "Jetzt abfragen"...` — French sidestepped
+it by using guillemets `« »` instead) must have that quote escaped as
+`\"` in the `.po` file, same as the source msgid already does; a fix
+script that writes the raw translated string straight into `msgstr
+"..."` without escaping embedded quotes produces a `.po` file that looks
+fine on casual inspection but fails `msgfmt --check` with a syntax error
+at the point the unescaped quote closes the string early. Caught immediately
+by running `msgfmt --check` right after the fix script rather than only at
+`compilemessages` time.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

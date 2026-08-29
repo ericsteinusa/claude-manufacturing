@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-
-{% block page_title %}Time Clock{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Time Clock" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-<a href="/time-clock/hours/" class="btn">My Hours</a>
-{% if is_hr %}<a href="/time-clock/attendance/" class="btn">Attendance</a>{% endif %}
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
+<a href="/time-clock/hours/" class="btn">{% trans "My Hours" %}</a>
+{% if is_hr %}<a href="/time-clock/attendance/" class="btn">{% trans "Attendance" %}</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -54,54 +54,54 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Time Clock</div>
+    <div class="menu-title">{% trans "Time Clock" %}</div>
     <div class="tc-wrap">
         {% if error %}
         <div class="tc-error">{{ error }}</div>
         {% else %}
 
         <div class="tc-card">
-            <div class="tc-status-label">Current Status</div>
+            <div class="tc-status-label">{% trans "Current Status" %}</div>
             {% if current %}
-            <div class="tc-status dot-in">&#9679; Clocked In</div>
-            <div class="tc-since">Since {{ current.clock_in }}</div>
+            <div class="tc-status dot-in">&#9679; {% trans "Clocked In" %}</div>
+            <div class="tc-since">{% blocktrans with time=current.clock_in %}Since {{ time }}{% endblocktrans %}</div>
             <form method="post" action="/time-clock/">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="clock_out">
-                <button type="submit" class="tc-btn tc-btn-out">Clock Out</button>
+                <button type="submit" class="tc-btn tc-btn-out">{% trans "Clock Out" %}</button>
             </form>
             {% else %}
-            <div class="tc-status dot-out">&#9679; Clocked Out</div>
+            <div class="tc-status dot-out">&#9679; {% trans "Clocked Out" %}</div>
             <div class="tc-since">&nbsp;</div>
             <form method="post" action="/time-clock/">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="clock_in">
-                <button type="submit" class="tc-btn tc-btn-in">Clock In</button>
+                <button type="submit" class="tc-btn tc-btn-in">{% trans "Clock In" %}</button>
             </form>
             {% endif %}
         </div>
 
         {% if today_entries %}
-        <div class="tc-log-title">Today&rsquo;s Log</div>
+        <div class="tc-log-title">{% trans "Today&rsquo;s Log" %}</div>
         <table class="tc-table">
             <thead>
                 <tr>
-                    <th>Clock In</th>
-                    <th>Clock Out</th>
-                    <th>Hours</th>
+                    <th>{% trans "Clock In" %}</th>
+                    <th>{% trans "Clock Out" %}</th>
+                    <th>{% trans "Hours" %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for e in today_entries %}
                 <tr>
                     <td>{{ e.clock_in|slice:"11:16" }}</td>
-                    <td>{% if e.clock_out %}{{ e.clock_out|slice:"11:16" }}{% else %}<em>in progress</em>{% endif %}</td>
+                    <td>{% if e.clock_out %}{{ e.clock_out|slice:"11:16" }}{% else %}<em>{% trans "in progress" %}</em>{% endif %}</td>
                     <td>{{ e.hours_fmt }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <div class="tc-total">Total today: {{ total_fmt }}</div>
+        <div class="tc-total">{% blocktrans with total=total_fmt %}Total today: {{ total }}{% endblocktrans %}</div>
         {% endif %}
 
         {% endif %}

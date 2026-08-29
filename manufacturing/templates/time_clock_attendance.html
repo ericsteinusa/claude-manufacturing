@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-
-{% block page_title %}Daily Attendance{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Daily Attendance" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/time-clock/" class="btn">Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/time-clock/" class="btn">{% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,42 +51,42 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Daily Attendance</div>
+    <div class="menu-title">{% trans "Daily Attendance" %}</div>
     <div class="tca-wrap">
         <form method="get" action="/time-clock/attendance/" class="tca-controls">
             <div>
-                <label>Date</label>
+                <label>{% trans "Date" %}</label>
                 <input type="date" name="date" value="{{ date_str }}">
             </div>
             <div style="padding-bottom:2px;">
-                <button type="submit" class="btn">Load</button>
+                <button type="submit" class="btn">{% trans "Load" %}</button>
             </div>
         </form>
 
         <div class="tca-summary">
             <div class="tca-stat">
                 <div class="n" style="color:#28a745;">{{ present }}</div>
-                <div class="lbl">Present</div>
+                <div class="lbl">{% trans "Present" %}</div>
             </div>
             <div class="tca-stat">
                 <div class="n" style="color:#dc3545;">{{ absent }}</div>
-                <div class="lbl">Absent</div>
+                <div class="lbl">{% trans "Absent" %}</div>
             </div>
             <div class="tca-stat">
                 <div class="n">{{ attendance|length }}</div>
-                <div class="lbl">Total</div>
+                <div class="lbl">{% trans "Total" %}</div>
             </div>
         </div>
 
         <table class="tca-table">
             <thead>
                 <tr>
-                    <th>Employee</th>
-                    <th>Department</th>
-                    <th>Clock In</th>
-                    <th>Clock Out</th>
-                    <th>Hours</th>
-                    <th>Status</th>
+                    <th>{% trans "Employee" %}</th>
+                    <th>{% trans "Department" %}</th>
+                    <th>{% trans "Clock In" %}</th>
+                    <th>{% trans "Clock Out" %}</th>
+                    <th>{% trans "Hours" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -99,16 +99,16 @@
                         <td>{{ e.clock_in|slice:"11:16" }}</td>
                         <td>
                             {% if e.clock_out %}{{ e.clock_out|slice:"11:16" }}
-                            {% else %}<span class="badge-prog">in progress</span>{% endif %}
+                            {% else %}<span class="badge-prog">{% trans "in progress" %}</span>{% endif %}
                         </td>
                         <td>{{ p.total_hours_fmt }}</td>
-                        <td><span class="badge-present">Present</span></td>
+                        <td><span class="badge-present">{% trans "Present" %}</span></td>
                         {% endwith %}
                     {% else %}
                         <td>—</td>
                         <td>—</td>
                         <td>—</td>
-                        <td><span class="badge-absent">Absent</span></td>
+                        <td><span class="badge-absent">{% trans "Absent" %}</span></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
