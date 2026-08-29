@@ -42,6 +42,8 @@ const STATUS_COLORS: Record<string, string> = {
   // Marketing campaigns
   planned: '#cce5ff',
   paused:  '#f8d7da',
+  // Payroll runs
+  processed: '#d4edda',
 };
 
 interface Props {

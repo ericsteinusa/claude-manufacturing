@@ -3,7 +3,7 @@
 from manufacturing.reports_core import (
     po_summary, wo_summary, inventory_alerts, cs_summary, hours_variance,
     sales_dashboard, accounting_dashboard, customer_service_dashboard,
-    engineering_dashboard, customers_dashboard,
+    engineering_dashboard, customers_dashboard, payroll_dashboard,
 )
 
 
@@ -363,3 +363,38 @@ def test_customers_dashboard_recent_collection_falls_back_to_contact_name():
     ])
     result = customers_dashboard(conn)
     assert result["recent_collections"][0]["customer_name"] == "Sue Jones"
+
+
+# ── payroll_dashboard ────────────────────────────────────────────────────────
+
+def test_payroll_dashboard_combines_counts_and_recent_runs():
+    conn = _FakeConn([
+        [{"total_runs": 3, "emp_with_rates": 12, "total_people": 46,
+          "active_ded_types": 5, "ytd_gross": 250000.0}],
+        [{"id": 1, "run_date": "2026-08-15", "pay_period_start": "2026-08-01",
+          "pay_period_end": "2026-08-15", "status": "completed",
+          "created_by": "admin", "emp_count": 12, "total_gross": 48000.0,
+          "total_net": 36000.0}],
+    ])
+    result = payroll_dashboard(conn)
+    assert result["counts"]["total_runs"] == 3
+    assert result["counts"]["ytd_gross"] == 250000.0
+    assert result["recent_runs"] == [{
+        "id": 1, "run_date": "2026-08-15", "pay_period_start": "2026-08-01",
+        "pay_period_end": "2026-08-15", "status": "completed",
+        "emp_count": 12, "total_gross": 48000.0, "total_net": 36000.0,
+    }]
+
+
+def test_payroll_dashboard_truncates_recent_runs_to_five():
+    run_row = {"id": 1, "run_date": "2026-01-01", "pay_period_start": "2025-12-16",
+               "pay_period_end": "2025-12-31", "status": "completed",
+               "created_by": "admin", "emp_count": 1, "total_gross": 100.0,
+               "total_net": 80.0}
+    conn = _FakeConn([
+        [{"total_runs": 0, "emp_with_rates": 0, "total_people": 0,
+          "active_ded_types": 0, "ytd_gross": 0.0}],
+        [dict(run_row) for _ in range(8)],
+    ])
+    result = payroll_dashboard(conn)
+    assert len(result["recent_runs"]) == 5

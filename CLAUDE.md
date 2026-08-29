@@ -104,7 +104,9 @@ this section in sync when adding endpoints, it has gone stale before.
 - Routes wired at `/api/v1/` in `manufacturing/urls.py`:
   - Auth: login/logout/refresh/profile.
   - Dashboards: main (4 KPIs) + financial/production/inventory/sales/personnel/
-    accounting/customer-service/engineering/customers/it/legal/marketing.
+    accounting/customer-service/engineering/customers/it/legal/marketing/payroll —
+    the 17th and last department, closing COMPETITIVE_GAP_ANALYSIS.md §6.9's mobile
+    coverage gap to full 17/17.
   - Time clock (status/clock-in/clock-out/hours) + time-off.
   - Work orders: list/detail/status, operations (list/start/complete), cost (get/compute).
   - Requisitions: list/pending, add item, submit, decide.
@@ -186,7 +188,15 @@ pure reuse of `marketing_core.get_marketing_dashboard()`, which already bundled
 `_marketing.py` dashboard view, so this also needed only a new `api_marketing_dashboard`
 view + `/api/v1/dashboards/marketing/` route, no `reports_core` wrapper, the third
 department in a row to need no wrapper at all; closes §6.9's Marketing-department
-mobile gap).
+mobile gap), Payroll (YTD gross payroll, employees-with-pay-rates, active deduction
+type counts, recent payroll runs with period/employee-count/gross/net — the one
+department in this whole series with no single existing `get_*_dashboard()` to reuse
+verbatim: `payroll_core.py` has `get_dashboard_counts()` and `list_payroll_runs()` as
+separate pieces the web `payroll_dashboard` view itself combines, so this needed a new
+`reports_core.payroll_dashboard()` wrapper combining the two — same shape as the
+Accounting/Customer-Service/Engineering/Customers wrapper cases — plus a new
+`api_payroll_dashboard` view + `/api/v1/dashboards/payroll/` route; closes §6.9's
+Payroll-department mobile gap and completes mobile coverage for all 17 departments).
 Plus `(auth)/login`. To run: `cd mobile && npx expo start` → scan QR with Expo Go on
 phone.
 

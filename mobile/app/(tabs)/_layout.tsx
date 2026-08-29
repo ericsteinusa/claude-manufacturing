@@ -180,6 +180,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📣</Text>,
         }}
       />
+      <Tabs.Screen
+        name="payroll"
+        options={{
+          title: 'Payroll',
+          tabBarLabel: ({ focused }) => <TabIcon label="Payroll" focused={focused} />,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🧾</Text>,
+        }}
+      />
     </Tabs>
   );
 }
