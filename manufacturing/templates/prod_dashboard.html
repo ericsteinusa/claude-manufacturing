@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}Production{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Production" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/prod/schedule/" class="btn">Schedule</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/batch-records/" class="btn">Batch Records</a>
-<a href="/bom/" class="btn">BOM</a>
-<a href="/cto/products/" class="btn">Configure-to-Order</a>
-<a href="/recipes/" class="btn">Recipes</a>
-<a href="/repetitive/" class="btn">Repetitive Mfg</a>
-<a href="/mrp/" class="btn">MRP</a>
-<a href="/inventory/" class="btn">Inventory</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/prod/schedule/" class="btn">{% trans "Schedule" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/batch-records/" class="btn">{% trans "Batch Records" %}</a>
+<a href="/bom/" class="btn">{% trans "BOM" %}</a>
+<a href="/cto/products/" class="btn">{% trans "Configure-to-Order" %}</a>
+<a href="/recipes/" class="btn">{% trans "Recipes" %}</a>
+<a href="/repetitive/" class="btn">{% trans "Repetitive Mfg" %}</a>
+<a href="/mrp/" class="btn">{% trans "MRP" %}</a>
+<a href="/inventory/" class="btn">{% trans "Inventory" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,19 +52,19 @@ a.kpi:hover { border-color:var(--accent); }
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Production Dashboard</h2>
+    <h2>{% trans "Production Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/wo/" class="dept-btn">Work Orders</a>
-        <a href="/wo/new/" class="dept-btn">New Work Order</a>
-        <a href="/prod/schedule/" class="dept-btn">Production Schedule</a>
-        <a href="/prod/shipping/" class="dept-btn">Shipping</a>
-        <a href="/bom/" class="dept-btn">BOM</a>
-        <a href="/mrp/" class="dept-btn">MRP Planning</a>
-        <a href="/inventory/" class="dept-btn">Inventory</a>
-        <a href="/inventory/new/" class="dept-btn">New Inventory Item</a>
-        <a href="/prod/reports/" class="dept-btn">Production Reports</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/wo/" class="dept-btn">{% trans "Work Orders" %}</a>
+        <a href="/wo/new/" class="dept-btn">{% trans "New Work Order" %}</a>
+        <a href="/prod/schedule/" class="dept-btn">{% trans "Production Schedule" %}</a>
+        <a href="/prod/shipping/" class="dept-btn">{% trans "Shipping" %}</a>
+        <a href="/bom/" class="dept-btn">{% trans "BOM" %}</a>
+        <a href="/mrp/" class="dept-btn">{% trans "MRP Planning" %}</a>
+        <a href="/inventory/" class="dept-btn">{% trans "Inventory" %}</a>
+        <a href="/inventory/new/" class="dept-btn">{% trans "New Inventory Item" %}</a>
+        <a href="/prod/reports/" class="dept-btn">{% trans "Production Reports" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
     <div id="prod-kpis" hx-get="/prod/kpis-fragment/" hx-trigger="every 30s" hx-swap="innerHTML">
@@ -72,45 +73,45 @@ a.kpi:hover { border-color:var(--accent); }
 
     <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Daily Output Trend (last 14 days)</h3>
+            <h3>{% trans "Daily Output Trend (last 14 days)" %}</h3>
             <canvas id="chart-daily-output" height="200"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Work Order Status</h3>
+            <h3>{% trans "Work Order Status" %}</h3>
             <canvas id="chart-wo-status" height="200"></canvas>
         </div>
     </div>
     <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;margin-top:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Top Products by Output (last 90 days)</h3>
+            <h3>{% trans "Top Products by Output (last 90 days)" %}</h3>
             <canvas id="chart-top-products" height="200"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>On-Time Delivery (last 30 days)</h3>
+            <h3>{% trans "On-Time Delivery (last 30 days)" %}</h3>
             <canvas id="chart-on-time" height="200"></canvas>
         </div>
     </div>
     <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;margin-top:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Scrap &amp; Rework by Operation</h3>
+            <h3>{% trans "Scrap &amp; Rework by Operation" %}</h3>
             <canvas id="chart-scrap-rework" height="200"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>WO Completions by Month (last 6 mo)</h3>
+            <h3>{% trans "WO Completions by Month (last 6 mo)" %}</h3>
             <canvas id="chart-wo-month" height="200"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>Recent Work Orders</h3>
+        <h3>{% trans "Recent Work Orders" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>WO #</th>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
+                    <th>{% trans "WO #" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -123,7 +124,7 @@ a.kpi:hover { border-color:var(--accent); }
                 <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;">No work orders yet.</td></tr>
+            <tr><td colspan="5" style="color:#888;">{% trans "No work orders yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
