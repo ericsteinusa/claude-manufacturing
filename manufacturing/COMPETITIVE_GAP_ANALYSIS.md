@@ -3687,3 +3687,23 @@ mobile-only, docs-only change. Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/
 write-queue), Work Orders list, Maintenance list, and now Quality's NCR list (all three list
 screens read-cache only). Inventory (stock levels, warehouse staff) remains the next cheapest,
 highest-value candidate named in the previous entry and still unclaimed.
+
+---
+
+**2026-08-29, and one more still:** Extended §6.10's mobile offline support to a fifth screen —
+Inventory's product list — per direct instruction, continuing right where the Quality extension
+left off (Inventory was explicitly named as the next candidate two entries running). Same
+mechanical pattern with one small wrinkle: `inventory.tsx`'s `load()` returns both `products` and
+the reorder `alerts` banner data from a single API response, so the fetcher passed to
+`fetchWithOfflineCache()` bundles both into one cached object (`{ products, alerts }`) rather than
+caching them separately — keeps the reorder-alert banner working from cache too, not just the
+product list. Added the shared `OfflineBanner`; receiving stock still requires connectivity — not
+queued, matching the Work Orders/Maintenance/Quality precedent. No backend touched — mobile-only,
+docs-only change. Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/`expo export --platform web` all
+clean; full backend suite untouched (3425 passed, unchanged). §6.10's offline-covered screen count
+moves from 4 to **5 of 21** — Time Clock (full read-cache + write-queue) plus four read-cache-only
+list screens (Work Orders, Maintenance, Quality, Inventory). The remaining 16 screens are mostly
+detail/CRUD-heavy or admin-facing (Costing, Approvals, Lots, Requisitions, and the 11 department
+dashboards) where the "plant-floor worker with no signal" rationale that's driven every screen
+picked so far applies less cleanly — worth a fresh look at which of them still justifies the same
+mechanical extension versus leaving offline support at its current five-screen scope.
