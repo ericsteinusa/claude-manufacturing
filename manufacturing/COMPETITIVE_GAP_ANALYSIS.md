@@ -4047,3 +4047,44 @@ department (13) + the full Reports department (4) + the full Payroll department 
 total. Time Clock (10), Engineering (13), Customer Service (13), and Accounting (13) are the
 smallest unclaimed department-sized candidates remaining (re-surveyed counts; IT is 17, larger than
 previously assumed to be next in line).
+
+---
+
+**2026-08-29, fifth whole department:** Continued the "whole department" approach — re-surveyed
+again and found Time Clock actually has 7 templates, not 10 as estimated in the previous entry
+(tied with Customers/Credit for smallest remaining); picked **Time Clock**
+(`time_clock_status.html`, `time_clock_hours.html`, `time_clock_attendance.html`,
+`tc_ot_report.html`, `tc_schedule.html`, `tc_device_list.html`, `tc_device_form.html`). 96 unique
+strings needed translation per language (35 fuzzy-matched, all wrong guesses as usual, e.g. "Add
+Time Clock" guessed against "Time Clock" itself, "Device Name" guessed against "Case Name" — plus
+61 genuinely blank new entries, 3 of which were multi-line msgids the single-line-aware scan missed
+on its first pass, caught only by a follow-up scan built to reconstruct msgids across wrapped
+lines the same way msgstrs already were). Used `{% blocktrans with %}` for the clock-status page's
+"Since {time}" / "Total today: {total}" lines and the schedule page's "Daily Summary ({start} –
+{end})" header. **New gotcha found here**: two of the translated strings (the device-form's
+"No sync history yet. Click ... to test the connection." message, in both its short and
+detail-page-hint forms) contain a literal double quote in the Spanish and German translations
+(`Use "Consultar ahora"...` / `Verwenden Sie "Jetzt abfragen"...`) — French sidestepped the whole
+issue by using guillemets (`« »`) instead of straight quotes for this kind of inline emphasis, but
+es/de don't have that convention. Writing the translated string straight into `msgstr "..."`
+without escaping that embedded quote produces a `.po` file that looks superficially fine (loads
+into an editor, `git diff` shows a normal-looking line) but fails `msgfmt --check` with a syntax
+error at the point the unescaped quote closes the string early, corrupting everything after it on
+that line. Caught immediately this time by running `msgfmt --check` right after the fix script
+rather than waiting for `compilemessages`, fixed by escaping as `\"` to match how the *source*
+msgid already escapes embedded quotes. Full suite 3431 passed (unchanged), `manage.py check`
+clean, `compilemessages` clean, `msgfmt --check` clean on all three files after the quote-escaping
+fix, zero fuzzy/blank/duplicated entries confirmed programmatically (the same "heures
+supplémentaires" false-positive duplicate from the Payroll pass reappears here for the same
+legitimate reason — unrelated to this batch, left as-is). Verified end-to-end against the real dev
+server: clocked in and back out to confirm the "Since {time}" line, navigated My Hours, Daily
+Attendance, the Overtime Report (both "all employees" and "my OT" tabs), the Schedule page
+(confirmed the multi-line explanatory note and the date-range summary header), the device list,
+and the device form for both the ZKTeco and Manual entry types (confirmed the multi-line hint
+paragraphs, including the one with the embedded quote fix) in Spanish, French, and German with
+real sample data, no console errors. **Localization coverage is now 49 templates across three
+languages** (core shell + login + main dashboard + all 5 htmx templates + the full Legal
+department (10) + the full Marketing department (13) + the full Reports department (4) + the full
+Payroll department (8) + the full Time Clock department (7)) out of ~450 total. Customers/Credit
+(7) and Engineering, Customer Service, and Accounting (13 each) are the smallest unclaimed
+department-sized candidates remaining.

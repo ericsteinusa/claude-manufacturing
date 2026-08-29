@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-
-{% block page_title %}My Hours{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "My Hours" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/time-clock/" class="btn">Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="/time-clock/" class="btn">{% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -36,17 +36,17 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">My Hours</div>
+    <div class="menu-title">{% trans "My Hours" %}</div>
     <div class="tch-wrap">
         {% if error %}<div class="tch-error">{{ error }}</div>{% endif %}
 
         <div class="tch-pills">
             <a href="/time-clock/hours/?period=today"
-               class="tch-pill {% if period == 'today' %}active{% endif %}">Today</a>
+               class="tch-pill {% if period == 'today' %}active{% endif %}">{% trans "Today" %}</a>
             <a href="/time-clock/hours/?period=week"
-               class="tch-pill {% if period == 'week' %}active{% endif %}">This Week</a>
+               class="tch-pill {% if period == 'week' %}active{% endif %}">{% trans "This Week" %}</a>
             <a href="/time-clock/hours/?period=month"
-               class="tch-pill {% if period == 'month' %}active{% endif %}">This Month</a>
+               class="tch-pill {% if period == 'month' %}active{% endif %}">{% trans "This Month" %}</a>
         </div>
 
         <div class="tch-range">
@@ -57,10 +57,10 @@
         <table class="tch-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Clock In</th>
-                    <th>Clock Out</th>
-                    <th>Hours</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Clock In" %}</th>
+                    <th>{% trans "Clock Out" %}</th>
+                    <th>{% trans "Hours" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -72,7 +72,7 @@
                         {% if e.clock_out %}
                             {{ e.clock_out|slice:"11:16" }}
                         {% else %}
-                            <span class="badge-prog">in progress</span>
+                            <span class="badge-prog">{% trans "in progress" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ e.hours_fmt }}</td>
@@ -81,13 +81,13 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="3" style="text-align:right;">Total</td>
+                    <td colspan="3" style="text-align:right;">{% trans "Total" %}</td>
                     <td>{{ total_fmt }}</td>
                 </tr>
             </tfoot>
         </table>
         {% else %}
-        <div class="tch-empty">No time entries for this period.</div>
+        <div class="tch-empty">{% trans "No time entries for this period." %}</div>
         {% endif %}
     </div>
 </div>
