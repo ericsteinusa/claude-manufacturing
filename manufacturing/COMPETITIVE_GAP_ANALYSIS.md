@@ -3672,3 +3672,18 @@ other 18 screens remain candidates for the same mechanical extension, roughly in
 department most plausibly has field/plant-floor connectivity gaps: Quality (NCR list, inspectors on
 the shop floor) and Inventory (stock levels, warehouse staff) look like the next two cheapest,
 highest-value picks.
+
+---
+
+**2026-08-29, one more:** Extended §6.10's mobile offline support to a fourth screen — Quality's
+NCR list — per direct instruction, continuing right where the Maintenance extension left off (it
+was explicitly named as the next cheapest pick). Identical mechanical pattern: wrapped
+`quality.tsx`'s existing `load()` in `fetchWithOfflineCache()`, added the shared `OfflineBanner`,
+kept the same scope boundary (list is read-cache only; creating an NCR still requires
+connectivity — not queued, matching the Work Orders/Maintenance precedent). No backend touched —
+mobile-only, docs-only change. Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/
+`expo export --platform web` all clean; full backend suite untouched (3425 passed, unchanged).
+§6.10's offline-covered screen count moves from 3 to **4 of 21** — Time Clock (full read-cache +
+write-queue), Work Orders list, Maintenance list, and now Quality's NCR list (all three list
+screens read-cache only). Inventory (stock levels, warehouse staff) remains the next cheapest,
+highest-value candidate named in the previous entry and still unclaimed.
