@@ -74,7 +74,9 @@ Deliberately partial, not a full offline-first rewrite:
   still require connectivity.
 - **Maintenance list** — read-cache only, same rationale as Work Orders;
   completing a work order still requires connectivity.
-- The other 18 screens have no offline support yet. Extending the pattern
+- **Quality NCR list** — read-cache only; creating an NCR still requires
+  connectivity.
+- The other 17 screens have no offline support yet. Extending the pattern
   to a screen is mechanical: wrap its `load()` in
   `fetchWithOfflineCache()` (`src/offline/cache.ts`) and wrap write
   actions in `enqueueMutation()` (`src/offline/queue.ts`) where queuing

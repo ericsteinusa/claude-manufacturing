@@ -6,6 +6,8 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { getNcrs, getNcr, createNcr } from '../../src/api/quality';
 import StatusBadge from '../../src/components/StatusBadge';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 const STATUSES = ['', 'Open', 'Under Review', 'Dispositioned', 'Closed'];
 const SEVERITIES = ['Minor', 'Major', 'Critical'];
@@ -27,12 +29,24 @@ export default function QualityScreen() {
     title: '', source: 'Incoming', severity: 'Minor', product: '', description: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getNcrs(statusFilter || undefined);
-      setNcrs(res.data.data.ncrs ?? []);
+      // Read-only offline support: the list view falls back to the last
+      // cached response when there's no connection. Creating an NCR still
+      // requires connectivity — not queued in this pass, matching the
+      // Work Orders/Maintenance list precedent (see mobile section of the
+      // root CLAUDE.md).
+      const result = await fetchWithOfflineCache(
+        `quality_ncr_list_${statusFilter}`,
+        async () => (await getNcrs(statusFilter || undefined)).data.data.ncrs ?? [],
+      );
+      setNcrs(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load NCRs.');
     } finally {
@@ -77,6 +91,7 @@ export default function QualityScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       <View style={styles.topBar}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
           {STATUSES.map((s) => (
