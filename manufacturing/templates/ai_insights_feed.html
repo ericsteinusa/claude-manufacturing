@@ -1,3 +1,4 @@
+{% load i18n %}
 {% for i in insights %}
 <div class="insight-card">
     <div>
@@ -9,9 +10,9 @@
     </div>
     <div style="text-align:right;white-space:nowrap;">
         <span class="pill-sev {{ i.severity }}">{{ i.severity|capfirst }}</span><br>
-        <a href="{{ i.link }}" style="font-size:12px;">View &rarr;</a>
+        <a href="{{ i.link }}" style="font-size:12px;">{% trans "View →" %}</a>
     </div>
 </div>
 {% empty %}
-<p style="text-align:center;color:var(--text-muted);">No active insights right now.</p>
+<p style="text-align:center;color:var(--text-muted);">{% trans "No active insights right now." %}</p>
 {% endfor %}

@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if live %}
 <div class="tv-grid">
     {% for wc in live %}
@@ -15,14 +16,14 @@
             <span>Q {{ wc.quality_pct }}%</span>
         </div>
         <div class="tv-output">
-            {{ wc.qty_produced|floatformat:0 }} produced
-            {% if wc.has_plan %} / {{ wc.planned_qty|floatformat:0 }} planned{% endif %}
-            &middot; {{ wc.qty_scrapped|floatformat:0 }} scrapped
+            {% blocktrans with qty=wc.qty_produced|floatformat:0 %}{{ qty }} produced{% endblocktrans %}
+            {% if wc.has_plan %} / {% blocktrans with qty=wc.planned_qty|floatformat:0 %}{{ qty }} planned{% endblocktrans %}{% endif %}
+            &middot; {% blocktrans with qty=wc.qty_scrapped|floatformat:0 %}{{ qty }} scrapped{% endblocktrans %}
         </div>
-        {% if not wc.has_plan %}<div class="tv-noplan">No plan set for this shift</div>{% endif %}
+        {% if not wc.has_plan %}<div class="tv-noplan">{% trans "No plan set for this shift" %}</div>{% endif %}
     </div>
     {% endfor %}
 </div>
 {% else %}
-<div class="tv-empty">No active workcenters found.</div>
+<div class="tv-empty">{% trans "No active workcenters found." %}</div>
 {% endif %}

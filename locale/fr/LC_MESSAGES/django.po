@@ -1,13 +1,14 @@
 # French translations for the Manufacturing ERP core navigation shell
 # (sidebar, top bar, login page, main dashboard) plus the Production and
-# Maintenance dashboards. See CLAUDE.md's Localization section for
-# exactly what's covered — this is a deliberately partial pass, not a
-# translation of the full ~450-template application.
+# Maintenance dashboards, the AI Insights feed, and the shop-floor OEE TV
+# display. See CLAUDE.md's Localization section for exactly what's
+# covered — this is a deliberately partial pass, not a translation of
+# the full ~450-template application.
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 03:55+0000\n"
+"POT-Creation-Date: 2026-08-29 17:43+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -16,6 +17,43 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: manufacturing/templates/ai_insights_dashboard.html:3
+#: manufacturing/templates/ai_insights_dashboard.html:32
+msgid "AI Insights"
+msgstr "Perspectives IA"
+
+#: manufacturing/templates/ai_insights_dashboard.html:6
+#: manufacturing/templates/base.html:603
+#: manufacturing/templates/prod_dashboard.html:9
+msgid "Reports"
+msgstr "Rapports"
+
+#: manufacturing/templates/ai_insights_dashboard.html:7
+#: manufacturing/templates/maint_dashboard.html:17
+#: manufacturing/templates/prod_dashboard.html:17
+#: manufacturing/templates/prod_dashboard.html:67
+msgid "Home"
+msgstr "Accueil"
+
+#: manufacturing/templates/ai_insights_dashboard.html:34
+msgid ""
+"A cross-domain feed combining <a href=\"/predictive-maintenance/"
+"\">predictive maintenance</a>\n"
+"        risk, <a href=\"/maint/apm/\">asset performance</a> recommendations, "
+"and hand-rolled\n"
+"        statistical anomaly detection over demand, quality, and customer "
+"ordering patterns.\n"
+"        Ranked by severity."
+msgstr "Un flux transversal combinant le risque de <a href=\"/predictive-maintenance/\">maintenance prédictive</a>, les recommandations de <a href=\"/maint/apm/\">performance des actifs</a> et une détection statistique d’anomalies sur mesure portant sur la demande, la qualité et les habitudes de commande des clients. Classé par gravité."
+
+#: manufacturing/templates/ai_insights_feed.html:13
+msgid "View →"
+msgstr "Voir →"
+
+#: manufacturing/templates/ai_insights_feed.html:17
+msgid "No active insights right now."
+msgstr "Aucune information active pour le moment."
 
 #: manufacturing/templates/base.html:423
 msgid "Toggle menu"
@@ -227,11 +265,6 @@ msgstr "Webhooks"
 msgid "Data Governance"
 msgstr "Gouvernance des données"
 
-#: manufacturing/templates/base.html:603
-#: manufacturing/templates/prod_dashboard.html:9
-msgid "Reports"
-msgstr "Rapports"
-
 #: manufacturing/templates/base.html:606
 #: manufacturing/templates/dashboard.html:12
 msgid "Periods"
@@ -412,12 +445,6 @@ msgstr "Itinéraires des techniciens"
 msgid "Asset Performance"
 msgstr "Performance des actifs"
 
-#: manufacturing/templates/maint_dashboard.html:17
-#: manufacturing/templates/prod_dashboard.html:17
-#: manufacturing/templates/prod_dashboard.html:67
-msgid "Home"
-msgstr "Accueil"
-
 #: manufacturing/templates/maint_dashboard.html:70
 msgid "PM Alerts (next 14 days)"
 msgstr "Alertes de maintenance préventive (14 prochains jours)"
@@ -441,7 +468,9 @@ msgstr "Dû"
 
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
-msgstr "Aucune tâche de maintenance préventive en retard ou à échéance dans les 14 prochains jours."
+msgstr ""
+"Aucune tâche de maintenance préventive en retard ou à échéance dans les 14 "
+"prochains jours."
 
 #: manufacturing/templates/maint_dashboard.html:96
 msgid "Weekly OEE Trend (last 8 weeks)"
@@ -624,3 +653,31 @@ msgstr "Rupture de stock"
 #: manufacturing/templates/prod_dashboard_kpis.html:24
 msgid "Low Stock"
 msgstr "Stock faible"
+
+#: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
+#, python-format
+msgid "Shop Floor OEE — %(shift)s Shift"
+msgstr "OEE atelier — Équipe %(shift)s"
+
+#: manufacturing/templates/sf_tv_grid.html:19
+#, python-format
+msgid "%(qty)s produced"
+msgstr "%(qty)s produites"
+
+#: manufacturing/templates/sf_tv_grid.html:20
+#, python-format
+msgid "%(qty)s planned"
+msgstr "%(qty)s planifiées"
+
+#: manufacturing/templates/sf_tv_grid.html:21
+#, python-format
+msgid "%(qty)s scrapped"
+msgstr "%(qty)s rebutées"
+
+#: manufacturing/templates/sf_tv_grid.html:23
+msgid "No plan set for this shift"
+msgstr "Aucun plan défini pour cette équipe"
+
+#: manufacturing/templates/sf_tv_grid.html:28
+msgid "No active workcenters found."
+msgstr "Aucun poste de travail actif trouvé."

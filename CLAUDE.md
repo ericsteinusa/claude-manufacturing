@@ -248,19 +248,34 @@ placeholder text — added after the original Spanish-only pass to close the
 localization-breadth gap flagged in COMPETITIVE_GAP_ANALYSIS.md §9's
 comparison against MRPeasy, which ships more languages than a single-language
 pass would have). Translation coverage is the app's core navigation shell,
-main landing page, and two department dashboards so far — `base.html`
-(sidebar: all 11 section headers + all ~37 nav links; top bar: notifications,
-password, 2FA, logout), `home.html` (the login page), `dashboard.html` (the
-post-login main dashboard: KPI labels, chart titles, the pending-PO-approvals
-banner using a real `{% blocktrans count %}` plural, not a hardcoded English
-`|pluralize`), `prod_dashboard.html` + `prod_dashboard_kpis.html` (the
-Production dashboard: toolbar/dept-grid nav labels, KPI labels, chart
-titles, the Recent Work Orders table headers), and `maint_dashboard.html` +
+main landing page, two department dashboards, and both remaining htmx
+live-refresh templates so far — `base.html` (sidebar: all 11 section headers
++ all ~37 nav links; top bar: notifications, password, 2FA, logout),
+`home.html` (the login page), `dashboard.html` (the post-login main
+dashboard: KPI labels, chart titles, the pending-PO-approvals banner using a
+real `{% blocktrans count %}` plural, not a hardcoded English `|pluralize`),
+`prod_dashboard.html` + `prod_dashboard_kpis.html` (the Production
+dashboard: toolbar/dept-grid nav labels, KPI labels, chart titles, the
+Recent Work Orders table headers), `maint_dashboard.html` +
 `maint_dashboard_kpis.html` (the Maintenance dashboard: toolbar/section-link
 nav labels, KPI labels including a second `{% blocktrans count %}` plural
 for the "N critical" work-order sub-label, PM-alert urgency badges, and all
-5 chart/section titles) — wrapped in `{% trans %}`/`{% blocktrans %}`. The
-main dashboard's department grid
+5 chart/section titles), `ai_insights_dashboard.html` + `ai_insights_feed.html`
+(the AI Insights feed: page title, toolbar, a `{% blocktrans %}` intro
+paragraph with embedded links, the "View →" link, and the empty-state
+message — data-driven `domain`/`severity` badge text left untranslated,
+matching the existing precedent of not translating raw status/enum values
+elsewhere), and `sf_tv.html` + `sf_tv_grid.html` (the standalone shop-floor
+OEE TV display — doesn't extend `base.html`, so needs its own
+`{% load i18n %}`; the header/title and per-workcenter output line use
+`{% blocktrans %}` with named variables for the shift name and produced/
+planned/scrapped quantities, while the single-letter A/P/Q — Availability/
+Performance/Quality — labels are left as-is, matching the app's existing
+convention of keeping industry acronyms like MRP/BOM/OEE untranslated) —
+wrapped in `{% trans %}`/`{% blocktrans %}`. This closes out all 5 of
+§6.1's htmx live-refresh templates (`dashboard.html`, `prod_dashboard.html`,
+`maint_dashboard.html`, `ai_insights_dashboard.html`, `sf_tv.html`) as
+translated. The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
 translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,

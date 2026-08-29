@@ -1,8 +1,8 @@
-<!doctype html>
+{% load i18n %}<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>Shop Floor OEE — {{ shift }} Shift</title>
+<title>{% blocktrans %}Shop Floor OEE — {{ shift }} Shift{% endblocktrans %}</title>
 <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
 <style>
     * { box-sizing: border-box; }
@@ -35,7 +35,7 @@
 </head>
 <body>
     <div class="tv-header">
-        <h1>Shop Floor OEE — {{ shift }} Shift</h1>
+        <h1>{% blocktrans %}Shop Floor OEE — {{ shift }} Shift{% endblocktrans %}</h1>
         <div class="clock">{{ entry_date }} &middot; <span id="tv-clock">{{ now|date:"g:i A" }}</span></div>
     </div>
 
