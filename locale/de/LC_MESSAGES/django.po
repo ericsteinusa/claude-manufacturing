@@ -1256,8 +1256,6 @@ msgstr "Fällig"
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
 msgstr "Keine überfälligen oder in den nächsten 14 Tagen fälligen Wartungsaufgaben."
-"Keine überfälligen oder in den nächsten 14 Tagen fälligen Wartungsaufgaben."
-"Keine überfälligen oder in den nächsten 14 Tagen fälligen Wartungsaufgaben."
 
 #: manufacturing/templates/maint_dashboard.html:96
 msgid "Weekly OEE Trend (last 8 weeks)"
