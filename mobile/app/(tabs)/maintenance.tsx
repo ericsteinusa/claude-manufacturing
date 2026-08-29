@@ -8,6 +8,8 @@ import {
   getMaintWorkOrders, getMaintWorkOrder, completeMaintWorkOrder,
 } from '../../src/api/maintenance';
 import StatusBadge from '../../src/components/StatusBadge';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 const STATUSES = ['', 'Open', 'Assigned', 'In Progress', 'On Hold', 'Completed', 'Cancelled'];
 
@@ -17,12 +19,24 @@ export default function MaintenanceScreen() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<any>(null);
   const [completing, setCompleting] = useState(false);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getMaintWorkOrders(statusFilter || undefined);
-      setWos(res.data.data.work_orders ?? []);
+      // Read-only offline support: the list view falls back to the last
+      // cached response when there's no connection. Completing a work
+      // order still requires connectivity — not queued in this pass,
+      // matching the Work Orders list's own precedent (see mobile
+      // section of the root CLAUDE.md).
+      const result = await fetchWithOfflineCache(
+        `maint_wo_list_${statusFilter}`,
+        async () => (await getMaintWorkOrders(statusFilter || undefined)).data.data.work_orders ?? [],
+      );
+      setWos(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load maintenance work orders.');
     } finally {
@@ -66,6 +80,7 @@ export default function MaintenanceScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
         {STATUSES.map((s) => (
           <TouchableOpacity
