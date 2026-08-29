@@ -3707,3 +3707,23 @@ detail/CRUD-heavy or admin-facing (Costing, Approvals, Lots, Requisitions, and t
 dashboards) where the "plant-floor worker with no signal" rationale that's driven every screen
 picked so far applies less cleanly — worth a fresh look at which of them still justifies the same
 mechanical extension versus leaving offline support at its current five-screen scope.
+
+---
+
+**2026-08-29, and one more again:** Extended §6.10's mobile offline support to a sixth screen —
+Costing's product-search list — per direct instruction, despite being named in the previous entry
+as one of the weaker-fit candidates (admin/reference-heavy rather than plant-floor). Applied the
+same mechanical pattern to just the top-level product list (`load()` wrapped in
+`fetchWithOfflineCache()`, cache key `costing_product_list_${search}`, shared `OfflineBanner`
+added) — deliberately did **not** extend it to the cost/history/routing detail drill-down or the
+Workcenters/GL Accounts reference modals opened from this screen, keeping scope consistent with
+every prior screen in this series (only the top-level list gets cached, not every drill-down).
+No backend touched — mobile-only, docs-only change. Mobile's `tsc --noEmit`/`expo-doctor` (21/21)/
+`expo export --platform web` all clean; full backend suite untouched (3425 passed, unchanged).
+§6.10's offline-covered screen count moves from 5 to **6 of 21**. The remaining 15 screens are
+Approvals, Lots, Requisitions, and the 11 department dashboards (Finance through Payroll) — all
+either workflow/admin screens or KPI-dashboard reads with materially weaker "worker with no
+signal" justification than Time Clock/Work Orders/Maintenance/Quality/Inventory ever had; whoever
+picks up this thread next should weigh whether continuing screen-by-screen is still the highest-
+value use of effort here versus one of this document's other partial gaps (i18n template coverage,
+htmx frontend coverage, CI-gated load testing).

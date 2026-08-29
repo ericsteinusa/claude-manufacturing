@@ -79,7 +79,9 @@ Deliberately partial, not a full offline-first rewrite:
 - **Inventory product list** — read-cache only, caching `products` and the
   reorder `alerts` banner together since they come from one response;
   receiving stock still requires connectivity.
-- The other 16 screens have no offline support yet. Extending the pattern
+- **Costing product-search list** — read-cache only; the cost/history/
+  routing/reference-data drill-downs it opens into a modal are not cached.
+- The other 15 screens have no offline support yet. Extending the pattern
   to a screen is mechanical: wrap its `load()` in
   `fetchWithOfflineCache()` (`src/offline/cache.ts`) and wrap write
   actions in `enqueueMutation()` (`src/offline/queue.ts`) where queuing
