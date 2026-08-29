@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block page_title %}{% if report %}Edit Report{% else %}New Report{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if report %}{% trans "Edit Report" %}{% else %}{% trans "New Report" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/reports/builder/" class="btn">← Back</a>
+<a href="/reports/builder/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,24 +29,24 @@
 {% block body %}
 <div class="content">
 <div class="rb-wrap">
-    <h2>{% if report %}Edit Report: {{ report.name }}{% else %}New Custom Report{% endif %}</h2>
+    <h2>{% if report %}{% blocktrans with name=report.name %}Edit Report: {{ name }}{% endblocktrans %}{% else %}{% trans "New Custom Report" %}{% endif %}</h2>
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>1. Choose a Table</h3>
+        <h3>{% trans "1. Choose a Table" %}</h3>
         <form method="post" action="">
             {% csrf_token %}
             <input type="hidden" name="action" value="choose_table">
             <div class="form-row" style="max-width:320px;">
-                <label>Table</label>
+                <label>{% trans "Table" %}</label>
                 <select name="table_name" onchange="this.form.submit()">
-                    <option value="">(select a table)</option>
+                    <option value="">{% trans "(select a table)" %}</option>
                     {% for name, table in tables_json_parsed.items %}
                     <option value="{{ name }}" {% if table_name == name %}selected{% endif %}>{{ table.label }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <noscript><button type="submit" class="btn btn-sm">Choose</button></noscript>
+            <noscript><button type="submit" class="btn btn-sm">{% trans "Choose" %}</button></noscript>
         </form>
     </div>
 
@@ -55,7 +56,7 @@
         <input type="hidden" name="table_name" value="{{ table_name }}">
 
         <div class="card">
-            <h3>2. Columns (used when no aggregate is selected below)</h3>
+            <h3>{% trans "2. Columns (used when no aggregate is selected below)" %}</h3>
             <div class="cols-grid">
                 {% for col, meta in current_columns.items %}
                 <label><input type="checkbox" name="columns" value="{{ col }}"
@@ -65,11 +66,11 @@
         </div>
 
         <div class="card">
-            <h3>3. Filters</h3>
+            <h3>{% trans "3. Filters" %}</h3>
             {% for i in "012" %}
             <div class="rule-row">
                 <select name="filter_column">
-                    <option value="">(no filter)</option>
+                    <option value="">{% trans "(no filter)" %}</option>
                     {% for col, meta in current_columns.items %}
                     <option value="{{ col }}">{{ meta.label }}</option>
                     {% endfor %}
@@ -81,21 +82,21 @@
                     <option value="<">&lt;</option>
                     <option value=">=">&gt;=</option>
                     <option value="<=">&lt;=</option>
-                    <option value="contains">contains</option>
-                    <option value="starts_with">starts with</option>
-                    <option value="in">in (comma-separated)</option>
-                    <option value="is_null">is empty</option>
-                    <option value="is_not_null">is not empty</option>
+                    <option value="contains">{% trans "contains" %}</option>
+                    <option value="starts_with">{% trans "starts with" %}</option>
+                    <option value="in">{% trans "in (comma-separated)" %}</option>
+                    <option value="is_null">{% trans "is empty" %}</option>
+                    <option value="is_not_null">{% trans "is not empty" %}</option>
                 </select>
-                <input type="text" name="filter_value" placeholder="Value">
+                <input type="text" name="filter_value" placeholder="{% trans 'Value' %}">
             </div>
             {% endfor %}
         </div>
 
         <div class="card">
-            <h3>4. Group By &amp; Aggregate (leave blank for a flat list report)</h3>
+            <h3>{% trans "4. Group By &amp; Aggregate (leave blank for a flat list report)" %}</h3>
             <div class="form-row">
-                <label>Group By</label>
+                <label>{% trans "Group By" %}</label>
                 <div class="cols-grid">
                     {% for col, meta in current_columns.items %}
                     <label><input type="checkbox" name="group_by" value="{{ col }}"
@@ -106,27 +107,27 @@
             {% for i in "01" %}
             <div class="agg-row">
                 <select name="agg_column">
-                    <option value="">(no aggregate)</option>
+                    <option value="">{% trans "(no aggregate)" %}</option>
                     {% for col, meta in current_columns.items %}
                     <option value="{{ col }}">{{ meta.label }}</option>
                     {% endfor %}
                 </select>
                 <select name="agg_func">
-                    <option value="count">Count</option>
-                    <option value="sum">Sum</option>
-                    <option value="avg">Average</option>
-                    <option value="min">Min</option>
-                    <option value="max">Max</option>
+                    <option value="count">{% trans "Count" %}</option>
+                    <option value="sum">{% trans "Sum" %}</option>
+                    <option value="avg">{% trans "Average" %}</option>
+                    <option value="min">{% trans "Min" %}</option>
+                    <option value="max">{% trans "Max" %}</option>
                 </select>
             </div>
             {% endfor %}
         </div>
 
         <div class="card">
-            <h3>5. Sort</h3>
+            <h3>{% trans "5. Sort" %}</h3>
             <div class="rule-row">
                 <select name="sort_column">
-                    <option value="">(no sort)</option>
+                    <option value="">{% trans "(no sort)" %}</option>
                     {% for col, meta in current_columns.items %}
                     <option value="{{ col }}">{{ meta.label }}</option>
                     {% endfor %}
@@ -135,17 +136,17 @@
                     {% endfor %}
                 </select>
                 <select name="sort_direction">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
+                    <option value="asc">{% trans "Ascending" %}</option>
+                    <option value="desc">{% trans "Descending" %}</option>
                 </select>
                 <div></div>
             </div>
-            <button type="submit" name="action" value="preview" class="btn-submit">Run Preview</button>
+            <button type="submit" name="action" value="preview" class="btn-submit">{% trans "Run Preview" %}</button>
         </div>
 
         {% if result %}
         <div class="card">
-            <h3>Preview ({{ result.rows|length }} row(s), max 200 shown)</h3>
+            <h3>{% blocktrans count counter=result.rows|length %}Preview ({{ counter }} row, max 200 shown){% plural %}Preview ({{ counter }} rows, max 200 shown){% endblocktrans %}</h3>
             <div class="erp-table-wrap">
                 <table class="list-table">
                     <thead><tr>{% for field, header in result.output_fields %}<th>{{ header }}</th>{% endfor %}</tr></thead>
@@ -160,21 +161,21 @@
         {% endif %}
 
         <div class="card">
-            <h3>6. Save</h3>
+            <h3>{% trans "6. Save" %}</h3>
             <div class="form-row" style="max-width:320px;">
-                <label>Report Name</label>
+                <label>{% trans "Report Name" %}</label>
                 <input type="text" name="name" value="{{ report.name|default:'' }}" required>
             </div>
             <div class="form-row" style="max-width:320px;">
-                <label>Access Level</label>
+                <label>{% trans "Access Level" %}</label>
                 <select name="access_level" {% if not can_share %}disabled{% endif %}>
                     {% for level in access_levels %}
                     <option value="{{ level }}" {% if report.access_level == level or level == 'private' and not report %}selected{% endif %}>{{ level|capfirst }}</option>
                     {% endfor %}
                 </select>
-                {% if not can_share %}<small style="color:#888;">Only managers can share reports beyond Private.</small>{% endif %}
+                {% if not can_share %}<small style="color:#888;">{% trans "Only managers can share reports beyond Private." %}</small>{% endif %}
             </div>
-            <button type="submit" name="action" value="save" class="btn-submit">Save Report</button>
+            <button type="submit" name="action" value="save" class="btn-submit">{% trans "Save Report" %}</button>
         </div>
     </form>
     {% endif %}

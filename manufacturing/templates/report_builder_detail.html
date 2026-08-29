@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ report.name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/reports/builder/" class="btn">← Back</a>
-<a href="/reports/builder/{{ report.id }}/edit/" class="btn">Edit</a>
-<a href="/reports/builder/{{ report.id }}/csv/" class="btn">Export CSV</a>
-<a href="/reports/builder/{{ report.id }}/pdf/" class="btn">Export PDF</a>
+<a href="/reports/builder/" class="btn">← {% trans "Back" %}</a>
+<a href="/reports/builder/{{ report.id }}/edit/" class="btn">{% trans "Edit" %}</a>
+<a href="/reports/builder/{{ report.id }}/csv/" class="btn">{% trans "Export CSV" %}</a>
+<a href="/reports/builder/{{ report.id }}/pdf/" class="btn">{% trans "Export PDF" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,14 +29,14 @@
 <div class="rb-wrap">
     <h2>{{ report.name }}</h2>
     <p style="font-size:12px;color:#666;">
-        Table: {{ report.table_name }} &nbsp;|&nbsp; Access: {{ report.access_level|capfirst }}
-        &nbsp;|&nbsp; Owner: {{ report.owner_email|default:"—" }}</p>
+        {% trans "Table" %}: {{ report.table_name }} &nbsp;|&nbsp; {% trans "Access" %}: {{ report.access_level|capfirst }}
+        &nbsp;|&nbsp; {% trans "Owner" %}: {{ report.owner_email|default:"—" }}</p>
 
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <div class="card">
-        <h3>Results ({{ result.rows|length }} row(s), max 200 shown)</h3>
+        <h3>{% blocktrans count counter=result.rows|length %}Results ({{ counter }} row, max 200 shown){% plural %}Results ({{ counter }} rows, max 200 shown){% endblocktrans %}</h3>
         <div class="erp-table-wrap">
             <table class="list-table">
                 <thead><tr>{% for field, header in result.output_fields %}<th>{{ header }}</th>{% endfor %}</tr></thead>
@@ -49,19 +50,19 @@
     </div>
 
     <div class="card">
-        <h3>Scheduled Delivery</h3>
+        <h3>{% trans "Scheduled Delivery" %}</h3>
         <p style="font-size:12px;color:#666;">
-            Runs via <code>python manage.py run_scheduled_reports</code> (scheduled externally
+            {% blocktrans %}Runs via <code>python manage.py run_scheduled_reports</code> (scheduled externally
             via cron/Task Scheduler). Emails require the server's EMAIL_HOST to be configured;
-            without it, runs are logged but not sent.</p>
+            without it, runs are logged but not sent.{% endblocktrans %}</p>
         <form method="post" action="">
             {% csrf_token %}
             <div class="form-row">
                 <label><input type="checkbox" name="schedule_enabled"
-                    {% if report.schedule_enabled %}checked{% endif %}> Enabled</label>
+                    {% if report.schedule_enabled %}checked{% endif %}> {% trans "Enabled" %}</label>
             </div>
             <div class="form-row">
-                <label>Frequency</label>
+                <label>{% trans "Frequency" %}</label>
                 <select name="schedule_frequency">
                     {% for f in schedule_frequencies %}
                     <option value="{{ f }}" {% if report.schedule_frequency == f %}selected{% endif %}>{{ f|capfirst }}</option>
@@ -69,21 +70,21 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Recipients (comma-separated emails)</label>
+                <label>{% trans "Recipients (comma-separated emails)" %}</label>
                 <input type="text" name="schedule_recipients" value="{{ report.schedule_recipients|default:'' }}">
             </div>
             <div class="form-row">
-                <label>Format</label>
+                <label>{% trans "Format" %}</label>
                 <select name="schedule_format">
                     {% for f in schedule_formats %}
                     <option value="{{ f }}" {% if report.schedule_format == f %}selected{% endif %}>{{ f|upper }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn-submit">Save Schedule</button>
+            <button type="submit" class="btn-submit">{% trans "Save Schedule" %}</button>
         </form>
         {% if report.last_run_at %}
-        <p style="font-size:12px;color:#666;margin-top:8px;">Last run: {{ report.last_run_at|slice:":19" }}</p>
+        <p style="font-size:12px;color:#666;margin-top:8px;">{% blocktrans with last_run=report.last_run_at|slice:":19" %}Last run: {{ last_run }}{% endblocktrans %}</p>
         {% endif %}
     </div>
 </div>

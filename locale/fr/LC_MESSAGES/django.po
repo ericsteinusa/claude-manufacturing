@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 18:32+0000\n"
+"POT-Creation-Date: 2026-08-29 22:49+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -21,6 +21,7 @@ msgstr ""
 
 #: manufacturing/templates/ai_insights_dashboard.html:3
 #: manufacturing/templates/ai_insights_dashboard.html:32
+#: manufacturing/templates/reports_dashboard.html:10
 msgid "AI Insights"
 msgstr "Perspectives IA"
 
@@ -59,6 +60,8 @@ msgstr "Rapports"
 #: manufacturing/templates/mkt_research_list.html:14
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
+#: manufacturing/templates/report_builder_list.html:8
+#: manufacturing/templates/reports_dashboard.html:11
 msgid "Home"
 msgstr "Accueil"
 
@@ -128,6 +131,7 @@ msgstr "Opérations"
 #: manufacturing/templates/maint_dashboard.html:125
 #: manufacturing/templates/prod_dashboard.html:6
 #: manufacturing/templates/prod_dashboard.html:58
+#: manufacturing/templates/reports_dashboard.html:168
 msgid "Work Orders"
 msgstr "Ordres de fabrication"
 
@@ -149,6 +153,7 @@ msgid "Procurement"
 msgstr "Achats"
 
 #: manufacturing/templates/base.html:497
+#: manufacturing/templates/reports_dashboard.html:144
 msgid "Purchase Orders"
 msgstr "Bons de commande"
 
@@ -170,6 +175,7 @@ msgid "Customers"
 msgstr "Clients"
 
 #: manufacturing/templates/base.html:511
+#: manufacturing/templates/reports_dashboard.html:223
 msgid "Customer Service"
 msgstr "Service client"
 
@@ -581,6 +587,8 @@ msgstr "Réglementation"
 #: manufacturing/templates/mkt_research_detail.html:121
 #: manufacturing/templates/mkt_research_list.html:91
 #: manufacturing/templates/mkt_research_list.html:137
+#: manufacturing/templates/report_builder_detail.html:33
+#: manufacturing/templates/report_builder_list.html:24
 msgid "Owner"
 msgstr "Responsable"
 
@@ -820,6 +828,7 @@ msgstr "Contrepartie"
 #: manufacturing/templates/legal_contract_detail.html:67
 #: manufacturing/templates/legal_contract_list.html:91
 #: manufacturing/templates/legal_dashboard.html:145
+#: manufacturing/templates/report_builder_form.html:91
 msgid "Value"
 msgstr "Valeur"
 
@@ -969,11 +978,13 @@ msgid "Total Cases"
 msgstr "Total des affaires"
 
 #: manufacturing/templates/legal_dashboard.html:95
+#: manufacturing/templates/reports_dashboard.html:233
 msgid "Open"
 msgstr "Ouvert"
 
 #: manufacturing/templates/legal_dashboard.html:99
 #: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/reports_dashboard.html:237
 msgid "Closed"
 msgstr "Clôturé"
 
@@ -1255,7 +1266,9 @@ msgstr "Dû"
 
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
-msgstr "Aucune tâche de maintenance préventive en retard ou à échéance dans les 14 prochains jours."
+msgstr ""
+"Aucune tâche de maintenance préventive en retard ou à échéance dans les 14 "
+"prochains jours."
 
 #: manufacturing/templates/maint_dashboard.html:96
 msgid "Weekly OEE Trend (last 8 weeks)"
@@ -1445,6 +1458,7 @@ msgstr "Budget"
 #: manufacturing/templates/mkt_analytics.html:141
 #: manufacturing/templates/mkt_analytics.html:148
 #: manufacturing/templates/mkt_analytics.html:162
+#: manufacturing/templates/reports_dashboard.html:229
 msgid "Total"
 msgstr "Total"
 
@@ -1508,6 +1522,7 @@ msgstr "Campagnes récentes"
 #: manufacturing/templates/mkt_lead_detail.html:95
 #: manufacturing/templates/mkt_lead_list.html:87
 #: manufacturing/templates/mkt_lead_list.html:121
+#: manufacturing/templates/report_builder_list.html:20
 msgid "Name"
 msgstr "Nom"
 
@@ -1676,15 +1691,15 @@ msgstr "Ajouter une annonce"
 msgid "Marketing Analytics"
 msgstr "Analytique marketing"
 
-#, python-format
 #: manufacturing/templates/mkt_analytics.html:54
+#, python-format
 msgid "%(counter)s active"
 msgid_plural "%(counter)s active"
 msgstr[0] "%(counter)s active"
 msgstr[1] "%(counter)s actives"
 
-#, python-format
 #: manufacturing/templates/mkt_analytics.html:59
+#, python-format
 msgid "%(counter)s converted"
 msgid_plural "%(counter)s converted"
 msgstr[0] "%(counter)s converti"
@@ -1700,8 +1715,8 @@ msgstr "Annonces"
 msgid "$%(spend)s spend"
 msgstr "%(spend)s $ de dépenses"
 
-#, python-format
 #: manufacturing/templates/mkt_analytics.html:69
+#, python-format
 msgid "%(counter)s clicks"
 msgid_plural "%(counter)s clicks"
 msgstr[0] "%(counter)s clic"
@@ -1711,8 +1726,8 @@ msgstr[1] "%(counter)s clics"
 msgid "from ads"
 msgstr "provenant des annonces"
 
-#, python-format
 #: manufacturing/templates/mkt_analytics.html:79
+#, python-format
 msgid "%(counter)s in draft"
 msgid_plural "%(counter)s in draft"
 msgstr[0] "%(counter)s en brouillon"
@@ -1973,6 +1988,7 @@ msgid "Create Project"
 msgstr "Créer un projet"
 
 #: manufacturing/templates/prod_dashboard.html:7
+#: manufacturing/templates/report_builder_list.html:23
 msgid "Schedule"
 msgstr "Planning"
 
@@ -2055,6 +2071,7 @@ msgid "WO #"
 msgstr "N° OF"
 
 #: manufacturing/templates/prod_dashboard.html:112
+#: manufacturing/templates/reports_dashboard.html:199
 msgid "Product"
 msgstr "Produit"
 
@@ -2081,6 +2098,289 @@ msgstr "Rupture de stock"
 #: manufacturing/templates/prod_dashboard_kpis.html:24
 msgid "Low Stock"
 msgstr "Stock faible"
+
+#: manufacturing/templates/report_builder_detail.html:6
+#: manufacturing/templates/report_builder_form.html:6
+#: manufacturing/templates/report_builder_list.html:6
+#: manufacturing/templates/reports_dashboard.html:7
+msgid "Back"
+msgstr "Retour"
+
+#: manufacturing/templates/report_builder_detail.html:7
+#: manufacturing/templates/report_builder_list.html:37
+msgid "Edit"
+msgstr "Modifier"
+
+#: manufacturing/templates/report_builder_detail.html:8
+msgid "Export CSV"
+msgstr "Exporter en CSV"
+
+#: manufacturing/templates/report_builder_detail.html:9
+msgid "Export PDF"
+msgstr "Exporter en PDF"
+
+#: manufacturing/templates/report_builder_detail.html:32
+#: manufacturing/templates/report_builder_form.html:41
+#: manufacturing/templates/report_builder_list.html:21
+msgid "Table"
+msgstr "Table"
+
+#: manufacturing/templates/report_builder_detail.html:32
+msgid "Access"
+msgstr "Accès"
+
+#: manufacturing/templates/report_builder_detail.html:39
+#, python-format
+msgid "Results (%(counter)s row, max 200 shown)"
+msgid_plural "Results (%(counter)s rows, max 200 shown)"
+msgstr[0] "Résultats (%(counter)s ligne, 200 max affichées)"
+msgstr[1] "Résultats (%(counter)s lignes, 200 max affichées)"
+
+#: manufacturing/templates/report_builder_detail.html:53
+msgid "Scheduled Delivery"
+msgstr "Envoi programmé"
+
+#: manufacturing/templates/report_builder_detail.html:55
+msgid ""
+"Runs via <code>python manage.py run_scheduled_reports</code> (scheduled "
+"externally\n"
+"            via cron/Task Scheduler). Emails require the server's EMAIL_HOST "
+"to be configured;\n"
+"            without it, runs are logged but not sent."
+msgstr "Exécuté via <code>python manage.py run_scheduled_reports</code> (planifié en externe via cron/Planificateur de tâches). Les e-mails nécessitent que l'EMAIL_HOST du serveur soit configuré ; sans cela, les exécutions sont journalisées mais non envoyées."
+
+#: manufacturing/templates/report_builder_detail.html:62
+msgid "Enabled"
+msgstr "Activé"
+
+#: manufacturing/templates/report_builder_detail.html:65
+msgid "Frequency"
+msgstr "Fréquence"
+
+#: manufacturing/templates/report_builder_detail.html:73
+msgid "Recipients (comma-separated emails)"
+msgstr "Destinataires (e-mails séparés par des virgules)"
+
+#: manufacturing/templates/report_builder_detail.html:77
+msgid "Format"
+msgstr "Format"
+
+#: manufacturing/templates/report_builder_detail.html:84
+msgid "Save Schedule"
+msgstr "Enregistrer la programmation"
+
+#: manufacturing/templates/report_builder_detail.html:87
+#, python-format
+msgid "Last run: %(last_run)s"
+msgstr "Dernière exécution : %(last_run)s"
+
+#: manufacturing/templates/report_builder_form.html:3
+msgid "Edit Report"
+msgstr "Modifier le rapport"
+
+#: manufacturing/templates/report_builder_form.html:3
+#: manufacturing/templates/report_builder_list.html:7
+msgid "New Report"
+msgstr "Nouveau rapport"
+
+#: manufacturing/templates/report_builder_form.html:32
+#, python-format
+msgid "Edit Report: %(name)s"
+msgstr "Modifier le rapport : %(name)s"
+
+#: manufacturing/templates/report_builder_form.html:32
+msgid "New Custom Report"
+msgstr "Nouveau rapport personnalisé"
+
+#: manufacturing/templates/report_builder_form.html:36
+msgid "1. Choose a Table"
+msgstr "1. Choisir une table"
+
+#: manufacturing/templates/report_builder_form.html:43
+msgid "(select a table)"
+msgstr "(choisir une table)"
+
+#: manufacturing/templates/report_builder_form.html:49
+msgid "Choose"
+msgstr "Choisir"
+
+#: manufacturing/templates/report_builder_form.html:59
+msgid "2. Columns (used when no aggregate is selected below)"
+msgstr "2. Colonnes (utilisées si aucun agrégat n'est sélectionné ci-dessous)"
+
+#: manufacturing/templates/report_builder_form.html:69
+msgid "3. Filters"
+msgstr "3. Filtres"
+
+#: manufacturing/templates/report_builder_form.html:73
+msgid "(no filter)"
+msgstr "(aucun filtre)"
+
+#: manufacturing/templates/report_builder_form.html:85
+msgid "contains"
+msgstr "contient"
+
+#: manufacturing/templates/report_builder_form.html:86
+msgid "starts with"
+msgstr "commence par"
+
+#: manufacturing/templates/report_builder_form.html:87
+msgid "in (comma-separated)"
+msgstr "dans (séparé par des virgules)"
+
+#: manufacturing/templates/report_builder_form.html:88
+msgid "is empty"
+msgstr "est vide"
+
+#: manufacturing/templates/report_builder_form.html:89
+msgid "is not empty"
+msgstr "n'est pas vide"
+
+#: manufacturing/templates/report_builder_form.html:97
+msgid "4. Group By &amp; Aggregate (leave blank for a flat list report)"
+msgstr "4. Regrouper et agréger (laisser vide pour un rapport en liste simple)"
+
+#: manufacturing/templates/report_builder_form.html:99
+msgid "Group By"
+msgstr "Regrouper par"
+
+#: manufacturing/templates/report_builder_form.html:110
+msgid "(no aggregate)"
+msgstr "(aucun agrégat)"
+
+#: manufacturing/templates/report_builder_form.html:116
+msgid "Count"
+msgstr "Compter"
+
+#: manufacturing/templates/report_builder_form.html:117
+msgid "Sum"
+msgstr "Somme"
+
+#: manufacturing/templates/report_builder_form.html:118
+msgid "Average"
+msgstr "Moyenne"
+
+#: manufacturing/templates/report_builder_form.html:119
+msgid "Min"
+msgstr "Min"
+
+#: manufacturing/templates/report_builder_form.html:120
+msgid "Max"
+msgstr "Max"
+
+#: manufacturing/templates/report_builder_form.html:127
+msgid "5. Sort"
+msgstr "5. Trier"
+
+#: manufacturing/templates/report_builder_form.html:130
+msgid "(no sort)"
+msgstr "(aucun tri)"
+
+#: manufacturing/templates/report_builder_form.html:139
+msgid "Ascending"
+msgstr "Croissant"
+
+#: manufacturing/templates/report_builder_form.html:140
+msgid "Descending"
+msgstr "Décroissant"
+
+#: manufacturing/templates/report_builder_form.html:144
+msgid "Run Preview"
+msgstr "Lancer l'aperçu"
+
+#: manufacturing/templates/report_builder_form.html:149
+#, python-format
+msgid "Preview (%(counter)s row, max 200 shown)"
+msgid_plural "Preview (%(counter)s rows, max 200 shown)"
+msgstr[0] "Aperçu (%(counter)s ligne, 200 max affichées)"
+msgstr[1] "Aperçu (%(counter)s lignes, 200 max affichées)"
+
+#: manufacturing/templates/report_builder_form.html:164
+msgid "6. Save"
+msgstr "6. Enregistrer"
+
+#: manufacturing/templates/report_builder_form.html:166
+msgid "Report Name"
+msgstr "Nom du rapport"
+
+#: manufacturing/templates/report_builder_form.html:170
+#: manufacturing/templates/report_builder_list.html:22
+msgid "Access Level"
+msgstr "Niveau d'accès"
+
+#: manufacturing/templates/report_builder_form.html:176
+msgid "Only managers can share reports beyond Private."
+msgstr "Seuls les responsables peuvent partager des rapports au-delà de Privé."
+
+#: manufacturing/templates/report_builder_form.html:178
+msgid "Save Report"
+msgstr "Enregistrer le rapport"
+
+#: manufacturing/templates/report_builder_list.html:3
+#: manufacturing/templates/report_builder_list.html:13
+#: manufacturing/templates/reports_dashboard.html:8
+msgid "Custom Reports"
+msgstr "Rapports personnalisés"
+
+#: manufacturing/templates/report_builder_list.html:41
+msgid "Delete"
+msgstr "Supprimer"
+
+#: manufacturing/templates/report_builder_list.html:50
+msgid "No custom reports yet."
+msgstr "Aucun rapport personnalisé pour le moment."
+
+#: manufacturing/templates/reports_dashboard.html:4
+#: manufacturing/templates/reports_dashboard.html:139
+msgid "Reports Dashboard"
+msgstr "Tableau de bord des rapports"
+
+#: manufacturing/templates/reports_dashboard.html:9
+msgid "ESG Dashboard"
+msgstr "Tableau de bord ESG"
+
+#: manufacturing/templates/reports_dashboard.html:148
+msgid "total active spend"
+msgstr "dépenses actives totales"
+
+#: manufacturing/templates/reports_dashboard.html:150
+msgid "%(counter)s overdue"
+msgid_plural "%(counter)s overdue"
+msgstr[0] "%(counter)s en retard"
+msgstr[1] "%(counter)s en retard"
+
+#: manufacturing/templates/reports_dashboard.html:159
+msgid "View purchase orders →"
+msgstr "Voir les bons de commande →"
+
+#: manufacturing/templates/reports_dashboard.html:161
+#: manufacturing/templates/reports_dashboard.html:179
+#: manufacturing/templates/reports_dashboard.html:216
+#: manufacturing/templates/reports_dashboard.html:245
+msgid "Data unavailable"
+msgstr "Données indisponibles"
+
+#: manufacturing/templates/reports_dashboard.html:186
+msgid "Inventory Alerts"
+msgstr "Alertes de stock"
+
+#: manufacturing/templates/reports_dashboard.html:193
+msgid "item at or below reorder point"
+msgid_plural "items at or below reorder point"
+msgstr[0] "article au niveau ou en dessous du seuil de réapprovisionnement"
+msgstr[1] "articles au niveau ou en dessous du seuil de réapprovisionnement"
+
+#: manufacturing/templates/reports_dashboard.html:200
+msgid "On Hand"
+msgstr "En stock"
+
+#: manufacturing/templates/reports_dashboard.html:201
+msgid "Reorder At"
+msgstr "Seuil de réapprovisionnement"
+
+#: manufacturing/templates/reports_dashboard.html:241
+msgid "Today"
+msgstr "Aujourd'hui"
 
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format
