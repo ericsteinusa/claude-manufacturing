@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Campaign — {{ campaign.name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=campaign.name %}Campaign — {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing Dashboard</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/mkt/leads/" class="btn">Leads</a>
-<a href="/mkt/content/" class="btn">Content</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mkt/" class="btn">{% trans "Marketing Dashboard" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/mkt/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/mkt/content/" class="btn">{% trans "Content" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,36 +52,36 @@
     <div class="card">
         <div class="field-grid">
             <div class="field-group">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <div class="val"><span class="badge s-{{ campaign.status|lower }}">{{ campaign.status }}</span></div>
             </div>
             <div class="field-group">
-                <label>Channel</label>
+                <label>{% trans "Channel" %}</label>
                 <div class="val">{{ campaign.channel|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Objective</label>
+                <label>{% trans "Objective" %}</label>
                 <div class="val">{{ campaign.objective|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Owner</label>
+                <label>{% trans "Owner" %}</label>
                 <div class="val">{{ campaign.owner|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Start Date</label>
+                <label>{% trans "Start Date" %}</label>
                 <div class="val">{{ campaign.start_date|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>End Date</label>
+                <label>{% trans "End Date" %}</label>
                 <div class="val">{{ campaign.end_date|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Budget</label>
+                <label>{% trans "Budget" %}</label>
                 <div class="val">{% if campaign.budget %}${{ campaign.budget|floatformat:2 }}{% else %}—{% endif %}</div>
             </div>
             {% if campaign.notes %}
             <div class="field-group full-span">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <div class="val">{{ campaign.notes }}</div>
             </div>
             {% endif %}
@@ -89,16 +90,16 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Campaign</h3>
+        <h3>{% trans "Edit Campaign" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Name *</label>
+                    <label>{% trans "Name" %} *</label>
                     <input type="text" name="name" value="{{ campaign.name }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Channel</label>
+                    <label>{% trans "Channel" %}</label>
                     <select name="channel">
                         {% for ch in channels %}
                         <option value="{{ ch }}"{% if campaign.channel == ch %} selected{% endif %}>{{ ch }}</option>
@@ -106,7 +107,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Objective</label>
+                    <label>{% trans "Objective" %}</label>
                     <select name="objective">
                         {% for o in objectives %}
                         <option value="{{ o }}"{% if campaign.objective == o %} selected{% endif %}>{{ o }}</option>
@@ -114,7 +115,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in campaign_statuses %}
                         <option value="{{ s }}"{% if campaign.status == s %} selected{% endif %}>{{ s }}</option>
@@ -122,27 +123,27 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner" value="{{ campaign.owner|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ campaign.start_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ campaign.end_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Budget ($)</label>
+                    <label>{% trans "Budget ($)" %}</label>
                     <input type="number" name="budget" min="0" step="0.01" value="{{ campaign.budget|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ campaign.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="submit" class="btn-save">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}

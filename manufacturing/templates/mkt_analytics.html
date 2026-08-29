@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Marketing Analytics{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Marketing Analytics" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/mkt/leads/" class="btn">Leads</a>
-<a href="/mkt/ads/" class="btn">Advertising</a>
-<a href="/mkt/research/" class="btn">Research</a>
-<a href="/mkt/analytics/" class="btn">Analytics</a>
-<a href="/mkt/content/" class="btn">Content</a>
-<a href="/mkt/budget/" class="btn">Budget</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mkt/" class="btn">{% trans "Marketing" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/mkt/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/mkt/ads/" class="btn">{% trans "Advertising" %}</a>
+<a href="/mkt/research/" class="btn">{% trans "Research" %}</a>
+<a href="/mkt/analytics/" class="btn">{% trans "Analytics" %}</a>
+<a href="/mkt/content/" class="btn">{% trans "Content" %}</a>
+<a href="/mkt/budget/" class="btn">{% trans "Budget" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -44,44 +45,44 @@
 {% block body %}
 <div class="content">
 <div class="mkt-wrap">
-    <h2>Marketing Analytics</h2>
+    <h2>{% trans "Marketing Analytics" %}</h2>
 
     <div class="kpi-row" style="margin-bottom:16px;">
         <div class="kpi">
             <div class="num">{{ campaigns.total|default:0 }}</div>
-            <div class="lbl">Campaigns</div>
-            <div class="sub">{{ campaigns.active|default:0 }} active</div>
+            <div class="lbl">{% trans "Campaigns" %}</div>
+            <div class="sub">{% blocktrans count counter=campaigns.active|default:0 %}{{ counter }} active{% plural %}{{ counter }} active{% endblocktrans %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ leads.total|default:0 }}</div>
-            <div class="lbl">Leads</div>
-            <div class="sub">{{ leads.converted|default:0 }} converted</div>
+            <div class="lbl">{% trans "Leads" %}</div>
+            <div class="sub">{% blocktrans count counter=leads.converted|default:0 %}{{ counter }} converted{% plural %}{{ counter }} converted{% endblocktrans %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ ads.total|default:0 }}</div>
-            <div class="lbl">Ads</div>
-            <div class="sub">${{ ads.total_spend|floatformat:0 }} spend</div>
+            <div class="lbl">{% trans "Ads" %}</div>
+            <div class="sub">{% blocktrans with spend=ads.total_spend|floatformat:0 %}${{ spend }} spend{% endblocktrans %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ ads.total_impressions|default:0 }}</div>
-            <div class="lbl">Impressions</div>
-            <div class="sub">{{ ads.total_clicks|default:0 }} clicks</div>
+            <div class="lbl">{% trans "Impressions" %}</div>
+            <div class="sub">{% blocktrans count counter=ads.total_clicks|default:0 %}{{ counter }} clicks{% plural %}{{ counter }} clicks{% endblocktrans %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ ads.total_conversions|default:0 }}</div>
-            <div class="lbl">Conversions</div>
-            <div class="sub">from ads</div>
+            <div class="lbl">{% trans "Conversions" %}</div>
+            <div class="sub">{% trans "from ads" %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ content.published|default:0 }}</div>
-            <div class="lbl">Published</div>
-            <div class="sub">{{ content.draft|default:0 }} in draft</div>
+            <div class="lbl">{% trans "Published" %}</div>
+            <div class="sub">{% blocktrans count counter=content.draft|default:0 %}{{ counter }} in draft{% plural %}{{ counter }} in draft{% endblocktrans %}</div>
         </div>
     </div>
 
     <div class="section-row">
         <div class="card">
-            <h3>Leads by Source</h3>
+            <h3>{% trans "Leads by Source" %}</h3>
             {% if leads_by_source %}
             {% with max_leads=leads_by_source.0.cnt %}
             {% for row in leads_by_source %}
@@ -97,21 +98,21 @@
             {% endfor %}
             {% endwith %}
             {% else %}
-            <div class="empty-msg">No lead data yet.</div>
+            <div class="empty-msg">{% trans "No lead data yet." %}</div>
             {% endif %}
         </div>
 
         <div class="card">
-            <h3>Ad Performance by Channel</h3>
+            <h3>{% trans "Ad Performance by Channel" %}</h3>
             {% if channel_performance %}
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Channel</th>
-                        <th class="metric">Ads</th>
-                        <th class="metric">Spend</th>
-                        <th class="metric">Clicks</th>
-                        <th class="metric">Conv.</th>
+                        <th>{% trans "Channel" %}</th>
+                        <th class="metric">{% trans "Ads" %}</th>
+                        <th class="metric">{% trans "Spend" %}</th>
+                        <th class="metric">{% trans "Clicks" %}</th>
+                        <th class="metric">{% trans "Conv." %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,40 +128,40 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-msg">No ad performance data yet.</div>
+            <div class="empty-msg">{% trans "No ad performance data yet." %}</div>
             {% endif %}
         </div>
     </div>
 
     <div class="card">
-        <h3>Summary</h3>
+        <h3>{% trans "Summary" %}</h3>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
             <div>
-                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Campaigns</div>
-                <div style="font-size:13px;">Total: <strong>{{ campaigns.total|default:0 }}</strong></div>
-                <div style="font-size:13px;">Active: <strong>{{ campaigns.active|default:0 }}</strong></div>
-                <div style="font-size:13px;">Completed: <strong>{{ campaigns.completed|default:0 }}</strong></div>
-                <div style="font-size:13px;">Total Budget: <strong>${{ campaigns.total_budget|floatformat:0 }}</strong></div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">{% trans "Campaigns" %}</div>
+                <div style="font-size:13px;">{% trans "Total" %}: <strong>{{ campaigns.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Active" %}: <strong>{{ campaigns.active|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Completed" %}: <strong>{{ campaigns.completed|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Total Budget" %}: <strong>${{ campaigns.total_budget|floatformat:0 }}</strong></div>
             </div>
             <div>
-                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Leads</div>
-                <div style="font-size:13px;">Total: <strong>{{ leads.total|default:0 }}</strong></div>
-                <div style="font-size:13px;">New: <strong>{{ leads.new_count|default:0 }}</strong></div>
-                <div style="font-size:13px;">Qualified: <strong>{{ leads.qualified|default:0 }}</strong></div>
-                <div style="font-size:13px;">Converted: <strong>{{ leads.converted|default:0 }}</strong></div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">{% trans "Leads" %}</div>
+                <div style="font-size:13px;">{% trans "Total" %}: <strong>{{ leads.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "New" %}: <strong>{{ leads.new_count|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Qualified" %}: <strong>{{ leads.qualified|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Converted" %}: <strong>{{ leads.converted|default:0 }}</strong></div>
             </div>
             <div>
-                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Advertising</div>
-                <div style="font-size:13px;">Total Ads: <strong>{{ ads.total|default:0 }}</strong></div>
-                <div style="font-size:13px;">Budget: <strong>${{ ads.total_budget|floatformat:0 }}</strong></div>
-                <div style="font-size:13px;">Spend: <strong>${{ ads.total_spend|floatformat:0 }}</strong></div>
-                <div style="font-size:13px;">Impressions: <strong>{{ ads.total_impressions|default:0 }}</strong></div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">{% trans "Advertising" %}</div>
+                <div style="font-size:13px;">{% trans "Total Ads" %}: <strong>{{ ads.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Budget" %}: <strong>${{ ads.total_budget|floatformat:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Spend" %}: <strong>${{ ads.total_spend|floatformat:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Impressions" %}: <strong>{{ ads.total_impressions|default:0 }}</strong></div>
             </div>
             <div>
-                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">Content</div>
-                <div style="font-size:13px;">Total: <strong>{{ content.total|default:0 }}</strong></div>
-                <div style="font-size:13px;">Published: <strong>{{ content.published|default:0 }}</strong></div>
-                <div style="font-size:13px;">In Draft: <strong>{{ content.draft|default:0 }}</strong></div>
+                <div style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:6px;">{% trans "Content" %}</div>
+                <div style="font-size:13px;">{% trans "Total" %}: <strong>{{ content.total|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "Published" %}: <strong>{{ content.published|default:0 }}</strong></div>
+                <div style="font-size:13px;">{% trans "In Draft" %}: <strong>{{ content.draft|default:0 }}</strong></div>
             </div>
         </div>
     </div>

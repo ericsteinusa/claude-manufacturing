@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Lead — {{ lead.name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with name=lead.name %}Lead — {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing Dashboard</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/mkt/leads/" class="btn">Leads</a>
-<a href="/mkt/content/" class="btn">Content</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mkt/" class="btn">{% trans "Marketing Dashboard" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/mkt/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/mkt/content/" class="btn">{% trans "Content" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -52,32 +53,32 @@
     <div class="card">
         <div class="field-grid">
             <div class="field-group">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <div class="val"><span class="badge s-{{ lead.status|lower }}">{{ lead.status }}</span></div>
             </div>
             <div class="field-group">
-                <label>Source</label>
+                <label>{% trans "Source" %}</label>
                 <div class="val">{{ lead.source|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Company</label>
+                <label>{% trans "Company" %}</label>
                 <div class="val">{{ lead.company|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Email</label>
+                <label>{% trans "Email" %}</label>
                 <div class="val">{{ lead.email|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Owner</label>
+                <label>{% trans "Owner" %}</label>
                 <div class="val">{{ lead.owner|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Captured Date</label>
+                <label>{% trans "Captured Date" %}</label>
                 <div class="val">{{ lead.captured_date|default:"—" }}</div>
             </div>
             {% if lead.notes %}
             <div class="field-group full-span">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <div class="val">{{ lead.notes }}</div>
             </div>
             {% endif %}
@@ -86,24 +87,24 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Lead</h3>
+        <h3>{% trans "Edit Lead" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Name *</label>
+                    <label>{% trans "Name" %} *</label>
                     <input type="text" name="name" value="{{ lead.name }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Company</label>
+                    <label>{% trans "Company" %}</label>
                     <input type="text" name="company" value="{{ lead.company|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>{% trans "Email" %}</label>
                     <input type="email" name="email" value="{{ lead.email|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Source</label>
+                    <label>{% trans "Source" %}</label>
                     <select name="source">
                         {% for src in lead_sources %}
                         <option value="{{ src }}"{% if lead.source == src %} selected{% endif %}>{{ src }}</option>
@@ -111,15 +112,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner" value="{{ lead.owner|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Captured Date</label>
+                    <label>{% trans "Captured Date" %}</label>
                     <input type="date" name="captured_date" value="{{ lead.captured_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in lead_statuses %}
                         <option value="{{ s }}"{% if lead.status == s %} selected{% endif %}>{{ s }}</option>
@@ -127,11 +128,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ lead.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="submit" class="btn-save">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Content{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Content" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing Dashboard</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/mkt/leads/" class="btn">Leads</a>
-<a href="/mkt/content/" class="btn">Content</a>
-<a href="/mkt/budget/" class="btn">Budget</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/mkt/" class="btn">{% trans "Marketing Dashboard" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/mkt/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/mkt/content/" class="btn">{% trans "Content" %}</a>
+<a href="/mkt/budget/" class="btn">{% trans "Budget" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,40 +54,40 @@
 {% block body %}
 <div class="content">
 <div class="mkt-wrap">
-    <h2>Content</h2>
+    <h2>{% trans "Content" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in content_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
         <select name="content_type">
-            <option value="">All Types</option>
+            <option value="">{% trans "All Types" %}</option>
             {% for t in content_types %}
             <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search title / author…">
-        <button type="submit">Filter</button>
-        <a href="/mkt/content/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search title / author…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/mkt/content/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Channel</th>
-                    <th>Author</th>
-                    <th>Due Date</th>
-                    <th>Publish Date</th>
-                    <th>Status</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Channel" %}</th>
+                    <th>{% trans "Author" %}</th>
+                    <th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Publish Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -101,7 +102,7 @@
                 <td><span class="badge s-{{ item.status|lower|slugify }}">{{ item.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No content found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No content found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -109,16 +110,16 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card">
-        <h3>New Content</h3>
+        <h3>{% trans "New Content" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Title *</label>
+                    <label>{% trans "Title" %} *</label>
                     <input type="text" name="title" required>
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="content_type">
                         {% for t in content_types %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -126,7 +127,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Channel</label>
+                    <label>{% trans "Channel" %}</label>
                     <select name="channel">
                         {% for ch in channels %}
                         <option value="{{ ch }}">{{ ch }}</option>
@@ -134,7 +135,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in content_statuses %}
                         <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
@@ -142,23 +143,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Author</label>
+                    <label>{% trans "Author" %}</label>
                     <input type="text" name="author">
                 </div>
                 <div class="form-group">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     <input type="date" name="due_date">
                 </div>
                 <div class="form-group">
-                    <label>Publish Date</label>
+                    <label>{% trans "Publish Date" %}</label>
                     <input type="date" name="publish_date">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Content</button>
+            <button type="submit" class="btn-submit">{% trans "Add Content" %}</button>
         </form>
     </div>
     {% endif %}

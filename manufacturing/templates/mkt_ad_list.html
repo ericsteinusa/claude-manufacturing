@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% block page_title %}Advertising{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Advertising" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/mkt/" class="btn">Marketing</a>
-<a href="/mkt/campaigns/" class="btn">Campaigns</a>
-<a href="/mkt/leads/" class="btn">Leads</a>
-<a href="/mkt/ads/" class="btn">Advertising</a>
-<a href="/mkt/research/" class="btn">Research</a>
-<a href="/mkt/analytics/" class="btn">Analytics</a>
-<a href="/mkt/content/" class="btn">Content</a>
-<a href="/mkt/budget/" class="btn">Budget</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if channel_filter %}&channel={{ channel_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if channel_filter %}&channel={{ channel_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/mkt/" class="btn">{% trans "Marketing" %}</a>
+<a href="/mkt/campaigns/" class="btn">{% trans "Campaigns" %}</a>
+<a href="/mkt/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/mkt/ads/" class="btn">{% trans "Advertising" %}</a>
+<a href="/mkt/research/" class="btn">{% trans "Research" %}</a>
+<a href="/mkt/analytics/" class="btn">{% trans "Analytics" %}</a>
+<a href="/mkt/content/" class="btn">{% trans "Content" %}</a>
+<a href="/mkt/budget/" class="btn">{% trans "Budget" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if channel_filter %}&channel={{ channel_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if channel_filter %}&channel={{ channel_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -60,27 +61,27 @@
 {% block body %}
 <div class="content">
 <div class="mkt-wrap">
-    <h2>Advertising</h2>
+    <h2>{% trans "Advertising" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in ad_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
         <select name="channel">
-            <option value="">All Channels</option>
+            <option value="">{% trans "All Channels" %}</option>
             {% for c in ad_channels %}
             <option value="{{ c }}"{% if channel_filter == c %} selected{% endif %}>{{ c }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search name / campaign / owner…">
-        <button type="submit">Filter</button>
-        <a href="/mkt/ads/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search name / campaign / owner…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/mkt/ads/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
@@ -88,17 +89,17 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Ad Name</th>
-                    <th>Channel</th>
-                    <th>Campaign</th>
-                    <th>Status</th>
-                    <th>Budget</th>
-                    <th>Spend</th>
-                    <th class="metric">Impressions</th>
-                    <th class="metric">Clicks</th>
-                    <th class="metric">Conv.</th>
-                    <th>Start</th>
-                    <th>End</th>
+                    <th>{% trans "Ad Name" %}</th>
+                    <th>{% trans "Channel" %}</th>
+                    <th>{% trans "Campaign" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Budget" %}</th>
+                    <th>{% trans "Spend" %}</th>
+                    <th class="metric">{% trans "Impressions" %}</th>
+                    <th class="metric">{% trans "Clicks" %}</th>
+                    <th class="metric">{% trans "Conv." %}</th>
+                    <th>{% trans "Start" %}</th>
+                    <th>{% trans "End" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,7 +119,7 @@
                 <td>{{ a.end_date|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="12" style="color:#888;text-align:center;">No ads found.</td></tr>
+            <tr><td colspan="12" style="color:#888;text-align:center;">{% trans "No ads found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -126,37 +127,37 @@
 
     {% if user_role != 'Auditor' %}
     <div class="card">
-        <h3>New Ad</h3>
+        <h3>{% trans "New Ad" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Ad Name *</label>
-                    <input type="text" name="name" placeholder="e.g. Spring Product Launch">
+                    <label>{% trans "Ad Name" %} *</label>
+                    <input type="text" name="name" placeholder="{% trans 'e.g. Spring Product Launch' %}">
                 </div>
                 <div class="form-group">
-                    <label>Channel</label>
+                    <label>{% trans "Channel" %}</label>
                     <select name="channel">
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for c in ad_channels %}
                         <option value="{{ c }}">{{ c }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Campaign</label>
-                    <input type="text" name="campaign_name" placeholder="Associated campaign name">
+                    <label>{% trans "Campaign" %}</label>
+                    <input type="text" name="campaign_name" placeholder="{% trans 'Associated campaign name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Budget ($)</label>
+                    <label>{% trans "Budget ($)" %}</label>
                     <input type="number" name="budget" value="0" step="0.01" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Spend ($)</label>
+                    <label>{% trans "Spend ($)" %}</label>
                     <input type="number" name="spend" value="0" step="0.01" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in ad_statuses %}
                         <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
@@ -164,23 +165,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date">
                 </div>
                 <div class="form-group">
-                    <label>Owner</label>
-                    <input type="text" name="owner" placeholder="Campaign manager">
+                    <label>{% trans "Owner" %}</label>
+                    <input type="text" name="owner" placeholder="{% trans 'Campaign manager' %}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional notes">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'Optional notes' %}">
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Ad</button>
+            <button type="submit" class="btn-submit">{% trans "Add Ad" %}</button>
         </form>
     </div>
     {% endif %}
