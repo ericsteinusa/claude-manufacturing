@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 22:49+0000\n"
+"POT-Creation-Date: 2026-08-29 23:11+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -58,6 +58,14 @@ msgstr "Berichte"
 #: manufacturing/templates/mkt_lead_list.html:11
 #: manufacturing/templates/mkt_research_detail.html:9
 #: manufacturing/templates/mkt_research_list.html:14
+#: manufacturing/templates/payroll_dashboard.html:10
+#: manufacturing/templates/payroll_deductions.html:9
+#: manufacturing/templates/payroll_history.html:14
+#: manufacturing/templates/payroll_pay_rates.html:9
+#: manufacturing/templates/payroll_run_detail.html:8
+#: manufacturing/templates/payroll_run_new.html:8
+#: manufacturing/templates/payroll_stub_detail.html:8
+#: manufacturing/templates/payroll_ytd.html:8
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
 #: manufacturing/templates/report_builder_list.html:8
@@ -119,6 +127,12 @@ msgstr "Abmelden"
 
 #: manufacturing/templates/base.html:478
 #: manufacturing/templates/dashboard.html:4
+#: manufacturing/templates/payroll_deductions.html:6
+#: manufacturing/templates/payroll_history.html:6
+#: manufacturing/templates/payroll_pay_rates.html:6
+#: manufacturing/templates/payroll_run_detail.html:7
+#: manufacturing/templates/payroll_run_new.html:7
+#: manufacturing/templates/payroll_ytd.html:6
 msgid "Dashboard"
 msgstr "Übersicht"
 
@@ -211,6 +225,7 @@ msgid "General Ledger"
 msgstr "Hauptbuch"
 
 #: manufacturing/templates/base.html:536
+#: manufacturing/templates/payroll_dashboard.html:3
 msgid "Payroll"
 msgstr "Lohnabrechnung"
 
@@ -551,6 +566,9 @@ msgstr "Rechtsstreitigkeiten"
 #: manufacturing/templates/mkt_research_detail.html:137
 #: manufacturing/templates/mkt_research_list.html:95
 #: manufacturing/templates/mkt_research_list.html:153
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_history.html:39
+#: manufacturing/templates/payroll_run_detail.html:41
 #: manufacturing/templates/prod_dashboard.html:114
 msgid "Status"
 msgstr "Status"
@@ -637,6 +655,7 @@ msgstr "Abschlussdatum"
 #: manufacturing/templates/mkt_research_detail.html:95
 #: manufacturing/templates/mkt_research_detail.html:153
 #: manufacturing/templates/mkt_research_list.html:165
+#: manufacturing/templates/payroll_deductions.html:192
 msgid "Notes"
 msgstr "Notizen"
 
@@ -763,6 +782,7 @@ msgstr "Filtern"
 #: manufacturing/templates/mkt_content_list.html:77
 #: manufacturing/templates/mkt_lead_list.html:80
 #: manufacturing/templates/mkt_research_list.html:81
+#: manufacturing/templates/payroll_pay_rates.html:58
 msgid "Clear"
 msgstr "Zurücksetzen"
 
@@ -956,6 +976,10 @@ msgstr "Verträge gesamt"
 #: manufacturing/templates/legal_dashboard.html:63
 #: manufacturing/templates/marketing_dashboard.html:70
 #: manufacturing/templates/mkt_analytics.html:142
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:66
+#: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/payroll_deductions.html:189
 msgid "Active"
 msgstr "Aktiv"
 
@@ -1027,6 +1051,13 @@ msgstr "Fall"
 
 #: manufacturing/templates/legal_employment_list.html:73
 #: manufacturing/templates/legal_employment_list.html:114
+#: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/payroll_deductions.html:161
+#: manufacturing/templates/payroll_pay_rates.html:64
+#: manufacturing/templates/payroll_pay_rates.html:104
+#: manufacturing/templates/payroll_pay_rates.html:148
+#: manufacturing/templates/payroll_run_detail.html:65
+#: manufacturing/templates/payroll_ytd.html:55
 msgid "Employee"
 msgstr "Mitarbeiter"
 
@@ -1069,6 +1100,8 @@ msgstr "Element"
 #: manufacturing/templates/legal_governance_list.html:105
 #: manufacturing/templates/mkt_budget_list.html:82
 #: manufacturing/templates/mkt_budget_list.html:120
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:87
 msgid "Category"
 msgstr "Kategorie"
 
@@ -1521,6 +1554,8 @@ msgstr "Aktuelle Kampagnen"
 #: manufacturing/templates/mkt_lead_detail.html:95
 #: manufacturing/templates/mkt_lead_list.html:87
 #: manufacturing/templates/mkt_lead_list.html:121
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:83
 #: manufacturing/templates/report_builder_list.html:20
 msgid "Name"
 msgstr "Name"
@@ -1778,6 +1813,7 @@ msgid "Search item / campaign / requester…"
 msgstr "Element / Kampagne / Antragsteller suchen…"
 
 #: manufacturing/templates/mkt_budget_list.html:83
+#: manufacturing/templates/payroll_deductions.html:121
 msgid "Amount"
 msgstr "Betrag"
 
@@ -1986,6 +2022,581 @@ msgstr "Was wird diese Forschung abdecken?"
 msgid "Create Project"
 msgstr "Projekt erstellen"
 
+#: manufacturing/templates/payroll_dashboard.html:6
+#: manufacturing/templates/payroll_dashboard.html:65
+#: manufacturing/templates/payroll_deductions.html:7
+#: manufacturing/templates/payroll_history.html:10
+#: manufacturing/templates/payroll_pay_rates.html:3
+msgid "Pay Rates"
+msgstr "Gehaltssätze"
+
+#: manufacturing/templates/payroll_dashboard.html:7
+#: manufacturing/templates/payroll_pay_rates.html:7
+msgid "Deductions"
+msgstr "Abzüge"
+
+#: manufacturing/templates/payroll_dashboard.html:8
+#: manufacturing/templates/payroll_deductions.html:8
+#: manufacturing/templates/payroll_pay_rates.html:8
+#: manufacturing/templates/payroll_ytd.html:7
+msgid "History"
+msgstr "Historie"
+
+#: manufacturing/templates/payroll_dashboard.html:9
+#: manufacturing/templates/payroll_dashboard.html:68
+#: manufacturing/templates/payroll_history.html:11
+msgid "YTD Report"
+msgstr "Jahresbericht (YTD)"
+
+#: manufacturing/templates/payroll_dashboard.html:39
+msgid "Payroll Department"
+msgstr "Lohnbuchhaltung"
+
+#: manufacturing/templates/payroll_dashboard.html:44
+msgid "Payroll Runs"
+msgstr "Lohnläufe"
+
+#: manufacturing/templates/payroll_dashboard.html:48
+msgid "Employees with Pay Rates"
+msgstr "Mitarbeiter mit Gehaltssätzen"
+
+#: manufacturing/templates/payroll_dashboard.html:52
+msgid "Total Employees"
+msgstr "Mitarbeiter insgesamt"
+
+#: manufacturing/templates/payroll_dashboard.html:56
+msgid "Active Deduction Types"
+msgstr "Aktive Abzugsarten"
+
+#: manufacturing/templates/payroll_dashboard.html:60
+msgid "YTD Gross Payroll"
+msgstr "Bruttolohn (Jahr bis heute)"
+
+#: manufacturing/templates/payroll_dashboard.html:66
+#: manufacturing/templates/payroll_deductions.html:45
+msgid "Deductions &amp; Benefits"
+msgstr "Abzüge und Leistungen"
+
+#: manufacturing/templates/payroll_dashboard.html:67
+#: manufacturing/templates/payroll_history.html:3
+#: manufacturing/templates/payroll_history.html:32
+#: manufacturing/templates/payroll_run_new.html:6
+msgid "Payroll History"
+msgstr "Lohnhistorie"
+
+#: manufacturing/templates/payroll_dashboard.html:73
+msgid "Monthly Gross Payroll"
+msgstr "Monatlicher Bruttolohn"
+
+#: manufacturing/templates/payroll_dashboard.html:77
+msgid "YTD Payroll by Department"
+msgstr "Jahresgehalt nach Abteilung"
+
+#: manufacturing/templates/payroll_dashboard.html:84
+msgid "Recent Payroll Runs"
+msgstr "Letzte Lohnläufe"
+
+#: manufacturing/templates/payroll_dashboard.html:87
+#: manufacturing/templates/payroll_history.html:37
+#: manufacturing/templates/payroll_run_detail.html:37
+msgid "Run Date"
+msgstr "Ausführungsdatum"
+
+#: manufacturing/templates/payroll_dashboard.html:87
+#: manufacturing/templates/payroll_history.html:37
+msgid "Period"
+msgstr "Zeitraum"
+
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_history.html:38
+#: manufacturing/templates/payroll_run_detail.html:49
+msgid "Employees"
+msgstr "Mitarbeiter"
+
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_history.html:38
+#: manufacturing/templates/payroll_run_detail.html:53
+msgid "Total Gross"
+msgstr "Bruttosumme"
+
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_run_detail.html:70
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "Net Pay"
+msgstr "Nettolohn"
+
+#: manufacturing/templates/payroll_dashboard.html:104
+msgid "View all runs →"
+msgstr "Alle Lohnläufe anzeigen →"
+
+#: manufacturing/templates/payroll_dashboard.html:109
+msgid "No Payroll Runs Yet"
+msgstr "Noch keine Lohnläufe"
+
+#: manufacturing/templates/payroll_dashboard.html:110
+msgid "Payroll runs are created from the desktop application."
+msgstr "Lohnläufe werden über die Desktop-Anwendung erstellt."
+
+#: manufacturing/templates/payroll_deductions.html:3
+msgid "Deductions & Benefits"
+msgstr "Abzüge und Leistungen"
+
+#: manufacturing/templates/payroll_deductions.html:52
+msgid "Deduction Types"
+msgstr "Abzugsarten"
+
+#: manufacturing/templates/payroll_deductions.html:56
+msgid "Pre-Tax"
+msgstr "Vor Steuern"
+
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+msgid "Yes"
+msgstr "Ja"
+
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+msgid "No"
+msgstr "Nein"
+
+#: manufacturing/templates/payroll_deductions.html:66
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: manufacturing/templates/payroll_deductions.html:72
+msgid "No deduction types defined."
+msgstr "Keine Abzugsarten definiert."
+
+#: manufacturing/templates/payroll_deductions.html:77
+msgid "Add Deduction Type"
+msgstr "Abzugsart hinzufügen"
+
+#: manufacturing/templates/payroll_deductions.html:93
+msgid "Pre-Tax Deduction"
+msgstr "Abzug vor Steuern"
+
+#: manufacturing/templates/payroll_deductions.html:96
+msgid "Add Type"
+msgstr "Art hinzufügen"
+
+#: manufacturing/templates/payroll_deductions.html:103
+msgid "Assign Deductions to Employees"
+msgstr "Abzüge Mitarbeitern zuweisen"
+
+#: manufacturing/templates/payroll_deductions.html:106
+msgid "Filter by Employee:"
+msgstr "Nach Mitarbeiter filtern:"
+
+#: manufacturing/templates/payroll_deductions.html:109
+#: manufacturing/templates/payroll_ytd.html:42
+msgid "All Employees"
+msgstr "Alle Mitarbeiter"
+
+#: manufacturing/templates/payroll_deductions.html:121
+msgid "Deduction"
+msgstr "Abzug"
+
+#: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/payroll_deductions.html:179
+msgid "Method"
+msgstr "Methode"
+
+#: manufacturing/templates/payroll_deductions.html:141
+msgid "Remove"
+msgstr "Entfernen"
+
+#: manufacturing/templates/payroll_deductions.html:150
+msgid "No deduction assignments found."
+msgstr "Keine Abzugszuweisungen gefunden."
+
+#: manufacturing/templates/payroll_deductions.html:155
+#: manufacturing/templates/payroll_deductions.html:196
+msgid "Assign Deduction"
+msgstr "Abzug zuweisen"
+
+#: manufacturing/templates/payroll_deductions.html:163
+#: manufacturing/templates/payroll_deductions.html:172
+#: manufacturing/templates/payroll_pay_rates.html:150
+msgid "-- select --"
+msgstr "-- auswählen --"
+
+#: manufacturing/templates/payroll_deductions.html:170
+msgid "Deduction Type"
+msgstr "Abzugsart"
+
+#: manufacturing/templates/payroll_deductions.html:185
+msgid "Amount ($/%%)"
+msgstr "Betrag ($/%%)"
+
+#: manufacturing/templates/payroll_history.html:8
+#: manufacturing/templates/payroll_run_new.html:3
+#: manufacturing/templates/payroll_run_new.html:30
+msgid "Run Payroll"
+msgstr "Lohnabrechnung ausführen"
+
+#: manufacturing/templates/payroll_history.html:12
+#: manufacturing/templates/report_builder_detail.html:8
+msgid "Export CSV"
+msgstr "CSV exportieren"
+
+#: manufacturing/templates/payroll_history.html:13
+msgid "Export Excel"
+msgstr "Excel exportieren"
+
+#: manufacturing/templates/payroll_history.html:38
+#: manufacturing/templates/payroll_run_detail.html:57
+msgid "Total Net"
+msgstr "Nettosumme"
+
+#: manufacturing/templates/payroll_history.html:39
+#: manufacturing/templates/payroll_run_detail.html:45
+msgid "Created By"
+msgstr "Erstellt von"
+
+#: manufacturing/templates/payroll_history.html:57
+msgid "No payroll runs found."
+msgstr "Keine Lohnläufe gefunden."
+
+#: manufacturing/templates/payroll_history.html:58
+msgid "Run payroll"
+msgstr "Lohnabrechnung ausführen"
+
+#: manufacturing/templates/payroll_history.html:58
+msgid "to create the first one."
+msgstr "um den ersten zu erstellen."
+
+#: manufacturing/templates/payroll_pay_rates.html:50
+msgid "Employee Pay Rates"
+msgstr "Gehaltssätze der Mitarbeiter"
+
+#: manufacturing/templates/payroll_pay_rates.html:56
+msgid "Search by name…"
+msgstr "Nach Namen suchen…"
+
+#: manufacturing/templates/payroll_pay_rates.html:57
+msgid "Go"
+msgstr "Los"
+
+#: manufacturing/templates/payroll_pay_rates.html:64
+msgid "Emp ID"
+msgstr "Mitarbeiter-ID"
+
+#: manufacturing/templates/payroll_pay_rates.html:64
+#: manufacturing/templates/payroll_pay_rates.html:112
+#: manufacturing/templates/payroll_pay_rates.html:157
+msgid "Pay Type"
+msgstr "Vergütungsart"
+
+#: manufacturing/templates/payroll_pay_rates.html:64
+msgid "Pay Rate"
+msgstr "Gehaltssatz"
+
+#: manufacturing/templates/payroll_pay_rates.html:64
+#: manufacturing/templates/payroll_pay_rates.html:122
+#: manufacturing/templates/payroll_pay_rates.html:167
+msgid "Effective Date"
+msgstr "Gültig ab"
+
+#: manufacturing/templates/payroll_pay_rates.html:65
+#: manufacturing/templates/payroll_pay_rates.html:87
+#: manufacturing/templates/report_builder_detail.html:7
+#: manufacturing/templates/report_builder_list.html:37
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: manufacturing/templates/payroll_pay_rates.html:75
+msgid "not set"
+msgstr "nicht festgelegt"
+
+#: manufacturing/templates/payroll_pay_rates.html:97
+msgid "Edit Pay Rate"
+msgstr "Gehaltssatz bearbeiten"
+
+#: manufacturing/templates/payroll_pay_rates.html:118
+msgid "Rate ($/hr or annual salary)"
+msgstr "Satz ($/Std. oder Jahresgehalt)"
+
+#: manufacturing/templates/payroll_pay_rates.html:127
+msgid "Save"
+msgstr "Speichern"
+
+#: manufacturing/templates/payroll_pay_rates.html:129
+msgid "Remove Rate"
+msgstr "Satz entfernen"
+
+#: manufacturing/templates/payroll_pay_rates.html:131
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: manufacturing/templates/payroll_pay_rates.html:142
+msgid "Add / Update Pay Rate"
+msgstr "Gehaltssatz hinzufügen/aktualisieren"
+
+#: manufacturing/templates/payroll_pay_rates.html:163
+msgid "Rate ($)"
+msgstr "Satz ($)"
+
+#: manufacturing/templates/payroll_pay_rates.html:172
+msgid "Save Pay Rate"
+msgstr "Gehaltssatz speichern"
+
+#: manufacturing/templates/payroll_run_detail.html:3
+msgid "Payroll Run"
+msgstr "Lohnlauf"
+
+#: manufacturing/templates/payroll_run_detail.html:6
+#: manufacturing/templates/payroll_stub_detail.html:7
+msgid "All Runs"
+msgstr "Alle Läufe"
+
+#: manufacturing/templates/payroll_run_detail.html:33
+#, python-format
+msgid "Payroll Run — %(start)s to %(end)s"
+msgstr "Lohnlauf — %(start)s bis %(end)s"
+
+#: manufacturing/templates/payroll_run_detail.html:66
+#: manufacturing/templates/payroll_ytd.html:56
+msgid "Reg Hrs"
+msgstr "Reg. Std."
+
+#: manufacturing/templates/payroll_run_detail.html:66
+#: manufacturing/templates/payroll_ytd.html:56
+msgid "OT Hrs"
+msgstr "Überstd."
+
+#: manufacturing/templates/payroll_run_detail.html:67
+#: manufacturing/templates/payroll_ytd.html:57
+msgid "Gross Pay"
+msgstr "Bruttolohn"
+
+#: manufacturing/templates/payroll_run_detail.html:67
+#: manufacturing/templates/payroll_ytd.html:57
+msgid "Pre-Tax Deds"
+msgstr "Abz. vor Steuern"
+
+#: manufacturing/templates/payroll_run_detail.html:68
+#: manufacturing/templates/payroll_ytd.html:58
+msgid "Fed Tax"
+msgstr "Bundessteuer"
+
+#: manufacturing/templates/payroll_run_detail.html:68
+#: manufacturing/templates/payroll_ytd.html:58
+msgid "State Tax"
+msgstr "Landessteuer"
+
+#: manufacturing/templates/payroll_run_detail.html:69
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "SS"
+msgstr "SV"
+
+#: manufacturing/templates/payroll_run_detail.html:69
+#: manufacturing/templates/payroll_ytd.html:59
+msgid "Medicare"
+msgstr "Medicare"
+
+#: manufacturing/templates/payroll_run_detail.html:70
+msgid "Post-Tax Deds"
+msgstr "Abz. nach Steuern"
+
+#: manufacturing/templates/payroll_run_detail.html:91
+#: manufacturing/templates/payroll_ytd.html:80
+msgid "TOTALS"
+msgstr "GESAMT"
+
+#: manufacturing/templates/payroll_run_detail.html:100
+msgid "Click a row to view that employee's pay stub."
+msgstr "Klicken Sie auf eine Zeile, um die Gehaltsabrechnung dieses Mitarbeiters anzuzeigen."
+
+#: manufacturing/templates/payroll_run_detail.html:102
+msgid "No entries for this run."
+msgstr "Keine Einträge für diesen Lauf."
+
+#: manufacturing/templates/payroll_run_new.html:34
+msgid "New Payroll Run"
+msgstr "Neuer Lohnlauf"
+
+#: manufacturing/templates/payroll_run_new.html:36
+msgid ""
+"Hourly employees are paid on actual clocked hours for this period\n"
+"            (regular + overtime, same split as the Time Clock OT report).\n"
+"            Salaried employees are paid their annual rate divided by the\n"
+"            number of pay periods per year for the frequency chosen below.\n"
+"            Only employees with a pay rate on file are included."
+msgstr "Stundenlöhner werden auf Basis der tatsächlich erfassten Arbeitsstunden für diesen Zeitraum bezahlt (reguläre Stunden + Überstunden, gleiche Aufteilung wie im Zeiterfassungs-Überstundenbericht). Gehaltsempfänger erhalten ihren Jahressatz geteilt durch die Anzahl der Zahlungszeiträume pro Jahr für die unten gewählte Häufigkeit. Es werden nur Mitarbeiter mit hinterlegtem Gehaltssatz berücksichtigt."
+
+#: manufacturing/templates/payroll_run_new.html:46
+msgid "Pay Period Start"
+msgstr "Beginn des Zahlungszeitraums"
+
+#: manufacturing/templates/payroll_run_new.html:50
+msgid "Pay Period End"
+msgstr "Ende des Zahlungszeitraums"
+
+#: manufacturing/templates/payroll_run_new.html:54
+msgid "Pay Frequency"
+msgstr "Zahlungshäufigkeit"
+
+#: manufacturing/templates/payroll_run_new.html:63
+#, python-format
+msgid "Federal Tax Rate (%%)"
+msgstr "Bundessteuersatz (%%)"
+
+#: manufacturing/templates/payroll_run_new.html:67
+#, python-format
+msgid "State Tax Rate (%%)"
+msgstr "Landessteuersatz (%%)"
+
+#: manufacturing/templates/payroll_run_new.html:71
+msgid "Process Payroll"
+msgstr "Lohnabrechnung verarbeiten"
+
+#: manufacturing/templates/payroll_stub_detail.html:3
+#: manufacturing/templates/payroll_stub_detail.html:35
+msgid "Pay Stub"
+msgstr "Gehaltsabrechnung"
+
+#: manufacturing/templates/payroll_stub_detail.html:6
+msgid "Back to Run"
+msgstr "Zurück zum Lauf"
+
+#: manufacturing/templates/payroll_stub_detail.html:36
+msgid "Print / Save PDF"
+msgstr "Drucken / Als PDF speichern"
+
+#: manufacturing/templates/payroll_stub_detail.html:39
+msgid "PAY STUB"
+msgstr "GEHALTSABRECHNUNG"
+
+#: manufacturing/templates/payroll_stub_detail.html:42
+#: manufacturing/templates/payroll_ytd.html:40
+msgid "Employee:"
+msgstr "Mitarbeiter:"
+
+#: manufacturing/templates/payroll_stub_detail.html:44
+msgid "Employee ID:"
+msgstr "Mitarbeiter-ID:"
+
+#: manufacturing/templates/payroll_stub_detail.html:46
+msgid "Pay Period:"
+msgstr "Zahlungszeitraum:"
+
+#: manufacturing/templates/payroll_stub_detail.html:48
+msgid "Payment Date:"
+msgstr "Zahlungsdatum:"
+
+#: manufacturing/templates/payroll_stub_detail.html:50
+msgid "Pay Type:"
+msgstr "Vergütungsart:"
+
+#: manufacturing/templates/payroll_stub_detail.html:53
+msgid "Pay Rate:"
+msgstr "Gehaltssatz:"
+
+#: manufacturing/templates/payroll_stub_detail.html:56
+msgid "Annual Salary:"
+msgstr "Jahresgehalt:"
+
+#: manufacturing/templates/payroll_stub_detail.html:62
+msgid "Earnings"
+msgstr "Verdienst"
+
+#: manufacturing/templates/payroll_stub_detail.html:63
+msgid "Regular Hours:"
+msgstr "Reguläre Stunden:"
+
+#: manufacturing/templates/payroll_stub_detail.html:65
+msgid "Overtime Hours:"
+msgstr "Überstunden:"
+
+#: manufacturing/templates/payroll_stub_detail.html:68
+msgid "Gross Pay:"
+msgstr "Bruttolohn:"
+
+#: manufacturing/templates/payroll_stub_detail.html:74
+msgid "Pre-Tax Deductions"
+msgstr "Abzüge vor Steuern"
+
+#: manufacturing/templates/payroll_stub_detail.html:80
+msgid "Total Pre-Tax Deductions:"
+msgstr "Abzüge vor Steuern gesamt:"
+
+#: manufacturing/templates/payroll_stub_detail.html:86
+msgid "Taxes"
+msgstr "Steuern"
+
+#: manufacturing/templates/payroll_stub_detail.html:87
+msgid "Federal Income Tax:"
+msgstr "Bundeseinkommensteuer:"
+
+#: manufacturing/templates/payroll_stub_detail.html:89
+msgid "State Income Tax:"
+msgstr "Landeseinkommensteuer:"
+
+#: manufacturing/templates/payroll_stub_detail.html:92
+#, python-format
+msgid "Social Security (%(rate)s%%):"
+msgstr "Sozialversicherung (%(rate)s%%):"
+
+#: manufacturing/templates/payroll_stub_detail.html:95
+#, python-format
+msgid "Medicare (%(rate)s%%):"
+msgstr "Medicare (%(rate)s%%):"
+
+#: manufacturing/templates/payroll_stub_detail.html:98
+msgid "Total Taxes:"
+msgstr "Steuern gesamt:"
+
+#: manufacturing/templates/payroll_stub_detail.html:104
+msgid "Post-Tax Deductions"
+msgstr "Abzüge nach Steuern"
+
+#: manufacturing/templates/payroll_stub_detail.html:110
+msgid "Total Post-Tax Deductions:"
+msgstr "Abzüge nach Steuern gesamt:"
+
+#: manufacturing/templates/payroll_stub_detail.html:116
+msgid "NET PAY:"
+msgstr "NETTOLOHN:"
+
+#: manufacturing/templates/payroll_ytd.html:3
+msgid "YTD Payroll Report"
+msgstr "Jahresbericht Lohnabrechnung"
+
+#: manufacturing/templates/payroll_ytd.html:33
+msgid "Year-to-Date Payroll Report"
+msgstr "Lohnbericht Jahr bis heute"
+
+#: manufacturing/templates/payroll_ytd.html:36
+msgid "Year:"
+msgstr "Jahr:"
+
+#: manufacturing/templates/payroll_ytd.html:49
+msgid "Run Report"
+msgstr "Bericht ausführen"
+
+#: manufacturing/templates/payroll_ytd.html:55
+msgid "Runs"
+msgstr "Läufe"
+
+#: manufacturing/templates/payroll_ytd.html:95
+msgid "%(counter)s employee"
+msgid_plural "%(counter)s employees"
+msgstr[0] "%(counter)s Mitarbeiter"
+msgstr[1] "%(counter)s Mitarbeiter"
+
+#: manufacturing/templates/payroll_ytd.html:96
+msgid "Total Gross:"
+msgstr "Bruttosumme:"
+
+#: manufacturing/templates/payroll_ytd.html:97
+msgid "Total Net:"
+msgstr "Nettosumme:"
+
+#: manufacturing/templates/payroll_ytd.html:100
+#, python-format
+msgid "No payroll data found for %(year)s."
+msgstr "Keine Lohndaten für %(year)s gefunden."
+
 #: manufacturing/templates/prod_dashboard.html:7
 #: manufacturing/templates/report_builder_list.html:23
 msgid "Schedule"
@@ -2105,15 +2716,6 @@ msgstr "Niedriger Bestand"
 msgid "Back"
 msgstr "Zurück"
 
-#: manufacturing/templates/report_builder_detail.html:7
-#: manufacturing/templates/report_builder_list.html:37
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: manufacturing/templates/report_builder_detail.html:8
-msgid "Export CSV"
-msgstr "CSV exportieren"
-
 #: manufacturing/templates/report_builder_detail.html:9
 msgid "Export PDF"
 msgstr "PDF exportieren"
@@ -2146,7 +2748,11 @@ msgid ""
 "            via cron/Task Scheduler). Emails require the server's EMAIL_HOST "
 "to be configured;\n"
 "            without it, runs are logged but not sent."
-msgstr "Läuft über <code>python manage.py run_scheduled_reports</code> (extern geplant via cron/Aufgabenplanung). E-Mails erfordern, dass der EMAIL_HOST des Servers konfiguriert ist; ohne ihn werden Ausführungen protokolliert, aber nicht gesendet."
+msgstr ""
+"Läuft über <code>python manage.py run_scheduled_reports</code> (extern "
+"geplant via cron/Aufgabenplanung). E-Mails erfordern, dass der EMAIL_HOST "
+"des Servers konfiguriert ist; ohne ihn werden Ausführungen protokolliert, "
+"aber nicht gesendet."
 
 #: manufacturing/templates/report_builder_detail.html:62
 msgid "Enabled"
@@ -2205,7 +2811,8 @@ msgstr "Auswählen"
 
 #: manufacturing/templates/report_builder_form.html:59
 msgid "2. Columns (used when no aggregate is selected below)"
-msgstr "2. Spalten (werden verwendet, wenn unten keine Aggregation ausgewählt ist)"
+msgstr ""
+"2. Spalten (werden verwendet, wenn unten keine Aggregation ausgewählt ist)"
 
 #: manufacturing/templates/report_builder_form.html:69
 msgid "3. Filters"
@@ -2237,7 +2844,8 @@ msgstr "ist nicht leer"
 
 #: manufacturing/templates/report_builder_form.html:97
 msgid "4. Group By &amp; Aggregate (leave blank for a flat list report)"
-msgstr "4. Gruppieren & Aggregieren (leer lassen für einen einfachen Listenbericht)"
+msgstr ""
+"4. Gruppieren & Aggregieren (leer lassen für einen einfachen Listenbericht)"
 
 #: manufacturing/templates/report_builder_form.html:99
 msgid "Group By"
@@ -2343,6 +2951,7 @@ msgid "total active spend"
 msgstr "gesamte aktive Ausgaben"
 
 #: manufacturing/templates/reports_dashboard.html:150
+#, python-format
 msgid "%(counter)s overdue"
 msgid_plural "%(counter)s overdue"
 msgstr[0] "%(counter)s überfällig"

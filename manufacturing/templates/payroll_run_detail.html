@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Payroll Run{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Payroll Run" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/payroll/history/" class="btn">All Runs</a>
-<a href="/payroll/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/payroll/history/" class="btn">{% trans "All Runs" %}</a>
+<a href="/payroll/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -29,31 +30,31 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Payroll Run — {{ run.pay_period_start }} to {{ run.pay_period_end }}</h2>
+    <h2>{% blocktrans with start=run.pay_period_start end=run.pay_period_end %}Payroll Run — {{ start }} to {{ end }}{% endblocktrans %}</h2>
 
     <div class="meta">
         <div class="meta-item">
-            <span class="lbl">Run Date</span>
+            <span class="lbl">{% trans "Run Date" %}</span>
             <span class="val">{{ run.run_date|slice:":10" }}</span>
         </div>
         <div class="meta-item">
-            <span class="lbl">Status</span>
+            <span class="lbl">{% trans "Status" %}</span>
             <span class="val">{{ run.status|default:"processed" }}</span>
         </div>
         <div class="meta-item">
-            <span class="lbl">Created By</span>
+            <span class="lbl">{% trans "Created By" %}</span>
             <span class="val">{{ run.created_by|default:"—" }}</span>
         </div>
         <div class="meta-item">
-            <span class="lbl">Employees</span>
+            <span class="lbl">{% trans "Employees" %}</span>
             <span class="val">{{ entries|length }}</span>
         </div>
         <div class="meta-item">
-            <span class="lbl">Total Gross</span>
+            <span class="lbl">{% trans "Total Gross" %}</span>
             <span class="val">${{ total_gross|floatformat:2 }}</span>
         </div>
         <div class="meta-item">
-            <span class="lbl">Total Net</span>
+            <span class="lbl">{% trans "Total Net" %}</span>
             <span class="val">${{ total_net|floatformat:2 }}</span>
         </div>
     </div>
@@ -61,12 +62,12 @@
     {% if entries %}
     <table class="list-table">
         <thead><tr>
-            <th>Employee</th>
-            <th>Reg Hrs</th><th>OT Hrs</th>
-            <th>Gross Pay</th><th>Pre-Tax Deds</th>
-            <th>Fed Tax</th><th>State Tax</th>
-            <th>SS</th><th>Medicare</th>
-            <th>Post-Tax Deds</th><th>Net Pay</th>
+            <th>{% trans "Employee" %}</th>
+            <th>{% trans "Reg Hrs" %}</th><th>{% trans "OT Hrs" %}</th>
+            <th>{% trans "Gross Pay" %}</th><th>{% trans "Pre-Tax Deds" %}</th>
+            <th>{% trans "Fed Tax" %}</th><th>{% trans "State Tax" %}</th>
+            <th>{% trans "SS" %}</th><th>{% trans "Medicare" %}</th>
+            <th>{% trans "Post-Tax Deds" %}</th><th>{% trans "Net Pay" %}</th>
         </tr></thead>
         <tbody>
         {% for e in entries %}
@@ -87,7 +88,7 @@
         </tbody>
         <tfoot>
         <tr class="totals-row">
-            <td>TOTALS</td>
+            <td>{% trans "TOTALS" %}</td>
             <td colspan="2"></td>
             <td>${{ total_gross|floatformat:2 }}</td>
             <td colspan="5"></td>
@@ -96,9 +97,9 @@
         </tr>
         </tfoot>
     </table>
-    <p style="color: var(--text-muted);font-size:12px;">Click a row to view that employee's pay stub.</p>
+    <p style="color: var(--text-muted);font-size:12px;">{% trans "Click a row to view that employee's pay stub." %}</p>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;">No entries for this run.</p>
+    <p style="color: var(--text-muted);font-size:14px;">{% trans "No entries for this run." %}</p>
     {% endif %}
 </div>
 </div>

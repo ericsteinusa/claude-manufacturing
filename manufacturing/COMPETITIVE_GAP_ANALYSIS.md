@@ -4007,3 +4007,43 @@ functions, sort directions) in Spanish, French, and German with real sample data
 dashboard + all 5 htmx templates + the full Legal department (10) + the full Marketing department
 (13) + the full Reports department (4)) out of ~450 total. IT (17 templates), Payroll (8), and Time
 Clock (10) remain the smallest unclaimed department-sized candidates.
+
+---
+
+**2026-08-29, fourth whole department:** Continued the "whole department" approach — re-surveyed
+all remaining departments' template counts and picked **Payroll** (8 templates:
+`payroll_dashboard.html`, `payroll_pay_rates.html`, `payroll_deductions.html`,
+`payroll_history.html`, `payroll_run_detail.html`, `payroll_run_new.html`,
+`payroll_stub_detail.html`, `payroll_ytd.html`) as the new smallest remaining group. 124 unique
+strings needed translation per language (55 fuzzy-matched, all wrong guesses as usual, e.g.
+"Deductions" guessed against "Production," "Total Gross" guessed against "Total Cases" — plus 69
+genuinely blank new entries). Used `{% blocktrans with %}` for the run-detail page's
+"Payroll Run — {start} to {end}" header and the pay stub's "Social Security ({rate}%)" /
+"Medicare ({rate}%)" tax lines, and `{% blocktrans count %}` for the YTD report's "N employee(s)"
+summary line. Two gotchas surfaced: (1) `makemessages` escapes any bare `%` in a msgid (not just
+`%(name)s` placeholders) to `%%` and flags the entry `#, python-format` — e.g. `"Federal Tax Rate
+(%)"` became `"Federal Tax Rate (%%)"` in the `.po` file — and `msgfmt --check` fails if the
+translated `msgstr` doesn't also double the `%`; easy to miss since it only bites literal `%`
+signs, not the interpolated values everywhere else in this series. (2) One more instance of the
+multi-line-msgid gap from the PR #155/#156 corruption-fix work: `payroll_run_new.html`'s
+"Hourly employees are paid on actual clocked hours..." hint paragraph is a `{% blocktrans %}`
+spanning several template source lines, so gettext wrapped its msgid across multiple `.po` lines
+from the start, and the blank-detection sweep (already fixed once to parse multi-line values) still
+needs eyes-on for this shape of entry — caught it in this pass's own audit rather than a special
+case, confirming the general "diff old vs. new checking for blank *and* re-run the duplication
+sweep every time" discipline established in the corruption-fix PR is sufficient going forward.
+Full suite 3431 passed (unchanged), `manage.py check` clean, `compilemessages` clean, `msgfmt
+--check` clean on all three files, zero fuzzy/blank/duplicated entries confirmed programmatically
+(one false-positive duplicate flagged by the heuristic sweep — a legitimately repeated French
+phrase, "heures supplémentaires," appearing twice in one long sentence — verified by inspection,
+not a bug). Verified end-to-end against the real dev server: navigated the Payroll dashboard,
+history list, a payroll run's detail page (confirmed the blocktrans date-range header), the new
+payroll run form (confirmed the hint paragraph and the `%%`-escaped tax-rate field labels), a pay
+stub (confirmed the Social Security/Medicare rate interpolation), and the YTD report with a report
+run (confirmed the "N employees" plural) in Spanish, French, and German with real sample data, no
+console errors. **Localization coverage is now 42 templates across three languages** (core shell +
+login + main dashboard + all 5 htmx templates + the full Legal department (10) + the full Marketing
+department (13) + the full Reports department (4) + the full Payroll department (8)) out of ~450
+total. Time Clock (10), Engineering (13), Customer Service (13), and Accounting (13) are the
+smallest unclaimed department-sized candidates remaining (re-surveyed counts; IT is 17, larger than
+previously assumed to be next in line).

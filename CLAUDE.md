@@ -347,6 +347,27 @@ inventory-reorder-point KPI sub-labels and the results/preview row-count
 headers, and `{% blocktrans with %}` for the "Edit Report: {name}" and
 "Last run: {timestamp}" headers.
 
+Also fully translated: the entire **Payroll department**
+(`payroll_dashboard.html`, `payroll_pay_rates.html`,
+`payroll_deductions.html`, `payroll_history.html`, `payroll_run_detail.html`,
+`payroll_run_new.html`, `payroll_stub_detail.html`, `payroll_ytd.html` —
+8 templates, the fourth "whole department" pass, the smallest remaining
+department at the time), same treatment plus `{% blocktrans with %}` for
+the "Payroll Run — {start} to {end}" detail-page header and the pay
+stub's "Social Security ({rate}%)"/"Medicare ({rate}%)" tax lines, and
+`{% blocktrans count %}` for the YTD report's "N employee(s)" summary
+line. Two new wrinkles here: (1) a msgid containing a bare `%` (not part
+of a `%(name)s` placeholder, e.g. `"Federal Tax Rate (%)"`) gets escaped
+by `makemessages` to `%%` in the `.po` file and is flagged
+`#, python-format` — the `msgstr` must also use the doubled `%%` or
+`msgfmt --check` fails; (2) another instance of the multi-line-msgid gap
+from the Reports pass's PR #155/#156 turned up again — `payroll_run_new
+.html`'s "Hourly employees are paid on actual clocked hours..." hint
+paragraph is a `{% blocktrans %}` spanning several template lines, so its
+msgid itself wraps across multiple `.po` lines and was left blank by the
+same kind of check that only understands single-line msgids; fixed by
+hand the same way as the Reports-pass instance.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

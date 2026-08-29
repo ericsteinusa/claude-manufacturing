@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Payroll History{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Payroll History" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/payroll/" class="btn">Dashboard</a>
+<a href="/payroll/" class="btn">{% trans "Dashboard" %}</a>
 {% if can_edit %}
-<a href="/payroll/history/new/" class="btn btn-primary">+ Run Payroll</a>
+<a href="/payroll/history/new/" class="btn btn-primary">+ {% trans "Run Payroll" %}</a>
 {% endif %}
-<a href="/payroll/pay-rates/" class="btn">Pay Rates</a>
-<a href="/payroll/ytd/" class="btn">YTD Report</a>
-<a href="/payroll/history/export/" class="btn">⬇ Export CSV</a>
-<a href="/payroll/history/export/?format=xlsx" class="btn">⬇ Export Excel</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/payroll/pay-rates/" class="btn">{% trans "Pay Rates" %}</a>
+<a href="/payroll/ytd/" class="btn">{% trans "YTD Report" %}</a>
+<a href="/payroll/history/export/" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="/payroll/history/export/?format=xlsx" class="btn">⬇ {% trans "Export Excel" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,14 +29,14 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Payroll History</h2>
+    <h2>{% trans "Payroll History" %}</h2>
 
     {% if runs %}
     <table class="list-table">
         <thead><tr>
-            <th>Run Date</th><th>Period</th>
-            <th>Employees</th><th>Total Gross</th><th>Total Net</th>
-            <th>Status</th><th>Created By</th>
+            <th>{% trans "Run Date" %}</th><th>{% trans "Period" %}</th>
+            <th>{% trans "Employees" %}</th><th>{% trans "Total Gross" %}</th><th>{% trans "Total Net" %}</th>
+            <th>{% trans "Status" %}</th><th>{% trans "Created By" %}</th>
         </tr></thead>
         <tbody>
         {% for r in runs %}
@@ -53,8 +54,8 @@
     </table>
     {% else %}
     <p style="color: var(--text-muted);font-size:14px;">
-        No payroll runs found.
-        {% if can_edit %}<a href="/payroll/history/new/">Run payroll</a> to create the first one.{% endif %}
+        {% trans "No payroll runs found." %}
+        {% if can_edit %}<a href="/payroll/history/new/">{% trans "Run payroll" %}</a> {% trans "to create the first one." %}{% endif %}
     </p>
     {% endif %}
 </div>
