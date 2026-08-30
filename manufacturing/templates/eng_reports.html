@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Engineering Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Engineering Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/eng/" class="btn">Dashboard</a>
-<a href="/eng/projects/" class="btn">Projects</a>
-<a href="/eng/ecrs/" class="btn">ECRs</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/eng/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/eng/projects/" class="btn">{% trans "Projects" %}</a>
+<a href="/eng/ecrs/" class="btn">{% trans "ECRs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -46,11 +47,11 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Engineering Reports</h2>
+    <h2>{% trans "Engineering Reports" %}</h2>
 
     <div class="two-col">
         <div class="card">
-            <h3>Projects by Status</h3>
+            <h3>{% trans "Projects by Status" %}</h3>
             {% with total=proj_by_status|length %}
             {% for r in proj_by_status %}
             <div class="bar-wrap">
@@ -60,12 +61,12 @@
                 </div>
                 <div class="bar-val">{{ r.cnt }}</div>
             </div>
-            {% empty %}<p style="color:#888;font-size:13px;">No projects.</p>
+            {% empty %}<p style="color:#888;font-size:13px;">{% trans "No projects." %}</p>
             {% endfor %}
             {% endwith %}
         </div>
         <div class="card">
-            <h3>ECRs by Status</h3>
+            <h3>{% trans "ECRs by Status" %}</h3>
             {% for r in ecr_by_status %}
             <div class="bar-wrap">
                 <div class="bar-lbl"><span class="badge st-{{ r.status }}">{{ r.status }}</span></div>
@@ -74,14 +75,14 @@
                 </div>
                 <div class="bar-val">{{ r.cnt }}</div>
             </div>
-            {% empty %}<p style="color:#888;font-size:13px;">No ECRs.</p>
+            {% empty %}<p style="color:#888;font-size:13px;">{% trans "No ECRs." %}</p>
             {% endfor %}
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Open Tasks by Priority</h3>
+            <h3>{% trans "Open Tasks by Priority" %}</h3>
             {% for r in open_tasks_by_priority %}
             <div class="bar-wrap">
                 <div class="bar-lbl"><span class="badge pri-{{ r.priority }}">{{ r.priority }}</span></div>
@@ -90,14 +91,14 @@
                 </div>
                 <div class="bar-val">{{ r.cnt }}</div>
             </div>
-            {% empty %}<p style="color:#888;font-size:13px;">No open tasks.</p>
+            {% empty %}<p style="color:#888;font-size:13px;">{% trans "No open tasks." %}</p>
             {% endfor %}
         </div>
         <div class="card">
-            <h3>Overdue Projects</h3>
+            <h3>{% trans "Overdue Projects" %}</h3>
             {% if overdue_projects %}
             <table class="list-table">
-                <thead><tr><th>Number</th><th>Title</th><th>Due</th></tr></thead>
+                <thead><tr><th>{% trans "Number" %}</th><th>{% trans "Title" %}</th><th>{% trans "Due" %}</th></tr></thead>
                 <tbody>
                 {% for p in overdue_projects %}
                 <tr class="clickable" onclick="location.href='/eng/projects/{{ p.id }}/'">
@@ -109,16 +110,16 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color:#888;font-size:13px;">No overdue projects.</p>
+            <p style="color:#888;font-size:13px;">{% trans "No overdue projects." %}</p>
             {% endif %}
         </div>
     </div>
 
-    <div class="section-hdr">Recent ECRs (last 10)</div>
+    <div class="section-hdr">{% trans "Recent ECRs (last 10)" %}</div>
     <div class="card">
         <table class="list-table">
             <thead><tr>
-                <th>ECR #</th><th>Title</th><th>Project</th><th>Status</th>
+                <th>{% trans "ECR #" %}</th><th>{% trans "Title" %}</th><th>{% trans "Project" %}</th><th>{% trans "Status" %}</th>
             </tr></thead>
             <tbody>
             {% for e in recent_ecrs %}
@@ -129,7 +130,7 @@
                 <td><span class="badge st-{{ e.status }}">{{ e.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;padding:12px;">No ECRs yet.</td></tr>
+            <tr><td colspan="4" style="color:#888;text-align:center;padding:12px;">{% trans "No ECRs yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

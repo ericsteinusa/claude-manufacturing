@@ -419,6 +419,40 @@ and repositioning existing entries around the new ones, not from any
 new corruption — reconfirmed via the same duplication/blank sweep
 used since the corruption-fix PR, which came back clean.
 
+Also fully translated: the entire **Engineering department**
+(`eng_dashboard.html`, `eng_projects.html`, `eng_project_detail.html`,
+`eng_tasks_list.html`, `eng_task_detail.html`, `eng_ecrs.html`,
+`eng_ecr_detail.html`, `eng_specs_list.html`, `eng_spec_detail.html`,
+`eng_reports.html` — 10 templates, the seventh "whole department"
+pass — note the `engagement_*.html` files living alongside these in
+`templates/` are a separate Consultants feature under `/consultants/`,
+not this department; only the `eng_*.html` prefix is Engineering),
+same treatment plus `{% blocktrans count %}` reusing the existing
+"N overdue" plural from the Reports pass for the project list's
+overdue-tasks badge, and `{% blocktrans with %}` for three dynamic
+page/section titles ("Project: {num} — {title}", "ECR: {num} —
+{title}", "Standard — {title}", "Task — {name}") plus the task-detail
+page's project-link line. **Caught and fixed a real bug during this
+pass, before it ever reached the `.po` file**: the task-detail
+page's project-link `{% blocktrans %}` originally referenced
+`{{ task.project_id }}` directly inside the block without binding it
+via `with` first. `blocktrans`/`makemessages` don't reject a dotted
+lookup like this at extraction time — it silently produces a msgid
+containing the literal placeholder `%(task.project_id)s`, which is not
+a valid Python `%`-format key (dots aren't permitted in identifiers),
+so it would have failed at *render* time once translated, or at best
+never actually interpolated the id and left a broken `href="/eng/
+projects/{{ task.project_id }}/"`-shaped URL in production. Fixed by
+adding `pid=task.project_id` to the `with` bindings and referencing
+`{{ pid }}` in the href instead — every variable used inside a
+`blocktrans` block that isn't a bare context name needs an explicit
+`with` binding, not just filtered values as documented in the Reports
+pass. Caught by inspecting the generated msgid in the `.po` diff
+before writing translations, not by a test failure — worth treating as
+a standing checklist item (grep the `makemessages` diff for `%(` keys
+containing a `.` before translating) for any future `blocktrans` block
+that references a dotted attribute lookup directly.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

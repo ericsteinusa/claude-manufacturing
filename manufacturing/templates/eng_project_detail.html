@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}{% if project %}{{ project.project_number }}{% else %}New Project{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if project %}{{ project.project_number }}{% else %}{% trans "New Project" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/eng/projects/" class="btn">All Projects</a>
-<a href="/eng/ecrs/" class="btn">ECRs</a>
-<a href="/eng/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/eng/projects/" class="btn">{% trans "All Projects" %}</a>
+<a href="/eng/ecrs/" class="btn">{% trans "ECRs" %}</a>
+<a href="/eng/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -63,7 +64,7 @@
         <small>ENGP-{{ project.project_number }}</small>
     </div>
     {% endif %}
-    <h2>{% if project %}Project: {{ project.project_number }} — {{ project.title }}{% else %}New Project{% endif %}</h2>
+    <h2>{% if project %}{% blocktrans with num=project.project_number title=project.title %}Project: {{ num }} — {{ title }}{% endblocktrans %}{% else %}{% trans "New Project" %}{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
@@ -75,11 +76,11 @@
             <input type="hidden" name="action" value="save">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
                 <div class="form-row" style="flex:3;min-width:220px;">
-                    <label>Title *</label>
+                    <label>{% trans "Title" %} *</label>
                     <input type="text" name="title" value="{{ project.title }}" required>
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in PROJECT_STATUSES %}
                         <option value="{{ s }}" {% if project.status == s %}selected{% endif %}>{{ s }}</option>
@@ -87,7 +88,7 @@
                     </select>
                 </div>
                 <div class="form-row" style="flex:1;min-width:140px;">
-                    <label>Engineer</label>
+                    <label>{% trans "Engineer" %}</label>
                     <select name="engineer">
                         <option value="">—</option>
                         {% for p in people %}
@@ -96,37 +97,37 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ project.start_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     <input type="date" name="due_date" value="{{ project.due_date|default:'' }}">
                 </div>
             </div>
             <div class="form-row" style="margin-bottom:10px;">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <textarea name="notes" rows="2">{{ project.notes|default:"" }}</textarea>
             </div>
-            <button type="submit" class="btn-act">Save Changes</button>
+            <button type="submit" class="btn-act">{% trans "Save Changes" %}</button>
         </form>
         {% else %}
         <div class="meta-row">
-            <div class="meta-item"><div class="lbl">Status</div><div class="val"><span class="badge st-{{ project.status }}">{{ project.status }}</span></div></div>
-            <div class="meta-item"><div class="lbl">Engineer</div><div class="val">{{ project.engineer|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Start</div><div class="val">{{ project.start_date|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Due</div><div class="val">{{ project.due_date|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Notes</div><div class="val">{{ project.notes|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Status" %}</div><div class="val"><span class="badge st-{{ project.status }}">{{ project.status }}</span></div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Engineer" %}</div><div class="val">{{ project.engineer|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Start" %}</div><div class="val">{{ project.start_date|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Due" %}</div><div class="val">{{ project.due_date|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Notes" %}</div><div class="val">{{ project.notes|default:"—" }}</div></div>
         </div>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Tasks</h3>
+        <h3>{% trans "Tasks" %}</h3>
         <table class="list-table" id="task-table">
             <thead><tr>
-                <th>Task</th><th>Assigned To</th><th>Priority</th>
-                <th>Status</th><th>Due</th>{% if can_edit %}<th></th>{% endif %}
+                <th>{% trans "Task" %}</th><th>{% trans "Assigned To" %}</th><th>{% trans "Priority" %}</th>
+                <th>{% trans "Status" %}</th><th>{% trans "Due" %}</th>{% if can_edit %}<th></th>{% endif %}
             </tr></thead>
             <tbody>
             {% for t in tasks %}
@@ -138,57 +139,57 @@
                 <td>{{ t.due_date|default:"—" }}</td>
                 {% if can_edit %}
                 <td><button type="button" class="btn-act" style="padding:3px 10px;font-size:11px;"
-                    onclick="openTaskEdit({{ t.id }},'{{ t.task_name|escapejs }}','{{ t.assigned_to|default:''|escapejs }}','{{ t.due_date|default:'' }}','{{ t.priority }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">Edit</button></td>
+                    onclick="openTaskEdit({{ t.id }},'{{ t.task_name|escapejs }}','{{ t.assigned_to|default:''|escapejs }}','{{ t.due_date|default:'' }}','{{ t.priority }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">{% trans "Edit" %}</button></td>
                 {% endif %}
             </tr>
             {% empty %}
-            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;padding:12px;">No tasks yet.</td></tr>
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;padding:12px;">{% trans "No tasks yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
 
         {% if can_edit %}
         <div id="task-edit-form" style="display:none;background:#f8f9ff;border:1px solid #cce;border-radius:6px;padding:14px;margin-top:12px;">
-            <h3 style="font-size:13px;color:#333;margin:0 0 10px;">Edit Task</h3>
+            <h3 style="font-size:13px;color:#333;margin:0 0 10px;">{% trans "Edit Task" %}</h3>
             <form method="post" id="edit-task-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_task">
                 <input type="hidden" name="task_id" id="edit-task-id">
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-                    <div class="form-row" style="flex:2;min-width:160px;"><label>Task Name *</label><input type="text" name="task_name" id="edit-task-name" required></div>
-                    <div class="form-row" style="flex:1;min-width:120px;"><label>Assigned To</label><input type="text" name="assigned_to" id="edit-assigned-to"></div>
-                    <div class="form-row"><label>Due Date</label><input type="date" name="due_date" id="edit-due-date"></div>
-                    <div class="form-row"><label>Priority</label>
+                    <div class="form-row" style="flex:2;min-width:160px;"><label>{% trans "Task Name" %} *</label><input type="text" name="task_name" id="edit-task-name" required></div>
+                    <div class="form-row" style="flex:1;min-width:120px;"><label>{% trans "Assigned To" %}</label><input type="text" name="assigned_to" id="edit-assigned-to"></div>
+                    <div class="form-row"><label>{% trans "Due Date" %}</label><input type="date" name="due_date" id="edit-due-date"></div>
+                    <div class="form-row"><label>{% trans "Priority" %}</label>
                         <select name="priority" id="edit-priority">
                             {% for pr in PRIORITIES %}<option value="{{ pr }}">{{ pr }}</option>{% endfor %}
                         </select>
                     </div>
-                    <div class="form-row"><label>Status</label>
+                    <div class="form-row"><label>{% trans "Status" %}</label>
                         <select name="status" id="edit-status">
                             {% for s in TASK_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
                         </select>
                     </div>
                 </div>
-                <div class="form-row" style="margin-bottom:8px;"><label>Notes</label><textarea name="notes" id="edit-notes" rows="2"></textarea></div>
-                <button type="submit" class="btn-act">Save Task</button>
-                <button type="button" class="btn-act" style="background:#888;" onclick="document.getElementById('task-edit-form').style.display='none'">Cancel</button>
+                <div class="form-row" style="margin-bottom:8px;"><label>{% trans "Notes" %}</label><textarea name="notes" id="edit-notes" rows="2"></textarea></div>
+                <button type="submit" class="btn-act">{% trans "Save Task" %}</button>
+                <button type="button" class="btn-act" style="background:#888;" onclick="document.getElementById('task-edit-form').style.display='none'">{% trans "Cancel" %}</button>
             </form>
         </div>
 
         <div style="margin-top:14px;">
-            <h3 style="font-size:13px;color:#333;margin:0 0 8px;">Add Task</h3>
+            <h3 style="font-size:13px;color:#333;margin:0 0 8px;">{% trans "Add Task" %}</h3>
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="add_task">
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-                    <div class="form-row" style="flex:2;min-width:160px;"><label>Task Name *</label><input type="text" name="task_name" required></div>
-                    <div class="form-row" style="flex:1;min-width:120px;"><label>Assigned To</label><input type="text" name="assigned_to"></div>
-                    <div class="form-row"><label>Due Date</label><input type="date" name="due_date"></div>
-                    <div class="form-row"><label>Priority</label>
+                    <div class="form-row" style="flex:2;min-width:160px;"><label>{% trans "Task Name" %} *</label><input type="text" name="task_name" required></div>
+                    <div class="form-row" style="flex:1;min-width:120px;"><label>{% trans "Assigned To" %}</label><input type="text" name="assigned_to"></div>
+                    <div class="form-row"><label>{% trans "Due Date" %}</label><input type="date" name="due_date"></div>
+                    <div class="form-row"><label>{% trans "Priority" %}</label>
                         <select name="priority">{% for pr in PRIORITIES %}<option value="{{ pr }}" {% if pr == 'medium' %}selected{% endif %}>{{ pr }}</option>{% endfor %}</select>
                     </div>
                 </div>
-                <button type="submit" class="btn-act">Add Task</button>
+                <button type="submit" class="btn-act">{% trans "Add Task" %}</button>
             </form>
         </div>
         {% endif %}
@@ -197,28 +198,28 @@
     {% else %}
     <!-- New Project form -->
     <div class="card">
-        <h3>Project Details</h3>
+        <h3>{% trans "Project Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="save">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
                 <div class="form-row">
-                    <label>Project # (auto)</label>
-                    <input type="text" name="project_number" value="{{ new_proj_num }}" placeholder="Auto-assigned">
+                    <label>{% trans "Project # (auto)" %}</label>
+                    <input type="text" name="project_number" value="{{ new_proj_num }}" placeholder="{% trans 'Auto-assigned' %}">
                 </div>
-                <div class="form-row" style="flex:3;min-width:220px;"><label>Title *</label><input type="text" name="title" required></div>
-                <div class="form-row"><label>Status</label>
+                <div class="form-row" style="flex:3;min-width:220px;"><label>{% trans "Title" %} *</label><input type="text" name="title" required></div>
+                <div class="form-row"><label>{% trans "Status" %}</label>
                     <select name="status">{% for s in PROJECT_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}</select>
                 </div>
-                <div class="form-row" style="flex:1;min-width:140px;"><label>Engineer</label>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>{% trans "Engineer" %}</label>
                     <select name="engineer"><option value="">—</option>
                     {% for p in people %}<option value="{{ p.email }}">{{ p.label }}</option>{% endfor %}</select>
                 </div>
-                <div class="form-row"><label>Start Date</label><input type="date" name="start_date"></div>
-                <div class="form-row"><label>Due Date</label><input type="date" name="due_date"></div>
+                <div class="form-row"><label>{% trans "Start Date" %}</label><input type="date" name="start_date"></div>
+                <div class="form-row"><label>{% trans "Due Date" %}</label><input type="date" name="due_date"></div>
             </div>
-            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label><textarea name="notes" rows="2"></textarea></div>
-            <button type="submit" class="btn-act">Create Project</button>
+            <div class="form-row" style="margin-bottom:10px;"><label>{% trans "Notes" %}</label><textarea name="notes" rows="2"></textarea></div>
+            <button type="submit" class="btn-act">{% trans "Create Project" %}</button>
         </form>
     </div>
     {% endif %}

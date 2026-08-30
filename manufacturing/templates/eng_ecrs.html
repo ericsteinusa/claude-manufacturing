@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Engineering Change Requests{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Engineering Change Requests" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/eng/" class="btn">Dashboard</a>
-<a href="/eng/projects/" class="btn">Projects</a>
-<a href="/eng/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/eng/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/eng/projects/" class="btn">{% trans "Projects" %}</a>
+<a href="/eng/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -39,34 +40,34 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Engineering Change Requests / Design Reviews</h2>
+    <h2>{% trans "Engineering Change Requests / Design Reviews" %}</h2>
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <label>Status:</label>
+        <label>{% trans "Status:" %}</label>
         <select name="status" onchange="this.form.submit()">
-            <option value="">All</option>
+            <option value="">{% trans "All" %}</option>
             {% for s in ECR_STATUSES %}
             <option value="{{ s }}" {% if filter_status == s %}selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <label>Project:</label>
+        <label>{% trans "Project:" %}</label>
         <select name="project_id" onchange="this.form.submit()">
-            <option value="">All Projects</option>
+            <option value="">{% trans "All Projects" %}</option>
             {% for p in projects %}
             <option value="{{ p.id }}" {% if filter_project == p.id|stringformat:"s" %}selected{% endif %}>{{ p.project_number }} — {{ p.title }}</option>
             {% endfor %}
         </select>
-        <label>Search:</label>
-        <input type="text" name="search" value="{{ filter_search }}" placeholder="Title or ECR #…">
-        <button type="submit" class="btn-sm">Filter</button>
-        <a href="/eng/ecrs/" style="color:#aad;font-size:13px;">Clear</a>
+        <label>{% trans "Search:" %}</label>
+        <input type="text" name="search" value="{{ filter_search }}" placeholder="{% trans 'Title or ECR #…' %}">
+        <button type="submit" class="btn-sm">{% trans "Filter" %}</button>
+        <a href="/eng/ecrs/" style="color:#aad;font-size:13px;">{% trans "Clear" %}</a>
     </form>
 
     <table class="list-table">
         <thead><tr>
-            <th>ECR #</th><th>Title</th><th>Project</th>
-            <th>Requested By</th><th>Review Date</th><th>Status</th>
+            <th>{% trans "ECR #" %}</th><th>{% trans "Title" %}</th><th>{% trans "Project" %}</th>
+            <th>{% trans "Requested By" %}</th><th>{% trans "Review Date" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for e in ecrs %}
@@ -79,24 +80,24 @@
             <td><span class="badge st-{{ e.status }}">{{ e.status }}</span></td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" style="color:#888;text-align:center;padding:16px;">No ECRs found.</td></tr>
+        <tr><td colspan="6" style="color:#888;text-align:center;padding:16px;">{% trans "No ECRs found." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>
 
     {% if can_edit %}
     <div class="card">
-        <h3>New ECR / Design Review</h3>
+        <h3>{% trans "New ECR / Design Review" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
                 <div class="form-row" style="flex:3;min-width:220px;">
-                    <label>Title *</label>
+                    <label>{% trans "Title" %} *</label>
                     <input type="text" name="title" required>
                 </div>
                 <div class="form-row" style="flex:1;min-width:140px;">
-                    <label>Project</label>
+                    <label>{% trans "Project" %}</label>
                     <select name="project_id">
                         <option value="">—</option>
                         {% for p in projects %}
@@ -105,7 +106,7 @@
                     </select>
                 </div>
                 <div class="form-row" style="flex:1;min-width:140px;">
-                    <label>Requested By</label>
+                    <label>{% trans "Requested By" %}</label>
                     <select name="requested_by">
                         <option value="">—</option>
                         {% for p in people %}
@@ -114,11 +115,11 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Review Date</label>
+                    <label>{% trans "Review Date" %}</label>
                     <input type="date" name="review_date">
                 </div>
             </div>
-            <button type="submit" class="btn-sm">Create ECR</button>
+            <button type="submit" class="btn-sm">{% trans "Create ECR" %}</button>
         </form>
     </div>
     {% endif %}
