@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-30 00:58+0000\n"
+"POT-Creation-Date: 2026-08-30 03:47+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
@@ -27,6 +27,11 @@ msgstr "Perspectivas de IA"
 
 #: manufacturing/templates/ai_insights_dashboard.html:6
 #: manufacturing/templates/base.html:603
+#: manufacturing/templates/cs_dashboard.html:9
+#: manufacturing/templates/cs_dashboard.html:46
+#: manufacturing/templates/cs_escalations.html:8
+#: manufacturing/templates/cs_list.html:8
+#: manufacturing/templates/cs_plans.html:7
 #: manufacturing/templates/eng_dashboard.html:11
 #: manufacturing/templates/eng_dashboard.html:64
 #: manufacturing/templates/eng_ecrs.html:8
@@ -48,6 +53,20 @@ msgstr "Informes"
 #: manufacturing/templates/credit_collections_list.html:10
 #: manufacturing/templates/credit_dashboard.html:10
 #: manufacturing/templates/credit_dashboard.html:55
+#: manufacturing/templates/cs_dashboard.html:13
+#: manufacturing/templates/cs_dashboard.html:53
+#: manufacturing/templates/cs_detail.html:8
+#: manufacturing/templates/cs_escalations.html:9
+#: manufacturing/templates/cs_kb_detail.html:11
+#: manufacturing/templates/cs_kb_list.html:11
+#: manufacturing/templates/cs_list.html:10
+#: manufacturing/templates/cs_new.html:7
+#: manufacturing/templates/cs_plans.html:8
+#: manufacturing/templates/cs_reports.html:9
+#: manufacturing/templates/cs_returns_detail.html:11
+#: manufacturing/templates/cs_returns_list.html:11
+#: manufacturing/templates/cs_surveys_detail.html:11
+#: manufacturing/templates/cs_surveys_list.html:11
 #: manufacturing/templates/eng_dashboard.html:12
 #: manufacturing/templates/eng_ecr_detail.html:9
 #: manufacturing/templates/eng_ecrs.html:9
@@ -222,11 +241,13 @@ msgstr "Pedidos de venta"
 
 #: manufacturing/templates/base.html:508
 #: manufacturing/templates/credit_dashboard.html:54
+#: manufacturing/templates/cs_dashboard.html:51
 #: manufacturing/templates/marketing_dashboard.html:59
 msgid "Customers"
 msgstr "Clientes"
 
 #: manufacturing/templates/base.html:511
+#: manufacturing/templates/cs_dashboard.html:3
 #: manufacturing/templates/reports_dashboard.html:223
 msgid "Customer Service"
 msgstr "Atención al cliente"
@@ -439,6 +460,18 @@ msgstr "Cobranzas"
 #: manufacturing/templates/credit_dashboard.html:103
 #: manufacturing/templates/credit_dashboard.html:122
 #: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_dashboard.html:125
+#: manufacturing/templates/cs_kb_detail.html:77
+#: manufacturing/templates/cs_kb_list.html:87
+#: manufacturing/templates/cs_kb_list.html:131
+#: manufacturing/templates/cs_list.html:62
+#: manufacturing/templates/cs_plans.html:80
+#: manufacturing/templates/cs_returns_detail.html:86
+#: manufacturing/templates/cs_returns_list.html:82
+#: manufacturing/templates/cs_returns_list.html:121
+#: manufacturing/templates/cs_surveys_detail.html:97
+#: manufacturing/templates/cs_surveys_list.html:87
+#: manufacturing/templates/cs_surveys_list.html:127
 #: manufacturing/templates/eng_dashboard.html:113
 #: manufacturing/templates/eng_dashboard.html:130
 #: manufacturing/templates/eng_ecr_detail.html:97
@@ -525,6 +558,8 @@ msgstr "Términos"
 
 #: manufacturing/templates/credit_account_detail.html:74
 #: manufacturing/templates/credit_account_list.html:79
+#: manufacturing/templates/cs_escalations.html:68
+#: manufacturing/templates/cs_list.html:59
 #: manufacturing/templates/legal_employment_list.html:74
 msgid "Opened"
 msgstr "Abierto"
@@ -551,6 +586,9 @@ msgstr "Teléfono"
 #: manufacturing/templates/credit_collections_detail.html:83
 #: manufacturing/templates/credit_collections_detail.html:129
 #: manufacturing/templates/credit_collections_list.html:155
+#: manufacturing/templates/cs_returns_detail.html:98
+#: manufacturing/templates/cs_returns_detail.html:113
+#: manufacturing/templates/cs_returns_list.html:137
 #: manufacturing/templates/eng_ecr_detail.html:105
 #: manufacturing/templates/eng_ecr_detail.html:113
 #: manufacturing/templates/eng_ecr_detail.html:149
@@ -615,6 +653,10 @@ msgstr "Solo se necesita si cambia el límite o el estado"
 
 #: manufacturing/templates/credit_account_detail.html:125
 #: manufacturing/templates/credit_collections_detail.html:133
+#: manufacturing/templates/cs_detail.html:166
+#: manufacturing/templates/cs_kb_detail.html:97
+#: manufacturing/templates/cs_returns_detail.html:102
+#: manufacturing/templates/cs_surveys_detail.html:117
 #: manufacturing/templates/eng_ecr_detail.html:107
 #: manufacturing/templates/eng_project_detail.html:112
 #: manufacturing/templates/eng_spec_detail.html:102
@@ -640,6 +682,8 @@ msgstr "Historial de límite / estado"
 #: manufacturing/templates/credit_collections_detail.html:62
 #: manufacturing/templates/credit_collections_list.html:77
 #: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_dashboard.html:123
+#: manufacturing/templates/cs_surveys_detail.html:127
 #: manufacturing/templates/tc_ot_report.html:87
 #: manufacturing/templates/tc_schedule.html:76
 #: manufacturing/templates/time_clock_attendance.html:58
@@ -657,6 +701,10 @@ msgid "Changed By"
 msgstr "Modificado por"
 
 #: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/cs_returns_detail.html:74
+#: manufacturing/templates/cs_returns_detail.html:110
+#: manufacturing/templates/cs_returns_list.html:80
+#: manufacturing/templates/cs_returns_list.html:113
 msgid "Reason"
 msgstr "Motivo"
 
@@ -694,6 +742,9 @@ msgstr "Actividades de cobranza"
 #: manufacturing/templates/credit_collections_list.html:78
 #: manufacturing/templates/credit_collections_list.html:123
 #: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_surveys_detail.html:89
+#: manufacturing/templates/cs_surveys_list.html:82
+#: manufacturing/templates/cs_surveys_list.html:119
 #: manufacturing/templates/legal_contract_detail.html:59
 #: manufacturing/templates/legal_contract_detail.html:106
 #: manufacturing/templates/legal_contract_list.html:90
@@ -740,6 +791,9 @@ msgstr "Cuentas de crédito"
 #: manufacturing/templates/credit_account_list.html:62
 #: manufacturing/templates/credit_application_list.html:61
 #: manufacturing/templates/credit_collections_list.html:62
+#: manufacturing/templates/cs_kb_list.html:61
+#: manufacturing/templates/cs_returns_list.html:63
+#: manufacturing/templates/cs_surveys_list.html:61
 #: manufacturing/templates/eng_specs_list.html:65
 #: manufacturing/templates/eng_tasks_list.html:70
 #: manufacturing/templates/legal_compliance_list.html:67
@@ -765,6 +819,9 @@ msgstr "Buscar cliente…"
 #: manufacturing/templates/credit_account_list.html:68
 #: manufacturing/templates/credit_application_list.html:67
 #: manufacturing/templates/credit_collections_list.html:68
+#: manufacturing/templates/cs_kb_list.html:73
+#: manufacturing/templates/cs_returns_list.html:69
+#: manufacturing/templates/cs_surveys_list.html:73
 #: manufacturing/templates/eng_ecrs.html:63
 #: manufacturing/templates/eng_projects.html:66
 #: manufacturing/templates/eng_specs_list.html:77
@@ -787,6 +844,10 @@ msgstr "Filtrar"
 #: manufacturing/templates/credit_account_list.html:69
 #: manufacturing/templates/credit_application_list.html:68
 #: manufacturing/templates/credit_collections_list.html:69
+#: manufacturing/templates/cs_kb_list.html:74
+#: manufacturing/templates/cs_list.html:47
+#: manufacturing/templates/cs_returns_list.html:70
+#: manufacturing/templates/cs_surveys_list.html:74
 #: manufacturing/templates/eng_ecrs.html:64
 #: manufacturing/templates/eng_projects.html:67
 #: manufacturing/templates/eng_specs_list.html:78
@@ -816,6 +877,15 @@ msgstr "Borrar"
 #: manufacturing/templates/credit_dashboard.html:103
 #: manufacturing/templates/credit_dashboard.html:122
 #: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_dashboard.html:122
+#: manufacturing/templates/cs_detail.html:109
+#: manufacturing/templates/cs_escalations.html:66
+#: manufacturing/templates/cs_list.html:57
+#: manufacturing/templates/cs_new.html:39
+#: manufacturing/templates/cs_returns_detail.html:61
+#: manufacturing/templates/cs_returns_detail.html:108
+#: manufacturing/templates/cs_returns_list.html:78
+#: manufacturing/templates/cs_surveys_detail.html:128
 msgid "Customer"
 msgstr "Cliente"
 
@@ -1025,6 +1095,10 @@ msgid "Total Activities"
 msgstr "Total de actividades"
 
 #: manufacturing/templates/credit_dashboard.html:94
+#: manufacturing/templates/cs_dashboard.html:137
+#: manufacturing/templates/cs_list.html:81
+#: manufacturing/templates/cs_reports.html:61
+#: manufacturing/templates/cs_reports.html:94
 #: manufacturing/templates/legal_dashboard.html:95
 #: manufacturing/templates/reports_dashboard.html:233
 msgid "Open"
@@ -1045,6 +1119,1013 @@ msgstr "Cobranzas abiertas"
 #: manufacturing/templates/credit_dashboard.html:151
 msgid "No open collection activities."
 msgstr "No hay actividades de cobranza abiertas."
+
+#: manufacturing/templates/cs_dashboard.html:6
+#: manufacturing/templates/cs_dashboard.html:43
+#: manufacturing/templates/cs_escalations.html:6
+#: manufacturing/templates/cs_plans.html:6
+#: manufacturing/templates/cs_reports.html:6
+msgid "All Tickets"
+msgstr "Todos los tickets"
+
+#: manufacturing/templates/cs_dashboard.html:7
+#: manufacturing/templates/cs_dashboard.html:44
+#: manufacturing/templates/cs_detail.html:7
+#: manufacturing/templates/cs_escalations.html:7
+#: manufacturing/templates/cs_list.html:6
+msgid "New Ticket"
+msgstr "Nuevo ticket"
+
+#: manufacturing/templates/cs_dashboard.html:8
+#: manufacturing/templates/cs_dashboard.html:45
+#: manufacturing/templates/cs_list.html:7
+#: manufacturing/templates/cs_reports.html:7
+msgid "Escalations"
+msgstr "Escalamientos"
+
+#: manufacturing/templates/cs_dashboard.html:10
+#: manufacturing/templates/cs_kb_detail.html:8
+#: manufacturing/templates/cs_kb_list.html:8
+#: manufacturing/templates/cs_returns_detail.html:8
+#: manufacturing/templates/cs_returns_list.html:8
+#: manufacturing/templates/cs_surveys_detail.html:8
+#: manufacturing/templates/cs_surveys_list.html:8
+msgid "Returns"
+msgstr "Devoluciones"
+
+#: manufacturing/templates/cs_dashboard.html:11
+#: manufacturing/templates/cs_dashboard.html:49
+#: manufacturing/templates/cs_kb_detail.html:9
+#: manufacturing/templates/cs_kb_list.html:3
+#: manufacturing/templates/cs_kb_list.html:9
+#: manufacturing/templates/cs_kb_list.html:54
+#: manufacturing/templates/cs_returns_detail.html:9
+#: manufacturing/templates/cs_returns_list.html:9
+#: manufacturing/templates/cs_surveys_detail.html:9
+#: manufacturing/templates/cs_surveys_list.html:9
+msgid "Knowledge Base"
+msgstr "Base de conocimientos"
+
+#: manufacturing/templates/cs_dashboard.html:12
+#: manufacturing/templates/cs_kb_detail.html:10
+#: manufacturing/templates/cs_kb_list.html:10
+#: manufacturing/templates/cs_returns_detail.html:10
+#: manufacturing/templates/cs_returns_list.html:10
+#: manufacturing/templates/cs_surveys_detail.html:10
+#: manufacturing/templates/cs_surveys_list.html:10
+msgid "Surveys"
+msgstr "Encuestas"
+
+#: manufacturing/templates/cs_dashboard.html:40
+msgid "Customer Service Dashboard"
+msgstr "Panel de servicio al cliente"
+
+#: manufacturing/templates/cs_dashboard.html:47
+msgid "Service Plans"
+msgstr "Planes de servicio"
+
+#: manufacturing/templates/cs_dashboard.html:48
+#: manufacturing/templates/cs_returns_list.html:56
+msgid "Returns &amp; Refunds"
+msgstr "Devoluciones y reembolsos"
+
+#: manufacturing/templates/cs_dashboard.html:50
+#: manufacturing/templates/cs_surveys_list.html:54
+msgid "Surveys &amp; Feedback"
+msgstr "Encuestas y comentarios"
+
+#: manufacturing/templates/cs_dashboard.html:52
+msgid "New Customer"
+msgstr "Nuevo cliente"
+
+#: manufacturing/templates/cs_dashboard.html:58
+msgid "Open Tickets"
+msgstr "Tickets abiertos"
+
+#: manufacturing/templates/cs_dashboard.html:62
+#: manufacturing/templates/cs_list.html:25
+#: manufacturing/templates/cs_reports.html:65
+#: manufacturing/templates/cs_reports.html:95
+#: manufacturing/templates/eng_dashboard.html:70
+#: manufacturing/templates/legal_compliance_list.html:85
+#: manufacturing/templates/legal_dashboard.html:83
+#: manufacturing/templates/mkt_analytics.html:143
+msgid "Completed"
+msgstr "Completado"
+
+#: manufacturing/templates/cs_dashboard.html:66
+msgid "Total (12 mo)"
+msgstr "Total (12 meses)"
+
+#: manufacturing/templates/cs_dashboard.html:70
+#: manufacturing/templates/cs_reports.html:69
+#: manufacturing/templates/cs_reports.html:96
+msgid "Completion Rate"
+msgstr "Tasa de finalización"
+
+#: manufacturing/templates/cs_dashboard.html:74
+msgid "Avg Resolution"
+msgstr "Resolución promedio"
+
+#: manufacturing/templates/cs_dashboard.html:75
+#: manufacturing/templates/cs_dashboard.html:79
+#, python-format
+msgid "%(days)s days"
+msgstr "%(days)s días"
+
+#: manufacturing/templates/cs_dashboard.html:78
+msgid "Avg Age Open"
+msgstr "Antigüedad promedio abierta"
+
+#: manufacturing/templates/cs_dashboard.html:85
+msgid "Ticket Volume by Month (last 6 mo)"
+msgstr "Volumen de tickets por mes (últimos 6 meses)"
+
+#: manufacturing/templates/cs_dashboard.html:89
+msgid "Open vs Closed Tickets"
+msgstr "Tickets abiertos vs. cerrados"
+
+#: manufacturing/templates/cs_dashboard.html:96
+msgid "Return Status"
+msgstr "Estado de devolución"
+
+#: manufacturing/templates/cs_dashboard.html:100
+msgid "Return Reasons"
+msgstr "Motivos de devolución"
+
+#: manufacturing/templates/cs_dashboard.html:107
+msgid "Survey Response Scores"
+msgstr "Puntuaciones de respuestas de encuestas"
+
+#: manufacturing/templates/cs_dashboard.html:111
+msgid "Knowledge Base Articles by Status"
+msgstr "Artículos de la base de conocimientos por estado"
+
+#: manufacturing/templates/cs_dashboard.html:117
+msgid "Recent Tickets"
+msgstr "Tickets recientes"
+
+#: manufacturing/templates/cs_dashboard.html:121
+#: manufacturing/templates/cs_returns_list.html:77
+msgid "ID"
+msgstr "ID"
+
+#: manufacturing/templates/cs_dashboard.html:124
+msgid "Issue"
+msgstr "Problema"
+
+#: manufacturing/templates/cs_dashboard.html:139
+#: manufacturing/templates/cs_detail.html:71
+#: manufacturing/templates/cs_list.html:81
+#: manufacturing/templates/legal_dashboard.html:99
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/reports_dashboard.html:237
+msgid "Closed"
+msgstr "Cerrado"
+
+#: manufacturing/templates/cs_dashboard.html:144
+#: manufacturing/templates/cs_list.html:94
+msgid "No tickets found."
+msgstr "No se encontraron tickets."
+
+#: manufacturing/templates/cs_detail.html:3
+msgid "Ticket #%(id)s"
+msgstr "Ticket n.º %(id)s"
+
+#: manufacturing/templates/cs_detail.html:6
+#: manufacturing/templates/cs_new.html:6
+msgid "Back to Tickets"
+msgstr "Volver a tickets"
+
+#: manufacturing/templates/cs_detail.html:63
+msgid "Ticket #%(id)s — %(name)s"
+msgstr "Ticket n.º %(id)s — %(name)s"
+
+#: manufacturing/templates/cs_detail.html:73
+msgid "Completed %(date)s %(time)s"
+msgstr "Completado el %(date)s %(time)s"
+
+#: manufacturing/templates/cs_detail.html:75
+#, python-format
+msgid "Open — %(counter)s day old"
+msgid_plural "Open — %(counter)s days old"
+msgstr[0] "Abierto — %(counter)s día"
+msgstr[1] "Abierto — %(counter)s días"
+
+#: manufacturing/templates/cs_detail.html:77
+msgid "Critical"
+msgstr "Crítico"
+
+#: manufacturing/templates/cs_detail.html:79
+#: manufacturing/templates/maint_dashboard.html:82
+#: manufacturing/templates/prod_dashboard_kpis.html:12
+msgid "Overdue"
+msgstr "Atrasadas"
+
+#: manufacturing/templates/cs_detail.html:87
+msgid "Close This Ticket"
+msgstr "Cerrar este ticket"
+
+#: manufacturing/templates/cs_detail.html:92
+msgid "Resolution Notes"
+msgstr "Notas de resolución"
+
+#: manufacturing/templates/cs_detail.html:94
+msgid "How was this resolved?"
+msgstr "¿Cómo se resolvió esto?"
+
+#: manufacturing/templates/cs_detail.html:96
+msgid "Mark as Closed"
+msgstr "Marcar como cerrado"
+
+#: manufacturing/templates/cs_detail.html:103
+msgid "Ticket Details"
+msgstr "Detalles del ticket"
+
+#: manufacturing/templates/cs_detail.html:123
+#: manufacturing/templates/cs_new.html:50
+msgid "Problem / Description"
+msgstr "Problema / Descripción"
+
+#: manufacturing/templates/cs_detail.html:128
+#: manufacturing/templates/cs_new.html:55
+msgid "Call Date"
+msgstr "Fecha de llamada"
+
+#: manufacturing/templates/cs_detail.html:134
+#: manufacturing/templates/cs_new.html:60
+msgid "Call Time"
+msgstr "Hora de llamada"
+
+#: manufacturing/templates/cs_detail.html:140
+msgid "Completion Date"
+msgstr "Fecha de finalización"
+
+#: manufacturing/templates/cs_detail.html:146
+msgid "Completion Time"
+msgstr "Hora de finalización"
+
+#: manufacturing/templates/cs_detail.html:152
+#: manufacturing/templates/cs_new.html:65
+msgid "Comments / Notes"
+msgstr "Comentarios / Notas"
+
+#: manufacturing/templates/cs_detail.html:161
+msgid "Mark as completed"
+msgstr "Marcar como completado"
+
+#: manufacturing/templates/cs_detail.html:172
+msgid "Created by %(by)s"
+msgstr "Creado por %(by)s"
+
+#: manufacturing/templates/cs_detail.html:172
+msgid "ID:"
+msgstr "ID:"
+
+#: manufacturing/templates/cs_escalations.html:3
+msgid "CS Escalations"
+msgstr "Escalamientos de SC"
+
+#: manufacturing/templates/cs_escalations.html:44
+msgid "Escalations — Open Tickets &ge;7 Days"
+msgstr "Escalamientos — Tickets abiertos &ge;7 días"
+
+#: manufacturing/templates/cs_escalations.html:49
+msgid "Critical (&ge;14 days)"
+msgstr "Crítico (&ge;14 días)"
+
+#: manufacturing/templates/cs_escalations.html:53
+msgid "High (&ge;7 days)"
+msgstr "Alto (&ge;7 días)"
+
+#: manufacturing/templates/cs_escalations.html:57
+msgid "Total Escalations"
+msgstr "Total de escalamientos"
+
+#: manufacturing/templates/cs_escalations.html:67
+#: manufacturing/templates/cs_list.html:58
+#: manufacturing/templates/cs_plans.html:131
+#: manufacturing/templates/cs_surveys_detail.html:113
+#: manufacturing/templates/cs_surveys_list.html:143
+#: manufacturing/templates/eng_spec_detail.html:94
+#: manufacturing/templates/eng_spec_detail.html:119
+#: manufacturing/templates/eng_specs_list.html:149
+#: manufacturing/templates/mkt_research_detail.html:83
+#: manufacturing/templates/mkt_research_detail.html:145
+#: manufacturing/templates/mkt_research_list.html:161
+#: manufacturing/templates/prod_dashboard.html:111
+msgid "Description"
+msgstr "Descripción"
+
+#: manufacturing/templates/cs_escalations.html:69
+#: manufacturing/templates/cs_list.html:60
+msgid "Days Open"
+msgstr "Días abierto"
+
+#: manufacturing/templates/cs_escalations.html:70
+#: manufacturing/templates/cs_list.html:61
+#: manufacturing/templates/eng_project_detail.html:129
+#: manufacturing/templates/eng_project_detail.html:162
+#: manufacturing/templates/eng_project_detail.html:188
+#: manufacturing/templates/eng_task_detail.html:91
+#: manufacturing/templates/eng_task_detail.html:119
+#: manufacturing/templates/eng_tasks_list.html:93
+#: manufacturing/templates/eng_tasks_list.html:147
+msgid "Priority"
+msgstr "Prioridad"
+
+#: manufacturing/templates/cs_escalations.html:82
+msgid "days"
+msgstr "días"
+
+#: manufacturing/templates/cs_escalations.html:86
+#: manufacturing/templates/cs_list.html:82
+msgid "View"
+msgstr "Ver"
+
+#: manufacturing/templates/cs_escalations.html:93
+msgid "Critical &ge;14 days"
+msgstr "Crítico &ge;14 días"
+
+#: manufacturing/templates/cs_escalations.html:95
+msgid "High &ge;7 days"
+msgstr "Alto &ge;7 días"
+
+#: manufacturing/templates/cs_escalations.html:98
+msgid "No escalated tickets — all open tickets are within the 7-day threshold."
+msgstr "No hay tickets escalados: todos los tickets abiertos están dentro del umbral de 7 días."
+
+#: manufacturing/templates/cs_kb_detail.html:6
+#: manufacturing/templates/cs_kb_list.html:6
+#: manufacturing/templates/cs_returns_detail.html:6
+#: manufacturing/templates/cs_returns_list.html:6
+#: manufacturing/templates/cs_surveys_detail.html:6
+#: manufacturing/templates/cs_surveys_list.html:6
+msgid "CS Dashboard"
+msgstr "Panel de SC"
+
+#: manufacturing/templates/cs_kb_detail.html:7
+#: manufacturing/templates/cs_kb_list.html:7
+#: manufacturing/templates/cs_returns_detail.html:7
+#: manufacturing/templates/cs_returns_list.html:7
+#: manufacturing/templates/cs_surveys_detail.html:7
+#: manufacturing/templates/cs_surveys_list.html:7
+msgid "Tickets"
+msgstr "Tickets"
+
+#: manufacturing/templates/cs_kb_detail.html:56
+msgid "Edit Article"
+msgstr "Editar artículo"
+
+#: manufacturing/templates/cs_kb_detail.html:61
+#: manufacturing/templates/cs_kb_list.html:81
+#: manufacturing/templates/cs_kb_list.html:115
+#: manufacturing/templates/cs_plans.html:76
+#: manufacturing/templates/cs_plans.html:119
+#: manufacturing/templates/cs_surveys_detail.html:85
+#: manufacturing/templates/cs_surveys_list.html:81
+#: manufacturing/templates/cs_surveys_list.html:115
+#: manufacturing/templates/eng_dashboard.html:113
+#: manufacturing/templates/eng_dashboard.html:130
+#: manufacturing/templates/eng_ecr_detail.html:77
+#: manufacturing/templates/eng_ecr_detail.html:128
+#: manufacturing/templates/eng_ecrs.html:69
+#: manufacturing/templates/eng_ecrs.html:96
+#: manufacturing/templates/eng_project_detail.html:79
+#: manufacturing/templates/eng_project_detail.html:210
+#: manufacturing/templates/eng_projects.html:72
+#: manufacturing/templates/eng_projects.html:101
+#: manufacturing/templates/eng_reports.html:101
+#: manufacturing/templates/eng_reports.html:122
+#: manufacturing/templates/eng_spec_detail.html:66
+#: manufacturing/templates/eng_specs_list.html:86
+#: manufacturing/templates/eng_specs_list.html:121
+#: manufacturing/templates/legal_contract_detail.html:98
+#: manufacturing/templates/legal_contract_list.html:88
+#: manufacturing/templates/legal_contract_list.html:124
+#: manufacturing/templates/legal_dashboard.html:142
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:103
+#: manufacturing/templates/mkt_content_detail.html:94
+#: manufacturing/templates/mkt_content_list.html:84
+#: manufacturing/templates/mkt_content_list.html:118
+#: manufacturing/templates/mkt_research_detail.html:108
+#: manufacturing/templates/mkt_research_list.html:89
+#: manufacturing/templates/mkt_research_list.html:124
+msgid "Title"
+msgstr "Título"
+
+#: manufacturing/templates/cs_kb_detail.html:65
+#: manufacturing/templates/cs_kb_detail.html:103
+#: manufacturing/templates/cs_kb_list.html:82
+#: manufacturing/templates/cs_kb_list.html:119
+#: manufacturing/templates/eng_spec_detail.html:70
+#: manufacturing/templates/eng_spec_detail.html:109
+#: manufacturing/templates/eng_specs_list.html:87
+#: manufacturing/templates/eng_specs_list.html:125
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:105
+#: manufacturing/templates/mkt_budget_list.html:82
+#: manufacturing/templates/mkt_budget_list.html:120
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:87
+msgid "Category"
+msgstr "Categoría"
+
+#: manufacturing/templates/cs_kb_detail.html:73
+#: manufacturing/templates/cs_kb_detail.html:104
+#: manufacturing/templates/cs_kb_list.html:83
+#: manufacturing/templates/cs_kb_list.html:127
+#: manufacturing/templates/mkt_content_detail.html:67
+#: manufacturing/templates/mkt_content_detail.html:122
+#: manufacturing/templates/mkt_content_list.html:87
+#: manufacturing/templates/mkt_content_list.html:146
+msgid "Author"
+msgstr "Autor"
+
+#: manufacturing/templates/cs_kb_detail.html:85
+#: manufacturing/templates/cs_kb_list.html:139
+msgid "Published Date"
+msgstr "Fecha de publicación"
+
+#: manufacturing/templates/cs_kb_detail.html:89
+#: manufacturing/templates/cs_kb_detail.html:107
+#: manufacturing/templates/cs_kb_list.html:86
+#: manufacturing/templates/cs_kb_list.html:143
+msgid "Tags"
+msgstr "Etiquetas"
+
+#: manufacturing/templates/cs_kb_detail.html:93
+#: manufacturing/templates/cs_kb_list.html:147
+#: manufacturing/templates/marketing_dashboard.html:12
+#: manufacturing/templates/marketing_dashboard.html:54
+#: manufacturing/templates/marketing_dashboard.html:95
+#: manufacturing/templates/mkt_ad_list.html:12
+#: manufacturing/templates/mkt_analytics.html:12
+#: manufacturing/templates/mkt_analytics.html:161
+#: manufacturing/templates/mkt_budget_list.html:12
+#: manufacturing/templates/mkt_campaign_detail.html:9
+#: manufacturing/templates/mkt_campaign_list.html:9
+#: manufacturing/templates/mkt_content_detail.html:9
+#: manufacturing/templates/mkt_content_list.html:3
+#: manufacturing/templates/mkt_content_list.html:9
+#: manufacturing/templates/mkt_content_list.html:57
+#: manufacturing/templates/mkt_lead_detail.html:9
+#: manufacturing/templates/mkt_lead_list.html:9
+#: manufacturing/templates/mkt_research_list.html:12
+msgid "Content"
+msgstr "Contenido"
+
+#: manufacturing/templates/cs_kb_detail.html:105
+#: manufacturing/templates/cs_kb_list.html:84
+#: manufacturing/templates/marketing_dashboard.html:106
+#: manufacturing/templates/mkt_analytics.html:78
+#: manufacturing/templates/mkt_analytics.html:163
+msgid "Published"
+msgstr "Publicado"
+
+#: manufacturing/templates/cs_kb_detail.html:106
+#: manufacturing/templates/cs_kb_list.html:85
+msgid "Views"
+msgstr "Vistas"
+
+#: manufacturing/templates/cs_kb_detail.html:109
+msgid "No content."
+msgstr "Sin contenido."
+
+#: manufacturing/templates/cs_kb_list.html:67
+#: manufacturing/templates/eng_specs_list.html:71
+#: manufacturing/templates/mkt_budget_list.html:68
+msgid "All Categories"
+msgstr "Todas las categorías"
+
+#: manufacturing/templates/cs_kb_list.html:72
+msgid "Search title / content / tags…"
+msgstr "Buscar título / contenido / etiquetas…"
+
+#: manufacturing/templates/cs_kb_list.html:102
+msgid "No articles found."
+msgstr "No se encontraron artículos."
+
+#: manufacturing/templates/cs_kb_list.html:110
+msgid "New Article"
+msgstr "Nuevo artículo"
+
+#: manufacturing/templates/cs_kb_list.html:116
+msgid "Article title"
+msgstr "Título del artículo"
+
+#: manufacturing/templates/cs_kb_list.html:128
+msgid "Author name"
+msgstr "Nombre del autor"
+
+#: manufacturing/templates/cs_kb_list.html:144
+msgid "Comma-separated tags"
+msgstr "Etiquetas separadas por comas"
+
+#: manufacturing/templates/cs_kb_list.html:148
+msgid "Article content…"
+msgstr "Contenido del artículo…"
+
+#: manufacturing/templates/cs_kb_list.html:151
+msgid "Create Article"
+msgstr "Crear artículo"
+
+#: manufacturing/templates/cs_list.html:3
+msgid "CS Tickets"
+msgstr "Tickets de SC"
+
+#: manufacturing/templates/cs_list.html:9
+#: manufacturing/templates/cs_plans.html:57
+#: manufacturing/templates/cs_reports.html:8
+msgid "Improvement Plans"
+msgstr "Planes de mejora"
+
+#: manufacturing/templates/cs_list.html:11
+#: manufacturing/templates/eng_specs_list.html:13
+#: manufacturing/templates/eng_tasks_list.html:13
+#: manufacturing/templates/legal_compliance_list.html:14
+#: manufacturing/templates/legal_contract_list.html:14
+#: manufacturing/templates/legal_litigation_list.html:14
+#: manufacturing/templates/mkt_ad_list.html:15
+#: manufacturing/templates/mkt_campaign_list.html:12
+#: manufacturing/templates/mkt_lead_list.html:12
+#: manufacturing/templates/mkt_research_list.html:15
+msgid "CSV"
+msgstr "CSV"
+
+#: manufacturing/templates/cs_list.html:12
+#: manufacturing/templates/eng_specs_list.html:14
+#: manufacturing/templates/eng_tasks_list.html:14
+#: manufacturing/templates/legal_compliance_list.html:15
+#: manufacturing/templates/legal_contract_list.html:15
+#: manufacturing/templates/legal_litigation_list.html:15
+#: manufacturing/templates/mkt_ad_list.html:16
+#: manufacturing/templates/mkt_campaign_list.html:13
+#: manufacturing/templates/mkt_lead_list.html:13
+#: manufacturing/templates/mkt_research_list.html:16
+msgid "Excel"
+msgstr "Excel"
+
+#: manufacturing/templates/cs_list.html:17
+msgid "Customer Service Tickets"
+msgstr "Tickets de servicio al cliente"
+
+#: manufacturing/templates/cs_list.html:21
+msgid "All (%(count)s)"
+msgstr "Todos (%(count)s)"
+
+#: manufacturing/templates/cs_list.html:23
+msgid "Open (%(count)s)"
+msgstr "Abiertos (%(count)s)"
+
+#: manufacturing/templates/cs_list.html:28
+#: manufacturing/templates/eng_projects.html:80
+#: manufacturing/templates/reports_dashboard.html:150
+#, python-format
+msgid "%(counter)s overdue"
+msgid_plural "%(counter)s overdue"
+msgstr[0] "%(counter)s atrasada"
+msgstr[1] "%(counter)s atrasadas"
+
+#: manufacturing/templates/cs_list.html:31
+msgid "My tickets ✕"
+msgstr "Mis tickets ✕"
+
+#: manufacturing/templates/cs_list.html:34
+msgid "My tickets"
+msgstr "Mis tickets"
+
+#: manufacturing/templates/cs_list.html:43
+msgid "Search customer or description…"
+msgstr "Buscar cliente o descripción…"
+
+#: manufacturing/templates/cs_list.html:44
+msgid "Search"
+msgstr "Buscar"
+
+#: manufacturing/templates/cs_list.html:89
+msgid "%(counter)s ticket"
+msgid_plural "%(counter)s tickets"
+msgstr[0] "%(counter)s ticket"
+msgstr[1] "%(counter)s tickets"
+
+#: manufacturing/templates/cs_list.html:90
+#, python-format
+msgid " matching \"%(q)s\""
+msgstr " que coincide con \"%(q)s\""
+
+#: manufacturing/templates/cs_list.html:94
+#, python-format
+msgid "No tickets found matching \"%(q)s\"."
+msgstr "No se encontraron tickets que coincidan con \"%(q)s\"."
+
+#: manufacturing/templates/cs_list.html:95
+msgid "Create one →"
+msgstr "Crear uno →"
+
+#: manufacturing/templates/cs_new.html:3
+msgid "New CS Ticket"
+msgstr "Nuevo ticket de SC"
+
+#: manufacturing/templates/cs_new.html:32
+msgid "New Support Ticket"
+msgstr "Nuevo ticket de soporte"
+
+#: manufacturing/templates/cs_new.html:41
+msgid "— select customer —"
+msgstr "— seleccionar cliente —"
+
+#: manufacturing/templates/cs_new.html:52
+msgid "Describe the customer&#39;s issue…"
+msgstr "Describa el problema del cliente…"
+
+#: manufacturing/templates/cs_new.html:67
+msgid "Internal notes…"
+msgstr "Notas internas…"
+
+#: manufacturing/templates/cs_new.html:70
+msgid "Create Ticket"
+msgstr "Crear ticket"
+
+#: manufacturing/templates/cs_plans.html:3
+msgid "CS Improvement Plans"
+msgstr "Planes de mejora de SC"
+
+#: manufacturing/templates/cs_plans.html:64
+#: manufacturing/templates/eng_ecrs.html:49
+#: manufacturing/templates/eng_projects.html:52
+#: manufacturing/templates/eng_projects.html:59
+msgid "All"
+msgstr "Todos"
+
+#: manufacturing/templates/cs_plans.html:77
+#: manufacturing/templates/cs_plans.html:123
+#: manufacturing/templates/legal_compliance_detail.html:62
+#: manufacturing/templates/legal_compliance_detail.html:97
+#: manufacturing/templates/legal_compliance_list.html:83
+#: manufacturing/templates/legal_compliance_list.html:121
+#: manufacturing/templates/legal_contract_detail.html:79
+#: manufacturing/templates/legal_contract_detail.html:134
+#: manufacturing/templates/legal_contract_list.html:94
+#: manufacturing/templates/legal_contract_list.html:160
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:134
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:129
+#: manufacturing/templates/mkt_ad_detail.html:82
+#: manufacturing/templates/mkt_ad_detail.html:182
+#: manufacturing/templates/mkt_ad_list.html:176
+#: manufacturing/templates/mkt_campaign_detail.html:67
+#: manufacturing/templates/mkt_campaign_detail.html:126
+#: manufacturing/templates/mkt_campaign_list.html:89
+#: manufacturing/templates/mkt_campaign_list.html:150
+#: manufacturing/templates/mkt_lead_detail.html:72
+#: manufacturing/templates/mkt_lead_detail.html:115
+#: manufacturing/templates/mkt_lead_list.html:91
+#: manufacturing/templates/mkt_lead_list.html:141
+#: manufacturing/templates/mkt_research_detail.html:61
+#: manufacturing/templates/mkt_research_detail.html:121
+#: manufacturing/templates/mkt_research_list.html:91
+#: manufacturing/templates/mkt_research_list.html:137
+#: manufacturing/templates/report_builder_detail.html:33
+#: manufacturing/templates/report_builder_list.html:24
+msgid "Owner"
+msgstr "Responsable"
+
+#: manufacturing/templates/cs_plans.html:78
+#: manufacturing/templates/cs_plans.html:127
+msgid "Target Date"
+msgstr "Fecha objetivo"
+
+#: manufacturing/templates/cs_plans.html:79
+msgid "Created"
+msgstr "Creado"
+
+#: manufacturing/templates/cs_plans.html:98
+msgid "overdue"
+msgstr "atrasado"
+
+#: manufacturing/templates/cs_plans.html:107
+msgid "No plans found."
+msgstr "No se encontraron planes."
+
+#: manufacturing/templates/cs_plans.html:113
+msgid "New Improvement Plan"
+msgstr "Nuevo plan de mejora"
+
+#: manufacturing/templates/cs_plans.html:120
+msgid "Plan title"
+msgstr "Título del plan"
+
+#: manufacturing/templates/cs_plans.html:124
+#: manufacturing/templates/mkt_research_list.html:138
+msgid "Responsible person"
+msgstr "Persona responsable"
+
+#: manufacturing/templates/cs_plans.html:133
+msgid "What needs to be improved and how…"
+msgstr "Qué debe mejorarse y cómo…"
+
+#: manufacturing/templates/cs_plans.html:137
+msgid "Create Plan"
+msgstr "Crear plan"
+
+#: manufacturing/templates/cs_reports.html:3
+#: manufacturing/templates/cs_reports.html:42
+msgid "CS Reports"
+msgstr "Informes de SC"
+
+#: manufacturing/templates/cs_reports.html:46
+msgid "Period:"
+msgstr "Período:"
+
+#: manufacturing/templates/cs_reports.html:47
+msgid "90 days"
+msgstr "90 días"
+
+#: manufacturing/templates/cs_reports.html:48
+msgid "6 months"
+msgstr "6 meses"
+
+#: manufacturing/templates/cs_reports.html:49
+msgid "1 year"
+msgstr "1 año"
+
+#: manufacturing/templates/cs_reports.html:50
+msgid "2 years"
+msgstr "2 años"
+
+#: manufacturing/templates/cs_reports.html:57
+msgid "Total Tickets"
+msgstr "Total de tickets"
+
+#: manufacturing/templates/cs_reports.html:75
+msgid "Avg Resolution (days)"
+msgstr "Resolución promedio (días)"
+
+#: manufacturing/templates/cs_reports.html:81
+msgid "Avg Age (open tickets)"
+msgstr "Antigüedad promedio (tickets abiertos)"
+
+#: manufacturing/templates/cs_reports.html:87
+msgid "Monthly Call Volume"
+msgstr "Volumen mensual de llamadas"
+
+#: manufacturing/templates/cs_reports.html:92
+msgid "Month"
+msgstr "Mes"
+
+#: manufacturing/templates/cs_reports.html:93
+#: manufacturing/templates/marketing_dashboard.html:66
+#: manufacturing/templates/mkt_analytics.html:141
+#: manufacturing/templates/mkt_analytics.html:148
+#: manufacturing/templates/mkt_analytics.html:162
+#: manufacturing/templates/reports_dashboard.html:229
+#: manufacturing/templates/time_clock_attendance.html:77
+#: manufacturing/templates/time_clock_hours.html:84
+msgid "Total"
+msgstr "Total"
+
+#: manufacturing/templates/cs_reports.html:112
+msgid "No data for this period."
+msgstr "No hay datos para este período."
+
+#: manufacturing/templates/cs_reports.html:118
+msgid "Open Tickets Summary"
+msgstr "Resumen de tickets abiertos"
+
+#: manufacturing/templates/cs_reports.html:120
+#, python-format
+#| msgid ""
+#| "You have <strong>%(counter)s</strong> purchase order awaiting approval."
+#| msgid_plural ""
+#| "You have <strong>%(counter)s</strong> purchase orders awaiting approval."
+msgid "<strong>%(counter)s</strong> open ticket"
+msgid_plural "<strong>%(counter)s</strong> open tickets"
+msgstr[0] "<strong>%(counter)s</strong> ticket abierto"
+msgstr[1] "<strong>%(counter)s</strong> tickets abiertos"
+
+#: manufacturing/templates/cs_reports.html:122
+#, python-format
+msgid ""
+"<strong style=\"color:#c62828;\">%(counter)s</strong> overdue (&ge;7 days)."
+msgid_plural ""
+"<strong style=\"color:#c62828;\">%(counter)s</strong> overdue (&ge;7 days)."
+msgstr[0] "<strong style=\"color:#c62828;\">%(counter)s</strong> atrasado (&ge;7 días)."
+msgstr[1] "<strong style=\"color:#c62828;\">%(counter)s</strong> atrasados (&ge;7 días)."
+
+#: manufacturing/templates/cs_reports.html:124
+msgid "View escalations &rarr;"
+msgstr "Ver escalamientos &rarr;"
+
+#: manufacturing/templates/cs_returns_detail.html:3
+#: manufacturing/templates/cs_returns_detail.html:47
+msgid "Return RET-%(id)s"
+msgstr "Devolución RET-%(id)s"
+
+#: manufacturing/templates/cs_returns_detail.html:56
+msgid "Edit Return"
+msgstr "Editar devolución"
+
+#: manufacturing/templates/cs_returns_detail.html:63
+msgid "— No Customer —"
+msgstr "— Sin cliente —"
+
+#: manufacturing/templates/cs_returns_detail.html:70
+#: manufacturing/templates/cs_returns_detail.html:109
+#: manufacturing/templates/cs_returns_list.html:79
+#: manufacturing/templates/cs_returns_list.html:109
+msgid "Return Date"
+msgstr "Fecha de devolución"
+
+#: manufacturing/templates/cs_returns_detail.html:82
+#: manufacturing/templates/cs_returns_list.html:129
+msgid "Refund Amount ($)"
+msgstr "Monto de reembolso ($)"
+
+#: manufacturing/templates/cs_returns_detail.html:94
+#: manufacturing/templates/cs_returns_detail.html:112
+#: manufacturing/templates/cs_returns_list.html:133
+msgid "Items Returned"
+msgstr "Artículos devueltos"
+
+#: manufacturing/templates/cs_returns_detail.html:111
+#: manufacturing/templates/cs_returns_list.html:81
+msgid "Refund Amount"
+msgstr "Monto de reembolso"
+
+#: manufacturing/templates/cs_returns_detail.html:114
+#: manufacturing/templates/eng_ecr_detail.html:66
+#: manufacturing/templates/eng_spec_detail.html:113
+#: manufacturing/templates/eng_task_detail.html:121
+#: manufacturing/templates/payroll_history.html:39
+#: manufacturing/templates/payroll_run_detail.html:45
+msgid "Created By"
+msgstr "Creado por"
+
+#: manufacturing/templates/cs_returns_list.html:3
+msgid "Returns & Refunds"
+msgstr "Devoluciones y reembolsos"
+
+#: manufacturing/templates/cs_returns_list.html:68
+msgid "Search customer / reason / notes…"
+msgstr "Buscar cliente / motivo / notas…"
+
+#: manufacturing/templates/cs_returns_list.html:96
+msgid "No returns found."
+msgstr "No se encontraron devoluciones."
+
+#: manufacturing/templates/cs_returns_list.html:104
+msgid "New Return"
+msgstr "Nueva devolución"
+
+#: manufacturing/templates/cs_returns_list.html:134
+msgid "Describe items…"
+msgstr "Describa los artículos…"
+
+#: manufacturing/templates/cs_returns_list.html:141
+msgid "Create Return"
+msgstr "Crear devolución"
+
+#: manufacturing/templates/cs_surveys_detail.html:3
+msgid "Survey — %(title)s"
+msgstr "Encuesta — %(title)s"
+
+#: manufacturing/templates/cs_surveys_detail.html:62
+#: manufacturing/templates/cs_surveys_list.html:85
+msgid "Responses"
+msgstr "Respuestas"
+
+#: manufacturing/templates/cs_surveys_detail.html:66
+#: manufacturing/templates/cs_surveys_list.html:86
+msgid "Avg Score"
+msgstr "Puntuación promedio"
+
+#: manufacturing/templates/cs_surveys_detail.html:70
+#: manufacturing/templates/payroll_dashboard.html:87
+#: manufacturing/templates/payroll_history.html:37
+msgid "Period"
+msgstr "Período"
+
+#: manufacturing/templates/cs_surveys_detail.html:79
+msgid "Edit Survey"
+msgstr "Editar encuesta"
+
+#: manufacturing/templates/cs_surveys_detail.html:105
+#: manufacturing/templates/cs_surveys_list.html:83
+#: manufacturing/templates/cs_surveys_list.html:135
+#: manufacturing/templates/eng_project_detail.html:100
+#: manufacturing/templates/eng_project_detail.html:218
+#: manufacturing/templates/eng_projects.html:122
+#: manufacturing/templates/legal_contract_detail.html:71
+#: manufacturing/templates/legal_contract_detail.html:126
+#: manufacturing/templates/legal_contract_list.html:152
+#: manufacturing/templates/mkt_ad_detail.html:86
+#: manufacturing/templates/mkt_ad_detail.html:174
+#: manufacturing/templates/mkt_ad_list.html:168
+#: manufacturing/templates/mkt_campaign_detail.html:71
+#: manufacturing/templates/mkt_campaign_detail.html:130
+#: manufacturing/templates/mkt_campaign_list.html:154
+#: manufacturing/templates/mkt_research_detail.html:69
+#: manufacturing/templates/mkt_research_detail.html:125
+#: manufacturing/templates/mkt_research_list.html:92
+#: manufacturing/templates/mkt_research_list.html:141
+msgid "Start Date"
+msgstr "Fecha de inicio"
+
+#: manufacturing/templates/cs_surveys_detail.html:109
+#: manufacturing/templates/cs_surveys_list.html:84
+#: manufacturing/templates/cs_surveys_list.html:139
+#: manufacturing/templates/legal_contract_detail.html:75
+#: manufacturing/templates/legal_contract_detail.html:130
+#: manufacturing/templates/legal_contract_list.html:156
+#: manufacturing/templates/legal_dashboard.html:146
+#: manufacturing/templates/mkt_ad_detail.html:90
+#: manufacturing/templates/mkt_ad_detail.html:178
+#: manufacturing/templates/mkt_ad_list.html:172
+#: manufacturing/templates/mkt_campaign_detail.html:75
+#: manufacturing/templates/mkt_campaign_detail.html:134
+#: manufacturing/templates/mkt_campaign_list.html:158
+#: manufacturing/templates/mkt_research_detail.html:73
+#: manufacturing/templates/mkt_research_detail.html:129
+#: manufacturing/templates/mkt_research_list.html:93
+#: manufacturing/templates/mkt_research_list.html:145
+msgid "End Date"
+msgstr "Fecha de finalización"
+
+#: manufacturing/templates/cs_surveys_detail.html:123
+#, python-format
+msgid "Responses (%(counter)s)"
+msgid_plural "Responses (%(counter)s)"
+msgstr[0] "Respuestas (%(counter)s)"
+msgstr[1] "Respuestas (%(counter)s)"
+
+#: manufacturing/templates/cs_surveys_detail.html:129
+msgid "Score"
+msgstr "Puntuación"
+
+#: manufacturing/templates/cs_surveys_detail.html:130
+#: manufacturing/templates/cs_surveys_detail.html:164
+msgid "Comments"
+msgstr "Comentarios"
+
+#: manufacturing/templates/cs_surveys_detail.html:142
+msgid "No responses yet."
+msgstr "Aún no hay respuestas."
+
+#: manufacturing/templates/cs_surveys_detail.html:150
+#: manufacturing/templates/cs_surveys_detail.html:168
+msgid "Add Response"
+msgstr "Agregar respuesta"
+
+#: manufacturing/templates/cs_surveys_detail.html:156
+msgid "Response Date"
+msgstr "Fecha de respuesta"
+
+#: manufacturing/templates/cs_surveys_detail.html:160
+msgid "Score (0–10)"
+msgstr "Puntuación (0-10)"
+
+#: manufacturing/templates/cs_surveys_detail.html:165
+msgid "Customer feedback…"
+msgstr "Comentarios del cliente…"
+
+#: manufacturing/templates/cs_surveys_list.html:3
+msgid "Surveys & Feedback"
+msgstr "Encuestas y comentarios"
+
+#: manufacturing/templates/cs_surveys_list.html:67
+#: manufacturing/templates/legal_contract_list.html:74
+#: manufacturing/templates/legal_litigation_list.html:74
+#: manufacturing/templates/mkt_content_list.html:70
+#: manufacturing/templates/mkt_research_list.html:74
+msgid "All Types"
+msgstr "Todos los tipos"
+
+#: manufacturing/templates/cs_surveys_list.html:72
+msgid "Search title…"
+msgstr "Buscar título…"
+
+#: manufacturing/templates/cs_surveys_list.html:102
+msgid "No surveys found."
+msgstr "No se encontraron encuestas."
+
+#: manufacturing/templates/cs_surveys_list.html:110
+msgid "New Survey"
+msgstr "Nueva encuesta"
+
+#: manufacturing/templates/cs_surveys_list.html:116
+msgid "Survey title"
+msgstr "Título de la encuesta"
+
+#: manufacturing/templates/cs_surveys_list.html:144
+msgid "Survey description…"
+msgstr "Descripción de la encuesta…"
+
+#: manufacturing/templates/cs_surveys_list.html:147
+msgid "Create Survey"
+msgstr "Crear encuesta"
 
 #: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
 msgid "Manufacturing ERP"
@@ -1216,13 +2297,6 @@ msgstr "Nuevo proyecto"
 msgid "Planning"
 msgstr "Planificación"
 
-#: manufacturing/templates/eng_dashboard.html:70
-#: manufacturing/templates/legal_compliance_list.html:85
-#: manufacturing/templates/legal_dashboard.html:83
-#: manufacturing/templates/mkt_analytics.html:143
-msgid "Completed"
-msgstr "Completado"
-
 #: manufacturing/templates/eng_dashboard.html:71
 msgid "ECRs Pending"
 msgstr "ECR pendientes"
@@ -1273,36 +2347,6 @@ msgid "Number"
 msgstr "Número"
 
 #: manufacturing/templates/eng_dashboard.html:113
-#: manufacturing/templates/eng_dashboard.html:130
-#: manufacturing/templates/eng_ecr_detail.html:77
-#: manufacturing/templates/eng_ecr_detail.html:128
-#: manufacturing/templates/eng_ecrs.html:69
-#: manufacturing/templates/eng_ecrs.html:96
-#: manufacturing/templates/eng_project_detail.html:79
-#: manufacturing/templates/eng_project_detail.html:210
-#: manufacturing/templates/eng_projects.html:72
-#: manufacturing/templates/eng_projects.html:101
-#: manufacturing/templates/eng_reports.html:101
-#: manufacturing/templates/eng_reports.html:122
-#: manufacturing/templates/eng_spec_detail.html:66
-#: manufacturing/templates/eng_specs_list.html:86
-#: manufacturing/templates/eng_specs_list.html:121
-#: manufacturing/templates/legal_contract_detail.html:98
-#: manufacturing/templates/legal_contract_list.html:88
-#: manufacturing/templates/legal_contract_list.html:124
-#: manufacturing/templates/legal_dashboard.html:142
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:103
-#: manufacturing/templates/mkt_content_detail.html:94
-#: manufacturing/templates/mkt_content_list.html:84
-#: manufacturing/templates/mkt_content_list.html:118
-#: manufacturing/templates/mkt_research_detail.html:108
-#: manufacturing/templates/mkt_research_list.html:89
-#: manufacturing/templates/mkt_research_list.html:124
-msgid "Title"
-msgstr "Título"
-
-#: manufacturing/templates/eng_dashboard.html:113
 #: manufacturing/templates/eng_project_detail.html:119
 #: manufacturing/templates/eng_project_detail.html:130
 #: manufacturing/templates/eng_reports.html:101
@@ -1335,6 +2379,7 @@ msgid "All ECRs"
 msgstr "Todos los ECR"
 
 #: manufacturing/templates/eng_ecr_detail.html:39
+#, python-format
 msgid "ECR: %(num)s — %(title)s"
 msgstr "ECR: %(num)s — %(title)s"
 
@@ -1370,14 +2415,6 @@ msgstr "Proyecto"
 msgid "Requested By"
 msgstr "Solicitado por"
 
-#: manufacturing/templates/eng_ecr_detail.html:66
-#: manufacturing/templates/eng_spec_detail.html:113
-#: manufacturing/templates/eng_task_detail.html:121
-#: manufacturing/templates/payroll_history.html:39
-#: manufacturing/templates/payroll_run_detail.html:45
-msgid "Created By"
-msgstr "Creado por"
-
 #: manufacturing/templates/eng_ecr_detail.html:72
 msgid "Edit ECR"
 msgstr "Editar ECR"
@@ -1408,12 +2445,6 @@ msgstr "Solicitudes de cambio de ingeniería"
 msgid "Engineering Change Requests / Design Reviews"
 msgstr "Solicitudes de cambio de ingeniería / Revisiones de diseño"
 
-#: manufacturing/templates/eng_ecrs.html:49
-#: manufacturing/templates/eng_projects.html:52
-#: manufacturing/templates/eng_projects.html:59
-msgid "All"
-msgstr "Todos"
-
 #: manufacturing/templates/eng_ecrs.html:54
 msgid "Project:"
 msgstr "Proyecto:"
@@ -1437,6 +2468,7 @@ msgid "No ECRs found."
 msgstr "No se encontraron ECR."
 
 #: manufacturing/templates/eng_project_detail.html:67
+#, python-format
 msgid "Project: %(num)s — %(title)s"
 msgstr "Proyecto: %(num)s — %(title)s"
 
@@ -1447,25 +2479,6 @@ msgstr "Proyecto: %(num)s — %(title)s"
 #: manufacturing/templates/eng_projects.html:113
 msgid "Engineer"
 msgstr "Ingeniero"
-
-#: manufacturing/templates/eng_project_detail.html:100
-#: manufacturing/templates/eng_project_detail.html:218
-#: manufacturing/templates/eng_projects.html:122
-#: manufacturing/templates/legal_contract_detail.html:71
-#: manufacturing/templates/legal_contract_detail.html:126
-#: manufacturing/templates/legal_contract_list.html:152
-#: manufacturing/templates/mkt_ad_detail.html:86
-#: manufacturing/templates/mkt_ad_detail.html:174
-#: manufacturing/templates/mkt_ad_list.html:168
-#: manufacturing/templates/mkt_campaign_detail.html:71
-#: manufacturing/templates/mkt_campaign_detail.html:130
-#: manufacturing/templates/mkt_campaign_list.html:154
-#: manufacturing/templates/mkt_research_detail.html:69
-#: manufacturing/templates/mkt_research_detail.html:125
-#: manufacturing/templates/mkt_research_list.html:92
-#: manufacturing/templates/mkt_research_list.html:141
-msgid "Start Date"
-msgstr "Fecha de inicio"
 
 #: manufacturing/templates/eng_project_detail.html:104
 #: manufacturing/templates/eng_project_detail.html:161
@@ -1511,16 +2524,6 @@ msgstr "Tarea"
 #: manufacturing/templates/eng_tasks_list.html:134
 msgid "Assigned To"
 msgstr "Asignado a"
-
-#: manufacturing/templates/eng_project_detail.html:129
-#: manufacturing/templates/eng_project_detail.html:162
-#: manufacturing/templates/eng_project_detail.html:188
-#: manufacturing/templates/eng_task_detail.html:91
-#: manufacturing/templates/eng_task_detail.html:119
-#: manufacturing/templates/eng_tasks_list.html:93
-#: manufacturing/templates/eng_tasks_list.html:147
-msgid "Priority"
-msgstr "Prioridad"
 
 #: manufacturing/templates/eng_project_detail.html:142
 #: manufacturing/templates/payroll_pay_rates.html:65
@@ -1590,14 +2593,6 @@ msgstr "Ingeniero:"
 msgid "Title or number…"
 msgstr "Título o número…"
 
-#: manufacturing/templates/eng_projects.html:80
-#: manufacturing/templates/reports_dashboard.html:150
-#, python-format
-msgid "%(counter)s overdue"
-msgid_plural "%(counter)s overdue"
-msgstr[0] "%(counter)s atrasada"
-msgstr[1] "%(counter)s atrasadas"
-
 #: manufacturing/templates/eng_projects.html:88
 msgid "No projects found."
 msgstr "No se encontraron proyectos."
@@ -1632,6 +2627,7 @@ msgid "Recent ECRs (last 10)"
 msgstr "ECR recientes (últimos 10)"
 
 #: manufacturing/templates/eng_spec_detail.html:3
+#, python-format
 msgid "Standard — %(title)s"
 msgstr "Norma — %(title)s"
 
@@ -1651,35 +2647,12 @@ msgstr "Editar norma"
 msgid "Standard Number"
 msgstr "Número de norma"
 
-#: manufacturing/templates/eng_spec_detail.html:70
-#: manufacturing/templates/eng_spec_detail.html:109
-#: manufacturing/templates/eng_specs_list.html:87
-#: manufacturing/templates/eng_specs_list.html:125
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:105
-#: manufacturing/templates/mkt_budget_list.html:82
-#: manufacturing/templates/mkt_budget_list.html:120
-#: manufacturing/templates/payroll_deductions.html:56
-#: manufacturing/templates/payroll_deductions.html:87
-msgid "Category"
-msgstr "Categoría"
-
 #: manufacturing/templates/eng_spec_detail.html:78
 #: manufacturing/templates/eng_spec_detail.html:110
 #: manufacturing/templates/eng_specs_list.html:88
 #: manufacturing/templates/eng_specs_list.html:133
 msgid "Version"
 msgstr "Versión"
-
-#: manufacturing/templates/eng_spec_detail.html:94
-#: manufacturing/templates/eng_spec_detail.html:119
-#: manufacturing/templates/eng_specs_list.html:149
-#: manufacturing/templates/mkt_research_detail.html:83
-#: manufacturing/templates/mkt_research_detail.html:145
-#: manufacturing/templates/mkt_research_list.html:161
-#: manufacturing/templates/prod_dashboard.html:111
-msgid "Description"
-msgstr "Descripción"
 
 #: manufacturing/templates/eng_spec_detail.html:108
 #: manufacturing/templates/eng_specs_list.html:85
@@ -1689,35 +2662,6 @@ msgstr "Norma n.º"
 #: manufacturing/templates/eng_spec_detail.html:114
 msgid "Created Date"
 msgstr "Fecha de creación"
-
-#: manufacturing/templates/eng_specs_list.html:13
-#: manufacturing/templates/eng_tasks_list.html:13
-#: manufacturing/templates/legal_compliance_list.html:14
-#: manufacturing/templates/legal_contract_list.html:14
-#: manufacturing/templates/legal_litigation_list.html:14
-#: manufacturing/templates/mkt_ad_list.html:15
-#: manufacturing/templates/mkt_campaign_list.html:12
-#: manufacturing/templates/mkt_lead_list.html:12
-#: manufacturing/templates/mkt_research_list.html:15
-msgid "CSV"
-msgstr "CSV"
-
-#: manufacturing/templates/eng_specs_list.html:14
-#: manufacturing/templates/eng_tasks_list.html:14
-#: manufacturing/templates/legal_compliance_list.html:15
-#: manufacturing/templates/legal_contract_list.html:15
-#: manufacturing/templates/legal_litigation_list.html:15
-#: manufacturing/templates/mkt_ad_list.html:16
-#: manufacturing/templates/mkt_campaign_list.html:13
-#: manufacturing/templates/mkt_lead_list.html:13
-#: manufacturing/templates/mkt_research_list.html:16
-msgid "Excel"
-msgstr "Excel"
-
-#: manufacturing/templates/eng_specs_list.html:71
-#: manufacturing/templates/mkt_budget_list.html:68
-msgid "All Categories"
-msgstr "Todas las categorías"
 
 #: manufacturing/templates/eng_specs_list.html:76
 msgid "Search number / title…"
@@ -1752,6 +2696,7 @@ msgid "Create Standard"
 msgstr "Crear norma"
 
 #: manufacturing/templates/eng_task_detail.html:3
+#, python-format
 msgid "Task — %(name)s"
 msgstr "Tarea — %(name)s"
 
@@ -1760,7 +2705,9 @@ msgstr "Tarea — %(name)s"
 msgid ""
 "Project: <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">\n"
 "        %(num)s — %(title)s</a>"
-msgstr "Proyecto: <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">%(num)s — %(title)s</a>"
+msgstr ""
+"Proyecto: <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">%(num)s — "
+"%(title)s</a>"
 
 #: manufacturing/templates/eng_task_detail.html:80
 #: manufacturing/templates/eng_tasks_list.html:136
@@ -1904,38 +2851,6 @@ msgstr "Litigios"
 msgid "Regulation"
 msgstr "Normativa"
 
-#: manufacturing/templates/legal_compliance_detail.html:62
-#: manufacturing/templates/legal_compliance_detail.html:97
-#: manufacturing/templates/legal_compliance_list.html:83
-#: manufacturing/templates/legal_compliance_list.html:121
-#: manufacturing/templates/legal_contract_detail.html:79
-#: manufacturing/templates/legal_contract_detail.html:134
-#: manufacturing/templates/legal_contract_list.html:94
-#: manufacturing/templates/legal_contract_list.html:160
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/legal_employment_list.html:134
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:129
-#: manufacturing/templates/mkt_ad_detail.html:82
-#: manufacturing/templates/mkt_ad_detail.html:182
-#: manufacturing/templates/mkt_ad_list.html:176
-#: manufacturing/templates/mkt_campaign_detail.html:67
-#: manufacturing/templates/mkt_campaign_detail.html:126
-#: manufacturing/templates/mkt_campaign_list.html:89
-#: manufacturing/templates/mkt_campaign_list.html:150
-#: manufacturing/templates/mkt_lead_detail.html:72
-#: manufacturing/templates/mkt_lead_detail.html:115
-#: manufacturing/templates/mkt_lead_list.html:91
-#: manufacturing/templates/mkt_lead_list.html:141
-#: manufacturing/templates/mkt_research_detail.html:61
-#: manufacturing/templates/mkt_research_detail.html:121
-#: manufacturing/templates/mkt_research_list.html:91
-#: manufacturing/templates/mkt_research_list.html:137
-#: manufacturing/templates/report_builder_detail.html:33
-#: manufacturing/templates/report_builder_list.html:24
-msgid "Owner"
-msgstr "Responsable"
-
 #: manufacturing/templates/legal_compliance_detail.html:70
 #: manufacturing/templates/legal_compliance_detail.html:113
 msgid "Completed Date"
@@ -2027,23 +2942,6 @@ msgstr "Contraparte"
 msgid "Value"
 msgstr "Valor"
 
-#: manufacturing/templates/legal_contract_detail.html:75
-#: manufacturing/templates/legal_contract_detail.html:130
-#: manufacturing/templates/legal_contract_list.html:156
-#: manufacturing/templates/legal_dashboard.html:146
-#: manufacturing/templates/mkt_ad_detail.html:90
-#: manufacturing/templates/mkt_ad_detail.html:178
-#: manufacturing/templates/mkt_ad_list.html:172
-#: manufacturing/templates/mkt_campaign_detail.html:75
-#: manufacturing/templates/mkt_campaign_detail.html:134
-#: manufacturing/templates/mkt_campaign_list.html:158
-#: manufacturing/templates/mkt_research_detail.html:73
-#: manufacturing/templates/mkt_research_detail.html:129
-#: manufacturing/templates/mkt_research_list.html:93
-#: manufacturing/templates/mkt_research_list.html:145
-msgid "End Date"
-msgstr "Fecha de finalización"
-
 #: manufacturing/templates/legal_contract_detail.html:93
 msgid "Edit Contract"
 msgstr "Editar contrato"
@@ -2052,13 +2950,6 @@ msgstr "Editar contrato"
 #: manufacturing/templates/legal_contract_list.html:148
 msgid "Value ($)"
 msgstr "Valor ($)"
-
-#: manufacturing/templates/legal_contract_list.html:74
-#: manufacturing/templates/legal_litigation_list.html:74
-#: manufacturing/templates/mkt_content_list.html:70
-#: manufacturing/templates/mkt_research_list.html:74
-msgid "All Types"
-msgstr "Todos los tipos"
 
 #: manufacturing/templates/legal_contract_list.html:79
 msgid "Search title / party / owner…"
@@ -2137,12 +3028,6 @@ msgstr "Pendiente"
 #: manufacturing/templates/legal_dashboard.html:91
 msgid "Total Cases"
 msgstr "Total de casos"
-
-#: manufacturing/templates/legal_dashboard.html:99
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/reports_dashboard.html:237
-msgid "Closed"
-msgstr "Cerrado"
 
 #: manufacturing/templates/legal_dashboard.html:106
 msgid "Contracts by Status"
@@ -2401,11 +3286,6 @@ msgstr "Alertas de mantenimiento preventivo (próximos 14 días)"
 msgid "Full Schedule →"
 msgstr "Programa completo →"
 
-#: manufacturing/templates/maint_dashboard.html:82
-#: manufacturing/templates/prod_dashboard_kpis.html:12
-msgid "Overdue"
-msgstr "Atrasadas"
-
 #: manufacturing/templates/maint_dashboard.html:83
 msgid "Due Soon"
 msgstr "Próximo a vencer"
@@ -2562,25 +3442,6 @@ msgstr "Investigación"
 msgid "Analytics"
 msgstr "Análisis"
 
-#: manufacturing/templates/marketing_dashboard.html:12
-#: manufacturing/templates/marketing_dashboard.html:54
-#: manufacturing/templates/marketing_dashboard.html:95
-#: manufacturing/templates/mkt_ad_list.html:12
-#: manufacturing/templates/mkt_analytics.html:12
-#: manufacturing/templates/mkt_analytics.html:161
-#: manufacturing/templates/mkt_budget_list.html:12
-#: manufacturing/templates/mkt_campaign_detail.html:9
-#: manufacturing/templates/mkt_campaign_list.html:9
-#: manufacturing/templates/mkt_content_detail.html:9
-#: manufacturing/templates/mkt_content_list.html:3
-#: manufacturing/templates/mkt_content_list.html:9
-#: manufacturing/templates/mkt_content_list.html:57
-#: manufacturing/templates/mkt_lead_detail.html:9
-#: manufacturing/templates/mkt_lead_list.html:9
-#: manufacturing/templates/mkt_research_list.html:12
-msgid "Content"
-msgstr "Contenido"
-
 #: manufacturing/templates/marketing_dashboard.html:58
 #: manufacturing/templates/marketing_dashboard.html:152
 #: manufacturing/templates/mkt_ad_detail.html:74
@@ -2600,16 +3461,6 @@ msgstr "Contenido"
 msgid "Budget"
 msgstr "Presupuesto"
 
-#: manufacturing/templates/marketing_dashboard.html:66
-#: manufacturing/templates/mkt_analytics.html:141
-#: manufacturing/templates/mkt_analytics.html:148
-#: manufacturing/templates/mkt_analytics.html:162
-#: manufacturing/templates/reports_dashboard.html:229
-#: manufacturing/templates/time_clock_attendance.html:77
-#: manufacturing/templates/time_clock_hours.html:84
-msgid "Total"
-msgstr "Total"
-
 #: manufacturing/templates/marketing_dashboard.html:74
 msgid "Planned"
 msgstr "Planificado"
@@ -2627,12 +3478,6 @@ msgstr "Nuevo"
 #: manufacturing/templates/mkt_analytics.html:150
 msgid "Qualified"
 msgstr "Calificado"
-
-#: manufacturing/templates/marketing_dashboard.html:106
-#: manufacturing/templates/mkt_analytics.html:78
-#: manufacturing/templates/mkt_analytics.html:163
-msgid "Published"
-msgstr "Publicado"
 
 #: manufacturing/templates/marketing_dashboard.html:113
 msgid "Campaigns by Status"
@@ -2981,13 +3826,6 @@ msgstr "Agregar campaña"
 msgid "Content — %(title)s"
 msgstr "Contenido — %(title)s"
 
-#: manufacturing/templates/mkt_content_detail.html:67
-#: manufacturing/templates/mkt_content_detail.html:122
-#: manufacturing/templates/mkt_content_list.html:87
-#: manufacturing/templates/mkt_content_list.html:146
-msgid "Author"
-msgstr "Autor"
-
 #: manufacturing/templates/mkt_content_detail.html:75
 #: manufacturing/templates/mkt_content_detail.html:130
 #: manufacturing/templates/mkt_content_list.html:89
@@ -3107,10 +3945,6 @@ msgstr "Nuevo proyecto de investigación"
 msgid "e.g. Q3 Competitor Analysis"
 msgstr "p. ej. Análisis de la competencia del tercer trimestre"
 
-#: manufacturing/templates/mkt_research_list.html:138
-msgid "Responsible person"
-msgstr "Persona responsable"
-
 #: manufacturing/templates/mkt_research_list.html:162
 msgid "What will this research cover?"
 msgstr "¿Qué cubrirá esta investigación?"
@@ -3194,11 +4028,6 @@ msgstr "Ejecuciones de nómina recientes"
 #: manufacturing/templates/payroll_run_detail.html:37
 msgid "Run Date"
 msgstr "Fecha de ejecución"
-
-#: manufacturing/templates/payroll_dashboard.html:87
-#: manufacturing/templates/payroll_history.html:37
-msgid "Period"
-msgstr "Período"
 
 #: manufacturing/templates/payroll_dashboard.html:88
 #: manufacturing/templates/payroll_history.html:38

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}CS Improvement Plans{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "CS Improvement Plans" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/cs/" class="btn">All Tickets</a>
-<a href="/cs/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/cs/" class="btn">{% trans "All Tickets" %}</a>
+<a href="/cs/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,14 +54,14 @@
 {% block body %}
 <div class="content">
 <div class="cs-wrap">
-    <h2>Improvement Plans</h2>
+    <h2>{% trans "Improvement Plans" %}</h2>
 
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <!-- Status filter -->
     <div class="filter-row">
-        <a href="/cs/plans/" {% if not status_filter %}class="active"{% endif %}>All</a>
+        <a href="/cs/plans/" {% if not status_filter %}class="active"{% endif %}>{% trans "All" %}</a>
         {% for st in plan_statuses %}
         <a href="/cs/plans/?status={{ st }}"
            {% if status_filter == st %}class="active"{% endif %}>{{ st }}</a>
@@ -72,11 +73,11 @@
     <table class="plans-table">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Owner</th>
-                <th>Target Date</th>
-                <th>Created</th>
-                <th>Status</th>
+                <th>{% trans "Title" %}</th>
+                <th>{% trans "Owner" %}</th>
+                <th>{% trans "Target Date" %}</th>
+                <th>{% trans "Created" %}</th>
+                <th>{% trans "Status" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -94,7 +95,7 @@
                 <td>{{ p.owner|default:"—" }}</td>
                 <td>
                     {{ p.target_date|default:"—" }}
-                    {% if p.overdue %}<span style="color:#c62828;font-size:11px;"> &#9888; overdue</span>{% endif %}
+                    {% if p.overdue %}<span style="color:#c62828;font-size:11px;"> &#9888; {% trans "overdue" %}</span>{% endif %}
                 </td>
                 <td style="color:#555;">{{ p.created_date }}</td>
                 <td><span class="st-badge st-{{ p.status }}">{{ p.status }}</span></td>
@@ -103,37 +104,37 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No plans found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No plans found." %}</p>
     {% endif %}
 
     <!-- Create / update form -->
     {% if can_edit %}
     <div class="card">
-        <h3>New Improvement Plan</h3>
+        <h3>{% trans "New Improvement Plan" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="create">
             <div class="form-grid">
                 <div class="form-row full">
-                    <label>Title *</label>
-                    <input type="text" name="title" required placeholder="Plan title">
+                    <label>{% trans "Title" %} *</label>
+                    <input type="text" name="title" required placeholder="{% trans 'Plan title' %}">
                 </div>
                 <div class="form-row">
-                    <label>Owner</label>
-                    <input type="text" name="owner" placeholder="Responsible person">
+                    <label>{% trans "Owner" %}</label>
+                    <input type="text" name="owner" placeholder="{% trans 'Responsible person' %}">
                 </div>
                 <div class="form-row">
-                    <label>Target Date</label>
+                    <label>{% trans "Target Date" %}</label>
                     <input type="date" name="target_date">
                 </div>
                 <div class="form-row full">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description" rows="3"
-                        placeholder="What needs to be improved and how…"></textarea>
+                        placeholder="{% trans 'What needs to be improved and how…' %}"></textarea>
                 </div>
             </div>
             <button type="submit" class="save-btn" style="margin-top:12px;">
-                Create Plan</button>
+                {% trans "Create Plan" %}</button>
         </form>
     </div>
     {% endif %}

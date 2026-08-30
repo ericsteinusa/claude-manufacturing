@@ -4174,3 +4174,44 @@ languages** (core shell + login + main dashboard + all 5 htmx templates + the fu
 department (8) + the full Time Clock department (7) + the full Customers/Credit department (7) +
 the full Engineering department (10)) out of ~450 total. Customer Service and Accounting (13
 templates each) are the smallest unclaimed department-sized candidates remaining.
+
+---
+
+**2026-08-30, eighth whole department:** Continued the "whole department" approach — picked
+**Customer Service** (`cs_dashboard.html`, `cs_list.html`, `cs_detail.html`, `cs_new.html`,
+`cs_escalations.html`, `cs_reports.html`, `cs_plans.html`, `cs_returns_list.html`,
+`cs_returns_detail.html`, `cs_kb_list.html`, `cs_kb_detail.html`, `cs_surveys_list.html`,
+`cs_surveys_detail.html`), tied with Accounting for the largest "whole department" pass in this
+series at 13 templates. 149 unique strings needed translation per language (144 simple + 5
+plural). Reused the existing "N overdue" plural verbatim for the ticket-list overdue badge, and
+added several new `{% blocktrans count %}` plurals ("N ticket(s)," "Open — N day(s) old," "N open
+ticket(s)," "Responses (N)"). Two gotchas recurred from earlier passes: (1) the quote-escaping
+issue first found in the Time Clock pass — two Spanish translations for search-result messages
+embedded a literal `"%(q)s"` with straight double quotes needing escaping as `\"`, same as the
+source msgid; caught immediately via `msgfmt --check` right after the fix script, before
+compiling (French sidestepped it with guillemets, matching the Time Clock precedent, but this time
+Spanish and German both needed the escape, not just one language). (2) A msgid/msgid_plural pair
+long enough to be wrapped by `makemessages` from its very first extraction, not from a later
+re-run like every prior wrapped-msgid case in this series — the "N overdue (≥7 days)" banner on
+the CS Reports page — needed the "preserve the original msgid/msgid_plural lines verbatim, only
+replace msgstr[0]/msgstr[1]" technique. Also re-confirmed a point worth stating plainly for future
+reference: `msgid_plural` is source text, never a translation target, since gettext's runtime
+lookup key is the singular `msgid` and `msgid_plural` is metadata only — a fix-script draft
+briefly (and incorrectly) tried to write a translated placeholder into `msgid_plural`, caught by
+reasoning through the lookup mechanism before that draft was ever run against the real files. Full
+suite 3431 passed (unchanged), `manage.py check` clean, `compilemessages` clean, `msgfmt --check`
+clean on all three files after the quote fix, zero fuzzy/blank/duplicated entries confirmed
+programmatically (the recurring "heures supplémentaires" false positive from the Payroll pass
+reappears here too, unrelated to this batch). Verified end-to-end against the real dev server:
+navigated the CS dashboard, the ticket list (confirmed both plural badges and the quote-escaped
+"no results" message with a live search), an open and a closed ticket's detail page (confirmed the
+"Open — N days old" plural and the "Completed {date} {time}" line), Reports (confirmed the nested
+"N open tickets — N overdue" summary line), Escalations, Returns list/detail, Knowledge Base
+list/detail, Surveys list/detail (confirmed the "Responses (N)" plural), and Improvement Plans, in
+Spanish, French, and German with real sample data, no console errors. **Localization coverage is
+now 79 templates across three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing department (13) + the full Reports
+department (4) + the full Payroll department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department (10) + the full Customer Service
+department (13)) out of ~450 total. Accounting (13 templates) is the only remaining
+department-sized candidate at the smallest tier; IT (17) is next after that.
