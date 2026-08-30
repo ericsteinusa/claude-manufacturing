@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 23:33+0000\n"
+"POT-Creation-Date: 2026-08-30 00:07+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -32,6 +32,14 @@ msgid "Reports"
 msgstr "Rapports"
 
 #: manufacturing/templates/ai_insights_dashboard.html:7
+#: manufacturing/templates/credit_account_detail.html:10
+#: manufacturing/templates/credit_account_list.html:10
+#: manufacturing/templates/credit_application_detail.html:10
+#: manufacturing/templates/credit_application_list.html:10
+#: manufacturing/templates/credit_collections_detail.html:10
+#: manufacturing/templates/credit_collections_list.html:10
+#: manufacturing/templates/credit_dashboard.html:10
+#: manufacturing/templates/credit_dashboard.html:55
 #: manufacturing/templates/legal_compliance_detail.html:10
 #: manufacturing/templates/legal_compliance_list.html:13
 #: manufacturing/templates/legal_contract_detail.html:10
@@ -189,6 +197,7 @@ msgid "Sales Orders"
 msgstr "Commandes clients"
 
 #: manufacturing/templates/base.html:508
+#: manufacturing/templates/credit_dashboard.html:54
 #: manufacturing/templates/marketing_dashboard.html:59
 msgid "Customers"
 msgstr "Clients"
@@ -339,6 +348,620 @@ msgstr "Gouvernance des données"
 msgid "Periods"
 msgstr "Périodes"
 
+#: manufacturing/templates/credit_account_detail.html:3
+msgid "Credit Account — %(name)s"
+msgstr "Compte crédit — %(name)s"
+
+#: manufacturing/templates/credit_account_detail.html:6
+#: manufacturing/templates/credit_account_list.html:6
+#: manufacturing/templates/credit_application_detail.html:6
+#: manufacturing/templates/credit_application_list.html:6
+#: manufacturing/templates/credit_collections_detail.html:6
+#: manufacturing/templates/credit_collections_list.html:6
+#: manufacturing/templates/credit_dashboard.html:6
+msgid "Credit Dashboard"
+msgstr "Tableau de bord crédit"
+
+#: manufacturing/templates/credit_account_detail.html:7
+#: manufacturing/templates/credit_account_list.html:7
+#: manufacturing/templates/credit_application_detail.html:7
+#: manufacturing/templates/credit_application_list.html:7
+#: manufacturing/templates/credit_collections_detail.html:7
+#: manufacturing/templates/credit_collections_list.html:7
+#: manufacturing/templates/credit_dashboard.html:7
+msgid "Accounts"
+msgstr "Comptes"
+
+#: manufacturing/templates/credit_account_detail.html:8
+#: manufacturing/templates/credit_account_detail.html:151
+#: manufacturing/templates/credit_account_list.html:8
+#: manufacturing/templates/credit_application_detail.html:8
+#: manufacturing/templates/credit_application_list.html:8
+#: manufacturing/templates/credit_collections_detail.html:8
+#: manufacturing/templates/credit_collections_list.html:8
+#: manufacturing/templates/credit_dashboard.html:8
+#: manufacturing/templates/credit_dashboard.html:74
+msgid "Applications"
+msgstr "Demandes"
+
+#: manufacturing/templates/credit_account_detail.html:9
+#: manufacturing/templates/credit_account_list.html:9
+#: manufacturing/templates/credit_application_detail.html:9
+#: manufacturing/templates/credit_application_list.html:9
+#: manufacturing/templates/credit_collections_detail.html:9
+#: manufacturing/templates/credit_collections_list.html:3
+#: manufacturing/templates/credit_collections_list.html:9
+#: manufacturing/templates/credit_collections_list.html:55
+#: manufacturing/templates/credit_dashboard.html:9
+#: manufacturing/templates/credit_dashboard.html:53
+#: manufacturing/templates/credit_dashboard.html:87
+msgid "Collections"
+msgstr "Recouvrements"
+
+#: manufacturing/templates/credit_account_detail.html:62
+#: manufacturing/templates/credit_account_detail.html:105
+#: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/credit_account_detail.html:153
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_account_list.html:80
+#: manufacturing/templates/credit_account_list.html:120
+#: manufacturing/templates/credit_application_detail.html:56
+#: manufacturing/templates/credit_application_list.html:80
+#: manufacturing/templates/credit_collections_detail.html:54
+#: manufacturing/templates/credit_collections_detail.html:109
+#: manufacturing/templates/credit_collections_list.html:82
+#: manufacturing/templates/credit_collections_list.html:147
+#: manufacturing/templates/credit_dashboard.html:103
+#: manufacturing/templates/credit_dashboard.html:122
+#: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/legal_compliance_detail.html:54
+#: manufacturing/templates/legal_compliance_detail.html:101
+#: manufacturing/templates/legal_compliance_list.html:86
+#: manufacturing/templates/legal_compliance_list.html:125
+#: manufacturing/templates/legal_contract_detail.html:55
+#: manufacturing/templates/legal_contract_detail.html:114
+#: manufacturing/templates/legal_contract_list.html:95
+#: manufacturing/templates/legal_contract_list.html:140
+#: manufacturing/templates/legal_dashboard.html:147
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:118
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:113
+#: manufacturing/templates/legal_ip_list.html:75
+#: manufacturing/templates/legal_ip_list.html:123
+#: manufacturing/templates/legal_litigation_detail.html:55
+#: manufacturing/templates/legal_litigation_detail.html:118
+#: manufacturing/templates/legal_litigation_list.html:93
+#: manufacturing/templates/legal_litigation_list.html:146
+#: manufacturing/templates/marketing_dashboard.html:155
+#: manufacturing/templates/mkt_ad_detail.html:70
+#: manufacturing/templates/mkt_ad_detail.html:154
+#: manufacturing/templates/mkt_ad_list.html:95
+#: manufacturing/templates/mkt_ad_list.html:160
+#: manufacturing/templates/mkt_budget_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:141
+#: manufacturing/templates/mkt_campaign_detail.html:55
+#: manufacturing/templates/mkt_campaign_detail.html:118
+#: manufacturing/templates/mkt_campaign_list.html:93
+#: manufacturing/templates/mkt_campaign_list.html:142
+#: manufacturing/templates/mkt_content_detail.html:55
+#: manufacturing/templates/mkt_content_detail.html:114
+#: manufacturing/templates/mkt_content_list.html:90
+#: manufacturing/templates/mkt_content_list.html:138
+#: manufacturing/templates/mkt_lead_detail.html:56
+#: manufacturing/templates/mkt_lead_detail.html:123
+#: manufacturing/templates/mkt_lead_list.html:93
+#: manufacturing/templates/mkt_lead_list.html:149
+#: manufacturing/templates/mkt_research_detail.html:65
+#: manufacturing/templates/mkt_research_detail.html:137
+#: manufacturing/templates/mkt_research_list.html:95
+#: manufacturing/templates/mkt_research_list.html:153
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_history.html:39
+#: manufacturing/templates/payroll_run_detail.html:41
+#: manufacturing/templates/prod_dashboard.html:114
+#: manufacturing/templates/tc_device_form.html:221
+#: manufacturing/templates/tc_device_list.html:45
+#: manufacturing/templates/time_clock_attendance.html:89
+msgid "Status"
+msgstr "Statut"
+
+#: manufacturing/templates/credit_account_detail.html:66
+#: manufacturing/templates/credit_account_list.html:77
+msgid "Credit Limit"
+msgstr "Limite de crédit"
+
+#: manufacturing/templates/credit_account_detail.html:70
+#: manufacturing/templates/credit_account_detail.html:113
+#: manufacturing/templates/credit_account_list.html:78
+#: manufacturing/templates/credit_account_list.html:128
+#: manufacturing/templates/credit_dashboard.html:103
+msgid "Terms"
+msgstr "Conditions"
+
+#: manufacturing/templates/credit_account_detail.html:74
+#: manufacturing/templates/credit_account_list.html:79
+#: manufacturing/templates/legal_employment_list.html:74
+msgid "Opened"
+msgstr "Ouvert"
+
+#: manufacturing/templates/credit_account_detail.html:78
+#: manufacturing/templates/home.html:18
+#: manufacturing/templates/mkt_lead_detail.html:68
+#: manufacturing/templates/mkt_lead_detail.html:103
+#: manufacturing/templates/mkt_lead_list.html:89
+#: manufacturing/templates/mkt_lead_list.html:129
+msgid "Email"
+msgstr "E-mail"
+
+#: manufacturing/templates/credit_account_detail.html:82
+msgid "Phone"
+msgstr "Téléphone"
+
+#: manufacturing/templates/credit_account_detail.html:87
+#: manufacturing/templates/credit_account_detail.html:121
+#: manufacturing/templates/credit_account_list.html:136
+#: manufacturing/templates/credit_application_detail.html:81
+#: manufacturing/templates/credit_application_detail.html:105
+#: manufacturing/templates/credit_application_list.html:124
+#: manufacturing/templates/credit_collections_detail.html:83
+#: manufacturing/templates/credit_collections_detail.html:129
+#: manufacturing/templates/credit_collections_list.html:155
+#: manufacturing/templates/legal_compliance_detail.html:75
+#: manufacturing/templates/legal_compliance_detail.html:117
+#: manufacturing/templates/legal_compliance_list.html:137
+#: manufacturing/templates/legal_contract_detail.html:84
+#: manufacturing/templates/legal_contract_detail.html:138
+#: manufacturing/templates/legal_contract_list.html:164
+#: manufacturing/templates/legal_employment_list.html:138
+#: manufacturing/templates/legal_governance_list.html:133
+#: manufacturing/templates/legal_ip_list.html:139
+#: manufacturing/templates/legal_litigation_detail.html:80
+#: manufacturing/templates/legal_litigation_detail.html:130
+#: manufacturing/templates/legal_litigation_list.html:154
+#: manufacturing/templates/mkt_ad_detail.html:116
+#: manufacturing/templates/mkt_ad_detail.html:186
+#: manufacturing/templates/mkt_ad_list.html:180
+#: manufacturing/templates/mkt_budget_list.html:149
+#: manufacturing/templates/mkt_campaign_detail.html:84
+#: manufacturing/templates/mkt_campaign_detail.html:142
+#: manufacturing/templates/mkt_campaign_list.html:166
+#: manufacturing/templates/mkt_content_detail.html:80
+#: manufacturing/templates/mkt_content_detail.html:134
+#: manufacturing/templates/mkt_content_list.html:158
+#: manufacturing/templates/mkt_lead_detail.html:81
+#: manufacturing/templates/mkt_lead_detail.html:131
+#: manufacturing/templates/mkt_lead_list.html:157
+#: manufacturing/templates/mkt_research_detail.html:95
+#: manufacturing/templates/mkt_research_detail.html:153
+#: manufacturing/templates/mkt_research_list.html:165
+#: manufacturing/templates/payroll_deductions.html:192
+msgid "Notes"
+msgstr "Notes"
+
+#: manufacturing/templates/credit_account_detail.html:96
+msgid "Update Account"
+msgstr "Mettre à jour le compte"
+
+#: manufacturing/templates/credit_account_detail.html:101
+#: manufacturing/templates/credit_account_list.html:116
+msgid "Credit Limit ($)"
+msgstr "Limite de crédit ($)"
+
+#: manufacturing/templates/credit_account_detail.html:117
+msgid "Reason for change"
+msgstr "Motif du changement"
+
+#: manufacturing/templates/credit_account_detail.html:118
+msgid "Only needed if limit or status changes"
+msgstr "Nécessaire uniquement en cas de changement de limite ou de statut"
+
+#: manufacturing/templates/credit_account_detail.html:125
+#: manufacturing/templates/credit_collections_detail.html:133
+#: manufacturing/templates/legal_compliance_detail.html:121
+#: manufacturing/templates/legal_contract_detail.html:142
+#: manufacturing/templates/legal_litigation_detail.html:134
+#: manufacturing/templates/mkt_ad_detail.html:190
+#: manufacturing/templates/mkt_campaign_detail.html:146
+#: manufacturing/templates/mkt_content_detail.html:138
+#: manufacturing/templates/mkt_lead_detail.html:135
+#: manufacturing/templates/mkt_research_detail.html:157
+#: manufacturing/templates/tc_device_form.html:192
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
+#: manufacturing/templates/credit_account_detail.html:131
+msgid "Limit / Status History"
+msgstr "Historique limite / statut"
+
+#: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_collections_detail.html:62
+#: manufacturing/templates/credit_collections_list.html:77
+#: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/tc_ot_report.html:87
+#: manufacturing/templates/tc_schedule.html:76
+#: manufacturing/templates/time_clock_attendance.html:58
+#: manufacturing/templates/time_clock_hours.html:60
+msgid "Date"
+msgstr "Date"
+
+#: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/credit_dashboard.html:103
+msgid "Limit"
+msgstr "Limite"
+
+#: manufacturing/templates/credit_account_detail.html:133
+msgid "Changed By"
+msgstr "Modifié par"
+
+#: manufacturing/templates/credit_account_detail.html:133
+msgid "Reason"
+msgstr "Motif"
+
+#: manufacturing/templates/credit_account_detail.html:144
+msgid "No history yet."
+msgstr "Aucun historique pour le moment."
+
+#: manufacturing/templates/credit_account_detail.html:153
+#: manufacturing/templates/credit_application_list.html:76
+#: manufacturing/templates/credit_dashboard.html:122
+msgid "Applied"
+msgstr "Demandé"
+
+#: manufacturing/templates/credit_account_detail.html:153
+#: manufacturing/templates/credit_application_list.html:77
+msgid "Requested"
+msgstr "Demandé"
+
+#: manufacturing/templates/credit_account_detail.html:153
+#: manufacturing/templates/credit_application_list.html:78
+msgid "Approved"
+msgstr "Approuvé"
+
+#: manufacturing/templates/credit_account_detail.html:163
+msgid "No applications on file."
+msgstr "Aucune demande enregistrée."
+
+#: manufacturing/templates/credit_account_detail.html:170
+msgid "Collection Activities"
+msgstr "Activités de recouvrement"
+
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_collections_detail.html:58
+#: manufacturing/templates/credit_collections_detail.html:97
+#: manufacturing/templates/credit_collections_list.html:78
+#: manufacturing/templates/credit_collections_list.html:123
+#: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/legal_contract_detail.html:59
+#: manufacturing/templates/legal_contract_detail.html:106
+#: manufacturing/templates/legal_contract_list.html:90
+#: manufacturing/templates/legal_contract_list.html:132
+#: manufacturing/templates/legal_dashboard.html:144
+#: manufacturing/templates/legal_employment_list.html:73
+#: manufacturing/templates/legal_employment_list.html:106
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:107
+#: manufacturing/templates/legal_litigation_detail.html:59
+#: manufacturing/templates/legal_litigation_detail.html:106
+#: manufacturing/templates/legal_litigation_list.html:91
+#: manufacturing/templates/legal_litigation_list.html:134
+#: manufacturing/templates/mkt_content_detail.html:59
+#: manufacturing/templates/mkt_content_detail.html:98
+#: manufacturing/templates/mkt_content_list.html:85
+#: manufacturing/templates/mkt_content_list.html:122
+#: manufacturing/templates/mkt_research_detail.html:57
+#: manufacturing/templates/mkt_research_detail.html:112
+#: manufacturing/templates/mkt_research_list.html:90
+#: manufacturing/templates/mkt_research_list.html:128
+#: manufacturing/templates/tc_device_list.html:42
+msgid "Type"
+msgstr "Type"
+
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_collections_detail.html:66
+#: manufacturing/templates/credit_collections_list.html:79
+msgid "Contact"
+msgstr "Contact"
+
+#: manufacturing/templates/credit_account_detail.html:182
+msgid "No collection activity."
+msgstr "Aucune activité de recouvrement."
+
+#: manufacturing/templates/credit_account_list.html:3
+#: manufacturing/templates/credit_account_list.html:55
+#: manufacturing/templates/credit_dashboard.html:51
+#: manufacturing/templates/credit_dashboard.html:58
+#: manufacturing/templates/credit_dashboard.html:101
+msgid "Credit Accounts"
+msgstr "Comptes de crédit"
+
+#: manufacturing/templates/credit_account_list.html:62
+#: manufacturing/templates/credit_application_list.html:61
+#: manufacturing/templates/credit_collections_list.html:62
+#: manufacturing/templates/legal_compliance_list.html:67
+#: manufacturing/templates/legal_contract_list.html:68
+#: manufacturing/templates/legal_employment_list.html:59
+#: manufacturing/templates/legal_governance_list.html:59
+#: manufacturing/templates/legal_ip_list.html:60
+#: manufacturing/templates/legal_litigation_list.html:68
+#: manufacturing/templates/mkt_ad_list.html:71
+#: manufacturing/templates/mkt_budget_list.html:62
+#: manufacturing/templates/mkt_campaign_list.html:66
+#: manufacturing/templates/mkt_content_list.html:64
+#: manufacturing/templates/mkt_lead_list.html:67
+#: manufacturing/templates/mkt_research_list.html:68
+msgid "All Statuses"
+msgstr "Tous les statuts"
+
+#: manufacturing/templates/credit_account_list.html:67
+#: manufacturing/templates/credit_application_list.html:66
+msgid "Search customer…"
+msgstr "Rechercher un client…"
+
+#: manufacturing/templates/credit_account_list.html:68
+#: manufacturing/templates/credit_application_list.html:67
+#: manufacturing/templates/credit_collections_list.html:68
+#: manufacturing/templates/legal_compliance_list.html:73
+#: manufacturing/templates/legal_contract_list.html:80
+#: manufacturing/templates/legal_employment_list.html:65
+#: manufacturing/templates/legal_governance_list.html:65
+#: manufacturing/templates/legal_ip_list.html:66
+#: manufacturing/templates/legal_litigation_list.html:80
+#: manufacturing/templates/mkt_ad_list.html:83
+#: manufacturing/templates/mkt_budget_list.html:74
+#: manufacturing/templates/mkt_campaign_list.html:78
+#: manufacturing/templates/mkt_content_list.html:76
+#: manufacturing/templates/mkt_lead_list.html:79
+#: manufacturing/templates/mkt_research_list.html:80
+msgid "Filter"
+msgstr "Filtrer"
+
+#: manufacturing/templates/credit_account_list.html:69
+#: manufacturing/templates/credit_application_list.html:68
+#: manufacturing/templates/credit_collections_list.html:69
+#: manufacturing/templates/legal_compliance_list.html:74
+#: manufacturing/templates/legal_contract_list.html:81
+#: manufacturing/templates/legal_employment_list.html:66
+#: manufacturing/templates/legal_governance_list.html:66
+#: manufacturing/templates/legal_ip_list.html:67
+#: manufacturing/templates/legal_litigation_list.html:81
+#: manufacturing/templates/mkt_ad_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:75
+#: manufacturing/templates/mkt_campaign_list.html:79
+#: manufacturing/templates/mkt_content_list.html:77
+#: manufacturing/templates/mkt_lead_list.html:80
+#: manufacturing/templates/mkt_research_list.html:81
+#: manufacturing/templates/payroll_pay_rates.html:58
+msgid "Clear"
+msgstr "Effacer"
+
+#: manufacturing/templates/credit_account_list.html:76
+#: manufacturing/templates/credit_account_list.html:107
+#: manufacturing/templates/credit_application_list.html:75
+#: manufacturing/templates/credit_application_list.html:107
+#: manufacturing/templates/credit_collections_list.html:76
+#: manufacturing/templates/credit_collections_list.html:110
+#: manufacturing/templates/credit_dashboard.html:103
+#: manufacturing/templates/credit_dashboard.html:122
+#: manufacturing/templates/credit_dashboard.html:141
+msgid "Customer"
+msgstr "Client"
+
+#: manufacturing/templates/credit_account_list.html:93
+#: manufacturing/templates/credit_dashboard.html:113
+msgid "No credit accounts found."
+msgstr "Aucun compte de crédit trouvé."
+
+#: manufacturing/templates/credit_account_list.html:101
+msgid "Open New Credit Account"
+msgstr "Ouvrir un nouveau compte de crédit"
+
+#: manufacturing/templates/credit_account_list.html:109
+#: manufacturing/templates/credit_application_list.html:109
+#: manufacturing/templates/credit_collections_list.html:112
+msgid "-- select customer --"
+msgstr "-- sélectionner un client --"
+
+#: manufacturing/templates/credit_account_list.html:129
+msgid "e.g. Net 30"
+msgstr "p. ex. Net 30 jours"
+
+#: manufacturing/templates/credit_account_list.html:132
+#: manufacturing/templates/legal_employment_list.html:126
+msgid "Opened Date"
+msgstr "Date d'ouverture"
+
+#: manufacturing/templates/credit_account_list.html:140
+msgid "Open Account"
+msgstr "Ouvrir le compte"
+
+#: manufacturing/templates/credit_account_list.html:143
+msgid "Every customer already has a credit account."
+msgstr "Tous les clients ont déjà un compte de crédit."
+
+#: manufacturing/templates/credit_application_detail.html:3
+msgid "Credit Application — %(name)s"
+msgstr "Demande de crédit — %(name)s"
+
+#: manufacturing/templates/credit_application_detail.html:60
+#: manufacturing/templates/credit_application_list.html:116
+msgid "Applied Date"
+msgstr "Date de demande"
+
+#: manufacturing/templates/credit_application_detail.html:64
+#: manufacturing/templates/credit_dashboard.html:122
+msgid "Requested Limit"
+msgstr "Limite demandée"
+
+#: manufacturing/templates/credit_application_detail.html:68
+msgid "Approved Limit"
+msgstr "Limite approuvée"
+
+#: manufacturing/templates/credit_application_detail.html:72
+#: manufacturing/templates/credit_application_list.html:79
+msgid "Reviewed By"
+msgstr "Examiné par"
+
+#: manufacturing/templates/credit_application_detail.html:76
+msgid "Review Date"
+msgstr "Date d'examen"
+
+#: manufacturing/templates/credit_application_detail.html:90
+#, python-format
+msgid ""
+"This customer already has a credit account: <a href=\"/credit/accounts/"
+"%(id)s/\">view account</a> (current limit $%(limit)s, status %(status)s)."
+msgstr "Ce client possède déjà un compte crédit : <a href=\"/credit/accounts/%(id)s/\">voir le compte</a> (limite actuelle $%(limit)s, statut %(status)s)."
+
+#: manufacturing/templates/credit_application_detail.html:96
+msgid "Review Application"
+msgstr "Examiner la demande"
+
+#: manufacturing/templates/credit_application_detail.html:101
+msgid "Approved Limit ($)"
+msgstr "Limite approuvée ($)"
+
+#: manufacturing/templates/credit_application_detail.html:109
+msgid "Approve"
+msgstr "Approuver"
+
+#: manufacturing/templates/credit_application_detail.html:110
+msgid "Deny"
+msgstr "Refuser"
+
+#: manufacturing/templates/credit_application_list.html:3
+#: manufacturing/templates/credit_application_list.html:54
+#: manufacturing/templates/credit_dashboard.html:52
+msgid "Credit Applications"
+msgstr "Demandes de crédit"
+
+#: manufacturing/templates/credit_application_list.html:94
+msgid "No credit applications found."
+msgstr "Aucune demande de crédit trouvée."
+
+#: manufacturing/templates/credit_application_list.html:102
+msgid "New Credit Application"
+msgstr "Nouvelle demande de crédit"
+
+#: manufacturing/templates/credit_application_list.html:120
+msgid "Requested Limit ($)"
+msgstr "Limite demandée ($)"
+
+#: manufacturing/templates/credit_application_list.html:128
+msgid "Submit Application"
+msgstr "Soumettre la demande"
+
+#: manufacturing/templates/credit_collections_detail.html:3
+msgid "Collection Activity — %(name)s"
+msgstr "Activité de recouvrement — %(name)s"
+
+#: manufacturing/templates/credit_collections_detail.html:70
+#: manufacturing/templates/credit_collections_list.html:80
+msgid "Amount Promised"
+msgstr "Montant promis"
+
+#: manufacturing/templates/credit_collections_detail.html:74
+#: manufacturing/templates/credit_collections_detail.html:121
+#: manufacturing/templates/credit_collections_list.html:139
+msgid "Promise Date"
+msgstr "Date de promesse"
+
+#: manufacturing/templates/credit_collections_detail.html:78
+#: manufacturing/templates/credit_collections_detail.html:125
+#: manufacturing/templates/credit_collections_list.html:143
+msgid "Follow-up Date"
+msgstr "Date de relance"
+
+#: manufacturing/templates/credit_collections_detail.html:92
+msgid "Update Activity"
+msgstr "Mettre à jour l'activité"
+
+#: manufacturing/templates/credit_collections_detail.html:105
+#: manufacturing/templates/credit_collections_list.html:131
+msgid "Contact Name"
+msgstr "Nom du contact"
+
+#: manufacturing/templates/credit_collections_detail.html:117
+#: manufacturing/templates/credit_collections_list.html:135
+msgid "Amount Promised ($)"
+msgstr "Montant promis ($)"
+
+#: manufacturing/templates/credit_collections_list.html:67
+msgid "Search customer / contact…"
+msgstr "Rechercher client / contact…"
+
+#: manufacturing/templates/credit_collections_list.html:81
+msgid "Follow-up"
+msgstr "Relance"
+
+#: manufacturing/templates/credit_collections_list.html:97
+msgid "No collection activities found."
+msgstr "Aucune activité de recouvrement trouvée."
+
+#: manufacturing/templates/credit_collections_list.html:105
+msgid "New Collection Activity"
+msgstr "Nouvelle activité de recouvrement"
+
+#: manufacturing/templates/credit_collections_list.html:119
+msgid "Activity Date"
+msgstr "Date de l'activité"
+
+#: manufacturing/templates/credit_collections_list.html:159
+msgid "Log Activity"
+msgstr "Enregistrer l'activité"
+
+#: manufacturing/templates/credit_dashboard.html:3
+#: manufacturing/templates/credit_dashboard.html:48
+msgid "Credit Department"
+msgstr "Département crédit"
+
+#: manufacturing/templates/credit_dashboard.html:61
+msgid "Total Accounts"
+msgstr "Total des comptes"
+
+#: manufacturing/templates/credit_dashboard.html:65
+msgid "Hold / Suspended"
+msgstr "En attente / suspendu"
+
+#: manufacturing/templates/credit_dashboard.html:69
+msgid "Total Exposure"
+msgstr "Exposition totale"
+
+#: manufacturing/templates/credit_dashboard.html:77
+msgid "Total Applications"
+msgstr "Total des demandes"
+
+#: manufacturing/templates/credit_dashboard.html:81
+msgid "Pending Review"
+msgstr "En attente d'examen"
+
+#: manufacturing/templates/credit_dashboard.html:90
+msgid "Total Activities"
+msgstr "Total des activités"
+
+#: manufacturing/templates/credit_dashboard.html:94
+#: manufacturing/templates/legal_dashboard.html:95
+#: manufacturing/templates/reports_dashboard.html:233
+msgid "Open"
+msgstr "Ouvert"
+
+#: manufacturing/templates/credit_dashboard.html:120
+msgid "Pending Applications"
+msgstr "Demandes en attente"
+
+#: manufacturing/templates/credit_dashboard.html:132
+msgid "No pending applications."
+msgstr "Aucune demande en attente."
+
+#: manufacturing/templates/credit_dashboard.html:139
+msgid "Open Collections"
+msgstr "Recouvrements ouverts"
+
+#: manufacturing/templates/credit_dashboard.html:151
+msgid "No open collection activities."
+msgstr "Aucune activité de recouvrement ouverte."
+
 #: manufacturing/templates/dashboard.html:4 manufacturing/templates/home.html:4
 msgid "Manufacturing ERP"
 msgstr "ERP de fabrication"
@@ -425,14 +1048,6 @@ msgstr "Position de trésorerie"
 #: manufacturing/templates/home.html:4
 msgid "Login"
 msgstr "Connexion"
-
-#: manufacturing/templates/home.html:18
-#: manufacturing/templates/mkt_lead_detail.html:68
-#: manufacturing/templates/mkt_lead_detail.html:103
-#: manufacturing/templates/mkt_lead_list.html:89
-#: manufacturing/templates/mkt_lead_list.html:129
-msgid "Email"
-msgstr "E-mail"
 
 #: manufacturing/templates/home.html:26
 msgid "Enter your password"
@@ -533,58 +1148,6 @@ msgstr "Conformité"
 msgid "Litigation"
 msgstr "Contentieux"
 
-#: manufacturing/templates/legal_compliance_detail.html:54
-#: manufacturing/templates/legal_compliance_detail.html:101
-#: manufacturing/templates/legal_compliance_list.html:86
-#: manufacturing/templates/legal_compliance_list.html:125
-#: manufacturing/templates/legal_contract_detail.html:55
-#: manufacturing/templates/legal_contract_detail.html:114
-#: manufacturing/templates/legal_contract_list.html:95
-#: manufacturing/templates/legal_contract_list.html:140
-#: manufacturing/templates/legal_dashboard.html:147
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/legal_employment_list.html:118
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:113
-#: manufacturing/templates/legal_ip_list.html:75
-#: manufacturing/templates/legal_ip_list.html:123
-#: manufacturing/templates/legal_litigation_detail.html:55
-#: manufacturing/templates/legal_litigation_detail.html:118
-#: manufacturing/templates/legal_litigation_list.html:93
-#: manufacturing/templates/legal_litigation_list.html:146
-#: manufacturing/templates/marketing_dashboard.html:155
-#: manufacturing/templates/mkt_ad_detail.html:70
-#: manufacturing/templates/mkt_ad_detail.html:154
-#: manufacturing/templates/mkt_ad_list.html:95
-#: manufacturing/templates/mkt_ad_list.html:160
-#: manufacturing/templates/mkt_budget_list.html:84
-#: manufacturing/templates/mkt_budget_list.html:141
-#: manufacturing/templates/mkt_campaign_detail.html:55
-#: manufacturing/templates/mkt_campaign_detail.html:118
-#: manufacturing/templates/mkt_campaign_list.html:93
-#: manufacturing/templates/mkt_campaign_list.html:142
-#: manufacturing/templates/mkt_content_detail.html:55
-#: manufacturing/templates/mkt_content_detail.html:114
-#: manufacturing/templates/mkt_content_list.html:90
-#: manufacturing/templates/mkt_content_list.html:138
-#: manufacturing/templates/mkt_lead_detail.html:56
-#: manufacturing/templates/mkt_lead_detail.html:123
-#: manufacturing/templates/mkt_lead_list.html:93
-#: manufacturing/templates/mkt_lead_list.html:149
-#: manufacturing/templates/mkt_research_detail.html:65
-#: manufacturing/templates/mkt_research_detail.html:137
-#: manufacturing/templates/mkt_research_list.html:95
-#: manufacturing/templates/mkt_research_list.html:153
-#: manufacturing/templates/payroll_dashboard.html:88
-#: manufacturing/templates/payroll_history.html:39
-#: manufacturing/templates/payroll_run_detail.html:41
-#: manufacturing/templates/prod_dashboard.html:114
-#: manufacturing/templates/tc_device_form.html:221
-#: manufacturing/templates/tc_device_list.html:45
-#: manufacturing/templates/time_clock_attendance.html:89
-msgid "Status"
-msgstr "Statut"
-
 #: manufacturing/templates/legal_compliance_detail.html:58
 #: manufacturing/templates/legal_compliance_list.html:82
 msgid "Regulation"
@@ -639,38 +1202,6 @@ msgstr "Date d'échéance"
 msgid "Completed Date"
 msgstr "Date d'achèvement"
 
-#: manufacturing/templates/legal_compliance_detail.html:75
-#: manufacturing/templates/legal_compliance_detail.html:117
-#: manufacturing/templates/legal_compliance_list.html:137
-#: manufacturing/templates/legal_contract_detail.html:84
-#: manufacturing/templates/legal_contract_detail.html:138
-#: manufacturing/templates/legal_contract_list.html:164
-#: manufacturing/templates/legal_employment_list.html:138
-#: manufacturing/templates/legal_governance_list.html:133
-#: manufacturing/templates/legal_ip_list.html:139
-#: manufacturing/templates/legal_litigation_detail.html:80
-#: manufacturing/templates/legal_litigation_detail.html:130
-#: manufacturing/templates/legal_litigation_list.html:154
-#: manufacturing/templates/mkt_ad_detail.html:116
-#: manufacturing/templates/mkt_ad_detail.html:186
-#: manufacturing/templates/mkt_ad_list.html:180
-#: manufacturing/templates/mkt_budget_list.html:149
-#: manufacturing/templates/mkt_campaign_detail.html:84
-#: manufacturing/templates/mkt_campaign_detail.html:142
-#: manufacturing/templates/mkt_campaign_list.html:166
-#: manufacturing/templates/mkt_content_detail.html:80
-#: manufacturing/templates/mkt_content_detail.html:134
-#: manufacturing/templates/mkt_content_list.html:158
-#: manufacturing/templates/mkt_lead_detail.html:81
-#: manufacturing/templates/mkt_lead_detail.html:131
-#: manufacturing/templates/mkt_lead_list.html:157
-#: manufacturing/templates/mkt_research_detail.html:95
-#: manufacturing/templates/mkt_research_detail.html:153
-#: manufacturing/templates/mkt_research_list.html:165
-#: manufacturing/templates/payroll_deductions.html:192
-msgid "Notes"
-msgstr "Notes"
-
 #: manufacturing/templates/legal_compliance_detail.html:84
 msgid "Edit Item"
 msgstr "Modifier l'élément"
@@ -685,18 +1216,6 @@ msgstr "Exigence"
 #: manufacturing/templates/legal_compliance_list.html:117
 msgid "Regulation / Standard"
 msgstr "Réglementation / norme"
-
-#: manufacturing/templates/legal_compliance_detail.html:121
-#: manufacturing/templates/legal_contract_detail.html:142
-#: manufacturing/templates/legal_litigation_detail.html:134
-#: manufacturing/templates/mkt_ad_detail.html:190
-#: manufacturing/templates/mkt_campaign_detail.html:146
-#: manufacturing/templates/mkt_content_detail.html:138
-#: manufacturing/templates/mkt_lead_detail.html:135
-#: manufacturing/templates/mkt_research_detail.html:157
-#: manufacturing/templates/tc_device_form.html:192
-msgid "Save Changes"
-msgstr "Enregistrer les modifications"
 
 #: manufacturing/templates/legal_compliance_list.html:10
 #: manufacturing/templates/legal_contract_list.html:10
@@ -749,55 +1268,9 @@ msgstr "Excel"
 msgid "Compliance Requirements"
 msgstr "Exigences de conformité"
 
-#: manufacturing/templates/legal_compliance_list.html:67
-#: manufacturing/templates/legal_contract_list.html:68
-#: manufacturing/templates/legal_employment_list.html:59
-#: manufacturing/templates/legal_governance_list.html:59
-#: manufacturing/templates/legal_ip_list.html:60
-#: manufacturing/templates/legal_litigation_list.html:68
-#: manufacturing/templates/mkt_ad_list.html:71
-#: manufacturing/templates/mkt_budget_list.html:62
-#: manufacturing/templates/mkt_campaign_list.html:66
-#: manufacturing/templates/mkt_content_list.html:64
-#: manufacturing/templates/mkt_lead_list.html:67
-#: manufacturing/templates/mkt_research_list.html:68
-msgid "All Statuses"
-msgstr "Tous les statuts"
-
 #: manufacturing/templates/legal_compliance_list.html:72
 msgid "Search requirement / regulation…"
 msgstr "Rechercher exigence / réglementation…"
-
-#: manufacturing/templates/legal_compliance_list.html:73
-#: manufacturing/templates/legal_contract_list.html:80
-#: manufacturing/templates/legal_employment_list.html:65
-#: manufacturing/templates/legal_governance_list.html:65
-#: manufacturing/templates/legal_ip_list.html:66
-#: manufacturing/templates/legal_litigation_list.html:80
-#: manufacturing/templates/mkt_ad_list.html:83
-#: manufacturing/templates/mkt_budget_list.html:74
-#: manufacturing/templates/mkt_campaign_list.html:78
-#: manufacturing/templates/mkt_content_list.html:76
-#: manufacturing/templates/mkt_lead_list.html:79
-#: manufacturing/templates/mkt_research_list.html:80
-msgid "Filter"
-msgstr "Filtrer"
-
-#: manufacturing/templates/legal_compliance_list.html:74
-#: manufacturing/templates/legal_contract_list.html:81
-#: manufacturing/templates/legal_employment_list.html:66
-#: manufacturing/templates/legal_governance_list.html:66
-#: manufacturing/templates/legal_ip_list.html:67
-#: manufacturing/templates/legal_litigation_list.html:81
-#: manufacturing/templates/mkt_ad_list.html:84
-#: manufacturing/templates/mkt_budget_list.html:75
-#: manufacturing/templates/mkt_campaign_list.html:79
-#: manufacturing/templates/mkt_content_list.html:77
-#: manufacturing/templates/mkt_lead_list.html:80
-#: manufacturing/templates/mkt_research_list.html:81
-#: manufacturing/templates/payroll_pay_rates.html:58
-msgid "Clear"
-msgstr "Effacer"
 
 #: manufacturing/templates/legal_compliance_list.html:85
 #: manufacturing/templates/legal_dashboard.html:83
@@ -825,31 +1298,6 @@ msgstr "Ajouter un élément"
 #, python-format
 msgid "Contract — %(title)s"
 msgstr "Contrat — %(title)s"
-
-#: manufacturing/templates/legal_contract_detail.html:59
-#: manufacturing/templates/legal_contract_detail.html:106
-#: manufacturing/templates/legal_contract_list.html:90
-#: manufacturing/templates/legal_contract_list.html:132
-#: manufacturing/templates/legal_dashboard.html:144
-#: manufacturing/templates/legal_employment_list.html:73
-#: manufacturing/templates/legal_employment_list.html:106
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:107
-#: manufacturing/templates/legal_litigation_detail.html:59
-#: manufacturing/templates/legal_litigation_detail.html:106
-#: manufacturing/templates/legal_litigation_list.html:91
-#: manufacturing/templates/legal_litigation_list.html:134
-#: manufacturing/templates/mkt_content_detail.html:59
-#: manufacturing/templates/mkt_content_detail.html:98
-#: manufacturing/templates/mkt_content_list.html:85
-#: manufacturing/templates/mkt_content_list.html:122
-#: manufacturing/templates/mkt_research_detail.html:57
-#: manufacturing/templates/mkt_research_detail.html:112
-#: manufacturing/templates/mkt_research_list.html:90
-#: manufacturing/templates/mkt_research_list.html:128
-#: manufacturing/templates/tc_device_list.html:42
-msgid "Type"
-msgstr "Type"
 
 #: manufacturing/templates/legal_contract_detail.html:63
 #: manufacturing/templates/legal_contract_detail.html:102
@@ -1015,11 +1463,6 @@ msgstr "En attente"
 msgid "Total Cases"
 msgstr "Total des affaires"
 
-#: manufacturing/templates/legal_dashboard.html:95
-#: manufacturing/templates/reports_dashboard.html:233
-msgid "Open"
-msgstr "Ouvert"
-
 #: manufacturing/templates/legal_dashboard.html:99
 #: manufacturing/templates/legal_employment_list.html:74
 #: manufacturing/templates/reports_dashboard.html:237
@@ -1077,10 +1520,6 @@ msgstr "Affaire"
 msgid "Employee"
 msgstr "Employé"
 
-#: manufacturing/templates/legal_employment_list.html:74
-msgid "Opened"
-msgstr "Ouvert"
-
 #: manufacturing/templates/legal_employment_list.html:89
 msgid "No matters found."
 msgstr "Aucune affaire trouvée."
@@ -1088,10 +1527,6 @@ msgstr "Aucune affaire trouvée."
 #: manufacturing/templates/legal_employment_list.html:97
 msgid "New Matter"
 msgstr "Nouvelle affaire"
-
-#: manufacturing/templates/legal_employment_list.html:126
-msgid "Opened Date"
-msgstr "Date d'ouverture"
 
 #: manufacturing/templates/legal_employment_list.html:130
 msgid "Closed Date"
@@ -3081,7 +3516,9 @@ msgstr "— sélectionner un type —"
 
 #: manufacturing/templates/tc_device_form.html:80
 msgid "CSV File Import — clock exports a CSV to a shared folder"
-msgstr "Importation de fichier CSV — la pointeuse exporte un CSV vers un dossier partagé"
+msgstr ""
+"Importation de fichier CSV — la pointeuse exporte un CSV vers un dossier "
+"partagé"
 
 #: manufacturing/templates/tc_device_form.html:81
 msgid "HTTP REST API — clock has a web API you can poll"
@@ -3089,11 +3526,14 @@ msgstr "API REST HTTP — la pointeuse dispose d'une API web interrogeable"
 
 #: manufacturing/templates/tc_device_form.html:82
 msgid "ZKTeco Terminal — fingerprint / badge terminal (TCP port 4370)"
-msgstr "Terminal ZKTeco — terminal d'empreinte digitale / badge (port TCP 4370)"
+msgstr ""
+"Terminal ZKTeco — terminal d'empreinte digitale / badge (port TCP 4370)"
 
 #: manufacturing/templates/tc_device_form.html:83
 msgid "Manual Entry — punches entered via the web UI (no polling)"
-msgstr "Saisie manuelle — les pointages sont saisis via l'interface web (pas d'interrogation)"
+msgstr ""
+"Saisie manuelle — les pointages sont saisis via l'interface web (pas "
+"d'interrogation)"
 
 #: manufacturing/templates/tc_device_form.html:89
 msgid "Device Info"
@@ -3178,7 +3618,9 @@ msgid ""
 "Requires <code>pip install pyzk</code> on the server.\n"
 "                        The terminal must be on the same network as the "
 "server."
-msgstr "Nécessite <code>pip install pyzk</code> sur le serveur. Le terminal doit se trouver sur le même réseau que le serveur."
+msgstr ""
+"Nécessite <code>pip install pyzk</code> sur le serveur. Le terminal doit se "
+"trouver sur le même réseau que le serveur."
 
 #: manufacturing/templates/tc_device_form.html:177
 msgid "Manual Entry"
@@ -3190,7 +3632,10 @@ msgid ""
 "                        web Time Clock page. Use \"Poll Now\" on the device "
 "to confirm\n"
 "                        (it will always return 0 records)."
-msgstr "Aucune connexion nécessaire. Les employés pointent leur entrée et leur sortie via la page web de la pointeuse. Utilisez « Interroger maintenant » sur l'appareil pour confirmer (cela renverra toujours 0 enregistrement)."
+msgstr ""
+"Aucune connexion nécessaire. Les employés pointent leur entrée et leur "
+"sortie via la page web de la pointeuse. Utilisez « Interroger maintenant » "
+"sur l'appareil pour confirmer (cela renverra toujours 0 enregistrement)."
 
 #: manufacturing/templates/tc_device_form.html:192
 #: manufacturing/templates/tc_device_list.html:7
@@ -3238,7 +3683,9 @@ msgstr "Partiel"
 
 #: manufacturing/templates/tc_device_form.html:239
 msgid "No sync history yet. Click \"Poll Now\" to test the connection."
-msgstr "Aucun historique de synchronisation pour le moment. Cliquez sur « Interroger maintenant » pour tester la connexion."
+msgstr ""
+"Aucun historique de synchronisation pour le moment. Cliquez sur « Interroger "
+"maintenant » pour tester la connexion."
 
 #: manufacturing/templates/tc_device_list.html:3
 #: manufacturing/templates/tc_device_list.html:34
@@ -3335,13 +3782,6 @@ msgstr "Cumul H.S. hebdomadaire"
 msgid "Daily Breakdown"
 msgstr "Répartition quotidienne"
 
-#: manufacturing/templates/tc_ot_report.html:87
-#: manufacturing/templates/tc_schedule.html:76
-#: manufacturing/templates/time_clock_attendance.html:58
-#: manufacturing/templates/time_clock_hours.html:60
-msgid "Date"
-msgstr "Date"
-
 #: manufacturing/templates/tc_ot_report.html:88
 msgid "Hours Worked"
 msgstr "Heures travaillées"
@@ -3381,7 +3821,10 @@ msgid ""
 "Schedule data is derived from actual clock-in/out records for the selected "
 "period.\n"
 "        A dedicated shift-planning module can be configured separately."
-msgstr "Les données de planning sont dérivées des pointages d'entrée/sortie réels pour la période sélectionnée. Un module dédié de planification des équipes peut être configuré séparément."
+msgstr ""
+"Les données de planning sont dérivées des pointages d'entrée/sortie réels "
+"pour la période sélectionnée. Un module dédié de planification des équipes "
+"peut être configuré séparément."
 
 #: manufacturing/templates/tc_schedule.html:52
 #: manufacturing/templates/time_clock_attendance.html:62

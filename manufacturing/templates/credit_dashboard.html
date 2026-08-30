@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Credit Department{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Credit Department" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/credit/" class="btn">Credit Dashboard</a>
-<a href="/credit/accounts/" class="btn">Accounts</a>
-<a href="/credit/applications/" class="btn">Applications</a>
-<a href="/credit/collections/" class="btn">Collections</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/credit/" class="btn">{% trans "Credit Dashboard" %}</a>
+<a href="/credit/accounts/" class="btn">{% trans "Accounts" %}</a>
+<a href="/credit/applications/" class="btn">{% trans "Applications" %}</a>
+<a href="/credit/collections/" class="btn">{% trans "Collections" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -44,62 +45,62 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Credit Department</h2>
+    <h2>{% trans "Credit Department" %}</h2>
 
     <div class="dept-grid">
-        <a href="/credit/accounts/" class="dept-btn">Credit Accounts</a>
-        <a href="/credit/applications/" class="dept-btn">Credit Applications</a>
-        <a href="/credit/collections/" class="dept-btn">Collections</a>
-        <a href="/customers/" class="dept-btn">Customers</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/credit/accounts/" class="dept-btn">{% trans "Credit Accounts" %}</a>
+        <a href="/credit/applications/" class="dept-btn">{% trans "Credit Applications" %}</a>
+        <a href="/credit/collections/" class="dept-btn">{% trans "Collections" %}</a>
+        <a href="/customers/" class="dept-btn">{% trans "Customers" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
-    <div class="section-label">Credit Accounts</div>
+    <div class="section-label">{% trans "Credit Accounts" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Accounts</div>
+            <div class="lbl">{% trans "Total Accounts" %}</div>
             <div class="val">{{ accounts.total|default:0 }}</div>
         </div>
         <div class="kpi{% if accounts.hold or accounts.suspended %} yellow{% endif %}">
-            <div class="lbl">Hold / Suspended</div>
+            <div class="lbl">{% trans "Hold / Suspended" %}</div>
             <div class="val">{{ accounts.hold|add:accounts.suspended|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total Exposure</div>
+            <div class="lbl">{% trans "Total Exposure" %}</div>
             <div class="val">${{ accounts.total_exposure|floatformat:0|default:0 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Applications</div>
+    <div class="section-label">{% trans "Applications" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Applications</div>
+            <div class="lbl">{% trans "Total Applications" %}</div>
             <div class="val">{{ applications.total|default:0 }}</div>
         </div>
         <div class="kpi{% if applications.pending %} yellow{% endif %}">
-            <div class="lbl">Pending Review</div>
+            <div class="lbl">{% trans "Pending Review" %}</div>
             <div class="val">{{ applications.pending|default:0 }}</div>
         </div>
         <div class="kpi">&nbsp;</div>
     </div>
 
-    <div class="section-label">Collections</div>
+    <div class="section-label">{% trans "Collections" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Total Activities</div>
+            <div class="lbl">{% trans "Total Activities" %}</div>
             <div class="val">{{ collections.total|default:0 }}</div>
         </div>
         <div class="kpi{% if collections.open %} red{% endif %}">
-            <div class="lbl">Open</div>
+            <div class="lbl">{% trans "Open" %}</div>
             <div class="val">{{ collections.open|default:0 }}</div>
         </div>
         <div class="kpi">&nbsp;</div>
     </div>
 
     <div class="card">
-        <h3>Credit Accounts</h3>
+        <h3>{% trans "Credit Accounts" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Customer</th><th>Limit</th><th>Terms</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Limit" %}</th><th>{% trans "Terms" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for a in recent_accounts %}
             <tr>
@@ -109,16 +110,16 @@
                 <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;">No credit accounts found.</td></tr>
+            <tr><td colspan="4" style="color:#888;">{% trans "No credit accounts found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card">
-        <h3>Pending Applications</h3>
+        <h3>{% trans "Pending Applications" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Customer</th><th>Applied</th><th>Requested Limit</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Applied" %}</th><th>{% trans "Requested Limit" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for a in recent_applications %}
             <tr>
@@ -128,16 +129,16 @@
                 <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;">No pending applications.</td></tr>
+            <tr><td colspan="4" style="color:#888;">{% trans "No pending applications." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div class="card">
-        <h3>Open Collections</h3>
+        <h3>{% trans "Open Collections" %}</h3>
         <table class="list-table">
-            <thead><tr><th>Customer</th><th>Type</th><th>Date</th><th>Status</th></tr></thead>
+            <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Type" %}</th><th>{% trans "Date" %}</th><th>{% trans "Status" %}</th></tr></thead>
             <tbody>
             {% for c in recent_collections %}
             <tr>
@@ -147,7 +148,7 @@
                 <td><span class="badge s-{{ c.status|lower|slugify }}">{{ c.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;">No open collection activities.</td></tr>
+            <tr><td colspan="4" style="color:#888;">{% trans "No open collection activities." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
