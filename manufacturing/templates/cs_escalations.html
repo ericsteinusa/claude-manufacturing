@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}CS Escalations{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "CS Escalations" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/cs/" class="btn">All Tickets</a>
-<a href="/cs/new/" class="btn">+ New Ticket</a>
-<a href="/cs/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/cs/" class="btn">{% trans "All Tickets" %}</a>
+<a href="/cs/new/" class="btn">+ {% trans "New Ticket" %}</a>
+<a href="/cs/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -40,20 +41,20 @@
 {% block body %}
 <div class="content">
 <div class="cs-wrap">
-    <h2>&#9888; Escalations — Open Tickets &ge;7 Days</h2>
+    <h2>&#9888; {% trans "Escalations — Open Tickets &ge;7 Days" %}</h2>
 
     <div class="summary-bar">
         <div class="stat-card critical-card">
             <div class="num">{{ critical_count }}</div>
-            <div class="lbl">Critical (&ge;14 days)</div>
+            <div class="lbl">{% trans "Critical (&ge;14 days)" %}</div>
         </div>
         <div class="stat-card high-card">
             <div class="num">{{ high_count }}</div>
-            <div class="lbl">High (&ge;7 days)</div>
+            <div class="lbl">{% trans "High (&ge;7 days)" %}</div>
         </div>
         <div class="stat-card">
             <div class="num" style="color:#333;">{{ tickets|length }}</div>
-            <div class="lbl">Total Escalations</div>
+            <div class="lbl">{% trans "Total Escalations" %}</div>
         </div>
     </div>
 
@@ -62,11 +63,11 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Customer</th>
-                <th>Description</th>
-                <th>Opened</th>
-                <th>Days Open</th>
-                <th>Priority</th>
+                <th>{% trans "Customer" %}</th>
+                <th>{% trans "Description" %}</th>
+                <th>{% trans "Opened" %}</th>
+                <th>{% trans "Days Open" %}</th>
+                <th>{% trans "Priority" %}</th>
                 <th></th>
             </tr>
         </thead>
@@ -78,23 +79,23 @@
                 <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                     {{ t.call|truncatechars:90 }}</td>
                 <td>{{ t.call_date }}</td>
-                <td><strong>{{ t.days_open }}</strong> days</td>
+                <td><strong>{{ t.days_open }}</strong> {% trans "days" %}</td>
                 <td><span class="pri-badge pri-{{ t.priority }}">
                     {{ t.priority|capfirst }}</span></td>
                 <td><a href="/cs/{{ t.id }}/" class="btn"
-                       style="padding:2px 10px;font-size:12px;">View</a></td>
+                       style="padding:2px 10px;font-size:12px;">{% trans "View" %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     <div class="legend">
         <span><span style="width:12px;height:12px;background:#fff0f0;border:1px solid #e57373;display:inline-block;"></span>
-            Critical &ge;14 days</span>
+            {% trans "Critical &ge;14 days" %}</span>
         <span><span style="width:12px;height:12px;background:#fffbe6;border:1px solid #ffb74d;display:inline-block;"></span>
-            High &ge;7 days</span>
+            {% trans "High &ge;7 days" %}</span>
     </div>
     {% else %}
-    <p class="empty-note">No escalated tickets — all open tickets are within the 7-day threshold.</p>
+    <p class="empty-note">{% trans "No escalated tickets — all open tickets are within the 7-day threshold." %}</p>
     {% endif %}
 </div>
 </div>

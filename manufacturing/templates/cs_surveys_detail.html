@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Survey — {{ survey.title }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with title=survey.title %}Survey — {{ title }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/cs-dash/" class="btn">CS Dashboard</a>
-<a href="/cs/" class="btn">Tickets</a>
-<a href="/cs/returns/" class="btn">Returns</a>
-<a href="/cs/kb/" class="btn">Knowledge Base</a>
-<a href="/cs/surveys/" class="btn">Surveys</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/cs-dash/" class="btn">{% trans "CS Dashboard" %}</a>
+<a href="/cs/" class="btn">{% trans "Tickets" %}</a>
+<a href="/cs/returns/" class="btn">{% trans "Returns" %}</a>
+<a href="/cs/kb/" class="btn">{% trans "Knowledge Base" %}</a>
+<a href="/cs/surveys/" class="btn">{% trans "Surveys" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -58,15 +59,15 @@
 
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Responses</div>
+            <div class="lbl">{% trans "Responses" %}</div>
             <div class="val">{{ survey.response_count|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Avg Score</div>
+            <div class="lbl">{% trans "Avg Score" %}</div>
             <div class="val">{{ survey.avg_score|default:"—" }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Period</div>
+            <div class="lbl">{% trans "Period" %}</div>
             <div class="val" style="font-size:14px;">
                 {{ survey.start_date|default:"—" }} → {{ survey.end_date|default:"—" }}
             </div>
@@ -75,17 +76,17 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Survey</h3>
+        <h3>{% trans "Edit Survey" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Title *</label>
+                    <label>{% trans "Title" %} *</label>
                     <input type="text" name="title" required value="{{ survey.title }}">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="survey_type">
                         {% for t in survey_types %}
                         <option value="{{ t }}"{% if survey.survey_type == t %} selected{% endif %}>{{ t }}</option>
@@ -93,7 +94,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in survey_statuses %}
                         <option value="{{ s }}"{% if survey.status == s %} selected{% endif %}>{{ s }}</option>
@@ -101,32 +102,32 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ survey.start_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ survey.end_date|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description">{{ survey.description|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Responses ({{ responses|length }})</h3>
+        <h3>{% blocktrans count counter=responses|length %}Responses ({{ counter }}){% plural %}Responses ({{ counter }}){% endblocktrans %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Customer</th>
-                    <th style="text-align:right;">Score</th>
-                    <th>Comments</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th style="text-align:right;">{% trans "Score" %}</th>
+                    <th>{% trans "Comments" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -138,7 +139,7 @@
                 <td>{{ r.comments|default:"—"|truncatechars:80 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">No responses yet.</td></tr>
+            <tr><td colspan="4" style="color:#888;text-align:center;">{% trans "No responses yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -146,25 +147,25 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Response</h3>
+        <h3>{% trans "Add Response" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="respond">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Response Date</label>
+                    <label>{% trans "Response Date" %}</label>
                     <input type="date" name="response_date">
                 </div>
                 <div class="form-group">
-                    <label>Score (0–10)</label>
+                    <label>{% trans "Score (0–10)" %}</label>
                     <input type="number" name="score" min="0" max="10" placeholder="0–10">
                 </div>
                 <div class="form-group full-span">
-                    <label>Comments</label>
-                    <textarea name="comments" placeholder="Customer feedback…"></textarea>
+                    <label>{% trans "Comments" %}</label>
+                    <textarea name="comments" placeholder="{% trans 'Customer feedback…' %}"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-add">Add Response</button>
+            <button type="submit" class="btn-add">{% trans "Add Response" %}</button>
         </form>
     </div>
     {% endif %}

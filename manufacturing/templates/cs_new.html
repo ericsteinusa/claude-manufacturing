@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}New CS Ticket{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "New CS Ticket" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/cs/" class="btn">Back to Tickets</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/cs/" class="btn">{% trans "Back to Tickets" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,16 +29,16 @@
 {% block body %}
 <div class="content">
 <div class="cs-wrap">
-    <h2>New Support Ticket</h2>
+    <h2>{% trans "New Support Ticket" %}</h2>
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
     <div class="card">
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row full">
-                    <label>Customer *</label>
+                    <label>{% trans "Customer" %} *</label>
                     <select name="customer_id" required>
-                        <option value="">— select customer —</option>
+                        <option value="">{% trans "— select customer —" %}</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}"
                             {% if form.customer_id == c.id|stringformat:"s" %}selected{% endif %}>
@@ -46,27 +47,27 @@
                     </select>
                 </div>
                 <div class="form-row full">
-                    <label>Problem / Description *</label>
+                    <label>{% trans "Problem / Description" %} *</label>
                     <textarea name="call" rows="4" required
-                        placeholder="Describe the customer's issue…">{{ form.call|default:"" }}</textarea>
+                        placeholder="{% trans 'Describe the customer&#39;s issue…' %}">{{ form.call|default:"" }}</textarea>
                 </div>
                 <div class="form-row">
-                    <label>Call Date</label>
+                    <label>{% trans "Call Date" %}</label>
                     <input type="date" name="call_date"
                            value="{{ form.call_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Call Time</label>
+                    <label>{% trans "Call Time" %}</label>
                     <input type="time" name="call_time"
                            value="{{ form.call_time|default:'' }}">
                 </div>
                 <div class="form-row full">
-                    <label>Comments / Notes</label>
+                    <label>{% trans "Comments / Notes" %}</label>
                     <textarea name="comments" rows="3"
-                        placeholder="Internal notes…">{{ form.comments|default:"" }}</textarea>
+                        placeholder="{% trans 'Internal notes…' %}">{{ form.comments|default:"" }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn">Create Ticket</button>
+            <button type="submit" class="save-btn">{% trans "Create Ticket" %}</button>
         </form>
     </div>
 </div>
