@@ -4129,3 +4129,48 @@ dashboard + all 5 htmx templates + the full Legal department (10) + the full Mar
 department (7) + the full Customers/Credit department (7)) out of ~450 total. Engineering, Customer
 Service, and Accounting (13 templates each) are the smallest unclaimed department-sized candidates
 remaining.
+
+---
+
+**2026-08-29, seventh whole department:** Continued the "whole department" approach — re-surveyed
+and found the 13 files matching `eng*.html` actually split across two unrelated features: the 3
+`engagement_*.html` files are a Consultants feature under `/consultants/engagements/`, and only the
+10 `eng_*.html` files (`eng_dashboard.html`, `eng_projects.html`, `eng_project_detail.html`,
+`eng_tasks_list.html`, `eng_task_detail.html`, `eng_ecrs.html`, `eng_ecr_detail.html`,
+`eng_specs_list.html`, `eng_spec_detail.html`, `eng_reports.html`) are actually Engineering —
+smaller than Customer Service/Accounting (13 each) once correctly scoped, so picked Engineering.
+92 unique strings needed translation per language (60 fuzzy-matched, all wrong guesses as usual —
+plus genuinely blank new entries). Reused the existing "N overdue" plural from the Reports pass
+verbatim for the project list's overdue-tasks badge (identical English source text, so it matched
+without needing a new translation), and used `{% blocktrans with %}` for four dynamic page/section
+titles ("Project: {num} — {title}," "ECR: {num} — {title}," "Standard — {title}," "Task — {name}")
+plus the task-detail page's project-link line. **Caught and fixed a real bug during this pass,
+before it ever reached the `.po` file**: the task-detail page's project-link `{% blocktrans %}`
+originally referenced `{{ task.project_id }}` directly inside the block without binding it via
+`with` first. Unlike the Customers/Credit pass's `|add:` filter bug (which at least errors loudly
+in a way that's easy to notice), this one is sneakier — `makemessages` doesn't reject a dotted
+lookup like this at extraction time, it silently produces a msgid containing the literal
+placeholder `%(task.project_id)s`, which is not a valid Python `%`-format key (dots aren't
+permitted in format-spec identifiers). Caught by inspecting the `needs translation` list generated
+from the `makemessages` diff and noticing the malformed key before writing any translation for it,
+not by a test failure. Fixed by adding `pid=task.project_id` to the `with` bindings and referencing
+`{{ pid }}` in the href instead, then re-ran `makemessages` to confirm the corrected msgid
+(`%(pid)s`) replaced the broken one cleanly with no leftover trace. Lesson for future `blocktrans`
+blocks: every variable referenced inside one that isn't a bare context name (i.e. involves a dot or
+a filter) needs an explicit `with` binding — the Reports pass already established this for filtered
+values (`{% blocktrans with rate=x|floatformat:1 %}`), and this pass extends it to plain dotted
+attribute lookups too, which are just as invalid inside the block body without a `with`. Full suite
+3431 passed (unchanged), `manage.py check` clean, `compilemessages` clean, `msgfmt --check` clean
+on all three files, zero fuzzy/blank/duplicated entries confirmed programmatically (the same
+"heures supplémentaires" false positive from the Payroll pass recurs here, unrelated to this
+batch). Verified end-to-end against the real dev server: navigated the Engineering dashboard, the
+project list (confirmed the "N overdue" badge), a project's detail page (confirmed the dynamic
+title and its tasks table), a task's detail page (confirmed the project-link line renders with a
+working link — this is the fixed `blocktrans`), the ECR list and an ECR's detail page, the
+Standards list and a standard's detail page, and the Reports page, in Spanish, French, and German
+with real sample data, no console errors. **Localization coverage is now 66 templates across three
+languages** (core shell + login + main dashboard + all 5 htmx templates + the full Legal department
+(10) + the full Marketing department (13) + the full Reports department (4) + the full Payroll
+department (8) + the full Time Clock department (7) + the full Customers/Credit department (7) +
+the full Engineering department (10)) out of ~450 total. Customer Service and Accounting (13
+templates each) are the smallest unclaimed department-sized candidates remaining.

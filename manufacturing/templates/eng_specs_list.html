@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Standards &amp; Compliance{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Standards &amp; Compliance" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/eng/" class="btn">Eng Dashboard</a>
-<a href="/eng/projects/" class="btn">Projects</a>
-<a href="/eng/tasks/" class="btn">Tasks</a>
-<a href="/eng/ecrs/" class="btn">ECRs</a>
-<a href="/eng/specs/" class="btn">Standards</a>
-<a href="/eng/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/eng/" class="btn">{% trans "Eng Dashboard" %}</a>
+<a href="/eng/projects/" class="btn">{% trans "Projects" %}</a>
+<a href="/eng/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/eng/ecrs/" class="btn">{% trans "ECRs" %}</a>
+<a href="/eng/specs/" class="btn">{% trans "Standards" %}</a>
+<a href="/eng/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -54,39 +55,39 @@
 {% block body %}
 <div class="content">
 <div class="es-wrap">
-    <h2>Standards &amp; Compliance</h2>
+    <h2>{% trans "Standards &amp; Compliance" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in spec_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
         <select name="category">
-            <option value="">All Categories</option>
+            <option value="">{% trans "All Categories" %}</option>
             {% for c in spec_categories %}
             <option value="{{ c }}"{% if category_filter == c %} selected{% endif %}>{{ c }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search number / title…">
-        <button type="submit">Filter</button>
-        <a href="/eng/specs/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search number / title…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/eng/specs/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Standard #</th>
-                    <th>Title</th>
-                    <th>Category</th>
-                    <th>Version</th>
-                    <th>Review Date</th>
-                    <th>Status</th>
+                    <th>{% trans "Standard #" %}</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans "Category" %}</th>
+                    <th>{% trans "Version" %}</th>
+                    <th>{% trans "Review Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -100,7 +101,7 @@
                 <td><span class="badge s-{{ s.status|cut:' ' }}">{{ s.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No standards found.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No standards found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -108,20 +109,20 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Standard</h3>
+        <h3>{% trans "New Standard" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Standard Number</label>
-                    <input type="text" name="standard_number" placeholder="e.g. ISO-9001">
+                    <label>{% trans "Standard Number" %}</label>
+                    <input type="text" name="standard_number" placeholder="{% trans 'e.g. ISO-9001' %}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Title *</label>
-                    <input type="text" name="title" required placeholder="Standard title">
+                    <label>{% trans "Title" %} *</label>
+                    <input type="text" name="title" required placeholder="{% trans 'Standard title' %}">
                 </div>
                 <div class="form-group">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     <select name="category">
                         {% for c in spec_categories %}
                         <option value="{{ c }}">{{ c }}</option>
@@ -129,11 +130,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Version</label>
-                    <input type="text" name="version" placeholder="e.g. 2015">
+                    <label>{% trans "Version" %}</label>
+                    <input type="text" name="version" placeholder="{% trans 'e.g. 2015' %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in spec_statuses %}
                         <option value="{{ s }}"{% if s == 'Active' %} selected{% endif %}>{{ s }}</option>
@@ -141,19 +142,19 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Review Date</label>
+                    <label>{% trans "Review Date" %}</label>
                     <input type="date" name="review_date">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
-                    <textarea name="description" placeholder="Brief description of this standard"></textarea>
+                    <label>{% trans "Description" %}</label>
+                    <textarea name="description" placeholder="{% trans 'Brief description of this standard' %}"></textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Standard</button>
+            <button type="submit" class="btn-submit">{% trans "Create Standard" %}</button>
         </form>
     </div>
     {% endif %}

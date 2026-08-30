@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-30 00:07+0000\n"
+"POT-Creation-Date: 2026-08-30 00:58+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -27,6 +27,14 @@ msgstr "Perspectives IA"
 
 #: manufacturing/templates/ai_insights_dashboard.html:6
 #: manufacturing/templates/base.html:603
+#: manufacturing/templates/eng_dashboard.html:11
+#: manufacturing/templates/eng_dashboard.html:64
+#: manufacturing/templates/eng_ecrs.html:8
+#: manufacturing/templates/eng_projects.html:8
+#: manufacturing/templates/eng_spec_detail.html:11
+#: manufacturing/templates/eng_specs_list.html:11
+#: manufacturing/templates/eng_task_detail.html:11
+#: manufacturing/templates/eng_tasks_list.html:11
 #: manufacturing/templates/prod_dashboard.html:9
 msgid "Reports"
 msgstr "Rapports"
@@ -40,6 +48,16 @@ msgstr "Rapports"
 #: manufacturing/templates/credit_collections_list.html:10
 #: manufacturing/templates/credit_dashboard.html:10
 #: manufacturing/templates/credit_dashboard.html:55
+#: manufacturing/templates/eng_dashboard.html:12
+#: manufacturing/templates/eng_ecr_detail.html:9
+#: manufacturing/templates/eng_ecrs.html:9
+#: manufacturing/templates/eng_project_detail.html:9
+#: manufacturing/templates/eng_projects.html:9
+#: manufacturing/templates/eng_reports.html:9
+#: manufacturing/templates/eng_spec_detail.html:12
+#: manufacturing/templates/eng_specs_list.html:12
+#: manufacturing/templates/eng_task_detail.html:12
+#: manufacturing/templates/eng_tasks_list.html:12
 #: manufacturing/templates/legal_compliance_detail.html:10
 #: manufacturing/templates/legal_compliance_list.html:13
 #: manufacturing/templates/legal_contract_detail.html:10
@@ -140,6 +158,11 @@ msgstr "Déconnexion"
 
 #: manufacturing/templates/base.html:478
 #: manufacturing/templates/dashboard.html:4
+#: manufacturing/templates/eng_ecr_detail.html:8
+#: manufacturing/templates/eng_ecrs.html:6
+#: manufacturing/templates/eng_project_detail.html:8
+#: manufacturing/templates/eng_projects.html:6
+#: manufacturing/templates/eng_reports.html:6
 #: manufacturing/templates/payroll_deductions.html:6
 #: manufacturing/templates/payroll_history.html:6
 #: manufacturing/templates/payroll_pay_rates.html:6
@@ -163,6 +186,7 @@ msgid "Work Orders"
 msgstr "Ordres de fabrication"
 
 #: manufacturing/templates/base.html:486
+#: manufacturing/templates/eng_dashboard.html:60
 msgid "Bill of Materials"
 msgstr "Nomenclature"
 
@@ -349,6 +373,7 @@ msgid "Periods"
 msgstr "Périodes"
 
 #: manufacturing/templates/credit_account_detail.html:3
+#, python-format
 msgid "Credit Account — %(name)s"
 msgstr "Compte crédit — %(name)s"
 
@@ -414,6 +439,25 @@ msgstr "Recouvrements"
 #: manufacturing/templates/credit_dashboard.html:103
 #: manufacturing/templates/credit_dashboard.html:122
 #: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/eng_dashboard.html:113
+#: manufacturing/templates/eng_dashboard.html:130
+#: manufacturing/templates/eng_ecr_detail.html:97
+#: manufacturing/templates/eng_ecrs.html:70
+#: manufacturing/templates/eng_project_detail.html:83
+#: manufacturing/templates/eng_project_detail.html:116
+#: manufacturing/templates/eng_project_detail.html:130
+#: manufacturing/templates/eng_project_detail.html:167
+#: manufacturing/templates/eng_project_detail.html:211
+#: manufacturing/templates/eng_projects.html:73
+#: manufacturing/templates/eng_projects.html:105
+#: manufacturing/templates/eng_reports.html:122
+#: manufacturing/templates/eng_spec_detail.html:82
+#: manufacturing/templates/eng_spec_detail.html:112
+#: manufacturing/templates/eng_specs_list.html:90
+#: manufacturing/templates/eng_specs_list.html:137
+#: manufacturing/templates/eng_task_detail.html:99
+#: manufacturing/templates/eng_task_detail.html:120
+#: manufacturing/templates/eng_tasks_list.html:94
 #: manufacturing/templates/legal_compliance_detail.html:54
 #: manufacturing/templates/legal_compliance_detail.html:101
 #: manufacturing/templates/legal_compliance_list.html:86
@@ -507,6 +551,19 @@ msgstr "Téléphone"
 #: manufacturing/templates/credit_collections_detail.html:83
 #: manufacturing/templates/credit_collections_detail.html:129
 #: manufacturing/templates/credit_collections_list.html:155
+#: manufacturing/templates/eng_ecr_detail.html:105
+#: manufacturing/templates/eng_ecr_detail.html:113
+#: manufacturing/templates/eng_ecr_detail.html:149
+#: manufacturing/templates/eng_project_detail.html:109
+#: manufacturing/templates/eng_project_detail.html:120
+#: manufacturing/templates/eng_project_detail.html:173
+#: manufacturing/templates/eng_project_detail.html:221
+#: manufacturing/templates/eng_spec_detail.html:98
+#: manufacturing/templates/eng_spec_detail.html:125
+#: manufacturing/templates/eng_specs_list.html:153
+#: manufacturing/templates/eng_task_detail.html:107
+#: manufacturing/templates/eng_task_detail.html:122
+#: manufacturing/templates/eng_tasks_list.html:155
 #: manufacturing/templates/legal_compliance_detail.html:75
 #: manufacturing/templates/legal_compliance_detail.html:117
 #: manufacturing/templates/legal_compliance_list.html:137
@@ -558,6 +615,10 @@ msgstr "Nécessaire uniquement en cas de changement de limite ou de statut"
 
 #: manufacturing/templates/credit_account_detail.html:125
 #: manufacturing/templates/credit_collections_detail.html:133
+#: manufacturing/templates/eng_ecr_detail.html:107
+#: manufacturing/templates/eng_project_detail.html:112
+#: manufacturing/templates/eng_spec_detail.html:102
+#: manufacturing/templates/eng_task_detail.html:111
 #: manufacturing/templates/legal_compliance_detail.html:121
 #: manufacturing/templates/legal_contract_detail.html:142
 #: manufacturing/templates/legal_litigation_detail.html:134
@@ -679,6 +740,8 @@ msgstr "Comptes de crédit"
 #: manufacturing/templates/credit_account_list.html:62
 #: manufacturing/templates/credit_application_list.html:61
 #: manufacturing/templates/credit_collections_list.html:62
+#: manufacturing/templates/eng_specs_list.html:65
+#: manufacturing/templates/eng_tasks_list.html:70
 #: manufacturing/templates/legal_compliance_list.html:67
 #: manufacturing/templates/legal_contract_list.html:68
 #: manufacturing/templates/legal_employment_list.html:59
@@ -702,6 +765,10 @@ msgstr "Rechercher un client…"
 #: manufacturing/templates/credit_account_list.html:68
 #: manufacturing/templates/credit_application_list.html:67
 #: manufacturing/templates/credit_collections_list.html:68
+#: manufacturing/templates/eng_ecrs.html:63
+#: manufacturing/templates/eng_projects.html:66
+#: manufacturing/templates/eng_specs_list.html:77
+#: manufacturing/templates/eng_tasks_list.html:81
 #: manufacturing/templates/legal_compliance_list.html:73
 #: manufacturing/templates/legal_contract_list.html:80
 #: manufacturing/templates/legal_employment_list.html:65
@@ -720,6 +787,10 @@ msgstr "Filtrer"
 #: manufacturing/templates/credit_account_list.html:69
 #: manufacturing/templates/credit_application_list.html:68
 #: manufacturing/templates/credit_collections_list.html:69
+#: manufacturing/templates/eng_ecrs.html:64
+#: manufacturing/templates/eng_projects.html:67
+#: manufacturing/templates/eng_specs_list.html:78
+#: manufacturing/templates/eng_tasks_list.html:82
 #: manufacturing/templates/legal_compliance_list.html:74
 #: manufacturing/templates/legal_contract_list.html:81
 #: manufacturing/templates/legal_employment_list.html:66
@@ -781,6 +852,7 @@ msgid "Every customer already has a credit account."
 msgstr "Tous les clients ont déjà un compte de crédit."
 
 #: manufacturing/templates/credit_application_detail.html:3
+#, python-format
 msgid "Credit Application — %(name)s"
 msgstr "Demande de crédit — %(name)s"
 
@@ -804,6 +876,15 @@ msgid "Reviewed By"
 msgstr "Examiné par"
 
 #: manufacturing/templates/credit_application_detail.html:76
+#: manufacturing/templates/eng_ecr_detail.html:65
+#: manufacturing/templates/eng_ecr_detail.html:95
+#: manufacturing/templates/eng_ecr_detail.html:146
+#: manufacturing/templates/eng_ecrs.html:70
+#: manufacturing/templates/eng_ecrs.html:118
+#: manufacturing/templates/eng_spec_detail.html:90
+#: manufacturing/templates/eng_spec_detail.html:111
+#: manufacturing/templates/eng_specs_list.html:89
+#: manufacturing/templates/eng_specs_list.html:145
 msgid "Review Date"
 msgstr "Date d'examen"
 
@@ -812,7 +893,9 @@ msgstr "Date d'examen"
 msgid ""
 "This customer already has a credit account: <a href=\"/credit/accounts/"
 "%(id)s/\">view account</a> (current limit $%(limit)s, status %(status)s)."
-msgstr "Ce client possède déjà un compte crédit : <a href=\"/credit/accounts/%(id)s/\">voir le compte</a> (limite actuelle $%(limit)s, statut %(status)s)."
+msgstr ""
+"Ce client possède déjà un compte crédit : <a href=\"/credit/accounts/%(id)s/"
+"\">voir le compte</a> (limite actuelle $%(limit)s, statut %(status)s)."
 
 #: manufacturing/templates/credit_application_detail.html:96
 msgid "Review Application"
@@ -853,6 +936,7 @@ msgid "Submit Application"
 msgstr "Soumettre la demande"
 
 #: manufacturing/templates/credit_collections_detail.html:3
+#, python-format
 msgid "Collection Activity — %(name)s"
 msgstr "Activité de recouvrement — %(name)s"
 
@@ -1045,6 +1129,674 @@ msgstr "%(zero)s à zéro"
 msgid "Cash Position"
 msgstr "Position de trésorerie"
 
+#: manufacturing/templates/eng_dashboard.html:3
+#: manufacturing/templates/eng_dashboard.html:52
+msgid "Engineering Dashboard"
+msgstr "Tableau de bord d'ingénierie"
+
+#: manufacturing/templates/eng_dashboard.html:6
+#: manufacturing/templates/eng_dashboard.html:55
+#: manufacturing/templates/eng_ecr_detail.html:7
+#: manufacturing/templates/eng_ecrs.html:7
+#: manufacturing/templates/eng_reports.html:7
+#: manufacturing/templates/eng_spec_detail.html:7
+#: manufacturing/templates/eng_specs_list.html:7
+#: manufacturing/templates/eng_task_detail.html:7
+#: manufacturing/templates/eng_tasks_list.html:7
+msgid "Projects"
+msgstr "Projets"
+
+#: manufacturing/templates/eng_dashboard.html:7
+#: manufacturing/templates/eng_dashboard.html:56
+#: manufacturing/templates/eng_project_detail.html:126
+#: manufacturing/templates/eng_projects.html:73
+#: manufacturing/templates/eng_spec_detail.html:8
+#: manufacturing/templates/eng_specs_list.html:8
+#: manufacturing/templates/eng_task_detail.html:8
+#: manufacturing/templates/eng_tasks_list.html:8
+msgid "Tasks"
+msgstr "Tâches"
+
+#: manufacturing/templates/eng_dashboard.html:8
+#: manufacturing/templates/eng_project_detail.html:7
+#: manufacturing/templates/eng_projects.html:7
+#: manufacturing/templates/eng_reports.html:8
+#: manufacturing/templates/eng_spec_detail.html:9
+#: manufacturing/templates/eng_specs_list.html:9
+#: manufacturing/templates/eng_task_detail.html:9
+#: manufacturing/templates/eng_tasks_list.html:9
+msgid "ECRs"
+msgstr "DCI"
+
+#: manufacturing/templates/eng_dashboard.html:9
+#: manufacturing/templates/eng_spec_detail.html:10
+#: manufacturing/templates/eng_specs_list.html:10
+#: manufacturing/templates/eng_task_detail.html:10
+#: manufacturing/templates/eng_tasks_list.html:10
+msgid "Standards"
+msgstr "Normes"
+
+#: manufacturing/templates/eng_dashboard.html:10
+#: manufacturing/templates/prod_dashboard.html:11
+#: manufacturing/templates/prod_dashboard.html:62
+msgid "BOM"
+msgstr "BOM"
+
+#: manufacturing/templates/eng_dashboard.html:57
+msgid "ECRs / Design Reviews"
+msgstr "DCI / Revues de conception"
+
+#: manufacturing/templates/eng_dashboard.html:58
+#: manufacturing/templates/eng_specs_list.html:3
+#: manufacturing/templates/eng_specs_list.html:58
+msgid "Standards &amp; Compliance"
+msgstr "Normes et conformité"
+
+#: manufacturing/templates/eng_dashboard.html:59
+msgid "Pending Reviews"
+msgstr "Revues en attente"
+
+#: manufacturing/templates/eng_dashboard.html:61
+#: manufacturing/templates/eng_dashboard.html:68
+msgid "Active Projects"
+msgstr "Projets actifs"
+
+#: manufacturing/templates/eng_dashboard.html:62
+#: manufacturing/templates/eng_ecr_detail.html:3
+msgid "New ECR"
+msgstr "Nouvelle DCI"
+
+#: manufacturing/templates/eng_dashboard.html:63
+#: manufacturing/templates/eng_project_detail.html:3
+#: manufacturing/templates/eng_project_detail.html:67
+#: manufacturing/templates/eng_projects.html:95
+msgid "New Project"
+msgstr "Nouveau projet"
+
+#: manufacturing/templates/eng_dashboard.html:69
+msgid "Planning"
+msgstr "Planification"
+
+#: manufacturing/templates/eng_dashboard.html:70
+#: manufacturing/templates/legal_compliance_list.html:85
+#: manufacturing/templates/legal_dashboard.html:83
+#: manufacturing/templates/mkt_analytics.html:143
+msgid "Completed"
+msgstr "Terminé"
+
+#: manufacturing/templates/eng_dashboard.html:71
+msgid "ECRs Pending"
+msgstr "DCI en attente"
+
+#: manufacturing/templates/eng_dashboard.html:72
+msgid "Open Tasks"
+msgstr "Tâches ouvertes"
+
+#: manufacturing/templates/eng_dashboard.html:73
+msgid "Overdue Tasks"
+msgstr "Tâches en retard"
+
+#: manufacturing/templates/eng_dashboard.html:78
+#: manufacturing/templates/eng_reports.html:54
+msgid "Projects by Status"
+msgstr "Projets par statut"
+
+#: manufacturing/templates/eng_dashboard.html:82
+msgid "Tasks by Status"
+msgstr "Tâches par statut"
+
+#: manufacturing/templates/eng_dashboard.html:89
+#: manufacturing/templates/eng_reports.html:85
+msgid "Open Tasks by Priority"
+msgstr "Tâches ouvertes par priorité"
+
+#: manufacturing/templates/eng_dashboard.html:93
+#: manufacturing/templates/eng_reports.html:69
+msgid "ECRs by Status"
+msgstr "DCI par statut"
+
+#: manufacturing/templates/eng_dashboard.html:100
+msgid "Projects by Engineer"
+msgstr "Projets par ingénieur"
+
+#: manufacturing/templates/eng_dashboard.html:104
+msgid "Standards by Status"
+msgstr "Normes par statut"
+
+#: manufacturing/templates/eng_dashboard.html:111
+msgid "Recent Projects"
+msgstr "Projets récents"
+
+#: manufacturing/templates/eng_dashboard.html:113
+#: manufacturing/templates/eng_projects.html:72
+#: manufacturing/templates/eng_reports.html:101
+msgid "Number"
+msgstr "Numéro"
+
+#: manufacturing/templates/eng_dashboard.html:113
+#: manufacturing/templates/eng_dashboard.html:130
+#: manufacturing/templates/eng_ecr_detail.html:77
+#: manufacturing/templates/eng_ecr_detail.html:128
+#: manufacturing/templates/eng_ecrs.html:69
+#: manufacturing/templates/eng_ecrs.html:96
+#: manufacturing/templates/eng_project_detail.html:79
+#: manufacturing/templates/eng_project_detail.html:210
+#: manufacturing/templates/eng_projects.html:72
+#: manufacturing/templates/eng_projects.html:101
+#: manufacturing/templates/eng_reports.html:101
+#: manufacturing/templates/eng_reports.html:122
+#: manufacturing/templates/eng_spec_detail.html:66
+#: manufacturing/templates/eng_specs_list.html:86
+#: manufacturing/templates/eng_specs_list.html:121
+#: manufacturing/templates/legal_contract_detail.html:98
+#: manufacturing/templates/legal_contract_list.html:88
+#: manufacturing/templates/legal_contract_list.html:124
+#: manufacturing/templates/legal_dashboard.html:142
+#: manufacturing/templates/legal_ip_list.html:74
+#: manufacturing/templates/legal_ip_list.html:103
+#: manufacturing/templates/mkt_content_detail.html:94
+#: manufacturing/templates/mkt_content_list.html:84
+#: manufacturing/templates/mkt_content_list.html:118
+#: manufacturing/templates/mkt_research_detail.html:108
+#: manufacturing/templates/mkt_research_list.html:89
+#: manufacturing/templates/mkt_research_list.html:124
+msgid "Title"
+msgstr "Titre"
+
+#: manufacturing/templates/eng_dashboard.html:113
+#: manufacturing/templates/eng_project_detail.html:119
+#: manufacturing/templates/eng_project_detail.html:130
+#: manufacturing/templates/eng_reports.html:101
+#: manufacturing/templates/maint_dashboard.html:84
+msgid "Due"
+msgstr "Dû"
+
+#: manufacturing/templates/eng_dashboard.html:122
+msgid "No projects yet."
+msgstr "Aucun projet pour le moment."
+
+#: manufacturing/templates/eng_dashboard.html:128
+msgid "Recent ECRs"
+msgstr "DCI récentes"
+
+#: manufacturing/templates/eng_dashboard.html:130
+#: manufacturing/templates/eng_ecr_detail.html:62
+#: manufacturing/templates/eng_ecrs.html:69
+#: manufacturing/templates/eng_reports.html:122
+msgid "ECR #"
+msgstr "N° DCI"
+
+#: manufacturing/templates/eng_dashboard.html:138
+#: manufacturing/templates/eng_reports.html:133
+msgid "No ECRs yet."
+msgstr "Aucune DCI pour le moment."
+
+#: manufacturing/templates/eng_ecr_detail.html:6
+msgid "All ECRs"
+msgstr "Toutes les DCI"
+
+#: manufacturing/templates/eng_ecr_detail.html:39
+msgid "ECR: %(num)s — %(title)s"
+msgstr "DCI : %(num)s — %(title)s"
+
+#: manufacturing/templates/eng_ecr_detail.html:39
+#: manufacturing/templates/eng_ecrs.html:90
+msgid "New ECR / Design Review"
+msgstr "Nouvelle DCI / Revue de conception"
+
+#: manufacturing/templates/eng_ecr_detail.html:47
+#: manufacturing/templates/eng_ecrs.html:47
+#: manufacturing/templates/eng_projects.html:50
+msgid "Status:"
+msgstr "Statut :"
+
+#: manufacturing/templates/eng_ecr_detail.html:63
+#: manufacturing/templates/eng_ecr_detail.html:79
+#: manufacturing/templates/eng_ecr_detail.html:130
+#: manufacturing/templates/eng_ecrs.html:69
+#: manufacturing/templates/eng_ecrs.html:100
+#: manufacturing/templates/eng_reports.html:122
+#: manufacturing/templates/eng_tasks_list.html:90
+#: manufacturing/templates/eng_tasks_list.html:125
+msgid "Project"
+msgstr "Projet"
+
+#: manufacturing/templates/eng_ecr_detail.html:64
+#: manufacturing/templates/eng_ecr_detail.html:87
+#: manufacturing/templates/eng_ecr_detail.html:138
+#: manufacturing/templates/eng_ecrs.html:70
+#: manufacturing/templates/eng_ecrs.html:109
+#: manufacturing/templates/mkt_budget_list.html:83
+#: manufacturing/templates/mkt_budget_list.html:133
+msgid "Requested By"
+msgstr "Demandé par"
+
+#: manufacturing/templates/eng_ecr_detail.html:66
+#: manufacturing/templates/eng_spec_detail.html:113
+#: manufacturing/templates/eng_task_detail.html:121
+#: manufacturing/templates/payroll_history.html:39
+#: manufacturing/templates/payroll_run_detail.html:45
+msgid "Created By"
+msgstr "Créé par"
+
+#: manufacturing/templates/eng_ecr_detail.html:72
+msgid "Edit ECR"
+msgstr "Modifier la DCI"
+
+#: manufacturing/templates/eng_ecr_detail.html:121
+msgid "ECR Details"
+msgstr "Détails de la DCI"
+
+#: manufacturing/templates/eng_ecr_detail.html:126
+msgid "ECR # (auto)"
+msgstr "N° DCI (auto)"
+
+#: manufacturing/templates/eng_ecr_detail.html:127
+#: manufacturing/templates/eng_project_detail.html:208
+msgid "Auto-assigned"
+msgstr "Attribué automatiquement"
+
+#: manufacturing/templates/eng_ecr_detail.html:151
+#: manufacturing/templates/eng_ecrs.html:122
+msgid "Create ECR"
+msgstr "Créer la DCI"
+
+#: manufacturing/templates/eng_ecrs.html:3
+msgid "Engineering Change Requests"
+msgstr "Demandes de changement d'ingénierie"
+
+#: manufacturing/templates/eng_ecrs.html:43
+msgid "Engineering Change Requests / Design Reviews"
+msgstr "Demandes de changement d'ingénierie / Revues de conception"
+
+#: manufacturing/templates/eng_ecrs.html:49
+#: manufacturing/templates/eng_projects.html:52
+#: manufacturing/templates/eng_projects.html:59
+msgid "All"
+msgstr "Tous"
+
+#: manufacturing/templates/eng_ecrs.html:54
+msgid "Project:"
+msgstr "Projet :"
+
+#: manufacturing/templates/eng_ecrs.html:56
+#: manufacturing/templates/eng_project_detail.html:6
+msgid "All Projects"
+msgstr "Tous les projets"
+
+#: manufacturing/templates/eng_ecrs.html:61
+#: manufacturing/templates/eng_projects.html:64
+msgid "Search:"
+msgstr "Recherche :"
+
+#: manufacturing/templates/eng_ecrs.html:62
+msgid "Title or ECR #…"
+msgstr "Titre ou n° de DCI…"
+
+#: manufacturing/templates/eng_ecrs.html:83
+msgid "No ECRs found."
+msgstr "Aucune DCI trouvée."
+
+#: manufacturing/templates/eng_project_detail.html:67
+msgid "Project: %(num)s — %(title)s"
+msgstr "Projet : %(num)s — %(title)s"
+
+#: manufacturing/templates/eng_project_detail.html:91
+#: manufacturing/templates/eng_project_detail.html:117
+#: manufacturing/templates/eng_project_detail.html:214
+#: manufacturing/templates/eng_projects.html:72
+#: manufacturing/templates/eng_projects.html:113
+msgid "Engineer"
+msgstr "Ingénieur"
+
+#: manufacturing/templates/eng_project_detail.html:100
+#: manufacturing/templates/eng_project_detail.html:218
+#: manufacturing/templates/eng_projects.html:122
+#: manufacturing/templates/legal_contract_detail.html:71
+#: manufacturing/templates/legal_contract_detail.html:126
+#: manufacturing/templates/legal_contract_list.html:152
+#: manufacturing/templates/mkt_ad_detail.html:86
+#: manufacturing/templates/mkt_ad_detail.html:174
+#: manufacturing/templates/mkt_ad_list.html:168
+#: manufacturing/templates/mkt_campaign_detail.html:71
+#: manufacturing/templates/mkt_campaign_detail.html:130
+#: manufacturing/templates/mkt_campaign_list.html:154
+#: manufacturing/templates/mkt_research_detail.html:69
+#: manufacturing/templates/mkt_research_detail.html:125
+#: manufacturing/templates/mkt_research_list.html:92
+#: manufacturing/templates/mkt_research_list.html:141
+msgid "Start Date"
+msgstr "Date de début"
+
+#: manufacturing/templates/eng_project_detail.html:104
+#: manufacturing/templates/eng_project_detail.html:161
+#: manufacturing/templates/eng_project_detail.html:187
+#: manufacturing/templates/eng_project_detail.html:219
+#: manufacturing/templates/eng_projects.html:73
+#: manufacturing/templates/eng_projects.html:126
+#: manufacturing/templates/eng_task_detail.html:87
+#: manufacturing/templates/eng_task_detail.html:118
+#: manufacturing/templates/eng_tasks_list.html:92
+#: manufacturing/templates/eng_tasks_list.html:143
+#: manufacturing/templates/legal_compliance_detail.html:66
+#: manufacturing/templates/legal_compliance_detail.html:109
+#: manufacturing/templates/legal_compliance_list.html:84
+#: manufacturing/templates/legal_compliance_list.html:133
+#: manufacturing/templates/mkt_content_detail.html:71
+#: manufacturing/templates/mkt_content_detail.html:126
+#: manufacturing/templates/mkt_content_list.html:88
+#: manufacturing/templates/mkt_content_list.html:150
+#: manufacturing/templates/prod_dashboard.html:113
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+#: manufacturing/templates/eng_project_detail.html:118
+#: manufacturing/templates/legal_contract_list.html:92
+#: manufacturing/templates/marketing_dashboard.html:153
+#: manufacturing/templates/mkt_ad_list.html:101
+#: manufacturing/templates/mkt_campaign_list.html:90
+msgid "Start"
+msgstr "Début"
+
+#: manufacturing/templates/eng_project_detail.html:129
+#: manufacturing/templates/eng_tasks_list.html:89
+msgid "Task"
+msgstr "Tâche"
+
+#: manufacturing/templates/eng_project_detail.html:129
+#: manufacturing/templates/eng_project_detail.html:160
+#: manufacturing/templates/eng_project_detail.html:186
+#: manufacturing/templates/eng_task_detail.html:78
+#: manufacturing/templates/eng_task_detail.html:117
+#: manufacturing/templates/eng_tasks_list.html:91
+#: manufacturing/templates/eng_tasks_list.html:134
+msgid "Assigned To"
+msgstr "Assigné à"
+
+#: manufacturing/templates/eng_project_detail.html:129
+#: manufacturing/templates/eng_project_detail.html:162
+#: manufacturing/templates/eng_project_detail.html:188
+#: manufacturing/templates/eng_task_detail.html:91
+#: manufacturing/templates/eng_task_detail.html:119
+#: manufacturing/templates/eng_tasks_list.html:93
+#: manufacturing/templates/eng_tasks_list.html:147
+msgid "Priority"
+msgstr "Priorité"
+
+#: manufacturing/templates/eng_project_detail.html:142
+#: manufacturing/templates/payroll_pay_rates.html:65
+#: manufacturing/templates/payroll_pay_rates.html:87
+#: manufacturing/templates/report_builder_detail.html:7
+#: manufacturing/templates/report_builder_list.html:37
+#: manufacturing/templates/tc_device_list.html:72
+msgid "Edit"
+msgstr "Modifier"
+
+#: manufacturing/templates/eng_project_detail.html:146
+msgid "No tasks yet."
+msgstr "Aucune tâche pour le moment."
+
+#: manufacturing/templates/eng_project_detail.html:153
+#: manufacturing/templates/eng_task_detail.html:69
+msgid "Edit Task"
+msgstr "Modifier la tâche"
+
+#: manufacturing/templates/eng_project_detail.html:159
+#: manufacturing/templates/eng_project_detail.html:185
+#: manufacturing/templates/eng_task_detail.html:74
+#: manufacturing/templates/eng_tasks_list.html:121
+msgid "Task Name"
+msgstr "Nom de la tâche"
+
+#: manufacturing/templates/eng_project_detail.html:174
+msgid "Save Task"
+msgstr "Enregistrer la tâche"
+
+#: manufacturing/templates/eng_project_detail.html:175
+#: manufacturing/templates/payroll_pay_rates.html:131
+#: manufacturing/templates/tc_device_form.html:194
+msgid "Cancel"
+msgstr "Annuler"
+
+#: manufacturing/templates/eng_project_detail.html:180
+#: manufacturing/templates/eng_project_detail.html:192
+msgid "Add Task"
+msgstr "Ajouter une tâche"
+
+#: manufacturing/templates/eng_project_detail.html:201
+#: manufacturing/templates/mkt_research_detail.html:54
+msgid "Project Details"
+msgstr "Détails du projet"
+
+#: manufacturing/templates/eng_project_detail.html:207
+msgid "Project # (auto)"
+msgstr "N° de projet (auto)"
+
+#: manufacturing/templates/eng_project_detail.html:222
+#: manufacturing/templates/eng_projects.html:130
+#: manufacturing/templates/mkt_research_list.html:169
+msgid "Create Project"
+msgstr "Créer un projet"
+
+#: manufacturing/templates/eng_projects.html:3
+#: manufacturing/templates/eng_projects.html:46
+msgid "Engineering Projects"
+msgstr "Projets d'ingénierie"
+
+#: manufacturing/templates/eng_projects.html:57
+msgid "Engineer:"
+msgstr "Ingénieur :"
+
+#: manufacturing/templates/eng_projects.html:65
+msgid "Title or number…"
+msgstr "Titre ou numéro…"
+
+#: manufacturing/templates/eng_projects.html:80
+#: manufacturing/templates/reports_dashboard.html:150
+#, python-format
+msgid "%(counter)s overdue"
+msgid_plural "%(counter)s overdue"
+msgstr[0] "%(counter)s en retard"
+msgstr[1] "%(counter)s en retard"
+
+#: manufacturing/templates/eng_projects.html:88
+msgid "No projects found."
+msgstr "Aucun projet trouvé."
+
+#: manufacturing/templates/eng_reports.html:3
+#: manufacturing/templates/eng_reports.html:50
+msgid "Engineering Reports"
+msgstr "Rapports d'ingénierie"
+
+#: manufacturing/templates/eng_reports.html:64
+msgid "No projects."
+msgstr "Aucun projet."
+
+#: manufacturing/templates/eng_reports.html:78
+msgid "No ECRs."
+msgstr "Aucune DCI."
+
+#: manufacturing/templates/eng_reports.html:94
+msgid "No open tasks."
+msgstr "Aucune tâche ouverte."
+
+#: manufacturing/templates/eng_reports.html:98
+msgid "Overdue Projects"
+msgstr "Projets en retard"
+
+#: manufacturing/templates/eng_reports.html:113
+msgid "No overdue projects."
+msgstr "Aucun projet en retard."
+
+#: manufacturing/templates/eng_reports.html:118
+msgid "Recent ECRs (last 10)"
+msgstr "DCI récentes (10 dernières)"
+
+#: manufacturing/templates/eng_spec_detail.html:3
+msgid "Standard — %(title)s"
+msgstr "Norme — %(title)s"
+
+#: manufacturing/templates/eng_spec_detail.html:6
+#: manufacturing/templates/eng_specs_list.html:6
+#: manufacturing/templates/eng_task_detail.html:6
+#: manufacturing/templates/eng_tasks_list.html:6
+msgid "Eng Dashboard"
+msgstr "Tableau de bord d'ingénierie"
+
+#: manufacturing/templates/eng_spec_detail.html:57
+msgid "Edit Standard"
+msgstr "Modifier la norme"
+
+#: manufacturing/templates/eng_spec_detail.html:62
+#: manufacturing/templates/eng_specs_list.html:117
+msgid "Standard Number"
+msgstr "Numéro de norme"
+
+#: manufacturing/templates/eng_spec_detail.html:70
+#: manufacturing/templates/eng_spec_detail.html:109
+#: manufacturing/templates/eng_specs_list.html:87
+#: manufacturing/templates/eng_specs_list.html:125
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:105
+#: manufacturing/templates/mkt_budget_list.html:82
+#: manufacturing/templates/mkt_budget_list.html:120
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:87
+msgid "Category"
+msgstr "Catégorie"
+
+#: manufacturing/templates/eng_spec_detail.html:78
+#: manufacturing/templates/eng_spec_detail.html:110
+#: manufacturing/templates/eng_specs_list.html:88
+#: manufacturing/templates/eng_specs_list.html:133
+msgid "Version"
+msgstr "Version"
+
+#: manufacturing/templates/eng_spec_detail.html:94
+#: manufacturing/templates/eng_spec_detail.html:119
+#: manufacturing/templates/eng_specs_list.html:149
+#: manufacturing/templates/mkt_research_detail.html:83
+#: manufacturing/templates/mkt_research_detail.html:145
+#: manufacturing/templates/mkt_research_list.html:161
+#: manufacturing/templates/prod_dashboard.html:111
+msgid "Description"
+msgstr "Description"
+
+#: manufacturing/templates/eng_spec_detail.html:108
+#: manufacturing/templates/eng_specs_list.html:85
+msgid "Standard #"
+msgstr "N° de norme"
+
+#: manufacturing/templates/eng_spec_detail.html:114
+msgid "Created Date"
+msgstr "Date de création"
+
+#: manufacturing/templates/eng_specs_list.html:13
+#: manufacturing/templates/eng_tasks_list.html:13
+#: manufacturing/templates/legal_compliance_list.html:14
+#: manufacturing/templates/legal_contract_list.html:14
+#: manufacturing/templates/legal_litigation_list.html:14
+#: manufacturing/templates/mkt_ad_list.html:15
+#: manufacturing/templates/mkt_campaign_list.html:12
+#: manufacturing/templates/mkt_lead_list.html:12
+#: manufacturing/templates/mkt_research_list.html:15
+msgid "CSV"
+msgstr "CSV"
+
+#: manufacturing/templates/eng_specs_list.html:14
+#: manufacturing/templates/eng_tasks_list.html:14
+#: manufacturing/templates/legal_compliance_list.html:15
+#: manufacturing/templates/legal_contract_list.html:15
+#: manufacturing/templates/legal_litigation_list.html:15
+#: manufacturing/templates/mkt_ad_list.html:16
+#: manufacturing/templates/mkt_campaign_list.html:13
+#: manufacturing/templates/mkt_lead_list.html:13
+#: manufacturing/templates/mkt_research_list.html:16
+msgid "Excel"
+msgstr "Excel"
+
+#: manufacturing/templates/eng_specs_list.html:71
+#: manufacturing/templates/mkt_budget_list.html:68
+msgid "All Categories"
+msgstr "Toutes les catégories"
+
+#: manufacturing/templates/eng_specs_list.html:76
+msgid "Search number / title…"
+msgstr "Rechercher numéro / titre…"
+
+#: manufacturing/templates/eng_specs_list.html:104
+msgid "No standards found."
+msgstr "Aucune norme trouvée."
+
+#: manufacturing/templates/eng_specs_list.html:112
+msgid "New Standard"
+msgstr "Nouvelle norme"
+
+#: manufacturing/templates/eng_specs_list.html:118
+msgid "e.g. ISO-9001"
+msgstr "p. ex. ISO-9001"
+
+#: manufacturing/templates/eng_specs_list.html:122
+msgid "Standard title"
+msgstr "Titre de la norme"
+
+#: manufacturing/templates/eng_specs_list.html:134
+msgid "e.g. 2015"
+msgstr "p. ex. 2015"
+
+#: manufacturing/templates/eng_specs_list.html:150
+msgid "Brief description of this standard"
+msgstr "Brève description de cette norme"
+
+#: manufacturing/templates/eng_specs_list.html:157
+msgid "Create Standard"
+msgstr "Créer la norme"
+
+#: manufacturing/templates/eng_task_detail.html:3
+msgid "Task — %(name)s"
+msgstr "Tâche — %(name)s"
+
+#: manufacturing/templates/eng_task_detail.html:59
+#, python-format
+msgid ""
+"Project: <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">\n"
+"        %(num)s — %(title)s</a>"
+msgstr "Projet : <a href=\"/eng/projects/%(pid)s/\" style=\"color:#aef;\">%(num)s — %(title)s</a>"
+
+#: manufacturing/templates/eng_task_detail.html:80
+#: manufacturing/templates/eng_tasks_list.html:136
+msgid "— Unassigned —"
+msgstr "— Non assigné —"
+
+#: manufacturing/templates/eng_tasks_list.html:3
+#: manufacturing/templates/eng_tasks_list.html:63
+msgid "Engineering Tasks"
+msgstr "Tâches d'ingénierie"
+
+#: manufacturing/templates/eng_tasks_list.html:76
+msgid "All Priorities"
+msgstr "Toutes les priorités"
+
+#: manufacturing/templates/eng_tasks_list.html:108
+msgid "No tasks found."
+msgstr "Aucune tâche trouvée."
+
+#: manufacturing/templates/eng_tasks_list.html:116
+msgid "New Task"
+msgstr "Nouvelle tâche"
+
+#: manufacturing/templates/eng_tasks_list.html:122
+msgid "Describe the task"
+msgstr "Décrivez la tâche"
+
+#: manufacturing/templates/eng_tasks_list.html:127
+msgid "— None —"
+msgstr "— Aucun —"
+
+#: manufacturing/templates/eng_tasks_list.html:159
+msgid "Create Task"
+msgstr "Créer la tâche"
+
 #: manufacturing/templates/home.html:4
 msgid "Login"
 msgstr "Connexion"
@@ -1185,18 +1937,6 @@ msgstr "Réglementation"
 msgid "Owner"
 msgstr "Responsable"
 
-#: manufacturing/templates/legal_compliance_detail.html:66
-#: manufacturing/templates/legal_compliance_detail.html:109
-#: manufacturing/templates/legal_compliance_list.html:84
-#: manufacturing/templates/legal_compliance_list.html:133
-#: manufacturing/templates/mkt_content_detail.html:71
-#: manufacturing/templates/mkt_content_detail.html:126
-#: manufacturing/templates/mkt_content_list.html:88
-#: manufacturing/templates/mkt_content_list.html:150
-#: manufacturing/templates/prod_dashboard.html:113
-msgid "Due Date"
-msgstr "Date d'échéance"
-
 #: manufacturing/templates/legal_compliance_detail.html:70
 #: manufacturing/templates/legal_compliance_detail.html:113
 msgid "Completed Date"
@@ -1244,26 +1984,6 @@ msgstr "Emploi"
 msgid "Governance"
 msgstr "Gouvernance"
 
-#: manufacturing/templates/legal_compliance_list.html:14
-#: manufacturing/templates/legal_contract_list.html:14
-#: manufacturing/templates/legal_litigation_list.html:14
-#: manufacturing/templates/mkt_ad_list.html:15
-#: manufacturing/templates/mkt_campaign_list.html:12
-#: manufacturing/templates/mkt_lead_list.html:12
-#: manufacturing/templates/mkt_research_list.html:15
-msgid "CSV"
-msgstr "CSV"
-
-#: manufacturing/templates/legal_compliance_list.html:15
-#: manufacturing/templates/legal_contract_list.html:15
-#: manufacturing/templates/legal_litigation_list.html:15
-#: manufacturing/templates/mkt_ad_list.html:16
-#: manufacturing/templates/mkt_campaign_list.html:13
-#: manufacturing/templates/mkt_lead_list.html:13
-#: manufacturing/templates/mkt_research_list.html:16
-msgid "Excel"
-msgstr "Excel"
-
 #: manufacturing/templates/legal_compliance_list.html:60
 msgid "Compliance Requirements"
 msgstr "Exigences de conformité"
@@ -1271,12 +1991,6 @@ msgstr "Exigences de conformité"
 #: manufacturing/templates/legal_compliance_list.html:72
 msgid "Search requirement / regulation…"
 msgstr "Rechercher exigence / réglementation…"
-
-#: manufacturing/templates/legal_compliance_list.html:85
-#: manufacturing/templates/legal_dashboard.html:83
-#: manufacturing/templates/mkt_analytics.html:143
-msgid "Completed"
-msgstr "Terminé"
 
 #: manufacturing/templates/legal_compliance_list.html:100
 msgid "No compliance items found."
@@ -1314,22 +2028,6 @@ msgstr "Contrepartie"
 msgid "Value"
 msgstr "Valeur"
 
-#: manufacturing/templates/legal_contract_detail.html:71
-#: manufacturing/templates/legal_contract_detail.html:126
-#: manufacturing/templates/legal_contract_list.html:152
-#: manufacturing/templates/mkt_ad_detail.html:86
-#: manufacturing/templates/mkt_ad_detail.html:174
-#: manufacturing/templates/mkt_ad_list.html:168
-#: manufacturing/templates/mkt_campaign_detail.html:71
-#: manufacturing/templates/mkt_campaign_detail.html:130
-#: manufacturing/templates/mkt_campaign_list.html:154
-#: manufacturing/templates/mkt_research_detail.html:69
-#: manufacturing/templates/mkt_research_detail.html:125
-#: manufacturing/templates/mkt_research_list.html:92
-#: manufacturing/templates/mkt_research_list.html:141
-msgid "Start Date"
-msgstr "Date de début"
-
 #: manufacturing/templates/legal_contract_detail.html:75
 #: manufacturing/templates/legal_contract_detail.html:130
 #: manufacturing/templates/legal_contract_list.html:156
@@ -1351,21 +2049,6 @@ msgstr "Date de fin"
 msgid "Edit Contract"
 msgstr "Modifier le contrat"
 
-#: manufacturing/templates/legal_contract_detail.html:98
-#: manufacturing/templates/legal_contract_list.html:88
-#: manufacturing/templates/legal_contract_list.html:124
-#: manufacturing/templates/legal_dashboard.html:142
-#: manufacturing/templates/legal_ip_list.html:74
-#: manufacturing/templates/legal_ip_list.html:103
-#: manufacturing/templates/mkt_content_detail.html:94
-#: manufacturing/templates/mkt_content_list.html:84
-#: manufacturing/templates/mkt_content_list.html:118
-#: manufacturing/templates/mkt_research_detail.html:108
-#: manufacturing/templates/mkt_research_list.html:89
-#: manufacturing/templates/mkt_research_list.html:124
-msgid "Title"
-msgstr "Titre"
-
 #: manufacturing/templates/legal_contract_detail.html:122
 #: manufacturing/templates/legal_contract_list.html:148
 msgid "Value ($)"
@@ -1381,13 +2064,6 @@ msgstr "Tous les types"
 #: manufacturing/templates/legal_contract_list.html:79
 msgid "Search title / party / owner…"
 msgstr "Rechercher titre / partie / responsable…"
-
-#: manufacturing/templates/legal_contract_list.html:92
-#: manufacturing/templates/marketing_dashboard.html:153
-#: manufacturing/templates/mkt_ad_list.html:101
-#: manufacturing/templates/mkt_campaign_list.html:90
-msgid "Start"
-msgstr "Début"
 
 #: manufacturing/templates/legal_contract_list.html:93
 #: manufacturing/templates/marketing_dashboard.html:154
@@ -1546,15 +2222,6 @@ msgstr "Rechercher élément / référence / responsable…"
 #: manufacturing/templates/mkt_budget_list.html:112
 msgid "Item"
 msgstr "Élément"
-
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:105
-#: manufacturing/templates/mkt_budget_list.html:82
-#: manufacturing/templates/mkt_budget_list.html:120
-#: manufacturing/templates/payroll_deductions.html:56
-#: manufacturing/templates/payroll_deductions.html:87
-msgid "Category"
-msgstr "Catégorie"
 
 #: manufacturing/templates/legal_governance_list.html:73
 #: manufacturing/templates/legal_governance_list.html:121
@@ -1743,10 +2410,6 @@ msgstr "En retard"
 #: manufacturing/templates/maint_dashboard.html:83
 msgid "Due Soon"
 msgstr "Bientôt dû"
-
-#: manufacturing/templates/maint_dashboard.html:84
-msgid "Due"
-msgstr "Dû"
 
 #: manufacturing/templates/maint_dashboard.html:91
 msgid "No PM tasks overdue or due in the next 14 days."
@@ -2259,10 +2922,6 @@ msgstr "En brouillon"
 msgid "Marketing Budget"
 msgstr "Budget marketing"
 
-#: manufacturing/templates/mkt_budget_list.html:68
-msgid "All Categories"
-msgstr "Toutes les catégories"
-
 #: manufacturing/templates/mkt_budget_list.html:73
 msgid "Search item / campaign / requester…"
 msgstr "Rechercher élément / campagne / demandeur…"
@@ -2271,11 +2930,6 @@ msgstr "Rechercher élément / campagne / demandeur…"
 #: manufacturing/templates/payroll_deductions.html:121
 msgid "Amount"
 msgstr "Montant"
-
-#: manufacturing/templates/mkt_budget_list.html:83
-#: manufacturing/templates/mkt_budget_list.html:133
-msgid "Requested By"
-msgstr "Demandé par"
 
 #: manufacturing/templates/mkt_budget_list.html:84
 #: manufacturing/templates/mkt_budget_list.html:137
@@ -2424,17 +3078,6 @@ msgstr "Recherche n° %(id)s"
 msgid "Research Project"
 msgstr "Projet de recherche"
 
-#: manufacturing/templates/mkt_research_detail.html:54
-msgid "Project Details"
-msgstr "Détails du projet"
-
-#: manufacturing/templates/mkt_research_detail.html:83
-#: manufacturing/templates/mkt_research_detail.html:145
-#: manufacturing/templates/mkt_research_list.html:161
-#: manufacturing/templates/prod_dashboard.html:111
-msgid "Description"
-msgstr "Description"
-
 #: manufacturing/templates/mkt_research_detail.html:89
 #: manufacturing/templates/mkt_research_detail.html:149
 msgid "Findings"
@@ -2472,10 +3115,6 @@ msgstr "Personne responsable"
 #: manufacturing/templates/mkt_research_list.html:162
 msgid "What will this research cover?"
 msgstr "Que couvrira cette recherche ?"
-
-#: manufacturing/templates/mkt_research_list.html:169
-msgid "Create Project"
-msgstr "Créer un projet"
 
 #: manufacturing/templates/payroll_dashboard.html:6
 #: manufacturing/templates/payroll_dashboard.html:65
@@ -2705,11 +3344,6 @@ msgstr "Exporter en Excel"
 msgid "Total Net"
 msgstr "Net total"
 
-#: manufacturing/templates/payroll_history.html:39
-#: manufacturing/templates/payroll_run_detail.html:45
-msgid "Created By"
-msgstr "Créé par"
-
 #: manufacturing/templates/payroll_history.html:57
 msgid "No payroll runs found."
 msgstr "Aucun cycle de paie trouvé."
@@ -2754,14 +3388,6 @@ msgstr "Taux de rémunération"
 msgid "Effective Date"
 msgstr "Date d'entrée en vigueur"
 
-#: manufacturing/templates/payroll_pay_rates.html:65
-#: manufacturing/templates/payroll_pay_rates.html:87
-#: manufacturing/templates/report_builder_detail.html:7
-#: manufacturing/templates/report_builder_list.html:37
-#: manufacturing/templates/tc_device_list.html:72
-msgid "Edit"
-msgstr "Modifier"
-
 #: manufacturing/templates/payroll_pay_rates.html:75
 msgid "not set"
 msgstr "non défini"
@@ -2781,11 +3407,6 @@ msgstr "Enregistrer"
 #: manufacturing/templates/payroll_pay_rates.html:129
 msgid "Remove Rate"
 msgstr "Supprimer le taux"
-
-#: manufacturing/templates/payroll_pay_rates.html:131
-#: manufacturing/templates/tc_device_form.html:194
-msgid "Cancel"
-msgstr "Annuler"
 
 #: manufacturing/templates/payroll_pay_rates.html:142
 msgid "Add / Update Pay Rate"
@@ -3077,11 +3698,6 @@ msgstr "Expéditions"
 #: manufacturing/templates/prod_dashboard.html:10
 msgid "Batch Records"
 msgstr "Dossiers de lot"
-
-#: manufacturing/templates/prod_dashboard.html:11
-#: manufacturing/templates/prod_dashboard.html:62
-msgid "BOM"
-msgstr "BOM"
 
 #: manufacturing/templates/prod_dashboard.html:12
 msgid "Configure-to-Order"
@@ -3420,13 +4036,6 @@ msgstr "Tableau de bord ESG"
 #: manufacturing/templates/reports_dashboard.html:148
 msgid "total active spend"
 msgstr "dépenses actives totales"
-
-#: manufacturing/templates/reports_dashboard.html:150
-#, python-format
-msgid "%(counter)s overdue"
-msgid_plural "%(counter)s overdue"
-msgstr[0] "%(counter)s en retard"
-msgstr[1] "%(counter)s en retard"
 
 #: manufacturing/templates/reports_dashboard.html:159
 msgid "View purchase orders →"

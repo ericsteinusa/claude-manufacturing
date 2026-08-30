@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Engineering Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Engineering Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/eng/projects/" class="btn">Projects</a>
-<a href="/eng/tasks/" class="btn">Tasks</a>
-<a href="/eng/ecrs/" class="btn">ECRs</a>
-<a href="/eng/specs/" class="btn">Standards</a>
-<a href="/bom/" class="btn">BOM</a>
-<a href="/eng/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/eng/projects/" class="btn">{% trans "Projects" %}</a>
+<a href="/eng/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/eng/ecrs/" class="btn">{% trans "ECRs" %}</a>
+<a href="/eng/specs/" class="btn">{% trans "Standards" %}</a>
+<a href="/bom/" class="btn">{% trans "BOM" %}</a>
+<a href="/eng/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -48,68 +49,68 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Engineering Dashboard</h2>
+    <h2>{% trans "Engineering Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/eng/projects/" class="dept-btn">Projects</a>
-        <a href="/eng/tasks/" class="dept-btn">Tasks</a>
-        <a href="/eng/ecrs/" class="dept-btn">ECRs / Design Reviews</a>
-        <a href="/eng/specs/" class="dept-btn">Standards &amp; Compliance</a>
-        <a href="/eng/ecrs/?status=pending" class="dept-btn">Pending Reviews</a>
-        <a href="/bom/" class="dept-btn">Bill of Materials</a>
-        <a href="/eng/projects/?status=in_progress" class="dept-btn">Active Projects</a>
-        <a href="/eng/ecrs/new/" class="dept-btn">New ECR</a>
-        <a href="/eng/projects/new/" class="dept-btn">New Project</a>
-        <a href="/eng/reports/" class="dept-btn">Reports</a>
+        <a href="/eng/projects/" class="dept-btn">{% trans "Projects" %}</a>
+        <a href="/eng/tasks/" class="dept-btn">{% trans "Tasks" %}</a>
+        <a href="/eng/ecrs/" class="dept-btn">{% trans "ECRs / Design Reviews" %}</a>
+        <a href="/eng/specs/" class="dept-btn">{% trans "Standards &amp; Compliance" %}</a>
+        <a href="/eng/ecrs/?status=pending" class="dept-btn">{% trans "Pending Reviews" %}</a>
+        <a href="/bom/" class="dept-btn">{% trans "Bill of Materials" %}</a>
+        <a href="/eng/projects/?status=in_progress" class="dept-btn">{% trans "Active Projects" %}</a>
+        <a href="/eng/ecrs/new/" class="dept-btn">{% trans "New ECR" %}</a>
+        <a href="/eng/projects/new/" class="dept-btn">{% trans "New Project" %}</a>
+        <a href="/eng/reports/" class="dept-btn">{% trans "Reports" %}</a>
     </div>
 
     <div class="kpi-row">
-        <div class="kpi"><div class="val">{{ dash.projects.in_progress|default:0 }}</div><div class="lbl">Active Projects</div></div>
-        <div class="kpi"><div class="val">{{ dash.projects.planning|default:0 }}</div><div class="lbl">Planning</div></div>
-        <div class="kpi"><div class="val">{{ dash.projects.completed|default:0 }}</div><div class="lbl">Completed</div></div>
-        <div class="kpi"><div class="val">{{ dash.ecrs.pending|default:0 }}</div><div class="lbl">ECRs Pending</div></div>
-        <div class="kpi"><div class="val">{{ dash.tasks.open_tasks|default:0 }}</div><div class="lbl">Open Tasks</div></div>
-        <div class="kpi"><div class="val">{{ dash.tasks.overdue_tasks|default:0 }}</div><div class="lbl">Overdue Tasks</div></div>
+        <div class="kpi"><div class="val">{{ dash.projects.in_progress|default:0 }}</div><div class="lbl">{% trans "Active Projects" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.projects.planning|default:0 }}</div><div class="lbl">{% trans "Planning" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.projects.completed|default:0 }}</div><div class="lbl">{% trans "Completed" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.ecrs.pending|default:0 }}</div><div class="lbl">{% trans "ECRs Pending" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.tasks.open_tasks|default:0 }}</div><div class="lbl">{% trans "Open Tasks" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.tasks.overdue_tasks|default:0 }}</div><div class="lbl">{% trans "Overdue Tasks" %}</div></div>
     </div>
 
     <div class="two-col" style="margin-bottom:16px;">
         <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
-            <div class="section-hdr" style="color:#333;">Projects by Status</div>
+            <div class="section-hdr" style="color:#333;">{% trans "Projects by Status" %}</div>
             <canvas id="chart-project-status" height="200"></canvas>
         </div>
         <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
-            <div class="section-hdr" style="color:#333;">Tasks by Status</div>
+            <div class="section-hdr" style="color:#333;">{% trans "Tasks by Status" %}</div>
             <canvas id="chart-task-status" height="200"></canvas>
         </div>
     </div>
 
     <div class="two-col" style="margin-bottom:16px;">
         <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
-            <div class="section-hdr" style="color:#333;">Open Tasks by Priority</div>
+            <div class="section-hdr" style="color:#333;">{% trans "Open Tasks by Priority" %}</div>
             <canvas id="chart-task-priority" height="200"></canvas>
         </div>
         <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
-            <div class="section-hdr" style="color:#333;">ECRs by Status</div>
+            <div class="section-hdr" style="color:#333;">{% trans "ECRs by Status" %}</div>
             <canvas id="chart-ecr-status" height="200"></canvas>
         </div>
     </div>
 
     <div class="two-col" style="margin-bottom:16px;">
         <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
-            <div class="section-hdr" style="color:#333;">Projects by Engineer</div>
+            <div class="section-hdr" style="color:#333;">{% trans "Projects by Engineer" %}</div>
             <canvas id="chart-project-engineer" height="200"></canvas>
         </div>
         <div class="list-table" style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:14px;">
-            <div class="section-hdr" style="color:#333;">Standards by Status</div>
+            <div class="section-hdr" style="color:#333;">{% trans "Standards by Status" %}</div>
             <canvas id="chart-standard-status" height="200"></canvas>
         </div>
     </div>
 
     <div class="two-col">
         <div>
-            <div class="section-hdr">Recent Projects</div>
+            <div class="section-hdr">{% trans "Recent Projects" %}</div>
             <table class="list-table">
-                <thead><tr><th>Number</th><th>Title</th><th>Status</th><th>Due</th></tr></thead>
+                <thead><tr><th>{% trans "Number" %}</th><th>{% trans "Title" %}</th><th>{% trans "Status" %}</th><th>{% trans "Due" %}</th></tr></thead>
                 <tbody>
                 {% for p in recent_projects %}
                 <tr onclick="location.href='/eng/projects/{{ p.id }}/'">
@@ -118,15 +119,15 @@
                     <td><span class="badge st-{{ p.status }}">{{ p.status }}</span></td>
                     <td>{{ p.due_date|default:"—" }}</td>
                 </tr>
-                {% empty %}<tr><td colspan="4" style="color:#888;">No projects yet.</td></tr>
+                {% empty %}<tr><td colspan="4" style="color:#888;">{% trans "No projects yet." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
         <div>
-            <div class="section-hdr">Recent ECRs</div>
+            <div class="section-hdr">{% trans "Recent ECRs" %}</div>
             <table class="list-table">
-                <thead><tr><th>ECR #</th><th>Title</th><th>Status</th></tr></thead>
+                <thead><tr><th>{% trans "ECR #" %}</th><th>{% trans "Title" %}</th><th>{% trans "Status" %}</th></tr></thead>
                 <tbody>
                 {% for e in recent_ecrs %}
                 <tr onclick="location.href='/eng/ecrs/{{ e.id }}/'">
@@ -134,7 +135,7 @@
                     <td>{{ e.title }}</td>
                     <td><span class="badge st-{{ e.status }}">{{ e.status }}</span></td>
                 </tr>
-                {% empty %}<tr><td colspan="3" style="color:#888;">No ECRs yet.</td></tr>
+                {% empty %}<tr><td colspan="3" style="color:#888;">{% trans "No ECRs yet." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>

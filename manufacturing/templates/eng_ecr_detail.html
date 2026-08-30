@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}{% if ecr %}{{ ecr.ecr_number }}{% else %}New ECR{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if ecr %}{{ ecr.ecr_number }}{% else %}{% trans "New ECR" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/eng/ecrs/" class="btn">All ECRs</a>
-<a href="/eng/projects/" class="btn">Projects</a>
-<a href="/eng/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/eng/ecrs/" class="btn">{% trans "All ECRs" %}</a>
+<a href="/eng/projects/" class="btn">{% trans "Projects" %}</a>
+<a href="/eng/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,7 +36,7 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>{% if ecr %}ECR: {{ ecr.ecr_number }} — {{ ecr.title }}{% else %}New ECR / Design Review{% endif %}</h2>
+    <h2>{% if ecr %}{% blocktrans with num=ecr.ecr_number title=ecr.title %}ECR: {{ num }} — {{ title }}{% endblocktrans %}{% else %}{% trans "New ECR / Design Review" %}{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
@@ -43,7 +44,7 @@
     <!-- Status chip + quick change -->
     <div class="card">
         <div class="status-row">
-            <span><strong>Status:</strong></span>
+            <span><strong>{% trans "Status:" %}</strong></span>
             <span class="badge st-{{ ecr.status }}">{{ ecr.status }}</span>
             {% if can_edit %}
             <form method="post" style="display:inline;margin-left:12px;">
@@ -58,24 +59,24 @@
             {% endif %}
         </div>
         <div class="meta-row">
-            <div class="meta-item"><div class="lbl">ECR #</div><div class="val">{{ ecr.ecr_number }}</div></div>
-            <div class="meta-item"><div class="lbl">Project</div><div class="val">{% if ecr.project_number %}{{ ecr.project_number }} — {{ ecr.project_title }}{% else %}—{% endif %}</div></div>
-            <div class="meta-item"><div class="lbl">Requested By</div><div class="val">{{ ecr.requested_by|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Review Date</div><div class="val">{{ ecr.review_date|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Created By</div><div class="val">{{ ecr.created_by|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "ECR #" %}</div><div class="val">{{ ecr.ecr_number }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Project" %}</div><div class="val">{% if ecr.project_number %}{{ ecr.project_number }} — {{ ecr.project_title }}{% else %}—{% endif %}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Requested By" %}</div><div class="val">{{ ecr.requested_by|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Review Date" %}</div><div class="val">{{ ecr.review_date|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Created By" %}</div><div class="val">{{ ecr.created_by|default:"—" }}</div></div>
         </div>
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit ECR</h3>
+        <h3>{% trans "Edit ECR" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="save">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row" style="flex:3;min-width:220px;"><label>Title *</label>
+                <div class="form-row" style="flex:3;min-width:220px;"><label>{% trans "Title" %} *</label>
                     <input type="text" name="title" value="{{ ecr.title }}" required></div>
-                <div class="form-row" style="flex:1;min-width:140px;"><label>Project</label>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>{% trans "Project" %}</label>
                     <select name="project_id">
                         <option value="">—</option>
                         {% for p in projects %}
@@ -83,7 +84,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-row" style="flex:1;min-width:140px;"><label>Requested By</label>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>{% trans "Requested By" %}</label>
                     <select name="requested_by">
                         <option value="">—</option>
                         {% for p in people %}
@@ -91,9 +92,9 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-row"><label>Review Date</label>
+                <div class="form-row"><label>{% trans "Review Date" %}</label>
                     <input type="date" name="review_date" value="{{ ecr.review_date|default:'' }}"></div>
-                <div class="form-row"><label>Status</label>
+                <div class="form-row"><label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in ECR_STATUSES %}
                         <option value="{{ s }}" {% if ecr.status == s %}selected{% endif %}>{{ s }}</option>
@@ -101,15 +102,15 @@
                     </select>
                 </div>
             </div>
-            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label>
+            <div class="form-row" style="margin-bottom:10px;"><label>{% trans "Notes" %}</label>
                 <textarea name="notes" rows="3">{{ ecr.notes|default:"" }}</textarea></div>
-            <button type="submit" class="btn-act">Save Changes</button>
+            <button type="submit" class="btn-act">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <div class="meta-row">
-            <div class="meta-item" style="flex:1;"><div class="lbl">Notes</div><div class="val">{{ ecr.notes|default:"—" }}</div></div>
+            <div class="meta-item" style="flex:1;"><div class="lbl">{% trans "Notes" %}</div><div class="val">{{ ecr.notes|default:"—" }}</div></div>
         </div>
     </div>
     {% endif %}
@@ -117,16 +118,16 @@
     {% else %}
     <!-- New ECR -->
     <div class="card">
-        <h3>ECR Details</h3>
+        <h3>{% trans "ECR Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="create">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row"><label>ECR # (auto)</label>
-                    <input type="text" name="ecr_number" value="{{ new_ecr_num }}" placeholder="Auto-assigned"></div>
-                <div class="form-row" style="flex:3;min-width:220px;"><label>Title *</label>
+                <div class="form-row"><label>{% trans "ECR # (auto)" %}</label>
+                    <input type="text" name="ecr_number" value="{{ new_ecr_num }}" placeholder="{% trans 'Auto-assigned' %}"></div>
+                <div class="form-row" style="flex:3;min-width:220px;"><label>{% trans "Title" %} *</label>
                     <input type="text" name="title" required></div>
-                <div class="form-row" style="flex:1;min-width:140px;"><label>Project</label>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>{% trans "Project" %}</label>
                     <select name="project_id">
                         <option value="">—</option>
                         {% for p in projects %}
@@ -134,7 +135,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-row" style="flex:1;min-width:140px;"><label>Requested By</label>
+                <div class="form-row" style="flex:1;min-width:140px;"><label>{% trans "Requested By" %}</label>
                     <select name="requested_by">
                         <option value="">—</option>
                         {% for p in people %}
@@ -142,12 +143,12 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-row"><label>Review Date</label>
+                <div class="form-row"><label>{% trans "Review Date" %}</label>
                     <input type="date" name="review_date"></div>
             </div>
-            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label>
+            <div class="form-row" style="margin-bottom:10px;"><label>{% trans "Notes" %}</label>
                 <textarea name="notes" rows="3"></textarea></div>
-            <button type="submit" class="btn-act">Create ECR</button>
+            <button type="submit" class="btn-act">{% trans "Create ECR" %}</button>
         </form>
     </div>
     {% endif %}
