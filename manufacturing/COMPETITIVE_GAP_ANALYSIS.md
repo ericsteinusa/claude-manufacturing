@@ -4088,3 +4088,44 @@ department (10) + the full Marketing department (13) + the full Reports departme
 Payroll department (8) + the full Time Clock department (7)) out of ~450 total. Customers/Credit
 (7) and Engineering, Customer Service, and Accounting (13 each) are the smallest unclaimed
 department-sized candidates remaining.
+
+---
+
+**2026-08-29, sixth whole department:** Continued the "whole department" approach — picked
+**Customers/Credit** (`credit_dashboard.html`, `credit_account_list.html`,
+`credit_account_detail.html`, `credit_application_list.html`, `credit_application_detail.html`,
+`credit_collections_list.html`, `credit_collections_detail.html`), tied with Time Clock for
+smallest remaining at 7 templates — this is the credit/collections risk-management domain from
+`credit_core.py`, distinct from the separate Sales and Customer Service departments. 73 unique
+strings needed translation per language. Used `{% blocktrans with %}` for the three detail pages'
+dynamic page titles ("Credit Account — {name}," "Credit Application — {name}," "Collection
+Activity — {name}") and, the trickiest of this whole i18n series so far, the application-detail
+page's "This customer already has a credit account: `<a href="...">`view account`</a>` (current
+limit ${limit}, status {status})." banner — a single `{% blocktrans %}` mixing literal HTML (an
+anchor tag) with three named interpolated variables at once. First attempt built the anchor's
+`href` by pre-concatenating the URL string with chained template filters
+(`"/credit/accounts/"|add:existing_account.id|stringformat:"s"|add:"/"`) — caught in review before
+it ever hit the `.po` file: Django's `add` filter does a literal Python `+`, which raises
+`TypeError` on `str + int` and silently swallows it, rendering an empty string, so that chain would
+have quietly produced a broken `href="/"` link in production. Fixed by passing
+`id=existing_account.id` as a plain named var and writing the URL as literal template text inside
+the `blocktrans` body (`href="/credit/accounts/{{ id }}/"`) — no filter chain needed, since
+`blocktrans` already supports arbitrary literal HTML around its variables. This batch's
+`makemessages` diff was unusually large (900+ changed lines per `.po` file, roughly double a
+typical single-department pass) purely from `msgmerge` reflowing and repositioning existing
+entries around the new ones as the file grew, not from any new corruption — reconfirmed clean via
+the same multi-line-aware duplication/blank sweep used since the corruption-fix PR (one recurring
+false-positive flagged, the same legitimate repeated French phrase from the Payroll pass, unrelated
+to this batch). Full suite 3431 passed (unchanged), `manage.py check` clean, `compilemessages`
+clean, `msgfmt --check` clean on all three files. Verified end-to-end against the real dev server:
+navigated the Credit dashboard, the account list and an account's detail page (confirmed the
+dynamic page title and the limit/status history table), the application list and an application's
+detail page (confirmed the tricky embedded-link banner renders correctly with a working link in
+all three languages, using a live sample application whose customer already has a credit account),
+and the collections list, in Spanish, French, and German with real sample data, no console errors.
+**Localization coverage is now 56 templates across three languages** (core shell + login + main
+dashboard + all 5 htmx templates + the full Legal department (10) + the full Marketing department
+(13) + the full Reports department (4) + the full Payroll department (8) + the full Time Clock
+department (7) + the full Customers/Credit department (7)) out of ~450 total. Engineering, Customer
+Service, and Accounting (13 templates each) are the smallest unclaimed department-sized candidates
+remaining.

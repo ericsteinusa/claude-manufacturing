@@ -389,6 +389,36 @@ at the point the unescaped quote closes the string early. Caught immediately
 by running `msgfmt --check` right after the fix script rather than only at
 `compilemessages` time.
 
+Also fully translated: the entire **Customers/Credit department**
+(`credit_dashboard.html`, `credit_account_list.html`,
+`credit_account_detail.html`, `credit_application_list.html`,
+`credit_application_detail.html`, `credit_collections_list.html`,
+`credit_collections_detail.html` — 7 templates, the sixth "whole
+department" pass, tied with Time Clock for smallest at the time —
+this is the credit/collections risk-management domain, distinct from
+the separate Sales and Customer Service departments), same treatment
+plus `{% blocktrans with %}` for the three detail pages' dynamic page
+titles ("Credit Account — {name}", "Credit Application — {name}",
+"Collection Activity — {name}") and, trickiest of the three, the
+application-detail page's "This customer already has a credit
+account: `<a href="...">`view account`</a>` (current limit ${limit},
+status {status})." banner — a `{% blocktrans %}` with literal HTML
+(an `<a>` tag) mixed with three named interpolated variables. Built
+the link's `href` with a plain `id=existing_account.id` named var
+substituted directly into the URL template inside the blocktrans body
+(`href="/credit/accounts/{{ id }}/"`) rather than trying to pre-build
+the full URL string via chained `|add:` filters — Django's `add`
+filter does a Python `+`, which raises (and is silently swallowed,
+returning `''`) on `string + int`, so `"/credit/accounts/"|add:some_id`
+quietly produces an empty/broken URL; passing the id straight through
+and building the path as literal template text inside the `blocktrans`
+block sidesteps that trap entirely. This batch's `makemessages` diff
+was unusually large (900+ changed lines per file vs. the ~500 typical
+of prior single-department passes) purely from `msgmerge` reflowing
+and repositioning existing entries around the new ones, not from any
+new corruption — reconfirmed via the same duplication/blank sweep
+used since the corruption-fix PR, which came back clean.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

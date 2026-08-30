@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Credit Accounts{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Credit Accounts" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/credit/" class="btn">Credit Dashboard</a>
-<a href="/credit/accounts/" class="btn">Accounts</a>
-<a href="/credit/applications/" class="btn">Applications</a>
-<a href="/credit/collections/" class="btn">Collections</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/credit/" class="btn">{% trans "Credit Dashboard" %}</a>
+<a href="/credit/accounts/" class="btn">{% trans "Accounts" %}</a>
+<a href="/credit/applications/" class="btn">{% trans "Applications" %}</a>
+<a href="/credit/collections/" class="btn">{% trans "Collections" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,32 +52,32 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Credit Accounts</h2>
+    <h2>{% trans "Credit Accounts" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in credit_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search customer…">
-        <button type="submit">Filter</button>
-        <a href="/credit/accounts/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search customer…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/credit/accounts/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Customer</th>
-                    <th>Credit Limit</th>
-                    <th>Terms</th>
-                    <th>Opened</th>
-                    <th>Status</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "Credit Limit" %}</th>
+                    <th>{% trans "Terms" %}</th>
+                    <th>{% trans "Opened" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,7 +90,7 @@
                 <td><span class="badge s-{{ a.status }}">{{ a.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No credit accounts found.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No credit accounts found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -97,26 +98,26 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Open New Credit Account</h3>
+        <h3>{% trans "Open New Credit Account" %}</h3>
         {% if available_customers %}
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Customer *</label>
+                    <label>{% trans "Customer" %} *</label>
                     <select name="customer_id" required>
-                        <option value="">-- select customer --</option>
+                        <option value="">{% trans "-- select customer --" %}</option>
                         {% for c in available_customers %}
                         <option value="{{ c.id }}">{{ c.company_name|default:c.first_name }} {{ c.last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Credit Limit ($)</label>
+                    <label>{% trans "Credit Limit ($)" %}</label>
                     <input type="number" name="credit_limit" min="0" step="0.01" placeholder="0" required>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in credit_statuses %}
                         <option value="{{ s }}"{% if s == 'good' %} selected{% endif %}>{{ s }}</option>
@@ -124,22 +125,22 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Terms</label>
-                    <input type="text" name="terms" placeholder="e.g. Net 30">
+                    <label>{% trans "Terms" %}</label>
+                    <input type="text" name="terms" placeholder="{% trans 'e.g. Net 30' %}">
                 </div>
                 <div class="form-group">
-                    <label>Opened Date</label>
+                    <label>{% trans "Opened Date" %}</label>
                     <input type="date" name="opened_date">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Open Account</button>
+            <button type="submit" class="btn-submit">{% trans "Open Account" %}</button>
         </form>
         {% else %}
-        <p style="color:#888;">Every customer already has a credit account.</p>
+        <p style="color:#888;">{% trans "Every customer already has a credit account." %}</p>
         {% endif %}
     </div>
     {% endif %}

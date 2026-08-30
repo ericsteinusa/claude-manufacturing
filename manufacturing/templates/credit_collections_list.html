@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Collections{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Collections" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/credit/" class="btn">Credit Dashboard</a>
-<a href="/credit/accounts/" class="btn">Accounts</a>
-<a href="/credit/applications/" class="btn">Applications</a>
-<a href="/credit/collections/" class="btn">Collections</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/credit/" class="btn">{% trans "Credit Dashboard" %}</a>
+<a href="/credit/accounts/" class="btn">{% trans "Accounts" %}</a>
+<a href="/credit/applications/" class="btn">{% trans "Applications" %}</a>
+<a href="/credit/collections/" class="btn">{% trans "Collections" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,34 +52,34 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Collections</h2>
+    <h2>{% trans "Collections" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in collection_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search customer / contact…">
-        <button type="submit">Filter</button>
-        <a href="/credit/collections/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search customer / contact…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/credit/collections/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Customer</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Contact</th>
-                    <th>Amount Promised</th>
-                    <th>Follow-up</th>
-                    <th>Status</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Contact" %}</th>
+                    <th>{% trans "Amount Promised" %}</th>
+                    <th>{% trans "Follow-up" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -93,7 +94,7 @@
                 <td><span class="badge s-{{ c.status|lower|slugify }}">{{ c.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No collection activities found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No collection activities found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -101,25 +102,25 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Collection Activity</h3>
+        <h3>{% trans "New Collection Activity" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group full-span">
-                    <label>Customer *</label>
+                    <label>{% trans "Customer" %} *</label>
                     <select name="customer_id" required>
-                        <option value="">-- select customer --</option>
+                        <option value="">{% trans "-- select customer --" %}</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}">{{ c.company_name|default:c.first_name }} {{ c.last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Activity Date</label>
+                    <label>{% trans "Activity Date" %}</label>
                     <input type="date" name="activity_date">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="activity_type">
                         {% for t in activity_types %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -127,23 +128,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Contact Name</label>
+                    <label>{% trans "Contact Name" %}</label>
                     <input type="text" name="contact_name">
                 </div>
                 <div class="form-group">
-                    <label>Amount Promised ($)</label>
+                    <label>{% trans "Amount Promised ($)" %}</label>
                     <input type="number" name="amount_promised" min="0" step="0.01">
                 </div>
                 <div class="form-group">
-                    <label>Promise Date</label>
+                    <label>{% trans "Promise Date" %}</label>
                     <input type="date" name="promise_date">
                 </div>
                 <div class="form-group">
-                    <label>Follow-up Date</label>
+                    <label>{% trans "Follow-up Date" %}</label>
                     <input type="date" name="follow_up_date">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in collection_statuses %}
                         <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
@@ -151,11 +152,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Log Activity</button>
+            <button type="submit" class="btn-submit">{% trans "Log Activity" %}</button>
         </form>
     </div>
     {% endif %}
