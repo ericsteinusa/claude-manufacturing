@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}{% if invoice %}AP Invoice {{ invoice.invoice_number }}{% else %}New AP Invoice{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if invoice %}{% blocktrans with num=invoice.invoice_number %}AP Invoice {{ num }}{% endblocktrans %}{% else %}{% trans "New AP Invoice" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ap/" class="btn">All Invoices</a>
-<a href="/ar/" class="btn">A/R</a>
-<a href="/gl/" class="btn">G/L</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ap/" class="btn">{% trans "All Invoices" %}</a>
+<a href="/ar/" class="btn">{% trans "A/R" %}</a>
+<a href="/gl/" class="btn">{% trans "G/L" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -50,9 +51,9 @@
 
 {% block body %}
 <div class="content">
-{% if invoice %}<button class="print-btn" onclick="window.print()">Print / Save PDF</button>{% endif %}
+{% if invoice %}<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>{% endif %}
 <div class="m-wrap">
-    <h2>{% if invoice %}Invoice: {{ invoice.invoice_number }}{% else %}New AP Invoice{% endif %}</h2>
+    <h2>{% if invoice %}{% blocktrans with num=invoice.invoice_number %}Invoice: {{ num }}{% endblocktrans %}{% else %}{% trans "New AP Invoice" %}{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
@@ -60,13 +61,13 @@
     <div class="stat-row">
         <span class="stat-chip stat-{{ invoice.status }}">{{ invoice.status|capfirst }}</span>
         <span style="color:white;font-size:14px;">
-            Amount: <strong>{{ invoice.currency|default:"USD" }} {{ invoice.amount|floatformat:2 }}</strong>
+            {% trans "Amount:" %} <strong>{{ invoice.currency|default:"USD" }} {{ invoice.amount|floatformat:2 }}</strong>
             {% if currencies and invoice.currency and invoice.currency != base_currency %}
                 <span style="font-size:12px;color:rgba(255,255,255,.7);">(≈ ${{ invoice.amount_base|floatformat:2 }} {{ base_currency }})</span>
             {% endif %}
             &nbsp;|&nbsp;
-            Paid: <strong>${{ invoice.paid|floatformat:2 }}</strong> &nbsp;|&nbsp;
-            Balance: <strong>${{ invoice.balance|floatformat:2 }}</strong>
+            {% trans "Paid:" %} <strong>${{ invoice.paid|floatformat:2 }}</strong> &nbsp;|&nbsp;
+            {% trans "Balance:" %} <strong>${{ invoice.balance|floatformat:2 }}</strong>
         </span>
         {% if can_edit %}
         <form method="post" style="display:inline;">
@@ -75,55 +76,55 @@
             <select name="new_status" style="padding:4px 8px;border-radius:4px;font-size:12px;border:1px solid #ccc;">
                 {% for s in statuses %}<option value="{{ s }}" {% if invoice.status == s %}selected{% endif %}>{{ s|capfirst }}</option>{% endfor %}
             </select>
-            <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Status</button>
+            <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">{% trans "Set Status" %}</button>
         </form>
         {% endif %}
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Invoice Details</h3>
+        <h3>{% trans "Invoice Details" %}</h3>
         {% if can_edit %}
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="save">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Vendor</label>
+                    <label>{% trans "Vendor" %}</label>
                     <select name="vendor_id">
-                        <option value="">(none)</option>
+                        <option value="">{% trans "(none)" %}</option>
                         {% for v in vendors %}
                         <option value="{{ v.id }}" {% if invoice and invoice.vendor_id == v.id %}selected{% endif %}>{{ v.label }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Invoice # *</label>
+                    <label>{% trans "Invoice # *" %}</label>
                     <input type="text" name="invoice_number" required
                         value="{{ invoice.invoice_number|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statuses %}<option value="{{ s }}" {% if invoice and invoice.status == s %}selected{% endif %}>{{ s|capfirst }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Invoice Date</label>
+                    <label>{% trans "Invoice Date" %}</label>
                     <input type="date" name="invoice_date" value="{{ invoice.invoice_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Due Date *</label>
+                    <label>{% trans "Due Date *" %}</label>
                     <input type="date" name="due_date" required value="{{ invoice.due_date|default:'' }}">
                 </div>
                 <div class="form-row">
-                    <label>Amount</label>
+                    <label>{% trans "Amount" %}</label>
                     <input type="number" name="amount" step="0.01" min="0"
                         value="{{ invoice.amount|default:0|floatformat:2 }}">
                 </div>
                 {% if currencies %}
                 <div class="form-row">
-                    <label>Currency</label>
+                    <label>{% trans "Currency" %}</label>
                     <select name="currency">
                         {% for cur in currencies %}
                         <option value="{{ cur.code }}" {% if invoice.currency == cur.code %}selected{% elif not invoice.currency and cur.code == base_currency %}selected{% endif %}>{{ cur.code }} — {{ cur.name }}</option>
@@ -131,39 +132,39 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Exchange Rate</label>
+                    <label>{% trans "Exchange Rate" %}</label>
                     <input type="number" name="exchange_rate" step="0.000001" min="0"
                         value="{{ invoice.exchange_rate|default:'1.0' }}" placeholder="1.0">
                 </div>
                 {% endif %}
                 <div class="form-row wide">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <input type="text" name="description" value="{{ invoice.description|default:'' }}">
                 </div>
             </div>
-            <button type="submit" class="save-btn">{% if invoice %}Save Changes{% else %}Create Invoice{% endif %}</button>
+            <button type="submit" class="save-btn">{% if invoice %}{% trans "Save Changes" %}{% else %}{% trans "Create Invoice" %}{% endif %}</button>
         </form>
         {% else %}
         <div class="form-grid">
-            <div class="form-row"><label>Vendor</label><input readonly value="{{ invoice.vendor_label|default:'—' }}"></div>
-            <div class="form-row"><label>Invoice #</label><input readonly value="{{ invoice.invoice_number }}"></div>
-            <div class="form-row"><label>Status</label><input readonly value="{{ invoice.status|capfirst }}"></div>
-            <div class="form-row"><label>Invoice Date</label><input readonly value="{{ invoice.invoice_date|default:'—' }}"></div>
-            <div class="form-row"><label>Due Date</label><input readonly value="{{ invoice.due_date|default:'—' }}"></div>
-            <div class="form-row"><label>Amount</label><input readonly value="${{ invoice.amount|floatformat:2 }}"></div>
-            <div class="form-row wide"><label>Description</label><input readonly value="{{ invoice.description|default:'' }}"></div>
+            <div class="form-row"><label>{% trans "Vendor" %}</label><input readonly value="{{ invoice.vendor_label|default:'—' }}"></div>
+            <div class="form-row"><label>{% trans "Invoice #" %}</label><input readonly value="{{ invoice.invoice_number }}"></div>
+            <div class="form-row"><label>{% trans "Status" %}</label><input readonly value="{{ invoice.status|capfirst }}"></div>
+            <div class="form-row"><label>{% trans "Invoice Date" %}</label><input readonly value="{{ invoice.invoice_date|default:'—' }}"></div>
+            <div class="form-row"><label>{% trans "Due Date" %}</label><input readonly value="{{ invoice.due_date|default:'—' }}"></div>
+            <div class="form-row"><label>{% trans "Amount" %}</label><input readonly value="${{ invoice.amount|floatformat:2 }}"></div>
+            <div class="form-row wide"><label>{% trans "Description" %}</label><input readonly value="{{ invoice.description|default:'' }}"></div>
         </div>
         {% endif %}
     </div>
 
     {% if invoice %}
     <div class="card">
-        <h3>Payment History</h3>
+        <h3>{% trans "Payment History" %}</h3>
         {% if payments %}
         <table class="list-table">
             <thead><tr>
-                <th>Date</th><th>Method</th><th>Reference</th>
-                <th class="num">Amount</th><th>Notes</th>
+                <th>{% trans "Date" %}</th><th>{% trans "Method" %}</th><th>{% trans "Reference" %}</th>
+                <th class="num">{% trans "Amount" %}</th><th>{% trans "Notes" %}</th>
             </tr></thead>
             <tbody>
             {% for p in payments %}
@@ -178,42 +179,42 @@
             </tbody>
         </table>
         {% else %}
-        <p style="color:#888;font-size:13px;">No payments recorded.</p>
+        <p style="color:#888;font-size:13px;">{% trans "No payments recorded." %}</p>
         {% endif %}
 
         {% if can_edit and invoice.balance > 0 %}
         <hr style="margin:14px 0;">
         <div style="font-size:13px;font-weight:bold;color:#333;margin-bottom:8px;">
-            Record Payment (Balance: ${{ invoice.balance|floatformat:2 }})
+            {% blocktrans with bal=invoice.balance|floatformat:2 %}Record Payment (Balance: ${{ bal }}){% endblocktrans %}
         </div>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="payment">
             <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
                 <div class="form-row">
-                    <label>Date</label>
+                    <label>{% trans "Date" %}</label>
                     <input type="date" name="payment_date">
                 </div>
                 <div class="form-row">
-                    <label>Amount ($)</label>
+                    <label>{% trans "Amount ($)" %}</label>
                     <input type="number" name="amount" step="0.01" min="0.01"
                         value="{{ invoice.balance|floatformat:2 }}" style="width:120px;">
                 </div>
                 <div class="form-row">
-                    <label>Method</label>
+                    <label>{% trans "Method" %}</label>
                     <select name="method">
                         {% for m in payment_methods %}<option>{{ m }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Reference</label>
-                    <input type="text" name="reference" placeholder="Check #, etc." style="width:140px;">
+                    <label>{% trans "Reference" %}</label>
+                    <input type="text" name="reference" placeholder="{% trans 'Check #, etc.' %}" style="width:140px;">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes" style="width:160px;">
                 </div>
-                <button type="submit" class="save-btn" style="margin-top:0;">Record Payment</button>
+                <button type="submit" class="save-btn" style="margin-top:0;">{% trans "Record Payment" %}</button>
             </div>
         </form>
         {% endif %}

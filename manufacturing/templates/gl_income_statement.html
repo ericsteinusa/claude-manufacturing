@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Income Statement{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Income Statement" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/" class="btn">G/L Dashboard</a>
-<a href="/gl/trial-balance/" class="btn">Trial Balance</a>
-<a href="/gl/balance-sheet/" class="btn">Balance Sheet</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/" class="btn">{% trans "G/L Dashboard" %}</a>
+<a href="/gl/trial-balance/" class="btn">{% trans "Trial Balance" %}</a>
+<a href="/gl/balance-sheet/" class="btn">{% trans "Balance Sheet" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -36,24 +37,24 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Income Statement</h2>
+    <h2>{% trans "Income Statement" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>From:</label>
+        <label>{% trans "From:" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}">
-        <label>To:</label>
+        <label>{% trans "To:" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}">
-        <button type="submit" class="btn-sm">Run</button>
+        <button type="submit" class="btn-sm">{% trans "Run" %}</button>
     </form>
 
     <div class="stmt">
         <div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:18px;color:#222;">
-            Income Statement<br>
-            <span style="font-size:12px;color:#555;font-weight:normal;">{{ date_from }} to {{ date_to }}</span>
+            {% trans "Income Statement" %}<br>
+            <span style="font-size:12px;color:#555;font-weight:normal;">{{ date_from }} {% trans "to" %} {{ date_to }}</span>
         </div>
 
         <div class="stmt-section">
-            <div class="sect-hdr">Revenue</div>
+            <div class="sect-hdr">{% trans "Revenue" %}</div>
             {% for r in sections.Revenue %}
             <div class="stmt-line">
                 <span>{{ r.account_number }} — {{ r.account_name }}</span>
@@ -61,13 +62,13 @@
             </div>
             {% endfor %}
             <div class="sect-total">
-                <span>Total Revenue</span>
+                <span>{% trans "Total Revenue" %}</span>
                 <span>${{ revenue|floatformat:2 }}</span>
             </div>
         </div>
 
         <div class="stmt-section">
-            <div class="sect-hdr">Cost of Goods Sold</div>
+            <div class="sect-hdr">{% trans "Cost of Goods Sold" %}</div>
             {% for r in sections.COGS %}
             <div class="stmt-line">
                 <span>{{ r.account_number }} — {{ r.account_name }}</span>
@@ -75,21 +76,21 @@
             </div>
             {% endfor %}
             <div class="sect-total">
-                <span>Total COGS</span>
+                <span>{% trans "Total COGS" %}</span>
                 <span>${{ cogs|floatformat:2 }}</span>
             </div>
         </div>
 
         <div class="summary-box">
             <div class="summary-line">
-                <span>Gross Profit (Revenue – COGS)</span>
+                <span>{% trans "Gross Profit (Revenue – COGS)" %}</span>
                 <span class="{% if gross_profit >= 0 %}pos{% else %}neg{% endif %}">
                     ${{ gross_profit|floatformat:2 }}</span>
             </div>
         </div>
 
         <div class="stmt-section" style="margin-top:16px;">
-            <div class="sect-hdr">Expenses</div>
+            <div class="sect-hdr">{% trans "Expenses" %}</div>
             {% for r in sections.Expense %}
             <div class="stmt-line">
                 <span>{{ r.account_number }} — {{ r.account_name }}</span>
@@ -97,22 +98,22 @@
             </div>
             {% endfor %}
             <div class="sect-total">
-                <span>Total Expenses</span>
+                <span>{% trans "Total Expenses" %}</span>
                 <span>${{ expenses|floatformat:2 }}</span>
             </div>
         </div>
 
         <div class="summary-box">
             <div class="summary-line">
-                <span>Gross Profit</span>
+                <span>{% trans "Gross Profit" %}</span>
                 <span>${{ gross_profit|floatformat:2 }}</span>
             </div>
             <div class="summary-line">
-                <span>Total Expenses</span>
+                <span>{% trans "Total Expenses" %}</span>
                 <span>(${{ expenses|floatformat:2 }})</span>
             </div>
             <div class="summary-line major">
-                <span>Net Income</span>
+                <span>{% trans "Net Income" %}</span>
                 <span class="{% if net_income >= 0 %}pos{% else %}neg{% endif %}">
                     ${{ net_income|floatformat:2 }}</span>
             </div>

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Trial Balance{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Trial Balance" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/" class="btn">G/L Dashboard</a>
-<a href="/gl/income-statement/" class="btn">Income Stmt</a>
-<a href="/gl/balance-sheet/" class="btn">Balance Sheet</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/" class="btn">{% trans "G/L Dashboard" %}</a>
+<a href="/gl/income-statement/" class="btn">{% trans "Income Stmt" %}</a>
+<a href="/gl/balance-sheet/" class="btn">{% trans "Balance Sheet" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -31,20 +32,20 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Trial Balance</h2>
+    <h2>{% trans "Trial Balance" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>As of:</label>
+        <label>{% trans "As of:" %}</label>
         <input type="date" name="as_of" value="{{ as_of }}">
-        <button type="submit" class="btn-sm">Run</button>
-        {% if as_of %}<a href="/gl/trial-balance/" style="color:#aad;font-size:13px;">Clear</a>{% endif %}
+        <button type="submit" class="btn-sm">{% trans "Run" %}</button>
+        {% if as_of %}<a href="/gl/trial-balance/" style="color:#aad;font-size:13px;">{% trans "Clear" %}</a>{% endif %}
     </form>
 
     {% if rows %}
     <table class="list-table">
         <thead><tr>
-            <th>Acct #</th><th>Account Name</th><th>Type</th>
-            <th class="num">Debit</th><th class="num">Credit</th>
+            <th>{% trans "Acct #" %}</th><th>{% trans "Account Name" %}</th><th>{% trans "Type" %}</th>
+            <th class="num">{% trans "Debit" %}</th><th class="num">{% trans "Credit" %}</th>
         </tr></thead>
         <tbody>
         {% for r in rows %}
@@ -59,17 +60,17 @@
         </tbody>
         <tfoot>
         <tr class="totals-row">
-            <td colspan="3">TOTALS</td>
+            <td colspan="3">{% trans "TOTALS" %}</td>
             <td class="num">${{ total_debit|floatformat:2 }}</td>
             <td class="num">${{ total_credit|floatformat:2 }}</td>
         </tr>
         </tfoot>
     </table>
     <span class="{% if balanced %}status-ok{% else %}status-err{% endif %}">
-        {% if balanced %}BALANCED{% else %}OUT OF BALANCE by ${{ total_debit|add:total_credit|floatformat:2 }}{% endif %}
+        {% if balanced %}{% trans "BALANCED" %}{% else %}{% blocktrans with amt=total_debit|add:total_credit|floatformat:2 %}OUT OF BALANCE by ${{ amt }}{% endblocktrans %}{% endif %}
     </span>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;">No posted journal entries found. Post some journal entries to see the trial balance.</p>
+    <p style="color: var(--text-muted);font-size:14px;">{% trans "No posted journal entries found. Post some journal entries to see the trial balance." %}</p>
     {% endif %}
 </div>
 </div>

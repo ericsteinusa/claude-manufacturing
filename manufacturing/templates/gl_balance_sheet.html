@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Balance Sheet{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Balance Sheet" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/" class="btn">G/L Dashboard</a>
-<a href="/gl/trial-balance/" class="btn">Trial Balance</a>
-<a href="/gl/income-statement/" class="btn">Income Stmt</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/" class="btn">{% trans "G/L Dashboard" %}</a>
+<a href="/gl/trial-balance/" class="btn">{% trans "Trial Balance" %}</a>
+<a href="/gl/income-statement/" class="btn">{% trans "Income Stmt" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -37,24 +38,24 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Balance Sheet</h2>
+    <h2>{% trans "Balance Sheet" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>As of:</label>
+        <label>{% trans "As of:" %}</label>
         <input type="date" name="as_of" value="{{ as_of }}">
-        <button type="submit" class="btn-sm">Run</button>
-        {% if as_of %}<a href="/gl/balance-sheet/" style="color:#aad;font-size:13px;">Clear</a>{% endif %}
+        <button type="submit" class="btn-sm">{% trans "Run" %}</button>
+        {% if as_of %}<a href="/gl/balance-sheet/" style="color:#aad;font-size:13px;">{% trans "Clear" %}</a>{% endif %}
     </form>
 
     <div class="stmt">
         <div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:18px;color:#222;">
-            Balance Sheet{% if as_of %} as of {{ as_of }}{% endif %}
+            {% if as_of %}{% blocktrans %}Balance Sheet as of {{ as_of }}{% endblocktrans %}{% else %}{% trans "Balance Sheet" %}{% endif %}
         </div>
 
         <div class="two-col">
             <div>
                 <div class="stmt-section">
-                    <div class="sect-hdr">Assets</div>
+                    <div class="sect-hdr">{% trans "Assets" %}</div>
                     {% for r in sections.Asset %}
                     <div class="stmt-line">
                         <span>{{ r.account_number }} — {{ r.account_name }}</span>
@@ -62,14 +63,14 @@
                     </div>
                     {% endfor %}
                     <div class="sect-total">
-                        <span>Total Assets</span>
+                        <span>{% trans "Total Assets" %}</span>
                         <span>${{ assets|floatformat:2 }}</span>
                     </div>
                 </div>
             </div>
             <div>
                 <div class="stmt-section">
-                    <div class="sect-hdr">Liabilities</div>
+                    <div class="sect-hdr">{% trans "Liabilities" %}</div>
                     {% for r in sections.Liability %}
                     <div class="stmt-line">
                         <span>{{ r.account_number }} — {{ r.account_name }}</span>
@@ -77,12 +78,12 @@
                     </div>
                     {% endfor %}
                     <div class="sect-total">
-                        <span>Total Liabilities</span>
+                        <span>{% trans "Total Liabilities" %}</span>
                         <span>${{ liabilities|floatformat:2 }}</span>
                     </div>
                 </div>
                 <div class="stmt-section">
-                    <div class="sect-hdr">Equity</div>
+                    <div class="sect-hdr">{% trans "Equity" %}</div>
                     {% for r in sections.Equity %}
                     <div class="stmt-line">
                         <span>{{ r.account_number }} — {{ r.account_name }}</span>
@@ -90,7 +91,7 @@
                     </div>
                     {% endfor %}
                     <div class="sect-total">
-                        <span>Total Equity</span>
+                        <span>{% trans "Total Equity" %}</span>
                         <span>${{ equity|floatformat:2 }}</span>
                     </div>
                 </div>
@@ -99,16 +100,16 @@
 
         <div class="summary-box">
             <div class="summary-line">
-                <span>Total Assets</span>
+                <span>{% trans "Total Assets" %}</span>
                 <span>${{ assets|floatformat:2 }}</span>
             </div>
             <div class="summary-line">
-                <span>Total Liabilities + Equity</span>
+                <span>{% trans "Total Liabilities + Equity" %}</span>
                 <span>${{ liabilities|floatformat:2 }} + ${{ equity|floatformat:2 }}</span>
             </div>
         </div>
         <span class="{% if balanced %}status-ok{% else %}status-err{% endif %}">
-            {% if balanced %}BALANCED{% else %}OUT OF BALANCE{% endif %}
+            {% if balanced %}{% trans "BALANCED" %}{% else %}{% trans "OUT OF BALANCE" %}{% endif %}
         </span>
     </div>
 </div>

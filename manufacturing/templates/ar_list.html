@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Accounts Receivable{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Accounts Receivable" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/ap/" class="btn">Accounts Payable</a>
-<a href="/gl/" class="btn">General Ledger</a>
-<a href="/ar/export/?status={{ status }}&customer_id={{ customer_id }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ Export CSV</a>
-<a href="/ar/export/?status={{ status }}&customer_id={{ customer_id }}&date_from={{ date_from }}&date_to={{ date_to }}&format=xlsx" class="btn">⬇ Export Excel</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/ap/" class="btn">{% trans "Accounts Payable" %}</a>
+<a href="/gl/" class="btn">{% trans "General Ledger" %}</a>
+<a href="/ar/export/?status={{ status }}&customer_id={{ customer_id }}&date_from={{ date_from }}&date_to={{ date_to }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="/ar/export/?status={{ status }}&customer_id={{ customer_id }}&date_from={{ date_from }}&date_to={{ date_to }}&format=xlsx" class="btn">⬇ {% trans "Export Excel" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -22,56 +23,56 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Accounts Receivable</div>
+    <div class="menu-title">{% trans "Accounts Receivable" %}</div>
 
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <div class="kpi-grid" style="max-width:900px;margin-bottom:20px;">
         <div class="kpi-card">
-            <div class="kpi-label">Open Invoices</div>
+            <div class="kpi-label">{% trans "Open Invoices" %}</div>
             <div class="kpi-value">{{ dashboard.open_count }}</div>
         </div>
         <div class="kpi-card" style="border-left:4px solid var(--danger-fg);">
-            <div class="kpi-label">Overdue</div>
+            <div class="kpi-label">{% trans "Overdue" %}</div>
             <div class="kpi-value warn">{{ dashboard.overdue_count }}</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Outstanding</div>
+            <div class="kpi-label">{% trans "Outstanding" %}</div>
             <div class="kpi-value">${{ dashboard.total_outstanding|floatformat:2 }}</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Total Invoiced</div>
+            <div class="kpi-label">{% trans "Total Invoiced" %}</div>
             <div class="kpi-value">${{ dashboard.total_invoiced|floatformat:2 }}</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Total Invoices</div>
+            <div class="kpi-label">{% trans "Total Invoices" %}</div>
             <div class="kpi-value">{{ dashboard.total_invoices }}</div>
         </div>
     </div>
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;margin-bottom:16px;">
-        <label>Status:</label>
+        <label>{% trans "Status:" %}</label>
         <select name="status" onchange="this.form.submit()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">(all)</option>
+            <option value="">{% trans "(all)" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
-        <label>Customer:</label>
+        <label>{% trans "Customer:" %}</label>
         <select name="customer_id" onchange="this.form.submit()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">(all)</option>
+            <option value="">{% trans "(all)" %}</option>
             {% for c in customers %}
             <option value="{{ c.id }}" {% if customer_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.label }}</option>
             {% endfor %}
         </select>
-        <label>Due From:</label>
+        <label>{% trans "Due From:" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-        <label>To:</label>
+        <label>{% trans "To:" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
         {% if status or customer_id or date_from or date_to %}
-        <a href="/ar/" class="btn">Clear</a>
+        <a href="/ar/" class="btn">{% trans "Clear" %}</a>
         {% endif %}
     </form>
 
@@ -79,8 +80,8 @@
     <div class="erp-table-wrap" style="margin-bottom:20px;">
         <table class="erp-table">
             <thead><tr>
-                <th>Invoice #</th><th>Customer</th><th>Invoice Date</th><th>Due Date</th>
-                <th class="num">Amount</th><th class="num">Received</th><th class="num">Balance</th><th>Status</th>
+                <th>{% trans "Invoice #" %}</th><th>{% trans "Customer" %}</th><th>{% trans "Invoice Date" %}</th><th>{% trans "Due Date" %}</th>
+                <th class="num">{% trans "Amount" %}</th><th class="num">{% trans "Received" %}</th><th class="num">{% trans "Balance" %}</th><th>{% trans "Status" %}</th>
             </tr></thead>
             <tbody>
             {% for inv in invoices %}
@@ -105,48 +106,48 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No invoices found.</div>
+    <div class="empty-state">{% trans "No invoices found." %}</div>
     {% endif %}
 
     {% if can_edit %}
     <div class="card" style="max-width:900px;">
-        <div class="card-title">New Invoice</div>
+        <div class="card-title">{% trans "New Invoice" %}</div>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
             <div class="inv-form-grid">
                 <div class="inv-form-row">
-                    <label>Customer *</label>
+                    <label>{% trans "Customer *" %}</label>
                     <select name="customer_id" required>
-                        <option value="">(select a customer)</option>
+                        <option value="">{% trans "(select a customer)" %}</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}">{{ c.label }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="inv-form-row">
-                    <label>Invoice # *</label>
+                    <label>{% trans "Invoice # *" %}</label>
                     <input type="text" name="invoice_number" required>
                 </div>
                 <div class="inv-form-row">
-                    <label>Invoice Date</label>
+                    <label>{% trans "Invoice Date" %}</label>
                     <input type="date" name="invoice_date">
                 </div>
                 <div class="inv-form-row">
-                    <label>Due Date *</label>
+                    <label>{% trans "Due Date *" %}</label>
                     <input type="date" name="due_date" required>
                 </div>
                 <div class="inv-form-row">
-                    <label>Amount ($)</label>
+                    <label>{% trans "Amount ($)" %}</label>
                     <input type="number" name="amount" step="0.01" min="0" value="0">
                 </div>
                 <div class="inv-form-row wide">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <input type="text" name="description">
                 </div>
             </div>
             <div style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Create Invoice</button>
+                <button type="submit" class="btn btn-primary">{% trans "Create Invoice" %}</button>
             </div>
         </form>
     </div>

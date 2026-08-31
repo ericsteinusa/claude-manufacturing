@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}{% if journal %}Journal Entry{% else %}New Journal Entry{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if journal %}{% trans "Journal Entry" %}{% else %}{% trans "New Journal Entry" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/journals/" class="btn">All Journals</a>
-<a href="/gl/accounts/" class="btn">Accounts</a>
-<a href="/gl/" class="btn">G/L</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/journals/" class="btn">{% trans "All Journals" %}</a>
+<a href="/gl/accounts/" class="btn">{% trans "Accounts" %}</a>
+<a href="/gl/" class="btn">{% trans "G/L" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -45,21 +46,21 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>{% if journal %}Journal Entry #{{ journal.id }}{% else %}New Journal Entry{% endif %}</h2>
+    <h2>{% if journal %}{% blocktrans with num=journal.id %}Journal Entry #{{ num }}{% endblocktrans %}{% else %}{% trans "New Journal Entry" %}{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     {% if journal %}
     <div class="card">
         <div class="meta-row">
-            <div class="meta-item"><div class="lbl">Date</div><div class="val">{{ journal.journal_date }}</div></div>
-            <div class="meta-item"><div class="lbl">Reference</div><div class="val">{{ journal.reference|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Description</div><div class="val">{{ journal.description|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Created By</div><div class="val">{{ journal.created_by|default:"—" }}</div></div>
-            <div class="meta-item"><div class="lbl">Status</div>
+            <div class="meta-item"><div class="lbl">{% trans "Date" %}</div><div class="val">{{ journal.journal_date }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Reference" %}</div><div class="val">{{ journal.reference|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Description" %}</div><div class="val">{{ journal.description|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Created By" %}</div><div class="val">{{ journal.created_by|default:"—" }}</div></div>
+            <div class="meta-item"><div class="lbl">{% trans "Status" %}</div>
                 <div class="val">
                     <span class="{% if journal.posted %}badge-posted{% else %}badge-unposted{% endif %}">
-                        {% if journal.posted %}Posted{% else %}Unposted{% endif %}</span>
+                        {% if journal.posted %}{% trans "Posted" %}{% else %}{% trans "Unposted" %}{% endif %}</span>
                 </div>
             </div>
         </div>
@@ -70,24 +71,24 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="post">
                 <button type="submit" class="btn-act"
-                    onclick="return confirm('Post this journal entry? This cannot be undone.')">Post Entry</button>
+                    onclick="return confirm('{% trans "Post this journal entry? This cannot be undone." %}')">{% trans "Post Entry" %}</button>
             </form>
             <form method="post" style="display:inline;">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="void">
                 <button type="submit" class="btn-danger"
-                    onclick="return confirm('Delete this unposted entry?')">Void / Delete</button>
+                    onclick="return confirm('{% trans "Delete this unposted entry?" %}')">{% trans "Void / Delete" %}</button>
             </form>
         </div>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3>Journal Lines</h3>
+        <h3>{% trans "Journal Lines" %}</h3>
         {% if lines %}
         <table class="list-table">
             <thead><tr>
-                <th>Account</th><th class="num">Debit</th><th class="num">Credit</th><th>Memo</th>
+                <th>{% trans "Account" %}</th><th class="num">{% trans "Debit" %}</th><th class="num">{% trans "Credit" %}</th><th>{% trans "Memo" %}</th>
             </tr></thead>
             <tbody>
             {% for ln in lines %}
@@ -106,31 +107,31 @@
     {% else %}
     <!-- New Journal Entry Form -->
     <div class="card">
-        <h3>Journal Details</h3>
+        <h3>{% trans "Journal Details" %}</h3>
         <form method="post" id="jform">
             {% csrf_token %}
             <input type="hidden" name="action" value="create">
             <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
                 <div class="form-row">
-                    <label>Date *</label>
+                    <label>{% trans "Date *" %}</label>
                     <input type="date" name="journal_date" required>
                 </div>
                 <div class="form-row" style="flex:1;min-width:160px;">
-                    <label>Reference</label>
-                    <input type="text" name="reference" placeholder="e.g. JE-001">
+                    <label>{% trans "Reference" %}</label>
+                    <input type="text" name="reference" placeholder="{% trans 'e.g. JE-001' %}">
                 </div>
                 <div class="form-row" style="flex:2;min-width:240px;">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <input type="text" name="description">
                 </div>
             </div>
 
-            <h3 style="font-size:14px;color:#333;margin-bottom:8px;">Journal Lines</h3>
+            <h3 style="font-size:14px;color:#333;margin-bottom:8px;">{% trans "Journal Lines" %}</h3>
             <div id="lines-container"></div>
 
             <div class="line-add-row">
                 <div class="form-row">
-                    <label>Account</label>
+                    <label>{% trans "Account" %}</label>
                     <select id="add-acct" style="min-width:220px;">
                         {% for a in accounts %}
                         <option value="{{ a.id }}">{{ a.account_number }} — {{ a.account_name }}</option>
@@ -138,27 +139,27 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Debit ($)</label>
+                    <label>{% trans "Debit ($)" %}</label>
                     <input type="number" id="add-dr" step="0.01" min="0" value="0" style="width:100px;">
                 </div>
                 <div class="form-row">
-                    <label>Credit ($)</label>
+                    <label>{% trans "Credit ($)" %}</label>
                     <input type="number" id="add-cr" step="0.01" min="0" value="0" style="width:100px;">
                 </div>
                 <div class="form-row">
-                    <label>Memo</label>
+                    <label>{% trans "Memo" %}</label>
                     <input type="text" id="add-memo" style="width:180px;">
                 </div>
-                <button type="button" class="btn-act" onclick="addLine()">Add Line</button>
+                <button type="button" class="btn-act" onclick="addLine()">{% trans "Add Line" %}</button>
             </div>
 
             <div id="totals-bar" style="font-size:13px;color:#555;margin-bottom:12px;">
-                Debits: <span id="tot-dr">$0.00</span> &nbsp;|&nbsp;
-                Credits: <span id="tot-cr">$0.00</span> &nbsp;|&nbsp;
-                Difference: <span id="tot-diff" class="bal-ok">$0.00</span>
+                {% trans "Debits:" %} <span id="tot-dr">$0.00</span> &nbsp;|&nbsp;
+                {% trans "Credits:" %} <span id="tot-cr">$0.00</span> &nbsp;|&nbsp;
+                {% trans "Difference:" %} <span id="tot-diff" class="bal-ok">$0.00</span>
             </div>
 
-            <button type="submit" class="btn-act" id="submit-btn" disabled>Save Journal Entry</button>
+            <button type="submit" class="btn-act" id="submit-btn" disabled>{% trans "Save Journal Entry" %}</button>
         </form>
     </div>
     {% endif %}
