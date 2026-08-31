@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Production Gantt{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Production Gantt" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/schedule/" class="btn">List View</a>
-<a href="/prod/schedule/gantt/" class="btn">Gantt</a>
-<a href="/prod/schedule/capacity/" class="btn">Capacity Planning</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/schedule/" class="btn">{% trans "List View" %}</a>
+<a href="/prod/schedule/gantt/" class="btn">{% trans "Gantt" %}</a>
+<a href="/prod/schedule/capacity/" class="btn">{% trans "Capacity Planning" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,32 +39,32 @@
 {% block body %}
 <div class="content">
 <div class="ps-wrap">
-    <h2>Production Gantt Chart</h2>
+    <h2>{% trans "Production Gantt Chart" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>From:</label>
+        <label>{% trans "From:" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}">
-        <label>To:</label>
+        <label>{% trans "To:" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}">
         <select name="workcenter_id">
-            <option value="">All Workcenters</option>
+            <option value="">{% trans "All Workcenters" %}</option>
             {% for wc in workcenters %}
             <option value="{{ wc.id }}"{% if workcenter_id == wc.id %} selected{% endif %}>{{ wc.name }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Filter</button>
-        <a href="/prod/schedule/gantt/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/prod/schedule/gantt/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <div id="gantt-container"><svg id="gantt"></svg></div>
         {% if ops_count == 0 %}
-        <p style="color:#888;text-align:center;">No scheduled operations in this window.</p>
+        <p style="color:#888;text-align:center;">{% trans "No scheduled operations in this window." %}</p>
         {% endif %}
     </div>
 
     <div class="card">
-        <h3 style="margin-top:0;">Workcenter Load</h3>
+        <h3 style="margin-top:0;">{% trans "Workcenter Load" %}</h3>
         <table class="load-table">
             {% for wc in load_data %}
             <tr>
@@ -78,7 +79,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td style="color:#888;">No active workcenters.</td></tr>
+            <tr><td style="color:#888;">{% trans "No active workcenters." %}</td></tr>
             {% endfor %}
         </table>
     </div>

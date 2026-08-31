@@ -1,17 +1,18 @@
 {% extends "base.html" %}
-{% block page_title %}Shipment — {{ shipment.ship_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=shipment.ship_number %}Shipment — {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/prod/schedule/" class="btn">Schedule</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/edi/856/{{ shipment.id }}/download/" class="btn">Download 856 (EDI)</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/prod/schedule/" class="btn">{% trans "Schedule" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/edi/856/{{ shipment.id }}/download/" class="btn">{% trans "Download 856 (EDI)" %}</a>
 <form method="post" action="/ecommerce/shipment/{{ shipment.id }}/push/" style="display:inline;">
     {% csrf_token %}
-    <button type="submit" class="btn">Push Shipment Confirmation</button>
+    <button type="submit" class="btn">{% trans "Push Shipment Confirmation" %}</button>
 </form>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -69,7 +70,7 @@
 
 {% block body %}
 <div class="content">
-<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+<button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
 <div class="sh-wrap">
     <div class="sh-barcode">
         <img src="/barcode/img/SHIP-{{ shipment.ship_number }}/" alt="Barcode SHIP-{{ shipment.ship_number }}">
@@ -85,15 +86,15 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Shipment</h3>
+        <h3>{% trans "Edit Shipment" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="edit">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Sales Order</label>
+                    <label>{% trans "Sales Order" %}</label>
                     <select name="so_id">
-                        <option value="">— None —</option>
+                        <option value="">{% trans "— None —" %}</option>
                         {% for so in sales_orders %}
                         <option value="{{ so.id }}"{% if shipment.so_id == so.id %} selected{% endif %}>
                             {{ so.so_number }}{% if so.customer_name %} — {{ so.customer_name }}{% endif %}
@@ -102,19 +103,19 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Ship Date</label>
+                    <label>{% trans "Ship Date" %}</label>
                     <input type="date" name="ship_date" value="{{ shipment.ship_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Carrier</label>
+                    <label>{% trans "Carrier" %}</label>
                     <input type="text" name="carrier" value="{{ shipment.carrier|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Tracking Number</label>
+                    <label>{% trans "Tracking Number" %}</label>
                     <input type="text" name="tracking_number" value="{{ shipment.tracking_number|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in SHIPMENT_STATUSES %}
                         <option value="{{ s }}"{% if shipment.status == s %} selected{% endif %}>{{ s|title }}</option>
@@ -122,34 +123,34 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ shipment.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="ro-table">
-            <tr><th>SO #</th><td>{% if shipment.so_number %}<a href="/so/{{ shipment.so_id }}/">{{ shipment.so_number }}</a>{% else %}—{% endif %}</td></tr>
-            <tr><th>Ship Date</th><td>{{ shipment.ship_date|default:"—" }}</td></tr>
-            <tr><th>Carrier</th><td>{{ shipment.carrier|default:"—" }}</td></tr>
-            <tr><th>Tracking #</th><td>{{ shipment.tracking_number|default:"—" }}</td></tr>
-            <tr><th>Status</th><td><span class="badge s-{{ shipment.status }}">{{ shipment.status|title }}</span></td></tr>
-            <tr><th>Notes</th><td>{{ shipment.notes|default:"—" }}</td></tr>
+            <tr><th>{% trans "SO #" %}</th><td>{% if shipment.so_number %}<a href="/so/{{ shipment.so_id }}/">{{ shipment.so_number }}</a>{% else %}—{% endif %}</td></tr>
+            <tr><th>{% trans "Ship Date" %}</th><td>{{ shipment.ship_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Carrier" %}</th><td>{{ shipment.carrier|default:"—" }}</td></tr>
+            <tr><th>{% trans "Tracking #" %}</th><td>{{ shipment.tracking_number|default:"—" }}</td></tr>
+            <tr><th>{% trans "Status" %}</th><td><span class="badge s-{{ shipment.status }}">{{ shipment.status|title }}</span></td></tr>
+            <tr><th>{% trans "Notes" %}</th><td>{{ shipment.notes|default:"—" }}</td></tr>
         </table>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Items ({{ items|length }})</h3>
+        <h3>{% blocktrans count counter=items|length %}Items ({{ counter }}){% plural %}Items ({{ counter }}){% endblocktrans %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th style="text-align:right;">Qty</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th style="text-align:right;">{% trans "Qty" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -160,7 +161,7 @@
                 <td style="text-align:right;">{{ item.qty }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" style="color:#888;text-align:center;">No items added yet.</td></tr>
+            <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No items added yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -169,15 +170,15 @@
         <form method="post" class="add-row" style="margin-top:14px;">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_item">
-            <input type="text" name="description" placeholder="Description *" required style="flex:2;">
+            <input type="text" name="description" placeholder="{% trans 'Description *' %}" required style="flex:2;">
             <select name="product_id" style="flex:1.5;">
-                <option value="">— Product (optional) —</option>
+                <option value="">{% trans "— Product (optional) —" %}</option>
                 {% for p in products %}
                 <option value="{{ p.id }}">{{ p.name }}</option>
                 {% endfor %}
             </select>
-            <input type="number" name="qty" placeholder="Qty" value="1" min="1" style="width:70px;">
-            <button type="submit" class="btn-sm">Add Item</button>
+            <input type="number" name="qty" placeholder="{% trans 'Qty' %}" value="1" min="1" style="width:70px;">
+            <button type="submit" class="btn-sm">{% trans "Add Item" %}</button>
         </form>
         {% endif %}
     </div>

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}RMA {{ rma.rma_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=rma.rma_number %}RMA {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/returns/" class="btn">Returns</a>
-<a href="/prod/returns/reports/" class="btn">Returns Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/returns/" class="btn">{% trans "Returns" %}</a>
+<a href="/prod/returns/reports/" class="btn">{% trans "Returns Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,7 +42,7 @@
 {% block body %}
 <div class="content">
 <div class="rd-wrap">
-    <h2>RMA {{ rma.rma_number }}</h2>
+    <h2>{% blocktrans with num=rma.rma_number %}RMA {{ num }}{% endblocktrans %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -49,37 +50,37 @@
     <div class="card">
         <div class="detail-grid">
             <div class="detail-item">
-                <label>RMA Number</label>
+                <label>{% trans "RMA Number" %}</label>
                 <span>{{ rma.rma_number }}</span>
             </div>
             <div class="detail-item">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <span><span class="badge rs-{{ rma.status }}">{{ rma.status|title }}</span></span>
             </div>
             <div class="detail-item">
-                <label>Customer</label>
+                <label>{% trans "Customer" %}</label>
                 <span>{{ rma.customer|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <label>Sales Order</label>
+                <label>{% trans "Sales Order" %}</label>
                 <span>{% if rma.so_number %}<a href="/so/{{ rma.so_id }}/">{{ rma.so_number }}</a>{% else %}—{% endif %}</span>
             </div>
             <div class="detail-item">
-                <label>Reason</label>
+                <label>{% trans "Reason" %}</label>
                 <span>{{ rma.reason|default:"—"|title }}</span>
             </div>
             <div class="detail-item">
-                <label>Created</label>
+                <label>{% trans "Created" %}</label>
                 <span>{{ rma.created_at|default:"—" }}</span>
             </div>
         </div>
         <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:bold;color:#777;text-transform:uppercase;">Description</label>
+            <label style="font-size:11px;font-weight:bold;color:#777;text-transform:uppercase;">{% trans "Description" %}</label>
             <div style="font-size:14px;color:#222;margin-top:4px;">{{ rma.description|default:"—" }}</div>
         </div>
         {% if rma.resolution %}
         <div>
-            <label style="font-size:11px;font-weight:bold;color:#777;text-transform:uppercase;">Resolution</label>
+            <label style="font-size:11px;font-weight:bold;color:#777;text-transform:uppercase;">{% trans "Resolution" %}</label>
             <div style="font-size:14px;color:#222;margin-top:4px;">{{ rma.resolution }}</div>
         </div>
         {% endif %}
@@ -87,18 +88,18 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit RMA</h3>
+        <h3>{% trans "Edit RMA" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Customer</label>
+                    <label>{% trans "Customer" %}</label>
                     <input type="text" name="customer" value="{{ rma.customer|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Sales Order</label>
+                    <label>{% trans "Sales Order" %}</label>
                     <select name="so_id">
-                        <option value="">— None —</option>
+                        <option value="">{% trans "— None —" %}</option>
                         {% for so in sales_orders %}
                         <option value="{{ so.id }}"{% if so.id == rma.so_id %} selected{% endif %}>
                             {{ so.so_number }}{% if so.customer_name %} — {{ so.customer_name }}{% endif %}
@@ -107,7 +108,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Reason</label>
+                    <label>{% trans "Reason" %}</label>
                     <select name="reason">
                         {% for r in RMA_REASONS %}
                         <option value="{{ r }}"{% if r == rma.reason %} selected{% endif %}>{{ r|title }}</option>
@@ -115,7 +116,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in RMA_STATUSES %}
                         <option value="{{ s }}"{% if s == rma.status %} selected{% endif %}>{{ s|title }}</option>
@@ -123,15 +124,15 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description">{{ rma.description|default:'' }}</textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Resolution</label>
+                    <label>{% trans "Resolution" %}</label>
                     <textarea name="resolution">{{ rma.resolution|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}

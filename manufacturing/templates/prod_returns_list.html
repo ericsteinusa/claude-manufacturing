@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Returns / RMA{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Returns / RMA" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/prod/returns/" class="btn">Returns</a>
-<a href="/prod/returns/reports/" class="btn">Returns Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/prod/returns/" class="btn">{% trans "Returns" %}</a>
+<a href="/prod/returns/reports/" class="btn">{% trans "Returns Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -54,33 +55,33 @@
 {% block body %}
 <div class="content">
 <div class="ret-wrap">
-    <h2>Returns / RMA</h2>
+    <h2>{% trans "Returns / RMA" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in RMA_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="RMA # / customer / description…">
-        <button type="submit">Filter</button>
-        <a href="/prod/returns/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'RMA # / customer / description…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/prod/returns/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>RMA #</th>
-                    <th>Customer</th>
-                    <th>SO #</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>Created</th>
+                    <th>{% trans "RMA #" %}</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "SO #" %}</th>
+                    <th>{% trans "Reason" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Created" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +95,7 @@
                 <td>{{ r.created_at|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No returns found.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No returns found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -102,25 +103,25 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Return / RMA</h3>
+        <h3>{% trans "New Return / RMA" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Customer</label>
-                    <input type="text" name="customer" placeholder="Customer name">
+                    <label>{% trans "Customer" %}</label>
+                    <input type="text" name="customer" placeholder="{% trans 'Customer name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Sales Order</label>
+                    <label>{% trans "Sales Order" %}</label>
                     <select name="so_id">
-                        <option value="">— None —</option>
+                        <option value="">{% trans "— None —" %}</option>
                         {% for so in sales_orders %}
                         <option value="{{ so.id }}">{{ so.so_number }}{% if so.customer_name %} — {{ so.customer_name }}{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Reason</label>
+                    <label>{% trans "Reason" %}</label>
                     <select name="reason">
                         {% for r in RMA_REASONS %}
                         <option value="{{ r }}">{{ r|title }}</option>
@@ -128,11 +129,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
-                    <textarea name="description" placeholder="Describe the return / issue…"></textarea>
+                    <label>{% trans "Description" %}</label>
+                    <textarea name="description" placeholder="{% trans 'Describe the return / issue…' %}"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create RMA</button>
+            <button type="submit" class="btn-submit">{% trans "Create RMA" %}</button>
         </form>
     </div>
     {% endif %}

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Returns Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Returns Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/returns/" class="btn">Returns</a>
-<a href="/prod/returns/reports/" class="btn">Returns Reports</a>
-<a href="/prod/reports/" class="btn">Production Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/returns/" class="btn">{% trans "Returns" %}</a>
+<a href="/prod/returns/reports/" class="btn">{% trans "Returns Reports" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Production Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -34,13 +35,13 @@
 {% block body %}
 <div class="content">
 <div class="rr-wrap">
-    <h2>Returns Reports</h2>
+    <h2>{% trans "Returns Reports" %}</h2>
 
     <div class="two-col">
         <div class="card">
-            <h3>Returns by Status</h3>
+            <h3>{% trans "Returns by Status" %}</h3>
             <table class="list-table">
-                <thead><tr><th>Status</th><th style="text-align:right;">Count</th></tr></thead>
+                <thead><tr><th>{% trans "Status" %}</th><th style="text-align:right;">{% trans "Count" %}</th></tr></thead>
                 <tbody>
                 {% for row in by_status %}
                 <tr>
@@ -48,24 +49,24 @@
                     <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="2" style="color:#888;text-align:center;">No returns on record.</td></tr>
+                <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No returns on record." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>Returns by Reason</h3>
+            <h3>{% trans "Returns by Reason" %}</h3>
             <table class="list-table">
-                <thead><tr><th>Reason</th><th style="text-align:right;">Count</th></tr></thead>
+                <thead><tr><th>{% trans "Reason" %}</th><th style="text-align:right;">{% trans "Count" %}</th></tr></thead>
                 <tbody>
                 {% for row in by_reason %}
                 <tr>
-                    <td>{{ row.reason|default:"Unknown"|title }}</td>
+                    <td>{% if row.reason %}{{ row.reason|title }}{% else %}{% trans "Unknown" %}{% endif %}</td>
                     <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="2" style="color:#888;text-align:center;">No data.</td></tr>
+                <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No data." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -73,16 +74,16 @@
     </div>
 
     <div class="card">
-        <h3>Recent Returns</h3>
+        <h3>{% trans "Recent Returns" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>RMA #</th>
-                    <th>Customer</th>
-                    <th>SO #</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>Created</th>
+                    <th>{% trans "RMA #" %}</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "SO #" %}</th>
+                    <th>{% trans "Reason" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Created" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,7 +97,7 @@
                 <td>{{ r.created_at|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No returns on record.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No returns on record." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

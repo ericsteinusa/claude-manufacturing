@@ -747,15 +747,72 @@ a logged defect (confirmed the "N open" and "Defecto (1)" plurals and
 the embedded Sampling Plans link), Supplier Quality list, and QA
 Reports (confirmed all KPI labels and section headers), in Spanish,
 French, and German with real sample data, no console errors.
-**Localization coverage is now 131 templates across three languages**
-(core shell + login + main dashboard + all 5 htmx templates + the
-full Legal department (10) + the full Marketing department (13) + the
-full Reports department (4) + the full Payroll department (8) + the
-full Time Clock department (7) + the full Customers/Credit department
-(7) + the full Engineering department (10) + the full Customer
-Service department (13) + the full Accounting department (13) + the
-full IT department (17) + the full Finance department (10) + the full
-Quality department (12)) out of ~450 total.
+
+Also fully translated: the entire **Production department**
+(`prod_reports.html`, `prod_daily_report.html`,
+`prod_delivery_status.html`, `prod_labor_report.html`,
+`prod_performance_report.html`, `prod_returns_list.html`,
+`prod_returns_detail.html`, `prod_returns_reports.html`,
+`prod_schedule.html`, `prod_schedule_gantt.html`,
+`prod_shipping_list.html`, `prod_shipping_detail.html`,
+`prod_tracking_dashboard.html` — 13 templates, the thirteenth "whole
+department" pass; `prod_dashboard.html`/`prod_dashboard_kpis.html`
+were already translated in the original htmx-templates pass, so
+weren't re-touched here). 112 unique strings per language (109 simple
++ 3 plural). Converted two hand-rolled `|pluralize` filter uses to
+proper `{% blocktrans count %}` blocks — `prod_labor_report.html`'s
+per-person "N WO" summary and `prod_schedule.html`'s "N work order(s)
+shown" footer — since the bare `|pluralize` filter only ever appends
+an English "s" and can't be translated at all; found by grepping for
+`|pluralize` while auditing the department, the same kind of targeted
+check as the Engineering pass's "grep for dotted blocktrans variables"
+checklist item. Used `{% blocktrans with %}` for three dynamic report
+titles carrying a day-count ("Work Order Summary/Shipping Summary/Top
+Completed Products ({days} days)"), plus "Work Orders Due {date}" and
+"RMA {num}"/"Shipment — {num}" detail-page titles. Kept the `RMA`
+acronym untranslated (same treatment as `NCR`/`CAPA` in the Quality
+pass and `MRP`/`BOM`/`OEE` elsewhere). **Found the labor report's
+"Completed By"/"Assigned To" footnote already had embedded straight
+double quotes in the English source** (`whose name matches the
+operation's "Completed By"...`) — rather than risk the quote-escaping
+gotcha first hit in the Time Clock pass, translated using guillemets
+(`« »`) in all three target languages here rather than just French,
+sidestepping backslash-escaping entirely for this string. **Three more
+bare `{{ x|default:"literal" }}` fallbacks were caught and fixed**,
+continuing the bug class first found in the IT department's Network
+Device page: `prod_performance_report.html`'s "Unknown" fallback for
+a product name, and `prod_returns_reports.html`'s "Unknown" fallback
+for a return reason — both needed the `{% if %}/{% else %}/{% trans %}`
+expansion. `makemessages` fuzzy-matched 84 of the new strings against
+unrelated existing translations, handled cleanly from the start with
+the established blank-the-msgstr-when-stripping-fuzzy technique. Full
+suite 3431 passed (unchanged), `manage.py check` clean,
+`compilemessages` clean, `msgfmt --check` clean on all three files,
+zero blank/duplicated entries confirmed programmatically (the
+recurring plural-concatenation false positive reappears here too,
+now including this pass's own new plurals, unrelated to any real
+corruption). Verified end-to-end against the real dev server: the
+Production Schedule (confirmed the "N work orders shown" plural),
+Labor Time & Cost Report (confirmed both the KPI cards and the
+per-person "N WO" plural in its `<details>` summary, plus the
+guillemet-quoted footnote), Shipping list + a returned shipment's
+detail page (confirmed "SH-2026-0003" title, the EDI/push-confirmation
+toolbar buttons, and the "Items (0)" plural), Returns list + a detail
+page (confirmed "RMA RMA-2026-0002"), the Gantt chart page (confirmed
+the empty-state message with no scheduled operations), the Tracking
+Dashboard, and Production Reports (confirmed all KPI cards and table
+headers), in German, French, and Spanish with real sample data, no
+console errors. **Localization coverage is now 144 templates across
+three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing
+department (13) + the full Reports department (4) + the full Payroll
+department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department
+(10) + the full Customer Service department (13) + the full
+Accounting department (13) + the full IT department (17) + the full
+Finance department (10) + the full Quality department (12) + the full
+Production department (13, plus the 2 already-translated htmx
+templates)) out of ~450 total.
 
 The main dashboard's department grid
 button labels are the one exception — they're rendered from

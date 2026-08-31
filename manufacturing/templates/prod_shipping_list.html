@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Shipping{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Shipping" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/schedule/" class="btn">Schedule</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/schedule/" class="btn">{% trans "Schedule" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,33 +54,33 @@
 {% block body %}
 <div class="content">
 <div class="sh-wrap">
-    <h2>Shipping</h2>
+    <h2>{% trans "Shipping" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in SHIPMENT_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search ship # / carrier / tracking…">
-        <button type="submit">Filter</button>
-        <a href="/prod/shipping/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search ship # / carrier / tracking…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/prod/shipping/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Ship #</th>
-                    <th>SO #</th>
-                    <th>Ship Date</th>
-                    <th>Carrier</th>
-                    <th>Tracking #</th>
-                    <th>Status</th>
+                    <th>{% trans "Ship #" %}</th>
+                    <th>{% trans "SO #" %}</th>
+                    <th>{% trans "Ship Date" %}</th>
+                    <th>{% trans "Carrier" %}</th>
+                    <th>{% trans "Tracking #" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -93,7 +94,7 @@
                 <td><span class="badge s-{{ s.status }}">{{ s.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No shipments found.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No shipments found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -101,33 +102,33 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Shipment</h3>
+        <h3>{% trans "New Shipment" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Sales Order</label>
+                    <label>{% trans "Sales Order" %}</label>
                     <select name="so_id">
-                        <option value="">— None —</option>
+                        <option value="">{% trans "— None —" %}</option>
                         {% for so in sales_orders %}
                         <option value="{{ so.id }}">{{ so.so_number }}{% if so.customer_name %} — {{ so.customer_name }}{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Ship Date</label>
+                    <label>{% trans "Ship Date" %}</label>
                     <input type="date" name="ship_date">
                 </div>
                 <div class="form-group">
-                    <label>Carrier</label>
-                    <input type="text" name="carrier" placeholder="UPS, FedEx, etc.">
+                    <label>{% trans "Carrier" %}</label>
+                    <input type="text" name="carrier" placeholder="{% trans 'UPS, FedEx, etc.' %}">
                 </div>
                 <div class="form-group">
-                    <label>Tracking Number</label>
-                    <input type="text" name="tracking_number" placeholder="Tracking #">
+                    <label>{% trans "Tracking Number" %}</label>
+                    <input type="text" name="tracking_number" placeholder="{% trans 'Tracking #' %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in SHIPMENT_STATUSES %}
                         <option value="{{ s }}"{% if s == 'pending' %} selected{% endif %}>{{ s|title }}</option>
@@ -135,11 +136,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Shipment</button>
+            <button type="submit" class="btn-submit">{% trans "Create Shipment" %}</button>
         </form>
     </div>
     {% endif %}

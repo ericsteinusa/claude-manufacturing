@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Delivery Status{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Delivery Status" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/prod/tracking/" class="btn">Tracking</a>
-<a href="/prod/delivery-status/" class="btn">Delivery Status</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/prod/tracking/" class="btn">{% trans "Tracking" %}</a>
+<a href="/prod/delivery-status/" class="btn">{% trans "Delivery Status" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,31 +39,31 @@
 {% block body %}
 <div class="content">
 <div class="ds-wrap">
-    <h2>Delivery Status</h2>
+    <h2>{% trans "Delivery Status" %}</h2>
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in SHIPMENT_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Ship # / carrier / tracking…">
-        <button type="submit">Filter</button>
-        <a href="/prod/delivery-status/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Ship # / carrier / tracking…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/prod/delivery-status/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Ship #</th>
-                    <th>SO #</th>
-                    <th>Ship Date</th>
-                    <th>Carrier</th>
-                    <th>Tracking #</th>
-                    <th>Status</th>
-                    <th>Notes</th>
+                    <th>{% trans "Ship #" %}</th>
+                    <th>{% trans "SO #" %}</th>
+                    <th>{% trans "Ship Date" %}</th>
+                    <th>{% trans "Carrier" %}</th>
+                    <th>{% trans "Tracking #" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Notes" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,7 +78,7 @@
                 <td>{{ s.notes|default:"—"|truncatechars:40 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No shipments found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No shipments found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
