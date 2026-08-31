@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}IT Task {{ task.task_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=task.task_number %}IT Task {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -23,7 +24,7 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Task {{ task.task_number }}</div>
+    <div class="menu-title">{% blocktrans with num=task.task_number %}Task {{ num }}{% endblocktrans %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -38,7 +39,7 @@
                 <option value="{{ s }}"{% if task.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn btn-primary" style="margin-left:6px;">Update Status</button>
+            <button type="submit" class="btn btn-primary" style="margin-left:6px;">{% trans "Update Status" %}</button>
         </form>
     </div>
 
@@ -48,11 +49,11 @@
         <div class="card" style="max-width:720px;">
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Task Name</label>
+                    <label>{% trans "Task Name" %}</label>
                     <input type="text" name="task_name" value="{{ task.task_name }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Task Type</label>
+                    <label>{% trans "Task Type" %}</label>
                     <select name="task_type">
                         {% for tt in task_types %}
                         <option value="{{ tt }}"{% if task.task_type == tt %} selected{% endif %}>{{ tt }}</option>
@@ -60,7 +61,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Priority</label>
+                    <label>{% trans "Priority" %}</label>
                     <select name="priority">
                         {% for p in task_priorities %}
                         <option value="{{ p }}"{% if task.priority == p %} selected{% endif %}>{{ p|capfirst }}</option>
@@ -68,50 +69,50 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Assigned To</label>
+                    <label>{% trans "Assigned To" %}</label>
                     <input type="text" name="assigned_to" value="{{ task.assigned_to|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Department</label>
+                    <label>{% trans "Department" %}</label>
                     <input type="text" name="department" value="{{ task.department|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Scheduled Date</label>
+                    <label>{% trans "Scheduled Date" %}</label>
                     <input type="date" name="scheduled_date" value="{{ task.scheduled_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     <input type="date" name="due_date" value="{{ task.due_date|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description">{{ task.description|default:'' }}</textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ task.notes|default:'' }}</textarea>
                 </div>
             </div>
             <div class="form-actions" style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="/it/tasks/" class="btn btn-cancel">Cancel</a>
+                <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+                <a href="/it/tasks/" class="btn btn-cancel">{% trans "Cancel" %}</a>
             </div>
         </div>
     </form>
     {% else %}
     <div class="card" style="max-width:720px;">
         <dl style="display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:13px;">
-            <dt style="color:var(--text-muted);font-weight:600;">Task #</dt><dd>{{ task.task_number }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Name</dt><dd>{{ task.task_name }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Type</dt><dd>{{ task.task_type|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Priority</dt><dd>{{ task.priority|capfirst }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Assigned To</dt><dd>{{ task.assigned_to|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Department</dt><dd>{{ task.department|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Scheduled</dt><dd>{{ task.scheduled_date|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Due Date</dt><dd>{{ task.due_date|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Status</dt><dd>{{ task.status|capfirst }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Description</dt><dd style="white-space:pre-wrap;">{{ task.description|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Notes</dt><dd style="white-space:pre-wrap;">{{ task.notes|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Task #" %}</dt><dd>{{ task.task_number }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Name" %}</dt><dd>{{ task.task_name }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Type" %}</dt><dd>{{ task.task_type|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Priority" %}</dt><dd>{{ task.priority|capfirst }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Assigned To" %}</dt><dd>{{ task.assigned_to|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Department" %}</dt><dd>{{ task.department|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Scheduled" %}</dt><dd>{{ task.scheduled_date|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Due Date" %}</dt><dd>{{ task.due_date|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Status" %}</dt><dd>{{ task.status|capfirst }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Description" %}</dt><dd style="white-space:pre-wrap;">{{ task.description|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Notes" %}</dt><dd style="white-space:pre-wrap;">{{ task.notes|default:"—" }}</dd>
         </dl>
     </div>
     {% endif %}

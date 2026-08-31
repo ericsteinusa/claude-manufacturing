@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}IT Network Incidents{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "IT Network Incidents" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -30,39 +31,39 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Network Incidents</div>
+    <div class="menu-title">{% trans "Network Incidents" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
         <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in incident_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <select name="severity" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Severities</option>
+            <option value="">{% trans "All Severities" %}</option>
             {% for sv in incident_severities %}
             <option value="{{ sv }}"{% if severity_filter == sv %} selected{% endif %}>{{ sv|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search…"
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:180px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
     </form>
 
     <div class="erp-table-wrap">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Severity</th>
-                    <th>Affected Systems</th>
-                    <th>Reported</th>
-                    <th>Resolved</th>
-                    <th>Status</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans "Severity" %}</th>
+                    <th>{% trans "Affected Systems" %}</th>
+                    <th>{% trans "Reported" %}</th>
+                    <th>{% trans "Resolved" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -70,23 +71,23 @@
                 <tr>
                     <td><a href="/it/incidents/{{ inc.id }}/" style="color:var(--accent);font-weight:bold;">{{ inc.title }}</a></td>
                     <td>
-                        {% if inc.severity == 'critical' %}<span class="pill" style="background:#f8d7da;color:#721c24;">Critical</span>
-                        {% elif inc.severity == 'warning' %}<span class="pill" style="background:#fff3cd;color:#856404;">Warning</span>
-                        {% else %}<span class="pill pill-info">Info</span>
+                        {% if inc.severity == 'critical' %}<span class="pill" style="background:#f8d7da;color:#721c24;">{% trans "Critical" %}</span>
+                        {% elif inc.severity == 'warning' %}<span class="pill" style="background:#fff3cd;color:#856404;">{% trans "Warning" %}</span>
+                        {% else %}<span class="pill pill-info">{% trans "Info" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ inc.affected_systems|default:"—" }}</td>
                     <td>{{ inc.reported_date|default:"—" }}</td>
                     <td>{{ inc.resolved_date|default:"—" }}</td>
                     <td>
-                        {% if inc.status == 'resolved' %}<span class="pill pill-success">Resolved</span>
-                        {% elif inc.status == 'investigating' %}<span class="pill pill-info">Investigating</span>
-                        {% else %}<span class="pill" style="background:#f8d7da;color:#721c24;">Open</span>
+                        {% if inc.status == 'resolved' %}<span class="pill pill-success">{% trans "Resolved" %}</span>
+                        {% elif inc.status == 'investigating' %}<span class="pill pill-info">{% trans "Investigating" %}</span>
+                        {% else %}<span class="pill" style="background:#f8d7da;color:#721c24;">{% trans "Open" %}</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="empty-state">No incidents found.</td></tr>
+                <tr><td colspan="6" class="empty-state">{% trans "No incidents found." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -95,17 +96,17 @@
     {% if user_role not in read_only_roles %}
     <div style="margin-top:24px;">
         <details>
-            <summary class="btn btn-primary" style="cursor:pointer;list-style:none;display:inline-block;">+ Report Incident</summary>
+            <summary class="btn btn-primary" style="cursor:pointer;list-style:none;display:inline-block;">+ {% trans "Report Incident" %}</summary>
             <div class="card" style="margin-top:12px;max-width:720px;">
                 <form method="post" action="/it/incidents/">
                     {% csrf_token %}
                     <div class="form-grid">
                         <div class="form-group full-span">
-                            <label>Title</label>
-                            <input type="text" name="title" required placeholder="Brief incident title">
+                            <label>{% trans "Title" %}</label>
+                            <input type="text" name="title" required placeholder="{% trans 'Brief incident title' %}">
                         </div>
                         <div class="form-group">
-                            <label>Severity</label>
+                            <label>{% trans "Severity" %}</label>
                             <select name="severity">
                                 {% for sv in incident_severities %}
                                 <option value="{{ sv }}">{{ sv|capfirst }}</option>
@@ -113,24 +114,24 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Reported Date</label>
+                            <label>{% trans "Reported Date" %}</label>
                             <input type="date" name="reported_date" value="{{ today }}">
                         </div>
                         <div class="form-group full-span">
-                            <label>Affected Systems</label>
-                            <input type="text" name="affected_systems" placeholder="e.g. Email server, VPN, Switch A">
+                            <label>{% trans "Affected Systems" %}</label>
+                            <input type="text" name="affected_systems" placeholder="{% trans 'e.g. Email server, VPN, Switch A' %}">
                         </div>
                         <div class="form-group full-span">
-                            <label>Description</label>
-                            <textarea name="description" placeholder="What happened…"></textarea>
+                            <label>{% trans "Description" %}</label>
+                            <textarea name="description" placeholder="{% trans 'What happened…' %}"></textarea>
                         </div>
                         <div class="form-group full-span">
-                            <label>Notes</label>
+                            <label>{% trans "Notes" %}</label>
                             <textarea name="notes"></textarea>
                         </div>
                     </div>
                     <div class="form-actions" style="margin-top:12px;">
-                        <button type="submit" class="btn btn-primary">Save Incident</button>
+                        <button type="submit" class="btn btn-primary">{% trans "Save Incident" %}</button>
                     </div>
                 </form>
             </div>

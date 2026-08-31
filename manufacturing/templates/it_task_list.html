@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}IT Tasks{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "IT Tasks" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -31,40 +32,40 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">IT Tasks</div>
+    <div class="menu-title">{% trans "IT Tasks" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
         <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in task_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <select name="priority" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Priorities</option>
+            <option value="">{% trans "All Priorities" %}</option>
             {% for p in task_priorities %}
             <option value="{{ p }}"{% if priority_filter == p %} selected{% endif %}>{{ p|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search…"
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search…' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:180px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
     </form>
 
     <div class="erp-table-wrap">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Task #</th>
-                    <th>Task Name</th>
-                    <th>Type</th>
-                    <th>Assigned To</th>
-                    <th>Priority</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
+                    <th>{% trans "Task #" %}</th>
+                    <th>{% trans "Task Name" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Assigned To" %}</th>
+                    <th>{% trans "Priority" %}</th>
+                    <th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,24 +76,24 @@
                     <td>{{ t.task_type|default:"—" }}</td>
                     <td>{{ t.assigned_to|default:"—" }}</td>
                     <td>
-                        {% if t.priority == 'critical' %}<span class="pill" style="background:#f8d7da;color:#721c24;">Critical</span>
-                        {% elif t.priority == 'high' %}<span class="pill" style="background:#fff3cd;color:#856404;">High</span>
-                        {% elif t.priority == 'medium' %}<span class="pill" style="background:#d1ecf1;color:#0c5460;">Medium</span>
+                        {% if t.priority == 'critical' %}<span class="pill" style="background:#f8d7da;color:#721c24;">{% trans "Critical" %}</span>
+                        {% elif t.priority == 'high' %}<span class="pill" style="background:#fff3cd;color:#856404;">{% trans "High" %}</span>
+                        {% elif t.priority == 'medium' %}<span class="pill" style="background:#d1ecf1;color:#0c5460;">{% trans "Medium" %}</span>
                         {% else %}<span class="pill" style="background:#e2e3e5;color:#383d41;">{{ t.priority|capfirst }}</span>
                         {% endif %}
                     </td>
                     <td>{{ t.due_date|default:"—" }}</td>
                     <td>
-                        {% if t.status == 'completed' %}<span class="pill pill-success">Completed</span>
-                        {% elif t.status == 'in_progress' %}<span class="pill pill-info">In Progress</span>
-                        {% elif t.status == 'on_hold' %}<span class="pill" style="background:#fff3cd;color:#856404;">On Hold</span>
-                        {% elif t.status == 'cancelled' %}<span class="pill" style="background:#e2e3e5;color:#383d41;">Cancelled</span>
+                        {% if t.status == 'completed' %}<span class="pill pill-success">{% trans "Completed" %}</span>
+                        {% elif t.status == 'in_progress' %}<span class="pill pill-info">{% trans "In Progress" %}</span>
+                        {% elif t.status == 'on_hold' %}<span class="pill" style="background:#fff3cd;color:#856404;">{% trans "On Hold" %}</span>
+                        {% elif t.status == 'cancelled' %}<span class="pill" style="background:#e2e3e5;color:#383d41;">{% trans "Cancelled" %}</span>
                         {% else %}<span class="pill">{{ t.status|capfirst }}</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7" class="empty-state">No tasks found.</td></tr>
+                <tr><td colspan="7" class="empty-state">{% trans "No tasks found." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -101,17 +102,17 @@
     {% if user_role not in read_only_roles %}
     <div style="margin-top:24px;">
         <details>
-            <summary class="btn btn-primary" style="cursor:pointer;list-style:none;display:inline-block;">+ New Task</summary>
+            <summary class="btn btn-primary" style="cursor:pointer;list-style:none;display:inline-block;">+ {% trans "New Task" %}</summary>
             <div class="card" style="margin-top:12px;max-width:720px;">
                 <form method="post" action="/it/tasks/">
                     {% csrf_token %}
                     <div class="form-grid">
                         <div class="form-group full-span">
-                            <label>Task Name</label>
-                            <input type="text" name="task_name" required placeholder="Short descriptive name">
+                            <label>{% trans "Task Name" %}</label>
+                            <input type="text" name="task_name" required placeholder="{% trans 'Short descriptive name' %}">
                         </div>
                         <div class="form-group">
-                            <label>Task Type</label>
+                            <label>{% trans "Task Type" %}</label>
                             <select name="task_type">
                                 {% for tt in task_types %}
                                 <option value="{{ tt }}">{{ tt }}</option>
@@ -119,7 +120,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Priority</label>
+                            <label>{% trans "Priority" %}</label>
                             <select name="priority">
                                 {% for p in task_priorities %}
                                 <option value="{{ p }}"{% if p == 'medium' %} selected{% endif %}>{{ p|capfirst }}</option>
@@ -127,32 +128,32 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Assigned To</label>
-                            <input type="text" name="assigned_to" placeholder="Name or email">
+                            <label>{% trans "Assigned To" %}</label>
+                            <input type="text" name="assigned_to" placeholder="{% trans 'Name or email' %}">
                         </div>
                         <div class="form-group">
-                            <label>Department</label>
+                            <label>{% trans "Department" %}</label>
                             <input type="text" name="department">
                         </div>
                         <div class="form-group">
-                            <label>Scheduled Date</label>
+                            <label>{% trans "Scheduled Date" %}</label>
                             <input type="date" name="scheduled_date">
                         </div>
                         <div class="form-group">
-                            <label>Due Date</label>
+                            <label>{% trans "Due Date" %}</label>
                             <input type="date" name="due_date">
                         </div>
                         <div class="form-group full-span">
-                            <label>Description</label>
-                            <textarea name="description" placeholder="What needs to be done…"></textarea>
+                            <label>{% trans "Description" %}</label>
+                            <textarea name="description" placeholder="{% trans 'What needs to be done…' %}"></textarea>
                         </div>
                         <div class="form-group full-span">
-                            <label>Notes</label>
+                            <label>{% trans "Notes" %}</label>
                             <textarea name="notes"></textarea>
                         </div>
                     </div>
                     <div class="form-actions" style="margin-top:12px;">
-                        <button type="submit" class="btn btn-primary">Save Task</button>
+                        <button type="submit" class="btn btn-primary">{% trans "Save Task" %}</button>
                     </div>
                 </form>
             </div>

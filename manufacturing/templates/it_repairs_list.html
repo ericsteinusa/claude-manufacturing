@@ -1,17 +1,18 @@
 {% extends "base.html" %}
-{% block page_title %}Hardware Repairs{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Hardware Repairs" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -29,28 +30,28 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Hardware Repairs</div>
+    <div class="menu-title">{% trans "Hardware Repairs" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
         <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in repair_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <select name="priority" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Priorities</option>
+            <option value="">{% trans "All Priorities" %}</option>
             {% for p in repair_priorities %}
             <option value="{{ p }}"{% if priority_filter == p %} selected{% endif %}>{{ p|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search asset / reporter…"
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search asset / reporter…' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:200px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/it/repairs/" class="btn">Clear</a>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <a href="/it/repairs/" class="btn">{% trans "Clear" %}</a>
     </form>
 
     <div class="erp-table-wrap" style="margin-bottom:24px;">
@@ -58,14 +59,14 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Asset Tag</th>
-                    <th>Problem</th>
-                    <th>Reported By</th>
-                    <th>Reported</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Assigned To</th>
-                    <th>Completed</th>
+                    <th>{% trans "Asset Tag" %}</th>
+                    <th>{% trans "Problem" %}</th>
+                    <th>{% trans "Reported By" %}</th>
+                    <th>{% trans "Reported" %}</th>
+                    <th>{% trans "Priority" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Assigned To" %}</th>
+                    <th>{% trans "Completed" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -98,7 +99,7 @@
                 <td>{{ r.completed_date|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" style="color:var(--text-muted);text-align:center;padding:20px;">No repairs found.</td></tr>
+            <tr><td colspan="9" style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No repairs found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -106,20 +107,20 @@
 
     {% if user_role not in 'Auditor' %}
     <div class="card" style="max-width:900px;">
-        <div class="card-title">New Repair Request</div>
+        <div class="card-title">{% trans "New Repair Request" %}</div>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Asset Tag</label>
+                    <label>{% trans "Asset Tag" %}</label>
                     <input type="text" name="asset_tag" placeholder="e.g. LPT-042">
                 </div>
                 <div class="form-group">
-                    <label>Reported By</label>
-                    <input type="text" name="reported_by" placeholder="Name of reporter">
+                    <label>{% trans "Reported By" %}</label>
+                    <input type="text" name="reported_by" placeholder="{% trans 'Name of reporter' %}">
                 </div>
                 <div class="form-group">
-                    <label>Priority</label>
+                    <label>{% trans "Priority" %}</label>
                     <select name="priority">
                         {% for p in repair_priorities %}
                         <option value="{{ p }}"{% if p == 'medium' %} selected{% endif %}>{{ p|capfirst }}</option>
@@ -127,24 +128,24 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Assigned To</label>
-                    <input type="text" name="assigned_to" placeholder="Technician">
+                    <label>{% trans "Assigned To" %}</label>
+                    <input type="text" name="assigned_to" placeholder="{% trans 'Technician' %}">
                 </div>
                 <div class="form-group">
-                    <label>Reported Date</label>
+                    <label>{% trans "Reported Date" %}</label>
                     <input type="date" name="reported_date" value="{{ today }}">
                 </div>
                 <div class="form-group">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional notes">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'Optional notes' %}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Problem Description *</label>
-                    <textarea name="problem_description" placeholder="Describe the hardware issue"></textarea>
+                    <label>{% trans "Problem Description *" %}</label>
+                    <textarea name="problem_description" placeholder="{% trans 'Describe the hardware issue' %}"></textarea>
                 </div>
             </div>
             <div style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Submit Repair Request</button>
+                <button type="submit" class="btn btn-primary">{% trans "Submit Repair Request" %}</button>
             </div>
         </form>
     </div>

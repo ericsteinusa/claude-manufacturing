@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 16:31+0000\n"
+"POT-Creation-Date: 2026-08-31 17:03+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -129,6 +129,24 @@ msgstr "Paie"
 #: manufacturing/templates/gl_journal_detail.html:9
 #: manufacturing/templates/gl_journals.html:9
 #: manufacturing/templates/gl_trial_balance.html:9
+#: manufacturing/templates/it_asset_detail.html:15
+#: manufacturing/templates/it_asset_list.html:15
+#: manufacturing/templates/it_dashboard.html:15
+#: manufacturing/templates/it_dashboard.html:23
+#: manufacturing/templates/it_incident_detail.html:10
+#: manufacturing/templates/it_incident_list.html:15
+#: manufacturing/templates/it_license_detail.html:11
+#: manufacturing/templates/it_license_list.html:15
+#: manufacturing/templates/it_network_detail.html:11
+#: manufacturing/templates/it_network_list.html:15
+#: manufacturing/templates/it_repairs_detail.html:11
+#: manufacturing/templates/it_repairs_list.html:15
+#: manufacturing/templates/it_software_detail.html:11
+#: manufacturing/templates/it_software_list.html:15
+#: manufacturing/templates/it_task_detail.html:10
+#: manufacturing/templates/it_task_list.html:15
+#: manufacturing/templates/it_ticket_detail.html:15
+#: manufacturing/templates/it_ticket_list.html:15
 #: manufacturing/templates/legal_compliance_detail.html:10
 #: manufacturing/templates/legal_compliance_list.html:13
 #: manufacturing/templates/legal_contract_detail.html:10
@@ -299,6 +317,8 @@ msgstr "Écritures Comptables Récentes"
 #: manufacturing/templates/gl_dashboard.html:90
 #: manufacturing/templates/gl_journal_detail.html:56
 #: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/it_asset_detail.html:253
+#: manufacturing/templates/it_dashboard.html:107
 #: manufacturing/templates/tc_ot_report.html:87
 #: manufacturing/templates/tc_schedule.html:76
 #: manufacturing/templates/time_clock_attendance.html:58
@@ -339,6 +359,14 @@ msgstr "Référence"
 #: manufacturing/templates/gl_journal_detail.html:58
 #: manufacturing/templates/gl_journal_detail.html:124
 #: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/it_incident_detail.html:72
+#: manufacturing/templates/it_incident_detail.html:95
+#: manufacturing/templates/it_incident_list.html:125
+#: manufacturing/templates/it_task_detail.html:88
+#: manufacturing/templates/it_task_detail.html:114
+#: manufacturing/templates/it_task_list.html:147
+#: manufacturing/templates/it_ticket_detail.html:107
+#: manufacturing/templates/it_ticket_detail.html:177
 #: manufacturing/templates/mkt_research_detail.html:83
 #: manufacturing/templates/mkt_research_detail.html:145
 #: manufacturing/templates/mkt_research_list.html:161
@@ -412,6 +440,31 @@ msgstr "Total Débit"
 #: manufacturing/templates/eng_tasks_list.html:94
 #: manufacturing/templates/gl_accounts.html:63
 #: manufacturing/templates/gl_journal_detail.html:60
+#: manufacturing/templates/it_asset_detail.html:75
+#: manufacturing/templates/it_asset_detail.html:138
+#: manufacturing/templates/it_asset_list.html:70
+#: manufacturing/templates/it_asset_list.html:117
+#: manufacturing/templates/it_dashboard.html:106
+#: manufacturing/templates/it_incident_detail.html:91
+#: manufacturing/templates/it_incident_list.html:66
+#: manufacturing/templates/it_license_detail.html:90
+#: manufacturing/templates/it_license_detail.html:159
+#: manufacturing/templates/it_license_list.html:68
+#: manufacturing/templates/it_license_list.html:148
+#: manufacturing/templates/it_network_detail.html:93
+#: manufacturing/templates/it_network_detail.html:149
+#: manufacturing/templates/it_network_list.html:67
+#: manufacturing/templates/it_network_list.html:142
+#: manufacturing/templates/it_repairs_detail.html:80
+#: manufacturing/templates/it_repairs_list.html:67
+#: manufacturing/templates/it_software_detail.html:76
+#: manufacturing/templates/it_software_detail.html:119
+#: manufacturing/templates/it_software_list.html:63
+#: manufacturing/templates/it_software_list.html:117
+#: manufacturing/templates/it_task_detail.html:113
+#: manufacturing/templates/it_task_list.html:68
+#: manufacturing/templates/it_ticket_detail.html:67
+#: manufacturing/templates/it_ticket_list.html:68
 #: manufacturing/templates/legal_compliance_detail.html:54
 #: manufacturing/templates/legal_compliance_detail.html:101
 #: manufacturing/templates/legal_compliance_list.html:86
@@ -598,6 +651,14 @@ msgstr "Détails de la Facture"
 #: manufacturing/templates/ap_invoice_detail.html:149
 #: manufacturing/templates/ap_list.html:83
 #: manufacturing/templates/ap_list.html:120
+#: manufacturing/templates/it_license_detail.html:64
+#: manufacturing/templates/it_license_detail.html:127
+#: manufacturing/templates/it_license_list.html:62
+#: manufacturing/templates/it_license_list.html:116
+#: manufacturing/templates/it_software_detail.html:64
+#: manufacturing/templates/it_software_detail.html:107
+#: manufacturing/templates/it_software_list.html:60
+#: manufacturing/templates/it_software_list.html:105
 msgid "Vendor"
 msgstr "Fournisseur"
 
@@ -666,6 +727,14 @@ msgstr "Taux de Change"
 #: manufacturing/templates/eng_project_detail.html:112
 #: manufacturing/templates/eng_spec_detail.html:102
 #: manufacturing/templates/eng_task_detail.html:111
+#: manufacturing/templates/it_asset_detail.html:214
+#: manufacturing/templates/it_incident_detail.html:81
+#: manufacturing/templates/it_license_detail.html:175
+#: manufacturing/templates/it_network_detail.html:165
+#: manufacturing/templates/it_repairs_detail.html:168
+#: manufacturing/templates/it_software_detail.html:135
+#: manufacturing/templates/it_task_detail.html:97
+#: manufacturing/templates/it_ticket_detail.html:185
 #: manufacturing/templates/legal_compliance_detail.html:121
 #: manufacturing/templates/legal_contract_detail.html:142
 #: manufacturing/templates/legal_litigation_detail.html:134
@@ -706,6 +775,13 @@ msgstr "N° de Facture"
 #: manufacturing/templates/eng_task_detail.html:118
 #: manufacturing/templates/eng_tasks_list.html:92
 #: manufacturing/templates/eng_tasks_list.html:143
+#: manufacturing/templates/it_task_detail.html:84
+#: manufacturing/templates/it_task_detail.html:112
+#: manufacturing/templates/it_task_list.html:67
+#: manufacturing/templates/it_task_list.html:143
+#: manufacturing/templates/it_ticket_detail.html:95
+#: manufacturing/templates/it_ticket_detail.html:169
+#: manufacturing/templates/it_ticket_list.html:137
 #: manufacturing/templates/legal_compliance_detail.html:66
 #: manufacturing/templates/legal_compliance_detail.html:109
 #: manufacturing/templates/legal_compliance_list.html:84
@@ -763,6 +839,30 @@ msgstr "Méthode"
 #: manufacturing/templates/eng_tasks_list.html:155
 #: manufacturing/templates/gl_accounts.html:109
 #: manufacturing/templates/gl_accounts.html:136
+#: manufacturing/templates/it_asset_detail.html:112
+#: manufacturing/templates/it_asset_detail.html:174
+#: manufacturing/templates/it_asset_list.html:153
+#: manufacturing/templates/it_incident_detail.html:76
+#: manufacturing/templates/it_incident_detail.html:96
+#: manufacturing/templates/it_incident_list.html:129
+#: manufacturing/templates/it_license_detail.html:109
+#: manufacturing/templates/it_license_detail.html:171
+#: manufacturing/templates/it_license_list.html:160
+#: manufacturing/templates/it_network_detail.html:102
+#: manufacturing/templates/it_network_detail.html:161
+#: manufacturing/templates/it_network_list.html:154
+#: manufacturing/templates/it_repairs_detail.html:104
+#: manufacturing/templates/it_repairs_detail.html:164
+#: manufacturing/templates/it_repairs_list.html:139
+#: manufacturing/templates/it_software_detail.html:85
+#: manufacturing/templates/it_software_detail.html:131
+#: manufacturing/templates/it_software_list.html:129
+#: manufacturing/templates/it_task_detail.html:92
+#: manufacturing/templates/it_task_detail.html:115
+#: manufacturing/templates/it_task_list.html:151
+#: manufacturing/templates/it_ticket_detail.html:112
+#: manufacturing/templates/it_ticket_detail.html:181
+#: manufacturing/templates/it_ticket_list.html:145
 #: manufacturing/templates/legal_compliance_detail.html:75
 #: manufacturing/templates/legal_compliance_detail.html:117
 #: manufacturing/templates/legal_compliance_list.html:137
@@ -900,6 +1000,14 @@ msgstr "À :"
 #: manufacturing/templates/eng_specs_list.html:77
 #: manufacturing/templates/eng_tasks_list.html:81
 #: manufacturing/templates/gl_journals.html:48
+#: manufacturing/templates/it_asset_list.html:54
+#: manufacturing/templates/it_incident_list.html:54
+#: manufacturing/templates/it_license_list.html:52
+#: manufacturing/templates/it_network_list.html:59
+#: manufacturing/templates/it_repairs_list.html:53
+#: manufacturing/templates/it_software_list.html:49
+#: manufacturing/templates/it_task_list.html:55
+#: manufacturing/templates/it_ticket_list.html:55
 #: manufacturing/templates/legal_compliance_list.html:73
 #: manufacturing/templates/legal_contract_list.html:80
 #: manufacturing/templates/legal_employment_list.html:65
@@ -931,6 +1039,12 @@ msgstr "Filtrer"
 #: manufacturing/templates/gl_balance_sheet.html:47
 #: manufacturing/templates/gl_journals.html:50
 #: manufacturing/templates/gl_trial_balance.html:41
+#: manufacturing/templates/it_asset_list.html:55
+#: manufacturing/templates/it_license_list.html:53
+#: manufacturing/templates/it_network_list.html:60
+#: manufacturing/templates/it_repairs_list.html:54
+#: manufacturing/templates/it_software_list.html:50
+#: manufacturing/templates/it_ticket_list.html:56
 #: manufacturing/templates/legal_compliance_list.html:74
 #: manufacturing/templates/legal_contract_list.html:81
 #: manufacturing/templates/legal_employment_list.html:66
@@ -1421,6 +1535,14 @@ msgstr "Activités de recouvrement"
 #: manufacturing/templates/gl_accounts.html:102
 #: manufacturing/templates/gl_accounts.html:130
 #: manufacturing/templates/gl_trial_balance.html:47
+#: manufacturing/templates/it_asset_detail.html:79
+#: manufacturing/templates/it_asset_detail.html:130
+#: manufacturing/templates/it_asset_list.html:63
+#: manufacturing/templates/it_asset_list.html:109
+#: manufacturing/templates/it_license_list.html:63
+#: manufacturing/templates/it_network_list.html:71
+#: manufacturing/templates/it_task_detail.html:107
+#: manufacturing/templates/it_task_list.html:64
 #: manufacturing/templates/legal_contract_detail.html:59
 #: manufacturing/templates/legal_contract_detail.html:106
 #: manufacturing/templates/legal_contract_list.html:90
@@ -1472,6 +1594,14 @@ msgstr "Comptes de crédit"
 #: manufacturing/templates/cs_surveys_list.html:61
 #: manufacturing/templates/eng_specs_list.html:65
 #: manufacturing/templates/eng_tasks_list.html:70
+#: manufacturing/templates/it_asset_list.html:41
+#: manufacturing/templates/it_incident_list.html:41
+#: manufacturing/templates/it_license_list.html:45
+#: manufacturing/templates/it_network_list.html:46
+#: manufacturing/templates/it_repairs_list.html:40
+#: manufacturing/templates/it_software_list.html:42
+#: manufacturing/templates/it_task_list.html:42
+#: manufacturing/templates/it_ticket_list.html:42
 #: manufacturing/templates/legal_compliance_list.html:67
 #: manufacturing/templates/legal_contract_list.html:68
 #: manufacturing/templates/legal_employment_list.html:59
@@ -1704,6 +1834,8 @@ msgstr "Total des activités"
 #: manufacturing/templates/cs_reports.html:94
 #: manufacturing/templates/gl_dashboard.html:50
 #: manufacturing/templates/gl_dashboard.html:62
+#: manufacturing/templates/it_dashboard.html:29
+#: manufacturing/templates/it_incident_list.html:85
 #: manufacturing/templates/legal_dashboard.html:95
 #: manufacturing/templates/reports_dashboard.html:233
 msgid "Open"
@@ -1738,6 +1870,7 @@ msgstr "Tous les tickets"
 #: manufacturing/templates/cs_detail.html:7
 #: manufacturing/templates/cs_escalations.html:7
 #: manufacturing/templates/cs_list.html:6
+#: manufacturing/templates/it_ticket_list.html:104
 msgid "New Ticket"
 msgstr "Nouveau ticket"
 
@@ -1812,6 +1945,8 @@ msgstr "Tickets ouverts"
 #: manufacturing/templates/cs_reports.html:65
 #: manufacturing/templates/cs_reports.html:95
 #: manufacturing/templates/eng_dashboard.html:70
+#: manufacturing/templates/it_repairs_list.html:69
+#: manufacturing/templates/it_task_list.html:87
 #: manufacturing/templates/legal_compliance_list.html:85
 #: manufacturing/templates/legal_dashboard.html:83
 #: manufacturing/templates/mkt_analytics.html:143
@@ -1843,6 +1978,7 @@ msgid "Avg Age Open"
 msgstr "Âge moy. ouvert"
 
 #: manufacturing/templates/cs_dashboard.html:85
+#: manufacturing/templates/it_dashboard.html:79
 msgid "Ticket Volume by Month (last 6 mo)"
 msgstr "Volume de tickets par mois (6 derniers mois)"
 
@@ -1890,6 +2026,8 @@ msgstr "Clôturé"
 
 #: manufacturing/templates/cs_dashboard.html:144
 #: manufacturing/templates/cs_list.html:94
+#: manufacturing/templates/it_dashboard.html:130
+#: manufacturing/templates/it_ticket_list.html:96
 msgid "No tickets found."
 msgstr "Aucun ticket trouvé."
 
@@ -1921,6 +2059,8 @@ msgstr[0] "Ouvert — %(counter)s jour"
 msgstr[1] "Ouvert — %(counter)s jours"
 
 #: manufacturing/templates/cs_detail.html:77
+#: manufacturing/templates/it_incident_list.html:74
+#: manufacturing/templates/it_task_list.html:79
 msgid "Critical"
 msgstr "Critique"
 
@@ -2019,6 +2159,19 @@ msgstr "Jours d'ouverture"
 #: manufacturing/templates/eng_task_detail.html:119
 #: manufacturing/templates/eng_tasks_list.html:93
 #: manufacturing/templates/eng_tasks_list.html:147
+#: manufacturing/templates/it_dashboard.html:105
+#: manufacturing/templates/it_repairs_detail.html:76
+#: manufacturing/templates/it_repairs_detail.html:144
+#: manufacturing/templates/it_repairs_list.html:66
+#: manufacturing/templates/it_repairs_list.html:123
+#: manufacturing/templates/it_task_detail.html:64
+#: manufacturing/templates/it_task_detail.html:108
+#: manufacturing/templates/it_task_list.html:66
+#: manufacturing/templates/it_task_list.html:123
+#: manufacturing/templates/it_ticket_detail.html:71
+#: manufacturing/templates/it_ticket_detail.html:157
+#: manufacturing/templates/it_ticket_list.html:67
+#: manufacturing/templates/it_ticket_list.html:125
 msgid "Priority"
 msgstr "Priorité"
 
@@ -2060,6 +2213,18 @@ msgstr "Tableau de bord SC"
 #: manufacturing/templates/cs_returns_list.html:7
 #: manufacturing/templates/cs_surveys_detail.html:7
 #: manufacturing/templates/cs_surveys_list.html:7
+#: manufacturing/templates/it_asset_detail.html:7
+#: manufacturing/templates/it_asset_list.html:7
+#: manufacturing/templates/it_dashboard.html:7
+#: manufacturing/templates/it_incident_list.html:7
+#: manufacturing/templates/it_license_list.html:7
+#: manufacturing/templates/it_network_list.html:7
+#: manufacturing/templates/it_repairs_list.html:7
+#: manufacturing/templates/it_software_list.html:7
+#: manufacturing/templates/it_task_detail.html:8
+#: manufacturing/templates/it_task_list.html:7
+#: manufacturing/templates/it_ticket_detail.html:7
+#: manufacturing/templates/it_ticket_list.html:7
 msgid "Tickets"
 msgstr "Tickets"
 
@@ -2090,6 +2255,10 @@ msgstr "Modifier l'article"
 #: manufacturing/templates/eng_spec_detail.html:66
 #: manufacturing/templates/eng_specs_list.html:86
 #: manufacturing/templates/eng_specs_list.html:121
+#: manufacturing/templates/it_incident_detail.html:52
+#: manufacturing/templates/it_incident_detail.html:89
+#: manufacturing/templates/it_incident_list.html:61
+#: manufacturing/templates/it_incident_list.html:105
 #: manufacturing/templates/legal_contract_detail.html:98
 #: manufacturing/templates/legal_contract_list.html:88
 #: manufacturing/templates/legal_contract_list.html:124
@@ -2234,6 +2403,13 @@ msgstr "Plans d'amélioration"
 #: manufacturing/templates/cs_list.html:11
 #: manufacturing/templates/eng_specs_list.html:13
 #: manufacturing/templates/eng_tasks_list.html:13
+#: manufacturing/templates/it_asset_list.html:16
+#: manufacturing/templates/it_incident_list.html:16
+#: manufacturing/templates/it_license_list.html:16
+#: manufacturing/templates/it_network_list.html:16
+#: manufacturing/templates/it_software_list.html:16
+#: manufacturing/templates/it_task_list.html:16
+#: manufacturing/templates/it_ticket_list.html:16
 #: manufacturing/templates/legal_compliance_list.html:14
 #: manufacturing/templates/legal_contract_list.html:14
 #: manufacturing/templates/legal_litigation_list.html:14
@@ -2247,6 +2423,13 @@ msgstr "CSV"
 #: manufacturing/templates/cs_list.html:12
 #: manufacturing/templates/eng_specs_list.html:14
 #: manufacturing/templates/eng_tasks_list.html:14
+#: manufacturing/templates/it_asset_list.html:17
+#: manufacturing/templates/it_incident_list.html:17
+#: manufacturing/templates/it_license_list.html:17
+#: manufacturing/templates/it_network_list.html:17
+#: manufacturing/templates/it_software_list.html:17
+#: manufacturing/templates/it_task_list.html:17
+#: manufacturing/templates/it_ticket_list.html:17
 #: manufacturing/templates/legal_compliance_list.html:15
 #: manufacturing/templates/legal_contract_list.html:15
 #: manufacturing/templates/legal_litigation_list.html:15
@@ -2338,6 +2521,7 @@ msgid "Internal notes…"
 msgstr "Notes internes…"
 
 #: manufacturing/templates/cs_new.html:70
+#: manufacturing/templates/it_ticket_list.html:150
 msgid "Create Ticket"
 msgstr "Créer le ticket"
 
@@ -2451,6 +2635,7 @@ msgid "2 years"
 msgstr "2 ans"
 
 #: manufacturing/templates/cs_reports.html:57
+#: manufacturing/templates/it_dashboard.html:41
 msgid "Total Tickets"
 msgstr "Total des tickets"
 
@@ -2556,6 +2741,7 @@ msgstr "Montant du remboursement"
 #: manufacturing/templates/eng_task_detail.html:121
 #: manufacturing/templates/gl_journal_detail.html:59
 #: manufacturing/templates/gl_journals.html:59
+#: manufacturing/templates/it_ticket_detail.html:103
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:45
 msgid "Created By"
@@ -2694,6 +2880,8 @@ msgid "Surveys & Feedback"
 msgstr "Enquêtes et retours"
 
 #: manufacturing/templates/cs_surveys_list.html:67
+#: manufacturing/templates/it_asset_list.html:47
+#: manufacturing/templates/it_network_list.html:52
 #: manufacturing/templates/legal_contract_list.html:74
 #: manufacturing/templates/legal_litigation_list.html:74
 #: manufacturing/templates/mkt_content_list.html:70
@@ -2833,6 +3021,23 @@ msgstr "Projets"
 #: manufacturing/templates/eng_specs_list.html:8
 #: manufacturing/templates/eng_task_detail.html:8
 #: manufacturing/templates/eng_tasks_list.html:8
+#: manufacturing/templates/it_asset_detail.html:13
+#: manufacturing/templates/it_asset_list.html:13
+#: manufacturing/templates/it_dashboard.html:13
+#: manufacturing/templates/it_incident_detail.html:8
+#: manufacturing/templates/it_incident_list.html:8
+#: manufacturing/templates/it_license_detail.html:9
+#: manufacturing/templates/it_license_list.html:13
+#: manufacturing/templates/it_network_detail.html:9
+#: manufacturing/templates/it_network_list.html:13
+#: manufacturing/templates/it_repairs_detail.html:9
+#: manufacturing/templates/it_repairs_list.html:13
+#: manufacturing/templates/it_software_detail.html:9
+#: manufacturing/templates/it_software_list.html:13
+#: manufacturing/templates/it_task_detail.html:7
+#: manufacturing/templates/it_task_list.html:8
+#: manufacturing/templates/it_ticket_detail.html:13
+#: manufacturing/templates/it_ticket_list.html:13
 msgid "Tasks"
 msgstr "Tâches"
 
@@ -2949,6 +3154,7 @@ msgstr "Numéro"
 #: manufacturing/templates/eng_project_detail.html:119
 #: manufacturing/templates/eng_project_detail.html:130
 #: manufacturing/templates/eng_reports.html:101
+#: manufacturing/templates/it_ticket_list.html:70
 #: manufacturing/templates/maint_dashboard.html:84
 msgid "Due"
 msgstr "Dû"
@@ -3093,12 +3299,29 @@ msgstr "Tâche"
 #: manufacturing/templates/eng_task_detail.html:117
 #: manufacturing/templates/eng_tasks_list.html:91
 #: manufacturing/templates/eng_tasks_list.html:134
+#: manufacturing/templates/it_asset_detail.html:95
+#: manufacturing/templates/it_asset_detail.html:158
+#: manufacturing/templates/it_asset_list.html:67
+#: manufacturing/templates/it_asset_list.html:137
+#: manufacturing/templates/it_repairs_detail.html:84
+#: manufacturing/templates/it_repairs_detail.html:152
+#: manufacturing/templates/it_repairs_list.html:68
+#: manufacturing/templates/it_repairs_list.html:131
+#: manufacturing/templates/it_task_detail.html:72
+#: manufacturing/templates/it_task_detail.html:109
+#: manufacturing/templates/it_task_list.html:65
+#: manufacturing/templates/it_task_list.html:131
+#: manufacturing/templates/it_ticket_detail.html:87
+#: manufacturing/templates/it_ticket_detail.html:165
+#: manufacturing/templates/it_ticket_list.html:71
+#: manufacturing/templates/it_ticket_list.html:133
 msgid "Assigned To"
 msgstr "Assigné à"
 
 #: manufacturing/templates/eng_project_detail.html:142
 #: manufacturing/templates/gl_accounts.html:64
 #: manufacturing/templates/gl_accounts.html:79
+#: manufacturing/templates/it_software_detail.html:94
 #: manufacturing/templates/payroll_pay_rates.html:65
 #: manufacturing/templates/payroll_pay_rates.html:87
 #: manufacturing/templates/report_builder_detail.html:7
@@ -3120,15 +3343,21 @@ msgstr "Modifier la tâche"
 #: manufacturing/templates/eng_project_detail.html:185
 #: manufacturing/templates/eng_task_detail.html:74
 #: manufacturing/templates/eng_tasks_list.html:121
+#: manufacturing/templates/it_task_detail.html:52
+#: manufacturing/templates/it_task_list.html:63
+#: manufacturing/templates/it_task_list.html:111
 msgid "Task Name"
 msgstr "Nom de la tâche"
 
 #: manufacturing/templates/eng_project_detail.html:174
+#: manufacturing/templates/it_task_list.html:156
 msgid "Save Task"
 msgstr "Enregistrer la tâche"
 
 #: manufacturing/templates/eng_project_detail.html:175
 #: manufacturing/templates/gl_accounts.html:115
+#: manufacturing/templates/it_incident_detail.html:82
+#: manufacturing/templates/it_task_detail.html:98
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/tc_device_form.html:194
 msgid "Cancel"
@@ -3225,6 +3454,10 @@ msgstr "Numéro de norme"
 #: manufacturing/templates/eng_spec_detail.html:110
 #: manufacturing/templates/eng_specs_list.html:88
 #: manufacturing/templates/eng_specs_list.html:133
+#: manufacturing/templates/it_software_detail.html:60
+#: manufacturing/templates/it_software_detail.html:103
+#: manufacturing/templates/it_software_list.html:59
+#: manufacturing/templates/it_software_list.html:101
 msgid "Version"
 msgstr "Version"
 
@@ -3294,14 +3527,19 @@ msgid "Engineering Tasks"
 msgstr "Tâches d'ingénierie"
 
 #: manufacturing/templates/eng_tasks_list.html:76
+#: manufacturing/templates/it_repairs_list.html:46
+#: manufacturing/templates/it_task_list.html:48
+#: manufacturing/templates/it_ticket_list.html:48
 msgid "All Priorities"
 msgstr "Toutes les priorités"
 
 #: manufacturing/templates/eng_tasks_list.html:108
+#: manufacturing/templates/it_task_list.html:96
 msgid "No tasks found."
 msgstr "Aucune tâche trouvée."
 
 #: manufacturing/templates/eng_tasks_list.html:116
+#: manufacturing/templates/it_task_list.html:105
 msgid "New Task"
 msgstr "Nouvelle tâche"
 
@@ -3356,6 +3594,7 @@ msgstr "Sous-Type"
 
 #: manufacturing/templates/gl_accounts.html:75
 #: manufacturing/templates/gl_accounts.html:108
+#: manufacturing/templates/it_dashboard.html:53
 #: manufacturing/templates/legal_dashboard.html:63
 #: manufacturing/templates/marketing_dashboard.html:70
 #: manufacturing/templates/mkt_analytics.html:142
@@ -3435,11 +3674,25 @@ msgid "Balance Sheet as of %(as_of)s"
 msgstr "Bilan au %(as_of)s"
 
 #: manufacturing/templates/gl_balance_sheet.html:58
+#: manufacturing/templates/it_asset_detail.html:8
+#: manufacturing/templates/it_asset_list.html:8
+#: manufacturing/templates/it_dashboard.html:8
+#: manufacturing/templates/it_incident_list.html:9
+#: manufacturing/templates/it_license_list.html:8
+#: manufacturing/templates/it_network_detail.html:8
+#: manufacturing/templates/it_network_list.html:8
+#: manufacturing/templates/it_repairs_detail.html:8
+#: manufacturing/templates/it_repairs_list.html:8
+#: manufacturing/templates/it_software_list.html:8
+#: manufacturing/templates/it_task_list.html:9
+#: manufacturing/templates/it_ticket_detail.html:8
+#: manufacturing/templates/it_ticket_list.html:8
 msgid "Assets"
 msgstr "Actifs"
 
 #: manufacturing/templates/gl_balance_sheet.html:66
 #: manufacturing/templates/gl_balance_sheet.html:103
+#: manufacturing/templates/it_dashboard.html:49
 msgid "Total Assets"
 msgstr "Total des Actifs"
 
@@ -3562,7 +3815,12 @@ msgid ""
 "reconcile with it —\n"
 "                see the notes on inventory and financing above for why they "
 "may not tie exactly."
-msgstr "Les montants de début/fin ci-dessus correspondent au solde bancaire réel enregistré, présentés à côté de la variation nette calculée plutôt que forcés à s'y réconcilier exactement ; voir les notes sur les stocks et le financement ci-dessus pour comprendre pourquoi ils peuvent ne pas correspondre exactement."
+msgstr ""
+"Les montants de début/fin ci-dessus correspondent au solde bancaire réel "
+"enregistré, présentés à côté de la variation nette calculée plutôt que "
+"forcés à s'y réconcilier exactement ; voir les notes sur les stocks et le "
+"financement ci-dessus pour comprendre pourquoi ils peuvent ne pas "
+"correspondre exactement."
 
 #: manufacturing/templates/gl_dashboard.html:57
 msgid "View A/P →"
@@ -3581,7 +3839,9 @@ msgstr "Naviguer"
 msgid ""
 "Chart of Accounts<br><span style=\"font-size:12px;font-weight:normal;"
 "\">(%(count)s accounts)</span>"
-msgstr "Plan Comptable<br><span style=\"font-size:12px;font-weight:normal;\">(%(count)s comptes)</span>"
+msgstr ""
+"Plan Comptable<br><span style=\"font-size:12px;font-weight:normal;"
+"\">(%(count)s comptes)</span>"
 
 #: manufacturing/templates/gl_dashboard.html:78
 #: manufacturing/templates/gl_journal_detail.html:3
@@ -3595,6 +3855,7 @@ msgid "Total Dr"
 msgstr "Total Débit"
 
 #: manufacturing/templates/gl_dashboard.html:91
+#: manufacturing/templates/it_asset_detail.html:256
 msgid "By"
 msgstr "Par"
 
@@ -3777,7 +4038,9 @@ msgstr "DÉSÉQUILIBRÉ de $%(amt)s"
 msgid ""
 "No posted journal entries found. Post some journal entries to see the trial "
 "balance."
-msgstr "Aucune écriture comptabilisée trouvée. Comptabilisez des écritures pour afficher la balance générale."
+msgstr ""
+"Aucune écriture comptabilisée trouvée. Comptabilisez des écritures pour "
+"afficher la balance générale."
 
 #: manufacturing/templates/home.html:4
 msgid "Login"
@@ -3815,6 +4078,1015 @@ msgstr "Êtes-vous client ? Connectez-vous au Portail Client"
 #: manufacturing/templates/home.html:51
 msgid "Are you a supplier? Log in to the Supplier Portal"
 msgstr "Êtes-vous fournisseur ? Connectez-vous au Portail Fournisseur"
+
+#: manufacturing/templates/it_asset_detail.html:3
+#: manufacturing/templates/it_asset_detail.html:67
+#, python-format
+msgid "Asset %(tag)s"
+msgstr "Actif %(tag)s"
+
+#: manufacturing/templates/it_asset_detail.html:6
+#: manufacturing/templates/it_asset_list.html:6
+#: manufacturing/templates/it_dashboard.html:3
+#: manufacturing/templates/it_dashboard.html:6
+#: manufacturing/templates/it_incident_detail.html:6
+#: manufacturing/templates/it_incident_list.html:6
+#: manufacturing/templates/it_license_detail.html:6
+#: manufacturing/templates/it_license_list.html:6
+#: manufacturing/templates/it_network_detail.html:6
+#: manufacturing/templates/it_network_list.html:6
+#: manufacturing/templates/it_repairs_detail.html:6
+#: manufacturing/templates/it_repairs_list.html:6
+#: manufacturing/templates/it_software_detail.html:6
+#: manufacturing/templates/it_software_list.html:6
+#: manufacturing/templates/it_task_detail.html:6
+#: manufacturing/templates/it_task_list.html:6
+#: manufacturing/templates/it_ticket_detail.html:6
+#: manufacturing/templates/it_ticket_list.html:6
+msgid "IT Dashboard"
+msgstr "Tableau de Bord TI"
+
+#: manufacturing/templates/it_asset_detail.html:9
+#: manufacturing/templates/it_asset_list.html:9
+#: manufacturing/templates/it_dashboard.html:9
+#: manufacturing/templates/it_incident_list.html:10
+#: manufacturing/templates/it_license_list.html:9
+#: manufacturing/templates/it_network_list.html:9
+#: manufacturing/templates/it_repairs_detail.html:7
+#: manufacturing/templates/it_repairs_list.html:9
+#: manufacturing/templates/it_software_list.html:9
+#: manufacturing/templates/it_task_list.html:10
+#: manufacturing/templates/it_ticket_detail.html:9
+#: manufacturing/templates/it_ticket_list.html:9
+msgid "Repairs"
+msgstr "Réparations"
+
+#: manufacturing/templates/it_asset_detail.html:10
+#: manufacturing/templates/it_asset_list.html:10
+#: manufacturing/templates/it_dashboard.html:10
+#: manufacturing/templates/it_incident_list.html:11
+#: manufacturing/templates/it_license_detail.html:7
+#: manufacturing/templates/it_license_detail.html:60
+#: manufacturing/templates/it_license_list.html:10
+#: manufacturing/templates/it_license_list.html:61
+#: manufacturing/templates/it_network_list.html:10
+#: manufacturing/templates/it_repairs_list.html:10
+#: manufacturing/templates/it_software_detail.html:7
+#: manufacturing/templates/it_software_list.html:10
+#: manufacturing/templates/it_task_list.html:11
+#: manufacturing/templates/it_ticket_detail.html:10
+#: manufacturing/templates/it_ticket_list.html:10
+msgid "Software"
+msgstr "Logiciels"
+
+#: manufacturing/templates/it_asset_detail.html:11
+#: manufacturing/templates/it_asset_list.html:11
+#: manufacturing/templates/it_dashboard.html:11
+#: manufacturing/templates/it_incident_list.html:12
+#: manufacturing/templates/it_license_detail.html:8
+#: manufacturing/templates/it_license_list.html:11
+#: manufacturing/templates/it_network_list.html:11
+#: manufacturing/templates/it_repairs_list.html:11
+#: manufacturing/templates/it_software_detail.html:8
+#: manufacturing/templates/it_software_list.html:11
+#: manufacturing/templates/it_task_list.html:12
+#: manufacturing/templates/it_ticket_detail.html:11
+#: manufacturing/templates/it_ticket_list.html:11
+msgid "Licenses"
+msgstr "Licences"
+
+#: manufacturing/templates/it_asset_detail.html:12
+#: manufacturing/templates/it_asset_list.html:12
+#: manufacturing/templates/it_dashboard.html:12
+#: manufacturing/templates/it_incident_detail.html:9
+#: manufacturing/templates/it_incident_list.html:13
+#: manufacturing/templates/it_license_list.html:12
+#: manufacturing/templates/it_network_detail.html:7
+#: manufacturing/templates/it_network_list.html:12
+#: manufacturing/templates/it_repairs_list.html:12
+#: manufacturing/templates/it_software_list.html:12
+#: manufacturing/templates/it_task_list.html:13
+#: manufacturing/templates/it_ticket_detail.html:12
+#: manufacturing/templates/it_ticket_list.html:12
+msgid "Network"
+msgstr "Réseau"
+
+#: manufacturing/templates/it_asset_detail.html:14
+#: manufacturing/templates/it_asset_list.html:14
+#: manufacturing/templates/it_dashboard.html:14
+#: manufacturing/templates/it_incident_detail.html:7
+#: manufacturing/templates/it_incident_list.html:14
+#: manufacturing/templates/it_license_detail.html:10
+#: manufacturing/templates/it_license_list.html:14
+#: manufacturing/templates/it_network_detail.html:10
+#: manufacturing/templates/it_network_list.html:14
+#: manufacturing/templates/it_repairs_detail.html:10
+#: manufacturing/templates/it_repairs_list.html:14
+#: manufacturing/templates/it_software_detail.html:10
+#: manufacturing/templates/it_software_list.html:14
+#: manufacturing/templates/it_task_detail.html:9
+#: manufacturing/templates/it_task_list.html:14
+#: manufacturing/templates/it_ticket_detail.html:14
+#: manufacturing/templates/it_ticket_list.html:14
+msgid "Incidents"
+msgstr "Incidents"
+
+#: manufacturing/templates/it_asset_detail.html:16
+msgid "Print Label"
+msgstr "Imprimer l'Étiquette"
+
+#: manufacturing/templates/it_asset_detail.html:83
+#: manufacturing/templates/it_asset_detail.html:146
+#: manufacturing/templates/it_asset_list.html:64
+#: manufacturing/templates/it_asset_list.html:125
+msgid "Make"
+msgstr "Marque"
+
+#: manufacturing/templates/it_asset_detail.html:87
+#: manufacturing/templates/it_asset_detail.html:150
+#: manufacturing/templates/it_asset_list.html:65
+#: manufacturing/templates/it_asset_list.html:129
+#: manufacturing/templates/it_network_detail.html:85
+#: manufacturing/templates/it_network_detail.html:141
+#: manufacturing/templates/it_network_list.html:134
+msgid "Model"
+msgstr "Modèle"
+
+#: manufacturing/templates/it_asset_detail.html:91
+#: manufacturing/templates/it_asset_detail.html:154
+#: manufacturing/templates/it_asset_list.html:66
+#: manufacturing/templates/it_asset_list.html:133
+msgid "Serial #"
+msgstr "N° de Série"
+
+#: manufacturing/templates/it_asset_detail.html:99
+#: manufacturing/templates/it_asset_detail.html:162
+#: manufacturing/templates/it_asset_list.html:141
+#: manufacturing/templates/it_dashboard.html:103
+#: manufacturing/templates/it_task_detail.html:76
+#: manufacturing/templates/it_task_detail.html:110
+#: manufacturing/templates/it_task_list.html:135
+#: manufacturing/templates/it_ticket_detail.html:79
+#: manufacturing/templates/it_ticket_detail.html:145
+#: manufacturing/templates/it_ticket_list.html:113
+#: manufacturing/templates/tc_ot_report.html:113
+#: manufacturing/templates/time_clock_attendance.html:85
+msgid "Department"
+msgstr "Département"
+
+#: manufacturing/templates/it_asset_detail.html:103
+#: manufacturing/templates/it_asset_detail.html:166
+#: manufacturing/templates/it_asset_list.html:145
+#: manufacturing/templates/it_license_detail.html:94
+#: manufacturing/templates/it_license_detail.html:151
+#: manufacturing/templates/it_license_list.html:65
+#: manufacturing/templates/it_license_list.html:140
+msgid "Purchase Date"
+msgstr "Date d'Achat"
+
+#: manufacturing/templates/it_asset_detail.html:107
+#: manufacturing/templates/it_asset_detail.html:170
+#: manufacturing/templates/it_asset_list.html:69
+#: manufacturing/templates/it_asset_list.html:149
+msgid "Warranty Exp"
+msgstr "Expir. Garantie"
+
+#: manufacturing/templates/it_asset_detail.html:121
+msgid "Edit Asset"
+msgstr "Modifier l'Actif"
+
+#: manufacturing/templates/it_asset_detail.html:126
+#: manufacturing/templates/it_asset_list.html:105
+msgid "Asset Tag *"
+msgstr "Étiquette d'Actif *"
+
+#: manufacturing/templates/it_asset_detail.html:179
+msgid "Financial &amp; Depreciation"
+msgstr "Finances et Amortissement"
+
+#: manufacturing/templates/it_asset_detail.html:182
+msgid "Purchase Price ($)"
+msgstr "Prix d'Achat ($)"
+
+#: manufacturing/templates/it_asset_detail.html:186
+msgid "Salvage Value ($)"
+msgstr "Valeur Résiduelle ($)"
+
+#: manufacturing/templates/it_asset_detail.html:190
+msgid "Useful Life (years)"
+msgstr "Durée de Vie Utile (années)"
+
+#: manufacturing/templates/it_asset_detail.html:194
+msgid "Depreciation Method"
+msgstr "Méthode d'Amortissement"
+
+#: manufacturing/templates/it_asset_detail.html:202
+msgid "Vendor / Supplier"
+msgstr "Fournisseur"
+
+#: manufacturing/templates/it_asset_detail.html:203
+msgid "Vendor name"
+msgstr "Nom du fournisseur"
+
+#: manufacturing/templates/it_asset_detail.html:206
+#: manufacturing/templates/it_network_detail.html:89
+#: manufacturing/templates/it_network_detail.html:145
+#: manufacturing/templates/it_network_list.html:73
+#: manufacturing/templates/it_network_list.html:138
+#: manufacturing/templates/tc_device_form.html:97
+#: manufacturing/templates/tc_device_list.html:41
+msgid "Location"
+msgstr "Emplacement"
+
+#: manufacturing/templates/it_asset_detail.html:207
+msgid "Room / Building"
+msgstr "Salle / Bâtiment"
+
+#: manufacturing/templates/it_asset_detail.html:210
+msgid "Cost Center"
+msgstr "Centre de Coûts"
+
+#: manufacturing/templates/it_asset_detail.html:211
+msgid "e.g. IT"
+msgstr "p. ex. TI"
+
+#: manufacturing/templates/it_asset_detail.html:221
+msgid "Depreciation Summary"
+msgstr "Résumé de l'Amortissement"
+
+#: manufacturing/templates/it_asset_detail.html:224
+msgid "Purchase Cost"
+msgstr "Coût d'Achat"
+
+#: manufacturing/templates/it_asset_detail.html:228
+msgid "Annual Dep."
+msgstr "Amort. Annuel"
+
+#: manufacturing/templates/it_asset_detail.html:232
+msgid "Accumulated"
+msgstr "Cumulé"
+
+#: manufacturing/templates/it_asset_detail.html:236
+msgid "Book Value"
+msgstr "Valeur Comptable"
+
+#: manufacturing/templates/it_asset_detail.html:240
+#, python-format
+msgid "Method: %(method)s"
+msgstr "Méthode : %(method)s"
+
+#: manufacturing/templates/it_asset_detail.html:241
+#, python-format
+msgid "Vendor: %(vendor)s"
+msgstr "Fournisseur : %(vendor)s"
+
+#: manufacturing/templates/it_asset_detail.html:242
+#, python-format
+msgid "Location: %(loc)s"
+msgstr "Emplacement : %(loc)s"
+
+#: manufacturing/templates/it_asset_detail.html:249
+msgid "Assignment History"
+msgstr "Historique d'Attribution"
+
+#: manufacturing/templates/it_asset_detail.html:254
+msgid "Event"
+msgstr "Événement"
+
+#: manufacturing/templates/it_asset_detail.html:255
+#: manufacturing/templates/it_repairs_detail.html:61
+#: manufacturing/templates/it_software_detail.html:53
+msgid "Details"
+msgstr "Détails"
+
+#: manufacturing/templates/it_asset_list.html:3
+msgid "IT Assets"
+msgstr "Actifs TI"
+
+#: manufacturing/templates/it_asset_list.html:34
+msgid "IT Asset Inventory"
+msgstr "Inventaire des Actifs TI"
+
+#: manufacturing/templates/it_asset_list.html:52
+msgid "Search tag / make / model…"
+msgstr "Rechercher étiquette / marque / modèle…"
+
+#: manufacturing/templates/it_asset_list.html:62
+#: manufacturing/templates/it_repairs_detail.html:64
+#: manufacturing/templates/it_repairs_detail.html:132
+#: manufacturing/templates/it_repairs_list.html:62
+#: manufacturing/templates/it_repairs_list.html:115
+#: manufacturing/templates/it_software_detail.html:68
+#: manufacturing/templates/it_software_detail.html:111
+#: manufacturing/templates/it_software_list.html:61
+#: manufacturing/templates/it_software_list.html:109
+msgid "Asset Tag"
+msgstr "Étiquette d'Actif"
+
+#: manufacturing/templates/it_asset_list.html:68
+#: manufacturing/templates/it_ticket_list.html:65
+msgid "Dept"
+msgstr "Dépt."
+
+#: manufacturing/templates/it_asset_list.html:92
+msgid "No assets found."
+msgstr "Aucun actif trouvé."
+
+#: manufacturing/templates/it_asset_list.html:100
+msgid "New Asset"
+msgstr "Nouvel Actif"
+
+#: manufacturing/templates/it_asset_list.html:106
+msgid "Unique asset tag"
+msgstr "Étiquette d'actif unique"
+
+#: manufacturing/templates/it_asset_list.html:126
+msgid "e.g. Dell, HP"
+msgstr "p. ex. Dell, HP"
+
+#: manufacturing/templates/it_asset_list.html:138
+msgid "Leave blank if spare"
+msgstr "Laisser vide si de rechange"
+
+#: manufacturing/templates/it_asset_list.html:158
+msgid "Add Asset"
+msgstr "Ajouter un Actif"
+
+#: manufacturing/templates/it_dashboard.html:20
+msgid "Information Technology Dashboard"
+msgstr "Tableau de Bord des Technologies de l'Information"
+
+#: manufacturing/templates/it_dashboard.html:26
+msgid "Help Desk Tickets"
+msgstr "Tickets d'Assistance"
+
+#: manufacturing/templates/it_dashboard.html:33
+#: manufacturing/templates/it_task_list.html:88
+#: manufacturing/templates/prod_dashboard_kpis.html:8
+msgid "In Progress"
+msgstr "En cours"
+
+#: manufacturing/templates/it_dashboard.html:37
+msgid "Critical (Open)"
+msgstr "Critique (Ouvert)"
+
+#: manufacturing/templates/it_dashboard.html:46
+msgid "Asset Inventory"
+msgstr "Inventaire des Actifs"
+
+#: manufacturing/templates/it_dashboard.html:57
+msgid "In Repair"
+msgstr "En Réparation"
+
+#: manufacturing/templates/it_dashboard.html:64
+msgid "Tickets by Status"
+msgstr "Tickets par Statut"
+
+#: manufacturing/templates/it_dashboard.html:68
+msgid "Tickets by Priority"
+msgstr "Tickets par Priorité"
+
+#: manufacturing/templates/it_dashboard.html:75
+msgid "Tickets by Issue Type"
+msgstr "Tickets par Type de Problème"
+
+#: manufacturing/templates/it_dashboard.html:86
+msgid "Assets by Status"
+msgstr "Actifs par Statut"
+
+#: manufacturing/templates/it_dashboard.html:90
+msgid "Assets by Type"
+msgstr "Actifs par Type"
+
+#: manufacturing/templates/it_dashboard.html:96
+msgid "Recent Support Tickets"
+msgstr "Tickets d'Assistance Récents"
+
+#: manufacturing/templates/it_dashboard.html:101
+#: manufacturing/templates/it_ticket_list.html:63
+msgid "Ticket #"
+msgstr "N° de Ticket"
+
+#: manufacturing/templates/it_dashboard.html:102
+#: manufacturing/templates/it_ticket_detail.html:75
+#: manufacturing/templates/it_ticket_detail.html:141
+#: manufacturing/templates/it_ticket_list.html:64
+#: manufacturing/templates/it_ticket_list.html:109
+msgid "Requester"
+msgstr "Demandeur"
+
+#: manufacturing/templates/it_dashboard.html:104
+#: manufacturing/templates/it_ticket_detail.html:83
+#: manufacturing/templates/it_ticket_detail.html:149
+#: manufacturing/templates/it_ticket_list.html:66
+#: manufacturing/templates/it_ticket_list.html:117
+msgid "Issue Type"
+msgstr "Type de Problème"
+
+#: manufacturing/templates/it_incident_detail.html:3
+#, python-format
+msgid "Incident: %(title)s"
+msgstr "Incident : %(title)s"
+
+#: manufacturing/templates/it_incident_detail.html:42
+#: manufacturing/templates/it_repairs_detail.html:112
+#: manufacturing/templates/it_repairs_detail.html:121
+#: manufacturing/templates/it_task_detail.html:42
+msgid "Update Status"
+msgstr "Mettre à Jour le Statut"
+
+#: manufacturing/templates/it_incident_detail.html:56
+#: manufacturing/templates/it_incident_detail.html:90
+#: manufacturing/templates/it_incident_list.html:62
+#: manufacturing/templates/it_incident_list.html:109
+msgid "Severity"
+msgstr "Gravité"
+
+#: manufacturing/templates/it_incident_detail.html:64
+#: manufacturing/templates/it_incident_list.html:117
+#: manufacturing/templates/it_repairs_detail.html:72
+#: manufacturing/templates/it_repairs_detail.html:140
+#: manufacturing/templates/it_repairs_list.html:135
+msgid "Reported Date"
+msgstr "Date de Signalement"
+
+#: manufacturing/templates/it_incident_detail.html:68
+#: manufacturing/templates/it_incident_detail.html:92
+#: manufacturing/templates/it_incident_list.html:63
+#: manufacturing/templates/it_incident_list.html:121
+msgid "Affected Systems"
+msgstr "Systèmes Affectés"
+
+#: manufacturing/templates/it_incident_detail.html:93
+#: manufacturing/templates/it_incident_list.html:64
+#: manufacturing/templates/it_repairs_list.html:65
+msgid "Reported"
+msgstr "Signalé"
+
+#: manufacturing/templates/it_incident_detail.html:94
+#: manufacturing/templates/it_incident_list.html:65
+#: manufacturing/templates/it_incident_list.html:83
+#: manufacturing/templates/it_ticket_detail.html:99
+msgid "Resolved"
+msgstr "Résolu"
+
+#: manufacturing/templates/it_incident_list.html:3
+msgid "IT Network Incidents"
+msgstr "Incidents Réseau TI"
+
+#: manufacturing/templates/it_incident_list.html:34
+msgid "Network Incidents"
+msgstr "Incidents Réseau"
+
+#: manufacturing/templates/it_incident_list.html:47
+msgid "All Severities"
+msgstr "Toutes Gravités"
+
+#: manufacturing/templates/it_incident_list.html:52
+#: manufacturing/templates/it_task_list.html:53
+#: manufacturing/templates/it_ticket_list.html:53
+msgid "Search…"
+msgstr "Rechercher…"
+
+#: manufacturing/templates/it_incident_list.html:75
+msgid "Warning"
+msgstr "Avertissement"
+
+#: manufacturing/templates/it_incident_list.html:76
+msgid "Info"
+msgstr "Info"
+
+#: manufacturing/templates/it_incident_list.html:84
+msgid "Investigating"
+msgstr "En Investigation"
+
+#: manufacturing/templates/it_incident_list.html:90
+msgid "No incidents found."
+msgstr "Aucun incident trouvé."
+
+#: manufacturing/templates/it_incident_list.html:99
+msgid "Report Incident"
+msgstr "Signaler un Incident"
+
+#: manufacturing/templates/it_incident_list.html:106
+msgid "Brief incident title"
+msgstr "Titre bref de l'incident"
+
+#: manufacturing/templates/it_incident_list.html:122
+msgid "e.g. Email server, VPN, Switch A"
+msgstr "p. ex. Serveur mail, VPN, Switch A"
+
+#: manufacturing/templates/it_incident_list.html:126
+msgid "What happened…"
+msgstr "Ce qui s'est passé…"
+
+#: manufacturing/templates/it_incident_list.html:134
+msgid "Save Incident"
+msgstr "Enregistrer l'Incident"
+
+#: manufacturing/templates/it_license_detail.html:3
+#, python-format
+msgid "License #%(num)s"
+msgstr "Licence N° %(num)s"
+
+#: manufacturing/templates/it_license_detail.html:51
+#: manufacturing/templates/it_software_detail.html:47
+#, python-format
+msgid "%(name)s — #%(num)s"
+msgstr "%(name)s — N° %(num)s"
+
+#: manufacturing/templates/it_license_detail.html:57
+msgid "License Details"
+msgstr "Détails de la Licence"
+
+#: manufacturing/templates/it_license_detail.html:68
+#: manufacturing/templates/it_license_detail.html:131
+#: manufacturing/templates/it_license_list.html:120
+msgid "License Type"
+msgstr "Type de Licence"
+
+#: manufacturing/templates/it_license_detail.html:72
+#: manufacturing/templates/it_license_list.html:64
+msgid "Seats Used / Total"
+msgstr "Sièges Utilisés / Total"
+
+#: manufacturing/templates/it_license_detail.html:86
+#: manufacturing/templates/it_license_list.html:67
+msgid "Cost"
+msgstr "Coût"
+
+#: manufacturing/templates/it_license_detail.html:98
+#: manufacturing/templates/it_license_detail.html:155
+#: manufacturing/templates/it_license_list.html:66
+#: manufacturing/templates/it_license_list.html:144
+#: manufacturing/templates/legal_ip_list.html:75
+#: manufacturing/templates/legal_ip_list.html:135
+msgid "Expiry Date"
+msgstr "Date d'expiration"
+
+#: manufacturing/templates/it_license_detail.html:103
+#: manufacturing/templates/it_license_detail.html:167
+#: manufacturing/templates/it_license_list.html:156
+msgid "License Key"
+msgstr "Clé de Licence"
+
+#: manufacturing/templates/it_license_detail.html:118
+msgid "Edit License"
+msgstr "Modifier la Licence"
+
+#: manufacturing/templates/it_license_detail.html:123
+#: manufacturing/templates/it_software_detail.html:56
+#: manufacturing/templates/it_software_detail.html:99
+#: manufacturing/templates/it_software_list.html:58
+msgid "Software Name"
+msgstr "Nom du Logiciel"
+
+#: manufacturing/templates/it_license_detail.html:139
+#: manufacturing/templates/it_license_list.html:128
+msgid "Seats"
+msgstr "Sièges"
+
+#: manufacturing/templates/it_license_detail.html:143
+#: manufacturing/templates/it_license_list.html:132
+msgid "Seats Used"
+msgstr "Sièges Utilisés"
+
+#: manufacturing/templates/it_license_detail.html:147
+#: manufacturing/templates/it_license_list.html:136
+msgid "Cost ($)"
+msgstr "Coût ($)"
+
+#: manufacturing/templates/it_license_list.html:3
+msgid "License Management"
+msgstr "Gestion des Licences"
+
+#: manufacturing/templates/it_license_list.html:38
+msgid "Software License Management"
+msgstr "Gestion des Licences Logicielles"
+
+#: manufacturing/templates/it_license_list.html:50
+msgid "Search software / vendor…"
+msgstr "Rechercher logiciel / fournisseur…"
+
+#: manufacturing/templates/it_license_list.html:99
+msgid "No licenses found."
+msgstr "Aucune licence trouvée."
+
+#: manufacturing/templates/it_license_list.html:107
+#: manufacturing/templates/it_license_list.html:165
+msgid "Add License"
+msgstr "Ajouter une Licence"
+
+#: manufacturing/templates/it_license_list.html:112
+#: manufacturing/templates/it_software_list.html:97
+msgid "Software Name *"
+msgstr "Nom du Logiciel *"
+
+#: manufacturing/templates/it_license_list.html:113
+msgid "e.g. Adobe Acrobat"
+msgstr "p. ex. Adobe Acrobat"
+
+#: manufacturing/templates/it_license_list.html:117
+msgid "e.g. Adobe"
+msgstr "p. ex. Adobe"
+
+#: manufacturing/templates/it_license_list.html:157
+msgid "Optional — keep confidential"
+msgstr "Facultatif — à garder confidentiel"
+
+#: manufacturing/templates/it_license_list.html:161
+#: manufacturing/templates/it_network_list.html:155
+#: manufacturing/templates/it_repairs_list.html:140
+#: manufacturing/templates/it_software_list.html:130
+#: manufacturing/templates/mkt_ad_list.html:181
+#: manufacturing/templates/mkt_research_list.html:166
+msgid "Optional notes"
+msgstr "Notes facultatives"
+
+#: manufacturing/templates/it_network_detail.html:3
+msgid "Device"
+msgstr "Appareil"
+
+#: manufacturing/templates/it_network_detail.html:55
+msgid "Network Device"
+msgstr "Appareil Réseau"
+
+#: manufacturing/templates/it_network_detail.html:62
+msgid "Device Information"
+msgstr "Informations sur l'Appareil"
+
+#: manufacturing/templates/it_network_detail.html:65
+#: manufacturing/templates/it_network_detail.html:116
+#: manufacturing/templates/it_network_list.html:68
+msgid "Hostname"
+msgstr "Nom d'Hôte"
+
+#: manufacturing/templates/it_network_detail.html:69
+#: manufacturing/templates/it_network_detail.html:120
+#: manufacturing/templates/it_network_list.html:69
+#: manufacturing/templates/it_network_list.html:113
+#: manufacturing/templates/tc_device_form.html:153
+#: manufacturing/templates/tc_device_list.html:43
+msgid "IP Address"
+msgstr "Adresse IP"
+
+#: manufacturing/templates/it_network_detail.html:73
+#: manufacturing/templates/it_network_detail.html:124
+#: manufacturing/templates/it_network_list.html:70
+#: manufacturing/templates/it_network_list.html:117
+msgid "MAC Address"
+msgstr "Adresse MAC"
+
+#: manufacturing/templates/it_network_detail.html:77
+#: manufacturing/templates/it_network_detail.html:128
+#: manufacturing/templates/it_network_list.html:121
+msgid "Device Type"
+msgstr "Type d'Appareil"
+
+#: manufacturing/templates/it_network_detail.html:81
+#: manufacturing/templates/it_network_detail.html:137
+#: manufacturing/templates/it_network_list.html:130
+msgid "Manufacturer"
+msgstr "Fabricant"
+
+#: manufacturing/templates/it_network_detail.html:97
+#: manufacturing/templates/it_network_detail.html:157
+#: manufacturing/templates/it_network_list.html:74
+#: manufacturing/templates/it_network_list.html:150
+msgid "Last Seen"
+msgstr "Dernière Détection"
+
+#: manufacturing/templates/it_network_detail.html:111
+msgid "Edit Device"
+msgstr "Modifier l'Appareil"
+
+#: manufacturing/templates/it_network_detail.html:130
+#: manufacturing/templates/it_network_list.html:123
+#: manufacturing/templates/mkt_ad_detail.html:135
+#: manufacturing/templates/mkt_ad_list.html:141
+#: manufacturing/templates/mkt_budget_list.html:122
+#: manufacturing/templates/mkt_research_detail.html:114
+#: manufacturing/templates/mkt_research_list.html:130
+msgid "— Select —"
+msgstr "— Sélectionner —"
+
+#: manufacturing/templates/it_network_list.html:3
+#: manufacturing/templates/it_network_list.html:39
+msgid "Network Devices"
+msgstr "Appareils Réseau"
+
+#: manufacturing/templates/it_network_list.html:57
+msgid "Search hostname / IP / location…"
+msgstr "Rechercher hôte / IP / emplacement…"
+
+#: manufacturing/templates/it_network_list.html:72
+msgid "Manufacturer / Model"
+msgstr "Fabricant / Modèle"
+
+#: manufacturing/templates/it_network_list.html:96
+msgid "No network devices found."
+msgstr "Aucun appareil réseau trouvé."
+
+#: manufacturing/templates/it_network_list.html:104
+msgid "Add Network Device"
+msgstr "Ajouter un Appareil Réseau"
+
+#: manufacturing/templates/it_network_list.html:109
+msgid "Hostname *"
+msgstr "Nom d'Hôte *"
+
+#: manufacturing/templates/it_network_list.html:110
+msgid "e.g. sw-floor2-01"
+msgstr "p. ex. sw-floor2-01"
+
+#: manufacturing/templates/it_network_list.html:114
+msgid "e.g. 192.168.1.10"
+msgstr "p. ex. 192.168.1.10"
+
+#: manufacturing/templates/it_network_list.html:118
+msgid "e.g. AA:BB:CC:DD:EE:FF"
+msgstr "p. ex. AA:BB:CC:DD:EE:FF"
+
+#: manufacturing/templates/it_network_list.html:131
+msgid "e.g. Cisco"
+msgstr "p. ex. Cisco"
+
+#: manufacturing/templates/it_network_list.html:135
+msgid "e.g. Catalyst 2960"
+msgstr "p. ex. Catalyst 2960"
+
+#: manufacturing/templates/it_network_list.html:139
+msgid "e.g. Server Room A"
+msgstr "p. ex. Salle des Serveurs A"
+
+#: manufacturing/templates/it_network_list.html:159
+#: manufacturing/templates/tc_device_form.html:192
+#: manufacturing/templates/tc_device_list.html:7
+msgid "Add Device"
+msgstr "Ajouter l'appareil"
+
+#: manufacturing/templates/it_repairs_detail.html:3
+#, python-format
+msgid "Repair #%(num)s"
+msgstr "Réparation N° %(num)s"
+
+#: manufacturing/templates/it_repairs_detail.html:55
+#, python-format
+msgid "Repair Request #%(num)s"
+msgstr "Demande de Réparation N° %(num)s"
+
+#: manufacturing/templates/it_repairs_detail.html:68
+#: manufacturing/templates/it_repairs_detail.html:136
+#: manufacturing/templates/it_repairs_list.html:64
+#: manufacturing/templates/it_repairs_list.html:119
+msgid "Reported By"
+msgstr "Signalé Par"
+
+#: manufacturing/templates/it_repairs_detail.html:88
+#: manufacturing/templates/legal_compliance_detail.html:70
+#: manufacturing/templates/legal_compliance_detail.html:113
+msgid "Completed Date"
+msgstr "Date d'achèvement"
+
+#: manufacturing/templates/it_repairs_detail.html:93
+#: manufacturing/templates/it_repairs_detail.html:156
+msgid "Problem Description"
+msgstr "Description du Problème"
+
+#: manufacturing/templates/it_repairs_detail.html:98
+#: manufacturing/templates/it_repairs_detail.html:160
+msgid "Resolution"
+msgstr "Résolution"
+
+#: manufacturing/templates/it_repairs_detail.html:126
+msgid "Edit Repair"
+msgstr "Modifier la Réparation"
+
+#: manufacturing/templates/it_repairs_list.html:3
+#: manufacturing/templates/it_repairs_list.html:33
+msgid "Hardware Repairs"
+msgstr "Réparations Matérielles"
+
+#: manufacturing/templates/it_repairs_list.html:51
+msgid "Search asset / reporter…"
+msgstr "Rechercher actif / rapporteur…"
+
+#: manufacturing/templates/it_repairs_list.html:63
+msgid "Problem"
+msgstr "Problème"
+
+#: manufacturing/templates/it_repairs_list.html:102
+msgid "No repairs found."
+msgstr "Aucune réparation trouvée."
+
+#: manufacturing/templates/it_repairs_list.html:110
+msgid "New Repair Request"
+msgstr "Nouvelle Demande de Réparation"
+
+#: manufacturing/templates/it_repairs_list.html:120
+msgid "Name of reporter"
+msgstr "Nom du rapporteur"
+
+#: manufacturing/templates/it_repairs_list.html:132
+#: manufacturing/templates/it_ticket_list.html:134
+msgid "Technician"
+msgstr "Technicien"
+
+#: manufacturing/templates/it_repairs_list.html:143
+msgid "Problem Description *"
+msgstr "Description du Problème *"
+
+#: manufacturing/templates/it_repairs_list.html:144
+msgid "Describe the hardware issue"
+msgstr "Décrivez le problème matériel"
+
+#: manufacturing/templates/it_repairs_list.html:148
+msgid "Submit Repair Request"
+msgstr "Soumettre la Demande de Réparation"
+
+#: manufacturing/templates/it_software_detail.html:3
+#, python-format
+msgid "Software #%(num)s"
+msgstr "Logiciel N° %(num)s"
+
+#: manufacturing/templates/it_software_detail.html:72
+#: manufacturing/templates/it_software_detail.html:115
+#: manufacturing/templates/it_software_list.html:62
+#: manufacturing/templates/it_software_list.html:113
+msgid "Install Date"
+msgstr "Date d'Installation"
+
+#: manufacturing/templates/it_software_detail.html:80
+#: manufacturing/templates/it_software_detail.html:127
+#: manufacturing/templates/it_software_list.html:64
+#: manufacturing/templates/it_software_list.html:125
+msgid "Installed By"
+msgstr "Installé Par"
+
+#: manufacturing/templates/it_software_list.html:3
+#: manufacturing/templates/it_software_list.html:35
+msgid "Software Inventory"
+msgstr "Inventaire des Logiciels"
+
+#: manufacturing/templates/it_software_list.html:47
+msgid "Search software / vendor / asset…"
+msgstr "Rechercher logiciel / fournisseur / actif…"
+
+#: manufacturing/templates/it_software_list.html:84
+msgid "No software records found."
+msgstr "Aucun enregistrement logiciel trouvé."
+
+#: manufacturing/templates/it_software_list.html:92
+msgid "Add Software Installation"
+msgstr "Ajouter une Installation Logicielle"
+
+#: manufacturing/templates/it_software_list.html:98
+msgid "e.g. Microsoft Office"
+msgstr "p. ex. Microsoft Office"
+
+#: manufacturing/templates/it_software_list.html:102
+msgid "e.g. 365 / 2021"
+msgstr "p. ex. 365 / 2021"
+
+#: manufacturing/templates/it_software_list.html:106
+msgid "e.g. Microsoft"
+msgstr "p. ex. Microsoft"
+
+#: manufacturing/templates/it_software_list.html:110
+msgid "Device asset tag"
+msgstr "Étiquette d'actif de l'appareil"
+
+#: manufacturing/templates/it_software_list.html:126
+msgid "Technician name"
+msgstr "Nom du technicien"
+
+#: manufacturing/templates/it_software_list.html:134
+msgid "Add Installation"
+msgstr "Ajouter une Installation"
+
+#: manufacturing/templates/it_task_detail.html:3
+#, python-format
+msgid "IT Task %(num)s"
+msgstr "Tâche TI %(num)s"
+
+#: manufacturing/templates/it_task_detail.html:27
+#, python-format
+msgid "Task %(num)s"
+msgstr "Tâche %(num)s"
+
+#: manufacturing/templates/it_task_detail.html:56
+#: manufacturing/templates/it_task_list.html:115
+msgid "Task Type"
+msgstr "Type de Tâche"
+
+#: manufacturing/templates/it_task_detail.html:80
+#: manufacturing/templates/it_task_list.html:139
+msgid "Scheduled Date"
+msgstr "Date Planifiée"
+
+#: manufacturing/templates/it_task_detail.html:105
+#: manufacturing/templates/it_task_list.html:62
+msgid "Task #"
+msgstr "N° de Tâche"
+
+#: manufacturing/templates/it_task_detail.html:106
+#: manufacturing/templates/marketing_dashboard.html:149
+#: manufacturing/templates/mkt_campaign_detail.html:98
+#: manufacturing/templates/mkt_campaign_list.html:86
+#: manufacturing/templates/mkt_campaign_list.html:122
+#: manufacturing/templates/mkt_lead_detail.html:95
+#: manufacturing/templates/mkt_lead_list.html:87
+#: manufacturing/templates/mkt_lead_list.html:121
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:83
+#: manufacturing/templates/report_builder_list.html:20
+#: manufacturing/templates/tc_device_list.html:40
+msgid "Name"
+msgstr "Nom"
+
+#: manufacturing/templates/it_task_detail.html:111
+msgid "Scheduled"
+msgstr "Planifié"
+
+#: manufacturing/templates/it_task_list.html:3
+#: manufacturing/templates/it_task_list.html:35
+msgid "IT Tasks"
+msgstr "Tâches TI"
+
+#: manufacturing/templates/it_task_list.html:80
+msgid "High"
+msgstr "Élevée"
+
+#: manufacturing/templates/it_task_list.html:81
+msgid "Medium"
+msgstr "Moyenne"
+
+#: manufacturing/templates/it_task_list.html:89
+msgid "On Hold"
+msgstr "En Attente"
+
+#: manufacturing/templates/it_task_list.html:90
+msgid "Cancelled"
+msgstr "Annulé"
+
+#: manufacturing/templates/it_task_list.html:112
+msgid "Short descriptive name"
+msgstr "Nom descriptif court"
+
+#: manufacturing/templates/it_task_list.html:132
+msgid "Name or email"
+msgstr "Nom ou e-mail"
+
+#: manufacturing/templates/it_task_list.html:148
+msgid "What needs to be done…"
+msgstr "Ce qui doit être fait…"
+
+#: manufacturing/templates/it_ticket_detail.html:3
+#: manufacturing/templates/it_ticket_detail.html:59
+#, python-format
+msgid "Ticket %(num)s"
+msgstr "Ticket %(num)s"
+
+#: manufacturing/templates/it_ticket_detail.html:91
+#: manufacturing/templates/it_ticket_list.html:69
+msgid "Submitted"
+msgstr "Soumis"
+
+#: manufacturing/templates/it_ticket_detail.html:121
+msgid "Change Status"
+msgstr "Changer le Statut"
+
+#: manufacturing/templates/it_ticket_detail.html:135
+msgid "Edit Ticket"
+msgstr "Modifier le Ticket"
+
+#: manufacturing/templates/it_ticket_detail.html:173
+msgid "Submitted Date"
+msgstr "Date de Soumission"
+
+#: manufacturing/templates/it_ticket_list.html:3
+msgid "IT Tickets"
+msgstr "Tickets TI"
+
+#: manufacturing/templates/it_ticket_list.html:35
+msgid "IT Support Tickets"
+msgstr "Tickets d'Assistance TI"
+
+#: manufacturing/templates/it_ticket_list.html:110
+msgid "Person submitting"
+msgstr "Personne soumettant"
+
+#: manufacturing/templates/it_ticket_list.html:114
+msgid "Requester's dept"
+msgstr "Département du demandeur"
+
+#: manufacturing/templates/it_ticket_list.html:141
+msgid "Description *"
+msgstr "Description *"
+
+#: manufacturing/templates/it_ticket_list.html:142
+msgid "Describe the issue (required)"
+msgstr "Décrivez le problème (obligatoire)"
 
 #: manufacturing/templates/legal_compliance_detail.html:3
 #, python-format
@@ -3886,11 +5158,6 @@ msgstr "Contentieux"
 #: manufacturing/templates/legal_compliance_list.html:82
 msgid "Regulation"
 msgstr "Réglementation"
-
-#: manufacturing/templates/legal_compliance_detail.html:70
-#: manufacturing/templates/legal_compliance_detail.html:113
-msgid "Completed Date"
-msgstr "Date d'achèvement"
 
 #: manufacturing/templates/legal_compliance_detail.html:84
 msgid "Edit Item"
@@ -4166,11 +5433,6 @@ msgstr "Juridiction"
 #: manufacturing/templates/legal_litigation_list.html:142
 msgid "Filed Date"
 msgstr "Date de dépôt"
-
-#: manufacturing/templates/legal_ip_list.html:75
-#: manufacturing/templates/legal_ip_list.html:135
-msgid "Expiry Date"
-msgstr "Date d'expiration"
 
 #: manufacturing/templates/legal_ip_list.html:90
 msgid "No IP records found."
@@ -4524,20 +5786,6 @@ msgstr "Contenu par statut"
 msgid "Recent Campaigns"
 msgstr "Campagnes récentes"
 
-#: manufacturing/templates/marketing_dashboard.html:149
-#: manufacturing/templates/mkt_campaign_detail.html:98
-#: manufacturing/templates/mkt_campaign_list.html:86
-#: manufacturing/templates/mkt_campaign_list.html:122
-#: manufacturing/templates/mkt_lead_detail.html:95
-#: manufacturing/templates/mkt_lead_list.html:87
-#: manufacturing/templates/mkt_lead_list.html:121
-#: manufacturing/templates/payroll_deductions.html:56
-#: manufacturing/templates/payroll_deductions.html:83
-#: manufacturing/templates/report_builder_list.html:20
-#: manufacturing/templates/tc_device_list.html:40
-msgid "Name"
-msgstr "Nom"
-
 #: manufacturing/templates/marketing_dashboard.html:150
 #: manufacturing/templates/mkt_ad_detail.html:62
 #: manufacturing/templates/mkt_ad_detail.html:133
@@ -4632,14 +5880,6 @@ msgstr "Modifier l'annonce"
 msgid "Ad Name"
 msgstr "Nom de l'annonce"
 
-#: manufacturing/templates/mkt_ad_detail.html:135
-#: manufacturing/templates/mkt_ad_list.html:141
-#: manufacturing/templates/mkt_budget_list.html:122
-#: manufacturing/templates/mkt_research_detail.html:114
-#: manufacturing/templates/mkt_research_list.html:130
-msgid "— Select —"
-msgstr "— Sélectionner —"
-
 #: manufacturing/templates/mkt_ad_detail.html:146
 #: manufacturing/templates/mkt_ad_list.html:152
 #: manufacturing/templates/mkt_campaign_detail.html:138
@@ -4688,11 +5928,6 @@ msgstr "Nom de la campagne associée"
 #: manufacturing/templates/mkt_ad_list.html:177
 msgid "Campaign manager"
 msgstr "Responsable de campagne"
-
-#: manufacturing/templates/mkt_ad_list.html:181
-#: manufacturing/templates/mkt_research_list.html:166
-msgid "Optional notes"
-msgstr "Notes facultatives"
 
 #: manufacturing/templates/mkt_ad_list.html:184
 msgid "Add Ad"
@@ -5570,10 +6805,6 @@ msgstr "Aucun ordre de fabrication pour l'instant."
 msgid "Open WOs"
 msgstr "OF ouverts"
 
-#: manufacturing/templates/prod_dashboard_kpis.html:8
-msgid "In Progress"
-msgstr "En cours"
-
 #: manufacturing/templates/prod_dashboard_kpis.html:16
 msgid "Total Products"
 msgstr "Total des produits"
@@ -5950,11 +7181,6 @@ msgstr "Nom de l'appareil"
 msgid "e.g. Front Door Clock"
 msgstr "p. ex. Pointeuse de l'entrée principale"
 
-#: manufacturing/templates/tc_device_form.html:97
-#: manufacturing/templates/tc_device_list.html:41
-msgid "Location"
-msgstr "Emplacement"
-
 #: manufacturing/templates/tc_device_form.html:100
 msgid "e.g. Main Entrance"
 msgstr "p. ex. Entrée principale"
@@ -6003,11 +7229,6 @@ msgstr "La réponse doit être un tableau JSON :"
 msgid "ZKTeco Terminal Configuration"
 msgstr "Configuration du terminal ZKTeco"
 
-#: manufacturing/templates/tc_device_form.html:153
-#: manufacturing/templates/tc_device_list.html:43
-msgid "IP Address"
-msgstr "Adresse IP"
-
 #: manufacturing/templates/tc_device_form.html:159
 msgid "Port"
 msgstr "Port"
@@ -6039,11 +7260,6 @@ msgstr ""
 "Aucune connexion nécessaire. Les employés pointent leur entrée et leur "
 "sortie via la page web de la pointeuse. Utilisez « Interroger maintenant » "
 "sur l'appareil pour confirmer (cela renverra toujours 0 enregistrement)."
-
-#: manufacturing/templates/tc_device_form.html:192
-#: manufacturing/templates/tc_device_list.html:7
-msgid "Add Device"
-msgstr "Ajouter l'appareil"
 
 #: manufacturing/templates/tc_device_form.html:204
 msgid "Delete Device"
@@ -6191,11 +7407,6 @@ msgstr "Aucune entrée pour cette période."
 #: manufacturing/templates/tc_ot_report.html:108
 msgid "OT Summary — All Employees"
 msgstr "Résumé des heures sup. — Tous les employés"
-
-#: manufacturing/templates/tc_ot_report.html:113
-#: manufacturing/templates/time_clock_attendance.html:85
-msgid "Department"
-msgstr "Département"
 
 #: manufacturing/templates/tc_ot_report.html:127
 #: manufacturing/templates/time_clock_hours.html:90

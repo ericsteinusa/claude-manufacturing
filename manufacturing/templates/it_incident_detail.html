@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Incident: {{ incident.title }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with title=incident.title %}Incident: {{ title }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,7 +39,7 @@
                 <option value="{{ s }}"{% if incident.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn btn-primary" style="margin-left:6px;">Update Status</button>
+            <button type="submit" class="btn btn-primary" style="margin-left:6px;">{% trans "Update Status" %}</button>
         </form>
     </div>
 
@@ -48,11 +49,11 @@
         <div class="card" style="max-width:720px;">
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Title</label>
+                    <label>{% trans "Title" %}</label>
                     <input type="text" name="title" value="{{ incident.title }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Severity</label>
+                    <label>{% trans "Severity" %}</label>
                     <select name="severity">
                         {% for sv in incident_severities %}
                         <option value="{{ sv }}"{% if incident.severity == sv %} selected{% endif %}>{{ sv|capfirst }}</option>
@@ -60,39 +61,39 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Reported Date</label>
+                    <label>{% trans "Reported Date" %}</label>
                     <input type="date" name="reported_date" value="{{ incident.reported_date|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Affected Systems</label>
+                    <label>{% trans "Affected Systems" %}</label>
                     <input type="text" name="affected_systems" value="{{ incident.affected_systems|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description">{{ incident.description|default:'' }}</textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ incident.notes|default:'' }}</textarea>
                 </div>
             </div>
             <div class="form-actions" style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="/it/incidents/" class="btn btn-cancel">Cancel</a>
+                <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+                <a href="/it/incidents/" class="btn btn-cancel">{% trans "Cancel" %}</a>
             </div>
         </div>
     </form>
     {% else %}
     <div class="card" style="max-width:720px;">
         <dl style="display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:13px;">
-            <dt style="color:var(--text-muted);font-weight:600;">Title</dt><dd>{{ incident.title }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Severity</dt><dd>{{ incident.severity|capfirst }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Status</dt><dd>{{ incident.status|capfirst }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Affected Systems</dt><dd>{{ incident.affected_systems|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Reported</dt><dd>{{ incident.reported_date|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Resolved</dt><dd>{{ incident.resolved_date|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Description</dt><dd style="white-space:pre-wrap;">{{ incident.description|default:"—" }}</dd>
-            <dt style="color:var(--text-muted);font-weight:600;">Notes</dt><dd style="white-space:pre-wrap;">{{ incident.notes|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Title" %}</dt><dd>{{ incident.title }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Severity" %}</dt><dd>{{ incident.severity|capfirst }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Status" %}</dt><dd>{{ incident.status|capfirst }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Affected Systems" %}</dt><dd>{{ incident.affected_systems|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Reported" %}</dt><dd>{{ incident.reported_date|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Resolved" %}</dt><dd>{{ incident.resolved_date|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Description" %}</dt><dd style="white-space:pre-wrap;">{{ incident.description|default:"—" }}</dd>
+            <dt style="color:var(--text-muted);font-weight:600;">{% trans "Notes" %}</dt><dd style="white-space:pre-wrap;">{{ incident.notes|default:"—" }}</dd>
         </dl>
     </div>
     {% endif %}

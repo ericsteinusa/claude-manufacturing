@@ -559,15 +559,99 @@ Accounts, Journal Entries list, a posted journal entry's detail page
 (confirmed "Journal Entry #{num}"), the Trial Balance (confirmed the
 BALANCED/CUADRADO status pill), and the Cash Flow Statement (confirmed
 the multi-line reconciliation note), in Spanish, French, and German
-with real sample data, no console errors. **Localization coverage is
-now 92 templates across three languages** (core shell + login + main
-dashboard + all 5 htmx templates + the full Legal department (10) +
-the full Marketing department (13) + the full Reports department (4) +
-the full Payroll department (8) + the full Time Clock department (7) +
-the full Customers/Credit department (7) + the full Engineering
-department (10) + the full Customer Service department (13) + the
-full Accounting department (13)) out of ~450 total. IT (17 templates)
-is the next-smallest remaining department.
+with real sample data, no console errors.
+
+Also fully translated: the entire **IT department**
+(`it_dashboard.html`, `it_ticket_list.html`, `it_ticket_detail.html`,
+`it_asset_list.html`, `it_asset_detail.html`, `it_repairs_list.html`,
+`it_repairs_detail.html`, `it_software_list.html`,
+`it_software_detail.html`, `it_license_list.html`,
+`it_license_detail.html`, `it_network_list.html`,
+`it_network_detail.html`, `it_task_list.html`, `it_task_detail.html`,
+`it_incident_list.html`, `it_incident_detail.html` — 17 templates,
+the tenth "whole department" pass and the largest one in this series
+so far), 177 unique strings per language, all simple (no plurals —
+IT's KPI sub-labels are all single counts, no "N of M" phrasing).
+Used `{% blocktrans with %}` for six different dynamic-title shapes
+across the department's five detail pages ("Ticket {num}", "Asset
+{tag}", "Repair #{num}"/"Repair Request #{num}", "IT Task {num}"/
+"Task {num}", "Incident: {title}", and — reusing the "{name} — #{num}"
+shape twice, once for Software and once for License detail pages —
+`{{ name }} — #{{ num }}` with `name` bound to `install.software_name|
+default:"Software Installation"` / `lic.software_name|default:
+"License"` so the friendly fallback text stays translatable too, the
+same pattern as the Software/License list-page row links). Also used
+`{% blocktrans with %}` three times on the Asset detail page's
+Depreciation Summary card for "Method: {method}", "Vendor: {vendor}",
+and "Location: {loc}" — three independent inline fragments rather
+than one combined string, matching how the source template already
+built the line up piecemeal with separate `{% if %}` blocks. **Two
+bare `{{ x|default:"..." }}` fallbacks were caught and fixed before
+they were missed entirely**: the Network Device detail page's
+`page_title` and `<h2>` both defaulted directly to a literal English
+string (`"Device"` / `"Network Device"`) with no `{% trans %}`
+wrapping at all — since this is a bare filter default rather than a
+`blocktrans with` binding, Django templates don't allow a translation
+function call inside the filter argument, so the fix uses an explicit
+`{% if device.hostname %}{{ device.hostname }}{% else %}{% trans "..."
+%}{% endif %}` instead of the filter. Worth a standing note: any
+`{{ var|default:"literal text" }}` used as a heading or title needs
+this if/else expansion, not a `default:` filter fix, since the filter
+argument position can't hold a `{% trans %}` or `_()` call. **Also
+caught and fixed a Django template syntax mistake before it ever hit
+`makemessages`**: a first draft used `{% trans \"Requester's dept\"
+%}` inside a double-quoted HTML attribute, escaping the trans tag's
+own quotes with a backslash — but Django's template lexer doesn't
+support backslash-escaping inside a `{% %}` tag's own string argument,
+so the literal backslash would have leaked into the rendered output.
+The correct approach (confirmed by testing) is simpler than it looks:
+the trans tag's internal quotes are consumed during template parsing
+and never appear in the HTML output, so nesting `{% trans "Requester's
+dept" %}` directly inside `placeholder="..."` is safe as-is — no
+escaping needed at all, since the string's only special character is
+an apostrophe, which doesn't conflict with the tag's own double
+quotes. **Found the largest `msgmerge` fuzzy-matching batch in this
+series yet**: 121 of the new strings were fuzzy-matched against
+unrelated existing translations (up from Accounting's 88), including
+10 in the newly-seen combined `#, fuzzy, python-format` form (used for
+every fuzzy-matched string that also contains a `%(name)s`-style
+placeholder) — confirming that combined-flag variant isn't a one-off,
+it recurs any time a fuzzy-matched string happens to carry a
+placeholder, and a strip script must match both `#, fuzzy` and `#,
+fuzzy, python-format` (reducing the latter to plain `#, python-format`
+rather than deleting the flag outright, since the string genuinely
+does contain a placeholder). Applied the corrected strip-and-blank
+technique from the Accounting pass's fix (blank the `msgstr` whenever
+either fuzzy variant is stripped, rather than only removing the flag)
+from the start this time, so no wrong guesses ever reached a written
+translation. Full suite 3431 passed (unchanged), `manage.py check`
+clean, `compilemessages` clean, `msgfmt --check` clean on all three
+files, zero blank/duplicated entries confirmed programmatically (the
+recurring plural-concatenation false positive from the Customer
+Service pass's checker reappears here too, unrelated to this batch,
+since IT added no new plurals). Verified end-to-end against the real
+dev server: the IT dashboard, Tickets list + a resolved ticket's
+detail page (confirmed "Ticket {num}"), Assets list + an asset detail
+page (confirmed "Asset {tag}" — no sample asset has a purchase price
+set, so the Depreciation Summary card's translations couldn't be
+exercised live, though the template logic is otherwise identical to
+every other verified block), Licenses list + a license detail page
+(confirmed "{name} — Nr. {num}" in German), Software list + a
+software detail page, Network Devices list + a device detail page,
+Repairs list + a repair detail page (confirmed "Reparaturanfrage Nr.
+{num}"), Tasks list (confirmed the hardcoded priority/status pill
+translations "Hoch"/"Mittel") + a task detail page (confirmed "Task
+{num}"), and Incidents list (empty state only — no sample incidents
+exist), in German, Spanish, and French with real sample data, no
+console errors. **Localization coverage is now 109 templates across
+three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing
+department (13) + the full Reports department (4) + the full Payroll
+department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department
+(10) + the full Customer Service department (13) + the full
+Accounting department (13) + the full IT department (17)) out of
+~450 total.
 
 The main dashboard's department grid
 button labels are the one exception — they're rendered from

@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}Network Devices{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Network Devices" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&device_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&device_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&device_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&device_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -35,42 +36,42 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Network Devices</div>
+    <div class="menu-title">{% trans "Network Devices" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
         <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in device_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <select name="device_type" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Types</option>
+            <option value="">{% trans "All Types" %}</option>
             {% for t in device_types %}
             <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search hostname / IP / location…"
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search hostname / IP / location…' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:220px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/it/network/" class="btn">Clear</a>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <a href="/it/network/" class="btn">{% trans "Clear" %}</a>
     </form>
 
     <div class="erp-table-wrap" style="margin-bottom:24px;">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Status</th>
-                    <th>Hostname</th>
-                    <th>IP Address</th>
-                    <th>MAC Address</th>
-                    <th>Type</th>
-                    <th>Manufacturer / Model</th>
-                    <th>Location</th>
-                    <th>Last Seen</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Hostname" %}</th>
+                    <th>{% trans "IP Address" %}</th>
+                    <th>{% trans "MAC Address" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Manufacturer / Model" %}</th>
+                    <th>{% trans "Location" %}</th>
+                    <th>{% trans "Last Seen" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,7 +93,7 @@
                 <td>{{ d.last_seen|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="8" style="color:var(--text-muted);text-align:center;padding:20px;">No network devices found.</td></tr>
+            <tr><td colspan="8" style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No network devices found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -100,45 +101,45 @@
 
     {% if user_role != 'Auditor' %}
     <div class="card" style="max-width:900px;">
-        <div class="card-title">Add Network Device</div>
+        <div class="card-title">{% trans "Add Network Device" %}</div>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Hostname *</label>
-                    <input type="text" name="hostname" placeholder="e.g. sw-floor2-01">
+                    <label>{% trans "Hostname *" %}</label>
+                    <input type="text" name="hostname" placeholder="{% trans 'e.g. sw-floor2-01' %}">
                 </div>
                 <div class="form-group">
-                    <label>IP Address</label>
-                    <input type="text" name="ip_address" placeholder="e.g. 192.168.1.10">
+                    <label>{% trans "IP Address" %}</label>
+                    <input type="text" name="ip_address" placeholder="{% trans 'e.g. 192.168.1.10' %}">
                 </div>
                 <div class="form-group">
-                    <label>MAC Address</label>
-                    <input type="text" name="mac_address" placeholder="e.g. AA:BB:CC:DD:EE:FF">
+                    <label>{% trans "MAC Address" %}</label>
+                    <input type="text" name="mac_address" placeholder="{% trans 'e.g. AA:BB:CC:DD:EE:FF' %}">
                 </div>
                 <div class="form-group">
-                    <label>Device Type</label>
+                    <label>{% trans "Device Type" %}</label>
                     <select name="device_type">
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for t in device_types %}
                         <option value="{{ t }}">{{ t }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Manufacturer</label>
-                    <input type="text" name="manufacturer" placeholder="e.g. Cisco">
+                    <label>{% trans "Manufacturer" %}</label>
+                    <input type="text" name="manufacturer" placeholder="{% trans 'e.g. Cisco' %}">
                 </div>
                 <div class="form-group">
-                    <label>Model</label>
-                    <input type="text" name="model" placeholder="e.g. Catalyst 2960">
+                    <label>{% trans "Model" %}</label>
+                    <input type="text" name="model" placeholder="{% trans 'e.g. Catalyst 2960' %}">
                 </div>
                 <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" name="location" placeholder="e.g. Server Room A">
+                    <label>{% trans "Location" %}</label>
+                    <input type="text" name="location" placeholder="{% trans 'e.g. Server Room A' %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in device_statuses %}
                         <option value="{{ s }}"{% if s == 'online' %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -146,16 +147,16 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Last Seen</label>
+                    <label>{% trans "Last Seen" %}</label>
                     <input type="date" name="last_seen" value="{{ today }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional notes">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'Optional notes' %}">
                 </div>
             </div>
             <div style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Add Device</button>
+                <button type="submit" class="btn btn-primary">{% trans "Add Device" %}</button>
             </div>
         </form>
     </div>

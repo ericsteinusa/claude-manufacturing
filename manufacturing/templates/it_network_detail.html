@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}{{ device.hostname|default:"Device" }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if device.hostname %}{{ device.hostname }}{% else %}{% trans "Device" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,54 +52,54 @@
 <div class="it-wrap">
     <h2>
         <span class="status-dot dot-{{ device.status }}"></span>
-        {{ device.hostname|default:"Network Device" }}
+        {% if device.hostname %}{{ device.hostname }}{% else %}{% trans "Network Device" %}{% endif %}
     </h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Device Information</h3>
+        <h3>{% trans "Device Information" %}</h3>
         <div class="detail-grid three">
             <div class="detail-item">
-                <span class="lbl">Hostname</span>
+                <span class="lbl">{% trans "Hostname" %}</span>
                 <span class="val" style="font-family:monospace;">{{ device.hostname|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">IP Address</span>
+                <span class="lbl">{% trans "IP Address" %}</span>
                 <span class="val" style="font-family:monospace;">{{ device.ip_address|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">MAC Address</span>
+                <span class="lbl">{% trans "MAC Address" %}</span>
                 <span class="val" style="font-family:monospace;font-size:12px;">{{ device.mac_address|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Device Type</span>
+                <span class="lbl">{% trans "Device Type" %}</span>
                 <span class="val">{{ device.device_type|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Manufacturer</span>
+                <span class="lbl">{% trans "Manufacturer" %}</span>
                 <span class="val">{{ device.manufacturer|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Model</span>
+                <span class="lbl">{% trans "Model" %}</span>
                 <span class="val">{{ device.model|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Location</span>
+                <span class="lbl">{% trans "Location" %}</span>
                 <span class="val">{{ device.location|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Status</span>
+                <span class="lbl">{% trans "Status" %}</span>
                 <span class="val"><span class="badge s-{{ device.status }}">{{ device.status|capfirst }}</span></span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Last Seen</span>
+                <span class="lbl">{% trans "Last Seen" %}</span>
                 <span class="val">{{ device.last_seen|default:"—" }}</span>
             </div>
             {% if device.notes %}
             <div class="detail-item full-span">
-                <span class="lbl">Notes</span>
+                <span class="lbl">{% trans "Notes" %}</span>
                 <span class="val">{{ device.notes }}</span>
             </div>
             {% endif %}
@@ -107,45 +108,45 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Device</h3>
+        <h3>{% trans "Edit Device" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Hostname</label>
+                    <label>{% trans "Hostname" %}</label>
                     <input type="text" name="hostname" value="{{ device.hostname }}">
                 </div>
                 <div class="form-group">
-                    <label>IP Address</label>
+                    <label>{% trans "IP Address" %}</label>
                     <input type="text" name="ip_address" value="{{ device.ip_address }}">
                 </div>
                 <div class="form-group">
-                    <label>MAC Address</label>
+                    <label>{% trans "MAC Address" %}</label>
                     <input type="text" name="mac_address" value="{{ device.mac_address }}">
                 </div>
                 <div class="form-group">
-                    <label>Device Type</label>
+                    <label>{% trans "Device Type" %}</label>
                     <select name="device_type">
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for t in device_types %}
                         <option value="{{ t }}"{% if device.device_type == t %} selected{% endif %}>{{ t }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Manufacturer</label>
+                    <label>{% trans "Manufacturer" %}</label>
                     <input type="text" name="manufacturer" value="{{ device.manufacturer }}">
                 </div>
                 <div class="form-group">
-                    <label>Model</label>
+                    <label>{% trans "Model" %}</label>
                     <input type="text" name="model" value="{{ device.model }}">
                 </div>
                 <div class="form-group">
-                    <label>Location</label>
+                    <label>{% trans "Location" %}</label>
                     <input type="text" name="location" value="{{ device.location }}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in device_statuses %}
                         <option value="{{ s }}"{% if device.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -153,15 +154,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Last Seen</label>
+                    <label>{% trans "Last Seen" %}</label>
                     <input type="date" name="last_seen" value="{{ device.last_seen }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ device.notes }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="submit" class="btn-primary">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}
