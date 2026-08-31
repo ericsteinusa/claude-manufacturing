@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 17:36+0000\n"
+"POT-Creation-Date: 2026-08-31 21:24+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -97,6 +97,12 @@ msgstr "Budgets"
 #: manufacturing/templates/finance_dashboard.html:62
 #: manufacturing/templates/finance_tax_detail.html:8
 #: manufacturing/templates/finance_tax_list.html:8
+#: manufacturing/templates/qa_capa_list.html:8
+#: manufacturing/templates/qa_dashboard.html:8
+#: manufacturing/templates/qa_dashboard.html:104
+#: manufacturing/templates/qa_ncr_list.html:8
+#: manufacturing/templates/qa_reports.html:10
+#: manufacturing/templates/qa_supplier_list.html:7
 msgid "Audits"
 msgstr "Audits"
 
@@ -233,6 +239,18 @@ msgstr "Paie"
 #: manufacturing/templates/payroll_ytd.html:8
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
+#: manufacturing/templates/qa_audit_detail.html:8
+#: manufacturing/templates/qa_audit_list.html:9
+#: manufacturing/templates/qa_capa_detail.html:8
+#: manufacturing/templates/qa_capa_list.html:9
+#: manufacturing/templates/qa_dashboard.html:12
+#: manufacturing/templates/qa_inspection_detail.html:8
+#: manufacturing/templates/qa_inspection_list.html:10
+#: manufacturing/templates/qa_ncr_detail.html:8
+#: manufacturing/templates/qa_ncr_list.html:12
+#: manufacturing/templates/qa_reports.html:13
+#: manufacturing/templates/qa_supplier_detail.html:8
+#: manufacturing/templates/qa_supplier_list.html:9
 #: manufacturing/templates/report_builder_list.html:8
 #: manufacturing/templates/reports_dashboard.html:11
 #: manufacturing/templates/tc_ot_report.html:9
@@ -396,6 +414,8 @@ msgstr "Écritures Comptables Récentes"
 #: manufacturing/templates/gl_journals.html:57
 #: manufacturing/templates/it_asset_detail.html:253
 #: manufacturing/templates/it_dashboard.html:107
+#: manufacturing/templates/qa_inspection_detail.html:100
+#: manufacturing/templates/qa_inspection_list.html:81
 #: manufacturing/templates/tc_ot_report.html:87
 #: manufacturing/templates/tc_schedule.html:76
 #: manufacturing/templates/time_clock_attendance.html:58
@@ -453,6 +473,7 @@ msgstr "Référence"
 #: manufacturing/templates/mkt_research_detail.html:145
 #: manufacturing/templates/mkt_research_list.html:161
 #: manufacturing/templates/prod_dashboard.html:111
+#: manufacturing/templates/qa_inspection_detail.html:194
 msgid "Description"
 msgstr "Description"
 
@@ -609,6 +630,17 @@ msgstr "Total Débit"
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:41
 #: manufacturing/templates/prod_dashboard.html:114
+#: manufacturing/templates/qa_audit_detail.html:89
+#: manufacturing/templates/qa_audit_list.html:70
+#: manufacturing/templates/qa_capa_detail.html:76
+#: manufacturing/templates/qa_capa_list.html:85
+#: manufacturing/templates/qa_inspection_detail.html:194
+#: manufacturing/templates/qa_ncr_detail.html:77
+#: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/qa_reports.html:138
+#: manufacturing/templates/qa_supplier_detail.html:107
+#: manufacturing/templates/qa_supplier_list.html:85
+#: manufacturing/templates/qa_supplier_list.html:134
 #: manufacturing/templates/tc_device_form.html:221
 #: manufacturing/templates/tc_device_list.html:45
 #: manufacturing/templates/time_clock_attendance.html:89
@@ -659,6 +691,9 @@ msgstr "Perspectives IA"
 #: manufacturing/templates/eng_task_detail.html:11
 #: manufacturing/templates/eng_tasks_list.html:11
 #: manufacturing/templates/prod_dashboard.html:9
+#: manufacturing/templates/qa_dashboard.html:11
+#: manufacturing/templates/qa_dashboard.html:116
+#: manufacturing/templates/qa_reports.html:7
 msgid "Reports"
 msgstr "Rapports"
 
@@ -715,6 +750,7 @@ msgstr "G/L"
 #: manufacturing/templates/ap_invoice_detail.html:54
 #: manufacturing/templates/ar_invoice_detail.html:54
 #: manufacturing/templates/payroll_stub_detail.html:36
+#: manufacturing/templates/qa_inspection_detail.html:77
 msgid "Print / Save PDF"
 msgstr "Imprimer / Enregistrer en PDF"
 
@@ -848,6 +884,10 @@ msgstr "Taux de Change"
 #: manufacturing/templates/mkt_content_detail.html:138
 #: manufacturing/templates/mkt_lead_detail.html:135
 #: manufacturing/templates/mkt_research_detail.html:157
+#: manufacturing/templates/qa_audit_detail.html:155
+#: manufacturing/templates/qa_capa_detail.html:142
+#: manufacturing/templates/qa_ncr_detail.html:165
+#: manufacturing/templates/qa_supplier_detail.html:129
 #: manufacturing/templates/tc_device_form.html:192
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
@@ -900,6 +940,9 @@ msgstr "N° de Facture"
 #: manufacturing/templates/mkt_content_list.html:88
 #: manufacturing/templates/mkt_content_list.html:150
 #: manufacturing/templates/prod_dashboard.html:113
+#: manufacturing/templates/qa_capa_detail.html:116
+#: manufacturing/templates/qa_capa_list.html:85
+#: manufacturing/templates/qa_capa_list.html:132
 msgid "Due Date"
 msgstr "Date d'échéance"
 
@@ -1019,6 +1062,12 @@ msgstr "Méthode"
 #: manufacturing/templates/mkt_research_detail.html:153
 #: manufacturing/templates/mkt_research_list.html:165
 #: manufacturing/templates/payroll_deductions.html:192
+#: manufacturing/templates/qa_inspection_detail.html:109
+#: manufacturing/templates/qa_inspection_list.html:159
+#: manufacturing/templates/qa_ncr_detail.html:155
+#: manufacturing/templates/qa_ncr_list.html:148
+#: manufacturing/templates/qa_supplier_detail.html:119
+#: manufacturing/templates/qa_supplier_list.html:140
 msgid "Notes"
 msgstr "Notes"
 
@@ -1054,6 +1103,7 @@ msgstr "Enregistrer le Paiement"
 #: manufacturing/templates/ap_list.html:8
 #: manufacturing/templates/ar_list.html:8
 #: manufacturing/templates/payroll_history.html:12
+#: manufacturing/templates/qa_ncr_list.html:10
 #: manufacturing/templates/report_builder_detail.html:8
 msgid "Export CSV"
 msgstr "Exporter en CSV"
@@ -1061,6 +1111,7 @@ msgstr "Exporter en CSV"
 #: manufacturing/templates/ap_list.html:9
 #: manufacturing/templates/ar_list.html:9
 #: manufacturing/templates/payroll_history.html:13
+#: manufacturing/templates/qa_ncr_list.html:11
 msgid "Export Excel"
 msgstr "Exporter en Excel"
 
@@ -1193,6 +1244,10 @@ msgstr "Filtrer"
 #: manufacturing/templates/mkt_lead_list.html:80
 #: manufacturing/templates/mkt_research_list.html:81
 #: manufacturing/templates/payroll_pay_rates.html:58
+#: manufacturing/templates/qa_capa_list.html:77
+#: manufacturing/templates/qa_inspection_list.html:73
+#: manufacturing/templates/qa_ncr_list.html:79
+#: manufacturing/templates/qa_supplier_list.html:77
 msgid "Clear"
 msgstr "Effacer"
 
@@ -1321,6 +1376,16 @@ msgstr "Déconnexion"
 #: manufacturing/templates/payroll_run_detail.html:7
 #: manufacturing/templates/payroll_run_new.html:7
 #: manufacturing/templates/payroll_ytd.html:6
+#: manufacturing/templates/qa_audit_detail.html:7
+#: manufacturing/templates/qa_audit_list.html:6
+#: manufacturing/templates/qa_capa_detail.html:7
+#: manufacturing/templates/qa_capa_list.html:6
+#: manufacturing/templates/qa_inspection_detail.html:7
+#: manufacturing/templates/qa_inspection_list.html:6
+#: manufacturing/templates/qa_ncr_detail.html:7
+#: manufacturing/templates/qa_ncr_list.html:6
+#: manufacturing/templates/qa_supplier_detail.html:7
+#: manufacturing/templates/qa_supplier_list.html:6
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
@@ -1361,6 +1426,7 @@ msgid "Purchase Orders"
 msgstr "Bons de commande"
 
 #: manufacturing/templates/base.html:500
+#: manufacturing/templates/qa_inspection_list.html:8
 msgid "Suppliers"
 msgstr "Fournisseurs"
 
@@ -1701,6 +1767,14 @@ msgstr "Activités de recouvrement"
 #: manufacturing/templates/mkt_research_detail.html:112
 #: manufacturing/templates/mkt_research_list.html:90
 #: manufacturing/templates/mkt_research_list.html:128
+#: manufacturing/templates/qa_audit_detail.html:101
+#: manufacturing/templates/qa_audit_list.html:69
+#: manufacturing/templates/qa_audit_list.html:103
+#: manufacturing/templates/qa_capa_detail.html:88
+#: manufacturing/templates/qa_capa_list.html:84
+#: manufacturing/templates/qa_capa_list.html:118
+#: manufacturing/templates/qa_inspection_detail.html:194
+#: manufacturing/templates/qa_inspection_detail.html:229
 #: manufacturing/templates/tc_device_list.html:42
 msgid "Type"
 msgstr "Type"
@@ -1977,6 +2051,7 @@ msgstr "Total des activités"
 #: manufacturing/templates/it_dashboard.html:29
 #: manufacturing/templates/it_incident_list.html:85
 #: manufacturing/templates/legal_dashboard.html:95
+#: manufacturing/templates/qa_inspection_detail.html:202
 #: manufacturing/templates/reports_dashboard.html:233
 msgid "Open"
 msgstr "Ouvert"
@@ -2092,6 +2167,7 @@ msgstr "Tickets ouverts"
 #: manufacturing/templates/legal_compliance_list.html:85
 #: manufacturing/templates/legal_dashboard.html:83
 #: manufacturing/templates/mkt_analytics.html:143
+#: manufacturing/templates/qa_audit_list.html:70
 msgid "Completed"
 msgstr "Terminé"
 
@@ -2413,6 +2489,9 @@ msgstr "Modifier l'article"
 #: manufacturing/templates/mkt_research_detail.html:108
 #: manufacturing/templates/mkt_research_list.html:89
 #: manufacturing/templates/mkt_research_list.html:124
+#: manufacturing/templates/qa_audit_list.html:69
+#: manufacturing/templates/qa_capa_list.html:84
+#: manufacturing/templates/qa_ncr_list.html:86
 msgid "Title"
 msgstr "Titre"
 
@@ -2563,6 +2642,10 @@ msgstr "Plans d'amélioration"
 #: manufacturing/templates/mkt_campaign_list.html:12
 #: manufacturing/templates/mkt_lead_list.html:12
 #: manufacturing/templates/mkt_research_list.html:15
+#: manufacturing/templates/qa_audit_list.html:10
+#: manufacturing/templates/qa_capa_list.html:10
+#: manufacturing/templates/qa_inspection_list.html:11
+#: manufacturing/templates/qa_supplier_list.html:10
 msgid "CSV"
 msgstr "CSV"
 
@@ -2585,6 +2668,10 @@ msgstr "CSV"
 #: manufacturing/templates/mkt_campaign_list.html:13
 #: manufacturing/templates/mkt_lead_list.html:13
 #: manufacturing/templates/mkt_research_list.html:16
+#: manufacturing/templates/qa_audit_list.html:11
+#: manufacturing/templates/qa_capa_list.html:11
+#: manufacturing/templates/qa_inspection_list.html:12
+#: manufacturing/templates/qa_supplier_list.html:11
 msgid "Excel"
 msgstr "Excel"
 
@@ -2604,6 +2691,7 @@ msgstr "Ouverts (%(count)s)"
 
 #: manufacturing/templates/cs_list.html:28
 #: manufacturing/templates/eng_projects.html:80
+#: manufacturing/templates/qa_dashboard.html:51
 #: manufacturing/templates/reports_dashboard.html:150
 #, python-format
 msgid "%(counter)s overdue"
@@ -2682,6 +2770,11 @@ msgstr "Plans d'amélioration SC"
 #: manufacturing/templates/eng_projects.html:52
 #: manufacturing/templates/eng_projects.html:59
 #: manufacturing/templates/gl_journals.html:40
+#: manufacturing/templates/qa_audit_list.html:59
+#: manufacturing/templates/qa_capa_list.html:67
+#: manufacturing/templates/qa_inspection_list.html:63
+#: manufacturing/templates/qa_ncr_list.html:69
+#: manufacturing/templates/qa_supplier_list.html:67
 msgid "All"
 msgstr "Tous"
 
@@ -2714,6 +2807,12 @@ msgstr "Tous"
 #: manufacturing/templates/mkt_research_detail.html:121
 #: manufacturing/templates/mkt_research_list.html:91
 #: manufacturing/templates/mkt_research_list.html:137
+#: manufacturing/templates/qa_capa_detail.html:108
+#: manufacturing/templates/qa_capa_list.html:85
+#: manufacturing/templates/qa_capa_list.html:128
+#: manufacturing/templates/qa_ncr_detail.html:141
+#: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/qa_ncr_list.html:144
 #: manufacturing/templates/report_builder_detail.html:33
 #: manufacturing/templates/report_builder_list.html:24
 msgid "Owner"
@@ -2746,6 +2845,7 @@ msgstr "Titre du plan"
 
 #: manufacturing/templates/cs_plans.html:124
 #: manufacturing/templates/mkt_research_list.html:138
+#: manufacturing/templates/qa_ncr_list.html:145
 msgid "Responsible person"
 msgstr "Personne responsable"
 
@@ -2800,6 +2900,7 @@ msgid "Monthly Call Volume"
 msgstr "Volume d'appels mensuel"
 
 #: manufacturing/templates/cs_reports.html:92
+#: manufacturing/templates/qa_reports.html:214
 msgid "Month"
 msgstr "Mois"
 
@@ -3133,6 +3234,8 @@ msgid "Purchasing"
 msgstr "Achats"
 
 #: manufacturing/templates/dashboard_kpis.html:22
+#: manufacturing/templates/qa_dashboard.html:47
+#: manufacturing/templates/qa_reports.html:52
 msgid "Open NCRs"
 msgstr "NC ouvertes"
 
@@ -3517,6 +3620,10 @@ msgstr "Enregistrer la tâche"
 #: manufacturing/templates/it_incident_detail.html:82
 #: manufacturing/templates/it_task_detail.html:98
 #: manufacturing/templates/payroll_pay_rates.html:131
+#: manufacturing/templates/qa_audit_detail.html:156
+#: manufacturing/templates/qa_capa_detail.html:143
+#: manufacturing/templates/qa_ncr_detail.html:166
+#: manufacturing/templates/qa_supplier_detail.html:130
 #: manufacturing/templates/tc_device_form.html:194
 msgid "Cancel"
 msgstr "Annuler"
@@ -3706,6 +3813,9 @@ msgid "Describe the task"
 msgstr "Décrivez la tâche"
 
 #: manufacturing/templates/eng_tasks_list.html:127
+#: manufacturing/templates/qa_inspection_list.html:116
+#: manufacturing/templates/qa_inspection_list.html:125
+#: manufacturing/templates/qa_inspection_list.html:148
 msgid "— None —"
 msgstr "— Aucun —"
 
@@ -3782,7 +3892,11 @@ msgid ""
 "        (already-overdue amounts are folded into the first week). Starts "
 "from the current\n"
 "        actual bank balance across active accounts."
-msgstr "Basé sur les factures clients et fournisseurs actuellement ouvertes/partielles/en retard, regroupées par date d'échéance (les montants déjà en retard sont inclus dans la première semaine). Part du solde bancaire réel actuel sur les comptes actifs."
+msgstr ""
+"Basé sur les factures clients et fournisseurs actuellement ouvertes/"
+"partielles/en retard, regroupées par date d'échéance (les montants déjà en "
+"retard sont inclus dans la première semaine). Part du solde bancaire réel "
+"actuel sur les comptes actifs."
 
 #: manufacturing/templates/finance_audit_detail.html:3
 #, python-format
@@ -3800,6 +3914,7 @@ msgstr "Nom de l'Audit *"
 
 #: manufacturing/templates/finance_audit_detail.html:66
 #: manufacturing/templates/finance_audit_list.html:122
+#: manufacturing/templates/qa_reports.html:160
 msgid "Audit Type"
 msgstr "Type d'Audit"
 
@@ -3828,6 +3943,9 @@ msgstr "Département"
 #: manufacturing/templates/finance_audit_detail.html:110
 #: manufacturing/templates/finance_audit_list.html:87
 #: manufacturing/templates/finance_audit_list.html:134
+#: manufacturing/templates/qa_audit_detail.html:113
+#: manufacturing/templates/qa_audit_list.html:69
+#: manufacturing/templates/qa_audit_list.html:109
 msgid "Auditor"
 msgstr "Auditeur"
 
@@ -3835,6 +3953,8 @@ msgstr "Auditeur"
 #: manufacturing/templates/finance_audit_list.html:138
 #: manufacturing/templates/it_task_detail.html:80
 #: manufacturing/templates/it_task_list.html:139
+#: manufacturing/templates/qa_audit_detail.html:121
+#: manufacturing/templates/qa_audit_list.html:113
 msgid "Scheduled Date"
 msgstr "Date Planifiée"
 
@@ -3842,12 +3962,15 @@ msgstr "Date Planifiée"
 #: manufacturing/templates/it_repairs_detail.html:88
 #: manufacturing/templates/legal_compliance_detail.html:70
 #: manufacturing/templates/legal_compliance_detail.html:113
+#: manufacturing/templates/qa_audit_detail.html:129
+#: manufacturing/templates/qa_capa_detail.html:124
 msgid "Completed Date"
 msgstr "Date d'achèvement"
 
 #: manufacturing/templates/finance_audit_detail.html:111
 #: manufacturing/templates/finance_audit_list.html:88
 #: manufacturing/templates/it_task_detail.html:111
+#: manufacturing/templates/qa_audit_list.html:70
 msgid "Scheduled"
 msgstr "Planifié"
 
@@ -3868,6 +3991,12 @@ msgstr "Réf."
 #: manufacturing/templates/it_incident_detail.html:90
 #: manufacturing/templates/it_incident_list.html:62
 #: manufacturing/templates/it_incident_list.html:109
+#: manufacturing/templates/qa_inspection_detail.html:194
+#: manufacturing/templates/qa_inspection_detail.html:233
+#: manufacturing/templates/qa_ncr_detail.html:101
+#: manufacturing/templates/qa_ncr_list.html:86
+#: manufacturing/templates/qa_ncr_list.html:124
+#: manufacturing/templates/qa_reports.html:86
 msgid "Severity"
 msgstr "Gravité"
 
@@ -3892,6 +4021,7 @@ msgstr "Réf. de Constatation"
 #: manufacturing/templates/finance_audit_detail.html:175
 #: manufacturing/templates/finance_budget_detail.html:156
 #: manufacturing/templates/it_ticket_list.html:141
+#: manufacturing/templates/qa_inspection_detail.html:240
 msgid "Description *"
 msgstr "Description *"
 
@@ -3908,10 +4038,12 @@ msgid "Audit Name"
 msgstr "Nom de l'Audit"
 
 #: manufacturing/templates/finance_audit_list.html:105
+#: manufacturing/templates/qa_audit_list.html:89
 msgid "No audits found."
 msgstr "Aucun audit trouvé."
 
 #: manufacturing/templates/finance_audit_list.html:113
+#: manufacturing/templates/qa_audit_list.html:94
 msgid "Schedule New Audit"
 msgstr "Planifier un Nouvel Audit"
 
@@ -3928,6 +4060,7 @@ msgid "Lead auditor name"
 msgstr "Nom de l'auditeur principal"
 
 #: manufacturing/templates/finance_audit_list.html:154
+#: manufacturing/templates/qa_audit_list.html:121
 msgid "Schedule Audit"
 msgstr "Planifier l'Audit"
 
@@ -5203,6 +5336,7 @@ msgstr "Signalé"
 #: manufacturing/templates/it_incident_list.html:65
 #: manufacturing/templates/it_incident_list.html:83
 #: manufacturing/templates/it_ticket_detail.html:99
+#: manufacturing/templates/qa_inspection_detail.html:202
 msgid "Resolved"
 msgstr "Résolu"
 
@@ -5221,6 +5355,10 @@ msgstr "Toutes Gravités"
 #: manufacturing/templates/it_incident_list.html:52
 #: manufacturing/templates/it_task_list.html:53
 #: manufacturing/templates/it_ticket_list.html:53
+#: manufacturing/templates/qa_capa_list.html:75
+#: manufacturing/templates/qa_inspection_list.html:71
+#: manufacturing/templates/qa_ncr_list.html:77
+#: manufacturing/templates/qa_supplier_list.html:75
 msgid "Search…"
 msgstr "Rechercher…"
 
@@ -6034,6 +6172,7 @@ msgid "New Matter"
 msgstr "Nouvelle affaire"
 
 #: manufacturing/templates/legal_employment_list.html:130
+#: manufacturing/templates/qa_ncr_detail.html:150
 msgid "Closed Date"
 msgstr "Date de clôture"
 
@@ -6166,6 +6305,10 @@ msgstr "Planning de maintenance préventive"
 
 #: manufacturing/templates/maint_dashboard.html:9
 #: manufacturing/templates/maint_dashboard.html:137
+#: manufacturing/templates/qa_dashboard.html:9
+#: manufacturing/templates/qa_dashboard.html:108
+#: manufacturing/templates/qa_ncr_list.html:9
+#: manufacturing/templates/qa_reports.html:11
 msgid "Inspections"
 msgstr "Inspections"
 
@@ -6248,6 +6391,7 @@ msgid "OEE Report"
 msgstr "Rapport OEE"
 
 #: manufacturing/templates/maint_dashboard_kpis.html:5
+#: manufacturing/templates/qa_dashboard.html:47
 #, python-format
 msgid "%(counter)s critical"
 msgid_plural "%(counter)s critical"
@@ -6748,6 +6892,10 @@ msgstr "Prospect — %(name)s"
 #: manufacturing/templates/mkt_lead_detail.html:107
 #: manufacturing/templates/mkt_lead_list.html:90
 #: manufacturing/templates/mkt_lead_list.html:133
+#: manufacturing/templates/qa_ncr_detail.html:89
+#: manufacturing/templates/qa_ncr_list.html:86
+#: manufacturing/templates/qa_ncr_list.html:118
+#: manufacturing/templates/qa_reports.html:108
 msgid "Source"
 msgstr "Source"
 
@@ -6803,6 +6951,8 @@ msgstr "Projet de recherche"
 
 #: manufacturing/templates/mkt_research_detail.html:89
 #: manufacturing/templates/mkt_research_detail.html:149
+#: manufacturing/templates/qa_audit_detail.html:62
+#: manufacturing/templates/qa_audit_detail.html:145
 msgid "Findings"
 msgstr "Résultats"
 
@@ -7051,6 +7201,10 @@ msgid "Search by name…"
 msgstr "Rechercher par nom…"
 
 #: manufacturing/templates/payroll_pay_rates.html:57
+#: manufacturing/templates/qa_capa_list.html:76
+#: manufacturing/templates/qa_inspection_list.html:72
+#: manufacturing/templates/qa_ncr_list.html:78
+#: manufacturing/templates/qa_supplier_list.html:76
 msgid "Go"
 msgstr "Aller"
 
@@ -7437,6 +7591,10 @@ msgid "WO #"
 msgstr "N° OF"
 
 #: manufacturing/templates/prod_dashboard.html:112
+#: manufacturing/templates/qa_inspection_detail.html:92
+#: manufacturing/templates/qa_inspection_list.html:80
+#: manufacturing/templates/qa_inspection_list.html:114
+#: manufacturing/templates/qa_ncr_list.html:87
 #: manufacturing/templates/reports_dashboard.html:199
 msgid "Product"
 msgstr "Produit"
@@ -7460,6 +7618,656 @@ msgstr "Rupture de stock"
 #: manufacturing/templates/prod_dashboard_kpis.html:24
 msgid "Low Stock"
 msgstr "Stock faible"
+
+#: manufacturing/templates/qa_audit_detail.html:3
+#, python-format
+msgid "Audit #%(num)s"
+msgstr "Audit N° %(num)s"
+
+#: manufacturing/templates/qa_audit_detail.html:6
+msgid "All Audits"
+msgstr "Tous les Audits"
+
+#: manufacturing/templates/qa_audit_detail.html:45
+#, python-format
+msgid "Audit #%(num)s &mdash; %(title)s"
+msgstr "Audit N° %(num)s — %(title)s"
+
+#: manufacturing/templates/qa_audit_detail.html:48
+msgid "This audit is past its scheduled date."
+msgstr "Cet audit a dépassé sa date prévue."
+
+#: manufacturing/templates/qa_audit_detail.html:52
+msgid "Complete Audit"
+msgstr "Terminer l'Audit"
+
+#: manufacturing/templates/qa_audit_detail.html:58
+msgid "Overall Result"
+msgstr "Résultat Global"
+
+#: manufacturing/templates/qa_audit_detail.html:59
+msgid "Pass / Fail / Conditional…"
+msgstr "Réussi / Échoué / Conditionnel…"
+
+#: manufacturing/templates/qa_audit_detail.html:64
+msgid "Key findings from the audit…"
+msgstr "Constatations clés de l'audit…"
+
+#: manufacturing/templates/qa_audit_detail.html:68
+msgid "Mark Complete"
+msgstr "Marquer comme Terminé"
+
+#: manufacturing/templates/qa_audit_detail.html:75
+msgid "Audit Details"
+msgstr "Détails de l'Audit"
+
+#: manufacturing/templates/qa_audit_detail.html:81
+#: manufacturing/templates/qa_audit_list.html:99
+#: manufacturing/templates/qa_capa_detail.html:68
+#: manufacturing/templates/qa_capa_list.html:114
+#: manufacturing/templates/qa_ncr_detail.html:69
+#: manufacturing/templates/qa_ncr_list.html:114
+msgid "Title *"
+msgstr "Titre *"
+
+#: manufacturing/templates/qa_audit_detail.html:137
+#: manufacturing/templates/qa_inspection_detail.html:104
+#: manufacturing/templates/qa_inspection_list.html:81
+#: manufacturing/templates/qa_reports.html:184
+msgid "Result"
+msgstr "Résultat"
+
+#: manufacturing/templates/qa_audit_list.html:3
+#: manufacturing/templates/qa_audit_list.html:53
+msgid "Quality Audits"
+msgstr "Audits Qualité"
+
+#: manufacturing/templates/qa_audit_list.html:7
+#: manufacturing/templates/qa_capa_list.html:7
+#: manufacturing/templates/qa_dashboard.html:6
+#: manufacturing/templates/qa_inspection_list.html:7
+#: manufacturing/templates/qa_reports.html:8
+#: manufacturing/templates/qa_supplier_list.html:8
+msgid "NCRs"
+msgstr "NCR"
+
+#: manufacturing/templates/qa_audit_list.html:8
+#: manufacturing/templates/qa_dashboard.html:7
+#: manufacturing/templates/qa_ncr_list.html:7
+#: manufacturing/templates/qa_reports.html:9
+msgid "CAPAs"
+msgstr "CAPA"
+
+#: manufacturing/templates/qa_audit_list.html:100
+msgid "Audit name / scope"
+msgstr "Nom / portée de l'audit"
+
+#: manufacturing/templates/qa_audit_list.html:117
+msgid "Initial Findings / Scope Notes"
+msgstr "Constatations Initiales / Notes de Portée"
+
+#: manufacturing/templates/qa_capa_detail.html:3
+#, python-format
+msgid "CAPA #%(num)s"
+msgstr "CAPA N° %(num)s"
+
+#: manufacturing/templates/qa_capa_detail.html:6
+msgid "All CAPAs"
+msgstr "Toutes les CAPA"
+
+#: manufacturing/templates/qa_capa_detail.html:43
+#, python-format
+msgid "CAPA #%(num)s &mdash; %(title)s"
+msgstr "CAPA N° %(num)s — %(title)s"
+
+#: manufacturing/templates/qa_capa_detail.html:46
+msgid "This CAPA is past its due date."
+msgstr "Cette CAPA a dépassé sa date d'échéance."
+
+#: manufacturing/templates/qa_capa_detail.html:50
+#: manufacturing/templates/qa_capa_detail.html:56
+msgid "Close CAPA"
+msgstr "Clôturer la CAPA"
+
+#: manufacturing/templates/qa_capa_detail.html:52
+msgid "Sets status to Closed and stamps today's completed date."
+msgstr "Définit le statut sur Clôturé et enregistre la date de réalisation du jour."
+
+#: manufacturing/templates/qa_capa_detail.html:62
+msgid "CAPA Details"
+msgstr "Détails de la CAPA"
+
+#: manufacturing/templates/qa_capa_detail.html:100
+#: manufacturing/templates/qa_capa_list.html:124
+msgid "NCR Reference"
+msgstr "Référence NCR"
+
+#: manufacturing/templates/qa_capa_detail.html:132
+#: manufacturing/templates/qa_capa_list.html:136
+msgid "Action Plan"
+msgstr "Plan d'Action"
+
+#: manufacturing/templates/qa_capa_list.html:3
+#: manufacturing/templates/qa_capa_list.html:61
+msgid "Corrective & Preventive Actions"
+msgstr "Actions Correctives et Préventives"
+
+#: manufacturing/templates/qa_capa_list.html:84
+msgid "NCR Ref"
+msgstr "Réf. NCR"
+
+#: manufacturing/templates/qa_capa_list.html:104
+msgid "No CAPAs found."
+msgstr "Aucune CAPA trouvée."
+
+#: manufacturing/templates/qa_capa_list.html:109
+msgid "New CAPA"
+msgstr "Nouvelle CAPA"
+
+#: manufacturing/templates/qa_capa_list.html:115
+msgid "Action title"
+msgstr "Titre de l'action"
+
+#: manufacturing/templates/qa_capa_list.html:125
+msgid "Optional NCR link"
+msgstr "Lien NCR optionnel"
+
+#: manufacturing/templates/qa_capa_list.html:140
+msgid "Create CAPA"
+msgstr "Créer une CAPA"
+
+#: manufacturing/templates/qa_dashboard.html:3
+#: manufacturing/templates/qa_reports.html:6
+msgid "QA Dashboard"
+msgstr "Tableau de Bord Qualité"
+
+#: manufacturing/templates/qa_dashboard.html:10
+#: manufacturing/templates/qa_dashboard.html:67
+#: manufacturing/templates/qa_dashboard.html:112
+#: manufacturing/templates/qa_reports.html:12
+#: manufacturing/templates/qa_supplier_list.html:3
+#: manufacturing/templates/qa_supplier_list.html:61
+msgid "Supplier Quality"
+msgstr "Qualité Fournisseurs"
+
+#: manufacturing/templates/qa_dashboard.html:42
+msgid "Quality Assurance Dashboard"
+msgstr "Tableau de Bord de l'Assurance Qualité"
+
+#: manufacturing/templates/qa_dashboard.html:51
+#: manufacturing/templates/qa_reports.html:56
+msgid "Open CAPAs"
+msgstr "CAPA Ouvertes"
+
+#: manufacturing/templates/qa_dashboard.html:55
+msgid "Active Audits"
+msgstr "Audits Actifs"
+
+#: manufacturing/templates/qa_dashboard.html:59
+msgid "Pending Inspections"
+msgstr "Inspections en Attente"
+
+#: manufacturing/templates/qa_dashboard.html:63
+msgid "Open Defects"
+msgstr "Défauts Ouverts"
+
+#: manufacturing/templates/qa_dashboard.html:73
+msgid "Defect Pareto"
+msgstr "Pareto des Défauts"
+
+#: manufacturing/templates/qa_dashboard.html:77
+msgid "NCRs by Severity (last 6 mo)"
+msgstr "NCR par Gravité (6 derniers mois)"
+
+#: manufacturing/templates/qa_dashboard.html:84
+msgid "Inspection Results"
+msgstr "Résultats d'Inspection"
+
+#: manufacturing/templates/qa_dashboard.html:88
+msgid "NCR by Status"
+msgstr "NCR par Statut"
+
+#: manufacturing/templates/qa_dashboard.html:96
+msgid "Non-Conformance"
+msgstr "Non-Conformité"
+
+#: manufacturing/templates/qa_dashboard.html:100
+msgid "Corrective Actions"
+msgstr "Actions Correctives"
+
+#: manufacturing/templates/qa_dashboard.html:120
+msgid "SPC"
+msgstr "SPC"
+
+#: manufacturing/templates/qa_dashboard.html:124
+msgid "Certificates of Analysis"
+msgstr "Certificats d'Analyse"
+
+#: manufacturing/templates/qa_dashboard.html:128
+msgid "Control Plans / FMEA"
+msgstr "Plans de Contrôle / FMEA"
+
+#: manufacturing/templates/qa_dashboard.html:132
+msgid "Regulatory Compliance"
+msgstr "Conformité Réglementaire"
+
+#: manufacturing/templates/qa_inspection_detail.html:6
+msgid "All Inspections"
+msgstr "Toutes les Inspections"
+
+#: manufacturing/templates/qa_inspection_detail.html:89
+msgid "Inspection Details"
+msgstr "Détails de l'Inspection"
+
+#: manufacturing/templates/qa_inspection_detail.html:96
+#: manufacturing/templates/qa_inspection_list.html:80
+#: manufacturing/templates/qa_inspection_list.html:132
+msgid "Inspector"
+msgstr "Inspecteur"
+
+#: manufacturing/templates/qa_inspection_detail.html:117
+msgid "Update Result"
+msgstr "Mettre à Jour le Résultat"
+
+#: manufacturing/templates/qa_inspection_detail.html:137
+msgid "AQL Sampling (ISO 2859-1)"
+msgstr "Échantillonnage AQL (ISO 2859-1)"
+
+#: manufacturing/templates/qa_inspection_detail.html:140
+msgid "Lot Quantity"
+msgstr "Quantité du Lot"
+
+#: manufacturing/templates/qa_inspection_detail.html:144
+msgid "Code Letter"
+msgstr "Lettre de Code"
+
+#: manufacturing/templates/qa_inspection_detail.html:148
+msgid "Sample Size"
+msgstr "Taille de l'Échantillon"
+
+#: manufacturing/templates/qa_inspection_detail.html:152
+msgid "Accept / Reject"
+msgstr "Accepter / Rejeter"
+
+#: manufacturing/templates/qa_inspection_detail.html:157
+msgid "no accept/reject data for this plan/lot size — see Sampling Plans"
+msgstr "pas de données d'acceptation/rejet pour ce plan/cette taille de lot — voir Plans d'Échantillonnage"
+
+#: manufacturing/templates/qa_inspection_detail.html:162
+msgid "Defective Units Found"
+msgstr "Unités Défectueuses Trouvées"
+
+#: manufacturing/templates/qa_inspection_detail.html:163
+msgid "not yet recorded"
+msgstr "pas encore enregistré"
+
+#: manufacturing/templates/qa_inspection_detail.html:170
+msgid "Record Sample Result"
+msgstr "Enregistrer le Résultat de l'Échantillon"
+
+#: manufacturing/templates/qa_inspection_detail.html:176
+#, python-format
+msgid "Defective Units Found (of %(size)s sampled)"
+msgstr "Unités Défectueuses Trouvées (sur %(size)s échantillonnées)"
+
+#: manufacturing/templates/qa_inspection_detail.html:180
+msgid "Save &amp; Auto-Evaluate"
+msgstr "Enregistrer et Auto-Évaluer"
+
+#: manufacturing/templates/qa_inspection_detail.html:189
+#, python-format
+msgid "Defects (%(counter)s)"
+msgid_plural "Defects (%(counter)s)"
+msgstr[0] "Défaut (%(counter)s)"
+msgstr[1] "Défauts (%(counter)s)"
+
+#: manufacturing/templates/qa_inspection_detail.html:209
+msgid "Resolve"
+msgstr "Résoudre"
+
+#: manufacturing/templates/qa_inspection_detail.html:218
+msgid "No defects logged."
+msgstr "Aucun défaut enregistré."
+
+#: manufacturing/templates/qa_inspection_detail.html:223
+#: manufacturing/templates/qa_inspection_detail.html:244
+msgid "Log Defect"
+msgstr "Enregistrer un Défaut"
+
+#: manufacturing/templates/qa_inspection_detail.html:230
+msgid "Visual, Dimensional…"
+msgstr "Visuel, Dimensionnel…"
+
+#: manufacturing/templates/qa_inspection_detail.html:242
+msgid "Describe the defect…"
+msgstr "Décrivez le défaut…"
+
+#: manufacturing/templates/qa_inspection_list.html:3
+#: manufacturing/templates/qa_inspection_list.html:57
+msgid "QA Inspections"
+msgstr "Inspections Qualité"
+
+#: manufacturing/templates/qa_inspection_list.html:9
+msgid "Sampling Plans"
+msgstr "Plans d'Échantillonnage"
+
+#: manufacturing/templates/qa_inspection_list.html:80
+msgid "Insp #"
+msgstr "N° Insp."
+
+#: manufacturing/templates/qa_inspection_list.html:81
+msgid "Defects"
+msgstr "Défauts"
+
+#: manufacturing/templates/qa_inspection_list.html:92
+#, python-format
+msgid "%(counter)s open"
+msgid_plural "%(counter)s open"
+msgstr[0] "%(counter)s ouvert"
+msgstr[1] "%(counter)s ouverts"
+
+#: manufacturing/templates/qa_inspection_list.html:93
+#, python-format
+msgid "%(counter)s total"
+msgid_plural "%(counter)s total"
+msgstr[0] "%(counter)s au total"
+msgstr[1] "%(counter)s au total"
+
+#: manufacturing/templates/qa_inspection_list.html:95
+#, python-format
+msgid "%(counter)s resolved"
+msgid_plural "%(counter)s resolved"
+msgstr[0] "%(counter)s résolu"
+msgstr[1] "%(counter)s résolus"
+
+#: manufacturing/templates/qa_inspection_list.html:104
+msgid "No inspections found."
+msgstr "Aucune inspection trouvée."
+
+#: manufacturing/templates/qa_inspection_list.html:109
+msgid "New Inspection"
+msgstr "Nouvelle Inspection"
+
+#: manufacturing/templates/qa_inspection_list.html:123
+msgid "Work Order"
+msgstr "Ordre de Fabrication"
+
+#: manufacturing/templates/qa_inspection_list.html:136
+msgid "Inspection Date"
+msgstr "Date d'Inspection"
+
+#: manufacturing/templates/qa_inspection_list.html:140
+msgid "Initial Result"
+msgstr "Résultat Initial"
+
+#: manufacturing/templates/qa_inspection_list.html:146
+msgid "Sampling Plan (optional, AQL)"
+msgstr "Plan d'Échantillonnage (optionnel, AQL)"
+
+#: manufacturing/templates/qa_inspection_list.html:155
+msgid "Lot Quantity (required with a sampling plan)"
+msgstr "Quantité du Lot (requise avec un plan d'échantillonnage)"
+
+#: manufacturing/templates/qa_inspection_list.html:163
+msgid "Create Inspection"
+msgstr "Créer une Inspection"
+
+#: manufacturing/templates/qa_inspection_list.html:166
+msgid ""
+"Attaching a sampling plan auto-calculates the sample size and accept/reject\n"
+"            numbers from the lot quantity (ISO 2859-1). Manage plans on the\n"
+"            <a href=\"/sampling-plans/\">Sampling Plans</a> page."
+msgstr "Associer un plan d'échantillonnage calcule automatiquement la taille de l'échantillon et les nombres d'acceptation/rejet à partir de la quantité du lot (ISO 2859-1). Gérez les plans sur la page <a href=\"/sampling-plans/\">Plans d'Échantillonnage</a>."
+
+#: manufacturing/templates/qa_ncr_detail.html:3
+#, python-format
+msgid "NCR #%(num)s"
+msgstr "NCR N° %(num)s"
+
+#: manufacturing/templates/qa_ncr_detail.html:6
+msgid "All NCRs"
+msgstr "Tous les NCR"
+
+#: manufacturing/templates/qa_ncr_detail.html:45
+#, python-format
+msgid "NCR #%(num)s &mdash; %(title)s"
+msgstr "NCR N° %(num)s — %(title)s"
+
+#: manufacturing/templates/qa_ncr_detail.html:51
+#: manufacturing/templates/qa_ncr_detail.html:57
+msgid "Close NCR"
+msgstr "Clôturer le NCR"
+
+#: manufacturing/templates/qa_ncr_detail.html:53
+msgid ""
+"Closing marks this NCR resolved. This action cannot be undone from the web "
+"UI."
+msgstr "La clôture marque ce NCR comme résolu. Cette action est irréversible depuis l'interface web."
+
+#: manufacturing/templates/qa_ncr_detail.html:63
+msgid "NCR Details"
+msgstr "Détails du NCR"
+
+#: manufacturing/templates/qa_ncr_detail.html:113
+#: manufacturing/templates/qa_ncr_list.html:130
+msgid "Product / Part"
+msgstr "Produit / Pièce"
+
+#: manufacturing/templates/qa_ncr_detail.html:121
+#: manufacturing/templates/qa_ncr_list.html:134
+msgid "Detected Date"
+msgstr "Date de Détection"
+
+#: manufacturing/templates/qa_ncr_detail.html:129
+#: manufacturing/templates/qa_ncr_list.html:138
+msgid "Disposition"
+msgstr "Décision"
+
+#: manufacturing/templates/qa_ncr_list.html:3
+#: manufacturing/templates/qa_ncr_list.html:63
+msgid "Non-Conformance Reports"
+msgstr "Rapports de Non-Conformité"
+
+#: manufacturing/templates/qa_ncr_list.html:87
+msgid "Detected"
+msgstr "Détecté"
+
+#: manufacturing/templates/qa_ncr_list.html:104
+msgid "No NCRs found."
+msgstr "Aucun NCR trouvé."
+
+#: manufacturing/templates/qa_ncr_list.html:109
+msgid "New NCR"
+msgstr "Nouveau NCR"
+
+#: manufacturing/templates/qa_ncr_list.html:115
+msgid "Description of nonconformance"
+msgstr "Description de la non-conformité"
+
+#: manufacturing/templates/qa_ncr_list.html:131
+msgid "Optional"
+msgstr "Facultatif"
+
+#: manufacturing/templates/qa_ncr_list.html:152
+msgid "Create NCR"
+msgstr "Créer un NCR"
+
+#: manufacturing/templates/qa_reports.html:3
+msgid "QA Reports"
+msgstr "Rapports Qualité"
+
+#: manufacturing/templates/qa_reports.html:47
+msgid "Quality Assurance Reports"
+msgstr "Rapports de l'Assurance Qualité"
+
+#: manufacturing/templates/qa_reports.html:60
+msgid "Overdue CAPAs"
+msgstr "CAPA en Retard"
+
+#: manufacturing/templates/qa_reports.html:64
+msgid "Total Inspections"
+msgstr "Total d'Inspections"
+
+#: manufacturing/templates/qa_reports.html:72
+msgid "Inspection Pass Rate"
+msgstr "Taux de Réussite d'Inspection"
+
+#: manufacturing/templates/qa_reports.html:76
+msgid "Failed Inspections"
+msgstr "Inspections Échouées"
+
+#: manufacturing/templates/qa_reports.html:82
+msgid "Open NCRs by Severity"
+msgstr "NCR Ouverts par Gravité"
+
+#: manufacturing/templates/qa_reports.html:87
+#: manufacturing/templates/qa_reports.html:109
+#: manufacturing/templates/qa_reports.html:139
+#: manufacturing/templates/qa_reports.html:161
+#: manufacturing/templates/qa_reports.html:185
+#: manufacturing/templates/qa_reports.html:215
+#: manufacturing/templates/report_builder_form.html:116
+msgid "Count"
+msgstr "Compter"
+
+#: manufacturing/templates/qa_reports.html:97
+#: manufacturing/templates/qa_reports.html:125
+msgid "No open NCRs."
+msgstr "Aucun NCR ouvert."
+
+#: manufacturing/templates/qa_reports.html:104
+msgid "Open NCRs by Source"
+msgstr "NCR Ouverts par Source"
+
+#: manufacturing/templates/qa_reports.html:110
+#: manufacturing/templates/qa_reports.html:216
+msgid "Volume"
+msgstr "Volume"
+
+#: manufacturing/templates/qa_reports.html:134
+msgid "CAPAs by Status"
+msgstr "CAPA par Statut"
+
+#: manufacturing/templates/qa_reports.html:149
+msgid "No CAPAs."
+msgstr "Aucune CAPA."
+
+#: manufacturing/templates/qa_reports.html:156
+msgid "Audits by Type"
+msgstr "Audits par Type"
+
+#: manufacturing/templates/qa_reports.html:171
+msgid "No audits."
+msgstr "Aucun audit."
+
+#: manufacturing/templates/qa_reports.html:180
+msgid "Inspections by Result"
+msgstr "Inspections par Résultat"
+
+#: manufacturing/templates/qa_reports.html:186
+msgid "Share"
+msgstr "Part"
+
+#: manufacturing/templates/qa_reports.html:203
+msgid "No inspections."
+msgstr "Aucune inspection."
+
+#: manufacturing/templates/qa_reports.html:210
+msgid "Monthly Inspections (Last 6 Months)"
+msgstr "Inspections Mensuelles (6 Derniers Mois)"
+
+#: manufacturing/templates/qa_reports.html:232
+msgid "No inspections in the last 6 months."
+msgstr "Aucune inspection au cours des 6 derniers mois."
+
+#: manufacturing/templates/qa_reports.html:240
+msgid "Supplier Quality Rating Breakdown"
+msgstr "Répartition des Notes de Qualité Fournisseurs"
+
+#: manufacturing/templates/qa_reports.html:244
+#: manufacturing/templates/qa_supplier_detail.html:78
+#: manufacturing/templates/qa_supplier_list.html:84
+#: manufacturing/templates/qa_supplier_list.html:119
+msgid "Rating"
+msgstr "Note"
+
+#: manufacturing/templates/qa_reports.html:245
+msgid "Supplier Count"
+msgstr "Nombre de Fournisseurs"
+
+#: manufacturing/templates/qa_reports.html:246
+msgid "Distribution"
+msgstr "Répartition"
+
+#: manufacturing/templates/qa_reports.html:252
+msgid "Unrated"
+msgstr "Non Noté"
+
+#: manufacturing/templates/qa_reports.html:262
+msgid "No supplier quality records."
+msgstr "Aucun enregistrement de qualité fournisseur."
+
+#: manufacturing/templates/qa_supplier_detail.html:3
+#, python-format
+msgid "Supplier Quality #%(num)s"
+msgstr "Qualité Fournisseur N° %(num)s"
+
+#: manufacturing/templates/qa_supplier_detail.html:6
+msgid "All Suppliers"
+msgstr "Tous les Fournisseurs"
+
+#: manufacturing/templates/qa_supplier_detail.html:57
+msgid "Supplier Quality Record"
+msgstr "Enregistrement de Qualité Fournisseur"
+
+#: manufacturing/templates/qa_supplier_detail.html:62
+#: manufacturing/templates/qa_supplier_list.html:111
+msgid "Supplier Name *"
+msgstr "Nom du Fournisseur *"
+
+#: manufacturing/templates/qa_supplier_detail.html:70
+#: manufacturing/templates/qa_supplier_list.html:115
+msgid "Material / Category"
+msgstr "Matériau / Catégorie"
+
+#: manufacturing/templates/qa_supplier_detail.html:91
+#: manufacturing/templates/qa_supplier_list.html:85
+#: manufacturing/templates/qa_supplier_list.html:126
+msgid "PPM"
+msgstr "PPM"
+
+#: manufacturing/templates/qa_supplier_detail.html:99
+#: manufacturing/templates/qa_supplier_list.html:85
+msgid "Last Audit"
+msgstr "Dernier Audit"
+
+#: manufacturing/templates/qa_supplier_list.html:84
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#: manufacturing/templates/qa_supplier_list.html:84
+msgid "Material"
+msgstr "Matériau"
+
+#: manufacturing/templates/qa_supplier_list.html:101
+msgid "No supplier quality records found."
+msgstr "Aucun enregistrement de qualité fournisseur trouvé."
+
+#: manufacturing/templates/qa_supplier_list.html:106
+msgid "Add Supplier Quality Record"
+msgstr "Ajouter un Enregistrement de Qualité Fournisseur"
+
+#: manufacturing/templates/qa_supplier_list.html:127
+msgid "Parts per million"
+msgstr "Parties par million"
+
+#: manufacturing/templates/qa_supplier_list.html:130
+msgid "Last Audit Date"
+msgstr "Date du Dernier Audit"
+
+#: manufacturing/templates/qa_supplier_list.html:144
+msgid "Add Record"
+msgstr "Ajouter un Enregistrement"
 
 #: manufacturing/templates/report_builder_detail.html:6
 #: manufacturing/templates/report_builder_form.html:6
@@ -7610,10 +8418,6 @@ msgstr "Regrouper par"
 #: manufacturing/templates/report_builder_form.html:110
 msgid "(no aggregate)"
 msgstr "(aucun agrégat)"
-
-#: manufacturing/templates/report_builder_form.html:116
-msgid "Count"
-msgstr "Compter"
 
 #: manufacturing/templates/report_builder_form.html:117
 msgid "Sum"

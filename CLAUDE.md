@@ -691,15 +691,71 @@ findings), Bank Accounts list + an account detail page (confirmed the
 Active "Oui"/"Yes" dropdown), Tax Filings list + a filing detail page,
 and the 13-Week Cash Forecast (confirmed the multi-line
 methodology note), in French, German, and Spanish with real sample
-data, no console errors. **Localization coverage is now 119 templates
-across three languages** (core shell + login + main dashboard + all 5
-htmx templates + the full Legal department (10) + the full Marketing
-department (13) + the full Reports department (4) + the full Payroll
-department (8) + the full Time Clock department (7) + the full
-Customers/Credit department (7) + the full Engineering department
-(10) + the full Customer Service department (13) + the full
-Accounting department (13) + the full IT department (17) + the full
-Finance department (10)) out of ~450 total.
+data, no console errors.
+
+Also fully translated: the entire **Quality department**
+(`qa_dashboard.html`, `qa_ncr_list.html`, `qa_ncr_detail.html`,
+`qa_capa_list.html`, `qa_capa_detail.html`, `qa_audit_list.html`,
+`qa_audit_detail.html`, `qa_inspection_list.html`,
+`qa_inspection_detail.html`, `qa_supplier_list.html`,
+`qa_supplier_detail.html`, `qa_reports.html` — 12 templates, the
+twelfth "whole department" pass). Note the QA Dashboard also links
+out to four further sub-features (SPC, Certificates of Analysis,
+Control Plans/FMEA, Regulatory Compliance) that are **not** part of
+this pass — their nav labels on the dashboard were translated since
+they're literal dashboard text, but the destination pages themselves
+remain untranslated, the same "translate the link, not yet the
+target" situation as Accounting's toolbar links into the separately-
+handled Finance department. 142 unique strings per language (138
+simple + 4 plural). Kept the `NCR`/`CAPA` acronyms themselves
+untranslated across all three languages (same treatment as MRP/BOM/
+OEE elsewhere in the app) while translating the surrounding
+descriptive text around them. Used `{% blocktrans with %}` for the
+"NCR #{num} — {title}" / "CAPA #{num} — {title}" / "Audit #{num} —
+{title}" / "Supplier Quality #{num}" dynamic detail-page titles, and
+`{% blocktrans %}` with an embedded literal `<a>` tag for the
+inspection-form's "Manage plans on the Sampling Plans page" hint
+paragraph — the same embedded-HTML-link pattern established in the
+Customers/Credit pass. Added four new `{% blocktrans count %}`
+plurals: the dashboard KPI cards' "{{ counter }} critical" / "{{
+counter }} overdue" suffixes (reusing the existing "N overdue" plural
+verbatim, confirming yet again it's now a shared string across many
+departments), the inspection detail page's "Defects (N)" header, and
+the inspection list's inline defect-count fragments ("N open", "N
+total", "N resolved"). **Two more bare `{{ x|default:"literal" }}`
+fallbacks were caught and fixed before they were missed**, the same
+class of bug first found in the IT department's Network Device page:
+the inspection detail page's "not yet recorded" fallback for
+`qty_defective`, and the reports page's "Unrated" fallback for a
+supplier's rating — both needed the `{% if %}/{% else %}/{% trans %}`
+expansion since a bare filter argument can't hold a `{% trans %}` or
+`_()` call. `makemessages` fuzzy-matched 93 of the new strings against
+unrelated existing translations, handled cleanly from the start with
+the blank-the-msgstr-when-stripping-fuzzy technique. Full suite 3431
+passed (unchanged), `manage.py check` clean, `compilemessages` clean,
+`msgfmt --check` clean on all three files, zero blank/duplicated
+entries confirmed programmatically (the recurring plural-
+concatenation false positive reappears here too, now including this
+pass's own new plurals, unrelated to any real corruption). Verified
+end-to-end against the real dev server: the QA dashboard (confirmed
+both "N critical"/"N overdue" KPI suffixes), NCR list + a closed NCR's
+detail page (confirmed "NCR N.° {num} — {title}"), CAPA list + an
+overdue CAPA's detail page (confirmed the overdue-notice banner),
+Audits list + a detail page (confirmed "Audit N° {num} — {title}" and
+its overdue notice in French), Inspections list + a detail page with
+a logged defect (confirmed the "N open" and "Defecto (1)" plurals and
+the embedded Sampling Plans link), Supplier Quality list, and QA
+Reports (confirmed all KPI labels and section headers), in Spanish,
+French, and German with real sample data, no console errors.
+**Localization coverage is now 131 templates across three languages**
+(core shell + login + main dashboard + all 5 htmx templates + the
+full Legal department (10) + the full Marketing department (13) + the
+full Reports department (4) + the full Payroll department (8) + the
+full Time Clock department (7) + the full Customers/Credit department
+(7) + the full Engineering department (10) + the full Customer
+Service department (13) + the full Accounting department (13) + the
+full IT department (17) + the full Finance department (10) + the full
+Quality department (12)) out of ~450 total.
 
 The main dashboard's department grid
 button labels are the one exception — they're rendered from

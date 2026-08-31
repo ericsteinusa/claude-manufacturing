@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}NCR #{{ ncr.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=ncr.id %}NCR #{{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/ncr/" class="btn">All NCRs</a>
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/ncr/" class="btn">{% trans "All NCRs" %}</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,31 +42,31 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>NCR #{{ ncr.id }} &mdash; {{ ncr.title }}</h2>
+    <h2>{% blocktrans with num=ncr.id title=ncr.title %}NCR #{{ num }} &mdash; {{ title }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     {% if ncr.status != 'Closed' and can_edit %}
     <div class="card" style="border-color:#c62828;">
-        <h3 style="color:#c62828;">Close NCR</h3>
+        <h3 style="color:#c62828;">{% trans "Close NCR" %}</h3>
         <p style="font-size:13px;color:#555;margin:0 0 12px;">
-            Closing marks this NCR resolved. This action cannot be undone from the web UI.</p>
+            {% trans "Closing marks this NCR resolved. This action cannot be undone from the web UI." %}</p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="close">
-            <button type="submit" class="close-btn">Close NCR</button>
+            <button type="submit" class="close-btn">{% trans "Close NCR" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>NCR Details</h3>
+        <h3>{% trans "NCR Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
+                    <label>{% trans "Title *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="title" value="{{ ncr.title }}" required>
                     {% else %}
@@ -73,7 +74,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in ncr_statuses %}
@@ -85,7 +86,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Source</label>
+                    <label>{% trans "Source" %}</label>
                     {% if can_edit %}
                     <select name="source">
                         {% for s in ncr_sources %}
@@ -97,7 +98,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Severity</label>
+                    <label>{% trans "Severity" %}</label>
                     {% if can_edit %}
                     <select name="severity">
                         {% for s in ncr_severities %}
@@ -109,7 +110,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Product / Part</label>
+                    <label>{% trans "Product / Part" %}</label>
                     {% if can_edit %}
                     <input type="text" name="product" value="{{ ncr.product|default:'' }}">
                     {% else %}
@@ -117,7 +118,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Detected Date</label>
+                    <label>{% trans "Detected Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="detected_date" value="{{ ncr.detected_date|default:'' }}">
                     {% else %}
@@ -125,7 +126,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Disposition</label>
+                    <label>{% trans "Disposition" %}</label>
                     {% if can_edit %}
                     <select name="disposition">
                         {% for d in ncr_dispositions %}
@@ -137,7 +138,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     {% if can_edit %}
                     <input type="text" name="owner" value="{{ ncr.owner|default:'' }}">
                     {% else %}
@@ -146,12 +147,12 @@
                 </div>
                 {% if ncr.closed_date %}
                 <div class="form-row">
-                    <label>Closed Date</label>
+                    <label>{% trans "Closed Date" %}</label>
                     <input class="ro" readonly value="{{ ncr.closed_date }}">
                 </div>
                 {% endif %}
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     {% if can_edit %}
                     <textarea name="notes" rows="4">{{ ncr.notes|default:'' }}</textarea>
                     {% else %}
@@ -161,8 +162,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/qa/ncr/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/qa/ncr/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>

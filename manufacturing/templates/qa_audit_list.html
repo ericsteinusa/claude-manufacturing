@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Quality Audits{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Quality Audits" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/qa/ncr/" class="btn">NCRs</a>
-<a href="/qa/capa/" class="btn">CAPAs</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/qa/ncr/" class="btn">{% trans "NCRs" %}</a>
+<a href="/qa/capa/" class="btn">{% trans "CAPAs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,13 +50,13 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>Quality Audits</h2>
+    <h2>{% trans "Quality Audits" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/qa/audits/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/qa/audits/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in audit_statuses %}
             <a href="/qa/audits/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
@@ -65,8 +66,8 @@
     {% if audits %}
     <table class="list-table">
         <thead><tr>
-            <th>Title</th><th>Type</th><th>Auditor</th>
-            <th>Scheduled</th><th>Completed</th><th>Status</th>
+            <th>{% trans "Title" %}</th><th>{% trans "Type" %}</th><th>{% trans "Auditor" %}</th>
+            <th>{% trans "Scheduled" %}</th><th>{% trans "Completed" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for a in audits %}
@@ -85,39 +86,39 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No audits found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No audits found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Schedule New Audit</h3>
+        <h3>{% trans "Schedule New Audit" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
-                    <input type="text" name="title" required placeholder="Audit name / scope">
+                    <label>{% trans "Title *" %}</label>
+                    <input type="text" name="title" required placeholder="{% trans 'Audit name / scope' %}">
                 </div>
                 <div class="form-row">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="audit_type">
                         {% for t in audit_types %}<option>{{ t }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Auditor</label>
+                    <label>{% trans "Auditor" %}</label>
                     <input type="text" name="auditor">
                 </div>
                 <div class="form-row">
-                    <label>Scheduled Date</label>
+                    <label>{% trans "Scheduled Date" %}</label>
                     <input type="date" name="scheduled_date">
                 </div>
                 <div class="form-row full">
-                    <label>Initial Findings / Scope Notes</label>
+                    <label>{% trans "Initial Findings / Scope Notes" %}</label>
                     <textarea name="findings" rows="3"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Schedule Audit</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Schedule Audit" %}</button>
         </form>
     </div>
     {% endif %}

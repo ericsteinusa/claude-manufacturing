@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}QA Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "QA Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">QA Dashboard</a>
-<a href="/qa/reports/" class="btn">Reports</a>
-<a href="/qa/ncr/" class="btn">NCRs</a>
-<a href="/qa/capa/" class="btn">CAPAs</a>
-<a href="/qa/audits/" class="btn">Audits</a>
-<a href="/qa/inspections/" class="btn">Inspections</a>
-<a href="/qa/suppliers/" class="btn">Supplier Quality</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/" class="btn">{% trans "QA Dashboard" %}</a>
+<a href="/qa/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/qa/ncr/" class="btn">{% trans "NCRs" %}</a>
+<a href="/qa/capa/" class="btn">{% trans "CAPAs" %}</a>
+<a href="/qa/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/qa/inspections/" class="btn">{% trans "Inspections" %}</a>
+<a href="/qa/suppliers/" class="btn">{% trans "Supplier Quality" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -43,24 +44,24 @@
 {% block body %}
 <div class="content">
 <div class="qr-wrap">
-    <h2>Quality Assurance Reports</h2>
+    <h2>{% trans "Quality Assurance Reports" %}</h2>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="val {% if kpis.open_ncrs %}warn{% endif %}">{{ kpis.open_ncrs|default:0 }}</div>
-            <div class="lbl">Open NCRs</div>
+            <div class="lbl">{% trans "Open NCRs" %}</div>
         </div>
         <div class="kpi">
             <div class="val {% if kpis.open_capas %}warn{% endif %}">{{ kpis.open_capas|default:0 }}</div>
-            <div class="lbl">Open CAPAs</div>
+            <div class="lbl">{% trans "Open CAPAs" %}</div>
         </div>
         <div class="kpi">
             <div class="val {% if kpis.overdue_capas %}danger{% endif %}">{{ kpis.overdue_capas|default:0 }}</div>
-            <div class="lbl">Overdue CAPAs</div>
+            <div class="lbl">{% trans "Overdue CAPAs" %}</div>
         </div>
         <div class="kpi">
             <div class="val">{{ kpis.total_insp|default:0 }}</div>
-            <div class="lbl">Total Inspections</div>
+            <div class="lbl">{% trans "Total Inspections" %}</div>
         </div>
         <div class="kpi">
             {% if kpis.pass_rate is not None %}
@@ -68,22 +69,22 @@
             {% else %}
             <div class="val" style="color:#aaa;">—</div>
             {% endif %}
-            <div class="lbl">Inspection Pass Rate</div>
+            <div class="lbl">{% trans "Inspection Pass Rate" %}</div>
         </div>
         <div class="kpi">
             <div class="val {% if kpis.failed_insp %}warn{% endif %}">{{ kpis.failed_insp|default:0 }}</div>
-            <div class="lbl">Failed Inspections</div>
+            <div class="lbl">{% trans "Failed Inspections" %}</div>
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Open NCRs by Severity</h3>
+            <h3>{% trans "Open NCRs by Severity" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Severity</th>
-                        <th style="text-align:right;">Count</th>
+                        <th>{% trans "Severity" %}</th>
+                        <th style="text-align:right;">{% trans "Count" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,20 +94,20 @@
                     <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="2" style="color:#888;text-align:center;">No open NCRs.</td></tr>
+                <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No open NCRs." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>Open NCRs by Source</h3>
+            <h3>{% trans "Open NCRs by Source" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Source</th>
-                        <th style="text-align:right;">Count</th>
-                        <th>Volume</th>
+                        <th>{% trans "Source" %}</th>
+                        <th style="text-align:right;">{% trans "Count" %}</th>
+                        <th>{% trans "Volume" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -121,7 +122,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">No open NCRs.</td></tr>
+                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No open NCRs." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -130,12 +131,12 @@
 
     <div class="two-col">
         <div class="card">
-            <h3>CAPAs by Status</h3>
+            <h3>{% trans "CAPAs by Status" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Status</th>
-                        <th style="text-align:right;">Count</th>
+                        <th>{% trans "Status" %}</th>
+                        <th style="text-align:right;">{% trans "Count" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -145,19 +146,19 @@
                     <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="2" style="color:#888;text-align:center;">No CAPAs.</td></tr>
+                <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No CAPAs." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>Audits by Type</h3>
+            <h3>{% trans "Audits by Type" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Audit Type</th>
-                        <th style="text-align:right;">Count</th>
+                        <th>{% trans "Audit Type" %}</th>
+                        <th style="text-align:right;">{% trans "Count" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,7 +168,7 @@
                     <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="2" style="color:#888;text-align:center;">No audits.</td></tr>
+                <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No audits." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -176,13 +177,13 @@
 
     <div class="two-col">
         <div class="card">
-            <h3>Inspections by Result</h3>
+            <h3>{% trans "Inspections by Result" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Result</th>
-                        <th style="text-align:right;">Count</th>
-                        <th>Share</th>
+                        <th>{% trans "Result" %}</th>
+                        <th style="text-align:right;">{% trans "Count" %}</th>
+                        <th>{% trans "Share" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -199,20 +200,20 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">No inspections.</td></tr>
+                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No inspections." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>Monthly Inspections (Last 6 Months)</h3>
+            <h3>{% trans "Monthly Inspections (Last 6 Months)" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Month</th>
-                        <th style="text-align:right;">Count</th>
-                        <th>Volume</th>
+                        <th>{% trans "Month" %}</th>
+                        <th style="text-align:right;">{% trans "Count" %}</th>
+                        <th>{% trans "Volume" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -228,7 +229,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">No inspections in the last 6 months.</td></tr>
+                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No inspections in the last 6 months." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -236,19 +237,19 @@
     </div>
 
     <div class="card">
-        <h3>Supplier Quality Rating Breakdown</h3>
+        <h3>{% trans "Supplier Quality Rating Breakdown" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Rating</th>
-                    <th style="text-align:right;">Supplier Count</th>
-                    <th>Distribution</th>
+                    <th>{% trans "Rating" %}</th>
+                    <th style="text-align:right;">{% trans "Supplier Count" %}</th>
+                    <th>{% trans "Distribution" %}</th>
                 </tr>
             </thead>
             <tbody>
             {% for row in suppliers_by_rating %}
             <tr>
-                <td style="font-weight:bold;">{{ row.rating|default:"Unrated" }}</td>
+                <td style="font-weight:bold;">{% if row.rating %}{{ row.rating }}{% else %}{% trans "Unrated" %}{% endif %}</td>
                 <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 <td>
                     <div class="bar-wrap">
@@ -258,7 +259,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" style="color:#888;text-align:center;">No supplier quality records.</td></tr>
+            <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No supplier quality records." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

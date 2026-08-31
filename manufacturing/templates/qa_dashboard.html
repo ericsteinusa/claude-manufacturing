@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}QA Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "QA Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/ncr/" class="btn">NCRs</a>
-<a href="/qa/capa/" class="btn">CAPAs</a>
-<a href="/qa/audits/" class="btn">Audits</a>
-<a href="/qa/inspections/" class="btn">Inspections</a>
-<a href="/qa/suppliers/" class="btn">Supplier Quality</a>
-<a href="/qa/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/ncr/" class="btn">{% trans "NCRs" %}</a>
+<a href="/qa/capa/" class="btn">{% trans "CAPAs" %}</a>
+<a href="/qa/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/qa/inspections/" class="btn">{% trans "Inspections" %}</a>
+<a href="/qa/suppliers/" class="btn">{% trans "Supplier Quality" %}</a>
+<a href="/qa/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,53 +39,53 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>Quality Assurance Dashboard</h2>
+    <h2>{% trans "Quality Assurance Dashboard" %}</h2>
 
     <div class="kpi-grid">
         <a href="/qa/ncr/?status=Open" class="kpi-card {% if counts.critical_ncrs %}danger{% elif counts.open_ncrs %}warn{% endif %}">
             <div class="num">{{ counts.open_ncrs }}</div>
-            <div class="lbl">Open NCRs{% if counts.critical_ncrs %} &mdash; {{ counts.critical_ncrs }} critical{% endif %}</div>
+            <div class="lbl">{% trans "Open NCRs" %}{% if counts.critical_ncrs %} &mdash; {% blocktrans count counter=counts.critical_ncrs %}{{ counter }} critical{% plural %}{{ counter }} critical{% endblocktrans %}{% endif %}</div>
         </a>
         <a href="/qa/capa/?status=Open" class="kpi-card {% if counts.overdue_capas %}danger{% elif counts.open_capas %}warn{% endif %}">
             <div class="num">{{ counts.open_capas }}</div>
-            <div class="lbl">Open CAPAs{% if counts.overdue_capas %} &mdash; {{ counts.overdue_capas }} overdue{% endif %}</div>
+            <div class="lbl">{% trans "Open CAPAs" %}{% if counts.overdue_capas %} &mdash; {% blocktrans count counter=counts.overdue_capas %}{{ counter }} overdue{% plural %}{{ counter }} overdue{% endblocktrans %}{% endif %}</div>
         </a>
         <a href="/qa/audits/" class="kpi-card {% if counts.open_audits %}warn{% endif %}">
             <div class="num">{{ counts.open_audits }}</div>
-            <div class="lbl">Active Audits</div>
+            <div class="lbl">{% trans "Active Audits" %}</div>
         </a>
         <a href="/qa/inspections/?result=pending" class="kpi-card {% if counts.pending_inspections %}warn{% endif %}">
             <div class="num">{{ counts.pending_inspections }}</div>
-            <div class="lbl">Pending Inspections</div>
+            <div class="lbl">{% trans "Pending Inspections" %}</div>
         </a>
         <a href="/qa/inspections/" class="kpi-card {% if counts.open_defects %}warn{% endif %}">
             <div class="num">{{ counts.open_defects }}</div>
-            <div class="lbl">Open Defects</div>
+            <div class="lbl">{% trans "Open Defects" %}</div>
         </a>
         <a href="/qa/suppliers/" class="kpi-card">
             <div class="num" style="color:#333;">&#10003;</div>
-            <div class="lbl">Supplier Quality</div>
+            <div class="lbl">{% trans "Supplier Quality" %}</div>
         </a>
     </div>
 
     <div class="two-col">
         <div class="card" style="margin-bottom:0;">
-            <h3>Defect Pareto</h3>
+            <h3>{% trans "Defect Pareto" %}</h3>
             <canvas id="chart-defect-pareto" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>NCRs by Severity (last 6 mo)</h3>
+            <h3>{% trans "NCRs by Severity (last 6 mo)" %}</h3>
             <canvas id="chart-ncr-trend" height="220"></canvas>
         </div>
     </div>
 
     <div class="two-col" style="margin-top:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Inspection Results</h3>
+            <h3>{% trans "Inspection Results" %}</h3>
             <canvas id="chart-insp-results" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>NCR by Status</h3>
+            <h3>{% trans "NCR by Status" %}</h3>
             <canvas id="chart-ncr-status" height="220"></canvas>
         </div>
     </div>
@@ -92,43 +93,43 @@
     <div class="section-links">
         <a href="/qa/ncr/" class="section-link">
             <div class="icon">&#9888;</div>
-            <div class="name">Non-Conformance</div>
+            <div class="name">{% trans "Non-Conformance" %}</div>
         </a>
         <a href="/qa/capa/" class="section-link">
             <div class="icon">&#9654;</div>
-            <div class="name">Corrective Actions</div>
+            <div class="name">{% trans "Corrective Actions" %}</div>
         </a>
         <a href="/qa/audits/" class="section-link">
             <div class="icon">&#128203;</div>
-            <div class="name">Audits</div>
+            <div class="name">{% trans "Audits" %}</div>
         </a>
         <a href="/qa/inspections/" class="section-link">
             <div class="icon">&#128269;</div>
-            <div class="name">Inspections</div>
+            <div class="name">{% trans "Inspections" %}</div>
         </a>
         <a href="/qa/suppliers/" class="section-link">
             <div class="icon">&#127970;</div>
-            <div class="name">Supplier Quality</div>
+            <div class="name">{% trans "Supplier Quality" %}</div>
         </a>
         <a href="/qa/reports/" class="section-link">
             <div class="icon">&#128202;</div>
-            <div class="name">Reports</div>
+            <div class="name">{% trans "Reports" %}</div>
         </a>
         <a href="/qa/spc/" class="section-link">
             <div class="icon">&#128200;</div>
-            <div class="name">SPC</div>
+            <div class="name">{% trans "SPC" %}</div>
         </a>
         <a href="/qa/coa/" class="section-link">
             <div class="icon">&#128196;</div>
-            <div class="name">Certificates of Analysis</div>
+            <div class="name">{% trans "Certificates of Analysis" %}</div>
         </a>
         <a href="/qa/control-plans/" class="section-link">
             <div class="icon">&#9878;</div>
-            <div class="name">Control Plans / FMEA</div>
+            <div class="name">{% trans "Control Plans / FMEA" %}</div>
         </a>
         <a href="/qa/compliance/templates/" class="section-link">
             <div class="icon">&#9989;</div>
-            <div class="name">Regulatory Compliance</div>
+            <div class="name">{% trans "Regulatory Compliance" %}</div>
         </a>
     </div>
 </div>
