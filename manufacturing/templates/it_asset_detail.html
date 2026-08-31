@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% block page_title %}Asset {{ asset.asset_tag }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with tag=asset.asset_tag %}Asset {{ tag }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="/label/asset/{{ asset.id }}/" target="_blank" class="btn">Print Label</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="/label/asset/{{ asset.id }}/" target="_blank" class="btn">{% trans "Print Label" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -63,7 +64,7 @@
         <img src="/barcode/img/ASSET-{{ asset.asset_tag }}/" alt="Barcode ASSET-{{ asset.asset_tag }}">
         <small>ASSET-{{ asset.asset_tag }}</small>
     </div>
-    <h2>Asset {{ asset.asset_tag }}</h2>
+    <h2>{% blocktrans with tag=asset.asset_tag %}Asset {{ tag }}{% endblocktrans %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -71,44 +72,44 @@
     <div class="card">
         <div class="field-grid">
             <div class="field-group">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <div class="val"><span class="badge s-{{ asset.status }}">{{ asset.status|capfirst }}</span></div>
             </div>
             <div class="field-group">
-                <label>Type</label>
+                <label>{% trans "Type" %}</label>
                 <div class="val">{{ asset.asset_type|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Make</label>
+                <label>{% trans "Make" %}</label>
                 <div class="val">{{ asset.make|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Model</label>
+                <label>{% trans "Model" %}</label>
                 <div class="val">{{ asset.model|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Serial #</label>
+                <label>{% trans "Serial #" %}</label>
                 <div class="val">{{ asset.serial_number|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Assigned To</label>
+                <label>{% trans "Assigned To" %}</label>
                 <div class="val">{{ asset.assigned_to|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Department</label>
+                <label>{% trans "Department" %}</label>
                 <div class="val">{{ asset.department|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Purchase Date</label>
+                <label>{% trans "Purchase Date" %}</label>
                 <div class="val">{{ asset.purchase_date|default:"—" }}</div>
             </div>
             <div class="field-group">
-                <label>Warranty Exp</label>
+                <label>{% trans "Warranty Exp" %}</label>
                 <div class="val">{{ asset.warranty_exp|default:"—" }}</div>
             </div>
             {% if asset.notes %}
             <div class="field-group full-span">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <div class="val">{{ asset.notes }}</div>
             </div>
             {% endif %}
@@ -117,16 +118,16 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Asset</h3>
+        <h3>{% trans "Edit Asset" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Asset Tag *</label>
+                    <label>{% trans "Asset Tag *" %}</label>
                     <input type="text" name="asset_tag" value="{{ asset.asset_tag }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="asset_type">
                         {% for t in asset_types %}
                         <option value="{{ t }}"{% if asset.asset_type == t %} selected{% endif %}>{{ t }}</option>
@@ -134,7 +135,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in asset_statuses %}
                         <option value="{{ s }}"{% if asset.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -142,55 +143,55 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Make</label>
+                    <label>{% trans "Make" %}</label>
                     <input type="text" name="make" value="{{ asset.make|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Model</label>
+                    <label>{% trans "Model" %}</label>
                     <input type="text" name="model" value="{{ asset.model|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Serial #</label>
+                    <label>{% trans "Serial #" %}</label>
                     <input type="text" name="serial_number" value="{{ asset.serial_number|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Assigned To</label>
+                    <label>{% trans "Assigned To" %}</label>
                     <input type="text" name="assigned_to" value="{{ asset.assigned_to|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Department</label>
+                    <label>{% trans "Department" %}</label>
                     <input type="text" name="department" value="{{ asset.department|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Purchase Date</label>
+                    <label>{% trans "Purchase Date" %}</label>
                     <input type="date" name="purchase_date" value="{{ asset.purchase_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Warranty Exp</label>
+                    <label>{% trans "Warranty Exp" %}</label>
                     <input type="date" name="warranty_exp" value="{{ asset.warranty_exp|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes" value="{{ asset.notes|default:'' }}">
                 </div>
             </div>
 
-            <div style="margin:14px 0 8px;font-size:13px;font-weight:700;color:#333;border-top:1px solid #eee;padding-top:12px;">Financial &amp; Depreciation</div>
+            <div style="margin:14px 0 8px;font-size:13px;font-weight:700;color:#333;border-top:1px solid #eee;padding-top:12px;">{% trans "Financial &amp; Depreciation" %}</div>
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Purchase Price ($)</label>
+                    <label>{% trans "Purchase Price ($)" %}</label>
                     <input type="number" name="purchase_price" step="0.01" min="0" value="{{ asset.purchase_price|default:'' }}" placeholder="0.00">
                 </div>
                 <div class="form-group">
-                    <label>Salvage Value ($)</label>
+                    <label>{% trans "Salvage Value ($)" %}</label>
                     <input type="number" name="salvage_value" step="0.01" min="0" value="{{ asset.salvage_value|default:'' }}" placeholder="0.00">
                 </div>
                 <div class="form-group">
-                    <label>Useful Life (years)</label>
+                    <label>{% trans "Useful Life (years)" %}</label>
                     <input type="number" name="useful_life_years" step="1" min="1" value="{{ asset.useful_life_years|default:'' }}" placeholder="5">
                 </div>
                 <div class="form-group">
-                    <label>Depreciation Method</label>
+                    <label>{% trans "Depreciation Method" %}</label>
                     <select name="depreciation_method">
                         {% for m in depreciation_methods %}
                         <option value="{{ m }}" {% if asset.depreciation_method == m %}selected{% endif %}>{{ m }}</option>
@@ -198,61 +199,61 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Vendor / Supplier</label>
-                    <input type="text" name="vendor" value="{{ asset.vendor|default:'' }}" placeholder="Vendor name">
+                    <label>{% trans "Vendor / Supplier" %}</label>
+                    <input type="text" name="vendor" value="{{ asset.vendor|default:'' }}" placeholder="{% trans 'Vendor name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" name="location" value="{{ asset.location|default:'' }}" placeholder="Room / Building">
+                    <label>{% trans "Location" %}</label>
+                    <input type="text" name="location" value="{{ asset.location|default:'' }}" placeholder="{% trans 'Room / Building' %}">
                 </div>
                 <div class="form-group">
-                    <label>Cost Center</label>
-                    <input type="text" name="cost_center" value="{{ asset.cost_center|default:'' }}" placeholder="e.g. IT">
+                    <label>{% trans "Cost Center" %}</label>
+                    <input type="text" name="cost_center" value="{{ asset.cost_center|default:'' }}" placeholder="{% trans 'e.g. IT' %}">
                 </div>
             </div>
-            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="submit" class="btn-save">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}
 
     {% if asset.purchase_price %}
     <div class="card">
-        <h3>Depreciation Summary</h3>
+        <h3>{% trans "Depreciation Summary" %}</h3>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:10px;">
             <div>
-                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">Purchase Cost</div>
+                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">{% trans "Purchase Cost" %}</div>
                 <div style="font-size:18px;font-weight:bold;color:var(--accent);">${{ asset.purchase_price|floatformat:2 }}</div>
             </div>
             <div>
-                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">Annual Dep.</div>
+                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">{% trans "Annual Dep." %}</div>
                 <div style="font-size:18px;font-weight:bold;color:var(--accent);">${{ asset.annual_depreciation|default:0|floatformat:2 }}</div>
             </div>
             <div>
-                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">Accumulated</div>
+                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">{% trans "Accumulated" %}</div>
                 <div style="font-size:18px;font-weight:bold;color:var(--accent);">${{ asset.accumulated_depreciation|default:0|floatformat:2 }}</div>
             </div>
             <div>
-                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">Book Value</div>
+                <div style="font-size:11px;color:#888;font-weight:bold;text-transform:uppercase;">{% trans "Book Value" %}</div>
                 <div style="font-size:18px;font-weight:bold;color:var(--accent);">${{ asset.book_value|default:0|floatformat:2 }}</div>
             </div>
         </div>
-        <div style="font-size:12px;color:#888;">Method: {{ asset.depreciation_method|default:"None" }}
-            {% if asset.vendor %} &nbsp;·&nbsp; Vendor: {{ asset.vendor }}{% endif %}
-            {% if asset.location %} &nbsp;·&nbsp; Location: {{ asset.location }}{% endif %}
+        <div style="font-size:12px;color:#888;">{% blocktrans with method=asset.depreciation_method|default:"None" %}Method: {{ method }}{% endblocktrans %}
+            {% if asset.vendor %} &nbsp;·&nbsp; {% blocktrans with vendor=asset.vendor %}Vendor: {{ vendor }}{% endblocktrans %}{% endif %}
+            {% if asset.location %} &nbsp;·&nbsp; {% blocktrans with loc=asset.location %}Location: {{ loc }}{% endblocktrans %}{% endif %}
         </div>
     </div>
     {% endif %}
 
     {% if history %}
     <div class="card">
-        <h3>Assignment History</h3>
+        <h3>{% trans "Assignment History" %}</h3>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <thead>
                 <tr>
-                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">Date</th>
-                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">Event</th>
-                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">Details</th>
-                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">By</th>
+                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">{% trans "Date" %}</th>
+                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">{% trans "Event" %}</th>
+                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">{% trans "Details" %}</th>
+                    <th style="text-align:left;padding:7px 10px;background:#f5f7fa;font-size:12px;text-transform:uppercase;color:#444;">{% trans "By" %}</th>
                 </tr>
             </thead>
             <tbody>

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}License #{{ lic.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=lic.id %}License #{{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -47,28 +48,28 @@
 {% block body %}
 <div class="content">
 <div class="it-wrap">
-    <h2>{{ lic.software_name|default:"License" }} — #{{ lic.id }}</h2>
+    <h2>{% blocktrans with name=lic.software_name|default:"License" num=lic.id %}{{ name }} — #{{ num }}{% endblocktrans %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>License Details</h3>
+        <h3>{% trans "License Details" %}</h3>
         <div class="detail-grid three">
             <div class="detail-item">
-                <span class="lbl">Software</span>
+                <span class="lbl">{% trans "Software" %}</span>
                 <span class="val">{{ lic.software_name|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Vendor</span>
+                <span class="lbl">{% trans "Vendor" %}</span>
                 <span class="val">{{ lic.vendor|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">License Type</span>
+                <span class="lbl">{% trans "License Type" %}</span>
                 <span class="val">{{ lic.license_type|capfirst }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Seats Used / Total</span>
+                <span class="lbl">{% trans "Seats Used / Total" %}</span>
                 <span class="val">
                     {{ lic.seats_used }} / {{ lic.seats }}
                     {% if lic.seats > 0 %}
@@ -82,30 +83,30 @@
                 </span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Cost</span>
+                <span class="lbl">{% trans "Cost" %}</span>
                 <span class="val">${{ lic.cost|floatformat:2 }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Status</span>
+                <span class="lbl">{% trans "Status" %}</span>
                 <span class="val"><span class="badge s-{{ lic.status }}">{{ lic.status|capfirst }}</span></span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Purchase Date</span>
+                <span class="lbl">{% trans "Purchase Date" %}</span>
                 <span class="val">{{ lic.purchase_date|default:"—" }}</span>
             </div>
             <div class="detail-item">
-                <span class="lbl">Expiry Date</span>
+                <span class="lbl">{% trans "Expiry Date" %}</span>
                 <span class="val">{{ lic.expiry_date|default:"—" }}</span>
             </div>
             {% if lic.license_key %}
             <div class="detail-item full-span">
-                <span class="lbl">License Key</span>
+                <span class="lbl">{% trans "License Key" %}</span>
                 <span class="val" style="font-family:monospace;">{{ lic.license_key }}</span>
             </div>
             {% endif %}
             {% if lic.notes %}
             <div class="detail-item full-span">
-                <span class="lbl">Notes</span>
+                <span class="lbl">{% trans "Notes" %}</span>
                 <span class="val">{{ lic.notes }}</span>
             </div>
             {% endif %}
@@ -114,20 +115,20 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit License</h3>
+        <h3>{% trans "Edit License" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Software Name</label>
+                    <label>{% trans "Software Name" %}</label>
                     <input type="text" name="software_name" value="{{ lic.software_name }}">
                 </div>
                 <div class="form-group">
-                    <label>Vendor</label>
+                    <label>{% trans "Vendor" %}</label>
                     <input type="text" name="vendor" value="{{ lic.vendor }}">
                 </div>
                 <div class="form-group">
-                    <label>License Type</label>
+                    <label>{% trans "License Type" %}</label>
                     <select name="license_type">
                         {% for t in license_types %}
                         <option value="{{ t }}"{% if lic.license_type == t %} selected{% endif %}>{{ t|capfirst }}</option>
@@ -135,27 +136,27 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Seats</label>
+                    <label>{% trans "Seats" %}</label>
                     <input type="number" name="seats" value="{{ lic.seats }}" min="1">
                 </div>
                 <div class="form-group">
-                    <label>Seats Used</label>
+                    <label>{% trans "Seats Used" %}</label>
                     <input type="number" name="seats_used" value="{{ lic.seats_used }}" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Cost ($)</label>
+                    <label>{% trans "Cost ($)" %}</label>
                     <input type="number" name="cost" value="{{ lic.cost }}" step="0.01" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Purchase Date</label>
+                    <label>{% trans "Purchase Date" %}</label>
                     <input type="date" name="purchase_date" value="{{ lic.purchase_date }}">
                 </div>
                 <div class="form-group">
-                    <label>Expiry Date</label>
+                    <label>{% trans "Expiry Date" %}</label>
                     <input type="date" name="expiry_date" value="{{ lic.expiry_date }}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in license_statuses %}
                         <option value="{{ s }}"{% if lic.status == s %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -163,15 +164,15 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>License Key</label>
+                    <label>{% trans "License Key" %}</label>
                     <input type="text" name="license_key" value="{{ lic.license_key }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ lic.notes }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="submit" class="btn-primary">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% endif %}

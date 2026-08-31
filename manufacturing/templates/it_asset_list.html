@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}IT Assets{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "IT Assets" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&asset_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&asset_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&asset_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&asset_type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -30,43 +31,43 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">IT Asset Inventory</div>
+    <div class="menu-title">{% trans "IT Asset Inventory" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
         <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in asset_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
         <select name="asset_type" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Types</option>
+            <option value="">{% trans "All Types" %}</option>
             {% for t in asset_types %}
             <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search tag / make / model…"
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search tag / make / model…' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:200px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/it/assets/" class="btn">Clear</a>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <a href="/it/assets/" class="btn">{% trans "Clear" %}</a>
     </form>
 
     <div class="erp-table-wrap" style="margin-bottom:24px;">
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Asset Tag</th>
-                    <th>Type</th>
-                    <th>Make</th>
-                    <th>Model</th>
-                    <th>Serial #</th>
-                    <th>Assigned To</th>
-                    <th>Dept</th>
-                    <th>Warranty Exp</th>
-                    <th>Status</th>
+                    <th>{% trans "Asset Tag" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Make" %}</th>
+                    <th>{% trans "Model" %}</th>
+                    <th>{% trans "Serial #" %}</th>
+                    <th>{% trans "Assigned To" %}</th>
+                    <th>{% trans "Dept" %}</th>
+                    <th>{% trans "Warranty Exp" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,7 +89,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" style="color:var(--text-muted);text-align:center;padding:20px;">No assets found.</td></tr>
+            <tr><td colspan="9" style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No assets found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -96,16 +97,16 @@
 
     {% if user_role != 'viewer' and user_role != 'read_only' %}
     <div class="card" style="max-width:900px;">
-        <div class="card-title">New Asset</div>
+        <div class="card-title">{% trans "New Asset" %}</div>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Asset Tag *</label>
-                    <input type="text" name="asset_tag" placeholder="Unique asset tag" required>
+                    <label>{% trans "Asset Tag *" %}</label>
+                    <input type="text" name="asset_tag" placeholder="{% trans 'Unique asset tag' %}" required>
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="asset_type">
                         {% for t in asset_types %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -113,7 +114,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in asset_statuses %}
                         <option value="{{ s }}"{% if s == 'active' %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -121,40 +122,40 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Make</label>
-                    <input type="text" name="make" placeholder="e.g. Dell, HP">
+                    <label>{% trans "Make" %}</label>
+                    <input type="text" name="make" placeholder="{% trans 'e.g. Dell, HP' %}">
                 </div>
                 <div class="form-group">
-                    <label>Model</label>
+                    <label>{% trans "Model" %}</label>
                     <input type="text" name="model">
                 </div>
                 <div class="form-group">
-                    <label>Serial #</label>
+                    <label>{% trans "Serial #" %}</label>
                     <input type="text" name="serial_number">
                 </div>
                 <div class="form-group">
-                    <label>Assigned To</label>
-                    <input type="text" name="assigned_to" placeholder="Leave blank if spare">
+                    <label>{% trans "Assigned To" %}</label>
+                    <input type="text" name="assigned_to" placeholder="{% trans 'Leave blank if spare' %}">
                 </div>
                 <div class="form-group">
-                    <label>Department</label>
+                    <label>{% trans "Department" %}</label>
                     <input type="text" name="department">
                 </div>
                 <div class="form-group">
-                    <label>Purchase Date</label>
+                    <label>{% trans "Purchase Date" %}</label>
                     <input type="date" name="purchase_date">
                 </div>
                 <div class="form-group">
-                    <label>Warranty Exp</label>
+                    <label>{% trans "Warranty Exp" %}</label>
                     <input type="date" name="warranty_exp">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes">
                 </div>
             </div>
             <div style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Add Asset</button>
+                <button type="submit" class="btn btn-primary">{% trans "Add Asset" %}</button>
             </div>
         </form>
     </div>

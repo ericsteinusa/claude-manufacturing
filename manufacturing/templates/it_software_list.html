@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}Software Inventory{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Software Inventory" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/it/" class="btn">IT Dashboard</a>
-<a href="/it/tickets/" class="btn">Tickets</a>
-<a href="/it/assets/" class="btn">Assets</a>
-<a href="/it/repairs/" class="btn">Repairs</a>
-<a href="/it/software/" class="btn">Software</a>
-<a href="/it/licenses/" class="btn">Licenses</a>
-<a href="/it/network/" class="btn">Network</a>
-<a href="/it/tasks/" class="btn">Tasks</a>
-<a href="/it/incidents/" class="btn">Incidents</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/it/" class="btn">{% trans "IT Dashboard" %}</a>
+<a href="/it/tickets/" class="btn">{% trans "Tickets" %}</a>
+<a href="/it/assets/" class="btn">{% trans "Assets" %}</a>
+<a href="/it/repairs/" class="btn">{% trans "Repairs" %}</a>
+<a href="/it/software/" class="btn">{% trans "Software" %}</a>
+<a href="/it/licenses/" class="btn">{% trans "Licenses" %}</a>
+<a href="/it/network/" class="btn">{% trans "Network" %}</a>
+<a href="/it/tasks/" class="btn">{% trans "Tasks" %}</a>
+<a href="/it/incidents/" class="btn">{% trans "Incidents" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -31,22 +32,22 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Software Inventory</div>
+    <div class="menu-title">{% trans "Software Inventory" %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar" style="flex-wrap:wrap;">
         <select name="status" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in software_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search software / vendor / asset…"
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search software / vendor / asset…' %}"
                style="padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;width:220px;">
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/it/software/" class="btn">Clear</a>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <a href="/it/software/" class="btn">{% trans "Clear" %}</a>
     </form>
 
     <div class="erp-table-wrap" style="margin-bottom:24px;">
@@ -54,13 +55,13 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Software Name</th>
-                    <th>Version</th>
-                    <th>Vendor</th>
-                    <th>Asset Tag</th>
-                    <th>Install Date</th>
-                    <th>Status</th>
-                    <th>Installed By</th>
+                    <th>{% trans "Software Name" %}</th>
+                    <th>{% trans "Version" %}</th>
+                    <th>{% trans "Vendor" %}</th>
+                    <th>{% trans "Asset Tag" %}</th>
+                    <th>{% trans "Install Date" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Installed By" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -80,7 +81,7 @@
                 <td>{{ i.installed_by|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="8" style="color:var(--text-muted);text-align:center;padding:20px;">No software records found.</td></tr>
+            <tr><td colspan="8" style="color:var(--text-muted);text-align:center;padding:20px;">{% trans "No software records found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -88,32 +89,32 @@
 
     {% if user_role != 'Auditor' %}
     <div class="card" style="max-width:900px;">
-        <div class="card-title">Add Software Installation</div>
+        <div class="card-title">{% trans "Add Software Installation" %}</div>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid three">
                 <div class="form-group">
-                    <label>Software Name *</label>
-                    <input type="text" name="software_name" placeholder="e.g. Microsoft Office">
+                    <label>{% trans "Software Name *" %}</label>
+                    <input type="text" name="software_name" placeholder="{% trans 'e.g. Microsoft Office' %}">
                 </div>
                 <div class="form-group">
-                    <label>Version</label>
-                    <input type="text" name="version" placeholder="e.g. 365 / 2021">
+                    <label>{% trans "Version" %}</label>
+                    <input type="text" name="version" placeholder="{% trans 'e.g. 365 / 2021' %}">
                 </div>
                 <div class="form-group">
-                    <label>Vendor</label>
-                    <input type="text" name="vendor" placeholder="e.g. Microsoft">
+                    <label>{% trans "Vendor" %}</label>
+                    <input type="text" name="vendor" placeholder="{% trans 'e.g. Microsoft' %}">
                 </div>
                 <div class="form-group">
-                    <label>Asset Tag</label>
-                    <input type="text" name="asset_tag" placeholder="Device asset tag">
+                    <label>{% trans "Asset Tag" %}</label>
+                    <input type="text" name="asset_tag" placeholder="{% trans 'Device asset tag' %}">
                 </div>
                 <div class="form-group">
-                    <label>Install Date</label>
+                    <label>{% trans "Install Date" %}</label>
                     <input type="date" name="install_date" value="{{ today }}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in software_statuses %}
                         <option value="{{ s }}"{% if s == 'installed' %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -121,16 +122,16 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Installed By</label>
-                    <input type="text" name="installed_by" placeholder="Technician name">
+                    <label>{% trans "Installed By" %}</label>
+                    <input type="text" name="installed_by" placeholder="{% trans 'Technician name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Notes</label>
-                    <input type="text" name="notes" placeholder="Optional notes">
+                    <label>{% trans "Notes" %}</label>
+                    <input type="text" name="notes" placeholder="{% trans 'Optional notes' %}">
                 </div>
             </div>
             <div style="margin-top:12px;">
-                <button type="submit" class="btn btn-primary">Add Installation</button>
+                <button type="submit" class="btn btn-primary">{% trans "Add Installation" %}</button>
             </div>
         </form>
     </div>
