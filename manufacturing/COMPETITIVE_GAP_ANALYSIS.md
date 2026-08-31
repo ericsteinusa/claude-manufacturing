@@ -4215,3 +4215,51 @@ department (4) + the full Payroll department (8) + the full Time Clock departmen
 Customers/Credit department (7) + the full Engineering department (10) + the full Customer Service
 department (13)) out of ~450 total. Accounting (13 templates) is the only remaining
 department-sized candidate at the smallest tier; IT (17) is next after that.
+
+**2026-08-31, ninth whole department:** Continued the "whole department" approach — picked
+**Accounting** (`acct_dashboard.html`, `ap_list.html`, `ap_invoice_detail.html`, `ar_list.html`,
+`ar_invoice_detail.html`, `gl_dashboard.html`, `gl_accounts.html`, `gl_journals.html`,
+`gl_journal_detail.html`, `gl_trial_balance.html`, `gl_income_statement.html`,
+`gl_balance_sheet.html`, `gl_cash_flow_statement.html`), tied with Customer Service and Marketing
+for the largest "whole department" pass in this series at 13 templates, and the last remaining
+department at the smallest tier. 162 unique strings needed translation per language, all simple
+(no new plurals this pass). `ap_list.html`/`ap_invoice_detail.html` and
+`ar_list.html`/`ar_invoice_detail.html` are structurally near-identical pairs (Vendor/Paid vs.
+Customer/Received terminology), the same near-duplicate-template pattern seen in earlier passes.
+Used `{% blocktrans with %}` for several dynamic titles ("AP/AR Invoice {num}," "Invoice: {num},"
+"Journal Entry #{num}," "Balance Sheet as of {as_of}," "OUT OF BALANCE by ${amt}") and the "Record
+Payment (Balance: ${bal})" sub-header, plus one HTML-mixed case (the G/L dashboard's "Chart of
+Accounts ({count} accounts)" nav button, literal `<br>`/`<span>` plus an interpolated variable —
+same shape as the Customers/Credit pass's embedded-link banner). **Found a new, larger-scale
+variant of the `msgmerge` fuzzy-matching gotcha**: because Accounting is dominated by short,
+generic labels ("Date," "Status," "Amount," "Vendor," "Due Date"), `makemessages` fuzzy-matched 88
+of the new strings against unrelated existing translations from other departments — worst case,
+the new GL journal-line header "Credit" got matched against the pre-existing "Credit Limit" (from
+Customers/Credit) and inherited its wrong translation ("Límite de crédito," i.e. "Credit limit," in
+a ledger-column context where it should just mean "Credit"). **The first fix-script draft made this
+worse rather than better**: it stripped the `#, fuzzy` marker and `#| msgid` lines but left the
+wrong guessed `msgstr` value sitting there unflagged, since the audit step only looked for
+genuinely *blank* `msgstr`s and a fuzzy match isn't blank — every one of those 88 wrong guesses
+would have shipped silently, with no `#, fuzzy` marker left behind to ever catch them again on a
+future pass. Caught before any translations were written, by manually inspecting the "Credit"
+entry's guessed value; fixed by reverting the `.po` files, re-running `makemessages` fresh, and
+rewriting the strip script to blank out the `msgstr`/`msgstr[n]` value (and any continuation lines)
+whenever it strips a `#, fuzzy` marker — folding all 88 formerly-fuzzy entries into the same
+"blank means needs translation" audit path used for genuinely new strings, rather than trusting the
+fuzzy flag alone to signal what needs attention. Full suite 3431 passed (unchanged), `manage.py
+check` clean, `compilemessages` clean, `msgfmt --check` clean on all three files, zero blank/
+duplicated entries confirmed programmatically after the fix (the recurring plural-concatenation
+false positive from the Customer Service pass's checker reappears here too, unrelated to this
+batch, since Accounting added no new plurals). Verified end-to-end against the real dev server:
+the Accounting dashboard, AP list and an overdue invoice's detail page (confirmed the "Invoice:
+{num}" title and the "Record Payment (Balance: ...)" sub-header against a live payment history),
+the G/L dashboard, Chart of Accounts, Journal Entries list, a posted journal entry's detail page
+(confirmed "Journal Entry #{num}"), the Trial Balance (confirmed the BALANCED/CUADRADO status
+pill), and the Cash Flow Statement (confirmed the multi-line bank-balance reconciliation note), in
+Spanish, French, and German with real sample data, no console errors. **Localization coverage is
+now 92 templates across three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing department (13) + the full Reports
+department (4) + the full Payroll department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department (10) + the full Customer Service
+department (13) + the full Accounting department (13)) out of ~450 total. IT (17 templates) is the
+next-smallest remaining department.

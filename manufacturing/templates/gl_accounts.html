@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Chart of Accounts{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Chart of Accounts" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/" class="btn">G/L Dashboard</a>
-<a href="/gl/journals/" class="btn">Journals</a>
-<a href="/gl/trial-balance/" class="btn">Trial Balance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/" class="btn">{% trans "G/L Dashboard" %}</a>
+<a href="/gl/journals/" class="btn">{% trans "Journals" %}</a>
+<a href="/gl/trial-balance/" class="btn">{% trans "Trial Balance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -42,25 +43,25 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Chart of Accounts</h2>
+    <h2>{% trans "Chart of Accounts" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <label>Type:</label>
+        <label>{% trans "Type:" %}</label>
         <select name="type" onchange="this.form.submit()">
-            <option value="">(all)</option>
+            <option value="">{% trans "(all)" %}</option>
             {% for t in account_types %}<option value="{{ t }}" {% if acct_type == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
         </select>
-        <label><input type="checkbox" name="active" value="0" {% if not active_only %}checked{% endif %} onchange="this.form.submit()"> Show Inactive</label>
+        <label><input type="checkbox" name="active" value="0" {% if not active_only %}checked{% endif %} onchange="this.form.submit()"> {% trans "Show Inactive" %}</label>
     </form>
 
     {% if accounts %}
     <table class="list-table">
         <thead><tr>
-            <th>Acct #</th><th>Account Name</th><th>Type</th><th>Sub-Type</th>
-            <th class="num">Balance</th><th>Status</th>
-            {% if can_edit %}<th>Edit</th>{% endif %}
+            <th>{% trans "Acct #" %}</th><th>{% trans "Account Name" %}</th><th>{% trans "Type" %}</th><th>{% trans "Sub-Type" %}</th>
+            <th class="num">{% trans "Balance" %}</th><th>{% trans "Status" %}</th>
+            {% if can_edit %}<th>{% trans "Edit" %}</th>{% endif %}
         </tr></thead>
         <tbody>
         {% for a in accounts %}
@@ -71,11 +72,11 @@
             <td>{{ a.account_sub|default:"—" }}</td>
             <td class="num">${{ a.balance|floatformat:2 }}</td>
             <td><span class="{% if a.is_active %}badge-active{% else %}badge-inactive{% endif %}">
-                {% if a.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+                {% if a.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</span></td>
             {% if can_edit %}
             <td>
                 <button class="btn-sm" style="padding:3px 10px;font-size:11px;"
-                    onclick="openEdit({{ a.id }},'{{ a.account_number }}','{{ a.account_name }}','{{ a.account_type }}','{{ a.account_sub|default:'' }}',{{ a.is_active }},'{{ a.notes|default:'' }}')">Edit</button>
+                    onclick="openEdit({{ a.id }},'{{ a.account_number }}','{{ a.account_name }}','{{ a.account_type }}','{{ a.account_sub|default:'' }}',{{ a.is_active }},'{{ a.notes|default:'' }}')">{% trans "Edit" %}</button>
             </td>
             {% endif %}
         </tr>
@@ -83,60 +84,60 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;">No accounts found.</p>
+    <p style="color: var(--text-muted);font-size:14px;">{% trans "No accounts found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card" id="edit-card" style="display:none;">
-        <h3 id="edit-hdr">Edit Account</h3>
+        <h3 id="edit-hdr">{% trans "Edit Account" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="acct_id" id="edit-id">
             <div class="form-grid">
-                <div class="form-row"><label>Account # *</label>
+                <div class="form-row"><label>{% trans "Account # *" %}</label>
                     <input type="text" name="account_number" id="edit-num" required></div>
-                <div class="form-row wide"><label>Account Name *</label>
+                <div class="form-row wide"><label>{% trans "Account Name *" %}</label>
                     <input type="text" name="account_name" id="edit-name" required></div>
-                <div class="form-row"><label>Type</label>
+                <div class="form-row"><label>{% trans "Type" %}</label>
                     <select name="account_type" id="edit-type">
                         {% for t in account_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
                     </select></div>
-                <div class="form-row"><label>Sub-Type</label>
-                    <input type="text" name="account_sub" id="edit-sub" placeholder="e.g. Current, Fixed"></div>
-                <div class="form-row"><label><input type="checkbox" name="is_active" id="edit-active" value="1"> Active</label></div>
-                <div class="form-row wide"><label>Notes</label>
+                <div class="form-row"><label>{% trans "Sub-Type" %}</label>
+                    <input type="text" name="account_sub" id="edit-sub" placeholder="{% trans 'e.g. Current, Fixed' %}"></div>
+                <div class="form-row"><label><input type="checkbox" name="is_active" id="edit-active" value="1"> {% trans "Active" %}</label></div>
+                <div class="form-row wide"><label>{% trans "Notes" %}</label>
                     <input type="text" name="notes" id="edit-notes"></div>
             </div>
             <div style="margin-top:10px;display:flex;gap:10px;">
-                <button type="submit" class="btn-sm">Save</button>
+                <button type="submit" class="btn-sm">{% trans "Save" %}</button>
                 <button type="button" onclick="document.getElementById('edit-card').style.display='none'"
-                    style="background:none;border:none;color:#aad;cursor:pointer;font-size:13px;">Cancel</button>
+                    style="background:none;border:none;color:#aad;cursor:pointer;font-size:13px;">{% trans "Cancel" %}</button>
             </div>
         </form>
     </div>
 
     <div class="card" style="margin-top:14px;">
-        <h3>Add Account</h3>
+        <h3>{% trans "Add Account" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="create">
             <div class="form-grid">
-                <div class="form-row"><label>Account # *</label>
-                    <input type="text" name="account_number" required placeholder="e.g. 1000"></div>
-                <div class="form-row wide"><label>Account Name *</label>
+                <div class="form-row"><label>{% trans "Account # *" %}</label>
+                    <input type="text" name="account_number" required placeholder="{% trans 'e.g. 1000' %}"></div>
+                <div class="form-row wide"><label>{% trans "Account Name *" %}</label>
                     <input type="text" name="account_name" required></div>
-                <div class="form-row"><label>Type</label>
+                <div class="form-row"><label>{% trans "Type" %}</label>
                     <select name="account_type">
                         {% for t in account_types %}<option>{{ t }}</option>{% endfor %}
                     </select></div>
-                <div class="form-row"><label>Sub-Type</label>
-                    <input type="text" name="account_sub" placeholder="e.g. Current"></div>
-                <div class="form-row wide"><label>Notes</label>
+                <div class="form-row"><label>{% trans "Sub-Type" %}</label>
+                    <input type="text" name="account_sub" placeholder="{% trans 'e.g. Current' %}"></div>
+                <div class="form-row wide"><label>{% trans "Notes" %}</label>
                     <input type="text" name="notes"></div>
             </div>
             <div style="margin-top:10px;">
-                <button type="submit" class="btn-sm">Add Account</button>
+                <button type="submit" class="btn-sm">{% trans "Add Account" %}</button>
             </div>
         </form>
     </div>

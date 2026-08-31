@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-30 03:47+0000\n"
+"POT-Creation-Date: 2026-08-31 16:31+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
@@ -19,32 +19,76 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: manufacturing/templates/ai_insights_dashboard.html:3
-#: manufacturing/templates/ai_insights_dashboard.html:32
-#: manufacturing/templates/reports_dashboard.html:10
-msgid "AI Insights"
-msgstr "Perspectives IA"
+#: manufacturing/templates/acct_dashboard.html:3
+#: manufacturing/templates/acct_dashboard.html:20
+msgid "Accounting Dashboard"
+msgstr "Tableau de Bord Comptabilité"
 
-#: manufacturing/templates/ai_insights_dashboard.html:6
-#: manufacturing/templates/base.html:603
-#: manufacturing/templates/cs_dashboard.html:9
-#: manufacturing/templates/cs_dashboard.html:46
-#: manufacturing/templates/cs_escalations.html:8
-#: manufacturing/templates/cs_list.html:8
-#: manufacturing/templates/cs_plans.html:7
-#: manufacturing/templates/eng_dashboard.html:11
-#: manufacturing/templates/eng_dashboard.html:64
-#: manufacturing/templates/eng_ecrs.html:8
-#: manufacturing/templates/eng_projects.html:8
-#: manufacturing/templates/eng_spec_detail.html:11
-#: manufacturing/templates/eng_specs_list.html:11
-#: manufacturing/templates/eng_task_detail.html:11
-#: manufacturing/templates/eng_tasks_list.html:11
-#: manufacturing/templates/prod_dashboard.html:9
-msgid "Reports"
-msgstr "Rapports"
+#: manufacturing/templates/acct_dashboard.html:6
+#: manufacturing/templates/base.html:524
+msgid "Accounting"
+msgstr "Comptabilité"
 
+#: manufacturing/templates/acct_dashboard.html:7
+#: manufacturing/templates/acct_dashboard.html:23
+#: manufacturing/templates/acct_dashboard.html:37
+#: manufacturing/templates/ap_list.html:3
+#: manufacturing/templates/ap_list.html:26
+#: manufacturing/templates/ar_list.html:6 manufacturing/templates/base.html:527
+#: manufacturing/templates/gl_dashboard.html:48
+msgid "Accounts Payable"
+msgstr "Comptes fournisseurs"
+
+#: manufacturing/templates/acct_dashboard.html:8
+#: manufacturing/templates/acct_dashboard.html:24
+#: manufacturing/templates/acct_dashboard.html:53
+#: manufacturing/templates/ap_list.html:6
+#: manufacturing/templates/ar_list.html:3
+#: manufacturing/templates/ar_list.html:26
+#: manufacturing/templates/base.html:530
+#: manufacturing/templates/gl_dashboard.html:60
+msgid "Accounts Receivable"
+msgstr "Comptes clients"
+
+#: manufacturing/templates/acct_dashboard.html:9
+#: manufacturing/templates/acct_dashboard.html:25
+#: manufacturing/templates/ap_list.html:7
+#: manufacturing/templates/ar_list.html:7 manufacturing/templates/base.html:533
+#: manufacturing/templates/gl_dashboard.html:3
+#: manufacturing/templates/gl_dashboard.html:44
+msgid "General Ledger"
+msgstr "Grand livre"
+
+#: manufacturing/templates/acct_dashboard.html:10
+#: manufacturing/templates/acct_dashboard.html:31
+msgid "Budgets"
+msgstr "Budgets"
+
+#: manufacturing/templates/acct_dashboard.html:11
+#: manufacturing/templates/acct_dashboard.html:32
+msgid "Audits"
+msgstr "Audits"
+
+#: manufacturing/templates/acct_dashboard.html:12
+msgid "Bank Rec"
+msgstr "Rappr. Bancaire"
+
+#: manufacturing/templates/acct_dashboard.html:13
+msgid "Tax"
+msgstr "Taxes"
+
+#: manufacturing/templates/acct_dashboard.html:14
+#: manufacturing/templates/base.html:536
+#: manufacturing/templates/payroll_dashboard.html:3
+msgid "Payroll"
+msgstr "Paie"
+
+#: manufacturing/templates/acct_dashboard.html:15
 #: manufacturing/templates/ai_insights_dashboard.html:7
+#: manufacturing/templates/ap_invoice_detail.html:9
+#: manufacturing/templates/ap_list.html:10
+#: manufacturing/templates/ar_invoice_detail.html:10
+#: manufacturing/templates/ar_list.html:10
 #: manufacturing/templates/credit_account_detail.html:10
 #: manufacturing/templates/credit_account_list.html:10
 #: manufacturing/templates/credit_application_detail.html:10
@@ -77,6 +121,14 @@ msgstr "Rapports"
 #: manufacturing/templates/eng_specs_list.html:12
 #: manufacturing/templates/eng_task_detail.html:12
 #: manufacturing/templates/eng_tasks_list.html:12
+#: manufacturing/templates/gl_accounts.html:9
+#: manufacturing/templates/gl_balance_sheet.html:9
+#: manufacturing/templates/gl_cash_flow_statement.html:10
+#: manufacturing/templates/gl_dashboard.html:13
+#: manufacturing/templates/gl_income_statement.html:9
+#: manufacturing/templates/gl_journal_detail.html:9
+#: manufacturing/templates/gl_journals.html:9
+#: manufacturing/templates/gl_trial_balance.html:9
 #: manufacturing/templates/legal_compliance_detail.html:10
 #: manufacturing/templates/legal_compliance_list.html:13
 #: manufacturing/templates/legal_contract_detail.html:10
@@ -123,6 +175,339 @@ msgstr "Rapports"
 msgid "Home"
 msgstr "Accueil"
 
+#: manufacturing/templates/acct_dashboard.html:26
+#: manufacturing/templates/gl_accounts.html:3
+#: manufacturing/templates/gl_accounts.html:46
+#: manufacturing/templates/gl_dashboard.html:6
+#: manufacturing/templates/gl_journals.html:7
+msgid "Chart of Accounts"
+msgstr "Plan Comptable"
+
+#: manufacturing/templates/acct_dashboard.html:27
+#: manufacturing/templates/gl_dashboard.html:7
+#: manufacturing/templates/gl_dashboard.html:77
+#: manufacturing/templates/gl_journals.html:3
+#: manufacturing/templates/gl_journals.html:35
+msgid "Journal Entries"
+msgstr "Écritures Comptables"
+
+#: manufacturing/templates/acct_dashboard.html:28
+#: manufacturing/templates/gl_accounts.html:8
+#: manufacturing/templates/gl_balance_sheet.html:7
+#: manufacturing/templates/gl_dashboard.html:8
+#: manufacturing/templates/gl_dashboard.html:79
+#: manufacturing/templates/gl_income_statement.html:7
+#: manufacturing/templates/gl_trial_balance.html:3
+#: manufacturing/templates/gl_trial_balance.html:35
+msgid "Trial Balance"
+msgstr "Balance Générale"
+
+#: manufacturing/templates/acct_dashboard.html:29
+#: manufacturing/templates/gl_cash_flow_statement.html:7
+#: manufacturing/templates/gl_dashboard.html:80
+#: manufacturing/templates/gl_income_statement.html:3
+#: manufacturing/templates/gl_income_statement.html:40
+#: manufacturing/templates/gl_income_statement.html:52
+msgid "Income Statement"
+msgstr "Compte de Résultat"
+
+#: manufacturing/templates/acct_dashboard.html:30
+#: manufacturing/templates/gl_balance_sheet.html:3
+#: manufacturing/templates/gl_balance_sheet.html:41
+#: manufacturing/templates/gl_balance_sheet.html:52
+#: manufacturing/templates/gl_cash_flow_statement.html:8
+#: manufacturing/templates/gl_dashboard.html:10
+#: manufacturing/templates/gl_dashboard.html:81
+#: manufacturing/templates/gl_income_statement.html:8
+#: manufacturing/templates/gl_trial_balance.html:8
+msgid "Balance Sheet"
+msgstr "Bilan"
+
+#: manufacturing/templates/acct_dashboard.html:33
+msgid "Bank Reconciliation"
+msgstr "Rapprochement Bancaire"
+
+#: manufacturing/templates/acct_dashboard.html:34
+msgid "Tax Filings"
+msgstr "Déclarations Fiscales"
+
+#: manufacturing/templates/acct_dashboard.html:40
+#: manufacturing/templates/acct_dashboard.html:56
+#: manufacturing/templates/ap_list.html:33
+#: manufacturing/templates/ar_list.html:33
+msgid "Open Invoices"
+msgstr "Factures Ouvertes"
+
+#: manufacturing/templates/acct_dashboard.html:44
+#: manufacturing/templates/acct_dashboard.html:60
+#: manufacturing/templates/ap_list.html:37
+#: manufacturing/templates/ar_list.html:37
+#: manufacturing/templates/cs_detail.html:79
+#: manufacturing/templates/gl_dashboard.html:52
+#: manufacturing/templates/gl_dashboard.html:64
+#: manufacturing/templates/maint_dashboard.html:82
+#: manufacturing/templates/prod_dashboard_kpis.html:12
+msgid "Overdue"
+msgstr "En retard"
+
+#: manufacturing/templates/acct_dashboard.html:48
+#: manufacturing/templates/acct_dashboard.html:64
+msgid "Total Outstanding"
+msgstr "Total en Souffrance"
+
+#: manufacturing/templates/acct_dashboard.html:71
+msgid "AP Invoices by Status"
+msgstr "Factures Fournisseurs par Statut"
+
+#: manufacturing/templates/acct_dashboard.html:75
+msgid "AR Invoices by Status"
+msgstr "Factures Clients par Statut"
+
+#: manufacturing/templates/acct_dashboard.html:82
+msgid "Top Vendors by AP Outstanding"
+msgstr "Principaux Fournisseurs par Solde en Souffrance"
+
+#: manufacturing/templates/acct_dashboard.html:86
+msgid "Top Customers by AR Outstanding"
+msgstr "Principaux Clients par Solde en Souffrance"
+
+#: manufacturing/templates/acct_dashboard.html:93
+msgid "Journal Entries by Month (last 6 mo)"
+msgstr "Écritures Comptables par Mois (6 derniers mois)"
+
+#: manufacturing/templates/acct_dashboard.html:97
+msgid "Journals: Posted vs Draft"
+msgstr "Écritures : Comptabilisées vs Brouillon"
+
+#: manufacturing/templates/acct_dashboard.html:103
+#: manufacturing/templates/gl_dashboard.html:86
+msgid "Recent Journal Entries"
+msgstr "Écritures Comptables Récentes"
+
+#: manufacturing/templates/acct_dashboard.html:108
+#: manufacturing/templates/ap_invoice_detail.html:166
+#: manufacturing/templates/ap_invoice_detail.html:195
+#: manufacturing/templates/ar_invoice_detail.html:166
+#: manufacturing/templates/ar_invoice_detail.html:195
+#: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_collections_detail.html:62
+#: manufacturing/templates/credit_collections_list.html:77
+#: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_dashboard.html:123
+#: manufacturing/templates/cs_surveys_detail.html:127
+#: manufacturing/templates/gl_dashboard.html:90
+#: manufacturing/templates/gl_journal_detail.html:56
+#: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/tc_ot_report.html:87
+#: manufacturing/templates/tc_schedule.html:76
+#: manufacturing/templates/time_clock_attendance.html:58
+#: manufacturing/templates/time_clock_hours.html:60
+msgid "Date"
+msgstr "Date"
+
+#: manufacturing/templates/acct_dashboard.html:109
+#: manufacturing/templates/ap_invoice_detail.html:166
+#: manufacturing/templates/ap_invoice_detail.html:210
+#: manufacturing/templates/ar_invoice_detail.html:166
+#: manufacturing/templates/ar_invoice_detail.html:210
+#: manufacturing/templates/gl_dashboard.html:90
+#: manufacturing/templates/gl_journal_detail.html:57
+#: manufacturing/templates/gl_journal_detail.html:120
+#: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/legal_governance_list.html:73
+#: manufacturing/templates/legal_governance_list.html:121
+msgid "Reference"
+msgstr "Référence"
+
+#: manufacturing/templates/acct_dashboard.html:110
+#: manufacturing/templates/ap_invoice_detail.html:141
+#: manufacturing/templates/ap_invoice_detail.html:155
+#: manufacturing/templates/ap_list.html:145
+#: manufacturing/templates/ar_invoice_detail.html:141
+#: manufacturing/templates/ar_invoice_detail.html:155
+#: manufacturing/templates/ar_list.html:145
+#: manufacturing/templates/cs_escalations.html:67
+#: manufacturing/templates/cs_list.html:58
+#: manufacturing/templates/cs_plans.html:131
+#: manufacturing/templates/cs_surveys_detail.html:113
+#: manufacturing/templates/cs_surveys_list.html:143
+#: manufacturing/templates/eng_spec_detail.html:94
+#: manufacturing/templates/eng_spec_detail.html:119
+#: manufacturing/templates/eng_specs_list.html:149
+#: manufacturing/templates/gl_dashboard.html:90
+#: manufacturing/templates/gl_journal_detail.html:58
+#: manufacturing/templates/gl_journal_detail.html:124
+#: manufacturing/templates/gl_journals.html:57
+#: manufacturing/templates/mkt_research_detail.html:83
+#: manufacturing/templates/mkt_research_detail.html:145
+#: manufacturing/templates/mkt_research_list.html:161
+#: manufacturing/templates/prod_dashboard.html:111
+msgid "Description"
+msgstr "Description"
+
+#: manufacturing/templates/acct_dashboard.html:111
+#: manufacturing/templates/gl_dashboard.html:91
+#: manufacturing/templates/gl_journals.html:58
+msgid "Lines"
+msgstr "Lignes"
+
+#: manufacturing/templates/acct_dashboard.html:112
+msgid "Total Debit"
+msgstr "Total Débit"
+
+#: manufacturing/templates/acct_dashboard.html:113
+#: manufacturing/templates/ap_invoice_detail.html:107
+#: manufacturing/templates/ap_invoice_detail.html:151
+#: manufacturing/templates/ap_list.html:84
+#: manufacturing/templates/ar_invoice_detail.html:107
+#: manufacturing/templates/ar_invoice_detail.html:151
+#: manufacturing/templates/ar_list.html:84
+#: manufacturing/templates/credit_account_detail.html:62
+#: manufacturing/templates/credit_account_detail.html:105
+#: manufacturing/templates/credit_account_detail.html:133
+#: manufacturing/templates/credit_account_detail.html:153
+#: manufacturing/templates/credit_account_detail.html:172
+#: manufacturing/templates/credit_account_list.html:80
+#: manufacturing/templates/credit_account_list.html:120
+#: manufacturing/templates/credit_application_detail.html:56
+#: manufacturing/templates/credit_application_list.html:80
+#: manufacturing/templates/credit_collections_detail.html:54
+#: manufacturing/templates/credit_collections_detail.html:109
+#: manufacturing/templates/credit_collections_list.html:82
+#: manufacturing/templates/credit_collections_list.html:147
+#: manufacturing/templates/credit_dashboard.html:103
+#: manufacturing/templates/credit_dashboard.html:122
+#: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_dashboard.html:125
+#: manufacturing/templates/cs_kb_detail.html:77
+#: manufacturing/templates/cs_kb_list.html:87
+#: manufacturing/templates/cs_kb_list.html:131
+#: manufacturing/templates/cs_list.html:62
+#: manufacturing/templates/cs_plans.html:80
+#: manufacturing/templates/cs_returns_detail.html:86
+#: manufacturing/templates/cs_returns_list.html:82
+#: manufacturing/templates/cs_returns_list.html:121
+#: manufacturing/templates/cs_surveys_detail.html:97
+#: manufacturing/templates/cs_surveys_list.html:87
+#: manufacturing/templates/cs_surveys_list.html:127
+#: manufacturing/templates/eng_dashboard.html:113
+#: manufacturing/templates/eng_dashboard.html:130
+#: manufacturing/templates/eng_ecr_detail.html:97
+#: manufacturing/templates/eng_ecrs.html:70
+#: manufacturing/templates/eng_project_detail.html:83
+#: manufacturing/templates/eng_project_detail.html:116
+#: manufacturing/templates/eng_project_detail.html:130
+#: manufacturing/templates/eng_project_detail.html:167
+#: manufacturing/templates/eng_project_detail.html:211
+#: manufacturing/templates/eng_projects.html:73
+#: manufacturing/templates/eng_projects.html:105
+#: manufacturing/templates/eng_reports.html:122
+#: manufacturing/templates/eng_spec_detail.html:82
+#: manufacturing/templates/eng_spec_detail.html:112
+#: manufacturing/templates/eng_specs_list.html:90
+#: manufacturing/templates/eng_specs_list.html:137
+#: manufacturing/templates/eng_task_detail.html:99
+#: manufacturing/templates/eng_task_detail.html:120
+#: manufacturing/templates/eng_tasks_list.html:94
+#: manufacturing/templates/gl_accounts.html:63
+#: manufacturing/templates/gl_journal_detail.html:60
+#: manufacturing/templates/legal_compliance_detail.html:54
+#: manufacturing/templates/legal_compliance_detail.html:101
+#: manufacturing/templates/legal_compliance_list.html:86
+#: manufacturing/templates/legal_compliance_list.html:125
+#: manufacturing/templates/legal_contract_detail.html:55
+#: manufacturing/templates/legal_contract_detail.html:114
+#: manufacturing/templates/legal_contract_list.html:95
+#: manufacturing/templates/legal_contract_list.html:140
+#: manufacturing/templates/legal_dashboard.html:147
+#: manufacturing/templates/legal_employment_list.html:74
+#: manufacturing/templates/legal_employment_list.html:118
+#: manufacturing/templates/legal_governance_list.html:74
+#: manufacturing/templates/legal_governance_list.html:113
+#: manufacturing/templates/legal_ip_list.html:75
+#: manufacturing/templates/legal_ip_list.html:123
+#: manufacturing/templates/legal_litigation_detail.html:55
+#: manufacturing/templates/legal_litigation_detail.html:118
+#: manufacturing/templates/legal_litigation_list.html:93
+#: manufacturing/templates/legal_litigation_list.html:146
+#: manufacturing/templates/marketing_dashboard.html:155
+#: manufacturing/templates/mkt_ad_detail.html:70
+#: manufacturing/templates/mkt_ad_detail.html:154
+#: manufacturing/templates/mkt_ad_list.html:95
+#: manufacturing/templates/mkt_ad_list.html:160
+#: manufacturing/templates/mkt_budget_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:141
+#: manufacturing/templates/mkt_campaign_detail.html:55
+#: manufacturing/templates/mkt_campaign_detail.html:118
+#: manufacturing/templates/mkt_campaign_list.html:93
+#: manufacturing/templates/mkt_campaign_list.html:142
+#: manufacturing/templates/mkt_content_detail.html:55
+#: manufacturing/templates/mkt_content_detail.html:114
+#: manufacturing/templates/mkt_content_list.html:90
+#: manufacturing/templates/mkt_content_list.html:138
+#: manufacturing/templates/mkt_lead_detail.html:56
+#: manufacturing/templates/mkt_lead_detail.html:123
+#: manufacturing/templates/mkt_lead_list.html:93
+#: manufacturing/templates/mkt_lead_list.html:149
+#: manufacturing/templates/mkt_research_detail.html:65
+#: manufacturing/templates/mkt_research_detail.html:137
+#: manufacturing/templates/mkt_research_list.html:95
+#: manufacturing/templates/mkt_research_list.html:153
+#: manufacturing/templates/payroll_dashboard.html:88
+#: manufacturing/templates/payroll_history.html:39
+#: manufacturing/templates/payroll_run_detail.html:41
+#: manufacturing/templates/prod_dashboard.html:114
+#: manufacturing/templates/tc_device_form.html:221
+#: manufacturing/templates/tc_device_list.html:45
+#: manufacturing/templates/time_clock_attendance.html:89
+msgid "Status"
+msgstr "Statut"
+
+#: manufacturing/templates/acct_dashboard.html:126
+#: manufacturing/templates/gl_dashboard.html:91
+#: manufacturing/templates/gl_journal_detail.html:63
+#: manufacturing/templates/gl_journals.html:59
+#: manufacturing/templates/gl_journals.html:70
+msgid "Posted"
+msgstr "Comptabilisé"
+
+#: manufacturing/templates/acct_dashboard.html:128
+#: manufacturing/templates/legal_dashboard.html:67
+#: manufacturing/templates/marketing_dashboard.html:102
+msgid "Draft"
+msgstr "Brouillon"
+
+#: manufacturing/templates/acct_dashboard.html:133
+#: manufacturing/templates/gl_dashboard.html:109
+msgid "No journal entries yet."
+msgstr "Aucune écriture comptable pour le moment."
+
+#: manufacturing/templates/ai_insights_dashboard.html:3
+#: manufacturing/templates/ai_insights_dashboard.html:32
+#: manufacturing/templates/reports_dashboard.html:10
+msgid "AI Insights"
+msgstr "Perspectives IA"
+
+#: manufacturing/templates/ai_insights_dashboard.html:6
+#: manufacturing/templates/base.html:603
+#: manufacturing/templates/cs_dashboard.html:9
+#: manufacturing/templates/cs_dashboard.html:46
+#: manufacturing/templates/cs_escalations.html:8
+#: manufacturing/templates/cs_list.html:8
+#: manufacturing/templates/cs_plans.html:7
+#: manufacturing/templates/eng_dashboard.html:11
+#: manufacturing/templates/eng_dashboard.html:64
+#: manufacturing/templates/eng_ecrs.html:8
+#: manufacturing/templates/eng_projects.html:8
+#: manufacturing/templates/eng_spec_detail.html:11
+#: manufacturing/templates/eng_specs_list.html:11
+#: manufacturing/templates/eng_task_detail.html:11
+#: manufacturing/templates/eng_tasks_list.html:11
+#: manufacturing/templates/prod_dashboard.html:9
+msgid "Reports"
+msgstr "Rapports"
+
 #: manufacturing/templates/ai_insights_dashboard.html:34
 msgid ""
 "A cross-domain feed combining <a href=\"/predictive-maintenance/"
@@ -146,6 +531,505 @@ msgstr "Voir →"
 #: manufacturing/templates/ai_insights_feed.html:17
 msgid "No active insights right now."
 msgstr "Aucune information active pour le moment."
+
+#: manufacturing/templates/ap_invoice_detail.html:3
+#, python-format
+msgid "AP Invoice %(num)s"
+msgstr "Facture Fournisseur %(num)s"
+
+#: manufacturing/templates/ap_invoice_detail.html:3
+#: manufacturing/templates/ap_invoice_detail.html:56
+msgid "New AP Invoice"
+msgstr "Nouvelle Facture Fournisseur"
+
+#: manufacturing/templates/ap_invoice_detail.html:6
+#: manufacturing/templates/ar_invoice_detail.html:6
+msgid "All Invoices"
+msgstr "Toutes les Factures"
+
+#: manufacturing/templates/ap_invoice_detail.html:7
+#: manufacturing/templates/gl_dashboard.html:12
+msgid "A/R"
+msgstr "C/C"
+
+#: manufacturing/templates/ap_invoice_detail.html:8
+#: manufacturing/templates/ar_invoice_detail.html:9
+#: manufacturing/templates/gl_journal_detail.html:8
+msgid "G/L"
+msgstr "G/L"
+
+#: manufacturing/templates/ap_invoice_detail.html:54
+#: manufacturing/templates/ar_invoice_detail.html:54
+#: manufacturing/templates/payroll_stub_detail.html:36
+msgid "Print / Save PDF"
+msgstr "Imprimer / Enregistrer en PDF"
+
+#: manufacturing/templates/ap_invoice_detail.html:56
+#: manufacturing/templates/ar_invoice_detail.html:56
+#, python-format
+msgid "Invoice: %(num)s"
+msgstr "Facture : %(num)s"
+
+#: manufacturing/templates/ap_invoice_detail.html:64
+#: manufacturing/templates/ar_invoice_detail.html:64
+msgid "Amount:"
+msgstr "Montant :"
+
+#: manufacturing/templates/ap_invoice_detail.html:69
+msgid "Paid:"
+msgstr "Payé :"
+
+#: manufacturing/templates/ap_invoice_detail.html:70
+#: manufacturing/templates/ar_invoice_detail.html:70
+msgid "Balance:"
+msgstr "Solde :"
+
+#: manufacturing/templates/ap_invoice_detail.html:79
+#: manufacturing/templates/ar_invoice_detail.html:79
+msgid "Set Status"
+msgstr "Définir le Statut"
+
+#: manufacturing/templates/ap_invoice_detail.html:86
+#: manufacturing/templates/ar_invoice_detail.html:86
+msgid "Invoice Details"
+msgstr "Détails de la Facture"
+
+#: manufacturing/templates/ap_invoice_detail.html:93
+#: manufacturing/templates/ap_invoice_detail.html:149
+#: manufacturing/templates/ap_list.html:83
+#: manufacturing/templates/ap_list.html:120
+msgid "Vendor"
+msgstr "Fournisseur"
+
+#: manufacturing/templates/ap_invoice_detail.html:95
+#: manufacturing/templates/ap_list.html:122
+msgid "(none)"
+msgstr "(aucun)"
+
+#: manufacturing/templates/ap_invoice_detail.html:102
+#: manufacturing/templates/ap_list.html:129
+#: manufacturing/templates/ar_invoice_detail.html:102
+#: manufacturing/templates/ar_list.html:129
+msgid "Invoice # *"
+msgstr "N° de Facture *"
+
+#: manufacturing/templates/ap_invoice_detail.html:113
+#: manufacturing/templates/ap_invoice_detail.html:152
+#: manufacturing/templates/ap_list.html:83
+#: manufacturing/templates/ap_list.html:133
+#: manufacturing/templates/ar_invoice_detail.html:113
+#: manufacturing/templates/ar_invoice_detail.html:152
+#: manufacturing/templates/ar_list.html:83
+#: manufacturing/templates/ar_list.html:133
+msgid "Invoice Date"
+msgstr "Date de Facture"
+
+#: manufacturing/templates/ap_invoice_detail.html:117
+#: manufacturing/templates/ap_list.html:137
+#: manufacturing/templates/ar_invoice_detail.html:117
+#: manufacturing/templates/ar_list.html:137
+msgid "Due Date *"
+msgstr "Date d'Échéance *"
+
+#: manufacturing/templates/ap_invoice_detail.html:121
+#: manufacturing/templates/ap_invoice_detail.html:154
+#: manufacturing/templates/ap_invoice_detail.html:167
+#: manufacturing/templates/ap_list.html:84
+#: manufacturing/templates/ar_invoice_detail.html:121
+#: manufacturing/templates/ar_invoice_detail.html:154
+#: manufacturing/templates/ar_invoice_detail.html:167
+#: manufacturing/templates/ar_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:83
+#: manufacturing/templates/payroll_deductions.html:121
+msgid "Amount"
+msgstr "Montant"
+
+#: manufacturing/templates/ap_invoice_detail.html:127
+#: manufacturing/templates/ar_invoice_detail.html:127
+msgid "Currency"
+msgstr "Devise"
+
+#: manufacturing/templates/ap_invoice_detail.html:135
+#: manufacturing/templates/ar_invoice_detail.html:135
+msgid "Exchange Rate"
+msgstr "Taux de Change"
+
+#: manufacturing/templates/ap_invoice_detail.html:145
+#: manufacturing/templates/ar_invoice_detail.html:145
+#: manufacturing/templates/credit_account_detail.html:125
+#: manufacturing/templates/credit_collections_detail.html:133
+#: manufacturing/templates/cs_detail.html:166
+#: manufacturing/templates/cs_kb_detail.html:97
+#: manufacturing/templates/cs_returns_detail.html:102
+#: manufacturing/templates/cs_surveys_detail.html:117
+#: manufacturing/templates/eng_ecr_detail.html:107
+#: manufacturing/templates/eng_project_detail.html:112
+#: manufacturing/templates/eng_spec_detail.html:102
+#: manufacturing/templates/eng_task_detail.html:111
+#: manufacturing/templates/legal_compliance_detail.html:121
+#: manufacturing/templates/legal_contract_detail.html:142
+#: manufacturing/templates/legal_litigation_detail.html:134
+#: manufacturing/templates/mkt_ad_detail.html:190
+#: manufacturing/templates/mkt_campaign_detail.html:146
+#: manufacturing/templates/mkt_content_detail.html:138
+#: manufacturing/templates/mkt_lead_detail.html:135
+#: manufacturing/templates/mkt_research_detail.html:157
+#: manufacturing/templates/tc_device_form.html:192
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
+#: manufacturing/templates/ap_invoice_detail.html:145
+#: manufacturing/templates/ap_list.html:150
+#: manufacturing/templates/ar_invoice_detail.html:145
+#: manufacturing/templates/ar_list.html:150
+msgid "Create Invoice"
+msgstr "Créer une Facture"
+
+#: manufacturing/templates/ap_invoice_detail.html:150
+#: manufacturing/templates/ap_list.html:83
+#: manufacturing/templates/ar_invoice_detail.html:150
+#: manufacturing/templates/ar_list.html:83
+msgid "Invoice #"
+msgstr "N° de Facture"
+
+#: manufacturing/templates/ap_invoice_detail.html:153
+#: manufacturing/templates/ap_list.html:83
+#: manufacturing/templates/ar_invoice_detail.html:153
+#: manufacturing/templates/ar_list.html:83
+#: manufacturing/templates/eng_project_detail.html:104
+#: manufacturing/templates/eng_project_detail.html:161
+#: manufacturing/templates/eng_project_detail.html:187
+#: manufacturing/templates/eng_project_detail.html:219
+#: manufacturing/templates/eng_projects.html:73
+#: manufacturing/templates/eng_projects.html:126
+#: manufacturing/templates/eng_task_detail.html:87
+#: manufacturing/templates/eng_task_detail.html:118
+#: manufacturing/templates/eng_tasks_list.html:92
+#: manufacturing/templates/eng_tasks_list.html:143
+#: manufacturing/templates/legal_compliance_detail.html:66
+#: manufacturing/templates/legal_compliance_detail.html:109
+#: manufacturing/templates/legal_compliance_list.html:84
+#: manufacturing/templates/legal_compliance_list.html:133
+#: manufacturing/templates/mkt_content_detail.html:71
+#: manufacturing/templates/mkt_content_detail.html:126
+#: manufacturing/templates/mkt_content_list.html:88
+#: manufacturing/templates/mkt_content_list.html:150
+#: manufacturing/templates/prod_dashboard.html:113
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+#: manufacturing/templates/ap_invoice_detail.html:162
+#: manufacturing/templates/ar_invoice_detail.html:162
+msgid "Payment History"
+msgstr "Historique des Paiements"
+
+#: manufacturing/templates/ap_invoice_detail.html:166
+#: manufacturing/templates/ap_invoice_detail.html:204
+#: manufacturing/templates/ar_invoice_detail.html:166
+#: manufacturing/templates/ar_invoice_detail.html:204
+#: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/payroll_deductions.html:179
+msgid "Method"
+msgstr "Méthode"
+
+#: manufacturing/templates/ap_invoice_detail.html:167
+#: manufacturing/templates/ap_invoice_detail.html:214
+#: manufacturing/templates/ar_invoice_detail.html:167
+#: manufacturing/templates/ar_invoice_detail.html:214
+#: manufacturing/templates/credit_account_detail.html:87
+#: manufacturing/templates/credit_account_detail.html:121
+#: manufacturing/templates/credit_account_list.html:136
+#: manufacturing/templates/credit_application_detail.html:81
+#: manufacturing/templates/credit_application_detail.html:105
+#: manufacturing/templates/credit_application_list.html:124
+#: manufacturing/templates/credit_collections_detail.html:83
+#: manufacturing/templates/credit_collections_detail.html:129
+#: manufacturing/templates/credit_collections_list.html:155
+#: manufacturing/templates/cs_returns_detail.html:98
+#: manufacturing/templates/cs_returns_detail.html:113
+#: manufacturing/templates/cs_returns_list.html:137
+#: manufacturing/templates/eng_ecr_detail.html:105
+#: manufacturing/templates/eng_ecr_detail.html:113
+#: manufacturing/templates/eng_ecr_detail.html:149
+#: manufacturing/templates/eng_project_detail.html:109
+#: manufacturing/templates/eng_project_detail.html:120
+#: manufacturing/templates/eng_project_detail.html:173
+#: manufacturing/templates/eng_project_detail.html:221
+#: manufacturing/templates/eng_spec_detail.html:98
+#: manufacturing/templates/eng_spec_detail.html:125
+#: manufacturing/templates/eng_specs_list.html:153
+#: manufacturing/templates/eng_task_detail.html:107
+#: manufacturing/templates/eng_task_detail.html:122
+#: manufacturing/templates/eng_tasks_list.html:155
+#: manufacturing/templates/gl_accounts.html:109
+#: manufacturing/templates/gl_accounts.html:136
+#: manufacturing/templates/legal_compliance_detail.html:75
+#: manufacturing/templates/legal_compliance_detail.html:117
+#: manufacturing/templates/legal_compliance_list.html:137
+#: manufacturing/templates/legal_contract_detail.html:84
+#: manufacturing/templates/legal_contract_detail.html:138
+#: manufacturing/templates/legal_contract_list.html:164
+#: manufacturing/templates/legal_employment_list.html:138
+#: manufacturing/templates/legal_governance_list.html:133
+#: manufacturing/templates/legal_ip_list.html:139
+#: manufacturing/templates/legal_litigation_detail.html:80
+#: manufacturing/templates/legal_litigation_detail.html:130
+#: manufacturing/templates/legal_litigation_list.html:154
+#: manufacturing/templates/mkt_ad_detail.html:116
+#: manufacturing/templates/mkt_ad_detail.html:186
+#: manufacturing/templates/mkt_ad_list.html:180
+#: manufacturing/templates/mkt_budget_list.html:149
+#: manufacturing/templates/mkt_campaign_detail.html:84
+#: manufacturing/templates/mkt_campaign_detail.html:142
+#: manufacturing/templates/mkt_campaign_list.html:166
+#: manufacturing/templates/mkt_content_detail.html:80
+#: manufacturing/templates/mkt_content_detail.html:134
+#: manufacturing/templates/mkt_content_list.html:158
+#: manufacturing/templates/mkt_lead_detail.html:81
+#: manufacturing/templates/mkt_lead_detail.html:131
+#: manufacturing/templates/mkt_lead_list.html:157
+#: manufacturing/templates/mkt_research_detail.html:95
+#: manufacturing/templates/mkt_research_detail.html:153
+#: manufacturing/templates/mkt_research_list.html:165
+#: manufacturing/templates/payroll_deductions.html:192
+msgid "Notes"
+msgstr "Notes"
+
+#: manufacturing/templates/ap_invoice_detail.html:182
+#: manufacturing/templates/ar_invoice_detail.html:182
+msgid "No payments recorded."
+msgstr "Aucun paiement enregistré."
+
+#: manufacturing/templates/ap_invoice_detail.html:188
+#: manufacturing/templates/ar_invoice_detail.html:188
+#, python-format
+msgid "Record Payment (Balance: $%(bal)s)"
+msgstr "Enregistrer un Paiement (Solde : $%(bal)s)"
+
+#: manufacturing/templates/ap_invoice_detail.html:199
+#: manufacturing/templates/ap_list.html:141
+#: manufacturing/templates/ar_invoice_detail.html:199
+#: manufacturing/templates/ar_list.html:141
+#: manufacturing/templates/mkt_budget_list.html:129
+msgid "Amount ($)"
+msgstr "Montant ($)"
+
+#: manufacturing/templates/ap_invoice_detail.html:211
+#: manufacturing/templates/ar_invoice_detail.html:211
+msgid "Check #, etc."
+msgstr "N° de chèque, etc."
+
+#: manufacturing/templates/ap_invoice_detail.html:217
+#: manufacturing/templates/ar_invoice_detail.html:217
+msgid "Record Payment"
+msgstr "Enregistrer le Paiement"
+
+#: manufacturing/templates/ap_list.html:8
+#: manufacturing/templates/ar_list.html:8
+#: manufacturing/templates/payroll_history.html:12
+#: manufacturing/templates/report_builder_detail.html:8
+msgid "Export CSV"
+msgstr "Exporter en CSV"
+
+#: manufacturing/templates/ap_list.html:9
+#: manufacturing/templates/ar_list.html:9
+#: manufacturing/templates/payroll_history.html:13
+msgid "Export Excel"
+msgstr "Exporter en Excel"
+
+#: manufacturing/templates/ap_list.html:41
+#: manufacturing/templates/ar_list.html:41
+#: manufacturing/templates/gl_dashboard.html:54
+#: manufacturing/templates/gl_dashboard.html:66
+msgid "Outstanding"
+msgstr "En Souffrance"
+
+#: manufacturing/templates/ap_list.html:45
+#: manufacturing/templates/ar_list.html:45
+msgid "Total Invoiced"
+msgstr "Total Facturé"
+
+#: manufacturing/templates/ap_list.html:49
+#: manufacturing/templates/ar_list.html:49
+msgid "Total Invoices"
+msgstr "Total des Factures"
+
+#: manufacturing/templates/ap_list.html:55
+#: manufacturing/templates/ar_list.html:55
+#: manufacturing/templates/eng_ecr_detail.html:47
+#: manufacturing/templates/eng_ecrs.html:47
+#: manufacturing/templates/eng_projects.html:50
+msgid "Status:"
+msgstr "Statut :"
+
+#: manufacturing/templates/ap_list.html:57
+#: manufacturing/templates/ap_list.html:64
+#: manufacturing/templates/ar_list.html:57
+#: manufacturing/templates/ar_list.html:64
+#: manufacturing/templates/gl_accounts.html:53
+msgid "(all)"
+msgstr "(tous)"
+
+#: manufacturing/templates/ap_list.html:62
+msgid "Vendor:"
+msgstr "Fournisseur :"
+
+#: manufacturing/templates/ap_list.html:69
+#: manufacturing/templates/ar_list.html:69
+msgid "Due From:"
+msgstr "Échéance Depuis :"
+
+#: manufacturing/templates/ap_list.html:71
+#: manufacturing/templates/ar_list.html:71
+#: manufacturing/templates/gl_cash_flow_statement.html:47
+#: manufacturing/templates/gl_income_statement.html:45
+#: manufacturing/templates/gl_journals.html:46
+msgid "To:"
+msgstr "À :"
+
+#: manufacturing/templates/ap_list.html:73
+#: manufacturing/templates/ar_list.html:73
+#: manufacturing/templates/credit_account_list.html:68
+#: manufacturing/templates/credit_application_list.html:67
+#: manufacturing/templates/credit_collections_list.html:68
+#: manufacturing/templates/cs_kb_list.html:73
+#: manufacturing/templates/cs_returns_list.html:69
+#: manufacturing/templates/cs_surveys_list.html:73
+#: manufacturing/templates/eng_ecrs.html:63
+#: manufacturing/templates/eng_projects.html:66
+#: manufacturing/templates/eng_specs_list.html:77
+#: manufacturing/templates/eng_tasks_list.html:81
+#: manufacturing/templates/gl_journals.html:48
+#: manufacturing/templates/legal_compliance_list.html:73
+#: manufacturing/templates/legal_contract_list.html:80
+#: manufacturing/templates/legal_employment_list.html:65
+#: manufacturing/templates/legal_governance_list.html:65
+#: manufacturing/templates/legal_ip_list.html:66
+#: manufacturing/templates/legal_litigation_list.html:80
+#: manufacturing/templates/mkt_ad_list.html:83
+#: manufacturing/templates/mkt_budget_list.html:74
+#: manufacturing/templates/mkt_campaign_list.html:78
+#: manufacturing/templates/mkt_content_list.html:76
+#: manufacturing/templates/mkt_lead_list.html:79
+#: manufacturing/templates/mkt_research_list.html:80
+msgid "Filter"
+msgstr "Filtrer"
+
+#: manufacturing/templates/ap_list.html:75
+#: manufacturing/templates/ar_list.html:75
+#: manufacturing/templates/credit_account_list.html:69
+#: manufacturing/templates/credit_application_list.html:68
+#: manufacturing/templates/credit_collections_list.html:69
+#: manufacturing/templates/cs_kb_list.html:74
+#: manufacturing/templates/cs_list.html:47
+#: manufacturing/templates/cs_returns_list.html:70
+#: manufacturing/templates/cs_surveys_list.html:74
+#: manufacturing/templates/eng_ecrs.html:64
+#: manufacturing/templates/eng_projects.html:67
+#: manufacturing/templates/eng_specs_list.html:78
+#: manufacturing/templates/eng_tasks_list.html:82
+#: manufacturing/templates/gl_balance_sheet.html:47
+#: manufacturing/templates/gl_journals.html:50
+#: manufacturing/templates/gl_trial_balance.html:41
+#: manufacturing/templates/legal_compliance_list.html:74
+#: manufacturing/templates/legal_contract_list.html:81
+#: manufacturing/templates/legal_employment_list.html:66
+#: manufacturing/templates/legal_governance_list.html:66
+#: manufacturing/templates/legal_ip_list.html:67
+#: manufacturing/templates/legal_litigation_list.html:81
+#: manufacturing/templates/mkt_ad_list.html:84
+#: manufacturing/templates/mkt_budget_list.html:75
+#: manufacturing/templates/mkt_campaign_list.html:79
+#: manufacturing/templates/mkt_content_list.html:77
+#: manufacturing/templates/mkt_lead_list.html:80
+#: manufacturing/templates/mkt_research_list.html:81
+#: manufacturing/templates/payroll_pay_rates.html:58
+msgid "Clear"
+msgstr "Effacer"
+
+#: manufacturing/templates/ap_list.html:84
+msgid "Paid"
+msgstr "Payé"
+
+#: manufacturing/templates/ap_list.html:84
+#: manufacturing/templates/ar_list.html:84
+#: manufacturing/templates/gl_accounts.html:63
+msgid "Balance"
+msgstr "Solde"
+
+#: manufacturing/templates/ap_list.html:109
+#: manufacturing/templates/ar_list.html:109
+msgid "No invoices found."
+msgstr "Aucune facture trouvée."
+
+#: manufacturing/templates/ap_list.html:114
+#: manufacturing/templates/ar_list.html:114
+msgid "New Invoice"
+msgstr "Nouvelle Facture"
+
+#: manufacturing/templates/ar_invoice_detail.html:3
+#, python-format
+msgid "AR Invoice %(num)s"
+msgstr "Facture Client %(num)s"
+
+#: manufacturing/templates/ar_invoice_detail.html:3
+#: manufacturing/templates/ar_invoice_detail.html:56
+msgid "New AR Invoice"
+msgstr "Nouvelle Facture Client"
+
+#: manufacturing/templates/ar_invoice_detail.html:7
+msgid "Download 810 (EDI)"
+msgstr "Télécharger 810 (EDI)"
+
+#: manufacturing/templates/ar_invoice_detail.html:8
+#: manufacturing/templates/gl_dashboard.html:11
+msgid "A/P"
+msgstr "C/F"
+
+#: manufacturing/templates/ar_invoice_detail.html:69
+msgid "Received:"
+msgstr "Reçu :"
+
+#: manufacturing/templates/ar_invoice_detail.html:93
+#: manufacturing/templates/ar_list.html:120
+msgid "Customer *"
+msgstr "Client *"
+
+#: manufacturing/templates/ar_invoice_detail.html:95
+#: manufacturing/templates/ar_list.html:122
+msgid "(select a customer)"
+msgstr "(sélectionner un client)"
+
+#: manufacturing/templates/ar_invoice_detail.html:149
+#: manufacturing/templates/ar_list.html:83
+#: manufacturing/templates/credit_account_list.html:76
+#: manufacturing/templates/credit_account_list.html:107
+#: manufacturing/templates/credit_application_list.html:75
+#: manufacturing/templates/credit_application_list.html:107
+#: manufacturing/templates/credit_collections_list.html:76
+#: manufacturing/templates/credit_collections_list.html:110
+#: manufacturing/templates/credit_dashboard.html:103
+#: manufacturing/templates/credit_dashboard.html:122
+#: manufacturing/templates/credit_dashboard.html:141
+#: manufacturing/templates/cs_dashboard.html:122
+#: manufacturing/templates/cs_detail.html:109
+#: manufacturing/templates/cs_escalations.html:66
+#: manufacturing/templates/cs_list.html:57
+#: manufacturing/templates/cs_new.html:39
+#: manufacturing/templates/cs_returns_detail.html:61
+#: manufacturing/templates/cs_returns_detail.html:108
+#: manufacturing/templates/cs_returns_list.html:78
+#: manufacturing/templates/cs_surveys_detail.html:128
+msgid "Customer"
+msgstr "Client"
+
+#: manufacturing/templates/ar_list.html:62
+msgid "Customer:"
+msgstr "Client :"
+
+#: manufacturing/templates/ar_list.html:84
+msgid "Received"
+msgstr "Reçu"
 
 #: manufacturing/templates/base.html:423
 msgid "Toggle menu"
@@ -266,27 +1150,6 @@ msgstr "Suivi des lots"
 #: manufacturing/templates/dashboard_kpis.html:39
 msgid "Finance"
 msgstr "Finance"
-
-#: manufacturing/templates/base.html:524
-msgid "Accounting"
-msgstr "Comptabilité"
-
-#: manufacturing/templates/base.html:527
-msgid "Accounts Payable"
-msgstr "Comptes fournisseurs"
-
-#: manufacturing/templates/base.html:530
-msgid "Accounts Receivable"
-msgstr "Comptes clients"
-
-#: manufacturing/templates/base.html:533
-msgid "General Ledger"
-msgstr "Grand livre"
-
-#: manufacturing/templates/base.html:536
-#: manufacturing/templates/payroll_dashboard.html:3
-msgid "Payroll"
-msgstr "Paie"
 
 #: manufacturing/templates/base.html:539
 msgid "Human Resources"
@@ -415,6 +1278,7 @@ msgstr "Tableau de bord crédit"
 #: manufacturing/templates/credit_collections_detail.html:7
 #: manufacturing/templates/credit_collections_list.html:7
 #: manufacturing/templates/credit_dashboard.html:7
+#: manufacturing/templates/gl_journal_detail.html:7
 msgid "Accounts"
 msgstr "Comptes"
 
@@ -443,105 +1307,6 @@ msgstr "Demandes"
 #: manufacturing/templates/credit_dashboard.html:87
 msgid "Collections"
 msgstr "Recouvrements"
-
-#: manufacturing/templates/credit_account_detail.html:62
-#: manufacturing/templates/credit_account_detail.html:105
-#: manufacturing/templates/credit_account_detail.html:133
-#: manufacturing/templates/credit_account_detail.html:153
-#: manufacturing/templates/credit_account_detail.html:172
-#: manufacturing/templates/credit_account_list.html:80
-#: manufacturing/templates/credit_account_list.html:120
-#: manufacturing/templates/credit_application_detail.html:56
-#: manufacturing/templates/credit_application_list.html:80
-#: manufacturing/templates/credit_collections_detail.html:54
-#: manufacturing/templates/credit_collections_detail.html:109
-#: manufacturing/templates/credit_collections_list.html:82
-#: manufacturing/templates/credit_collections_list.html:147
-#: manufacturing/templates/credit_dashboard.html:103
-#: manufacturing/templates/credit_dashboard.html:122
-#: manufacturing/templates/credit_dashboard.html:141
-#: manufacturing/templates/cs_dashboard.html:125
-#: manufacturing/templates/cs_kb_detail.html:77
-#: manufacturing/templates/cs_kb_list.html:87
-#: manufacturing/templates/cs_kb_list.html:131
-#: manufacturing/templates/cs_list.html:62
-#: manufacturing/templates/cs_plans.html:80
-#: manufacturing/templates/cs_returns_detail.html:86
-#: manufacturing/templates/cs_returns_list.html:82
-#: manufacturing/templates/cs_returns_list.html:121
-#: manufacturing/templates/cs_surveys_detail.html:97
-#: manufacturing/templates/cs_surveys_list.html:87
-#: manufacturing/templates/cs_surveys_list.html:127
-#: manufacturing/templates/eng_dashboard.html:113
-#: manufacturing/templates/eng_dashboard.html:130
-#: manufacturing/templates/eng_ecr_detail.html:97
-#: manufacturing/templates/eng_ecrs.html:70
-#: manufacturing/templates/eng_project_detail.html:83
-#: manufacturing/templates/eng_project_detail.html:116
-#: manufacturing/templates/eng_project_detail.html:130
-#: manufacturing/templates/eng_project_detail.html:167
-#: manufacturing/templates/eng_project_detail.html:211
-#: manufacturing/templates/eng_projects.html:73
-#: manufacturing/templates/eng_projects.html:105
-#: manufacturing/templates/eng_reports.html:122
-#: manufacturing/templates/eng_spec_detail.html:82
-#: manufacturing/templates/eng_spec_detail.html:112
-#: manufacturing/templates/eng_specs_list.html:90
-#: manufacturing/templates/eng_specs_list.html:137
-#: manufacturing/templates/eng_task_detail.html:99
-#: manufacturing/templates/eng_task_detail.html:120
-#: manufacturing/templates/eng_tasks_list.html:94
-#: manufacturing/templates/legal_compliance_detail.html:54
-#: manufacturing/templates/legal_compliance_detail.html:101
-#: manufacturing/templates/legal_compliance_list.html:86
-#: manufacturing/templates/legal_compliance_list.html:125
-#: manufacturing/templates/legal_contract_detail.html:55
-#: manufacturing/templates/legal_contract_detail.html:114
-#: manufacturing/templates/legal_contract_list.html:95
-#: manufacturing/templates/legal_contract_list.html:140
-#: manufacturing/templates/legal_dashboard.html:147
-#: manufacturing/templates/legal_employment_list.html:74
-#: manufacturing/templates/legal_employment_list.html:118
-#: manufacturing/templates/legal_governance_list.html:74
-#: manufacturing/templates/legal_governance_list.html:113
-#: manufacturing/templates/legal_ip_list.html:75
-#: manufacturing/templates/legal_ip_list.html:123
-#: manufacturing/templates/legal_litigation_detail.html:55
-#: manufacturing/templates/legal_litigation_detail.html:118
-#: manufacturing/templates/legal_litigation_list.html:93
-#: manufacturing/templates/legal_litigation_list.html:146
-#: manufacturing/templates/marketing_dashboard.html:155
-#: manufacturing/templates/mkt_ad_detail.html:70
-#: manufacturing/templates/mkt_ad_detail.html:154
-#: manufacturing/templates/mkt_ad_list.html:95
-#: manufacturing/templates/mkt_ad_list.html:160
-#: manufacturing/templates/mkt_budget_list.html:84
-#: manufacturing/templates/mkt_budget_list.html:141
-#: manufacturing/templates/mkt_campaign_detail.html:55
-#: manufacturing/templates/mkt_campaign_detail.html:118
-#: manufacturing/templates/mkt_campaign_list.html:93
-#: manufacturing/templates/mkt_campaign_list.html:142
-#: manufacturing/templates/mkt_content_detail.html:55
-#: manufacturing/templates/mkt_content_detail.html:114
-#: manufacturing/templates/mkt_content_list.html:90
-#: manufacturing/templates/mkt_content_list.html:138
-#: manufacturing/templates/mkt_lead_detail.html:56
-#: manufacturing/templates/mkt_lead_detail.html:123
-#: manufacturing/templates/mkt_lead_list.html:93
-#: manufacturing/templates/mkt_lead_list.html:149
-#: manufacturing/templates/mkt_research_detail.html:65
-#: manufacturing/templates/mkt_research_detail.html:137
-#: manufacturing/templates/mkt_research_list.html:95
-#: manufacturing/templates/mkt_research_list.html:153
-#: manufacturing/templates/payroll_dashboard.html:88
-#: manufacturing/templates/payroll_history.html:39
-#: manufacturing/templates/payroll_run_detail.html:41
-#: manufacturing/templates/prod_dashboard.html:114
-#: manufacturing/templates/tc_device_form.html:221
-#: manufacturing/templates/tc_device_list.html:45
-#: manufacturing/templates/time_clock_attendance.html:89
-msgid "Status"
-msgstr "Statut"
 
 #: manufacturing/templates/credit_account_detail.html:66
 #: manufacturing/templates/credit_account_list.html:77
@@ -577,63 +1342,6 @@ msgstr "E-mail"
 msgid "Phone"
 msgstr "Téléphone"
 
-#: manufacturing/templates/credit_account_detail.html:87
-#: manufacturing/templates/credit_account_detail.html:121
-#: manufacturing/templates/credit_account_list.html:136
-#: manufacturing/templates/credit_application_detail.html:81
-#: manufacturing/templates/credit_application_detail.html:105
-#: manufacturing/templates/credit_application_list.html:124
-#: manufacturing/templates/credit_collections_detail.html:83
-#: manufacturing/templates/credit_collections_detail.html:129
-#: manufacturing/templates/credit_collections_list.html:155
-#: manufacturing/templates/cs_returns_detail.html:98
-#: manufacturing/templates/cs_returns_detail.html:113
-#: manufacturing/templates/cs_returns_list.html:137
-#: manufacturing/templates/eng_ecr_detail.html:105
-#: manufacturing/templates/eng_ecr_detail.html:113
-#: manufacturing/templates/eng_ecr_detail.html:149
-#: manufacturing/templates/eng_project_detail.html:109
-#: manufacturing/templates/eng_project_detail.html:120
-#: manufacturing/templates/eng_project_detail.html:173
-#: manufacturing/templates/eng_project_detail.html:221
-#: manufacturing/templates/eng_spec_detail.html:98
-#: manufacturing/templates/eng_spec_detail.html:125
-#: manufacturing/templates/eng_specs_list.html:153
-#: manufacturing/templates/eng_task_detail.html:107
-#: manufacturing/templates/eng_task_detail.html:122
-#: manufacturing/templates/eng_tasks_list.html:155
-#: manufacturing/templates/legal_compliance_detail.html:75
-#: manufacturing/templates/legal_compliance_detail.html:117
-#: manufacturing/templates/legal_compliance_list.html:137
-#: manufacturing/templates/legal_contract_detail.html:84
-#: manufacturing/templates/legal_contract_detail.html:138
-#: manufacturing/templates/legal_contract_list.html:164
-#: manufacturing/templates/legal_employment_list.html:138
-#: manufacturing/templates/legal_governance_list.html:133
-#: manufacturing/templates/legal_ip_list.html:139
-#: manufacturing/templates/legal_litigation_detail.html:80
-#: manufacturing/templates/legal_litigation_detail.html:130
-#: manufacturing/templates/legal_litigation_list.html:154
-#: manufacturing/templates/mkt_ad_detail.html:116
-#: manufacturing/templates/mkt_ad_detail.html:186
-#: manufacturing/templates/mkt_ad_list.html:180
-#: manufacturing/templates/mkt_budget_list.html:149
-#: manufacturing/templates/mkt_campaign_detail.html:84
-#: manufacturing/templates/mkt_campaign_detail.html:142
-#: manufacturing/templates/mkt_campaign_list.html:166
-#: manufacturing/templates/mkt_content_detail.html:80
-#: manufacturing/templates/mkt_content_detail.html:134
-#: manufacturing/templates/mkt_content_list.html:158
-#: manufacturing/templates/mkt_lead_detail.html:81
-#: manufacturing/templates/mkt_lead_detail.html:131
-#: manufacturing/templates/mkt_lead_list.html:157
-#: manufacturing/templates/mkt_research_detail.html:95
-#: manufacturing/templates/mkt_research_detail.html:153
-#: manufacturing/templates/mkt_research_list.html:165
-#: manufacturing/templates/payroll_deductions.html:192
-msgid "Notes"
-msgstr "Notes"
-
 #: manufacturing/templates/credit_account_detail.html:96
 msgid "Update Account"
 msgstr "Mettre à jour le compte"
@@ -651,45 +1359,9 @@ msgstr "Motif du changement"
 msgid "Only needed if limit or status changes"
 msgstr "Nécessaire uniquement en cas de changement de limite ou de statut"
 
-#: manufacturing/templates/credit_account_detail.html:125
-#: manufacturing/templates/credit_collections_detail.html:133
-#: manufacturing/templates/cs_detail.html:166
-#: manufacturing/templates/cs_kb_detail.html:97
-#: manufacturing/templates/cs_returns_detail.html:102
-#: manufacturing/templates/cs_surveys_detail.html:117
-#: manufacturing/templates/eng_ecr_detail.html:107
-#: manufacturing/templates/eng_project_detail.html:112
-#: manufacturing/templates/eng_spec_detail.html:102
-#: manufacturing/templates/eng_task_detail.html:111
-#: manufacturing/templates/legal_compliance_detail.html:121
-#: manufacturing/templates/legal_contract_detail.html:142
-#: manufacturing/templates/legal_litigation_detail.html:134
-#: manufacturing/templates/mkt_ad_detail.html:190
-#: manufacturing/templates/mkt_campaign_detail.html:146
-#: manufacturing/templates/mkt_content_detail.html:138
-#: manufacturing/templates/mkt_lead_detail.html:135
-#: manufacturing/templates/mkt_research_detail.html:157
-#: manufacturing/templates/tc_device_form.html:192
-msgid "Save Changes"
-msgstr "Enregistrer les modifications"
-
 #: manufacturing/templates/credit_account_detail.html:131
 msgid "Limit / Status History"
 msgstr "Historique limite / statut"
-
-#: manufacturing/templates/credit_account_detail.html:133
-#: manufacturing/templates/credit_account_detail.html:172
-#: manufacturing/templates/credit_collections_detail.html:62
-#: manufacturing/templates/credit_collections_list.html:77
-#: manufacturing/templates/credit_dashboard.html:141
-#: manufacturing/templates/cs_dashboard.html:123
-#: manufacturing/templates/cs_surveys_detail.html:127
-#: manufacturing/templates/tc_ot_report.html:87
-#: manufacturing/templates/tc_schedule.html:76
-#: manufacturing/templates/time_clock_attendance.html:58
-#: manufacturing/templates/time_clock_hours.html:60
-msgid "Date"
-msgstr "Date"
 
 #: manufacturing/templates/credit_account_detail.html:133
 #: manufacturing/templates/credit_dashboard.html:103
@@ -745,6 +1417,10 @@ msgstr "Activités de recouvrement"
 #: manufacturing/templates/cs_surveys_detail.html:89
 #: manufacturing/templates/cs_surveys_list.html:82
 #: manufacturing/templates/cs_surveys_list.html:119
+#: manufacturing/templates/gl_accounts.html:62
+#: manufacturing/templates/gl_accounts.html:102
+#: manufacturing/templates/gl_accounts.html:130
+#: manufacturing/templates/gl_trial_balance.html:47
 #: manufacturing/templates/legal_contract_detail.html:59
 #: manufacturing/templates/legal_contract_detail.html:106
 #: manufacturing/templates/legal_contract_list.html:90
@@ -815,79 +1491,6 @@ msgstr "Tous les statuts"
 #: manufacturing/templates/credit_application_list.html:66
 msgid "Search customer…"
 msgstr "Rechercher un client…"
-
-#: manufacturing/templates/credit_account_list.html:68
-#: manufacturing/templates/credit_application_list.html:67
-#: manufacturing/templates/credit_collections_list.html:68
-#: manufacturing/templates/cs_kb_list.html:73
-#: manufacturing/templates/cs_returns_list.html:69
-#: manufacturing/templates/cs_surveys_list.html:73
-#: manufacturing/templates/eng_ecrs.html:63
-#: manufacturing/templates/eng_projects.html:66
-#: manufacturing/templates/eng_specs_list.html:77
-#: manufacturing/templates/eng_tasks_list.html:81
-#: manufacturing/templates/legal_compliance_list.html:73
-#: manufacturing/templates/legal_contract_list.html:80
-#: manufacturing/templates/legal_employment_list.html:65
-#: manufacturing/templates/legal_governance_list.html:65
-#: manufacturing/templates/legal_ip_list.html:66
-#: manufacturing/templates/legal_litigation_list.html:80
-#: manufacturing/templates/mkt_ad_list.html:83
-#: manufacturing/templates/mkt_budget_list.html:74
-#: manufacturing/templates/mkt_campaign_list.html:78
-#: manufacturing/templates/mkt_content_list.html:76
-#: manufacturing/templates/mkt_lead_list.html:79
-#: manufacturing/templates/mkt_research_list.html:80
-msgid "Filter"
-msgstr "Filtrer"
-
-#: manufacturing/templates/credit_account_list.html:69
-#: manufacturing/templates/credit_application_list.html:68
-#: manufacturing/templates/credit_collections_list.html:69
-#: manufacturing/templates/cs_kb_list.html:74
-#: manufacturing/templates/cs_list.html:47
-#: manufacturing/templates/cs_returns_list.html:70
-#: manufacturing/templates/cs_surveys_list.html:74
-#: manufacturing/templates/eng_ecrs.html:64
-#: manufacturing/templates/eng_projects.html:67
-#: manufacturing/templates/eng_specs_list.html:78
-#: manufacturing/templates/eng_tasks_list.html:82
-#: manufacturing/templates/legal_compliance_list.html:74
-#: manufacturing/templates/legal_contract_list.html:81
-#: manufacturing/templates/legal_employment_list.html:66
-#: manufacturing/templates/legal_governance_list.html:66
-#: manufacturing/templates/legal_ip_list.html:67
-#: manufacturing/templates/legal_litigation_list.html:81
-#: manufacturing/templates/mkt_ad_list.html:84
-#: manufacturing/templates/mkt_budget_list.html:75
-#: manufacturing/templates/mkt_campaign_list.html:79
-#: manufacturing/templates/mkt_content_list.html:77
-#: manufacturing/templates/mkt_lead_list.html:80
-#: manufacturing/templates/mkt_research_list.html:81
-#: manufacturing/templates/payroll_pay_rates.html:58
-msgid "Clear"
-msgstr "Effacer"
-
-#: manufacturing/templates/credit_account_list.html:76
-#: manufacturing/templates/credit_account_list.html:107
-#: manufacturing/templates/credit_application_list.html:75
-#: manufacturing/templates/credit_application_list.html:107
-#: manufacturing/templates/credit_collections_list.html:76
-#: manufacturing/templates/credit_collections_list.html:110
-#: manufacturing/templates/credit_dashboard.html:103
-#: manufacturing/templates/credit_dashboard.html:122
-#: manufacturing/templates/credit_dashboard.html:141
-#: manufacturing/templates/cs_dashboard.html:122
-#: manufacturing/templates/cs_detail.html:109
-#: manufacturing/templates/cs_escalations.html:66
-#: manufacturing/templates/cs_list.html:57
-#: manufacturing/templates/cs_new.html:39
-#: manufacturing/templates/cs_returns_detail.html:61
-#: manufacturing/templates/cs_returns_detail.html:108
-#: manufacturing/templates/cs_returns_list.html:78
-#: manufacturing/templates/cs_surveys_detail.html:128
-msgid "Customer"
-msgstr "Client"
 
 #: manufacturing/templates/credit_account_list.html:93
 #: manufacturing/templates/credit_dashboard.html:113
@@ -1099,6 +1702,8 @@ msgstr "Total des activités"
 #: manufacturing/templates/cs_list.html:81
 #: manufacturing/templates/cs_reports.html:61
 #: manufacturing/templates/cs_reports.html:94
+#: manufacturing/templates/gl_dashboard.html:50
+#: manufacturing/templates/gl_dashboard.html:62
 #: manufacturing/templates/legal_dashboard.html:95
 #: manufacturing/templates/reports_dashboard.html:233
 msgid "Open"
@@ -1289,6 +1894,7 @@ msgid "No tickets found."
 msgstr "Aucun ticket trouvé."
 
 #: manufacturing/templates/cs_detail.html:3
+#, python-format
 msgid "Ticket #%(id)s"
 msgstr "Ticket n° %(id)s"
 
@@ -1298,10 +1904,12 @@ msgid "Back to Tickets"
 msgstr "Retour aux tickets"
 
 #: manufacturing/templates/cs_detail.html:63
+#, python-format
 msgid "Ticket #%(id)s — %(name)s"
 msgstr "Ticket n° %(id)s — %(name)s"
 
 #: manufacturing/templates/cs_detail.html:73
+#, python-format
 msgid "Completed %(date)s %(time)s"
 msgstr "Terminé le %(date)s %(time)s"
 
@@ -1315,12 +1923,6 @@ msgstr[1] "Ouvert — %(counter)s jours"
 #: manufacturing/templates/cs_detail.html:77
 msgid "Critical"
 msgstr "Critique"
-
-#: manufacturing/templates/cs_detail.html:79
-#: manufacturing/templates/maint_dashboard.html:82
-#: manufacturing/templates/prod_dashboard_kpis.html:12
-msgid "Overdue"
-msgstr "En retard"
 
 #: manufacturing/templates/cs_detail.html:87
 msgid "Close This Ticket"
@@ -1375,6 +1977,7 @@ msgid "Mark as completed"
 msgstr "Marquer comme terminé"
 
 #: manufacturing/templates/cs_detail.html:172
+#, python-format
 msgid "Created by %(by)s"
 msgstr "Créé par %(by)s"
 
@@ -1401,21 +2004,6 @@ msgstr "Élevé (&ge;7 jours)"
 #: manufacturing/templates/cs_escalations.html:57
 msgid "Total Escalations"
 msgstr "Total des escalades"
-
-#: manufacturing/templates/cs_escalations.html:67
-#: manufacturing/templates/cs_list.html:58
-#: manufacturing/templates/cs_plans.html:131
-#: manufacturing/templates/cs_surveys_detail.html:113
-#: manufacturing/templates/cs_surveys_list.html:143
-#: manufacturing/templates/eng_spec_detail.html:94
-#: manufacturing/templates/eng_spec_detail.html:119
-#: manufacturing/templates/eng_specs_list.html:149
-#: manufacturing/templates/mkt_research_detail.html:83
-#: manufacturing/templates/mkt_research_detail.html:145
-#: manufacturing/templates/mkt_research_list.html:161
-#: manufacturing/templates/prod_dashboard.html:111
-msgid "Description"
-msgstr "Description"
 
 #: manufacturing/templates/cs_escalations.html:69
 #: manufacturing/templates/cs_list.html:60
@@ -1453,7 +2041,9 @@ msgstr "Élevé &ge;7 jours"
 
 #: manufacturing/templates/cs_escalations.html:98
 msgid "No escalated tickets — all open tickets are within the 7-day threshold."
-msgstr "Aucun ticket escaladé — tous les tickets ouverts sont dans le seuil de 7 jours."
+msgstr ""
+"Aucun ticket escaladé — tous les tickets ouverts sont dans le seuil de 7 "
+"jours."
 
 #: manufacturing/templates/cs_kb_detail.html:6
 #: manufacturing/templates/cs_kb_list.html:6
@@ -1672,10 +2262,12 @@ msgid "Customer Service Tickets"
 msgstr "Tickets du service client"
 
 #: manufacturing/templates/cs_list.html:21
+#, python-format
 msgid "All (%(count)s)"
 msgstr "Tous (%(count)s)"
 
 #: manufacturing/templates/cs_list.html:23
+#, python-format
 msgid "Open (%(count)s)"
 msgstr "Ouverts (%(count)s)"
 
@@ -1705,6 +2297,7 @@ msgid "Search"
 msgstr "Rechercher"
 
 #: manufacturing/templates/cs_list.html:89
+#, python-format
 msgid "%(counter)s ticket"
 msgid_plural "%(counter)s tickets"
 msgstr[0] "%(counter)s ticket"
@@ -1756,6 +2349,7 @@ msgstr "Plans d'amélioration SC"
 #: manufacturing/templates/eng_ecrs.html:49
 #: manufacturing/templates/eng_projects.html:52
 #: manufacturing/templates/eng_projects.html:59
+#: manufacturing/templates/gl_journals.html:40
 msgid "All"
 msgstr "Tous"
 
@@ -1897,10 +2491,6 @@ msgstr "Résumé des tickets ouverts"
 
 #: manufacturing/templates/cs_reports.html:120
 #, python-format
-#| msgid ""
-#| "You have <strong>%(counter)s</strong> purchase order awaiting approval."
-#| msgid_plural ""
-#| "You have <strong>%(counter)s</strong> purchase orders awaiting approval."
 msgid "<strong>%(counter)s</strong> open ticket"
 msgid_plural "<strong>%(counter)s</strong> open tickets"
 msgstr[0] "<strong>%(counter)s</strong> ticket ouvert"
@@ -1912,8 +2502,12 @@ msgid ""
 "<strong style=\"color:#c62828;\">%(counter)s</strong> overdue (&ge;7 days)."
 msgid_plural ""
 "<strong style=\"color:#c62828;\">%(counter)s</strong> overdue (&ge;7 days)."
-msgstr[0] "<strong style=\"color:#c62828;\">%(counter)s</strong> en retard (&ge;7 jours)."
-msgstr[1] "<strong style=\"color:#c62828;\">%(counter)s</strong> en retard (&ge;7 jours)."
+msgstr[0] ""
+"<strong style=\"color:#c62828;\">%(counter)s</strong> en retard (&ge;7 "
+"jours)."
+msgstr[1] ""
+"<strong style=\"color:#c62828;\">%(counter)s</strong> en retard (&ge;7 "
+"jours)."
 
 #: manufacturing/templates/cs_reports.html:124
 msgid "View escalations &rarr;"
@@ -1921,6 +2515,7 @@ msgstr "Voir les escalades &rarr;"
 
 #: manufacturing/templates/cs_returns_detail.html:3
 #: manufacturing/templates/cs_returns_detail.html:47
+#, python-format
 msgid "Return RET-%(id)s"
 msgstr "Retour RET-%(id)s"
 
@@ -1959,6 +2554,8 @@ msgstr "Montant du remboursement"
 #: manufacturing/templates/eng_ecr_detail.html:66
 #: manufacturing/templates/eng_spec_detail.html:113
 #: manufacturing/templates/eng_task_detail.html:121
+#: manufacturing/templates/gl_journal_detail.html:59
+#: manufacturing/templates/gl_journals.html:59
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:45
 msgid "Created By"
@@ -1989,6 +2586,7 @@ msgid "Create Return"
 msgstr "Créer le retour"
 
 #: manufacturing/templates/cs_surveys_detail.html:3
+#, python-format
 msgid "Survey — %(title)s"
 msgstr "Enquête — %(title)s"
 
@@ -2389,12 +2987,6 @@ msgstr "DCI : %(num)s — %(title)s"
 msgid "New ECR / Design Review"
 msgstr "Nouvelle DCI / Revue de conception"
 
-#: manufacturing/templates/eng_ecr_detail.html:47
-#: manufacturing/templates/eng_ecrs.html:47
-#: manufacturing/templates/eng_projects.html:50
-msgid "Status:"
-msgstr "Statut :"
-
 #: manufacturing/templates/eng_ecr_detail.html:63
 #: manufacturing/templates/eng_ecr_detail.html:79
 #: manufacturing/templates/eng_ecr_detail.html:130
@@ -2481,28 +3073,6 @@ msgstr "Projet : %(num)s — %(title)s"
 msgid "Engineer"
 msgstr "Ingénieur"
 
-#: manufacturing/templates/eng_project_detail.html:104
-#: manufacturing/templates/eng_project_detail.html:161
-#: manufacturing/templates/eng_project_detail.html:187
-#: manufacturing/templates/eng_project_detail.html:219
-#: manufacturing/templates/eng_projects.html:73
-#: manufacturing/templates/eng_projects.html:126
-#: manufacturing/templates/eng_task_detail.html:87
-#: manufacturing/templates/eng_task_detail.html:118
-#: manufacturing/templates/eng_tasks_list.html:92
-#: manufacturing/templates/eng_tasks_list.html:143
-#: manufacturing/templates/legal_compliance_detail.html:66
-#: manufacturing/templates/legal_compliance_detail.html:109
-#: manufacturing/templates/legal_compliance_list.html:84
-#: manufacturing/templates/legal_compliance_list.html:133
-#: manufacturing/templates/mkt_content_detail.html:71
-#: manufacturing/templates/mkt_content_detail.html:126
-#: manufacturing/templates/mkt_content_list.html:88
-#: manufacturing/templates/mkt_content_list.html:150
-#: manufacturing/templates/prod_dashboard.html:113
-msgid "Due Date"
-msgstr "Date d'échéance"
-
 #: manufacturing/templates/eng_project_detail.html:118
 #: manufacturing/templates/legal_contract_list.html:92
 #: manufacturing/templates/marketing_dashboard.html:153
@@ -2527,6 +3097,8 @@ msgid "Assigned To"
 msgstr "Assigné à"
 
 #: manufacturing/templates/eng_project_detail.html:142
+#: manufacturing/templates/gl_accounts.html:64
+#: manufacturing/templates/gl_accounts.html:79
 #: manufacturing/templates/payroll_pay_rates.html:65
 #: manufacturing/templates/payroll_pay_rates.html:87
 #: manufacturing/templates/report_builder_detail.html:7
@@ -2556,6 +3128,7 @@ msgid "Save Task"
 msgstr "Enregistrer la tâche"
 
 #: manufacturing/templates/eng_project_detail.html:175
+#: manufacturing/templates/gl_accounts.html:115
 #: manufacturing/templates/payroll_pay_rates.html:131
 #: manufacturing/templates/tc_device_form.html:194
 msgid "Cancel"
@@ -2743,6 +3316,468 @@ msgstr "— Aucun —"
 #: manufacturing/templates/eng_tasks_list.html:159
 msgid "Create Task"
 msgstr "Créer la tâche"
+
+#: manufacturing/templates/gl_accounts.html:6
+#: manufacturing/templates/gl_balance_sheet.html:6
+#: manufacturing/templates/gl_cash_flow_statement.html:6
+#: manufacturing/templates/gl_income_statement.html:6
+#: manufacturing/templates/gl_journals.html:6
+#: manufacturing/templates/gl_trial_balance.html:6
+msgid "G/L Dashboard"
+msgstr "Tableau de Bord du Grand Livre"
+
+#: manufacturing/templates/gl_accounts.html:7
+msgid "Journals"
+msgstr "Écritures"
+
+#: manufacturing/templates/gl_accounts.html:51
+msgid "Type:"
+msgstr "Type :"
+
+#: manufacturing/templates/gl_accounts.html:56
+msgid "Show Inactive"
+msgstr "Afficher Inactifs"
+
+#: manufacturing/templates/gl_accounts.html:62
+#: manufacturing/templates/gl_trial_balance.html:47
+msgid "Acct #"
+msgstr "N° Compte"
+
+#: manufacturing/templates/gl_accounts.html:62
+#: manufacturing/templates/gl_trial_balance.html:47
+msgid "Account Name"
+msgstr "Nom du Compte"
+
+#: manufacturing/templates/gl_accounts.html:62
+#: manufacturing/templates/gl_accounts.html:106
+#: manufacturing/templates/gl_accounts.html:134
+msgid "Sub-Type"
+msgstr "Sous-Type"
+
+#: manufacturing/templates/gl_accounts.html:75
+#: manufacturing/templates/gl_accounts.html:108
+#: manufacturing/templates/legal_dashboard.html:63
+#: manufacturing/templates/marketing_dashboard.html:70
+#: manufacturing/templates/mkt_analytics.html:142
+#: manufacturing/templates/payroll_deductions.html:56
+#: manufacturing/templates/payroll_deductions.html:66
+#: manufacturing/templates/payroll_deductions.html:121
+#: manufacturing/templates/payroll_deductions.html:189
+msgid "Active"
+msgstr "Actif"
+
+#: manufacturing/templates/gl_accounts.html:75
+#: manufacturing/templates/payroll_deductions.html:66
+msgid "Inactive"
+msgstr "Inactif"
+
+#: manufacturing/templates/gl_accounts.html:87
+msgid "No accounts found."
+msgstr "Aucun compte trouvé."
+
+#: manufacturing/templates/gl_accounts.html:92
+msgid "Edit Account"
+msgstr "Modifier le Compte"
+
+#: manufacturing/templates/gl_accounts.html:98
+#: manufacturing/templates/gl_accounts.html:126
+msgid "Account # *"
+msgstr "N° de Compte *"
+
+#: manufacturing/templates/gl_accounts.html:100
+#: manufacturing/templates/gl_accounts.html:128
+msgid "Account Name *"
+msgstr "Nom du Compte *"
+
+#: manufacturing/templates/gl_accounts.html:107
+msgid "e.g. Current, Fixed"
+msgstr "p. ex. Courant, Fixe"
+
+#: manufacturing/templates/gl_accounts.html:113
+#: manufacturing/templates/payroll_pay_rates.html:127
+msgid "Save"
+msgstr "Enregistrer"
+
+#: manufacturing/templates/gl_accounts.html:121
+#: manufacturing/templates/gl_accounts.html:140
+msgid "Add Account"
+msgstr "Ajouter un Compte"
+
+#: manufacturing/templates/gl_accounts.html:127
+msgid "e.g. 1000"
+msgstr "p. ex. 1000"
+
+#: manufacturing/templates/gl_accounts.html:135
+msgid "e.g. Current"
+msgstr "p. ex. Courant"
+
+#: manufacturing/templates/gl_balance_sheet.html:8
+#: manufacturing/templates/gl_dashboard.html:9
+#: manufacturing/templates/gl_trial_balance.html:7
+msgid "Income Stmt"
+msgstr "Compte Résultat"
+
+#: manufacturing/templates/gl_balance_sheet.html:44
+#: manufacturing/templates/gl_trial_balance.html:38
+msgid "As of:"
+msgstr "Au :"
+
+#: manufacturing/templates/gl_balance_sheet.html:46
+#: manufacturing/templates/gl_cash_flow_statement.html:49
+#: manufacturing/templates/gl_income_statement.html:47
+#: manufacturing/templates/gl_trial_balance.html:40
+msgid "Run"
+msgstr "Exécuter"
+
+#: manufacturing/templates/gl_balance_sheet.html:52
+#, python-format
+msgid "Balance Sheet as of %(as_of)s"
+msgstr "Bilan au %(as_of)s"
+
+#: manufacturing/templates/gl_balance_sheet.html:58
+msgid "Assets"
+msgstr "Actifs"
+
+#: manufacturing/templates/gl_balance_sheet.html:66
+#: manufacturing/templates/gl_balance_sheet.html:103
+msgid "Total Assets"
+msgstr "Total des Actifs"
+
+#: manufacturing/templates/gl_balance_sheet.html:73
+msgid "Liabilities"
+msgstr "Passifs"
+
+#: manufacturing/templates/gl_balance_sheet.html:81
+msgid "Total Liabilities"
+msgstr "Total des Passifs"
+
+#: manufacturing/templates/gl_balance_sheet.html:86
+msgid "Equity"
+msgstr "Capitaux Propres"
+
+#: manufacturing/templates/gl_balance_sheet.html:94
+msgid "Total Equity"
+msgstr "Total des Capitaux Propres"
+
+#: manufacturing/templates/gl_balance_sheet.html:107
+msgid "Total Liabilities + Equity"
+msgstr "Total Passifs + Capitaux Propres"
+
+#: manufacturing/templates/gl_balance_sheet.html:112
+#: manufacturing/templates/gl_trial_balance.html:70
+msgid "BALANCED"
+msgstr "ÉQUILIBRÉ"
+
+#: manufacturing/templates/gl_balance_sheet.html:112
+msgid "OUT OF BALANCE"
+msgstr "DÉSÉQUILIBRÉ"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:3
+#: manufacturing/templates/gl_cash_flow_statement.html:42
+msgid "Cash Flow Statement"
+msgstr "Tableau des Flux de Trésorerie"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:9
+msgid "13-Week Forecast"
+msgstr "Prévision sur 13 Semaines"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:45
+#: manufacturing/templates/gl_income_statement.html:43
+#: manufacturing/templates/gl_journals.html:44
+msgid "From:"
+msgstr "Du :"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:54
+msgid "Cash Flow Statement (Indirect Method)"
+msgstr "Tableau des Flux de Trésorerie (Méthode Indirecte)"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:55
+#: manufacturing/templates/gl_income_statement.html:53
+#: manufacturing/templates/tc_ot_report.html:49
+#: manufacturing/templates/tc_schedule.html:50
+msgid "to"
+msgstr "au"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:59
+msgid "Operating Activities"
+msgstr "Activités Opérationnelles"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:60
+#: manufacturing/templates/gl_income_statement.html:116
+msgid "Net Income"
+msgstr "Résultat Net"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:61
+msgid "Depreciation &amp; Amortization"
+msgstr "Amortissements"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:62
+msgid "(Increase)/Decrease in Accounts Receivable"
+msgstr "(Augmentation)/Diminution des Comptes Clients"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:63
+msgid "Increase/(Decrease) in Accounts Payable"
+msgstr "Augmentation/(Diminution) des Comptes Fournisseurs"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:64
+msgid "Net Cash from Operating Activities"
+msgstr "Trésorerie Nette des Activités Opérationnelles"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:69
+msgid "Investing Activities"
+msgstr "Activités d'Investissement"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:70
+msgid "Purchases of Fixed Assets"
+msgstr "Acquisitions d'Immobilisations"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:71
+msgid "Net Cash from Investing Activities"
+msgstr "Trésorerie Nette des Activités d'Investissement"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:75
+msgid "Financing Activities"
+msgstr "Activités de Financement"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:76
+msgid "Net Cash from Financing Activities"
+msgstr "Trésorerie Nette des Activités de Financement"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:82
+msgid "Net Change in Cash"
+msgstr "Variation Nette de Trésorerie"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:87
+msgid "Cash — Start of Period (actual bank balance)"
+msgstr "Trésorerie — Début de Période (solde bancaire réel)"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:91
+msgid "Cash — End of Period (actual bank balance)"
+msgstr "Trésorerie — Fin de Période (solde bancaire réel)"
+
+#: manufacturing/templates/gl_cash_flow_statement.html:95
+msgid ""
+"The start/end figures above are the actual recorded bank balance, shown\n"
+"                alongside the computed net change rather than forced to "
+"reconcile with it —\n"
+"                see the notes on inventory and financing above for why they "
+"may not tie exactly."
+msgstr "Les montants de début/fin ci-dessus correspondent au solde bancaire réel enregistré, présentés à côté de la variation nette calculée plutôt que forcés à s'y réconcilier exactement ; voir les notes sur les stocks et le financement ci-dessus pour comprendre pourquoi ils peuvent ne pas correspondre exactement."
+
+#: manufacturing/templates/gl_dashboard.html:57
+msgid "View A/P →"
+msgstr "Voir C/F →"
+
+#: manufacturing/templates/gl_dashboard.html:69
+msgid "View A/R →"
+msgstr "Voir C/C →"
+
+#: manufacturing/templates/gl_dashboard.html:74
+msgid "Navigate"
+msgstr "Naviguer"
+
+#: manufacturing/templates/gl_dashboard.html:76
+#, python-format
+msgid ""
+"Chart of Accounts<br><span style=\"font-size:12px;font-weight:normal;"
+"\">(%(count)s accounts)</span>"
+msgstr "Plan Comptable<br><span style=\"font-size:12px;font-weight:normal;\">(%(count)s comptes)</span>"
+
+#: manufacturing/templates/gl_dashboard.html:78
+#: manufacturing/templates/gl_journal_detail.html:3
+#: manufacturing/templates/gl_journal_detail.html:49
+msgid "New Journal Entry"
+msgstr "Nouvelle Écriture Comptable"
+
+#: manufacturing/templates/gl_dashboard.html:91
+#: manufacturing/templates/gl_journals.html:58
+msgid "Total Dr"
+msgstr "Total Débit"
+
+#: manufacturing/templates/gl_dashboard.html:91
+msgid "By"
+msgstr "Par"
+
+#: manufacturing/templates/gl_dashboard.html:102
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+msgid "Yes"
+msgstr "Oui"
+
+#: manufacturing/templates/gl_dashboard.html:102
+#: manufacturing/templates/payroll_deductions.html:64
+#: manufacturing/templates/payroll_deductions.html:132
+msgid "No"
+msgstr "Non"
+
+#: manufacturing/templates/gl_income_statement.html:57
+msgid "Revenue"
+msgstr "Produits"
+
+#: manufacturing/templates/gl_income_statement.html:65
+msgid "Total Revenue"
+msgstr "Total des Produits"
+
+#: manufacturing/templates/gl_income_statement.html:71
+msgid "Cost of Goods Sold"
+msgstr "Coût des Marchandises Vendues"
+
+#: manufacturing/templates/gl_income_statement.html:79
+msgid "Total COGS"
+msgstr "Total CMV"
+
+#: manufacturing/templates/gl_income_statement.html:86
+msgid "Gross Profit (Revenue – COGS)"
+msgstr "Marge Brute (Produits – CMV)"
+
+#: manufacturing/templates/gl_income_statement.html:93
+msgid "Expenses"
+msgstr "Charges"
+
+#: manufacturing/templates/gl_income_statement.html:101
+#: manufacturing/templates/gl_income_statement.html:112
+msgid "Total Expenses"
+msgstr "Total des Charges"
+
+#: manufacturing/templates/gl_income_statement.html:108
+msgid "Gross Profit"
+msgstr "Marge Brute"
+
+#: manufacturing/templates/gl_journal_detail.html:3
+msgid "Journal Entry"
+msgstr "Écriture Comptable"
+
+#: manufacturing/templates/gl_journal_detail.html:6
+msgid "All Journals"
+msgstr "Toutes les Écritures"
+
+#: manufacturing/templates/gl_journal_detail.html:49
+#, python-format
+msgid "Journal Entry #%(num)s"
+msgstr "Écriture Comptable N° %(num)s"
+
+#: manufacturing/templates/gl_journal_detail.html:63
+#: manufacturing/templates/gl_journals.html:70
+msgid "Unposted"
+msgstr "Non Comptabilisé"
+
+#: manufacturing/templates/gl_journal_detail.html:74
+msgid "Post this journal entry? This cannot be undone."
+msgstr "Comptabiliser cette écriture ? Cette action est irréversible."
+
+#: manufacturing/templates/gl_journal_detail.html:74
+msgid "Post Entry"
+msgstr "Comptabiliser"
+
+#: manufacturing/templates/gl_journal_detail.html:80
+msgid "Delete this unposted entry?"
+msgstr "Supprimer cette écriture non comptabilisée ?"
+
+#: manufacturing/templates/gl_journal_detail.html:80
+msgid "Void / Delete"
+msgstr "Annuler / Supprimer"
+
+#: manufacturing/templates/gl_journal_detail.html:87
+#: manufacturing/templates/gl_journal_detail.html:129
+msgid "Journal Lines"
+msgstr "Lignes de l'Écriture"
+
+#: manufacturing/templates/gl_journal_detail.html:91
+#: manufacturing/templates/gl_journal_detail.html:134
+msgid "Account"
+msgstr "Compte"
+
+#: manufacturing/templates/gl_journal_detail.html:91
+#: manufacturing/templates/gl_trial_balance.html:48
+msgid "Debit"
+msgstr "Débit"
+
+#: manufacturing/templates/gl_journal_detail.html:91
+#: manufacturing/templates/gl_trial_balance.html:48
+msgid "Credit"
+msgstr "Crédit"
+
+#: manufacturing/templates/gl_journal_detail.html:91
+#: manufacturing/templates/gl_journal_detail.html:150
+msgid "Memo"
+msgstr "Mémo"
+
+#: manufacturing/templates/gl_journal_detail.html:110
+msgid "Journal Details"
+msgstr "Détails de l'Écriture"
+
+#: manufacturing/templates/gl_journal_detail.html:116
+msgid "Date *"
+msgstr "Date *"
+
+#: manufacturing/templates/gl_journal_detail.html:121
+msgid "e.g. JE-001"
+msgstr "p. ex. JE-001"
+
+#: manufacturing/templates/gl_journal_detail.html:142
+msgid "Debit ($)"
+msgstr "Débit ($)"
+
+#: manufacturing/templates/gl_journal_detail.html:146
+msgid "Credit ($)"
+msgstr "Crédit ($)"
+
+#: manufacturing/templates/gl_journal_detail.html:153
+msgid "Add Line"
+msgstr "Ajouter une Ligne"
+
+#: manufacturing/templates/gl_journal_detail.html:157
+msgid "Debits:"
+msgstr "Débits :"
+
+#: manufacturing/templates/gl_journal_detail.html:158
+msgid "Credits:"
+msgstr "Crédits :"
+
+#: manufacturing/templates/gl_journal_detail.html:159
+msgid "Difference:"
+msgstr "Différence :"
+
+#: manufacturing/templates/gl_journal_detail.html:162
+msgid "Save Journal Entry"
+msgstr "Enregistrer l'Écriture"
+
+#: manufacturing/templates/gl_journals.html:8
+msgid "New Entry"
+msgstr "Nouvelle Écriture"
+
+#: manufacturing/templates/gl_journals.html:38
+msgid "Posted:"
+msgstr "Comptabilisé :"
+
+#: manufacturing/templates/gl_journals.html:41
+msgid "Posted Only"
+msgstr "Comptabilisées Uniquement"
+
+#: manufacturing/templates/gl_journals.html:42
+msgid "Unposted Only"
+msgstr "Non Comptabilisées Uniquement"
+
+#: manufacturing/templates/gl_journals.html:77
+msgid "No journal entries found."
+msgstr "Aucune écriture comptable trouvée."
+
+#: manufacturing/templates/gl_trial_balance.html:63
+#: manufacturing/templates/payroll_run_detail.html:91
+#: manufacturing/templates/payroll_ytd.html:80
+msgid "TOTALS"
+msgstr "TOTAUX"
+
+#: manufacturing/templates/gl_trial_balance.html:70
+#, python-format
+msgid "OUT OF BALANCE by $%(amt)s"
+msgstr "DÉSÉQUILIBRÉ de $%(amt)s"
+
+#: manufacturing/templates/gl_trial_balance.html:73
+msgid ""
+"No posted journal entries found. Post some journal entries to see the trial "
+"balance."
+msgstr "Aucune écriture comptabilisée trouvée. Comptabilisez des écritures pour afficher la balance générale."
 
 #: manufacturing/templates/home.html:4
 msgid "Login"
@@ -3002,21 +4037,6 @@ msgstr "Gestion des risques"
 msgid "Total Contracts"
 msgstr "Total des contrats"
 
-#: manufacturing/templates/legal_dashboard.html:63
-#: manufacturing/templates/marketing_dashboard.html:70
-#: manufacturing/templates/mkt_analytics.html:142
-#: manufacturing/templates/payroll_deductions.html:56
-#: manufacturing/templates/payroll_deductions.html:66
-#: manufacturing/templates/payroll_deductions.html:121
-#: manufacturing/templates/payroll_deductions.html:189
-msgid "Active"
-msgstr "Actif"
-
-#: manufacturing/templates/legal_dashboard.html:67
-#: manufacturing/templates/marketing_dashboard.html:102
-msgid "Draft"
-msgstr "Brouillon"
-
 #: manufacturing/templates/legal_dashboard.html:75
 #: manufacturing/templates/marketing_dashboard.html:98
 msgid "Total Items"
@@ -3107,11 +4127,6 @@ msgstr "Rechercher élément / référence / responsable…"
 #: manufacturing/templates/mkt_budget_list.html:112
 msgid "Item"
 msgstr "Élément"
-
-#: manufacturing/templates/legal_governance_list.html:73
-#: manufacturing/templates/legal_governance_list.html:121
-msgid "Reference"
-msgstr "Référence"
 
 #: manufacturing/templates/legal_governance_list.html:74
 #: manufacturing/templates/legal_governance_list.html:125
@@ -3771,11 +4786,6 @@ msgstr "Budget marketing"
 msgid "Search item / campaign / requester…"
 msgstr "Rechercher élément / campagne / demandeur…"
 
-#: manufacturing/templates/mkt_budget_list.html:83
-#: manufacturing/templates/payroll_deductions.html:121
-msgid "Amount"
-msgstr "Montant"
-
 #: manufacturing/templates/mkt_budget_list.html:84
 #: manufacturing/templates/mkt_budget_list.html:137
 msgid "Request Date"
@@ -3792,10 +4802,6 @@ msgstr "Nouvelle demande de budget"
 #: manufacturing/templates/mkt_budget_list.html:113
 msgid "e.g. Trade show booth"
 msgstr "p. ex. Stand de salon professionnel"
-
-#: manufacturing/templates/mkt_budget_list.html:129
-msgid "Amount ($)"
-msgstr "Montant ($)"
 
 #: manufacturing/templates/mkt_budget_list.html:153
 msgid "Submit Request"
@@ -4072,20 +5078,6 @@ msgstr "Types de déduction"
 msgid "Pre-Tax"
 msgstr "Avant impôt"
 
-#: manufacturing/templates/payroll_deductions.html:64
-#: manufacturing/templates/payroll_deductions.html:132
-msgid "Yes"
-msgstr "Oui"
-
-#: manufacturing/templates/payroll_deductions.html:64
-#: manufacturing/templates/payroll_deductions.html:132
-msgid "No"
-msgstr "Non"
-
-#: manufacturing/templates/payroll_deductions.html:66
-msgid "Inactive"
-msgstr "Inactif"
-
 #: manufacturing/templates/payroll_deductions.html:72
 msgid "No deduction types defined."
 msgstr "Aucun type de déduction défini."
@@ -4120,11 +5112,6 @@ msgstr "Tous les employés"
 msgid "Deduction"
 msgstr "Déduction"
 
-#: manufacturing/templates/payroll_deductions.html:121
-#: manufacturing/templates/payroll_deductions.html:179
-msgid "Method"
-msgstr "Méthode"
-
 #: manufacturing/templates/payroll_deductions.html:141
 msgid "Remove"
 msgstr "Supprimer"
@@ -4158,15 +5145,6 @@ msgstr "Montant ($/%%)"
 #: manufacturing/templates/payroll_run_new.html:30
 msgid "Run Payroll"
 msgstr "Exécuter la paie"
-
-#: manufacturing/templates/payroll_history.html:12
-#: manufacturing/templates/report_builder_detail.html:8
-msgid "Export CSV"
-msgstr "Exporter en CSV"
-
-#: manufacturing/templates/payroll_history.html:13
-msgid "Export Excel"
-msgstr "Exporter en Excel"
 
 #: manufacturing/templates/payroll_history.html:38
 #: manufacturing/templates/payroll_run_detail.html:57
@@ -4228,10 +5206,6 @@ msgstr "Modifier le taux de rémunération"
 #: manufacturing/templates/payroll_pay_rates.html:118
 msgid "Rate ($/hr or annual salary)"
 msgstr "Taux ($/h ou salaire annuel)"
-
-#: manufacturing/templates/payroll_pay_rates.html:127
-msgid "Save"
-msgstr "Enregistrer"
 
 #: manufacturing/templates/payroll_pay_rates.html:129
 msgid "Remove Rate"
@@ -4307,11 +5281,6 @@ msgstr "Medicare"
 msgid "Post-Tax Deds"
 msgstr "Déd. après impôt"
 
-#: manufacturing/templates/payroll_run_detail.html:91
-#: manufacturing/templates/payroll_ytd.html:80
-msgid "TOTALS"
-msgstr "TOTAUX"
-
 #: manufacturing/templates/payroll_run_detail.html:100
 msgid "Click a row to view that employee's pay stub."
 msgstr "Cliquez sur une ligne pour voir le bulletin de paie de cet employé."
@@ -4373,10 +5342,6 @@ msgstr "Bulletin de paie"
 #: manufacturing/templates/payroll_stub_detail.html:6
 msgid "Back to Run"
 msgstr "Retour au cycle"
-
-#: manufacturing/templates/payroll_stub_detail.html:36
-msgid "Print / Save PDF"
-msgstr "Imprimer / Enregistrer en PDF"
 
 #: manufacturing/templates/payroll_stub_detail.html:39
 msgid "PAY STUB"
@@ -5178,11 +6143,6 @@ msgstr "Mes heures"
 #: manufacturing/templates/tc_ot_report.html:45
 msgid "Overtime Reports"
 msgstr "Rapports d'heures supplémentaires"
-
-#: manufacturing/templates/tc_ot_report.html:49
-#: manufacturing/templates/tc_schedule.html:50
-msgid "to"
-msgstr "au"
 
 #: manufacturing/templates/tc_ot_report.html:51
 msgid "Apply"
