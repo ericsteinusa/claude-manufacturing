@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}13-Week Cash Forecast{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "13-Week Cash Forecast" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/fin/" class="btn">Finance Dashboard</a>
-<a href="/gl/cash-flow/" class="btn">Cash Flow Statement</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/fin/" class="btn">{% trans "Finance Dashboard" %}</a>
+<a href="/gl/cash-flow/" class="btn">{% trans "Cash Flow Statement" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -28,16 +29,16 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>13-Week Cash Forecast</h2>
+    <h2>{% trans "13-Week Cash Forecast" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>Start Date:</label>
+        <label>{% trans "Start Date:" %}</label>
         <input type="date" name="start_date" value="{{ start_date }}">
-        <button type="submit" class="btn-sm">Run</button>
+        <button type="submit" class="btn-sm">{% trans "Run" %}</button>
     </form>
 
     <div class="card">
-        <h3 style="margin-top:0;">Projected Cash Balance</h3>
+        <h3 style="margin-top:0;">{% trans "Projected Cash Balance" %}</h3>
         <canvas id="chart-forecast" height="80"></canvas>
     </div>
 
@@ -45,11 +46,11 @@
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Week Of</th>
-                    <th>AR Collections</th>
-                    <th>AP Disbursements</th>
-                    <th>Net Cash Flow</th>
-                    <th>Projected Balance</th>
+                    <th>{% trans "Week Of" %}</th>
+                    <th>{% trans "AR Collections" %}</th>
+                    <th>{% trans "AP Disbursements" %}</th>
+                    <th>{% trans "Net Cash Flow" %}</th>
+                    <th>{% trans "Projected Balance" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,9 +67,9 @@
         </table>
     </div>
     <p style="font-size:12px;color:var(--text-muted);">
-        Based on currently open/partial/overdue AR and AP invoices, bucketed by due date
+        {% blocktrans %}Based on currently open/partial/overdue AR and AP invoices, bucketed by due date
         (already-overdue amounts are folded into the first week). Starts from the current
-        actual bank balance across active accounts.
+        actual bank balance across active accounts.{% endblocktrans %}
     </p>
 </div>
 </div>

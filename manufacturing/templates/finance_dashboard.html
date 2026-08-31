@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% block page_title %}Finance Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Finance Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/gl/" class="btn">General Ledger</a>
-<a href="/ap/" class="btn">Accounts Payable</a>
-<a href="/ar/" class="btn">Accounts Receivable</a>
-<a href="/fin/budgets/" class="btn">Budgets</a>
-<a href="/fin/audits/" class="btn">Audits</a>
-<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
-<a href="/fin/tax/" class="btn">Tax Filings</a>
-<a href="/gl/cash-flow/" class="btn">Cash Flow</a>
-<a href="/fin/forecast/" class="btn">13-Week Forecast</a>
-<a href="/gl/abc-costing/report/" class="btn">ABC Costing</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/gl/" class="btn">{% trans "General Ledger" %}</a>
+<a href="/ap/" class="btn">{% trans "Accounts Payable" %}</a>
+<a href="/ar/" class="btn">{% trans "Accounts Receivable" %}</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
+<a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
+<a href="/gl/cash-flow/" class="btn">{% trans "Cash Flow" %}</a>
+<a href="/fin/forecast/" class="btn">{% trans "13-Week Forecast" %}</a>
+<a href="/gl/abc-costing/report/" class="btn">{% trans "ABC Costing" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -46,119 +47,119 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Finance Dashboard</h2>
+    <h2>{% trans "Finance Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/gl/" class="dept-btn">GL Dashboard</a>
-        <a href="/gl/accounts/" class="dept-btn">Chart of Accounts</a>
-        <a href="/gl/journals/" class="dept-btn">Journal Entries</a>
-        <a href="/gl/trial-balance/" class="dept-btn">Trial Balance</a>
-        <a href="/gl/income-statement/" class="dept-btn">Income Statement</a>
-        <a href="/gl/balance-sheet/" class="dept-btn">Balance Sheet</a>
-        <a href="/ap/" class="dept-btn">Accounts Payable</a>
-        <a href="/ar/" class="dept-btn">Accounts Receivable</a>
-        <a href="/fin/budgets/" class="dept-btn">Budgets</a>
-        <a href="/fin/audits/" class="dept-btn">Audits</a>
-        <a href="/fin/bank-rec/" class="dept-btn">Bank Reconciliation</a>
-        <a href="/fin/tax/" class="dept-btn">Tax Filings</a>
-        <a href="/gl/cash-flow/" class="dept-btn">Cash Flow Statement</a>
-        <a href="/fin/forecast/" class="dept-btn">13-Week Forecast</a>
+        <a href="/gl/" class="dept-btn">{% trans "GL Dashboard" %}</a>
+        <a href="/gl/accounts/" class="dept-btn">{% trans "Chart of Accounts" %}</a>
+        <a href="/gl/journals/" class="dept-btn">{% trans "Journal Entries" %}</a>
+        <a href="/gl/trial-balance/" class="dept-btn">{% trans "Trial Balance" %}</a>
+        <a href="/gl/income-statement/" class="dept-btn">{% trans "Income Statement" %}</a>
+        <a href="/gl/balance-sheet/" class="dept-btn">{% trans "Balance Sheet" %}</a>
+        <a href="/ap/" class="dept-btn">{% trans "Accounts Payable" %}</a>
+        <a href="/ar/" class="dept-btn">{% trans "Accounts Receivable" %}</a>
+        <a href="/fin/budgets/" class="dept-btn">{% trans "Budgets" %}</a>
+        <a href="/fin/audits/" class="dept-btn">{% trans "Audits" %}</a>
+        <a href="/fin/bank-rec/" class="dept-btn">{% trans "Bank Reconciliation" %}</a>
+        <a href="/fin/tax/" class="dept-btn">{% trans "Tax Filings" %}</a>
+        <a href="/gl/cash-flow/" class="dept-btn">{% trans "Cash Flow Statement" %}</a>
+        <a href="/fin/forecast/" class="dept-btn">{% trans "13-Week Forecast" %}</a>
     </div>
 
-    <div class="section-label">Accounts Payable</div>
+    <div class="section-label">{% trans "Accounts Payable" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Open Invoices</div>
+            <div class="lbl">{% trans "Open Invoices" %}</div>
             <div class="val">{{ ap.open_count|default:0 }}</div>
         </div>
         <div class="kpi{% if ap.overdue_count %} red{% endif %}">
-            <div class="lbl">Overdue</div>
+            <div class="lbl">{% trans "Overdue" %}</div>
             <div class="val">{{ ap.overdue_count|default:0 }}</div>
         </div>
         <div class="kpi{% if ap.total_outstanding %} yellow{% endif %}">
-            <div class="lbl">Total Outstanding</div>
+            <div class="lbl">{% trans "Total Outstanding" %}</div>
             <div class="val">${{ ap.total_outstanding|floatformat:2 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Accounts Receivable</div>
+    <div class="section-label">{% trans "Accounts Receivable" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Open Invoices</div>
+            <div class="lbl">{% trans "Open Invoices" %}</div>
             <div class="val">{{ ar.open_count|default:0 }}</div>
         </div>
         <div class="kpi{% if ar.overdue_count %} red{% endif %}">
-            <div class="lbl">Overdue</div>
+            <div class="lbl">{% trans "Overdue" %}</div>
             <div class="val">{{ ar.overdue_count|default:0 }}</div>
         </div>
         <div class="kpi{% if ar.total_outstanding %} yellow{% endif %}">
-            <div class="lbl">Total Outstanding</div>
+            <div class="lbl">{% trans "Total Outstanding" %}</div>
             <div class="val">${{ ar.total_outstanding|floatformat:2 }}</div>
         </div>
     </div>
 
-    <div class="section-label">Cash Flow</div>
+    <div class="section-label">{% trans "Cash Flow" %}</div>
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Cash Position</div>
+            <div class="lbl">{% trans "Cash Position" %}</div>
             <div class="val">${{ cash_position|floatformat:2 }}</div>
         </div>
         <div class="kpi{% if cash_forecast_end < 0 %} red{% endif %}">
-            <div class="lbl">Projected Balance (13 wks)</div>
+            <div class="lbl">{% trans "Projected Balance (13 wks)" %}</div>
             <div class="val">${{ cash_forecast_end|floatformat:2 }}</div>
         </div>
         <div class="kpi{% if cash_forecast_net_change < 0 %} red{% endif %}">
-            <div class="lbl">Net Change (13 wks)</div>
+            <div class="lbl">{% trans "Net Change (13 wks)" %}</div>
             <div class="val">${{ cash_forecast_net_change|floatformat:2 }}</div>
         </div>
     </div>
 
     <div class="card">
-        <h3>13-Week Cash Balance Projection</h3>
+        <h3>{% trans "13-Week Cash Balance Projection" %}</h3>
         <canvas id="chart-cash-forecast" height="90"></canvas>
         <p style="font-size:12px;color:var(--text-muted);margin:8px 0 0;">
-            <a href="/fin/forecast/" style="color:var(--accent);">View full forecast</a> ·
-            <a href="/gl/cash-flow/" style="color:var(--accent);">Cash flow statement</a>
+            <a href="/fin/forecast/" style="color:var(--accent);">{% trans "View full forecast" %}</a> ·
+            <a href="/gl/cash-flow/" style="color:var(--accent);">{% trans "Cash flow statement" %}</a>
         </p>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Revenue vs. Expense &amp; Net Income</h3>
+            <h3>{% trans "Revenue vs. Expense &amp; Net Income" %}</h3>
             <canvas id="chart-rev-expense" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>AR Aging</h3>
+            <h3>{% trans "AR Aging" %}</h3>
             <canvas id="chart-ar-aging" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>AP Aging</h3>
+            <h3>{% trans "AP Aging" %}</h3>
             <canvas id="chart-ap-aging" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Top AR Customers (open balance)</h3>
+            <h3>{% trans "Top AR Customers (open balance)" %}</h3>
             <canvas id="chart-top-ar" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Invoice Status — AR vs AP</h3>
+            <h3>{% trans "Invoice Status — AR vs AP" %}</h3>
             <canvas id="chart-invoice-status" height="220"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>Recent Journal Entries</h3>
+        <h3>{% trans "Recent Journal Entries" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Reference</th>
-                    <th>Description</th>
-                    <th>Lines</th>
-                    <th>Total Debit</th>
-                    <th>Status</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Reference" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Lines" %}</th>
+                    <th>{% trans "Total Debit" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -171,14 +172,14 @@
                 <td>${{ j.total_debit|floatformat:2 }}</td>
                 <td>
                     {% if j.posted %}
-                        <span class="badge posted">Posted</span>
+                        <span class="badge posted">{% trans "Posted" %}</span>
                     {% else %}
-                        <span class="badge unposted">Draft</span>
+                        <span class="badge unposted">{% trans "Draft" %}</span>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;">No journal entries yet.</td></tr>
+            <tr><td colspan="6" style="color:#888;">{% trans "No journal entries yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

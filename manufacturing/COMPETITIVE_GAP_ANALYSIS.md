@@ -4318,3 +4318,38 @@ full Marketing department (13) + the full Reports department (4) + the full Payr
 + the full Time Clock department (7) + the full Customers/Credit department (7) + the full
 Engineering department (10) + the full Customer Service department (13) + the full Accounting
 department (13) + the full IT department (17)) out of ~450 total.
+
+**2026-08-31, eleventh whole department:** Continued the "whole department" approach — picked
+**Finance** (`finance_dashboard.html`, `finance_budget_list.html`, `finance_budget_detail.html`,
+`finance_audit_list.html`, `finance_audit_detail.html`, `finance_bank_rec_list.html`,
+`finance_bank_rec_detail.html`, `finance_tax_list.html`, `finance_tax_detail.html`,
+`fin_cash_forecast.html`), tied with Legal at 10 templates, the smallest size seen in this series.
+This "Finance" surface (Budgets, Audits, Bank Reconciliation, Tax Filings, 13-Week Cash Forecast,
+all under `/fin/`) is distinct from the already-translated Accounting department, though reached
+via toolbar links from it. 100 unique strings per language (99 simple + 1 plural). Used
+`{% blocktrans with %}` for three dynamic detail-page titles ("Budget — {name}", "Audit — {name}",
+"Tax Filing — {tax_type}"), and added a new `{% blocktrans count %}` plural for the audit detail
+page's "Findings (N)" header — notable as the first plural in this series where the target
+languages use genuinely different singular/plural *nouns* (Spanish "Hallazgo"/"Hallazgos", French
+"Constatation"/"Constatations", German "Feststellung"/"Feststellungen") even though the English
+source text is identical in both forms. Two dynamic headings were deliberately left un-wrapped,
+matching established precedent: the bank account and tax filing detail pages' titles combine only
+data fields with a literal " — " separator and no English words. `makemessages` fuzzy-matched 74 of
+the new strings against unrelated existing translations (down from IT's 121, none combined with
+`python-format` this time); handled cleanly from the start using the blank-the-msgstr-when-
+stripping-fuzzy technique established since the Accounting pass, so no wrong guesses were ever
+written. Full suite 3431 passed (unchanged), `manage.py check` clean, `compilemessages` clean,
+`msgfmt --check` clean on all three files, zero blank/duplicated entries confirmed
+programmatically (the recurring plural-concatenation false positive from the Customer Service
+pass's checker reappears here too, unrelated to this batch). Verified end-to-end against the real
+dev server: the Finance dashboard, Budgets list + a draft budget's detail page, Audits list + a
+scheduled audit's detail page (confirmed the "Constatation (0)" plural with zero findings), Bank
+Accounts list + an account detail page (confirmed the Active Yes/No dropdown), Tax Filings list + a
+filing detail page, and the 13-Week Cash Forecast (confirmed the multi-line methodology note), in
+French, German, and Spanish with real sample data, no console errors. **Localization coverage is
+now 119 templates across three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing department (13) + the full Reports
+department (4) + the full Payroll department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department (10) + the full Customer Service
+department (13) + the full Accounting department (13) + the full IT department (17) + the full
+Finance department (10)) out of ~450 total.

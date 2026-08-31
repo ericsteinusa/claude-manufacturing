@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Budgets{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Budgets" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/fin/" class="btn">Finance Dashboard</a>
-<a href="/fin/budgets/" class="btn">Budgets</a>
-<a href="/fin/audits/" class="btn">Audits</a>
-<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
-<a href="/fin/tax/" class="btn">Tax Filings</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/fin/" class="btn">{% trans "Finance Dashboard" %}</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
+<a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if year_filter %}&fiscal_year={{ year_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -53,33 +54,33 @@
 {% block body %}
 <div class="content">
 <div class="fn-wrap">
-    <h2>Budgets</h2>
+    <h2>{% trans "Budgets" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in budget_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|capfirst }}</option>
             {% endfor %}
         </select>
-        <input type="number" name="fiscal_year" value="{{ year_filter }}" placeholder="Fiscal Year" style="width:120px;">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search name…">
-        <button type="submit">Filter</button>
-        <a href="/fin/budgets/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="number" name="fiscal_year" value="{{ year_filter }}" placeholder="{% trans 'Fiscal Year' %}" style="width:120px;">
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search name…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/fin/budgets/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Budget Name</th>
-                    <th>Fiscal Year</th>
-                    <th>Status</th>
-                    <th>Created By</th>
-                    <th>Notes</th>
+                    <th>{% trans "Budget Name" %}</th>
+                    <th>{% trans "Fiscal Year" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Created By" %}</th>
+                    <th>{% trans "Notes" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,7 +93,7 @@
                 <td>{{ b.notes|default:"—"|truncatechars:60 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No budgets found.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No budgets found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -100,20 +101,20 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Budget</h3>
+        <h3>{% trans "New Budget" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Budget Name *</label>
-                    <input type="text" name="budget_name" required placeholder="e.g. Operations FY2026">
+                    <label>{% trans "Budget Name *" %}</label>
+                    <input type="text" name="budget_name" required placeholder="{% trans 'e.g. Operations FY2026' %}">
                 </div>
                 <div class="form-group">
-                    <label>Fiscal Year *</label>
+                    <label>{% trans "Fiscal Year *" %}</label>
                     <input type="number" name="fiscal_year" required value="{% now 'Y' %}" min="2000" max="2099">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in budget_statuses %}
                         <option value="{{ s }}"{% if s == 'draft' %} selected{% endif %}>{{ s|capfirst }}</option>
@@ -121,11 +122,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Budget</button>
+            <button type="submit" class="btn-submit">{% trans "Create Budget" %}</button>
         </form>
     </div>
     {% endif %}
