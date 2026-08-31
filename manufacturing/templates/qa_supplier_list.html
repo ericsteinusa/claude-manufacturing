@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Supplier Quality{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Supplier Quality" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/qa/audits/" class="btn">Audits</a>
-<a href="/qa/ncr/" class="btn">NCRs</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/qa/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/qa/ncr/" class="btn">{% trans "NCRs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -57,13 +58,13 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>Supplier Quality</h2>
+    <h2>{% trans "Supplier Quality" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/qa/suppliers/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/qa/suppliers/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in supplier_statuses %}
             <a href="/qa/suppliers/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
@@ -71,17 +72,17 @@
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
             <input class="search-input" type="text" name="search"
-                   value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
-            {% if search %}<a href="/qa/suppliers/{% if status_filter %}?status={{ status_filter }}{% endif %}" class="chip">Clear</a>{% endif %}
+                   value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
+            {% if search %}<a href="/qa/suppliers/{% if status_filter %}?status={{ status_filter }}{% endif %}" class="chip">{% trans "Clear" %}</a>{% endif %}
         </form>
     </div>
 
     {% if suppliers %}
     <table class="list-table">
         <thead><tr>
-            <th>Supplier</th><th>Material</th><th>Rating</th>
-            <th>PPM</th><th>Last Audit</th><th>Status</th>
+            <th>{% trans "Supplier" %}</th><th>{% trans "Material" %}</th><th>{% trans "Rating" %}</th>
+            <th>{% trans "PPM" %}</th><th>{% trans "Last Audit" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for s in suppliers %}
@@ -97,50 +98,50 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No supplier quality records found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No supplier quality records found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Supplier Quality Record</h3>
+        <h3>{% trans "Add Supplier Quality Record" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Supplier Name *</label>
+                    <label>{% trans "Supplier Name *" %}</label>
                     <input type="text" name="supplier" required>
                 </div>
                 <div class="form-row">
-                    <label>Material / Category</label>
+                    <label>{% trans "Material / Category" %}</label>
                     <input type="text" name="material">
                 </div>
                 <div class="form-row">
-                    <label>Rating</label>
+                    <label>{% trans "Rating" %}</label>
                     <select name="rating">
                         <option value="">—</option>
                         {% for r in supplier_ratings %}<option>{{ r }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>PPM</label>
-                    <input type="text" name="ppm" placeholder="Parts per million">
+                    <label>{% trans "PPM" %}</label>
+                    <input type="text" name="ppm" placeholder="{% trans 'Parts per million' %}">
                 </div>
                 <div class="form-row">
-                    <label>Last Audit Date</label>
+                    <label>{% trans "Last Audit Date" %}</label>
                     <input type="date" name="last_audit">
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for st in supplier_statuses %}<option>{{ st }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Add Record</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Add Record" %}</button>
         </form>
     </div>
     {% endif %}

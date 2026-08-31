@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Non-Conformance Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Non-Conformance Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/qa/capa/" class="btn">CAPAs</a>
-<a href="/qa/audits/" class="btn">Audits</a>
-<a href="/qa/inspections/" class="btn">Inspections</a>
-<a href="/qa/ncr/export/?status={{ status_filter }}&search={{ search }}" class="btn">⬇ Export CSV</a>
-<a href="/qa/ncr/export/?status={{ status_filter }}&search={{ search }}&format=xlsx" class="btn">⬇ Export Excel</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/qa/capa/" class="btn">{% trans "CAPAs" %}</a>
+<a href="/qa/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/qa/inspections/" class="btn">{% trans "Inspections" %}</a>
+<a href="/qa/ncr/export/?status={{ status_filter }}&search={{ search }}" class="btn">⬇ {% trans "Export CSV" %}</a>
+<a href="/qa/ncr/export/?status={{ status_filter }}&search={{ search }}&format=xlsx" class="btn">⬇ {% trans "Export Excel" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -59,13 +60,13 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>Non-Conformance Reports</h2>
+    <h2>{% trans "Non-Conformance Reports" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/qa/ncr/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/qa/ncr/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in ncr_statuses %}
             <a href="/qa/ncr/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
@@ -73,17 +74,17 @@
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
             <input class="search-input" type="text" name="search"
-                   value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
-            {% if search %}<a href="/qa/ncr/{% if status_filter %}?status={{ status_filter }}{% endif %}" class="chip">Clear</a>{% endif %}
+                   value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
+            {% if search %}<a href="/qa/ncr/{% if status_filter %}?status={{ status_filter }}{% endif %}" class="chip">{% trans "Clear" %}</a>{% endif %}
         </form>
     </div>
 
     {% if ncrs %}
     <table class="list-table">
         <thead><tr>
-            <th>Title</th><th>Source</th><th>Severity</th>
-            <th>Product</th><th>Detected</th><th>Owner</th><th>Status</th>
+            <th>{% trans "Title" %}</th><th>{% trans "Source" %}</th><th>{% trans "Severity" %}</th>
+            <th>{% trans "Product" %}</th><th>{% trans "Detected" %}</th><th>{% trans "Owner" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for n in ncrs %}
@@ -100,55 +101,55 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No NCRs found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No NCRs found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>New NCR</h3>
+        <h3>{% trans "New NCR" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
-                    <input type="text" name="title" required placeholder="Description of nonconformance">
+                    <label>{% trans "Title *" %}</label>
+                    <input type="text" name="title" required placeholder="{% trans 'Description of nonconformance' %}">
                 </div>
                 <div class="form-row">
-                    <label>Source</label>
+                    <label>{% trans "Source" %}</label>
                     <select name="source">
                         {% for s in ncr_sources %}<option>{{ s }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Severity</label>
+                    <label>{% trans "Severity" %}</label>
                     <select name="severity">
                         {% for s in ncr_severities %}<option>{{ s }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Product / Part</label>
-                    <input type="text" name="product" placeholder="Optional">
+                    <label>{% trans "Product / Part" %}</label>
+                    <input type="text" name="product" placeholder="{% trans 'Optional' %}">
                 </div>
                 <div class="form-row">
-                    <label>Detected Date</label>
+                    <label>{% trans "Detected Date" %}</label>
                     <input type="date" name="detected_date">
                 </div>
                 <div class="form-row">
-                    <label>Disposition</label>
+                    <label>{% trans "Disposition" %}</label>
                     <select name="disposition">
                         {% for d in ncr_dispositions %}<option>{{ d }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Owner</label>
-                    <input type="text" name="owner" placeholder="Responsible person">
+                    <label>{% trans "Owner" %}</label>
+                    <input type="text" name="owner" placeholder="{% trans 'Responsible person' %}">
                 </div>
                 <div class="form-row full">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="3"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Create NCR</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Create NCR" %}</button>
         </form>
     </div>
     {% endif %}

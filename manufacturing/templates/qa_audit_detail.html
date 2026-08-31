@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}Audit #{{ audit.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=audit.id %}Audit #{{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/audits/" class="btn">All Audits</a>
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/audits/" class="btn">{% trans "All Audits" %}</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,43 +42,43 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>Audit #{{ audit.id }} &mdash; {{ audit.title }}</h2>
+    <h2>{% blocktrans with num=audit.id title=audit.title %}Audit #{{ num }} &mdash; {{ title }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
-    {% if audit.is_overdue %}<div class="overdue-notice">&#9888; This audit is past its scheduled date.</div>{% endif %}
+    {% if audit.is_overdue %}<div class="overdue-notice">&#9888; {% trans "This audit is past its scheduled date." %}</div>{% endif %}
 
     {% if audit.status not in 'Complete,Closed' and can_edit %}
     <div class="card complete-card">
-        <h3>Complete Audit</h3>
+        <h3>{% trans "Complete Audit" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="complete">
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Overall Result</label>
-                    <input type="text" name="result" placeholder="Pass / Fail / Conditional…">
+                    <label>{% trans "Overall Result" %}</label>
+                    <input type="text" name="result" placeholder="{% trans 'Pass / Fail / Conditional…' %}">
                 </div>
                 <div class="form-row full">
-                    <label>Findings</label>
+                    <label>{% trans "Findings" %}</label>
                     <textarea name="findings" rows="3"
-                        placeholder="Key findings from the audit…">{{ audit.findings|default:'' }}</textarea>
+                        placeholder="{% trans 'Key findings from the audit…' %}">{{ audit.findings|default:'' }}</textarea>
                 </div>
             </div>
             <div class="btn-row">
-                <button type="submit" class="ok-btn">Mark Complete</button>
+                <button type="submit" class="ok-btn">{% trans "Mark Complete" %}</button>
             </div>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Audit Details</h3>
+        <h3>{% trans "Audit Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
+                    <label>{% trans "Title *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="title" value="{{ audit.title }}" required>
                     {% else %}
@@ -85,7 +86,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in audit_statuses %}
@@ -97,7 +98,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     {% if can_edit %}
                     <select name="audit_type">
                         {% for t in audit_types %}
@@ -109,7 +110,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Auditor</label>
+                    <label>{% trans "Auditor" %}</label>
                     {% if can_edit %}
                     <input type="text" name="auditor" value="{{ audit.auditor|default:'' }}">
                     {% else %}
@@ -117,7 +118,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Scheduled Date</label>
+                    <label>{% trans "Scheduled Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="scheduled_date" value="{{ audit.scheduled_date|default:'' }}">
                     {% else %}
@@ -125,7 +126,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Completed Date</label>
+                    <label>{% trans "Completed Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="completed_date" value="{{ audit.completed_date|default:'' }}">
                     {% else %}
@@ -133,7 +134,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Result</label>
+                    <label>{% trans "Result" %}</label>
                     {% if can_edit %}
                     <input type="text" name="result" value="{{ audit.result|default:'' }}">
                     {% else %}
@@ -141,7 +142,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row full">
-                    <label>Findings</label>
+                    <label>{% trans "Findings" %}</label>
                     {% if can_edit %}
                     <textarea name="findings" rows="5">{{ audit.findings|default:'' }}</textarea>
                     {% else %}
@@ -151,8 +152,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/qa/audits/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/qa/audits/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>

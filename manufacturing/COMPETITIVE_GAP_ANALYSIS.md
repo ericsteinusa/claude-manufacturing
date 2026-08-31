@@ -4353,3 +4353,45 @@ department (4) + the full Payroll department (8) + the full Time Clock departmen
 Customers/Credit department (7) + the full Engineering department (10) + the full Customer Service
 department (13) + the full Accounting department (13) + the full IT department (17) + the full
 Finance department (10)) out of ~450 total.
+
+**2026-08-31, twelfth whole department:** Continued the "whole department" approach — picked
+**Quality** (`qa_dashboard.html`, `qa_ncr_list.html`, `qa_ncr_detail.html`, `qa_capa_list.html`,
+`qa_capa_detail.html`, `qa_audit_list.html`, `qa_audit_detail.html`, `qa_inspection_list.html`,
+`qa_inspection_detail.html`, `qa_supplier_list.html`, `qa_supplier_detail.html`, `qa_reports.html`),
+12 templates. The QA Dashboard also links out to four further sub-features (SPC, Certificates of
+Analysis, Control Plans/FMEA, Regulatory Compliance) left out of this pass — their dashboard nav
+labels were translated since they're literal dashboard text, but the destination pages remain
+untranslated, mirroring the "translate the link, not yet the target" situation from Accounting's
+toolbar links into the separately-handled Finance department. 142 unique strings per language (138
+simple + 4 plural). Kept the `NCR`/`CAPA` acronyms themselves untranslated across all three
+languages (same treatment as MRP/BOM/OEE elsewhere) while translating the surrounding descriptive
+text. Used `{% blocktrans with %}` for four dynamic detail-page title shapes ("NCR #{num} —
+{title}", "CAPA #{num} — {title}", "Audit #{num} — {title}", "Supplier Quality #{num}"), and
+`{% blocktrans %}` with an embedded literal `<a>` tag for the inspection form's "Manage plans on
+the Sampling Plans page" hint — the same embedded-HTML-link pattern established in the
+Customers/Credit pass. Added four new `{% blocktrans count %}` plurals: the dashboard KPI cards'
+"N critical"/"N overdue" suffixes (the latter reusing the existing "N overdue" plural verbatim yet
+again), the inspection detail page's "Defects (N)" header, and the inspection list's inline
+defect-count fragments ("N open", "N total", "N resolved"). **Two more bare
+`{{ x|default:"literal" }}` fallbacks were caught and fixed** — the same bug class first found in
+the IT department's Network Device page: the inspection detail page's "not yet recorded" fallback
+and the reports page's "Unrated" fallback for a supplier's rating, both needing the
+`{% if %}/{% else %}/{% trans %}` expansion since a bare filter argument can't hold a `{% trans %}`
+or `_()` call. `makemessages` fuzzy-matched 93 of the new strings against unrelated existing
+translations, handled cleanly from the start with the established blank-the-msgstr-when-stripping-
+fuzzy technique. Full suite 3431 passed (unchanged), `manage.py check` clean, `compilemessages`
+clean, `msgfmt --check` clean on all three files, zero blank/duplicated entries confirmed
+programmatically (the recurring plural-concatenation false positive reappears here too, now
+including this pass's own new plurals, unrelated to any real corruption). Verified end-to-end
+against the real dev server: the QA dashboard (confirmed both KPI plural suffixes), NCR list + a
+closed NCR's detail page, CAPA list + an overdue CAPA's detail page (confirmed the overdue-notice
+banner), Audits list + a detail page (confirmed the title and overdue notice in French),
+Inspections list + a detail page with a logged defect (confirmed the "N open" and "Defecto (1)"
+plurals and the embedded Sampling Plans link), Supplier Quality list, and QA Reports, in Spanish,
+French, and German with real sample data, no console errors. **Localization coverage is now 131
+templates across three languages** (core shell + login + main dashboard + all 5 htmx templates +
+the full Legal department (10) + the full Marketing department (13) + the full Reports department
+(4) + the full Payroll department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department (10) + the full Customer Service
+department (13) + the full Accounting department (13) + the full IT department (17) + the full
+Finance department (10) + the full Quality department (12)) out of ~450 total.

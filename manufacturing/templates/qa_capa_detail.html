@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}CAPA #{{ capa.id }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=capa.id %}CAPA #{{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/capa/" class="btn">All CAPAs</a>
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/qa/capa/" class="btn">{% trans "All CAPAs" %}</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -39,32 +40,32 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>CAPA #{{ capa.id }} &mdash; {{ capa.title }}</h2>
+    <h2>{% blocktrans with num=capa.id title=capa.title %}CAPA #{{ num }} &mdash; {{ title }}{% endblocktrans %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
-    {% if capa.is_overdue %}<div class="overdue-notice">&#9888; This CAPA is past its due date.</div>{% endif %}
+    {% if capa.is_overdue %}<div class="overdue-notice">&#9888; {% trans "This CAPA is past its due date." %}</div>{% endif %}
 
     {% if capa.status != 'Closed' and can_edit %}
     <div class="card" style="border-color:#c62828;">
-        <h3 style="color:#c62828;">Close CAPA</h3>
+        <h3 style="color:#c62828;">{% trans "Close CAPA" %}</h3>
         <p style="font-size:13px;color:#555;margin:0 0 12px;">
-            Sets status to Closed and stamps today's completed date.</p>
+            {% trans "Sets status to Closed and stamps today's completed date." %}</p>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="close">
-            <button type="submit" class="close-btn">Close CAPA</button>
+            <button type="submit" class="close-btn">{% trans "Close CAPA" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>CAPA Details</h3>
+        <h3>{% trans "CAPA Details" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
+                    <label>{% trans "Title *" %}</label>
                     {% if can_edit %}
                     <input type="text" name="title" value="{{ capa.title }}" required>
                     {% else %}
@@ -72,7 +73,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     {% if can_edit %}
                     <select name="status">
                         {% for st in capa_statuses %}
@@ -84,7 +85,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     {% if can_edit %}
                     <select name="capa_type">
                         {% for t in capa_types %}
@@ -96,7 +97,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>NCR Reference</label>
+                    <label>{% trans "NCR Reference" %}</label>
                     {% if can_edit %}
                     <input type="text" name="ncr_ref" value="{{ capa.ncr_ref|default:'' }}">
                     {% else %}
@@ -104,7 +105,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     {% if can_edit %}
                     <input type="text" name="owner" value="{{ capa.owner|default:'' }}">
                     {% else %}
@@ -112,7 +113,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="due_date" value="{{ capa.due_date|default:'' }}">
                     {% else %}
@@ -120,7 +121,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row">
-                    <label>Completed Date</label>
+                    <label>{% trans "Completed Date" %}</label>
                     {% if can_edit %}
                     <input type="date" name="completed_date" value="{{ capa.completed_date|default:'' }}">
                     {% else %}
@@ -128,7 +129,7 @@
                     {% endif %}
                 </div>
                 <div class="form-row full">
-                    <label>Action Plan</label>
+                    <label>{% trans "Action Plan" %}</label>
                     {% if can_edit %}
                     <textarea name="action_plan" rows="4">{{ capa.action_plan|default:'' }}</textarea>
                     {% else %}
@@ -138,8 +139,8 @@
             </div>
             {% if can_edit %}
             <div class="btn-row">
-                <button type="submit" class="save-btn">Save Changes</button>
-                <a href="/qa/capa/" style="color:#aad;font-size:13px;">Cancel</a>
+                <button type="submit" class="save-btn">{% trans "Save Changes" %}</button>
+                <a href="/qa/capa/" style="color:#aad;font-size:13px;">{% trans "Cancel" %}</a>
             </div>
             {% endif %}
         </form>

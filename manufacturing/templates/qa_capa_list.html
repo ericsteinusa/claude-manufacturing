@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Corrective & Preventive Actions{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Corrective & Preventive Actions" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/qa/" class="btn">Dashboard</a>
-<a href="/qa/ncr/" class="btn">NCRs</a>
-<a href="/qa/audits/" class="btn">Audits</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/qa/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/qa/ncr/" class="btn">{% trans "NCRs" %}</a>
+<a href="/qa/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -57,13 +58,13 @@
 {% block body %}
 <div class="content">
 <div class="qa-wrap">
-    <h2>Corrective & Preventive Actions</h2>
+    <h2>{% trans "Corrective & Preventive Actions" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <div class="toolbar">
         <div class="chip-row">
-            <a href="/qa/capa/" class="chip {% if not status_filter %}active{% endif %}">All</a>
+            <a href="/qa/capa/" class="chip {% if not status_filter %}active{% endif %}">{% trans "All" %}</a>
             {% for st in capa_statuses %}
             <a href="/qa/capa/?status={{ st }}" class="chip {% if status_filter == st %}active{% endif %}">{{ st }}</a>
             {% endfor %}
@@ -71,17 +72,17 @@
         <form method="get" style="display:flex;gap:6px;align-items:center;">
             {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
             <input class="search-input" type="text" name="search"
-                   value="{{ search }}" placeholder="Search…">
-            <button type="submit" class="save-btn" style="padding:5px 14px;">Go</button>
-            {% if search %}<a href="/qa/capa/{% if status_filter %}?status={{ status_filter }}{% endif %}" class="chip">Clear</a>{% endif %}
+                   value="{{ search }}" placeholder="{% trans 'Search…' %}">
+            <button type="submit" class="save-btn" style="padding:5px 14px;">{% trans "Go" %}</button>
+            {% if search %}<a href="/qa/capa/{% if status_filter %}?status={{ status_filter }}{% endif %}" class="chip">{% trans "Clear" %}</a>{% endif %}
         </form>
     </div>
 
     {% if capas %}
     <table class="list-table">
         <thead><tr>
-            <th>Title</th><th>Type</th><th>NCR Ref</th>
-            <th>Owner</th><th>Due Date</th><th>Status</th>
+            <th>{% trans "Title" %}</th><th>{% trans "Type" %}</th><th>{% trans "NCR Ref" %}</th>
+            <th>{% trans "Owner" %}</th><th>{% trans "Due Date" %}</th><th>{% trans "Status" %}</th>
         </tr></thead>
         <tbody>
         {% for c in capas %}
@@ -100,43 +101,43 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">No CAPAs found.</p>
+    <p style="color: var(--text-muted);font-size:14px;margin-bottom:20px;">{% trans "No CAPAs found." %}</p>
     {% endif %}
 
     {% if can_edit %}
     <div class="card">
-        <h3>New CAPA</h3>
+        <h3>{% trans "New CAPA" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-row span2">
-                    <label>Title *</label>
-                    <input type="text" name="title" required placeholder="Action title">
+                    <label>{% trans "Title *" %}</label>
+                    <input type="text" name="title" required placeholder="{% trans 'Action title' %}">
                 </div>
                 <div class="form-row">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="capa_type">
                         {% for t in capa_types %}<option>{{ t }}</option>{% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>NCR Reference</label>
-                    <input type="text" name="ncr_ref" placeholder="Optional NCR link">
+                    <label>{% trans "NCR Reference" %}</label>
+                    <input type="text" name="ncr_ref" placeholder="{% trans 'Optional NCR link' %}">
                 </div>
                 <div class="form-row">
-                    <label>Owner</label>
+                    <label>{% trans "Owner" %}</label>
                     <input type="text" name="owner">
                 </div>
                 <div class="form-row">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     <input type="date" name="due_date">
                 </div>
                 <div class="form-row full">
-                    <label>Action Plan</label>
+                    <label>{% trans "Action Plan" %}</label>
                     <textarea name="action_plan" rows="3"></textarea>
                 </div>
             </div>
-            <button type="submit" class="save-btn" style="margin-top:12px;">Create CAPA</button>
+            <button type="submit" class="save-btn" style="margin-top:12px;">{% trans "Create CAPA" %}</button>
         </form>
     </div>
     {% endif %}
