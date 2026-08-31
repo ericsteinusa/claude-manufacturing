@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Daily Production Report{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Daily Production Report" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/prod/daily-report/" class="btn">Daily Report</a>
-<a href="/prod/performance/" class="btn">Performance</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/prod/daily-report/" class="btn">{% trans "Daily Report" %}</a>
+<a href="/prod/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -45,43 +46,43 @@
 {% block body %}
 <div class="content">
 <div class="dr-wrap">
-    <h2>Daily Production Report</h2>
+    <h2>{% trans "Daily Production Report" %}</h2>
 
     <form method="get" class="date-bar">
-        <label for="rdate">Report Date:</label>
+        <label for="rdate">{% trans "Report Date:" %}</label>
         <input type="date" id="rdate" name="date" value="{{ report_date }}">
-        <button type="submit">Load</button>
+        <button type="submit">{% trans "Load" %}</button>
     </form>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="val" style="color:#0a3622;">{{ completed_count }}</div>
-            <div class="lbl">WOs Completed</div>
+            <div class="lbl">{% trans "WOs Completed" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#856404;">{{ started_count }}</div>
-            <div class="lbl">In Progress</div>
+            <div class="lbl">{% trans "In Progress" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#004085;">{{ opened_count }}</div>
-            <div class="lbl">Opened / Due</div>
+            <div class="lbl">{% trans "Opened / Due" %}</div>
         </div>
         <div class="kpi">
             <div class="val">{{ shipments_today }}</div>
-            <div class="lbl">Shipments Out</div>
+            <div class="lbl">{% trans "Shipments Out" %}</div>
         </div>
     </div>
 
     <div class="card">
-        <h3>Work Orders Due {{ report_date }}</h3>
+        <h3>{% blocktrans with date=report_date %}Work Orders Due {{ date }}{% endblocktrans %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>WO #</th>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Status</th>
+                    <th>{% trans "WO #" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Qty" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +95,7 @@
                 <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No work orders due on this date.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No work orders due on this date." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

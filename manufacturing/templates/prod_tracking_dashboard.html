@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Tracking Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Tracking Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/prod/tracking/" class="btn">Tracking</a>
-<a href="/prod/delivery-status/" class="btn">Delivery Status</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/prod/tracking/" class="btn">{% trans "Tracking" %}</a>
+<a href="/prod/delivery-status/" class="btn">{% trans "Delivery Status" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -37,42 +38,42 @@
 {% block body %}
 <div class="content">
 <div class="td-wrap">
-    <h2>Tracking Dashboard</h2>
+    <h2>{% trans "Tracking Dashboard" %}</h2>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="val">{{ counts.total|default:0 }}</div>
-            <div class="lbl">Total Shipments</div>
+            <div class="lbl">{% trans "Total Shipments" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#004085;">{{ counts.pending|default:0 }}</div>
-            <div class="lbl">Pending</div>
+            <div class="lbl">{% trans "Pending" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#856404;">{{ counts.shipped|default:0 }}</div>
-            <div class="lbl">Shipped</div>
+            <div class="lbl">{% trans "Shipped" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#0a3622;">{{ counts.delivered|default:0 }}</div>
-            <div class="lbl">Delivered</div>
+            <div class="lbl">{% trans "Delivered" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#383d41;">{{ counts.returned|default:0 }}</div>
-            <div class="lbl">Returned</div>
+            <div class="lbl">{% trans "Returned" %}</div>
         </div>
     </div>
 
     <div class="card">
-        <h3>Recent Shipments</h3>
+        <h3>{% trans "Recent Shipments" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Ship #</th>
-                    <th>SO #</th>
-                    <th>Ship Date</th>
-                    <th>Carrier</th>
-                    <th>Tracking #</th>
-                    <th>Status</th>
+                    <th>{% trans "Ship #" %}</th>
+                    <th>{% trans "SO #" %}</th>
+                    <th>{% trans "Ship Date" %}</th>
+                    <th>{% trans "Carrier" %}</th>
+                    <th>{% trans "Tracking #" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,7 +87,7 @@
                 <td><span class="badge s-{{ s.status }}">{{ s.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No shipments on record.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No shipments on record." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

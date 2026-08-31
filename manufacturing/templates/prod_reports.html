@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Production Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Production Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/schedule/" class="btn">Schedule</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/inventory/" class="btn">Inventory</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/schedule/" class="btn">{% trans "Schedule" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/inventory/" class="btn">{% trans "Inventory" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,32 +39,32 @@
 {% block body %}
 <div class="content">
 <div class="pr-wrap">
-    <h2>Production Reports</h2>
+    <h2>{% trans "Production Reports" %}</h2>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="val">{{ completed_today }}</div>
-            <div class="lbl">Completed Today</div>
+            <div class="lbl">{% trans "Completed Today" %}</div>
         </div>
         <div class="kpi">
             <div class="val">{{ completed_week }}</div>
-            <div class="lbl">Completed This Week</div>
+            <div class="lbl">{% trans "Completed This Week" %}</div>
         </div>
         <div class="kpi">
             <div class="val">{{ completed_month }}</div>
-            <div class="lbl">Completed This Month</div>
+            <div class="lbl">{% trans "Completed This Month" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="{% if overdue %}color:#c33;{% endif %}">{{ overdue|length }}</div>
-            <div class="lbl">Overdue WOs</div>
+            <div class="lbl">{% trans "Overdue WOs" %}</div>
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Work Orders by Status</h3>
+            <h3>{% trans "Work Orders by Status" %}</h3>
             <table class="list-table">
-                <thead><tr><th>Status</th><th style="text-align:right;">Count</th></tr></thead>
+                <thead><tr><th>{% trans "Status" %}</th><th style="text-align:right;">{% trans "Count" %}</th></tr></thead>
                 <tbody>
                 {% for row in by_status %}
                 <tr>
@@ -71,20 +72,20 @@
                     <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="2" style="color:#888;text-align:center;">No data.</td></tr>
+                <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No data." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>Low Stock Alerts</h3>
+            <h3>{% trans "Low Stock Alerts" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th style="text-align:right;">On Hand</th>
-                        <th style="text-align:right;">Reorder Pt</th>
+                        <th>{% trans "Product" %}</th>
+                        <th style="text-align:right;">{% trans "On Hand" %}</th>
+                        <th style="text-align:right;">{% trans "Reorder Pt" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -95,7 +96,7 @@
                     <td style="text-align:right;color:#c33;font-weight:bold;">{{ s.reorder_point|floatformat:0 }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">No low stock items.</td></tr>
+                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No low stock items." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -103,15 +104,15 @@
     </div>
 
     <div class="card">
-        <h3>Overdue Work Orders</h3>
+        <h3>{% trans "Overdue Work Orders" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>WO #</th>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
+                    <th>{% trans "WO #" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -124,7 +125,7 @@
                 <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No overdue work orders.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No overdue work orders." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

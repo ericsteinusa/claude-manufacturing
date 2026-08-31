@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Performance Report{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Performance Report" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/prod/daily-report/" class="btn">Daily Report</a>
-<a href="/prod/performance/" class="btn">Performance</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/prod/daily-report/" class="btn">{% trans "Daily Report" %}</a>
+<a href="/prod/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -37,84 +38,84 @@
 {% block body %}
 <div class="content">
 <div class="perf-wrap">
-    <h2>Performance Report</h2>
+    <h2>{% trans "Performance Report" %}</h2>
 
     <form method="get" class="period-bar">
-        <label for="pdays">Period:</label>
+        <label for="pdays">{% trans "Period:" %}</label>
         <select id="pdays" name="days">
-            <option value="7"{% if days == 7 %} selected{% endif %}>Last 7 days</option>
-            <option value="30"{% if days == 30 %} selected{% endif %}>Last 30 days</option>
-            <option value="90"{% if days == 90 %} selected{% endif %}>Last 90 days</option>
+            <option value="7"{% if days == 7 %} selected{% endif %}>{% trans "Last 7 days" %}</option>
+            <option value="30"{% if days == 30 %} selected{% endif %}>{% trans "Last 30 days" %}</option>
+            <option value="90"{% if days == 90 %} selected{% endif %}>{% trans "Last 90 days" %}</option>
         </select>
-        <button type="submit">Load</button>
+        <button type="submit">{% trans "Load" %}</button>
     </form>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="val">{{ wo_stats.total|default:0 }}</div>
-            <div class="lbl">WOs Scheduled</div>
+            <div class="lbl">{% trans "WOs Scheduled" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#0a3622;">{{ wo_stats.completed|default:0 }}</div>
-            <div class="lbl">Completed</div>
+            <div class="lbl">{% trans "Completed" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#c33;">{{ wo_stats.overdue|default:0 }}</div>
-            <div class="lbl">Overdue</div>
+            <div class="lbl">{% trans "Overdue" %}</div>
         </div>
         <div class="kpi">
             <div class="val">{{ shipped.total|default:0 }}</div>
-            <div class="lbl">Shipments</div>
+            <div class="lbl">{% trans "Shipments" %}</div>
         </div>
         <div class="kpi">
             <div class="val" style="color:#0a3622;">{{ shipped.delivered|default:0 }}</div>
-            <div class="lbl">Delivered</div>
+            <div class="lbl">{% trans "Delivered" %}</div>
         </div>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Work Order Summary ({{ days }} days)</h3>
+            <h3>{% blocktrans with days=days %}Work Order Summary ({{ days }} days){% endblocktrans %}</h3>
             <table class="list-table">
-                <thead><tr><th>Metric</th><th style="text-align:right;">Count</th></tr></thead>
+                <thead><tr><th>{% trans "Metric" %}</th><th style="text-align:right;">{% trans "Count" %}</th></tr></thead>
                 <tbody>
-                <tr><td>Total Scheduled</td><td style="text-align:right;font-weight:bold;">{{ wo_stats.total|default:0 }}</td></tr>
-                <tr><td>Completed</td><td style="text-align:right;font-weight:bold;color:#0a3622;">{{ wo_stats.completed|default:0 }}</td></tr>
-                <tr><td>Cancelled</td><td style="text-align:right;font-weight:bold;">{{ wo_stats.cancelled|default:0 }}</td></tr>
-                <tr><td>Currently Overdue</td><td style="text-align:right;font-weight:bold;color:#c33;">{{ wo_stats.overdue|default:0 }}</td></tr>
+                <tr><td>{% trans "Total Scheduled" %}</td><td style="text-align:right;font-weight:bold;">{{ wo_stats.total|default:0 }}</td></tr>
+                <tr><td>{% trans "Completed" %}</td><td style="text-align:right;font-weight:bold;color:#0a3622;">{{ wo_stats.completed|default:0 }}</td></tr>
+                <tr><td>{% trans "Cancelled" %}</td><td style="text-align:right;font-weight:bold;">{{ wo_stats.cancelled|default:0 }}</td></tr>
+                <tr><td>{% trans "Currently Overdue" %}</td><td style="text-align:right;font-weight:bold;color:#c33;">{{ wo_stats.overdue|default:0 }}</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>Shipping Summary ({{ days }} days)</h3>
+            <h3>{% blocktrans with days=days %}Shipping Summary ({{ days }} days){% endblocktrans %}</h3>
             <table class="list-table">
-                <thead><tr><th>Metric</th><th style="text-align:right;">Count</th></tr></thead>
+                <thead><tr><th>{% trans "Metric" %}</th><th style="text-align:right;">{% trans "Count" %}</th></tr></thead>
                 <tbody>
-                <tr><td>Total Shipments</td><td style="text-align:right;font-weight:bold;">{{ shipped.total|default:0 }}</td></tr>
-                <tr><td>Delivered</td><td style="text-align:right;font-weight:bold;color:#0a3622;">{{ shipped.delivered|default:0 }}</td></tr>
+                <tr><td>{% trans "Total Shipments" %}</td><td style="text-align:right;font-weight:bold;">{{ shipped.total|default:0 }}</td></tr>
+                <tr><td>{% trans "Delivered" %}</td><td style="text-align:right;font-weight:bold;color:#0a3622;">{{ shipped.delivered|default:0 }}</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <div class="card">
-        <h3>Top Completed Products ({{ days }} days)</h3>
+        <h3>{% blocktrans with days=days %}Top Completed Products ({{ days }} days){% endblocktrans %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th style="text-align:right;">WOs Completed</th>
+                    <th>{% trans "Product" %}</th>
+                    <th style="text-align:right;">{% trans "WOs Completed" %}</th>
                 </tr>
             </thead>
             <tbody>
             {% for row in top_products %}
             <tr>
-                <td>{{ row.product_name|default:"Unknown" }}</td>
+                <td>{% if row.product_name %}{{ row.product_name }}{% else %}{% trans "Unknown" %}{% endif %}</td>
                 <td style="text-align:right;font-weight:bold;">{{ row.cnt }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="2" style="color:#888;text-align:center;">No completed work orders in this period.</td></tr>
+            <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No completed work orders in this period." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

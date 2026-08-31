@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Production Schedule{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Production Schedule" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/prod/" class="btn">Production</a>
-<a href="/prod/schedule/" class="btn">Schedule</a>
-<a href="/wo/" class="btn">Work Orders</a>
-<a href="/prod/reports/" class="btn">Reports</a>
-<a href="/prod/shipping/" class="btn">Shipping</a>
-<a href="/bom/" class="btn">BOM</a>
-<a href="/mrp/" class="btn">MRP</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/prod/" class="btn">{% trans "Production" %}</a>
+<a href="/prod/schedule/" class="btn">{% trans "Schedule" %}</a>
+<a href="/wo/" class="btn">{% trans "Work Orders" %}</a>
+<a href="/prod/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/prod/shipping/" class="btn">{% trans "Shipping" %}</a>
+<a href="/bom/" class="btn">{% trans "BOM" %}</a>
+<a href="/mrp/" class="btn">{% trans "MRP" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -41,33 +42,33 @@
 {% block body %}
 <div class="content">
 <div class="ps-wrap">
-    <h2>Production Schedule</h2>
+    <h2>{% trans "Production Schedule" %}</h2>
 
     <form method="get" class="filter-bar">
-        <label>From:</label>
+        <label>{% trans "From:" %}</label>
         <input type="date" name="date_from" value="{{ date_from }}">
-        <label>To:</label>
+        <label>{% trans "To:" %}</label>
         <input type="date" name="date_to" value="{{ date_to }}">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in WO_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s|title }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Filter</button>
-        <a href="/prod/schedule/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/prod/schedule/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>WO #</th>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th style="text-align:right;">Qty</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
+                    <th>{% trans "WO #" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th style="text-align:right;">{% trans "Qty" %}</th>
+                    <th>{% trans "Due Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,15 +82,15 @@
                 <td><span class="badge st-{{ wo.status }}">{{ wo.status|title }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No work orders found for this schedule.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No work orders found for this schedule." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <p style="color:white;font-size:13px;">
-        {{ wos|length }} work order{{ wos|length|pluralize }} shown.
-        <a href="/wo/new/" style="color:#aef;">+ New Work Order</a>
+        {% blocktrans count counter=wos|length %}{{ counter }} work order shown.{% plural %}{{ counter }} work orders shown.{% endblocktrans %}
+        <a href="/wo/new/" style="color:#aef;">+ {% trans "New Work Order" %}</a>
     </p>
 
 </div>
