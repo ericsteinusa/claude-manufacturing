@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ account.account_name }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/fin/" class="btn">Finance Dashboard</a>
-<a href="/fin/budgets/" class="btn">Budgets</a>
-<a href="/fin/audits/" class="btn">Audits</a>
-<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
-<a href="/fin/tax/" class="btn">Tax Filings</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/fin/" class="btn">{% trans "Finance Dashboard" %}</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
+<a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,63 +50,63 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Account</h3>
+        <h3>{% trans "Edit Account" %}</h3>
         <form method="post" action="?action=update">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Account Name *</label>
+                    <label>{% trans "Account Name *" %}</label>
                     <input type="text" name="account_name" value="{{ account.account_name }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Bank Name</label>
+                    <label>{% trans "Bank Name" %}</label>
                     <input type="text" name="bank_name" value="{{ account.bank_name|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Account Number</label>
+                    <label>{% trans "Account Number" %}</label>
                     <input type="text" name="account_number" value="{{ account.account_number|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Routing Number</label>
+                    <label>{% trans "Routing Number" %}</label>
                     <input type="text" name="routing_number" value="{{ account.routing_number|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Active</label>
+                    <label>{% trans "Active" %}</label>
                     <select name="is_active">
-                        <option value="1"{% if account.is_active %} selected{% endif %}>Yes</option>
-                        <option value="0"{% if not account.is_active %} selected{% endif %}>No</option>
+                        <option value="1"{% if account.is_active %} selected{% endif %}>{% trans "Yes" %}</option>
+                        <option value="0"{% if not account.is_active %} selected{% endif %}>{% trans "No" %}</option>
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ account.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="list-table">
-            <tr><th>Bank</th><td>{{ account.bank_name|default:"—" }}</td></tr>
-            <tr><th>Account #</th><td>{{ account.account_number|default:"—" }}</td></tr>
-            <tr><th>Routing #</th><td>{{ account.routing_number|default:"—" }}</td></tr>
-            <tr><th>Active</th><td>{% if account.is_active %}Yes{% else %}No{% endif %}</td></tr>
-            <tr><th>Notes</th><td>{{ account.notes|default:"—" }}</td></tr>
+            <tr><th>{% trans "Bank" %}</th><td>{{ account.bank_name|default:"—" }}</td></tr>
+            <tr><th>{% trans "Account #" %}</th><td>{{ account.account_number|default:"—" }}</td></tr>
+            <tr><th>{% trans "Routing #" %}</th><td>{{ account.routing_number|default:"—" }}</td></tr>
+            <tr><th>{% trans "Active" %}</th><td>{% if account.is_active %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</td></tr>
+            <tr><th>{% trans "Notes" %}</th><td>{{ account.notes|default:"—" }}</td></tr>
         </table>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Bank Statements</h3>
+        <h3>{% trans "Bank Statements" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Statement Date</th>
-                    <th style="text-align:right;">Beginning Balance</th>
-                    <th style="text-align:right;">Ending Balance</th>
-                    <th>Status</th>
-                    <th>Reconciled By</th>
+                    <th>{% trans "Statement Date" %}</th>
+                    <th style="text-align:right;">{% trans "Beginning Balance" %}</th>
+                    <th style="text-align:right;">{% trans "Ending Balance" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Reconciled By" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,7 +119,7 @@
                 <td>{{ stmt.reconciled_by|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No statements recorded.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No statements recorded." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -126,16 +127,16 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Statement</h3>
+        <h3>{% trans "Add Statement" %}</h3>
         <form method="post" action="?action=add_statement">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Statement Date *</label>
+                    <label>{% trans "Statement Date *" %}</label>
                     <input type="date" name="statement_date" required>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in statement_statuses %}
                         <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
@@ -143,19 +144,19 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Beginning Balance ($)</label>
+                    <label>{% trans "Beginning Balance ($)" %}</label>
                     <input type="number" name="beginning_balance" step="0.01" placeholder="0.00">
                 </div>
                 <div class="form-group">
-                    <label>Ending Balance ($)</label>
+                    <label>{% trans "Ending Balance ($)" %}</label>
                     <input type="number" name="ending_balance" step="0.01" placeholder="0.00">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <input type="text" name="notes">
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Statement</button>
+            <button type="submit" class="btn-submit">{% trans "Add Statement" %}</button>
         </form>
     </div>
     {% endif %}

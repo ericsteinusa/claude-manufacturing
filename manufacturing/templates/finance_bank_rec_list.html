@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Bank Reconciliation{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Bank Reconciliation" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/fin/" class="btn">Finance Dashboard</a>
-<a href="/fin/budgets/" class="btn">Budgets</a>
-<a href="/fin/audits/" class="btn">Audits</a>
-<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
-<a href="/fin/tax/" class="btn">Tax Filings</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/fin/" class="btn">{% trans "Finance Dashboard" %}</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
+<a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -49,26 +50,26 @@
 {% block body %}
 <div class="content">
 <div class="fn-wrap">
-    <h2>Bank Accounts</h2>
+    <h2>{% trans "Bank Accounts" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search account / bank…">
-        <button type="submit">Filter</button>
-        <a href="/fin/bank-rec/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search account / bank…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/fin/bank-rec/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Account Name</th>
-                    <th>Bank</th>
-                    <th>Account #</th>
-                    <th>Active</th>
-                    <th>Notes</th>
+                    <th>{% trans "Account Name" %}</th>
+                    <th>{% trans "Bank" %}</th>
+                    <th>{% trans "Account #" %}</th>
+                    <th>{% trans "Active" %}</th>
+                    <th>{% trans "Notes" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -79,15 +80,15 @@
                 <td>{{ acct.account_number|default:"—" }}</td>
                 <td>
                     {% if acct.is_active %}
-                    <span class="badge active-yes">Active</span>
+                    <span class="badge active-yes">{% trans "Active" %}</span>
                     {% else %}
-                    <span class="badge active-no">Inactive</span>
+                    <span class="badge active-no">{% trans "Inactive" %}</span>
                     {% endif %}
                 </td>
                 <td>{{ acct.notes|default:"—"|truncatechars:60 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;text-align:center;">No bank accounts found.</td></tr>
+            <tr><td colspan="5" style="color:#888;text-align:center;">{% trans "No bank accounts found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -95,32 +96,32 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Bank Account</h3>
+        <h3>{% trans "Add Bank Account" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Account Name *</label>
-                    <input type="text" name="account_name" required placeholder="e.g. Operating Checking">
+                    <label>{% trans "Account Name *" %}</label>
+                    <input type="text" name="account_name" required placeholder="{% trans 'e.g. Operating Checking' %}">
                 </div>
                 <div class="form-group">
-                    <label>Bank Name</label>
-                    <input type="text" name="bank_name" placeholder="e.g. First National Bank">
+                    <label>{% trans "Bank Name" %}</label>
+                    <input type="text" name="bank_name" placeholder="{% trans 'e.g. First National Bank' %}">
                 </div>
                 <div class="form-group">
-                    <label>Account Number</label>
+                    <label>{% trans "Account Number" %}</label>
                     <input type="text" name="account_number">
                 </div>
                 <div class="form-group">
-                    <label>Routing Number</label>
+                    <label>{% trans "Routing Number" %}</label>
                     <input type="text" name="routing_number">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Account</button>
+            <button type="submit" class="btn-submit">{% trans "Add Account" %}</button>
         </form>
     </div>
     {% endif %}

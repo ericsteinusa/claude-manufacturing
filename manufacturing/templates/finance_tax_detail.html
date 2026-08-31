@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Tax Filing — {{ filing.tax_type }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with tax_type=filing.tax_type %}Tax Filing — {{ tax_type }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/fin/" class="btn">Finance Dashboard</a>
-<a href="/fin/budgets/" class="btn">Budgets</a>
-<a href="/fin/audits/" class="btn">Audits</a>
-<a href="/fin/bank-rec/" class="btn">Bank Rec</a>
-<a href="/fin/tax/" class="btn">Tax Filings</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/fin/" class="btn">{% trans "Finance Dashboard" %}</a>
+<a href="/fin/budgets/" class="btn">{% trans "Budgets" %}</a>
+<a href="/fin/audits/" class="btn">{% trans "Audits" %}</a>
+<a href="/fin/bank-rec/" class="btn">{% trans "Bank Rec" %}</a>
+<a href="/fin/tax/" class="btn">{% trans "Tax Filings" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -57,27 +58,27 @@
 
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Amount Due</div>
+            <div class="lbl">{% trans "Amount Due" %}</div>
             <div class="val">${{ filing.amount_due|floatformat:2 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Amount Paid</div>
+            <div class="lbl">{% trans "Amount Paid" %}</div>
             <div class="val">${{ filing.amount_paid|floatformat:2 }}</div>
         </div>
         <div class="kpi{% if filing.status == 'Overdue' %} red{% endif %}">
-            <div class="lbl">Due Date</div>
+            <div class="lbl">{% trans "Due Date" %}</div>
             <div class="val" style="font-size:18px;">{{ filing.due_date|default:"—" }}</div>
         </div>
     </div>
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Filing</h3>
+        <h3>{% trans "Edit Filing" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Tax Type *</label>
+                    <label>{% trans "Tax Type *" %}</label>
                     <select name="tax_type" required>
                         {% for t in tax_types %}
                         <option value="{{ t }}"{% if filing.tax_type == t %} selected{% endif %}>{{ t }}</option>
@@ -85,23 +86,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Jurisdiction</label>
+                    <label>{% trans "Jurisdiction" %}</label>
                     <input type="text" name="jurisdiction" value="{{ filing.jurisdiction|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Period</label>
+                    <label>{% trans "Period" %}</label>
                     <input type="text" name="period" value="{{ filing.period|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Amount Due ($)</label>
+                    <label>{% trans "Amount Due ($)" %}</label>
                     <input type="number" name="amount_due" value="{{ filing.amount_due }}" min="0" step="0.01">
                 </div>
                 <div class="form-group">
-                    <label>Amount Paid ($)</label>
+                    <label>{% trans "Amount Paid ($)" %}</label>
                     <input type="number" name="amount_paid" value="{{ filing.amount_paid }}" min="0" step="0.01">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in tax_statuses %}
                         <option value="{{ s }}"{% if filing.status == s %} selected{% endif %}>{{ s }}</option>
@@ -109,32 +110,32 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Due Date</label>
+                    <label>{% trans "Due Date" %}</label>
                     <input type="date" name="due_date" value="{{ filing.due_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Filed Date</label>
+                    <label>{% trans "Filed Date" %}</label>
                     <input type="date" name="filed_date" value="{{ filing.filed_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Reference #</label>
+                    <label>{% trans "Reference #" %}</label>
                     <input type="text" name="reference" value="{{ filing.reference|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ filing.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="list-table">
-            <tr><th>Period</th><td>{{ filing.period|default:"—" }}</td></tr>
-            <tr><th>Filed Date</th><td>{{ filing.filed_date|default:"—" }}</td></tr>
-            <tr><th>Reference</th><td>{{ filing.reference|default:"—" }}</td></tr>
-            <tr><th>Notes</th><td>{{ filing.notes|default:"—" }}</td></tr>
+            <tr><th>{% trans "Period" %}</th><td>{{ filing.period|default:"—" }}</td></tr>
+            <tr><th>{% trans "Filed Date" %}</th><td>{{ filing.filed_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Reference" %}</th><td>{{ filing.reference|default:"—" }}</td></tr>
+            <tr><th>{% trans "Notes" %}</th><td>{{ filing.notes|default:"—" }}</td></tr>
         </table>
     </div>
     {% endif %}

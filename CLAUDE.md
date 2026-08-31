@@ -643,15 +643,63 @@ Repairs list + a repair detail page (confirmed "Reparaturanfrage Nr.
 translations "Hoch"/"Mittel") + a task detail page (confirmed "Task
 {num}"), and Incidents list (empty state only — no sample incidents
 exist), in German, Spanish, and French with real sample data, no
-console errors. **Localization coverage is now 109 templates across
-three languages** (core shell + login + main dashboard + all 5 htmx
-templates + the full Legal department (10) + the full Marketing
+console errors.
+
+Also fully translated: the entire **Finance department**
+(`finance_dashboard.html`, `finance_budget_list.html`,
+`finance_budget_detail.html`, `finance_audit_list.html`,
+`finance_audit_detail.html`, `finance_bank_rec_list.html`,
+`finance_bank_rec_detail.html`, `finance_tax_list.html`,
+`finance_tax_detail.html`, `fin_cash_forecast.html` — 10 templates,
+the eleventh "whole department" pass, tied with Legal at the smallest
+size seen in this series). Note this "Finance" surface is distinct
+from — and reached via toolbar links out of — the already-translated
+Accounting department: it covers Budgets, Audits, Bank Reconciliation,
+Tax Filings, and the 13-Week Cash Forecast, all served under `/fin/`.
+100 unique strings per language (99 simple + 1 plural). Used
+`{% blocktrans with %}` for three dynamic detail-page titles
+("Budget — {name}", "Audit — {name}", "Tax Filing — {tax_type}"), and
+added one new `{% blocktrans count %}` plural for the audit detail
+page's "Findings (N)" header — the first plural in this series where
+the target languages use genuinely different singular/plural *nouns*
+(Spanish "Hallazgo"/"Hallazgos", French "Constatation"/
+"Constatations", German "Feststellung"/"Feststellungen") rather than
+an invariant noun with only the count changing, since the English
+source text is identical in both forms ("Findings (N)") but the
+Romance/Germanic target grammar isn't. Left two dynamic headings
+un-wrapped by design, matching established precedent: the bank
+account detail page's `{{ account.account_name }}{% if
+account.bank_name %} — {{ account.bank_name }}{% endif %}` and the
+tax filing detail page's `{{ filing.tax_type }}{% if
+filing.jurisdiction %} — {{ filing.jurisdiction }}{% endif %}` both
+combine only data fields with a literal " — " separator, with no
+English words to translate. `manage.py makemessages` fuzzy-matched 74
+of the new strings against unrelated existing translations from other
+departments (down from IT's 121, none combined with `python-format`
+this time), all handled cleanly from the start with the
+blank-the-msgstr-when-stripping-fuzzy technique established since the
+Accounting pass. Full suite 3431 passed (unchanged), `manage.py check`
+clean, `compilemessages` clean, `msgfmt --check` clean on all three
+files, zero blank/duplicated entries confirmed programmatically (the
+recurring plural-concatenation false positive from the Customer
+Service pass's checker reappears here too, unrelated to this batch).
+Verified end-to-end against the real dev server: the Finance
+dashboard, Budgets list + a draft budget's detail page ("Lignes
+Budgétaires" / no line items yet), Audits list + a scheduled audit's
+detail page (confirmed the "Constatation (0)" plural with zero
+findings), Bank Accounts list + an account detail page (confirmed the
+Active "Oui"/"Yes" dropdown), Tax Filings list + a filing detail page,
+and the 13-Week Cash Forecast (confirmed the multi-line
+methodology note), in French, German, and Spanish with real sample
+data, no console errors. **Localization coverage is now 119 templates
+across three languages** (core shell + login + main dashboard + all 5
+htmx templates + the full Legal department (10) + the full Marketing
 department (13) + the full Reports department (4) + the full Payroll
 department (8) + the full Time Clock department (7) + the full
 Customers/Credit department (7) + the full Engineering department
 (10) + the full Customer Service department (13) + the full
-Accounting department (13) + the full IT department (17)) out of
-~450 total.
+Accounting department (13) + the full IT department (17) + the full
+Finance department (10)) out of ~450 total.
 
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
