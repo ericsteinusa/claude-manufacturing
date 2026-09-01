@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Territory Performance{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Territory Performance" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/territories/" class="btn">Territories</a>
-<a href="/sales/targets/" class="btn">Targets</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/territories/" class="btn">{% trans "Territories" %}</a>
+<a href="/sales/targets/" class="btn">{% trans "Targets" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -27,16 +28,16 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Territory Performance</h2>
+    <h2>{% trans "Territory Performance" %}</h2>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Territory</th>
-                    <th>Region</th>
-                    <th>Assigned Rep</th>
-                    <th>Status</th>
+                    <th>{% trans "Territory" %}</th>
+                    <th>{% trans "Region" %}</th>
+                    <th>{% trans "Assigned Rep" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,20 +45,20 @@
             <tr>
                 <td><strong>{{ t.name }}</strong></td>
                 <td>{{ t.region|default:"—" }}</td>
-                <td>{{ t.assigned_rep|default:"Unassigned" }}</td>
+                <td>{% if t.assigned_rep %}{{ t.assigned_rep }}{% else %}{% trans "Unassigned" %}{% endif %}</td>
                 <td><span class="badge st-{{ t.status|cut:" " }}">{{ t.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">No territories configured. <a href="/sales/territories/">Add territories</a> to track performance.</td></tr>
+            <tr><td colspan="4" style="color:#888;text-align:center;">{% blocktrans %}No territories configured. <a href="/sales/territories/">Add territories</a> to track performance.{% endblocktrans %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
     <p style="color:white;font-size:12px;">
-        Performance data is sourced from sales targets. To see detailed rep attainment by territory,
+        {% blocktrans %}Performance data is sourced from sales targets. To see detailed rep attainment by territory,
         assign reps in <a href="/sales/territories/" style="color:#aad;">Territory Management</a>
-        and set targets in <a href="/sales/targets/" style="color:#aad;">Sales Targets</a>.
+        and set targets in <a href="/sales/targets/" style="color:#aad;">Sales Targets</a>.{% endblocktrans %}
     </p>
 
 </div>

@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/quotes/" class="btn">Quotes</a>
-<a href="/sales/leads/" class="btn">Leads</a>
-<a href="/sales/contracts/" class="btn">Contracts</a>
-<a href="/sales/forecast/" class="btn">Forecast</a>
-<a href="/sales/targets/" class="btn">Targets</a>
-<a href="/sales/reports/" class="btn">Reports</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/quotes/" class="btn">{% trans "Quotes" %}</a>
+<a href="/sales/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/sales/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/sales/forecast/" class="btn">{% trans "Forecast" %}</a>
+<a href="/sales/targets/" class="btn">{% trans "Targets" %}</a>
+<a href="/sales/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -52,66 +53,66 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Sales Dashboard</h2>
+    <h2>{% trans "Sales Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/sales/orders/" class="dept-btn">Sales Orders</a>
-        <a href="/sales/orders/new/" class="dept-btn">New Order</a>
-        <a href="/sales/quotes/" class="dept-btn">Quotes</a>
-        <a href="/sales/leads/" class="dept-btn">Leads &amp; Opportunities</a>
-        <a href="/sales/contracts/" class="dept-btn">Contracts</a>
-        <a href="/sales/forecast/" class="dept-btn">Forecast</a>
-        <a href="/sales/targets/" class="dept-btn">Targets &amp; Actuals</a>
-        <a href="/sales/orders/?status=confirmed" class="dept-btn">Confirmed Orders</a>
-        <a href="/sales/quotes/?status=Sent" class="dept-btn">Open Quotes</a>
-        <a href="/ar/" class="dept-btn">Accounts Receivable</a>
+        <a href="/sales/orders/" class="dept-btn">{% trans "Sales Orders" %}</a>
+        <a href="/sales/orders/new/" class="dept-btn">{% trans "New Order" %}</a>
+        <a href="/sales/quotes/" class="dept-btn">{% trans "Quotes" %}</a>
+        <a href="/sales/leads/" class="dept-btn">{% trans "Leads &amp; Opportunities" %}</a>
+        <a href="/sales/contracts/" class="dept-btn">{% trans "Contracts" %}</a>
+        <a href="/sales/forecast/" class="dept-btn">{% trans "Forecast" %}</a>
+        <a href="/sales/targets/" class="dept-btn">{% trans "Targets &amp; Actuals" %}</a>
+        <a href="/sales/orders/?status=confirmed" class="dept-btn">{% trans "Confirmed Orders" %}</a>
+        <a href="/sales/quotes/?status=Sent" class="dept-btn">{% trans "Open Quotes" %}</a>
+        <a href="/ar/" class="dept-btn">{% trans "Accounts Receivable" %}</a>
     </div>
 
     <div class="kpi-row">
-        <div class="kpi"><div class="val">{{ dash.orders.confirmed|default:0 }}</div><div class="lbl">Confirmed Orders</div></div>
-        <div class="kpi"><div class="val">{{ dash.orders.shipped|default:0 }}</div><div class="lbl">Shipped</div></div>
-        <div class="kpi"><div class="val">{{ dash.orders.invoiced|default:0 }}</div><div class="lbl">Invoiced</div></div>
-        <div class="kpi"><div class="val money">${{ dash.orders.total_value|floatformat:0|default:0 }}</div><div class="lbl">Total Order Value</div></div>
-        <div class="kpi"><div class="val">{{ dash.quotes.sent|default:0 }}</div><div class="lbl">Open Quotes</div></div>
-        <div class="kpi"><div class="val money">${{ dash.quotes.won_value|floatformat:0|default:0 }}</div><div class="lbl">Won Quote Value</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.confirmed|default:0 }}</div><div class="lbl">{% trans "Confirmed Orders" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.shipped|default:0 }}</div><div class="lbl">{% trans "Shipped" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.orders.invoiced|default:0 }}</div><div class="lbl">{% trans "Invoiced" %}</div></div>
+        <div class="kpi"><div class="val money">${{ dash.orders.total_value|floatformat:0|default:0 }}</div><div class="lbl">{% trans "Total Order Value" %}</div></div>
+        <div class="kpi"><div class="val">{{ dash.quotes.sent|default:0 }}</div><div class="lbl">{% trans "Open Quotes" %}</div></div>
+        <div class="kpi"><div class="val money">${{ dash.quotes.won_value|floatformat:0|default:0 }}</div><div class="lbl">{% trans "Won Quote Value" %}</div></div>
     </div>
 
     <div class="two-col" style="margin-bottom:16px;">
         <div class="card">
-            <h3>Revenue by Month (last 6 mo)</h3>
+            <h3>{% trans "Revenue by Month (last 6 mo)" %}</h3>
             <canvas id="chart-revenue-month" height="200"></canvas>
         </div>
         <div class="card">
-            <h3>Top Customers by Revenue</h3>
+            <h3>{% trans "Top Customers by Revenue" %}</h3>
             <canvas id="chart-top-customers" height="200"></canvas>
         </div>
     </div>
     <div class="two-col" style="margin-bottom:16px;">
         <div class="card">
-            <h3>Quote Pipeline</h3>
+            <h3>{% trans "Quote Pipeline" %}</h3>
             <canvas id="chart-quote-funnel" height="200"></canvas>
         </div>
         <div class="card">
-            <h3>Leads by Status</h3>
+            <h3>{% trans "Leads by Status" %}</h3>
             <canvas id="chart-leads-status" height="200"></canvas>
         </div>
     </div>
     <div class="two-col" style="margin-bottom:16px;">
         <div class="card">
-            <h3>Top Products by Revenue</h3>
+            <h3>{% trans "Top Products by Revenue" %}</h3>
             <canvas id="chart-top-products" height="200"></canvas>
         </div>
         <div class="card">
-            <h3>Order Status Breakdown</h3>
+            <h3>{% trans "Order Status Breakdown" %}</h3>
             <canvas id="chart-order-status" height="200"></canvas>
         </div>
     </div>
 
     <div class="two-col">
         <div>
-            <div class="section-hdr">Recent Orders</div>
+            <div class="section-hdr">{% trans "Recent Orders" %}</div>
             <table class="list-table">
-                <thead><tr><th>SO #</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead>
+                <thead><tr><th>{% trans "SO #" %}</th><th>{% trans "Customer" %}</th><th>{% trans "Status" %}</th><th>{% trans "Total" %}</th></tr></thead>
                 <tbody>
                 {% for o in recent_orders %}
                 <tr onclick="location.href='/sales/orders/{{ o.id }}/'">
@@ -120,15 +121,15 @@
                     <td><span class="badge st-{{ o.status }}">{{ o.status }}</span></td>
                     <td>${{ o.total|floatformat:2 }}</td>
                 </tr>
-                {% empty %}<tr><td colspan="4" style="color:#888;">No orders yet.</td></tr>
+                {% empty %}<tr><td colspan="4" style="color:#888;">{% trans "No orders yet." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
         <div>
-            <div class="section-hdr">Recent Quotes</div>
+            <div class="section-hdr">{% trans "Recent Quotes" %}</div>
             <table class="list-table">
-                <thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+                <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th></tr></thead>
                 <tbody>
                 {% for q in recent_quotes %}
                 <tr onclick="location.href='/sales/quotes/'">
@@ -136,7 +137,7 @@
                     <td>${{ q.amount|floatformat:2 }}</td>
                     <td><span class="badge st-{{ q.status }}">{{ q.status }}</span></td>
                 </tr>
-                {% empty %}<tr><td colspan="3" style="color:#888;">No quotes yet.</td></tr>
+                {% empty %}<tr><td colspan="3" style="color:#888;">{% trans "No quotes yet." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>

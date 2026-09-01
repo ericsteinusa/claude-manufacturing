@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Lead — {{ lead.company }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with company=lead.company %}Lead — {{ company }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/quotes/" class="btn">Quotes</a>
-<a href="/sales/leads/" class="btn">Leads</a>
-<a href="/sales/contracts/" class="btn">Contracts</a>
-<a href="/sales/forecast/" class="btn">Forecast</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/quotes/" class="btn">{% trans "Quotes" %}</a>
+<a href="/sales/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/sales/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/sales/forecast/" class="btn">{% trans "Forecast" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -54,24 +55,24 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Lead</h3>
+        <h3>{% trans "Edit Lead" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Company *</label>
+                    <label>{% trans "Company *" %}</label>
                     <input type="text" name="company" required value="{{ lead.company }}">
                 </div>
                 <div class="form-group">
-                    <label>Contact</label>
+                    <label>{% trans "Contact" %}</label>
                     <input type="text" name="contact" value="{{ lead.contact|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Owner / Rep</label>
+                    <label>{% trans "Owner / Rep" %}</label>
                     <input type="text" name="owner" value="{{ lead.owner|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Source</label>
+                    <label>{% trans "Source" %}</label>
                     <select name="source">
                         {% for s in lead_sources %}
                         <option value="{{ s }}"{% if lead.source == s %} selected{% endif %}>{{ s }}</option>
@@ -79,7 +80,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Priority</label>
+                    <label>{% trans "Priority" %}</label>
                     <select name="priority">
                         {% for p in lead_priorities %}
                         <option value="{{ p }}"{% if lead.priority == p %} selected{% endif %}>{{ p }}</option>
@@ -87,7 +88,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in lead_statuses %}
                         <option value="{{ s }}"{% if lead.status == s %} selected{% endif %}>{{ s }}</option>
@@ -95,27 +96,27 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Estimated Value ($)</label>
+                    <label>{% trans "Estimated Value ($)" %}</label>
                     <input type="number" name="estimated_value" value="{{ lead.estimated_value }}" min="0" step="0.01">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ lead.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="ro-table">
-            <tr><th>Contact</th><td>{{ lead.contact|default:"—" }}</td></tr>
-            <tr><th>Source</th><td>{{ lead.source|default:"—" }}</td></tr>
-            <tr><th>Owner</th><td>{{ lead.owner|default:"—" }}</td></tr>
-            <tr><th>Priority</th><td>{{ lead.priority|default:"—" }}</td></tr>
-            <tr><th>Est. Value</th><td>${{ lead.estimated_value|floatformat:0 }}</td></tr>
-            <tr><th>Created</th><td>{{ lead.created_date|default:"—" }}</td></tr>
-            <tr><th>Notes</th><td>{{ lead.notes|default:"—" }}</td></tr>
+            <tr><th>{% trans "Contact" %}</th><td>{{ lead.contact|default:"—" }}</td></tr>
+            <tr><th>{% trans "Source" %}</th><td>{{ lead.source|default:"—" }}</td></tr>
+            <tr><th>{% trans "Owner" %}</th><td>{{ lead.owner|default:"—" }}</td></tr>
+            <tr><th>{% trans "Priority" %}</th><td>{{ lead.priority|default:"—" }}</td></tr>
+            <tr><th>{% trans "Est. Value" %}</th><td>${{ lead.estimated_value|floatformat:0 }}</td></tr>
+            <tr><th>{% trans "Created" %}</th><td>{{ lead.created_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Notes" %}</th><td>{{ lead.notes|default:"—" }}</td></tr>
         </table>
     </div>
     {% endif %}

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Forecast{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Forecast" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/forecast/" class="btn">Forecast</a>
-<a href="/sales/demand/" class="btn">Demand</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/forecast/" class="btn">{% trans "Forecast" %}</a>
+<a href="/sales/demand/" class="btn">{% trans "Demand" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -59,46 +60,46 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Sales Forecast</h2>
+    <h2>{% trans "Sales Forecast" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="period">
-            <option value="">All Periods</option>
+            <option value="">{% trans "All Periods" %}</option>
             {% for p in forecast_periods %}
             <option value="{{ p }}"{% if period_filter == p %} selected{% endif %}>{{ p }}</option>
             {% endfor %}
         </select>
-        <input type="number" name="fiscal_year" value="{{ fiscal_year }}" min="2000" max="2099" style="width:90px;" title="Fiscal year for actuals">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search rep / product line…">
-        <button type="submit">Filter</button>
-        <a href="/sales/forecast/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
-        <a href="/sales/demand/" class="btn" style="margin-left:auto;background:rgba(255,255,255,.15);color:white;">📊 Demand by Product</a>
+        <input type="number" name="fiscal_year" value="{{ fiscal_year }}" min="2000" max="2099" style="width:90px;" title="{% trans 'Fiscal year for actuals' %}">
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search rep / product line…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/sales/forecast/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
+        <a href="/sales/demand/" class="btn" style="margin-left:auto;background:rgba(255,255,255,.15);color:white;">📊 {% trans "Demand by Product" %}</a>
     </form>
 
     <!-- KPI Cards -->
     {% if kpis %}
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Forecasts</div>
+            <div class="lbl">{% trans "Forecasts" %}</div>
             <div class="val">{{ kpis.cnt }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total Expected</div>
+            <div class="lbl">{% trans "Total Expected" %}</div>
             <div class="val">${{ kpis.total_expected|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total Weighted</div>
+            <div class="lbl">{% trans "Total Weighted" %}</div>
             <div class="val">${{ kpis.total_weighted|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Avg Probability</div>
+            <div class="lbl">{% trans "Avg Probability" %}</div>
             <div class="val">{{ kpis.avg_prob|floatformat:0 }}%</div>
         </div>
         <div class="kpi {% if kpis.total_variance >= 0 %}pos{% else %}neg{% endif %}">
-            <div class="lbl">Actual vs Weighted</div>
+            <div class="lbl">{% trans "Actual vs Weighted" %}</div>
             <div class="val">{% if kpis.total_variance >= 0 %}+{% endif %}${{ kpis.total_variance|floatformat:0 }}</div>
         </div>
     </div>
@@ -107,7 +108,7 @@
     <!-- Period Actuals Banner -->
     {% if period_actuals %}
     <div class="card" style="padding:12px 20px;margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:bold;color:#555;margin-bottom:8px;text-transform:uppercase;">{{ fiscal_year }} Actual SO Revenue (Closed/Shipped)</div>
+        <div style="font-size:11px;font-weight:bold;color:#555;margin-bottom:8px;text-transform:uppercase;">{% blocktrans with fy=fiscal_year %}{{ fy }} Actual SO Revenue (Closed/Shipped){% endblocktrans %}</div>
         <div style="display:flex;gap:24px;flex-wrap:wrap;">
             {% for p in forecast_periods %}
             {% with val=period_actuals|default:'' %}
@@ -134,16 +135,16 @@
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Rep</th>
-                    <th>Period</th>
-                    <th>Fiscal Year</th>
-                    <th>Product Line</th>
-                    <th style="text-align:right;">Expected ($)</th>
-                    <th style="text-align:right;">Prob %</th>
-                    <th style="text-align:right;">Weighted ($)</th>
-                    <th style="text-align:right;">Actual ($)</th>
-                    <th style="text-align:right;">Variance</th>
-                    <th>Status</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th>{% trans "Period" %}</th>
+                    <th>{% trans "Fiscal Year" %}</th>
+                    <th>{% trans "Product Line" %}</th>
+                    <th style="text-align:right;">{% trans "Expected ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Prob %" %}</th>
+                    <th style="text-align:right;">{% trans "Weighted ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Actual ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Variance" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -168,13 +169,13 @@
             </tr>
             {% endwith %}
             {% empty %}
-            <tr><td colspan="10" style="color:#888;text-align:center;">No forecasts found.</td></tr>
+            <tr><td colspan="10" style="color:#888;text-align:center;">{% trans "No forecasts found." %}</td></tr>
             {% endfor %}
             </tbody>
             {% if forecasts and kpis %}
             <tfoot>
                 <tr>
-                    <td colspan="4" style="font-weight:bold;">Totals</td>
+                    <td colspan="4" style="font-weight:bold;">{% trans "Totals" %}</td>
                     <td style="text-align:right;">${{ kpis.total_expected|floatformat:0 }}</td>
                     <td style="text-align:right;">{{ kpis.avg_prob|floatformat:0 }}%</td>
                     <td style="text-align:right;">${{ kpis.total_weighted|floatformat:0 }}</td>
@@ -191,16 +192,16 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Forecast Entry</h3>
+        <h3>{% trans "New Forecast Entry" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Rep / Owner</label>
-                    <input type="text" name="rep" placeholder="Sales rep name">
+                    <label>{% trans "Rep / Owner" %}</label>
+                    <input type="text" name="rep" placeholder="{% trans 'Sales rep name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Period</label>
+                    <label>{% trans "Period" %}</label>
                     <select name="period">
                         {% for p in forecast_periods %}
                         <option value="{{ p }}">{{ p }}</option>
@@ -208,23 +209,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Fiscal Year</label>
+                    <label>{% trans "Fiscal Year" %}</label>
                     <input type="number" name="fiscal_year" value="{% now 'Y' %}" min="2000" max="2099">
                 </div>
                 <div class="form-group">
-                    <label>Product Line</label>
-                    <input type="text" name="product_line" placeholder="Product / service line">
+                    <label>{% trans "Product Line" %}</label>
+                    <input type="text" name="product_line" placeholder="{% trans 'Product / service line' %}">
                 </div>
                 <div class="form-group">
-                    <label>Expected Value ($)</label>
+                    <label>{% trans "Expected Value ($)" %}</label>
                     <input type="number" name="expected_value" min="0" step="0.01" placeholder="0">
                 </div>
                 <div class="form-group">
-                    <label>Probability (%)</label>
+                    <label>{% trans "Probability (%)" %}</label>
                     <input type="number" name="probability" min="0" max="100" placeholder="0–100">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in forecast_statuses %}
                         <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
@@ -232,11 +233,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Forecast</button>
+            <button type="submit" class="btn-submit">{% trans "Create Forecast" %}</button>
         </form>
     </div>
     {% endif %}

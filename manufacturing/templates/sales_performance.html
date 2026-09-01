@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Performance{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Performance" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/performance/" class="btn">Performance</a>
-<a href="/sales/performance/reviews/" class="btn">Reviews</a>
-<a href="/sales/performance/coaching/" class="btn">Coaching</a>
-<a href="/sales/targets/" class="btn">Targets</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/sales/performance/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/sales/performance/coaching/" class="btn">{% trans "Coaching" %}</a>
+<a href="/sales/targets/" class="btn">{% trans "Targets" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -34,19 +35,19 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Sales Performance Dashboard</h2>
+    <h2>{% trans "Sales Performance Dashboard" %}</h2>
 
-    <p class="section-head">Rep Rankings — Target Attainment</p>
+    <p class="section-head">{% trans "Rep Rankings — Target Attainment" %}</p>
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th style="width:40px;">Rank</th>
-                    <th>Rep</th>
-                    <th class="num">Target</th>
-                    <th class="num">Actual</th>
-                    <th class="num">Variance</th>
-                    <th>Attainment</th>
+                    <th style="width:40px;">{% trans "Rank" %}</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th class="num">{% trans "Target" %}</th>
+                    <th class="num">{% trans "Actual" %}</th>
+                    <th class="num">{% trans "Variance" %}</th>
+                    <th>{% trans "Attainment" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -76,21 +77,21 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No target data available. <a href="/sales/targets/">Add targets</a> to see rankings.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% blocktrans %}No target data available. <a href="/sales/targets/">Add targets</a> to see rankings.{% endblocktrans %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <p class="section-head">Rep Rankings — Revenue from Orders</p>
+    <p class="section-head">{% trans "Rep Rankings — Revenue from Orders" %}</p>
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th style="width:40px;">Rank</th>
-                    <th>Rep</th>
-                    <th class="num">Orders</th>
-                    <th class="num">Revenue</th>
+                    <th style="width:40px;">{% trans "Rank" %}</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th class="num">{% trans "Orders" %}</th>
+                    <th class="num">{% trans "Revenue" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -107,7 +108,7 @@
                 <td class="num">${{ r.revenue|floatformat:0 }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">No order data by rep yet. Orders are credited to whoever creates them — create an order on the <a href="/so/">Sales Orders</a> page to see rankings here.</td></tr>
+            <tr><td colspan="4" style="color:#888;text-align:center;">{% blocktrans %}No order data by rep yet. Orders are credited to whoever creates them — create an order on the <a href="/so/">Sales Orders</a> page to see rankings here.{% endblocktrans %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

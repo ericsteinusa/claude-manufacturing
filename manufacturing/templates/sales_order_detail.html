@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block page_title %}{% if so %}{{ so.so_number }}{% else %}New Order{% endif %}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% if so %}{{ so.so_number }}{% else %}{% trans "New Order" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/orders/" class="btn">All Orders</a>
-<a href="/sales/" class="btn">Dashboard</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/orders/" class="btn">{% trans "All Orders" %}</a>
+<a href="/sales/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -43,7 +44,7 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>{% if so %}{{ so.so_number }}{% else %}New Sales Order{% endif %}</h2>
+    <h2>{% if so %}{{ so.so_number }}{% else %}{% trans "New Sales Order" %}{% endif %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
@@ -53,16 +54,16 @@
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
             <div class="meta-row">
                 <div class="meta-item">
-                    <div class="lbl">Status</div>
+                    <div class="lbl">{% trans "Status" %}</div>
                     <div class="val"><span class="badge st-{{ so.status }}">{{ so.status }}</span></div>
                 </div>
                 <div class="meta-item">
-                    <div class="lbl">Customer</div>
+                    <div class="lbl">{% trans "Customer" %}</div>
                     <div class="val">{% if so.company_name %}{{ so.company_name }}{% else %}{{ so.first_name }} {{ so.last_name }}{% endif %}</div>
                 </div>
-                <div class="meta-item"><div class="lbl">Order Date</div><div class="val">{{ so.order_date|default:"—" }}</div></div>
-                <div class="meta-item"><div class="lbl">Ship Date</div><div class="val">{{ so.ship_date|default:"—" }}</div></div>
-                <div class="meta-item"><div class="lbl">Created By</div><div class="val">{{ so.created_by|default:"—" }}</div></div>
+                <div class="meta-item"><div class="lbl">{% trans "Order Date" %}</div><div class="val">{{ so.order_date|default:"—" }}</div></div>
+                <div class="meta-item"><div class="lbl">{% trans "Ship Date" %}</div><div class="val">{{ so.ship_date|default:"—" }}</div></div>
+                <div class="meta-item"><div class="lbl">{% trans "Created By" %}</div><div class="val">{{ so.created_by|default:"—" }}</div></div>
             </div>
             {% if can_edit and transitions %}
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -72,7 +73,7 @@
                     <input type="hidden" name="action" value="status">
                     <input type="hidden" name="new_status" value="{{ t }}">
                     <button type="submit" class="btn-act"
-                        onclick="return confirm('Move to {{ t }}?')">
+                        onclick="return confirm('{% blocktrans with s=t %}Move to {{ s }}?{% endblocktrans %}')">
                         {{ SO_STATUS_ACTION_LABELS|get_item:t|default:t }}
                     </button>
                 </form>
@@ -86,14 +87,14 @@
     {% if can_edit and so.status == 'draft' %}
     <!-- Edit header -->
     <div class="card">
-        <h3>Edit Order</h3>
+        <h3>{% trans "Edit Order" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="save">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row" style="flex:2;min-width:180px;"><label>Customer</label>
+                <div class="form-row" style="flex:2;min-width:180px;"><label>{% trans "Customer" %}</label>
                     <select name="customer_id">
-                        <option value="">— No customer —</option>
+                        <option value="">{% trans "— No customer —" %}</option>
                         {% for c in customers %}
                         <option value="{{ c.id }}" {% if so.customer_id == c.id %}selected{% endif %}>
                             {% if c.company_name %}{{ c.company_name }}{% else %}{{ c.first_name }} {{ c.last_name }}{% endif %}
@@ -101,23 +102,23 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-row"><label>Order Date</label><input type="date" name="order_date" value="{{ so.order_date|default:'' }}"></div>
-                <div class="form-row"><label>Ship Date</label><input type="date" name="ship_date" value="{{ so.ship_date|default:'' }}"></div>
-                <div class="form-row" style="flex:2;min-width:180px;"><label>Notes</label><input type="text" name="notes" value="{{ so.notes|default:'' }}"></div>
+                <div class="form-row"><label>{% trans "Order Date" %}</label><input type="date" name="order_date" value="{{ so.order_date|default:'' }}"></div>
+                <div class="form-row"><label>{% trans "Ship Date" %}</label><input type="date" name="ship_date" value="{{ so.ship_date|default:'' }}"></div>
+                <div class="form-row" style="flex:2;min-width:180px;"><label>{% trans "Notes" %}</label><input type="text" name="notes" value="{{ so.notes|default:'' }}"></div>
             </div>
-            <button type="submit" class="btn-act">Save</button>
+            <button type="submit" class="btn-act">{% trans "Save" %}</button>
         </form>
     </div>
     {% endif %}
 
     <!-- Line items -->
     <div class="card">
-        <h3>Line Items</h3>
+        <h3>{% trans "Line Items" %}</h3>
         <table class="list-table">
             <thead><tr>
-                <th>Description</th><th>Product</th>
-                <th class="num">Qty</th><th class="num">Unit Price</th>
-                <th class="num">Line Total</th>
+                <th>{% trans "Description" %}</th><th>{% trans "Product" %}</th>
+                <th class="num">{% trans "Qty" %}</th><th class="num">{% trans "Unit Price" %}</th>
+                <th class="num">{% trans "Line Total" %}</th>
                 {% if can_edit and so.status == 'draft' %}<th></th>{% endif %}
             </tr></thead>
             <tbody>
@@ -135,20 +136,20 @@
                         <input type="hidden" name="action" value="delete_item">
                         <input type="hidden" name="item_id" value="{{ item.id }}">
                         <button type="submit" class="btn-danger"
-                            onclick="return confirm('Remove this line?')">✕</button>
+                            onclick="return confirm('{% trans "Remove this line?" %}')">✕</button>
                     </form>
                 </td>
                 {% endif %}
             </tr>
             {% empty %}
             <tr><td colspan="{% if can_edit and so.status == 'draft' %}6{% else %}5{% endif %}"
-                style="color:#888;text-align:center;padding:12px;">No line items yet.</td></tr>
+                style="color:#888;text-align:center;padding:12px;">{% trans "No line items yet." %}</td></tr>
             {% endfor %}
             </tbody>
             {% if items %}
             <tfoot>
             <tr class="totals-row">
-                <td colspan="{% if can_edit and so.status == 'draft' %}4{% else %}3{% endif %}">TOTAL</td>
+                <td colspan="{% if can_edit and so.status == 'draft' %}4{% else %}3{% endif %}">{% trans "TOTAL" %}</td>
                 <td class="num" colspan="2">${{ so.total|floatformat:2 }}</td>
             </tr>
             </tfoot>
@@ -157,14 +158,14 @@
 
         {% if can_edit and so.status == 'draft' %}
         <div style="margin-top:14px;">
-            <h3 style="font-size:13px;color:#333;margin:0 0 8px;">Add Line Item</h3>
+            <h3 style="font-size:13px;color:#333;margin:0 0 8px;">{% trans "Add Line Item" %}</h3>
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="add_item">
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-                    <div class="form-row" style="flex:3;min-width:160px;"><label>Description *</label>
+                    <div class="form-row" style="flex:3;min-width:160px;"><label>{% trans "Description *" %}</label>
                         <input type="text" name="description" required></div>
-                    <div class="form-row" style="flex:2;min-width:140px;"><label>Product</label>
+                    <div class="form-row" style="flex:2;min-width:140px;"><label>{% trans "Product" %}</label>
                         <select name="product_id">
                             <option value="">—</option>
                             {% for p in products %}
@@ -172,12 +173,12 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-row"><label>Qty</label>
+                    <div class="form-row"><label>{% trans "Qty" %}</label>
                         <input type="number" name="qty" value="1" min="1" style="width:70px;"></div>
-                    <div class="form-row"><label>Unit Price</label>
+                    <div class="form-row"><label>{% trans "Unit Price" %}</label>
                         <input type="number" name="unit_price" value="0" step="0.01" min="0" style="width:100px;"></div>
                 </div>
-                <button type="submit" class="btn-act">Add Item</button>
+                <button type="submit" class="btn-act">{% trans "Add Item" %}</button>
             </form>
         </div>
         {% endif %}

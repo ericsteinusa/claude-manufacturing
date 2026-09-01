@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Coaching Notes{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Coaching Notes" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/performance/" class="btn">Performance</a>
-<a href="/sales/performance/reviews/" class="btn">Reviews</a>
-<a href="/sales/performance/coaching/" class="btn">Coaching</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/sales/performance/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/sales/performance/coaching/" class="btn">{% trans "Coaching" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -47,33 +48,33 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Coaching Notes &amp; Sessions</h2>
+    <h2>{% trans "Coaching Notes &amp; Sessions" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <input type="text" name="rep" value="{{ rep_filter }}" placeholder="Rep name…">
+        <input type="text" name="rep" value="{{ rep_filter }}" placeholder="{% trans 'Rep name…' %}">
         <select name="status" onchange="this.form.submit()">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in COACHING_NOTE_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Filter</button>
-        <a href="/sales/performance/coaching/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/sales/performance/coaching/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Rep</th>
-                    <th>Subject</th>
-                    <th>Coach</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Note</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th>{% trans "Subject" %}</th>
+                    <th>{% trans "Coach" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Note" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,7 +89,7 @@
                     {{ n.note|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No coaching notes found.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No coaching notes found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -96,24 +97,24 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Add Coaching Note</h3>
+        <h3>{% trans "Add Coaching Note" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Rep *</label>
-                    <input type="text" name="rep" required placeholder="Sales rep name">
+                    <label>{% trans "Rep *" %}</label>
+                    <input type="text" name="rep" required placeholder="{% trans 'Sales rep name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Subject</label>
-                    <input type="text" name="subject" placeholder="Topic / focus area">
+                    <label>{% trans "Subject" %}</label>
+                    <input type="text" name="subject" placeholder="{% trans 'Topic / focus area' %}">
                 </div>
                 <div class="form-group">
-                    <label>Coach</label>
-                    <input type="text" name="coach" placeholder="Coach / manager name">
+                    <label>{% trans "Coach" %}</label>
+                    <input type="text" name="coach" placeholder="{% trans 'Coach / manager name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in COACHING_NOTE_STATUSES %}
                         <option value="{{ s }}"{% if s == 'Open' %} selected{% endif %}>{{ s }}</option>
@@ -121,11 +122,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Note</label>
-                    <textarea name="note" placeholder="Coaching session notes, action items, observations…"></textarea>
+                    <label>{% trans "Note" %}</label>
+                    <textarea name="note" placeholder="{% trans 'Coaching session notes, action items, observations…' %}"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Note</button>
+            <button type="submit" class="btn-submit">{% trans "Add Note" %}</button>
         </form>
     </div>
     {% endif %}

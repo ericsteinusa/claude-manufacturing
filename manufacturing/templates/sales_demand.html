@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Demand Forecast{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Demand Forecast" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/forecast/" class="btn">Sales Forecast</a>
-<a href="/demand-forecast/" class="btn">AI Demand Forecast &rarr;</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/forecast/" class="btn">{% trans "Sales Forecast" %}</a>
+<a href="/demand-forecast/" class="btn">{% trans "AI Demand Forecast" %} &rarr;</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -40,42 +41,42 @@
 {% block body %}
 <div class="content">
 <div class="dm-wrap">
-    <h2>Demand Forecast — {{ fiscal_year }}</h2>
+    <h2>{% blocktrans with fy=fiscal_year %}Demand Forecast — {{ fy }}{% endblocktrans %}</h2>
 
     <form method="get" class="filter-bar">
-        <label style="color:white;font-size:13px;">Fiscal Year:</label>
+        <label style="color:white;font-size:13px;">{% trans "Fiscal Year:" %}</label>
         <select name="fiscal_year">
             {% for y in years %}
             <option value="{{ y }}"{% if y == fiscal_year %} selected{% endif %}>{{ y }}</option>
             {% endfor %}
         </select>
-        <button type="submit">View</button>
+        <button type="submit">{% trans "View" %}</button>
         <a href="/sales/forecast/?fiscal_year={{ fiscal_year }}" class="btn"
            style="background:rgba(255,255,255,.15);color:white;margin-left:auto;">
-           📋 Forecast Entries
+           📋 {% trans "Forecast Entries" %}
         </a>
     </form>
 
     <!-- Quarter KPIs -->
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Q1 Revenue</div>
+            <div class="lbl">{% trans "Q1 Revenue" %}</div>
             <div class="val">${{ quarter_totals.Q1|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Q2 Revenue</div>
+            <div class="lbl">{% trans "Q2 Revenue" %}</div>
             <div class="val">${{ quarter_totals.Q2|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Q3 Revenue</div>
+            <div class="lbl">{% trans "Q3 Revenue" %}</div>
             <div class="val">${{ quarter_totals.Q3|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Q4 Revenue</div>
+            <div class="lbl">{% trans "Q4 Revenue" %}</div>
             <div class="val">${{ quarter_totals.Q4|floatformat:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Annual Total</div>
+            <div class="lbl">{% trans "Annual Total" %}</div>
             <div class="val">${{ quarter_totals.total|floatformat:0 }}</div>
         </div>
     </div>
@@ -83,15 +84,15 @@
     <!-- Forecast vs Actual comparison by period -->
     {% if forecast_by_period %}
     <div class="card">
-        <h3>Weighted Forecast vs Actual SO Revenue</h3>
+        <h3>{% trans "Weighted Forecast vs Actual SO Revenue" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Period</th>
-                    <th style="text-align:right;">Weighted Forecast ($)</th>
-                    <th style="text-align:right;">Actual Revenue ($)</th>
-                    <th style="text-align:right;">Variance</th>
-                    <th style="text-align:right;">Attainment</th>
+                    <th>{% trans "Period" %}</th>
+                    <th style="text-align:right;">{% trans "Weighted Forecast ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Actual Revenue ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Variance" %}</th>
+                    <th style="text-align:right;">{% trans "Attainment" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,19 +141,19 @@
 
     <!-- Demand by Product -->
     <div class="card">
-        <h3>Demand by Product — {{ fiscal_year }} Actual SO Revenue</h3>
+        <h3>{% blocktrans with fy=fiscal_year %}Demand by Product — {{ fy }} Actual SO Revenue{% endblocktrans %}</h3>
         {% if product_rows %}
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th style="text-align:right;">Q1 ($)</th>
-                    <th style="text-align:right;">Q2 ($)</th>
-                    <th style="text-align:right;">Q3 ($)</th>
-                    <th style="text-align:right;">Q4 ($)</th>
-                    <th style="text-align:right;">Annual ($)</th>
-                    <th style="text-align:right;">Units</th>
-                    <th style="width:120px;">Share</th>
+                    <th>{% trans "Product" %}</th>
+                    <th style="text-align:right;">{% trans "Q1 ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Q2 ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Q3 ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Q4 ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Annual ($)" %}</th>
+                    <th style="text-align:right;">{% trans "Units" %}</th>
+                    <th style="width:120px;">{% trans "Share" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -180,7 +181,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td>Totals</td>
+                    <td>{% trans "Totals" %}</td>
                     <td style="text-align:right;">${{ quarter_totals.Q1|floatformat:0 }}</td>
                     <td style="text-align:right;">${{ quarter_totals.Q2|floatformat:0 }}</td>
                     <td style="text-align:right;">${{ quarter_totals.Q3|floatformat:0 }}</td>
@@ -192,8 +193,8 @@
         </table>
         {% else %}
         <div class="empty-note">
-            No sales order data found for {{ fiscal_year }}.<br>
-            <span style="font-size:12px;">Revenue is pulled from closed/shipped sales orders with line items.</span>
+            {% blocktrans with fy=fiscal_year %}No sales order data found for {{ fy }}.{% endblocktrans %}<br>
+            <span style="font-size:12px;">{% trans "Revenue is pulled from closed/shipped sales orders with line items." %}</span>
         </div>
         {% endif %}
     </div>

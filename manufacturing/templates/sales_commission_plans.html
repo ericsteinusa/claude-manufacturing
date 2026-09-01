@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Commission Plans{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Commission Plans" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/commissions/" class="btn">Commissions</a>
-<a href="/sales/commissions/history/" class="btn">Payment History</a>
-<a href="/sales/commissions/plans/" class="btn">Plans</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/commissions/" class="btn">{% trans "Commissions" %}</a>
+<a href="/sales/commissions/history/" class="btn">{% trans "Payment History" %}</a>
+<a href="/sales/commissions/plans/" class="btn">{% trans "Plans" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -46,7 +47,7 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Commission Plans</h2>
+    <h2>{% trans "Commission Plans" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -55,11 +56,11 @@
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Plan Name</th>
-                    <th>Type</th>
-                    <th class="num">Rate (%)</th>
-                    <th>Description</th>
-                    <th>Active</th>
+                    <th>{% trans "Plan Name" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th class="num">{% trans "Rate (%)" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Active" %}</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr>
             </thead>
@@ -72,18 +73,18 @@
                 <td>{{ p.description|default:"—" }}</td>
                 <td>
                     <span class="badge {% if p.active %}active-yes{% else %}active-no{% endif %}">
-                        {% if p.active %}Active{% else %}Inactive{% endif %}
+                        {% if p.active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
                     </span>
                 </td>
                 {% if can_edit %}
                 <td>
                     <button type="button" class="btn-sm"
-                        onclick="openEdit({{ p.id }},'{{ p.name|escapejs }}','{{ p.plan_type|escapejs }}',{{ p.rate }},'{{ p.description|default:''|escapejs }}',{{ p.active|yesno:'true,false' }})">Edit</button>
+                        onclick="openEdit({{ p.id }},'{{ p.name|escapejs }}','{{ p.plan_type|escapejs }}',{{ p.rate }},'{{ p.description|default:''|escapejs }}',{{ p.active|yesno:'true,false' }})">{% trans "Edit" %}</button>
                 </td>
                 {% endif %}
             </tr>
             {% empty %}
-            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;">No commission plans defined.</td></tr>
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;">{% trans "No commission plans defined." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -91,18 +92,18 @@
 
     {% if can_edit %}
     <div class="edit-card" id="edit-card">
-        <h3>Edit Plan</h3>
+        <h3>{% trans "Edit Plan" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="plan_id" id="edit-id">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Plan Name *</label>
+                    <label>{% trans "Plan Name *" %}</label>
                     <input type="text" name="name" id="edit-name" required>
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="plan_type" id="edit-type">
                         {% for t in COMMISSION_PLAN_TYPES %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -110,36 +111,36 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Rate (%)</label>
+                    <label>{% trans "Rate (%)" %}</label>
                     <input type="number" name="rate" id="edit-rate" step="0.01" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Active</label>
+                    <label>{% trans "Active" %}</label>
                     <input type="checkbox" name="active" id="edit-active" style="width:auto;margin-top:8px;">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <textarea name="description" id="edit-desc"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save</button>
+            <button type="submit" class="btn-submit">{% trans "Save" %}</button>
             <button type="button" class="btn-submit" style="background:#888;margin-left:8px;"
-                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+                onclick="document.getElementById('edit-card').style.display='none'">{% trans "Cancel" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>Create Commission Plan</h3>
+        <h3>{% trans "Create Commission Plan" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Plan Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Standard 5%">
+                    <label>{% trans "Plan Name *" %}</label>
+                    <input type="text" name="name" required placeholder="{% trans 'e.g. Standard 5%' %}">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="plan_type">
                         {% for t in COMMISSION_PLAN_TYPES %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -147,15 +148,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Rate (%)</label>
+                    <label>{% trans "Rate (%)" %}</label>
                     <input type="number" name="rate" step="0.01" min="0" value="0" placeholder="5.00">
                 </div>
                 <div class="form-group full-span">
-                    <label>Description</label>
-                    <textarea name="description" placeholder="Plan details…"></textarea>
+                    <label>{% trans "Description" %}</label>
+                    <textarea name="description" placeholder="{% trans 'Plan details…' %}"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Plan</button>
+            <button type="submit" class="btn-submit">{% trans "Create Plan" %}</button>
         </form>
     </div>
     {% endif %}

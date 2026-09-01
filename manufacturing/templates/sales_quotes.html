@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Quotes{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Quotes" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/targets/" class="btn">Targets</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/targets/" class="btn">{% trans "Targets" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -42,29 +43,29 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Sales Quotes</h2>
+    <h2>{% trans "Sales Quotes" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <label>Status:</label>
+        <label>{% trans "Status:" %}</label>
         <select name="status" onchange="this.form.submit()">
-            <option value="">All</option>
+            <option value="">{% trans "All" %}</option>
             {% for s in QUOTE_STATUSES %}
             <option value="{{ s }}" {% if filter_status == s %}selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <label>Search:</label>
-        <input type="text" name="search" value="{{ filter_search }}" placeholder="Customer or description…">
-        <button type="submit" class="btn-sm">Filter</button>
-        <a href="/sales/quotes/" style="color:#aad;font-size:13px;">Clear</a>
+        <label>{% trans "Search:" %}</label>
+        <input type="text" name="search" value="{{ filter_search }}" placeholder="{% trans 'Customer or description…' %}">
+        <button type="submit" class="btn-sm">{% trans "Filter" %}</button>
+        <a href="/sales/quotes/" style="color:#aad;font-size:13px;">{% trans "Clear" %}</a>
     </form>
 
     <table class="list-table">
         <thead><tr>
-            <th>Customer</th><th>Description</th><th>Owner</th>
-            <th>Date</th><th>Valid Until</th>
-            <th class="num">Amount</th><th>Status</th>
+            <th>{% trans "Customer" %}</th><th>{% trans "Description" %}</th><th>{% trans "Owner" %}</th>
+            <th>{% trans "Date" %}</th><th>{% trans "Valid Until" %}</th>
+            <th class="num">{% trans "Amount" %}</th><th>{% trans "Status" %}</th>
             {% if can_edit %}<th></th>{% endif %}
         </tr></thead>
         <tbody>
@@ -80,7 +81,7 @@
             {% if can_edit %}
             <td style="white-space:nowrap;">
                 <button type="button" class="btn-sm" style="padding:3px 10px;font-size:11px;"
-                    onclick="openEdit({{ q.id }},'{{ q.customer|escapejs }}','{{ q.description|default:''|escapejs }}',{{ q.amount }},'{{ q.owner|default:''|escapejs }}','{{ q.quote_date|default:'' }}','{{ q.valid_until|default:'' }}','{{ q.status }}','{{ q.notes|default:''|escapejs }}')">Edit</button>
+                    onclick="openEdit({{ q.id }},'{{ q.customer|escapejs }}','{{ q.description|default:''|escapejs }}',{{ q.amount }},'{{ q.owner|default:''|escapejs }}','{{ q.quote_date|default:'' }}','{{ q.valid_until|default:'' }}','{{ q.status }}','{{ q.notes|default:''|escapejs }}')">{% trans "Edit" %}</button>
                 <form method="post" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="set_status">
@@ -95,7 +96,7 @@
             {% endif %}
         </tr>
         {% empty %}
-        <tr><td colspan="{% if can_edit %}8{% else %}7{% endif %}" style="color:#888;text-align:center;padding:16px;">No quotes found.</td></tr>
+        <tr><td colspan="{% if can_edit %}8{% else %}7{% endif %}" style="color:#888;text-align:center;padding:16px;">{% trans "No quotes found." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>
@@ -103,45 +104,45 @@
     {% if can_edit %}
     <!-- Edit card (hidden, revealed by JS) -->
     <div class="edit-card" id="edit-card">
-        <h3>Edit Quote</h3>
+        <h3>{% trans "Edit Quote" %}</h3>
         <form method="post" id="edit-form">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="quote_id" id="edit-id">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row" style="flex:2;min-width:160px;"><label>Customer *</label><input type="text" name="customer" id="edit-customer" required></div>
-                <div class="form-row" style="flex:2;min-width:160px;"><label>Description</label><input type="text" name="description" id="edit-description"></div>
-                <div class="form-row"><label>Amount ($)</label><input type="number" name="amount" id="edit-amount" step="0.01" min="0" style="width:110px;"></div>
-                <div class="form-row" style="flex:1;min-width:120px;"><label>Owner</label><input type="text" name="owner" id="edit-owner"></div>
-                <div class="form-row"><label>Quote Date</label><input type="date" name="quote_date" id="edit-quote-date"></div>
-                <div class="form-row"><label>Valid Until</label><input type="date" name="valid_until" id="edit-valid-until"></div>
-                <div class="form-row"><label>Status</label>
+                <div class="form-row" style="flex:2;min-width:160px;"><label>{% trans "Customer *" %}</label><input type="text" name="customer" id="edit-customer" required></div>
+                <div class="form-row" style="flex:2;min-width:160px;"><label>{% trans "Description" %}</label><input type="text" name="description" id="edit-description"></div>
+                <div class="form-row"><label>{% trans "Amount ($)" %}</label><input type="number" name="amount" id="edit-amount" step="0.01" min="0" style="width:110px;"></div>
+                <div class="form-row" style="flex:1;min-width:120px;"><label>{% trans "Owner" %}</label><input type="text" name="owner" id="edit-owner"></div>
+                <div class="form-row"><label>{% trans "Quote Date" %}</label><input type="date" name="quote_date" id="edit-quote-date"></div>
+                <div class="form-row"><label>{% trans "Valid Until" %}</label><input type="date" name="valid_until" id="edit-valid-until"></div>
+                <div class="form-row"><label>{% trans "Status" %}</label>
                     <select name="status" id="edit-status">
                         {% for s in QUOTE_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
                     </select>
                 </div>
             </div>
-            <div class="form-row" style="margin-bottom:10px;"><label>Notes</label><textarea name="notes" id="edit-notes" rows="2"></textarea></div>
-            <button type="submit" class="btn-sm">Save Quote</button>
+            <div class="form-row" style="margin-bottom:10px;"><label>{% trans "Notes" %}</label><textarea name="notes" id="edit-notes" rows="2"></textarea></div>
+            <button type="submit" class="btn-sm">{% trans "Save Quote" %}</button>
             <button type="button" class="btn-sm" style="background:#888;margin-left:8px;"
-                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+                onclick="document.getElementById('edit-card').style.display='none'">{% trans "Cancel" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>New Quote</h3>
+        <h3>{% trans "New Quote" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row" style="flex:2;min-width:160px;"><label>Customer *</label><input type="text" name="customer" required></div>
-                <div class="form-row" style="flex:2;min-width:160px;"><label>Description</label><input type="text" name="description"></div>
-                <div class="form-row"><label>Amount ($)</label><input type="number" name="amount" step="0.01" min="0" value="0" style="width:110px;"></div>
-                <div class="form-row" style="flex:1;min-width:120px;"><label>Owner</label><input type="text" name="owner"></div>
-                <div class="form-row"><label>Quote Date</label><input type="date" name="quote_date"></div>
-                <div class="form-row"><label>Valid Until</label><input type="date" name="valid_until"></div>
+                <div class="form-row" style="flex:2;min-width:160px;"><label>{% trans "Customer *" %}</label><input type="text" name="customer" required></div>
+                <div class="form-row" style="flex:2;min-width:160px;"><label>{% trans "Description" %}</label><input type="text" name="description"></div>
+                <div class="form-row"><label>{% trans "Amount ($)" %}</label><input type="number" name="amount" step="0.01" min="0" value="0" style="width:110px;"></div>
+                <div class="form-row" style="flex:1;min-width:120px;"><label>{% trans "Owner" %}</label><input type="text" name="owner"></div>
+                <div class="form-row"><label>{% trans "Quote Date" %}</label><input type="date" name="quote_date"></div>
+                <div class="form-row"><label>{% trans "Valid Until" %}</label><input type="date" name="valid_until"></div>
             </div>
-            <button type="submit" class="btn-sm">Create Quote</button>
+            <button type="submit" class="btn-sm">{% trans "Create Quote" %}</button>
         </form>
     </div>
     {% endif %}

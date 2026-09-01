@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Territory Management{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Territory Management" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/targets/" class="btn">Targets</a>
-<a href="/sales/territories/" class="btn">Territories</a>
-<a href="/sales/territories/performance/" class="btn">Performance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/targets/" class="btn">{% trans "Targets" %}</a>
+<a href="/sales/territories/" class="btn">{% trans "Territories" %}</a>
+<a href="/sales/territories/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,32 +52,32 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Territory Management</h2>
+    <h2>{% trans "Territory Management" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status" onchange="this.form.submit()">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in TERRITORY_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search name / region / rep…">
-        <button type="submit">Filter</button>
-        <a href="/sales/territories/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search name / region / rep…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/sales/territories/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Territory Name</th>
-                    <th>Region</th>
-                    <th>Assigned Rep</th>
-                    <th>Status</th>
-                    <th>Notes</th>
+                    <th>{% trans "Territory Name" %}</th>
+                    <th>{% trans "Region" %}</th>
+                    <th>{% trans "Assigned Rep" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Notes" %}</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr>
             </thead>
@@ -92,12 +93,12 @@
                 {% if can_edit %}
                 <td>
                     <button type="button" class="btn-sm"
-                        onclick="openEdit({{ t.id }},'{{ t.name|escapejs }}','{{ t.region|default:''|escapejs }}','{{ t.assigned_rep|default:''|escapejs }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">Edit</button>
+                        onclick="openEdit({{ t.id }},'{{ t.name|escapejs }}','{{ t.region|default:''|escapejs }}','{{ t.assigned_rep|default:''|escapejs }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">{% trans "Edit" %}</button>
                 </td>
                 {% endif %}
             </tr>
             {% empty %}
-            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;">No territories found.</td></tr>
+            <tr><td colspan="{% if can_edit %}6{% else %}5{% endif %}" style="color:#888;text-align:center;">{% trans "No territories found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -105,26 +106,26 @@
 
     {% if can_edit %}
     <div class="edit-card" id="edit-card">
-        <h3>Edit Territory</h3>
+        <h3>{% trans "Edit Territory" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="territory_id" id="edit-id">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Territory Name *</label>
+                    <label>{% trans "Territory Name *" %}</label>
                     <input type="text" name="name" id="edit-name" required>
                 </div>
                 <div class="form-group">
-                    <label>Region</label>
+                    <label>{% trans "Region" %}</label>
                     <input type="text" name="region" id="edit-region">
                 </div>
                 <div class="form-group">
-                    <label>Assigned Rep</label>
+                    <label>{% trans "Assigned Rep" %}</label>
                     <input type="text" name="assigned_rep" id="edit-rep">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status" id="edit-status">
                         {% for s in TERRITORY_STATUSES %}
                         <option value="{{ s }}">{{ s }}</option>
@@ -132,36 +133,36 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" id="edit-notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
             <button type="button" class="btn-submit" style="background:#888;margin-left:8px;"
-                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+                onclick="document.getElementById('edit-card').style.display='none'">{% trans "Cancel" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>Add Territory</h3>
+        <h3>{% trans "Add Territory" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Territory Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Northeast">
+                    <label>{% trans "Territory Name *" %}</label>
+                    <input type="text" name="name" required placeholder="{% trans 'e.g. Northeast' %}">
                 </div>
                 <div class="form-group">
-                    <label>Region</label>
-                    <input type="text" name="region" placeholder="e.g. New England">
+                    <label>{% trans "Region" %}</label>
+                    <input type="text" name="region" placeholder="{% trans 'e.g. New England' %}">
                 </div>
                 <div class="form-group">
-                    <label>Assigned Rep</label>
-                    <input type="text" name="assigned_rep" placeholder="Sales rep name">
+                    <label>{% trans "Assigned Rep" %}</label>
+                    <input type="text" name="assigned_rep" placeholder="{% trans 'Sales rep name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in TERRITORY_STATUSES %}
                         <option value="{{ s }}"{% if s == 'Active' %} selected{% endif %}>{{ s }}</option>
@@ -169,11 +170,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Territory</button>
+            <button type="submit" class="btn-submit">{% trans "Add Territory" %}</button>
         </form>
     </div>
     {% endif %}

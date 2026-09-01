@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Leads & Opportunities{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Leads & Opportunities" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/quotes/" class="btn">Quotes</a>
-<a href="/sales/leads/" class="btn">Leads</a>
-<a href="/sales/contracts/" class="btn">Contracts</a>
-<a href="/sales/forecast/" class="btn">Forecast</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/quotes/" class="btn">{% trans "Quotes" %}</a>
+<a href="/sales/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/sales/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/sales/forecast/" class="btn">{% trans "Forecast" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -59,35 +60,35 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Leads &amp; Opportunities</h2>
+    <h2>{% trans "Leads &amp; Opportunities" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in lead_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search company / contact…">
-        <button type="submit">Filter</button>
-        <a href="/sales/leads/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search company / contact…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/sales/leads/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Company</th>
-                    <th>Contact</th>
-                    <th>Source</th>
-                    <th>Owner</th>
-                    <th style="text-align:right;">Est. Value</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Created</th>
+                    <th>{% trans "Company" %}</th>
+                    <th>{% trans "Contact" %}</th>
+                    <th>{% trans "Source" %}</th>
+                    <th>{% trans "Owner" %}</th>
+                    <th style="text-align:right;">{% trans "Est. Value" %}</th>
+                    <th>{% trans "Priority" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Created" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -103,7 +104,7 @@
                 <td>{{ l.created_date|default:"—" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="8" style="color:#888;text-align:center;">No leads found.</td></tr>
+            <tr><td colspan="8" style="color:#888;text-align:center;">{% trans "No leads found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -111,24 +112,24 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Lead</h3>
+        <h3>{% trans "New Lead" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Company *</label>
-                    <input type="text" name="company" required placeholder="Company name">
+                    <label>{% trans "Company *" %}</label>
+                    <input type="text" name="company" required placeholder="{% trans 'Company name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Contact</label>
-                    <input type="text" name="contact" placeholder="Contact name">
+                    <label>{% trans "Contact" %}</label>
+                    <input type="text" name="contact" placeholder="{% trans 'Contact name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Owner / Rep</label>
-                    <input type="text" name="owner" placeholder="Sales rep">
+                    <label>{% trans "Owner / Rep" %}</label>
+                    <input type="text" name="owner" placeholder="{% trans 'Sales rep' %}">
                 </div>
                 <div class="form-group">
-                    <label>Source</label>
+                    <label>{% trans "Source" %}</label>
                     <select name="source">
                         {% for s in lead_sources %}
                         <option value="{{ s }}">{{ s }}</option>
@@ -136,7 +137,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Priority</label>
+                    <label>{% trans "Priority" %}</label>
                     <select name="priority">
                         {% for p in lead_priorities %}
                         <option value="{{ p }}"{% if p == 'Medium' %} selected{% endif %}>{{ p }}</option>
@@ -144,7 +145,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in lead_statuses %}
                         <option value="{{ s }}"{% if s == 'New' %} selected{% endif %}>{{ s }}</option>
@@ -152,15 +153,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Estimated Value ($)</label>
+                    <label>{% trans "Estimated Value ($)" %}</label>
                     <input type="number" name="estimated_value" min="0" step="0.01" placeholder="0">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Lead</button>
+            <button type="submit" class="btn-submit">{% trans "Create Lead" %}</button>
         </form>
     </div>
     {% endif %}

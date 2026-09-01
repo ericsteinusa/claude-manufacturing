@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Performance Reviews{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Performance Reviews" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/performance/" class="btn">Performance</a>
-<a href="/sales/performance/reviews/" class="btn">Reviews</a>
-<a href="/sales/performance/coaching/" class="btn">Coaching</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/sales/performance/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/sales/performance/coaching/" class="btn">{% trans "Coaching" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -47,33 +48,33 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Performance Reviews</h2>
+    <h2>{% trans "Performance Reviews" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <input type="text" name="rep" value="{{ rep_filter }}" placeholder="Rep name…">
+        <input type="text" name="rep" value="{{ rep_filter }}" placeholder="{% trans 'Rep name…' %}">
         <select name="status" onchange="this.form.submit()">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in PERF_REVIEW_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Filter</button>
-        <a href="/sales/performance/reviews/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/sales/performance/reviews/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Rep</th>
-                    <th>Review Date</th>
-                    <th>Period</th>
-                    <th>Rating</th>
-                    <th>Reviewer</th>
-                    <th>Status</th>
+                    <th>{% trans "Rep" %}</th>
+                    <th>{% trans "Review Date" %}</th>
+                    <th>{% trans "Period" %}</th>
+                    <th>{% trans "Rating" %}</th>
+                    <th>{% trans "Reviewer" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,7 +88,7 @@
                 <td><span class="badge st-{{ r.status }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No performance reviews scheduled.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No performance reviews scheduled." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -95,32 +96,32 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Schedule Review</h3>
+        <h3>{% trans "Schedule Review" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Rep *</label>
-                    <input type="text" name="rep" required placeholder="Sales rep name">
+                    <label>{% trans "Rep *" %}</label>
+                    <input type="text" name="rep" required placeholder="{% trans 'Sales rep name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Review Date</label>
+                    <label>{% trans "Review Date" %}</label>
                     <input type="date" name="review_date">
                 </div>
                 <div class="form-group">
-                    <label>Period</label>
-                    <input type="text" name="period" placeholder="e.g. 2024-Q1">
+                    <label>{% trans "Period" %}</label>
+                    <input type="text" name="period" placeholder="{% trans 'e.g. 2024-Q1' %}">
                 </div>
                 <div class="form-group">
-                    <label>Rating</label>
-                    <input type="text" name="rating" placeholder="e.g. Exceeds, Meets, Below">
+                    <label>{% trans "Rating" %}</label>
+                    <input type="text" name="rating" placeholder="{% trans 'e.g. Exceeds, Meets, Below' %}">
                 </div>
                 <div class="form-group">
-                    <label>Reviewer</label>
-                    <input type="text" name="reviewer" placeholder="Manager name">
+                    <label>{% trans "Reviewer" %}</label>
+                    <input type="text" name="reviewer" placeholder="{% trans 'Manager name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in PERF_REVIEW_STATUSES %}
                         <option value="{{ s }}"{% if s == 'Scheduled' %} selected{% endif %}>{{ s }}</option>
@@ -128,19 +129,19 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Strengths</label>
-                    <textarea name="strengths" placeholder="Key strengths…"></textarea>
+                    <label>{% trans "Strengths" %}</label>
+                    <textarea name="strengths" placeholder="{% trans 'Key strengths…' %}"></textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Areas for Improvement</label>
-                    <textarea name="improvements" placeholder="Areas to improve…"></textarea>
+                    <label>{% trans "Areas for Improvement" %}</label>
+                    <textarea name="improvements" placeholder="{% trans 'Areas to improve…' %}"></textarea>
                 </div>
                 <div class="form-group full-span">
-                    <label>Goals</label>
-                    <textarea name="goals" placeholder="Goals for next period…"></textarea>
+                    <label>{% trans "Goals" %}</label>
+                    <textarea name="goals" placeholder="{% trans 'Goals for next period…' %}"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Schedule Review</button>
+            <button type="submit" class="btn-submit">{% trans "Schedule Review" %}</button>
         </form>
     </div>
     {% endif %}

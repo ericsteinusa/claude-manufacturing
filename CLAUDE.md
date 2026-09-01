@@ -982,6 +982,104 @@ already-translated htmx templates) + the full Maintenance department (16,
 plus the 2 already-translated htmx templates) + the full Purchasing
 department (19)) out of ~450 total.
 
+Also fully translated: the entire **Sales department**
+(`sales_dashboard.html`, `sales_orders.html`, `sales_order_detail.html`,
+`sales_quotes.html`, `sales_leads_list.html`/`_detail.html`,
+`sales_contracts_list.html`/`_detail.html`, `sales_forecast_list.html`/
+`_detail.html`, `sales_targets.html`, `sales_territories.html`,
+`sales_territory_performance.html`, `sales_commissions.html`,
+`sales_commission_plans.html`, `sales_commission_history.html`,
+`sales_performance.html`, `sales_performance_reviews.html`,
+`sales_coaching.html`, `sales_reports.html`, `sales_demand.html` — 21
+templates, the sixteenth "whole department" pass and the largest yet by
+template count, tied with Purchasing's 19 but one bigger). Deliberately
+excluded `/demand-forecast/` (a separate AI-driven demand-forecasting
+feature backed by its own `demand_forecast.html`, distinct from this
+department's own `sales_demand.html` "Demand Forecast" page which pulls
+from actual sales-order revenue) — matching the "translate the link, not
+yet the target" precedent. 214 unique strings per language, all simple —
+the largest single-department string count in this series, edging out
+Purchasing's 182. Found and fixed **two more bare `{{ x|default:"literal"
+}}` fallback bugs**, continuing the class first found in the IT
+department's Network Device page: `sales_territory_performance.html`'s
+`{{ t.assigned_rep|default:"Unassigned" }}` and
+`sales_forecast_detail.html`'s `{{ forecast.rep|default:"Forecast" }}`
+(the latter in the page's own `<h2>` heading) — both needed the
+`{% if %}/{% else %}/{% trans %}` expansion. Also translated a literal
+`{% if p.active %}Active{% else %}Inactive{% endif %}` badge in
+`sales_commission_plans.html` that had been left as bare English text
+inside the conditional. **Extended the embedded-HTML-link `{% blocktrans
+%}` pattern (established in the Customers/Credit and Accounting passes)
+to its most complex case yet**: `sales_performance.html`'s two ranking-
+table empty-state messages and `sales_territory_performance.html`'s
+empty-state plus a multi-line footer paragraph containing **two**
+`<a href="..." style="...">` links with an inline `style` attribute —
+each `href`'s and `style`'s literal double quote gets escaped by
+`makemessages` to the two-character sequence `\"` in the `.po` msgid
+(the same escaping gotcha the Purchasing pass hit for plain quoted text,
+now recurring inside HTML attributes), and the multi-line footer
+additionally wraps across a template line break exactly like the
+Maintenance pass's labor-report footnote. Both gotchas compound in the
+same string: translation-dict keys and values both needed to be built as
+Python raw strings (`r"...\"..."`) using a **double-quote-delimited** raw
+string rather than single-quoted, specifically because several French
+translations of this content contain apostrophes (`d'objectif`,
+`l'instant`) that would otherwise prematurely terminate a single-quoted
+raw string — confirmed by testing both delimiter choices at the byte
+level before applying, since getting this wrong would have silently
+dropped the real `<a>` links from the translated pages in favor of
+plain text (caught in a first draft that mistakenly rendered these as
+guillemet-quoted plain text instead of live links, corrected before
+applying to the `.po` files). `manage.py makemessages` fuzzy-matched 169
+of the new strings against unrelated existing translations, a new high
+for this series, handled cleanly with the established
+blank-the-msgstr-when-stripping-fuzzy technique. Full suite 3431 passed
+(unchanged), `manage.py check` clean, `compilemessages` clean,
+`msgfmt --check` clean on all three files (including the four
+attribute-quoted/multi-line entries), zero blank/duplicated entries
+confirmed programmatically (the recurring plural-concatenation false
+positives reappear here too, plus one new expected false-positive flag
+on the multi-line footer paragraph itself, since its two `style="color:
+#aad;"` attributes are legitimately repeated text within a single long
+string — confirmed not corruption). Verified end-to-end against the real
+dev server: the Sales Dashboard, Sales Orders list + a draft order's
+detail page, Sales Quotes, Leads list + a detail page, Sales Contracts
+list, Sales Forecast list + a detail page (confirmed the blocktrans'd
+period-actuals banner), Territory Management + Territory Performance
+(confirmed the "Sin Asignar"/`Unassigned` fix and, via direct DOM
+inspection, that the footer paragraph's two `<a>` tags render as real
+working links with correct `href`s in Spanish), Commission Tracking,
+Commission Plans (confirmed the Active/Inactive fix and the doubled-`%%`
+"e.g. Standard 5%" placeholder), Commission Payment History, the Sales
+Performance rankings dashboard, Performance Reviews, Coaching Notes,
+Sales Reports, and Demand Forecast, in Spanish, French, and German with
+real sample data, no console errors. **Two pre-existing, unrelated bugs
+were found and flagged separately rather than fixed in this i18n-only
+pass**: (1) `sales_order_detail.html`'s status-transition buttons
+(`{{ SO_STATUS_ACTION_LABELS|get_item:t|default:t }}`) crash with
+`TemplateSyntaxError: Invalid filter: 'get_item'` whenever an order has
+available status transitions, because no `get_item` template filter has
+ever been defined anywhere in the codebase (confirmed via `git show
+main:...` that this predates this pass entirely — there is no
+`manufacturing/templatetags/` directory at all); (2) confirmed to be a
+distinct, already-flagged issue from the `/purch/reports/` table-name bug
+found during the Purchasing pass. **Localization coverage is now 200
+templates across three languages** (core shell + login + main dashboard +
+all 5 htmx templates + the full Legal department (10) + the full
+Marketing department (13) + the full Reports department (4) + the full
+Payroll department (8) + the full Time Clock department (7) + the full
+Customers/Credit department (7) + the full Engineering department (10) +
+the full Customer Service department (13) + the full Accounting
+department (13) + the full IT department (17) + the full Finance
+department (10) + the full Quality department (12) + the full Production
+department (13, plus the 2 already-translated htmx templates) + the full
+Maintenance department (16, plus the 2 already-translated htmx
+templates) + the full Purchasing department (19) + the full Sales
+department (21)) out of ~450 total — the first time this series has
+crossed 200, with only Personnel (larger, sprawling across separate
+`benefit_*`/`employee_*`/`skill_*`/`termination_*`/`workforce_*`
+prefixes) left as an unstarted department.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so
