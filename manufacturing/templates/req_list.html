@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Purchase Requisitions{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Purchase Requisitions" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/purch/" class="btn">Purchasing</a>
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/purch/contracts/" class="btn">Contracts</a>
-<a href="/purch/reports/" class="btn">Reports</a>
-<a href="/purch/requisitions/" class="btn">Requisitions</a>
-<a href="/suppliers/" class="btn">Suppliers</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/purch/" class="btn">{% trans "Purchasing" %}</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/purch/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/purch/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/purch/requisitions/" class="btn">{% trans "Requisitions" %}</a>
+<a href="/suppliers/" class="btn">{% trans "Suppliers" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -55,29 +56,29 @@
 {% block body %}
 <div class="content">
 <div class="lg-wrap">
-    <h2>Purchase Requisitions</h2>
+    <h2>{% trans "Purchase Requisitions" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search req # / justification…">
-        <button type="submit">Filter</button>
-        <a href="/purch/requisitions/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search req # / justification…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/purch/requisitions/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Req #</th><th>Requester</th><th>Department</th>
-                    <th>Justification</th><th>Needed</th>
-                    <th class="metric">Est. Total</th><th>Status</th>
+                    <th>{% trans "Req #" %}</th><th>{% trans "Requester" %}</th><th>{% trans "Department" %}</th>
+                    <th>{% trans "Justification" %}</th><th>{% trans "Needed" %}</th>
+                    <th class="metric">{% trans "Est. Total" %}</th><th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,7 +93,7 @@
                 <td><span class="badge s-{{ r.status }}">{{ r.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="color:#888;text-align:center;">No requisitions found.</td></tr>
+            <tr><td colspan="7" style="color:#888;text-align:center;">{% trans "No requisitions found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -100,27 +101,27 @@
 
     {% if user_role != 'Auditor' %}
     <div class="card">
-        <h3>New Requisition</h3>
+        <h3>{% trans "New Requisition" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Justification *</label>
-                    <input type="text" name="justification" required placeholder="Why is this needed?">
+                    <label>{% trans "Justification *" %}</label>
+                    <input type="text" name="justification" required placeholder="{% trans 'Why is this needed?' %}">
                 </div>
                 <div class="form-group">
-                    <label>Needed By</label>
+                    <label>{% trans "Needed By" %}</label>
                     <input type="date" name="needed_date">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Requisition</button>
+            <button type="submit" class="btn-submit">{% trans "Create Requisition" %}</button>
         </form>
         <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">
-            You'll add line items and submit for approval from the requisition's detail page.
+            {% trans "You'll add line items and submit for approval from the requisition's detail page." %}
         </p>
     </div>
     {% endif %}

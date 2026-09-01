@@ -1,25 +1,26 @@
 {% extends "base.html" %}
-{% block page_title %}Requests for Quote{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Requests for Quote" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% if can_edit %}
-<a href="/rfq/new/" class="btn btn-primary">+ New RFQ</a>
+<a href="/rfq/new/" class="btn btn-primary">+ {% trans "New RFQ" %}</a>
 {% endif %}
-<a href="/rfq/?{% if status %}status={{ status }}&{% endif %}export=1" class="btn">&#8659; CSV</a>
+<a href="/rfq/?{% if status %}status={{ status }}&{% endif %}export=1" class="btn">&#8659; {% trans "CSV" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Requests for Quote</div>
+    <div class="menu-title">{% trans "Requests for Quote" %}</div>
 
     <div class="filter-bar">
-        <label>Status:</label>
-        <a href="/rfq/" class="{% if not status %}active{% endif %}">All</a>
-        <a href="/rfq/?status=open" class="{% if status == 'open' %}active{% endif %}">Open</a>
-        <a href="/rfq/?status=awarded" class="{% if status == 'awarded' %}active{% endif %}">Awarded</a>
-        <a href="/rfq/?status=closed" class="{% if status == 'closed' %}active{% endif %}">Closed</a>
+        <label>{% trans "Status:" %}</label>
+        <a href="/rfq/" class="{% if not status %}active{% endif %}">{% trans "All" %}</a>
+        <a href="/rfq/?status=open" class="{% if status == 'open' %}active{% endif %}">{% trans "Open" %}</a>
+        <a href="/rfq/?status=awarded" class="{% if status == 'awarded' %}active{% endif %}">{% trans "Awarded" %}</a>
+        <a href="/rfq/?status=closed" class="{% if status == 'closed' %}active{% endif %}">{% trans "Closed" %}</a>
     </div>
 
     {% if rfqs %}
@@ -27,11 +28,11 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>RFQ #</th>
-                    <th>Status</th>
-                    <th>Notes</th>
-                    <th>Created By</th>
-                    <th>Created</th>
+                    <th>{% trans "RFQ #" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Notes" %}</th>
+                    <th>{% trans "Created By" %}</th>
+                    <th>{% trans "Created" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -41,24 +42,30 @@
                     <td><a href="/rfq/{{ r.id }}/">{{ r.rfq_number }}</a></td>
                     <td>
                         {% if r.status == 'awarded' %}
-                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Awarded</span>
+                        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Awarded" %}</span>
                         {% elif r.status == 'closed' %}
-                        <span class="pill" style="font-size:11px;padding:2px 8px;">Closed</span>
+                        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Closed" %}</span>
                         {% else %}
-                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+                        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "Open" %}</span>
                         {% endif %}
                     </td>
                     <td style="color:var(--text-muted);">{{ r.notes|default:"—" }}</td>
                     <td style="color:var(--text-muted);">{{ r.created_by|default:"—" }}</td>
                     <td>{{ r.created_at|date:"Y-m-d" }}</td>
-                    <td><a href="/rfq/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">Detail</a></td>
+                    <td><a href="/rfq/{{ r.id }}/" class="btn" style="padding:3px 10px;font-size:12px;">{% trans "Detail" %}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No RFQs found{% if status %} with status "{{ status }}"{% endif %}.</div>
+    <div class="empty-state">
+        {% if status %}
+        {% blocktrans %}No RFQs found with status "{{ status }}".{% endblocktrans %}
+        {% else %}
+        {% trans "No RFQs found." %}
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,36 +1,37 @@
 {% extends "base.html" %}
-{% block page_title %}Landed Cost — PO {{ po.po_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=po.po_number %}Landed Cost — PO {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/po/{{ po.id }}/" class="btn">← Back to PO</a>
+<a href="/po/{{ po.id }}/" class="btn">← {% trans "Back to PO" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Landed Cost — PO {{ po.po_number }}</div>
+    <div class="menu-title">{% blocktrans with num=po.po_number %}Landed Cost — PO {{ num }}{% endblocktrans %}</div>
 
     <div class="card">
-        <div class="card-title">Summary</div>
-        <p><strong>Allocation Method:</strong> {{ lc.allocation_method|capfirst }}</p>
-        <p><strong>Freight:</strong> ${{ lc.freight|floatformat:2 }}</p>
-        <p><strong>Duty:</strong> ${{ lc.duty|floatformat:2 }}</p>
-        <p><strong>Broker Fee:</strong> ${{ lc.broker_fee|floatformat:2 }}</p>
-        <p><strong>Insurance:</strong> ${{ lc.insurance|floatformat:2 }}</p>
-        <p><strong>Total:</strong> ${{ lc.total|floatformat:2 }}</p>
-        <p><strong>Entered:</strong> {{ lc.created_at|default:"" }} by {{ lc.created_by|default:"" }}</p>
+        <div class="card-title">{% trans "Summary" %}</div>
+        <p><strong>{% trans "Allocation Method:" %}</strong> {{ lc.allocation_method|capfirst }}</p>
+        <p><strong>{% trans "Freight:" %}</strong> ${{ lc.freight|floatformat:2 }}</p>
+        <p><strong>{% trans "Duty:" %}</strong> ${{ lc.duty|floatformat:2 }}</p>
+        <p><strong>{% trans "Broker Fee:" %}</strong> ${{ lc.broker_fee|floatformat:2 }}</p>
+        <p><strong>{% trans "Insurance:" %}</strong> ${{ lc.insurance|floatformat:2 }}</p>
+        <p><strong>{% trans "Total:" %}</strong> ${{ lc.total|floatformat:2 }}</p>
+        <p><strong>{% trans "Entered:" %}</strong> {{ lc.created_at|default:"" }} {% trans "by" %} {{ lc.created_by|default:"" }}</p>
     </div>
 
     <div class="card">
-        <div class="card-title">Allocation Detail</div>
+        <div class="card-title">{% trans "Allocation Detail" %}</div>
         <div class="erp-table-wrap">
             <table class="erp-table">
                 <thead>
                     <tr>
-                        <th>Description</th>
-                        <th class="num">Qty Received</th>
-                        <th class="num">Weight Used</th>
-                        <th class="num">Allocated Amount</th>
-                        <th class="num">Per-Unit Cost Added</th>
+                        <th>{% trans "Description" %}</th>
+                        <th class="num">{% trans "Qty Received" %}</th>
+                        <th class="num">{% trans "Weight Used" %}</th>
+                        <th class="num">{% trans "Allocated Amount" %}</th>
+                        <th class="num">{% trans "Per-Unit Cost Added" %}</th>
                     </tr>
                 </thead>
                 <tbody>

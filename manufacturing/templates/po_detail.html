@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page_title %}{{ po.po_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">Back</a>
-{% if can_edit %}<a href="/po/{{ po.id }}/edit/" class="btn">Edit</a>{% endif %}
+<a href="{{ back_url }}" class="btn">{% trans "Back" %}</a>
+{% if can_edit %}<a href="/po/{{ po.id }}/edit/" class="btn">{% trans "Edit" %}</a>{% endif %}
 {% if user_role == 'President' or user_role == 'Vice President' or user_role == 'Auditor' %}
-<a href="{% url 'audit_record' 'purchase_order' po.id %}" class="btn">History</a>
+<a href="{% url 'audit_record' 'purchase_order' po.id %}" class="btn">{% trans "History" %}</a>
 {% endif %}
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
-<a href="/label/po/{{ po.id }}/" target="_blank" class="btn">Print Label</a>
-<a href="/label/receiving/{{ po.id }}/" target="_blank" class="btn">Print Receiving Label</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
+<a href="/label/po/{{ po.id }}/" target="_blank" class="btn">{% trans "Print Label" %}</a>
+<a href="/label/receiving/{{ po.id }}/" target="_blank" class="btn">{% trans "Print Receiving Label" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -86,7 +87,7 @@
 
 {% block body %}
 <div class="content">
-    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    <button class="print-btn" onclick="window.print()">{% trans "Print / Save PDF" %}</button>
     <div class="po-wrap">
         <div class="po-card">
             <div class="po-barcode">
@@ -100,23 +101,23 @@
                 </span>
             </div>
             <div class="po-meta">
-                <div><b>Supplier:</b> {{ po.company_name|default:"—" }}</div>
-                <div><b>Total:</b> {{ po.currency|default:"USD" }} {{ po.total|floatformat:2 }}
+                <div><b>{% trans "Supplier:" %}</b> {{ po.company_name|default:"—" }}</div>
+                <div><b>{% trans "Total:" %}</b> {{ po.currency|default:"USD" }} {{ po.total|floatformat:2 }}
                     {% if currencies and po.currency and po.currency != base_currency %}
                     <span style="font-size:12px;color:#888;">(≈ ${{ po.total_base|floatformat:2 }} {{ base_currency }})</span>
                     {% endif %}
                 </div>
-                <div><b>Order Date:</b> {{ po.order_date|default:"—" }}</div>
-                <div><b>Expected:</b> {{ po.expected_date|default:"—" }}</div>
+                <div><b>{% trans "Order Date:" %}</b> {{ po.order_date|default:"—" }}</div>
+                <div><b>{% trans "Expected:" %}</b> {{ po.expected_date|default:"—" }}</div>
                 <div style="grid-column: 1 / -1;">
-                    <b>Notes:</b> {{ po.notes|default:"—" }}</div>
+                    <b>{% trans "Notes:" %}</b> {{ po.notes|default:"—" }}</div>
             </div>
             {% if currencies and can_edit %}
             <div style="margin-top:10px;">
                 <form method="post" action="" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="currency">
-                    <label style="font-size:12px;font-weight:bold;color:#555;">Currency:</label>
+                    <label style="font-size:12px;font-weight:bold;color:#555;">{% trans "Currency:" %}</label>
                     <select name="currency" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
                         {% for cur in currencies %}
                         <option value="{{ cur.code }}" {% if po.currency == cur.code %}selected{% elif not po.currency and cur.code == base_currency %}selected{% endif %}>{{ cur.code }} — {{ cur.name }}</option>
@@ -125,18 +126,18 @@
                     <input type="number" name="exchange_rate" step="0.000001" min="0"
                         value="{{ po.exchange_rate|default:'1.0' }}"
                         style="width:90px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;"
-                        placeholder="Rate">
-                    <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Set Currency</button>
+                        placeholder="{% trans 'Rate' %}">
+                    <button type="submit" style="padding:4px 10px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">{% trans "Set Currency" %}</button>
                 </form>
             </div>
             {% endif %}
             {% if po.status == 'pending_approval' and approval %}
             <div style="margin-top:14px;padding:10px 14px;background:#fff0b3;
                         border:1px solid #e0b800;border-radius:4px;font-size:13px;">
-                <b>Awaiting approval</b> — this PO exceeds the ${{ approval_threshold|floatformat:0 }}
-                approval threshold. Requested by {{ approval.requested_by }}.
+                <b>{% trans "Awaiting approval" %}</b> —
+                {% blocktrans with threshold=approval_threshold|floatformat:0 requester=approval.requested_by %}this PO exceeds the ${{ threshold }} approval threshold. Requested by {{ requester }}.{% endblocktrans %}
                 {% if user_role == 'President' or user_role == 'Vice President' %}
-                <a href="{% url 'po_approvals' %}" style="color:#003cb4;">Go to approval queue &rarr;</a>
+                <a href="{% url 'po_approvals' %}" style="color:#003cb4;">{% trans "Go to approval queue" %} &rarr;</a>
                 {% endif %}
             </div>
             {% endif %}
@@ -144,7 +145,7 @@
             <div class="po-status-actions">
                 {% for target, label in status_actions %}
                 <form method="post" action="/po/{{ po.id }}/status/"
-                      {% if target == 'cancelled' %}onsubmit="return confirm('Cancel this PO?');"{% endif %}>
+                      {% if target == 'cancelled' %}onsubmit="return confirm('{% trans "Cancel this PO?" %}');"{% endif %}>
                     {% csrf_token %}
                     <input type="hidden" name="status" value="{{ target }}">
                     <button type="submit"
@@ -160,13 +161,13 @@
         <table class="po-table">
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th>Product</th>
-                    <th class="num">Qty</th>
-                    <th class="num">Unit Price</th>
-                    <th class="num">Received</th>
-                    {% if can_receive %}<th class="num">Receive</th>{% endif %}
-                    <th class="num">Line Total</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th class="num">{% trans "Qty" %}</th>
+                    <th class="num">{% trans "Unit Price" %}</th>
+                    <th class="num">{% trans "Received" %}</th>
+                    {% if can_receive %}<th class="num">{% trans "Receive" %}</th>{% endif %}
+                    <th class="num">{% trans "Line Total" %}</th>
                     {% if can_edit %}<th></th>{% endif %}
                 </tr>
             </thead>
@@ -187,7 +188,7 @@
                             <input type="number" name="qty_received" min="0"
                                    max="{{ it.qty_ordered }}"
                                    value="{{ it.qty_received }}">
-                            <button type="submit" class="btn btn-sm">Save</button>
+                            <button type="submit" class="btn btn-sm">{% trans "Save" %}</button>
                         </form>
                     </td>
                     {% endif %}
@@ -195,10 +196,10 @@
                     {% if can_edit %}
                     <td class="num">
                         <form method="post" action="/po/{{ po.id }}/items/remove/"
-                              onsubmit="return confirm('Remove this line item?');">
+                              onsubmit="return confirm('{% trans "Remove this line item?" %}');">
                             {% csrf_token %}
                             <input type="hidden" name="item_id" value="{{ it.id }}">
-                            <button type="submit" class="btn btn-sm">Remove</button>
+                            <button type="submit" class="btn btn-sm">{% trans "Remove" %}</button>
                         </form>
                     </td>
                     {% endif %}
@@ -207,7 +208,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" class="num">Total</td>
+                    <td colspan="5" class="num">{% trans "Total" %}</td>
                     {% if can_receive %}<td></td>{% endif %}
                     <td class="num">${{ po.total|floatformat:2 }}</td>
                     {% if can_edit %}<td></td>{% endif %}
@@ -215,21 +216,21 @@
             </tfoot>
         </table>
         {% else %}
-        <div class="po-card po-empty">This purchase order has no line items.</div>
+        <div class="po-card po-empty">{% trans "This purchase order has no line items." %}</div>
         {% endif %}
 
         <div class="po-card" style="margin-top:20px;">
-            <h3>Landed Costs
+            <h3>{% trans "Landed Costs" %}
                 {% if can_edit %}
-                <a href="/po/{{ po.id }}/landed-cost/new/" class="btn btn-sm" style="float:right;">+ Add Landed Cost</a>
+                <a href="/po/{{ po.id }}/landed-cost/new/" class="btn btn-sm" style="float:right;">+ {% trans "Add Landed Cost" %}</a>
                 {% endif %}
             </h3>
             {% if landed_costs %}
             <table class="po-table">
                 <thead>
-                    <tr><th>Method</th><th class="num">Freight</th><th class="num">Duty</th>
-                        <th class="num">Broker Fee</th><th class="num">Insurance</th>
-                        <th class="num">Total</th><th>Entered</th></tr>
+                    <tr><th>{% trans "Method" %}</th><th class="num">{% trans "Freight" %}</th><th class="num">{% trans "Duty" %}</th>
+                        <th class="num">{% trans "Broker Fee" %}</th><th class="num">{% trans "Insurance" %}</th>
+                        <th class="num">{% trans "Total" %}</th><th>{% trans "Entered" %}</th></tr>
                 </thead>
                 <tbody>
                     {% for lc in landed_costs %}
@@ -246,40 +247,40 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color:#888;font-size:13px;">No landed costs recorded yet.</p>
+            <p style="color:#888;font-size:13px;">{% trans "No landed costs recorded yet." %}</p>
             {% endif %}
         </div>
 
         {% if can_edit %}
         <div class="add-item">
-            <h3>Add Line Item</h3>
+            <h3>{% trans "Add Line Item" %}</h3>
             <form method="post" action="/po/{{ po.id }}/items/add/">
                 {% csrf_token %}
                 <div class="grid">
                     <div>
-                        <label>Product (optional)</label>
+                        <label>{% trans "Product (optional)" %}</label>
                         <select name="product_id">
-                            <option value="">(none)</option>
+                            <option value="">{% trans "(none)" %}</option>
                             {% for p in products %}
                             <option value="{{ p.id }}">{{ p.product_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div>
-                        <label>Description</label>
+                        <label>{% trans "Description" %}</label>
                         <input type="text" name="description" required>
                     </div>
                     <div>
-                        <label>Qty</label>
+                        <label>{% trans "Qty" %}</label>
                         <input type="number" name="qty_ordered" min="1" value="1">
                     </div>
                     <div>
-                        <label>Unit Price</label>
+                        <label>{% trans "Unit Price" %}</label>
                         <input type="number" name="unit_price" min="0"
                                step="0.01" value="0.00">
                     </div>
                     <div>
-                        <button type="submit" class="btn">Add</button>
+                        <button type="submit" class="btn">{% trans "Add" %}</button>
                     </div>
                 </div>
             </form>

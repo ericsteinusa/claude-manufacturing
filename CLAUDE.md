@@ -888,6 +888,100 @@ Production department (13, plus the 2 already-translated htmx
 templates) + the full Maintenance department (16, plus the 2
 already-translated htmx templates)) out of ~450 total.
 
+Also fully translated: the entire **Purchasing department**
+(`purchasing_dashboard.html`, `purch_reports.html`,
+`purch_contracts_list.html`/`_detail.html`, `po_list.html`/`_detail.html`/
+`_form.html`, `po_approvals.html`, `po_landed_cost_detail.html`/`_new.html`,
+`rfq_list.html`/`_detail.html`/`_new.html`, `blanket_po_list.html`/
+`_detail.html`/`_new.html`, `blanket_po_release_new.html`, `req_list.html`/
+`_detail.html` — 19 templates, the fifteenth "whole department" pass, the
+largest yet by unique-string count). Deliberately excluded, matching the
+established "translate the link, not yet the target" precedent: the
+dashboard's links to `/suppliers/` (renders the generic, non-Purchasing-
+specific `contacts_list.html` shared across multiple contact types — not
+even really a Purchasing-owned template), `/consignment/` (5 templates),
+`/supplier-portal/` (9 templates), and the supplier-scorecard pages (2
+templates) — none of which are part of this 19-template core. 182 unique
+strings per language, all simple (no plurals — none of this department's
+KPI sub-labels needed one). Half of these templates (`po_*.html`,
+`blanket_po_*.html`) use the newer shared `erp-table`/`menu-title`/`pill`/
+`empty-state` design-system classes from the web-native PO migration
+(`views.WEB_LEAF_URLS`; see the Web-PO feature note) rather than this
+app's older hand-styled per-page CSS — cosmetically different from the
+`purch_*.html`/`rfq_*.html` half of the pass, but translated with the same
+`{% trans %}`/`{% blocktrans %}` approach throughout. Extended the existing
+`confirm('{% trans "..." %}')` pattern (previously used in only two other
+templates app-wide, `finance_budget_detail.html` and `gl_journal_detail
+.html`) to five more JS `confirm()` dialogs here, including two using
+`{% blocktrans %}` with an interpolated PO/blanket-PO number inside the JS
+string — confirmed this works identically to `{% trans %}` since Django
+renders the tag server-side before the JS ever reaches the browser. Used
+`{% blocktrans with %}` for eight dynamic titles ("Edit {num}", "Contract —
+{num}", "Landed Cost — PO {num}", "Add Landed Cost — PO {num}", "Add
+Call-off — {num}", "Requisition {num}", plus two embedded-HTML "Total
+Value:"/"Total Qty:" summary lines mixing a `<b>` tag with two or three
+interpolated variables, the same pattern established in the Customers/
+Credit and Accounting passes). **Found and correctly handled the same
+class of escaping gotcha the Maintenance pass hit for embedded newlines,
+but for embedded quotes instead**: three empty-state messages
+(`po_list.html`, `blanket_po_list.html`, `rfq_list.html`) read `No purchase
+orders with status "{{ status }}".` in the English source — `makemessages`
+escapes the literal `"` characters to the two-character sequence `\"` in
+the `.po` msgid (same as any quoted string embedded in a `.po` file), so a
+translation-dict key built with a normal escaped-quote Python string
+(where `\"` is decoded to a single `"` character) silently fails to match
+and leaves the entry unapplied; fixed by building those specific dict keys
+as Python raw strings (`r'...\"...'`) so the literal two-character
+backslash-quote sequence survives into the runtime string exactly as
+`makemessages` wrote it — confirmed with a byte-level check before
+applying, mirroring the Maintenance pass's `\n`-escape fix. Sidestepped the
+same issue in the *translated* values entirely by using guillemets (`«
+»`) instead of straight quotes, the established convention since the Time
+Clock pass. Same raw-string technique also handled two multi-line
+`{% blocktrans %}` strings that wrap across a template line break (the PO
+approval-queue's threshold notice, mirroring the Maintenance labor
+report's footnote gotcha). No bare `{{ x|default:"literal" }}` fallback
+bugs and no untranslatable `|pluralize` uses found this pass — the first
+department pass in this series to come up clean on both of those standing
+checklist items. `makemessages` fuzzy-matched 111 of the new strings
+against unrelated existing translations (second only to IT's 121), handled
+cleanly from the start with the established blank-the-msgstr-when-stripping-fuzzy
+technique. Full suite 3431 passed (unchanged), `manage.py check` clean,
+`compilemessages` clean, `msgfmt --check` clean on all three files
+(including the two escaped-quote and two multi-line entries), zero blank/
+duplicated entries confirmed programmatically (the recurring plural-
+concatenation false positives from earlier passes reappear here too,
+unrelated to this batch, since Purchasing added no new plurals). Verified
+end-to-end against the real dev server: the Purchasing Dashboard (KPI
+cards and charts), PO list + a draft PO's detail page, RFQ list + an open
+RFQ's detail page (confirmed the quote-comparison table and vendor-invite
+flow), Blanket PO list + a closed blanket PO's detail page (confirmed the
+embedded-`<b>`-tag "Valor Total: $1000,00 (Liberado: ..., Restante: ...)"
+line in Spanish), Purchase Requisitions list + a dept-approved
+requisition's detail page (confirmed "Requisición REQ-2026-0006"), the PO
+Approval Queue (confirmed the threshold notice's multi-line blocktrans in
+French), Vendor Contracts (empty state + new-contract form), and a New PO
+form, in Spanish, French, and German with real sample data, no console
+errors. **A pre-existing, unrelated bug was found and flagged separately
+rather than fixed in this i18n-only pass**: `/purch/reports/` 500s with
+`relation "purchase_order_item" does not exist` — the view's SQL
+references a table name that doesn't match the live schema (the real
+table is `po_item`), the same live-schema-vs-code-assumption class of bug
+documented elsewhere in this file's "Database gotchas" section; confirmed
+present on `main` before this branch's changes, unrelated to any template
+edit here. **Localization coverage is now 179 templates across three
+languages** (core shell + login + main dashboard + all 5 htmx templates +
+the full Legal department (10) + the full Marketing department (13) + the
+full Reports department (4) + the full Payroll department (8) + the full
+Time Clock department (7) + the full Customers/Credit department (7) +
+the full Engineering department (10) + the full Customer Service
+department (13) + the full Accounting department (13) + the full IT
+department (17) + the full Finance department (10) + the full Quality
+department (12) + the full Production department (13, plus the 2
+already-translated htmx templates) + the full Maintenance department (16,
+plus the 2 already-translated htmx templates) + the full Purchasing
+department (19)) out of ~450 total.
+
 The main dashboard's department grid
 button labels are the one exception — they're rendered from
 `menus.py`-generated Python strings, not template-static text, so

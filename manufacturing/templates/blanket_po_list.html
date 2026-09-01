@@ -1,20 +1,21 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Blanket Purchase Orders{% endblock %}
+{% block page_title %}{% trans "Blanket Purchase Orders" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-{% if can_edit %}<a href="/blanket-po/new/" class="btn btn-primary">+ New Blanket PO</a>{% endif %}
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+{% if can_edit %}<a href="/blanket-po/new/" class="btn btn-primary">+ {% trans "New Blanket PO" %}</a>{% endif %}
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Blanket Purchase Orders</div>
+    <div class="menu-title">{% trans "Blanket Purchase Orders" %}</div>
 
     <div class="filter-bar">
-        <label>Status:</label>
-        <a href="/blanket-po/" class="{% if not status %}active{% endif %}">All</a>
+        <label>{% trans "Status:" %}</label>
+        <a href="/blanket-po/" class="{% if not status %}active{% endif %}">{% trans "All" %}</a>
         {% for s in statuses %}
         <a href="/blanket-po/?status={{ s }}"
            class="{% if status == s %}active{% endif %}">{{ s|capfirst }}</a>
@@ -26,13 +27,13 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>Blanket #</th>
-                    <th>Supplier</th>
-                    <th>Validity</th>
-                    <th class="num">Total</th>
-                    <th class="num">Released</th>
-                    <th class="num">Remaining</th>
-                    <th>Status</th>
+                    <th>{% trans "Blanket #" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "Validity" %}</th>
+                    <th class="num">{% trans "Total" %}</th>
+                    <th class="num">{% trans "Released" %}</th>
+                    <th class="num">{% trans "Remaining" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,17 +44,17 @@
                     <td>{{ bp.start_date|default:"—" }} – {{ bp.end_date|default:"—" }}</td>
                     <td class="num">
                         {% if bp.total_value %}${{ bp.total_value|floatformat:2 }}
-                        {% elif bp.total_qty %}{{ bp.total_qty|floatformat:0 }} units
+                        {% elif bp.total_qty %}{% blocktrans with qty=bp.total_qty|floatformat:0 %}{{ qty }} units{% endblocktrans %}
                         {% else %}—{% endif %}
                     </td>
                     <td class="num">
                         {% if bp.total_value %}${{ bp.released_value|floatformat:2 }}
-                        {% elif bp.total_qty %}{{ bp.released_qty|floatformat:0 }} units
+                        {% elif bp.total_qty %}{% blocktrans with qty=bp.released_qty|floatformat:0 %}{{ qty }} units{% endblocktrans %}
                         {% else %}—{% endif %}
                     </td>
                     <td class="num">
                         {% if bp.total_value %}${{ bp.remaining_value|floatformat:2 }}
-                        {% elif bp.total_qty %}{{ bp.remaining_qty|floatformat:0 }} units
+                        {% elif bp.total_qty %}{% blocktrans with qty=bp.remaining_qty|floatformat:0 %}{{ qty }} units{% endblocktrans %}
                         {% else %}—{% endif %}
                     </td>
                     <td><span class="pill">{{ bp.status|capfirst }}</span></td>
@@ -64,7 +65,11 @@
     </div>
     {% else %}
     <div class="empty-state">
-        No blanket purchase orders{% if status %} with status "{{ status|capfirst }}"{% endif %}.
+        {% if status %}
+        {% blocktrans with s=status|capfirst %}No blanket purchase orders with status "{{ s }}".{% endblocktrans %}
+        {% else %}
+        {% trans "No blanket purchase orders." %}
+        {% endif %}
     </div>
     {% endif %}
 </div>

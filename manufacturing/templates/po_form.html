@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}{% if mode == 'edit' %}Edit {{ form.po_number }}{% else %}New Purchase Order{% endif %}{% endblock %}
+{% block page_title %}{% if mode == 'edit' %}{% blocktrans with num=form.po_number %}Edit {{ num }}{% endblocktrans %}{% else %}{% trans "New Purchase Order" %}{% endif %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <div class="menu-title">
-        {% if mode == 'edit' %}Edit {{ form.po_number }}{% else %}New Purchase Order{% endif %}
+        {% if mode == 'edit' %}{% blocktrans with num=form.po_number %}Edit {{ num }}{% endblocktrans %}{% else %}{% trans "New Purchase Order" %}{% endif %}
     </div>
 
     <div class="card" style="max-width:520px;">
@@ -21,7 +22,7 @@
             {% csrf_token %}
 
             <div class="form-row">
-                <label>PO Number</label>
+                <label>{% trans "PO Number" %}</label>
                 {% if mode == 'edit' %}
                 <input type="text" value="{{ form.po_number }}" readonly>
                 {% else %}
@@ -30,9 +31,9 @@
             </div>
 
             <div class="form-row">
-                <label>Supplier</label>
+                <label>{% trans "Supplier" %}</label>
                 <select name="supplier_id">
-                    <option value="">(none)</option>
+                    <option value="">{% trans "(none)" %}</option>
                     {% for s in suppliers %}
                     <option value="{{ s.id }}"
                         {% if s.id == form.supplier_id %}selected{% endif %}>
@@ -42,23 +43,23 @@
             </div>
 
             <div class="form-row">
-                <label>Order Date</label>
+                <label>{% trans "Order Date" %}</label>
                 <input type="date" name="order_date" value="{{ form.order_date }}">
             </div>
 
             <div class="form-row">
-                <label>Expected Date</label>
+                <label>{% trans "Expected Date" %}</label>
                 <input type="date" name="expected_date" value="{{ form.expected_date }}">
             </div>
 
             {% if mode == 'edit' %}
             <div class="form-row">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <input type="text" value="{{ form.status|capfirst }}" readonly>
             </div>
             {% else %}
             <div class="form-row">
-                <label>Status</label>
+                <label>{% trans "Status" %}</label>
                 <select name="status">
                     {% for s in statuses %}
                     <option value="{{ s }}"
@@ -70,15 +71,15 @@
             {% endif %}
 
             <div class="form-row">
-                <label>Notes</label>
+                <label>{% trans "Notes" %}</label>
                 <input type="text" name="notes" value="{{ form.notes }}">
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                    {% if mode == 'edit' %}Save{% else %}Create PO{% endif %}
+                    {% if mode == 'edit' %}{% trans "Save" %}{% else %}{% trans "Create PO" %}{% endif %}
                 </button>
-                <a href="{{ back_url }}" class="btn">Cancel</a>
+                <a href="{{ back_url }}" class="btn">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>

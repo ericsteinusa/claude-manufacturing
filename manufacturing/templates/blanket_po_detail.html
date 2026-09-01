@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page_title %}{{ bp.blanket_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="{{ back_url }}" class="btn">← Back</a>
-{% if full_access %}<a href="/dashboard/" class="btn">Home</a>{% endif %}
+<a href="{{ back_url }}" class="btn">← {% trans "Back" %}</a>
+{% if full_access %}<a href="/dashboard/" class="btn">{% trans "Home" %}</a>{% endif %}
 {% endblock %}
 
 {% block extra_styles %}
@@ -47,45 +48,45 @@
                 <span class="pill">{{ bp.status|capfirst }}</span>
             </div>
             <div class="po-meta">
-                <div><b>Supplier:</b> {{ bp.supplier_name|default:"—" }}</div>
-                <div><b>Description:</b> {{ bp.description|default:"—" }}</div>
-                <div><b>Validity:</b> {{ bp.start_date|default:"—" }} – {{ bp.end_date|default:"—" }}</div>
+                <div><b>{% trans "Supplier:" %}</b> {{ bp.supplier_name|default:"—" }}</div>
+                <div><b>{% trans "Description:" %}</b> {{ bp.description|default:"—" }}</div>
+                <div><b>{% trans "Validity:" %}</b> {{ bp.start_date|default:"—" }} – {{ bp.end_date|default:"—" }}</div>
                 <div>
                     {% if bp.total_value %}
-                    <b>Total Value:</b> ${{ bp.total_value|floatformat:2 }}
-                    (Released: ${{ bp.released_value|floatformat:2 }}, Remaining: ${{ bp.remaining_value|floatformat:2 }})
+                    {% blocktrans with tot=bp.total_value|floatformat:2 rel=bp.released_value|floatformat:2 rem=bp.remaining_value|floatformat:2 %}<b>Total Value:</b> ${{ tot }}
+                    (Released: ${{ rel }}, Remaining: ${{ rem }}){% endblocktrans %}
                     {% elif bp.total_qty %}
-                    <b>Total Qty:</b> {{ bp.total_qty|floatformat:0 }}
-                    (Released: {{ bp.released_qty|floatformat:0 }}, Remaining: {{ bp.remaining_qty|floatformat:0 }})
+                    {% blocktrans with tot=bp.total_qty|floatformat:0 rel=bp.released_qty|floatformat:0 rem=bp.remaining_qty|floatformat:0 %}<b>Total Qty:</b> {{ tot }}
+                    (Released: {{ rel }}, Remaining: {{ rem }}){% endblocktrans %}
                     {% endif %}
                 </div>
-                <div style="grid-column: 1 / -1;"><b>Notes:</b> {{ bp.notes|default:"—" }}</div>
+                <div style="grid-column: 1 / -1;"><b>{% trans "Notes:" %}</b> {{ bp.notes|default:"—" }}</div>
             </div>
             {% if can_edit and bp.status == 'open' %}
             <form method="post" action="/blanket-po/{{ bp.id }}/cancel/"
-                  onsubmit="return confirm('Cancel this blanket PO?');" style="margin-top:12px;">
+                  onsubmit="return confirm('{% trans "Cancel this blanket PO?" %}');" style="margin-top:12px;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger">Cancel Blanket PO</button>
+                <button type="submit" class="btn btn-sm btn-danger">{% trans "Cancel Blanket PO" %}</button>
             </form>
             {% endif %}
         </div>
 
         <div class="po-card">
             <div class="po-head">
-                <h3 style="margin:0;">Call-offs</h3>
+                <h3 style="margin:0;">{% trans "Call-offs" %}</h3>
                 {% if can_edit and bp.status == 'open' %}
-                <a href="/blanket-po/{{ bp.id }}/release/new/" class="btn btn-sm">+ Add Call-off</a>
+                <a href="/blanket-po/{{ bp.id }}/release/new/" class="btn btn-sm">+ {% trans "Add Call-off" %}</a>
                 {% endif %}
             </div>
             {% if releases %}
             <table class="po-table">
                 <thead>
                     <tr>
-                        <th>Release #</th>
-                        <th class="num">Qty</th>
-                        <th class="num">Value</th>
-                        <th>Delivery Date</th>
-                        <th>Notes</th>
+                        <th>{% trans "Release #" %}</th>
+                        <th class="num">{% trans "Qty" %}</th>
+                        <th class="num">{% trans "Value" %}</th>
+                        <th>{% trans "Delivery Date" %}</th>
+                        <th>{% trans "Notes" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -101,7 +102,7 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="po-empty">No call-offs recorded yet.</div>
+            <div class="po-empty">{% trans "No call-offs recorded yet." %}</div>
             {% endif %}
         </div>
     </div>

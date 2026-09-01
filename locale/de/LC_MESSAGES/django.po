@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 22:34+0000\n"
+"POT-Creation-Date: 2026-09-01 02:27+0000\n"
 "PO-Revision-Date: 2026-08-28 04:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -135,6 +135,8 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/ap_list.html:10
 #: manufacturing/templates/ar_invoice_detail.html:10
 #: manufacturing/templates/ar_list.html:10
+#: manufacturing/templates/blanket_po_detail.html:8
+#: manufacturing/templates/blanket_po_list.html:9
 #: manufacturing/templates/credit_account_detail.html:10
 #: manufacturing/templates/credit_account_list.html:10
 #: manufacturing/templates/credit_application_detail.html:10
@@ -253,6 +255,10 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/payroll_run_new.html:8
 #: manufacturing/templates/payroll_stub_detail.html:8
 #: manufacturing/templates/payroll_ytd.html:8
+#: manufacturing/templates/po_approvals.html:7
+#: manufacturing/templates/po_detail.html:12
+#: manufacturing/templates/po_form.html:8
+#: manufacturing/templates/po_list.html:14
 #: manufacturing/templates/prod_daily_report.html:11
 #: manufacturing/templates/prod_dashboard.html:17
 #: manufacturing/templates/prod_dashboard.html:67
@@ -268,6 +274,11 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/prod_shipping_detail.html:15
 #: manufacturing/templates/prod_shipping_list.html:11
 #: manufacturing/templates/prod_tracking_dashboard.html:11
+#: manufacturing/templates/purch_contract_detail.html:10
+#: manufacturing/templates/purch_contracts_list.html:12
+#: manufacturing/templates/purch_reports.html:12
+#: manufacturing/templates/purchasing_dashboard.html:15
+#: manufacturing/templates/purchasing_dashboard.html:62
 #: manufacturing/templates/qa_audit_detail.html:8
 #: manufacturing/templates/qa_audit_list.html:9
 #: manufacturing/templates/qa_capa_detail.html:8
@@ -282,6 +293,11 @@ msgstr "Lohnabrechnung"
 #: manufacturing/templates/qa_supplier_list.html:9
 #: manufacturing/templates/report_builder_list.html:8
 #: manufacturing/templates/reports_dashboard.html:11
+#: manufacturing/templates/req_detail.html:8
+#: manufacturing/templates/req_list.html:12
+#: manufacturing/templates/rfq_detail.html:7
+#: manufacturing/templates/rfq_list.html:7
+#: manufacturing/templates/rfq_new.html:7
 #: manufacturing/templates/tc_ot_report.html:9
 #: manufacturing/templates/tc_schedule.html:10
 #: manufacturing/templates/time_clock_attendance.html:7
@@ -449,6 +465,7 @@ msgstr "Letzte Buchungen"
 #: manufacturing/templates/maint_downtime_list.html:117
 #: manufacturing/templates/qa_inspection_detail.html:100
 #: manufacturing/templates/qa_inspection_list.html:81
+#: manufacturing/templates/req_detail.html:115
 #: manufacturing/templates/tc_ot_report.html:87
 #: manufacturing/templates/tc_schedule.html:76
 #: manufacturing/templates/time_clock_attendance.html:58
@@ -479,6 +496,7 @@ msgstr "Referenz"
 #: manufacturing/templates/ar_invoice_detail.html:141
 #: manufacturing/templates/ar_invoice_detail.html:155
 #: manufacturing/templates/ar_list.html:145
+#: manufacturing/templates/blanket_po_new.html:30
 #: manufacturing/templates/cs_escalations.html:67
 #: manufacturing/templates/cs_list.html:58
 #: manufacturing/templates/cs_plans.html:131
@@ -505,6 +523,10 @@ msgstr "Referenz"
 #: manufacturing/templates/mkt_research_detail.html:83
 #: manufacturing/templates/mkt_research_detail.html:145
 #: manufacturing/templates/mkt_research_list.html:161
+#: manufacturing/templates/po_detail.html:164
+#: manufacturing/templates/po_detail.html:270
+#: manufacturing/templates/po_landed_cost_detail.html:30
+#: manufacturing/templates/po_landed_cost_new.html:50
 #: manufacturing/templates/prod_daily_report.html:82
 #: manufacturing/templates/prod_dashboard.html:111
 #: manufacturing/templates/prod_reports.html:112
@@ -514,6 +536,8 @@ msgstr "Referenz"
 #: manufacturing/templates/prod_schedule.html:67
 #: manufacturing/templates/prod_shipping_detail.html:151
 #: manufacturing/templates/qa_inspection_detail.html:194
+#: manufacturing/templates/req_detail.html:72
+#: manufacturing/templates/rfq_detail.html:87
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -536,6 +560,7 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/ar_invoice_detail.html:107
 #: manufacturing/templates/ar_invoice_detail.html:151
 #: manufacturing/templates/ar_list.html:84
+#: manufacturing/templates/blanket_po_list.html:36
 #: manufacturing/templates/credit_account_detail.html:62
 #: manufacturing/templates/credit_account_detail.html:105
 #: manufacturing/templates/credit_account_detail.html:133
@@ -687,6 +712,9 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/payroll_dashboard.html:88
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:41
+#: manufacturing/templates/po_form.html:57
+#: manufacturing/templates/po_form.html:62
+#: manufacturing/templates/po_list.html:42
 #: manufacturing/templates/prod_daily_report.html:85
 #: manufacturing/templates/prod_dashboard.html:114
 #: manufacturing/templates/prod_delivery_status.html:65
@@ -704,6 +732,11 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/prod_shipping_list.html:83
 #: manufacturing/templates/prod_shipping_list.html:131
 #: manufacturing/templates/prod_tracking_dashboard.html:76
+#: manufacturing/templates/purch_contract_detail.html:82
+#: manufacturing/templates/purch_contract_detail.html:115
+#: manufacturing/templates/purch_contracts_list.html:86
+#: manufacturing/templates/purch_contracts_list.html:137
+#: manufacturing/templates/purchasing_dashboard.html:134
 #: manufacturing/templates/qa_audit_detail.html:89
 #: manufacturing/templates/qa_audit_list.html:70
 #: manufacturing/templates/qa_capa_detail.html:76
@@ -715,6 +748,8 @@ msgstr "Gesamt Soll"
 #: manufacturing/templates/qa_supplier_detail.html:107
 #: manufacturing/templates/qa_supplier_list.html:85
 #: manufacturing/templates/qa_supplier_list.html:134
+#: manufacturing/templates/req_list.html:81
+#: manufacturing/templates/rfq_list.html:32
 #: manufacturing/templates/tc_device_form.html:221
 #: manufacturing/templates/tc_device_list.html:45
 #: manufacturing/templates/time_clock_attendance.html:89
@@ -734,6 +769,7 @@ msgstr "Gebucht"
 #: manufacturing/templates/finance_dashboard.html:177
 #: manufacturing/templates/legal_dashboard.html:67
 #: manufacturing/templates/marketing_dashboard.html:102
+#: manufacturing/templates/purchasing_dashboard.html:75
 msgid "Draft"
 msgstr "Entwurf"
 
@@ -773,9 +809,14 @@ msgstr "KI-Erkenntnisse"
 #: manufacturing/templates/prod_shipping_detail.html:9
 #: manufacturing/templates/prod_shipping_list.html:10
 #: manufacturing/templates/prod_tracking_dashboard.html:10
+#: manufacturing/templates/purch_contract_detail.html:8
+#: manufacturing/templates/purch_contracts_list.html:8
+#: manufacturing/templates/purch_reports.html:7
+#: manufacturing/templates/purchasing_dashboard.html:9
 #: manufacturing/templates/qa_dashboard.html:11
 #: manufacturing/templates/qa_dashboard.html:116
 #: manufacturing/templates/qa_reports.html:7
+#: manufacturing/templates/req_list.html:9
 msgid "Reports"
 msgstr "Berichte"
 
@@ -833,6 +874,7 @@ msgstr "HB"
 #: manufacturing/templates/ar_invoice_detail.html:54
 #: manufacturing/templates/maint_wo_detail.html:57
 #: manufacturing/templates/payroll_stub_detail.html:36
+#: manufacturing/templates/po_detail.html:90
 #: manufacturing/templates/prod_shipping_detail.html:73
 #: manufacturing/templates/qa_inspection_detail.html:77
 msgid "Print / Save PDF"
@@ -885,6 +927,10 @@ msgstr "Lieferant"
 
 #: manufacturing/templates/ap_invoice_detail.html:95
 #: manufacturing/templates/ap_list.html:122
+#: manufacturing/templates/blanket_po_new.html:23
+#: manufacturing/templates/po_detail.html:263
+#: manufacturing/templates/po_form.html:36
+#: manufacturing/templates/rfq_detail.html:93
 msgid "(none)"
 msgstr "(keine)"
 
@@ -977,6 +1023,7 @@ msgstr "Wechselkurs"
 #: manufacturing/templates/mkt_research_detail.html:157
 #: manufacturing/templates/prod_returns_detail.html:135
 #: manufacturing/templates/prod_shipping_detail.html:130
+#: manufacturing/templates/purch_contract_detail.html:106
 #: manufacturing/templates/qa_audit_detail.html:155
 #: manufacturing/templates/qa_capa_detail.html:142
 #: manufacturing/templates/qa_ncr_detail.html:165
@@ -1056,6 +1103,7 @@ msgstr "Zahlungsverlauf"
 #: manufacturing/templates/ar_invoice_detail.html:204
 #: manufacturing/templates/payroll_deductions.html:121
 #: manufacturing/templates/payroll_deductions.html:179
+#: manufacturing/templates/po_detail.html:231
 msgid "Method"
 msgstr "Methode"
 
@@ -1063,6 +1111,9 @@ msgstr "Methode"
 #: manufacturing/templates/ap_invoice_detail.html:214
 #: manufacturing/templates/ar_invoice_detail.html:167
 #: manufacturing/templates/ar_invoice_detail.html:214
+#: manufacturing/templates/blanket_po_detail.html:89
+#: manufacturing/templates/blanket_po_new.html:50
+#: manufacturing/templates/blanket_po_release_new.html:44
 #: manufacturing/templates/credit_account_detail.html:87
 #: manufacturing/templates/credit_account_detail.html:121
 #: manufacturing/templates/credit_account_list.html:136
@@ -1175,16 +1226,23 @@ msgstr "Methode"
 #: manufacturing/templates/mkt_research_detail.html:153
 #: manufacturing/templates/mkt_research_list.html:165
 #: manufacturing/templates/payroll_deductions.html:192
+#: manufacturing/templates/po_form.html:74
 #: manufacturing/templates/prod_delivery_status.html:66
 #: manufacturing/templates/prod_shipping_detail.html:126
 #: manufacturing/templates/prod_shipping_detail.html:141
 #: manufacturing/templates/prod_shipping_list.html:139
+#: manufacturing/templates/purch_contract_detail.html:102
+#: manufacturing/templates/purch_contract_detail.html:121
+#: manufacturing/templates/purch_contracts_list.html:157
 #: manufacturing/templates/qa_inspection_detail.html:109
 #: manufacturing/templates/qa_inspection_list.html:159
 #: manufacturing/templates/qa_ncr_detail.html:155
 #: manufacturing/templates/qa_ncr_list.html:148
 #: manufacturing/templates/qa_supplier_detail.html:119
 #: manufacturing/templates/qa_supplier_list.html:140
+#: manufacturing/templates/req_detail.html:63
+#: manufacturing/templates/req_list.html:117
+#: manufacturing/templates/rfq_list.html:33
 msgid "Notes"
 msgstr "Notizen"
 
@@ -1221,6 +1279,7 @@ msgstr "Zahlung Erfassen"
 #: manufacturing/templates/ar_list.html:8
 #: manufacturing/templates/maint_wo_list.html:9
 #: manufacturing/templates/payroll_history.html:12
+#: manufacturing/templates/po_list.html:12
 #: manufacturing/templates/qa_ncr_list.html:10
 #: manufacturing/templates/report_builder_detail.html:8
 msgid "Export CSV"
@@ -1230,6 +1289,7 @@ msgstr "CSV exportieren"
 #: manufacturing/templates/ar_list.html:9
 #: manufacturing/templates/maint_wo_list.html:10
 #: manufacturing/templates/payroll_history.html:13
+#: manufacturing/templates/po_list.html:13
 #: manufacturing/templates/qa_ncr_list.html:11
 msgid "Export Excel"
 msgstr "Excel exportieren"
@@ -1253,9 +1313,12 @@ msgstr "Rechnungen Gesamt"
 
 #: manufacturing/templates/ap_list.html:55
 #: manufacturing/templates/ar_list.html:55
+#: manufacturing/templates/blanket_po_list.html:17
 #: manufacturing/templates/eng_ecr_detail.html:47
 #: manufacturing/templates/eng_ecrs.html:47
 #: manufacturing/templates/eng_projects.html:50
+#: manufacturing/templates/po_list.html:23
+#: manufacturing/templates/rfq_list.html:19
 msgid "Status:"
 msgstr "Status:"
 
@@ -1328,6 +1391,8 @@ msgstr "Bis:"
 #: manufacturing/templates/prod_schedule.html:58
 #: manufacturing/templates/prod_schedule_gantt.html:55
 #: manufacturing/templates/prod_shipping_list.html:70
+#: manufacturing/templates/purch_contracts_list.html:71
+#: manufacturing/templates/req_list.html:71
 msgid "Filter"
 msgstr "Filtern"
 
@@ -1376,10 +1441,12 @@ msgstr "Filtern"
 #: manufacturing/templates/prod_schedule.html:59
 #: manufacturing/templates/prod_schedule_gantt.html:56
 #: manufacturing/templates/prod_shipping_list.html:71
+#: manufacturing/templates/purch_contracts_list.html:72
 #: manufacturing/templates/qa_capa_list.html:77
 #: manufacturing/templates/qa_inspection_list.html:73
 #: manufacturing/templates/qa_ncr_list.html:79
 #: manufacturing/templates/qa_supplier_list.html:77
+#: manufacturing/templates/req_list.html:72
 msgid "Clear"
 msgstr "Zurücksetzen"
 
@@ -1469,6 +1536,7 @@ msgid "Customer:"
 msgstr "Kunde:"
 
 #: manufacturing/templates/ar_list.html:84
+#: manufacturing/templates/po_detail.html:168
 msgid "Received"
 msgstr "Erhalten"
 
@@ -1590,12 +1658,27 @@ msgid "Procurement"
 msgstr "Beschaffung"
 
 #: manufacturing/templates/base.html:497
+#: manufacturing/templates/po_approvals.html:6
+#: manufacturing/templates/po_list.html:4
+#: manufacturing/templates/po_list.html:19
+#: manufacturing/templates/purch_contract_detail.html:9
+#: manufacturing/templates/purch_contracts_list.html:10
+#: manufacturing/templates/purch_reports.html:10
+#: manufacturing/templates/purchasing_dashboard.html:6
+#: manufacturing/templates/purchasing_dashboard.html:53
 #: manufacturing/templates/reports_dashboard.html:144
+#: manufacturing/templates/req_list.html:7
+#: manufacturing/templates/rfq_list.html:6
 msgid "Purchase Orders"
 msgstr "Bestellungen"
 
 #: manufacturing/templates/base.html:500
+#: manufacturing/templates/purch_contracts_list.html:11
+#: manufacturing/templates/purch_reports.html:11
+#: manufacturing/templates/purchasing_dashboard.html:11
+#: manufacturing/templates/purchasing_dashboard.html:58
 #: manufacturing/templates/qa_inspection_list.html:8
+#: manufacturing/templates/req_list.html:11
 msgid "Suppliers"
 msgstr "Lieferanten"
 
@@ -1624,6 +1707,8 @@ msgstr "Kundendienst"
 #: manufacturing/templates/prod_dashboard.html:16
 #: manufacturing/templates/prod_dashboard.html:64
 #: manufacturing/templates/prod_reports.html:11
+#: manufacturing/templates/purchasing_dashboard.html:14
+#: manufacturing/templates/purchasing_dashboard.html:60
 msgid "Inventory"
 msgstr "Lagerbestand"
 
@@ -1743,6 +1828,318 @@ msgstr "Datenverwaltung"
 #: manufacturing/templates/dashboard.html:12
 msgid "Periods"
 msgstr "Perioden"
+
+#: manufacturing/templates/blanket_po_detail.html:7
+#: manufacturing/templates/blanket_po_list.html:7
+#: manufacturing/templates/blanket_po_new.html:7
+#: manufacturing/templates/blanket_po_release_new.html:7
+#: manufacturing/templates/po_detail.html:7
+#: manufacturing/templates/po_form.html:7
+#: manufacturing/templates/po_list.html:7
+#: manufacturing/templates/report_builder_detail.html:6
+#: manufacturing/templates/report_builder_form.html:6
+#: manufacturing/templates/report_builder_list.html:6
+#: manufacturing/templates/reports_dashboard.html:7
+#: manufacturing/templates/tc_device_form.html:6
+#: manufacturing/templates/tc_device_list.html:6
+#: manufacturing/templates/time_clock_attendance.html:6
+#: manufacturing/templates/time_clock_hours.html:6
+#: manufacturing/templates/time_clock_status.html:6
+msgid "Back"
+msgstr "Zurück"
+
+#: manufacturing/templates/blanket_po_detail.html:51
+#: manufacturing/templates/po_detail.html:104
+msgid "Supplier:"
+msgstr "Lieferant:"
+
+#: manufacturing/templates/blanket_po_detail.html:52
+msgid "Description:"
+msgstr "Beschreibung:"
+
+#: manufacturing/templates/blanket_po_detail.html:53
+msgid "Validity:"
+msgstr "Gültigkeit:"
+
+#: manufacturing/templates/blanket_po_detail.html:56
+#, python-format
+msgid ""
+"<b>Total Value:</b> $%(tot)s\n"
+"                    (Released: $%(rel)s, Remaining: $%(rem)s)"
+msgstr "<b>Gesamtwert:</b> $%(tot)s\n                    (Freigegeben: $%(rel)s, Verbleibend: $%(rem)s)"
+
+#: manufacturing/templates/blanket_po_detail.html:59
+#, python-format
+msgid ""
+"<b>Total Qty:</b> %(tot)s\n"
+"                    (Released: %(rel)s, Remaining: %(rem)s)"
+msgstr "<b>Gesamtmenge:</b> %(tot)s\n                    (Freigegeben: %(rel)s, Verbleibend: %(rem)s)"
+
+#: manufacturing/templates/blanket_po_detail.html:63
+#: manufacturing/templates/po_detail.html:113
+msgid "Notes:"
+msgstr "Notizen:"
+
+#: manufacturing/templates/blanket_po_detail.html:67
+msgid "Cancel this blanket PO?"
+msgstr "Diese Rahmenbestellung stornieren?"
+
+#: manufacturing/templates/blanket_po_detail.html:69
+msgid "Cancel Blanket PO"
+msgstr "Rahmenbestellung Stornieren"
+
+#: manufacturing/templates/blanket_po_detail.html:76
+msgid "Call-offs"
+msgstr "Abrufe"
+
+#: manufacturing/templates/blanket_po_detail.html:78
+#: manufacturing/templates/blanket_po_release_new.html:48
+msgid "Add Call-off"
+msgstr "Abruf Hinzufügen"
+
+#: manufacturing/templates/blanket_po_detail.html:85
+msgid "Release #"
+msgstr "Freigabe-Nr."
+
+#: manufacturing/templates/blanket_po_detail.html:86
+#: manufacturing/templates/blanket_po_release_new.html:29
+#: manufacturing/templates/maint_parts_list.html:78
+#: manufacturing/templates/po_detail.html:166
+#: manufacturing/templates/po_detail.html:274
+#: manufacturing/templates/prod_daily_report.html:84
+#: manufacturing/templates/prod_schedule.html:69
+#: manufacturing/templates/prod_shipping_detail.html:153
+#: manufacturing/templates/prod_shipping_detail.html:180
+#: manufacturing/templates/req_detail.html:72
+#: manufacturing/templates/req_detail.html:98
+#: manufacturing/templates/rfq_detail.html:100
+#: manufacturing/templates/rfq_detail.html:123
+msgid "Qty"
+msgstr "Menge"
+
+#: manufacturing/templates/blanket_po_detail.html:87
+#: manufacturing/templates/blanket_po_release_new.html:35
+#: manufacturing/templates/legal_contract_detail.html:67
+#: manufacturing/templates/legal_contract_list.html:91
+#: manufacturing/templates/legal_dashboard.html:145
+#: manufacturing/templates/purch_contract_detail.html:118
+#: manufacturing/templates/purch_contracts_list.html:85
+#: manufacturing/templates/report_builder_form.html:91
+msgid "Value"
+msgstr "Wert"
+
+#: manufacturing/templates/blanket_po_detail.html:88
+#: manufacturing/templates/blanket_po_release_new.html:40
+msgid "Delivery Date"
+msgstr "Lieferdatum"
+
+#: manufacturing/templates/blanket_po_detail.html:105
+msgid "No call-offs recorded yet."
+msgstr "Noch keine Abrufe erfasst."
+
+#: manufacturing/templates/blanket_po_list.html:4
+#: manufacturing/templates/blanket_po_list.html:14
+msgid "Blanket Purchase Orders"
+msgstr "Rahmenbestellungen"
+
+#: manufacturing/templates/blanket_po_list.html:8
+#: manufacturing/templates/blanket_po_new.html:4
+#: manufacturing/templates/blanket_po_new.html:12
+msgid "New Blanket PO"
+msgstr "Neue Rahmenbestellung"
+
+#: manufacturing/templates/blanket_po_list.html:18
+#: manufacturing/templates/cs_plans.html:64
+#: manufacturing/templates/eng_ecrs.html:49
+#: manufacturing/templates/eng_projects.html:52
+#: manufacturing/templates/eng_projects.html:59
+#: manufacturing/templates/gl_journals.html:40
+#: manufacturing/templates/maint_downtime_list.html:63
+#: manufacturing/templates/maint_equipment_list.html:63
+#: manufacturing/templates/maint_inspection_list.html:63
+#: manufacturing/templates/maint_mechanics_list.html:60
+#: manufacturing/templates/maint_parts_list.html:62
+#: manufacturing/templates/maint_schedule_list.html:58
+#: manufacturing/templates/maint_wo_list.html:64
+#: manufacturing/templates/po_list.html:24
+#: manufacturing/templates/qa_audit_list.html:59
+#: manufacturing/templates/qa_capa_list.html:67
+#: manufacturing/templates/qa_inspection_list.html:63
+#: manufacturing/templates/qa_ncr_list.html:69
+#: manufacturing/templates/qa_supplier_list.html:67
+#: manufacturing/templates/rfq_list.html:20
+msgid "All"
+msgstr "Alle"
+
+#: manufacturing/templates/blanket_po_list.html:30
+msgid "Blanket #"
+msgstr "Rahmen-Nr."
+
+#: manufacturing/templates/blanket_po_list.html:31
+#: manufacturing/templates/blanket_po_new.html:21
+#: manufacturing/templates/po_approvals.html:36
+#: manufacturing/templates/po_form.html:34
+#: manufacturing/templates/po_list.html:37
+#: manufacturing/templates/purch_contract_detail.html:64
+#: manufacturing/templates/purch_contract_detail.html:113
+#: manufacturing/templates/purch_contracts_list.html:81
+#: manufacturing/templates/purch_contracts_list.html:119
+#: manufacturing/templates/purch_reports.html:67
+#: manufacturing/templates/purch_reports.html:123
+#: manufacturing/templates/purchasing_dashboard.html:131
+#: manufacturing/templates/qa_supplier_list.html:84
+msgid "Supplier"
+msgstr "Lieferant"
+
+#: manufacturing/templates/blanket_po_list.html:32
+msgid "Validity"
+msgstr "Gültigkeit"
+
+#: manufacturing/templates/blanket_po_list.html:33
+#: manufacturing/templates/cs_reports.html:93
+#: manufacturing/templates/finance_budget_detail.html:135
+#: manufacturing/templates/marketing_dashboard.html:66
+#: manufacturing/templates/mkt_analytics.html:141
+#: manufacturing/templates/mkt_analytics.html:148
+#: manufacturing/templates/mkt_analytics.html:162
+#: manufacturing/templates/po_approvals.html:37
+#: manufacturing/templates/po_detail.html:211
+#: manufacturing/templates/po_detail.html:233
+#: manufacturing/templates/po_list.html:41
+#: manufacturing/templates/reports_dashboard.html:229
+#: manufacturing/templates/time_clock_attendance.html:77
+#: manufacturing/templates/time_clock_hours.html:84
+msgid "Total"
+msgstr "Gesamt"
+
+#: manufacturing/templates/blanket_po_list.html:34
+msgid "Released"
+msgstr "Freigegeben"
+
+#: manufacturing/templates/blanket_po_list.html:35
+msgid "Remaining"
+msgstr "Verbleibend"
+
+#: manufacturing/templates/blanket_po_list.html:47
+#: manufacturing/templates/blanket_po_list.html:52
+#: manufacturing/templates/blanket_po_list.html:57
+#, python-format
+msgid "%(qty)s units"
+msgstr "%(qty)s Einheiten"
+
+#: manufacturing/templates/blanket_po_list.html:69
+#, python-format
+msgid "No blanket purchase orders with status \"%(s)s\"."
+msgstr "Keine Rahmenbestellungen mit Status «%(s)s»."
+
+#: manufacturing/templates/blanket_po_list.html:71
+msgid "No blanket purchase orders."
+msgstr "Keine Rahmenbestellungen."
+
+#: manufacturing/templates/blanket_po_new.html:34
+msgid "Total Value (leave 0 to track by quantity instead)"
+msgstr "Gesamtwert (0 lassen, um stattdessen nach Menge zu verfolgen)"
+
+#: manufacturing/templates/blanket_po_new.html:38
+msgid "Total Quantity (leave 0 to track by value instead)"
+msgstr "Gesamtmenge (0 lassen, um stattdessen nach Wert zu verfolgen)"
+
+#: manufacturing/templates/blanket_po_new.html:42
+#: manufacturing/templates/cs_surveys_detail.html:105
+#: manufacturing/templates/cs_surveys_list.html:83
+#: manufacturing/templates/cs_surveys_list.html:135
+#: manufacturing/templates/eng_project_detail.html:100
+#: manufacturing/templates/eng_project_detail.html:218
+#: manufacturing/templates/eng_projects.html:122
+#: manufacturing/templates/legal_contract_detail.html:71
+#: manufacturing/templates/legal_contract_detail.html:126
+#: manufacturing/templates/legal_contract_list.html:152
+#: manufacturing/templates/mkt_ad_detail.html:86
+#: manufacturing/templates/mkt_ad_detail.html:174
+#: manufacturing/templates/mkt_ad_list.html:168
+#: manufacturing/templates/mkt_campaign_detail.html:71
+#: manufacturing/templates/mkt_campaign_detail.html:130
+#: manufacturing/templates/mkt_campaign_list.html:154
+#: manufacturing/templates/mkt_research_detail.html:69
+#: manufacturing/templates/mkt_research_detail.html:125
+#: manufacturing/templates/mkt_research_list.html:92
+#: manufacturing/templates/mkt_research_list.html:141
+#: manufacturing/templates/purch_contract_detail.html:90
+#: manufacturing/templates/purch_contract_detail.html:116
+#: manufacturing/templates/purch_contracts_list.html:83
+#: manufacturing/templates/purch_contracts_list.html:145
+msgid "Start Date"
+msgstr "Startdatum"
+
+#: manufacturing/templates/blanket_po_new.html:46
+#: manufacturing/templates/cs_surveys_detail.html:109
+#: manufacturing/templates/cs_surveys_list.html:84
+#: manufacturing/templates/cs_surveys_list.html:139
+#: manufacturing/templates/legal_contract_detail.html:75
+#: manufacturing/templates/legal_contract_detail.html:130
+#: manufacturing/templates/legal_contract_list.html:156
+#: manufacturing/templates/legal_dashboard.html:146
+#: manufacturing/templates/mkt_ad_detail.html:90
+#: manufacturing/templates/mkt_ad_detail.html:178
+#: manufacturing/templates/mkt_ad_list.html:172
+#: manufacturing/templates/mkt_campaign_detail.html:75
+#: manufacturing/templates/mkt_campaign_detail.html:134
+#: manufacturing/templates/mkt_campaign_list.html:158
+#: manufacturing/templates/mkt_research_detail.html:73
+#: manufacturing/templates/mkt_research_detail.html:129
+#: manufacturing/templates/mkt_research_list.html:93
+#: manufacturing/templates/mkt_research_list.html:145
+#: manufacturing/templates/purch_contract_detail.html:94
+#: manufacturing/templates/purch_contract_detail.html:117
+#: manufacturing/templates/purch_contracts_list.html:84
+#: manufacturing/templates/purch_contracts_list.html:149
+#: manufacturing/templates/purch_reports.html:124
+msgid "End Date"
+msgstr "Enddatum"
+
+#: manufacturing/templates/blanket_po_new.html:54
+msgid "Create Blanket PO"
+msgstr "Rahmenbestellung Erstellen"
+
+#: manufacturing/templates/blanket_po_new.html:55
+#: manufacturing/templates/blanket_po_release_new.html:49
+#: manufacturing/templates/eng_project_detail.html:175
+#: manufacturing/templates/gl_accounts.html:115
+#: manufacturing/templates/it_incident_detail.html:82
+#: manufacturing/templates/it_task_detail.html:98
+#: manufacturing/templates/maint_downtime_detail.html:137
+#: manufacturing/templates/maint_equipment_detail.html:146
+#: manufacturing/templates/maint_inspection_detail.html:166
+#: manufacturing/templates/maint_mechanic_detail.html:122
+#: manufacturing/templates/maint_part_detail.html:144
+#: manufacturing/templates/maint_schedule_detail.html:161
+#: manufacturing/templates/maint_wo_detail.html:207
+#: manufacturing/templates/payroll_pay_rates.html:131
+#: manufacturing/templates/po_form.html:82
+#: manufacturing/templates/po_landed_cost_new.html:76
+#: manufacturing/templates/qa_audit_detail.html:156
+#: manufacturing/templates/qa_capa_detail.html:143
+#: manufacturing/templates/qa_ncr_detail.html:166
+#: manufacturing/templates/qa_supplier_detail.html:130
+#: manufacturing/templates/tc_device_form.html:194
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: manufacturing/templates/blanket_po_release_new.html:4
+#: manufacturing/templates/blanket_po_release_new.html:12
+#, python-format
+msgid "Add Call-off — %(num)s"
+msgstr "Abruf Hinzufügen — %(num)s"
+
+#: manufacturing/templates/blanket_po_release_new.html:20
+#, python-format
+msgid "Remaining balance: <b>$%(rem)s</b> of $%(tot)s"
+msgstr "Verbleibendes Guthaben: <b>$%(rem)s</b> von $%(tot)s"
+
+#: manufacturing/templates/blanket_po_release_new.html:22
+#, python-format
+msgid "Remaining balance: <b>%(rem)s</b> of %(tot)s units"
+msgstr "Verbleibendes Guthaben: <b>%(rem)s</b> von %(tot)s Einheiten"
 
 #: manufacturing/templates/credit_account_detail.html:3
 #, python-format
@@ -2023,6 +2420,8 @@ msgstr "Kreditkonten"
 #: manufacturing/templates/prod_returns_list.html:65
 #: manufacturing/templates/prod_schedule.html:53
 #: manufacturing/templates/prod_shipping_list.html:64
+#: manufacturing/templates/purch_contracts_list.html:65
+#: manufacturing/templates/req_list.html:65
 msgid "All Statuses"
 msgstr "Alle Status"
 
@@ -2118,10 +2517,13 @@ msgid "Approved Limit ($)"
 msgstr "Genehmigtes Limit ($)"
 
 #: manufacturing/templates/credit_application_detail.html:109
+#: manufacturing/templates/po_approvals.html:58
+#: manufacturing/templates/req_detail.html:157
 msgid "Approve"
 msgstr "Genehmigen"
 
 #: manufacturing/templates/credit_application_detail.html:110
+#: manufacturing/templates/req_detail.html:158
 msgid "Deny"
 msgstr "Ablehnen"
 
@@ -2248,6 +2650,9 @@ msgstr "Aktivitäten insgesamt"
 #: manufacturing/templates/legal_dashboard.html:95
 #: manufacturing/templates/qa_inspection_detail.html:202
 #: manufacturing/templates/reports_dashboard.html:233
+#: manufacturing/templates/rfq_detail.html:38
+#: manufacturing/templates/rfq_list.html:21
+#: manufacturing/templates/rfq_list.html:49
 msgid "Open"
 msgstr "Offen"
 
@@ -2440,6 +2845,9 @@ msgstr "Problem"
 #: manufacturing/templates/legal_dashboard.html:99
 #: manufacturing/templates/legal_employment_list.html:74
 #: manufacturing/templates/reports_dashboard.html:237
+#: manufacturing/templates/rfq_detail.html:36
+#: manufacturing/templates/rfq_list.html:23
+#: manufacturing/templates/rfq_list.html:47
 msgid "Closed"
 msgstr "Abgeschlossen"
 
@@ -2598,6 +3006,7 @@ msgid "Priority"
 msgstr "Priorität"
 
 #: manufacturing/templates/cs_escalations.html:82
+#: manufacturing/templates/rfq_detail.html:157
 msgid "days"
 msgstr "Tage"
 
@@ -2695,6 +3104,9 @@ msgstr "Artikel bearbeiten"
 #: manufacturing/templates/mkt_research_detail.html:108
 #: manufacturing/templates/mkt_research_list.html:89
 #: manufacturing/templates/mkt_research_list.html:124
+#: manufacturing/templates/purch_contract_detail.html:112
+#: manufacturing/templates/purch_contracts_list.html:80
+#: manufacturing/templates/purch_reports.html:122
 #: manufacturing/templates/qa_audit_list.html:69
 #: manufacturing/templates/qa_capa_list.html:84
 #: manufacturing/templates/qa_ncr_list.html:86
@@ -2723,6 +3135,10 @@ msgstr "Titel"
 #: manufacturing/templates/mkt_budget_list.html:120
 #: manufacturing/templates/payroll_deductions.html:56
 #: manufacturing/templates/payroll_deductions.html:87
+#: manufacturing/templates/purch_contract_detail.html:73
+#: manufacturing/templates/purch_contract_detail.html:114
+#: manufacturing/templates/purch_contracts_list.html:82
+#: manufacturing/templates/purch_contracts_list.html:128
 msgid "Category"
 msgstr "Kategorie"
 
@@ -2863,10 +3279,13 @@ msgstr "Verbesserungspläne"
 #: manufacturing/templates/mkt_research_list.html:15
 #: manufacturing/templates/prod_returns_list.html:11
 #: manufacturing/templates/prod_shipping_list.html:12
+#: manufacturing/templates/purch_contracts_list.html:13
 #: manufacturing/templates/qa_audit_list.html:10
 #: manufacturing/templates/qa_capa_list.html:10
 #: manufacturing/templates/qa_inspection_list.html:11
 #: manufacturing/templates/qa_supplier_list.html:10
+#: manufacturing/templates/rfq_detail.html:8
+#: manufacturing/templates/rfq_list.html:11
 msgid "CSV"
 msgstr "CSV"
 
@@ -2897,6 +3316,7 @@ msgstr "CSV"
 #: manufacturing/templates/mkt_research_list.html:16
 #: manufacturing/templates/prod_returns_list.html:12
 #: manufacturing/templates/prod_shipping_list.html:13
+#: manufacturing/templates/purch_contracts_list.html:14
 #: manufacturing/templates/qa_audit_list.html:11
 #: manufacturing/templates/qa_capa_list.html:11
 #: manufacturing/templates/qa_inspection_list.html:12
@@ -2994,26 +3414,6 @@ msgstr "Ticket erstellen"
 msgid "CS Improvement Plans"
 msgstr "CS-Verbesserungspläne"
 
-#: manufacturing/templates/cs_plans.html:64
-#: manufacturing/templates/eng_ecrs.html:49
-#: manufacturing/templates/eng_projects.html:52
-#: manufacturing/templates/eng_projects.html:59
-#: manufacturing/templates/gl_journals.html:40
-#: manufacturing/templates/maint_downtime_list.html:63
-#: manufacturing/templates/maint_equipment_list.html:63
-#: manufacturing/templates/maint_inspection_list.html:63
-#: manufacturing/templates/maint_mechanics_list.html:60
-#: manufacturing/templates/maint_parts_list.html:62
-#: manufacturing/templates/maint_schedule_list.html:58
-#: manufacturing/templates/maint_wo_list.html:64
-#: manufacturing/templates/qa_audit_list.html:59
-#: manufacturing/templates/qa_capa_list.html:67
-#: manufacturing/templates/qa_inspection_list.html:63
-#: manufacturing/templates/qa_ncr_list.html:69
-#: manufacturing/templates/qa_supplier_list.html:67
-msgid "All"
-msgstr "Alle"
-
 #: manufacturing/templates/cs_plans.html:77
 #: manufacturing/templates/cs_plans.html:123
 #: manufacturing/templates/legal_compliance_detail.html:62
@@ -3063,6 +3463,7 @@ msgstr "Zieldatum"
 #: manufacturing/templates/prod_returns_detail.html:73
 #: manufacturing/templates/prod_returns_list.html:84
 #: manufacturing/templates/prod_returns_reports.html:86
+#: manufacturing/templates/rfq_list.html:35
 msgid "Created"
 msgstr "Erstellt"
 
@@ -3140,21 +3541,10 @@ msgid "Monthly Call Volume"
 msgstr "Monatliches Anrufvolumen"
 
 #: manufacturing/templates/cs_reports.html:92
+#: manufacturing/templates/purch_reports.html:91
 #: manufacturing/templates/qa_reports.html:214
 msgid "Month"
 msgstr "Monat"
-
-#: manufacturing/templates/cs_reports.html:93
-#: manufacturing/templates/finance_budget_detail.html:135
-#: manufacturing/templates/marketing_dashboard.html:66
-#: manufacturing/templates/mkt_analytics.html:141
-#: manufacturing/templates/mkt_analytics.html:148
-#: manufacturing/templates/mkt_analytics.html:162
-#: manufacturing/templates/reports_dashboard.html:229
-#: manufacturing/templates/time_clock_attendance.html:77
-#: manufacturing/templates/time_clock_hours.html:84
-msgid "Total"
-msgstr "Gesamt"
 
 #: manufacturing/templates/cs_reports.html:112
 msgid "No data for this period."
@@ -3236,6 +3626,8 @@ msgstr "Erstattungsbetrag"
 #: manufacturing/templates/it_ticket_detail.html:103
 #: manufacturing/templates/payroll_history.html:39
 #: manufacturing/templates/payroll_run_detail.html:45
+#: manufacturing/templates/purch_contract_detail.html:119
+#: manufacturing/templates/rfq_list.html:34
 msgid "Created By"
 msgstr "Erstellt von"
 
@@ -3292,48 +3684,6 @@ msgstr "Zeitraum"
 #: manufacturing/templates/cs_surveys_detail.html:79
 msgid "Edit Survey"
 msgstr "Umfrage bearbeiten"
-
-#: manufacturing/templates/cs_surveys_detail.html:105
-#: manufacturing/templates/cs_surveys_list.html:83
-#: manufacturing/templates/cs_surveys_list.html:135
-#: manufacturing/templates/eng_project_detail.html:100
-#: manufacturing/templates/eng_project_detail.html:218
-#: manufacturing/templates/eng_projects.html:122
-#: manufacturing/templates/legal_contract_detail.html:71
-#: manufacturing/templates/legal_contract_detail.html:126
-#: manufacturing/templates/legal_contract_list.html:152
-#: manufacturing/templates/mkt_ad_detail.html:86
-#: manufacturing/templates/mkt_ad_detail.html:174
-#: manufacturing/templates/mkt_ad_list.html:168
-#: manufacturing/templates/mkt_campaign_detail.html:71
-#: manufacturing/templates/mkt_campaign_detail.html:130
-#: manufacturing/templates/mkt_campaign_list.html:154
-#: manufacturing/templates/mkt_research_detail.html:69
-#: manufacturing/templates/mkt_research_detail.html:125
-#: manufacturing/templates/mkt_research_list.html:92
-#: manufacturing/templates/mkt_research_list.html:141
-msgid "Start Date"
-msgstr "Startdatum"
-
-#: manufacturing/templates/cs_surveys_detail.html:109
-#: manufacturing/templates/cs_surveys_list.html:84
-#: manufacturing/templates/cs_surveys_list.html:139
-#: manufacturing/templates/legal_contract_detail.html:75
-#: manufacturing/templates/legal_contract_detail.html:130
-#: manufacturing/templates/legal_contract_list.html:156
-#: manufacturing/templates/legal_dashboard.html:146
-#: manufacturing/templates/mkt_ad_detail.html:90
-#: manufacturing/templates/mkt_ad_detail.html:178
-#: manufacturing/templates/mkt_ad_list.html:172
-#: manufacturing/templates/mkt_campaign_detail.html:75
-#: manufacturing/templates/mkt_campaign_detail.html:134
-#: manufacturing/templates/mkt_campaign_list.html:158
-#: manufacturing/templates/mkt_research_detail.html:73
-#: manufacturing/templates/mkt_research_detail.html:129
-#: manufacturing/templates/mkt_research_list.html:93
-#: manufacturing/templates/mkt_research_list.html:145
-msgid "End Date"
-msgstr "Enddatum"
 
 #: manufacturing/templates/cs_surveys_detail.html:123
 #, python-format
@@ -3479,10 +3829,16 @@ msgid "Production"
 msgstr "Produktion"
 
 #: manufacturing/templates/dashboard_kpis.html:17
+#: manufacturing/templates/purchasing_dashboard.html:67
 msgid "Open POs"
 msgstr "Offene Bestellungen"
 
 #: manufacturing/templates/dashboard_kpis.html:19
+#: manufacturing/templates/purch_contract_detail.html:6
+#: manufacturing/templates/purch_contracts_list.html:6
+#: manufacturing/templates/purch_reports.html:6
+#: manufacturing/templates/req_detail.html:6
+#: manufacturing/templates/req_list.html:6
 msgid "Purchasing"
 msgstr "Einkauf"
 
@@ -3727,6 +4083,7 @@ msgstr "Projekt"
 #: manufacturing/templates/eng_ecrs.html:109
 #: manufacturing/templates/mkt_budget_list.html:83
 #: manufacturing/templates/mkt_budget_list.html:133
+#: manufacturing/templates/po_approvals.html:38
 msgid "Requested By"
 msgstr "Beantragt von"
 
@@ -3846,6 +4203,7 @@ msgstr "Zugewiesen an"
 #: manufacturing/templates/it_software_detail.html:94
 #: manufacturing/templates/payroll_pay_rates.html:65
 #: manufacturing/templates/payroll_pay_rates.html:87
+#: manufacturing/templates/po_detail.html:8
 #: manufacturing/templates/report_builder_detail.html:7
 #: manufacturing/templates/report_builder_list.html:37
 #: manufacturing/templates/tc_device_list.html:72
@@ -3875,26 +4233,6 @@ msgstr "Aufgabenname"
 #: manufacturing/templates/it_task_list.html:156
 msgid "Save Task"
 msgstr "Aufgabe speichern"
-
-#: manufacturing/templates/eng_project_detail.html:175
-#: manufacturing/templates/gl_accounts.html:115
-#: manufacturing/templates/it_incident_detail.html:82
-#: manufacturing/templates/it_task_detail.html:98
-#: manufacturing/templates/maint_downtime_detail.html:137
-#: manufacturing/templates/maint_equipment_detail.html:146
-#: manufacturing/templates/maint_inspection_detail.html:166
-#: manufacturing/templates/maint_mechanic_detail.html:122
-#: manufacturing/templates/maint_part_detail.html:144
-#: manufacturing/templates/maint_schedule_detail.html:161
-#: manufacturing/templates/maint_wo_detail.html:207
-#: manufacturing/templates/payroll_pay_rates.html:131
-#: manufacturing/templates/qa_audit_detail.html:156
-#: manufacturing/templates/qa_capa_detail.html:143
-#: manufacturing/templates/qa_ncr_detail.html:166
-#: manufacturing/templates/qa_supplier_detail.html:130
-#: manufacturing/templates/tc_device_form.html:194
-msgid "Cancel"
-msgstr "Abbrechen"
 
 #: manufacturing/templates/eng_project_detail.html:180
 #: manufacturing/templates/eng_project_detail.html:192
@@ -4000,6 +4338,7 @@ msgid "Standard #"
 msgstr "Norm Nr."
 
 #: manufacturing/templates/eng_spec_detail.html:114
+#: manufacturing/templates/purch_contract_detail.html:120
 msgid "Created Date"
 msgstr "Erstellungsdatum"
 
@@ -4090,6 +4429,8 @@ msgstr "Beschreiben Sie die Aufgabe"
 #: manufacturing/templates/prod_returns_list.html:117
 #: manufacturing/templates/prod_shipping_detail.html:97
 #: manufacturing/templates/prod_shipping_list.html:112
+#: manufacturing/templates/purch_contract_detail.html:66
+#: manufacturing/templates/purch_contracts_list.html:121
 #: manufacturing/templates/qa_inspection_list.html:116
 #: manufacturing/templates/qa_inspection_list.html:125
 #: manufacturing/templates/qa_inspection_list.html:148
@@ -4211,6 +4552,8 @@ msgstr "Audit-Typ"
 #: manufacturing/templates/it_ticket_detail.html:79
 #: manufacturing/templates/it_ticket_detail.html:145
 #: manufacturing/templates/it_ticket_list.html:113
+#: manufacturing/templates/req_detail.html:59
+#: manufacturing/templates/req_list.html:79
 #: manufacturing/templates/tc_ot_report.html:113
 #: manufacturing/templates/time_clock_attendance.html:85
 msgid "Department"
@@ -4305,6 +4648,7 @@ msgstr "Feststellungs-Ref."
 #: manufacturing/templates/it_ticket_list.html:141
 #: manufacturing/templates/prod_shipping_detail.html:173
 #: manufacturing/templates/qa_inspection_detail.html:240
+#: manufacturing/templates/req_detail.html:94
 msgid "Description *"
 msgstr "Beschreibung *"
 
@@ -4542,10 +4886,13 @@ msgid "Del"
 msgstr "Lösch."
 
 #: manufacturing/templates/finance_budget_detail.html:129
+#: manufacturing/templates/req_detail.html:83
 msgid "No line items yet."
 msgstr "Noch keine Zeilen vorhanden."
 
 #: manufacturing/templates/finance_budget_detail.html:147
+#: manufacturing/templates/po_detail.html:256
+#: manufacturing/templates/rfq_detail.html:81
 msgid "Add Line Item"
 msgstr "Zeile Hinzufügen"
 
@@ -4785,6 +5132,8 @@ msgstr "z. B. Kurzfristig, Anlage"
 
 #: manufacturing/templates/gl_accounts.html:113
 #: manufacturing/templates/payroll_pay_rates.html:127
+#: manufacturing/templates/po_detail.html:191
+#: manufacturing/templates/po_form.html:80
 msgid "Save"
 msgstr "Speichern"
 
@@ -5310,6 +5659,7 @@ msgid "Incidents"
 msgstr "Vorfälle"
 
 #: manufacturing/templates/it_asset_detail.html:16
+#: manufacturing/templates/po_detail.html:13
 msgid "Print Label"
 msgstr "Etikett Drucken"
 
@@ -5585,6 +5935,8 @@ msgstr "Ticket-Nr."
 #: manufacturing/templates/it_ticket_detail.html:141
 #: manufacturing/templates/it_ticket_list.html:64
 #: manufacturing/templates/it_ticket_list.html:109
+#: manufacturing/templates/req_detail.html:58
+#: manufacturing/templates/req_list.html:79
 msgid "Requester"
 msgstr "Antragsteller"
 
@@ -5893,6 +6245,8 @@ msgstr "Gerät Bearbeiten"
 #: manufacturing/templates/mkt_budget_list.html:122
 #: manufacturing/templates/mkt_research_detail.html:114
 #: manufacturing/templates/mkt_research_list.html:130
+#: manufacturing/templates/purch_contract_detail.html:75
+#: manufacturing/templates/purch_contracts_list.html:130
 msgid "— Select —"
 msgstr "— Auswählen —"
 
@@ -6236,6 +6590,11 @@ msgstr "Rechtsabteilungs-Dashboard"
 #: manufacturing/templates/legal_ip_list.html:7
 #: manufacturing/templates/legal_litigation_detail.html:7
 #: manufacturing/templates/legal_litigation_list.html:7
+#: manufacturing/templates/purch_contract_detail.html:7
+#: manufacturing/templates/purch_contracts_list.html:7
+#: manufacturing/templates/purch_reports.html:8
+#: manufacturing/templates/purchasing_dashboard.html:8
+#: manufacturing/templates/req_list.html:8
 msgid "Contracts"
 msgstr "Verträge"
 
@@ -6338,6 +6697,8 @@ msgstr "z. B. OSHA 29 CFR 1910"
 
 #: manufacturing/templates/legal_compliance_list.html:141
 #: manufacturing/templates/prod_shipping_detail.html:181
+#: manufacturing/templates/req_detail.html:106
+#: manufacturing/templates/rfq_detail.html:108
 msgid "Add Item"
 msgstr "Element hinzufügen"
 
@@ -6354,19 +6715,15 @@ msgstr "Vertrag — %(title)s"
 msgid "Counterparty"
 msgstr "Vertragspartner"
 
-#: manufacturing/templates/legal_contract_detail.html:67
-#: manufacturing/templates/legal_contract_list.html:91
-#: manufacturing/templates/legal_dashboard.html:145
-#: manufacturing/templates/report_builder_form.html:91
-msgid "Value"
-msgstr "Wert"
-
 #: manufacturing/templates/legal_contract_detail.html:93
+#: manufacturing/templates/purch_contract_detail.html:55
 msgid "Edit Contract"
 msgstr "Vertrag bearbeiten"
 
 #: manufacturing/templates/legal_contract_detail.html:122
 #: manufacturing/templates/legal_contract_list.html:148
+#: manufacturing/templates/purch_contract_detail.html:98
+#: manufacturing/templates/purch_contracts_list.html:153
 msgid "Value ($)"
 msgstr "Wert ($)"
 
@@ -6383,14 +6740,17 @@ msgstr "Ende"
 
 #: manufacturing/templates/legal_contract_list.html:111
 #: manufacturing/templates/legal_dashboard.html:161
+#: manufacturing/templates/purch_contracts_list.html:102
 msgid "No contracts found."
 msgstr "Keine Verträge gefunden."
 
 #: manufacturing/templates/legal_contract_list.html:119
+#: manufacturing/templates/purch_contracts_list.html:110
 msgid "New Contract"
 msgstr "Neuer Vertrag"
 
 #: manufacturing/templates/legal_contract_list.html:168
+#: manufacturing/templates/purch_contracts_list.html:161
 msgid "Create Contract"
 msgstr "Vertrag erstellen"
 
@@ -6510,6 +6870,7 @@ msgstr "Element / Referenz / Verantwortlichen suchen…"
 #: manufacturing/templates/legal_governance_list.html:101
 #: manufacturing/templates/mkt_budget_list.html:82
 #: manufacturing/templates/mkt_budget_list.html:112
+#: manufacturing/templates/rfq_detail.html:122
 msgid "Item"
 msgstr "Element"
 
@@ -7120,7 +7481,9 @@ msgstr "Arbeitskosten"
 
 #: manufacturing/templates/maint_labor_report.html:115
 msgid "No work orders with estimated/actual hours in this range."
-msgstr "Keine Arbeitsaufträge mit geschätzten/tatsächlichen Stunden in diesem Zeitraum."
+msgstr ""
+"Keine Arbeitsaufträge mit geschätzten/tatsächlichen Stunden in diesem "
+"Zeitraum."
 
 #: manufacturing/templates/maint_labor_report.html:122
 msgid "Labor by Mechanic"
@@ -7163,7 +7526,10 @@ msgid ""
 "Cost uses each mechanic's Hourly Rate (set on their profile) applied to "
 "actual\n"
 "            hours on work orders assigned to them by name."
-msgstr "Die Kosten verwenden den Stundensatz jedes Mechanikers (im Profil festgelegt), angewendet auf die tatsächlichen\n            Stunden bei Arbeitsaufträgen, die ihm namentlich zugewiesen sind."
+msgstr ""
+"Die Kosten verwenden den Stundensatz jedes Mechanikers (im Profil "
+"festgelegt), angewendet auf die tatsächlichen\n"
+"            Stunden bei Arbeitsaufträgen, die ihm namentlich zugewiesen sind."
 
 #: manufacturing/templates/maint_mechanic_detail.html:6
 msgid "All Mechanics"
@@ -7191,7 +7557,9 @@ msgstr "Ausgeblendet — Nur Lohnbuchhaltung/Personal"
 
 #: manufacturing/templates/maint_mechanic_detail.html:107
 msgid "Compensation fields are only visible to Payroll, Personnel, or HR roles"
-msgstr "Vergütungsfelder sind nur für die Rollen Lohnbuchhaltung, Personal oder HR sichtbar"
+msgstr ""
+"Vergütungsfelder sind nur für die Rollen Lohnbuchhaltung, Personal oder HR "
+"sichtbar"
 
 #: manufacturing/templates/maint_mechanics_list.html:90
 msgid "No mechanics found."
@@ -7286,7 +7654,10 @@ msgstr "(Geplante Stunden − Ausfallzeit) ÷ Geplante Stunden"
 msgid ""
 "Scheduled hours = workcenter capacity × calendar days. Downtime pulled from "
 "the downtime log by equipment name match."
-msgstr "Geplante Stunden = Arbeitsplatzkapazität × Kalendertage. Die Ausfallzeit wird durch Abgleich des Ausrüstungsnamens aus dem Ausfallzeit-Protokoll übernommen."
+msgstr ""
+"Geplante Stunden = Arbeitsplatzkapazität × Kalendertage. Die Ausfallzeit "
+"wird durch Abgleich des Ausrüstungsnamens aus dem Ausfallzeit-Protokoll "
+"übernommen."
 
 #: manufacturing/templates/maint_oee_report.html:162
 msgid "Standard Hours ÷ Actual Hours"
@@ -7296,7 +7667,10 @@ msgstr "Standardstunden ÷ Tatsächliche Stunden"
 msgid ""
 "From completed work order routing operations at each workcenter. Standard "
 "hours are set in the routing; actual hours are recorded at completion."
-msgstr "Aus abgeschlossenen Arbeitsplan-Operationen der Arbeitsaufträge an jedem Arbeitsplatz. Standardstunden werden im Arbeitsplan festgelegt; tatsächliche Stunden werden bei Abschluss erfasst."
+msgstr ""
+"Aus abgeschlossenen Arbeitsplan-Operationen der Arbeitsaufträge an jedem "
+"Arbeitsplatz. Standardstunden werden im Arbeitsplan festgelegt; tatsächliche "
+"Stunden werden bei Abschluss erfasst."
 
 #: manufacturing/templates/maint_oee_report.html:167
 msgid "(Total Qty − Scrap) ÷ Total Qty"
@@ -7306,7 +7680,9 @@ msgstr "(Gesamtmenge − Ausschuss) ÷ Gesamtmenge"
 msgid ""
 "Total quantity from work orders routed through this workcenter; scrap "
 "quantity recorded per routing step at completion."
-msgstr "Gesamtmenge der Arbeitsaufträge, die durch diesen Arbeitsplatz geleitet wurden; Ausschussmenge wird pro Arbeitsplanschritt bei Abschluss erfasst."
+msgstr ""
+"Gesamtmenge der Arbeitsaufträge, die durch diesen Arbeitsplatz geleitet "
+"wurden; Ausschussmenge wird pro Arbeitsplanschritt bei Abschluss erfasst."
 
 #: manufacturing/templates/maint_part_detail.html:6
 msgid "All Parts"
@@ -7350,14 +7726,6 @@ msgid "Part #"
 msgstr "Teile-Nr."
 
 #: manufacturing/templates/maint_parts_list.html:78
-#: manufacturing/templates/prod_daily_report.html:84
-#: manufacturing/templates/prod_schedule.html:69
-#: manufacturing/templates/prod_shipping_detail.html:153
-#: manufacturing/templates/prod_shipping_detail.html:180
-msgid "Qty"
-msgstr "Menge"
-
-#: manufacturing/templates/maint_parts_list.html:78
 #: manufacturing/templates/reports_dashboard.html:201
 msgid "Reorder At"
 msgstr "Meldebestand"
@@ -7395,7 +7763,8 @@ msgstr "Diese IH-Aufgabe hat ihr Fälligkeitsdatum überschritten."
 
 #: manufacturing/templates/maint_schedule_detail.html:65
 msgid "Stamps today's date as last_done and sets status to Completed."
-msgstr "Setzt das heutige Datum als last_done und den Status auf Abgeschlossen."
+msgstr ""
+"Setzt das heutige Datum als last_done und den Status auf Abgeschlossen."
 
 #: manufacturing/templates/maint_schedule_detail.html:69
 msgid "Mark Done"
@@ -7483,6 +7852,8 @@ msgstr "Arbeitsauftragsdetails"
 
 #: manufacturing/templates/maint_wo_detail.html:92
 #: manufacturing/templates/maint_wo_list.html:111
+#: manufacturing/templates/purch_contract_detail.html:60
+#: manufacturing/templates/purch_contracts_list.html:115
 #: manufacturing/templates/qa_audit_detail.html:81
 #: manufacturing/templates/qa_audit_list.html:99
 #: manufacturing/templates/qa_capa_detail.html:68
@@ -7897,6 +8268,7 @@ msgid "No ad performance data yet."
 msgstr "Noch keine Anzeigenleistungsdaten."
 
 #: manufacturing/templates/mkt_analytics.html:137
+#: manufacturing/templates/po_landed_cost_detail.html:14
 msgid "Summary"
 msgstr "Zusammenfassung"
 
@@ -8111,6 +8483,7 @@ msgstr "Abzüge"
 #: manufacturing/templates/payroll_deductions.html:8
 #: manufacturing/templates/payroll_pay_rates.html:8
 #: manufacturing/templates/payroll_ytd.html:7
+#: manufacturing/templates/po_detail.html:10
 msgid "History"
 msgstr "Historie"
 
@@ -8251,6 +8624,8 @@ msgid "Deduction"
 msgstr "Abzug"
 
 #: manufacturing/templates/payroll_deductions.html:141
+#: manufacturing/templates/po_detail.html:202
+#: manufacturing/templates/rfq_detail.html:57
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -8614,6 +8989,352 @@ msgstr "Nettosumme:"
 msgid "No payroll data found for %(year)s."
 msgstr "Keine Lohndaten für %(year)s gefunden."
 
+#: manufacturing/templates/po_approvals.html:3
+#: manufacturing/templates/po_approvals.html:24
+msgid "PO Approval Queue"
+msgstr "Bestellfreigabe-Warteschlange"
+
+#: manufacturing/templates/po_approvals.html:26
+#, python-format
+msgid ""
+"Purchase orders over $%(threshold)s require approval before\n"
+"        being sent to the supplier. Approve to advance to Sent; reject to "
+"return to Draft."
+msgstr "Bestellungen über $%(threshold)s erfordern eine Genehmigung, bevor\n        sie an den Lieferanten gesendet werden. Genehmigen, um zu Gesendet zu wechseln; ablehnen, um zu Entwurf zurückzukehren."
+
+#: manufacturing/templates/po_approvals.html:35
+#: manufacturing/templates/po_form.html:25
+msgid "PO Number"
+msgstr "Bestellnummer"
+
+#: manufacturing/templates/po_approvals.html:39
+msgid "Requested At"
+msgstr "Angefordert am"
+
+#: manufacturing/templates/po_approvals.html:40
+#: manufacturing/templates/tc_device_list.html:46
+msgid "Actions"
+msgstr "Aktionen"
+
+#: manufacturing/templates/po_approvals.html:54
+#, python-format
+msgid "Approve %(num)s?"
+msgstr "%(num)s genehmigen?"
+
+#: manufacturing/templates/po_approvals.html:57
+msgid "Approval note…"
+msgstr "Genehmigungsnotiz…"
+
+#: manufacturing/templates/po_approvals.html:61
+#, python-format
+msgid "Reject %(num)s and return to draft?"
+msgstr "%(num)s ablehnen und zu Entwurf zurücksetzen?"
+
+#: manufacturing/templates/po_approvals.html:64
+msgid "Rejection reason…"
+msgstr "Ablehnungsgrund…"
+
+#: manufacturing/templates/po_approvals.html:65
+msgid "Reject"
+msgstr "Ablehnen"
+
+#: manufacturing/templates/po_approvals.html:75
+msgid "No purchase orders are currently awaiting approval."
+msgstr "Derzeit warten keine Bestellungen auf Genehmigung."
+
+#: manufacturing/templates/po_detail.html:14
+msgid "Print Receiving Label"
+msgstr "Wareneingangsetikett Drucken"
+
+#: manufacturing/templates/po_detail.html:105
+#: manufacturing/templates/po_landed_cost_detail.html:20
+msgid "Total:"
+msgstr "Gesamt:"
+
+#: manufacturing/templates/po_detail.html:110
+msgid "Order Date:"
+msgstr "Bestelldatum:"
+
+#: manufacturing/templates/po_detail.html:111
+msgid "Expected:"
+msgstr "Erwartet:"
+
+#: manufacturing/templates/po_detail.html:120
+msgid "Currency:"
+msgstr "Währung:"
+
+#: manufacturing/templates/po_detail.html:129
+msgid "Rate"
+msgstr "Kurs"
+
+#: manufacturing/templates/po_detail.html:130
+msgid "Set Currency"
+msgstr "Währung Festlegen"
+
+#: manufacturing/templates/po_detail.html:137
+msgid "Awaiting approval"
+msgstr "Genehmigung ausstehend"
+
+#: manufacturing/templates/po_detail.html:138
+#, python-format
+msgid ""
+"this PO exceeds the $%(threshold)s approval threshold. Requested by "
+"%(requester)s."
+msgstr "diese Bestellung überschreitet den Genehmigungsschwellenwert von $%(threshold)s. Angefordert von %(requester)s."
+
+#: manufacturing/templates/po_detail.html:140
+msgid "Go to approval queue"
+msgstr "Zur Genehmigungswarteschlange"
+
+#: manufacturing/templates/po_detail.html:148
+msgid "Cancel this PO?"
+msgstr "Diese Bestellung stornieren?"
+
+#: manufacturing/templates/po_detail.html:165
+#: manufacturing/templates/prod_daily_report.html:83
+#: manufacturing/templates/prod_dashboard.html:112
+#: manufacturing/templates/prod_labor_report.html:94
+#: manufacturing/templates/prod_performance_report.html:107
+#: manufacturing/templates/prod_reports.html:86
+#: manufacturing/templates/prod_reports.html:113
+#: manufacturing/templates/prod_schedule.html:68
+#: manufacturing/templates/prod_shipping_detail.html:152
+#: manufacturing/templates/qa_inspection_detail.html:92
+#: manufacturing/templates/qa_inspection_list.html:80
+#: manufacturing/templates/qa_inspection_list.html:114
+#: manufacturing/templates/qa_ncr_list.html:87
+#: manufacturing/templates/reports_dashboard.html:199
+msgid "Product"
+msgstr "Produkt"
+
+#: manufacturing/templates/po_detail.html:167
+#: manufacturing/templates/po_detail.html:278
+#: manufacturing/templates/po_landed_cost_new.html:52
+msgid "Unit Price"
+msgstr "Stückpreis"
+
+#: manufacturing/templates/po_detail.html:169
+msgid "Receive"
+msgstr "Empfangen"
+
+#: manufacturing/templates/po_detail.html:170
+#: manufacturing/templates/req_detail.html:72
+msgid "Line Total"
+msgstr "Zeilensumme"
+
+#: manufacturing/templates/po_detail.html:199
+msgid "Remove this line item?"
+msgstr "Diese Position entfernen?"
+
+#: manufacturing/templates/po_detail.html:219
+msgid "This purchase order has no line items."
+msgstr "Diese Bestellung hat keine Positionen."
+
+#: manufacturing/templates/po_detail.html:223
+msgid "Landed Costs"
+msgstr "Anlandekosten"
+
+#: manufacturing/templates/po_detail.html:225
+msgid "Add Landed Cost"
+msgstr "Anlandekosten Hinzufügen"
+
+#: manufacturing/templates/po_detail.html:231
+#: manufacturing/templates/po_landed_cost_new.html:21
+msgid "Freight"
+msgstr "Fracht"
+
+#: manufacturing/templates/po_detail.html:231
+#: manufacturing/templates/po_landed_cost_new.html:25
+msgid "Duty"
+msgstr "Zoll"
+
+#: manufacturing/templates/po_detail.html:232
+#: manufacturing/templates/po_landed_cost_new.html:29
+msgid "Broker Fee"
+msgstr "Maklergebühr"
+
+#: manufacturing/templates/po_detail.html:232
+#: manufacturing/templates/po_landed_cost_new.html:33
+msgid "Insurance"
+msgstr "Versicherung"
+
+#: manufacturing/templates/po_detail.html:233
+msgid "Entered"
+msgstr "Erfasst"
+
+#: manufacturing/templates/po_detail.html:250
+msgid "No landed costs recorded yet."
+msgstr "Noch keine Anlandekosten erfasst."
+
+#: manufacturing/templates/po_detail.html:261
+#: manufacturing/templates/rfq_detail.html:91
+msgid "Product (optional)"
+msgstr "Produkt (optional)"
+
+#: manufacturing/templates/po_detail.html:283
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: manufacturing/templates/po_form.html:4
+#: manufacturing/templates/po_form.html:14
+#, python-format
+msgid "Edit %(num)s"
+msgstr "%(num)s Bearbeiten"
+
+#: manufacturing/templates/po_form.html:4
+#: manufacturing/templates/po_form.html:14
+msgid "New Purchase Order"
+msgstr "Neue Bestellung"
+
+#: manufacturing/templates/po_form.html:46
+#: manufacturing/templates/po_list.html:38
+#: manufacturing/templates/purchasing_dashboard.html:132
+msgid "Order Date"
+msgstr "Bestelldatum"
+
+#: manufacturing/templates/po_form.html:51
+#: manufacturing/templates/purchasing_dashboard.html:133
+msgid "Expected Date"
+msgstr "Erwartetes Datum"
+
+#: manufacturing/templates/po_form.html:80
+msgid "Create PO"
+msgstr "Bestellung Erstellen"
+
+#: manufacturing/templates/po_landed_cost_detail.html:3
+#: manufacturing/templates/po_landed_cost_detail.html:11
+#, python-format
+msgid "Landed Cost — PO %(num)s"
+msgstr "Anlandekosten — Bestellung %(num)s"
+
+#: manufacturing/templates/po_landed_cost_detail.html:6
+#: manufacturing/templates/po_landed_cost_new.html:6
+msgid "Back to PO"
+msgstr "Zurück zur Bestellung"
+
+#: manufacturing/templates/po_landed_cost_detail.html:15
+msgid "Allocation Method:"
+msgstr "Zuordnungsmethode:"
+
+#: manufacturing/templates/po_landed_cost_detail.html:16
+msgid "Freight:"
+msgstr "Fracht:"
+
+#: manufacturing/templates/po_landed_cost_detail.html:17
+msgid "Duty:"
+msgstr "Zoll:"
+
+#: manufacturing/templates/po_landed_cost_detail.html:18
+msgid "Broker Fee:"
+msgstr "Maklergebühr:"
+
+#: manufacturing/templates/po_landed_cost_detail.html:19
+msgid "Insurance:"
+msgstr "Versicherung:"
+
+#: manufacturing/templates/po_landed_cost_detail.html:21
+msgid "Entered:"
+msgstr "Erfasst:"
+
+#: manufacturing/templates/po_landed_cost_detail.html:21
+msgid "by"
+msgstr "von"
+
+#: manufacturing/templates/po_landed_cost_detail.html:25
+msgid "Allocation Detail"
+msgstr "Zuordnungsdetail"
+
+#: manufacturing/templates/po_landed_cost_detail.html:31
+#: manufacturing/templates/po_landed_cost_new.html:51
+msgid "Qty Received"
+msgstr "Empf. Menge"
+
+#: manufacturing/templates/po_landed_cost_detail.html:32
+msgid "Weight Used"
+msgstr "Verwendetes Gewicht"
+
+#: manufacturing/templates/po_landed_cost_detail.html:33
+msgid "Allocated Amount"
+msgstr "Zugeordneter Betrag"
+
+#: manufacturing/templates/po_landed_cost_detail.html:34
+msgid "Per-Unit Cost Added"
+msgstr "Hinzugefügte Stückkosten"
+
+#: manufacturing/templates/po_landed_cost_new.html:3
+#: manufacturing/templates/po_landed_cost_new.html:11
+#, python-format
+msgid "Add Landed Cost — PO %(num)s"
+msgstr "Anlandekosten Hinzufügen — Bestellung %(num)s"
+
+#: manufacturing/templates/po_landed_cost_new.html:37
+msgid "Allocation Method"
+msgstr "Zuordnungsmethode"
+
+#: manufacturing/templates/po_landed_cost_new.html:45
+msgid "Received Line Items"
+msgstr "Empfangene Positionen"
+
+#: manufacturing/templates/po_landed_cost_new.html:53
+msgid "Received Value"
+msgstr "Empfangener Wert"
+
+#: manufacturing/templates/po_landed_cost_new.html:54
+msgid "Weight (for weight method)"
+msgstr "Gewicht (für Gewichtsmethode)"
+
+#: manufacturing/templates/po_landed_cost_new.html:75
+msgid "Allocate Landed Cost"
+msgstr "Anlandekosten Zuordnen"
+
+#: manufacturing/templates/po_landed_cost_new.html:82
+msgid ""
+"This PO has no received line items yet — receive at least one item before "
+"adding a landed cost."
+msgstr "Diese Bestellung hat noch keine empfangenen Positionen — empfangen Sie mindestens einen Artikel, bevor Sie Anlandekosten hinzufügen."
+
+#: manufacturing/templates/po_list.html:8
+#: manufacturing/templates/purchasing_dashboard.html:7
+#: manufacturing/templates/purchasing_dashboard.html:54
+msgid "New PO"
+msgstr "Neue Bestellung"
+
+#: manufacturing/templates/po_list.html:9
+#: manufacturing/templates/rfq_detail.html:6
+#: manufacturing/templates/rfq_new.html:6
+msgid "RFQs"
+msgstr "Angebotsanfragen"
+
+#: manufacturing/templates/po_list.html:10
+msgid "Blanket POs"
+msgstr "Rahmenbestellungen"
+
+#: manufacturing/templates/po_list.html:11
+msgid "Consignment"
+msgstr "Konsignation"
+
+#: manufacturing/templates/po_list.html:36
+#: manufacturing/templates/purchasing_dashboard.html:130
+msgid "PO #"
+msgstr "Bestell-Nr."
+
+#: manufacturing/templates/po_list.html:39
+msgid "Expected"
+msgstr "Erwartet"
+
+#: manufacturing/templates/po_list.html:40
+msgid "Items"
+msgstr "Artikel"
+
+#: manufacturing/templates/po_list.html:67
+#, python-format
+msgid "No purchase orders with status \"%(s)s\"."
+msgstr "Keine Bestellungen mit Status «%(s)s»."
+
+#: manufacturing/templates/po_list.html:69
+msgid "No purchase orders."
+msgstr "Keine Bestellungen."
+
 #: manufacturing/templates/prod_daily_report.html:3
 #: manufacturing/templates/prod_daily_report.html:49
 msgid "Daily Production Report"
@@ -8652,22 +9373,6 @@ msgstr "Ausgehende Sendungen"
 #, python-format
 msgid "Work Orders Due %(date)s"
 msgstr "Fällige Fertigungsaufträge %(date)s"
-
-#: manufacturing/templates/prod_daily_report.html:83
-#: manufacturing/templates/prod_dashboard.html:112
-#: manufacturing/templates/prod_labor_report.html:94
-#: manufacturing/templates/prod_performance_report.html:107
-#: manufacturing/templates/prod_reports.html:86
-#: manufacturing/templates/prod_reports.html:113
-#: manufacturing/templates/prod_schedule.html:68
-#: manufacturing/templates/prod_shipping_detail.html:152
-#: manufacturing/templates/qa_inspection_detail.html:92
-#: manufacturing/templates/qa_inspection_list.html:80
-#: manufacturing/templates/qa_inspection_list.html:114
-#: manufacturing/templates/qa_ncr_list.html:87
-#: manufacturing/templates/reports_dashboard.html:199
-msgid "Product"
-msgstr "Produkt"
 
 #: manufacturing/templates/prod_daily_report.html:98
 msgid "No work orders due on this date."
@@ -8987,6 +9692,7 @@ msgstr "Fertigungsaufträge nach Status"
 
 #: manufacturing/templates/prod_reports.html:75
 #: manufacturing/templates/prod_returns_reports.html:69
+#: manufacturing/templates/purch_reports.html:80
 msgid "No data."
 msgstr "Keine Daten."
 
@@ -9208,6 +9914,150 @@ msgstr "Aktuelle Sendungen"
 #: manufacturing/templates/prod_tracking_dashboard.html:90
 msgid "No shipments on record."
 msgstr "Keine Sendungen erfasst."
+
+#: manufacturing/templates/purch_contract_detail.html:3
+#, python-format
+msgid "Contract — %(num)s"
+msgstr "Vertrag — %(num)s"
+
+#: manufacturing/templates/purch_contracts_list.html:3
+#: manufacturing/templates/purch_contracts_list.html:58
+#: manufacturing/templates/purchasing_dashboard.html:56
+msgid "Vendor Contracts"
+msgstr "Lieferantenverträge"
+
+#: manufacturing/templates/purch_contracts_list.html:9
+#: manufacturing/templates/purch_reports.html:9
+#: manufacturing/templates/purchasing_dashboard.html:10
+#: manufacturing/templates/req_detail.html:7
+#: manufacturing/templates/req_list.html:10
+msgid "Requisitions"
+msgstr "Anforderungen"
+
+#: manufacturing/templates/purch_contracts_list.html:70
+msgid "Search title / contract # / supplier…"
+msgstr "Titel / Vertrags-Nr. / Lieferant suchen…"
+
+#: manufacturing/templates/purch_contracts_list.html:79
+#: manufacturing/templates/purch_reports.html:121
+msgid "Contract #"
+msgstr "Vertrags-Nr."
+
+#: manufacturing/templates/purch_contracts_list.html:116
+msgid "Contract title"
+msgstr "Vertragstitel"
+
+#: manufacturing/templates/purch_reports.html:3
+#: manufacturing/templates/purch_reports.html:46
+#: manufacturing/templates/purchasing_dashboard.html:57
+msgid "Purchasing Reports"
+msgstr "Einkaufsberichte"
+
+#: manufacturing/templates/purch_reports.html:51
+msgid "Open PO Value"
+msgstr "Wert Offener Bestellungen"
+
+#: manufacturing/templates/purch_reports.html:63
+msgid "Top Suppliers by PO Count"
+msgstr "Top-Lieferanten nach Bestellanzahl"
+
+#: manufacturing/templates/purch_reports.html:68
+#: manufacturing/templates/purch_reports.html:92
+msgid "POs"
+msgstr "Bestellungen"
+
+#: manufacturing/templates/purch_reports.html:69
+msgid "Total Value"
+msgstr "Gesamtwert"
+
+#: manufacturing/templates/purch_reports.html:87
+msgid "POs by Month (Last 6 Months)"
+msgstr "Bestellungen nach Monat (Letzte 6 Monate)"
+
+#: manufacturing/templates/purch_reports.html:93
+#: manufacturing/templates/qa_reports.html:110
+#: manufacturing/templates/qa_reports.html:216
+msgid "Volume"
+msgstr "Volumen"
+
+#: manufacturing/templates/purch_reports.html:109
+msgid "No recent POs."
+msgstr "Keine aktuellen Bestellungen."
+
+#: manufacturing/templates/purch_reports.html:117
+msgid "Contracts Expiring Within 90 Days"
+msgstr "Verträge, die in 90 Tagen Ablaufen"
+
+#: manufacturing/templates/purch_reports.html:136
+msgid "No contracts expiring within 90 days."
+msgstr "Keine Verträge laufen innerhalb von 90 Tagen ab."
+
+#: manufacturing/templates/purchasing_dashboard.html:3
+#: manufacturing/templates/purchasing_dashboard.html:50
+msgid "Purchasing Dashboard"
+msgstr "Einkaufs-Dashboard"
+
+#: manufacturing/templates/purchasing_dashboard.html:12
+#: manufacturing/templates/purchasing_dashboard.html:59
+msgid "Consultants"
+msgstr "Berater"
+
+#: manufacturing/templates/purchasing_dashboard.html:13
+msgid "Supplier Portal"
+msgstr "Lieferantenportal"
+
+#: manufacturing/templates/purchasing_dashboard.html:55
+#: manufacturing/templates/purchasing_dashboard.html:71
+msgid "Pending Approval"
+msgstr "Genehmigung Ausstehend"
+
+#: manufacturing/templates/purchasing_dashboard.html:61
+msgid "New Product"
+msgstr "Neues Produkt"
+
+#: manufacturing/templates/purchasing_dashboard.html:79
+msgid "Sent"
+msgstr "Gesendet"
+
+#: manufacturing/templates/purchasing_dashboard.html:83
+msgid "Partial Receipt"
+msgstr "Teilweiser Eingang"
+
+#: manufacturing/templates/purchasing_dashboard.html:87
+msgid "Total POs"
+msgstr "Bestellungen Gesamt"
+
+#: manufacturing/templates/purchasing_dashboard.html:94
+msgid "PO Status Breakdown"
+msgstr "Bestellstatus-Aufschlüsselung"
+
+#: manufacturing/templates/purchasing_dashboard.html:98
+msgid "Spend by Month (last 6 mo)"
+msgstr "Ausgaben nach Monat (letzte 6 Monate)"
+
+#: manufacturing/templates/purchasing_dashboard.html:105
+msgid "Top Suppliers by Spend"
+msgstr "Top-Lieferanten nach Ausgaben"
+
+#: manufacturing/templates/purchasing_dashboard.html:109
+msgid "PO Count by Month (last 6 mo)"
+msgstr "Anzahl Bestellungen nach Monat (letzte 6 Monate)"
+
+#: manufacturing/templates/purchasing_dashboard.html:116
+msgid "Top Items by Spend"
+msgstr "Top-Artikel nach Ausgaben"
+
+#: manufacturing/templates/purchasing_dashboard.html:120
+msgid "Requisition Status"
+msgstr "Anforderungsstatus"
+
+#: manufacturing/templates/purchasing_dashboard.html:126
+msgid "Recent Purchase Orders"
+msgstr "Aktuelle Bestellungen"
+
+#: manufacturing/templates/purchasing_dashboard.html:147
+msgid "No purchase orders yet."
+msgstr "Noch keine Bestellungen."
 
 #: manufacturing/templates/qa_audit_detail.html:3
 #, python-format
@@ -9642,6 +10492,7 @@ msgid "Description of nonconformance"
 msgstr "Beschreibung der Nichtkonformität"
 
 #: manufacturing/templates/qa_ncr_list.html:131
+#: manufacturing/templates/req_detail.html:155
 msgid "Optional"
 msgstr "Optional"
 
@@ -9685,11 +10536,6 @@ msgstr "Keine offenen NCR."
 #: manufacturing/templates/qa_reports.html:104
 msgid "Open NCRs by Source"
 msgstr "Offene NCR nach Quelle"
-
-#: manufacturing/templates/qa_reports.html:110
-#: manufacturing/templates/qa_reports.html:216
-msgid "Volume"
-msgstr "Volumen"
 
 #: manufacturing/templates/qa_reports.html:134
 msgid "CAPAs by Status"
@@ -9789,10 +10635,6 @@ msgid "Last Audit"
 msgstr "Letztes Audit"
 
 #: manufacturing/templates/qa_supplier_list.html:84
-msgid "Supplier"
-msgstr "Lieferant"
-
-#: manufacturing/templates/qa_supplier_list.html:84
 msgid "Material"
 msgstr "Material"
 
@@ -9815,18 +10657,6 @@ msgstr "Datum des Letzten Audits"
 #: manufacturing/templates/qa_supplier_list.html:144
 msgid "Add Record"
 msgstr "Datensatz Hinzufügen"
-
-#: manufacturing/templates/report_builder_detail.html:6
-#: manufacturing/templates/report_builder_form.html:6
-#: manufacturing/templates/report_builder_list.html:6
-#: manufacturing/templates/reports_dashboard.html:7
-#: manufacturing/templates/tc_device_form.html:6
-#: manufacturing/templates/tc_device_list.html:6
-#: manufacturing/templates/time_clock_attendance.html:6
-#: manufacturing/templates/time_clock_hours.html:6
-#: manufacturing/templates/time_clock_status.html:6
-msgid "Back"
-msgstr "Zurück"
 
 #: manufacturing/templates/report_builder_detail.html:9
 msgid "Export PDF"
@@ -10076,6 +10906,231 @@ msgid_plural "items at or below reorder point"
 msgstr[0] "Artikel am oder unter dem Meldebestand"
 msgstr[1] "Artikel am oder unter dem Meldebestand"
 
+#: manufacturing/templates/req_detail.html:3
+#: manufacturing/templates/req_detail.html:50
+#, python-format
+msgid "Requisition %(num)s"
+msgstr "Anforderung %(num)s"
+
+#: manufacturing/templates/req_detail.html:60
+#: manufacturing/templates/req_list.html:113
+msgid "Needed By"
+msgstr "Benötigt Bis"
+
+#: manufacturing/templates/req_detail.html:61
+#: manufacturing/templates/req_list.html:80
+msgid "Justification"
+msgstr "Begründung"
+
+#: manufacturing/templates/req_detail.html:69
+msgid "Line Items"
+msgstr "Positionen"
+
+#: manufacturing/templates/req_detail.html:72
+msgid "Est. Unit Price"
+msgstr "Gesch. Stückpreis"
+
+#: manufacturing/templates/req_detail.html:102
+msgid "Est. Unit Price ($)"
+msgstr "Gesch. Stückpreis ($)"
+
+#: manufacturing/templates/req_detail.html:112
+msgid "Approval History"
+msgstr "Genehmigungsverlauf"
+
+#: manufacturing/templates/req_detail.html:115
+msgid "Level"
+msgstr "Ebene"
+
+#: manufacturing/templates/req_detail.html:115
+msgid "Approver"
+msgstr "Genehmiger"
+
+#: manufacturing/templates/req_detail.html:115
+msgid "Decision"
+msgstr "Entscheidung"
+
+#: manufacturing/templates/req_detail.html:115
+#: manufacturing/templates/req_detail.html:154
+msgid "Comment"
+msgstr "Kommentar"
+
+#: manufacturing/templates/req_detail.html:127
+msgid "No decisions recorded yet."
+msgstr "Noch keine Entscheidungen erfasst."
+
+#: manufacturing/templates/req_detail.html:135
+#: manufacturing/templates/req_detail.html:142
+msgid "Submit for Approval"
+msgstr "Zur Genehmigung Einreichen"
+
+#: manufacturing/templates/req_detail.html:137
+msgid ""
+"Once submitted, this requisition can no longer be edited and will be routed "
+"to your department manager for a decision."
+msgstr "Nach dem Einreichen kann diese Anforderung nicht mehr bearbeitet werden und wird zur Entscheidung an Ihren Abteilungsleiter weitergeleitet."
+
+#: manufacturing/templates/req_detail.html:149
+msgid "Decide"
+msgstr "Entscheiden"
+
+#: manufacturing/templates/req_list.html:3
+#: manufacturing/templates/req_list.html:59
+msgid "Purchase Requisitions"
+msgstr "Beschaffungsanforderungen"
+
+#: manufacturing/templates/req_list.html:70
+msgid "Search req # / justification…"
+msgstr "Anforderungs-Nr. / Begründung suchen…"
+
+#: manufacturing/templates/req_list.html:79
+msgid "Req #"
+msgstr "Anf.-Nr."
+
+#: manufacturing/templates/req_list.html:80
+msgid "Needed"
+msgstr "Benötigt"
+
+#: manufacturing/templates/req_list.html:81
+msgid "Est. Total"
+msgstr "Gesch. Gesamt"
+
+#: manufacturing/templates/req_list.html:96
+msgid "No requisitions found."
+msgstr "Keine Anforderungen gefunden."
+
+#: manufacturing/templates/req_list.html:104
+msgid "New Requisition"
+msgstr "Neue Anforderung"
+
+#: manufacturing/templates/req_list.html:109
+msgid "Justification *"
+msgstr "Begründung *"
+
+#: manufacturing/templates/req_list.html:110
+msgid "Why is this needed?"
+msgstr "Warum wird dies benötigt?"
+
+#: manufacturing/templates/req_list.html:121
+msgid "Create Requisition"
+msgstr "Anforderung Erstellen"
+
+#: manufacturing/templates/req_list.html:124
+msgid ""
+"You'll add line items and submit for approval from the requisition's detail "
+"page."
+msgstr "Sie fügen Positionen hinzu und reichen sie von der Detailseite der Anforderung aus zur Genehmigung ein."
+
+#: manufacturing/templates/rfq_detail.html:34
+#: manufacturing/templates/rfq_list.html:22
+#: manufacturing/templates/rfq_list.html:45
+msgid "Awarded"
+msgstr "Vergeben"
+
+#: manufacturing/templates/rfq_detail.html:47
+msgid "Invited Vendors"
+msgstr "Eingeladene Lieferanten"
+
+#: manufacturing/templates/rfq_detail.html:62
+msgid "No vendors invited yet."
+msgstr "Noch keine Lieferanten eingeladen."
+
+#: manufacturing/templates/rfq_detail.html:74
+msgid "Invite Vendor"
+msgstr "Lieferant Einladen"
+
+#: manufacturing/templates/rfq_detail.html:104
+msgid "Target Price"
+msgstr "Zielpreis"
+
+#: manufacturing/templates/rfq_detail.html:114
+msgid "Quote Comparison"
+msgstr "Angebotsvergleich"
+
+#: manufacturing/templates/rfq_detail.html:124
+msgid "Target"
+msgstr "Ziel"
+
+#: manufacturing/templates/rfq_detail.html:128
+msgid "Winner"
+msgstr "Gewinner"
+
+#: manufacturing/templates/rfq_detail.html:128
+msgid "Awarded To"
+msgstr "Vergeben An"
+
+#: manufacturing/templates/rfq_detail.html:141
+msgid "Remove item"
+msgstr "Artikel Entfernen"
+
+#: manufacturing/templates/rfq_detail.html:153
+msgid "price"
+msgstr "Preis"
+
+#: manufacturing/templates/rfq_detail.html:161
+#, python-format
+msgid "%(d)sd"
+msgstr "%(d)sT"
+
+#: manufacturing/templates/rfq_detail.html:185
+msgid "Save Quotes"
+msgstr "Angebote Speichern"
+
+#: manufacturing/templates/rfq_detail.html:186
+msgid "Award Selected Winners"
+msgstr "Ausgewählte Gewinner Vergeben"
+
+#: manufacturing/templates/rfq_detail.html:191
+msgid "Add line items to start collecting quotes."
+msgstr "Fügen Sie Positionen hinzu, um Angebote zu sammeln."
+
+#: manufacturing/templates/rfq_list.html:3
+#: manufacturing/templates/rfq_list.html:16
+msgid "Requests for Quote"
+msgstr "Angebotsanfragen"
+
+#: manufacturing/templates/rfq_list.html:9
+#: manufacturing/templates/rfq_new.html:3
+msgid "New RFQ"
+msgstr "Neue Angebotsanfrage"
+
+#: manufacturing/templates/rfq_list.html:31
+msgid "RFQ #"
+msgstr "Anfrage-Nr."
+
+#: manufacturing/templates/rfq_list.html:55
+msgid "Detail"
+msgstr "Detail"
+
+#: manufacturing/templates/rfq_list.html:64
+#, python-format
+msgid "No RFQs found with status \"%(status)s\"."
+msgstr "Keine Angebotsanfragen mit Status «%(status)s» gefunden."
+
+#: manufacturing/templates/rfq_list.html:66
+msgid "No RFQs found."
+msgstr "Keine Angebotsanfragen gefunden."
+
+#: manufacturing/templates/rfq_new.html:21
+msgid "New Request for Quote"
+msgstr "Neue Angebotsanfrage"
+
+#: manufacturing/templates/rfq_new.html:29
+msgid "Notes (optional)"
+msgstr "Notizen (optional)"
+
+#: manufacturing/templates/rfq_new.html:30
+msgid "e.g. Q3 raw material sourcing"
+msgstr "z. B. Rohstoffbeschaffung Q3"
+
+#: manufacturing/templates/rfq_new.html:32
+msgid "Create RFQ"
+msgstr "Angebotsanfrage Erstellen"
+
+#: manufacturing/templates/rfq_new.html:37
+msgid "After creating the RFQ, add line items and invite vendors to quote."
+msgstr "Fügen Sie nach dem Erstellen der Anfrage Positionen hinzu und laden Sie Lieferanten zur Angebotsabgabe ein."
+
 #: manufacturing/templates/sf_tv.html:5 manufacturing/templates/sf_tv.html:38
 #, python-format
 msgid "Shop Floor OEE — %(shift)s Shift"
@@ -10294,10 +11349,6 @@ msgstr "Stempeluhr-Geräte"
 #: manufacturing/templates/tc_device_list.html:44
 msgid "Last Sync"
 msgstr "Letzte Synchronisierung"
-
-#: manufacturing/templates/tc_device_list.html:46
-msgid "Actions"
-msgstr "Aktionen"
 
 #: manufacturing/templates/tc_device_list.html:56
 msgid "Never"

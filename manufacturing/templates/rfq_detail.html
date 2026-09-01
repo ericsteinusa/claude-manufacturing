@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block page_title %}{{ rfq.rfq_number }}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/rfq/" class="btn">RFQs</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="/rfq/{{ rfq.id }}/?export=1" class="btn">&#8659; CSV</a>
+<a href="/rfq/" class="btn">{% trans "RFQs" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="/rfq/{{ rfq.id }}/?export=1" class="btn">&#8659; {% trans "CSV" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -30,11 +31,11 @@
 <div class="rfq-wrap">
     <div class="menu-title">{{ rfq.rfq_number }}
         {% if rfq.status == 'awarded' %}
-        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">Awarded</span>
+        <span class="pill pill-ok" style="font-size:11px;padding:2px 8px;">{% trans "Awarded" %}</span>
         {% elif rfq.status == 'closed' %}
-        <span class="pill" style="font-size:11px;padding:2px 8px;">Closed</span>
+        <span class="pill" style="font-size:11px;padding:2px 8px;">{% trans "Closed" %}</span>
         {% else %}
-        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">Open</span>
+        <span class="pill pill-info" style="font-size:11px;padding:2px 8px;">{% trans "Open" %}</span>
         {% endif %}
     </div>
     {% if rfq.notes %}<p style="font-size:13px;color:var(--text-muted);margin-top:-8px;">{{ rfq.notes }}</p>{% endif %}
@@ -43,7 +44,7 @@
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <div class="card">
-        <h3>Invited Vendors</h3>
+        <h3>{% trans "Invited Vendors" %}</h3>
         <div>
             {% for v in comparison.vendors %}
             <span class="vendor-tag">
@@ -53,12 +54,12 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="remove_vendor">
                     <input type="hidden" name="rfq_vendor_id" value="{{ v.rfq_vendor_id }}">
-                    <button type="submit" title="Remove">×</button>
+                    <button type="submit" title="{% trans 'Remove' %}">×</button>
                 </form>
                 {% endif %}
             </span>
             {% empty %}
-            <span style="color:var(--text-muted);font-size:13px;">No vendors invited yet.</span>
+            <span style="color:var(--text-muted);font-size:13px;">{% trans "No vendors invited yet." %}</span>
             {% endfor %}
         </div>
         {% if can_edit and rfq.status == 'open' %}
@@ -70,47 +71,47 @@
                 <option value="{{ s.id }}">{{ s.company_name }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn">Invite Vendor</button>
+            <button type="submit" class="btn">{% trans "Invite Vendor" %}</button>
         </form>
         {% endif %}
     </div>
 
     {% if can_edit and rfq.status == 'open' %}
     <div class="card">
-        <h3>Add Line Item</h3>
+        <h3>{% trans "Add Line Item" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_item">
             <div class="form-grid">
                 <div class="form-row">
-                    <label>Description</label>
+                    <label>{% trans "Description" %}</label>
                     <input type="text" name="description" required>
                 </div>
                 <div class="form-row">
-                    <label>Product (optional)</label>
+                    <label>{% trans "Product (optional)" %}</label>
                     <select name="product_id">
-                        <option value="">(none)</option>
+                        <option value="">{% trans "(none)" %}</option>
                         {% for p in products %}
                         <option value="{{ p.id }}">{{ p.product_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Qty</label>
+                    <label>{% trans "Qty" %}</label>
                     <input type="number" name="qty" min="1" value="1">
                 </div>
                 <div class="form-row">
-                    <label>Target Price</label>
+                    <label>{% trans "Target Price" %}</label>
                     <input type="number" name="target_price" step="0.01" min="0" value="0.00">
                 </div>
             </div>
-            <button type="submit" class="btn">Add Item</button>
+            <button type="submit" class="btn">{% trans "Add Item" %}</button>
         </form>
     </div>
     {% endif %}
 
     <div class="card">
-        <h3>Quote Comparison</h3>
+        <h3>{% trans "Quote Comparison" %}</h3>
         {% if comparison.rows %}
         <form method="post">
             {% csrf_token %}
@@ -118,13 +119,13 @@
                 <table class="erp-table">
                     <thead>
                         <tr>
-                            <th>Item</th>
-                            <th class="num">Qty</th>
-                            <th class="num">Target</th>
+                            <th>{% trans "Item" %}</th>
+                            <th class="num">{% trans "Qty" %}</th>
+                            <th class="num">{% trans "Target" %}</th>
                             {% for v in comparison.vendors %}
                             <th>{{ v.label }}</th>
                             {% endfor %}
-                            {% if rfq.status == 'open' %}<th>Winner</th>{% else %}<th>Awarded To</th>{% endif %}
+                            {% if rfq.status == 'open' %}<th>{% trans "Winner" %}</th>{% else %}<th>{% trans "Awarded To" %}</th>{% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -137,7 +138,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="delete_item">
                                     <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <button type="submit" title="Remove item" style="border:none;background:none;color:#c62828;cursor:pointer;font-size:13px;padding:0;">&#10005;</button>
+                                    <button type="submit" title="{% trans 'Remove item' %}" style="border:none;background:none;color:#c62828;cursor:pointer;font-size:13px;padding:0;">&#10005;</button>
                                 </form>
                                 {% endif %}
                             </td>
@@ -149,15 +150,15 @@
                                 <input class="price-input" type="number" step="0.01" min="0"
                                        name="quote_{{ item.id }}_{{ vendor.id }}"
                                        value="{% if cell %}{{ cell.quoted_price|floatformat:2 }}{% endif %}"
-                                       placeholder="price">
+                                       placeholder="{% trans 'price' %}">
                                 <input class="lead-input" type="number" min="0"
                                        name="lead_{{ item.id }}_{{ vendor.id }}"
                                        value="{% if cell %}{{ cell.lead_time_days|default_if_none:'' }}{% endif %}"
-                                       placeholder="days">
+                                       placeholder="{% trans 'days' %}">
                                 {% else %}
                                 {% if cell and cell.quoted_price is not None %}
                                 <span {% if cell.is_lowest %}class="cell-lowest"{% endif %}>${{ cell.quoted_price|floatformat:2 }}</span>
-                                {% if cell.lead_time_days %}<span style="font-size:11px;color:#888;"> {{ cell.lead_time_days }}d</span>{% endif %}
+                                {% if cell.lead_time_days %}<span style="font-size:11px;color:#888;"> {% blocktrans with d=cell.lead_time_days %}{{ d }}d{% endblocktrans %}</span>{% endif %}
                                 {% else %}—{% endif %}
                                 {% endif %}
                             </td>
@@ -181,13 +182,13 @@
             </div>
             {% if can_edit and rfq.status == 'open' %}
             <div style="display:flex;gap:10px;margin-top:14px;">
-                <button type="submit" name="action" value="enter_quotes" class="btn">Save Quotes</button>
-                <button type="submit" name="action" value="award" class="btn btn-primary">Award Selected Winners</button>
+                <button type="submit" name="action" value="enter_quotes" class="btn">{% trans "Save Quotes" %}</button>
+                <button type="submit" name="action" value="award" class="btn btn-primary">{% trans "Award Selected Winners" %}</button>
             </div>
             {% endif %}
         </form>
         {% else %}
-        <div class="empty-state">Add line items to start collecting quotes.</div>
+        <div class="empty-state">{% trans "Add line items to start collecting quotes." %}</div>
         {% endif %}
     </div>
 </div>

@@ -4485,3 +4485,53 @@ Accounting department (13) + the full IT department (17) + the full Finance depa
 full Quality department (12) + the full Production department (13, plus the 2 already-translated
 htmx templates) + the full Maintenance department (16, plus the 2 already-translated htmx
 templates)) out of ~450 total.
+
+**2026-09-01, fifteenth whole department:** Continued the "whole department" approach — picked
+**Purchasing** (`purchasing_dashboard.html`, `purch_reports.html`, `purch_contracts_list.html`/
+`_detail.html`, `po_list.html`/`_detail.html`/`_form.html`, `po_approvals.html`,
+`po_landed_cost_detail.html`/`_new.html`, `rfq_list.html`/`_detail.html`/`_new.html`,
+`blanket_po_list.html`/`_detail.html`/`_new.html`, `blanket_po_release_new.html`,
+`req_list.html`/`_detail.html`), 19 templates — the largest single pass yet by unique-string
+count. Deliberately excluded the dashboard's links to `/suppliers/` (which renders the generic,
+shared `contacts_list.html` — not even a Purchasing-owned template), `/consignment/`,
+`/supplier-portal/`, and the supplier-scorecard pages, matching the "translate the link, not yet
+the target" precedent. 182 unique strings per language, all simple (no plurals needed). Extended
+the existing `confirm('{% trans "..." %}')` JS-dialog pattern (previously used in only two other
+templates app-wide) to five more `confirm()` dialogs here, including two using
+`{% blocktrans %}` with an interpolated PO number inside the JS string — confirmed this works
+identically since Django renders the tag server-side before the JS ever reaches the browser.
+**Found a new escaping gotcha, the same class as the Maintenance pass's embedded-newline issue
+but for embedded quotes**: three empty-state messages (`No purchase orders with status "{{ status
+}}".` and two siblings) contain literal `"` characters that `makemessages` escapes to the
+two-character sequence `\"` in the `.po` msgid — a translation-dict key built with a normal
+escaped-quote Python string decodes that back to a single `"` character and silently fails to
+match, leaving the entry unapplied; fixed by building those dict keys as Python raw strings
+(`r'...\"...'`) so the literal two-character sequence survives intact, confirmed with a
+byte-level check before applying. Sidestepped the issue in the translated values entirely by
+using guillemets (`« »`) instead of straight quotes, per the Time Clock-pass convention. The
+same raw-string technique also handled two multi-line `{% blocktrans %}` strings that wrap
+across a template line break. No bare `{{ x|default:"literal" }}` fallback bugs and no
+untranslatable `|pluralize` uses found this pass — the first department in this series to come
+up clean on both standing checklist items. `makemessages` fuzzy-matched 111 of the new strings
+against unrelated existing translations (second only to IT's 121), handled cleanly with the
+established blank-the-msgstr-when-stripping-fuzzy technique. Full suite 3431 passed (unchanged),
+`manage.py check` clean, `compilemessages` clean, `msgfmt --check` clean on all three files, zero
+blank/duplicated entries confirmed programmatically. Verified end-to-end against the real dev
+server: the Purchasing Dashboard, PO list + a draft PO's detail page, RFQ list + an open RFQ's
+detail page (quote comparison + vendor invite), Blanket PO list + a closed blanket PO's detail
+page (confirmed the embedded-`<b>`-tag summary line in Spanish), Purchase Requisitions list + a
+dept-approved requisition's detail page, the PO Approval Queue (confirmed the multi-line
+threshold notice in French), Vendor Contracts, and a New PO form, in Spanish, French, and German
+with real sample data, no console errors. **A pre-existing, unrelated bug was found and flagged
+separately rather than fixed in this i18n-only pass**: `/purch/reports/` 500s with `relation
+"purchase_order_item" does not exist` — the view's SQL references a table name that doesn't
+match the live schema (the real table is `po_item`); confirmed present on `main` before this
+branch's changes. **Localization coverage is now 179 templates across three languages** (core
+shell + login + main dashboard + all 5 htmx templates + the full Legal department (10) + the
+full Marketing department (13) + the full Reports department (4) + the full Payroll department
+(8) + the full Time Clock department (7) + the full Customers/Credit department (7) + the full
+Engineering department (10) + the full Customer Service department (13) + the full Accounting
+department (13) + the full IT department (17) + the full Finance department (10) + the full
+Quality department (12) + the full Production department (13, plus the 2 already-translated
+htmx templates) + the full Maintenance department (16, plus the 2 already-translated htmx
+templates) + the full Purchasing department (19)) out of ~450 total.

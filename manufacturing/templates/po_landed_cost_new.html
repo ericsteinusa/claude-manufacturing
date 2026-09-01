@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Add Landed Cost — PO {{ po.po_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=po.po_number %}Add Landed Cost — PO {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/po/{{ po.id }}/" class="btn">← Back to PO</a>
+<a href="/po/{{ po.id }}/" class="btn">← {% trans "Back to PO" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Add Landed Cost — PO {{ po.po_number }}</div>
+    <div class="menu-title">{% blocktrans with num=po.po_number %}Add Landed Cost — PO {{ num }}{% endblocktrans %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -17,23 +18,23 @@
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="form-row">
-                    <label>Freight</label>
+                    <label>{% trans "Freight" %}</label>
                     <input type="number" name="freight" min="0" step="0.01" value="0.00">
                 </div>
                 <div class="form-row">
-                    <label>Duty</label>
+                    <label>{% trans "Duty" %}</label>
                     <input type="number" name="duty" min="0" step="0.01" value="0.00">
                 </div>
                 <div class="form-row">
-                    <label>Broker Fee</label>
+                    <label>{% trans "Broker Fee" %}</label>
                     <input type="number" name="broker_fee" min="0" step="0.01" value="0.00">
                 </div>
                 <div class="form-row">
-                    <label>Insurance</label>
+                    <label>{% trans "Insurance" %}</label>
                     <input type="number" name="insurance" min="0" step="0.01" value="0.00">
                 </div>
                 <div class="form-row">
-                    <label>Allocation Method</label>
+                    <label>{% trans "Allocation Method" %}</label>
                     <select name="method">
                         {% for m in methods %}
                         <option value="{{ m }}">{{ m|capfirst }}</option>
@@ -41,16 +42,16 @@
                     </select>
                 </div>
 
-                <div class="card-title" style="margin-top:20px;">Received Line Items</div>
+                <div class="card-title" style="margin-top:20px;">{% trans "Received Line Items" %}</div>
                 <div class="erp-table-wrap">
                     <table class="erp-table">
                         <thead>
                             <tr>
-                                <th>Description</th>
-                                <th class="num">Qty Received</th>
-                                <th class="num">Unit Price</th>
-                                <th class="num">Received Value</th>
-                                <th class="num">Weight (for weight method)</th>
+                                <th>{% trans "Description" %}</th>
+                                <th class="num">{% trans "Qty Received" %}</th>
+                                <th class="num">{% trans "Unit Price" %}</th>
+                                <th class="num">{% trans "Received Value" %}</th>
+                                <th class="num">{% trans "Weight (for weight method)" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -71,14 +72,14 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn">Allocate Landed Cost</button>
-                    <a href="/po/{{ po.id }}/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Allocate Landed Cost" %}</button>
+                    <a href="/po/{{ po.id }}/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>
     </div>
     {% else %}
-    <div class="empty-state">This PO has no received line items yet — receive at least one item before adding a landed cost.</div>
+    <div class="empty-state">{% trans "This PO has no received line items yet — receive at least one item before adding a landed cost." %}</div>
     {% endif %}
 </div>
 {% endblock %}

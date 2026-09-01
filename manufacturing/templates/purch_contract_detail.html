@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Contract — {{ contract.contract_number }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with num=contract.contract_number %}Contract — {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/purch/" class="btn">Purchasing</a>
-<a href="/purch/contracts/" class="btn">Contracts</a>
-<a href="/purch/reports/" class="btn">Reports</a>
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/purch/" class="btn">{% trans "Purchasing" %}</a>
+<a href="/purch/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/purch/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -51,34 +52,34 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Contract</h3>
+        <h3>{% trans "Edit Contract" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Title *</label>
+                    <label>{% trans "Title *" %}</label>
                     <input type="text" name="title" value="{{ contract.title }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Supplier</label>
+                    <label>{% trans "Supplier" %}</label>
                     <select name="supplier_id">
-                        <option value="">— None —</option>
+                        <option value="">{% trans "— None —" %}</option>
                         {% for s in suppliers %}
                         <option value="{{ s.id }}"{% if contract.supplier_id == s.id %} selected{% endif %}>{{ s.company_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Category</label>
+                    <label>{% trans "Category" %}</label>
                     <select name="category">
-                        <option value="">— Select —</option>
+                        <option value="">{% trans "— Select —" %}</option>
                         {% for cat in CONTRACT_CATEGORIES %}
                         <option value="{{ cat }}"{% if contract.category == cat %} selected{% endif %}>{{ cat }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in CONTRACT_STATUSES %}
                         <option value="{{ s }}"{% if contract.status == s %} selected{% endif %}>{{ s }}</option>
@@ -86,38 +87,38 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ contract.start_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ contract.end_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Value ($)</label>
+                    <label>{% trans "Value ($)" %}</label>
                     <input type="number" name="value" step="0.01" min="0" value="{{ contract.value|default:'' }}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ contract.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="ro-table">
-            <tr><th>Title</th><td>{{ contract.title }}</td></tr>
-            <tr><th>Supplier</th><td>{{ contract.supplier_name|default:"—" }}</td></tr>
-            <tr><th>Category</th><td>{{ contract.category|default:"—" }}</td></tr>
-            <tr><th>Status</th><td><span class="badge s-{{ contract.status|cut:' ' }}">{{ contract.status }}</span></td></tr>
-            <tr><th>Start Date</th><td>{{ contract.start_date|default:"—" }}</td></tr>
-            <tr><th>End Date</th><td>{{ contract.end_date|default:"—" }}</td></tr>
-            <tr><th>Value</th><td>{% if contract.value %}${{ contract.value|floatformat:2 }}{% else %}—{% endif %}</td></tr>
-            <tr><th>Created By</th><td>{{ contract.created_by|default:"—" }}</td></tr>
-            <tr><th>Created Date</th><td>{{ contract.created_date|default:"—" }}</td></tr>
-            <tr><th>Notes</th><td><pre style="margin:0;white-space:pre-wrap;font-family:inherit;">{{ contract.notes|default:"—" }}</pre></td></tr>
+            <tr><th>{% trans "Title" %}</th><td>{{ contract.title }}</td></tr>
+            <tr><th>{% trans "Supplier" %}</th><td>{{ contract.supplier_name|default:"—" }}</td></tr>
+            <tr><th>{% trans "Category" %}</th><td>{{ contract.category|default:"—" }}</td></tr>
+            <tr><th>{% trans "Status" %}</th><td><span class="badge s-{{ contract.status|cut:' ' }}">{{ contract.status }}</span></td></tr>
+            <tr><th>{% trans "Start Date" %}</th><td>{{ contract.start_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "End Date" %}</th><td>{{ contract.end_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Value" %}</th><td>{% if contract.value %}${{ contract.value|floatformat:2 }}{% else %}—{% endif %}</td></tr>
+            <tr><th>{% trans "Created By" %}</th><td>{{ contract.created_by|default:"—" }}</td></tr>
+            <tr><th>{% trans "Created Date" %}</th><td>{{ contract.created_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Notes" %}</th><td><pre style="margin:0;white-space:pre-wrap;font-family:inherit;">{{ contract.notes|default:"—" }}</pre></td></tr>
         </table>
     </div>
     {% endif %}
