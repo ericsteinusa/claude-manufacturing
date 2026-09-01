@@ -5,6 +5,8 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { getFinancialDashboard } from '../../src/api/finance';
 import KpiCard from '../../src/components/KpiCard';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 import type { FinancialDashboardData } from '../../src/api/finance';
 
 const AGING_LABELS: [keyof FinancialDashboardData['ar_aging'], string][] = [
@@ -22,13 +24,20 @@ export default function FinanceScreen() {
   const [data, setData] = useState<FinancialDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await getFinancialDashboard();
-      setData(res.data.data);
+      const result = await fetchWithOfflineCache(
+        'finance_dashboard',
+        async () => (await getFinancialDashboard()).data.data,
+      );
+      setData(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       setError('Could not load the financial dashboard.');
     } finally {
@@ -43,6 +52,7 @@ export default function FinanceScreen() {
       style={styles.screen}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
     >
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {loading && !data ? <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#1a73e8" /> : null}
 

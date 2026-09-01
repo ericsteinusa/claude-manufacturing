@@ -5,6 +5,8 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { getDashboard } from '../../src/api/dashboard';
 import KpiCard from '../../src/components/KpiCard';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 import { useAuth } from '../../src/hooks/useAuth';
 import type { DashboardData } from '../../src/api/dashboard';
 
@@ -13,13 +15,20 @@ export default function DashboardScreen() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await getDashboard();
-      setData(res.data.data);
+      const result = await fetchWithOfflineCache(
+        'dashboard',
+        async () => (await getDashboard()).data.data,
+      );
+      setData(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       setError('Could not load dashboard.');
     } finally {
@@ -41,6 +50,7 @@ export default function DashboardScreen() {
       style={styles.screen}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
     >
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       <View style={styles.header}>
         <Text style={styles.greeting}>
           Hello, {user?.role ?? 'User'}

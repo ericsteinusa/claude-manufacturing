@@ -5,7 +5,9 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { getCustomersDashboard } from '../../src/api/customers';
 import KpiCard from '../../src/components/KpiCard';
+import OfflineBanner from '../../src/components/OfflineBanner';
 import StatusBadge from '../../src/components/StatusBadge';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 import type { CustomersDashboardData } from '../../src/api/customers';
 
 const fmtMoney = (n: number) =>
@@ -15,13 +17,20 @@ export default function CustomersScreen() {
   const [data, setData] = useState<CustomersDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await getCustomersDashboard();
-      setData(res.data.data);
+      const result = await fetchWithOfflineCache(
+        'customers_dashboard',
+        async () => (await getCustomersDashboard()).data.data,
+      );
+      setData(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       setError('Could not load the customers dashboard.');
     } finally {
@@ -38,6 +47,7 @@ export default function CustomersScreen() {
       style={styles.screen}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
     >
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {loading && !data ? <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#1a73e8" /> : null}
 

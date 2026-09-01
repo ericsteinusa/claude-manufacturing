@@ -210,8 +210,9 @@ automatically by a global `NetInfo` listener in `app/_layout.tsx` the instant th
 device reconnects — not tied to whichever screen happens to be focused at that
 moment. `netStatus.ts`'s `useIsOnline()` hook and the shared `OfflineBanner`
 component surface "showing cached data" / "N actions waiting to sync" to the user
-rather than failing silently. **Wired into six screens so far**: Time Clock
-(full read-cache + write-queue — clock in/out are the canonical "plant-floor worker
+rather than failing silently. **Wired into all 21 screens now** (initially six,
+then extended to the remaining 15 in a follow-up pass): Time Clock (full
+read-cache + write-queue — clock in/out are the canonical "plant-floor worker
 with no signal" case), Work Orders' list view (read-cache only; status changes
 and assignment still require connectivity), Maintenance's list view (read-cache
 only, same rationale as Work Orders — completing a work order still requires
@@ -221,10 +222,24 @@ caching `products` and the reorder `alerts` banner data together as one unit
 since they come from the same response — receiving stock still requires
 connectivity), and Costing's product-search list (read-cache only; the
 cost/history/routing/reference-data drill-downs it opens into a modal are
-not cached in this pass). The other 15 screens have no offline support yet —
-extending this pattern to them is mechanical (wrap the existing `load()` in
-`fetchWithOfflineCache`, wrap write actions in `enqueueMutation` where queuing
-makes sense) but not yet done.
+not cached in this pass). The remaining 15 are all read-cache only, matching
+that same precedent rather than extending write-queueing beyond Time Clock's
+canonical case: the 11 single-`getXDashboard()` screens (main Dashboard,
+Finance, Sales, Personnel, Accounting, Customer Service, Engineering,
+Customers, IT, Legal, Marketing, Payroll) each cache their one dashboard
+call under a screen-specific key (`dashboard`, `finance_dashboard`, etc.);
+Requisitions caches its two list GETs separately (`req_list_mine`,
+`req_list_pending`, the latter only fetched for managers) and merges
+`isStale`/`cachedAt` across both, leaving create/submit/decide online-only;
+Approvals caches the pending-steps list (`approval_pending_steps`), leaving
+the approve/reject decision online-only; Lots caches its list and 30-day
+expiry-alert banner together (`lots_list_<statusFilter>`, `lots_expiry_30`,
+`Promise.all`'d and merged the same way as Requisitions), leaving the detail
+drill-down, product search, and create/status-update mutations uncached —
+matching the same "don't cache the modal drill-down" precedent Costing set.
+Extending write-queueing to Requisitions/Approvals/Lots' mutations, if
+wanted later, is a separate scoping decision from this pass (which only
+closed the read-cache coverage gap).
 CI (`.github/workflows/mobile.yml`: `npm ci`, `tsc --noEmit`, `expo-doctor`,
 `expo export --platform web`) can fail on PRs that never touch `mobile/` —
 Expo periodically ships new SDK 57 patch releases, so the pinned patch

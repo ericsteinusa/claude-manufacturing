@@ -5,7 +5,9 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { getLegalDashboard } from '../../src/api/legal';
 import KpiCard from '../../src/components/KpiCard';
+import OfflineBanner from '../../src/components/OfflineBanner';
 import StatusBadge from '../../src/components/StatusBadge';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 import type { LegalDashboardData } from '../../src/api/legal';
 
 const fmtMoney = (n: number) =>
@@ -15,13 +17,20 @@ export default function LegalScreen() {
   const [data, setData] = useState<LegalDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await getLegalDashboard();
-      setData(res.data.data);
+      const result = await fetchWithOfflineCache(
+        'legal_dashboard',
+        async () => (await getLegalDashboard()).data.data,
+      );
+      setData(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       setError('Could not load the legal dashboard.');
     } finally {
@@ -36,6 +45,7 @@ export default function LegalScreen() {
       style={styles.screen}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
     >
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {loading && !data ? <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#1a73e8" /> : null}
 

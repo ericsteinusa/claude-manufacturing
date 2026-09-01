@@ -5,6 +5,8 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { getPendingSteps, decideStep } from '../../src/api/approvals';
+import OfflineBanner from '../../src/components/OfflineBanner';
+import { fetchWithOfflineCache } from '../../src/offline/cache';
 
 const ENTITY_LABELS: Record<string, string> = {
   purchase_order: 'Purchase Order',
@@ -15,6 +17,8 @@ const ENTITY_LABELS: Record<string, string> = {
 export default function ApprovalsScreen() {
   const [steps, setSteps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
   const [selected, setSelected] = useState<any>(null);
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -22,8 +26,18 @@ export default function ApprovalsScreen() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getPendingSteps();
-      setSteps(res.data.data.steps ?? []);
+      // Read-only offline support: the pending-steps list falls back to
+      // the last cached response when there's no connection. The approve/
+      // reject decision is not queued in this pass — matching the Work
+      // Orders/Maintenance/Quality/Inventory/Costing list precedent (see
+      // mobile section of the root CLAUDE.md).
+      const result = await fetchWithOfflineCache(
+        'approval_pending_steps',
+        async () => (await getPendingSteps()).data.data.steps ?? [],
+      );
+      setSteps(result.data);
+      setIsStale(result.isStale);
+      setCachedAt(result.cachedAt);
     } catch {
       Alert.alert('Error', 'Could not load pending approvals.');
     } finally {
@@ -63,6 +77,7 @@ export default function ApprovalsScreen() {
 
   return (
     <View style={styles.screen}>
+      <OfflineBanner isStale={isStale} cachedAt={cachedAt} />
       {loading
         ? <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#1a73e8" />
         : (
