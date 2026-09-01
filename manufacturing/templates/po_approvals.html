@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block page_title %}PO Approval Queue{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "PO Approval Queue" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -20,10 +21,10 @@
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">PO Approval Queue</div>
+    <div class="menu-title">{% trans "PO Approval Queue" %}</div>
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">
-        Purchase orders over ${{ threshold|floatformat:0 }} require approval before
-        being sent to the supplier. Approve to advance to Sent; reject to return to Draft.
+        {% blocktrans with threshold=threshold|floatformat:0 %}Purchase orders over ${{ threshold }} require approval before
+        being sent to the supplier. Approve to advance to Sent; reject to return to Draft.{% endblocktrans %}
     </p>
 
     {% if pending %}
@@ -31,12 +32,12 @@
         <table class="erp-table">
             <thead>
                 <tr>
-                    <th>PO Number</th>
-                    <th>Supplier</th>
-                    <th class="num">Total</th>
-                    <th>Requested By</th>
-                    <th>Requested At</th>
-                    <th>Actions</th>
+                    <th>{% trans "PO Number" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th class="num">{% trans "Total" %}</th>
+                    <th>{% trans "Requested By" %}</th>
+                    <th>{% trans "Requested At" %}</th>
+                    <th>{% trans "Actions" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,18 +51,18 @@
                     <td>
                         <div class="appr-actions">
                             <form method="post" action="{% url 'po_approve' a.id %}"
-                                  onsubmit="return confirm('Approve {{ a.po_number }}?');"
+                                  onsubmit="return confirm('{% blocktrans with num=a.po_number %}Approve {{ num }}?{% endblocktrans %}');"
                                   style="display:flex;gap:4px;align-items:center;">
                                 {% csrf_token %}
-                                <input type="text" name="notes" placeholder="Approval note…">
-                                <button type="submit" class="btn btn-approve" style="padding:4px 10px;font-size:12px;">Approve</button>
+                                <input type="text" name="notes" placeholder="{% trans 'Approval note…' %}">
+                                <button type="submit" class="btn btn-approve" style="padding:4px 10px;font-size:12px;">{% trans "Approve" %}</button>
                             </form>
                             <form method="post" action="{% url 'po_reject' a.id %}"
-                                  onsubmit="return confirm('Reject {{ a.po_number }} and return to draft?');"
+                                  onsubmit="return confirm('{% blocktrans with num=a.po_number %}Reject {{ num }} and return to draft?{% endblocktrans %}');"
                                   style="display:flex;gap:4px;align-items:center;">
                                 {% csrf_token %}
-                                <input type="text" name="notes" placeholder="Rejection reason…">
-                                <button type="submit" class="btn btn-reject" style="padding:4px 10px;font-size:12px;">Reject</button>
+                                <input type="text" name="notes" placeholder="{% trans 'Rejection reason…' %}">
+                                <button type="submit" class="btn btn-reject" style="padding:4px 10px;font-size:12px;">{% trans "Reject" %}</button>
                             </form>
                         </div>
                     </td>
@@ -71,7 +72,7 @@
         </table>
     </div>
     {% else %}
-    <div class="empty-state">No purchase orders are currently awaiting approval.</div>
+    <div class="empty-state">{% trans "No purchase orders are currently awaiting approval." %}</div>
     {% endif %}
 </div>
 {% endblock %}

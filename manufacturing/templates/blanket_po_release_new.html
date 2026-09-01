@@ -1,14 +1,15 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block page_title %}Add Call-off — {{ bp.blanket_number }}{% endblock %}
+{% block page_title %}{% blocktrans with num=bp.blanket_number %}Add Call-off — {{ num }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/blanket-po/{{ bp.id }}/" class="btn">← Back</a>
+<a href="/blanket-po/{{ bp.id }}/" class="btn">← {% trans "Back" %}</a>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <div class="menu-title">Add Call-off — {{ bp.blanket_number }}</div>
+    <div class="menu-title">{% blocktrans with num=bp.blanket_number %}Add Call-off — {{ num }}{% endblocktrans %}</div>
 
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
@@ -16,36 +17,36 @@
         <div class="card">
             <p style="font-size:13px;color:#555;margin-bottom:14px;">
                 {% if bp.total_value %}
-                Remaining balance: <b>${{ bp.remaining_value|floatformat:2 }}</b> of ${{ bp.total_value|floatformat:2 }}
+                {% blocktrans with rem=bp.remaining_value|floatformat:2 tot=bp.total_value|floatformat:2 %}Remaining balance: <b>${{ rem }}</b> of ${{ tot }}{% endblocktrans %}
                 {% elif bp.total_qty %}
-                Remaining balance: <b>{{ bp.remaining_qty|floatformat:0 }}</b> of {{ bp.total_qty|floatformat:0 }} units
+                {% blocktrans with rem=bp.remaining_qty|floatformat:0 tot=bp.total_qty|floatformat:0 %}Remaining balance: <b>{{ rem }}</b> of {{ tot }} units{% endblocktrans %}
                 {% endif %}
             </p>
             <form method="post" action="">
                 {% csrf_token %}
                 {% if bp.total_qty %}
                 <div class="form-row">
-                    <label>Qty</label>
+                    <label>{% trans "Qty" %}</label>
                     <input type="number" name="qty" min="0" step="1" value="0">
                 </div>
                 {% endif %}
                 {% if bp.total_value %}
                 <div class="form-row">
-                    <label>Value</label>
+                    <label>{% trans "Value" %}</label>
                     <input type="number" name="value" min="0" step="0.01" value="0.00">
                 </div>
                 {% endif %}
                 <div class="form-row">
-                    <label>Delivery Date</label>
+                    <label>{% trans "Delivery Date" %}</label>
                     <input type="date" name="delivery_date">
                 </div>
                 <div class="form-row">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn">Add Call-off</button>
-                    <a href="/blanket-po/{{ bp.id }}/" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn">{% trans "Add Call-off" %}</button>
+                    <a href="/blanket-po/{{ bp.id }}/" class="btn btn-cancel">{% trans "Cancel" %}</a>
                 </div>
             </form>
         </div>

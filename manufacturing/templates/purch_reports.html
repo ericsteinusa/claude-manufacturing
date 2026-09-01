@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block page_title %}Purchasing Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Purchasing Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/purch/" class="btn">Purchasing</a>
-<a href="/purch/reports/" class="btn">Reports</a>
-<a href="/purch/contracts/" class="btn">Contracts</a>
-<a href="/purch/requisitions/" class="btn">Requisitions</a>
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/suppliers/" class="btn">Suppliers</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/purch/" class="btn">{% trans "Purchasing" %}</a>
+<a href="/purch/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/purch/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/purch/requisitions/" class="btn">{% trans "Requisitions" %}</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/suppliers/" class="btn">{% trans "Suppliers" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -42,12 +43,12 @@
 {% block body %}
 <div class="content">
 <div class="pr-wrap">
-    <h2>Purchasing Reports</h2>
+    <h2>{% trans "Purchasing Reports" %}</h2>
 
     <div class="kpi-row">
         <div class="kpi">
             <div class="val">${{ open_value|floatformat:0 }}</div>
-            <div class="lbl">Open PO Value</div>
+            <div class="lbl">{% trans "Open PO Value" %}</div>
         </div>
         {% for row in by_status %}
         <div class="kpi">
@@ -59,13 +60,13 @@
 
     <div class="two-col">
         <div class="card">
-            <h3>Top Suppliers by PO Count</h3>
+            <h3>{% trans "Top Suppliers by PO Count" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Supplier</th>
-                        <th style="text-align:right;">POs</th>
-                        <th style="text-align:right;">Total Value</th>
+                        <th>{% trans "Supplier" %}</th>
+                        <th style="text-align:right;">{% trans "POs" %}</th>
+                        <th style="text-align:right;">{% trans "Total Value" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,20 +77,20 @@
                     <td style="text-align:right;">${{ s.total_value|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">No data.</td></tr>
+                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No data." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="card">
-            <h3>POs by Month (Last 6 Months)</h3>
+            <h3>{% trans "POs by Month (Last 6 Months)" %}</h3>
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Month</th>
-                        <th style="text-align:right;">POs</th>
-                        <th>Volume</th>
+                        <th>{% trans "Month" %}</th>
+                        <th style="text-align:right;">{% trans "POs" %}</th>
+                        <th>{% trans "Volume" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,7 +106,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" style="color:#888;text-align:center;">No recent POs.</td></tr>
+                <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No recent POs." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -113,14 +114,14 @@
     </div>
 
     <div class="card">
-        <h3>Contracts Expiring Within 90 Days</h3>
+        <h3>{% trans "Contracts Expiring Within 90 Days" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Contract #</th>
-                    <th>Title</th>
-                    <th>Supplier</th>
-                    <th>End Date</th>
+                    <th>{% trans "Contract #" %}</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "End Date" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -132,7 +133,7 @@
                 <td style="color:#b8860b;font-weight:bold;">{{ c.end_date }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="color:#888;text-align:center;">No contracts expiring within 90 days.</td></tr>
+            <tr><td colspan="4" style="color:#888;text-align:center;">{% trans "No contracts expiring within 90 days." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>

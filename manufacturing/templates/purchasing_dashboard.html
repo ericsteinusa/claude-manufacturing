@@ -1,17 +1,18 @@
 {% extends "base.html" %}
-{% block page_title %}Purchasing Dashboard{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Purchasing Dashboard" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/po/" class="btn">Purchase Orders</a>
-<a href="/po/new/" class="btn">New PO</a>
-<a href="/purch/contracts/" class="btn">Contracts</a>
-<a href="/purch/reports/" class="btn">Reports</a>
-<a href="/purch/requisitions/" class="btn">Requisitions</a>
-<a href="/suppliers/" class="btn">Suppliers</a>
-<a href="/consultants/" class="btn">Consultants</a>
-<a href="/supplier-portal/login/" class="btn">Supplier Portal</a>
-<a href="/inventory/" class="btn">Inventory</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/po/" class="btn">{% trans "Purchase Orders" %}</a>
+<a href="/po/new/" class="btn">{% trans "New PO" %}</a>
+<a href="/purch/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/purch/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/purch/requisitions/" class="btn">{% trans "Requisitions" %}</a>
+<a href="/suppliers/" class="btn">{% trans "Suppliers" %}</a>
+<a href="/consultants/" class="btn">{% trans "Consultants" %}</a>
+<a href="/supplier-portal/login/" class="btn">{% trans "Supplier Portal" %}</a>
+<a href="/inventory/" class="btn">{% trans "Inventory" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -46,91 +47,91 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Purchasing Dashboard</h2>
+    <h2>{% trans "Purchasing Dashboard" %}</h2>
 
     <div class="dept-grid">
-        <a href="/po/" class="dept-btn">Purchase Orders</a>
-        <a href="/po/new/" class="dept-btn">New PO</a>
-        <a href="/po/approvals/" class="dept-btn">Pending Approval</a>
-        <a href="/purch/contracts/" class="dept-btn">Vendor Contracts</a>
-        <a href="/purch/reports/" class="dept-btn">Purchasing Reports</a>
-        <a href="/suppliers/" class="dept-btn">Suppliers</a>
-        <a href="/consultants/" class="dept-btn">Consultants</a>
-        <a href="/inventory/" class="dept-btn">Inventory</a>
-        <a href="/inventory/new/" class="dept-btn">New Product</a>
-        <a href="/dashboard/" class="dept-btn">Home</a>
+        <a href="/po/" class="dept-btn">{% trans "Purchase Orders" %}</a>
+        <a href="/po/new/" class="dept-btn">{% trans "New PO" %}</a>
+        <a href="/po/approvals/" class="dept-btn">{% trans "Pending Approval" %}</a>
+        <a href="/purch/contracts/" class="dept-btn">{% trans "Vendor Contracts" %}</a>
+        <a href="/purch/reports/" class="dept-btn">{% trans "Purchasing Reports" %}</a>
+        <a href="/suppliers/" class="dept-btn">{% trans "Suppliers" %}</a>
+        <a href="/consultants/" class="dept-btn">{% trans "Consultants" %}</a>
+        <a href="/inventory/" class="dept-btn">{% trans "Inventory" %}</a>
+        <a href="/inventory/new/" class="dept-btn">{% trans "New Product" %}</a>
+        <a href="/dashboard/" class="dept-btn">{% trans "Home" %}</a>
     </div>
 
     <div class="kpi-row">
         <div class="kpi">
-            <div class="lbl">Open POs</div>
+            <div class="lbl">{% trans "Open POs" %}</div>
             <div class="val">{{ pos.open|default:0 }}</div>
         </div>
         <div class="kpi{% if pos.pending_approval %} yellow{% endif %}">
-            <div class="lbl">Pending Approval</div>
+            <div class="lbl">{% trans "Pending Approval" %}</div>
             <div class="val">{{ pos.pending_approval|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Draft</div>
+            <div class="lbl">{% trans "Draft" %}</div>
             <div class="val">{{ pos.draft|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Sent</div>
+            <div class="lbl">{% trans "Sent" %}</div>
             <div class="val">{{ pos.sent|default:0 }}</div>
         </div>
         <div class="kpi{% if pos.partial %} yellow{% endif %}">
-            <div class="lbl">Partial Receipt</div>
+            <div class="lbl">{% trans "Partial Receipt" %}</div>
             <div class="val">{{ pos.partial|default:0 }}</div>
         </div>
         <div class="kpi">
-            <div class="lbl">Total POs</div>
+            <div class="lbl">{% trans "Total POs" %}</div>
             <div class="val">{{ pos.total|default:0 }}</div>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>PO Status Breakdown</h3>
+            <h3>{% trans "PO Status Breakdown" %}</h3>
             <canvas id="chart-po-status" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Spend by Month (last 6 mo)</h3>
+            <h3>{% trans "Spend by Month (last 6 mo)" %}</h3>
             <canvas id="chart-spend-month" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Top Suppliers by Spend</h3>
+            <h3>{% trans "Top Suppliers by Spend" %}</h3>
             <canvas id="chart-top-suppliers" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>PO Count by Month (last 6 mo)</h3>
+            <h3>{% trans "PO Count by Month (last 6 mo)" %}</h3>
             <canvas id="chart-po-trend" height="220"></canvas>
         </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:16px;">
         <div class="card" style="margin-bottom:0;">
-            <h3>Top Items by Spend</h3>
+            <h3>{% trans "Top Items by Spend" %}</h3>
             <canvas id="chart-top-items" height="220"></canvas>
         </div>
         <div class="card" style="margin-bottom:0;">
-            <h3>Requisition Status</h3>
+            <h3>{% trans "Requisition Status" %}</h3>
             <canvas id="chart-req-status" height="220"></canvas>
         </div>
     </div>
 
     <div class="card">
-        <h3>Recent Purchase Orders</h3>
+        <h3>{% trans "Recent Purchase Orders" %}</h3>
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>PO #</th>
-                    <th>Supplier</th>
-                    <th>Order Date</th>
-                    <th>Expected Date</th>
-                    <th>Status</th>
+                    <th>{% trans "PO #" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "Order Date" %}</th>
+                    <th>{% trans "Expected Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -143,7 +144,7 @@
                 <td><span class="badge st-{{ po.status }}">{{ po.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" style="color:#888;">No purchase orders yet.</td></tr>
+            <tr><td colspan="5" style="color:#888;">{% trans "No purchase orders yet." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
