@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Reports{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Reports" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/reports/" class="btn">Reports</a>
-<a href="/sales/performance/" class="btn">Performance</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/reports/" class="btn">{% trans "Reports" %}</a>
+<a href="/sales/performance/" class="btn">{% trans "Performance" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -38,19 +39,19 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Sales Reports</h2>
+    <h2>{% trans "Sales Reports" %}</h2>
 
     <div class="chip-row">
-        <a href="/sales/reports/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">Today</a>
-        <a href="/sales/reports/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">This Month</a>
-        <a href="/sales/reports/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">This Quarter</a>
-        <a href="/sales/reports/?period=year"     class="chip {% if period == 'year' %}active{% endif %}">This Year</a>
+        <a href="/sales/reports/?period=day"     class="chip {% if period == 'day' %}active{% endif %}">{% trans "Today" %}</a>
+        <a href="/sales/reports/?period=month"   class="chip {% if period == 'month' %}active{% endif %}">{% trans "This Month" %}</a>
+        <a href="/sales/reports/?period=quarter" class="chip {% if period == 'quarter' %}active{% endif %}">{% trans "This Quarter" %}</a>
+        <a href="/sales/reports/?period=year"     class="chip {% if period == 'year' %}active{% endif %}">{% trans "This Year" %}</a>
         <form method="get" action="/sales/reports/" class="date-form" style="margin-left:8px;">
             <input type="hidden" name="period" value="custom">
             <input type="date" name="date_from" value="{{ date_from }}" required>
-            <span style="font-size:13px;color:#888;">to</span>
+            <span style="font-size:13px;color:#888;">{% trans "to" %}</span>
             <input type="date" name="date_to" value="{{ date_to }}" required>
-            <button type="submit">Go</button>
+            <button type="submit">{% trans "Go" %}</button>
         </form>
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 20px;">{{ start }} → {{ end }}</p>
@@ -58,46 +59,46 @@
     <div class="kpi-row">
         <div class="kpi">
             <div class="num">${{ totals.total_revenue|floatformat:0 }}</div>
-            <div class="lbl">Total Revenue</div>
+            <div class="lbl">{% trans "Total Revenue" %}</div>
         </div>
         <div class="kpi">
             <div class="num">{{ totals.order_count }}</div>
-            <div class="lbl">Orders</div>
+            <div class="lbl">{% trans "Orders" %}</div>
         </div>
         <div class="kpi">
             <div class="num">${{ totals.avg_order_value|floatformat:0 }}</div>
-            <div class="lbl">Avg. Order Value</div>
+            <div class="lbl">{% trans "Avg. Order Value" %}</div>
         </div>
     </div>
 
     <div class="card" style="margin-bottom:20px;">
-        <h3>Revenue Trend</h3>
+        <h3>{% trans "Revenue Trend" %}</h3>
         <canvas id="chart-revenue-trend" height="90"></canvas>
     </div>
 
     <div class="two-col">
         <div class="card">
-            <h3>Top Customers</h3>
+            <h3>{% trans "Top Customers" %}</h3>
             <table class="list-table">
-                <thead><tr><th>Customer</th><th>Revenue</th></tr></thead>
+                <thead><tr><th>{% trans "Customer" %}</th><th>{% trans "Revenue" %}</th></tr></thead>
                 <tbody>
                 {% for c in top_customers %}
                 <tr><td>{{ c.customer }}</td><td>${{ c.revenue|floatformat:0 }}</td></tr>
                 {% empty %}
-                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No orders in this range.</td></tr>
+                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">{% trans "No orders in this range." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="card">
-            <h3>Top Products</h3>
+            <h3>{% trans "Top Products" %}</h3>
             <table class="list-table">
-                <thead><tr><th>Product</th><th>Revenue</th></tr></thead>
+                <thead><tr><th>{% trans "Product" %}</th><th>{% trans "Revenue" %}</th></tr></thead>
                 <tbody>
                 {% for p in top_products %}
                 <tr><td>{{ p.product }}</td><td>${{ p.revenue|floatformat:0 }}</td></tr>
                 {% empty %}
-                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No orders in this range.</td></tr>
+                <tr><td colspan="2" style="text-align:center;color:var(--text-muted);">{% trans "No orders in this range." %}</td></tr>
                 {% endfor %}
                 </tbody>
             </table>

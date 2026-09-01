@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Targets{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Targets" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/quotes/" class="btn">Quotes</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/sales/" class="btn">{% trans "Dashboard" %}</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/quotes/" class="btn">{% trans "Quotes" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -46,35 +47,35 @@
 {% block body %}
 <div class="content">
 <div class="m-wrap">
-    <h2>Sales Targets &amp; Actuals</h2>
+    <h2>{% trans "Sales Targets &amp; Actuals" %}</h2>
     {% if success %}<div class="msg-ok">{{ success }}</div>{% endif %}
     {% if error %}<div class="msg-err">{{ error }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
-        <label>Rep:</label>
+        <label>{% trans "Rep:" %}</label>
         <select name="rep" onchange="this.form.submit()">
-            <option value="">All Reps</option>
+            <option value="">{% trans "All Reps" %}</option>
             {% for r in reps %}
             <option value="{{ r }}" {% if filter_rep == r %}selected{% endif %}>{{ r }}</option>
             {% endfor %}
         </select>
-        <label>Period:</label>
+        <label>{% trans "Period:" %}</label>
         <select name="period" onchange="this.form.submit()">
-            <option value="">All Periods</option>
+            <option value="">{% trans "All Periods" %}</option>
             {% for p in periods %}
             <option value="{{ p }}" {% if filter_period == p %}selected{% endif %}>{{ p }}</option>
             {% endfor %}
         </select>
-        <button type="submit" class="btn-sm">Filter</button>
-        <a href="/sales/targets/" style="color:#aad;font-size:13px;">Clear</a>
+        <button type="submit" class="btn-sm">{% trans "Filter" %}</button>
+        <a href="/sales/targets/" style="color:#aad;font-size:13px;">{% trans "Clear" %}</a>
     </form>
 
     <table class="list-table">
         <thead><tr>
-            <th>Rep</th><th>Period</th><th>Region</th>
-            <th class="num">Target</th><th class="num">Actual</th>
-            <th class="num">Variance</th><th>Attainment</th>
-            <th>Status</th>
+            <th>{% trans "Rep" %}</th><th>{% trans "Period" %}</th><th>{% trans "Region" %}</th>
+            <th class="num">{% trans "Target" %}</th><th class="num">{% trans "Actual" %}</th>
+            <th class="num">{% trans "Variance" %}</th><th>{% trans "Attainment" %}</th>
+            <th>{% trans "Status" %}</th>
             {% if can_edit %}<th></th>{% endif %}
         </tr></thead>
         <tbody>
@@ -102,60 +103,60 @@
             {% if can_edit %}
             <td>
                 <button type="button" class="btn-sm" style="padding:3px 10px;font-size:11px;"
-                    onclick="openEdit({{ t.id }},'{{ t.rep|escapejs }}','{{ t.period|escapejs }}',{{ t.target }},{{ t.actual }},'{{ t.region|default:''|escapejs }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">Edit</button>
+                    onclick="openEdit({{ t.id }},'{{ t.rep|escapejs }}','{{ t.period|escapejs }}',{{ t.target }},{{ t.actual }},'{{ t.region|default:''|escapejs }}','{{ t.status }}','{{ t.notes|default:''|escapejs }}')">{% trans "Edit" %}</button>
             </td>
             {% endif %}
         </tr>
         {% endwith %}
         {% empty %}
-        <tr><td colspan="{% if can_edit %}9{% else %}8{% endif %}" style="color:#888;text-align:center;padding:16px;">No targets found.</td></tr>
+        <tr><td colspan="{% if can_edit %}9{% else %}8{% endif %}" style="color:#888;text-align:center;padding:16px;">{% trans "No targets found." %}</td></tr>
         {% endfor %}
         </tbody>
     </table>
 
     {% if can_edit %}
     <div class="edit-card" id="edit-card">
-        <h3>Edit Target</h3>
+        <h3>{% trans "Edit Target" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="target_id" id="edit-id">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row"><label>Rep *</label><input type="text" name="rep" id="edit-rep" required></div>
-                <div class="form-row"><label>Period</label><input type="text" name="period" id="edit-period" placeholder="e.g. 2024-Q1"></div>
-                <div class="form-row"><label>Target ($)</label><input type="number" name="target" id="edit-target" step="0.01" min="0" style="width:110px;"></div>
-                <div class="form-row"><label>Actual ($)</label><input type="number" name="actual" id="edit-actual" step="0.01" min="0" style="width:110px;"></div>
-                <div class="form-row"><label>Region</label><input type="text" name="region" id="edit-region"></div>
-                <div class="form-row"><label>Status</label>
+                <div class="form-row"><label>{% trans "Rep *" %}</label><input type="text" name="rep" id="edit-rep" required></div>
+                <div class="form-row"><label>{% trans "Period" %}</label><input type="text" name="period" id="edit-period" placeholder="{% trans 'e.g. 2024-Q1' %}"></div>
+                <div class="form-row"><label>{% trans "Target ($)" %}</label><input type="number" name="target" id="edit-target" step="0.01" min="0" style="width:110px;"></div>
+                <div class="form-row"><label>{% trans "Actual ($)" %}</label><input type="number" name="actual" id="edit-actual" step="0.01" min="0" style="width:110px;"></div>
+                <div class="form-row"><label>{% trans "Region" %}</label><input type="text" name="region" id="edit-region"></div>
+                <div class="form-row"><label>{% trans "Status" %}</label>
                     <select name="status" id="edit-status">
                         {% for s in TARGET_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn-sm">Save</button>
+            <button type="submit" class="btn-sm">{% trans "Save" %}</button>
             <button type="button" class="btn-sm" style="background:#888;margin-left:8px;"
-                onclick="document.getElementById('edit-card').style.display='none'">Cancel</button>
+                onclick="document.getElementById('edit-card').style.display='none'">{% trans "Cancel" %}</button>
         </form>
     </div>
 
     <div class="card">
-        <h3>Add Target</h3>
+        <h3>{% trans "Add Target" %}</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="new">
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-                <div class="form-row"><label>Rep *</label><input type="text" name="rep" required></div>
-                <div class="form-row"><label>Period</label><input type="text" name="period" placeholder="e.g. 2024-Q1"></div>
-                <div class="form-row"><label>Target ($)</label><input type="number" name="target" step="0.01" min="0" value="0" style="width:110px;"></div>
-                <div class="form-row"><label>Actual ($)</label><input type="number" name="actual" step="0.01" min="0" value="0" style="width:110px;"></div>
-                <div class="form-row"><label>Region</label><input type="text" name="region"></div>
-                <div class="form-row"><label>Status</label>
+                <div class="form-row"><label>{% trans "Rep *" %}</label><input type="text" name="rep" required></div>
+                <div class="form-row"><label>{% trans "Period" %}</label><input type="text" name="period" placeholder="{% trans 'e.g. 2024-Q1' %}"></div>
+                <div class="form-row"><label>{% trans "Target ($)" %}</label><input type="number" name="target" step="0.01" min="0" value="0" style="width:110px;"></div>
+                <div class="form-row"><label>{% trans "Actual ($)" %}</label><input type="number" name="actual" step="0.01" min="0" value="0" style="width:110px;"></div>
+                <div class="form-row"><label>{% trans "Region" %}</label><input type="text" name="region"></div>
+                <div class="form-row"><label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in TARGET_STATUSES %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn-sm">Add Target</button>
+            <button type="submit" class="btn-sm">{% trans "Add Target" %}</button>
         </form>
     </div>
     {% endif %}

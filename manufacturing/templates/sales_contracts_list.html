@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Sales Contracts{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Sales Contracts" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/sales/" class="btn">Sales Dashboard</a>
-<a href="/sales/orders/" class="btn">Orders</a>
-<a href="/sales/quotes/" class="btn">Quotes</a>
-<a href="/sales/leads/" class="btn">Leads</a>
-<a href="/sales/contracts/" class="btn">Contracts</a>
-<a href="/sales/forecast/" class="btn">Forecast</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/sales/" class="btn">{% trans "Sales Dashboard" %}</a>
+<a href="/sales/orders/" class="btn">{% trans "Orders" %}</a>
+<a href="/sales/quotes/" class="btn">{% trans "Quotes" %}</a>
+<a href="/sales/leads/" class="btn">{% trans "Leads" %}</a>
+<a href="/sales/contracts/" class="btn">{% trans "Contracts" %}</a>
+<a href="/sales/forecast/" class="btn">{% trans "Forecast" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -56,35 +57,35 @@
 {% block body %}
 <div class="content">
 <div class="sl-wrap">
-    <h2>Sales Contracts</h2>
+    <h2>{% trans "Sales Contracts" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in contract_statuses %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search customer / title / owner…">
-        <button type="submit">Filter</button>
-        <a href="/sales/contracts/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search customer / title / owner…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/sales/contracts/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Customer</th>
-                    <th>Title</th>
-                    <th style="text-align:right;">Value</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Renewal</th>
-                    <th>Owner</th>
-                    <th>Status</th>
+                    <th>{% trans "Customer" %}</th>
+                    <th>{% trans "Title" %}</th>
+                    <th style="text-align:right;">{% trans "Value" %}</th>
+                    <th>{% trans "Start" %}</th>
+                    <th>{% trans "End" %}</th>
+                    <th>{% trans "Renewal" %}</th>
+                    <th>{% trans "Owner" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -100,7 +101,7 @@
                 <td><span class="badge s-{{ c.status|cut:' ' }}">{{ c.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="8" style="color:#888;text-align:center;">No contracts found.</td></tr>
+            <tr><td colspan="8" style="color:#888;text-align:center;">{% trans "No contracts found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -108,28 +109,28 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Contract</h3>
+        <h3>{% trans "New Contract" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Customer *</label>
-                    <input type="text" name="customer" required placeholder="Customer name">
+                    <label>{% trans "Customer *" %}</label>
+                    <input type="text" name="customer" required placeholder="{% trans 'Customer name' %}">
                 </div>
                 <div class="form-group full-span">
-                    <label>Title</label>
-                    <input type="text" name="title" placeholder="Contract title / description">
+                    <label>{% trans "Title" %}</label>
+                    <input type="text" name="title" placeholder="{% trans 'Contract title / description' %}">
                 </div>
                 <div class="form-group">
-                    <label>Value ($)</label>
+                    <label>{% trans "Value ($)" %}</label>
                     <input type="number" name="value" min="0" step="0.01" placeholder="0">
                 </div>
                 <div class="form-group">
-                    <label>Owner / Rep</label>
+                    <label>{% trans "Owner / Rep" %}</label>
                     <input type="text" name="owner">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in contract_statuses %}
                         <option value="{{ s }}"{% if s == 'Draft' %} selected{% endif %}>{{ s }}</option>
@@ -137,23 +138,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date">
                 </div>
                 <div class="form-group">
-                    <label>Renewal Date</label>
+                    <label>{% trans "Renewal Date" %}</label>
                     <input type="date" name="renewal_date">
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Create Contract</button>
+            <button type="submit" class="btn-submit">{% trans "Create Contract" %}</button>
         </form>
     </div>
     {% endif %}
