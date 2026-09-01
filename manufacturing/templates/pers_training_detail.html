@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Training — {{ training.course_name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with course=training.course_name %}Training — {{ course }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/people/" class="btn">Employees</a>
-<a href="/pers/reviews/" class="btn">Reviews</a>
-<a href="/pers/training/" class="btn">Training</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/people/" class="btn">{% trans "Employees" %}</a>
+<a href="/pers/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/pers/training/" class="btn">{% trans "Training" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -46,7 +47,7 @@
         <span class="badge s-{{ training.status|cut:' ' }}" style="font-size:14px;">{{ training.status }}</span>
     </h2>
     <p style="color:white;margin-bottom:12px;font-size:13px;">
-        Employee: <a href="/people/{{ training.people_id }}/" style="color:#aef;">
+        {% trans "Employee:" %} <a href="/people/{{ training.people_id }}/" style="color:#aef;">
         {{ training.last_name }}, {{ training.first_name }}</a>
     </p>
 
@@ -55,16 +56,16 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Training Record</h3>
+        <h3>{% trans "Edit Training Record" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group full-span">
-                    <label>Course Name *</label>
+                    <label>{% trans "Course Name *" %}</label>
                     <input type="text" name="course_name" required value="{{ training.course_name }}">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="training_type">
                         {% for t in TRAINING_TYPES %}
                         <option value="{{ t }}"{% if training.training_type == t %} selected{% endif %}>{{ t }}</option>
@@ -72,15 +73,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date" value="{{ training.start_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date" value="{{ training.end_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in TRAINING_STATUSES %}
                         <option value="{{ s }}"{% if training.status == s %} selected{% endif %}>{{ s }}</option>
@@ -88,24 +89,24 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ training.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="ro-table">
-            <tr><th>Type</th><td>{{ training.training_type|default:"—" }}</td></tr>
-            <tr><th>Start Date</th><td>{{ training.start_date|default:"—" }}</td></tr>
-            <tr><th>End Date</th><td>{{ training.end_date|default:"—" }}</td></tr>
-            <tr><th>Status</th><td><span class="badge s-{{ training.status|cut:' ' }}">{{ training.status }}</span></td></tr>
-            <tr><th>Created By</th><td>{{ training.created_by|default:"—" }}</td></tr>
+            <tr><th>{% trans "Type" %}</th><td>{{ training.training_type|default:"—" }}</td></tr>
+            <tr><th>{% trans "Start Date" %}</th><td>{{ training.start_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "End Date" %}</th><td>{{ training.end_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Status" %}</th><td><span class="badge s-{{ training.status|cut:' ' }}">{{ training.status }}</span></td></tr>
+            <tr><th>{% trans "Created By" %}</th><td>{{ training.created_by|default:"—" }}</td></tr>
         </table>
         {% if training.notes %}
-        <div style="margin-top:12px;"><strong>Notes:</strong>
+        <div style="margin-top:12px;"><strong>{% trans "Notes:" %}</strong>
             <pre style="white-space:pre-wrap;font-size:13px;margin:6px 0 0;">{{ training.notes }}</pre>
         </div>
         {% endif %}

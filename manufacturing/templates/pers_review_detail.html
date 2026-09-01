@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block page_title %}Review — {{ review.last_name }}, {{ review.first_name }}{% endblock %}
+{% load i18n %}
+{% block page_title %}{% blocktrans with last=review.last_name first=review.first_name %}Review — {{ last }}, {{ first }}{% endblocktrans %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/people/" class="btn">Employees</a>
-<a href="/pers/reviews/" class="btn">Reviews</a>
-<a href="/pers/training/" class="btn">Training</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/people/" class="btn">{% trans "Employees" %}</a>
+<a href="/pers/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/pers/training/" class="btn">{% trans "Training" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -52,12 +53,12 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>Edit Review</h3>
+        <h3>{% trans "Edit Review" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Review Type</label>
+                    <label>{% trans "Review Type" %}</label>
                     <select name="review_type">
                         {% for t in REVIEW_TYPES %}
                         <option value="{{ t }}"{% if review.review_type == t %} selected{% endif %}>{{ t }}</option>
@@ -65,24 +66,24 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Review Date</label>
+                    <label>{% trans "Review Date" %}</label>
                     <input type="date" name="review_date" value="{{ review.review_date|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Reviewer</label>
+                    <label>{% trans "Reviewer" %}</label>
                     <input type="text" name="reviewer" value="{{ review.reviewer|default:'' }}">
                 </div>
                 <div class="form-group">
-                    <label>Rating</label>
+                    <label>{% trans "Rating" %}</label>
                     <select name="rating">
-                        <option value="">— Not yet rated —</option>
+                        <option value="">{% trans "— Not yet rated —" %}</option>
                         {% for r in REVIEW_RATINGS %}
                         <option value="{{ r }}"{% if review.rating == r %} selected{% endif %}>{{ r }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in REVIEW_STATUSES %}
                         <option value="{{ s }}"{% if review.status == s %} selected{% endif %}>{{ s }}</option>
@@ -90,25 +91,25 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes">{{ review.notes|default:'' }}</textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Save Changes</button>
+            <button type="submit" class="btn-submit">{% trans "Save Changes" %}</button>
         </form>
     </div>
     {% else %}
     <div class="card">
         <table class="ro-table">
-            <tr><th>Review Type</th><td>{{ review.review_type|default:"—" }}</td></tr>
-            <tr><th>Review Date</th><td>{{ review.review_date|default:"—" }}</td></tr>
-            <tr><th>Reviewer</th><td>{{ review.reviewer|default:"—" }}</td></tr>
-            <tr><th>Rating</th><td>{{ review.rating|default:"—" }}</td></tr>
-            <tr><th>Status</th><td><span class="badge s-{{ review.status|cut:' ' }}">{{ review.status }}</span></td></tr>
-            <tr><th>Created By</th><td>{{ review.created_by|default:"—" }}</td></tr>
+            <tr><th>{% trans "Review Type" %}</th><td>{{ review.review_type|default:"—" }}</td></tr>
+            <tr><th>{% trans "Review Date" %}</th><td>{{ review.review_date|default:"—" }}</td></tr>
+            <tr><th>{% trans "Reviewer" %}</th><td>{{ review.reviewer|default:"—" }}</td></tr>
+            <tr><th>{% trans "Rating" %}</th><td>{{ review.rating|default:"—" }}</td></tr>
+            <tr><th>{% trans "Status" %}</th><td><span class="badge s-{{ review.status|cut:' ' }}">{{ review.status }}</span></td></tr>
+            <tr><th>{% trans "Created By" %}</th><td>{{ review.created_by|default:"—" }}</td></tr>
         </table>
         {% if review.notes %}
-        <div style="margin-top:12px;"><strong>Notes:</strong>
+        <div style="margin-top:12px;"><strong>{% trans "Notes:" %}</strong>
             <pre style="white-space:pre-wrap;font-size:13px;margin:6px 0 0;">{{ review.notes }}</pre>
         </div>
         {% endif %}
@@ -117,7 +118,7 @@
 
     <p style="margin-top:4px;">
         <a href="/people/{{ review.people_id }}/" style="color:white;font-size:13px;">
-            &larr; View {{ review.first_name }} {{ review.last_name }}'s profile
+            &larr; {% blocktrans with first=review.first_name last=review.last_name %}View {{ first }} {{ last }}'s profile{% endblocktrans %}
         </a>
     </p>
 
