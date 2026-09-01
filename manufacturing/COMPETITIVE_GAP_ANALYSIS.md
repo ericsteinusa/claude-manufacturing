@@ -4584,3 +4584,40 @@ templates) + the full Maintenance department (16, plus the 2 already-translated 
 + the full Purchasing department (19) + the full Sales department (21)) out of ~450 total — the
 first time this series has crossed 200, with only Personnel (larger, sprawling across separate
 sub-feature prefixes) left as an unstarted department.
+
+**2026-09-01, seventeenth whole department:** Continued the "whole department" approach — picked
+**Personnel**'s core (`personnel_dashboard.html`, `pers_depts.html`, `pers_reviews_list.html`/
+`_detail.html`, `pers_training_list.html`/`_detail.html`), 6 templates — by a wide margin the
+smallest pass yet. Personnel's dashboard links out to far more areas than any prior department
+(Employees, Time Off, Benefits, Skills Matrix, Workforce Analytics, Recruiting/ATS, and an
+Offboarding cluster of Terminations/Exit Interviews/Offboarding), but only Dashboard,
+Departments, Reviews, and Training share the `pers_` view/template naming convention — the rest
+route through distinctly-named views backed by their own separately-prefixed templates
+(`benefit_*`, `employee_*`, `skill_*`, `termination_*`, `exit_interview_*`, `offboarding_*`,
+`ats_*`, `workforce_*`), a materially larger and more sprawling exclusion than any prior
+"translate the link, not yet the target" case in this series. 48 unique strings per language, no
+plurals, and — for only the second time in this series, after Purchasing — no bare
+`{{ x|default:"literal" }}` fallback bugs and no untranslatable `|pluralize` uses found. Used
+`{% blocktrans with %}` for three dynamic titles/lines including the review detail page's "View
+{first} {last}'s profile" back-link (a possessive apostrophe, no escaping needed since it
+contains no straight double quotes). `makemessages` fuzzy-matched only 40 of the new strings, the
+smallest fuzzy count in this series. Full suite 3431 passed (unchanged), `manage.py check`
+clean, `compilemessages` clean, `msgfmt --check` clean on all three files, zero blank/duplicated
+entries confirmed programmatically. Verified end-to-end against the real dev server: the
+Personnel Dashboard, Departments & Sub-Departments (both tables live-edited), Performance
+Reviews list (empty state) plus a review created live through the form and its detail page, and
+Training & Development list plus a training record created live through the form and its detail
+page, in Spanish, French, and German with real data, no console errors. **Localization coverage
+is now 206 templates across three languages** (core shell + login + main dashboard + all 5 htmx
+templates + the full Legal department (10) + the full Marketing department (13) + the full
+Reports department (4) + the full Payroll department (8) + the full Time Clock department (7) +
+the full Customers/Credit department (7) + the full Engineering department (10) + the full
+Customer Service department (13) + the full Accounting department (13) + the full IT department
+(17) + the full Finance department (10) + the full Quality department (12) + the full Production
+department (13, plus the 2 already-translated htmx templates) + the full Maintenance department
+(16, plus the 2 already-translated htmx templates) + the full Purchasing department (19) + the
+full Sales department (21) + the Personnel department core (6)) out of ~450 total — this closes
+out the last of the 17 named departments' core areas, though a substantial long tail of linked
+sub-features across many departments remains untranslated, consistent with this series' policy
+of scoping each pass to a department's own directly-owned templates rather than every reachable
+link.

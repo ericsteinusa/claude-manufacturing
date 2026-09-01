@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Departments{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Departments" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/people/" class="btn">Employees</a>
-<a href="/pers/reviews/" class="btn">Reviews</a>
-<a href="/pers/training/" class="btn">Training</a>
-<a href="/time-off/" class="btn">Time Off</a>
-<a href="/dashboard/" class="btn">Home</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/people/" class="btn">{% trans "Employees" %}</a>
+<a href="/pers/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/pers/training/" class="btn">{% trans "Training" %}</a>
+<a href="/time-off/" class="btn">{% trans "Time Off" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -39,7 +40,7 @@
 {% block body %}
 <div class="content">
 <div class="pd-wrap">
-    <h2>Departments &amp; Sub-Departments</h2>
+    <h2>{% trans "Departments &amp; Sub-Departments" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
@@ -48,9 +49,9 @@
 
         <div>
             <div class="card">
-                <h3>Departments</h3>
+                <h3>{% trans "Departments" %}</h3>
                 <table class="list-table">
-                    <thead><tr><th>Department</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
+                    <thead><tr><th>{% trans "Department" %}</th>{% if can_edit %}<th></th>{% endif %}</tr></thead>
                     <tbody>
                     {% for d in depts %}
                     <tr>
@@ -63,13 +64,13 @@
                                 <input type="hidden" name="dept_id" value="{{ d.dept_id }}">
                                 <input type="text" name="dept_name" value="{{ d.dept_name }}"
                                     style="width:120px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;">
-                                <button type="submit" class="btn-sm" style="padding:3px 8px;font-size:12px;">Save</button>
+                                <button type="submit" class="btn-sm" style="padding:3px 8px;font-size:12px;">{% trans "Save" %}</button>
                             </form>
                         </td>
                         {% endif %}
                     </tr>
                     {% empty %}
-                    <tr><td colspan="2" style="color:#888;text-align:center;">No departments.</td></tr>
+                    <tr><td colspan="2" style="color:#888;text-align:center;">{% trans "No departments." %}</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -77,8 +78,8 @@
                 <form method="post" class="inline-form">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="new_dept">
-                    <input type="text" name="dept_name" placeholder="New department name" required>
-                    <button type="submit" class="btn-sm">Add</button>
+                    <input type="text" name="dept_name" placeholder="{% trans 'New department name' %}" required>
+                    <button type="submit" class="btn-sm">{% trans "Add" %}</button>
                 </form>
                 {% endif %}
             </div>
@@ -86,12 +87,12 @@
 
         <div>
             <div class="card">
-                <h3>Sub-Departments</h3>
+                <h3>{% trans "Sub-Departments" %}</h3>
                 <table class="list-table">
                     <thead>
                         <tr>
-                            <th>Sub-Department</th>
-                            <th>Department</th>
+                            <th>{% trans "Sub-Department" %}</th>
+                            <th>{% trans "Department" %}</th>
                             {% if can_edit %}<th></th>{% endif %}
                         </tr>
                     </thead>
@@ -113,13 +114,13 @@
                                     <option value="{{ d.dept_id }}"{% if s.dept_id == d.dept_id %} selected{% endif %}>{{ d.dept_name }}</option>
                                     {% endfor %}
                                 </select>
-                                <button type="submit" class="btn-sm" style="padding:3px 8px;font-size:12px;">Save</button>
+                                <button type="submit" class="btn-sm" style="padding:3px 8px;font-size:12px;">{% trans "Save" %}</button>
                             </form>
                         </td>
                         {% endif %}
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3" style="color:#888;text-align:center;">No sub-departments.</td></tr>
+                    <tr><td colspan="3" style="color:#888;text-align:center;">{% trans "No sub-departments." %}</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -128,13 +129,13 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="new_sub">
                     <select name="dept_id" required>
-                        <option value="">— Department —</option>
+                        <option value="">{% trans "— Department —" %}</option>
                         {% for d in depts %}
                         <option value="{{ d.dept_id }}">{{ d.dept_name }}</option>
                         {% endfor %}
                     </select>
-                    <input type="text" name="dept_sub_name" placeholder="Sub-department name" required>
-                    <button type="submit" class="btn-sm">Add</button>
+                    <input type="text" name="dept_sub_name" placeholder="{% trans 'Sub-department name' %}" required>
+                    <button type="submit" class="btn-sm">{% trans "Add" %}</button>
                 </form>
                 {% endif %}
             </div>

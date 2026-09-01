@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}Training &amp; Development{% endblock %}
+{% load i18n %}
+{% block page_title %}{% trans "Training &amp; Development" %}{% endblock %}
 
 {% block toolbar_left %}
-<a href="/pers/" class="btn">Personnel</a>
-<a href="/people/" class="btn">Employees</a>
-<a href="/pers/depts/" class="btn">Departments</a>
-<a href="/pers/reviews/" class="btn">Reviews</a>
-<a href="/pers/training/" class="btn">Training</a>
-<a href="/time-off/" class="btn">Time Off</a>
-<a href="/dashboard/" class="btn">Home</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ CSV</a>
-<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ Excel</a>
+<a href="/pers/" class="btn">{% trans "Personnel" %}</a>
+<a href="/people/" class="btn">{% trans "Employees" %}</a>
+<a href="/pers/depts/" class="btn">{% trans "Departments" %}</a>
+<a href="/pers/reviews/" class="btn">{% trans "Reviews" %}</a>
+<a href="/pers/training/" class="btn">{% trans "Training" %}</a>
+<a href="/time-off/" class="btn">{% trans "Time Off" %}</a>
+<a href="/dashboard/" class="btn">{% trans "Home" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn">⬇ {% trans "CSV" %}</a>
+<a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}&format=xlsx" class="btn">⬇ {% trans "Excel" %}</a>
 {% endblock %}
 
 {% block extra_styles %}
@@ -54,39 +55,39 @@
 {% block body %}
 <div class="content">
 <div class="pt-wrap">
-    <h2>Training &amp; Development</h2>
+    <h2>{% trans "Training &amp; Development" %}</h2>
 
     {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
     <form method="get" class="filter-bar">
         <select name="status">
-            <option value="">All Statuses</option>
+            <option value="">{% trans "All Statuses" %}</option>
             {% for s in TRAINING_STATUSES %}
             <option value="{{ s }}"{% if status_filter == s %} selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
         <select name="type">
-            <option value="">All Types</option>
+            <option value="">{% trans "All Types" %}</option>
             {% for t in TRAINING_TYPES %}
             <option value="{{ t }}"{% if type_filter == t %} selected{% endif %}>{{ t }}</option>
             {% endfor %}
         </select>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search course / employee…">
-        <button type="submit">Filter</button>
-        <a href="/pers/training/" style="font-size:13px;color:white;margin-left:4px;">Clear</a>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% trans 'Search course / employee…' %}">
+        <button type="submit">{% trans "Filter" %}</button>
+        <a href="/pers/training/" style="font-size:13px;color:white;margin-left:4px;">{% trans "Clear" %}</a>
     </form>
 
     <div class="card">
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Employee</th>
-                    <th>Course</th>
-                    <th>Type</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Status</th>
+                    <th>{% trans "Employee" %}</th>
+                    <th>{% trans "Course" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Start Date" %}</th>
+                    <th>{% trans "End Date" %}</th>
+                    <th>{% trans "Status" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -100,7 +101,7 @@
                 <td><span class="badge s-{{ t.status|cut:' ' }}">{{ t.status }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" style="color:#888;text-align:center;">No training records found.</td></tr>
+            <tr><td colspan="6" style="color:#888;text-align:center;">{% trans "No training records found." %}</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -108,25 +109,25 @@
 
     {% if can_edit %}
     <div class="card">
-        <h3>New Training Record</h3>
+        <h3>{% trans "New Training Record" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Employee *</label>
+                    <label>{% trans "Employee *" %}</label>
                     <select name="people_id" required>
-                        <option value="">— Select employee —</option>
+                        <option value="">{% trans "— Select employee —" %}</option>
                         {% for p in people %}
                         <option value="{{ p.id }}">{{ p.last_name }}, {{ p.first_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Course Name *</label>
-                    <input type="text" name="course_name" required placeholder="Course or training name">
+                    <label>{% trans "Course Name *" %}</label>
+                    <input type="text" name="course_name" required placeholder="{% trans 'Course or training name' %}">
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label>{% trans "Type" %}</label>
                     <select name="training_type">
                         {% for t in TRAINING_TYPES %}
                         <option value="{{ t }}">{{ t }}</option>
@@ -134,15 +135,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     <input type="date" name="start_date">
                 </div>
                 <div class="form-group">
-                    <label>End Date</label>
+                    <label>{% trans "End Date" %}</label>
                     <input type="date" name="end_date">
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{% trans "Status" %}</label>
                     <select name="status">
                         {% for s in TRAINING_STATUSES %}
                         <option value="{{ s }}"{% if s == 'Scheduled' %} selected{% endif %}>{{ s }}</option>
@@ -150,11 +151,11 @@
                     </select>
                 </div>
                 <div class="form-group full-span">
-                    <label>Notes</label>
+                    <label>{% trans "Notes" %}</label>
                     <textarea name="notes"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Add Training Record</button>
+            <button type="submit" class="btn-submit">{% trans "Add Training Record" %}</button>
         </form>
     </div>
     {% endif %}
