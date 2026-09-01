@@ -1156,12 +1156,33 @@ consistent with this series' policy of scoping each pass to a
 department's own directly-owned templates rather than every reachable
 link.
 
-The main dashboard's department grid
-button labels are the one exception — they're rendered from
-`menus.py`-generated Python strings, not template-static text, so
-translating them needs `gettext`/`gettext_lazy` calls in `menus.py` itself,
-a different mechanism from the template-level `{% trans %}` used everywhere
-else here; not done. `manage.py makemessages` does **not** ignore `venv/` by
+The main dashboard's department grid button labels were the one exception —
+they're rendered from `menus.py`-generated Python strings
+(`DASHBOARD_DEPARTMENTS`, a 17-entry `(key, label)` list, also reused
+verbatim by the Approval Rules admin's department dropdown in
+`views/_approval_rules.py`), not template-static text, so translating them
+needed `gettext_lazy` calls in `menus.py` itself rather than the
+template-level `{% trans %}` used everywhere else — now done (`from
+django.utils.translation import gettext_lazy as _`, each label wrapped in
+`_(...)`). 15 of the 17 labels auto-merged with existing correct
+translations from elsewhere in the app (department names repeated as sidebar
+nav labels, page titles, etc.) via `makemessages`'s exact-source-text
+matching; 2 (`"Information Tech"`, `"Budget Management"`) were genuinely new
+strings that `msgmerge` fuzzy-matched to unrelated existing translations
+("Information Technology Dashboard" and "Budget Name" respectively) —
+handled with the by-now-standard fix (strip the `#, fuzzy`/`#| msgid` lines,
+replace with a correct manual translation) rather than the
+blank-and-retranslate technique, since only these 2 of the 17 needed fresh
+translation work. Verified end-to-end against a from-this-worktree dev
+server instance (the already-running `manage.py runserver` on port 8000
+turned out to be serving a *different* worktree's checkout — a reminder
+that a long-lived background dev server doesn't necessarily reflect the
+current worktree's uncommitted changes; spun up a throwaway instance on
+port 8001 instead) logged in as a full-access (President) user, switching
+through all three languages via `/i18n/setlang/` and confirming both the
+main dashboard grid and the Approval Rules new-rule form's department
+dropdown render the correct translated label for all 17 departments,
+including the 2 previously-fuzzy ones. `manage.py makemessages` does **not** ignore `venv/` by
 default (unlike `.gitignore`-based tools) — a bare `makemessages -l <code>`
 run against this repo will scan the whole venv's site-packages and pollute
 every `.po` file with hundreds of unrelated strings; always pass
